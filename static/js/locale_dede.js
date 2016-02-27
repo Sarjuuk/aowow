@@ -3155,7 +3155,7 @@ var LANG = {
     ct_dialog_reporttopic:    "Meldet das Thema von $1",
     ct_dialog_thanks:         "Eure Mitteilung wurde erhalten. Vielen Dank, dass Ihr uns kontaktiert habt!",
     ct_dialog_thanks_user:    "Eure Mitteilung wurde erhalten, $1. Vielen Dank, dass Ihr uns kontaktiert habt!",
-    ct_dialog_noemailwarning: "<b>Wichtig:</b> Wenn Ihr keine E-Mail-Adresse eingebt, können nicht weiter auf Eure Rückmeldungen eingehen. Wir werden Eure E-Mail-Adresse niemals verkaufen oder weitergeben.",
+    ct_dialog_noemailwarning: "<b>Wichtig:</b> Wenn Ihr keine E-Mail-Adresse eingebt, können wir nicht weiter auf Eure Rückmeldungen eingehen. Wir werden Eure E-Mail-Adresse niemals verkaufen oder weitergeben.",
 
     ct_dialog_error_captcha:    "Der CAPTCHA, den Ihr eingegeben habt, ist nicht gültig. Bitte versucht es erneut.",
     ct_dialog_error_desc:       "Bitte gebt eine genaue, nicht zu lange Beschreibung an.",

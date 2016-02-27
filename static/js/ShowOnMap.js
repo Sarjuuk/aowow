@@ -417,7 +417,7 @@ ShowOnMap.prototype.setLegend = function(info) {
             $WH.ae(sp, a);
         }
         else {
-            sp.innerText = info[i][0];
+            $WH.ae(sp, $WH.ct(info[i][0]));
         }
 
         $WH.ae(div, sp);

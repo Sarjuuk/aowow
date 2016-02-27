@@ -17,23 +17,24 @@ function emotes(/*array $ids = [] */)
     $allOK        = true;
     $locPath      = [];
 
+    DB::Aowow()->query('TRUNCATE ?_emotes_aliasses');
+
     foreach (CLISetup::$localeIds as $lId)
     {
-        DB::Aowow()->query('TRUNCATE ?_emotes_aliasses');
-
-        $path = sprintf($globStrPath, Util::$localeStrings[$lId].'/');
-        if (CLISetup::fileExists($path))
+        foreach (CLISetup::$expectedPaths as $xp => $locId)
         {
-            $locPath[$lId] = $path;
-            continue;
-        }
+            if ($lId != $locId)
+                continue;
 
-        // locale not found, try base mpqData
-        $path = sprintf($globStrPath, '');
-        if (CLISetup::fileExists($path))
-        {
-            $locPath[$lId] = $path;
-            continue;
+            if ($xp)                                        // if in subDir add trailing slash
+                $xp .= '/';
+
+            $path = sprintf($globStrPath, $xp);
+            if (CLISetup::fileExists($path))
+            {
+                $locPath[$lId] = $path;
+                continue 2;
+            }
         }
 
         CLISetup::log('GlobalStrings.lua not found for selected locale '.CLISetup::bold(Util::$localeStrings[$lId]), CLISetup::LOG_WARN);

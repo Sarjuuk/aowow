@@ -140,11 +140,11 @@ class User
                     $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
 
                 // check IPv4
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE))
                     break;
 
                 // check IPv6
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE))
                     break;
             }
         }
@@ -349,7 +349,7 @@ class User
     public static function verifyCrypt($pass, $hash = '')
     {
         $_ = $hash ?: self::$passHash;
-        return $_ == crypt($pass, $_);
+        return $_ === crypt($pass, $_);
     }
 
     // sha1 used by TC / MaNGOS
@@ -360,7 +360,7 @@ class User
 
     private static function verifySHA1($name, $pass)
     {
-        return self::$passHash == self::hashSHA1($name, $pass);
+        return strtoupper(self::$passHash) === strtoupper(self::hashSHA1($name, $pass));
     }
 
     public static function isValidName($name, &$errCode = 0)
@@ -369,7 +369,7 @@ class User
 
         if (mb_strlen($name) < 4 || mb_strlen($name) > 16)
             $errCode = 1;
-        else if (preg_match('/[^\w\d]/i', $name))
+        else if (preg_match('/[^\w\d\-]/i', $name))
             $errCode = 2;
 
         return $errCode == 0;
