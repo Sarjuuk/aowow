@@ -2841,7 +2841,7 @@ var Markup = {
             attr:
             {
                 unnamed: { req: false, valid: /\S+/ },
-                rel: { req: false, valid: /(item|quest|spell|achievement|npc|object)=([0-9]+)/ },
+                rel: { req: false, valid: /(item|quest|spell|achievement|event|npc|object|itemset|currency)=([0-9]+)/ },
                 onclick: { req: false, valid: /[\S ]+/ },
                 tooltip: { req: false, valid: /\S+/ },
                 tooltip2: { req: false, valid: /\S+/ }

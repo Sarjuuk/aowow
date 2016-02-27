@@ -41,7 +41,7 @@ var mn_dev = [
 //  [17, 'Cookies',                  '?admin=cookies',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
     [21, 'PHP Information',          '?admin=phpinfo',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
     [18, 'Site Configuration',       '?admin=siteconfig',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV}],
-//  [16, 'Weight Presets',           '?admin=weight-presets',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
+    [16, 'Weight Presets',           '?admin=weight-presets',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
 //  [22, 'API Keys',                 '?admin=apikey',                         null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
 
 //  [,   'Cache'],

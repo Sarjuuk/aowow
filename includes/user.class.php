@@ -521,31 +521,17 @@ class User
 
     public static function getWeightScales()
     {
-        $data = [];
+        $result = [];
 
-        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE userId = ?d', self::$id);
-        foreach ($res as $i)
-        {
-            $set = array (
-                'name' => $i['name'],
-                'id'   => $i['id']
-            );
+        $res = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, name FROM ?_account_weightscales WHERE userId = ?d', self::$id);
+        if (!$res)
+            return $result;
 
-            $weights = explode(',', $i['weights']);
-            foreach ($weights as $weight)
-            {
-                $w = explode(':', $weight);
+        $weights = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, `field` AS ARRAY_KEY2, val FROM ?_account_weightscale_data WHERE id IN (?a)', array_keys($res));
+        foreach ($weights as $id => $data)
+            $result[] = array_merge(['name' => $res[$id], 'id' => $id], $data);
 
-                if ($w[1] === 'undefined')
-                    $w[1] = 0;
-
-                $set[$w[0]] = $w[1];
-            }
-
-            $data[] = $set;
-        }
-
-        return $data;
+        return $result;
     }
 
     public static function getCharacters()
