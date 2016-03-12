@@ -301,7 +301,7 @@ $lang = array(
         'groups'        => array(
             -1 => "Keine",                  "Tester",                       "Administrator",                "Editor",                       "Moderator",                    "Bürokrat",
             "Entwickler",                   "VIP",                          "Blogger",                      "Premium",                      "Übersetzer",                   "Handelsvertreter",
-            "Screenshot-Verwalter",         "Video-Verwalter"
+            "Screenshot-Verwalter",         "Video-Verwalter",              "API-Partner",                  "Ausstehend"
         ),
         // signIn
         'doSignIn'      => "Mit Eurem AoWoW-Konto anmelden",
@@ -347,7 +347,7 @@ $lang = array(
         'accActivated'  => 'Euer Konto wurde soeben aktiviert.<br>Ihr könnt euch nun <a href="?account=signin&token=%s">anmelden</a>',
         'userNotFound'  => "Ein Konto mit diesem Namen existiert nicht.",
         'wrongPass'     => "Dieses Kennwort ist ungültig.",
-        'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
+        // 'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
         'loginExceeded' => "Die maximale Anzahl an Anmelde-Versuchen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
         'signupExceeded'=> "Die maximale Anzahl an Regustrierungen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
         'errNameLength' => "Euer Benutzername muss mindestens 4 Zeichen lang sein.", // message_usernamemin

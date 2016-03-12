@@ -10,7 +10,7 @@ class RacesPage extends GenericPage
 {
     use ListPage;
 
-    protected $type          = TYPE_CLASS;
+    protected $type          = TYPE_RACE;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 13];
     protected $tabId         = 0;

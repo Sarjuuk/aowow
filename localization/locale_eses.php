@@ -301,7 +301,7 @@ $lang = array(
         'groups'        => array(
             -1 => "Ninguno",                "Probador",                     "Administrador",                "Editor",                       "Moderador",                    "Burócrata",
             "Desarrollador",                "VIP",                          "Bloggor",                      "Premium",                      "Traductor",                    "Agente de ventas",
-            "Gestor de Capturas de pantalla","Gestor de vídeos"
+            "Gestor de Capturas de pantalla","Gestor de vídeos",            "Partner de API",               "Pendiente"
         ),
 
         // signIn
@@ -348,7 +348,7 @@ $lang = array(
         'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
         'userNotFound'  => "The username you entered does not exists.",
         'wrongPass'     => "That password is not vaild.",
-        'accInactive'   => "That account has not yet been confirmed active.",
+        // 'accInactive'   => "That account has not yet been confirmed active.",
         'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
         'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
         'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin

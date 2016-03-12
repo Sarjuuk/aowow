@@ -301,7 +301,7 @@ $lang = array(
         'groups'        => array(
             -1 => "None",                   "Testeur",                      "Administrateur",               "Éditeur",                      "Modérateur",                   "Bureaucrate",
             "Développeur",                  "VIP",                          "Bloggeur",                     "Premium",                      "Traducteur",                   "Agent de ventes",
-            "Gestionnaire de capture d'écran","Gestionnaire de vidéos"
+            "Gestionnaire de capture d'écran","Gestionnaire de vidéos"      "Partenaire API",               "En attente"
         ),
         // signIn
         'doSignIn'      => "Connexion à votre compte Aowow",
@@ -347,7 +347,7 @@ $lang = array(
         'accActivated'  => 'Votre compte a été activé.<br>Vous pouvez maintenant <a href="?account=signin&token=%s">vous connecter</a>',
         'userNotFound'  => "Le nom d'utilisateur que vous avez saisi n'éxiste pas.",
         'wrongPass'     => "Ce mot de passe est invalide.",
-        'accInactive'   => "Ce compte n'a pas encore été activé.",
+        // 'accInactive'   => "Ce compte n'a pas encore été activé.",
         'loginExceeded' => "Le nombre maximum de connections depuis cette IP a été dépassé. Essayez de nouevau dans %s.",
         'signupExceeded'=> "Le nombre maximum d'inscriptions depuis cette IP a été dépassé. Essayez de nouveau dans %s.",
         'errNameLength' => "Votre nom d'utilisateur doit faire au moins 4 caractères de long.", // message_usernamemin

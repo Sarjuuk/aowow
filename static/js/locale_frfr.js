@@ -2195,7 +2195,9 @@ var g_user_roles = {
     10: 'Traducteur',
     11: 'Agent de ventes',
     12: 'Gestionnaire de capture d\'écran',
-    13: 'Gestionnaire de vidéos'
+    13: 'Gestionnaire de vidéos',
+    14: 'artenaire API',
+    15: 'En attente'
 };
 
 var g_gem_colors = {
@@ -2305,8 +2307,11 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    linkremoved:     "lien enlevé",
+    linkremoved_tip: "Les nouveaux utilisateurs ne peuvent pas donner de liens vers<br />des sites web non-approuvés.",
+
     and:      " et ",
-    or:       " ou ",
+    or:       " ou ",                                       // custom
     comma:    ", ",
     ellipsis: "…",
     dash:     " – ",

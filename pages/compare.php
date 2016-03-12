@@ -43,6 +43,12 @@ class ComparePage extends GenericPage
         // add conditional js
         $this->addJS('?data=weight-presets.gems.enchants.itemsets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
+        $this->summary = array(
+            'template' => 'compare',
+            'id'       => 'compare',
+            'parent'   => 'compare-generic'
+        );
+
         if (!$this->compareString)
             return;
 
@@ -64,12 +70,8 @@ class ComparePage extends GenericPage
 
             $outSet[] = $outString;
         }
-        $this->summary = array(
-            'template' => 'compare',
-            'id'       => 'compare',
-            'parent'   => 'compare-generic',
-            'groups'   => $outSet
-        );
+
+        $this->summary['groups'] = $outSet;
 
         $iList = new ItemList(array(['i.id', $items]));
         $data  = $iList->getListviewData(ITEMINFO_SUBITEMS | ITEMINFO_JSON);

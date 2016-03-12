@@ -2252,7 +2252,9 @@ var g_user_roles = {
     10: 'Localizer',
     11: 'Sales agent',
     12: 'Screenshot manager',
-    13: 'Video manager'
+    13: 'Video manager',
+    14: 'API partner',
+    15: 'Pending'
 };
 
 var g_gem_colors = {
@@ -2362,6 +2364,9 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    linkremoved:     "link removed",
+    linkremoved_tip: "Newly registered users cannot<br />post links.",
+
     and:      " and ",
     or:       " or ",                                       // custom
     comma:    ", ",

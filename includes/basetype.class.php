@@ -572,13 +572,16 @@ trait spawnHelper
                         if ($p['wait'])
                             $label[] = Lang::npc('wait').Lang::main('colon').Util::formatTime($p['wait'], false);
 
-                        $set = ['label' => '$<br><span class="q0">'.implode('<br>', $label).'</span>', 'type'  => $wpIdx];
+                        $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
+                            'label' => "\0$<br><span class=\"q0\">".implode('<br>', $label).'</span>',
+                            'type'  => $wpIdx
+                        );
 
                         // connective line
                         if ($i > 0)
-                            $set['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
+                            $opts['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
 
-                        $data[$s['areaId']][$s['floor']]['coords'][] = [$p['posX'], $p['posY'], $set];
+                        $data[$s['areaId']][$s['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
                         if (empty($wpSum[$s['areaId']][$s['floor']]))
                             $wpSum[$s['areaId']][$s['floor']] = 1;
                         else
@@ -588,21 +591,21 @@ trait spawnHelper
                 }
             }
 
-            $label = [];
-
-            if (User::isInGroup(U_GROUP_STAFF))
-                $label[] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::main('colon').$s['guid'];
+            $opts   = $menu = $tt = $info = [];
+            $footer = '';
 
             if ($s['respawn'])
-                $label[] = Lang::npc('respawnIn').Lang::main('colon').Util::formatTime($s['respawn'] * 1000, false);
+                $info[1] = '<span class="q0">'.Lang::npc('respawnIn').Lang::main('colon').Util::formatTime($s['respawn'] * 1000, false).'</span>';
 
             if (User::isInGroup(U_GROUP_STAFF))
             {
+                $info[0] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::main('colon').$s['guid'];
+
                 if ($s['phaseMask'] > 1 && ($s['phaseMask'] & 0xFFFF) != 0xFFFF)
-                    $label[] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
+                    $info[2] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
 
                 if ($s['spawnMask'] == 15)
-                    $label[] = Lang::game('mode').Lang::main('colon').Lang::game('modes', -1);
+                    $info[3] = Lang::game('mode').Lang::main('colon').Lang::game('modes', -1);
                 else if ($s['spawnMask'])
                 {
                     $_ = [];
@@ -610,11 +613,25 @@ trait spawnHelper
                         if ($s['spawnMask'] & 1 << $i)
                             $_[] = Lang::game('modes', $i);
 
-                    $label[] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
+                    $info[4] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
                 }
+
+                $footer = '<span class="q2">Click to move to different floor</span>';
             }
 
-            $data[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], ['label' => '$<br><span class="q0">'.implode('<br>', $label).'</span>']];
+            if ($info)
+                $tt['info'] = $info;
+
+            if ($footer)
+                $tt['footer'] = $footer;
+
+            if ($tt)
+                $opts['tooltip'] = [$this->getField('name', true) => $tt];
+
+            if ($menu)
+                $opts['menu'] = $menu;
+
+            $data[$s['areaId']] [$s['floor']] ['coords'] [] = [$s['posX'], $s['posY'], $opts];
         }
         foreach ($data as $a => &$areas)
             foreach ($areas as $f => &$floor)

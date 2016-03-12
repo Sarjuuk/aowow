@@ -141,10 +141,8 @@ class AccountPage extends GenericPage
                 else if (!empty($_GET['token']) && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token'])))
                 {
                     $nStep = 2;
-                    DB::Aowow()->query('UPDATE ?_account SET status = ?d WHERE token = ?', ACC_STATUS_OK, $_GET['token']);
+                    DB::Aowow()->query('UPDATE ?_account SET status = ?d, statusTimer = 0, token = 0, userGroups = ?d WHERE token = ?', ACC_STATUS_OK, U_GROUP_NONE, $_GET['token']);
                     DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_ACC_FAILED_AUTH_COUNT, CFG_ACC_FAILED_AUTH_BLOCK);
-
-                    Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
                     $this->text = sprintf(Lang::account('accActivated'), $_GET['token']);
                 }
@@ -335,9 +333,10 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                     return Lang::main('intError');
 
                 // reset account status, update expiration
-                DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = 0, statusTimer = 0, token = "" WHERE user = ?',
+                DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = IF(status = ?d, status, 0), statusTimer = IF(status = ?d, statusTimer, 0), token = IF(status = ?d, token, "") WHERE user = ?',
                     User::$ip, User::$ip, User::$ip,
                     $this->_post['remember_me'] != 'yes',
+                    ACC_STATUS_NEW, ACC_STATUS_NEW, ACC_STATUS_NEW,
                     $this->_post['username']
                 );
 
@@ -355,9 +354,6 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             case AUTH_WRONGPASS:
                 User::destroy();
                 return Lang::account('wrongPass');
-            case AUTH_ACC_INACTIVE:
-                User::destroy();
-                return Lang::account('accInactive');
             case AUTH_IPBANNED:
                 User::destroy();
                 return sprintf(Lang::account('loginExceeded'), Util::formatTime(CFG_ACC_FAILED_AUTH_BLOCK * 1000));
@@ -404,7 +400,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
 
         // create..
         $token = Util::createHash();
-        $id = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, status, statusTimer, token) VALUES (?, ?, ?, ?,  UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
+        $ok = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, userGroups, status, statusTimer, token) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
             $this->_post['username'],
             User::hashCrypt($this->_post['password']),
             Util::ucFirst($this->_post['username']),
@@ -412,14 +408,18 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             User::$ip,
             $this->_post['remember_me'] != 'yes',
             User::$localeId,
+            U_GROUP_PENDING,
             ACC_STATUS_NEW,
             CFG_ACC_CREATE_SAVE_DECAY,
             $token
         );
-        if (!$id)                                           // something went wrong
+        if (!$ok)
             return Lang::main('intError');
         else if ($_ = $this->sendMail(Lang::mail('accConfirm', 0), sprintf(Lang::mail('accConfirm', 1), $token), CFG_ACC_CREATE_SAVE_DECAY))
         {
+            if ($id = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ?', $token))
+                Util::gainSiteReputation($id, SITEREP_ACTION_REGISTER);
+
             // success:: update ip-bans
             if (!$ip || $ip['unbanDate'] < time())
                 DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_ACC_FAILED_AUTH_BLOCK);
