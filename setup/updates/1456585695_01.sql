@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 -- create system account
 REPLACE INTO `aowow_account` (`id`, `user`, `displayName`) VALUES (0, '<system>', 'AoWoW');
 
@@ -343,3 +345,5 @@ ALTER TABLE `aowow_comments_rates`
 
 -- auto-create datasets/weight-presets
 UPDATE `aowow_dbversion` SET `build` = CONCAT(`build`, ' weightPresets');
+
+SET FOREIGN_KEY_CHECKS=1;
