@@ -412,6 +412,7 @@ $lang = array(
         'trap'          => "Piège",
         'triggeredBy'   => "Déclenché par",
         'capturePoint'  => "Point de capture",
+        'foundIn'       => "Cette entité se trouve dans",
         'restock'       => "Se remplit toutes les %s.]"
     ),
     'npc' => array(
@@ -434,6 +435,7 @@ $lang = array(
         'melee'         => "de mêlée",
         'ranged'        => "à distance",
         'armor'         => "Armure",
+        'foundIn'       => "Ce PNJ se trouve dans",
         'tameable'      => "Domptable (%s)",
         'waypoint'      => "Point de route",
         'wait'          => "Période d'attente",

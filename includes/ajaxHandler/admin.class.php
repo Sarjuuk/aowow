@@ -19,7 +19,7 @@ class AjaxAdmin extends AjaxHandler
     protected $_post       = array(
         'alt'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
         'id'     => [FILTER_SANITIZE_NUMBER_INT, null],
-        'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
+        'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkScale']],
         '__icon' => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']],
     );
 
@@ -237,7 +237,7 @@ class AjaxAdmin extends AjaxHandler
         }
 
         // flag as deleted if not aready
-        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $ids);
+        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $this->_get['id']);
 
         return '';
     }

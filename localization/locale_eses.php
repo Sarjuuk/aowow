@@ -413,6 +413,7 @@ $lang = array(
         'trap'          => "Trampa",
         'triggeredBy'   => "Accionado por",
         'capturePoint'  => "Punto de captura",
+        'foundIn'       => "Este entidad se puede encontrar en",
         'restock'       => "[Restocks every %s.]"
     ),
     'npc' => array(
@@ -435,6 +436,7 @@ $lang = array(
         'melee'         => "Cuerpo a cuerpo",
         'ranged'        => "Ataque a distancia",
         'armor'         => "Armadura",
+        'foundIn'       => "Este PNJ se puede encontrar en",
         'tameable'      => "Domesticable (%s)",
         'waypoint'      => "punto de recorrido",
         'wait'          => "Tiempo de espera",
