@@ -367,7 +367,21 @@ class User
     {
         $errCode = 0;
 
-        if (mb_strlen($name) < 4 || mb_strlen($name) > 16)
+        // different auth modes require different usernames
+        $min = 0;                                           // external case
+        $max = 0;
+        if (CFG_ACC_AUTH_MODE == AUTH_MODE_SELF)
+        {
+            $min = 4;
+            $max = 16;
+        }
+        else if (CFG_ACC_AUTH_MODE == AUTH_MODE_REALM)
+        {
+            $min = 3;
+            $max = 32;
+        }
+
+        if (($min && mb_strlen($name) < $min) || ($max && mb_strlen($name) > $max))
             $errCode = 1;
         else if (preg_match('/[^\w\d\-]/i', $name))
             $errCode = 2;
