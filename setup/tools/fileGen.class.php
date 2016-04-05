@@ -36,18 +36,19 @@ class FileGen
         'itemScaling'     => ['item-scaling',   'datasets/',                      []]
     );
     public static $datasets   = array(                      // name => [AowowDeps, TCDeps]
-        'realms'      => [null, ['realmlist']],
-        'statistics'  => [null, ['player_levelstats', 'player_classlevelstats']],
-        'simpleImg'   => [null, null],
-        'complexImg'  => [null, null],
-        'talentCalc'  => [null, null],
-        'pets'        => [['spawns', 'creature'], null],
-        'talentIcons' => [null, null],
-        'glyphs'      => [['items', 'spell'], null],
-        'itemsets'    => [['itemset', 'spell'], null],
-        'enchants'    => [['items', 'spell', 'itemenchantment'], null],
-        'gems'        => [['items', 'spell', 'itemenchantment'], null],
-        'profiler'    => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null]
+        'realms'        => [null, ['realmlist']],
+        'statistics'    => [null, ['player_levelstats', 'player_classlevelstats']],
+        'simpleImg'     => [null, null],
+        'complexImg'    => [null, null],
+        'talentCalc'    => [null, null],
+        'pets'          => [['spawns', 'creature'], null],
+        'talentIcons'   => [null, null],
+        'glyphs'        => [['items', 'spell'], null],
+        'itemsets'      => [['itemset', 'spell'], null],
+        'enchants'      => [['items', 'spell', 'itemenchantment'], null],
+        'gems'          => [['items', 'spell', 'itemenchantment'], null],
+        'profiler'      => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null],
+        'weightPresets' => [null, null]
     );
 
     public  static $defaultExecTime = 30;

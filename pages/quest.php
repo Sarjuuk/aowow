@@ -781,13 +781,13 @@ class QuestPage extends GenericPage
         // spellRewards
         $displ = $this->subject->getField('rewardSpell');
         $cast  = $this->subject->getField('rewardSpellCast');
-        if (!$cast && $displ)
+        if ($cast <= 0 && $displ > 0)
         {
             $cast  = $displ;
             $displ = 0;
         }
 
-        if ($cast || $displ)
+        if ($cast > 0 || $displ > 0)
         {
             $rewSpells = new SpellList(array(['id', [$displ, $cast]]));
             $this->extendGlobalData($rewSpells->getJSGlobals());

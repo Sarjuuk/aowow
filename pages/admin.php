@@ -20,7 +20,7 @@ class AdminPage extends GenericPage
         switch ($pageParam)
         {
             case 'screenshots':
-                $this->reqUGroup = U_GROUP_STAFF | U_GROUP_SCREENSHOT;
+                $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT;
                 $this->generator = 'handleScreenshots';
                 $this->tpl       = 'admin/screenshots';
 
@@ -38,10 +38,18 @@ class AdminPage extends GenericPage
             case 'siteconfig':
                 $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_DEV;
                 $this->generator = 'handleConfig';
-                $this->tpl       = 'list-page-generic';
+                $this->tpl       = 'admin/siteconfig';
 
                 array_push($this->path, 2, 18);
                 $this->name = 'Site Configuration';
+                break;
+            case 'weight-presets':
+                $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_DEV | U_GROUP_BUREAU;
+                $this->generator = 'handleWeightPresets';
+                $this->tpl       = 'admin/weight-presets';
+
+                array_push($this->path, 2, 16);
+                $this->name = 'Weight Presets';
                 break;
             default:                                        // error out through unset template
         }
@@ -68,275 +76,6 @@ class AdminPage extends GenericPage
             ['string' => '.grid .disabled { opacity:0.4 !important; }'],
             ['string' => '.grid .status { position:absolute; right:5px; }'],
         ));
-
-        // well .. fuck!
-        ob_start();
-?>
-<script type="text/javascript">
-    function createStatusIcon(errTxt)
-    {
-        function fadeout()
-        {
-            $(this).animate({ opacity: '0.0' }, 250, null, function() {
-                $WH.de(this);
-                $WH.Tooltip.hide()
-            });
-        }
-
-        var a = $WH.ce('a');
-        a.style.opacity = 0;
-        a.className = errTxt ? 'icon-report' : 'icon-tick';
-        g_addTooltip(a, errTxt || 'success', 'q');
-        a.onclick = fadeout.bind(a);
-        setTimeout(function () { $(a).animate({ opacity: '1.0' }, 250); }, 50);
-        setTimeout(fadeout.bind(a), 10000);
-
-        return a;
-    }
-
-    function cfg_add(el)
-    {
-        _self = el.parentNode.parentNode;
-
-        var tr = $WH.ce('tr');
-
-        tr.style.position = 'relative';
-
-        var td  = $WH.ce('td'),
-            key = $WH.ce('input');
-
-        key.type = 'text';
-        key.name = 'key';
-        $WH.ae(td, key);
-        $WH.ae(tr, td);
-
-        var td  = $WH.ce('td'),
-            val = $WH.ce('input');
-
-        val.type = 'text';
-        val.name = 'value';
-        $WH.ae(td, val);
-        $WH.ae(tr, td);
-
-        var td      = $WH.ce('td'),
-            aCancel = $WH.ce('a'),
-            aSubmit = $WH.ce('a'),
-            status  = $WH.ce('span');
-
-        aSubmit.className  = 'icon-save tip';
-        g_addTooltip(aSubmit, 'Submit Setting', 'q');
-
-        aCancel.className  = 'icon-delete tip';
-        g_addTooltip(aCancel, 'Cancel', 'q');
-
-        aSubmit.onclick = cfg_new.bind(aSubmit, key, val);
-        aCancel.onclick = function () {
-            $WH.Tooltip.hide();
-            $WH.de(this.parentNode.parentNode);
-        };
-
-        status.className = 'status';
-
-        $WH.ae(td, aSubmit);
-        $WH.ae(td, $WH.ct('|'));
-        $WH.ae(td, aCancel);
-        $WH.ae(td, status);
-        $WH.ae(tr, td);
-
-        _self.parentNode.insertBefore(tr, _self);
-        key.focus();
-    }
-
-    function cfg_new(elKey, elVal)
-    {
-        var
-            _td     = this.parentNode,
-            _row    = this.parentNode.parentNode,
-            _status = $(_td).find('.status')[0];
-
-        // already performing action
-        if (_status.lastChild && _status.lastChild.tagName == 'IMG')
-            return;
-        else if (_status.lastChild && _status.lastChild.tagName == 'A')
-            $WH.ee(_status);
-
-        if (!elKey.value || !elVal.value)
-        {
-            $WH.ae(_status, createStatusIcon('key or value are empty'));
-            return;
-        }
-
-        var
-            key   = elKey.value.toLowerCase().trim(),
-            value = elVal.value.trim();
-
-        $(_status).append(CreateAjaxLoader());
-
-        new Ajax('?admin=siteconfig&action=add&key=' + key + '&val=' + value, {
-            method: 'get',
-            onSuccess: function(xhr) {
-                $WH.ee(_status);
-
-                if (!xhr.responseText) {
-                    $WH.ee(_row);
-                    $(_row).append($('<td>' + key + '</td>')).append($('<td><input id="' + key + '" type="text" name="' + key + '" value="' + value + '" /></td>'));
-
-                    var
-                        td = $WH.ce('td'),
-                        a  = $WH.ce('a'),
-                        sp = $WH.ce('span');
-
-                    g_addTooltip(a, 'Save Changes', 'q');
-                    a.onclick = cfg_submit.bind(a, key);
-                    a.className = 'icon-save tip';
-                    $WH.ae(td, a);
-
-                    a  = $WH.ce('a');
-                    a.className = 'icon-refresh tip disabled';
-                    $WH.ae(td, $WH.ct('|'));
-                    $WH.ae(td, a);
-
-                    a  = $WH.ce('a');
-                    g_addTooltip(a, 'Remove Setting', 'q');
-                    a.onclick = cfg_remove.bind(a, key);
-                    a.className = 'icon-delete tip';
-                    $WH.ae(td, $WH.ct('|'));
-                    $WH.ae(td, a);
-
-                    sp.className = 'status';
-                    $WH.ae(sp, createStatusIcon());
-                    $WH.ae(td, sp);
-                    $WH.ae(_row, td);
-                }
-                else {
-                    $WH.ae(_status, createStatusIcon(xhr.responseText));
-                }
-
-            }
-        });
-    }
-
-    function cfg_submit(id)
-    {
-        var
-            node = $WH.ge(id),
-            _td  = this.parentNode,
-            _status = $(_td).find('.status')[0];
-
-        if (!node)
-            return;
-
-        var value = 0;
-
-        // already performing action
-        if (_status.lastChild && _status.lastChild.tagName == 'IMG')
-            return;
-        else if (_status.lastChild && _status.lastChild.tagName == 'A')
-            $WH.ee(_status);
-
-        if (node.tagName == 'DIV')
-        {
-            // bitmask
-            $(node).find('input[type="checkbox"]').each(function(idx, opt) {
-                if (opt.checked)
-                    value |= (1 << opt.value);
-            });
-
-            // boolean
-            $(node).find('input[type="radio"]').each(function(idx, opt) {
-                if (opt.checked)
-                    value = opt.value;
-            });
-        }
-        else if (node.tagName == 'SELECT')                  // opt-list
-        {
-            $(node).find('option').each(function(idx, opt) {
-                if (opt.selected)
-                    value = opt.value;
-            });
-        }
-        else if (node.tagName == 'INPUT')                   // string or numeric
-        {
-            if (node.value && node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1)
-                node.value = eval(node.value);
-
-            value = node.value;
-        }
-
-        value = value.toString().trim();
-
-        if (!value.length && (node.tagName != 'INPUT' || node.type != 'text'))
-        {
-            $WH.ae(_status, createStatusIcon('value is empty'));
-            return;
-        }
-
-        $(_status).append(CreateAjaxLoader());
-
-        new Ajax('?admin=siteconfig&action=update&key=' + id + '&val=' + value, {
-            method: 'get',
-            onSuccess: function(xhr) {
-                $WH.ee(_status);
-                $WH.ae(_status, createStatusIcon(xhr.responseText));
-            }
-        });
-    }
-
-    function cfg_default(id, val)
-    {
-        var node = $WH.ge(id);
-        if (!node)
-            return;
-
-        if (node.tagName == 'DIV')
-        {
-            // bitmask
-            $(node).find('input[type="checkbox"]').each(function(idx, opt) { opt.checked = !!(val & (1 << opt.value)); });
-
-            // boolean
-            $(node).find('input[type="radio"]').each(function(idx, opt) { opt.checked = !!opt.value == !!val; });
-        }
-        else if (node.tagName == 'SELECT')                  // opt-list
-            $(node).find('option').each(function(idx, opt) { opt.selected = opt.value == val; });
-        else if (node.tagName == 'INPUT')                   // string or numeric
-            node.value = node.type == 'text' ? val : eval(val);
-    }
-
-    function cfg_remove(id)
-    {
-        var
-            _td = this.parentNode,
-            _status = $(_td).find('.status')[0];
-
-        // already performing action
-        if (_status.lastChild && _status.lastChild.tagName == 'IMG')
-            return;
-        else if (_status.lastChild && _status.lastChild.tagName == 'A')
-            $WH.ee(_status);
-
-        if (!confirm('Confirm remove'))
-            return;
-
-        $(_status).append(CreateAjaxLoader());
-
-        new Ajax('?admin=siteconfig&action=remove&key=' + id, {
-            method: 'get',
-            onSuccess: function(xhr) {
-                if (!xhr.responseText)
-                    $WH.de(_td.parentNode);
-                else {
-                    $WH.ee(_status);
-                    $WH.ae(_status, createStatusIcon(xhr.responseText));
-                }
-
-            }
-        });
-    }
-</script>
-<?php
-        $this->extraHTML = ob_get_contents();
-        ob_end_clean();
-        // eof (end of fuckup)
 
         $head = '<table class="grid"><tr><th><b>Key</b></th><th><b>Value</b></th><th style="width:150px;"><b>Options</b></th></tr>';
         $mainTab = [];
@@ -477,6 +216,33 @@ class AdminPage extends GenericPage
         $this->ssPages  = $ssPages;
         $this->ssData   = $ssData;
         $this->ssNFound = $nMatches;                        // ssm_numPagesFound
+    }
+
+    private function handleWeightPresets()
+    {
+        $this->addCSS(['string' => '.wt-edit {display:inline-block; vertical-align:top; width:350px;}']);
+        $this->addJS('filters.js');
+
+        $head = $body = '';
+
+        $scales  = DB::Aowow()->select('SELECT class AS ARRAY_KEY, id AS ARRAY_KEY2, name, icon FROM ?_account_weightscales WHERE userId = 0');
+        $weights = DB::Aowow()->selectCol('SELECT awd.id AS ARRAY_KEY, awd.field AS ARRAY_KEY2, awd.val FROM ?_account_weightscale_data awd JOIN ?_account_weightscales ad ON awd.id = ad.id WHERE ad.userId = 0');
+        foreach ($scales as $cl => $data)
+        {
+            $ul = '';
+            foreach ($data as $id => $s)
+            {
+                $weights[$id]['__icon'] = $s['icon'];
+                $ul .= '[url=# onclick="loadScale.bind(this, '.$id.')();"]'.$s['name'].'[/url][br]';
+            }
+
+            $head .= '[td=header]'.Lang::game('cl', $cl).'[/td]';
+            $body .= '[td valign=top]'.$ul.'[/td]';
+        }
+
+        $this->extraText = '[table class=grid][tr]'.$head.'[/tr][tr]'.$body.'[/tr][/table]';
+
+        $this->extraHTML = '<script type="text/javascript">var wt_presets = '.Util::toJSON($weights).";</script>\n\n";
     }
 
     private function configAddRow($r)

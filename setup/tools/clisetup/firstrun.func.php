@@ -93,6 +93,7 @@ function firstrun()
         ['FileGen::generate', 'enchants',                 null, null, null],
         ['FileGen::generate', 'gems',                     null, null, null],
         ['FileGen::generate', 'profiler',                 null, null, null],
+        ['FileGen::generate', 'weightPresets',            null, null, null],
         // apply sql-updates from repository
         ['update',            null,                       null, null, null],
         ['account',           null,                       'testAcc',  'Please create your admin account.', 'There is no user with administrator priviledges in the DB.'],

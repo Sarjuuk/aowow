@@ -391,10 +391,11 @@ class ObjectPage extends GenericPage
                 }
 
                 $tabData = array(
-                    'data' => array_values($goLoot->getResult()),
-                    'id'   => 'contains',
-                    'name' => '$LANG.tab_contains',
-                    'sort' => ['-percent', 'name']
+                    'data'      => array_values($goLoot->getResult()),
+                    'id'        => 'contains',
+                    'name'      => '$LANG.tab_contains',
+                    'sort'      => ['-percent', 'name'],
+                    'extraCols' => ['$Listview.extraCols.percent']
                 );
 
                 if ($hiddenCols)

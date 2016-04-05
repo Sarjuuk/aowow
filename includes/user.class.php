@@ -367,7 +367,21 @@ class User
     {
         $errCode = 0;
 
-        if (mb_strlen($name) < 4 || mb_strlen($name) > 16)
+        // different auth modes require different usernames
+        $min = 0;                                           // external case
+        $max = 0;
+        if (CFG_ACC_AUTH_MODE == AUTH_MODE_SELF)
+        {
+            $min = 4;
+            $max = 16;
+        }
+        else if (CFG_ACC_AUTH_MODE == AUTH_MODE_REALM)
+        {
+            $min = 3;
+            $max = 32;
+        }
+
+        if (($min && mb_strlen($name) < $min) || ($max && mb_strlen($name) > $max))
             $errCode = 1;
         else if (preg_match('/[^\w\d\-]/i', $name))
             $errCode = 2;
@@ -521,31 +535,17 @@ class User
 
     public static function getWeightScales()
     {
-        $data = [];
+        $result = [];
 
-        $res = DB::Aowow()->select('SELECT * FROM ?_account_weightscales WHERE userId = ?d', self::$id);
-        foreach ($res as $i)
-        {
-            $set = array (
-                'name' => $i['name'],
-                'id'   => $i['id']
-            );
+        $res = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, name FROM ?_account_weightscales WHERE userId = ?d', self::$id);
+        if (!$res)
+            return $result;
 
-            $weights = explode(',', $i['weights']);
-            foreach ($weights as $weight)
-            {
-                $w = explode(':', $weight);
+        $weights = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, `field` AS ARRAY_KEY2, val FROM ?_account_weightscale_data WHERE id IN (?a)', array_keys($res));
+        foreach ($weights as $id => $data)
+            $result[] = array_merge(['name' => $res[$id], 'id' => $id], $data);
 
-                if ($w[1] === 'undefined')
-                    $w[1] = 0;
-
-                $set[$w[0]] = $w[1];
-            }
-
-            $data[] = $set;
-        }
-
-        return $data;
+        return $result;
     }
 
     public static function getCharacters()

@@ -14,13 +14,13 @@ if (isset($this->notFound)):
             <div class="pad3"></div>
 
             <div class="inputbox">
-                <h1><?php echo $this->notFound['title']; ?></h1>
-                <div id="inputbox-error"><?php echo $this->notFound['msg']; ?></div>
+                <h1><?=$this->notFound['title'];?></h1>
+                <div id="inputbox-error"><?=$this->notFound['msg'];?></div>
 <?php
 else:
 ?>
             <div class="text">
-                <h1><?php echo $this->name; ?></h1>
+                <h1><?=$this->name;?></h1>
 
 <?php
     $this->brick('article');
@@ -29,7 +29,7 @@ else:
 ?>
                 <div id="text-generic" class="left"></div>
                 <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml("<?php echo Util::jsEscape($this->extraText); ?>", "text-generic", {
+                    Markup.printHtml("<?=Util::jsEscape($this->extraText);?>", "text-generic", {
                         allow: Markup.CLASS_ADMIN,
                         dbpage: true
                     });

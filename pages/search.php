@@ -706,7 +706,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
             {
-                foreach ($talents->iterate() as $__)
+                foreach ($talents->iterate() as $id => $__)
                 {
                     $osInfo[3][$id] = strToLower($talents->getField('iconString'));
                     $osInfo[4][$id] = $talents->ranks[$talents->id];
@@ -752,7 +752,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($glyphs->iterate() as $__)
+                foreach ($glyphs->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($glyphs->getField('iconString'));
 
             if ($glyphs->getMatches() > $this->maxResults)
@@ -794,7 +794,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($prof->iterate() as $__)
+                foreach ($prof->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($prof->getField('iconString'));
 
             if ($prof->getMatches() > $this->maxResults)
@@ -836,7 +836,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($prof->iterate() as $__)
+                foreach ($prof->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($prof->getField('iconString'));
 
             if ($prof->getMatches() > $this->maxResults)
@@ -878,7 +878,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($vPets->iterate() as $__)
+                foreach ($vPets->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($vPets->getField('iconString'));
 
             if ($vPets->getMatches() > $this->maxResults)
@@ -919,7 +919,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($mounts->iterate() as $__)
+                foreach ($mounts->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($mounts->getField('iconString'));
 
             if ($mounts->getMatches() > $this->maxResults)
@@ -1027,7 +1027,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($acvs->iterate() as $__)
+                foreach ($acvs->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($acvs->getField('iconString'));
 
             if ($acvs->getMatches() > $this->maxResults)
@@ -1175,7 +1175,7 @@ class SearchPage extends GenericPage
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
                 foreach ($skills->iterate() as $id => $__)
-                    $osInf[3][$id] = $skills->getField('iconString');
+                    $osInfo[3][$id] = $skills->getField('iconString');
 
             if ($skills->getMatches() > $this->maxResults)
             {
@@ -1203,7 +1203,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($pets->iterate() as $__)
+                foreach ($pets->iterate() as $id => $__)
                     $osInfo[3][$id] = $pets->getField('iconString');
 
             if ($pets->getMatches() > $this->maxResults)
@@ -1241,7 +1241,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($npcAbilities->iterate() as $__)
+                foreach ($npcAbilities->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($npcAbilities->getField('iconString'));
 
             if ($npcAbilities->getMatches() > $this->maxResults)
@@ -1287,7 +1287,7 @@ class SearchPage extends GenericPage
             );
 
             if ($this->searchMask & SEARCH_TYPE_OPEN)
-                foreach ($misc->iterate() as $__)
+                foreach ($misc->iterate() as $id => $__)
                     $osInfo[3][$id] = strToLower($misc->getField('iconString'));
 
             if ($misc->getMatches() > $this->maxResults)

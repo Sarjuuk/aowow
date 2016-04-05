@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxAdmin extends AjaxHandler
 {
-    protected $validParams = ['screenshots', 'siteconfig'];
+    protected $validParams = ['screenshots', 'siteconfig', 'weight-presets'];
     protected $_get        = array(
         'action' => [FILTER_SANITIZE_STRING,     0xC],          // FILTER_FLAG_STRIP_LOW | *_HIGH
         'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkId']],
@@ -17,7 +17,10 @@ class AjaxAdmin extends AjaxHandler
         'val'    => [FILTER_UNSAFE_RAW,          null]
     );
     protected $_post       = array(
-        'alt' => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW],
+        'alt'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
+        'id'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkScale']],
+        '__icon' => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']],
     );
 
     public function __construct(array $params)
@@ -30,7 +33,7 @@ class AjaxAdmin extends AjaxHandler
 
         if ($this->params[0] == 'screenshots')
         {
-            if (!User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT))  // comment_mod, handleSSmod, vi_mod ?
+            if (!User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT))
                 return;
 
             if ($this->_get['action'] == 'list')
@@ -59,6 +62,14 @@ class AjaxAdmin extends AjaxHandler
                 $this->handler = 'confRemove';
             else if ($this->_get['action'] == 'update')
                 $this->handler = 'confUpdate';
+        }
+        else if ($this->params[0] == 'weight-presets')
+        {
+            if (!User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_BUREAU))
+                return;
+
+            if ($this->_get['action'] == 'save')
+                $this->handler = 'wtSave';
         }
     }
 
@@ -226,7 +237,7 @@ class AjaxAdmin extends AjaxHandler
         }
 
         // flag as deleted if not aready
-        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $ids);
+        DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $this->_get['id']);
 
         return '';
     }
@@ -304,6 +315,74 @@ class AjaxAdmin extends AjaxHandler
         return '';
     }
 
+    protected function wtSave()
+    {
+        if (!$this->_post['id'] || !$this->_post['__icon'])
+            return 3;
+
+        $writeFile = function($file, $content)
+        {
+            $success = false;
+            if ($handle = @fOpen($file, "w"))
+            {
+                if (fWrite($handle, $content))
+                    $success = true;
+
+                fClose($handle);
+            }
+            else
+                die('me no file');
+
+            if ($success)
+                @chmod($file, Util::FILE_ACCESS);
+
+            return $success;
+        };
+
+
+        // save to db
+
+        DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE id = ?d', $this->_post['id']);
+        DB::Aowow()->query('UPDATE ?_account_weightscales SET `icon`= ? WHERE `id` = ?d', $this->_post['__icon'], $this->_post['id']);
+
+        foreach (explode(',', $this->_post['scale']) as $s)
+        {
+            list($k, $v) = explode(':', $s);
+
+            if (!in_array($k, Util::$weightScales) || $v < 1)
+                continue;
+
+            if (DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $this->_post['id'], $k, $v) === null)
+                return 1;
+        }
+
+
+        // write dataset
+
+        $wtPresets = [];
+        $scales    = DB::Aowow()->select('SELECT id, name, icon, class FROM ?_account_weightscales WHERE userId = 0 ORDER BY class, id ASC');
+
+        foreach ($scales as $s)
+        {
+            $weights = DB::Aowow()->selectCol('SELECT field AS ARRAY_KEY, val FROM ?_account_weightscale_data WHERE id = ?d', $s['id']);
+            if (!$weights)
+                continue;
+
+            $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
+        }
+
+        $toFile = "var wt_presets = ".Util::toJSON($wtPresets).";";
+        $file   = 'datasets/weight-presets';
+
+        if (!$writeFile($file, $toFile))
+            return 2;
+
+
+        // all done
+
+        return 0;
+    }
+
     protected function checkId($val)
     {
         // expecting id-list
@@ -328,6 +407,14 @@ class AjaxAdmin extends AjaxHandler
 
         if (User::isValidName($n))
             return $n;
+
+        return null;
+    }
+
+    protected function checkScale($val)
+    {
+        if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
+            return $val;
 
         return null;
     }

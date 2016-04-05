@@ -125,11 +125,11 @@ class GenericPage
         'race'              => ['template' => 'race',              'id' => 'races',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_races'         ],
         'replypreview'      => ['template' => 'replypreview',      'id' => 'comment-replies', 'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_commentreplies'],
         'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_reputation'    ],
-        'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'parent' => 'lv-generic', 'data' => []                                      ],
+        'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_screenshots'   ],
         'skill'             => ['template' => 'skill',             'id' => 'skills',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_skills'        ],
         'spell'             => ['template' => 'spell',             'id' => 'spells',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_spells'        ],
         'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
-        'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [],                                     ],
+        'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_videos'        ],
         'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ]
     );
 
