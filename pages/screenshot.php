@@ -299,22 +299,18 @@ class ScreenshotPage extends GenericPage
             return Lang::main('intError');
         }
 
+        // check if file is an image; allow jpeg, png
+        $finfo = new finfo(FILEINFO_MIME);                  // fileInfo appends charset information and other nonsense
+        $mime  = $finfo->file($_FILES['screenshotfile']['tmp_name']);
+        if (preg_match('/^image\/(png|jpe?g)/i', $mime, $m))
+            $isPNG = $m[0] == 'image/png';
+        else
+            return Lang::screenshot('error', 'unkFormat');
+
         // invalid file
         $is = getimagesize($_FILES['screenshotfile']['tmp_name']);
-        if (!$is || empty($is['mime']))
+        if (!$is)
             return Lang::screenshot('error', 'selectSS');
-
-        // allow jpeg, png
-        switch ($is['mime'])
-        {
-            case 'image/png':
-                $isPNG = true;
-            case 'image/jpg':
-            case 'image/jpeg':
-                break;
-            default:
-                return Lang::screenshot('error', 'unkFormat');
-        }
 
         // size-missmatch: 4k UHD upper limit; 150px lower limit
         if ($is[0] < $this->minSize || $is[1] < $this->minSize)

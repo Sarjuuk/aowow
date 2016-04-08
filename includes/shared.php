@@ -4,7 +4,7 @@ define('AOWOW_REVISION', 19);
 define('CLI', PHP_SAPI === 'cli');
 
 
-$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring'];
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'];
 $error  = '';
 foreach ($reqExt as $r)
     if (!extension_loaded($r))
