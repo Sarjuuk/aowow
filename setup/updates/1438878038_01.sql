@@ -12,7 +12,7 @@ ALTER TABLE `aowow_home_featuredbox`
   CHANGE COLUMN `active` `active` tinyint(1) unsigned NOT NULL AFTER `editDate`,
   ADD CONSTRAINT `FK_acc_hFBox` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON UPDATE CASCADE ON DELETE SET NULL;
 
-RENAME TABLE `aowow_news_overlay` TO `aowow_home_featurebox_overlay`;
+RENAME TABLE `aowow_news_overlay` TO `aowow_home_featuredbox_overlay`;
 ALTER TABLE `aowow_home_featuredbox_overlay`
   ALTER `newsId` DROP DEFAULT;
 ALTER TABLE `aowow_home_featuredbox_overlay`
