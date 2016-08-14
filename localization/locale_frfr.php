@@ -301,7 +301,7 @@ $lang = array(
         'groups'        => array(
             -1 => "None",                   "Testeur",                      "Administrateur",               "Éditeur",                      "Modérateur",                   "Bureaucrate",
             "Développeur",                  "VIP",                          "Bloggeur",                     "Premium",                      "Traducteur",                   "Agent de ventes",
-            "Gestionnaire de capture d'écran","Gestionnaire de vidéos"      "Partenaire API",               "En attente"
+            "Gestionnaire de capture d'écran","Gestionnaire de vidéos",     "Partenaire API",               "En attente"
         ),
         // signIn
         'doSignIn'      => "Connexion à votre compte Aowow",

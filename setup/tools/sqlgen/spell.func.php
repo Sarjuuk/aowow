@@ -110,8 +110,10 @@ function spell()
             0 AS spellDifficulty
         FROM
             spell_dbc
+        WHERE
+            Id > ?d
         LIMIT
-            ?d, ?d';
+            ?d';
 
     $baseQuery = '
         SELECT
@@ -209,19 +211,23 @@ function spell()
             dbc_spellradius    sr2 ON s.effect2RadiusId = sr2.Id
         LEFT JOIN
             dbc_spellradius    sr3 ON s.effect3RadiusId = sr3.Id
+        WHERE
+            s.Id > ?d
         LIMIT
-            ?d, ?d';
+            ?d';
 
     $serverside = [];
 
     // merge serverside spells into dbc_spell (should not affect other scripts)
-    $offset = 0;
+    $lastMax = 0;
     CLISetup::log(' - merging serverside spells into spell.dbc');
-    while ($spells = DB::World()->select($ssQuery, $offset, SqlGen::$stepSize))
+    while ($spells = DB::World()->select($ssQuery, $lastMax, SqlGen::$stepSize))
     {
-        CLISetup::log(' * sets '.($offset + 1).' - '.($offset + count($spells)));
+        $newMax = max(array_column($spells, 'Id'));
 
-        $offset += SqlGen::$stepSize;
+        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+
+        $lastMax = $newMax;
 
         foreach ($spells as $id => $spell)
         {
@@ -231,13 +237,15 @@ function spell()
     }
 
     // merge everything into aowow_spell
-    $offset = 0;
+    $lastMax = 0;
     CLISetup::log(' - filling aowow_spell');
-    while ($spells = DB::Aowow()->select($baseQuery, $offset, SqlGen::$stepSize))
+    while ($spells = DB::Aowow()->select($baseQuery, $lastMax, SqlGen::$stepSize))
     {
-        CLISetup::log(' * sets '.($offset + 1).' - '.($offset + count($spells)));
+        $newMax = max(array_column($spells, 'Id'));
 
-        $offset += SqlGen::$stepSize;
+        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+
+        $lastMax = $newMax;
 
         foreach ($spells as $spell)
             DB::Aowow()->query('REPLACE INTO ?_spell VALUES (?a)', array_values($spell));

@@ -91,12 +91,13 @@ function creature(array $ids = [])
             creature_template_locale ctl8 ON ct.entry = ctl8.entry AND ctl8.`locale` = "ruRU"
         LEFT JOIN
             instance_encounters ie ON ie.creditEntry = ct.entry AND ie.creditType = 0
-        {
         WHERE
-            ct.entry IN (?a)
+            ct.entry > ?d
+        {
+            AND ct.entry IN (?a)
         }
         LIMIT
-           ?d, ?d';
+           ?d';
 
     $dummyQuery = '
         UPDATE
@@ -124,12 +125,14 @@ function creature(array $ids = [])
             c.modelId = cdi.modelId,
             c.iconString = cdi.iconString';
 
-    $offset = 0;
-    while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, $offset, SqlGen::$stepSize))
+    $lastMax = 0;
+    while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
-        CLISetup::log(' * sets '.($offset + 1).' - '.($offset + count($npcs)));
+        $newMax = max(array_column($npcs, 'entry'));
 
-        $offset += SqlGen::$stepSize;
+        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+
+        $lastMax = $newMax;
 
         foreach ($npcs as $npc)
             DB::Aowow()->query('REPLACE INTO ?_creature VALUES (?a)', array_values($npc));

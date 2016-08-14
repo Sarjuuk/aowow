@@ -75,14 +75,15 @@ function objects(array $ids = [])
             gameobject_template_locale gtl8 ON go.entry = gtl8.entry AND gtl8.`locale` = "ruRU"
         LEFT JOIN
             gameobject_questitem gqi ON gqi.GameObjectEntry = go.entry
-        {
         WHERE
-            go.entry IN (?a)
+            go.entry > ?d
+        {
+            AND go.entry IN (?a)
         }
         GROUP BY
             go.entry
         LIMIT
-            ?d, ?d';
+            ?d';
 
     $updateQuery = '
         UPDATE
@@ -100,12 +101,14 @@ function objects(array $ids = [])
             o.id IN (?a)
         }';
 
-    $offset = 0;
-    while ($objects = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, $offset, SqlGen::$stepSize))
+    $lastMax = 0;
+    while ($objects = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
-        CLISetup::log(' * sets '.($offset + 1).' - '.($offset + count($objects)));
+        $newMax = max(array_column($objects, 'entry'));
 
-        $offset += SqlGen::$stepSize;
+        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+
+        $lastMax = $newMax;
 
         foreach ($objects as $o)
             DB::Aowow()->query('REPLACE INTO ?_objects VALUES (?a)', array_values($o));
