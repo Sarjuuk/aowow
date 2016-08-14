@@ -87,8 +87,9 @@ class EventPage extends GenericPage
         /* Main Content */
         /****************/
 
-        if ($this->hId)
-            $this->extraText = Util::jsEscape($this->subject->getField('description', true));
+        // no entry in ?_articles? use default HolidayDescription
+        if ($this->hId && empty($this->article))
+            $this->article = ['text' => Util::jsEscape($this->subject->getField('description', true)), 'params' => []];
 
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(

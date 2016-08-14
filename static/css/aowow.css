@@ -150,6 +150,267 @@ h5 a.icontiny span { text-decoration:none !important; }
     overflow:auto;
 }
 
+.quote-blizz,.quote-wh
+{
+    clear:both;
+}
+
+.quote-blizz h1,.quote-wh h1,.quote-blizz h2,.quote-wh h2,.quote-blizz h3,.quote-wh h3,.quote-blizz h4,.quote-wh h4
+{
+    border:none;
+    line-height:1.2;
+    padding:0;
+}
+
+.quote-blizz h1,.quote-wh h1
+{
+    margin:25px 0 15px 0;
+    line-height:1;
+}
+
+.quote-blizz h2,.quote-wh h2
+{
+    margin:15px 0 10px 0;
+}
+
+.quote-blizz h3,.quote-wh h3
+{
+    margin:10px 0 7px 0;
+}
+
+.quote-blizz h4,.quote-wh h4
+{
+    margin:8px 0 5px 0;
+}
+
+.quote-blizz ul,.quote-blizz ol,.quote-wh ul,.quote-wh ol
+{
+    margin-top:10px;
+}
+
+.quote-header
+{
+    padding:15px 0 0 15px;
+    line-height:1;
+    position:relative;
+    font-size:13px;
+}
+
+.collapse .quote-body
+{
+    display:none;
+}
+
+.quote-header a
+{
+    font-size:10px;
+    text-decoration:none!important;
+}
+
+.quote-header h2,.quote-header h2 a
+{
+    background:none!important;
+    text-shadow:0 1px 1px #000;
+    color:#fff!important;
+    margin:15px 0 0 0;
+}
+
+.quote-header h2 a:hover
+{
+    color:#fff;
+}
+
+.quote-body
+{
+    padding:10px 15px 0 15px;
+    -moz-border-radius:0 0 10px 0;
+    -webkit-border-radius:0 0 10px 0;
+    border-radius:0 0 10px 0;
+}
+
+.quote-blizz
+{
+    background:#13181e url(../images/blog/bluepost-bg.png) left top no-repeat;
+    color:#00c0ff;
+}
+
+.quote-blizz .quote-header a
+{
+    color:#BEF;
+    font-size:13px;
+}
+
+.quote-blizz .quote-header a:hover
+{
+    color:#FFF;
+}
+
+.quote-blizz .quote-body a,.quote-blizz .quote-body .q1 a
+{
+    color:#bef;
+}
+
+.quote-blizz .quote-body a:hover,.quote-blizz quote-body .q1 a:hover
+{
+    color:#fff!important;
+}
+
+.quote-blizz .quote-body a b
+{
+    color:#bef!important;
+    text-decoration:none;
+}
+
+.quote-blizz .quote-body a:hover b
+{
+    color:#fff!important;
+}
+
+.quote-blizz .quote-body b a
+{
+    text-decoration:none;
+}
+
+.quote-blizz hr
+{
+    background:transparent;
+    border-top:1px dotted #333;
+    height:1px;
+    margin:5px 0 10px 0;
+}
+
+.quote-wh
+{
+    /* background:#1e1e1e url(../images/blog/whpost-bg.png) left top no-repeat; */
+    position:relative;
+    color:#ccc;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border-radius:10px;
+    border:solid 2px #bbb;
+    margin:15px;
+    clear:both;
+    min-height:24px;
+}
+
+.quote-wh .quote-header a
+{
+    color:#ffcd55;
+    text-shadow:0 -1px 0 #13181e;
+    background:url(../images/blog/wh-link.png) right center no-repeat;
+}
+
+.quote-wh .quote-header a:hover
+{
+    color:#fff;
+}
+
+.quote-wh .quote-body
+{
+    background:none;
+}
+
+.quote-wh .quote-body a
+{
+    color:#ffd100;
+}
+
+.quote-body .c3
+{
+    color:#AAD372!important;
+}
+
+.quote-body .c4
+{
+    color:#FFF468!important;
+}
+
+.quote-body .c5,.quote-body .q1
+{
+    color:#fff!important;
+}
+
+.quote-body .c8
+{
+    color:#68CCEF!important;
+}
+
+.quote-body h1,.quote-body h2,.quote-body h3,.quote-body h4,.quote-body h5
+{
+    color:#fff;
+}
+
+.quote-body li
+{
+    background:none!important;
+    list-style-type:disc;
+    padding-left:0!important;
+}
+
+div.secheader
+{
+    background-color:#1e1e1e;
+    color:#fff;
+    border:solid 2px #bbb;
+    border-width:2px 0;
+    margin:15px 0;
+    padding:5px 0 6px 8px;
+    clear:both;
+    -moz-box-shadow:0 1px 13px #000,0 0 3px #000 inset;
+    font-size:22px;
+}
+
+a.revealtoggle
+{
+    text-decoration:none;
+}
+
+.quote-header a.toggle,.quote-wh a.toggle
+{
+    position:absolute;
+    top:15px;
+    right:18px;
+    display:block;
+    width:51px;
+    height:11px;
+    line-height:11px;
+    color:#888!important;
+    background:transparent url(../images/blog/quote-toggle.png) no-repeat!important;
+    background-position:0 -11px!important;
+    padding:0 0 0 10px;
+    text-align:right;
+    text-decoration:none!important;
+}
+
+.quote-wh a.toggle
+{
+    top:12px;
+}
+
+.collapse .quote-header a.toggle,.collapse a.toggle
+{
+    color:#fff!important;
+    background-position:0 0!important;
+    width:46px;
+}
+
+.collapse .quote-header a.toggle
+{
+    right:15px;
+    top:auto;
+    bottom:0;
+}
+
+.collapse .quote-header
+{
+    padding-right:81px;
+}
+
+.quote-wh.collapse
+{
+    padding-top:18px;
+}
+
 /**************************************************************/
 /* CSS BELOW TO BE MOVED TO A PROPER LOCATION AND/OR REFACTOR */
 /**************************************************************/
@@ -2956,6 +3217,9 @@ td.screenshot-cell:hover img {
 .text .last {
     margin-bottom: 0 !important;
 }
+
+del.diffmod, del.diffdel { opacity: 0.40; filter: alpha(opacity=40); text-decoration: none; border-bottom: 1px dotted; }
+ins.diffmod, ins.diffins { color: #5DF644; text-decoration: none; border-bottom: 1px dotted; }
 
 /*
 Reusable UI elements/features
