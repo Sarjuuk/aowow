@@ -42,7 +42,7 @@ $lang = array(
         'cancel'        => "Cancelar",
         'rewards'       => "Recompensas",
         'gains'         => "Ganancias",
-        'login'         => "[Ingresar]",
+        'login'         => "Ingresar",
         'forum'         => "Foro",
         'n_a'           => "n/d",
         'siteRep'       => "Reputación",
@@ -68,10 +68,10 @@ $lang = array(
 
         // infobox
         'unavailable'   => "No está disponible a los jugadores",
-        'disabled'      => "[Deshabilitado]",
-        'disabledHint'  => "[No puede ser conseguido o completado]",
-        'serverside'    => "[Parte del Servidor]",
-        'serversideHint'=> "[Esta información no se encuentra en el Cliente y ha sido previsto mediante un analizador de paquetes (Sniffing) y/o suponiendo.]",
+        'disabled'      => "Deshabilitado",
+        'disabledHint'  => "No puede ser conseguido o completado",
+        'serverside'    => "Parte del Servidor",
+        'serversideHint'=> "Esta información no se encuentra en el Cliente y ha sido previsto mediante un analizador de paquetes (Sniffing) y/o suponiendo.",
 
         // red buttons
         'links'         => "Enlaces",
@@ -138,8 +138,8 @@ $lang = array(
         'dateFmtLong'   => "d/m/Y \a \l\a\s H:i",
 
         // error
-        'intError'      => "[Un error interno ha ocurrido.]",
-        'intError2'     => "[Un error interno ha ocurrido. (%s)]",
+        'intError'      => "Un error interno ha ocurrido.",
+        'intError2'     => "Un error interno ha ocurrido. (%s)",
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana.", # LANG.tooltip_too_many_votes
@@ -148,8 +148,8 @@ $lang = array(
         'submission'    => "Enviar una captura de pantalla",
         'selectAll'     => "Seleccionar todos",
         'cropHint'      => "Puede reducir su imagen e introducir una etiqueta.",
-        'displayOn'     => "[Mostrado en:[br]%s - [%s=%d]]",
-        'caption'       => "[Anotación]",
+        'displayOn'     => "Mostrado en:[br]%s - [%s=%d]",
+        'caption'       => "Anotación",
         'charLimit'     => "Opcional, hasta 200 caracteres",
         'thanks'        => array(
             'contrib' => "¡Muchísimas gracias por tu aportación!",
@@ -160,7 +160,7 @@ $lang = array(
             'unkFormat'   => "Formato de imagen desconocido.",
             'tooSmall'    => "Su captura de pantalla es muy pequeña. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
             'selectSS'    => "Por favor seleccione la captura de pantalla para subir.",
-            'notAllowed'  => "[¡No estás permitido para subir capturas de pantalla!]",
+            'notAllowed'  => "¡No estás permitido para subir capturas de pantalla!",
         )
     ),
     'game' => array(
@@ -359,7 +359,7 @@ $lang = array(
         'mailInUse'     => "El correo electrónico ya se encuentra registrado a una cuenta",
         'isRecovering'  => "Esta cuenta ya se encuentra en proceso de recuperación. Siga las intrucciones en su correo o espere %s para que el token expire ",
         'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a Su contraseña anterior." // message_newpassdifferent
+        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a su contraseña anterior." // message_newpassdifferent
     ),
     'user' => array(
         'notFound'      => "¡No se encontró el usuario \"%s\"!",
@@ -379,25 +379,25 @@ $lang = array(
     ),
     'mail' => array(
         'tokenExpires'  => "Este token expira en %s",
-        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
+        'accConfirm'    => "Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.",
+        'recoverUser'   => "Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.",
+        'resetPass'     => "Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."
     ),
     'emote' => array(
-        'notFound'      => "[Este emoticón no existe]",
-        'self'          => "[Para Usted]",
-        'target'        => "[Para otros con un objetivo]",
-        'noTarget'      => "[Para otros sin un objetivo]",
-        'isAnimated'    => "[Usa una animación]",
-        'aliases'       => "[Aliases]",
-        'noText'        => "[Este emoticón no tiene texto]",
+        'notFound'      => "Este emoticón no existe",
+        'self'          => "Para Usted",
+        'target'        => "Para otros con un objetivo",
+        'noTarget'      => "Para otros sin un objetivo",
+        'isAnimated'    => "Usa una animación",
+        'aliases'       => "Aliases",
+        'noText'        => "Este emoticón no tiene texto",
     ),
     'enchantment' => array(
         'details'       => "Detalles",
         'activation'    => "Activación",
         'notFound'      => "Este encantamiento no existe.",
         'types'         => array(
-            1 => "[Prob. Hechizo]",            3 => "[Equipar Hechizo]",           7 => "[Usar Hechizo]",             8 => "Ranura prismática",
+            1 => "Prob. Hechizo",            3 => "Equipar Hechizo",           7 => "Usar Hechizo",             8 => "Ranura prismática",
             5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
         )
     ),
@@ -406,15 +406,15 @@ $lang = array(
         'cat'           => [0 => "Otros", 9 => "Libros", 3 => "Contenedores", -5 => "Cofres", 25 => "Bancos de peces", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              9 => "Libro",  3 => "Contenedore",  -5 => "Cofre",  25 => "",                -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",
-        'npcLootPH'     => '[El <b>%s</b> contiene el botín de la pelea contra <a href="?npc=%d">%s</a>. Aparece al morir.]',
+        'npcLootPH'     => 'El <b>%s</b> contiene el botín de la pelea contra <a href="?npc=%d">%s</a>. Aparece al morir.',
         'key'           => "Llave",
-        'focus'         => "[Foco del hechizo]",
-        'focusDesc'     => "[El hechizo que requiere este foco no puede ser lanzado cerca del objeto]",
+        'focus'         => "Foco del hechizo",
+        'focusDesc'     => "El hechizo que requiere este foco no puede ser lanzado cerca del objeto",
         'trap'          => "Trampa",
         'triggeredBy'   => "Accionado por",
         'capturePoint'  => "Punto de captura",
         'foundIn'       => "Este entidad se puede encontrar en",
-        'restock'       => "[Se renueva cada %s.]"
+        'restock'       => "Se renueva cada %s."
     ),
     'npc' => array(
         'notFound'      => "Este PNJ no existe.",
@@ -423,10 +423,10 @@ $lang = array(
         'react'         => "Reacción",
         'worth'         => "Valor",
         'unkPosition'   => "No se conoce la ubicación de este PNJ.",
-        'difficultyPH'  => "[Este PNJ es un marcador de posición para un modo diferente de]",
-        'seat'          => "[Asiento]",
-        'accessory'     => "[Accesorio]",
-        'accessoryFor'  => "[Esta criatura es una accesorio para vehículo]",
+        'difficultyPH'  => "Este PNJ es un marcador de posición para un modo diferente de",
+        'seat'          => "Asiento",
+        'accessory'     => "Accesorio",
+        'accessoryFor'  => "Esta criatura es una accesorio para vehículo",
         'quotes'        => "Citas",
         'gainsDesc'     => "Tras acabar con este PNJ ganarás",
         'repWith'       => "reputación con",
@@ -530,7 +530,7 @@ $lang = array(
         'requirements'  => 'Requisitos',
         'reqMoney'      => 'Dinero necesario',
         'money'         => 'Dinero',
-        'additionalReq' => "[Requerimientos adicionales para obtener esta misión]",
+        'additionalReq' => "Requerimientos adicionales para obtener esta misión",
         'reqRepWith'    => 'Tu reputación con <a href="?faction=%d">%s</a> debe ser %s %s',
         'reqRepMin'     => "de al menos",
         'reqRepMax'     => "menor que",
@@ -763,12 +763,12 @@ $lang = array(
         'pctCostOf'     => "del %s base",
         'costPerSec'    => ", mas %s por segundo",
         'costPerLevel'  => ", mas %s por nivel",
-        'stackGroup'    => "[Stack Group]",
-        'linkedWith'    => "[Linked with]",
-        '_scaling'      => "[Scaling]",
+        'stackGroup'    => "Grupo de aplilamiento",
+        'linkedWith'    => "Asociado con",
+        '_scaling'      => "Escala",
         'scaling'       => array(
-            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
-            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
+            'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
+            'dotSP'    => "+%.2f%% del poder de hechizo por tick",                   'dotAP'    => "+%.2f%% del poder de ataque por tick"
         ),
         'powerRunes'    => ["Escarcha", "Profano", "Sangre", "Muerte"],
         'powerTypes'    => array(
@@ -934,9 +934,9 @@ $lang = array(
             "meta",                 "roja(s)",          "amarilla(s)",              "azul(es)"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => ["menos de %d %s gema", "menos de %d %s gemas"],
+            2 => "menos de %d %s gema", "menos de %d %s gemas",
             3 => "más gemas %s que gemas %s",
-            5 => ["al menos %d %s gema", "al menos %d %s gemas"]
+            5 => "al menos %d %s gema", "al menos %d %s gemas"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",
