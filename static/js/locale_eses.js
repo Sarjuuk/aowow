@@ -2400,7 +2400,7 @@ var LANG = {
     ok:                     "OK",
     original:               "Original",
     players:                "Jugadores",
-    previous:               "Anterior",
+    previous:               " Anterior",
     quality:                "Calidad",
     race:                   "Raza",
     races:                  "Razas",
