@@ -42,14 +42,14 @@ $lang = array(
         'cancel'        => "Cancelar",
         'rewards'       => "Recompensas",
         'gains'         => "Ganancias",
-        'login'         => "[Login]",
+        'login'         => "Ingresar",
         'forum'         => "Foro",
         'n_a'           => "n/d",
         'siteRep'       => "Reputación",
         'aboutUs'       => "Sobre Aowow",
         'and'           => " y ",
         'or'            => " o ",
-        'back'          => "Arrière",
+        'back'          => "Atrás",
         'reputationTip' => "Puntos de reputación",
         'byUserTimeAgo' => 'Por <a href="'.HOST_URL.'/?user=%s">%1$s</a> hace %s',
 
@@ -68,10 +68,10 @@ $lang = array(
 
         // infobox
         'unavailable'   => "No está disponible a los jugadores",
-        'disabled'      => "[Disabled]",
-        'disabledHint'  => "[Cannot be attained or completed]",
-        'serverside'    => "[Serverside]",
-        'serversideHint'=> "[These informations are not in the Client and have been provided by sniffing and/or guessing.]",
+        'disabled'      => "Deshabilitado",
+        'disabledHint'  => "No puede ser conseguido o completado",
+        'serverside'    => "Parte del Servidor",
+        'serversideHint'=> "Esta información no se encuentra en el Cliente y ha sido previsto mediante un analizador de paquetes (Sniffing) y/o suponiendo.",
 
         // red buttons
         'links'         => "Enlaces",
@@ -111,7 +111,7 @@ $lang = array(
         // profiler
         'realm'         => "Reino",
         'region'        => "Región",
-        'viewCharacter' => "View Character",
+        'viewCharacter' => "Mirar Personaje",
         '_cpHead'       => "Perfiles de Personaje",
         '_cpHint'       => "l <b>Gestor de perfiles</b> te permite editar tu personaje, encontrar mejoras de equipo, comprobar tu gearscore, ¡y más!",
         '_cpHelp'       => "Para comenzar, sigue los pasos abajo indicados. Si quieres más información, revisa nuestra amplia <a href=\"?help=profiler\">página de ayuda</a>.",
@@ -121,7 +121,7 @@ $lang = array(
         'help'          => "Ayuda",
         'helpTopics'    => array(
             "Los comentarios y tú",                 "Visualizador de modelos",              "Capturas de pantalla: Sugerencias y trucos", "Medición de atributos",
-            "Calculadora de talentos",              "Comparación de objetos",               "Perfiles",                                   "Markup Guide"
+            "Calculadora de talentos",              "Comparación de objetos",               "Perfiles",                                   "Margen de Guia"
         ),
 
         // search
@@ -138,8 +138,8 @@ $lang = array(
         'dateFmtLong'   => "d/m/Y \a \l\a\s H:i",
 
         // error
-        'intError'      => "[An internal error occured.]",
-        'intError2'     => "[An internal error occured. (%s)]",
+        'intError'      => "Un error interno ha ocurrido.",
+        'intError2'     => "Un error interno ha ocurrido. (%s)",
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana.", # LANG.tooltip_too_many_votes
@@ -148,8 +148,8 @@ $lang = array(
         'submission'    => "Enviar una captura de pantalla",
         'selectAll'     => "Seleccionar todos",
         'cropHint'      => "Puede reducir su imagen e introducir una etiqueta.",
-        'displayOn'     => "[Displayed on:[br]%s - [%s=%d]]",
-        'caption'       => "[Caption]",
+        'displayOn'     => "Mostrado en:[br]%s - [%s=%d]",
+        'caption'       => "Anotación",
         'charLimit'     => "Opcional, hasta 200 caracteres",
         'thanks'        => array(
             'contrib' => "¡Muchísimas gracias por tu aportación!",
@@ -160,7 +160,7 @@ $lang = array(
             'unkFormat'   => "Formato de imagen desconocido.",
             'tooSmall'    => "Su captura de pantalla es muy pequeña. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
             'selectSS'    => "Por favor seleccione la captura de pantalla para subir.",
-            'notAllowed'  => "[You are not allowed to upload screenshots!]",
+            'notAllowed'  => "¡No estás permitido para subir capturas de pantalla!",
         )
     ),
     'game' => array(
@@ -287,11 +287,11 @@ $lang = array(
             45 => "Can del Núcleo",         46 => "Bestia espíritu"
         ),
         'pvpRank'       => array(
-            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
-            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
-            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
+            null,                                                           "Soldado / Explorador",                                         "Cabo / Bruto",
+            "Sargento / Sargento",                                          "Sargento maestro / Sargento jefe",                             "Sargento mayor / Sargento primero",
+            "Caballero / Guardian de Piedra",                               "Teniente caballero / Guardia de sangre",                       "Capitán caballero / Legionario",
+            "Campeón caballero / Centurion",                                "Teniente coronel / Campeón",                                   "Comandante / Teniente general",
+            "Mariscal / General",                                           "Mariscal de campo / Señor de la Guerra",                       "Gran mariscal / Gran Señor de la Guerra"
         ),
     ),
     'account' => array(
@@ -318,48 +318,48 @@ $lang = array(
         // recovery
         'recoverUser'   => "Pedir nombre de usuario",
         'recoverPass'   => "Reiniciar contraseña: Paso %s de 2",
-        'newPass'       => "New Password",
+        'newPass'       => "Nueva Contraseña",
 
         // creation
         'register'      => "Inscripción: Paso %s de 2",
         'passConfirm'   => "Confirmar contraseña",
 
         // dashboard
-        'ipAddress'     => "IP-Adress",
-        'lastIP'        => "last used IP",
-        'myAccount'     => "My Account",
-        'editAccount'   => "Simply use the forms below to update your account information",
-        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+        'ipAddress'     => "Dirección IP",
+        'lastIP'        => "Última IP usada",
+        'myAccount'     => "Mi cuenta",
+        'editAccount'   => "Use el formulario siguienta para actualizar la información de la cuenta.",
+        'viewPubDesc'   => 'Mira tu descripción pública en tu <a href="?user=%s">Página de perfil</a>',
 
         // bans
-        'accBanned'     => "This Account was closed",
-        'bannedBy'      => "Banned by",
-        'ends'          => "Ends on",
-        'permanent'     => "The ban is permanent",
-        'reason'        => "Reason",
-        'noReason'      => "No reason was given.",
+        'accBanned'     => "Esta cuenta fue cerrada.",
+        'bannedBy'      => "Suspendida por",
+        'ends'          => "Finaliza en",
+        'permanent'     => "La restricción es permanente",
+        'reason'        => "Razón",
+        'noReason'      => "Ningúna razón fue escrita.",
 
         // form-text
         'emailInvalid'  => "Esa dirección de correo electrónico no es válida.", // message_emailnotvalid
-        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
-        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
-        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
-        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
-        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
-        'userNotFound'  => "The username you entered does not exists.",
-        'wrongPass'     => "That password is not vaild.",
+        'emailNotFound' => "El correo electrónico que ingresaste no está asociado con ninguna cuenta.<br><br>Si olvistaste el correo electronico con el que registraste la cuenta, escribe a ".CFG_CONTACT_EMAIL." para asistencia.",
+        'createAccSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para crear su cuenta.",
+        'recovUserSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para recuperar su nombre de usuario.",
+        'recovPassSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para reiniciar su contraseña.",
+        'accActivated'  => 'Su cuenta ha sido activada.<br>Ingrese a <a href="?account=signin&token=%s">para ingresar</a>',
+        'userNotFound'  => "El usuario que ha ingresado no existe",
+        'wrongPass'     => "La contraseña no es valida.",
         // 'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
-        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+        'loginExceeded' => "Ha excedido la cantidad de inicios de sesion con esta IP. Por favor intente en %s",
+        'signupExceeded'=> "Ha excedido la cantidad de creaciones de cuentas con esta IP. Por favor intente en %s.",
         'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin
         'errNameChars'  => "Tu nombre de usuario solo puede contener números y letras.", // message_usernamenotvalid
         'errPassLength' => "Tu contraseña tiene que tener por lo menos seis caracteres.", // message_passwordmin
-        'passMismatch'  => "The passwords you entered do not match.",
-        'nameInUse'     => "That username is already taken.",
-        'mailInUse'     => "That email is already registered to an account.",
-        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+        'passMismatch'  => "La contraseña que ingresó no concuerdan.",
+        'nameInUse'     => "El nombre de usuario ya se encuentra utilzado",
+        'mailInUse'     => "El correo electrónico ya se encuentra registrado a una cuenta",
+        'isRecovering'  => "Esta cuenta ya se encuentra en proceso de recuperación. Siga las intrucciones en su correo o espere %s para que el token expire ",
         'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a Su contraseña anterior." // message_newpassdifferent
+        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a su contraseña anterior." // message_newpassdifferent
     ),
     'user' => array(
         'notFound'      => "¡No se encontró el usuario \"%s\"!",
@@ -378,26 +378,26 @@ $lang = array(
         'posts'         => "Mensajes en los foros"
     ),
     'mail' => array(
-        'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+        'tokenExpires'  => "Este token expira en %s",
+        'accConfirm'    => "[Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
+        'recoverUser'   => "Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.",
+        'resetPass'     => "Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."
     ),
     'emote' => array(
-        'notFound'      => "[This Emote doesn't exist.]",
-        'self'          => "[To Yourself]",
-        'target'        => "[To others with a target]",
-        'noTarget'      => "[To others without a target]",
-        'isAnimated'    => "[Uses an animation]",
-        'aliases'       => "[Aliases]",
-        'noText'        => "[This Emote has no text.]",
+        'notFound'      => "Este emoticón no existe",
+        'self'          => "Para Usted",
+        'target'        => "Para otros con un objetivo",
+        'noTarget'      => "Para otros sin un objetivo",
+        'isAnimated'    => "Usa una animación",
+        'aliases'       => "Aliases",
+        'noText'        => "Este emoticón no tiene texto",
     ),
     'enchantment' => array(
         'details'       => "Detalles",
         'activation'    => "Activación",
         'notFound'      => "Este encantamiento no existe.",
         'types'         => array(
-            1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Ranura prismática",
+            1 => "Prob. Hechizo",            3 => "Equipar Hechizo",           7 => "Usar Hechizo",             8 => "Ranura prismática",
             5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
         )
     ),
@@ -406,15 +406,15 @@ $lang = array(
         'cat'           => [0 => "Otros", 9 => "Libros", 3 => "Contenedores", -5 => "Cofres", 25 => "Bancos de peces", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              9 => "Libro",  3 => "Contenedore",  -5 => "Cofre",  25 => "",                -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
         'unkPosition'   => "No se conoce la ubicación de esta entidad.",
-        'npcLootPH'     => '[The <b>%s</b> contains the loot from the fight against <a href="?npc=%d">%s</a>. It spawns after his death.]',
+        'npcLootPH'     => 'El <b>%s</b> contiene el botín de la pelea contra <a href="?npc=%d">%s</a>. Aparece al morir.',
         'key'           => "Llave",
-        'focus'         => "[Spell Focus]",
-        'focusDesc'     => "[Spells requiring this Focus can be cast near this Object]",
+        'focus'         => "Foco del hechizo",
+        'focusDesc'     => "El hechizo que requiere este foco no puede ser lanzado cerca del objeto",
         'trap'          => "Trampa",
         'triggeredBy'   => "Accionado por",
         'capturePoint'  => "Punto de captura",
         'foundIn'       => "Este entidad se puede encontrar en",
-        'restock'       => "[Restocks every %s.]"
+        'restock'       => "Se renueva cada %s."
     ),
     'npc' => array(
         'notFound'      => "Este PNJ no existe.",
@@ -423,10 +423,10 @@ $lang = array(
         'react'         => "Reacción",
         'worth'         => "Valor",
         'unkPosition'   => "No se conoce la ubicación de este PNJ.",
-        'difficultyPH'  => "[Este PNJ es un marcador de posición para un modo diferente de]",
-        'seat'          => "[Seat]",
-        'accessory'     => "[Accessory]",
-        'accessoryFor'  => "[This creature is an accessory for vehicle]",
+        'difficultyPH'  => "Este PNJ es un marcador de posición para un modo diferente de",
+        'seat'          => "Asiento",
+        'accessory'     => "Accesorio",
+        'accessoryFor'  => "Esta criatura es una accesorio para vehículo",
         'quotes'        => "Citas",
         'gainsDesc'     => "Tras acabar con este PNJ ganarás",
         'repWith'       => "reputación con",
@@ -442,7 +442,7 @@ $lang = array(
         'wait'          => "Tiempo de espera",
         'respawnIn'     => "Reingreso en",
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
-        'textRanges'    => [null, "[sent to area]", "[sent to zone]", "[sent to map]", "[sent to world]"],
+        'textRanges'    => [null, "[Mandar al área]", "[Mandar a zona]", "[Mandar al mapa]", "[Mandar al mundo]"],
         'textTypes'     => [null, "grita", "dice", "susurra"],
         'modes'         => array(
             1 => ["Normal", "Heroico"],
@@ -505,10 +505,10 @@ $lang = array(
         'attunement'    => ["Requisito", "Requisito heroica"],
         'key'           => ["Llave", "Llave heroica"],
         'location'      => "Ubicación",
-        'raidFaction'   => "[Raid faction]",
+        'raidFaction'   => "[Facción de la banda]",
         'boss'          => "Jefe Final",
         'reqLevels'     => "Niveles requeridos: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
-        'zonePartOf'    => "Cette zone fait partie de la zone [zone=%d].",
+        'zonePartOf'    => "Este campo es parte de la zona [zone=%d].",
         'autoRez'       => "Resurrección automática",
         'city'          => "Ciudad",
         'territory'     => "Territorio",
@@ -530,7 +530,7 @@ $lang = array(
         'requirements'  => 'Requisitos',
         'reqMoney'      => 'Dinero necesario',
         'money'         => 'Dinero',
-        'additionalReq' => "[Additional requirements to obtain this quest]",
+        'additionalReq' => "Requerimientos adicionales para obtener esta misión",
         'reqRepWith'    => 'Tu reputación con <a href="?faction=%d">%s</a> debe ser %s %s',
         'reqRepMin'     => "de al menos",
         'reqRepMax'     => "menor que",
@@ -579,7 +579,7 @@ $lang = array(
         'spellLearn'    => "Aprenderás",
         'bonusTalents'  => "puntos de talento",
         'spellDisplayed'=> ' (mostrando <a href="?spell=%d">%s</a>)',
-        'attachment'    => "[Attachment]",
+        'attachment'    => "[Adjunto]",
         'questInfo'     => array(
              0 => "Normal",              1 => "Élite",              21 => "Vida",               41 => "JcJ",                62 => "Banda",              81 => "Mazmorra",           82 => "Evento del mundo",
             83 => "Legendaria",         84 => "Escolta",            85 => "Heroica",            88 => "Banda (10)",         89 => "Banda (25)"
@@ -683,12 +683,12 @@ $lang = array(
     ),
     'faction' => array(
         'notFound'      => "Esta facción no existe.",
-        'spillover'     => "[Reputation Spillover]",
-        'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'spillover'     => "[Excedente de reputación]",
+        'spilloverDesc' => "[Ganar reputación con esta facción tambien una proporción ganada con las facciones listadas a continuación.]",
         'maxStanding'   => "Posición máxima",
         'quartermaster' => "Intendente",
-        'customRewRate' => "[Custom Reward Rate]",
-        '_transfer'     => '[The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.]',
+        'customRewRate' => "[Radio de recompenza personalizado]",
+        '_transfer'     => '[La reputación de esta facción sera convertida a <a href="?faction=%d" class="q1">%s</a> Si te transfieres a <span class="icon-%s">%s</span>.]',
         'cat'           => array(
             1118 => ["Clásicas", 469 => "Alianza", 169 => "Cártel Bonvapor", 67 => "Horda", 891 => "Fuerzas de la Alianza", 892 => "Fuerzas de la Horda"],
             980  => ["The Burning Crusade", 936 => "Ciudad de Shattrath"],
@@ -763,12 +763,12 @@ $lang = array(
         'pctCostOf'     => "del %s base",
         'costPerSec'    => ", mas %s por segundo",
         'costPerLevel'  => ", mas %s por nivel",
-        'stackGroup'    => "[Stack Group]",
-        'linkedWith'    => "[Linked with]",
-        '_scaling'      => "[Scaling]",
+        'stackGroup'    => "Grupo de aplilamiento",
+        'linkedWith'    => "Asociado con",
+        '_scaling'      => "Escala",
         'scaling'       => array(
-            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
-            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
+            'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
+            'dotSP'    => "+%.2f%% del poder de hechizo por tick",                   'dotAP'    => "+%.2f%% del poder de ataque por tick"
         ),
         'powerRunes'    => ["Escarcha", "Profano", "Sangre", "Muerte"],
         'powerTypes'    => array(
@@ -936,7 +936,7 @@ $lang = array(
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
             2 => ["menos de %d %s gema", "menos de %d %s gemas"],
             3 => "más gemas %s que gemas %s",
-            5 => ["al menos %d %s gema", "al menos %d %s gemas"]
+            5 => "al menos %d %s gema", "al menos %d %s gemas"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",
