@@ -379,9 +379,9 @@ $lang = array(
     ),
     'mail' => array(
         'tokenExpires'  => "Este token expira en %s",
-        'accConfirm'    => "[Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'recoverUser'   => "Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.",
-        'resetPass'     => "Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."
+        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.]",
+        'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
+        'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
     ),
     'emote' => array(
         'notFound'      => "Este emoticón no existe",
@@ -936,7 +936,7 @@ $lang = array(
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
             2 => ["menos de %d %s gema", "menos de %d %s gemas"],
             3 => "más gemas %s que gemas %s",
-            5 => "al menos %d %s gema", "al menos %d %s gemas"
+            5 => ["al menos %d %s gema", "al menos %d %s gemas"]
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",
