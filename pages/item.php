@@ -337,7 +337,7 @@ class ItemPage extends genericPage
                 if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
                 {
                     $next = $row['NextPageID'];
-                    $pageText = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+                    $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
                 }
                 else
                 {

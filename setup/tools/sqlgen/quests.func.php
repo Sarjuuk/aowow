@@ -101,12 +101,13 @@ function quests(array $ids = [])
             locales_quest lq ON q.ID = lq.Id
         LEFT JOIN
             game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
-        {
         WHERE
-            q.ID IN (?a)
+            q.Id > ?d
+        {
+            AND q.Id IN (?a)
         }
         LIMIT
-            ?d, ?d';
+            ?d';
 
     $xpQuery = '
         UPDATE
@@ -140,12 +141,14 @@ function quests(array $ids = [])
             }';
 
 
-    $offset = 0;
-    while ($quests = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, $offset, SqlGen::$stepSize))
+    $lastMax = 0;
+    while ($quests = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
-        CLISetup::log(' * sets '.($offset + 1).' - '.($offset + count($quests)));
+        $newMax = max(array_column($quests, 'Id'));
 
-        $offset += SqlGen::$stepSize;
+        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+
+        $lastMax = $newMax;
 
         foreach ($quests as $q)
             DB::Aowow()->query('REPLACE INTO ?_quests VALUES (?a)', array_values($q));

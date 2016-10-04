@@ -1147,7 +1147,7 @@ class SpellList extends BaseType
             if ($formula[$pos] == '$')
                 $pos++;
 
-            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([g])([\w\s]*:[\w\s]*);|([a-z])([123]?)\b)/i', substr($formula, $pos), $result))
+            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([lg])([^:]*:[^;]*);|([a-z])([123]?)\b)/i', substr($formula, $pos), $result))
             {
                 $str .= '#';                                // mark as done, reset below
                 continue;
@@ -1325,10 +1325,43 @@ class SpellList extends BaseType
         $data = $this->handleVariables($data, $scaling, true);
 
     // step 5: variable-dependant variable-text
-        // special case $lONE:ELSE;
-        // todo (low): russian uses THREE (wtf?! oO) cases ($l[singular]:[plural1]:[plural2]) .. explode() chooses always the first plural option :/
-        while (preg_match('/([\d\.]+)([^\d]*)(\$l:*)([^:]*):([^;]*);/i', $data, $m))
-            $data = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].($m[1] == 1 ? $m[4] : explode(':', $m[5])[0]), $data);
+        // special case $lONE:ELSE[:ELSE2]; or $|ONE:ELSE[:ELSE2];
+        while (preg_match('/([\d\.]+)([^\d]*)(\$[l|]:*)([^:]*):([^;]*);/i', $data, $m))
+        {
+            $plurals = explode(':', $m[5]);
+            $replace = '';
+
+            if (count($plurals) == 2)                       // special case: ruRU
+            {
+                switch (substr($m[1], -1))                  // check last digit of number
+                {
+                    case 1:
+                        // but not 11 (teen number)
+                        if (!in_array($m[1], [11]))
+                        {
+                            $replace = $m[4];
+                            break;
+                        }
+                    case 2:
+                    case 3:
+                    case 4:
+                        // but not 12, 13, 14 (teen number) [11 is passthrough]
+                        if (!in_array($m[1], [11, 12, 13, 14]))
+                        {
+                            $replace = $plurals[0];
+                            break;
+                        }
+                        break;
+                    default:
+                        $replace = $plurals[1];
+                }
+
+            }
+            else
+                $replace = ($m[1] == 1 ? $m[4] : $plurals[0]);
+
+            $data = str_ireplace($m[1].$m[2].$m[3].$m[4].':'.$m[5].';', $m[1].$m[2].$replace, $data);
+        }
 
     // step 6: HTMLize
         // colors
@@ -1408,8 +1441,8 @@ class SpellList extends BaseType
             if ($data[$pos] == '$')
                 $pos++;
 
-            //            ( (op) (oparg); )? (refSpell) ( ([g]ifText:elseText; | (var) (effIdx) )
-            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([g])([\w\s]*:[\w\s]*);|([a-z])([123]?)\b)/i', substr($data, $pos), $result))
+            //            ( (op) (oparg); )? (refSpell) ( ([lg]ifText:elseText; | (var) (effIdx) )
+            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([lg])([^:]*:[^;]*);|([a-z])([123]?)\b)/i', substr($data, $pos), $result))
             {
                 $str .= '#';                                // mark as done, reset below
                 continue;
@@ -1435,9 +1468,6 @@ class SpellList extends BaseType
                 $resolved .= Lang::game('valueDelim');
                 $resolved .= isset($var[3]) ? sprintf($var[3], $_) : $_;
             }
-
-            if ($var[0] === null && $topLevel)              // {Unknown}
-                $resolved .= '{'.Lang::game('sources', 0).'}';
 
             $str .= $resolved;
         }
