@@ -379,7 +379,7 @@ $lang = array(
     ),
     'mail' => array(
         'tokenExpires'  => "Este token expira en %s",
-        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo.]",
+        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
         'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
         'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
     ),
@@ -442,7 +442,7 @@ $lang = array(
         'wait'          => "Tiempo de espera",
         'respawnIn'     => "Reingreso en",
         'rank'          => [0 => "Normal", 1 => "Élite", 4 => "Raro", 2 => "Élite raro", 3 => "Jefe"],
-        'textRanges'    => [null, "[Mandar al área]", "[Mandar a zona]", "[Mandar al mapa]", "[Mandar al mundo]"],
+        'textRanges'    => [null, "Mandar al área", "Mandar a zona", "Mandar al mapa", "Mandar al mundo"],
         'textTypes'     => [null, "grita", "dice", "susurra"],
         'modes'         => array(
             1 => ["Normal", "Heroico"],
@@ -505,7 +505,7 @@ $lang = array(
         'attunement'    => ["Requisito", "Requisito heroica"],
         'key'           => ["Llave", "Llave heroica"],
         'location'      => "Ubicación",
-        'raidFaction'   => "[Facción de la banda]",
+        'raidFaction'   => "Facción de la banda",
         'boss'          => "Jefe Final",
         'reqLevels'     => "Niveles requeridos: [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
         'zonePartOf'    => "Este campo es parte de la zona [zone=%d].",
@@ -579,7 +579,7 @@ $lang = array(
         'spellLearn'    => "Aprenderás",
         'bonusTalents'  => "puntos de talento",
         'spellDisplayed'=> ' (mostrando <a href="?spell=%d">%s</a>)',
-        'attachment'    => "[Adjunto]",
+        'attachment'    => "Adjunto",
         'questInfo'     => array(
              0 => "Normal",              1 => "Élite",              21 => "Vida",               41 => "JcJ",                62 => "Banda",              81 => "Mazmorra",           82 => "Evento del mundo",
             83 => "Legendaria",         84 => "Escolta",            85 => "Heroica",            88 => "Banda (10)",         89 => "Banda (25)"
@@ -683,11 +683,11 @@ $lang = array(
     ),
     'faction' => array(
         'notFound'      => "Esta facción no existe.",
-        'spillover'     => "[Excedente de reputación]",
-        'spilloverDesc' => "[Ganar reputación con esta facción tambien una proporción ganada con las facciones listadas a continuación.]",
+        'spillover'     => "Excedente de reputación",
+        'spilloverDesc' => "Ganar reputación con esta facción tambien una proporción ganada con las facciones listadas a continuación.",
         'maxStanding'   => "Posición máxima",
         'quartermaster' => "Intendente",
-        'customRewRate' => "[Radio de recompenza personalizado]",
+        'customRewRate' => "Radio de recompenza personalizado",
         '_transfer'     => '[La reputación de esta facción sera convertida a <a href="?faction=%d" class="q1">%s</a> Si te transfieres a <span class="icon-%s">%s</span>.]',
         'cat'           => array(
             1118 => ["Clásicas", 469 => "Alianza", 169 => "Cártel Bonvapor", 67 => "Horda", 891 => "Fuerzas de la Alianza", 892 => "Fuerzas de la Horda"],
