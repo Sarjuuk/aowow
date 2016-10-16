@@ -55,14 +55,14 @@ class ItemPage extends genericPage
             // allow lookup by name for xml
             if (!is_numeric($param))
                 $conditions = [['name_loc'.User::$localeId, utf8_encode(urldecode($param))]];
+
+            if (!is_numeric($param))
+                $this->typeId = $this->subject->id;
         }
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
             $this->notFound();
-
-        if (!is_numeric($param))
-            $this->typeId = $this->subject->id;
 
         $this->name = $this->subject->getField('name', true);
 
@@ -979,7 +979,7 @@ class ItemPage extends genericPage
         {
             // item root
             $xml = $root->addChild('item');
-            $xml->addAttribute('id', $this->subject->id);
+            $xml->addAttribute('id', $this->typeId);
 
             // name
             $xml->addChild('name')->addCData($this->subject->getField('name', true));
@@ -1003,22 +1003,31 @@ class ItemPage extends genericPage
             $this->subject->extendJsonStats();
 
             // json
-            $fields = ['classs', 'displayid', 'dps', 'id', 'level', 'name', 'reqlevel', 'slot', 'slotbak', 'source', 'sourcemore', 'speed', 'subclass'];
+            $fields = ['classs', 'displayid', 'dps', 'id', 'level', 'name', 'reqlevel', 'slot', 'slotbak', 'speed', 'subclass'];
             $json   = [];
             foreach ($fields as $f)
             {
-                if (isset($this->subject->json[$this->subject->id][$f]))
+                if (isset($this->subject->json[$this->typeId][$f]))
                 {
-                    $_ = $this->subject->json[$this->subject->id][$f];
+                    $_ = $this->subject->json[$this->typeId][$f];
                     if ($f == 'name')
                         $_ = (7 - $this->subject->getField('quality')).$_;
 
                     $json[$f] = $_;
                 }
             }
+
+            // itemsource
+            if ($this->subject->getSources($s, $m))
+            {
+                $json['source'] = $s;
+                if ($m)
+                    $json['sourcemore'] = $m;
+            }
+
             $xml->addChild('json')->addCData(substr(json_encode($json), 1, -1));
 
-            // jsonEquip missing: avgbuyout, cooldown, source, sourcemore
+            // jsonEquip missing: avgbuyout
             $json = [];
             if ($_ = $this->subject->getField('sellPrice'))          // sellprice
                 $json['sellprice'] = $_;
@@ -1032,10 +1041,13 @@ class ItemPage extends genericPage
             if ($_ = $this->subject->getField('requiredSkillRank'))  // reqskillrank
                 $json['reqskillrank'] = $_;
 
-            foreach ($this->subject->itemMods[$this->subject->id] as $mod => $qty)
+            if ($_ = $this->subject->getField('cooldown'))           // cooldown
+                $json['cooldown'] = $_ / 1000;
+
+            foreach ($this->subject->itemMods[$this->typeId] as $mod => $qty)
                 $json[$mod] = $qty;
 
-            foreach ($this->subject->json[$this->subject->id] as $name => $qty)
+            foreach ($this->subject->json[$this->typeId] as $name => $qty)
                 if (in_array($name, Util::$itemFilter))
                     $json[$name] = $qty;
 
@@ -1054,9 +1066,9 @@ class ItemPage extends genericPage
             // reagents
             $cnd = array(
                 'OR',
-                ['AND', ['effect1CreateItemId', $this->subject->id], ['OR', ['effect1Id', SpellList::$effects['itemCreate']], ['effect1AuraId', SpellList::$auras['itemCreate']]]],
-                ['AND', ['effect2CreateItemId', $this->subject->id], ['OR', ['effect2Id', SpellList::$effects['itemCreate']], ['effect2AuraId', SpellList::$auras['itemCreate']]]],
-                ['AND', ['effect3CreateItemId', $this->subject->id], ['OR', ['effect3Id', SpellList::$effects['itemCreate']], ['effect3AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect1CreateItemId', $this->typeId], ['OR', ['effect1Id', SpellList::$effects['itemCreate']], ['effect1AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect2CreateItemId', $this->typeId], ['OR', ['effect2Id', SpellList::$effects['itemCreate']], ['effect2AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect3CreateItemId', $this->typeId], ['OR', ['effect3Id', SpellList::$effects['itemCreate']], ['effect3AuraId', SpellList::$auras['itemCreate']]]],
             );
 
             $spellSource = new SpellList($cnd);
@@ -1068,7 +1080,7 @@ class ItemPage extends genericPage
                 {
                     foreach ($spellSource->canCreateItem() as $idx)
                     {
-                        if ($spellSource->getField('effect'.$idx.'CreateItemId') != $this->subject->id)
+                        if ($spellSource->getField('effect'.$idx.'CreateItemId') != $this->typeId)
                             continue;
 
                         $splNode = $cbNode->addChild('spell');

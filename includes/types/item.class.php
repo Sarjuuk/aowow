@@ -59,9 +59,6 @@ class ItemList extends BaseType
                 $_ = 0;
 
             // sources
-            if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
-                $this->sourceMore[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
-
             for ($i = 1; $i < 25; $i++)
             {
                 if ($_ = $_curTpl['src'.$i])
@@ -69,6 +66,9 @@ class ItemList extends BaseType
 
                 unset($_curTpl['src'.$i]);
             }
+
+            if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
+                $this->sourceMore[$_curTpl['moreType']] = (new Util::$typeClasses[$_curTpl['moreType']](array(['id', $_curTpl['moreTypeId']], CFG_SQL_LIMIT_NONE)))->getSourceData();
         }
     }
 
@@ -257,11 +257,6 @@ class ItemList extends BaseType
         if ($addInfoMask & ITEMINFO_JSON)
             $this->extendJsonStats();
 
-        // gather sourceMore data
-        if (!($addInfoMask & ITEMINFO_MODEL))               // probably others too
-            foreach ($this->sourceMore as $type => $ids)
-                $this->sourceMore[$type] = (new Util::$typeClasses[$type](array(['id', $ids], CFG_SQL_LIMIT_NONE)))->getSourceData();
-
         foreach ($this->iterate() as $__)
         {
             foreach ($this->json[$this->id] as $k => $v)
@@ -382,13 +377,11 @@ class ItemList extends BaseType
                 if ($_ = $this->getField('displayId'))
                     $data[$this->id]['displayid'] = $_;
 
-            if (!empty($this->sources[$this->id]))
+            if ($this->getSources($s, $sm) && !($addInfoMask & ITEMINFO_MODEL))
             {
-                $data[$this->id]['source'] = array_keys($this->sources[$this->id]);
-                if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
-                    $data[$this->id]['sourcemore'] = [$this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]];
-                else if (!empty($this->sources[$this->id][3]))
-                    $data[$this->id]['sourcemore'] = [['p' => $this->sources[$this->id][3][0]]];
+                $data[$this->id]['source'] = $s;
+                if ($sm)
+                    $data[$this->id]['sourcemore'] = $sm;
             }
 
             if (!empty($this->curTpl['cooldown']))
@@ -1309,6 +1302,20 @@ class ItemList extends BaseType
             return 0;
 
         return round(($dps - 54.8) * 14, 0);
+    }
+
+    public function getSources(&$s, &$sm)
+    {
+        if (empty($this->sources[$this->id]))
+            return false;
+
+        $s = array_keys($this->sources[$this->id]);
+        if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
+            $sm = [$this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]];
+        else if (!empty($this->sources[$this->id][3]))
+            $sm = [['p' => $this->sources[$this->id][3][0]]];
+
+        return true;
     }
 
     private function parseRating($type, $value, $interactive = false, &$scaling = false)
