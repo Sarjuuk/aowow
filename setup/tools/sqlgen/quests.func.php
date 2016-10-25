@@ -144,7 +144,7 @@ function quests(array $ids = [])
     $lastMax = 0;
     while ($quests = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
-        $newMax = max(array_column($quests, 'Id'));
+        $newMax = max(array_column($quests, 'ID'));
 
         CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
 
