@@ -332,6 +332,7 @@ class Lang
             LOCALE_EN => [',', '.'],
             LOCALE_FR => [' ', ','],
             LOCALE_DE => ['.', ','],
+            LOCALE_CN => [',', '.'],
             LOCALE_ES => ['.', ','],
             LOCALE_RU => [' ', ',']
         );

@@ -56,7 +56,7 @@ function taxi()                                             // path & nodes
             0 AS typeId,
             1 AS reactA,
             1 AS reactH,
-            tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc6, tn.name_loc8,
+            tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc4, tn.name_loc6, tn.name_loc8,
             tn.mapId AS origMap,
             tn.posX AS origPosX,
             tn.posY AS origPosY
@@ -87,7 +87,7 @@ function taxi()                                             // path & nodes
             0 AS typeId,
             1 AS reactA,
             1 AS reactH,
-            tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc6, tn.name_loc8,
+            tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc4, tn.name_loc6, tn.name_loc8,
             tn.mapId AS origMap,
             tn.posX AS origPosX,
             tn.posY AS origPosY

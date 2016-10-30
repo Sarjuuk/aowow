@@ -32,6 +32,12 @@ if (!CLI)
                          "            domain: 'de',\r\n" .
                          "            description: 'Deutsch'\r\n" .
                          "        }",
+            LOCALE_CN => "        4:{ // Chinese\r\n" .
+                         "            id: LOCALE_ZHCN,\r\n" .
+                         "            name: 'zhcn',\r\n" .
+                         "            domain: 'cn',\r\n" .
+                         "            description: String.fromCharCode(31616, 20307, 20013, 25991)\r\n" .
+                         "        }",
             LOCALE_ES => "        6: { // Spanish\r\n" .
                          "            id: LOCALE_ESES,\r\n" .
                          "            name: 'eses',\r\n" .

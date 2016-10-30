@@ -32,7 +32,7 @@ function pet(array $ids = [])
             petTalentType,
             0,                                              -- exotic
             0,                                              -- expansion
-            name_loc0, name_loc2, name_loc3, name_lo6, name_loc8,
+            name_loc0, name_loc2, name_loc3, name_loc4, name_lo6, name_loc8,
             LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)),
             skillLine1,
             0, 0, 0, 0,                                     -- spell[1-4]
