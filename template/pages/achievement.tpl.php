@@ -51,7 +51,18 @@ foreach ($this->criteria['data'] as $i => $cr):
         echo ' '.$cr['extraText'];
     endif;
 
-    echo '</span></td></tr>';
+    echo '</span>';
+
+    if (!empty($cr['extraData'])):
+        $buff = [];
+        foreach ($cr['extraData'] as $xd):
+            $buff[] = $xd[0] ? '<a href="'.$xd[0].'">'.$xd[1].'</a>' : '<span>'.$xd[1].'</span>';
+        endforeach;
+
+        echo '<br /><sup style="margin-left:8px;">('.implode(', ', $buff).')</sup>';
+    endif;
+
+    echo '</td></tr>';
 
     // every odd number of elements
     if ($i + 1 == round(count($this->criteria['data']) / 2)):

@@ -621,10 +621,10 @@ class NpcPage extends GenericPage
                 );
 
                 if (!empty($sf['note']))
-                    $lootTab['note'] = $sf['note'];
+                    $tabData['note'] = $sf['note'];
 
                 if ($sf[4])
-                    $lootTab['hiddenCols'] = $sf[4];
+                    $tabData['hiddenCols'] = $sf[4];
 
                 $this->lvTabs[] = ['item', $tabData];
             }
