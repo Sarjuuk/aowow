@@ -90,6 +90,7 @@ if (typeof $WowheadPower == "undefined") {
                 0: "enus",
                 2: "frfr",
                 3: "dede",
+                4: "zhcn",
                 6: "eses",
                 8: "ruru"
             },
@@ -353,12 +354,12 @@ if (typeof $WowheadPower == "undefined") {
                 locale = $WH.g_getLocaleFromDomain(domain);
 
                 /* edit start */
-                if ($WH.in_array(['fr', 'de', 'es', 'ru', 'en'], domain) == -1) {
+                if ($WH.in_array(['fr', 'de', 'cn', 'es', 'ru', 'en'], domain) == -1) {
                     for (i in document.scripts) {
                         if (!document.scripts[i].src)
                             continue;
 
-                        var dmn = document.scripts[i].src.match(/widgets\/power.js\?(lang|locale)=(en|fr|de|es|ru)/i);
+                        var dmn = document.scripts[i].src.match(/widgets\/power.js\?(lang|locale)=(en|fr|de|cn|es|ru)/i);
                         if (dmn) {
                             domain = dmn[2];
                             locale = $WH.g_getLocaleFromDomain(dmn[2]);
