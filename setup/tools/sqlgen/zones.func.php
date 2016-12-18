@@ -84,6 +84,7 @@ function zones()
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc0, m.name_loc0),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc2, m.name_loc2),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc3, m.name_loc3),
+                IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc4, m.name_loc4),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc6, m.name_loc6),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc8, m.name_loc8)
             FROM

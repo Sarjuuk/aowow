@@ -39,6 +39,7 @@ class CLISetup
         ''     => LOCALE_EN,    'enGB' => LOCALE_EN,    'enUS' => LOCALE_EN,
         'frFR' => LOCALE_FR,
         'deDE' => LOCALE_DE,
+        'zhCN' => LOCALE_CN,    'enCN' => LOCALE_CN,
         'esES' => LOCALE_ES,    'esMX' => LOCALE_ES,
         'ruRU' => LOCALE_RU
     );
