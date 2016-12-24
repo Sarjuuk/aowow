@@ -13132,6 +13132,7 @@ Listview.templates = {
             container.append($WH.sprintf('<a href="?user=$1">$2</a>', comment.user, comment.user));
             container.append(g_getReputationPlusAchievementText(user.gold, user.silver, user.copper, user.reputation));
             container.append($WH.sprintf(' <a class="q0" id="comments:id=$1" href="#comments:id=$2">$3</a>', comment.id, comment.id, g_formatDate(null, elapsed, postedOn)));
+            container.append(' ');
             container.append($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(postedOn)));
         },
 

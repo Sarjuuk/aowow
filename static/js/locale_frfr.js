@@ -2326,7 +2326,7 @@ var LANG = {
     date_ago:    "il y a $1",
     date_at:     " à ",
     date_to:     " à ",
-    date_simple: "$3-$2-$1",
+    date_simple: "$1-$2-$3",
     unknowndate_stc: "Date inconnue",
     date_months: ["janvier", "février", "mars", "Avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
     date_days:   ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
