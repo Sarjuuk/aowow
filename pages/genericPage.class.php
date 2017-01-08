@@ -433,6 +433,7 @@ class GenericPage
         if (isset($this->tabId))
             $this->pageTemplate['activeTab'] = $this->tabId;
 
+        header("HTTP/1.0 404 Not Found", true, 404);
         $this->display('text-page-generic');
         exit();
     }
@@ -450,6 +451,7 @@ class GenericPage
 
         Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 
+        header("HTTP/1.0 404 Not Found", true, 404);
         $this->display('text-page-generic');
         exit();
     }
