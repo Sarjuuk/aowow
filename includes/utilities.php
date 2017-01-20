@@ -1014,8 +1014,8 @@ class Util
 
             return $data;
         }
-        else
-            return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
+
+        return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
     }
 
     public static function jsEscape($data)
@@ -1027,14 +1027,32 @@ class Util
 
             return $data;
         }
-        else
-            return strtr(trim($data), array(
-                '\\' => '\\\\',
-                "'"  => "\\'",
-                '"'  => '\\"',
-                "\r" => '\\r',
-                "\n" => '\\n'
-            ));
+
+        return strtr(trim($data), array(
+            '\\' => '\\\\',
+            "'"  => "\\'",
+            '"'  => '\\"',
+            "\r" => '\\r',
+            "\n" => '\\n'
+        ));
+    }
+
+    public static function defStatic($data)
+    {
+        if (is_array($data))
+        {
+            foreach ($data as &$v)
+                $v = self::defStatic($v);
+
+            return $data;
+        }
+
+        return strtr($data, array(
+            '<script'    => '<scr"+"ipt',
+            'script>'    => 'scr"+"ipt>',
+            'HOST_URL'   => HOST_URL,
+            'STATIC_URL' => STATIC_URL
+        ));
     }
 
     // default back to enUS if localization unavailable

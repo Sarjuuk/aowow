@@ -103,6 +103,8 @@ class GenericPage
     private   $memcached    = null;
     private   $mysql        = ['time' => 0, 'count' => 0];
 
+    private   $headerLogo   = '';
+
     private   $lvTemplates  = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_achievements'  ],
         'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_calendar'      ],
@@ -158,6 +160,10 @@ class GenericPage
             $this->mode = CACHE_TYPE_XML;
         else
         {
+            // get alt header logo
+            if ($ahl = DB::Aowow()->selectCell('SELECT altHeaderLogo FROM ?_home_featuredbox WHERE ?d BETWEEN startDate AND endDate ORDER BY id DESC', time()))
+                $this->headerLogo = Util::defStatic($ahl);
+
             $this->gUser   = User::getUserGlobals();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
 
@@ -325,15 +331,8 @@ class GenericPage
             foreach ($article as $text)
                 (new Markup($text))->parseGlobalsFromText($this->jsgBuffer);
 
-            $replace = array(
-                '<script'    => '<scr"+"ipt',
-                'script>'    => 'scr"+"ipt>',
-                'HOST_URL'   => HOST_URL,
-                'STATIC_URL' => STATIC_URL
-            );
-
             $this->article = array(
-                'text'   => strtr($article['article'], $replace),
+                'text'   => Util::defStatic($article['article']),
                 'params' => []
             );
 
@@ -374,22 +373,17 @@ class GenericPage
             {
                 if ($t = Util::localizedString($v, 'text'))
                 {
-                    $replace = array(
-                        'HOST_URL'   => HOST_URL,
-                        'STATIC_URL' => STATIC_URL
-                    );
-
                     $_ = array(
                         'parent' => 'announcement-'.$k,
                         'id'     => $v['id'],
                         'mode'   => $v['mode'],
                         'status' => $v['status'],
                         'name'   => $v['name'],
-                        'text'   => strtr($t, $replace)
+                        'text'   => Util::defStatic($t)
                     );
 
                     if ($v['style'])                        // may be empty
-                        $_['style'] = strtr($v['style'], $replace);
+                        $_['style'] = Util::defStatic($v['style']);
 
                     $this->announcements[$k] = $_;
                 }

@@ -10,8 +10,8 @@ class HomePage extends GenericPage
     protected $js       = ['home.js'];
     protected $css      = [['path' => 'home.css']];
 
-    protected $news     = [];
-    protected $oneliner = '';
+    protected $featuredBox = [];
+    protected $oneliner    = '';
 
     public function __construct()
     {
@@ -26,27 +26,27 @@ class HomePage extends GenericPage
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_home_oneliner WHERE active = 1 LIMIT 1'))
             $this->oneliner = Util::jsEscape(Util::localizedString($_, 'text'));
 
-        // load news
-        $this->news = DB::Aowow()->selectRow('SELECT id as ARRAY_KEY, n.* FROM ?_home_featuredbox n WHERE active = 1 ORDER BY id DESC LIMIT 1');
-        if (!$this->news)
+        // load featuredBox (user web server time)
+        $this->featuredBox = DB::Aowow()->selectRow('SELECT id as ARRAY_KEY, n.* FROM ?_home_featuredbox n WHERE ?d BETWEEN startDate AND endDate ORDER BY id DESC LIMIT 1', time());
+        if (!$this->featuredBox)
             return;
 
-        $this->news['text'] = Util::localizedString($this->news, 'text', true);
+        $this->featuredBox = Util::defStatic($this->featuredBox);
 
-        if ($_ = (new Markup($this->news['text']))->parseGlobalsFromText())
+        $this->featuredBox['text'] = Util::localizedString($this->featuredBox, 'text', true);
+
+        if ($_ = (new Markup($this->featuredBox['text']))->parseGlobalsFromText())
             $this->extendGlobalData($_);
 
-        if (empty($this->news['bgImgUrl']))
-            $this->news['bgImgUrl'] = STATIC_URL.'/images/'.User::$localeString.'/mainpage-bg-news.jpg';
-        else
-            $this->news['bgImgUrl'] = strtr($this->news['bgImgUrl'], ['HOST_URL' => HOST_URL, 'STATIC_URL' => STATIC_URL]);
+        if (empty($this->featuredBox['boxBG']))
+            $this->featuredBox['boxBG'] = STATIC_URL.'/images/'.User::$localeString.'/mainpage-bg-news.jpg';
 
         // load overlay links
-        $this->news['overlays'] = DB::Aowow()->select('SELECT * FROM ?_home_featuredbox_overlay WHERE featureId = ?d', $this->news['id']);
-        foreach ($this->news['overlays'] as &$o)
+        $this->featuredBox['overlays'] = DB::Aowow()->select('SELECT * FROM ?_home_featuredbox_overlay WHERE featureId = ?d', $this->featuredBox['id']);
+        foreach ($this->featuredBox['overlays'] as &$o)
         {
             $o['title'] = Util::localizedString($o, 'title', true);
-            $o['title'] = strtr($o['title'], ['HOST_URL' => HOST_URL, 'STATIC_URL' => STATIC_URL]);
+            $o['title'] = Util::defStatic($o['title']);
         }
     }
 

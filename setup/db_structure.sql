@@ -758,9 +758,12 @@ CREATE TABLE `aowow_home_featuredbox` (
   `id` smallint(5) unsigned NOT NULL,
   `editorId` int(10) unsigned DEFAULT NULL,
   `editDate` int(10) unsigned NOT NULL,
-  `active` tinyint(1) unsigned NOT NULL,
+  `startDate` int(10) unsigned NOT NULL DEFAULT '0',
+  `endDate` int(10) unsigned NOT NULL DEFAULT '0',
   `extraWide` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `bgImgUrl` varchar(150) NOT NULL DEFAULT '',
+  `boxBG` varchar(150) NULL DEFAULT NULL,
+  `altHomeLogo` varchar(150) NULL DEFAULT NULL,
+  `altHeaderLogo` varchar(150) NULL DEFAULT NULL,
   `text_loc0` text NOT NULL,
   `text_loc2` text NOT NULL,
   `text_loc3` text NOT NULL,
@@ -2520,7 +2523,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_home_featuredbox` WRITE;
 /*!40000 ALTER TABLE `aowow_home_featuredbox` DISABLE KEYS */;
-INSERT INTO `aowow_home_featuredbox` VALUES (1,NULL,0,1,0,'','[pad]Welcome to [b][span class=q5]AoWoW[/span][/b]!','[pad]Bienvenue à [b][span class=q5]AoWoW[/span][/b]!','[pad]Willkommen bei [b][span class=q5]AoWoW[/span][/b]!','','Добро[pad] пожаловать на [b][span class=q5]AoWoW[/span][/b]!'),(2,NULL,0,0,1,'STATIC_URL/images/logos/newsbox-explained.png','[ul]\n[li][i]just demoing the newsbox here..[/i][/li]\n[li][b][url=http://www.example.com]..with urls[/url][/b][/li]\n[li][b]..typeLinks [item=45533][/b][/li]\n[li][b]..also, over there to the right is an overlay-trigger =>[/b][/li]\n[/ul]\n\n[ul]\n[li][tooltip name=demotip]hey, it hints you stuff![/tooltip][b][span class=tip tooltip=demotip]..hover me[/span][/b][/li]\n[/ul]','','','','');
+INSERT INTO `aowow_home_featuredbox` VALUES (1,NULL,0,0,0,0,'',NULL,NULL,'[pad]Welcome to [b][span class=q5]AoWoW[/span][/b]!','[pad]Bienvenue à [b][span class=q5]AoWoW[/span][/b]!','[pad]Willkommen bei [b][span class=q5]AoWoW[/span][/b]!','','Добро[pad] пожаловать на [b][span class=q5]AoWoW[/span][/b]!'),(2,NULL,0,0,0,1,'STATIC_URL/images/logos/newsbox-explained.png',NULL,NULL,'[ul]\n[li][i]just demoing the newsbox here..[/i][/li]\n[li][b][url=http://www.example.com]..with urls[/url][/b][/li]\n[li][b]..typeLinks [item=45533][/b][/li]\n[li][b]..also, over there to the right is an overlay-trigger =>[/b][/li]\n[/ul]\n\n[ul]\n[li][tooltip name=demotip]hey, it hints you stuff![/tooltip][b][span class=tip tooltip=demotip]..hover me[/span][/b][/li]\n[/ul]','','','','');
 /*!40000 ALTER TABLE `aowow_home_featuredbox` ENABLE KEYS */;
 UNLOCK TABLES;
 
