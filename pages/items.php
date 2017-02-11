@@ -249,7 +249,6 @@ class ItemsPage extends GenericPage
                 $extraOpts = array_merge($this->filterOpts, ['i'  => ['g' => ['itemlevel'], 'o' => ['itemlevel DESC']]]);
 
                 $levelRef = new ItemList(array_merge($conditions, [10]), ['extraOpts' => $extraOpts]);
-
                 foreach ($levelRef->iterate() as $_)
                 {
                     $l = $levelRef->getField('itemLevel');

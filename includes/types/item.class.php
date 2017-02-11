@@ -14,11 +14,11 @@ class ItemList extends BaseType
     public        $json       = [];
     public        $itemMods   = [];
     public        $sources    = [];
-    public        $sourceMore = [];
 
     public        $rndEnchIds = [];
     public        $subItems   = [];
 
+    private       $sourceMore = null;
     private       $ssd        = [];
     private       $vendors    = [];
     private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
@@ -66,9 +66,6 @@ class ItemList extends BaseType
 
                 unset($_curTpl['src'.$i]);
             }
-
-            if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
-                $this->sourceMore[$_curTpl['moreType']] = (new Util::$typeClasses[$_curTpl['moreType']](array(['id', $_curTpl['moreTypeId']], CFG_SQL_LIMIT_NONE)))->getSourceData();
         }
     }
 
@@ -1306,8 +1303,21 @@ class ItemList extends BaseType
 
     public function getSources(&$s, &$sm)
     {
+        $s = $sm = null;
         if (empty($this->sources[$this->id]))
             return false;
+
+        if ($this->sourceMore === null)
+        {
+            $buff = [];
+            $this->sourceMore = [];
+            foreach ($this->iterate() as $_curTpl)
+                if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
+                    $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
+
+            foreach ($buff as $type => $ids)
+                $this->sourceMore[$type] = (new Util::$typeClasses[$type](array(['id', $ids])))->getSourceData();
+        }
 
         $s = array_keys($this->sources[$this->id]);
         if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
