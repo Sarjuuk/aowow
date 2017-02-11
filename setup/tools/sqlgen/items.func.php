@@ -125,7 +125,7 @@ function items(array $ids = [])
            ?d';
 
     $lastMax = 0;
-    while ($items = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, $offset, SqlGen::$stepSize))
+    while ($items = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
         $newMax = max(array_column($items, 'entry'));
 
