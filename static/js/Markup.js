@@ -3379,8 +3379,8 @@ var Markup = {
 
             this.inited = true;
 
-            $('[data-highlight]')
-                .live('mouseenter', function() {
+            $(function () {
+                $(document).delegate('[data-highlight]', 'mouseenter', function() {
                     var _ = $(this).attr('data-highlight').split(':');
 
                     if(_.length != 2)
@@ -3399,6 +3399,7 @@ var Markup = {
                     elem.selectionStart = start;
                     elem.selectionEnd   = start;
                 });
+            });
         }
     },
 

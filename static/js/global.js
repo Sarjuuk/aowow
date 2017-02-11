@@ -1705,7 +1705,7 @@ function g_disclose(el, _this) {
 
 function g_setupChangeWarning(form, elements, warningMessage) {
     /* Still skip IE since it triggers this when anchor links are clicked. */
-    if ($.browser.msie) {
+    if ($WH.Browser.ie) {
         return;
     }
 
@@ -16291,7 +16291,7 @@ var Menu = new function()
             var $outerDiv = $('<div class="menu-outer"></div>');
             var $innerDiv = $('<div class="menu-inner"></div>');
 
-            $menuItems.appendTo($innerDiv);
+            $menuItems.each(function () { $innerDiv.append(this) });
             $outerDiv.append($innerDiv);
 
             return $outerDiv;
@@ -16313,7 +16313,7 @@ var Menu = new function()
             var start = nItemsAdded;
             var end   = start + nItemsToAdd;
 
-            $menuItems.slice(start, end).appendTo($innerDiv);
+            $menuItems.slice(start, end).each(function() { $innerDiv.append(this) });
             $outerDiv.append($innerDiv);
             $holder.append($outerDiv);
 

@@ -877,7 +877,7 @@ function Profiler() {
             _divMessage.style.backgroundImage = 'none';
         }
         // can't have javascript:; hrefs all over the place with an onbeforeunload on IE
-        if (!$.browser.msie) {
+        if (!$WH.Browser.ie) {
             window.onbeforeunload = (saved ? null : function (e) {
                 return LANG.message_savebeforeexit;
             });

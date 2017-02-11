@@ -1164,7 +1164,7 @@ function fi_presetClass(_this, stealth) {
         }
 
         if(!stealth && (_this.form.ub.selectedIndex == 0 || _this.form.ub.value == oldValue)) {
-            $('select[name=ub] option[value=' + _this.value + ']').attr('selected', 'selected');
+            $('select[name=ub] option[value="' + _this.value + '"]').attr('selected', 'selected');
         }
 
         while (_.firstChild) {
@@ -1338,8 +1338,8 @@ function fi_presetSave() {
 
     for (i = 0; i < _.childNodes.length; ++i) {
         var
-            w = fi_Lookup($('[name=wt[]]', _.childNodes[i]).val()),
-            v = $('[name=wtv[]]', _.childNodes[i]).val();
+            w = fi_Lookup($('[name="wt[]"]', _.childNodes[i]).val()),
+            v = $('[name="wtv[]"]', _.childNodes[i]).val();
 
         if (w && v != 0) {
             scale[w.name] = v;

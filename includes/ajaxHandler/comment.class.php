@@ -237,6 +237,8 @@ class AjaxComment extends AjaxHandler
 
     protected function handleCommentOutOfDate()
     {
+        $this->contentType = 'text/plain';
+
         if (!$this->_post['id'])
             return 'The comment does not exist.';
 
@@ -275,6 +277,8 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyAdd()
     {
+        $this->contentType = 'text/plain';
+
         if (!User::canComment())
             return 'You are not allowed to reply.';
 
@@ -293,6 +297,8 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyEdit()
     {
+        $this->contentType = 'text/plain';
+
         if (!User::canComment())
             return 'You are not allowed to reply.';
 

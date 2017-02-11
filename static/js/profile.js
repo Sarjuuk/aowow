@@ -99,7 +99,7 @@ pr_onChangeRegion.C = {};
 
 function pr_onChangeRace()
 {
-    if($('select[name=ra[]] option:selected').length)
+    if($('select[name="ra[]"] option:selected').length)
         $('select[name=si]').attr('disabled', true).val('');
     else
         $('select[name=si]').attr('disabled', false);
