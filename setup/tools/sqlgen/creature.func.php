@@ -9,7 +9,7 @@ if (!CLI)
 
 /* deps:
  * creature_template
- * locales_creature
+ * creature_template_locale
  * creature_classlevelstats
  * instance_encounters
 */

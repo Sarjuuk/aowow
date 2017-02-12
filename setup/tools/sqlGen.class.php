@@ -54,7 +54,7 @@ class SqlGen
         'emotes'                   => [null, null,                             null, null],
         'itemenchantment'          => [null, null, null,                      ['spell_enchant_proc_data']],
         'achievement'              => [null, null, null,                      ['dbc_achievement']],
-        'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
+        'creature'                 => [null, null, null,                      ['creature_template', 'creature_template_locale', 'creature_classlevelstats', 'instance_encounters']],
         'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],
         'events'                   => [null, null, null,                      ['game_event', 'game_event_prerequisite']],
         'objects'                  => [null, null, null,                      ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem']],
