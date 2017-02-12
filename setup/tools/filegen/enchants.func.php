@@ -59,16 +59,29 @@ if (!CLI)
         $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
         $castItems     = [];
         $successs      = true;
-        $enchantSpells = new SpellList([['effect1Id', 53], ['name_loc0', 'QA%', '!'], CFG_SQL_LIMIT_NONE]);     // enchantItemPermanent && !qualityAssurance
+        $enchantSpells = DB::Aowow()->select('
+            SELECT
+                s.id AS ARRAY_KEY,
+                effect1MiscValue,
+                equippedItemClass, equippedItemInventoryTypeMask, equippedItemSubClassMask,
+                skillLine1,
+                IFNULL(i.iconString, "inv_misc_questionmark") AS iconString,
+                name_loc0, name_loc2, name_loc3, name_loc6, name_loc8
+            FROM
+                ?_spell s
+            LEFT JOIN
+                ?_icons i ON i.id = s.iconId
+            WHERE
+                effect1Id = ?d AND
+                name_loc0 NOT LIKE "QA%"'
+        , 53);                                              // enchantItemPermanent && !qualityAssurance
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
             if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
-        $enchIds = [];
-        foreach ($enchantSpells->iterate() as $__)
-            $enchIds[] = $enchantSpells->getField('effect1MiscValue');
+        $enchIds = array_column($enchantSpells, 'effect1MiscValue');
 
         $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
         if ($enchantments->error)
@@ -86,32 +99,32 @@ if (!CLI)
             Lang::load(Util::$localeStrings[$lId]);
 
             $enchantsOut = [];
-            foreach ($enchantSpells->iterate() as $__)
+            foreach ($enchantSpells as $esId => $es)
             {
-                $eId = $enchantSpells->getField('effect1MiscValue');
+                $eId = $es['effect1MiscValue'];
                 if (!$enchantments->getEntry($eId))
                 {
-                    CLISetup::log(' * could not find enchantment #'.$eId.' referenced by spell #'.$enchantSpells->id, CLISetup::LOG_WARN);
+                    CLISetup::log(' * could not find enchantment #'.$eId.' referenced by spell #'.$esId, CLISetup::LOG_WARN);
                     continue;
                 }
 
                 // slots have to be recalculated
                 $slot = 0;
-                if ($enchantSpells->getField('equippedItemClass') == 4)   // armor
+                if ($es['equippedItemClass'] == 4)          // armor
                 {
-                    if ($invType = $enchantSpells->getField('equippedItemInventoryTypeMask'))
+                    if ($invType = $es['equippedItemInventoryTypeMask'])
                         $slot = $invType >> 1;
                     else  /* if (equippedItemSubClassMask == 64) */ // shields have it their own way <_<
                         $slot = (1 << (14 - 1));
                 }
-                else if ($enchantSpells->getField('equippedItemClass') == 2) // weapon
+                else if ($es['equippedItemClass'] == 2)     // weapon
                 {
                     foreach ($slotPointer as $i => $sp)
                     {
                         if (!$sp)
                             continue;
 
-                        if ((1 << $i) & $enchantSpells->getField('equippedItemSubClassMask'))
+                        if ((1 << $i) & $es['equippedItemSubClassMask'])
                         {
                             if ($sp == 13)                  // also mainHand & offHand *siiigh*
                                 $slot |= ((1 << (21 - 1)) | (1 << (22 - 1)));
@@ -126,7 +139,7 @@ if (!CLI)
                 $ench = array(
                     'name'        => [],                    // set by skill or item
                     'quality'     => -1,                    // modified if item
-                    'icon'        => strToLower($enchantSpells->getField('iconString')),  // item over spell
+                    'icon'        => strToLower($es['iconString']),  // item over spell
                     'source'      => [],                    // <0: item; >0:spell
                     'skill'       => -1,                    // modified if skill
                     'slots'       => [],                    // determined per spell but set per item
@@ -146,19 +159,20 @@ if (!CLI)
                     $ench['jsonequip']['reqlevel'] = $_;
 
                 // check if the spell has an entry in skill_line_ability -> Source:Profession
-                if ($skills = $enchantSpells->getField('skillLines'))
+                if ($es['skillLine1'])
                 {
-                    $ench['name'][]   = $enchantSpells->getField('name', true);
-                    $ench['source'][] = $enchantSpells->id;
-                    $ench['skill']    = $skills[0];
+                    $ench['name'][]   = Util::localizedString($es, 'name');
+                    $ench['source'][] = $esId;
+                    $ench['skill']    = $es['skillLine1'];
                     $ench['slots'][]  = $slot;
                 }
 
                 // check if this spell can be cast via item -> Source:Item
-                if (!isset($castItems[$enchantSpells->id]))
-                    $castItems[$enchantSpells->id] = new ItemList([['spellId1', $enchantSpells->id], ['name_loc0', 'Scroll of Enchant%', '!']]);    // do not reuse enchantment scrolls
+                // do not reuse enchantment scrolls; do not use items without source
+                if (!isset($castItems[$esId]))
+                    $castItems[$esId] = new ItemList([['spellId1', $esId], ['name_loc0', 'Scroll of Enchant%', '!'], ['src.typeId', null, '!']]);
 
-                $cI = &$castItems[$enchantSpells->id];      // this construct is a bit .. unwieldy
+                $cI = &$castItems[$esId];      // this construct is a bit .. unwieldy
                 foreach ($cI->iterate() as $__)
                 {
                     $ench['name'][]   = $cI->getField('name', true);
