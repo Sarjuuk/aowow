@@ -1,6 +1,7 @@
 # cache
 /cache/template/*
 /setup/generated/alphaMaps/*.png
+/cache/firstrun
 
 # generated files
 /static/js/profile_all.js

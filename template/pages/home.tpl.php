@@ -79,7 +79,7 @@ endif;
             <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
         </div>
         <div class="footer-copy">
-            &#12484; 2016 Aowow<br />rev. <?=AOWOW_REVISION; ?>
+            &#12484; 2017 Aowow<br />rev. <?=AOWOW_REVISION; ?>
         </div>
     </div>
 
