@@ -11,7 +11,7 @@ class AjaxAccount extends AjaxHandler
         'save'   => [FILTER_SANITIZE_NUMBER_INT, null],
         'delete' => [FILTER_SANITIZE_NUMBER_INT, null],
         'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
-        'name'   => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
+        'name'   => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
         'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
     );
     protected $_get        = array(
@@ -56,6 +56,8 @@ class AjaxAccount extends AjaxHandler
             {
                 if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE userId = ?d AND id = ?d', User::$id, $id))
                     return 0;
+
+                DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE id = ?d', $this->_post['name'], $id);
             }
             else
             {
@@ -91,5 +93,12 @@ class AjaxAccount extends AjaxHandler
             return $val;
 
         return null;
+    }
+
+    protected function checkName($val)
+    {
+        $var = trim(urldecode($val));
+
+        return filter_var($var, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
     }
 }
