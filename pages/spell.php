@@ -1493,7 +1493,7 @@ class SpellPage extends GenericPage
     private function createEffects(&$infobox, &$redButtons)
     {
         // proc data .. maybe use more information..?
-        $procData = DB::World()->selectRow('SELECT IF(ppmRate > 0, -ppmRate, customChance) AS chance, cooldown FROM spell_proc_event WHERE entry = ?d', $this->typeId);
+        $procData = DB::World()->selectRow('SELECT IF(ProcsPerMinute  > 0, -ProcsPerMinute, Chance) AS chance, Cooldown AS cooldown FROM spell_proc WHERE ABS(SpellId) = ?d', $this->firstRank);
         if (!isset($procData['cooldown']))
             $procData['cooldown'] = 0;
 
@@ -1593,15 +1593,15 @@ class SpellPage extends GenericPage
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $foo['mechanic'] = Lang::game('me', $_);
 
-            if (!empty($procData['chance']))
+            if (in_array($i, $this->subject->canTriggerSpell()) && !empty($procData['chance']))
                 $foo['procData'] = array(
                     $procData['chance'],
-                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
+                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'], true) : null
                 );
             else if (in_array($i, $this->subject->canTriggerSpell()) && $this->subject->getField('procChance'))
                 $foo['procData'] = array(
                     $this->subject->getField('procChance'),
-                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'] * 1000, true) : null
+                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'], true) : null
                 );
 
             // parse masks and indizes
