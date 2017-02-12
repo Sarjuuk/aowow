@@ -19,6 +19,9 @@ function account()
         'pass2' => ['Confirm Password', true ]
     );
 
+    User::useLocale(LOCALE_EN);
+    Lang::load(Util::$localeStrings[LOCALE_EN]);
+
     if (CLISetup::readInput($fields))
     {
         CLISetup::log();

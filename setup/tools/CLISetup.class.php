@@ -385,7 +385,8 @@ class CLISetup
                             continue;
 
                         $charBuff = mb_substr($charBuff, 0, -1);
-                        echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
+                        if (!$isHidden && self::$hasReadline)
+                            echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
                     }
                     else if ($keyId == self::CHR_LF)
                     {

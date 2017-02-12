@@ -13,7 +13,7 @@ if (!CLI)
 
 function siteconfig()
 {
-    $reqKeys = ['SITE_HOST', 'STATIC_HOST'];
+    $reqKeys = ['site_host', 'static_host'];
 
     if (!DB::isConnected(DB_AOWOW))
     {

@@ -56,7 +56,7 @@ class EventsPage extends GenericPage
 
         $this->lvTabs[] = ['event', ['data' => $data]];
 
-        if ($_ = array_filter($data, function($x) {return $x['id'] > 0;}))
+        if ($_ = array_values(array_filter($data, function($x) {return $x['category'] > 0;})))
         {
             $this->lvTabs[] = ['calendar', array(
                 'data'      => $_,

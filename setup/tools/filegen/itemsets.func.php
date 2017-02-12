@@ -69,8 +69,8 @@ if (!CLI)
                     $setOut['classes']  = [];
 
                     for ($i = 0; $i < 12; $i++)
-                        if ($set['classMask'] & (1 << ($i - 1)))
-                            $setOut['classes'][] = $i;
+                        if ($set['classMask'] & (1 << $i))
+                            $setOut['classes'][] = $i + 1;
                 }
 
                 if ($set['contentGroup'])

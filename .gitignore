@@ -11,6 +11,8 @@
 /static/widgets/searchbox/searchbox.html
 /static/download/searchplugins/aowow.xml
 /config/config.php
+/datasets/*
+!/datasets/zones
 # /datasets/item-scaling
 
 # extracted images
@@ -19,12 +21,13 @@
 /static/images/wow/icons/small/*
 /static/images/wow/icons/tiny/*
 !/static/images/wow/icons/tiny/quest_*
-/static/images/wow/hunterpettalents/icons*
-/static/images/wow/interface/*
+/static/images/wow/hunterpettalents/*
+/static/images/wow/Interface/*
 /static/images/wow/loadingscreens/*
 /static/images/wow/maps/*
 !/static/images/wow/maps/overlay*
 /static/images/wow/talents/icons/*
+/static/images/wow/talents/backgrounds/*
 
 # modelviewer (~7GB data)
 /static/modelviewer/models/*

@@ -387,7 +387,7 @@ if (!CLI)
 
                 // source for mapFiles
                 $mapSrcDir = null;
-                $locDirs   = array_filter(CLISetup::$expectedPaths, function($var) use ($l) { return !$var || $var == $l; });
+                $locDirs   = array_reverse(array_filter(CLISetup::$expectedPaths, function($var) use ($l) { return !$var || $var == $l; }), true);
                 foreach ($locDirs as $mapLoc => $__)
                 {
                     if ($mapLoc)                            // and trailing slash again

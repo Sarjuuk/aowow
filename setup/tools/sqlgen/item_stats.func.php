@@ -161,7 +161,6 @@ function item_stats(array $ids = [])
         $offset = $max;
 
         $items->writeStatsTable();
-
     }
 
     return true;
