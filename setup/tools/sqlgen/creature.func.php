@@ -31,8 +31,8 @@ function creature(array $ids = [])
             "" AS textureString,                            -- textureString
             0 AS modelId,                                   -- modelId
             "" AS iconString,                               -- iconString
-            ct.name, ctl2.`Name`  AS n2, ctl3.`Name`  AS n3, ctl6.`Name`  AS n6, ctl8.`Name`  AS n8,
-            subname, ctl2.`Title` AS t2, ctl3.`Title` AS t3, ctl6.`Title` AS t6, ctl8.`Title` AS t8,
+            ct.name, IFNULL(ctl2.`Name`, "")  AS n2, IFNULL(ctl3.`Name`, "")  AS n3, IFNULL(ctl6.`Name`, "")  AS n6, IFNULL(ctl8.`Name`, "")  AS n8,
+            subname, IFNULL(ctl2.`Title`, "") AS t2, IFNULL(ctl3.`Title`, "") AS t3, IFNULL(ctl6.`Title`, "") AS t6, IFNULL(ctl8.`Title`, "") AS t8,
             minLevel, maxLevel,
             exp,
             faction,
@@ -96,6 +96,8 @@ function creature(array $ids = [])
         {
             AND ct.entry IN (?a)
         }
+        ORDER BY
+            ct.entry ASC
         LIMIT
            ?d';
 

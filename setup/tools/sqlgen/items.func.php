@@ -34,7 +34,7 @@ function items(array $ids = [])
             class,                  class as classBak,
             subclass,               subclass AS subClassBak,
             IFNULL(sg.id, 0) AS subSubClass,
-            name,                   name_loc2,              name_loc3,              name_loc6,              name_loc8,
+            name,                   IFNULL(li.name_loc2, ""), IFNULL(li.name_loc3, ""), IFNULL(li.name_loc6, ""), IFNULL(li.name_loc8, ""),
             displayid,
             Quality,
             Flags,                  FlagsExtra,
@@ -81,7 +81,7 @@ function items(array $ids = [])
             spellid_4,              spelltrigger_4,         spellcharges_4,         spellppmRate_4,         spellcooldown_4,        spellcategory_4,        spellcategorycooldown_4,
             spellid_5,              spelltrigger_5,         spellcharges_5,         spellppmRate_5,         spellcooldown_5,        spellcategory_5,        spellcategorycooldown_5,
             bonding,
-            it.description,         description_loc2,       description_loc3,       description_loc6,       description_loc8,
+            it.description,         IFNULL(li.description_loc2, ""), IFNULL(li.description_loc3, ""), IFNULL(li.description_loc6, ""), IFNULL(li.description_loc8, ""),
             PageText,
             LanguageID,
             startquest,
@@ -121,6 +121,8 @@ function items(array $ids = [])
         {
             AND it.entry IN (?a)
         }
+        ORDER BY
+            it.entry ASC
         LIMIT
            ?d';
 
