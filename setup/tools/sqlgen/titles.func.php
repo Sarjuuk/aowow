@@ -97,11 +97,6 @@ function titles()
     DB::Aowow()->query('UPDATE ?_titles SET side = 2 WHERE id <= 28 OR id IN (118, 119, 116, 117, 110, 127)');
     DB::Aowow()->query('UPDATE ?_titles SET side = 1 WHERE id <= 14 OR id IN (111, 115, 112, 114, 126)');
 
-    // ! src12Ext pendant in source-script !
-    $doubles = DB::World()->selectCol('SELECT IF(title_A, title_A, title_H) AS ARRAY_KEY, GROUP_CONCAT(entry SEPARATOR " "), count(1) FROM achievement_reward WHERE title_A <> 0 OR title_H <> 0 GROUP BY ARRAY_KEY HAVING count(1) > 1');
-    foreach ($doubles as $tId => $acvIds)
-        DB::Aowow()->query('UPDATE ?_titles SET src12Ext = ?d WHERE id = ?d', explode(' ', $acvIds)[1], $tId);
-
     return true;
 }
 

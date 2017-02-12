@@ -1181,14 +1181,19 @@ function source(array $ids = [])
     # 12: Achievement
     CLISetup::log('   * #12 Achievement');
     $sets = DB::World()->select('
-        SELECT ?d, IF (title_A <> 0, title_A, title_H) AS title, 1, ?d, entry FROM achievement_reward WHERE title_A <> 0 OR title_H <> 0 GROUP BY title
-        UNION
-        SELECT ?d, title_H AS title, 1, ?d, entry FROM achievement_reward WHERE title_A <> title_H AND title_A <> 0 AND title_H <> 0',
-        TYPE_TITLE, TYPE_ACHIEVEMENT,
-        TYPE_TITLE, TYPE_ACHIEVEMENT
+        SELECT titleId AS ARRAY_KEY, MIN(entry) AS srcId, NULLIF(MAX(entry), MIN(entry)) AS altSrcId FROM (
+            SELECT title_A as `titleId`, entry FROM achievement_reward WHERE title_A <> 0
+            UNION
+            SELECT title_H as `titleId`, entry FROM achievement_reward WHERE title_H <> 0
+        ) AS x GROUP BY titleId'
     );
-    if ($sets)
-        DB::Aowow()->query(queryfy('[V]', $sets, $insMore), 12, 12, 12);
+    foreach ($sets as $tId => $set)
+    {
+        DB::Aowow()->query(queryfy('[V]', [[TYPE_TITLE, $tId, 1, TYPE_ACHIEVEMENT, $set['srcId']]], $insMore), 12, 12, 12);
+
+        if ($set['altSrcId'])
+            DB::Aowow()->query('UPDATE ?_titles SET src12Ext = ?d WHERE id = ?d', $set['altSrcId'], $tId);
+    }
 
     # 13: Source-String
     CLISetup::log('   * #13 cuStrings');
