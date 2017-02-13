@@ -529,7 +529,8 @@ class ItemList extends BaseType
         {
             $x .= '<br />'.Lang::item('unique');
 
-            if ($this->curTpl['maxCount'] > 1)
+            // not for currency tokens
+            if ($this->curTpl['maxCount'] > 1 && $this->curTpl['bagFamily'] != 8192)
                 $x .= ' ('.$this->curTpl['maxCount'].')';
         }
         else if ($_flags & ITEM_FLAG_UNIQUEEQUIPPED)
