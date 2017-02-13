@@ -843,7 +843,7 @@ class ItemList extends BaseType
 
         // required reputation w/ faction
         if ($reqFac = $this->curTpl['requiredFaction'])
-            $x .= sprintf(Lang::game('requires'), '<a class="q1" href=?faction="'.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::game('rep', $this->curTpl['requiredFactionRank'])).'<br />';
+            $x .= sprintf(Lang::game('requires'), '<a class="q1" href="?faction='.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::game('rep', $this->curTpl['requiredFactionRank'])).'<br />';
 
         // locked or openable
         if ($locks = Lang::getLocks($this->curTpl['lockId'], true))
