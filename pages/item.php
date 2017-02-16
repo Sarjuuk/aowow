@@ -924,12 +924,15 @@ class ItemPage extends genericPage
         if ($cdCats)
         {
             $conditions = array(
-                'OR',
-                ['spellCategory1', $cdCats],
-                ['spellCategory2', $cdCats],
-                ['spellCategory3', $cdCats],
-                ['spellCategory4', $cdCats],
-                ['spellCategory5', $cdCats]
+                ['id', $this->typeId, '!'],
+                [
+                    'OR',
+                    ['spellCategory1', $cdCats],
+                    ['spellCategory2', $cdCats],
+                    ['spellCategory3', $cdCats],
+                    ['spellCategory4', $cdCats],
+                    ['spellCategory5', $cdCats],
+                ]
             );
             $cdItems = new ItemList($conditions);
             if (!$cdItems->error)
