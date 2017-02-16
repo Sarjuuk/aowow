@@ -810,17 +810,58 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
+    // a variables structure is pretty .. flexile. match in steps
+    private function matchVariableString($varString, &$len = 0)
+    {
+        $varParts = array(
+            'op'     => null,
+            'oparg'  => null,
+            'lookup' => null,
+            'var'    => null,
+            'effIdx' => null,
+            'switch' => null
+        );
+
+        // basic variable ref (most common case)        $(refSpell)?(var)(effIdx)?
+        if (preg_match('/^(\d*)([a-z])([123]?)\b/i', $varString, $m))
+        {
+            $len                = strlen($m[0]);
+            $varParts['lookup'] = $m[1];
+            $varParts['var']    = $m[2];
+            $varParts['effIdx'] = $m[3];
+        }
+        // last value or gender -switch                 $[lg]ifText:elseText;
+        else if (preg_match('/^([lg])([^:]*:[^;]*);/i', $varString, $m))
+        {
+            $len                = strlen($m[0]);
+            $varParts['var']    = $m[1];
+            $varParts['switch'] = explode(':', $m[2]);
+        }
+        // variable ref /w formula                      $( (op) (oparg); )? (refSpell) ( (var) (effIdx) )   OR   $(refSpell) ( (op) (oparg); )? ( (var) (effIdx) )
+        else if (preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([\+\-\*\/])(\d+);)?([a-z])([123]?)\b/i', $varString, $m))
+        {
+            $len                = strlen($m[0]);
+            $varParts['lookup'] = $m[4];
+            $varParts['var']    = $m[8];
+            $varParts['effIdx'] = $m[9];
+            $varParts['op']     = $m[6] ?: $m[2];
+            $varParts['oparg']  = $m[7] ?: $m[3];
+        }
+        // something .. else?
+        else
+            return [];
+
+        return $varParts;
+    }
+
+    // description-, buff-parsing component
     // returns [min, max, minFulltext, maxFulltext, ratingId]
-    private function resolveVariableString($variable, &$usesScalingRating)
+    private function resolveVariableString($var, &$usesScalingRating)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
-        $op     = $variable[2];
-        $oparg  = $variable[3];
-        $lookup = (int)$variable[4];
-        $var    = $variable[6] ? $variable[6] : $variable[8];
-        $effIdx = $variable[6] ? null         : $variable[9];
-        $switch = $variable[7] ? explode(':', $variable[7]) : null;
+        foreach ($var as $k => $v)
+            $$k = $v;
 
         $result = [null];
 
@@ -962,7 +1003,14 @@ class SpellList extends BaseType
                 $duration = $srcSpell->getField('duration');
 
                 if (!$periode)
-                    $periode = 3000;
+                {
+                    // Mod Power Regeneration & Mod Health Regeneration have an implicit periode of 5sec
+                    $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
+                    if ($aura == 84 || $aura == 85)
+                        $periode = 5000;
+                    else
+                        $periode = 3000;
+                }
 
                 $min  *= $duration / $periode;
                 $max  *= $duration / $periode;
@@ -1147,18 +1195,20 @@ class SpellList extends BaseType
             if ($formula[$pos] == '$')
                 $pos++;
 
-            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([lg])([^:]*:[^;]*);|([a-z])([123]?)\b)/i', substr($formula, $pos), $result))
+            $varParts = $this->matchVariableString(substr($formula, $pos), $len);
+            if (!$varParts)
             {
                 $str .= '#';                                // mark as done, reset below
                 continue;
             }
-            $pos += strlen($result[0]);
+
+            $pos += $len;
 
             // we are resolving a formula -> omit ranges
-            $var = $this->resolveVariableString($result, $scaling);
+            $var = $this->resolveVariableString($varParts, $scaling);
 
             // time within formula -> rebase to seconds and omit timeUnit
-            if (strtolower($result[6] ?: $result[8]) == 'd')
+            if (strtolower($varParts['var']) == 'd')
             {
                $var[0] /= 1000;
                unset($var[2]);
@@ -1253,6 +1303,7 @@ class SpellList extends BaseType
 
         deviations from standard procedures
             division    - example: $/10;2687s1 => $2687s1/10
+                        - also:    $61829/5;s1 => $61829s1/5
 
         functions in use .. caseInsensitive
             $cond(a, b, c) - like SQL, if A is met use B otherwise use C
@@ -1441,16 +1492,16 @@ class SpellList extends BaseType
             if ($data[$pos] == '$')
                 $pos++;
 
-            //            ( (op) (oparg); )? (refSpell) ( ([lg]ifText:elseText; | (var) (effIdx) )
-            if (!preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([lg])([^:]*:[^;]*);|([a-z])([123]?)\b)/i', substr($data, $pos), $result))
+            $varParts = $this->matchVariableString(substr($data, $pos), $len);
+            if (!$varParts)
             {
                 $str .= '#';                                // mark as done, reset below
                 continue;
             }
 
-            $pos += strlen($result[0]);
+            $pos += $len;
 
-            $var = $this->resolveVariableString($result, $scaling);
+            $var = $this->resolveVariableString($varParts, $scaling);
             $resolved = is_numeric($var[0]) ? abs($var[0]) : $var[0];
             if (isset($var[2]))
             {
