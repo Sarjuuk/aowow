@@ -966,36 +966,13 @@ class SpellPage extends GenericPage
             $list = [];
             if (count($src) == 1 && $src[0] == 1)           // multiple trainer
             {
-                $tt = null;
-                // Professions
-                if (in_array($_cat, [9, 11]) && isset(Util::$trainerTemplates[TYPE_SKILL][$this->subject->getField('skillLines')[0]]))
-                    $tt = Util::$trainerTemplates[TYPE_SKILL][$this->subject->getField('skillLines')[0]];
-                // Class Spells
-                else if ($_cat == 7 && $this->subject->getField('reqClassMask'))
-                {
-                    $clId = log($this->subject->getField('reqClassMask'), 2) + 1 ;
-                    if (intVal($clId) == $clId)             // only one class was set, so float == int
-                        if (isset(Util::$trainerTemplates[TYPE_CLASS][$clId]))
-                            $tt = Util::$trainerTemplates[TYPE_CLASS][$clId];
-                }
-
-                if ($tt)
-                    $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', $tt);
-                else
-                {
-                    $mask = 0;
-                    foreach (Util::$skillLineMask[-3] as $idx => $pair)
-                        if ($pair[1] == $this->typeId)
-                            $mask |= 1 << $idx;
-
-                    $list = DB::World()->selectCol('
-                        SELECT    IF(t1.ID > 200000, t2.ID, t1.ID)
-                        FROM      npc_trainer t1
-                        LEFT JOIN npc_trainer t2 ON t2.SpellID = -t1.ID
-                        WHERE     t1.SpellID = ?d',
-                        $this->typeId
-                    );
-                }
+                $list = DB::World()->selectCol('
+                    SELECT    IF(t1.ID > 200000, t2.ID, t1.ID)
+                    FROM      npc_trainer t1
+                    LEFT JOIN npc_trainer t2 ON t2.SpellID = -t1.ID
+                    WHERE     t1.SpellID = ?d',
+                    $this->typeId
+                );
             }
             else if ($src)
                 $list = array_values($src);
