@@ -1,15 +1,3 @@
-.topbar-search input.search-database {
-    background: white url(../images/dede/searchdatabase.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results {
-    background: white url(../images/dede/searchwithinresults.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results2 {
-    background: white url(../images/dede/searchwithinresults2.gif) .2em center no-repeat;
-}
-
 div.modelviewer-quality div {
     float: left;
     width: 71px;

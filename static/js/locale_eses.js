@@ -2487,6 +2487,8 @@ var LANG = {
     male:   "Hombre",
     female: "Mujer",
 
+    searchdb: "Buscar en la Base de Datos...",
+
     source_bossdrop: "Botín de Jefe",
     source_zonedrop: "Despojo de zona",
     source_quests:   "Misiones",
@@ -2567,6 +2569,9 @@ var LANG = {
     lvpage_previous: " Anterior",
     lvpage_next:     "Siguiente ",
     lvpage_last:     "Última ",
+
+    lvsearchresults: "Buscar en resultados",
+    lvsearchdisplayedresults: "Buscar en los resultados mostrados",
 
     lvscreenshot_submit: "Envia una captura de pantalla",
     lvscreenshot_from:   "Desde ",

@@ -2380,7 +2380,7 @@ function ProfilerTalents(_parent) {
         }
 
         if (!_displayed) {
-            // sarjuuk: causes infinite loop and it works fine without this
+            // aowow: causes infinite loop and it works fine without this
             // _talentCalc.setLevelCap(_profile.level);
             if (_mode != 'pets') {
                 _updateBuilds();
@@ -4600,7 +4600,7 @@ function ProfilerInventory(_parent) {
             };
 
             var params = {
-                wmode: 'direct',                            // sarjuuk: was 'opaque'; doesn't draw with this
+                wmode: 'direct',                            // aowow: was 'opaque'; doesn't draw with this
                 quality: 'high',
                 allowscriptaccess: 'always',
                 allowfullscreen: true,
@@ -4617,7 +4617,7 @@ function ProfilerInventory(_parent) {
 
             _mvInited = true;
         }
-        else { /* sarjuuk: the idea of this is to directly access the swf. it just doesn't work with the ZAMviewerfp11.swf */
+        else { /* aowow: the idea of this is to directly access the swf. it just doesn't work with the ZAMviewerfp11.swf */
             _swfModel = $WH.ge(_swfModel.id);
 
             if (_swfModel.clearSlots) {
@@ -7388,7 +7388,7 @@ function ProfilerCompletion(_parent) {
             return _timer[wut] = setTimeout(_self.filterData.bind(_self, wut, value), 750);
         }
 
-        if (!_divTotals)                                    // sarjuuk: prevent error on matching available data against empty known data
+        if (!_divTotals)                                    // aowow: prevent error on matching available data against empty known data
             return;
 
         var _ = 0;
@@ -7513,7 +7513,7 @@ function ProfilerCompletion(_parent) {
             }
 
             if ((!_opt.compute || _opt.compute(row, data[i])) && data[i]) {
-                // row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));                     // sarjuuk: idk a way to generate a jScript-TimeObject in php (there probably isn't), but one is expected here
+                // row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));                     // aowow: idk a way to generate a jScript-TimeObject in php (there probably isn't), but one is expected here
                 row.completed = (data[i] > 946681200 ? new Date(data[i] * 1000) : (_opt.showQuantity ? data[i] : 1));   // so we create a dateObject from data[i] if it is a unixtime past the 1.1.2000 - 0:00 (wich probably isn't used as a sensible int anyway)
                 hasData = true;
             }

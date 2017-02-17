@@ -2477,6 +2477,8 @@ var LANG = {
     male:   "Мужчина",
     female: "Женщина",
 
+    searchdb: "Искать в Базе Данных...",
+
     source_bossdrop: "Добыча с боссов",
     source_zonedrop: "Добыча на территории",
     source_quests:   "Задания",
@@ -2557,6 +2559,9 @@ var LANG = {
     lvpage_previous: " Назад",
     lvpage_next:     "Далее ",
     lvpage_last:     "Конец ",
+
+    lvsearchresults:          "Поиск в результатах",
+    lvsearchdisplayedresults: "Поиск в показанных результатах",
 
     lvscreenshot_submit: "Отправить изображение",
     lvscreenshot_from:   "От ",

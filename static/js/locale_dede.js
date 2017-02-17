@@ -2487,6 +2487,8 @@ var LANG = {
     male:   "Mann",
     female: "Frau",
 
+    searchdb: "Datenbank durchsuchen...",
+
     source_bossdrop: "Bossdrop",
     source_zonedrop: "Gebietsdrop",
     source_quests:   "Quests",
@@ -2567,6 +2569,9 @@ var LANG = {
     lvpage_previous: " Vorherige",
     lvpage_next:     "Nächste ",
     lvpage_last:     "Letzte ",
+
+    lvsearchresults:          "In Ergebnissen suchen...",
+    lvsearchdisplayedresults: "In angezeigten Ergebnissen suchen...",
 
     lvscreenshot_submit: "Einen Screenshot einsenden",
     lvscreenshot_from:   "Von ",

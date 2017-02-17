@@ -3281,7 +3281,7 @@ a.button-red i {
     left: -1px;
     top: 2px;
     z-index: 1;
-    /* font-style: normal; sarjuuk: breaks textShadow*/
+    /* font-style: normal; aowow: breaks textShadow*/
     color: black;
 }
 
@@ -3976,9 +3976,9 @@ div.captcha-center {
 }
 
 
-/**************************************************/
-/* sarjuuk: deprecated stuff that might be of use */
-/**************************************************/
+/************************************************/
+/* aowow: deprecated stuff that might be of use */
+/************************************************/
 
 
 .pet-model {

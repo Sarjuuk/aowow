@@ -1650,7 +1650,7 @@ var g_sources = {
     10: 'Starter',
     11: 'Event',
     12: 'Achievement',
-    // sarjuuk: 13 is string from serverside table, used by titles
+    // aowow: note - 13 is string from serverside table, used by titles
     14: 'Black Market',
     15: 'Disenchanted',
     16: 'Fished',
@@ -2534,6 +2534,8 @@ var LANG = {
     male:   "Male",
     female: "Female",
 
+    searchdb: "Search database...",
+
     source_bossdrop: "Boss Drop",
     source_zonedrop: "Zone Drop",
     source_quests:   "Quests",
@@ -2614,6 +2616,9 @@ var LANG = {
     lvpage_previous: " Previous",
     lvpage_next:     "Next ",
     lvpage_last:     "Last ",
+
+    lvsearchresults:          "Search within results...",
+    lvsearchdisplayedresults: "Search within displayed results...",
 
     lvscreenshot_submit: "Submit a screenshot",
     lvscreenshot_from:   "From ",

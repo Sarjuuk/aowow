@@ -395,7 +395,7 @@ ShowOnMap.prototype.construct = function() {
                 }
             }
         }
-        if (menu && menu[2] && menu[2].constructor && menu[2].call && menu[2].apply) {      // sarjuuk: check if menu[2] is function
+        if (menu && menu[2] && menu[2].constructor && menu[2].call && menu[2].apply) {      // aowow: check if menu[2] is function
             menu[2]();
         }
     }

@@ -404,7 +404,7 @@ var PageTemplate = new function()
         initFeedbackLink();
         initLanguageMenu();
 
-        initFilterDisclosure();                             // sarjuuk: custom (visibility toggle for filters was removed at some point)
+        initFilterDisclosure();                             // aowow: custom (visibility toggle for filters was removed at some point)
 
         // UI before page contents
         initFloatingStuff();
@@ -644,7 +644,7 @@ var PageTemplate = new function()
             var menuItem = [
                 locale.id,
                 locale.description,
-                g_host + '/?locale=' + locale.id,                           // sarjuuk: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
+                g_host + '/?locale=' + locale.id,                           // aowow: edited for unsupported subdomains # linkBefore + locale.domain + linkAfter
                 null,                                                       // more custom
                 null                                                        // also custom
             ];
@@ -718,26 +718,9 @@ var PageTemplate = new function()
         // Search
         var $search = $('div.topbar-search', $topBar);
 
-        // custom start (note: html5 supports placeholder attribute)
-        var inp = $WH.ge('livesearch-generic');
-        if (inp.value == '') {
-            inp.className = 'search-database';
-        }
-        inp.onmouseover = function() {
-            if ($WH.trim(this.value) != '') {
-                this.className = '';
-            }
-        };
-        inp.onfocus = function() {
-            this.className = '';
-        };
-        inp.onblur = function() {
-            if ($WH.trim(this.value) == '') {
-                this.className = 'search-database';
-                this.value = '';
-            }
-        };
-        // custom end
+        // aowow: custom start
+        $('#livesearch-generic').attr('placeholder', LANG.searchdb);
+        // aowow: custom end
 
         // Icon
         var $icon = $('<a></a>').attr('href', 'javascript:;');
@@ -1469,7 +1452,7 @@ function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints)
                 side = 1;
             }
 
-            // sarjuuk: custom start
+            // aowow: custom start
             if (currencyId == 103) {                        // arena
                 html += '<a href="?currency=' + currencyId + '" class="moneyarena tip" onmouseover="Listview.funcBox.moneyArenaOver(event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">' + $WH.number_format(count) + '</a>';
             }
@@ -1479,7 +1462,7 @@ function g_getMoneyHtml(money, side, costItems, costCurrency, achievementPoints)
             else {                                          // tokens
                 html += '<a href="?currency=' + currencyId + '" class="icontinyr tip q1" onmouseover="Listview.funcBox.moneyCurrencyOver(' + currencyId + ', ' + count + ', event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()" style="background-image: url(' + g_staticUrl + '/images/wow/icons/tiny/' + icon[0].toLowerCase() + '.gif)">' +  count + '</a>';
             }
-            // sarjuuk: custom end
+            // aowow: custom end
             // html += '<a href="?currency=' + currencyId + '" class="icontinyr tip q1" onmouseover="Listview.funcBox.moneyCurrencyOver(' + currencyId + ', ' + count + ', event)" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[(side == 3 ? 1 : side - 1)].toLowerCase() + '.gif)">' + (side == 3 ? '<span class="icontinyr" style="background-image: url(' + g_staticUrl + '/images/icons/tiny/' + icon[0].toLowerCase() + '.gif)">' : '') + count + (side == 3 ? '</span>' : '') + '</a>';
         }
     }
@@ -3682,6 +3665,10 @@ var
                 }
             }
 
+            if (field.placeholder) {
+                f.placeholder = field.placeholder;
+            }
+
             if (field.type != 'checkbox' && field.type != 'radio') {
                 if (field.width) {
                     f.style.width = field.width;
@@ -5420,12 +5407,12 @@ Listview.prototype = {
         $WH.ae(bandTop, this.navTop);
         if (this.searchable) {
             var
-                FI_FUNC  = this.updateFilters.bind(this, true),
-                FI_CLASS = (this._truncated ? 'search-within-results2' : 'search-within-results'),
-                sp       = $WH.ce('span'),
-                em       = $WH.ce('em'),
-                a        = $WH.ce('a'),
-                input    = $WH.ce('input');
+                FI_FUNC = this.updateFilters.bind(this, true),
+                FI_PH   = (this._truncated ? LANG.lvsearchdisplayedresults : LANG.lvsearchresults),
+                sp      = $WH.ce('span'),
+                em      = $WH.ce('em'),
+                a       = $WH.ce('a'),
+                input   = $WH.ce('input');
 
             sp.className = 'listview-quicksearch';
 
@@ -5439,7 +5426,7 @@ Listview.prototype = {
             a.onclick = function() {
                 var foo = this.nextSibling;
                 foo.value = '';
-                foo.className = FI_CLASS;
+                foo.placeholder = FI_PH;
                 FI_FUNC();
             };
             a.style.display = 'none';
@@ -5448,7 +5435,7 @@ Listview.prototype = {
             $WH.ns(a);
 
             input.setAttribute('type', 'text');
-            input.className = FI_CLASS;
+            input.placeholder = FI_PH;
             input.style.width = (this._truncated ? '19em': '15em');
             g_onAfterTyping(input, FI_FUNC, this.searchDelay);
 
@@ -5464,7 +5451,6 @@ Listview.prototype = {
 
             input.onblur = function() {
                 if ($WH.trim(this.value) == '') {
-                    this.className = FI_CLASS;
                     this.value = '';
                 }
             };
@@ -7322,7 +7308,7 @@ Listview.extraCols = {
             }
 
             // var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 0 : (row.percent >= 0.195 ? 1 : 2)));
-            var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 1 : 2)); // sarjuuk: doesn't look as nice but i prefer accuracy
+            var value = parseFloat(row.percent.toFixed(row.percent >= 1.95 ? 1 : 2)); // aowow: doesn't look as nice but i prefer accuracy
 
             if (row.pctstack) {
                 var sp = $WH.ce('span');
@@ -8595,7 +8581,7 @@ Listview.funcBox = {
             Listview.templates.comment.updateCommentCell(comment);
             comment.deleted = true;
 
-            // sarjuuk: lets see....
+            // aowow: custom start
             comment.voteCell.hide();
             comment.repliesCell.hide();
             comment.commentBody.hide();
@@ -8615,7 +8601,7 @@ Listview.funcBox = {
                     comment.repliesControl.toggle();
                 });
             }
-            // nothing more to see here
+            // aowow: custom end
 
             return;
         }
@@ -8641,7 +8627,7 @@ Listview.funcBox = {
                     comment.deleted = false;
                     Listview.templates.comment.updateCommentCell(comment);
 
-                    // sarjuuk: lets see....
+                    // aowow: custom start
                     comment.voteCell.show();
                     comment.repliesCell.show();
                     comment.commentBody.show();
@@ -8651,7 +8637,7 @@ Listview.funcBox = {
                         comment.headerCell.css('cursor', 'auto');
                         comment.headerCell.unbind('click');
                     }
-                    // nothig mor to see here
+                    // aowow custom end
                 }
             }
             else
@@ -8661,7 +8647,7 @@ Listview.funcBox = {
 
     coEdit: function(comment, mode, blog)
     {
-        // sarjuuk: already editing
+        // aowow: custom
         if (comment.commentCell.find('.comment-edit')[0]) {
             return;
         }
@@ -9406,7 +9392,7 @@ Listview.funcBox = {
     moneyCurrencyOver: function(currencyId, count, e) {
         var buff = g_gatheredcurrencies[currencyId]['name_' + Locale.getName()];
 
-        // sarjuuk: justice / valor points handling removed
+        // aowow: justice / valor points handling removed
 
         $WH.Tooltip.showAtCursor(e, buff, 0, 0, 'q1');
     },
@@ -9504,7 +9490,7 @@ Listview.funcBox = {
                     icon = g_gatheredcurrencies[currencyId].icon;
                 }
 
-//  sarjuuk: replacement
+//  aowow: replacement
                 _ = $WH.ce('a');
                 _.href = '?currency=' + currencyId;
                 _.onmousemove = $WH.Tooltip.cursorUpdate;
@@ -9537,7 +9523,7 @@ Listview.funcBox = {
                     _.onmouseover = Listview.funcBox.moneyCurrencyOver.bind(_, currencyId, count);
                     $WH.ae(_, $WH.ct($WH.number_format(count)));
                 }
-/*  sarjuuk: original
+/*  aowow: original
                 if (side == 3 && icon[0] == icon[1]) {
                     side = 1;
                 }
@@ -12064,7 +12050,7 @@ Listview.templates = {
                     return buff;
                 },
                 sortFunc: function(a, b) {
-                /*  sarjuuk: behaves unpredictable if reqclass not set or 0
+                /*  aowow: behaves unpredictable if reqclass not set or 0
                     if (a.reqclass && b.reqclass) {
                         var reqClass = $WH.strcmp(g_chr_classes[(1 + Math.log(a.reqclass) / Math.LN2)], g_chr_classes[(1 + Math.log(b.reqclass) / Math.LN2)]);
                         if (reqClass) {
@@ -12107,7 +12093,7 @@ Listview.templates = {
                     return Listview.funcBox.assocArrCmp(a.skill, b.skill, g_spell_skills);
                 }
             },
-    /* sarjuuk
+    /* aowow
         todo: localize he next three cols
     */
             {
@@ -12902,7 +12888,7 @@ Listview.templates = {
                 comment.headerCell.css('cursor', 'pointer');
                 comment.headerCell.bind('click', function(e) {
                     if ($WH.$E(e)._target.nodeName == 'A') {
-                        return;                             // sarjuuk - custom: prevent toggle if using function buttons
+                        return;                             // aowow - custom: prevent toggle if using function buttons
                     }
 
                     comment.voteCell.toggle();
@@ -13773,7 +13759,7 @@ Listview.templates = {
 
         getItemLink: function(reply)
         {
-        /* sarjuuk: g_getCommentDomain returned a whole domain to ptr., old., ect.
+        /* aowow: g_getCommentDomain returned a whole domain to ptr., old., ect.
             if(reply.url)
                 return g_getCommentDomain(reply.domain) + '/' + reply.url;
             if(!g_types[reply.type])
@@ -15310,7 +15296,7 @@ Listview.templates = {
 
             var a = $WH.ce('a');
             a.href = 'javascript:;';
-            // a.className = 'pet-zoom';   // sarjuuk: keep as reference only
+            // a.className = 'pet-zoom';   // aowow: keep as reference only
             a.onclick = this.template.modelShow.bind(this.template, model.npcId, model.displayId, false);
 
             var img = $WH.ce('img');
@@ -16758,12 +16744,12 @@ function MessageBox(parent, text) {
     box.addClass("message-box");
     box.html('<p class="message">' + text + '</p><p class="close">(Click on this box to close it)</p>');
 
-    setTimeout(function() {                                 // sarjuuk - custom: popups that never vanish are just insane
+    setTimeout(function() {                                 // aowow - custom: popups that never vanish are just insane
         box.fadeOut();
     }, 5000);
 
     box.click(function (e) {
-        $WH.sp(e);                                          // sarjuuk - custom: without this, the comment-header would also register the click
+        $WH.sp(e);                                          // aowow - custom: without this, the comment-header would also register the click
         $(this).fadeOut();
     });
 
@@ -18590,7 +18576,7 @@ Mapper.prototype = {
                 this.sZoom.style.display = 'none';
         }
 
-        /*  sarjuuk: check for e is custom as it should only affect the lightbox */
+        /*  aowow: check for e is custom as it should only affect the lightbox */
         if(this.zoom && e === undefined)
             MapViewer.show({ mapper: this });
     },
@@ -18980,7 +18966,7 @@ Mapper.prototype = {
     }
 };
 
-/* sarjuuk: already defined in locale_xx instead of being fetched later
+/* aowow: already defined in locale_xx instead of being fetched later
 var g_zone_areas = {};
 */
 

@@ -1045,7 +1045,7 @@ $WH.g_intersectRect = function(a, b) {
 //****************************************************************************//
 //****************************************************************************//
 
-// sarjuuk: this function should be obsolete by now :x
+// aowow: this function should be obsolete by now :x
 $WH.g_setRatingLevel = function(sp, level, rating, value) {
     var newLvl = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), level);
     if (newLvl != null) {
@@ -1378,7 +1378,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                 }
 
                 // Always keep the base armor type
-                return $WH.isset('g_itemset_types') ? prefix + g_itemset_types[_] : _all;   // sarjuuk: LANG is not available if the tooltip is included externaly
+                return $WH.isset('g_itemset_types') ? prefix + g_itemset_types[_] : _all;   // aowow: LANG is not available if the tooltip is included externaly
                 // return prefix + g_itemset_types[_];
             });
 
@@ -1461,7 +1461,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
     // Rating to percent
     nMatch = [];
     tooltip = tooltip.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function(_all, prefix, ratingId, percent) {
-/*  sarjuuk: fix tooltips with multiple occurences of the same rating
+/*  aowow: fix tooltips with multiple occurences of the same rating
         _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)'));
         if (!_) {
             return _all;

@@ -1,15 +1,3 @@
-.topbar-search input.search-database {
-    background: white url(../images/frfr/searchdatabase.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results {
-    background: white url(../images/frfr/searchwithinresults.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results2 {
-    background: white url(../images/frfr/searchwithinresults2.gif) .2em center no-repeat;
-}
-
 div.modelviewer-quality div {
     float: left;
     width: 61px;
@@ -106,4 +94,3 @@ a:hover.screenshotviewer-close span {
     width: 550px !important;
 }
  */
- 

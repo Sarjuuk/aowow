@@ -2477,6 +2477,8 @@ var LANG = {
     male:   "Homme",
     female: "Femme",
 
+    searchdb: "Rechercher dans la base de données...",
+
     source_bossdrop: "Butin de Boss",
     source_zonedrop: "Butin de zone",
     source_quests:   "Quêtes",
@@ -2557,6 +2559,9 @@ var LANG = {
     lvpage_previous: " Préc.",
     lvpage_next:     "Suiv. ",
     lvpage_last:     "Dernière ",
+
+    lvsearchresults:          "Rechercher parmi les résultats...",
+    lvsearchdisplayedresults: "Rechercher parmi les résultats affichés...",
 
     lvscreenshot_submit: "Envoyer une capture d'écran",
     lvscreenshot_from:   "Par ",
