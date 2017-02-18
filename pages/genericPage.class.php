@@ -332,7 +332,7 @@ class GenericPage
                 (new Markup($text))->parseGlobalsFromText($this->jsgBuffer);
 
             $this->article = array(
-                'text'   => Util::defStatic($article['article']),
+                'text'   => Util::jsEscape(Util::defStatic($article['article'])),
                 'params' => []
             );
 
