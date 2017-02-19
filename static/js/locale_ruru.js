@@ -2367,6 +2367,7 @@ var LANG = {
     amount:                 "Количество",
     abilities:              "Способности",
     activity:               "Активность",
+    add:                    "Добавить",
     animation:              "Анимация",
     armor:                  "Броня",
     text:                   "Текст",
@@ -2650,6 +2651,7 @@ var LANG = {
     lvnote_arenateamsfound2:  "Команд арены: $1, подходящих: $2",
     lvnote_currenciesfound:   "Найдено валюты: $1 (показано: $2)",
     lvnote_enchantmentsfound: "Найдено улучшения: $1 (показано: $2)",
+    lvnote_soundsfound:       "$1 звуков найдено ($2 отображено)",
 
     lvnote_createafilter:  '<small><a href="$1">Применить фильтр</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Отфильтровать результаты</a></small>',
@@ -2745,6 +2747,7 @@ var LANG = {
     dialog_mouseovertoload: "Наведите мышкой для загрузки...",
 
     message_ajaxnotsupported:     "Обновите ваш браузер на версию с поддержкой технологии 'Ajax'.",
+    message_browsernoaudio:       "К сожалению, ваш браузер не может проигрывать этот аудио формат: $1",
     message_cantdeletecomment:    "Этот комментарий был автоматически удален из-за негативного рейтинга.",
     message_cantdetachcomment:    "Этот коментарий уже откреплен.",
     message_codenotentered:       "Вы не ввели CAPTCHA код.",

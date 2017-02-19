@@ -214,6 +214,8 @@ $lang = array(
         'school'        => "Школа",
         'skill'         => "Уровень навыка",
         'skills'        => "Умения",
+        'sound'         => "Звук",
+        'sounds'        => "Звуки",
         'spell'         => "заклинание",
         'spells'        => "Заклинания",
         'type'          => "Тип",
@@ -673,6 +675,16 @@ $lang = array(
         'cap'           => "Максимум всего",
         'cat'           => array(
             1 => "Разное", 2 => "PvP", 4 => "World of Warcraft", 21 => "Wrath of the Lich King", 22 => "Подземелья и рейды", 23 => "Burning Crusade", 41 => "Test", 3 => "Неактивно"
+        )
+    ),
+    'sound' => array(
+        'notFound'      => "Этот звук не существует.",
+        'goToPlaylist'  => "Перейти к плейлисту",
+        'cat'           => array(
+            null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
+            "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
+            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
+            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Мой плейлист"
         )
     ),
     'pet'      => array(

@@ -2367,6 +2367,7 @@ var LANG = {
     amount:                 "Montant",
     abilities:              "Techniques",
     activity:               "Activité",
+    add:                    "Ajouter",
     animation:              "Animation",
     armor:                  "Armure",
     text:                   "Texte",
@@ -2650,6 +2651,7 @@ var LANG = {
     lvnote_arenateamsfound2:  "Total de $1 équipes d'aréna, $2 qui coïncides",
     lvnote_currenciesfound:   "$1 monnaies trouvées ($2 affichées)",
     lvnote_enchantmentsfound: "$1 enchantements trouvés ($2 affichés)",
+    lvnote_soundsfound:       "$1 sons trouvés (2$ affichés)",
 
     lvnote_createafilter:  '<small><a href="$1">Créer un filtre</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filtrer ces résultats</a></small>',
@@ -2745,6 +2747,7 @@ var LANG = {
     dialog_mouseovertoload: "Passez votre curseur de souris pour charger...",
 
     message_ajaxnotsupported:     "Veuillez utiliser un navigateur plus moderne (tel que Firefox) qui supporte les requêtes 'Ajax'.",
+    message_browsernoaudio:       "Nous sommes désolés, mais votre navigateur ne peut pas lire le format audio obligatoire : $1",
     message_cantdeletecomment:    "Ce commentaire a été automatiquement effacé à cause d'une note négative. Il ne peut être supprimé.",
     message_cantdetachcomment:    "Ce commentaire a déjà été détaché.",
     message_codenotentered:       "Vous n'avez pas écrit le CAPTCHA.",

@@ -214,6 +214,8 @@ $lang = array(
         'school'        => "Escuela",
         'skill'         => "habilidad",
         'skills'        => "Habilidades",
+        'sound'         => "Sonido",
+        'sounds'        => "Sonidos",
         'spell'         => "hechizo",
         'spells'        => "Hechizos",
         'type'          => "Tipo",
@@ -674,6 +676,16 @@ $lang = array(
         'cap'           => "Límite total",
         'cat'           => array(
             1 => "Miscelánea", 2 => "Jugador contra Jugador", 4 => "Clásico", 21 => "Wrath of the Lich King", 22 => "Mazmorra y banda", 23 => "Burning Crusade", 41 => "Prueba", 3 => "No las uso"
+        )
+    ),
+    'sound' => array(
+        'notFound'      => "Este sonido no existe.",
+        'goToPlaylist'  => "Ir a mi lista de reproducción",
+        'cat'           => array(
+            null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
+            "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
+            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
+            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Mi Lista de Reproducción"
         )
     ),
     'pet'      => array(

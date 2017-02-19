@@ -2424,6 +2424,7 @@ var LANG = {
     amount:                 "Amount",
     abilities:              "Abilities",
     activity:               "Activity",
+    add:                    "Add",
     animation:              "Animation",
     armor:                  "Armor",
     text:                   "Text",
@@ -2707,6 +2708,7 @@ var LANG = {
     lvnote_arenateamsfound2:  "$1 total arena teams, $2 matching",
     lvnote_currenciesfound:   "$1 currencies found ($2 displayed)",
     lvnote_enchantmentsfound: "$1 enchantments found ($2 displayed)",
+    lvnote_soundsfound:       "$1 sounds found ($2 displayed)",
 
     lvnote_createafilter:  '<small><a href="$1">Create a filter</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filter these results</a></small>',
@@ -2802,6 +2804,7 @@ var LANG = {
     dialog_mouseovertoload: "Mouseover to load...",
 
     message_ajaxnotsupported:     "Please upgrade to a modern browser (such as Firefox) that supports 'Ajax' requests.",
+    message_browsernoaudio:       "We're sorry, but your web browser cannot play the required audio format: $1",
     message_cantdeletecomment:    "This comment has been automatically purged due to a negative rating. It cannot be deleted.",
     message_cantdetachcomment:    "This comment has already been detached.",
     message_codenotentered:       "You did not enter the code.",

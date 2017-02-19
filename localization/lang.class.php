@@ -25,6 +25,7 @@ class Lang
     private static $quest;
     private static $race;
     private static $skill;
+    private static $sound;
     private static $spell;
     private static $title;
     private static $zone;

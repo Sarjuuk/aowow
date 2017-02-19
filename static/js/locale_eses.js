@@ -2378,6 +2378,7 @@ var LANG = {
     amount:                 "Cantidad",
     abilities:              "Habilidades",
     activity:               "Actividad",
+    add:                    "Añadir",
     animation:              "Animación",
     armor:                  "Armadura",
     text:                   "Texto",
@@ -2660,6 +2661,7 @@ var LANG = {
     lvnote_arenateamsfound2:  "$1 equipos de arena en total, $2 coincidente(s)",
     lvnote_currenciesfound:   "$1 monedas encontradas ($2 mostradas)",
     lvnote_enchantmentsfound: "$1 encantamientos encontrados (mostrados $2)",
+    lvnote_soundsfound:       "$1 sonidos encontrados ($2 mostrados)",
 
     lvnote_createafilter:  '<small><a href="$1">Crea un filtro</a></small>',
     lvnote_filterresults:  '<small><a href="$1">Filtrar estos resultados</a></small>',
@@ -2755,6 +2757,7 @@ var LANG = {
     dialog_mouseovertoload: "Pasa el ratón por encima para cargar...",
 
     message_ajaxnotsupported:     "Por favor, instale un navegador de internet más moderno (como Firefox) que pueda hacer peticiones 'Ajax'.",
+    message_browsernoaudio:       "Lo sentimos pero tu navegador no puede reproducir el formato de audio requerido",
     message_cantdeletecomment:    "Este comentario fue automaticamente eliminado debido a que tiene una valoración negativa. No puede ser borrado.",
     message_cantdetachcomment:    "Este comentario ya fue separado.",
     message_codenotentered:       "No introdujo el código.",
