@@ -2249,6 +2249,138 @@ var Markup = {
                 return str.replace(/<small\b[\s\S]*?>([\s\S]*?)<\/small>/gi, '[small]$1[/small]');
             }
         },
+        sound: {
+            empty: true,
+            attr:
+            {
+                unnamed: { req: false, valid: /^[0-9]+$/ },
+                src:     { req: false, valid: /\S+/ },
+                title:   { req: false, valid: /\S+/ },
+                type:    { req: false, valid: /\S+/ },
+                src2:    { req: false, valid: /\S+/ },
+                type2:   { req: false, valid: /\S+/ },
+                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+            },
+            validate: function (attr)
+            {
+                if(attr.unnamed)
+                    return true;
+
+                if(!attr.src)
+                    return false;
+
+                return true;
+            },
+            toHtml: function (attr)
+            {
+                var
+                    type,
+                    src,
+                    title,
+                    href,
+                    src2,
+                    type2;
+
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var url = domainInfo[0];
+                if (attr.unnamed)
+                {
+                    if (!(attr.unnamed in g_sounds))
+                        return '';
+
+                    if (!g_sounds[attr.unnamed].hasOwnProperty("files"))
+                        return '';
+
+                    if (g_sounds[attr.unnamed].files.length == 0)
+                        return '';
+
+                    if (!g_sounds[attr.unnamed].files[0].hasOwnProperty('type'))
+                        return '';
+
+                    type  = g_sounds[attr.unnamed].files[0].type;
+                    src   = g_sounds[attr.unnamed].files[0].url;
+                    title = g_sounds[attr.unnamed].name ? g_sounds[attr.unnamed].name: g_sounds[attr.unnamed].files[0].title;
+                    href  = url + '/sound=' + attr.unnamed + '/' + g_urlize(title);
+                }
+                else
+                {
+                    if (Markup.allow < MARKUP_CLASS_STAFF)
+                        return '';
+
+                    src = attr.src;
+                    title = attr.title ? attr.title: '(Unknown)';
+                    if (attr.hasOwnProperty('type'))
+                        type = attr.type;
+                    else
+                    {
+                        switch (attr.src.toLowerCase().substr(-4))
+                        {
+                            case '.mp3':
+                                type = 'audio/mpeg';
+                                break;
+                            case '.ogg':
+                                type = 'audio/ogg; codecs="vorbis"';
+                                break;
+                        }
+                    }
+
+                    if (attr.src2)
+                    {
+                        src2 = attr.src2;
+                        if (attr.hasOwnProperty('type2'))
+                            type2 = attr.type2;
+                        else
+                        {
+                            switch (attr.src2.toLowerCase().substr(-4))
+                            {
+                                case '.mp3':
+                                    type2 = 'audio/mpeg';
+                                    break;
+                                case '.ogg':
+                                    type2 = 'audio/ogg; codecs="vorbis"';
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                var str = '<audio preload="none" controls="true"' + Markup._addGlobalAttributes(attr);
+                if (attr.unnamed)
+                    str += ' rel="sound=' + attr.unnamed + '"';
+                str += ">";
+
+                if (!(/^(https?:)?\/\//).test(src))
+                    src = g_staticUrl + "/wowsounds" + src;
+
+                str += '<source src="' + src + '"';
+                if (type)
+                    str += ' type="' + type.replace(/"/g, "&quot;") + '"';
+                str += ">";
+
+                if (src2)
+                {
+                    str += '<source src="' + src2 + '"';
+                    if (type2)
+                        str += ' type="' + type2.replace(/"/g, "&quot;") + '"';
+                    str += ">";
+                }
+
+                str += "</audio>";
+
+                if (href)
+                    str = '<div class="audiomarkup">' + str + '<br><a href="' + href + '">' + title + "</a></div>";
+
+                return str;
+            },
+            fromHtml: function (str)
+            {
+                var m = str.match(/<audio [^>]*\brel="sound=(\d+)/);
+                if (m)
+                    return "[sound=" + m[1] + "]";
+
+                return str.replace(/<audio\b[\s\S]*?><source\b[\s\S]*\bsrc="([^"]*?)"[\s\S]*?<\/audio>/gi, '[sound src="$1"]');
+            }
+        },
         span:
         {
             empty: false,

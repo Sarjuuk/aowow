@@ -129,6 +129,7 @@ class GenericPage
         'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_reputation'    ],
         'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_screenshots'   ],
         'skill'             => ['template' => 'skill',             'id' => 'skills',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_skills'        ],
+        'sound'             => ['template' => 'sound',             'id' => 'sounds',          'parent' => 'lv-generic', 'data' => [],                                     ],
         'spell'             => ['template' => 'spell',             'id' => 'spells',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_spells'        ],
         'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
         'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_videos'        ],
@@ -641,6 +642,7 @@ class GenericPage
             case TYPE_RACE:        $jsg[TYPE_RACE]        = ['g_races',              [], []]; break;
             case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['g_skills',             [], []]; break;
             case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['g_gatheredcurrencies', [], []]; break;
+            case TYPE_SOUND:       $jsg[TYPE_SOUND]       = ['g_sounds',             [], []]; break;
             // well, this is awkward
             case TYPE_USER:        $jsg[TYPE_USER]        = ['g_users',              [], []]; break;
             case TYPE_EMOTE:       $jsg[TYPE_EMOTE]       = ['g_emotes',             [], []]; break;
@@ -681,6 +683,7 @@ class GenericPage
                 case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
                 case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
+                case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
                 // "um, eh":, he ums and ehs.
                 case TYPE_USER:        $obj = new UserList($cnd);        break;
                 case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
