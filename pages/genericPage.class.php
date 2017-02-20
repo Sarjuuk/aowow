@@ -129,7 +129,7 @@ class GenericPage
         'reputationhistory' => ['template' => 'reputationhistory', 'id' => 'reputation',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_reputation'    ],
         'screenshot'        => ['template' => 'screenshot',        'id' => 'screenshots',     'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_screenshots'   ],
         'skill'             => ['template' => 'skill',             'id' => 'skills',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_skills'        ],
-        'sound'             => ['template' => 'sound',             'id' => 'sounds',          'parent' => 'lv-generic', 'data' => [],                                     ],
+        'sound'             => ['template' => 'sound',             'id' => 'sounds',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.types[19][2]'      ],
         'spell'             => ['template' => 'spell',             'id' => 'spells',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_spells'        ],
         'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
         'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_videos'        ],

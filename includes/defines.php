@@ -159,6 +159,7 @@ define('BUTTON_LINKS',                      4);
 define('BUTTON_FORUM',                      5);
 define('BUTTON_TALENT',                     6);
 define('BUTTON_EQUIP',                      7);
+define('BUTTON_PLAYLIST',                   8);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
@@ -200,6 +201,9 @@ define('CC_FLAG_STICKY',                    0x1);
 define('CC_FLAG_DELETED',                   0x2);
 define('CC_FLAG_OUTDATED',                  0x4);
 define('CC_FLAG_APPROVED',                  0x8);
+
+define('SOUND_TYPE_OGG',                    1);
+define('SOUND_TYPE_MP3',                    2);
 
 /*
  * Game
