@@ -44,7 +44,7 @@ class DBC
         'achievement'                   => 'niiisxssxxsxsxxxxxxxxsxssxxsxsxxxxxxxxiiiiisxssxxsxsxxxxxxxxii',
         'achievement_category'          => 'nisxssxxsxsxxxxxxxxx',
         'achievement_criteria'          => 'niiiiiiiisxssxxsxsxxxxxxxxiixii',
-        'areatable'                     => 'niixixxxxxxsxssxxsxsxxxxxxxxixxxxxxx',
+        'areatable'                     => 'niixixxiiixsxssxxsxsxxxxxxxxixxxxxxx',
         'battlemasterlist'              => 'niixxxxxxixxxxxxxxxxxxxxxxxxixii',
         'charbaseinfo'                  => 'bb',
         'charstartoutfit'               => 'nbbbXiiiiiiiiiiiiiiiiiiiixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
@@ -97,6 +97,7 @@ class DBC
         'skillline'                     => 'nixsxssxxsxsxxxxxxxxsxssxxsxsxxxxxxxxixxxxxxxxxxxxxxxxxx',
         'skilllineability'              => 'niiiixxixiiixx',
         'skillraceclassinfo'            => 'niiiiixx',
+        'soundambience'                 => 'nii',
         'soundentries'                  => 'nisssssssssssxxxxxxxxxxsxixxxx',
         'spell'                         => 'niiiuuuuuuuuixixxxixxxxxxxxxiiixxxxiiiiiiiiiiiixxiiiiiiiiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiiiiiiiifffiiiiiiiiiiiiiiifffiiiiiiiiixxiixsxssxxsxsxxxxxxxxsxssxxsxsxxxxxxxxsxssxxsxsxxxxxxxxsxssxxsxsxxxxxxxxiiiiiiiiiixxfffxxxiixiixifffii',
         'spellcasttimes'                => 'nixx',
@@ -120,6 +121,9 @@ class DBC
         'worldmaparea'                  => 'niisffffxix',         // 4.x - niisffffxixxxx
         'worldmapoverlay'               => 'niixxxxxsiiiixxxx',   // 4.x - niixxxsiiiixxxx
         'worldmaptransforms'            => 'niffffiffi',
+        'zoneintromusictable'           => 'nxixx',
+        'zonemusic'                     => 'nxxxxxii',
+
     );
 
 
@@ -127,7 +131,7 @@ class DBC
         'achievement'                   => 'Id,faction,map,previous,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,description_loc0,description_loc2,description_loc3,description_loc6,description_loc8,category,points,orderInGroup,flags,iconId,reward_loc0,reward_loc2,reward_loc3,reward_loc6,reward_loc8,reqCriteriaCount,refAchievement',
         'achievement_category'          => 'Id,parentCategory,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8',
         'achievement_criteria'          => 'Id,refAchievementId,type,value1,value2,value3,value4,value5,value6,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,completionFlags,groupFlags,timeLimit,order',
-        'areatable'                     => 'Id,mapId,areaTable,flags,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,factionGroupMask',
+        'areatable'                     => 'Id,mapId,areaTable,flags,soundAmbience,zoneMusic,zoneIntroMusic,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,factionGroupMask',
         'battlemasterlist'              => 'Id,mapId,moreMapId,areaType,maxPlayers,minLevel,maxLevel',
         'charbaseinfo'                  => 'raceId,classId',
         'charstartoutfit'               => 'Id,raceId,classId,gender,item1,item2,item3,item4,item5,item6,item7,item8,item9,item10,item11,item12,item13,item14,item15,item16,item17,item18,item19,item20',
@@ -180,6 +184,7 @@ class DBC
         'skillline'                     => 'Id,categoryId,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,description_loc0,description_loc2,description_loc3,description_loc6,description_loc8,iconId',
         'skilllineability'              => 'Id,skillLineId,spellId,reqRaceMask,reqClassMask,reqSkillLevel,acquireMethod,skillLevelGrey,skillLevelYellow',
         'skillraceclassinfo'            => 'Id,skillLine,raceMask,classMask,flags,reqLevel',
+        'soundambience'                 => 'Id,soundIdDay,soundIdNight',
         'soundentries'                  => 'Id,type,name,file1,file2,file3,file4,file5,file6,file7,file8,file9,file10,path,flags',
         'spell'                         => 'Id,category,dispelType,mechanic,attributes0,attributes1,attributes2,attributes3,attributes4,attributes5,attributes6,attributes7,stanceMask,stanceMaskNot,spellFocus,castTimeId,recoveryTime,recoveryTimeCategory,procChance,procCharges,maxLevel,baseLevel,spellLevel,durationId,powerType,powerCost,powerCostPerLevel,powerPerSecond,powerPerSecondPerLevel,rangeId,stackAmount,tool1,tool2,reagent1,reagent2,reagent3,reagent4,reagent5,reagent6,reagent7,reagent8,reagentCount1,reagentCount2,reagentCount3,reagentCount4,reagentCount5,reagentCount6,reagentCount7,reagentCount8,equippedItemClass,equippedItemSubClassMask,equippedItemInventoryTypeMask,effect1Id,effect2Id,effect3Id,effect1DieSides,effect2DieSides,effect3DieSides,effect1RealPointsPerLevel,effect2RealPointsPerLevel,effect3RealPointsPerLevel,effect1BasePoints,effect2BasePoints,effect3BasePoints,effect1Mechanic,effect2Mechanic,effect3Mechanic,effect1ImplicitTargetA,effect2ImplicitTargetA,effect3ImplicitTargetA,effect1ImplicitTargetB,effect2ImplicitTargetB,effect3ImplicitTargetB,effect1RadiusId,effect2RadiusId,effect3RadiusId,effect1AuraId,effect2AuraId,effect3AuraId,effect1Periode,effect2Periode,effect3Periode,effect1ValueMultiplier,effect2ValueMultiplier,effect3ValueMultiplier,effect1ChainTarget,effect2ChainTarget,effect3ChainTarget,effect1CreateItemId,effect2CreateItemId,effect3CreateItemId,effect1MiscValue,effect2MiscValue,effect3MiscValue,effect1MiscValueB,effect2MiscValueB,effect3MiscValueB,effect1TriggerSpell,effect2TriggerSpell,effect3TriggerSpell,effect1PointsPerComboPoint,effect2PointsPerComboPoint,effect3PointsPerComboPoint,effect1SpellClassMaskA,effect2SpellClassMaskA,effect3SpellClassMaskA,effect1SpellClassMaskB,effect2SpellClassMaskB,effect3SpellClassMaskB,effect1SpellClassMaskC,effect2SpellClassMaskC,effect3SpellClassMaskC,iconId,iconIdActive,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,rank_loc0,rank_loc2,rank_loc3,rank_loc6,rank_loc8,description_loc0,description_loc2,description_loc3,description_loc6,description_loc8,buff_loc0,buff_loc2,buff_loc3,buff_loc6,buff_loc8,powerCostPercent,startRecoveryCategory,startRecoveryTime,maxTargetLevel,spellFamilyId,spellFamilyFlags1,spellFamilyFlags2,spellFamilyFlags3,maxAffectedTargets,damageClass,effect1DamageMultiplier,effect2DamageMultiplier,effect3DamageMultiplier,toolCategory1,toolCategory2,schoolMask,runeCostId,powerDisplayId,effect1BonusMultiplier,effect2BonusMultiplier,effect3BonusMultiplier,spellDescriptionVariable,spellDifficulty',
         'spellcasttimes'                => 'Id,baseTime',
@@ -203,6 +208,8 @@ class DBC
         'worldmaparea'                  => 'Id,mapId,areaId,nameINT,left,right,top,bottom,defaultDungeonMapId',
         'worldmapoverlay'               => 'Id,worldMapAreaId,areaTableId,textureString,w,h,x,y',
         'worldmaptransforms'            => 'Id,sourceMapId,minX,minY,maxX,maxY,targetMapId,offsetX,offsetY,dungeonMapId',
+        'zoneintromusictable'           => 'Id,soundId',
+        'zonemusic'                     => 'Id,soundIdDay,soundIdNight',
     );
 
     private $isGameTable = false;

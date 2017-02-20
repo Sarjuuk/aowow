@@ -29,3 +29,10 @@ CREATE TABLE `aowow_sounds_files` (
 	`type` TINYINT(1) UNSIGNED NOT NULL COMMENT '1: ogg; 2: mp3',
 	PRIMARY KEY (`id`)
 ) COLLATE='utf8_general_ci' ENGINE=InnoDB;
+
+ALTER TABLE `aowow_zones`
+	ADD COLUMN `soundAmbiDay` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `parentY`,
+	ADD COLUMN `soundAmbiNight` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundAmbiDay`,
+	ADD COLUMN `soundMusicDay` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundAmbiNight`,
+	ADD COLUMN `soundMusicNight` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundMusicDay`,
+	ADD COLUMN `soundIntro` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundMusicNight`;

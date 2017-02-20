@@ -494,7 +494,7 @@ class ZonePage extends GenericPage
         {
             $this->lvTabs[] = ['quest', array(
                 'data' => array_values($questsLV),
-                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')'
+                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')'
             )];
         }
 
@@ -684,6 +684,24 @@ class ZonePage extends GenericPage
             )];
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
+        }
+
+        // tab: sound (including subzones; excluding parents)
+        $soundIds = $this->subject->getSounds();
+        foreach ($subZones->iterate() as $__)
+            $soundIds = array_merge($soundIds, $subZones->getSounds());
+
+        if ($soundIds)
+        {
+            $music = new SoundList(array(['id', array_unique($soundIds)]));
+            if (!$music->error)
+            {
+                $this->lvTabs[] = ['sound', array(
+                    'data' => array_values($music->getListviewData()),
+                )];
+
+                $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
+            }
         }
     }
 

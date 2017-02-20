@@ -10,7 +10,6 @@ class SoundList extends BaseType
     public static   $brickFile = 'sound';
 
     protected       $queryBase = 'SELECT *, s.id AS ARRAY_KEY FROM ?_sounds s';
-    protected       $queryOpts = [];
 
     private         $fileBuffer = [];
     private static  $fileTypes  = array(

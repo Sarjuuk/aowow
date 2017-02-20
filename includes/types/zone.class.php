@@ -104,6 +104,18 @@ class ZoneList extends BaseType
         return $data;
     }
 
+    public function getSounds()
+    {
+        $data   = [];
+        $fields = ['soundAmbiDay', 'soundAmbiNight', 'soundMusicDay', 'soundMusicNight', 'soundIntro'];
+
+        foreach ($fields as $idx => $n)
+            if ($x = $this->getField($n))
+                $data[$idx] = $x;
+
+        return $data;
+    }
+
     public function renderTooltip() { }
 }
 

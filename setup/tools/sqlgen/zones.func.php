@@ -26,7 +26,7 @@ $customData = array(
     3848 => ['parentAreaId' => 3523, 'parentX' => 74.3, 'parentY' => 57.8],
     3456 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7]
 );
-$reqDBC = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist'];
+$reqDBC = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist', 'soundambience', 'zonemusic', 'zoneintromusictable'];
 
 function zones()
 {
@@ -82,6 +82,9 @@ function zones()
                 IFNULL(pa.areaId, 0),
                 IFNULL(pa.posX, 0),
                 IFNULL(pa.posY, 0),
+                IFNULL(sa.soundIdDay, 0), IFNULL(sa.soundIdNight, 0),
+                IFNULL(zm.soundIdDay, 0), IFNULL(zm.soundIdNight, 0),
+                IFNULL(zimt.soundId, 0),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc0, m.name_loc0),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc2, m.name_loc2),
                 IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc3, m.name_loc3),
@@ -91,6 +94,12 @@ function zones()
                 dbc_areatable a
             JOIN
                 dbc_map m ON a.mapId = m.id
+            LEFT JOIN
+                dbc_soundambience sa ON sa.id = a.soundAmbience
+            LEFT JOIN
+                dbc_zonemusic zm ON zm.id = a.zoneMusic
+            LEFT JOIN
+                dbc_zoneintromusictable zimt ON zimt.id = a.zoneIntroMusic
             LEFT JOIN (
                 SELECT mapId, BIT_OR(1 << difficulty) AS modeMask, MIN(nPlayer) AS minPl, MAX(nPlayer) AS maxPl FROM dbc_mapdifficulty GROUP BY mapId
             ) md ON md.mapId = a.mapId

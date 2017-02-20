@@ -111,11 +111,65 @@ class SoundPage extends GenericPage
             )];
         }
 
+        // tab: Zones
+        $cnd = array(
+            'OR',
+            ['soundAmbiDay',    $this->typeId],
+            ['soundAmbiNight',  $this->typeId],
+            ['soundMusicDay',   $this->typeId],
+            ['soundMusicNight', $this->typeId],
+            ['soundIntro',      $this->typeId]
+        );
+        $zones = new ZoneList($cnd);
+        if (!$zones->error)
+        {
+            $this->extendGlobalData($zones->getJSGlobals(GLOBALINFO_SELF));
+
+            $zoneData = $zones->getListviewData();
+            $parents  = $zones->getAllFields('parentArea');
+
+            $pIds = array_filter(array_unique(array_values($parents)));
+            if ($pIds)
+            {
+                $pZones = new ZoneList(array(['id', $pIds]));
+                if (!$pZones->error)
+                {
+                    $this->extendGlobalData($pZones->getJSGlobals(GLOBALINFO_SELF));
+
+                    $pData = $pZones->getListviewData();
+                    foreach ($parents as $child => $parent)
+                    {
+                        if (!$parent || empty($pData[$parent]))
+                            continue;
+
+                        if (!isset($pData[$parent]['subzones']))
+                            $pData[$parent]['subzones'] = [];
+
+                        $pData[$parent]['subzones'][] = $child;
+                        unset($parents[$child]);
+                    }
+
+                    // these are original parents
+                    foreach ($parents as $parent => $__)
+                        if (empty($pData[$parent]))
+                            $pData[$parent] = $zoneData[$parent];
+
+                    $zoneData = $pData;
+                }
+            }
+
+            $this->lvTabs[] = ['zone', array(
+                'data'       => array_values($zoneData),
+                'hiddenCols' => ['territory']
+            )];
+
+        }
+
         // now here is the interesting part
         // there is a crapton of sound-related dbc files
         // how can we link sounds and events
         // anything goes .. probably
-        // used by: spell (effect: play sound + actual spell effects), item (material sounds), zone (music + ambience), creature (dialog + activities), race (error text + emotes)
+        // used by: spell (actual spell effects), item (material sounds), creature (dialog + activities), race (error text + emotes)
     }
 }
 

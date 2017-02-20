@@ -340,6 +340,16 @@ abstract class BaseType
         return $value;
     }
 
+    public function getAllFields($field, $localized = false, $silent = false)
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+            $data[$this->id] = $this->getField($field, $localized, $silent);
+
+        return $data;
+    }
+
     public function getRandomId()
     {
         // ORDER BY RAND() is not optimal, so if anyone has an alternative idea..
