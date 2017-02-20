@@ -18,7 +18,7 @@ class SoundPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
 
     private   $cat           = 0;
-    private   $special       = false;
+    protected $special       = false;
 
     public function __construct($pageCall, $id)
     {
@@ -30,7 +30,6 @@ class SoundPage extends GenericPage
             $this->special = true;
             $this->name    = Lang::sound('cat', 1000);
             $this->cat     = 1000;
-            $this->tpl     = 'text-page-generic';
             $this->typeId  = -1000;
         }
         // regular case

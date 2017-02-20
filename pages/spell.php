@@ -1726,6 +1726,9 @@ class SpellPage extends GenericPage
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
+                case 132:                                   // Play Sound
+                    $foo['sound'] = $effMV;
+                    break;
                 case 123:                                   // Send Taxi - effMV is taxiPathId. We only use paths for flightmasters for now, so spell-triggered paths are not in the table
                 default:
                 {
@@ -1978,7 +1981,7 @@ class SpellPage extends GenericPage
             }
 
             // cases where we dont want 'Value' to be displayed
-            if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []) || empty($foo['value']))
+            if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, [132]) || empty($foo['value']))
                 unset($foo['value']);
         }
 

@@ -1015,12 +1015,7 @@ function g_addTooltip(element, text, className) {
         className = 'q';
     }
 
-    element.onmouseover = function(d) {
-        $WH.Tooltip.showAtCursor(d, text, 0, 0, className);
-    };
-
-    element.onmousemove = $WH.Tooltip.cursorUpdate;
-    element.onmouseout  = $WH.Tooltip.hide;
+    $WH.Tooltip.simple(element, text, className);
 }
 
 function g_addStaticTooltip(icon, text, className) {
@@ -20062,9 +20057,9 @@ var ContactTool = new function() {
             [2, true], // Bug report
             [8, true], // Article misinformation
             [3, true], // Typo/mistranslation
-         // [4, true], // Advertise with us
-         // [5, true], // Partnership opportunities
-         // [6, true], // Press inquiry
+            [4, true], // Advertise with us
+            [5, true], // Partnership opportunities
+            [6, true], // Press inquiry
             [7, true]  // Other
         ],
         1: [ // comment
@@ -21045,7 +21040,8 @@ AudioControls = function () {
                 n = 0;
                 if (!canPlay) {
                     var v = $WH.ce('div');
-                    v.className = 'minibox';
+                    // v.className = 'minibox'; Aowow custom
+                    v.className = 'minibox minibox-left';
                     $WH.st(v, $WH.sprintf(LANG.message_browsernoaudio, t.type));
                     p.table.parentNode.replaceChild(v, p.table);
                     return

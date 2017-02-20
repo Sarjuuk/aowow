@@ -114,7 +114,7 @@ h5 a.icontiny span { text-decoration:none !important; }
 
 .entryc .quote, .comment-body .quote,
 .text .quote, .text blockquote,
-.quote-blizz, .quote-wh, .minibox {
+.quote-blizz, .quote-wh {
     background:#1b1b1b;
     padding: 15px;
     margin:15px 0;

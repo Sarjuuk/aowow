@@ -2389,6 +2389,7 @@ var LANG = {
     daily:                  "Journalière",
     weekly:                 "Chaque semaine",
     damage:                 "Dégâts",
+    'delete':               "Supprimer",
     diet:                   "Alimentation",
     dps:                    "DPS",
     earned:                 "Accomplis",

@@ -2399,6 +2399,7 @@ var LANG = {
     daily:                  "Täglich",
     weekly:                 "Wöchentlich",
     damage:                 "Schaden",
+    'delete':               "Löschen",
     diet:                   "Ernährung",
     dps:                    "DPS",
     earned:                 "Errungen",
@@ -2756,7 +2757,7 @@ var LANG = {
     dialog_mouseovertoload: "Mouseover, um zu laden...",
 
     message_ajaxnotsupported:     "Bitte aktualisiert auf einen modernen Browser (zum Beispiel Firefox), welcher 'Ajax'-Anfragen unterstützt.",
-    message_browsernoaudio:       "Entschuldigung, dein Webbrowser kann leider das benötigte Audioformat wiedergeben: ",
+    message_browsernoaudio:       "Entschuldigung, dein Webbrowser kann leider das benötigte Audioformat nicht wiedergeben: $1",
     message_cantdeletecomment:    "Dieser Kommentar wurde aufgrund seiner negativen Wertung automatisch bereinigt und kann nicht gelöscht werden.",
     message_cantdetachcomment:    "Dieser Kommentar wurde bereits abgetrennt.",
     message_codenotentered:       "Ihr habt den Code nicht eingegeben.",

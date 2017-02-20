@@ -2446,6 +2446,7 @@ var LANG = {
     daily:                  "Daily",
     weekly:                 "Weekly",
     damage:                 "Damage",
+    'delete':               "Delete",
     diet:                   "Diet",
     dps:                    "DPS",
     earned:                 "Earned",

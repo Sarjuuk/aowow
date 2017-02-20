@@ -2400,6 +2400,7 @@ var LANG = {
     daily:                  "Diaria",
     weekly:                 "Semanal",
     damage:                 "Daño",
+    'delete':               "Borrar",
     diet:                   "Dieta",
     dps:                    "DPS",
     earned:                 "Logrados",
@@ -2757,7 +2758,7 @@ var LANG = {
     dialog_mouseovertoload: "Pasa el ratón por encima para cargar...",
 
     message_ajaxnotsupported:     "Por favor, instale un navegador de internet más moderno (como Firefox) que pueda hacer peticiones 'Ajax'.",
-    message_browsernoaudio:       "Lo sentimos pero tu navegador no puede reproducir el formato de audio requerido",
+    message_browsernoaudio:       "Lo sentimos pero tu navegador no puede reproducir el formato de audio requerido: $1",
     message_cantdeletecomment:    "Este comentario fue automaticamente eliminado debido a que tiene una valoración negativa. No puede ser borrado.",
     message_cantdetachcomment:    "Este comentario ya fue separado.",
     message_codenotentered:       "No introdujo el código.",

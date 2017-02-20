@@ -2129,6 +2129,18 @@ $WH.Tooltip = {
         }
 
         $WH.Tooltip.iconVisible = icon ? 1 : 0;
+    },
+
+    simple: function(element, text, className, fixed) {
+        if (fixed)
+            element.onmouseover = function(x) { $WH.Tooltip.show(element, text, false, false, className) };
+        else
+        {
+            element.onmouseover = function(x) { $WH.Tooltip.showAtCursor(x, text, false, false, className) };
+            element.onmousemove = $WH.Tooltip.cursorUpdate;
+        }
+
+        element.onmouseout = $WH.Tooltip.hide;
     }
 };
 
