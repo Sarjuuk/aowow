@@ -2300,7 +2300,7 @@ var Markup = {
                     type  = g_sounds[attr.unnamed].files[0].type;
                     src   = g_sounds[attr.unnamed].files[0].url;
                     title = g_sounds[attr.unnamed].name ? g_sounds[attr.unnamed].name: g_sounds[attr.unnamed].files[0].title;
-                    href  = url + '/sound=' + attr.unnamed + '/' + g_urlize(title);
+                    href  = url + '?sound=' + attr.unnamed;
                 }
                 else
                 {

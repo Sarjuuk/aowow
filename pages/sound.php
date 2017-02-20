@@ -92,6 +92,25 @@ class SoundPage extends GenericPage
         /* Extra Tabs */
         /**************/
 
+
+        // tab: Spells (howto: actual spell sounds?)
+        $cnd = array(
+            'OR',
+            ['AND', ['effect1Id', 132], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', 132], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', 132], ['effect3MiscValue', $this->typeId]]
+        );
+        $spells = new SpellList($cnd);
+        if (!$spells->error)
+        {
+            $data = $spells->getListviewData();
+            $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
+
+            $this->lvTabs[] = ['spell', array(
+                'data' => array_values($data),
+            )];
+        }
+
         // now here is the interesting part
         // there is a crapton of sound-related dbc files
         // how can we link sounds and events
