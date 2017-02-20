@@ -80,6 +80,11 @@ class EnchantmentPage extends GenericPage
 
 
         $this->infobox = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->redButtons = array(
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
+            BUTTON_WOWHEAD => false
+        );
+
         $this->effects = [];
         // 3 effects
         for ($i = 1; $i < 4; $i++)

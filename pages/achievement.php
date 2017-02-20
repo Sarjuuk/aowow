@@ -146,8 +146,14 @@ class AchievementPage extends GenericPage
         $this->series      = $series ? [[$series, null]] : null;
         $this->description = $this->subject->getField('description', true);
         $this->redButtons  = array(
-            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
-            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE)
+            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE),
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ffffff00',
+                'linkId'    => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0',
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
         $this->criteria    = array(
             'reqQty' => $this->subject->getField('reqCriteriaCount'),
