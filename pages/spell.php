@@ -122,9 +122,15 @@ class SpellPage extends GenericPage
         $_cat = $this->subject->getField('typeCat');
 
         $redButtons = array(
-            BUTTON_LINKS   => ['color' => 'ff71d5ff', 'linkId' => Util::$typeStrings[TYPE_SPELL].':'.$this->typeId],
             BUTTON_VIEW3D  => false,
-            BUTTON_WOWHEAD => true
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ff71d5ff',
+                'linkId'    => Util::$typeStrings[TYPE_SPELL].':'.$this->typeId,
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
 
         /***********/

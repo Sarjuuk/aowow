@@ -323,7 +323,7 @@ class NpcPage extends GenericPage
         $this->reputation   = $this->getOnKillRep($_altIds, $mapType);
         $this->redButtons   = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true,
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['type' => TYPE_NPC, 'typeId' => $this->typeId, 'displayId' => $this->subject->getRandomModelId()]
         );
 

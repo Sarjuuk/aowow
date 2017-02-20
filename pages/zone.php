@@ -446,7 +446,7 @@ class ZonePage extends GenericPage
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
     /*

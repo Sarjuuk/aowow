@@ -249,7 +249,7 @@ class ObjectPage extends GenericPage
         $this->relBoss     = $relBoss;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true,
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $this->typeId]
         );
 

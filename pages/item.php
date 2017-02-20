@@ -360,11 +360,17 @@ class ItemPage extends genericPage
         $this->tooltip    = $this->subject->renderTooltip(true);
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$this->subject->getField('quality')], 'linkId' => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0'],
             BUTTON_VIEW3D  => in_array($_slot, $_visSlots) && $_model ? ['displayId' => $this->subject->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $this->typeId] : false,
             BUTTON_COMPARE => $_cu,
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
-            BUTTON_UPGRADE => $_cu ? ['class' => $_class, 'slot' => $_slot] : false
+            BUTTON_UPGRADE => ($_cu ? ['class' => $_class, 'slot' => $_slot] : false),
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ff'.Util::$rarityColorStings[$this->subject->getField('quality')],
+                'linkId'    => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0',
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
 
         // availablility

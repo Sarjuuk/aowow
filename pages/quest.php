@@ -559,8 +559,14 @@ class QuestPage extends GenericPage
         $this->suggestedPl   = $this->subject->getField('suggestedPlayers');
         $this->unavailable   = $_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW;
         $this->redButtons    = array(
-            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => 'quest:'.$this->typeId.':'.$_level.''],
             BUTTON_WOWHEAD => true
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ffffff00',
+                'linkId'    => 'quest:'.$this->typeId.':'.$_level;
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
 
         if ($maTab)

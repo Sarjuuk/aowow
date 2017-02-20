@@ -52,7 +52,7 @@ class SkillPage extends GenericPage
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
         if ($_ = $this->subject->getField('description', true))
