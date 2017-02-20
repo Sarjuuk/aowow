@@ -115,6 +115,25 @@ $WH.strcmp = function(a, b) {
     return a < b ? -1 : 1;
 }
 
+$WH.stringCompare = function (a, b) {
+    if (a == b)
+        return 0;
+    if (a == null)
+        return -1;
+    if (b == null)
+        return 1;
+
+    var fa = parseFloat(a);
+    var fb = parseFloat(b);
+    if (!isNaN(fa) && !isNaN(fb) && fa != fb)
+        return fa < fb ? -1 : 1;
+
+    if (typeof a == 'string' && typeof b == 'string')
+        return a.localeCompare(b);
+
+    return a < b ? -1 : 1;
+};
+
 $WH.trim = function(str) {
     return str.replace(/(^\s*|\s*$)/g, '');
 }
@@ -2111,6 +2130,98 @@ $WH.Tooltip = {
 
         $WH.Tooltip.iconVisible = icon ? 1 : 0;
     }
+};
+
+$WH.g_createButton = function(text, href, opts) {
+    var aClass  = 'btn btn-site';
+    var aTarget = '';
+    var aId     = '';
+    var aStyle  = '';
+    var UNUSED  = '';
+    var classes = [];
+    var styles  = [];
+
+    if (!opts)
+        opts = {};
+
+    if (!opts['no-margin'])
+        styles.push('margin-left:5px');
+
+    if (typeof href != 'string' || href === '')
+        href = 'javascript:;';
+
+    if (opts['new-window'])
+        aTarget = ' target="_blank"';
+
+    if (typeof opts.id == 'string')
+        aId = ' id="' + opts.id + '"';
+
+    if (typeof opts.size != 'undefined') {
+        switch (opts.size) {
+            case 'small':
+            case 'large':
+                classes.push('btn-' + opts.size);
+                break
+        }
+    }
+    else
+        classes.push('btn-small');
+
+    if (typeof opts['class'] == 'string')
+        classes.push(opts['class']);
+
+    if (typeof opts.type == 'string') {
+        switch (opts.type) {
+            case 'default':
+            case 'gray':
+                aClass = 'btn';
+                break;
+            default:
+                aClass = 'btn btn-' + opts.type
+        }
+    }
+
+    if (opts.disabled) {
+        classes.push('btn-disabled');
+        href = 'javascript:;';
+    }
+
+    if (classes.length)
+        aClass += ' ' + classes.join(' ');
+
+    if (aClass)
+        aClass = ' class="' + aClass + '"';
+
+    if (!(typeof opts['float'] != 'undefined' && !opts['float']))
+        styles.push('float:right');
+
+    if (typeof opts.style == 'string')
+        styles.push(opts.style);
+
+    if (styles.length)
+        aStyle = ' style="' + styles.join(';') + '"';
+
+    var a = '<a href="' + href + '"' + aTarget + aId + aClass + aStyle + '>' + (text || '') + '</a>';
+    var div = $WH.ce('div');
+    div.innerHTML = a;
+    var button = div.childNodes[0];
+
+    if (typeof opts.click == 'function' && !opts.disabled)
+        button.onclick = opts.click;
+
+    if (typeof opts.tooltip != 'undefined') {
+        if (opts.tooltip !== false)
+            button.setAttribute('data-whattach', 'true');
+
+        if (opts.tooltip === false)
+            button.rel = 'np';
+        else if (typeof opts.tooltip == 'string')
+            $WH.Tooltip.simple(button, opts.tooltip, null, true);
+        else if (typeof opts.tooltip == 'object' && opts.tooltip['text'])
+            $WH.Tooltip.simple(button, opts.tooltip['text'], opts.tooltip['class'], true);
+    }
+
+    return button;
 };
 
 if ($WH.isset('$WowheadPower')) {
