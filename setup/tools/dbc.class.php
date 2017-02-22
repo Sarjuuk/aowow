@@ -61,6 +61,7 @@ class DBC
         'emotes'                        => 'nxixxxx',
         'emotestext'                    => 'nsiixxxixixxxxxxxxx',
         'emotestextdata'                => 'nsxssxxsxsxxxxxxxx',
+        'emotestextsound'               => 'niiii',
         'faction'                       => 'nixxxxxxxxxxxxixxxiffixsxssxxsxsxxxxxxxxxxxxxxxxxxxxxxxxx',
         'factiontemplate'               => 'nixiiiiiiiiiii',
         'gemproperties'                 => 'nixxi',
@@ -118,6 +119,7 @@ class DBC
         'taxipath'                      => 'niix',
         'taxipathnode'                  => 'niiiffxxxxx',
         'totemcategory'                 => 'nsxssxxsxsxxxxxxxxiu',
+        'vocaluisounds'                 => 'nxiiixx',
         'worldmaparea'                  => 'niisffffxix',         // 4.x - niisffffxixxxx
         'worldmapoverlay'               => 'niixxxxxsiiiixxxx',   // 4.x - niixxxsiiiixxxx
         'worldmaptransforms'            => 'niffffiffi',
@@ -147,6 +149,7 @@ class DBC
         'durabilityquality'             => 'Id,mod',
         'emotes'                        => 'Id,animationId',
         'emotestext'                    => 'Id,command,emoteId,targetId,noTargetId,selfId',
+        'emotestextsound'               => 'Id,emotesTextId,raceId,gender,soundId',
         'emotestextdata'                => 'Id,text_loc0,text_loc2,text_loc3,text_loc6,text_loc8',
         'faction'                       => 'Id,repIdx,repFlags1,parentFaction,spilloverRateIn,spilloverRateOut,spilloverMaxRank,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8',
         'factiontemplate'               => 'Id,factionId,ourMask,friendlyMask,hostileMask,enemyFactionId1,enemyFactionId2,enemyFactionId3,enemyFactionId4,friendFactionId1,friendFactionId2,friendFactionId3,friendFactionId4',
@@ -205,6 +208,7 @@ class DBC
         'taxipath'                      => 'Id,startNodeId,endNodeId',
         'taxipathnode'                  => 'Id,pathId,nodeIdx,mapId,posX,posY',
         'totemcategory'                 => 'Id,name_loc0,name_loc2,name_loc3,name_loc6,name_loc8,category,categoryMask',
+        'vocaluisounds'                 => 'Id,raceId,soundIdMale,soundIdFemale',
         'worldmaparea'                  => 'Id,mapId,areaId,nameINT,left,right,top,bottom,defaultDungeonMapId',
         'worldmapoverlay'               => 'Id,worldMapAreaId,areaTableId,textureString,w,h,x,y',
         'worldmaptransforms'            => 'Id,sourceMapId,minX,minY,maxX,maxY,targetMapId,offsetX,offsetY,dungeonMapId',

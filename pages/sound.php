@@ -93,7 +93,9 @@ class SoundPage extends GenericPage
         /**************/
 
 
-        // tab: Spells (howto: actual spell sounds?)
+        // tab: Spells
+        // todo: -> SpellVisual.dbc (missleSound, animEventSound, 8x link to SpellVisualKit.dbc)
+        //       -> SpellVisualKit.dbc (soundId)
         $cnd = array(
             'OR',
             ['AND', ['effect1Id', 132], ['effect1MiscValue', $this->typeId]],
@@ -165,16 +167,36 @@ class SoundPage extends GenericPage
 
         }
 
-        // tab: Races (VocalUISounds (containing error voice overs) EmotesTextSound (containing emote audio))
+        // tab: Races (VocalUISounds (containing error voice overs))
+        if ($vo = DB::Aowow()->selectCol('SELECT raceId FROM ?_races_sounds WHERE soundId = ?d GROUP BY raceId', $this->typeId))
+        {
+            $races = new CharRaceList(array(['id', $vo]));
+            if (!$races->error)
+            {
+                $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['race', array(
+                    'data' => array_values($races->getListviewData()),
+                )];
+            }
+        }
 
+        // tab: Emotes (EmotesTextSound (containing emote audio))
+        if ($em = DB::Aowow()->selectCol('SELECT emoteId FROM ?_emotes_sounds WHERE soundId = ?d GROUP BY emoteId', $this->typeId))
+        {
+            $races = new EmoteList(array(['id', $em]));
+            if (!$races->error)
+            {
+                $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['emote', array(
+                    'data' => array_values($races->getListviewData()),
+                    'name' => Util::ucFirst(Lang::game('emotes'))
+                ), 'emote'];
+            }
+        }
 
+        // tab: Item (material sounds), creature (dialog + activities),
 
-
-        // now here is the interesting part
-        // there is a crapton of sound-related dbc files
-        // how can we link sounds and events
-        // anything goes .. probably
-        // used by: item (material sounds), creature (dialog + activities),
+        // tab: NPC (dialogues...?, generic creature sound)
     }
 }
 
