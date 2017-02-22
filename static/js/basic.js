@@ -2144,6 +2144,7 @@ $WH.Tooltip = {
     }
 };
 
+/* Aowow: totally incompatible with our styles. Only for reference use
 $WH.g_createButton = function(text, href, opts) {
     var aClass  = 'btn btn-site';
     var aTarget = '';
@@ -2216,25 +2217,84 @@ $WH.g_createButton = function(text, href, opts) {
     var a = '<a href="' + href + '"' + aTarget + aId + aClass + aStyle + '>' + (text || '') + '</a>';
     var div = $WH.ce('div');
     div.innerHTML = a;
-    var button = div.childNodes[0];
+    var btn = div.childNodes[0];
 
     if (typeof opts.click == 'function' && !opts.disabled)
-        button.onclick = opts.click;
+        btn.onclick = opts.click;
 
     if (typeof opts.tooltip != 'undefined') {
         if (opts.tooltip !== false)
-            button.setAttribute('data-whattach', 'true');
+            btn.setAttribute('data-whattach', 'true');
 
         if (opts.tooltip === false)
-            button.rel = 'np';
+            btn.rel = 'np';
         else if (typeof opts.tooltip == 'string')
-            $WH.Tooltip.simple(button, opts.tooltip, null, true);
+            $WH.Tooltip.simple(btn, opts.tooltip, null, true);
         else if (typeof opts.tooltip == 'object' && opts.tooltip['text'])
-            $WH.Tooltip.simple(button, opts.tooltip['text'], opts.tooltip['class'], true);
+            $WH.Tooltip.simple(btn, opts.tooltip['text'], opts.tooltip['class'], true);
     }
 
-    return button;
+    return btn;
 };
+*/
+$WH.g_createButton = function(text, href, opts)
+{
+    var classes = [];
+    var styles  = [];
+    var func    = null;
+
+    if (!opts)
+        opts = {};
+
+    if (!opts['no-margin'])
+        styles.push('margin-left:5px');
+
+    if (typeof href != 'string' || href === '')
+        href = 'javascript:;';
+
+    if (typeof opts['class'] == 'string')
+        classes.push(opts['class']);
+
+    if (opts.disabled)
+        href = 'javascript:;';
+
+    if (typeof opts['float'] != 'undefined' && !opts['float'])
+        styles.push('float:inherit');
+
+    if (typeof opts.style == 'string')
+        styles.push(opts.style);
+
+    if (typeof opts.click == 'function' && !opts.disabled)
+        func = opts.click;
+
+    var btn = RedButton.create(text, !opts.disabled, func);
+
+    if (styles.length)
+        $(btn).attr('style', styles.join(';'));
+
+    if (classes.length)
+         $(btn).addClass(classes.join(' '));
+
+    btn.href = href;
+
+    if (opts['new-window'])
+        btn.target = '_blank';
+
+    if (typeof opts.id == 'string')
+        btn.id = opts.id;
+
+    if (typeof opts.tooltip != 'undefined') {
+        if (opts.tooltip === false)
+            btn.rel = 'np';
+        else if (typeof opts.tooltip == 'string')
+            $WH.Tooltip.simple(btn, opts.tooltip, null, true);
+        else if (typeof opts.tooltip == 'object' && opts.tooltip['text'])
+            $WH.Tooltip.simple(btn, opts.tooltip['text'], opts.tooltip['class'], true);
+    }
+
+    return btn;
+}
+/* Aowow: end replacement */
 
 if ($WH.isset('$WowheadPower')) {
     $WowheadPower.init();

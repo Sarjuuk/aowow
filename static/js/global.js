@@ -20967,10 +20967,6 @@ Announcement.prototype = {
     }
 };
 
-/*  get
-    LANG.message_browsernoaudio
-*/
-
 var g_audiocontrols = {
     __windowloaded: false,
 };
@@ -21004,89 +21000,89 @@ if (!window.JSON) {
 }
 
 AudioControls = function () {
-    var n = -1;
-    var canPlay = false;
-    var looping = false;
+    var fileIdx    = -1;
+    var canPlay    = false;
+    var looping    = false;
     var fullPlayer = false;
-    var autoStart = false;
-    var p = {};
-    var c = [];
-    var k = '';
+    var autoStart  = false;
+    var controls   = {};
+    var playlist   = [];
+    var url        = '';
 
-    function createPlayer(q, A, doPlay) {
-        var r = $WH.ce('audio');
-        r.preload = 'none';
-        r.controls = 'true';
-        $(r).click(function (s) { s.stopPropagation() });
-        r.style.marginTop = '5px';
-        p.audio.parentNode.replaceChild(r, p.audio);
-        p.audio = r;
-        $WH.aE(p.audio, 'ended', e.bind(q));
+    function updatePlayer(_self, itr, doPlay) {
+        var elAudio = $WH.ce('audio');
+        elAudio.preload = 'none';
+        elAudio.controls = 'true';
+        $(elAudio).click(function (s) { s.stopPropagation() });
+        elAudio.style.marginTop = '5px';
+        controls.audio.parentNode.replaceChild(elAudio, controls.audio);
+        controls.audio = elAudio;
+        $WH.aE(controls.audio, 'ended', setNextTrack.bind(_self));
 
         if (doPlay) {
-            r.preload = 'auto';
+            elAudio.preload = 'auto';
             autoStart = true;
-            $WH.aE(p.audio, 'canplaythrough', autoplay.bind(this));
+            $WH.aE(controls.audio, 'canplaythrough', autoplay.bind(this));
         }
 
         if (!canPlay)
-            p.table.style.visibility = 'visible';
+            controls.table.style.visibility = 'visible';
 
-
-        var t;
+        var file;
         do {
-            n += A;
-            if (n > c.length - 1) {
-                n = 0;
+            fileIdx += itr;
+            if (fileIdx > playlist.length - 1) {
+                fileIdx = 0;
                 if (!canPlay) {
-                    var v = $WH.ce('div');
-                    // v.className = 'minibox'; Aowow custom
-                    v.className = 'minibox minibox-left';
-                    $WH.st(v, $WH.sprintf(LANG.message_browsernoaudio, t.type));
-                    p.table.parentNode.replaceChild(v, p.table);
+                    var div = $WH.ce('div');
+                    // div.className = 'minibox'; Aowow custom
+                    div.className = 'minibox minibox-left';
+                    $WH.st(div, $WH.sprintf(LANG.message_browsernoaudio, file.type));
+                    controls.table.parentNode.replaceChild(div, controls.table);
                     return
                 }
             }
 
-            if (n < 0)
-                n = c.length - 1;
+            if (fileIdx < 0)
+                fileIdx = playlist.length - 1;
 
-            t = c[n];
+            file = playlist[fileIdx];
         }
-        while (p.audio.canPlayType(t.type) == '');
+        while (controls.audio.canPlayType(file.type) == '');
 
-        var B = $WH.ce('source');
-        B.src = t.url;
-        B.type = t.type;
-        $WH.ae(p.audio, B);
-        if (p.hasOwnProperty('title')) {
-            if (k) {
-                $WH.ee(p.title);
-                var y = $WH.ce('a');
-                y.href = k;
-                $WH.st(y, '"' + t.title + '"');
-                $WH.ae(p.title, y)
+        var elSource = $WH.ce('source');
+        elSource.src = file.url;
+        elSource.type = file.type;
+        $WH.ae(controls.audio, elSource);
+        if (controls.hasOwnProperty('title')) {
+            if (url) {
+                $WH.ee(controls.title);
+                var a = $WH.ce('a');
+                a.href = url;
+                $WH.st(a, '"' + file.title + '"');
+                $WH.ae(controls.title, a);
             }
             else
-                $WH.st(p.title, '"' + t.title + '"');
+                $WH.st(controls.title, '"' + file.title + '"');
         }
 
-        if (p.hasOwnProperty('trackdisplay'))
-            $WH.st(p.trackdisplay, '' + (n + 1) + ' / ' + c.length);
+        if (controls.hasOwnProperty('trackdisplay'))
+            $WH.st(controls.trackdisplay, '' + (fileIdx + 1) + ' / ' + playlist.length);
 
         if (!canPlay) {
             canPlay = true;
-            for (var w = n + 1; w <= c.length - 1; w++) {
-                if (p.audio.canPlayType(c[w].type)) {
-                    $(p.controlsdiv).children('a').removeClass('btn-disabled');
+            for (var i = fileIdx + 1; i <= playlist.length - 1; i++) {
+                if (controls.audio.canPlayType(playlist[i].type)) {
+                    $(controls.controlsdiv).children('a').removeClass('button-red-disabled');
                     break;
                 }
             }
         }
 
-        if (p.hasOwnProperty('addbutton')) {
-            $(p.addbutton).removeClass('btn-disabled');
-            $WH.st(p.addbutton, LANG.add);
+        if (controls.hasOwnProperty('addbutton')) {
+            $(controls.addbutton).removeClass('button-red-disabled');
+            // $WH.st(controls.addbutton, LANG.add);           Aowow: doesnt work with RedButtons
+            RedButton.setText(controls.addbutton, LANG.add);
         }
     }
 
@@ -21095,133 +21091,138 @@ AudioControls = function () {
             return;
 
         autoStart = false;
-        p.audio.play();
+        controls.audio.play();
     }
 
-    this.init = function (t, r, s) {
-        if (!$WH.is_array(t)) {
-            return
+    this.init = function (files, parent, opt) {
+        if (!$WH.is_array(files))
+            return;
+
+        if (files.length == 0)
+            return;
+
+        if ((parent.id == '') || g_audiocontrols.hasOwnProperty(parent.id)) {
+            var i = 0;
+            while (g_audiocontrols.hasOwnProperty('auto-audiocontrols-' + (++i))) {}
+            parent.id = 'auto-audiocontrols-' + i;
         }
-        if (t.length == 0) {
-            return
-        }
-        if ((r.id == '') || g_audiocontrols.hasOwnProperty(r.id)) {
-            var z = 0;
-            while (g_audiocontrols.hasOwnProperty('auto-audiocontrols-' + (++z))) {}
-            r.id = 'auto-audiocontrols-' + z
-        }
-        g_audiocontrols[r.id] = this;
-        if (typeof s == 'undefined') {
-            s = {}
-        }
-        looping = !!s.loop;
-        if (s.hasOwnProperty('url')) {
-            k = s.url
-        }
-        c = t;
-        p.div = r;
-        if (!s.listview) {
-            var B = $WH.ce('table', {
-                className: 'audio-controls'
-            });
-            p.table = B;
-            p.table.style.visibility = 'hidden';
-            $WH.ae(p.div, B);
-            var w = $WH.ce('tr');
-            $WH.ae(B, w);
-            var u = $WH.ce('td');
-            $WH.ae(w, u);
-            p.audio = $WH.ce('div');
-            $WH.ae(u, p.audio);
-            p.title = $WH.ce('div', {
-                className: 'audio-controls-title'
-            });
-            $WH.ae(u, p.title);
-            p.controlsdiv = $WH.ce('div', {
-                className: 'audio-controls-pagination'
-            });
-            $WH.ae(u, p.controlsdiv);
-            var A = m(LANG.previous, true);
-            $WH.ae(p.controlsdiv, A);
-            $WH.aE(A, 'click', this.btnPrevTrack.bind(this));
-            p.trackdisplay = $WH.ce('div', {
-                className: 'audio-controls-pagination-track'
-            });
-            $WH.ae(p.controlsdiv, p.trackdisplay);
-            var q = m(LANG.next, true);
-            $WH.ae(p.controlsdiv, q);
-            $WH.aE(q, 'click', this.btnNextTrack.bind(this))
+
+        g_audiocontrols[parent.id] = this;
+
+        if (typeof opt == 'undefined')
+            opt = {};
+
+        looping = !!opt.loop;
+        if (opt.hasOwnProperty('url'))
+            url = opt.url;
+
+        playlist = files;
+        controls.div = parent;
+
+        if (!opt.listview) {
+            var tbl = $WH.ce('table', { className: 'audio-controls' });
+            controls.table = tbl;
+            controls.table.style.visibility = 'hidden';
+            $WH.ae(controls.div, tbl);
+
+            var tr = $WH.ce('tr');
+            $WH.ae(tbl, tr);
+
+            var td = $WH.ce('td');
+            $WH.ae(tr, td);
+
+            controls.audio = $WH.ce('div');
+            $WH.ae(td, controls.audio);
+
+            controls.title = $WH.ce('div', { className: 'audio-controls-title' });
+            $WH.ae(td, controls.title);
+
+            controls.controlsdiv = $WH.ce('div', { className: 'audio-controls-pagination' });
+            $WH.ae(td, controls.controlsdiv);
+
+            var prevBtn = createButton(LANG.previous, true);
+            $WH.ae(controls.controlsdiv, prevBtn);
+            $WH.aE(prevBtn, 'click', this.btnPrevTrack.bind(this));
+
+
+            controls.trackdisplay = $WH.ce('div', { className: 'audio-controls-pagination-track' });
+            $WH.ae(controls.controlsdiv, controls.trackdisplay);
+
+            var nextBtn = createButton(LANG.next, true);
+            $WH.ae(controls.controlsdiv, nextBtn);
+            $WH.aE(nextBtn, 'click', this.btnNextTrack.bind(this))
         }
         else {
             fullPlayer = true;
-            var v = $WH.ce('div');
-            p.table = v;
-            $WH.ae(p.div, v);
-            p.audio = $WH.ce('div');
-            $WH.ae(v, p.audio);
-            p.trackdisplay = s.trackdisplay;
-            p.controlsdiv = $WH.ce('span');
-            $WH.ae(v, p.controlsdiv)
+            var div = $WH.ce('div');
+            controls.table = div;
+            $WH.ae(controls.div, div);
+
+            controls.audio = $WH.ce('div');
+            $WH.ae(div, controls.audio);
+
+            controls.trackdisplay = opt.trackdisplay;
+            controls.controlsdiv = $WH.ce('span');
+            $WH.ae(div, controls.controlsdiv);
         }
 
-        if (g_audioplaylist.isEnabled() && !s.fromplaylist) {
-            var y = m(LANG.add);
-            $WH.ae(p.controlsdiv, y);
-            $WH.aE(y, 'click', this.btnAddToPlaylist.bind(this, y));
-            p.addbutton = y;
-            if (fullPlayer) {
-                y.style.verticalAlign = '50%'
-            }
+        if (g_audioplaylist.isEnabled() && !opt.fromplaylist) {
+            var addBtn = createButton(LANG.add);
+            $WH.ae(controls.controlsdiv, addBtn);
+            $WH.aE(addBtn, 'click', this.btnAddToPlaylist.bind(this, addBtn));
+            controls.addbutton = addBtn;
+            if (fullPlayer)
+                addBtn.style.verticalAlign = '50%';
         }
 
         if (g_audiocontrols.__windowloaded)
             this.btnNextTrack();
     };
 
-    function e() {
-        createPlayer(this, 1, (looping || (n < (c.length - 1))));
+    function setNextTrack() {
+        updatePlayer(this, 1, (looping || (fileIdx < (playlist.length - 1))));
     }
 
     this.btnNextTrack = function () {
-        createPlayer(this, 1, (canPlay && (p.audio.readyState > 1) && (!p.audio.paused)));
+        updatePlayer(this, 1, (canPlay && (controls.audio.readyState > 1) && (!controls.audio.paused)));
     };
 
     this.btnPrevTrack = function () {
-        createPlayer(this, -1, (canPlay && (p.audio.readyState > 1) && (!p.audio.paused)));
+        updatePlayer(this, -1, (canPlay && (controls.audio.readyState > 1) && (!controls.audio.paused)));
     };
 
-    this.btnAddToPlaylist = function (r) {
+    this.btnAddToPlaylist = function (_self) {
         if (fullPlayer) {
-            for (var q = 0; q < c.length; q++) {
-                g_audioplaylist.addSound(c[q])
-            }
+            for (var i = 0; i < playlist.length; i++)
+                g_audioplaylist.addSound(playlist[i]);
         }
         else
-            g_audioplaylist.addSound(c[n]);
+            g_audioplaylist.addSound(playlist[fileIdx]);
 
-        r.className += ' btn-disabled';
-        $WH.st(r, LANG.added);
+        _self.className += ' button-red-disabled';
+        // $WH.st(_self, LANG.added);                       // Aowow doesn't work with RedButtons
+        RedButton.setText(_self, LANG.added);
     };
 
     this.isPlaying = function () {
-        return !p.audio.paused
+        return !controls.audio.paused;
     };
 
     this.removeSelf = function () {
-        p.table.parentNode.removeChild(p.table);
-        delete g_audiocontrols[p.div]
+        controls.table.parentNode.removeChild(controls.table);
+        delete g_audiocontrols[controls.div];
     };
 
-    function m(q, r) {
-        return $WH.g_createButton(q, null, {
-            disabled: r,
+    function createButton(text, disabled) {
+        return $WH.g_createButton(text, null, {
+            disabled: disabled,
             'float': false,
-            style: 'margin:0 12px'
-        })
+            style: 'margin:0 12px; display:inline-block'
+        });
     }
 };
 
-$WH.aE(window, "load", function () {
+$WH.aE(window, 'load', function () {
     g_audiocontrols.__windowloaded = true;
     for (var i in g_audiocontrols)
         if (i.substr(0, 2) != '__')
@@ -21229,70 +21230,76 @@ $WH.aE(window, "load", function () {
 });
 
 AudioPlaylist = function () {
-    var enabled = false;
-    var list = [];
+    var enabled  = false;
+    var playlist = [];
     var player, container;
 
     this.init = function () {
-        if (!$WH.localStorage.isSupported()) {
-            return
-        }
+        if (!$WH.localStorage.isSupported())
+            return;
+
         enabled = true;
-        var j;
-        if (j = $WH.localStorage.get("AudioPlaylist")) {
-            list = JSON.parse(j)
-        }
+
+        var tracks;
+        if (tracks = $WH.localStorage.get('AudioPlaylist'))
+            playlist = JSON.parse(tracks);
     };
+
     this.savePlaylist = function () {
-        if (!enabled) {
-            return false
-        }
-        $WH.localStorage.set("AudioPlaylist", JSON.stringify(list))
+        if (!enabled)
+            return false;
+
+        $WH.localStorage.set('AudioPlaylist', JSON.stringify(playlist));
     };
+
     this.isEnabled = function () {
-        return enabled
+        return enabled;
     };
-    this.addSound = function (j) {
-        if (!enabled) {
-            return false
-        }
+
+    this.addSound = function (track) {
+        if (!enabled)
+            return false;
+
         this.init();
-        list.push(j);
+        playlist.push(track);
         this.savePlaylist();
     };
-    this.deleteSound = function (j) {
-        if (j < 0) {
-            list = []
-        } else {
-            list.splice(j, 1)
-        }
+
+    this.deleteSound = function (idx) {
+        if (idx < 0)
+            playlist = [];
+        else
+            playlist.splice(idx, 1);
+
         this.savePlaylist();
+
         if (!player.isPlaying()) {
             player.removeSelf();
-            this.setAudioControls(container)
+            this.setAudioControls(container);
         }
-        if (list.length == 0) {
-            $WH.Tooltip.hide()
-        }
+
+        if (playlist.length == 0)
+            $WH.Tooltip.hide();
     };
 
     this.getList = function () {
         var buf = [];
-        for (var i = 0; i < list.length; i++)
-            buf.push(list[i].title);
+        for (var i = 0; i < playlist.length; i++)
+            buf.push(playlist[i].title);
 
         return buf;
     };
 
-    this.setAudioControls = function (el) {
+    this.setAudioControls = function (parent) {
         if (!enabled)
             return false;
 
-        container = el;
+        container = parent;
         player = new AudioControls();
-        player.init(list, container, { loop: true, fromplaylist: true });
+        player.init(playlist, container, { loop: true, fromplaylist: true });
     };
 };
+
 g_audioplaylist = (new AudioPlaylist);
 g_audioplaylist.init();
 

@@ -3987,6 +3987,22 @@ div.captcha-center {
     font-size: 11px;
 }
 
+.audio-controls td {
+    text-align:center
+}
+
+.audio-controls-title {
+    padding:0 15px 5px;
+    word-break:break-word;
+    word-wrap:break-word;
+    overflow-wrap:break-word
+}
+
+.audio-controls-pagination-track {
+    display:inline-block;
+    min-width:50px
+}
+
 
 /************************************************/
 /* aowow: deprecated stuff that might be of use */
