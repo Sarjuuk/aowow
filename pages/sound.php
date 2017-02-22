@@ -165,11 +165,16 @@ class SoundPage extends GenericPage
 
         }
 
+        // tab: Races (VocalUISounds (containing error voice overs) EmotesTextSound (containing emote audio))
+
+
+
+
         // now here is the interesting part
         // there is a crapton of sound-related dbc files
         // how can we link sounds and events
         // anything goes .. probably
-        // used by: spell (actual spell effects), item (material sounds), creature (dialog + activities), race (error text + emotes)
+        // used by: item (material sounds), creature (dialog + activities),
     }
 }
 

@@ -68,10 +68,10 @@ class SoundList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'id'   => $this->id,
-                'type' => $this->getField('cat'),
-                'name' => $this->getField('name'),
-                'files' => $this->getField('files')
+                'id'    => $this->id,
+                'type'  => $this->getField('cat'),
+                'name'  => $this->getField('name'),
+                'files' => array_values(array_filter($this->getField('files')))
             );
 
             /* if creature movement
@@ -90,7 +90,7 @@ class SoundList extends BaseType
             $data[self::$type][$this->id] = array(
                 'name'  => Util::jsEscape($this->getField('name', true)),
                 'type'  => $this->getField('cat'),
-                'files' => $this->getField('files')
+                'files' => array_values(array_filter($this->getField('files')))
             );
 
         return $data;
