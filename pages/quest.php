@@ -562,7 +562,7 @@ class QuestPage extends GenericPage
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => array(
                 'linkColor' => 'ffffff00',
-                'linkId'    => 'quest:'.$this->typeId.':'.$_level;
+                'linkId'    => 'quest:'.$this->typeId.':'.$_level,
                 'linkName'  => $this->name,
                 'type'      => $this->type,
                 'typeId'    => $this->typeId

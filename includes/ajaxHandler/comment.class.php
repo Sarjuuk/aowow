@@ -93,7 +93,7 @@ class AjaxComment extends AjaxHandler
                 DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
 
                 // flag target with hasComment
-                if (Util::$typeClasses[$this->_get['type']] && ($tbl = (new Util::$typeClasses[$this->_get['type']])::$dataTable))
+                if (Util::$typeClasses[$this->_get['type']] && ($tbl = (new Util::$typeClasses[$this->_get['type']](null))::$dataTable))
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->_get['typeid']);
             }
         }
@@ -151,7 +151,7 @@ class AjaxComment extends AjaxHandler
                 $this->_post['id']
             );
 
-            if (!$coInfo['hasMore'] && Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']])::$dataTable))
+            if (!$coInfo['hasMore'] && Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']](null))::$dataTable))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
     }
@@ -172,7 +172,7 @@ class AjaxComment extends AjaxHandler
         if ($ok)
         {
             $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', $this->_post['id']);
-            if (Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']])::$dataTable))
+            if (Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']](null))::$dataTable))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
     }

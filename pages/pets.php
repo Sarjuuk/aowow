@@ -36,6 +36,7 @@ class PetsPage extends GenericPage
         if ($this->category)
             $conditions[] = ['type', (int)$this->category[0]];
 
+        $data = [];
         $pets = new PetList($conditions);
         if (!$pets->error)
         {
@@ -49,9 +50,8 @@ class PetsPage extends GenericPage
 
             if (!$pets->hasDiffFields(['type']))
                 $data['hiddenCols'] = ['type'];
-
-            $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
         };
+        $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
     }
 
     protected function generateTitle()

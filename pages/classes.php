@@ -25,7 +25,7 @@ class ClassesPage extends GenericPage
 
     protected function generateContent()
     {
-        $classes = new CharClassList([true]);
+        $classes = new CharClassList();
         if (!$classes->error)
             $this->lvTabs[] = ['class', ['data' => array_values($classes->getListviewData())]];
     }

@@ -247,7 +247,7 @@ class AjaxAdmin extends AjaxHandler
         {
             $typeIds  = explode(',', $typeIds);
             $toUnflag = DB::Aowow()->selectCol('SELECT typeId AS ARRAY_KEY, IF(BIT_OR(`status`) & ?d, 1, 0) AS hasMore FROM ?_screenshots WHERE `type` = ?d AND typeId IN (?a) GROUP BY typeId HAVING hasMore = 0', CC_FLAG_APPROVED, $type, $typeIds);
-            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = (new Util::$typeClasses[$type])::$dataTable))
+            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = (new Util::$typeClasses[$type](null))::$dataTable))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id IN (?a)', CUSTOM_HAS_SCREENSHOT, array_keys($toUnflag));
         }
 

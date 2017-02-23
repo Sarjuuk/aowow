@@ -1313,6 +1313,7 @@ class ItemList extends BaseType
         {
             $buff = [];
             $this->sourceMore = [];
+
             foreach ($this->iterate() as $_curTpl)
                 if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
@@ -1793,7 +1794,7 @@ class ItemListFilter extends Filter
 
     public function __construct()
     {
-        $classes = new CharClassList([true]);
+        $classes = new CharClassList();
         foreach ($classes->iterate() as $cId => $_tpl)
         {
             // preselect misc subclasses

@@ -50,14 +50,14 @@ abstract class BaseType
     *   results in
     *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
-    public function __construct(array $conditions = [], $miscData = null)
+    public function __construct($conditions = [], $miscData = null)
     {
         $where     = [];
         $linking   = ' AND ';
         $limit     = CFG_SQL_LIMIT_DEFAULT;
         $className = get_class($this);
 
-        if (!$this->queryBase || !$conditions)
+        if (!$this->queryBase || $conditions === null)
             return;
 
         $prefixes = [];
@@ -289,6 +289,8 @@ abstract class BaseType
 
     public function &iterate()
     {
+        $oldIdx = $this->id;
+
         // reset on __construct
         $this->reset();
 
@@ -302,9 +304,19 @@ abstract class BaseType
             unset($this->curTpl);                           // kill reference or it will 'bleed' into the next iteration
         }
 
-        // reset on __destruct .. Generator, Y U NO HAVE __destruct ?!
+        // fforward to old index
         $this->reset();
-    }
+        do
+        {
+            if (key($this->templates) != $oldIdx)
+                continue;
+
+            $this->curTpl = current($this->templates);
+            $this->id     = key($this->templates);
+            break;
+        }
+        while (next($this->templates));
+   }
 
     protected function reset()
     {
