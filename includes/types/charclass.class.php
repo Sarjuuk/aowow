@@ -6,10 +6,11 @@ if (!defined('AOWOW_REVISION'))
 
 class CharClassList extends BaseType
 {
-    public static $type      = TYPE_CLASS;
-    public static $brickFile = 'class';
+    public static   $type      = TYPE_CLASS;
+    public static   $brickFile = 'class';
+    public static   $dataTable = '?_classes';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_classes c';
+    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_classes c';
 
     public function __construct($conditions = [])
     {

@@ -8,10 +8,11 @@ class ZoneList extends BaseType
 {
     use listviewHelper;
 
-    public static $type      = TYPE_ZONE;
-    public static $brickFile = 'zone';
+    public static   $type      = TYPE_ZONE;
+    public static   $brickFile = 'zone';
+    public static   $dataTable = '?_zones';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z';
+    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_zones z';
 
     public function __construct($conditions = [], $miscData = null)
     {

@@ -8,10 +8,11 @@ class PetList extends BaseType
 {
     use ListviewHelper;
 
-    public static $type      = TYPE_PET;
-    public static $brickFile = 'pet';
+    public static   $type      = TYPE_PET;
+    public static   $brickFile = 'pet';
+    public static   $dataTable = '?_pet';
 
-    protected     $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_pet p';
+    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_pet p';
 
     public function getListviewData()
     {

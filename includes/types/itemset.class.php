@@ -8,14 +8,15 @@ class ItemsetList extends BaseType
 {
     use ListviewHelper;
 
-    public static $type       = TYPE_ITEMSET;
-    public static $brickFile  = 'itemset';
+    public static   $type       = TYPE_ITEMSET;
+    public static   $brickFile  = 'itemset';
+    public static   $dataTable  = '?_itemset';
 
-    public        $pieceToSet = [];                             // used to build g_items and search
-    private       $classes    = [];                             // used to build g_classes
+    public          $pieceToSet = [];                       // used to build g_items and search
+    private         $classes    = [];                       // used to build g_classes
 
-    protected     $queryBase  = 'SELECT `set`.*, `set`.id AS ARRAY_KEY FROM ?_itemset `set`';
-    protected     $queryOpts  = array(
+    protected       $queryBase  = 'SELECT `set`.*, `set`.id AS ARRAY_KEY FROM ?_itemset `set`';
+    protected       $queryOpts  = array(
                         'set' => ['o' => 'maxlevel DESC'],
                         'e'   => ['j' => ['?_events e ON e.id = `set`.eventId', true], 's' => ', e.holidayId']
                     );

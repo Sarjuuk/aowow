@@ -1430,23 +1430,6 @@ class Util
         return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
     }
 
-    // TYPE => tableName; when handling comments, screenshots or videos
-    public static function getCCTableParent($type)
-    {
-        // only filtrable types; others don't care about being flagged for having CommunityContent
-        switch ($type)
-        {
-            case TYPE_ACHIEVEMENT:  return '?_achievement';
-            case TYPE_SPELL:        return '?_spell';
-            case TYPE_OBJECT:       return '?_objects';
-            case TYPE_ITEM:         return '?_items';
-            case TYPE_ITEMSET:      return '?_itemset';
-            case TYPE_NPC:          return '?_creature';
-            case TYPE_QUEST:        return '?_quests';
-            default:                return null;
-        }
-    }
-
     public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)
     {
         if (!$srcGroup && !$srcEntry)

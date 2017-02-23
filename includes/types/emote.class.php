@@ -6,10 +6,11 @@ if (!defined('AOWOW_REVISION'))
 
 class EmoteList extends BaseType
 {
-    public static $type      = TYPE_EMOTE;
-    public static $brickFile = 'emote';
+    public static   $type      = TYPE_EMOTE;
+    public static   $brickFile = 'emote';
+    public static   $dataTable = '?_emotes';
 
-    protected     $queryBase = 'SELECT *, e.id AS ARRAY_KEY FROM ?_emotes e';
+    protected       $queryBase = 'SELECT *, e.id AS ARRAY_KEY FROM ?_emotes e';
 
     public function __construct($conditions = [])
     {

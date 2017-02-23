@@ -50,14 +50,14 @@ abstract class BaseType
     *   results in
     *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], $miscData = null)
     {
         $where     = [];
         $linking   = ' AND ';
         $limit     = CFG_SQL_LIMIT_DEFAULT;
         $className = get_class($this);
 
-        if (!$this->queryBase || $conditions === null)
+        if (!$this->queryBase || !$conditions)
             return;
 
         $prefixes = [];

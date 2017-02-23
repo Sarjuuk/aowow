@@ -8,30 +8,31 @@ class ItemList extends BaseType
 {
     use ListviewHelper;
 
-    public static $type       = TYPE_ITEM;
-    public static $brickFile  = 'item';
+    public static   $type       = TYPE_ITEM;
+    public static   $brickFile  = 'item';
+    public static   $dataTable  = '?_items';
 
-    public        $json       = [];
-    public        $itemMods   = [];
-    public        $sources    = [];
+    public          $json       = [];
+    public          $itemMods   = [];
+    public          $sources    = [];
 
-    public        $rndEnchIds = [];
-    public        $subItems   = [];
+    public          $rndEnchIds = [];
+    public          $subItems   = [];
 
-    private       $sourceMore = null;
-    private       $ssd        = [];
-    private       $vendors    = [];
-    private       $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
+    private         $sourceMore = null;
+    private         $ssd        = [];
+    private         $vendors    = [];
+    private         $jsGlobals  = [];                       // getExtendedCost creates some and has no access to template
 
-    protected     $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
-    protected     $queryOpts  = array(                      // 3 => TYPE_ITEM
-                      'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
-                      'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = -`i`.`displayId`', true], 's' => ', ic.iconString'],
-                      'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
-                      's'   => ['j' => ['?_spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.id'],
-                      'e'   => ['j' => ['?_events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.holidayId'],
-                      'src' => ['j' => ['?_source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
-                  );
+    protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
+    protected       $queryOpts  = array(                    // 3 => TYPE_ITEM
+                        'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
+                        'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = -`i`.`displayId`', true], 's' => ', ic.iconString'],
+                        'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
+                        's'   => ['j' => ['?_spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.id'],
+                        'e'   => ['j' => ['?_events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.holidayId'],
+                        'src' => ['j' => ['?_source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', moreType, moreTypeId, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
+                    );
 
     public function __construct($conditions = [], $miscData = null)
     {
@@ -1792,7 +1793,7 @@ class ItemListFilter extends Filter
 
     public function __construct()
     {
-        $classes = new CharClassList();
+        $classes = new CharClassList([true]);
         foreach ($classes->iterate() as $cId => $_tpl)
         {
             // preselect misc subclasses

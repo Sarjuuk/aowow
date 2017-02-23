@@ -8,6 +8,7 @@ class SkillList extends BaseType
 {
     public static   $type      = TYPE_SKILL;
     public static   $brickFile = 'skill';
+    public static   $dataTable = '?_skillline';
 
     protected       $queryBase = 'SELECT *, sl.id AS ARRAY_KEY FROM ?_skillline sl';
     protected       $queryOpts = array(

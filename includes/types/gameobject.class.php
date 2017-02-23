@@ -8,11 +8,12 @@ class GameObjectList extends BaseType
 {
     use listviewHelper, spawnHelper;
 
-    public static $type      = TYPE_OBJECT;
-    public static $brickFile = 'object';
+    public static   $type      = TYPE_OBJECT;
+    public static   $brickFile = 'object';
+    public static   $dataTable = '?_objects';
 
-    protected     $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
-    protected     $queryOpts = array(
+    protected       $queryBase = 'SELECT o.*, o.id AS ARRAY_KEY FROM ?_objects o';
+    protected       $queryOpts = array(
                         'o'   => [['ft', 'qse']],
                         'ft'  => ['j' => ['?_factiontemplate ft ON ft.id = o.faction', true], 's' => ', ft.factionId, ft.A, ft.H'],
                         'qse' => ['j' => ['?_quests_startend qse ON qse.type = 2 AND qse.typeId = o.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'o.id'],

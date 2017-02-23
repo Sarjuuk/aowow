@@ -8,16 +8,17 @@ class TitleList extends BaseType
 {
     use listviewHelper;
 
-    public static $type      = TYPE_TITLE;
-    public static $brickFile = 'title';
+    public static   $type      = TYPE_TITLE;
+    public static   $brickFile = 'title';
+    public static   $dataTable = '?_titles';
 
-    public        $sources   = [];
+    public          $sources   = [];
 
-    protected     $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
-    protected     $queryOpts = array(
-                      't'   => [['src']],                   //  11: TYPE_TITLE
-                      'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']
-    );
+    protected       $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
+    protected       $queryOpts = array(
+                        't'   => [['src']],                 //    11: TYPE_TITLE
+                        'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']
+                    );
 
     public function __construct($conditions = [])
     {

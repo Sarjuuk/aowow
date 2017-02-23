@@ -128,7 +128,7 @@ class AjaxAdmin extends AjaxHandler
         foreach ($this->_get['id'] as $id)
         {
             // must not be already approved
-            if ($_ = DB::Aowow()->selectRow('SELECT userIdOwner, date FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
+            if ($_ = DB::Aowow()->selectRow('SELECT userIdOwner, date, type, typeId FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
             {
                 // should also error-log
                 if (!file_exists(sprintf($path, 'pending', $id)))
@@ -171,6 +171,9 @@ class AjaxAdmin extends AjaxHandler
                 // set as approved in DB and gain rep (once!)
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
                 Util::gainSiteReputation($_['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $_['date']]);
+                // flag DB entry as having screenshots
+                if (Util::$typeClasses[$_['type']] && ($tbl = (new Util::$typeClasses[$_['type']])::$dataTable))
+                    DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $_['typeId']);
             }
         }
 
@@ -237,7 +240,16 @@ class AjaxAdmin extends AjaxHandler
         }
 
         // flag as deleted if not aready
+        $oldEntries = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, GROUP_CONCAT(typeId) FROM ?_screenshots WHERE id IN (?a) GROUP BY `type`', $this->_get['id']);
         DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdDelete = ?d WHERE id IN (?a)', CC_FLAG_DELETED, User::$id, $this->_get['id']);
+        // deflag db entry as having screenshots
+        foreach ($oldEntries as $type => $typeIds)
+        {
+            $typeIds  = explode(',', $typeIds);
+            $toUnflag = DB::Aowow()->selectCol('SELECT typeId AS ARRAY_KEY, IF(BIT_OR(`status`) & ?d, 1, 0) AS hasMore FROM ?_screenshots WHERE `type` = ?d AND typeId IN (?a) GROUP BY typeId HAVING hasMore = 0', CC_FLAG_APPROVED, $type, $typeIds);
+            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = (new Util::$typeClasses[$type])::$dataTable))
+                DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id IN (?a)', CUSTOM_HAS_SCREENSHOT, array_keys($toUnflag));
+        }
 
         return '';
     }
@@ -249,11 +261,24 @@ class AjaxAdmin extends AjaxHandler
         if (!$this->_get['id'] || !$this->_get['typeid'])
             return '';
 
-        $type   = DB::Aowow()->selectCell('SELECT type FROM ?_screenshots WHERE id = ?d', $this->_get['id']);
-        $typeId = (int)$this->_get['typeid'];
+        $id                     = $this->_get['id'][0];
+        list($type, $oldTypeId) = array_values(DB::Aowow()->selectRow('SELECT type, typeId FROM ?_screenshots WHERE id = ?d', $id));
+        $typeId                 = (int)$this->_get['typeid'];
 
-        if (!(new Util::$typeClasses[$type]([['id', $typeId]]))->error)
-            DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $this->_get['id'][0]);
+        $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
+        if (!$tc->error)
+        {
+            // move screenshot
+            DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $id);
+
+            // flag target as having screenshot
+            DB::Aowow()->query('UPDATE '.$tc::$dataTable.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $typeId);
+
+            // deflag source for having had screenshots (maybe)
+            $ssInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~status) & ?d, 1, 0) AS hasMore FROM ?_screenshots WHERE `status`& ?d AND `type` = ?d AND typeId = ?d', CC_FLAG_DELETED, CC_FLAG_APPROVED, $type, $oldTypeId);
+            if($ssInfo || !$ssInfo['hasMore'])
+                DB::Aowow()->query('UPDATE '.$tc::$dataTable.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $oldTypeId);
+        }
 
         return '';
     }

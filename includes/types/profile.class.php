@@ -9,11 +9,12 @@ if (!defined('AOWOW_REVISION'))
 // class ArenaTeamList extends BaseType
 class ProfileList extends BaseType
 {
-    public static $type      = 0;                           // profiles dont actually have one
-    public static $brickFile = 'profile';
+    public static   $type      = 0;                         // profiles dont actually have one
+    public static   $brickFile = 'profile';
+    public static   $dataTable = '';                        // doesn't have community content
 
-    protected     $queryBase = ''; // SELECT p.*, p.id AS ARRAY_KEY FROM ?_profiles p';
-    protected     $queryOpts = array(
+    protected       $queryBase = ''; // SELECT p.*, p.id AS ARRAY_KEY FROM ?_profiles p';
+    protected       $queryOpts = array(
                         'p'   => [['pa', 'pg']],
                         'pam' => [['?_profiles_arenateam_member pam ON pam.memberId = p.id', true], 's' => ', pam.status'],
                         'pa'  => ['?_profiles_arenateam pa ON pa.id = pam.teamId', 's' => ', pa.mode, pa.name'],

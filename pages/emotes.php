@@ -26,7 +26,7 @@ class EmotesPage extends GenericPage
     protected function generateContent()
     {
         $tabData = array(
-            'data' => array_values((new EmoteList())->getListviewData()),
+            'data' => array_values((new EmoteList([true]))->getListviewData()),
             'name' => Util::ucFirst(Lang::game('emotes'))
         );
 

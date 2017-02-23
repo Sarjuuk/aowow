@@ -92,8 +92,8 @@ class AjaxComment extends AjaxHandler
                 // every comment starts with a rating of +1 and i guess the simplest thing to do is create a db-entry with the system as owner
                 DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
 
-                // flag target with hasComment (if filtrable)
-                if ($tbl = Util::getCCTableParent($this->_get['type']))
+                // flag target with hasComment
+                if (Util::$typeClasses[$this->_get['type']] && ($tbl = (new Util::$typeClasses[$this->_get['type']])::$dataTable))
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->_get['typeid']);
             }
         }
@@ -143,7 +143,7 @@ class AjaxComment extends AjaxHandler
             User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
         );
 
-        // deflag hasComment (if filtrable)
+        // deflag hasComment
         if ($ok)
         {
             $coInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~b.flags) & ?d, 1, 0) as hasMore, b.type, b.typeId FROM ?_comments a JOIN ?_comments b ON a.type = b.type AND a.typeId = b.typeId WHERE a.id = ?d',
@@ -151,7 +151,7 @@ class AjaxComment extends AjaxHandler
                 $this->_post['id']
             );
 
-            if (!$coInfo['hasMore'] && ($tbl = Util::getCCTableParent($coInfo['type'])))
+            if (!$coInfo['hasMore'] && Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']])::$dataTable))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
     }
@@ -168,11 +168,11 @@ class AjaxComment extends AjaxHandler
             User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
         );
 
-        // reflag hasComment (if filtrable)
+        // reflag hasComment
         if ($ok)
         {
             $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', $this->_post['id']);
-            if ($tbl = Util::getCCTableParent($coInfo['type']))
+            if (Util::$typeClasses[$coInfo['type']] && ($tbl = (new Util::$typeClasses[$coInfo['type']])::$dataTable))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
     }
