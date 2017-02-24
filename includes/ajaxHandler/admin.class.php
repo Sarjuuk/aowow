@@ -172,7 +172,7 @@ class AjaxAdmin extends AjaxHandler
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
                 Util::gainSiteReputation($_['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $_['date']]);
                 // flag DB entry as having screenshots
-                if (Util::$typeClasses[$_['type']] && ($tbl = (new Util::$typeClasses[$_['type']])::$dataTable))
+                if (Util::$typeClasses[$_['type']] && ($tbl = get_class_vars(Util::$typeClasses[$_['type'])['dataTable']))
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $_['typeId']);
             }
         }
@@ -247,7 +247,7 @@ class AjaxAdmin extends AjaxHandler
         {
             $typeIds  = explode(',', $typeIds);
             $toUnflag = DB::Aowow()->selectCol('SELECT typeId AS ARRAY_KEY, IF(BIT_OR(`status`) & ?d, 1, 0) AS hasMore FROM ?_screenshots WHERE `type` = ?d AND typeId IN (?a) GROUP BY typeId HAVING hasMore = 0', CC_FLAG_APPROVED, $type, $typeIds);
-            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = (new Util::$typeClasses[$type](null))::$dataTable))
+            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = get_class_vars(Util::$typeClasses[$type])['dataTable']))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id IN (?a)', CUSTOM_HAS_SCREENSHOT, array_keys($toUnflag));
         }
 
