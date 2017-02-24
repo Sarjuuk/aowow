@@ -178,9 +178,18 @@ class User
             }
         }
 
-        // check
-        if ($loc != LOCALE_EN && !(CFG_LOCALES & (1 << $loc)))
-            $loc = LOCALE_EN;
+        // check; pick first viable if failed
+        if (CFG_LOCALES && !(CFG_LOCALES & (1 << $loc)))
+        {
+            foreach (Util::$localeStrings as $idx => $__)
+            {
+                if (CFG_LOCALES & (1 << $idx))
+                {
+                    $loc = $idx;
+                    break;
+                }
+            }
+        }
 
         // set
         if (self::$id)

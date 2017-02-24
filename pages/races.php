@@ -30,9 +30,12 @@ class RacesPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $data  = [];
         $races = new CharRaceList($conditions);
         if (!$races->error)
-            $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
+            $data = array_values($races->getListviewData());
+
+        $this->lvTabs[] = ['race', ['data' => $data]];
     }
 
     protected function generateTitle()

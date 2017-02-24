@@ -289,6 +289,8 @@ abstract class BaseType
 
     public function &iterate()
     {
+        $oldIdx = $this->id;
+
         // reset on __construct
         $this->reset();
 
@@ -302,9 +304,19 @@ abstract class BaseType
             unset($this->curTpl);                           // kill reference or it will 'bleed' into the next iteration
         }
 
-        // reset on __destruct .. Generator, Y U NO HAVE __destruct ?!
+        // fforward to old index
         $this->reset();
-    }
+        do
+        {
+            if (key($this->templates) != $oldIdx)
+                continue;
+
+            $this->curTpl = current($this->templates);
+            $this->id     = key($this->templates);
+            break;
+        }
+        while (next($this->templates));
+   }
 
     protected function reset()
     {

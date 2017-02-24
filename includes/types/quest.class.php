@@ -8,6 +8,7 @@ class QuestList extends BaseType
 {
     public static   $type      = TYPE_QUEST;
     public static   $brickFile = 'quest';
+    public static   $dataTable = '?_quests';
 
     public          $requires  = [];
     public          $rewards   = [];

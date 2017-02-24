@@ -8,14 +8,15 @@ class SpellList extends BaseType
 {
     use listviewHelper;
 
-    public        $ranks       = [];
-    public        $relItems    = null;
-    public        $sources     = [];
+    public          $ranks       = [];
+    public          $relItems    = null;
+    public          $sources     = [];
 
-    public static $type        = TYPE_SPELL;
-    public static $brickFile   = 'spell';
+    public static   $type        = TYPE_SPELL;
+    public static   $brickFile   = 'spell';
+    public static   $dataTable   = '?_spell';
 
-    public static $skillLines  = array(
+    public static   $skillLines  = array(
          6 => [ 43,  44,  45,  46,  54,  55,  95, 118, 136, 160, 162, 172, 173, 176, 226, 228, 229, 473], // Weapons
          8 => [293, 413, 414, 415, 433],                                                                  // Armor
          9 => [129, 185, 356, 762],                                                                       // sec. Professions
@@ -23,20 +24,20 @@ class SpellList extends BaseType
         11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                                     // prim. Professions
     );
 
-    public static $spellTypes  = array(
+    public static   $spellTypes  = array(
          6 => 1,
          8 => 2,
         10 => 4
     );
 
-    public static $effects     = array(
+    public static   $effects     = array(
         'heal'       => [ 0,  3,  10,  67,  75, 136                         ],  // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
         'damage'     => [ 0,  2,   3,   9,  62                              ],  // <no effect>, Dummy, School Damage, Health Leech, Power Burn
         'itemCreate' => [24, 34,  59,  66, 157                              ],  // createItem, changeItem, randomItem, createManaGem, createItem2
         'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
         'teach'      => [36, 57, /*133*/                                    ]   // learn spell, learn pet spell, /*unlearn specialization*/
     );
-    public static $auras       = array(
+    public static   $auras       = array(
         'heal'       => [ 4,  8, 62, 69,  97, 226                           ],  // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
         'damage'     => [ 3,  4, 15, 53,  89, 162, 226                      ],  // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
         'itemCreate' => [86                                                 ],  // Channel Death Item
@@ -44,20 +45,20 @@ class SpellList extends BaseType
         'teach'      => [                                                   ]
     );
 
-    private       $spellVars   = [];
-    private       $refSpells   = [];
-    private       $tools       = [];
-    private       $interactive = false;
-    private       $charLevel   = MAX_LEVEL;
+    private         $spellVars   = [];
+    private         $refSpells   = [];
+    private         $tools       = [];
+    private         $interactive = false;
+    private         $charLevel   = MAX_LEVEL;
 
-    protected     $queryBase   = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_spell s';
-    protected     $queryOpts   = array(
-                      's'   => [['src', 'sr', 'si', 'si', 'sia']],             //  6: TYPE_SPELL
-                      'si'  => ['j' => ['?_icons si  ON si.id  = s.iconId',    true], 's' => ', IFNULL (si.iconString,  "inv_misc_questionmark") AS iconString'],
-                      'sia' => ['j' => ['?_icons sia ON sia.id = s.iconIdAlt', true], 's' => ', sia.iconString AS iconStringAlt'],
-                      'sr'  => ['j' => ['?_spellrange sr ON sr.id = s.rangeId'], 's' => ', sr.rangeMinHostile, sr.rangeMinFriend, sr.rangeMaxHostile, sr.rangeMaxFriend, sr.name_loc0 AS rangeText_loc0, sr.name_loc2 AS rangeText_loc2, sr.name_loc3 AS rangeText_loc3, sr.name_loc6 AS rangeText_loc6, sr.name_loc8 AS rangeText_loc8'],
-                      'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
-    );
+    protected       $queryBase   = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_spell s';
+    protected       $queryOpts   = array(
+                        's'   => [['src', 'sr', 'si', 'si', 'sia']],             //  6: TYPE_SPELL
+                        'si'  => ['j' => ['?_icons si  ON si.id  = s.iconId',    true], 's' => ', IFNULL (si.iconString,  "inv_misc_questionmark") AS iconString'],
+                        'sia' => ['j' => ['?_icons sia ON sia.id = s.iconIdAlt', true], 's' => ', sia.iconString AS iconStringAlt'],
+                        'sr'  => ['j' => ['?_spellrange sr ON sr.id = s.rangeId'], 's' => ', sr.rangeMinHostile, sr.rangeMinFriend, sr.rangeMaxHostile, sr.rangeMaxFriend, sr.name_loc0 AS rangeText_loc0, sr.name_loc2 AS rangeText_loc2, sr.name_loc3 AS rangeText_loc3, sr.name_loc6 AS rangeText_loc6, sr.name_loc8 AS rangeText_loc8'],
+                        'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
+                    );
 
     public function __construct($conditions = [])
     {

@@ -8,17 +8,18 @@ class AchievementList extends BaseType
 {
     use listviewHelper;
 
-    public static $type      = TYPE_ACHIEVEMENT;
-    public static $brickFile = 'achievement';
+    public static   $type      = TYPE_ACHIEVEMENT;
+    public static   $brickFile = 'achievement';
+    public static   $dataTable = '?_achievement';
 
-    public        $criteria  = [];
+    public          $criteria  = [];
 
-    protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
-    protected     $queryOpts = array(
-                          'a' => [['si'], 'o' => 'orderInGroup ASC'],
-                         'si' => ['j' => ['?_icons si ON si.id = a.iconId', true], 's' => ', si.iconString'],
-                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
-                  );
+    protected       $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected       $queryOpts = array(
+                        'a' => [['si'], 'o' => 'orderInGroup ASC'],
+                        'si' => ['j' => ['?_icons si ON si.id = a.iconId', true], 's' => ', si.iconString'],
+                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
+                    );
 
     /*
         todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation
