@@ -43,7 +43,7 @@ define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);
 define('SEARCH_MASK_OPEN',                  0x007DC1FF);    // open search
-define('SEARCH_MASK_ALL',                   0x07FFFFFF);    // normal search
+define('SEARCH_MASK_ALL',                   0x0FFFFFFF);    // normal search
 
 // Databases
 define('DB_AOWOW',                          0);

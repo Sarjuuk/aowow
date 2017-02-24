@@ -174,9 +174,7 @@ class SoundPage extends GenericPage
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['race', array(
-                    'data' => array_values($races->getListviewData()),
-                )];
+                $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
             }
         }
 
@@ -194,9 +192,23 @@ class SoundPage extends GenericPage
             }
         }
 
+        // tab: NPC (dialogues...?, generic creature sound)
+        // lokaler Brotkasten text <- creature_text
+        if ($ids = DB::World()->selectCol('SELECT entry FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundId = ?d OR ct.sound = ?d', $this->typeId, $this->typeId))
+        {
+            $npcs = new CreatureList(array(['id', $ids]));
+            if (!$npcs->error)
+            {
+                $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
+                $this->extendGlobalData($npcs->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['creature', ['data' => array_values($npcs->getListviewData())]];
+            }
+        }
+
+
         // tab: Item (material sounds), creature (dialog + activities),
 
-        // tab: NPC (dialogues...?, generic creature sound)
     }
 }
 

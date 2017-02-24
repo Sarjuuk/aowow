@@ -18,6 +18,8 @@ class NpcPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
+    private   $soundIds      = [];
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -752,6 +754,17 @@ class NpcPage extends GenericPage
                 $this->lvTabs[] = ['creature', $tabData];
             }
         }
+
+        // tab sounds
+        if ($this->soundIds)
+        {
+            $sounds = new SoundList(array(['id', $this->soundIds]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['sound', ['data' => array_values($sounds->getListviewData())]];
+            }
+        }
     }
 
     protected function generateTooltip($asError = false)
@@ -908,7 +921,8 @@ class NpcPage extends GenericPage
                 IFNULL(NULLIF(lbct.MaleText_loc2, ""), IFNULL(NULLIF(lbct.FemaleText_loc2, ""), IFNULL(lct.text_loc2, ""))) AS text_loc2,
                 IFNULL(NULLIF(lbct.MaleText_loc3, ""), IFNULL(NULLIF(lbct.FemaleText_loc3, ""), IFNULL(lct.text_loc3, ""))) AS text_loc3,
                 IFNULL(NULLIF(lbct.MaleText_loc6, ""), IFNULL(NULLIF(lbct.FemaleText_loc6, ""), IFNULL(lct.text_loc6, ""))) AS text_loc6,
-                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8
+                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8,
+                IF(bct.SoundId > 0, bct.SoundId, ct.sound) AS soundId
             FROM
                 creature_text ct
             LEFT JOIN
@@ -927,6 +941,9 @@ class NpcPage extends GenericPage
             $group = [];
             foreach ($text as $t)
             {
+                if ($t['soundId'])
+                    $this->soundIds[] = $t['soundId'];
+
                 $msg = Util::localizedString($t, 'text');
                 if (!$msg)
                     continue;

@@ -8,6 +8,7 @@ class SoundList extends BaseType
 {
     public static   $type      = TYPE_SOUND;
     public static   $brickFile = 'sound';
+    public static   $dataTable = '?_sounds';
 
     protected       $queryBase = 'SELECT *, s.id AS ARRAY_KEY FROM ?_sounds s';
 

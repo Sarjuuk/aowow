@@ -8,6 +8,7 @@ if (!CLI)
 
 
 $customData = array(
+    15407 => ['cat' => 10]                                  // UR_Algalon_Summon03 (this is not an item pickup)
 );
 $reqDBC = ['soundentries'];
 
