@@ -75,8 +75,10 @@ class SoundList extends BaseType
                 'files' => array_values(array_filter($this->getField('files')))
             );
 
-            /* if creature movement
-                $data[$this->id]['activity'] = <string>; // e.g. exertion, finch, where are those templated anyway...?
+            /* Linking: CreatureDisplayInfo.dbc/3 => CreatureSoundData.dbc
+                        CreatureDisplayInfo.dbc/2 => CreatureModelData.dbc/15 => CreatureSoundData.dbc
+
+                $data[$this->id]['activity'] = <string>; // LANG.sound_activities (e.g. exertion, finch)
             */
         }
 

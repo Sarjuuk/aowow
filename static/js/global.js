@@ -144,7 +144,6 @@ var DomContentLoaded = new function() {
 };
 
 
-
 /*
 Global functions related to DOM manipulation, events & forms that jQuery doesn't already provide
 */
@@ -2802,7 +2801,6 @@ var ScreenshotViewer = new function() {
 };
 
 
-
 /*
 Global video-related functions
 */
@@ -3303,7 +3301,6 @@ var VideoViewer = new function() {
 
     DomContentLoaded.addEvent(this.checkPound)
 };
-
 
 
 var Dialog = function() {
@@ -20730,7 +20727,8 @@ var Links = new function() {
         }
 
         if (opt.sound)
-            link = '/script PlaySoundKitID(' + opt.sound + ')';
+            link = '/script PlaySoundFile("' + opt.sound + '", "master")';
+            // link = '/script PlaySoundKitID(' + opt.sound + ')'; Aowow: not available in 3.3.5
 
         if (link) {
             if (Dialog.templates.links.fields[Dialog.templates.links.fields.length - 2].id != 'ingamelink') {

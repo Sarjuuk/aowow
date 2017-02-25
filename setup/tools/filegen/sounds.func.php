@@ -13,8 +13,8 @@ if (!CLI)
         // ALL files
         $files  = DB::Aowow()->selectCol('SELECT ABS(id) AS ARRAY_KEY, CONCAT(path, "/", `file`) FROM ?_sounds_files');
         $nFiles = count($files);
-        $itr = $i = 0;
-        $step = 1000;
+        $itr    = $i = 0;
+        $nStep  = 1000;
         foreach ($files as $fileId => $filePath)
         {
             $i++;
@@ -25,10 +25,9 @@ if (!CLI)
                 CLISetup::log(' - '.$itr.'/'.$nFiles.' ('.(intVal(100 * $itr / $nFiles).'%) done'));
             }
 
-            // they are ogg files by now...
-            if (stristr($filePath, '.wav'))
+            if (stristr($filePath, '.wav'))                 // expected file.wav.ogg
                 $filePath .= '.ogg';
-            else
+            else                                            // expected file.mp3.mp3
                 $filePath .= '.mp3';
 
             // just use the first locale available .. i there is no support for multiple audio files anyway

@@ -75,6 +75,9 @@ class SoundPage extends GenericPage
         /* Main Content */
         /****************/
 
+        // get full path ingame for sound (workaround for missing PlaySoundKit())
+        $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path`, CONCAT(sf.`path`, "\\\\", sf.`file`), sf.`file`) FROM ?_sounds_files sf JOIN ?_sounds s ON s.soundFile1 = sf.id WHERE s.id = ?d', $this->typeId);
+
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD  => true,
@@ -82,7 +85,7 @@ class SoundPage extends GenericPage
             BUTTON_LINKS    => array(
                 'type'   => TYPE_SOUND,
                 'typeId' => $this->typeId,
-                'sound'  => $this->typeId
+                'sound'  => str_replace('\\', '\\\\', $fullpath) // escape for wow client
             )
         );
 
