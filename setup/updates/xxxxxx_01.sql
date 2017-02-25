@@ -23,7 +23,7 @@ CREATE TABLE `aowow_sounds` (
 ) COLLATE='utf8_general_ci' ENGINE=InnoDB;
 
 CREATE TABLE `aowow_sounds_files` (
-	`id` MEDIUMINT(8) NOT NULL COMMENT '<0 not found in client files',
+    `id` MEDIUMINT(8) NOT NULL COMMENT '<0 not found in client files',
     `file` VARCHAR(50) NOT NULL,
     `path` VARCHAR(100) NOT NULL COMMENT 'in client',
     `type` TINYINT(1) UNSIGNED NOT NULL COMMENT '1: ogg; 2: mp3',
@@ -47,14 +47,14 @@ CREATE TABLE `aowow_races_sounds` (
 
 
 CREATE TABLE `aowow_emotes_sounds` (
-	`emoteId` SMALLINT(5) UNSIGNED NOT NULL,
-	`raceId` TINYINT(3) UNSIGNED NOT NULL,
-	`gender` TINYINT(1) UNSIGNED NOT NULL,
-	`soundId` MEDIUMINT(8) UNSIGNED NOT NULL,
-	UNIQUE INDEX `emoteId_raceId_gender_soundId` (`emoteId`, `raceId`, `gender`, `soundId`),
-	INDEX `emoteId` (`emoteId`),
-	INDEX `raceId` (`raceId`),
-	INDEX `soundId` (`soundId`)
+    `emoteId` SMALLINT(5) UNSIGNED NOT NULL,
+    `raceId` TINYINT(3) UNSIGNED NOT NULL,
+    `gender` TINYINT(1) UNSIGNED NOT NULL,
+    `soundId` MEDIUMINT(8) UNSIGNED NOT NULL,
+    UNIQUE INDEX `emoteId_raceId_gender_soundId` (`emoteId`, `raceId`, `gender`, `soundId`),
+    INDEX `emoteId` (`emoteId`),
+    INDEX `raceId` (`raceId`),
+    INDEX `soundId` (`soundId`)
 )
 COLLATE='utf8_general_ci' ENGINE=InnoDB;
 

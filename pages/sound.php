@@ -192,11 +192,42 @@ class SoundPage extends GenericPage
             }
         }
 
-        // tab: NPC (dialogues...?, generic creature sound)
-        // lokaler Brotkasten text <- creature_text
-        if ($ids = DB::World()->selectCol('SELECT entry FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundId = ?d OR ct.sound = ?d', $this->typeId, $this->typeId))
+        $ssQuery = 'SELECT
+                        source_type AS ARRAY_KEY,
+                        entryorguid AS ARRAY_KEY2,
+                        0
+                    FROM
+                        smart_scripts
+                    WHERE
+                        (action_type = 4 AND action_param1 = ?d AND source_type <> 9) {
+                        OR (action_type = 80 AND (action_param1 IN (?a)))
+                        OR (action_type = 87 AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a)))
+                        OR (action_type = 88 AND (action_param1 IN (?a) OR action_param2 IN (?a)))
+                    }';
+
+        $ssActionLists = DB::World()->selectCol('SELECT entryorguid FROM smart_scripts WHERE action_type = 4 AND action_param1 = ?d AND source_type = 9', $this->typeId);
+        $smartScripts  = DB::World()->selectCol($ssQuery, $this->typeId, $ssActionLists ?: DBSIMPLE_SKIP, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists);
+
+        $creatureIds = DB::World()->selectCol('SELECT entry FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundId = ?d OR ct.sound = ?d', $this->typeId, $this->typeId);
+        foreach ($smartScripts as $source => $ids)
         {
-            $npcs = new CreatureList(array(['id', $ids]));
+            switch($source)
+            {
+                case 0:                                     // npc
+                    // todo: filter for guids
+                    $creatureIds += array_keys($ids);       // yes, arrays can do that
+                    break;
+                case 1:                                     // gameobject
+                default:
+                    break;
+            }
+        }
+
+        // tab: NPC (dialogues...?, generic creature sound)
+        // broadcast_text <-> creature_text
+        if ($creatureIds)
+        {
+            $npcs = new CreatureList(array(['id', $creatureIds]));
             if (!$npcs->error)
             {
                 $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);

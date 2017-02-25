@@ -44,6 +44,7 @@ class SoundsPage extends GenericPage
         $this->filter['fi']    =  $this->filterObj->getForm();
 
         $sounds = new SoundList($conditions);
+        $tabData = [];
         if (!$sounds->error)
         {
             $tabData['data'] = array_values($sounds->getListviewData());
@@ -57,9 +58,8 @@ class SoundsPage extends GenericPage
 
             if ($this->filterObj->error)
                 $tabData['_errors'] = 1;
-
-            $this->lvTabs[] = ['sound', $tabData];
         }
+        $this->lvTabs[] = ['sound', $tabData];
 
         Lang::sort('sound', 'cat');
     }

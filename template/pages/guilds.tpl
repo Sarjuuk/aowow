@@ -9,10 +9,10 @@
     {/foreach}
 {/if}
 
-			<script type="text/javascript">
-				g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});           _// activeTab: 1, breadcrumb: [1,5,2,'eu','blackout','dragonblight']});
+            <script type="text/javascript">
+                g_initPath({$page.path}, {if empty($filter.query)} 0 {else} 1 {/if});           _// activeTab: 1, breadcrumb: [1,5,2,'eu','blackout','dragonblight']});
                 {if isset($filter.query)}Menu.append(mn_database[1], '&filter={$filter.query|escape:'quotes'}'); // todo: menu order varies per locale{/if}
-			</script>
+            </script>
 
             <div id="fi">
                 <form action="/web/20120205222627/http://www.wowhead.com/filter=guilds" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
