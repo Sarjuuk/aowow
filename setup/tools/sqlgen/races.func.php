@@ -12,7 +12,7 @@ $customData = array(
     ['leader' => 29611, 'factionId' => 72,  'startAreaId' =>   12],
     ['leader' => 4949,  'factionId' => 76,  'startAreaId' =>   14],
     ['leader' => 2784,  'factionId' => 47,  'startAreaId' =>    1],
-    ['leader' => 7999,  'factionId' => 96,  'startAreaId' =>  141],
+    ['leader' => 7999,  'factionId' => 69,  'startAreaId' =>  141],
     ['leader' => 10181, 'factionId' => 68,  'startAreaId' =>   85],
     ['leader' => 3057,  'factionId' => 81,  'startAreaId' =>  215],
     ['leader' => 7937,  'factionId' => 54,  'startAreaId' =>    1],

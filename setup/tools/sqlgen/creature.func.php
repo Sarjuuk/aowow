@@ -149,6 +149,9 @@ function creature(array $ids = [])
     // apply cuFlag: excludeFromListview [for trigger-creatures]
     DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE flagsExtra & ?d', CUSTOM_EXCLUDE_FOR_LISTVIEW, 0x80);
 
+    // apply cuFlag: exCludeFromListview [for nameparts indicating internal usage]
+    DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(%" OR name_loc0 LIKE "%visual%" OR name_loc0 LIKE "%trigger%" OR name_loc0 LIKE "%credit%" OR name_loc0 LIKE "%marker%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+
     return true;
 }
 
