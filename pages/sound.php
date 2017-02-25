@@ -195,18 +195,20 @@ class SoundPage extends GenericPage
             }
         }
 
-        $ssQuery = 'SELECT
-                        source_type AS ARRAY_KEY,
-                        entryorguid AS ARRAY_KEY2,
-                        0
-                    FROM
-                        smart_scripts
-                    WHERE
-                        (action_type = 4 AND action_param1 = ?d AND source_type <> 9) {
-                        OR (action_type = 80 AND (action_param1 IN (?a)))
-                        OR (action_type = 87 AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a)))
-                        OR (action_type = 88 AND (action_param1 IN (?a) OR action_param2 IN (?a)))
-                    }';
+        $ssQuery = '
+            SELECT
+                source_type AS ARRAY_KEY,
+                entryorguid AS ARRAY_KEY2,
+                0
+            FROM
+                smart_scripts
+            WHERE
+                (action_type = 4 AND action_param1 = ?d AND source_type <> 9) {
+                OR (action_type = 80 AND (action_param1 IN (?a)))
+                OR (action_type = 87 AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a)))
+                OR (action_type = 88 AND (action_param1 IN (?a) OR action_param2 IN (?a)))
+            }
+        ';
 
         $ssActionLists = DB::World()->selectCol('SELECT entryorguid FROM smart_scripts WHERE action_type = 4 AND action_param1 = ?d AND source_type = 9', $this->typeId);
         $smartScripts  = DB::World()->selectCol($ssQuery, $this->typeId, $ssActionLists ?: DBSIMPLE_SKIP, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists);
@@ -217,8 +219,8 @@ class SoundPage extends GenericPage
             switch($source)
             {
                 case 0:                                     // npc
-                    // todo: filter for guids
-                    $creatureIds += array_keys($ids);       // yes, arrays can do that
+                    // filter for guids (id < 0)
+                    $creatureIds = array_merge($creatureIds, array_keys(array_filter($ids, function($x) { return $x > 0; })) );
                     break;
                 case 1:                                     // gameobject
                 default:
@@ -226,11 +228,58 @@ class SoundPage extends GenericPage
             }
         }
 
+        // skipping transforms and footsteps (always empty)
+        $displayIds = DB::Aowow()->selectCol('
+            SELECT id FROM ?_creature_sounds WHERE
+                greeting = ?d OR
+                farewell = ?d OR
+                angry = ?d OR
+                exertion = ?d OR
+                exertioncritical = ?d OR
+                injury = ?d OR
+                injurycritical = ?d OR
+                death = ?d OR
+                stun = ?d OR
+                stand = ?d OR
+                aggro = ?d OR
+                wingflap = ?d OR
+                wingglide = ?d OR
+                alert = ?d OR
+                fidget = ?d OR
+                customattack = ?d OR
+                `loop` = ?d OR
+                jumpstart = ?d OR
+                jumpend = ?d OR
+                petattack = ?d OR
+                petorder = ?d OR
+                petdismiss = ?d OR
+                birth = ?d OR
+                spellcast = ?d OR
+                submerge = ?d OR
+                submerged = ?d
+        ', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId);
+
         // tab: NPC (dialogues...?, generic creature sound)
         // broadcast_text <-> creature_text
-        if ($creatureIds)
+        if ($creatureIds || $displayIds)
         {
-            $npcs = new CreatureList(array(['id', $creatureIds]));
+            $extra = [];
+            $cnds = [CFG_SQL_LIMIT_NONE, &$extra];
+            if (!User::isInGroup(U_GROUP_STAFF))
+                $cnds[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+            if ($creatureIds)
+                $extra[] = ['id', $creatureIds];
+
+            if ($displayIds)
+                $extra[] = ['displayId1', $displayIds];
+
+            if (count($extra) > 1)
+                array_unshift($extra, 'OR');
+            else
+                $extra = array_pop($extra);
+
+            $npcs = new CreatureList($cnds);
             if (!$npcs->error)
             {
                 $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);

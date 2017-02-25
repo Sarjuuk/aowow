@@ -93,15 +93,6 @@ function emotes(/*array $ids = [] */)
         }
     }
 
-
-    /*******************/
-    /* EmotesTextSound */
-    /*******************/
-
-    DB::Aowow()->query('TRUNCATE ?_emotes_sounds');
-    DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_sounds SELECT emotesTextId, raceId, gender + 1, soundId FROM dbc_emotestextsound');
-
-
     return $allOK;
 }
 

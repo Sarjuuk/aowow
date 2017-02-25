@@ -755,14 +755,55 @@ class NpcPage extends GenericPage
             }
         }
 
-        // tab sounds
+        /* tab sounds:
+            * activity sounds => CreatureDisplayInfo.dbc => (CreatureModelData.dbc => ) CreatureSoundData.dbc
+            * AI => smart_scripts
+            * Dialogue VO => creature_text
+            * onClick VO => CreatureDisplayInfo.dbc => NPCSounds.dbc
+        */
+        $ssActionLists = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE entryorguid = ?d AND source_type = 0 AND action_type IN (80, 87, 88)', $this->typeId);
+        $actionListIds = [];
+        foreach ($ssActionLists as $sal)
+        {
+            $iMax = 0;
+            switch ($sal['action_type'])
+            {
+                case 80: $iMax = 1; break;
+                case 87: $iMax = 6; break;
+                case 88: $iMax = 2; break;
+                default: continue;
+            }
+
+            for ($i = 1; $i <= $iMax; $i++)
+                if ($sal['action_param'.$i])
+                    $actionListIds[] = $sal['action_param'.$i];
+        }
+
+        // not going for a per guid basis. The infos are nested enough as is.
+        $smartScripts   = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE action_type = 4 AND ((source_type = 0 AND entryorguid = ?d) { OR (source_type = 9 AND entryorguid IN (?a)) } )',  $this->typeId, $actionListIds ?: DBSIMPLE_SKIP);
+        $this->soundIds = array_merge($this->soundIds, $smartScripts);
+
+        // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE id = ?d', $this->subject->getField('displayId1'));
+        array_shift($activitySounds);                       // remove id-column
+        $this->soundIds = array_merge($this->soundIds, array_values($activitySounds));
+
         if ($this->soundIds)
         {
             $sounds = new SoundList(array(['id', $this->soundIds]));
             if (!$sounds->error)
             {
+                $data = $sounds->getListviewData();
+                foreach ($activitySounds as $activity => $id)
+                    if (isset($data[$id]) && $activity != 'id')
+                        $data[$id]['activity'] = $activity; // no index, js wants a string :(
+
+                $tabData = ['data' => array_values($data)];
+                if ($activitySounds)
+                    $tabData['visibleCols'] = ['activity'];
+
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['sound', ['data' => array_values($sounds->getListviewData())]];
+                $this->lvTabs[] = ['sound', $tabData];
             }
         }
     }
