@@ -795,7 +795,7 @@ class NpcPage extends GenericPage
             {
                 $data = $sounds->getListviewData();
                 foreach ($activitySounds as $activity => $id)
-                    if (isset($data[$id]) && $activity != 'id')
+                    if (isset($data[$id]))
                         $data[$id]['activity'] = $activity; // no index, js wants a string :(
 
                 $tabData = ['data' => array_values($data)];

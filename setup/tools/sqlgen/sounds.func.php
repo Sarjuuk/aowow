@@ -10,7 +10,7 @@ if (!CLI)
 $customData = array(
     15407 => ['cat' => 10]                                  // UR_Algalon_Summon03 (this is not an item pickup)
 );
-$reqDBC = ['soundentries', 'emotestextsound', 'npcsounds', 'creaturesounddata', 'creaturedisplayinfo', 'creaturemodeldata', 'vocaluisounds'];
+$reqDBC = ['soundentries', 'emotestextsound', 'npcsounds', 'creaturesounddata', 'creaturedisplayinfo', 'creaturemodeldata', 'vocaluisounds', 'spell', 'spellvisual', 'spellvisualkit'];
 
 function sounds(/*array $ids = [] */)
 {
@@ -154,13 +154,13 @@ function sounds(/*array $ids = [] */)
     /* Creature Sounds */
     /*******************/
 
+    CLISetup::log(' - linking to creatures');
+
     // currently ommitting:
     //      * footsteps (matrix of: creature + terrain + humidity)
     //      * fidget2 through 5
     //      * customattack2 through 3
     //  in case of conficting data CreatureDisplayInfo overrides CreatureModelData (seems to be more specialized (Thral > MaleOrc / Maiden > FemaleTitan))
-
-    CLISetup::log(' - linking to creatures');
 
     DB::Aowow()->query('TRUNCATE ?_creature_sounds');
     DB::Aowow()->query('
@@ -206,6 +206,65 @@ function sounds(/*array $ids = [] */)
             dbc_npcsounds ns ON cdi.npcSoundId = ns.Id
     ');
 
+
+    /****************/
+    /* Spell Sounds */
+    /****************/
+
+    CLISetup::log(' - linking to spells');
+
+    // issues: (probably because of 335-data)
+    //      * animate is probably wrong
+    //      * missile and impactarea not in js
+    //      * ready, castertargeting, casterstate and targetstate not in dbc
+
+    DB::Aowow()->query('TRUNCATE ?_spell_sounds');
+    DB::Aowow()->query('
+        INSERT INTO
+            ?_spell_sounds (`Id`, `precast`, `cast`, `impact`, `state`, `statedone`, `channel`, `missile`, `animation`, `casterimpact`, `targetimpact`, `missiletargeting`, `instantarea`, `impactarea`, `persistentarea`)
+        SELECT
+            sv.Id,
+            IFNULL(svk1.soundId, 0),
+            IFNULL(svk2.soundId, 0),
+            IFNULL(svk3.soundId, 0),
+            IFNULL(svk4.soundId, 0),
+            IFNULL(svk5.soundId, 0),
+            IFNULL(svk6.soundId, 0),
+            missileSoundId,
+            animationSoundId,
+            IFNULL(svk7.soundId, 0),
+            IFNULL(svk8.soundId, 0),
+            IFNULL(svk9.soundId, 0),
+            IFNULL(svk10.soundId, 0),
+            IFNULL(svk11.soundId, 0),
+            IFNULL(svk12.soundId, 0)
+        FROM
+            dbc_spellvisual sv
+        LEFT JOIN
+            dbc_spellvisualkit svk1  ON svk1.Id  = sv.precastKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk2  ON svk2.Id  = sv.castKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk3  ON svk3.Id  = sv.impactKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk4  ON svk4.Id  = sv.stateKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk5  ON svk5.Id  = sv.statedoneKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk6  ON svk6.Id  = sv.channelKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk7  ON svk7.Id  = sv.casterImpactKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk8  ON svk8.Id  = sv.targetImpactKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk9  ON svk9.Id  = sv.missileTargetingKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk10 ON svk10.Id = sv.instantAreaKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk11 ON svk11.Id = sv.impactAreaKitId
+        LEFT JOIN
+            dbc_spellvisualkit svk12 ON svk12.Id = sv.persistentAreaKitId
+    ');
 
     return true;
 }

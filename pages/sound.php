@@ -97,14 +97,35 @@ class SoundPage extends GenericPage
 
 
         // tab: Spells
-        // todo: -> SpellVisual.dbc (missleSound, animEventSound, 8x link to SpellVisualKit.dbc)
-        //       -> SpellVisualKit.dbc (soundId)
+        // skipping (always empty): ready, castertargeting, casterstate, targetstate
+        $displayIds = DB::Aowow()->selectCol('
+            SELECT id FROM ?_spell_sounds WHERE
+                animation = ?d OR
+                precast = ?d OR
+                cast = ?d OR
+                impact = ?d OR
+                state = ?d OR
+                statedone = ?d OR
+                channel = ?d OR
+                casterimpact = ?d OR
+                targetimpact = ?d OR
+                missiletargeting = ?d OR
+                instantarea = ?d OR
+                persistentarea = ?d OR
+                missile = ?d OR
+                impactarea = ?d
+        ', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId);
+
         $cnd = array(
             'OR',
             ['AND', ['effect1Id', 132], ['effect1MiscValue', $this->typeId]],
             ['AND', ['effect2Id', 132], ['effect2MiscValue', $this->typeId]],
             ['AND', ['effect3Id', 132], ['effect3MiscValue', $this->typeId]]
         );
+
+        if ($displayIds)
+            $cnd[] = ['spellVisualId', $displayIds];
+
         $spells = new SpellList($cnd);
         if (!$spells->error)
         {
@@ -228,7 +249,8 @@ class SoundPage extends GenericPage
             }
         }
 
-        // skipping transforms and footsteps (always empty)
+        // tab: NPC (dialogues...?, generic creature sound)
+        // skipping (always empty): transforms, footsteps
         $displayIds = DB::Aowow()->selectCol('
             SELECT id FROM ?_creature_sounds WHERE
                 greeting = ?d OR
@@ -259,7 +281,6 @@ class SoundPage extends GenericPage
                 submerged = ?d
         ', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId);
 
-        // tab: NPC (dialogues...?, generic creature sound)
         // broadcast_text <-> creature_text
         if ($creatureIds || $displayIds)
         {
@@ -290,7 +311,7 @@ class SoundPage extends GenericPage
         }
 
 
-        // tab: Item (material sounds), creature (dialog + activities),
+        // tab: Item (material sounds, weapon hits)
 
     }
 }
