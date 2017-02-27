@@ -172,7 +172,7 @@ class AjaxAdmin extends AjaxHandler
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
                 Util::gainSiteReputation($_['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $_['date']]);
                 // flag DB entry as having screenshots
-                if (Util::$typeClasses[$_['type']] && ($tbl = get_class_vars(Util::$typeClasses[$_['type'])['dataTable']))
+                if (Util::$typeClasses[$_['type']] && ($tbl = get_class_vars(Util::$typeClasses[$_['type']])['dataTable']))
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $_['typeId']);
             }
         }

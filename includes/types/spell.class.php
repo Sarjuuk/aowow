@@ -538,7 +538,7 @@ class SpellList extends BaseType
             return sprintf(Lang::spell('range'), $this->curTpl['rangeMinHostile'].' - '.$this->curTpl['rangeMaxHostile']);
         // friend and hostile differ; do color
         else if ($this->curTpl['rangeMaxHostile'] != $this->curTpl['rangeMaxFriend'])
-            return sprintf(Lang::spell('range'), '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxHostile']. '</span>');
+            return sprintf(Lang::spell('range'), '<span class="q10">'.$this->curTpl['rangeMaxHostile'].'</span> - <span class="q2">'.$this->curTpl['rangeMaxFriend']. '</span>');
         // hardcode: "melee range"
         else if ($this->curTpl['rangeMaxHostile'] == 5)
             return Lang::spell('meleeRange');
@@ -956,7 +956,8 @@ class SpellList extends BaseType
                 break;
             case 'l':                                       // boolean choice with last value as condition $lX:Y;
             case 'L':
-                $result[2] = '$l'.$switch[0].':'.$switch[1];// resolve later by backtracking
+                // resolve later by backtracking
+                $result[2] = '$l'.$switch[0].':'.$switch[1].';';
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
