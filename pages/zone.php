@@ -687,18 +687,46 @@ class ZonePage extends GenericPage
         }
 
         // tab: sound (including subzones; excluding parents)
-        $soundIds = $this->subject->getSounds();
-        foreach ($subZones->iterate() as $__)
-            $soundIds = array_merge($soundIds, $subZones->getSounds());
+        $areaIds = [];
+        if (!$subZones->error)
+            $areaIds = $subZones->getFoundIDs();
+
+        $areaIds[] = $this->typeId;
+
+        $soundIds = DB::Aowow()->select('
+            SELECT
+                x.soundId, x.worldStateId, x.worldStateValue
+            FROM (
+                SELECT ambienceDay   AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
+                SELECT ambienceNight AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
+                SELECT musicDay      AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicDay      > 0 UNION
+                SELECT musicNight    AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicNight    > 0 UNION
+                SELECT intro         AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND intro         > 0
+            ) x
+            GROUP BY
+                x.soundId, x.worldStateId, x.worldStateValue
+       ', $areaIds, $areaIds, $areaIds, $areaIds, $areaIds);
 
         if ($soundIds)
         {
-            $music = new SoundList(array(['id', array_unique($soundIds)]));
+            $music = new SoundList(array(['id', array_unique(array_column($soundIds, 'soundId'))]));
             if (!$music->error)
             {
-                $this->lvTabs[] = ['sound', array(
-                    'data' => array_values($music->getListviewData()),
-                )];
+                $data    = $music->getListviewData();
+                $tabData = [];
+
+                if (array_filter(array_column($soundIds, 'worldStateId')))
+                {
+                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+
+                    foreach ($soundIds as $sData)
+                    if ($sData['worldStateId'])
+                        $data[$sData['soundId']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $sData['worldStateId'], $sData['worldStateValue']]];
+                }
+
+                $tabData['data'] = array_values($data);
+
+                $this->lvTabs[] = ['sound', $tabData];
 
                 $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
             }

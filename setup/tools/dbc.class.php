@@ -128,6 +128,7 @@ class DBC
         'worldmaparea'                  => 'niisffffxix',         // 4.x - niisffffxixxxx
         'worldmapoverlay'               => 'niixxxxxsiiiixxxx',   // 4.x - niixxxsiiiixxxx
         'worldmaptransforms'            => 'niffffiffi',
+        'worldstatezonesounds'          => 'iiiiiiix',
         'zoneintromusictable'           => 'nxixx',
         'zonemusic'                     => 'nxxxxxii',
 
@@ -222,6 +223,7 @@ class DBC
         'worldmaparea'                  => 'Id,mapId,areaId,nameINT,left,right,top,bottom,defaultDungeonMapId',
         'worldmapoverlay'               => 'Id,worldMapAreaId,areaTableId,textureString,w,h,x,y',
         'worldmaptransforms'            => 'Id,sourceMapId,minX,minY,maxX,maxY,targetMapId,offsetX,offsetY,dungeonMapId',
+        'worldstatezonesounds'          => 'stateId,value,areaId,wmoAreaId,zoneIntroMusicId,zoneMusicId,soundAmbienceId',
         'zoneintromusictable'           => 'Id,soundId',
         'zonemusic'                     => 'Id,soundIdDay,soundIdNight',
     );

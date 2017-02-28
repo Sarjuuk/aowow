@@ -138,57 +138,60 @@ class SoundPage extends GenericPage
         }
 
         // tab: Zones
-        $cnd = array(
-            'OR',
-            ['soundAmbiDay',    $this->typeId],
-            ['soundAmbiNight',  $this->typeId],
-            ['soundMusicDay',   $this->typeId],
-            ['soundMusicNight', $this->typeId],
-            ['soundIntro',      $this->typeId]
-        );
-        $zones = new ZoneList($cnd);
-        if (!$zones->error)
+        if ($zoneIds = DB::Aowow()->select('SELECT id, worldStateId, worldStateValue FROM ?_zones_sounds WHERE ambienceDay = ?d OR ambienceNight = ?d OR musicDay = ?d OR musicNight = ?d OR intro = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
-            $this->extendGlobalData($zones->getJSGlobals(GLOBALINFO_SELF));
-
-            $zoneData = $zones->getListviewData();
-            $parents  = $zones->getAllFields('parentArea');
-
-            $pIds = array_filter(array_unique(array_values($parents)));
-            if ($pIds)
+            $zones = new ZoneList(array(['id', array_column($zoneIds, 'id')]));
+            if (!$zones->error)
             {
-                $pZones = new ZoneList(array(['id', $pIds]));
-                if (!$pZones->error)
+                $this->extendGlobalData($zones->getJSGlobals(GLOBALINFO_SELF));
+
+                $zoneData = $zones->getListviewData();
+                $parents  = $zones->getAllFields('parentArea');
+                $tabData  = [];
+                $pIds     = array_filter(array_unique(array_values($parents)));
+                if ($pIds)
                 {
-                    $this->extendGlobalData($pZones->getJSGlobals(GLOBALINFO_SELF));
-
-                    $pData = $pZones->getListviewData();
-                    foreach ($parents as $child => $parent)
+                    $pZones = new ZoneList(array(['id', $pIds]));
+                    if (!$pZones->error)
                     {
-                        if (!$parent || empty($pData[$parent]))
-                            continue;
+                        $this->extendGlobalData($pZones->getJSGlobals(GLOBALINFO_SELF));
 
-                        if (!isset($pData[$parent]['subzones']))
-                            $pData[$parent]['subzones'] = [];
+                        $pData = $pZones->getListviewData();
+                        foreach ($parents as $child => $parent)
+                        {
+                            if (!$parent || empty($pData[$parent]))
+                                continue;
 
-                        $pData[$parent]['subzones'][] = $child;
-                        unset($parents[$child]);
+                            if (!isset($pData[$parent]['subzones']))
+                                $pData[$parent]['subzones'] = [];
+
+                            $pData[$parent]['subzones'][] = $child;
+                            unset($parents[$child]);
+                        }
+
+                        // these are original parents
+                        foreach ($parents as $parent => $__)
+                            if (empty($pData[$parent]))
+                                $pData[$parent] = $zoneData[$parent];
+
+                        $zoneData = $pData;
                     }
-
-                    // these are original parents
-                    foreach ($parents as $parent => $__)
-                        if (empty($pData[$parent]))
-                            $pData[$parent] = $zoneData[$parent];
-
-                    $zoneData = $pData;
                 }
+
+                if (array_filter(array_column($zoneIds, 'worldStateId')))
+                {
+                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+
+                    foreach ($zoneIds as $zData)
+                        if ($zData['worldStateId'])
+                            $zoneData[$zData['id']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]];
+                }
+
+                $tabData['data'] = array_values($zoneData);
+                $tabData['hiddenCols'] = ['territory'];
+
+                $this->lvTabs[] = ['zone', $tabData];
             }
-
-            $this->lvTabs[] = ['zone', array(
-                'data'       => array_values($zoneData),
-                'hiddenCols' => ['territory']
-            )];
-
         }
 
         // tab: Races (VocalUISounds (containing error voice overs))

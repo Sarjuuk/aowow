@@ -11,5 +11,6 @@ DROP TABLE IF EXISTS `dbc_spell`;
 DROP TABLE IF EXISTS `dbc_spellvisual`;
 DROP TABLE IF EXISTS `dbc_spellvisualkit`;
 DROP TABLE IF EXISTS `dbc_vocaluisounds`;
+DROP TABLE IF EXISTS `dbc_worldstatezonesound`;
 DROP TABLE IF EXISTS `dbc_zoneintromusictable`;
 DROP TABLE IF EXISTS `dbc_zonemusic`;

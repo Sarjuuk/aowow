@@ -1,15 +1,7 @@
 -- alteration (ALSO ALTER db_structure.sql GODDAMNIT))
 
 ALTER TABLE `aowow_spell`
-    ADD COLUMN `spellVisualId` SMALLINT UNSIGNED NOT NULL AFTER `rankNo`;
-
-ALTER TABLE `aowow_zones`
-    ADD COLUMN `soundAmbiDay` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `parentY`,
-    ADD COLUMN `soundAmbiNight` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundAmbiDay`,
-    ADD COLUMN `soundMusicDay` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundAmbiNight`,
-    ADD COLUMN `soundMusicNight` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundMusicDay`,
-    ADD COLUMN `soundIntro` MEDIUMINT(8) UNSIGNED NOT NULL AFTER `soundMusicNight`;
-
+    ADD COLUMN `spellVisualId` smallint(5) unsigned NOT NULL AFTER `rankNo`;
 
 -- additions
 
@@ -22,6 +14,19 @@ REPLACE INTO `aowow_articles` (`type`, `typeId`, `locale`, `article`, `quickInfo
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+DROP TABLE IF EXISTS `aowow_zones_sounds`;
+CREATE TABLE `aowow_zones_sounds` (
+    `id` smallint(5) unsigned NOT NULL,
+    `ambienceDay` smallint(5) unsigned NOT NULL,
+    `ambienceNight` smallint(5) unsigned NOT NULL,
+    `musicDay` smallint(5) unsigned NOT NULL,
+    `musicNight` smallint(5) unsigned NOT NULL,
+    `intro` smallint(5) unsigned NOT NULL,
+    `worldStateId` smallint(5) unsigned NOT NULL,
+    `worldStateValue` smallint(6) NOT NULL,
+    INDEX `id` (`id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `aowow_creature_sounds`;
 CREATE TABLE IF NOT EXISTS `aowow_creature_sounds` (
@@ -139,4 +144,4 @@ CREATE TABLE IF NOT EXISTS `aowow_spell_sounds` (
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 
-/* UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell sounds zones'); */
+/* UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell sounds'); */

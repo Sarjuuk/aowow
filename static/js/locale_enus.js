@@ -2371,7 +2371,7 @@ var g_conditions = {
      8: 'The Player has$: not; finished $1',
      9: 'The Player has$: not; accepted $1',
     10: 'The Player is$: not; $1',
-    11: 'The game word is$: not; in a certain state',                       // nyi
+    11: 'WorldState #$1 is$: not; $2',
     12: '$1 must$: not; be active',
     13: 'The instance $has:does not have; a certain state',                 // nyi
     14: 'The Player has $never:; interacted with $1',

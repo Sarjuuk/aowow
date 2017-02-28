@@ -10,10 +10,36 @@ if (!CLI)
 $customData = array(
     15407 => ['cat' => 10]                                  // UR_Algalon_Summon03 (this is not an item pickup)
 );
-$reqDBC = ['soundentries', 'emotestextsound', 'npcsounds', 'creaturesounddata', 'creaturedisplayinfo', 'creaturemodeldata', 'vocaluisounds', 'spell', 'spellvisual', 'spellvisualkit'];
+$reqDBC = array(
+    // base          emotes             race
+    'soundentries', 'emotestextsound', 'vocaluisounds',
+    // creatures
+    'npcsounds', 'creaturesounddata', 'creaturedisplayinfo', 'creaturemodeldata',
+    // spells
+    'spell', 'spellvisual', 'spellvisualkit',
+    // zones
+    'soundambience', 'zonemusic', 'zoneintromusictable', 'worldstatezonesounds', 'areatable'
+);
+
 
 function sounds(/*array $ids = [] */)
 {
+    /*
+        okay, here's the thing. WMOAreaTable.dbc references WMO-files to get its position in the world (AreTable) and has sparse information on the related AreaTables themself.
+        Though it has sets for ZoneAmbience, ZoneMusic and ZoneIntroMusic, these can't be linked for this very reason and are omitted for now.
+        content: e.g. Tavern Music
+    */
+
+    // WMOAreaTable.dbc/Id => AreaTable.dbc/Id
+    $worldStateZoneSoundFix = array(
+        18153 => 2119,
+        18154 => 2119,
+        47321 => 4273,                                          // The Spark of Imagination
+        43600 => 4273,                                          // The Celestial Planetarium
+        47478 => 4273                                           // The Prison of Yogg-Saron
+    );
+
+
     /***********/
     /* M A I N */
     /***********/
@@ -265,6 +291,64 @@ function sounds(/*array $ids = [] */)
         LEFT JOIN
             dbc_spellvisualkit svk12 ON svk12.Id = sv.persistentAreaKitId
     ');
+
+
+    /***************/
+    /* Zone Sounds */
+    /***************/
+
+    CLISetup::log(' - linking to zones');
+
+    // omiting data from WMOAreaTable, as its at the moment impossible to link to actual zones
+
+    DB::Aowow()->query('TRUNCATE ?_zones_sounds');
+    DB::Aowow()->query('
+        INSERT INTO
+            ?_zones_sounds (id, ambienceDay, ambienceNight, musicDay, musicNight, intro, worldStateId, worldStateValue)
+        SELECT
+            a.id,
+            IFNULL(sa1.soundIdDay, 0),
+            IFNULL(sa1.soundIdNight, 0),
+            IFNULL(zm1.soundIdDay, 0),
+            IFNULL(zm1.soundIdNight, 0),
+            IFNULL(zimt1.soundId, 0),
+            0,
+            0
+        FROM
+            dbc_areatable a
+        LEFT JOIN
+            dbc_soundambience sa1 ON sa1.id = a.soundAmbience
+        LEFT JOIN
+            dbc_zonemusic zm1 ON zm1.id = a.zoneMusic
+        LEFT JOIN
+            dbc_zoneintromusictable zimt1 ON zimt1.id = a.zoneIntroMusic
+        WHERE
+            a.soundAmbience > 0 OR a.zoneMusic > 0 OR a.zoneIntroMusic
+        UNION
+        SELECT
+            IF(wszs.areaId, wszs.areaId, wszs.wmoAreaId),
+            IFNULL(sa2.soundIdDay, 0),
+            IFNULL(sa2.soundIdNight, 0),
+            IFNULL(zm2.soundIdDay, 0),
+            IFNULL(zm2.soundIdNight, 0),
+            IFNULL(zimt2.soundId, 0),
+            wszs.stateId,
+            wszs.value
+        FROM
+            dbc_worldstatezonesounds wszs
+        LEFT JOIN
+            dbc_soundambience sa2 ON sa2.id = wszs.soundAmbienceId
+        LEFT JOIN
+            dbc_zonemusic zm2 ON zm2.id = wszs.zoneMusicId
+        LEFT JOIN
+            dbc_zoneintromusictable zimt2 ON zimt2.id = wszs.zoneIntroMusicId
+        WHERE
+            wszs.zoneMusicId > 0 AND (wszs.areaId OR wszs.wmoAreaId IN (?a))
+    ', array_keys($worldStateZoneSoundFix));
+
+    // apply post-fix
+    foreach ($worldStateZoneSoundFix as $old => $new)
+        DB::Aowow()->query('UPDATE ?_zones_sounds SET id = ?d WHERE id = ?d', $new, $old);
 
     return true;
 }

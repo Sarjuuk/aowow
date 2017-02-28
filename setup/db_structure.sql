@@ -2411,11 +2411,6 @@ CREATE TABLE `aowow_zones` (
   `parentAreaId` smallint(5) unsigned NOT NULL,
   `parentX` float NOT NULL,
   `parentY` float NOT NULL,
-  `soundAmbiDay` mediumint(8) unsigned NOT NULL,
-  `soundAmbiNight` mediumint(8) unsigned NOT NULL,
-  `soundMusicDay` mediumint(8) unsigned NOT NULL,
-  `soundMusicNight` mediumint(8) unsigned NOT NULL,
-  `soundIntro` mediumint(8) unsigned NOT NULL,
   `name_loc0` varchar(120) NOT NULL COMMENT 'Map Name',
   `name_loc2` varchar(120) NOT NULL,
   `name_loc3` varchar(120) NOT NULL,
@@ -2425,6 +2420,19 @@ CREATE TABLE `aowow_zones` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+DROP TABLE IF EXISTS `aowow_zones_sounds`;
+CREATE TABLE `aowow_zones_sounds` (
+  `id` smallint(5) unsigned NOT NULL,
+  `ambienceDay` smallint(5) unsigned NOT NULL,
+  `ambienceNight` smallint(5) unsigned NOT NULL,
+  `musicDay` smallint(5) unsigned NOT NULL,
+  `musicNight` smallint(5) unsigned NOT NULL,
+  `intro` smallint(5) unsigned NOT NULL,
+  `worldStateId` smallint(5) unsigned NOT NULL,
+  `worldStateValue` smallint(6) NOT NULL,
+  INDEX `id` (`id`),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `aowow_creature_sounds`;
 CREATE TABLE IF NOT EXISTS `aowow_creature_sounds` (

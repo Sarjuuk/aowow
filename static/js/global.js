@@ -22128,7 +22128,7 @@ var ConditionList = new function() {
             return 'unknown condition index ' + strIdx;
 
         // these cases are not (yet) handled in detail
-        if ($WH.in_array([11, 13, 21, 24, 33, 34], strIdx) != -1)
+        if ($WH.in_array([13, 21, 24, 33, 34], strIdx) != -1)
             return g_conditions[strIdx].replace(/\$([^\$:;]*):([^\$:;]*);/, '$' + (entry[0] > 0 ? 1 : 2));
 
         switch (Math.abs(entry[0])) {
@@ -22197,6 +22197,9 @@ var ConditionList = new function() {
                      break;
             case 35: param[0] = entry[2];
                      param[1] = g_operators[entry[3]];
+                     break;
+            case 11: param[0] = entry[1];
+                     param[1] = entry[2];
                      break;
             case 26:
                     var pIndex = 0;

@@ -2326,7 +2326,7 @@ var g_conditions = {
      8: 'El Jugador tiene$: no; finalizado $1',
      9: 'El Jugador tiene$: no; aceptado $1',
     10: 'El Jugador es$: no; $1',
-    11: 'El juego de palabras es$: no; en cierto estado',       // nyi
+    11: 'WorldState #$1 es$: no; $2',
     12: '$1 debe$: no; estar activo',
     13: 'La instancia $debe:no debe; en cierto estado', // nyi
     14: 'El Jugador tiene $nunca:; ha interactuado con $1',

@@ -2324,7 +2324,7 @@ var g_conditions = {
      8: 'Der Spieler hat $1$: nicht; beendet',
      9: 'Der Spieler hat $1$: nicht; angenommen',
     10: 'Der Spieler ist$: nicht; $1',
-    11: 'Die Spielwelt hat einen bestimmten Zustand$: nicht;',                // nyi
+    11: 'WorldState #$1 ist$: nicht; $2',
     12: '$1 ist$: nicht; aktiv',
     13: 'Die Instanz hat einen bestimmten Zustand$: nicht;',                  // nyi
     14: 'Der Spieler hat $nie :;mit $1 interagiert',
