@@ -392,6 +392,8 @@ class ZonePage extends GenericPage
                 }
             }
 
+            unset($data);
+
             // append paths between nodes
             if ($flightNodes)
             {
@@ -693,7 +695,8 @@ class ZonePage extends GenericPage
 
         $areaIds[] = $this->typeId;
 
-        $soundIds = DB::Aowow()->select('
+        $soundIds  = [];
+        $zoneMusic = DB::Aowow()->select('
             SELECT
                 x.soundId, x.worldStateId, x.worldStateValue
             FROM (
@@ -707,9 +710,15 @@ class ZonePage extends GenericPage
                 x.soundId, x.worldStateId, x.worldStateValue
        ', $areaIds, $areaIds, $areaIds, $areaIds, $areaIds);
 
+        if ($sSpawns = DB::Aowow()->selectCol('SELECT typeId FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_SOUND))
+            $soundIds = array_merge($soundIds, $sSpawns);
+
+        if ($zoneMusic)
+            $soundIds = array_merge($soundIds, array_column($zoneMusic, 'soundId'));
+
         if ($soundIds)
         {
-            $music = new SoundList(array(['id', array_unique(array_column($soundIds, 'soundId'))]));
+            $music = new SoundList(array(['id', array_unique($soundIds)]));
             if (!$music->error)
             {
                 $data    = $music->getListviewData();

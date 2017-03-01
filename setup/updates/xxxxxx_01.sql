@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS `dbc_creaturesounddata`;
 DROP TABLE IF EXISTS `dbc_emotestextsound`;
 DROP TABLE IF EXISTS `dbc_npcsounds`;
 DROP TABLE IF EXISTS `dbc_soundambience`;
+DROP TABLE IF EXISTS `dbc_soundemitters`;
 DROP TABLE IF EXISTS `dbc_soundentries`;
 DROP TABLE IF EXISTS `dbc_spell`;
 DROP TABLE IF EXISTS `dbc_spellvisual`;

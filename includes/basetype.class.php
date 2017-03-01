@@ -678,7 +678,7 @@ trait spawnHelper
     public function getSpawns($mode)
     {
         // ony Creatures and GOs can be spawned
-        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT))
+        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
             return [];
 
         switch ($mode)

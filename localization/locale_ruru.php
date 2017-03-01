@@ -679,6 +679,7 @@ $lang = array(
     ),
     'sound' => array(
         'notFound'      => "Этот звук не существует.",
+        'foundIn'       => "Этот Звук может быть найден в следующих зонах:",
         'goToPlaylist'  => "Перейти к плейлисту",
         'cat'           => array(
             null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",

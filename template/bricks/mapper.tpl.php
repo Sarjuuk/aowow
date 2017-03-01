@@ -3,7 +3,7 @@ if (isset($this->map) && empty($this->map)):
     echo Lang::zone('noMap');
 elseif (!empty($this->map['data'])):
     if ($this->type != TYPE_ZONE):
-        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : Lang::npc('foundIn')).' <span id="locations">';
+        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : ($this->type == TYPE_SOUND ? Lang::sound('foundIn') : Lang::npc('foundIn'))).' <span id="locations">';
 
         $n = count($this->map['mapperData']);
         $i = 0;

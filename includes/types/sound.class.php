@@ -6,6 +6,8 @@ if (!defined('AOWOW_REVISION'))
 
 class SoundList extends BaseType
 {
+    use spawnHelper;
+
     public static   $type      = TYPE_SOUND;
     public static   $brickFile = 'sound';
     public static   $dataTable = '?_sounds';

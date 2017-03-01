@@ -2516,8 +2516,8 @@ CREATE TABLE IF NOT EXISTS `aowow_sounds` (
 DROP TABLE IF EXISTS `aowow_sounds_files`;
 CREATE TABLE IF NOT EXISTS `aowow_sounds_files` (
   `id` smallint(6) NOT NULL COMMENT '<0 not found in client files',
-  `file` varchar(50) NOT NULL,
-  `path` varchar(100) NOT NULL COMMENT 'in client',
+  `file` varchar(75) NOT NULL,
+  `path` varchar(75) NOT NULL COMMENT 'in client',
   `type` tinyint(1) unsigned NOT NULL COMMENT '1: ogg; 2: mp3',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

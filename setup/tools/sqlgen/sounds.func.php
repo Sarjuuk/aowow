@@ -350,6 +350,19 @@ function sounds(/*array $ids = [] */)
     foreach ($worldStateZoneSoundFix as $old => $new)
         DB::Aowow()->query('UPDATE ?_zones_sounds SET id = ?d WHERE id = ?d', $new, $old);
 
+
+    /***************/
+    /* Item Sounds */
+    /***************/
+
+    CLISetup::log(' - linking to items');
+
+    // ItemDisplayInfo.dbc/ItemGroupSoundId => ItemGroupSounds.dbc/Id (Pickup/dropdown)
+    // SheatheSoundLookups.dbc ...? pretty much guesswork
+    // WeaponImpactSounds
+    // WeaponSwingSounds2
+
+
     return true;
 }
 

@@ -214,7 +214,7 @@ $lang = array(
         'school'        => "École",
         'skill'         => "compétence",
         'skills'        => "Compétences",
-        'sound'         => "Son",
+        'sound'         => "son",
         'sounds'        => "Sons",
         'spell'         => "sort",
         'spells'        => "Sorts",
@@ -678,6 +678,7 @@ $lang = array(
     ),
     'sound' => array(
         'notFound'      => "Ce son n'existe pas.",
+        'foundIn'       => "Ce son se trouve dans",
         'goToPlaylist'  => "Aller à votre playlist",
         'cat'           => array(
             null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",

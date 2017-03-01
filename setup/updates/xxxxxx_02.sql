@@ -110,8 +110,8 @@ CREATE TABLE IF NOT EXISTS `aowow_sounds` (
 DROP TABLE IF EXISTS `aowow_sounds_files`;
 CREATE TABLE IF NOT EXISTS `aowow_sounds_files` (
     `id` smallint(6) NOT NULL COMMENT '<0 not found in client files',
-    `file` varchar(50) NOT NULL,
-    `path` varchar(100) NOT NULL COMMENT 'in client',
+    `file` varchar(75) NOT NULL,
+    `path` varchar(75) NOT NULL COMMENT 'in client',
     `type` tinyint(1) unsigned NOT NULL COMMENT '1: ogg; 2: mp3',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -144,4 +144,4 @@ CREATE TABLE IF NOT EXISTS `aowow_spell_sounds` (
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 
-/* UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell sounds'); */
+/* UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell sounds spawns'); */

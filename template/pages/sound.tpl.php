@@ -67,6 +67,10 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
 
 <?php
     else:
+
+    if (!empty($this->map)):
+        $this->brick('mapper');
+    endif;
 ?>
                 <ol id="soundfilelist"></ol>
                 <div id="mainsound"></div>
