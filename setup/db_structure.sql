@@ -2438,7 +2438,7 @@ CREATE TABLE `aowow_zones_sounds` (
   `intro` smallint(5) unsigned NOT NULL,
   `worldStateId` smallint(5) unsigned NOT NULL,
   `worldStateValue` smallint(6) NOT NULL,
-  INDEX `id` (`id`),
+  INDEX `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `aowow_creature_sounds`;

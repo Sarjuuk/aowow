@@ -957,7 +957,13 @@ class ItemPage extends genericPage
         // tab: sounds
         $soundIds = [];
         if ($_class == ITEM_CLASS_WEAPON)
-            $soundIds = DB::Aowow()->selectCol('SELECT soundId FROM ?_items_sounds WHERE subClassMask & ?d', (1 << ($this->getField('soundOverrideSubclass') ?: $_subClass)));
+        {
+            $scm = (1 << $_subClass);
+            if ($this->subject->getField('soundOverrideSubclass') > 0)
+                $scm = (1 << $this->subject->getField('soundOverrideSubclass'));
+
+            $soundIds = DB::Aowow()->selectCol('SELECT soundId FROM ?_items_sounds WHERE subClassMask & ?d', $scm);
+        }
 
         $fields = ['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'];
         foreach ($fields as $f)

@@ -1,4 +1,3 @@
-
 // Needed for IE because it's dumb
 'abbr article aside audio canvas details figcaption figure footer header hgroup mark menu meter nav output progress section summary time video'.replace(/\w+/g,function(n){document.createElement(n)})
 
@@ -3036,7 +3035,6 @@ var VideoViewer = new function() {
             }
 
             divFrom.style.display = (hasFrom1 || hasFrom2 ? '': 'none');
-
 
             var hasCaption = (video.caption != null && video.caption.length);
             var hasSubject = (video.subject != null && video.subject.length && video.type && video.typeId);
@@ -13956,12 +13954,6 @@ Listview.templates = {
             }
         }
     },
-
-    /* AoWoW TODO:
-        retrieve
-            - AudioControls() / g_audiocontrols
-            - AudioPlaylist() / g_audioplaylist
-    */
 
     sound: {
         searchable: 1,

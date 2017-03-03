@@ -110,7 +110,10 @@ function items(array $ids = [])
             FoodType,
             0 AS gemEnchantmentId,
             minMoneyLoot,           maxMoneyLoot,
-            0, 0, 0, 0                                      -- sounds
+            0 AS pickUpSoundId,
+            0 AS dropDownSoundId,
+            0 AS sheatheSoundId,
+            0 AS unsheatheSoundId,
             flagsCustom
         FROM
             item_template it

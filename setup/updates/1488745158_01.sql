@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS `dbc_creaturedisplayinfo`;
 DROP TABLE IF EXISTS `dbc_creaturemodeldata`;
 DROP TABLE IF EXISTS `dbc_creaturesounddata`;
 DROP TABLE IF EXISTS `dbc_emotestextsound`;
-DROP TABLE IF EXISTS `dbc_itemisplayinfo`;
+DROP TABLE IF EXISTS `dbc_itemdisplayinfo`;
 DROP TABLE IF EXISTS `dbc_itemgroupsounds`;
 DROP TABLE IF EXISTS `dbc_itemsubclass`;
 DROP TABLE IF EXISTS `dbc_material`;
