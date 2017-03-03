@@ -76,12 +76,6 @@ class SoundList extends BaseType
                 'name'  => $this->getField('name'),
                 'files' => array_values(array_filter($this->getField('files')))
             );
-
-            /* Linking: CreatureDisplayInfo.dbc/3 => CreatureSoundData.dbc
-                        CreatureDisplayInfo.dbc/2 => CreatureModelData.dbc/15 => CreatureSoundData.dbc
-
-                $data[$this->id]['activity'] = <string>; // LANG.sound_activities (e.g. exertion, finch)
-            */
         }
 
         return $data;
@@ -127,7 +121,7 @@ class SoundListFilter extends Filter
         // type [list]
         if (isset($_v['ty']))
         {
-            if ($_ = array_intersect((array)$_v['ty'], [1, 2, 3, 4, 6, 9, 10, 12, 14, 16, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53]))
+            if ($_ = array_intersect((array)$_v['ty'], [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53]))
                 $parts[] = ['cat', $_];
             else
             {

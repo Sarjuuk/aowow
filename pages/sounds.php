@@ -15,7 +15,7 @@ class SoundsPage extends GenericPage
     protected $path      = [0, 19];
     protected $tabId     = 0;
     protected $mode      = CACHE_TYPE_PAGE;
-    protected $validCats = [1, 2, 3, 4, 6,/* 7, 8,*/ 9, 10, 12, /*13,*/ 14, 16, 17, /*18,*/ 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53]; /* reality 404 */
+    protected $validCats = [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53];
 
     public function __construct($pageCall, $pageParam)
     {

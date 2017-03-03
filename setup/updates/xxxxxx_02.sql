@@ -3,6 +3,15 @@
 ALTER TABLE `aowow_spell`
     ADD COLUMN `spellVisualId` smallint(5) unsigned NOT NULL AFTER `rankNo`;
 
+ALTER TABLE `aowow_items`
+    ADD COLUMN `spellVisualId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `displayId`,
+    ADD COLUMN `material` tinyint(3) NOT NULL DEFAULT '0' AFTER `lockId`,
+    ADD COLUMN `soundOverrideSubclass` tinyint(3) NOT NULL AFTER `subClassBak`,
+    ADD COLUMN `pickUpSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `maxMoneyLoot`,
+    ADD COLUMN `dropDownSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `pickUpSoundId`,
+    ADD COLUMN `sheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `dropDownSoundId`,
+    ADD COLUMN `unsheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `sheatheSoundId`;
+
 -- additions
 
 REPLACE INTO `aowow_articles` (`type`, `typeId`, `locale`, `article`, `quickInfo`)
@@ -14,6 +23,13 @@ REPLACE INTO `aowow_articles` (`type`, `typeId`, `locale`, `article`, `quickInfo
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+
+DROP TABLE IF EXISTS `aowow_items_sounds`;
+CREATE TABLE `aowow_items_sounds` (
+    `soundId` smallint(5) unsigned NOT NULL,
+    `subClassMask` mediumint(8) unsigned NOT NULL,
+    PRIMARY KEY (`soundId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='actually .. its only weapon related sounds in here';
 
 DROP TABLE IF EXISTS `aowow_zones_sounds`;
 CREATE TABLE `aowow_zones_sounds` (

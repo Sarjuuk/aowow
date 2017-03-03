@@ -18,7 +18,9 @@ $reqDBC = array(
     // spells
     'spell', 'spellvisual', 'spellvisualkit',
     // zones
-    'soundambience', 'zonemusic', 'zoneintromusictable', 'worldstatezonesounds', 'areatable'
+    'soundambience', 'zonemusic', 'zoneintromusictable', 'worldstatezonesounds', 'areatable',
+    // items
+    'material', 'itemgroupsounds', 'itemdisplayinfo', 'weaponimpactsounds', 'itemsubclass', 'weaponswingsounds2' /*, 'sheathesoundlookups' data is redundant with material..? */
 );
 
 
@@ -357,11 +359,66 @@ function sounds(/*array $ids = [] */)
 
     CLISetup::log(' - linking to items');
 
-    // ItemDisplayInfo.dbc/ItemGroupSoundId => ItemGroupSounds.dbc/Id (Pickup/dropdown)
-    // SheatheSoundLookups.dbc ...? pretty much guesswork
-    // WeaponImpactSounds
-    // WeaponSwingSounds2
+    DB::Aowow()->query('
+        UPDATE
+            ?_items i
+        LEFT JOIN
+            dbc_itemdisplayinfo idi ON
+                idi.id = i.displayId
+        LEFT JOIN
+            dbc_itemgroupsounds igs ON
+                igs.id = idi.groupSoundId
+        LEFT JOIN
+            dbc_material m ON
+                m.id = i.material
+        SET
+            i.spellVisualId    = IFNULL(idi.spellVisualId,   0),
+            i.pickUpSoundId    = IFNULL(igs.pickUpSoundId,   0),
+            i.dropDownSoundId  = IFNULL(igs.dropDownSoundId, 0),
+            i.sheatheSoundId   = IFNULL(m.sheatheSoundId,    0),
+            i.unsheatheSoundId = IFNULL(m.unsheatheSoundId,  0)
+    ');
 
+    DB::Aowow()->query('TRUNCATE ?_items_sounds');
+
+    $fields = ['hit', 'crit'];
+    foreach ($fields as $f)
+    {
+        for ($i = 1; $i <= 10; $i++)
+        {
+            DB::Aowow()->query('
+                INSERT INTO
+                    ?_items_sounds
+                SELECT
+                    ?#,
+                    (1 << wis.subClass)
+                FROM
+                    dbc_weaponimpactsounds wis
+                WHERE
+                    ?# > 0
+                ON DUPLICATE KEY UPDATE
+                    subClassMask = subClassMask | (1 << wis.subClass)
+            ', $f.$i, $f.$i);
+        }
+    }
+
+
+    DB::Aowow()->query('
+        INSERT INTO
+            ?_items_sounds
+        SELECT
+            wss.soundId,
+            (1 << isc.subClass)
+        FROM
+            dbc_itemsubclass isc
+        JOIN
+            dbc_weaponswingsounds2 wss ON
+                wss.weaponSize = isc.weaponSize
+        WHERE
+            isc.class = 2
+        ON DUPLICATE KEY UPDATE
+            subClassMask = subClassMask | (1 << isc.subClass)
+    ');
 
     return true;
 }

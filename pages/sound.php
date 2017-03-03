@@ -149,6 +149,42 @@ class SoundPage extends GenericPage
             )];
         }
 
+
+        // tab: Items
+
+        $subClasses = [];
+        if ($subClassMask = DB::Aowow()->selectCell('SELECT subClassMask FROM ?_items_sounds WHERE soundId = ?d', $this->typeId))
+            for ($i = 0; $i <= 20; $i++)
+                if ($subClassMask & (1 << $i))
+                    $subClasses[] = $i;
+
+        $itemIds = DB::Aowow()->selectCol('
+            SELECT
+                id
+            FROM
+                ?_items
+            WHERE
+               {spellVisualId    IN (?a) OR }
+                pickUpSoundId    =   ?d  OR
+                dropDownSoundId  =   ?d  OR
+                sheatheSoundId   =   ?d  OR
+                unsheatheSoundId =   ?d {OR
+                (
+                    IF (soundOverrideSubclass > 0, soundOverrideSubclass, subclass) IN (?a) AND
+                    class = ?d
+                )}
+        ', $displayIds ?: DBSIMPLE_SKIP, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $subClasses ?: DBSIMPLE_SKIP, ITEM_CLASS_WEAPON);
+        if ($itemIds)
+        {
+            $items = new ItemList(array(['id', $itemIds]));
+            if (!$items->error)
+            {
+                $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['item', ['data' => array_values($items->getListviewData())]];
+            }
+        }
+
+
         // tab: Zones
         if ($zoneIds = DB::Aowow()->select('SELECT id, worldStateId, worldStateValue FROM ?_zones_sounds WHERE ambienceDay = ?d OR ambienceNight = ?d OR musicDay = ?d OR musicNight = ?d OR intro = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {

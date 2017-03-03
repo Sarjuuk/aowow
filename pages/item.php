@@ -953,6 +953,39 @@ class ItemPage extends genericPage
             }
         }
 
+
+        // tab: sounds
+        $soundIds = [];
+        if ($_class == ITEM_CLASS_WEAPON)
+            $soundIds = DB::Aowow()->selectCol('SELECT soundId FROM ?_items_sounds WHERE subClassMask & ?d', (1 << ($this->getField('soundOverrideSubclass') ?: $_subClass)));
+
+        $fields = ['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'];
+        foreach ($fields as $f)
+            if ($x = $this->subject->getField($f))
+                $soundIds[] = $x;
+
+        if ($x = $this->subject->getField('spellVisualId'))
+        {
+            if ($spellSounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE id = ?d', $x))
+            {
+                array_shift($spellSounds);                  // bye 'id'-field
+                foreach ($spellSounds as $ss)
+                    if ($ss)
+                        $soundIds[] = $ss;
+            }
+        }
+
+        if ($soundIds)
+        {
+            $sounds = new SoundList(array(['id', $soundIds]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['sound', ['data' => array_values($sounds->getListviewData())]];
+            }
+        }
+
+
         // // todo - tab: taught by
         // use var $createdBy to find source of this spell
         // id: 'taught-by-X',

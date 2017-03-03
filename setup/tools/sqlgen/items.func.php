@@ -33,9 +33,11 @@ function items(array $ids = [])
             it.entry,
             class,                  class as classBak,
             subclass,               subclass AS subClassBak,
+            SoundOverrideSubclass,
             IFNULL(sg.id, 0) AS subSubClass,
             name,                   IFNULL(li.name_loc2, ""), IFNULL(li.name_loc3, ""), IFNULL(li.name_loc6, ""), IFNULL(li.name_loc8, ""),
             displayid,
+            0 AS spellVisualId,
             Quality,
             Flags,                  FlagsExtra,
             BuyCount,               BuyPrice,               SellPrice,
@@ -86,6 +88,7 @@ function items(array $ids = [])
             LanguageID,
             startquest,
             lockid,
+            Material,
             IF(RandomProperty > 0, RandomProperty, -RandomSuffix) AS randomEnchant,
             itemset,
             MaxDurability,
@@ -107,6 +110,7 @@ function items(array $ids = [])
             FoodType,
             0 AS gemEnchantmentId,
             minMoneyLoot,           maxMoneyLoot,
+            0, 0, 0, 0                                      -- sounds
             flagsCustom
         FROM
             item_template it
