@@ -1,4 +1,4 @@
--- alteration (ALSO ALTER db_structure.sql GODDAMNIT))
+-- alterations
 
 ALTER TABLE `aowow_spell`
     ADD COLUMN `spellVisualId` smallint(5) unsigned NOT NULL AFTER `rankNo`;
@@ -11,6 +11,7 @@ ALTER TABLE `aowow_items`
     ADD COLUMN `dropDownSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `pickUpSoundId`,
     ADD COLUMN `sheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `dropDownSoundId`,
     ADD COLUMN `unsheatheSoundId` smallint(5) unsigned NOT NULL DEFAULT '0' AFTER `sheatheSoundId`;
+
 
 -- additions
 
@@ -160,4 +161,4 @@ CREATE TABLE IF NOT EXISTS `aowow_spell_sounds` (
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 
-/* UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell sounds spawns'); */
+UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell creature sounds spawns');

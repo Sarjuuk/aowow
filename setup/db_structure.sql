@@ -2553,6 +2553,13 @@ CREATE TABLE IF NOT EXISTS `aowow_spell_sounds` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='!ATTENTION!\r\nthe primary key of this table is NOT a spellId, but spellVisualId\r\n\r\ncolumn names from LANG.sound_activities';
 
+DROP TABLE IF EXISTS `aowow_items_sounds`;
+CREATE TABLE `aowow_items_sounds` (
+  `soundId` smallint(5) unsigned NOT NULL,
+  `subClassMask` mediumint(8) unsigned NOT NULL,
+  PRIMARY KEY (`soundId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='actually .. its only weapon related sounds in here';
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -2646,7 +2653,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (< T B D >,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1488745159,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -122,7 +122,6 @@ class EmotePage extends GenericPage
                 )];
             }
         }
-
     }
 }
 

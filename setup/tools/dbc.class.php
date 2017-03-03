@@ -136,8 +136,7 @@ class DBC
         'worldmaptransforms'            => 'niffffiffi',
         'worldstatezonesounds'          => 'iiiiiiix',
         'zoneintromusictable'           => 'nxixx',
-        'zonemusic'                     => 'nxxxxxii',
-
+        'zonemusic'                     => 'nxxxxxii'
     );
 
 
@@ -237,7 +236,7 @@ class DBC
         'worldmaptransforms'            => 'Id,sourceMapId,minX,minY,maxX,maxY,targetMapId,offsetX,offsetY,dungeonMapId',
         'worldstatezonesounds'          => 'stateId,value,areaId,wmoAreaId,zoneIntroMusicId,zoneMusicId,soundAmbienceId',
         'zoneintromusictable'           => 'Id,soundId',
-        'zonemusic'                     => 'Id,soundIdDay,soundIdNight',
+        'zonemusic'                     => 'Id,soundIdDay,soundIdNight'
     );
 
     private $isGameTable = false;

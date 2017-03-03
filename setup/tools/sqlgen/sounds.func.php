@@ -188,7 +188,7 @@ function sounds(/*array $ids = [] */)
     //      * footsteps (matrix of: creature + terrain + humidity)
     //      * fidget2 through 5
     //      * customattack2 through 3
-    //  in case of conficting data CreatureDisplayInfo overrides CreatureModelData (seems to be more specialized (Thral > MaleOrc / Maiden > FemaleTitan))
+    //  in case of conflicting data CreatureDisplayInfo overrides CreatureModelData (seems to be more specialized (Thral > MaleOrc / Maiden > FemaleTitan))
 
     DB::Aowow()->query('TRUNCATE ?_creature_sounds');
     DB::Aowow()->query('

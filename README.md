@@ -81,7 +81,7 @@ Calculate.Gameoject.Zone.Area.Data = 1
    example for ffmpeg
    ```
 find path/to/extracted/files/<localeCode> -name "*.wav" -exec ffmpeg -hide_banner -y -i {} -acodec libvorbis {}.ogg \;      # file.wav -> file.wav.ogg
-find path/to/extracted/files/<localeCode> -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {} \;  # file.mp3 -> file.mp3.mp3
+find path/to/extracted/files/<localeCode> -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {}.mp3 \;  # file.mp3 -> file.mp3.mp3
 ```
 
 7. run the initial setup from the CLI `php aowow --firstrun`. It should guide you through with minimal input required from your end.

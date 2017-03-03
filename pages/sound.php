@@ -103,10 +103,10 @@ class SoundPage extends GenericPage
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
+
         /**************/
         /* Extra Tabs */
         /**************/
-
 
         // tab: Spells
         // skipping (always empty): ready, castertargeting, casterstate, targetstate
@@ -151,7 +151,6 @@ class SoundPage extends GenericPage
 
 
         // tab: Items
-
         $subClasses = [];
         if ($subClassMask = DB::Aowow()->selectCell('SELECT subClassMask FROM ?_items_sounds WHERE soundId = ?d', $this->typeId))
             for ($i = 0; $i <= 20; $i++)
@@ -242,6 +241,7 @@ class SoundPage extends GenericPage
             }
         }
 
+
         // tab: Races (VocalUISounds (containing error voice overs))
         if ($vo = DB::Aowow()->selectCol('SELECT raceId FROM ?_races_sounds WHERE soundId = ?d GROUP BY raceId', $this->typeId))
         {
@@ -252,6 +252,7 @@ class SoundPage extends GenericPage
                 $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
             }
         }
+
 
         // tab: Emotes (EmotesTextSound (containing emote audio))
         if ($em = DB::Aowow()->selectCol('SELECT emoteId FROM ?_emotes_sounds WHERE soundId = ?d GROUP BY emoteId', $this->typeId))
@@ -299,6 +300,7 @@ class SoundPage extends GenericPage
                     break;
             }
         }
+
 
         // tab: NPC (dialogues...?, generic creature sound)
         // skipping (always empty): transforms, footsteps
@@ -360,10 +362,6 @@ class SoundPage extends GenericPage
                 $this->lvTabs[] = ['creature', ['data' => array_values($npcs->getListviewData())]];
             }
         }
-
-
-        // tab: Item (material sounds, weapon hits)
-
     }
 }
 
