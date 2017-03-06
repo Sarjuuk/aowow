@@ -392,6 +392,8 @@ class ZonePage extends GenericPage
                 }
             }
 
+            unset($data);
+
             // append paths between nodes
             if ($flightNodes)
             {
@@ -494,7 +496,7 @@ class ZonePage extends GenericPage
         {
             $this->lvTabs[] = ['quest', array(
                 'data' => array_values($questsLV),
-                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')'
+                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')'
             )];
         }
 
@@ -684,6 +686,59 @@ class ZonePage extends GenericPage
             )];
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
+        }
+
+        // tab: sound (including subzones; excluding parents)
+        $areaIds = [];
+        if (!$subZones->error)
+            $areaIds = $subZones->getFoundIDs();
+
+        $areaIds[] = $this->typeId;
+
+        $soundIds  = [];
+        $zoneMusic = DB::Aowow()->select('
+            SELECT
+                x.soundId, x.worldStateId, x.worldStateValue
+            FROM (
+                SELECT ambienceDay   AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
+                SELECT ambienceNight AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
+                SELECT musicDay      AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicDay      > 0 UNION
+                SELECT musicNight    AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicNight    > 0 UNION
+                SELECT intro         AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND intro         > 0
+            ) x
+            GROUP BY
+                x.soundId, x.worldStateId, x.worldStateValue
+       ', $areaIds, $areaIds, $areaIds, $areaIds, $areaIds);
+
+        if ($sSpawns = DB::Aowow()->selectCol('SELECT typeId FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_SOUND))
+            $soundIds = array_merge($soundIds, $sSpawns);
+
+        if ($zoneMusic)
+            $soundIds = array_merge($soundIds, array_column($zoneMusic, 'soundId'));
+
+        if ($soundIds)
+        {
+            $music = new SoundList(array(['id', array_unique($soundIds)]));
+            if (!$music->error)
+            {
+                $data    = $music->getListviewData();
+                $tabData = [];
+
+                if (array_filter(array_column($soundIds, 'worldStateId')))
+                {
+                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+
+                    foreach ($soundIds as $sData)
+                    if ($sData['worldStateId'])
+                        $data[$sData['soundId']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $sData['worldStateId'], $sData['worldStateValue']]];
+                }
+
+                $tabData['data'] = array_values($data);
+
+                $this->lvTabs[] = ['sound', $tabData];
+
+                $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
+            }
         }
     }
 

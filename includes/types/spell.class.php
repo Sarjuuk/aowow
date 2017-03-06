@@ -1998,6 +1998,11 @@ class SpellList extends BaseType
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
                             $data[TYPE_RACE][$i + 1] = $i + 1;
+
+                // play sound effect
+                for ($i = 1; $i < 4; $i++)
+                    if ($this->getField('effect'.$i.'Id') == 132)
+                        $data[TYPE_SOUND][$this->getField('effect'.$i.'MiscValue')] = $this->getField('effect'.$i.'MiscValue');
             }
 
             if ($addMask & GLOBALINFO_SELF)

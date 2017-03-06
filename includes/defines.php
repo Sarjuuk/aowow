@@ -24,6 +24,7 @@ define('TYPE_CLASS',                        13);
 define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
+define('TYPE_SOUND',                        19);
 // internal types (not published to js)
 define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);
@@ -42,7 +43,7 @@ define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);
 define('SEARCH_MASK_OPEN',                  0x007DC1FF);    // open search
-define('SEARCH_MASK_ALL',                   0x07FFFFFF);    // normal search
+define('SEARCH_MASK_ALL',                   0x0FFFFFFF);    // normal search
 
 // Databases
 define('DB_AOWOW',                          0);
@@ -158,6 +159,7 @@ define('BUTTON_LINKS',                      4);
 define('BUTTON_FORUM',                      5);
 define('BUTTON_TALENT',                     6);
 define('BUTTON_EQUIP',                      7);
+define('BUTTON_PLAYLIST',                   8);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
@@ -199,6 +201,9 @@ define('CC_FLAG_STICKY',                    0x1);
 define('CC_FLAG_DELETED',                   0x2);
 define('CC_FLAG_OUTDATED',                  0x4);
 define('CC_FLAG_APPROVED',                  0x8);
+
+define('SOUND_TYPE_OGG',                    1);
+define('SOUND_TYPE_MP3',                    2);
 
 /*
  * Game

@@ -183,6 +183,24 @@ class RacePage extends GenericPage
                 'hiddenCols' => ['slot', 'type']
             )];
         }
+
+        // Sounds
+        if ($vo = DB::Aowow()->selectCol('SELECT soundId AS ARRAY_KEY, gender FROM ?_races_sounds WHERE raceId = ?d', $this->typeId))
+        {
+            $sounds = new SoundList(array(['id', array_keys($vo)]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $data = $sounds->getListviewData();
+                foreach ($data as $id => &$d)
+                    $d['gender'] = $vo[$id];
+
+                $this->lvTabs[] = ['sound', array(
+                    'data' => array_values($data),
+                    'extraCols' => ['$Listview.templates.title.columns[1]']
+                )];
+            }
+        }
     }
 }
 

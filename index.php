@@ -64,8 +64,8 @@ switch ($pageCall)
     case 'search':                                          // tool: searches
     case 'skill':
     case 'skills':
-    // case 'sound':                                        // db: sounds for zone, creature, spell, ...
-    // case 'sounds':
+    case 'sound':                                           // db: sounds for zone, creature, spell, ...
+    case 'sounds':
     case 'spell':
     case 'spells':
     case 'talent':                                          // tool: talent calculator

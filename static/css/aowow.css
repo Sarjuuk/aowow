@@ -114,7 +114,7 @@ h5 a.icontiny span { text-decoration:none !important; }
 
 .entryc .quote, .comment-body .quote,
 .text .quote, .text blockquote,
-.quote-blizz, .quote-wh, .minibox {
+.quote-blizz, .quote-wh {
     background:#1b1b1b;
     padding: 15px;
     margin:15px 0;
@@ -148,6 +148,14 @@ h5 a.icontiny span { text-decoration:none !important; }
 .text .quote, .text blockquote {
     word-wrap:break-word;
     overflow:auto;
+}
+
+div.audiomarkup
+{
+    text-align:center;
+    display:inline-block;
+    font-size:13px;
+    line-height:normal
 }
 
 .quote-blizz,.quote-wh
@@ -1824,6 +1832,10 @@ td.checked:hover {
 
 td.checked .listview-cb:hover {
     background-color: #343434;
+}
+
+.listview-cleartext {
+    font-family:Verdana, "Open Sans", Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 .live-search {
@@ -3973,6 +3985,22 @@ div.captcha-center {
     border: 1px solid #404040;
     font-weight: bold;
     font-size: 11px;
+}
+
+.audio-controls td {
+    text-align:center
+}
+
+.audio-controls-title {
+    padding:0 15px 5px;
+    word-break:break-word;
+    word-wrap:break-word;
+    overflow-wrap:break-word
+}
+
+.audio-controls-pagination-track {
+    display:inline-block;
+    min-width:50px
 }
 
 

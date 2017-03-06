@@ -1083,6 +1083,29 @@ class SpellPage extends GenericPage
             $this->extendGlobalData($enchList->getJSGlobals());
         }
 
+        // tab: sounds
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE id = ?d', $this->subject->getField('spellVisualId'));
+        array_shift($activitySounds);                       // remove id-column
+        if ($activitySounds)
+        {
+            $sounds = new SoundList(array(['id', $activitySounds]));
+            if (!$sounds->error)
+            {
+                $data = $sounds->getListviewData();
+                foreach ($activitySounds as $activity => $id)
+                    if (isset($data[$id]))
+                        $data[$id]['activity'] = $activity; // no index, js wants a string :(
+
+                $tabData = ['data' => array_values($data)];
+                if ($activitySounds)
+                    $tabData['visibleCols'] = ['activity'];
+
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['sound', $tabData];
+            }
+        }
+
+
         // find associated NPC, Item and merge results
         // taughtbypets (unused..?)
         // taughtbyquest (usually the spell casted as quest reward teaches something; exclude those seplls from taughtBySpell)
@@ -1726,6 +1749,9 @@ class SpellPage extends GenericPage
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
+                case 132:                                   // Play Sound
+                    $foo['sound'] = $effMV;
+                    break;
                 case 123:                                   // Send Taxi - effMV is taxiPathId. We only use paths for flightmasters for now, so spell-triggered paths are not in the table
                 default:
                 {
@@ -1978,7 +2004,7 @@ class SpellPage extends GenericPage
             }
 
             // cases where we dont want 'Value' to be displayed
-            if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, []) || empty($foo['value']))
+            if (in_array($effAura, [11, 12, 36, 77]) || in_array($effId, [132]) || empty($foo['value']))
                 unset($foo['value']);
         }
 

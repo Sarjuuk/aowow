@@ -214,6 +214,8 @@ $lang = array(
         'school'        => "Magieart",
         'skill'         => "Fertigkeit",
         'skills'        => "Fertigkeiten",
+        'sound'         => "Klang",
+        'sounds'        => "Klänge",
         'spell'         => "Zauber",
         'spells'        => "Zauber",
         'type'          => "Art",
@@ -673,6 +675,17 @@ $lang = array(
         'cap'           => "Obergrenze",
         'cat'           => array(
             1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
+        )
+    ),
+    'sound' => array(
+        'notFound'      => "Dieser Klang existiert nicht.",
+        'foundIn'       => "Dieser Klang befindet sich in",
+        'goToPlaylist'  => "Gehe zu meiner Playlist",
+        'cat'           => array(
+            null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
+            "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
+            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
+            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Meine Playlist"
         )
     ),
     'pet'      => array(

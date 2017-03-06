@@ -18,6 +18,8 @@ class NpcPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
+    private   $soundIds      = [];
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -581,7 +583,7 @@ class NpcPage extends GenericPage
             {
                 $mode = ($_altIds[$id] + 1) * ($mapType == 1 ? -1 : 1);
                 if ($lootGO = DB::Aowow()->selectRow('SELECT o.id, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE l.npcId = ?d', $id))
-                    array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lootGO['lootId'], $langref[$mode], 'drops-object-'.abs($mode), [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lootGO['id'].', \''.Util::jsEscape(Util::localizedString($lootGO, 'name')).'\')']]);
+                    array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lootGO['lootId'], $langref[$mode], 'drops-object-'.abs($mode), [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lootGO['id'].', "'.Util::localizedString($lootGO, 'name').'")']]);
                 if ($lootId = $_altNPCs->getField('lootId'))
                     array_splice($sourceFor, 1, 0, [[LOOT_CREATURE,   $lootId,           $langref[$mode], 'drops-'.abs($mode), []]]);
             }
@@ -589,7 +591,7 @@ class NpcPage extends GenericPage
 
         if ($lootGOs = DB::Aowow()->select('SELECT o.id, IF(npcId < 0, 1, 0) AS modeDummy, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE ABS(l.npcId) = ?d', $this->typeId))
             foreach ($lootGOs as $idx => $lgo)
-                array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', \''.Util::jsEscape(Util::localizedString($lgo, 'name')).'\')']]);
+                array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")']]);
 
         $reqQuest = [];
         foreach ($sourceFor as $sf)
@@ -752,6 +754,58 @@ class NpcPage extends GenericPage
                 $this->lvTabs[] = ['creature', $tabData];
             }
         }
+
+        /* tab sounds:
+            * activity sounds => CreatureDisplayInfo.dbc => (CreatureModelData.dbc => ) CreatureSoundData.dbc
+            * AI => smart_scripts
+            * Dialogue VO => creature_text
+            * onClick VO => CreatureDisplayInfo.dbc => NPCSounds.dbc
+        */
+        $ssActionLists = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE entryorguid = ?d AND source_type = 0 AND action_type IN (80, 87, 88)', $this->typeId);
+        $actionListIds = [];
+        foreach ($ssActionLists as $sal)
+        {
+            $iMax = 0;
+            switch ($sal['action_type'])
+            {
+                case 80: $iMax = 1; break;
+                case 87: $iMax = 6; break;
+                case 88: $iMax = 2; break;
+                default: continue;
+            }
+
+            for ($i = 1; $i <= $iMax; $i++)
+                if ($sal['action_param'.$i])
+                    $actionListIds[] = $sal['action_param'.$i];
+        }
+
+        // not going for a per guid basis. The infos are nested enough as is.
+        $smartScripts   = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE action_type = 4 AND ((source_type = 0 AND entryorguid = ?d) { OR (source_type = 9 AND entryorguid IN (?a)) } )',  $this->typeId, $actionListIds ?: DBSIMPLE_SKIP);
+        $this->soundIds = array_merge($this->soundIds, $smartScripts);
+
+        // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE id = ?d', $this->subject->getField('displayId1'));
+        array_shift($activitySounds);                       // remove id-column
+        $this->soundIds = array_merge($this->soundIds, array_values($activitySounds));
+
+        if ($this->soundIds)
+        {
+            $sounds = new SoundList(array(['id', $this->soundIds]));
+            if (!$sounds->error)
+            {
+                $data = $sounds->getListviewData();
+                foreach ($activitySounds as $activity => $id)
+                    if (isset($data[$id]))
+                        $data[$id]['activity'] = $activity; // no index, js wants a string :(
+
+                $tabData = ['data' => array_values($data)];
+                if ($activitySounds)
+                    $tabData['visibleCols'] = ['activity'];
+
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['sound', $tabData];
+            }
+        }
     }
 
     protected function generateTooltip($asError = false)
@@ -908,7 +962,8 @@ class NpcPage extends GenericPage
                 IFNULL(NULLIF(lbct.MaleText_loc2, ""), IFNULL(NULLIF(lbct.FemaleText_loc2, ""), IFNULL(lct.text_loc2, ""))) AS text_loc2,
                 IFNULL(NULLIF(lbct.MaleText_loc3, ""), IFNULL(NULLIF(lbct.FemaleText_loc3, ""), IFNULL(lct.text_loc3, ""))) AS text_loc3,
                 IFNULL(NULLIF(lbct.MaleText_loc6, ""), IFNULL(NULLIF(lbct.FemaleText_loc6, ""), IFNULL(lct.text_loc6, ""))) AS text_loc6,
-                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8
+                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8,
+                IF(bct.SoundId > 0, bct.SoundId, ct.sound) AS soundId
             FROM
                 creature_text ct
             LEFT JOIN
@@ -927,6 +982,9 @@ class NpcPage extends GenericPage
             $group = [];
             foreach ($text as $t)
             {
+                if ($t['soundId'])
+                    $this->soundIds[] = $t['soundId'];
+
                 $msg = Util::localizedString($t, 'text');
                 if (!$msg)
                     continue;

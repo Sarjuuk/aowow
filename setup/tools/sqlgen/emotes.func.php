@@ -9,10 +9,14 @@ if (!CLI)
 
 $customData = array(
 );
-$reqDBC = ['emotes', 'emotestext', 'emotestextdata' /*, 'emotestextsound' */];
+$reqDBC = ['emotes', 'emotestext', 'emotestextdata'];
 
 function emotes(/*array $ids = [] */)
 {
+    /**********/
+    /* Basics */
+    /**********/
+
     $globStrPath  = CLISetup::$srcDir.'%sInterface/FrameXML/GlobalStrings.lua';
     $allOK        = true;
     $locPath      = [];

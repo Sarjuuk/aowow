@@ -8,6 +8,11 @@ if (isset($this->redButtons[BUTTON_WOWHEAD])):
     endif;
 endif;
 
+// go to my playlist
+if (isset($this->redButtons[BUTTON_PLAYLIST])):
+    echo '<a href="?sound&playlist" class="button-red"><em><b><i>'.Lang::sound('goToPlaylist').'</i></b><span>'.Lang::sound('goToPlaylist').'</span></em></a>';
+endif;
+
 // ingame-links/markdown/ect
 if (isset($this->redButtons[BUTTON_LINKS])):
     if ($b = $this->redButtons[BUTTON_LINKS]):

@@ -328,6 +328,42 @@ class CLISetup
         return false;
     }
 
+    public static function nicePath(/* $file = '', ...$pathParts */)
+    {
+        $path = '';
+
+        switch (func_num_args())
+        {
+            case 0:
+                return '';
+            case 1:
+                $path = func_get_arg(0);
+                break;
+            default:
+                $args = func_get_args();
+                $file = array_shift($args);
+                $path = implode(DIRECTORY_SEPARATOR, $args).DIRECTORY_SEPARATOR.$file;
+        }
+
+        if (DIRECTORY_SEPARATOR == '/')                     // *nix
+        {
+            $path = str_replace('\\', '/', $path);
+            $path = preg_replace('/\/+/i', '/', $path);
+        }
+        else if (DIRECTORY_SEPARATOR == '\\')               // win
+        {
+            $path = str_replace('/', '\\', $path);
+            $path = preg_replace('/\\\\+/i', '\\', $path);
+        }
+        else
+            CLISetup::log('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLISetup::LOG_ERROR);
+
+        if ($path[0] == DIRECTORY_SEPARATOR)
+            $path = substr($path, 1);
+
+        return $path;
+    }
+
     /**************/
     /* read input */
     /**************/

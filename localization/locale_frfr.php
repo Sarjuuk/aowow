@@ -214,6 +214,8 @@ $lang = array(
         'school'        => "École",
         'skill'         => "compétence",
         'skills'        => "Compétences",
+        'sound'         => "son",
+        'sounds'        => "Sons",
         'spell'         => "sort",
         'spells'        => "Sorts",
         'type'          => "Type",
@@ -672,6 +674,17 @@ $lang = array(
         'cap'           => "Maximum total",
         'cat'           => array(
             1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
+        )
+    ),
+    'sound' => array(
+        'notFound'      => "Ce son n'existe pas.",
+        'foundIn'       => "Ce son se trouve dans",
+        'goToPlaylist'  => "Aller à votre playlist",
+        'cat'           => array(
+            null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
+            "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
+            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
+            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Ma playlist"
         )
     ),
     'pet'      => array(

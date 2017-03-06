@@ -39,7 +39,7 @@ class Util
     public static $typeClasses              = array(
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
-        'CharRaceList',     'SkillList',        null,               'CurrencyList',
+        'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
         TYPE_EMOTE       => 'EmoteList',
         TYPE_ENCHANTMENT => 'EnchantmentList'
     );
@@ -47,6 +47,7 @@ class Util
     public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
+        null,           'sound',
         TYPE_USER        => 'user',
         TYPE_EMOTE       => 'emote',
         TYPE_ENCHANTMENT => 'enchantment'

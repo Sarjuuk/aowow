@@ -352,6 +352,16 @@ abstract class BaseType
         return $value;
     }
 
+    public function getAllFields($field, $localized = false, $silent = false)
+    {
+        $data = [];
+
+        foreach ($this->iterate() as $__)
+            $data[$this->id] = $this->getField($field, $localized, $silent);
+
+        return $data;
+    }
+
     public function getRandomId()
     {
         // ORDER BY RAND() is not optimal, so if anyone has an alternative idea..
@@ -668,7 +678,7 @@ trait spawnHelper
     public function getSpawns($mode)
     {
         // ony Creatures and GOs can be spawned
-        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT))
+        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
             return [];
 
         switch ($mode)

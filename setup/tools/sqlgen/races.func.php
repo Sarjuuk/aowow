@@ -25,6 +25,10 @@ $reqDBC = ['chrraces', 'charbaseinfo'];
 
 function races()
 {
+    /**********/
+    /* Basics */
+    /**********/
+
     $baseQuery = '
         REPLACE INTO
             ?_races

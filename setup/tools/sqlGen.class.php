@@ -52,6 +52,7 @@ class SqlGen
         'shapeshiftforms'          => [null, null,                             null, null],
         'skillline'                => [null, null,                             null, null],
         'emotes'                   => [null, null,                             null, null],
+        'sounds'                   => [null, null,                             null, null],
         'itemenchantment'          => [null, null, null,                      ['spell_enchant_proc_data']],
         'achievement'              => [null, null, null,                      ['dbc_achievement']],
         'creature'                 => [null, null, null,                      ['creature_template', 'creature_template_locale', 'creature_classlevelstats', 'instance_encounters']],

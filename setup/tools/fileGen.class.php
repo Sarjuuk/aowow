@@ -48,7 +48,8 @@ class FileGen
         'enchants'      => [['items', 'spell', 'itemenchantment'], null],
         'gems'          => [['items', 'spell', 'itemenchantment'], null],
         'profiler'      => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null],
-        'weightPresets' => [null, null]
+        'weightPresets' => [null, null],
+        'sounds'        => [['sounds_files'], null]
     );
 
     public  static $defaultExecTime = 30;
@@ -60,7 +61,8 @@ class FileGen
         'static/uploads/screenshots/temp',
         'static/uploads/screenshots/thumb',
         'static/uploads/temp/',
-        'static/download/searchplugins/'
+        'static/download/searchplugins/',
+        'static/wowsounds/'
     );
 
     public static $txtConstants = array(

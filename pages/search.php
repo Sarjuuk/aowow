@@ -52,7 +52,7 @@ class SearchPage extends GenericPage
         '_searchProficiency', '_searchProfession',  '_searchCompanion', '_searchMount',           '_searchCreature',
         '_searchQuest',       '_searchAchievement', '_searchStatistic', '_searchZone',            '_searchObject',
         '_searchFaction',     '_searchSkill',       '_searchPet',       '_searchCreatureAbility', '_searchSpell',
-        '_searchEmote',       '_searchEnchantment'
+        '_searchEmote',       '_searchEnchantment', '_searchSound'
     );
 
     public function __construct($pageCall, $pageParam)
@@ -1359,9 +1359,35 @@ class SearchPage extends GenericPage
         return false;
     }
 
-    // private function _searchCharacter($cndBase) { }      // 27 Characters $searchMask & 0x8000000
-    // private function _searchGuild($cndBase) { }          // 28 Guilds $searchMask & 0x10000000
-    // private function _searchArenaTeam($cndBase) { }      // 29 Arena Teams $searchMask & 0x20000000
+    private function _searchSound($cndBase)                 // 27 Sounds $searchMask & 0x8000000
+    {
+        $cnd    = array_merge($cndBase, [$this->createLookup(['name'])]);
+        $sounds = new SoundList($cnd);
+
+        if ($data = $sounds->getListviewData())
+        {
+            if ($this->searchMask & SEARCH_TYPE_REGULAR)
+                $this->extendGlobalData($sounds->getJSGlobals());
+
+            $osInfo         = [TYPE_SOUND, ' (Sound)', $sounds->getMatches()];
+            $result['data'] = array_values($data);
+
+            if ($sounds->getMatches() > $this->maxResults)
+            {
+                $result['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), $this->maxResults);
+                $result['_truncated'] = 1;
+            }
+
+            return ['sound', $result, null, $osInfo];
+        }
+
+        return false;
+    }
+
+
+    // private function _searchCharacter($cndBase) { }      // 28 Characters $searchMask & 0x10000000
+    // private function _searchGuild($cndBase) { }          // 29 Guilds $searchMask & 0x20000000
+    // private function _searchArenaTeam($cndBase) { }      // 30 Arena Teams $searchMask & 0x40000000
 }
 
 ?>
