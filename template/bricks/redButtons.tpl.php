@@ -16,7 +16,7 @@ endif;
 // ingame-links/markdown/ect
 if (isset($this->redButtons[BUTTON_LINKS])):
     if ($b = $this->redButtons[BUTTON_LINKS]):
-        echo '<a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNSECAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).');"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
+        echo '<a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).');"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
     else:
         echo '<a href="javascript:;" id="open-links-button" class="button-red button-red-disabled"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
     endif;
@@ -25,7 +25,7 @@ endif;
 // view in 3D
 if (isset($this->redButtons[BUTTON_VIEW3D])):
     if ($b = $this->redButtons[BUTTON_VIEW3D]):             // json_encode puts property names in brackets wich is not cool with inline javascript
-        echo '<a href="javascript:;" id="view3D-button" class="button-red" onclick="this.blur(); ModelViewer.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNSECAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).')"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
+        echo '<a href="javascript:;" id="view3D-button" class="button-red" onclick="this.blur(); ModelViewer.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).')"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
     else:
         echo '<a href="javascript:;" id="view3D-button" class="button-red button-red-disabled"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
     endif;

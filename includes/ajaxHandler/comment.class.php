@@ -19,6 +19,7 @@ class AjaxComment extends AjaxHandler
         'remove'      => [FILTER_SANITIZE_NUMBER_INT, null],
         'commentId'   => [FILTER_SANITIZE_NUMBER_INT, null],
         'replyId'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'sticky'      => [FILTER_SANITIZE_NUMBER_INT, null],
      // 'username'    => [FILTER_SANITIZE_STRING,     0xC]  // FILTER_FLAG_STRIP_LOW | *_HIGH
     );
 

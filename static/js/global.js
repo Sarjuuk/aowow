@@ -13021,7 +13021,7 @@ Listview.templates = {
                 var replyHtml = Markup.toHtml(reply.body, {allow: Markup.CLASS_USER, mode: Markup.MODE_REPLY, roles: 0, locale: comment.locale});
 
                 replyHtml = replyHtml.replace(/[^\s<>]{81,}/, function(text) {
-                    if(text.substring(0, 5) == 'href')
+                    if(text.substring(0, 4) == 'href' || text.substring(0, 3) == 'src')
                         return text;
 
                     var ret = '';
