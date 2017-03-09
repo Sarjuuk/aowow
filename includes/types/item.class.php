@@ -671,9 +671,9 @@ class ItemList extends BaseType
         }
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
-        if ($this->curTpl['randomEnchant'] && !isset($enhance['r']))
+        if ($this->curTpl['randomEnchant'] && empty($enhance['r']))
             $x .= '<span class="q2">'.Lang::item('randEnchant').'</span><br />';
-        else if (isset($enhance['r']))
+        else if (!empty($enhance['r']))
             $x .= $randEnchant;
 
         // itemMods (display stats and save ratings for later use)

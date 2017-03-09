@@ -247,7 +247,7 @@ class ZonePage extends GenericPage
                             $questsLV[$id] = $data;
                         }
 
-                        $this->extendGlobalData($started->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+                        $this->extendGlobalData($started->getJSGlobals());
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
@@ -343,6 +343,8 @@ class ZonePage extends GenericPage
 
                             $questsLV[$id] = $data;
                         }
+
+                        $this->extendGlobalData($started->getJSGlobals());
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
@@ -494,10 +496,18 @@ class ZonePage extends GenericPage
         // tab: Quests [data collected by SOM-routine]
         if ($questsLV)
         {
-            $this->lvTabs[] = ['quest', array(
-                'data' => array_values($questsLV),
-                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')'
-            )];
+            $tabData = ['quest', ['data' => array_values($questsLV)]];
+
+            foreach (Util::$questClasses as $parent => $children)
+            {
+                if (in_array($this->typeId, $children))
+                {
+                    $tabData[1]['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                    break;
+                }
+            }
+
+            $this->lvTabs[] = $tabData;
         }
 
         // tab: item-quest starter
