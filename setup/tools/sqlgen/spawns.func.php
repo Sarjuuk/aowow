@@ -23,7 +23,7 @@ if (!CLI)
 
 $customData = array(
 );
-$reqDBC = ['worldmaparea', 'map', 'dungeonmap', 'taxipathnode', 'soundemitters'];
+$reqDBC = ['worldmaparea', 'map', 'dungeonmap', 'taxipathnode', 'soundemitters', 'areatrigger'];
 
 function spawns()                                           // and waypoints
 {
@@ -102,15 +102,19 @@ function spawns()                                           // and waypoints
                  'FROM dbc_soundemitters',
                  ' - assembling '.CLISetup::bold('sound emitter').' spawns'];
 
-    $query[4] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
+    $query[4] = ['SELECT Id AS "guid", 503 AS "type", Id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
+                 'FROM dbc_areatrigger',
+                 ' - assembling '.CLISetup::bold('areatrigger').' spawns'];
+
+    $query[5] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
                  'FROM creature c JOIN script_waypoint w ON c.id = w.entry',
                  ' - assembling waypoints from '.CLISetup::bold('script_waypoint')];
 
-    $query[5] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
+    $query[6] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
                  'FROM creature c JOIN waypoints w ON c.id = w.entry',
                  ' - assembling waypoints from '.CLISetup::bold('waypoints')];
 
-    $query[6] = ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
+    $query[7] = ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
                  'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
                  ' - assembling waypoints from '.CLISetup::bold('waypoint_data')];
 
@@ -154,7 +158,7 @@ function spawns()                                           // and waypoints
         $n   = 0;
         $sum = 0;
 
-        if ($idx == 3)
+        if ($idx == 3 || $idx == 4)
             $queryResult = DB::Aowow()->select($q[0]);
         else
             $queryResult = DB::World()->select($q[0]);
@@ -183,14 +187,14 @@ function spawns()                                           // and waypoints
 
             if (!$points)                                   // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
             {
-                CLISetup::log('GUID '.$spawn['guid'].($idx < 4 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$spawn['areaId'].'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLISetup::LOG_WARN);
+                CLISetup::log('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$spawn['areaId'].'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLISetup::LOG_WARN);
                 continue;
             }
 
             // if areaId is set, area was determined by TC .. we're fine .. mostly
             $final  = $spawn['areaId'] ? $points[0] : $checkCoords($points);
 
-            if ($idx < 4)
+            if ($idx < 5)
             {
                 $set = array(
                     'guid'      => $spawn['guid'],

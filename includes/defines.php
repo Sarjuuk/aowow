@@ -29,6 +29,7 @@ define('TYPE_SOUND',                        19);
 define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);
 define('TYPE_ENCHANTMENT',                  502);
+define('TYPE_AREATRIGGER',                  503);           // not for display, but indexing in ?_spawns-table
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);
@@ -195,6 +196,7 @@ define('ACHIEVEMENTINFO_PROFILE',           0x1);
 define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
 define('SPAWNINFO_SHORT',                   2);
 define('SPAWNINFO_FULL',                    3);
+define('SPAWNINFO_QUEST',                   4);
 
 // Community Content
 define('CC_FLAG_STICKY',                    0x1);

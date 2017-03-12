@@ -1965,7 +1965,7 @@ DROP TABLE IF EXISTS `aowow_spawns`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_spawns` (
   `guid` int(11) NOT NULL COMMENT '< 0: vehicle accessory',
-  `type` tinyint(3) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
   `typeId` int(10) unsigned NOT NULL,
   `respawn` int(10) unsigned NOT NULL COMMENT 'in seconds',
   `spawnMask` tinyint(3) unsigned NOT NULL,

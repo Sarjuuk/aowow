@@ -2,8 +2,10 @@
 if (isset($this->map) && empty($this->map)):
     echo Lang::zone('noMap');
 elseif (!empty($this->map['data'])):
-    if ($this->type != TYPE_ZONE):
-        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : ($this->type == TYPE_SOUND ? Lang::sound('foundIn') : Lang::npc('foundIn'))).' <span id="locations">';
+    if ($this->type == TYPE_QUEST) :
+        echo "            <div id=\"mapper-zone-generic\"></div>\n";
+    elseif ($this->type != TYPE_ZONE):
+        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : ($this->type == TYPE_SOUND ? Lang::sound('foundIn') : Lang::npc('foundIn'))).' <span id="mapper-zone-generic">';
 
         $n = count($this->map['mapperData']);
         $i = 0;
@@ -34,10 +36,10 @@ elseif (!empty($this->map['data'])):
 <?php
     else:
 ?>
-            <div class="pad"></div>
 <?php
         if (isset($this->map['som'])):
 ?>
+            <div class="pad"></div>
             <div id="som-generic"></div>
 <?php
         endif;
@@ -52,8 +54,8 @@ elseif (!empty($this->map['data'])):
 <?php
     if (!empty($this->map['data']['zone'])):
         echo "                ".(!empty($this->gPageInfo) ? "$.extend(g_pageInfo, {id: ".$this->map['data']['zone']."})" : "var g_pageInfo = {id: ".$this->map['data']['zone']."}").";\n";
-    elseif (!empty($this->map['mapperData'])):
-        echo "                var g_mapperData = ".Util::toJSON($this->map['mapperData']).";\n";
+    elseif (isset($this->map['mapperData'])):
+        echo "                var g_mapperData = ".Util::toJSON($this->map['mapperData'], empty($this->map['mapperData']) ? JSON_FORCE_OBJECT : 0).";\n";
     endif;
 
     // dont forget to set "parent: 'mapper-generic'"
@@ -63,8 +65,8 @@ elseif (!empty($this->map['data'])):
         echo "                new ShowOnMap(".Util::toJSON($this->map['som']).");\n";
     endif;
 
-    if ($this->type != TYPE_ZONE):
-        echo "                                    \$WH.gE(\$WH.ge('locations'), 'a')[0].onclick();\n";
+    if ($this->type != TYPE_ZONE && $this->type != TYPE_QUEST):
+        echo "                \$WH.gE(\$WH.ge('mapper-zone-generic'), 'a')[0].onclick();\n";
     endif;
 ?>
             //]]></script>

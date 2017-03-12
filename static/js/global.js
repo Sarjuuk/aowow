@@ -18385,14 +18385,14 @@ Mapper.prototype = {
             var maxIdx = [false, -1];
             for(var i = 0; i < zoneList.length; ++i)
             {
-                if(i > 0) $WH.ae(span, (i == zoneList.length-1 ? LANG.and : LANG.comma));
+                if(i > 0) $WH.ae(span, $WH.ct(i == zoneList.length-1 ? LANG.and : LANG.comma));
                 var entry = null;
                 if(self.objectives[zoneList[i][0]].mappable > 0)
                 {
                     entry = $WH.ce('a');
                     entry.href = 'javascript:;';
                     $WH.ae(entry, $WH.ct(self.objectives[zoneList[i][0]].zone));
-                    entry.onClick = function(link, zone) {
+                    entry.onclick = function(link, zone) {
                         self.update({ zone: zone });
                         g_setSelectedLink(link, 'mapper');
                     }.bind(self, entry, zoneList[i][0]);
@@ -18509,121 +18509,121 @@ Mapper.prototype = {
                 var parts = LANG.mapper_happensin.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(startEnd && types.objective.length == 0) // starts and ends in x
             {
                 var parts = LANG.mapper_objectives.sex.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(startEnd) // objectives in x, starts and ends in y
             {
                 var parts = LANG.mapper_objectives.ox_sey.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[2]);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(startObj && types.end.length == 0) // objectives and starts in x
             {
                 var parts = LANG.mapper_objectives.osx.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(startObj) // objectives and starts in x, ends in y
             {
                 var parts = LANG.mapper_objectives.osx_ey.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                $WH.ae(span, parts[2]);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(endObj && types.start.length == 0) // objectives and ends in x
             {
                 var parts = LANG.mapper_objectives.oex.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(endObj) // objectives and ends in x, starts in y
             {
                 var parts = LANG.mapper_objectives.oex_sy.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(types.start.length > 0 && types.end.length > 0 && types.objective.length > 0) // objectives in x, starts in y, ends in z
             {
                 var parts = LANG.mapper_objectives.ox_sy_ez.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 tertiaryLink = zoneLinks(this, span, endZones, typesByZone);
-                $WH.ae(span, parts[3]);
+                $WH.ae(span, $WH.ct(parts[3]));
             }
             else if(types.start.length > 0 && types.end.length > 0) // starts in x, ends in y
             {
                 var parts = LANG.mapper_objectives.sx_ey.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                $WH.ae(span, parts[2]);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(types.start.length > 0 && types.objective.length > 0) // objectives in x, starts in y
             {
                 var parts = LANG.mapper_objectives.ox_sy.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[2]);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(types.end.length > 0 && types.objective.length > 0) // objectives in x, ends in y
             {
                 var parts = LANG.mapper_objectives.ox_ey.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, endZones, typesByZone);
-                $WH.ae(span, parts[2]);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(types.start.length > 0) // starts in x
             {
                 var parts = LANG.mapper_objectives.sx.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(types.end.length > 0) // ends in x
             {
                 var parts = LANG.mapper_objectives.ex.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else if(types.objective.length > 0) // objectives in x
             {
                 var parts = LANG.mapper_objectives.ox.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             else // wat?
             {
                 var parts = LANG.mapper_happensin.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
                 primaryLink = zoneLinks(this, span, zones, typesByZone);
-                $WH.ae(span, parts[1]);
+                $WH.ae(span, $WH.ct(parts[1]));
             }
             $WH.ae(div, span);
 

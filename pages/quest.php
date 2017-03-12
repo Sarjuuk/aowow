@@ -17,6 +17,7 @@ class QuestPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $css           = [['path' => 'Book.css']];
+    protected $js            = ['ShowOnMap.js'];
 
     public function __construct($pageCall, $id)
     {
@@ -347,7 +348,8 @@ class QuestPage extends GenericPage
         $this->providedItem  = [];
 
         // gather ids for lookup
-        $olItems = $olNPCs = $olGOs = $olFactions = [];
+        $olItems    = $olNPCs    = $olGOs    = $olFactions = [];
+        $olItemData = $olNPCData = $olGOData = null;
 
         // items
         $olItems[0] = array(                                // srcItem on idx:0
@@ -459,7 +461,7 @@ class QuestPage extends GenericPage
             $olGOData = new GameObjectList(array(['id', $ids]));
             $this->extendGlobalData($olGOData->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($olNPCs as $i => $pair)
+            foreach ($olGOs as $i => $pair)
             {
                 if (!$i || !in_array($i, $olGOData->getFoundIDs()))
                     continue;
@@ -531,17 +533,331 @@ class QuestPage extends GenericPage
 
         $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
 
-        /*
-            TODO (GODDAMNIT): jeez..
-        */
+        // gather points of interest
+        $mapNPCs = $mapGOs = [];                            // [typeId, start|end|objective, startItemId]
 
-        // $startend + reqNpcOrGo[1-4]
+        // todo (med): this double list creation very much sucks ...
+        $getItemSource = function ($itemId, $method = 0) use (&$mapNPCs, &$mapGOs)
+        {
+            $lootTabs  = new Loot();
+            if ($lootTabs->getByItem($itemId))
+            {
+                /*
+                    todo (med): sanity check:
+                        there are loot templates that are absolute tosh, containing hundrets of random items (e.g. Peacebloom for Quest "The Horde Needs Peacebloom!")
+                        even without these .. consider quests like "A Donation of Runecloth" .. oh my .....
+                        should we...
+                        .. display only a maximum of sources?
+                        .. filter sources for low drop chance?
 
-        $this->map = null;
-        // array(
-            // 'data' => ['zone' => $this->typeId],
-            // 'som'  => Util::toJSON($som)
-        // );
+                    for the moment:
+                        if an item has >10 sources, only display sources with >90% chance
+                        always filter sources with <1% chance
+                */
+
+                $nSources = 0;
+                foreach ($lootTabs->iterate() as list($type, $data))
+                    if ($type == 'creature' || $type == 'object')
+                        $nSources += count(array_filter($data['data'], function($val) { return $val['percent'] >= 1.0; }));
+
+                foreach ($lootTabs->iterate() as $idx => list($file, $tabData))
+                {
+                    if (!$tabData['data'])
+                        continue;
+
+                    foreach ($tabData['data'] as $data)
+                    {
+                        if ($data['percent'] < 1.0)
+                            continue;
+
+                        if ($nSources > 10 && $data['percent'] < 90.0)
+                            continue;
+
+                        switch ($file)
+                        {
+                            case 'creature':
+                                $mapNPCs[] = [$data['id'], $method, $itemId];
+                                break;
+                            case 'object':
+                                $mapGOs[]  = [$data['id'], $method, $itemId];
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+
+            // also there's vendors...
+            // dear god, if you are one of the types who puts queststarter-items in container-items, in conatiner-items, in container-items, in container-GOs .. you should kill yourself by killing yourself!
+            // so yeah .. no recursion checking
+            $vendors = DB::World()->selectCol('
+                SELECT nv.entry FROM npc_vendor nv WHERE nv.item = ?d UNION
+                SELECT c.id FROM game_event_npc_vendor genv JOIN creature c ON c.guid = genv.guid WHERE genv.item = ?d',
+                $itemId, $itemId
+            );
+            foreach ($vendors as $v)
+                $mapNPCs[] = [$v, $method, $itemId];
+        };
+
+        $addObjectiveSpawns = function (array $spawns, callable $processing) use (&$mObjectives)
+        {
+            foreach ($spawns as $zoneId => $zoneData)
+            {
+                if (!isset($mObjectives[$zoneId]))
+                    $mObjectives[$zoneId] = array(
+                        'zone'     => 'Zone #'.$zoneId,
+                        'mappable' => 1,
+                        'levels'   => []
+                    );
+
+                foreach ($zoneData as $floor => $floorData)
+                {
+                    if (!isset($mObjectives[$zoneId]['levels'][$floor]))
+                        $mObjectives[$zoneId]['levels'][$floor] = [];
+
+                    foreach ($floorData as $objId => $objData)
+                        $mObjectives[$zoneId]['levels'][$floor][] = $processing($objId, $objData);
+                }
+            }
+       };
+
+
+        // POI: start + end
+        foreach ($startEnd as $se)
+        {
+            if ($se['type'] == TYPE_NPC)
+                $mapNPCs[] = [$se['typeId'], $se['method'], 0];
+            else if ($se['type'] == TYPE_OBJECT)
+                $mapGOs[]  = [$se['typeId'], $se['method'], 0];
+            else if ($se['type'] == TYPE_ITEM)
+                $getItemSource($se['typeId'], $se['method']);
+        }
+
+        $itemObjectives = [];
+        $mObjectives    = [];
+        $mZones         = [];
+        $objectiveIdx   = 0;
+
+        // POI objectives
+        // also map olItems to objectiveIdx so every container gets the same pin color
+        foreach ($olItems as $i => list($itemId, $qty, $provided))
+        {
+            if (!$provided && $itemId)
+            {
+                $itemObjectives[$itemId] = $objectiveIdx++;
+                $getItemSource($itemId);
+            }
+        }
+
+        // PSA: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
+
+        // external event / areatrigger
+        if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
+        {
+            if ($atir = DB::World()->selectCell('SELECT id FROM areatrigger_involvedrelation WHERE quest = ?d', $this->typeId))
+                if ($atsp = DB::AoWoW()->selectRow('SELECT guid, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_AREATRIGGER, $atir))
+                    $mObjectives[$atsp['areaId']] = array(
+                        'zone'     => 'Zone #'.$atsp['areaId'],
+                        'mappable' => 1,
+                        'levels'   => array (
+                            $atsp['floor'] => array (
+                                array (
+                                    'type'      => -1,      // TYPE_AREATRIGGER is internal, the javascript doesn't know it
+                                    'point'     => 'requirement',
+                                    'name'      => $this->subject->parseText('end', false),
+                                    'coord'     => [$atsp['posX'], $atsp['posY']],
+                                    'coords'    => [[$atsp['posX'], $atsp['posY']]],
+                                    'objective' => $objectiveIdx++
+                                )
+                            )
+                        )
+                    );
+        }
+
+        // ..adding creature kill requirements
+        if ($olNPCData && !$olNPCData->error)
+        {
+            $spawns = $olNPCData->getSpawns(SPAWNINFO_QUEST);
+            $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($olNPCs, &$objectiveIdx)
+            {
+                $npcData['point'] = 'requirement';          // always requirement
+                foreach ($olNPCs as $proxyNpcId => $npc)
+                {
+                    if (empty($npc[2][$npcId]))
+                        continue;
+
+                    $npcData['objective'] = $proxyNpcId;
+                    break;
+                }
+
+                if (!$npcData['objective'])
+                    $npcData['objective'] = $objectiveIdx++;
+
+                return $npcData;
+            });
+        }
+
+        // ..adding object interaction requirements
+        if ($olGOData && !$olGOData->error)
+        {
+            $spawns = $olGOData->getSpawns(SPAWNINFO_QUEST);
+            $addObjectiveSpawns($spawns, function ($goId, $goData, &$objectiveIdx)
+            {
+                $goData['point']     = 'requirement';       // always requirement
+                $goData['objective'] = $objectiveIdx++;
+                return $goData;
+            });
+        }
+
+        // .. adding npc from: droping queststart item; dropping item needed to collect; starting quest; ending quest
+        if ($mapNPCs)
+        {
+            $npcs = new CreatureList(array(['id', array_column($mapNPCs, 0)]));
+            if (!$npcs->error)
+            {
+                $startEndDupe = [];                         // if quest starter/ender is the same creature, we need to add it twice
+                $spawns       = $npcs->getSpawns(SPAWNINFO_QUEST);
+                $addObjectiveSpawns($spawns, function ($npcId, $npcData) use ($mapNPCs, &$startEndDupe, $itemObjectives)
+                {
+                    foreach ($mapNPCs as $mn)
+                    {
+                        if ($mn[0] != $npcId)
+                            continue;
+
+                        if ($mn[2])                         // source for itemId
+                            $npcData['item'] = ItemList::getName($mn[2]);
+
+                        switch ($mn[1])                     // method
+                        {
+                            case 1:                         // quest start
+                                $npcData['point'] = $mn[2] ? 'sourcestart' : 'start';
+                                break;
+                            case 2:                         // quest end (sourceend doesn't actually make sense .. oh well....)
+                                $npcData['point'] = $mn[2] ? 'sourceend' : 'end';
+                                break;
+                            case 3:                         // quest start & end
+                                $npcData['point'] = $mn[2] ? 'sourcestart' : 'start';
+                                $startEndDupe = $npcData;
+                                $startEndDupe['point'] = $mn[2] ? 'sourceend' : 'end';
+                                break;
+                            default:                        // just something to kill for quest
+                                $npcData['point'] = $mn[2] ? 'sourcerequirement' : 'requirement';
+                                if ($mn[2] && !empty($itemObjectives[$mn[2]]))
+                                    $npcData['objective'] = $itemObjectives[$mn[2]];
+                        }
+                    }
+
+                    return $npcData;
+                });
+
+                if ($startEndDupe)
+                    foreach ($spawns as $zoneId => $zoneData)
+                        foreach ($zoneData as $floor => $floorData)
+                            foreach ($floorData as $objId => $objData)
+                                if ($objId == $startEndDupe['id'])
+                                {
+                                    $mObjectives[$zoneId]['levels'][$floor][] = $startEndDupe;
+                                    break 3;
+                                }
+            }
+        }
+
+        // .. adding go from: containing queststart item; containing item needed to collect; starting quest; ending quest
+        if ($mapGOs)
+        {
+            $gos = new GameObjectList(array(['id', array_column($mapGOs, 0)]));
+            if (!$gos->error)
+            {
+                $startEndDupe = [];                         // if quest starter/ender is the same object, we need to add it twice
+                $spawns       = $gos->getSpawns(SPAWNINFO_QUEST);
+                $addObjectiveSpawns($spawns, function ($goId, $goData) use ($mapGOs, &$startEndDupe, $itemObjectives)
+                {
+                    foreach ($mapGOs as $mgo)
+                    {
+                        if ($mgo[0] != $goId)
+                            continue;
+
+                        if ($mgo[2])                        // source for itemId
+                            $goData['item'] = ItemList::getName($mgo[2]);
+
+                        switch ($mgo[1])                    // method
+                        {
+                            case 1:                         // quest start
+                                $goData['point'] = $mgo[2] ? 'sourcestart' : 'start';
+                                break;
+                            case 2:                         // quest end (sourceend doesn't actually make sense .. oh well....)
+                                $goData['point'] = $mgo[2] ? 'sourceend' : 'end';
+                                break;
+                            case 3:                         // quest start & end
+                                $goData['point'] = $mgo[2] ? 'sourcestart' : 'start';
+                                $startEndDupe = $goData;
+                                $startEndDupe['point'] = $mgo[2] ? 'sourceend' : 'end';
+                                break;
+                            default:                        // just something to kill for quest
+                                $goData['point'] = $mgo[2] ? 'sourcerequirement' : 'requirement';
+                                if ($mgo[2] && !empty($itemObjectives[$mgo[2]]))
+                                    $goData['objective'] = $itemObjectives[$mgo[2]];
+                        }
+                    }
+
+                    return $goData;
+                });
+
+                if ($startEndDupe)
+                    foreach ($spawns as $zoneId => $zoneData)
+                        foreach ($zoneData as $floor => $floorData)
+                            foreach ($floorData as $objId => $objData)
+                                if ($objId == $startEndDupe['id'])
+                                {
+                                    $mObjectives[$zoneId]['levels'][$floor][] = $startEndDupe;
+                                    break 3;
+                                }
+            }
+        }
+
+        // ..process zone data
+        if ($mObjectives)
+        {
+            $areas = new ZoneList(array(['id', array_keys($mObjectives)]));
+            if (!$areas->error)
+            {
+                $someIDX = 0;                               // todo (low): UNK value ... map priority, floor, mapId..? values seen: 0,3; doesn't seem to affect anything
+                foreach ($areas->iterate() as $id => $__)
+                {
+                    $mObjectives[$id]['zone'] = $areas->getField('name', true);
+                    $mZones[] = [$id, $someIDX];
+                }
+            }
+        }
+
+        // has start & end?
+        $hasStartEnd = 0x0;
+        foreach ($mObjectives as $levels)
+        {
+            foreach ($levels['levels'] as $floor)
+            {
+                foreach ($floor as $entry)
+                {
+                    if ($entry['point'] == 'start' || $entry['point'] == 'sourcestart')
+                        $hasStartEnd |= 0x1;
+                    else if ($entry['point'] == 'end' || $entry['point'] == 'sourceend')
+                        $hasStartEnd |= 0x2;
+                }
+            }
+        }
+
+        $this->map = $mObjectives ? array(
+            'mapperData' => [],                             // always empty
+            'data'       => array(
+                'parent'     => 'mapper-generic',
+                'objectives' => $mObjectives,
+                'zoneparent' => 'mapper-zone-generic',
+                'zones'      => $mZones,
+                'missing'    => count($mZones) > 1 || $hasStartEnd != 0x3 ? 1 : 0  // 0 if everything happens in one zone, else 1
+            )
+        ) : null;
+
 
         /****************/
         /* Main Content */

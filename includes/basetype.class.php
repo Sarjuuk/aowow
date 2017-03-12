@@ -552,7 +552,8 @@ trait spawnHelper
     private $spawnResult = array(
         SPAWNINFO_FULL  => null,
         SPAWNINFO_SHORT => null,
-        SPAWNINFO_ZONES => null
+        SPAWNINFO_ZONES => null,
+        SPAWNINFO_QUEST => null
     );
 
     private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
@@ -675,9 +676,41 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_ZONES] = $res;
     }
 
+    private function createQuestSpawns()                    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]
+    {
+        if (self::$type == TYPE_SOUND)
+            return;
+
+        $res    = DB::Aowow()->select('SELECT areaId, floor, typeId, posX, posY FROM ?_spawns WHERE type = ?d && typeId IN (?a)', self::$type, $this->getFoundIDs());
+        $spawns = [];
+        foreach ($res as $data)
+        {
+            // zone => floor => spawnData
+            // todo (low): why is there a single set of coordinates; which one should be picked, instead of the first? gets used in ShowOnMap.buildTooltip i think
+            if (!isset($spawns[$data['areaId']][$data['floor']][$data['typeId']]))
+            {
+                $spawns[$data['areaId']][$data['floor']][$data['typeId']] = array(
+                    'type'          => self::$type,
+                    'id'            => $data['typeId'],
+                    'point'         => '',                      // tbd later (start, end, requirement, sourcestart, sourceend, sourcerequirement)
+                    'name'          => Util::localizedString($this->templates[$data['typeId']], 'name'),
+                    'coord'         => [$data['posX'], $data['posY']],
+                    'coords'        => [[$data['posX'], $data['posY']]],
+                    'objective'     => 0,                       // tbd later (1-4 set a color; id of creature this entry gives credit for)
+                    'reactalliance' => $this->templates[$data['typeId']]['A'] ?: 0,
+                    'reacthorde'    => $this->templates[$data['typeId']]['H'] ?: 0
+                );
+            }
+            else
+                $spawns[$data['areaId']][$data['floor']][$data['typeId']]['coords'][] = [$data['posX'], $data['posY']];
+        }
+
+        $this->spawnResult[SPAWNINFO_QUEST] = $spawns;
+    }
+
     public function getSpawns($mode)
     {
-        // ony Creatures and GOs can be spawned
+        // only Creatures, GOs and SoundEmitters can be spawned
         if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
             return [];
 
@@ -698,6 +731,11 @@ trait spawnHelper
                     $this->createZoneSpawns();
 
                 return !empty($this->spawnResult[SPAWNINFO_ZONES][$this->id]) ? $this->spawnResult[SPAWNINFO_ZONES][$this->id] : [];
+            case SPAWNINFO_QUEST:
+                if (empty($this->spawnResult[SPAWNINFO_QUEST]))
+                    $this->createQuestSpawns();
+
+                return $this->spawnResult[SPAWNINFO_QUEST];
         }
 
         return [];
