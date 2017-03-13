@@ -875,7 +875,7 @@ class ItemPage extends genericPage
 
                 $this->lvTabs[] = ['item', $tabData];
 
-                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF));
+                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
         }
 

@@ -1636,12 +1636,12 @@ class SpellPage extends GenericPage
                 case 28:                                    // Summon
                 case 90:                                    // Kill Credit
                 case 134:                                   // Kill Credit2
-                    $_ = Lang::game('npc').' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
-                    {
-                        $_ = $summon['typeId'] ? ' (<a href="?npc='.$summon['typeId'].'">'.$summon['displayName'].'</a>)' : ' (#0)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
-                    }
+
+                    $_ = Lang::game('npc').' #'.$effMV;
+                    if ($n = CreatureList::getName($effMV))
+                        $_ = ' (<a href="?npc='.$effMV.'">'.$n.'</a>)';
 
                     $foo['name'] .= $_;
                     break;
@@ -1689,12 +1689,12 @@ class SpellPage extends GenericPage
                 case 105:                                   // Summon Object (slot 2)
                 case 106:                                   // Summon Object (slot 3)
                 case 107:                                   // Summon Object (slot 4)
-                    $_ = Util::ucFirst(Lang::game('object')).' #'.$effMV;
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
-                    {
-                        $_ = $summon['typeId'] ? ' (<a href="?object='.$summon['typeId'].'">'.$summon['displayName'].'</a>)' : ' (#0)';
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
-                    }
+
+                    $_ = Util::ucFirst(Lang::game('object')).' #'.$effMV;
+                    if ($n = GameobjectList::getName($effMV))
+                        $_ = ' (<a href="?object='.$effMV.'">'.$n.'</a>)';
 
                     $foo['name'] .= $_;
                     break;
