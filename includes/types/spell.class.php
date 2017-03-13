@@ -823,20 +823,20 @@ class SpellList extends BaseType
             'switch' => null
         );
 
+        // last value or gender -switch                 $[lg]ifText:elseText;
+        if (preg_match('/^([lg])([^:]*:[^;]*);/i', $varString, $m))
+        {
+            $len                = strlen($m[0]);
+            $varParts['var']    = $m[1];
+            $varParts['switch'] = explode(':', $m[2]);
+        }
         // basic variable ref (most common case)        $(refSpell)?(var)(effIdx)?
-        if (preg_match('/^(\d*)([a-z])([123]?)\b/i', $varString, $m))
+        else if (preg_match('/^(\d*)([a-z])([123]?)\b/i', $varString, $m))
         {
             $len                = strlen($m[0]);
             $varParts['lookup'] = $m[1];
             $varParts['var']    = $m[2];
             $varParts['effIdx'] = $m[3];
-        }
-        // last value or gender -switch                 $[lg]ifText:elseText;
-        else if (preg_match('/^([lg])([^:]*:[^;]*);/i', $varString, $m))
-        {
-            $len                = strlen($m[0]);
-            $varParts['var']    = $m[1];
-            $varParts['switch'] = explode(':', $m[2]);
         }
         // variable ref /w formula                      $( (op) (oparg); )? (refSpell) ( (var) (effIdx) )   OR   $(refSpell) ( (op) (oparg); )? ( (var) (effIdx) )
         else if (preg_match('/^(([\+\-\*\/])(\d+);)?(\d*)(([\+\-\*\/])(\d+);)?([a-z])([123]?)\b/i', $varString, $m))
@@ -857,11 +857,11 @@ class SpellList extends BaseType
 
     // description-, buff-parsing component
     // returns [min, max, minFulltext, maxFulltext, ratingId]
-    private function resolveVariableString($var, &$usesScalingRating)
+    private function resolveVariableString($varParts, &$usesScalingRating)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
-        foreach ($var as $k => $v)
+        foreach ($varParts as $k => $v)
             $$k = $v;
 
         $result = [null];
