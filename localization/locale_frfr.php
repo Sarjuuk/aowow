@@ -511,7 +511,7 @@ $lang = array(
         'reqLevels'     => "Niveaux requis : [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
         'zonePartOf'    => "Cette zone fait partie de la zone [zone=%d].",
         'autoRez'       => "Résurrection automatique",
-        'city'          => "Город",
+        'city'          => "Ville",
         'territory'     => "Territoire",
         'instanceType'  => "Type d'instance",
         'hcAvailable'   => "Mode héroïque disponible&nbsp;(%d)",
