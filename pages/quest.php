@@ -684,11 +684,11 @@ class QuestPage extends GenericPage
                 $npcData['point'] = 'requirement';          // always requirement
                 foreach ($olNPCs as $proxyNpcId => $npc)
                 {
-                    if (empty($npc[2][$npcId]))
-                        continue;
+                    if ($npc[1] && $npcId == $proxyNpcId)  // overwrite creature name with quest specific text, if set.
+                        $npcData['name'] = $npc[1];
 
-                    $npcData['objective'] = $proxyNpcId;
-                    break;
+                    if (!empty($npc[2][$npcId]))
+                        $npcData['objective'] = $proxyNpcId;
                 }
 
                 if (!$npcData['objective'])
@@ -702,8 +702,17 @@ class QuestPage extends GenericPage
         if ($olGOData && !$olGOData->error)
         {
             $spawns = $olGOData->getSpawns(SPAWNINFO_QUEST);
-            $addObjectiveSpawns($spawns, function ($goId, $goData, &$objectiveIdx)
+            $addObjectiveSpawns($spawns, function ($goId, $goData) use ($olGOs, &$objectiveIdx)
             {
+                foreach ($olGOs as $_goId => $go)
+                {
+                    if ($go[1] && $goId == $_goId)          // overwrite object name with quest specific text, if set.
+                    {
+                        $goData['name'] = $go[1];
+                        break;
+                    }
+                }
+
                 $goData['point']     = 'requirement';       // always requirement
                 $goData['objective'] = $objectiveIdx++;
                 return $goData;
