@@ -218,7 +218,7 @@ class AjaxAdmin extends AjaxHandler
         foreach ($this->_get['id'] as $id)
         {
             // irrevocably remove already deleted files
-            if (DB::Aowow()->selectCell('SELECT 1 FROM ?_screenshots WHERE status & ?d AND id = ?d', CC_FLAG_DELETED, $id))
+            if (User::isInGroup(U_GROUP_ADMIN) && DB::Aowow()->selectCell('SELECT 1 FROM ?_screenshots WHERE status & ?d AND id = ?d', CC_FLAG_DELETED, $id))
             {
                 DB::Aowow()->query('DELETE FROM ?_screenshots WHERE id = ?d', $id);
                 if (file_exists(sprintf($path, 'pending', $id)))

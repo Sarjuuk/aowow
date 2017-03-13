@@ -551,7 +551,7 @@ class QuestPage extends GenericPage
                         .. filter sources for low drop chance?
 
                     for the moment:
-                        if an item has >10 sources, only display sources with >90% chance
+                        if an item has >10 sources, only display sources with >80% chance
                         always filter sources with <1% chance
                 */
 
@@ -570,7 +570,7 @@ class QuestPage extends GenericPage
                         if ($data['percent'] < 1.0)
                             continue;
 
-                        if ($nSources > 10 && $data['percent'] < 90.0)
+                        if ($nSources > 10 && $data['percent'] < 80.0)
                             continue;
 
                         switch ($file)
