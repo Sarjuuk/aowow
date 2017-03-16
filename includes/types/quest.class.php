@@ -122,12 +122,18 @@ class QuestList extends BaseType
         return $this->curTpl['flags'] & QUEST_FLAG_REPEATABLE || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_REPEATABLE;
     }
 
-    public function isDaily($strict = false)
+    public function isDaily()
     {
-        if ($strict)
-            return $this->curTpl['flags'] & QUEST_FLAG_DAILY;
-        else
-            return $this->curTpl['flags'] & (QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY) || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_MONTHLY;
+        if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
+            return 1;
+
+        if ($this->curTpl['flags'] & QUEST_FLAG_WEEKLY)
+            return 2;
+
+        if ($this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_MONTHLY)
+            return 3;
+
+        return 0;
     }
 
     // using reqPlayerKills and rewardHonor as a crutch .. has TC this even implemented..?

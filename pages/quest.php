@@ -170,7 +170,7 @@ class QuestPage extends GenericPage
         $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE questId = ?d', $this->typeId);
 
         // start
-        $start = '[icon name=quest_start'.($this->subject->isDaily() ? '_daily' : '').']'.Lang::event('start').Lang::main('colon').'[/icon]';
+        $start = '[icon name=quest_start'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('start').Lang::main('colon').'[/icon]';
         $s     = [];
         foreach ($startEnd as $se)
         {
@@ -185,7 +185,7 @@ class QuestPage extends GenericPage
             $infobox[] = implode('[br]', $s);
 
         // end
-        $end = '[icon name=quest_end'.($this->subject->isDaily() ? '_daily' : '').']'.Lang::event('end').Lang::main('colon').'[/icon]';
+        $end = '[icon name=quest_end'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('end').Lang::main('colon').'[/icon]';
         $e   = [];
         foreach ($startEnd as $se)
         {
@@ -200,7 +200,7 @@ class QuestPage extends GenericPage
             $infobox[] = implode('[br]', $e);
 
         // Repeatable
-        if ($_flags & QUEST_FLAG_REPEATABLE || $_specialFlags & QUEST_FLAG_SPECIAL_REPEATABLE)
+        if ($this->subject->isRepeatable())
             $infobox[] = Lang::quest('repeatable');
 
         // sharable | not sharable
@@ -1259,11 +1259,30 @@ class QuestPage extends GenericPage
             if (!$fac || !$qty)
                 continue;
 
-            $gains['rep'][] = array(
-                'qty'  => $qty,
+            $rep = array(
+                'qty'  => [$qty, 0],
                 'id'   => $fac,
                 'name' => FactionList::getName($fac)
             );
+
+            if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE faction = ?d', $fac))
+            {
+                if ($dailyType = $this->subject->isDaily())
+                {
+                    if ($dailyType == 1 && $cuRates['quest_daily_rate'] != 1.0)
+                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_daily_rate'] - 1);
+                    else if ($dailyType == 2 && $cuRates['quest_weekly_rate'] != 1.0)
+                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_weekly_rate'] - 1);
+                    else if ($dailyType == 3 && $cuRates['quest_monthly_rate'] != 1.0)
+                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_monthly_rate'] - 1);
+                }
+                else if ($this->subject->isRepeatable() && $cuRates['quest_repeatable_rate'] != 1.0)
+                    $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_repeatable_rate'] - 1);
+                else if ($cuRates['quest_rate'] != 1.0)
+                    $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_rate'] - 1);
+            }
+
+            $gains['rep'][] = $rep;
         }
 
         // title

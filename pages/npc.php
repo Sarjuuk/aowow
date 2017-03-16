@@ -869,15 +869,19 @@ class NpcPage extends GenericPage
 
             $set = array(
                 'id'   => $row['faction'],
-                'qty'  => $row['qty'],
+                'qty'  => [$row['qty'], 0],
                 'name' => $factions->getField('name', true),
                 'npc'  => $row['npc'],
                 'cap'  => $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::game('rep', $row['maxRank']) : null
             );
 
+            $cuRate = DB::World()->selectCell('SELECT creature_rate FROM reputation_reward_rate WHERE creature_rate <> 1 AND faction = ?d', $row['faction']);
+            if ($cuRate !== null)
+                $set['qty'][1] = $set['qty'][0] * ($cuRate - 1);
+
             if ($row['spillover'])
             {
-                $spillover[$factions->getField('cat')] = [intVal($row['qty'] / 2), $row['maxRank']];
+                $spillover[$factions->getField('cat')] = [intVal(array_sum($row['qty']) / 2), $row['maxRank']];
                 $set['spillover'] = $factions->getField('cat');
             }
 

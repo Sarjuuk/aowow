@@ -985,7 +985,7 @@ class SpellPage extends GenericPage
 
             if ($list)
             {
-                $tbTrainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $tbTrainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', null, '!'], ['ct.npcflag', 0x10, '&']));
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
@@ -1758,9 +1758,8 @@ class SpellPage extends GenericPage
                         $_ = ' (<a href="?faction='.$effMV.'">'.$n.'</a>)';
 
                     // apply custom reward rated
-                    if ($cuRate = DB::World()->selectCell('SELECT spell_rate FROM reputation_reward_rate WHERE faction = ?d', $effMV))
-                        if ($cuRate != 1.0)
-                            $foo['value'] .= sprintf(Util::$dfnString, Lang::faction('customRewRate'), ' ('.(($cuRate < 1 ? '-' : '+').intVal(($cuRate - 1) * $foo['value'])).')');
+                    if ($cuRate = DB::World()->selectCell('SELECT spell_rate FROM reputation_reward_rate WHERE spell_rate <> 1 && faction = ?d', $effMV))
+                        $foo['value'] .= sprintf(Util::$dfnString, Lang::faction('customRewRate'), ' ('.(($cuRate < 1 ? '-' : '+').intVal(($cuRate - 1) * $foo['value'])).')');
 
                     $foo['name'] .= $_;
 
@@ -1940,8 +1939,8 @@ class SpellPage extends GenericPage
                                 break;
                             case 30:                        // Mod Skill
                             case 98:                        // Mod Skill Value
-                                if ($_ = SkillList::getName($effMV))
-                                    $bar = ' (<a href="?skill='.$effMV.'">'.SkillList::getName($effMV).'</a>)';
+                                if ($n = SkillList::getName($effMV))
+                                    $bar = ' (<a href="?skill='.$effMV.'">'.$n.'</a>)';
                                 else
                                     $bar = Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
 
@@ -1998,7 +1997,8 @@ class SpellPage extends GenericPage
                                 $foo['value'] = sprintf(Util::$dfnString, $foo['value'], Lang::game('rep', $foo['value']));
                                 // DO NOT BREAK
                             case 190:                       // Mod Faction Reputation Gain
-                                $bar          = ' (<a href="?faction='.$effMV.'">'.FactionList::getName($effMV).'</a>)';
+                                $n = FactionList::getName($effMV);
+                                $bar          = ' ('.($n ? '<a href="?faction='.$effMV.'">'.$n.'</a>' : Util::ucFirst(Lang::game('faction')).' #'.$effMV).')';
                                 break;                      // also breaks for 139
                         }
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);

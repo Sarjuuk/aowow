@@ -1464,12 +1464,12 @@ class Util
             switch ($c['ConditionTypeOrReference'])
             {
                 case CND_AURA:                              // 1
-                    $c['ConditionValue2'] = NULL;           // do not use his param
+                    $c['ConditionValue2'] = null;           // do not use his param
                 case CND_SPELL:                             // 25
                     $jsGlobals[TYPE_SPELL][] = $c['ConditionValue1'];
                     break;
                 case CND_ITEM:                              // 2
-                    $c['ConditionValue3'] = NULL;           // do not use his param
+                    $c['ConditionValue3'] = null;           // do not use his param
                 case CND_ITEM_EQUIPPED:                     // 3
                     $jsGlobals[TYPE_ITEM][] = $c['ConditionValue1'];
                     break;

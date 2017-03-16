@@ -179,7 +179,12 @@ if ($g = $this->gains):
 
     if (!empty($g['rep'])):
         foreach ($g['rep'] as $r):
-            echo '                        <li><div>'.($r['qty'] < 0 ? '<b class="q10">'.$r['qty'].'</b>' : $r['qty']).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
+            if ($r['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
+                $qty = $r['qty'][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($r['qty'][1] > 0 ? '+' : '').$r['qty'][1]);
+            else
+                $qty = array_sum($r['qty']);
+
+            echo '                        <li><div>'.($r['qty'][0] < 0 ? '<b class="q10">'.$qty.'</b>' : $qty).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
         endforeach;
     endif;
 

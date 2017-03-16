@@ -91,8 +91,13 @@ if ($this->reputation):
         echo '<ul>';
 
         foreach ($set[1] as $itr):
-            echo '<li><div'.($itr['qty'] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$itr['qty'].'</span> '.Lang::npc('repWith') .
-                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
+            if ($itr['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
+                $qty = $itr['qty'][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($itr['qty'][1] > 0 ? '+' : '').$itr['qty'][1]);
+            else
+                $qty = array_sum($itr['qty']);
+
+            echo '<li><div'.($itr['qty'][0] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$qty.'</span> '.Lang::npc('repWith') .
+                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'][0] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
         endforeach;
 
         echo '</ul>';
