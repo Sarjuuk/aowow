@@ -247,9 +247,9 @@ class GenericPage
         {
             $this->addArticle();
 
+            $this->generateContent();
             $this->generatePath();
             $this->generateTitle();
-            $this->generateContent();
 
             $this->applyGlobals();
 

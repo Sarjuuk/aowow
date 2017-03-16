@@ -87,7 +87,7 @@ class ItemsPage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('items'));
-        $this->subCat = $pageParam ? '='.$pageParam : '';
+        $this->subCat = $pageParam !== NULL ? '='.$pageParam : '';
     }
 
     protected function generateContent()
@@ -112,7 +112,6 @@ class ItemsPage extends GenericPage
         $this->filter['fi']    =  $this->filterObj->getForm();
 
         $menu = $this->createExtraMenus();
-
         foreach ($menu['type'][0] as $k => $str)
             if ($str && (!$menu['type'][1] || ($menu['type'][1] & (1 << $k))))
                 $this->filter['type'][$k] = $str;
@@ -436,6 +435,8 @@ class ItemsPage extends GenericPage
             $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1], 1, $this->category[2]);
         else if (isset($this->category[1]) && is_array(Lang::item('cat', $this->category[0])))
             $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1]);
+        else if ($this->category[0] == 0 && isset($this->filter['ty']) && !is_array($this->filter['ty']))
+            $tPart = Lang::item('cat', 0, 1, $this->filter['ty']);
         else
             $tPart = Lang::item('cat', $this->category[0]);
 
@@ -451,6 +452,8 @@ class ItemsPage extends GenericPage
         $form = $this->filterObj->getForm('form');
         if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
             $this->path[] = $form['sl'];
+        else if ($this->category[0] == 0 && isset($form['ty']) && !is_array($form['ty']))
+            $this->path[] = $form['ty'];
     }
 
     // fetch best possible gems for chosen weights
@@ -528,8 +531,7 @@ class ItemsPage extends GenericPage
             switch ($this->category[0])
             {
                 case 0:
-                    if (!isset($this->category[1]))
-                        $menu['type'] = [Lang::item('cat', 0, 1), null];
+                    $menu['type'] = [Lang::item('cat', 0, 1), null];
 
                     if (!isset($this->category[1]) || in_array($this->category[1], [6, -3]))
                     {

@@ -55,7 +55,14 @@ if (!empty($f['type'])):
                         <select name="ty[]" size="<?php echo min(count($f['type']), 7); ?>" multiple="multiple" class="rightselect">
 <?php
     foreach ($f['type'] as $k => $str):
-        echo '                            <option value="'.$k.'" '.(isset($f['ty']) && in_array($k, (array)$f['ty']) ? ' selected' : null).'>'.(is_array($str) ? $str[0] : $str)."</option>\n";
+        $selected = false;
+        if (isset($f['ty']) && in_array($k, (array)$f['ty'])):
+            $selected = true;
+        elseif (isset($this->category[1]) && $this->category[0] == 0 && $this->category[1] == $k):
+            $selected = true;
+        endif;
+
+        echo '                            <option value="'.$k.'" '.( $selected ? ' selected' : null).'>'.(is_array($str) ? $str[0] : $str)."</option>\n";
     endforeach;
 ?>
                         </select>
