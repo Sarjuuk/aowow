@@ -18412,20 +18412,20 @@ Mapper.prototype = {
                     if(types.start && types.end)
                     {
                         entry.className += ' icontiny';
-                        entry.style += ' background-image', 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_startend.gif)';
-                        entry.style += ' padding-left', '20px';
+                        entry.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_startend.gif)';
+                        entry.style.paddingLeft  = '20px';
                     }
                     else if(types.start)
                     {
                         entry.className += ' icontiny';
-                        entry.style += ' background-image', 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_start.gif)';
-                        entry.style += ' padding-left', '14px';
+                        entry.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_start.gif)';
+                        entry.style.paddingLeft  = '14px';
                     }
                     else if(types.end)
                     {
                         entry.className += ' icontiny';
-                        entry.style += ' background-image', 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_end.gif)';
-                        entry.style += ' padding-left', '16px';
+                        entry.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/quest_end.gif)';
+                        entry.style.paddingLeft  = '16px';
                     }
                 }
                 $WH.ae(container, entry);
@@ -18554,10 +18554,10 @@ Mapper.prototype = {
             {
                 var parts = LANG.mapper_objectives.oex_sy.split('$$');
                 $WH.ae(span, $WH.ct(parts[0]));
-                primaryLink = zoneLinks(this, span, startZones, typesByZone);
-                $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
                 $WH.ae(span, $WH.ct(parts[1]));
+                primaryLink = zoneLinks(this, span, startZones, typesByZone);
+                $WH.ae(span, $WH.ct(parts[2]));
             }
             else if(types.start.length > 0 && types.end.length > 0 && types.objective.length > 0) // objectives in x, starts in y, ends in z
             {
@@ -18566,7 +18566,7 @@ Mapper.prototype = {
                 primaryLink = zoneLinks(this, span, startZones, typesByZone);
                 $WH.ae(span, $WH.ct(parts[1]));
                 secondaryLink = zoneLinks(this, span, objZones, typesByZone);
-                $WH.ae(span, $WH.ct(parts[1]));
+                $WH.ae(span, $WH.ct(parts[2]));
                 tertiaryLink = zoneLinks(this, span, endZones, typesByZone);
                 $WH.ae(span, $WH.ct(parts[3]));
             }

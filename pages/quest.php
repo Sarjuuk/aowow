@@ -831,11 +831,11 @@ class QuestPage extends GenericPage
             $areas = new ZoneList(array(['id', array_keys($mObjectives)]));
             if (!$areas->error)
             {
-                $someIDX = 0;                               // todo (low): UNK value ... map priority, floor, mapId..? values seen: 0,3; doesn't seem to affect anything
+                $someIDX = 0;                               // todo (low): UNK value ... map priority, floor, mapId..? values seen: 0 - 3; doesn't seem to affect anything
                 foreach ($areas->iterate() as $id => $__)
                 {
                     $mObjectives[$id]['zone'] = $areas->getField('name', true);
-                    $mZones[] = [$id, $someIDX];
+                    $mZones[] = [$id, ++$someIDX];
                 }
             }
         }
