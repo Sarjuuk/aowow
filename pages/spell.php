@@ -1752,6 +1752,19 @@ class SpellPage extends GenericPage
                 case 132:                                   // Play Sound
                     $foo['sound'] = $effMV;
                     break;
+                case 103:                                   // Reputation
+                    $_ = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
+                    if ($n = FactionList::getName($effMV))
+                        $_ = ' (<a href="?faction='.$effMV.'">'.$n.'</a>)';
+
+                    // apply custom reward rated
+                    if ($cuRate = DB::World()->selectCell('SELECT spell_rate FROM reputation_reward_rate WHERE faction = ?d', $effMV))
+                        if ($cuRate != 1.0)
+                            $foo['value'] .= sprintf(Util::$dfnString, Lang::faction('customRewRate'), ' ('.(($cuRate < 1 ? '-' : '+').intVal(($cuRate - 1) * $foo['value'])).')');
+
+                    $foo['name'] .= $_;
+
+                    break;
                 case 123:                                   // Send Taxi - effMV is taxiPathId. We only use paths for flightmasters for now, so spell-triggered paths are not in the table
                 default:
                 {
