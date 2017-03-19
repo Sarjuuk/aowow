@@ -300,7 +300,7 @@ class AjaxAdmin extends AjaxHandler
         if (DB::Aowow()->selectCell('SELECT 1 FROM ?_config WHERE `flags` & ?d AND `key` = ?', CON_FLAG_PHP, $key))
             return 'this configuration option is already in use';
 
-        DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `flags`) VALUES (?, ?, ?d)', $key, $val, CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
+        DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, 0, ?d)', $key, $val, CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
         return '';
     }
 
