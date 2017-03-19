@@ -11,20 +11,22 @@ if (!defined('AOWOW_REVISION'))
 class MorePage extends GenericPage
 {
     protected $tpl           = 'list-page-generic';
-    protected $path          = [2];
-    protected $tabId         = 2;
+    protected $path          = [];
+    protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_NONE;
     protected $js            = ['swfobject.js'];
 
-    private   $subPages      = [ -13 => ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']];
-    private   $validPages    = array(                       // [type, typeId, name]
-        'whats-new'     => [ -7,    0, "What's New"],
-        'searchbox'     => [-16,    0, 'Search Box'],
-        'tooltips'      => [-10,    0, 'Tooltips'],
-        'faq'           => [ -3,    0, 'Frequently Asked Questions'],
-        'aboutus'       => [ -1,    0, 'What is AoWoW?'],
-        'searchplugins' => [ -8,    0, 'Search Plugins'],
-        'help'          => [-13, null, '']
+    private   $validPages    = array(                       // [tabId, path[, subPaths]]
+        'whats-new'     => [2, [2,  7]],
+        'searchbox'     => [2, [2, 16]],
+        'tooltips'      => [2, [2, 10]],
+        'faq'           => [2, [2,  3]],
+        'aboutus'       => [2, [2,  0]],
+        'searchplugins' => [2, [2,  8]],
+        'help'          => [2, [2, 13], ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide', 'markup-guide-ext']],
+        'reputation'    => [1, [3, 10]],
+        'privilege'     => [1, [3, 10], [1, 2, 5, 9, 10, 11, 12, 13, 14, 15, 16]],
+        'privileges'    => [1, [3, 10, 0]],
     );
 
     public function __construct($pageCall, $subPage)
@@ -34,44 +36,116 @@ class MorePage extends GenericPage
         // chack if page is valid
         if (isset($this->validPages[$pageCall]))
         {
-            $_ = $this->validPages[$pageCall];
+            $pageData = $this->validPages[$pageCall];
 
-            // check if subpage is valid
-            if (!isset($_[1]))
+            $this->tab  = $pageData[0];
+            $this->path = $pageData[1];
+
+            if ($subPage && isset($pageData[2]))
             {
-                if (($_[1] = array_search($subPage, $this->subPages[$_[0]])) === false)
+                $subPath = array_search($subPage, $pageData[2]);
+                if (!$subPath)
                     $this->error();
 
-                if ($pageCall == 'help')                    // ye.. hack .. class definitions only allow static values
-                    $_[2] = Lang::main('helpTopics', $_[1]);
+                if (is_numeric($subPath))
+                    $this->path[] = $subPath;
+                else
+                    $this->path[] = $subPage;
+
+                $this->articleUrl = $subPage;
+                $this->name = Lang::main('moreTitles', $pageCall, $subPage);
             }
-            $this->type      = $_[0];
-            $this->typeId    = $_[1];
-            $this->name      = $_[2];
-            $this->gPageInfo = array(
-                'type'   => $this->type,
-                'typeId' => $this->typeId,
-                'name'   => $this->name
-            );
+            else
+            {
+                $this->articleUrl = $pageCall;
+                $this->name = Lang::main('moreTitles', $pageCall);
+            }
         }
         else
             $this->error();
     }
 
-    protected function generatePath()
+    protected function generateContent()
     {
-        $this->path[] = abs($this->type);
-
-        if ($this->typeId > -1)
-            $this->path[] = $this->typeId;
+        if ($this->articleUrl == 'reputation')
+            $this->handleReputationPage();
+        else if ($this->articleUrl == 'privileges')
+            $this->handlePrivilegesPage();
     }
+
+    protected function postArticle()
+    {
+        if ($this->articleUrl == 'reputation')
+            $this->handleReputationArticle();
+    }
+
+    protected function generatePath() { }
 
     protected function generateTitle()
     {
         array_unshift($this->title, $this->name);
     }
 
-    protected function generateContent() {}                 // its just articles here
+    private function handleReputationPage()
+    {
+        if (!User::$id)
+            return;
+
+        if ($repData = DB::Aowow()->select('SELECT action, amount, date AS \'when\', IF(action IN (3, 4, 5), sourceA, 0) AS param FROM ?_account_reputation WHERE userId = ?d', User::$id))
+        {
+            foreach ($repData as &$r)
+                $r['when'] = date(Util::$dateFormatInternal, $r['when']);
+
+            $this->tabsTitle = Lang::main('yourRepHistory');
+            $this->forceTabs = true;
+            $this->lvTabs[] = ['reputationhistory', array(
+                'id'   => 'reputation-history',
+                'name' => '$LANG.reputationhistory',
+                'data' => $repData
+            )];
+        }
+    }
+
+    private function handleReputationArticle()
+    {
+        $txt = &$this->article['text'];
+
+        $consts = get_defined_constants(true);
+        foreach ($consts['user'] as $k => $v)
+            if (strstr($k, 'CFG_REP_'))
+                $txt = str_replace($k, Lang::nf($v), $txt);
+    }
+
+    private function handlePrivilegesPage()
+    {
+        $this->tpl        = 'privileges';
+        $this->privileges = [];
+
+        $req2priv = array(
+             1 => CFG_REP_REQ_COMMENT,                      // write comments
+         //  2 => CFG_REP_REQ_XXX,                          // post external links
+         //  4 => CFG_REP_REQ_XXX,                          // no captcha
+             5 => CFG_REP_REQ_SUPERVOTE,                    // votes count for more
+             9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
+            10 => CFG_REP_REQ_UPVOTE,                       // can upvote
+            11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
+            12 => CFG_REP_REQ_COMMENT,                      // can reply [NYI: grouped with canComment]
+         // 13 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
+         // 14 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
+         // 15 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
+         // 16 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
+            17 => CFG_REP_REQ_PREMIUM                       // premium status
+        );
+
+        asort($req2priv);
+
+        foreach ($req2priv as $id => $val)
+            $this->privileges[$id] = array(
+                User::getReputation() >= $val,
+                Lang::privileges('_privileges', $id),
+                $val
+            );
+    }
 }
 
 ?>

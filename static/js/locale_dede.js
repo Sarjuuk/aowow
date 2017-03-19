@@ -923,13 +923,33 @@ var mn_tools = [
         [4,"Zufällige Seite","?random"]
     ]]
 ];
+var mn_reputation = [
+    [0, "Alle Privilegien anzeigen", "?privileges"],
+    [, "Privilegien"],
+    [1, "Kommentare einsenden", "?privilege=1"],
+    // [2, "Webseitenexterne Links einsenden", "?privilege=2"],
+    // [4, "Kein CAPTCHA", "?privilege=4"],
+    [5, "Kommentarbewertungen zählen mehr", "?privilege=5"],
+    [9, "Mehr Wertungsfreiheit", "?privilege=9"],
+    [10, "Kommentare positiv bewerten", "?privilege=10"],
+    [11, "Kommentare negativ bewerten", "?privilege=11"],
+    [12, "Kommentarantwort einsenden", "?privilege=12"],
+    // [13, "Rahmen: Außergewöhnlich", "?privilege=13"],
+    // [14, "Rahmen: Selten", "?privilege=14"],
+    // [15, "Rahmen: Episch", "?privilege=15"],
+    // [16, "Rahmen: Legendär", "?privilege=16"],
+    [17, "AoWoW Premium", "?privilege=17"]
+];
 var mn_community = [
     [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
     [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
+    [,"Community"],
+    [10,"Benutzerruf", "?reputation", mn_reputation],
+    [11,"Hilfreichste Benutzer", "?top-users"],
     [,"Soziales"],
-    [6,"Facebook-Seite","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.gif"}],
-    [5,"Twitter-Seite","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.gif"}]
+    [6,"Facebook-Seite","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
+    [5,"Twitter-Seite","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
 ];
 var mn_more = [
     [,"Alles über AoWoW"],

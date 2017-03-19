@@ -118,6 +118,9 @@ switch ($pageCall)
     case 'help':
     case 'faq':
     case 'aboutus':
+    case 'reputation':
+    case 'privilege':
+    case 'privileges':
         (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':

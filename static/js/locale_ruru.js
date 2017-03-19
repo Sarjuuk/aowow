@@ -923,13 +923,33 @@ var mn_tools = [
         [4,"Случайная страница","?random"]
     ]]
 ];
+var mn_reputation = [
+    [0, "Показать все привилегии", "?privileges"],
+    [, "Привилегии"],
+    [1, "Оставлять комментарии", "?privilege=1"],
+    // [2, "Оставлять внешние ссылки", "?privilege=2"],
+    // [4, "Нет CAPTCHA", "?privilege=4"],
+    [5, "Более сильные голоса", "?privilege=5"],
+    [9, "Больше голосов в день", "?privilege=9"],
+    [10, "Голосовать за комментарии", "?privilege=10"],
+    [11, "Голосовать против комментариев", "?privilege=11"],
+    [12, "Отвечать на комментарии", "?privilege=12"],
+    // [13, "Граница: Необычный", "?privilege=13"],
+    // [14, "Граница: Редкий", "?privilege=14"],
+    // [15, "Граница: Эпический", "?privilege=15"],
+    // [16, "Граница: Легендарный", "?privilege=16"],
+    [17, "AoWoW Premium", "?privilege=17"]
+];
 var mn_community = [
     [3,"Форум","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Блог","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
     [4,"Канал IRC","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
+    [,"Сообщество"],
+    [10, "Репутация на сайте", "?reputation", mn_reputation],
+    [11, "Лучшие пользователи", "?top-users"],
     [,"Социальные сети"],
-    [6,"Facebook","http://facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.gif"}],
-    [5,"Twitter","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.gif"}]
+    [6,"Facebook","http://facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
+    [5,"Twitter","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
 ];
 var mn_more = [
     [,"О AoWoW"],

@@ -123,6 +123,7 @@ class CommunityContent
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
                 case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
                 case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
+                case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
                 default: continue;
             }
 

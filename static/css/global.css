@@ -3,6 +3,70 @@
     overflow: visible;
 }
 
+.wsa-tbl {
+    border-spacing:0
+}
+
+.wsa-tbl th {
+    border-bottom:2px solid #333;
+    color:#fff;
+    font-size:15px;
+    padding:0 0 3px 0;
+    text-align:left
+}
+
+.wsa-tbl td {
+    padding:0 5px 0 0
+}
+
+.wsa-tbl td:last-child {
+    padding:0
+}
+
+.wsa-list {
+    color:#ccc
+}
+
+.wsa-list td {
+    vertical-align:text-top
+}
+
+.wsa-list td {
+    padding-right:25px
+}
+
+.wsa-list td.nopad {
+    padding-right:0
+}
+
+.wsa-list tr {
+    line-height:20px
+}
+
+.wsa-list .checkmark {
+    padding:0;
+    width:18px
+}
+
+.wsa-check {
+    background:url(../images/ui/check2.png) no-repeat 0 -11px;
+    height:20px;
+    width:15px
+}
+
+.wsa-earned {
+    color:#777
+}
+
+.wsa-earned .wsa-check {
+    background-position:-15px -11px
+}
+
+.wsa-earned .wsa-count {
+    background-color:#aaa;
+    color:#242424
+}
+
 /* Generic - Sprites */
 .vote-column .upvote, .vote-column .downvote, .reply-upvote, .reply-downvote, .reply-detach, .reply-delete, .reply-report, .reply-edit {
     background: url(../images/ui/sprite3.png);

@@ -46,12 +46,14 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n. v.",
         'siteRep'       => "Ruf",
+        'yourRepHistory'=> "Dein Ruf-Verlauf",
         'aboutUs'       => "Über Aowow",
         'and'           => " und ",
         'or'            => " oder ",
         'back'          => "Zurück",
         'reputationTip' => "Rufpunkte",
         'byUserTimeAgo' => 'Von <a href="'.HOST_URL.'/?user=%s">%1$s</a> vor %s',
+        'help'          => "Hilfe",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -117,13 +119,6 @@ $lang = array(
         '_cpHelp'       => "Um loszulegen, folgt einfach den untenstehenden Schritten. Falls Ihr mehr Informationen benötigt, schaut auf unserer ausführlichen <a href=\"?help=profiler\">Hilfeseite</a> nach.",
         '_cpFooter'     => "Falls Ihr eine genauere Suche möchtet, probiert unsere <a href=\"?profiles\">erweiterten Suchoptionen</a>. Ihr könnt außerdem ein <a href=\"?profile&amp;new\">neues individuelles Profil</a> erstellen.",
 
-        // help
-        'help'          => "Hilfe",
-        'helpTopics'    => array(
-            "Wie man Kommentare schreibt",          "Modellviewer",                         "Screenshots: Tipps & Tricks",          "Gewichtung von Werten",
-            "Talentrechner",                        "Gegenstandsvergleich",                 "Profiler",                             "Markup Guide"
-        ),
-
         // search
         'search'        => "Suche",
         'searchButton'  => "Suche",
@@ -143,6 +138,25 @@ $lang = array(
         'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Ihr wurdet davon gesperrt, Kommentare zu bewerten.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!", # LANG.tooltip_too_many_votes
+
+        'moreTitles'    => array(
+            'reputation'    => "Benutzerruf",
+            'whats-new'     => "Was gibt's Neues?",
+            'searchbox'     => "Suchbox",
+            'tooltips'      => "Tooltips",
+            'faq'           => "Häufig gestellte Fragen",
+            'aboutus'       => "Was ist AoWoW?",
+            'searchplugins' => "Such-Plugins",
+            'privileges'    => "Privilegien",
+            'help'          => array(
+                'commenting-and-you' => "Wie man Kommentare schreibt",      'modelviewer'       => "Modellviewer",              'screenshots-tips-tricks' => "Screenshots: Tipps & Tricks",
+                'stat-weighting'     => "Gewichtung von Werten",            'talent-calculator' => "Talentrechner",             'item-comparison'         => "Gegenstandsvergleich",
+                'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
+            ),
+            'privilege'     => array(
+
+            )
+        )
     ),
     'screenshot' => array(
         'submission'    => "Screenshot-Einsendung",
@@ -500,6 +514,19 @@ $lang = array(
         'Miscellaneous' => "Diverse",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Kosmische Karte",
+    ),
+    'privileges' => array(
+        'main'          => "Auf unserer Seite könnt Ihr <a href=\"?reputation\">Ruf</a> erringen. Hauptsächlich erringt man Ruf dadurch, dass Eure Kommentare positiv bewertet werden.<br><br>Das heißt, Euer Ruf hängt in gewissem Maße davon ab, wie sehr Ihr der Community beiträgt.<br><br>Mit dem Sammeln von Ruf verdient Ihr Euch auch das Vertrauen der Gemeinschaft ein, und Ihr erhält Privilegien. Unten könnt Ihr eine vollständige Liste einsehen.",
+        'privilege'     => "Privileg",
+        'privileges'    => "Privilegien",
+        'requiredRep'   => "Benötigter Ruf",
+        '_privileges'   => array(
+            null,                                   "Kommentare einsenden",                         "Webseitenexterne Links einsenden",                 null,
+            "Kein CAPTCHA",                         "Kommentarbewertungen zählen mehr",             null,                                               null,
+            null,                                   "Mehr Wertungsfreiheit",                        "Kommentare positiv bewerten",                      "Kommentare negativ bewerten",
+            "Kommentarantwort einsenden",           "Rahmen: Außergewöhnlich",                      "Rahmen: Selten",                                   "Rahmen: Episch",
+            "Rahmen: Legendär",                     "AoWoW Premium"
+        )
     ),
     'zone' => array(
         'notFound'      => "Dieses Gebiet existiert nicht.",

@@ -10,6 +10,7 @@ class Lang
     private static $game;
     private static $maps;
     private static $screenshot;
+    private static $privileges;
 
     // types
     private static $achievement;

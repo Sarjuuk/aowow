@@ -46,12 +46,14 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n/d",
         'siteRep'       => "Réputation",
+        'yourRepHistory'=> "Votre historique de réputation",
         'aboutUs'       => "À propos de Aowow",
         'and'           => " et ",
         'or'            => " ou ",
         'back'          => "Redro",
         'reputationTip' => "Points de réputation",
         'byUserTimeAgo' => 'Par <a href="'.HOST_URL.'/?user=%s">%1$s</a> il y a %s',
+        'help'          => "Aide",
 
         // filter
         'extSearch'     => "Recherche avancée",
@@ -117,13 +119,6 @@ $lang = array(
         '_cpHelp'       => "Pour débuter, suivez simplement les étapes ci-dessous. Si vous voulez plus d'information, lisez notre <a href=\"?help=profiler\">page d'aide</a> détaillée.",
         '_cpFooter'     => "Si vous voulez une recherche plus raffinée, essayez nos options de <a href=\"?profiles\">recherche avancée</a>. Vous pouvez aussi créer un <a href=\"?profile&amp;new\">nouveau profile personnalisé</a>.",
 
-        // help
-        'help'          => "Aide",
-        'helpTopics'    => array(
-            "Le guide du commentaire",              "Visionneuse 3D",                       "Captures d'écran : Trucs et astuces",  "Échelles de valeurs",
-            "Calculateur de talents",               "Comparaison d'objets",                 "Profiler",                             "Markup Guide"
-        ),
-
         // search
         'search'        => "Recherche",
         'searchButton'  => "Rechercher",
@@ -143,6 +138,25 @@ $lang = array(
         'genericError'  => "Une erreur est survenue; Actualisez la page et essayez à nouveau. Si l'erreur persiste, envoyez un email à <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Vous avez été banni du score des commentaires.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Vous avez voté trop souvent aujourd'hui! Revenez demain.", # LANG.tooltip_too_many_votes
+
+        'moreTitles'    => array(
+            'reputation'    => "Réputation du site",
+            'whats-new'     => "Quoi de neuf?",
+            'searchbox'     => "Boîte de recherche",
+            'tooltips'      => "Info-bulles",
+            'faq'           => "[Frequently Asked Questions]",
+            'aboutus'       => "[What is AoWoW?]",
+            'searchplugins' => "Plug-ins de recherche",
+            'privileges'    => "Privilèges",
+            'help'          => array(
+                'commenting-and-you' => "Le guide du commentaire",          'modelviewer'       => "Visionneuse 3D",            'screenshots-tips-tricks' => "Captures d'écran : Trucs et astuces",
+                'stat-weighting'     => "Échelles de valeurs",              'talent-calculator' => "Calculateur de talents",    'item-comparison'         => "Comparaison d'objets",
+                'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
+            ),
+            'privilege'     => array(
+
+            )
+        )
     ),
     'screenshot' => array(
         'submission'    => "Envoi d'une capture d'écran",
@@ -500,6 +514,19 @@ $lang = array(
         'Miscellaneous' => "Divers",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Carte cosmique",
+    ),
+    'privileges' => array(
+        'main'          => "Sur AoWoW, vous pouvez accumuler de la <a href=\"?reputation\">réputation</a>. Le principal moyen d'en accumuler est d'avoir un score élevé pour vos commentaires.<br><br>Ainsi, la réputation est une vision sommaire de vos contributions à la communauté.<br><br>En amassant de la réputation, vous gagnez le respect de la communauté et vous obtiendrez certains privilèges. Vous pouvez en trouver la liste complète ci-dessous.",
+        'privilege'     => "Privilège",
+        'privileges'    => "Privilèges",
+        'requiredRep'   => "Réputation Requise",
+        '_privileges'   => array(
+            null,                                   "Poster des commentaires",                      "Poster des liens externes",                        null,
+            "Pas de CAPTCHA",                       "Les votes des commentaires ont plus de valeur",null,                                               null,
+            null,                                   "Plus de votes par jour",                       "Emettre des votes positifs pour les commentaires", "Donner des votes négatifs aux commentaires",
+            "Envoyer des réponses aux commentaires","Bordure : Bonne",                              "Bordure : Rare",                                   "Bordure : Épique",
+            "Bordure : Légendaire",                 "AoWoW Premium"
+        )
     ),
     'zone' => array(
         'notFound'      => "Cette zone n'existe pas.",

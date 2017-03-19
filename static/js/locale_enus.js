@@ -969,13 +969,33 @@ var mn_tools = [
         [4,"Random Page","?random"]
     ]]
 ];
+var mn_reputation = [
+    [0, "Show All Privileges", "?privileges"],
+    [, "Privileges"],
+    [1, "Post comments", "?privilege=1"],
+    // [2, "Post external links", "?privilege=2"],
+    // [4, "No CAPTCHAs", "?privilege=4"],
+    [5, "Comment votes worth more", "?privilege=5"],
+    [9, "More votes per day", "?privilege=9"],
+    [10, "Upvote comments", "?privilege=10"],
+    [11, "Downvote comments", "?privilege=11"],
+    [12, "Post comment replies", "?privilege=12"],
+    // [13, "Border: Uncommon", "?privilege=13"],
+    // [14, "Border: Rare", "?privilege=14"],
+    // [15, "Border: Epic", "?privilege=15"],
+    // [16, "Border: Legendary", "?privilege=16"],
+    [17, "Wowhead Premium", "?privilege=17"]
+];
 var mn_community = [
     [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
     [4,"IRC-Channel","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
+    [,"Community"],
+    [10, "Site Reputation", "?reputation", mn_reputation],
+    [11, "Top Users", "?top-users"],
     [,"Social"],
-    [6,"Facebook Page","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.gif"}],
-    [5,"Twitter Page","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.gif"}]
+    [6,"Facebook Page","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
+    [5,"Twitter Page","http://twitter.com",null,{tinyIcon: g_staticUrl + "/images/icons/twitter.png"}]
 ];
 var mn_more = [
     [,"All About AoWoW"],

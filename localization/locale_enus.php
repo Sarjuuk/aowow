@@ -41,12 +41,14 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n/a",
         'siteRep'       => "Reputation",
+        'yourRepHistory'=> "Your Reputation History",
         'aboutUs'       => "About us & contact",
         'and'           => " and ",
         'or'            => " or ",
         'back'          => "Back",
         'reputationTip' => "Reputation points",
         'byUserTimeAgo' => 'By <a href="'.HOST_URL.'/?user=%s">%1$s</a> %s ago',
+        'help'          => "Help",
 
         // filter
         'extSearch'     => "Extended search",
@@ -112,13 +114,6 @@ $lang = array(
         '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
         '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
 
-        // help
-        'help'          => "Help",
-        'helpTopics'    => array(
-            "Commenting and You",                   "Model Viewer",                         "Screenshots: Tips & Tricks",          "Stat Weighting",
-            "Talent Calculator",                    "Item Comparison",                      "Profiler",                            "Markup Guide"
-        ),
-
         // search
         'search'        => "Search",
         'searchButton'  => "Search",
@@ -138,6 +133,25 @@ $lang = array(
         'genericError'  => "An error has occurred; refresh the page and try again. If the error persists email <a href=\"#contact\">feedback</a>", # LANG.genericerror
         'bannedRating'  => "You have been banned from rating comments.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "You have reached the daily voting cap. Come back tomorrow!", # LANG.tooltip_too_many_votes
+
+        'moreTitles'    => array(
+            'reputation'    => "Website Reputation",
+            'whats-new'     => "What's New",
+            'searchbox'     => "Search Box",
+            'tooltips'      => "Tooltips",
+            'faq'           => "Frequently Asked Questions",
+            'aboutus'       => "What is AoWoW?",
+            'searchplugins' => "Search Plugins",
+            'privileges'    => "Privileges",
+            'help'          => array(
+                'commenting-and-you' => "Commenting and You",               'modelviewer'       => "Model Viewer",              'screenshots-tips-tricks' => "Screenshots: Tips & Tricks",
+                'stat-weighting'     => "Stat Weighting",                   'talent-calculator' => "Talent Calculator",         'item-comparison'         => "Item Comparison",
+                'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
+            ),
+            'privilege'     => array(
+
+            )
+        )
     ),
     'screenshot' => array(
         'submission'    => "Screenshot Submission",
@@ -495,6 +509,19 @@ $lang = array(
         'Miscellaneous' => "Miscellaneous",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Cosmic Map",
+    ),
+    'privileges' => array(
+        'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br><br>So, reputation is a rough measure of how much you contributed to the community.<br><br>As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",
+        'privilege'     => "Privilege",
+        'privileges'    => "Privileges",
+        'requiredRep'   => "Reputation Required",
+        '_privileges'   => array(
+            null,                                   "Post comments",                                "Post external links",                              null,
+            "No CAPTCHAs",                          "Comment votes worth more",                     null,                                               null,
+            null,                                   "More votes per day",                           "Upvote comments",                                  "Downvote comments",
+            "Post comment replies",                 "Border: Uncommon",                             "Border: Rare",                                     "Border: Epic",
+            "Border: Legendary",                    "AoWoW Premium"
+        )
     ),
     'zone' => array(
         'notFound'      => "This zone doesn't exist.",

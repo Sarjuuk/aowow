@@ -104,6 +104,7 @@ class GenericPage
     private   $mysql        = ['time' => 0, 'count' => 0];
 
     private   $headerLogo   = '';
+    private   $fullParams   = '';
 
     private   $lvTemplates  = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_achievements'  ],
@@ -136,9 +137,13 @@ class GenericPage
         'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ]
     );
 
-    public function __construct($pageCall/*, $pageParam */)
+    public function __construct($pageCall, $pageParam = null)
     {
         $this->time = microtime(true);
+
+        $this->fullParams = $pageCall;
+        if ($pageParam)
+            $this->fullParams .= '='.$pageParam;
 
         if (CFG_CACHE_DIR && Util::checkOrCreateDirectory(CFG_CACHE_DIR))
             $this->cacheDir = mb_substr(CFG_CACHE_DIR, -1) != '/' ? CFG_CACHE_DIR.'/' : CFG_CACHE_DIR;
@@ -257,11 +262,20 @@ class GenericPage
         }
 
         if (isset($this->type) && isset($this->typeId))
+        {
             $this->gPageInfo = array(                       // varies slightly for special pages like maps, user-dashboard or profiler
                 'type'   => $this->type,
                 'typeId' => $this->typeId,
                 'name'   => $this->name
             );
+        }
+        else if (!empty($this->articleUrl))
+        {
+            $this->gPageInfo = array(
+                'articleUrl' => $this->fullParams,          // is actually be the url-param
+                'editAccess' => isset($this->editAccess) ? $this->editAccess : (U_GROUP_ADMIN | U_GROUP_EDITOR | U_GROUP_BUREAU)
+            );
+        }
 
         if (!empty($this->path))
             $this->pageTemplate['breadcrumb'] = $this->path;
@@ -317,31 +331,57 @@ class GenericPage
 
     private function addArticle()                           // get article & static infobox (run before processing jsGlobals)
     {
-        if (empty($this->type) || !isset($this->typeId))
-            return;
-
-        $article = DB::Aowow()->selectRow(
-            'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL '.
-            'SELECT article, quickInfo, locale FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0  ORDER BY locale DESC LIMIT 1',
-            $this->type, $this->typeId, User::$localeId,
-            $this->type, $this->typeId
-        );
+        $article = [];
+        if (!empty($this->type) && isset($this->typeId))
+        {
+            $article = DB::Aowow()->selectRow('SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0  ORDER BY locale DESC LIMIT 1',
+                $this->type, $this->typeId, User::$localeId, $this->type, $this->typeId
+            );
+        }
+        else if (!empty($this->articleUrl))
+        {
+            $article = DB::Aowow()->selectRow('SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE url = ? AND locale = ?d UNION ALL SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE url = ? AND locale = 0  ORDER BY locale DESC LIMIT 1',
+                $this->articleUrl, User::$localeId, $this->articleUrl
+            );
+        }
 
         if ($article)
         {
-            foreach ($article as $text)
-                (new Markup($text))->parseGlobalsFromText($this->jsgBuffer);
+            if ($article['article'])
+                (new Markup($article['article']))->parseGlobalsFromText($this->jsgBuffer);
+            if ($article['quickInfo'])
+                (new Markup($article['quickInfo']))->parseGlobalsFromText($this->jsgBuffer);
 
             $this->article = array(
                 'text'   => Util::jsEscape(Util::defStatic($article['article'])),
                 'params' => []
             );
 
+            if (!empty($this->type) && isset($this->typeId))
+                $this->article['params']['dbpage'] = true;
+
+            // convert U_GROUP_* to MARKUP.CLASS_* (as seen in js-object Markup)
+            if($article['editAccess'] & (U_GROUP_ADMIN | U_GROUP_VIP | U_GROUP_DEV))
+                $this->article['params']['allow'] = '$Markup.CLASS_ADMIN';
+            else if($article['editAccess'] & U_GROUP_STAFF)
+                $this->article['params']['allow'] = '$Markup.CLASS_STAFF';
+            else if($article['editAccess'] & U_GROUP_PREMIUM)
+                $this->article['params']['allow'] = '$Markup.CLASS_PREMIUM';
+            else if($article['editAccess'] & U_GROUP_PENDING)
+                $this->article['params']['allow'] = '$Markup.CLASS_PENDING';
+            else
+                $this->article['params']['allow'] = '$Markup.CLASS_USER';
+
+            $this->editAccess = $article['editAccess'];
+
             if (empty($this->infobox) && !empty($article['quickInfo']))
                 $this->infobox = $article['quickInfo'];
 
             if ($article['locale'] != User::$localeId)
-                $this->article['params'] = ['prepend' => Util::jsEscape('<div class="notice-box"><span class="icon-bubble">'.Lang::main('englishOnly').'</span></div>')];
+                $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('englishOnly').'</span></div>';
+
+            if (method_exists($this, 'postArticle'))        // e.g. update variables in article
+                $this->postArticle();
         }
     }
 
@@ -435,12 +475,11 @@ class GenericPage
 
     public function error()                                 // unknown page
     {
-        $this->path    = null;
-        $this->tabId   = null;
-        $this->type    = -99;                               // get error-article
-        $this->typeId  = 0;
-        $this->title[] = Lang::main('errPageTitle');
-        $this->name    = Lang::main('errPageTitle');
+        $this->path       = null;
+        $this->tabId      = null;
+        $this->articleUrl = 'page-not-found';
+        $this->title[]    = Lang::main('errPageTitle');
+        $this->name       = Lang::main('errPageTitle');
 
         $this->addArticle();
 
