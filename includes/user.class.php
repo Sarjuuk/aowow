@@ -451,6 +451,14 @@ class User
         return self::$perms || self::$reputation >= CFG_REP_REQ_COMMENT;
     }
 
+    public static function canReply()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return self::$perms || self::$reputation >= CFG_REP_REQ_REPLY;
+    }
+
     public static function canUpvote()
     {
         if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
@@ -473,6 +481,22 @@ class User
             return false;
 
         return self::$reputation >= CFG_REP_REQ_SUPERVOTE;
+    }
+
+    public static function canUploadScreenshot()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_SCREENSHOT | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return true;
+    }
+
+    public static function canSuggestVideo()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_VIDEO | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return true;
     }
 
     public static function isPremium()
@@ -521,10 +545,10 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM))
             return $gUser;
 
-        $gUser['commentban']        = (bool)(self::$banStatus & ACC_BAN_COMMENT);
+        $gUser['commentban']        = !self::canComment();
         $gUser['canUpvote']         = self::canUpvote();
         $gUser['canDownvote']       = self::canDownvote();
-        $gUser['canPostReplies']    = self::canComment();
+        $gUser['canPostReplies']    = self::canReply();
         $gUser['superCommentVotes'] = self::canSupervote();
         $gUser['downvoteRep']       = CFG_REP_REQ_DOWNVOTE;
         $gUser['upvoteRep']         = CFG_REP_REQ_UPVOTE;

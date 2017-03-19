@@ -129,7 +129,7 @@ class MorePage extends GenericPage
              9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
             10 => CFG_REP_REQ_UPVOTE,                       // can upvote
             11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
-            12 => CFG_REP_REQ_COMMENT,                      // can reply [NYI: grouped with canComment]
+            12 => CFG_REP_REQ_REPLY,                        // can reply
          // 13 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
          // 14 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
          // 15 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
