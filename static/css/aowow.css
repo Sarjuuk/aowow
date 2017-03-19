@@ -60,6 +60,20 @@ a.open {
     color: white;
 }
 
+img.content-image {
+    border-radius:2px;
+    margin:2px;
+}
+
+img.content-image.content-image-shadowed {
+    box-shadow:0 3px 10px rgba(0, 0, 0, .35);
+}
+
+a:hover img.content-image {
+    -webkit-filter:brightness(1.35);
+    filter:brightness(1.35);
+}
+
 img.border {
     border: 2px solid #404040;
     background-color: #080808;
@@ -72,6 +86,10 @@ img.border {
 a:hover img.border {
     border-color: #505050;
     background-color: #101010;
+}
+
+img.no-border {
+    border:0 !important;
 }
 
 .pad {
@@ -417,6 +435,18 @@ a.revealtoggle
 .quote-wh.collapse
 {
     padding-top:18px;
+}
+
+.markup-float-left
+{
+    float:left;
+    margin:0 10px 10px 0;
+}
+
+.markup-float-right
+{
+    float:right;
+    margin:10px 0 0 10px;
 }
 
 /**************************************************************/
