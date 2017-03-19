@@ -10,7 +10,7 @@ if (!defined('AOWOW_REVISION'))
 
 class MorePage extends GenericPage
 {
-    protected $tpl           = 'text-page-generic';
+    protected $tpl           = 'list-page-generic';
     protected $path          = [2];
     protected $tabId         = 2;
     protected $mode          = CACHE_TYPE_NONE;

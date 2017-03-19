@@ -91,7 +91,7 @@ class ScreenshotPage extends GenericPage
                     header('Location: ?screenshot=thankyou&'.$this->destType.'.'.$this->destTypeId, true, 302);
                 die();
             case 'thankyou':
-                $this->tpl = 'text-page-generic';
+                $this->tpl = 'list-page-generic';
                 $this->handleThankyou();
                 break;
         }
