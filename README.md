@@ -1,4 +1,4 @@
-﻿# ![logo](static/images/logos/home.png)
+![logo](static/images/logos/home.png)
 
 
 ## Build Status
@@ -37,10 +37,9 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 #### Highly Recommended
 + setting the following configuration values on your TrintyCore server will greatly increase the accuracy of spawn points
- ```
-Calculate.Creature.Zone.Area.Data = 1
-Calculate.Gameoject.Zone.Area.Data = 1
-```
+> Calculate.Creature.Zone.Area.Data = 1  
+> Calculate.Gameoject.Zone.Area.Data = 1
+
 
 ## Install
 
@@ -52,38 +51,32 @@ Calculate.Gameoject.Zone.Area.Data = 1
 5. compile the MPQExtractor
   extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (suffix: 1 -> 9 -> A -> Z)
    .. for every locale you are going to use:
-   ```
-<localeCode>/DBFilesClient/
-<localeCode>/Interface/WorldMap/
-<localeCode>/Interface/FrameXML/GlobalStrings.lua
-```
-
+   > \<localeCode>/DBFilesClient/  
+   > \<localeCode>/Interface/WorldMap/  
+   > \<localeCode>/Interface/FrameXML/GlobalStrings.lua  
+   
    .. once is enough (still apply the localeCode though):
-   ```
-<localeCode>/Interface/TalentFrame/
-<localeCode>/Interface/Glues/Credits/
-<localeCode>/Interface/Icons/
-<localeCode>/Interface/Spellbook/
-<localeCode>/Interface/PaperDoll/
-<localeCode>/Interface/GLUES/CHARACTERCREATE/
-<localeCode>/Interface/Pictures
-<localeCode>/Interface/PvPRankBadges
-<localeCode>/Interface/FlavorImages
-<localeCode>/Interface/Calendar/Holidays/
-<localeCode>/Sounds/
-```
-
+   > \<localeCode>/Interface/TalentFrame/  
+   > \<localeCode>/Interface/Glues/Credits/  
+   > \<localeCode>/Interface/Icons/  
+   > \<localeCode>/Interface/Spellbook/  
+   > \<localeCode>/Interface/PaperDoll/  
+   > \<localeCode>/Interface/GLUES/CHARACTERCREATE/  
+   > \<localeCode>/Interface/Pictures  
+   > \<localeCode>/Interface/PvPRankBadges  
+   > \<localeCode>/Interface/FlavorImages  
+   > \<localeCode>/Interface/Calendar/Holidays/  
+   > \<localeCode>/Sounds/  
+   
    .. optionaly (for other uses):
-   ```
-<localeCode>/Interface/GLUES/LOADINGSCREENS/
-```
+   > \<localeCode>/Interface/GLUES/LOADINGSCREENS/  
 6. reencode the audio files. WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.
    example for ffmpeg
    ```
-cd path/to/mpqdata/<localeCode>
-find -name "*.wav" -exec ffmpeg -hide_banner -y -i {} -acodec libvorbis {}.ogg \;          # file.wav -> file.wav.ogg
-find -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {}.mp3 \;  # file.mp3 -> file.mp3.mp3
-```
+   cd path/to/mpqdata/<localeCode>  
+   find -name "*.wav" -exec ffmpeg -hide_banner -y -i {} -acodec libvorbis {}.ogg \;          # file.wav -> file.wav.ogg  
+   find -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {}.mp3 \;  # file.mp3 -> file.mp3.mp3  
+   ```
 
 7. run the initial setup from the CLI `php aowow --firstrun`. It should guide you through with minimal input required from your end.
   This will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.
