@@ -752,7 +752,7 @@ trait spawnHelper
 
 abstract class Filter
 {
-    private static  $pattern   = "/[^\p{L}0-9\s_\-\'\.\?\*]/ui";// delete any char not in unicode, number, space, underscore, hyphen, single quote, dot or common wildcard
+    private static  $pattern   = "/[\p{C}]/ui";             // delete unprintable characters
     private static  $wCards    = ['*' => '%', '?' => '_'];
     private static  $criteria  = ['cr', 'crs', 'crv'];      // [cr]iterium, [cr].[s]ign, [cr].[v]alue
 

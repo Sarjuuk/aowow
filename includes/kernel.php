@@ -96,7 +96,7 @@ foreach ($sets as $k => $v)
     else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
         $val = (bool)$v['value'];
     else if ($v['flags'] & CON_FLAG_TYPE_STRING)
-        $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
+        $val = preg_replace("/[\p{C}]/ui", '', $v['value']);
     else if ($php)
     {
         trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
