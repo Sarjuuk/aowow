@@ -48,6 +48,9 @@ function quests_startend(/* array $ids = [] */)
             DB::Aowow()->query('INSERT INTO ?_quests_startend (?#) VALUES (?a) ON DUPLICATE KEY UPDATE method = method | VALUES(method), eventId = IF(eventId = 0, VALUES(eventId), eventId)', array_keys($d), array_values($d));
     }
 
+    // update quests without start as unavailable
+    Db::Aowow()->query('UPDATE ?_quests q LEFT JOIN ?_quests_startend qse ON qse.questId = q.id AND qse.method & 1 SET q.cuFlags = q.cuFlags | ?d WHERE qse.questId IS NULL', CUSTOM_UNAVAILABLE);
+
     return true;
 }
 

@@ -374,7 +374,7 @@ class ItemPage extends genericPage
         );
 
         // availablility
-        $this->disabled = false;    // todo (med): get itemSources (which are not yet in DB :x) or
+        $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
 
         // subItems
         $this->subject->initSubItems();

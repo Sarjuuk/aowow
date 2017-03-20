@@ -249,6 +249,8 @@ class QuestList extends BaseType
 
             // if ($this->isRepeatable())       // dafuque..? says repeatable and is used as 'disabled'..?
                 // $data[$this->id]['wflags'] |= QUEST_CU_REPEATABLE;
+            if ($this->curTpl['cuFlags'] & (CUSTOM_UNAVAILABLE | CUSTOM_DISABLED))
+                $data[$this->id]['wflags'] |= QUEST_CU_REPEATABLE;
 
             if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
             {
@@ -505,9 +507,9 @@ class QuestListFilter extends Filter
                 if ($this->int2Bool($cr[1]))
                 {
                     if ($cr[1])
-                        return ['AND', [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0], [['flags', QUEST_FLAG_UNAVAILABLE, '&'], 0]];
+                        return [['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0];
                     else
-                        return ['OR', ['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], ['flags', QUEST_FLAG_UNAVAILABLE, '&']];
+                        return ['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'];
                 }
                 break;
             case 23:                                        // itemchoices [op] [int]

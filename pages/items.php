@@ -452,7 +452,7 @@ class ItemsPage extends GenericPage
         $form = $this->filterObj->getForm('form');
         if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
             $this->path[] = $form['sl'];
-        else if ($this->category[0] == 0 && isset($form['ty']) && !is_array($form['ty']))
+        else if (!empty($this->category[0]) && $this->category[0] == 0 && isset($form['ty']) && !is_array($form['ty']))
             $this->path[] = $form['ty'];
     }
 

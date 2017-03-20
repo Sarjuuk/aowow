@@ -107,7 +107,7 @@ class ScreenshotPage extends GenericPage
     {
         $this->imgHash = Util::createHash(16);
 
-        if (User::$banStatus & ACC_BAN_SCREENSHOT)
+        if (User::canUploadScreenshot())
         {
             $_SESSION['error']['ss'] = Lang::screenshot('error', 'notAllowed');
             return false;

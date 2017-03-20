@@ -40,13 +40,6 @@ if (isset($this->extraText)):
 <?php
 endif;
 
-if (isset($this->unavailable)):
-?>
-                <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::main('_unavailable'); ?></b>
-<?php
-endif;
-
 if (!empty($this->transfer)):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;

@@ -21,7 +21,13 @@ if ($this->expansion):
 else:
     echo '                <h1>'.$this->name."</h1>\n";
 endif;
-
+if ($this->unavailable):
+?>
+                <div class="pad"></div>
+                <b style="color: red"><?=Lang::itemset('_unavailable'); ?></b>
+                <div class="pad"></div>
+<?php
+endif;
 $this->brick('article');
 
 echo $this->description;
@@ -51,13 +57,6 @@ foreach ($this->pieces as $iId => $__):
 endforeach;
 ?>
                 //]]></script>
-
-<?php
-if ($this->unavailable):
-?>
-                <div class="pad"></div>
-                <b style="color: red"><?=Lang::itemset('_unavailable'); ?></b>
-<?php endif; ?>
 
                 <h3><?=Lang::itemset('_setBonuses').$this->bonusExt; ?></h3>
 

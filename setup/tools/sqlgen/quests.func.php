@@ -13,6 +13,7 @@ if (!CLI)
  * locales_quest
  * game_event
  * game_event_seasonal_questrelation
+ * disables
 */
 
 
@@ -39,9 +40,12 @@ function quests(array $ids = [])
             IFNULL(qa.NextQuestId, 0),
             IFNULL(qa.ExclusiveGroup, 0),
             RewardNextQuest,
-            Flags,
+            q.Flags,
             IFNULL(qa.SpecialFlags, 0),
-            0 AS cuFlags,                                   -- cuFlags
+            (
+                IF(d.entry IS NULL, 0, 134217728) +         -- disabled
+                IF(q.Flags & 16384, 536870912, 0)           -- unavailable
+            ) AS cuFlags,                                   -- cuFlags
             IFNULL(qa.AllowableClasses, 0),
             AllowableRaces,
             IFNULL(qa.RequiredSkillId, 0),      IFNULL(qa.RequiredSkillPoints, 0),
@@ -101,6 +105,8 @@ function quests(array $ids = [])
             locales_quest lq ON q.ID = lq.Id
         LEFT JOIN
             game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
+        LEFT JOIN
+            disables d ON d.entry = q.ID AND d.sourceType = 1
         WHERE
             q.Id > ?d
         {

@@ -406,7 +406,8 @@ function source(array $ids = [])
             SELECT RewardItem1         AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardItem1         > 0 GROUP BY item UNION
             SELECT RewardItem2         AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardItem2         > 0 GROUP BY item UNION
             SELECT RewardItem3         AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardItem3         > 0 GROUP BY item UNION
-            SELECT RewardItem4         AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardItem4         > 0 GROUP BY item
+            SELECT RewardItem4         AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE RewardItem4         > 0 GROUP BY item UNION
+            SELECT StartItem           AS item, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE StartItem           > 0 GROUP BY item
         ) n JOIN item_template it ON it.entry = n.item
         GROUP BY item'
     );
@@ -993,6 +994,7 @@ function source(array $ids = [])
     if ($spellBuff)
         DB::Aowow()->query(queryfy('[V]', $spellBuff, $insMore), 22, 22, 22);
 
+
     ###############
     # 23: Skinned #
     ###############
@@ -1044,6 +1046,9 @@ function source(array $ids = [])
         DB::Aowow()->query(queryfy('[V]', $spellBuff, $insMore), 23, 23, 23);
 
 
+    // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawnd, quests granting items may be disabled)
+    DB::Aowow()->query('UPDATE ?_items SET cuFlags = cuFlags & ?d', ~CUSTOM_UNAVAILABLE);
+    DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.typeId = i.id AND s.type = ?d SET i.cuFlags = i.cuFlags | ?d WHERE s.typeId IS NULL', TYPE_ITEM, CUSTOM_UNAVAILABLE);
 
     /*********/
     /* Spell */

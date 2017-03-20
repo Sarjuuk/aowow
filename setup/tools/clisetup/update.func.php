@@ -23,6 +23,8 @@ function update()
         $pi = pathinfo($file);
         list($fDate, $fPart) = explode('_', $pi['filename']);
 
+        $fData = intVal($fDate);
+
         if ($date && $fDate < $date)
             continue;
         else if ($part && $date && $fDate == $date && $fPart <= $part)

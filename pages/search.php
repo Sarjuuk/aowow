@@ -943,7 +943,7 @@ class SearchPage extends GenericPage
     {
         $cnd  = array_merge($cndBase, array(
             [['flagsExtra', 0x80], 0],                      // exclude trigger creatures
-        //  [['cuFlags', MASK, '&'], 0],                    // todo (med): exclude difficulty entries
+            [['cuFlags', NPC_CU_DIFFICULTY_DUMMY, '&'], 0], // exclude difficulty entries
             $this->createLookup()
         ));
         $npcs = new CreatureList($cnd);
@@ -977,7 +977,7 @@ class SearchPage extends GenericPage
     private function _searchQuest($cndBase)                 // 15 Quests $searchMask & 0x0008000
     {
         $cnd    = array_merge($cndBase, array(
-        //  [['cuFlags', MASK, '&'], 0],                    // todo (med): identify disabled quests
+            [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
             $this->createLookup()
         ));
         $quests = new QuestList($cnd);

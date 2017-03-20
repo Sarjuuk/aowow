@@ -19,6 +19,7 @@
 <?php if ($this->unavailable): ?>
                 <div class="pad"></div>
                 <b style="color: red"><?php echo Lang::quest('unavailable'); ?></b>
+                <div class="pad"></div>
 <?php
 endif;
 

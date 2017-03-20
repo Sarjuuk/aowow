@@ -215,9 +215,9 @@ define('SOUND_TYPE_MP3',                    2);
 define('CUSTOM_HAS_COMMENT',                0x01000000);
 define('CUSTOM_HAS_SCREENSHOT',             0x02000000);
 define('CUSTOM_HAS_VIDEO',                  0x04000000);
-define('CUSTOM_DISABLED',                   0x08000000);
+define('CUSTOM_DISABLED',                   0x08000000);    // contained in world.disables
 define('CUSTOM_SERVERSIDE',                 0x10000000);
-define('CUSTOM_UNAVAILABLE',                0x20000000);
+define('CUSTOM_UNAVAILABLE',                0x20000000);    // no source for X or questFlag
 define('CUSTOM_EXCLUDE_FOR_LISTVIEW',       0x40000000);    // will not show up in search or on listPage (override for staff)
 
 // Custom Flags (per type)

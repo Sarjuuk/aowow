@@ -257,8 +257,8 @@ function spell()
     if ($serverside)
         DB::Aowow()->query('UPDATE ?_spell SET cuFlags = cuFlags | ?d WHERE id IN (?a)', CUSTOM_SERVERSIDE, $serverside);
 
-    // apply flag: CUSTOM_DISABLED
-    if ($disables = DB::World()->selectCol('SELECT entry FROM disables WHERE sourceType = 0 AND flags & 0xD'))  // 0xD: players (0x1), pets (0x4), general (0x8)
+    // apply flag: CUSTOM_DISABLED [0xD: players (0x1), pets (0x4), general (0x8); only generally disabled spells]
+    if ($disables = DB::World()->selectCol('SELECT entry FROM disables WHERE sourceType = 0 AND params_0 = "" AND params_1 = "" AND flags & 0xD'))
         DB::Aowow()->query('UPDATE ?_spell SET cuFlags = cuFlags | ?d WHERE id IN (?a)', CUSTOM_DISABLED, $disables);
 
     // apply spell ranks (can't use skilllineability.dbc, as it does not contain ranks for non-player/pet spells)
