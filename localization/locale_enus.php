@@ -147,9 +147,6 @@ $lang = array(
                 'commenting-and-you' => "Commenting and You",               'modelviewer'       => "Model Viewer",              'screenshots-tips-tricks' => "Screenshots: Tips & Tricks",
                 'stat-weighting'     => "Stat Weighting",                   'talent-calculator' => "Talent Calculator",         'item-comparison'         => "Item Comparison",
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
-            ),
-            'privilege'     => array(
-
             )
         )
     ),
@@ -515,6 +512,7 @@ $lang = array(
         'privilege'     => "Privilege",
         'privileges'    => "Privileges",
         'requiredRep'   => "Reputation Required",
+        'reqPoints'     => "This privilege requires <b>%s</b> reputation points.",
         '_privileges'   => array(
             null,                                   "Post comments",                                "Post external links",                              null,
             "No CAPTCHAs",                          "Comment votes worth more",                     null,                                               null,

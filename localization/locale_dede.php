@@ -152,9 +152,6 @@ $lang = array(
                 'commenting-and-you' => "Wie man Kommentare schreibt",      'modelviewer'       => "Modellviewer",              'screenshots-tips-tricks' => "Screenshots: Tipps & Tricks",
                 'stat-weighting'     => "Gewichtung von Werten",            'talent-calculator' => "Talentrechner",             'item-comparison'         => "Gegenstandsvergleich",
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
-            ),
-            'privilege'     => array(
-
             )
         )
     ),
@@ -520,6 +517,7 @@ $lang = array(
         'privilege'     => "Privileg",
         'privileges'    => "Privilegien",
         'requiredRep'   => "Benötigter Ruf",
+        'reqPoints'     => "Dieses Privileg benötigt <b>%s</b> Rufpunkte.",
         '_privileges'   => array(
             null,                                   "Kommentare einsenden",                         "Webseitenexterne Links einsenden",                 null,
             "Kein CAPTCHA",                         "Kommentarbewertungen zählen mehr",             null,                                               null,

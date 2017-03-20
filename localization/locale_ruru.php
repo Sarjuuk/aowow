@@ -152,9 +152,6 @@ $lang = array(
                 'commenting-and-you' => "Комментарии и Вы",                 'modelviewer'       => "3D просмотр",               'screenshots-tips-tricks' => "Скриншоты: Секреты мастерства",
                 'stat-weighting'     => "Значимость характеристик",         'talent-calculator' => "Расчёт талантов",           'item-comparison'         => "Сравнение предметов",
                 'profiler'           => "Профили персонажей",               'markup-guide'      => "Markup Guide"
-            ),
-            'privilege'     => array(
-
             )
         )
     ),
@@ -520,6 +517,7 @@ $lang = array(
         'privilege'     => "Привилегия",
         'privileges'    => "Привилегии",
         'requiredRep'   => "Необходима репутация",
+        'reqPoints'     => "Для этой привилегии требуется <b>%s</b> очков репутации.",
         '_privileges'   => array(
             null,                                   "Оставлять комментарии",                        "Оставлять внешние ссылки",                         null,
             "Нет CAPTCHA",                          "Более сильные голоса",                         null,                                               null,

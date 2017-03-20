@@ -44,9 +44,10 @@ class Lang
         foreach ($lang as $k => $v)
             self::$$k = $v;
 
-        // *cough* .. reuse-hack
+        // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
         self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
+        self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 
     public static function __callStatic($prop, $args)

@@ -10,13 +10,30 @@ if (!defined('AOWOW_REVISION'))
 
 class MorePage extends GenericPage
 {
-    protected $tpl           = 'list-page-generic';
-    protected $path          = [];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_NONE;
-    protected $js            = ['swfobject.js'];
+    protected $tpl          = 'list-page-generic';
+    protected $path         = [];
+    protected $tabId        = 0;
+    protected $mode         = CACHE_TYPE_NONE;
+    protected $js           = ['swfobject.js'];
 
-    private   $validPages    = array(                       // [tabId, path[, subPaths]]
+    private   $page         = [];
+    private   $req2priv     = array(
+             1 => CFG_REP_REQ_COMMENT,                      // write comments
+             2 => 0,                                        // NYI post external links
+             4 => 0,                                        // NYI no captcha
+             5 => CFG_REP_REQ_SUPERVOTE,                    // votes count for more
+             9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
+            10 => CFG_REP_REQ_UPVOTE,                       // can upvote
+            11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
+            12 => CFG_REP_REQ_REPLY,                        // can reply
+            13 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            14 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            15 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            16 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            17 => CFG_REP_REQ_PREMIUM                       // premium status
+        );
+
+    private   $validPages   = array(                        // [tabId, path[, subPaths]]
         'whats-new'     => [2, [2,  7]],
         'searchbox'     => [2, [2, 16]],
         'tooltips'      => [2, [2, 10]],
@@ -25,7 +42,7 @@ class MorePage extends GenericPage
         'searchplugins' => [2, [2,  8]],
         'help'          => [2, [2, 13], ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide', 'markup-guide-ext']],
         'reputation'    => [1, [3, 10]],
-        'privilege'     => [1, [3, 10], [1, 2, 5, 9, 10, 11, 12, 13, 14, 15, 16]],
+        'privilege'     => [1, [3, 10], [1, 2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 17]],
         'privileges'    => [1, [3, 10, 0]],
     );
 
@@ -40,20 +57,21 @@ class MorePage extends GenericPage
 
             $this->tab  = $pageData[0];
             $this->path = $pageData[1];
+            $this->page = [$pageCall, $subPage];
 
             if ($subPage && isset($pageData[2]))
             {
-                $subPath = array_search($subPage, $pageData[2]);
-                if (!$subPath)
+                $exists = array_search($subPage, $pageData[2]);
+                if ($exists === false)
                     $this->error();
 
-                if (is_numeric($subPath))
-                    $this->path[] = $subPath;
+                if (is_numeric($subPage))
+                    $this->articleUrl = $pageCall.'='.$subPage;
                 else
-                    $this->path[] = $subPage;
+                    $this->articleUrl = $subPage;
 
-                $this->articleUrl = $subPage;
-                $this->name = Lang::main('moreTitles', $pageCall, $subPage);
+                $this->path[] = $subPage;
+                $this->name   = Lang::main('moreTitles', $pageCall, $subPage);
             }
             else
             {
@@ -63,20 +81,46 @@ class MorePage extends GenericPage
         }
         else
             $this->error();
+
+        // order by requirement ASC
+        asort($this->req2priv);
     }
 
     protected function generateContent()
     {
-        if ($this->articleUrl == 'reputation')
-            $this->handleReputationPage();
-        else if ($this->articleUrl == 'privileges')
-            $this->handlePrivilegesPage();
+        switch ($this->page[0])
+        {
+            case 'reputation':
+                $this->handleReputationPage();
+                return;
+            case 'privileges':
+                $this->handlePrivilegesPage();
+                return;
+            case 'privilege':
+                $this->tpl = 'privilege';
+                $this->privReqPoints = sprintf(Lang::privileges('reqPoints'), Lang::nf($this->req2priv[$this->page[1]]));
+                return;
+            default:
+                return;
+        }
     }
 
     protected function postArticle()
     {
-        if ($this->articleUrl == 'reputation')
-            $this->handleReputationArticle();
+        if ($this->page[0] != 'reputation' &&
+            $this->page[0] != 'privileges' &&
+            $this->page[0] != 'privilege')
+            return;
+
+        $txt = &$this->article['text'];
+        $consts = get_defined_constants(true);
+        foreach ($consts['user'] as $k => $v)
+        {
+            if (strstr($k, 'CFG_REP_'))
+                $txt = str_replace($k, Lang::nf($v), $txt);
+            else if ($k == 'CFG_USER_MAX_VOTES' || $k == 'CFG_BOARD_URL')
+                $txt = str_replace($k, $v, $txt);
+        }
     }
 
     protected function generatePath() { }
@@ -106,45 +150,18 @@ class MorePage extends GenericPage
         }
     }
 
-    private function handleReputationArticle()
-    {
-        $txt = &$this->article['text'];
-
-        $consts = get_defined_constants(true);
-        foreach ($consts['user'] as $k => $v)
-            if (strstr($k, 'CFG_REP_'))
-                $txt = str_replace($k, Lang::nf($v), $txt);
-    }
-
     private function handlePrivilegesPage()
     {
         $this->tpl        = 'privileges';
         $this->privileges = [];
 
-        $req2priv = array(
-             1 => CFG_REP_REQ_COMMENT,                      // write comments
-         //  2 => CFG_REP_REQ_XXX,                          // post external links
-         //  4 => CFG_REP_REQ_XXX,                          // no captcha
-             5 => CFG_REP_REQ_SUPERVOTE,                    // votes count for more
-             9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
-            10 => CFG_REP_REQ_UPVOTE,                       // can upvote
-            11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
-            12 => CFG_REP_REQ_REPLY,                        // can reply
-         // 13 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
-         // 14 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
-         // 15 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
-         // 16 => CFG_REP_REQ_XXX,                          // avatar border [NYI: checked by js, avatars not in use]
-            17 => CFG_REP_REQ_PREMIUM                       // premium status
-        );
-
-        asort($req2priv);
-
-        foreach ($req2priv as $id => $val)
-            $this->privileges[$id] = array(
-                User::getReputation() >= $val,
-                Lang::privileges('_privileges', $id),
-                $val
-            );
+        foreach ($this->req2priv as $id => $val)
+            if ($val)
+                $this->privileges[$id] = array(
+                    User::getReputation() >= $val,
+                    Lang::privileges('_privileges', $id),
+                    $val
+                );
     }
 }
 
