@@ -1,7 +1,7 @@
 ALTER TABLE `aowow_creature`
-	ADD INDEX `difficultyEntry1` (`difficultyEntry1`),
-	ADD INDEX `difficultyEntry2` (`difficultyEntry2`),
-	ADD INDEX `difficultyEntry3` (`difficultyEntry3`);
+    ADD INDEX `difficultyEntry1` (`difficultyEntry1`),
+    ADD INDEX `difficultyEntry2` (`difficultyEntry2`),
+    ADD INDEX `difficultyEntry3` (`difficultyEntry3`);
 
 UPDATE aowow_items i, aowow_spell s SET i.class = 0, i.subClass = 6 WHERE s.Id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12;
 UPDATE aowow_items SET class    = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%";
