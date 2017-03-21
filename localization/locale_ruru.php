@@ -148,6 +148,7 @@ $lang = array(
             'aboutus'       => "[What is AoWoW?]",
             'searchplugins' => "Дополнения для браузеров",
             'privileges'    => "Привилегии",
+            'top-users'     => "Лучшие пользователи",
             'help'          => array(
                 'commenting-and-you' => "Комментарии и Вы",                 'modelviewer'       => "3D просмотр",               'screenshots-tips-tricks' => "Скриншоты: Секреты мастерства",
                 'stat-weighting'     => "Значимость характеристик",         'talent-calculator' => "Расчёт талантов",           'item-comparison'         => "Сравнение предметов",

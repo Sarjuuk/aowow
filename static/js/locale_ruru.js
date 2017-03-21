@@ -2360,6 +2360,10 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    alltime_stc:   "Все время",
+    lastmonth_stc: "Последний месяц",
+    lastweek_stc:  "Последняя неделя",
+
     linkremoved:     "ссылка удалена",
     linkremoved_tip: "Новые пользователи не могут публиковать<br />\nссылки на не разрешенные сайты.",
 

@@ -2360,6 +2360,10 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    alltime_stc:   "A chaque fois",
+    lastmonth_stc: "Mois dernier",
+    lastweek_stc:  "Semaine dernière",
+
     linkremoved:     "lien enlevé",
     linkremoved_tip: "Les nouveaux utilisateurs ne peuvent pas donner de liens vers<br />des sites web non-approuvés.",
 

@@ -133,6 +133,7 @@ class GenericPage
         'sound'             => ['template' => 'sound',             'id' => 'sounds',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.types[19][2]'      ],
         'spell'             => ['template' => 'spell',             'id' => 'spells',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_spells'        ],
         'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
+        'topusers'          => ['template' => 'topusers',          'id' => 'topusers',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.topusers'          ],
         'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_videos'        ],
         'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ]
     );

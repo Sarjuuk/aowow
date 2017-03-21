@@ -121,6 +121,7 @@ switch ($pageCall)
     case 'reputation':
     case 'privilege':
     case 'privileges':
+    case 'top-users':
         (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':

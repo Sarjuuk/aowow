@@ -2370,6 +2370,10 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    alltime_stc:   "Allzeit",
+    lastmonth_stc: "Letzter Monat",
+    lastweek_stc:  "Letzte Woche",
+
     linkremoved:     "Link entfernt",
     linkremoved_tip: "Neue Benutzer können nicht<br />zu nicht-weißgelisteten Seiten verlinken.",
 

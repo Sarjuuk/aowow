@@ -2417,6 +2417,10 @@ var g_conditions = {
 /* end custom */
 
 var LANG = {
+    alltime_stc:   "All Time",
+    lastmonth_stc: "Last Month",
+    lastweek_stc:  "Last Week",
+
     linkremoved:     "link removed",
     linkremoved_tip: "Newly registered users cannot<br />post links.",
 

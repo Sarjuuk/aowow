@@ -2371,6 +2371,10 @@ var g_conditions = {
 };
 
 var LANG = {
+    alltime_stc:   "Todo el tiempo",
+    lastmonth_stc: "Mes pasado",
+    lastweek_stc:  "Semana pasada",
+
     linkremoved:     "enlace eliminado",
     linkremoved_tip: "Los nuevos usuarios no pueden enlazar a<br />webs que no estén aprobadas.",
 

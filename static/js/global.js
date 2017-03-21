@@ -28,6 +28,7 @@ var U_GROUP_PENDING    = 0x4000;
 var U_GROUP_STAFF               = U_GROUP_ADMIN   | U_GROUP_EDITOR    | U_GROUP_MOD | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_BLOGGER | U_GROUP_LOCALIZER | U_GROUP_SALESAGENT;
 var U_GROUP_EMPLOYEE            = U_GROUP_ADMIN   | U_GROUP_BUREAU    | U_GROUP_DEV;
 var U_GROUP_GREEN_TEXT          = U_GROUP_MOD     | U_GROUP_BUREAU    | U_GROUP_DEV;
+var U_GROUP_PREMIUMISH          = U_GROUP_PREMIUM | U_GROUP_EDITOR;
 var U_GROUP_MODERATOR           = U_GROUP_ADMIN   | U_GROUP_MOD       | U_GROUP_BUREAU;
 var U_GROUP_COMMENTS_MODERATOR  = U_GROUP_BUREAU  | U_GROUP_MODERATOR | U_GROUP_LOCALIZER;
 var U_GROUP_PREMIUM_PERMISSIONS = U_GROUP_PREMIUM | U_GROUP_STAFF     | U_GROUP_VIP;
@@ -1079,6 +1080,9 @@ function g_GetStaffColorFromRoles(roles) {
         return 'comment-green';
     }
     if (roles & U_GROUP_VIP) { // VIP
+        return 'comment-gold';
+    }
+    if (roles & U_GROUP_PREMIUMISH) { // Premium, Editor
         return 'comment-gold';
     }
 
@@ -8458,12 +8462,16 @@ Listview.funcBox = {
                 break;
 
             case 3: // Post reply (forums)
+                if (comment.roles & U_GROUP_PREMIUMISH)
+                    return ' comment-gold';
             case 4: // Signature (account settings)
                 if(comment.roles & U_GROUP_ADMIN)
                     return ' comment-blue';
                 if(comment.roles & U_GROUP_GREEN_TEXT) // Mod, Bureau, Dev
                     return ' comment-green';
-                else if(comment.roles & U_GROUP_VIP) // VIP
+                if(comment.roles & U_GROUP_VIP) // VIP
+                    return ' comment-gold';
+                if (comment.roles & U_GROUP_PREMIUMISH) // Premium, Editor
                     return ' comment-gold';
                 break;
         }
@@ -8474,6 +8482,8 @@ Listview.funcBox = {
             return ' comment-green';
         else if(comment.rating < -2)
             return ' comment-bt';
+        else if(comment.roles & U_GROUP_PREMIUMISH)
+            return ' comment-gold';
 
         return '';
     },
@@ -11371,6 +11381,193 @@ Listview.templates = {
         ]
     },
 
+    topusers:
+    {
+        sort: ['reputation'],
+        searchable: 1,
+        filtrable: 0,
+
+        columns: [
+            {
+                id: 'username',
+                name: LANG.username,
+                type: 'text',
+                align: 'left',
+                compute: function(user, td) {
+                    var a = $('<a>');
+                    var color = g_GetStaffColorFromRoles(user.groups);
+                    if (color != '')
+                        a.addClass(color);
+                    else
+                        a.css('color', 'white');
+
+                    a.text(user.username);
+                    a.addClass('listview-cleartext');
+                    a.attr('href', '?user=' + user.username);
+                    $(td).append(a);
+                    return;
+                },
+                getVisibleText: function(user) {
+                    return user.username;
+                },
+                sortFunc: function(a, b) {
+                    return $WH.stringCompare(a.username, b.username);
+                },
+                getItemLink: function(user) {
+                    return '?user=' + user.username;
+                }
+            },
+            {
+                id: 'reputation',
+                name: LANG.reputation,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.reputation));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (b.reputation == a.reputation)
+                        return 0;
+
+                    return a.reputation < b.reputation ? 1 : -1;
+                }
+            },
+            {
+                id: 'achievements',
+                name: LANG.achievements,
+                type: 'text',
+                compute: function(user, td) {
+                    var sp = $('<span>').addClass('wsach-pts').css('font-size', 'inherit');
+                    var buf = '';
+                    if (user.gold)
+                        buf += '<i>' + user.gold + '</i>&middot;';
+                    if (user.silver)
+                        buf += '<b>' + user.silver + '</b>&middot;';
+                    buf += '<u>' + user.copper + '</u>';
+
+                    sp.html(buf);
+                    $(td).append(sp);
+
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    var sumA = (a.gold * 1000 * 1000) + (a.silver * 1000) + a.copper;
+                    var sumB = (b.gold * 1000 * 1000) + (b.silver * 1000) + b.copper;
+                    if (sumA == sumB)
+                        return 0;
+                    return sumA < sumB ? 1 : -1;
+                }
+            },
+            {
+                id: 'comments',
+                name: LANG.comments,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.comments));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (a.comments == b.comments)
+                        return 0;
+                    return a.comments < b.comments ? 1 : -1;
+                }
+            },
+            {
+                id: 'posts',
+                name: LANG.posts,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.posts));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (a.posts == b.posts)
+                        return 0;
+                    return a.posts < b.posts ? 1 : -1;
+                }
+            },
+            {
+                id: 'screenshots',
+                name: LANG.screenshots,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.screenshots));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (a.screenshots == b.screenshots)
+                        return 0;
+                    return a.screenshots < b.screenshots ? 1 : -1;
+                }
+            },
+            {
+                id: 'reports',
+                name: LANG.reports,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.reports));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (a.reports == b.reports)
+                        return 0;
+                    return a.reports < b.reports ? 1 : -1;
+                }
+            },
+            {
+                id: 'votes',
+                name: LANG.votes,
+                type: 'text',
+                compute: function(user, td) {
+                    $(td).append($WH.number_format(user.votes));
+                    return;
+                },
+                sortFunc: function(a, b) {
+                    if (a.votes == b.votes)
+                        return 0;
+                    return a.votes < b.votes ? 1 : -1;
+                }
+            },
+            {
+                id: 'uploads',
+                name: LANG.uploads,
+                type: 'text',
+                compute: function(user, c) {
+                    $(c).append($WH.number_format(user.uploads));
+                    return;
+                },
+                sortFunc: function(a, c) {
+                    if (a.uploads == c.uploads)
+                        return 0;
+                    return a.uploads < c.uploads ? 1 : -1;
+                }
+            },
+            {
+                id: 'created',
+                name: LANG.created,
+                type: 'text',
+                hidden: 1,
+                compute: function(user, td) {
+                    var date = new Date(user.creation),
+                        diff = (g_serverTime - date) / 1000;
+
+                    sp = $WH.ce('span');
+                    g_formatDate(sp, diff, date);
+                    $WH.ae(td, sp);
+                },
+                sortFunc: function(a, b) {
+                    if (a.creation == b.creation)
+                        return 0;
+                    return a.creation < b.creation ? 1 : -1;
+                }
+            }
+        ],
+
+        getItemLink: function(user) {
+            return '?user=' + user.username;
+        }
+    },
+
     skill: {
         sort: [1],
         searchable: 1,
@@ -13730,7 +13927,7 @@ Listview.templates = {
                     td.className = 'q1';
 
                     var a = $WH.ce('a');
-                    a.href = '/user=' + reply.user;
+                    a.href = '?user=' + reply.user;
                     $WH.ae(a, $WH.ct(reply.user))
                     $WH.ae(td, a);
                 }
