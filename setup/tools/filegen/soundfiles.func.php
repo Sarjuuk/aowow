@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 if (!CLI)
     die('not in cli mode');
 
-    function sounds()
+    function soundfiles()
     {
         $ok = true;
 
@@ -14,7 +14,6 @@ if (!CLI)
         $files  = DB::Aowow()->selectCol('SELECT ABS(id) AS ARRAY_KEY, CONCAT(path, "/", `file`) FROM ?_sounds_files');
         $nFiles = count($files);
         $itr    = $i = 0;
-        $nStep  = 1000;
         foreach ($files as $fileId => $filePath)
         {
             $i++;

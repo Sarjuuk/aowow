@@ -49,7 +49,7 @@ class FileGen
         'gems'          => [['items', 'spell', 'itemenchantment'], null],
         'profiler'      => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null],
         'weightPresets' => [null, null],
-        'sounds'        => [['sounds_files'], null]
+        'soundfiles'    => [['sounds'], null]
     );
 
     public  static $defaultExecTime = 30;
