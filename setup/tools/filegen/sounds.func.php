@@ -30,7 +30,7 @@ if (!CLI)
             else                                            // expected file.mp3.mp3
                 $filePath .= '.mp3';
 
-            // just use the first locale available .. i there is no support for multiple audio files anyway
+            // just use the first locale available .. there is no support for multiple audio files anyway
             foreach (CLISetup::$expectedPaths as $locStr => $__)
             {
                 // get your paths straight!
@@ -43,7 +43,7 @@ if (!CLI)
                     {
                         $ok = false;
                         CLISetup::log(' - could not copy '.CLISetup::bold($p).' into '.CLISetup::bold('static/wowsounds/'.$fileId), CLISetup::LOG_ERROR);
-                        die();
+                        break 2;
                     }
 
                     continue 2;

@@ -480,6 +480,7 @@ class GenericPage
         $this->articleUrl = 'page-not-found';
         $this->title[]    = Lang::main('errPageTitle');
         $this->name       = Lang::main('errPageTitle');
+        $this->lvTabs     = [];
 
         $this->addArticle();
 
@@ -521,7 +522,10 @@ class GenericPage
             $this->prepareContent();
 
             if (!$this->isSaneInclude('template/pages/', $this->tpl))
-                die(User::isInGroup(U_GROUP_EMPLOYEE) ? 'Error: nonexistant template requested: template/pages/'.$this->tpl.'.tpl.php' : null);
+            {
+                trigger_error('Error: nonexistant template requested: template/pages/'.$this->tpl.'.tpl.php', E_USER_ERROR);
+                $this->error();
+            }
 
             $this->addAnnouncements();
 
@@ -584,7 +588,7 @@ class GenericPage
             $$n = $v;
 
         if (!$this->isSaneInclude('template/bricks/', $file))
-            trigger_error("Nonexistant template requested: template/bricks/".$file.".tpl.php");
+            trigger_error('Nonexistant template requested: template/bricks/'.$file.'.tpl.php', E_USER_ERROR);
         else
             include('template/bricks/'.$file.'.tpl.php');
     }
@@ -592,7 +596,7 @@ class GenericPage
     public function lvBrick($file)                          // load listview addIns
     {
         if (!$this->isSaneInclude('template/listviews/', $file))
-            trigger_error('Nonexistant Listview addin requested: template/listviews/'.$file.'.tpl.php');
+            trigger_error('Nonexistant Listview addin requested: template/listviews/'.$file.'.tpl.php', E_USER_ERROR);
         else
             include('template/listviews/'.$file.'.tpl.php');
     }
@@ -602,7 +606,7 @@ class GenericPage
         if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc))
         {
             if ($loc == LOCALE_EN || !$this->isSaneInclude('template/localized/', $file.'_'.LOCALE_EN))
-                trigger_error("Nonexistant template requested: template/localized/".$file.'_'.$loc.".tpl.php");
+                trigger_error('Nonexistant template requested: template/localized/'.$file.'_'.$loc.'.tpl.php', E_USER_ERROR);
             else
                 include('template/localized/'.$file.'_'.LOCALE_EN.'.tpl.php');
         }
