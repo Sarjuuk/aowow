@@ -161,4 +161,4 @@ CREATE TABLE IF NOT EXISTS `aowow_spell_sounds` (
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 
-UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' sounds'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell creature sounds spawns');
+UPDATE aowow_dbversion SET  `build` = CONCAT(IFNULL(`build`, ''), ' soundfiles'), `sql` = CONCAT(IFNULL(`sql`, ''), ' spell creature sounds spawns');
