@@ -149,6 +149,18 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
     return true;
 }, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
 
+set_exception_handler(function ($ex)
+{
+    Util::addNote(U_GROUP_EMPLOYEE, 'EXCEPTION - '.$ex->getMessage().' @ '.$ex->getFile(). ':'.$ex->getLine()."\n".$ex->getTraceAsString());
+
+    if (DB::isConnectable(DB_AOWOW))
+        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+            AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $ex->getMessage()
+        );
+
+    (new GenericPage(null))->error();
+});
+
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || (!empty($AoWoWconf['aowow']) && CFG_FORCE_SSL);
 if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts

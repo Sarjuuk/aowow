@@ -1888,7 +1888,7 @@ class SpellPage extends GenericPage
                             case 147:                       // Mechanic Immunity Mask
                                 $_ = [];
                                 foreach (Lang::game('me') as $k => $str)
-                                    if ($effMV & (1 << $k - 1))
+                                    if ($k && ($effMV & (1 << $k - 1)))
                                         $_[] = $str;
 
                                 if ($_ = implode(', ', $_))
@@ -1968,7 +1968,7 @@ class SpellPage extends GenericPage
                             case 180:                       // Mod Spell Damage Versus
                                 $_ = [];
                                 foreach (Lang::game('ct') as $k => $str)
-                                    if ($effMV & (1 << $k - 1))
+                                    if ($k && ($effMV & (1 << $k - 1)))
                                         $_[] = $str;
 
                                 if ($_ = implode(', ', $_))

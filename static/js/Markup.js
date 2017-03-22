@@ -223,7 +223,7 @@ var Markup = {
                     var ach = g_achievements[id];
                     return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + ach.icon.toLowerCase() + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(ach[nameCol]) + '</span></a>';
                 }
-                return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[10][0] + ' #' + l + ')')) + '</a>';
+                return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[10][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
@@ -1214,7 +1214,7 @@ var Markup = {
                     str += Markup._safeHtml(item[nameCol]) + '</span></a>';
                     return str;
                 }
-                return '<a href="' + url + '?item=' + id + '"' + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[3][0] + ' #' + c + ')')) + '</a>';
+                return '<a href="' + url + '?item=' + id + '"' + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[3][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
@@ -2531,7 +2531,7 @@ var Markup = {
                     return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + spell.icon.toLowerCase() + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(spell[nameCol]) + '</span></a>';
                 }
 
-                return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + '>' + (tempname ? tempname : ('(' + LANG.types[6][0] + ' #' + f + ')')) + '</a>';
+                return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + '>' + (tempname ? tempname : ('(' + LANG.types[6][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
