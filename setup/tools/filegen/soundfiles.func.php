@@ -22,6 +22,7 @@ if (!CLI)
             {
                 $i = 0;
                 CLISetup::log(' - '.$itr.'/'.$nFiles.' ('.(intVal(100 * $itr / $nFiles).'%) done'));
+                DB::Aowow()->selectCell('SELECT 1');        // keep mysql busy or it may go away
             }
 
             if (stristr($filePath, '.wav'))                 // expected file.wav.ogg

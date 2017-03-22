@@ -74,6 +74,8 @@ function firstrun()
         ['SqlGen::generate',  'itemset',                  null, null, null],
         ['SqlGen::generate',  'item_stats',               null, null, null],
         ['SqlGen::generate',  'source',                   null, null, null],
+        ['SqlGen::generate',  'sounds',                   null, null, null],
+        ['FileGen::generate', 'soundfiles',               null, null, null],
         ['FileGen::generate', 'searchplugin',             null, null, null],
         ['FileGen::generate', 'power',                    null, null, null],
         ['FileGen::generate', 'searchboxScript',          null, null, null],
