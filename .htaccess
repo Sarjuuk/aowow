@@ -21,8 +21,9 @@ AddDefaultCharset utf8
     CharsetRecodeMultipartForms Off
 </IfModule>
 
-# 5MB should be enough for the largest screenshots in the land (cannot be set in config)
-    php_value       upload_max_filesize                         5M
+# UHD screenshots can get pretty large (cannot be set in config)
+    php_value       upload_max_filesize                         20M
+    php_value       post_max_size                               25M
 
 RewriteEngine on
 # RewriteBase /~user/localPath/     # enable if the rules do not work, when they should
