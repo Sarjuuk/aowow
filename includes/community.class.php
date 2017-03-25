@@ -309,14 +309,14 @@ class CommunityContent
 
     public static function getScreenshotPagesForManager($all, &$nFound)
     {
-        // i GUESS .. ss_getALL ? everything : unapproved
+        // i GUESS .. ss_getALL ? everything : pending
         $nFound = 0;
         $pages  = DB::Aowow()->select('
              SELECT   s.`type`, s.`typeId`, count(1) AS "count", MIN(s.`date`) AS "date"
              FROM     ?_screenshots s
             {WHERE    (s.status & ?d) = 0}
              GROUP BY s.`type`, s.`typeId`',
-            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED
+            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED | CC_FLAG_DELETED
         );
 
         if ($pages)
