@@ -48,7 +48,8 @@ function sounds(/*array $ids = [] */)
 
     CLISetup::log(' - sounds main data');
 
-    // file extraction and conversion in build step. data here is purely structural
+    // file extraction and conversion manually
+    // moving files in build step. data here is purely structural
     // reality check ... thats probably gigabytes worth of sound.. only growing in size with every locale added on top (RedRocketSite didn't do it. Should i then?)
 
     // .wav => audio/ogg; codecs="vorbis"
