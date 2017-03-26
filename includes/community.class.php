@@ -333,7 +333,7 @@ class CommunityContent
                 if (!$ids)
                     continue;
 
-                $tClass = new Util::$typeClasses[$t](array(['id', $ids]));
+                $tClass = new Util::$typeClasses[$t](array(['id', $ids], CFG_SQL_LIMIT_NONE));
                 foreach ($pages as &$p)
                     if ($p['type'] == $t)
                         if ($tClass->getEntry($p['typeId']))

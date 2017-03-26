@@ -193,6 +193,8 @@ class SearchPage extends GenericPage
         if ($this->mode == CACHE_TYPE_NONE)                 // search is invalid
             return;
 
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $this->performSearch();
     }
 
