@@ -60,36 +60,36 @@ if (!CLI)
         $destDir  = 'static/images/wow/';
         $success  = true;
         $iconDirs = array(
-            ['icons/large/',  'jpg',  0, 56, 4],
-            ['icons/medium/', 'jpg',  0, 36, 4],
-            ['icons/small/',  'jpg',  0, 18, 4],
-            ['icons/tiny/',   'gif',  0, 15, 4]
+            ['icons/large/',  '.jpg',  0, 56, 4],
+            ['icons/medium/', '.jpg',  0, 36, 4],
+            ['icons/small/',  '.jpg',  0, 18, 4],
+            ['icons/tiny/',   '.gif',  0, 15, 4]
         );
         $calendarDirs = array(
-            ['icons/large/',  'jpg', 90, 56, 4],
-            ['icons/medium/', 'jpg', 90, 36, 4],
-            ['icons/small/',  'jpg', 90, 18, 4],
-            ['icons/tiny/',   'gif', 90, 15, 4]
+            ['icons/large/',  '.jpg', 90, 56, 4],
+            ['icons/medium/', '.jpg', 90, 36, 4],
+            ['icons/small/',  '.jpg', 90, 18, 4],
+            ['icons/tiny/',   '.gif', 90, 15, 4]
         );
         $loadScreenDirs = array(
-            ['loadingscreens/large/',    'jpg', 0, 1024, 0],
-            ['loadingscreens/medium/',   'jpg', 0,  488, 0],
-            ['loadingscreens/original/', 'png', 0,    0, 0],
-            ['loadingscreens/small/',    'jpg', 0,  244, 0]
+            ['loadingscreens/large/',    '.jpg', 0, 1024, 0],
+            ['loadingscreens/medium/',   '.jpg', 0,  488, 0],
+            ['loadingscreens/original/', '.png', 0,    0, 0],
+            ['loadingscreens/small/',    '.jpg', 0,  244, 0]
         );
         $paths    = array(                                  // src, [dest, ext, srcSize, destSize, borderOffset], pattern, isIcon, tileSize
-             0 => ['Icons/',                                                $iconDirs,                                       '/*.[bB][lL][pP]',                true,   0],
-             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     'png', 0,  0, 0]], '/UI-Glyph-Rune*.blp',            true,   0],
-             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                    '/UI-{Backpack,PaperDoll}-*.blp', true,   0],
-             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                       '',                               true,  64],
-             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                       '',                               true,  64],
-             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                       '',                               true,  64],
-          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              'gif', 0, 16, 2]], '',                               true,  32],
-             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  'png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-             8 => ['Pictures/',                                             [['Interface/Pictures/',      'png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', 'png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                   '/*{rt,a,y,h,s}.[bB][lL][pP]',    true,   0],
-            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                 '/[lL][oO]*.[bB][lL][pP]',        false,  0]
+             0 => ['Icons/',                                                $iconDirs,                                        '/*.[bB][lL][pP]',                true,   0],
+             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]], '/UI-Glyph-Rune*.blp',            true,   0],
+             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                     '/UI-{Backpack,PaperDoll}-*.blp', true,   0],
+             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                        '',                               true,  64],
+             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                        '',                               true,  64],
+             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                        '',                               true,  64],
+          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]], '',                               true,  32],
+             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
+             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
+             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
+            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                    '/*{rt,a,y,h,s}.[bB][lL][pP]',    true,   0],
+            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                  '/[lL][oO]*.[bB][lL][pP]',        false,  0]
         );
         // textures are composed of 64x64 icons
         // numeric indexed arrays mimick the position on the texture
@@ -159,21 +159,21 @@ if (!CLI)
             $dest = imagecreatetruecolor($destDims['w'], $destDims['h']);
 
             imagesavealpha($dest, true);
-            if ($ext == 'png')
+            if ($ext == '.png')
                 imagealphablending($dest, false);
 
             imagecopyresampled($dest, $src, $destDims['x'], $destDims['x'], $srcDims['x'], $srcDims['y'], $destDims['w'], $destDims['h'], $srcDims['w'], $srcDims['h']);
 
             switch ($ext)
             {
-                case 'jpg':
-                    $ok = imagejpeg($dest, $name.'.'.$ext, 85);
+                case '.jpg':
+                    $ok = imagejpeg($dest, $name.$ext, 85);
                     break;
-                case 'gif':
-                    $ok = imagegif($dest, $name.'.'.$ext);
+                case '.gif':
+                    $ok = imagegif($dest, $name.$ext);
                     break;
-                case 'png':
-                    $ok = imagepng($dest, $name.'.'.$ext);
+                case '.png':
+                    $ok = imagepng($dest, $name.$ext);
                     break;
                 default:
                     CLISetup::log($done.' - unsupported file fromat: '.$ext, CLISetup::LOG_WARN);
@@ -183,11 +183,11 @@ if (!CLI)
 
             if ($ok)
             {
-                chmod($name.'.'.$ext, Util::FILE_ACCESS);
-                CLISetup::log($done.' - image '.$name.'.'.$ext.' written', CLISetup::LOG_OK);
+                chmod($name.$ext, Util::FILE_ACCESS);
+                CLISetup::log($done.' - image '.$name.$ext.' written', CLISetup::LOG_OK);
             }
             else
-                CLISetup::log($done.' - could not create image '.$name.'.'.$ext, CLISetup::LOG_ERROR);
+                CLISetup::log($done.' - could not create image '.$name.$ext, CLISetup::LOG_ERROR);
 
             return $ok;
         };
@@ -294,13 +294,13 @@ if (!CLI)
         $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));
 
         $allPaths = [];
-        foreach ($paths as $i => $p)
+        foreach ($paths as $i => list($inPath, $outInfo, $pattern, $isIcon, $tileSize))
         {
-            $path = sprintf($imgPath, $locStr).$p[0];
+            $path = sprintf($imgPath, $locStr).$inPath;
             if (!CLISetup::fileExists($path))
                 continue;
 
-            $files    = glob($path.$p[2], GLOB_BRACE);
+            $files    = glob($path.$pattern, GLOB_BRACE);
             $allPaths = array_merge($allPaths, $files);
 
             CLISetup::log('processing '.count($files).' files in '.$path.'...');
@@ -320,31 +320,31 @@ if (!CLI)
                 {
                     if (!empty($cuNames[$i][strtolower($img)]))
                         $img = $cuNames[$i][strtolower($img)];
-                    else if (!$p[4])
+                    else if (!$tileSize)
                     {
-                        $j += count($p[1]);
-                        CLISetup::log('skipping extraneous file '.$img.' (+'.count($p[1]).')');
+                        $j += count($outInfo);
+                        CLISetup::log('skipping extraneous file '.$img.' (+'.count($outInfo).')');
                         continue;
                     }
                 }
 
-                $nFiles = count($p[1]) * ($p[4] ? array_sum(array_map('count', $cuNames[$i])) : count($files));
+                $nFiles = count($outInfo) * ($tileSize ? array_sum(array_map('count', $cuNames[$i])) : count($files));
 
-                foreach ($p[1] as $info)
+                foreach ($outInfo as list($dest, $ext, $srcSize, $destSize, $borderOffset))
                 {
-                    if ($p[4])
+                    if ($tileSize)
                     {
                         foreach ($cuNames[$i] as $y => $row)
                         {
                             foreach ($row as $x => $name)
                             {
                                 $j++;
-                                $img  = $p[3] ? strtolower($name) : $name;
+                                $img  = $isIcon ? strtolower($name) : $name;
                                 $done = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
 
-                                if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$info[0].$img.'.'.$info[1]))
+                                if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$dest.$img.$ext))
                                 {
-                                    CLISetup::log($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
+                                    CLISetup::log($done.' - file '.$dest.$img.$ext.' was already processed');
                                     continue;
                                 }
 
@@ -354,27 +354,33 @@ if (!CLI)
                                 if (!$src)                              // error should be created by imagecreatefromblp
                                     continue;
 
+                                /*
+                                    ready for some major bullshitery? well, here it comes anyway!
+                                    the class-icon tile [idx: 4] isn't 64x64 but 63x64 .. the right side border is 1px short
+                                    so if we don't watch out, the icons start to shift over and show the borderi
+                                    also the icon border is displayced by 1px
+                                */
                                 $from = array(
-                                    'x' => $info[4] + $p[4] * $x,
-                                    'y' => $info[4] + $p[4] * $y,
-                                    'w' => $p[4] - $info[4] * 2,
-                                    'h' => $p[4] - $info[4] * 2
+                                    'x' => $borderOffset + 1 + ($tileSize - ($i == 4 ? 1 : 0)) * $x,
+                                    'y' => $borderOffset + 1 +  $tileSize                      * $y,
+                                    'w' => ($tileSize - ($i == 4 ? 1 : 0)) - $borderOffset * 2,
+                                    'h' =>  $tileSize                      - $borderOffset * 2
                                 );
                                 $to   = array(
                                     'x' => 0,
                                     'y' => 0,
-                                    'w' => $info[3],
-                                    'h' => $info[3]
+                                    'w' => $destSize,
+                                    'h' => $destSize
                                 );
 
-                                if (!$writeImage($destDir.$info[0].$img, $info[1], $src, $from, $to, $done))
+                                if (!$writeImage($destDir.$dest.$img, $ext, $src, $from, $to, $done))
                                    $success = false;
                             }
                         }
 
                         // custom handle for combined icon 'quest_startend'
                         /* not used due to alphaChannel issues
-                        if ($p[4] == 32)
+                        if ($tileSize == 32)
                         {
                             $dest = imagecreatetruecolor(19, 16);
                             imagesavealpha($dest, true);
@@ -384,11 +390,11 @@ if (!CLI)
                             imagecopyresampled($dest, $src, 0, 1, 32 + 5, 32 + 2,  8, 15, 18, 30);
                             imagecopyresampled($dest, $src, 5, 0, 64 + 1, 32 + 1, 10, 16, 18, 28);
 
-                            if (imagegif($dest, $destDir.$info[0].'quest_startend.gif'))
-                                CLISetup::log('                extra - image '.$destDir.$info[0].'quest_startend.gif written', CLISetup::LOG_OK);
+                            if (imagegif($dest, $destDir.$dest.'quest_startend.gif'))
+                                CLISetup::log('                extra - image '.$destDir.$dest.'quest_startend.gif written', CLISetup::LOG_OK);
                             else
                             {
-                                CLISetup::log('                extra - could not create image '.$destDir.$info[0].'quest_startend.gif', CLISetup::LOG_ERROR);
+                                CLISetup::log('                extra - could not create image '.$destDir.$dest.'quest_startend.gif', CLISetup::LOG_ERROR);
                                 $success = false;
                             }
 
@@ -399,15 +405,15 @@ if (!CLI)
                     else
                     {
                         // icon -> lowercase
-                        if ($p[3])
+                        if ($isIcon)
                             $img = strtolower($img);
 
                         $j++;
                         $done = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
 
-                        if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$info[0].$img.'.'.$info[1]))
+                        if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$dest.$img.$ext))
                         {
-                            CLISetup::log($done.' - file '.$info[0].$img.'.'.$info[1].' was already processed');
+                            CLISetup::log($done.' - file '.$dest.$img.$ext.' was already processed');
                             continue;
                         }
 
@@ -418,19 +424,19 @@ if (!CLI)
                             continue;
 
                         $from = array(
-                            'x' => $info[4],
-                            'y' => $info[4],
-                            'w' => ($info[2] ?: imagesx($src)) - $info[4] * 2,
-                            'h' => ($info[2] ?: imagesy($src)) - $info[4] * 2
+                            'x' => $borderOffset,
+                            'y' => $borderOffset,
+                            'w' => ($srcSize ?: imagesx($src)) - $borderOffset * 2,
+                            'h' => ($srcSize ?: imagesy($src)) - $borderOffset * 2
                         );
                         $to   = array(
                             'x' => 0,
                             'y' => 0,
-                            'w' => $info[3] ?: imagesx($src),
-                            'h' => $info[3] ?: imagesy($src)
+                            'w' => $destSize ?: imagesx($src),
+                            'h' => $destSize ?: imagesy($src)
                         );
 
-                        if (!$writeImage($destDir.$info[0].$img, $info[1], $src, $from, $to, $done))
+                        if (!$writeImage($destDir.$dest.$img, $ext, $src, $from, $to, $done))
                             $success = false;
                     }
                 }
