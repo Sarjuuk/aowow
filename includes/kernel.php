@@ -115,9 +115,10 @@ foreach ($sets as $k => $v)
 }
 
 
-// handle occuring errors
+// handle non-fatal errors and notices
 error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
-set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
+set_error_handler(function($errNo, $errStr, $errFile, $errLine)
+{
     $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
     $uGroup  = U_GROUP_EMPLOYEE;
 
@@ -149,18 +150,41 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
     return true;
 }, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
 
+// handle exceptions
 set_exception_handler(function ($ex)
 {
-    Util::addNote(U_GROUP_EMPLOYEE, 'EXCEPTION - '.$ex->getMessage().' @ '.$ex->getFile(). ':'.$ex->getLine()."\n".$ex->getTraceAsString());
+    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$ex->getMessage().' @ '.$ex->getFile(). ':'.$ex->getLine()."\n".$ex->getTraceAsString());
 
     if (DB::isConnectable(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $ex->getMessage()
         );
 
-    (new GenericPage(null))->error();
+    if (!CLI)
+        (new GenericPage(null))->error();
+    else
+        echo 'Exception - '.$ex->getMessage()."\n   ".$ex->getFile(). '('.$ex->getLine().")\n".$ex->getTraceAsString()."\n";
 });
 
+// handle fatal errors
+register_shutdown_function(function()
+{
+    if (($e = error_get_last()) && $e['type'] & (E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR))
+    {
+        Util::addNote(U_GROUP_EMPLOYEE, 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']);
+
+        if (DB::isConnectable(DB_AOWOW))
+            DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $e['message']
+            );
+
+        if (CLI)
+            echo 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']."\n";
+
+        // cant generate a page for web view :(
+        die();
+    }
+});
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || (!empty($AoWoWconf['aowow']) && CFG_FORCE_SSL);
 if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts
