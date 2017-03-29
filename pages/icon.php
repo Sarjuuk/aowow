@@ -54,7 +54,10 @@ class IconPage extends GenericPage
         if (!$ubSpells->error)
         {
             $this->extendGlobalData($ubSpells->getJsGlobals());
-            $this->lvTabs[] = [SpellList::$brickFile, ['data' => array_values($ubSpells->getListviewData())]];
+            $this->lvTabs[] = [SpellList::$brickFile, array(
+                'data' => array_values($ubSpells->getListviewData()),
+                'id'   => 'used-by-spell'
+            )];
         }
 
         // used by: item
@@ -62,7 +65,10 @@ class IconPage extends GenericPage
         if (!$ubItems->error)
         {
             $this->extendGlobalData($ubItems->getJsGlobals());
-            $this->lvTabs[] = [ItemList::$brickFile, ['data' =>array_values( $ubItems->getListviewData())]];
+            $this->lvTabs[] = [ItemList::$brickFile, array(
+                'data' => array_values($ubItems->getListviewData()),
+                'id'   => 'used-by-item'
+            )];
         }
 
         // used by: achievement
@@ -70,7 +76,10 @@ class IconPage extends GenericPage
         if (!$ubAchievements->error)
         {
             $this->extendGlobalData($ubAchievements->getJsGlobals());
-            $this->lvTabs[] = [AchievementList::$brickFile, ['data' => array_values($ubAchievements->getListviewData())]];
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
+                'data' => array_values($ubAchievements->getListviewData()),
+                'id'   => 'used-by-achievement'
+            )];
         }
 
         // used by: currency
@@ -78,7 +87,10 @@ class IconPage extends GenericPage
         if (!$ubCurrencies->error)
         {
             $this->extendGlobalData($ubCurrencies->getJsGlobals());
-            $this->lvTabs[] = [CurrencyList::$brickFile, ['data' => array_values($ubCurrencies->getListviewData())]];
+            $this->lvTabs[] = [CurrencyList::$brickFile, array(
+                'data' => array_values($ubCurrencies->getListviewData()),
+                'id'   => 'used-by-currency'
+            )];
         }
 
         // used by: hunter pet
@@ -86,7 +98,10 @@ class IconPage extends GenericPage
         if (!$ubPets->error)
         {
             $this->extendGlobalData($ubPets->getJsGlobals());
-            $this->lvTabs[] = [PetList::$brickFile, ['data' => array_values($ubPets->getListviewData())]];
+            $this->lvTabs[] = [PetList::$brickFile, array(
+                'data' => array_values($ubPets->getListviewData()),
+                'id'   => 'used-by-pet'
+            )];
         }
     }
 

@@ -78,7 +78,7 @@ class IconList extends BaseType
                 'buildingcount'       => 0,                 // UNUSED
                 'petcount'            => (int)$this->getField('nPets'),
                 'threatcount'         => 0,                 // UNUSED
-                'classcount'          => 0                  // class icons are hardcoeded and do not referenced in dbc
+                'classcount'          => 0                  // class icons are hardcoded and not referenced in dbc
             );
         }
 

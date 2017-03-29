@@ -17,12 +17,11 @@ class IconsPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['filters.js'];
 
-    public function __construct($pageCall, $pageParam)
+    public function __construct($pageCall)
     {
         $this->filterObj = new IconListFilter();
-        $this->getCategoryFromUrl($pageParam);;
 
-        parent::__construct($pageCall, $pageParam);
+        parent::__construct($pageCall);
 
         $this->name   = Util::ucFirst(Lang::game('icons'));
     }

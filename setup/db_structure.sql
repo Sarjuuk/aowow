@@ -858,10 +858,12 @@ DROP TABLE IF EXISTS `aowow_icons`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_icons` (
-  `id` mediumint(9) NOT NULL,
-  `iconString` varchar(55) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `cuFlags` int(11) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(55) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  INDEX `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

@@ -5,7 +5,7 @@ CREATE TABLE `aowow_icons` (
     `name` VARCHAR(55) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`),
     INDEX `name` (`name`)
-) COLLATE='utf8_general_ci' ENGINE=MyISAM AUTO_INCREMENT=1;
+) COLLATE='utf8_general_ci' ENGINE=InnoDB AUTO_INCREMENT=1;
 
 ALTER TABLE `aowow_items`
     ADD COLUMN `iconId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `name_loc8`,

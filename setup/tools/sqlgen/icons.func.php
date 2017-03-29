@@ -9,7 +9,7 @@ if (!CLI)
 
 $customData = array(
 );
-$reqDBC = ['spellicon', 'itemdisplayinfo'];
+$reqDBC = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
 
 function icons()
 {
@@ -22,6 +22,8 @@ function icons()
             (SELECT LOWER(SUBSTRING_INDEX(iconPath, "\\\\", -1)) AS x FROM dbc_spellicon WHERE iconPath LIKE "%icons%")
             UNION
             (SELECT LOWER(inventoryIcon1) AS x FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> "")
+            UNION
+            (SELECT LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS x FROM dbc_creaturefamily WHERE iconString LIKE "%icons%")
         ) y
         GROUP BY
             x
