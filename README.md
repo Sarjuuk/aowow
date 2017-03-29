@@ -84,15 +84,15 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 ## Troubleshooting
 
-Q: The Page appears white, without any styles.
+Q: The Page appears white, without any styles.  
 A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined poperly. Either way this can be fixed via config `php aowow --siteconfig`
 
-Q: Some generated images appear distorted or have alpha-channel issues.
+Q: Some generated images appear distorted or have alpha-channel issues.  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
  BUT you can convert the affected blp file into a png file in the same directory, using the provided BLPConverter.
  AoWoW will priorize png files over blp files.
 
-Q: How can i get the modelviewer to work?
+Q: How can i get the modelviewer to work?  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
 
 
