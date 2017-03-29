@@ -291,7 +291,10 @@ class GenericPage
 
         // determine contribute tabs
         if (isset($this->subject))
-            $this->contribute = $this->subject::$contribute;
+        {
+            $x = get_class($this->subject);
+            $this->contribute = $x::$contribute;
+        }
 
         if (!empty($this->hasComContent))                   // get comments, screenshots, videos
         {
