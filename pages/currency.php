@@ -218,7 +218,7 @@ class CurrencyPage extends GenericPage
 
         $x = '$WowheadPower.registerCurrency('.$this->typeId.', '.User::$localeId.", {\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+        $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
         $x .= "});";
 

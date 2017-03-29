@@ -16,8 +16,8 @@ class AchievementList extends BaseType
 
     protected       $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
     protected       $queryOpts = array(
-                        'a' => [['si'], 'o' => 'orderInGroup ASC'],
-                        'si' => ['j' => ['?_icons si ON si.id = a.iconId', true], 's' => ', si.iconString'],
+                        'a' => [['ic'], 'o' => 'orderInGroup ASC'],
+                        'ic' => ['j' => ['?_icons ic ON ic.id = a.iconId', true], 's' => ', ic.name AS iconString'],
                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                     );
 
@@ -286,7 +286,7 @@ class AchievementListFilter extends Filter
          3 => [FILTER_CR_STRING,    'reward',         true                      ], // rewardtext
          7 => [FILTER_CR_BOOLEAN,   'chainId',                                  ], // partseries
          9 => [FILTER_CR_NUMERIC,   'id',             null,                 true], // id
-        10 => [FILTER_CR_STRING,    'si.iconString',                            ], // icon
+        10 => [FILTER_CR_STRING,    'ic.name',                                  ], // icon
         18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // flags
         14 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_COMMENT        ], // hascomments
         15 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots

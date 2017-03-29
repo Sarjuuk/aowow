@@ -25,6 +25,7 @@ define('TYPE_RACE',                         14);
 define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
 define('TYPE_SOUND',                        19);
+define('TYPE_ICON',                         29);
 // internal types (not published to js)
 define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);

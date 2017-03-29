@@ -33,12 +33,14 @@ function pet(array $ids = [])
             0,                                              -- exotic
             0,                                              -- expansion
             name_loc0, name_loc2, name_loc3, name_lo6, name_loc8,
-            LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)),
+            ic.id,
             skillLine1,
             0, 0, 0, 0,                                     -- spell[1-4]
             0, 0, 0                                         -- armor, damage, health
         FROM
             dbc_creaturefamily f
+        LEFT JOIN
+            ?_icons ic ON ic.name = LOWER(SUBSTRING_INDEX(f.iconString, "\\\\", -1))
         WHERE
             petTalentType <> -1';
 

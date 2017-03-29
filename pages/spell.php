@@ -247,7 +247,7 @@ class SpellPage extends GenericPage
             if ($this->subject->getField('effect'.$i.'Id') == 74)
                 $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
 
-        if ($_ = DB::Aowow()->selectCell('SELECT si.iconString FROM ?_glyphproperties gp JOIN ?_icons si ON gp.iconId = si.id WHERE gp.spellId = ?d { OR gp.id = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
+        if ($_ = DB::Aowow()->selectCell('SELECT ic.name FROM ?_glyphproperties gp JOIN ?_icons ic ON gp.iconId = ic.id WHERE gp.spellId = ?d { OR gp.id = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
             if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
                 $infobox .= '[img src='.STATIC_URL.'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]';
 
@@ -1138,8 +1138,8 @@ class SpellPage extends GenericPage
         $pt = [];
         if ($n = $this->subject->getField('name', true))
             $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
-        if ($i = $this->subject->getField('iconString'))
-            $pt[] = "\ticon: '".urlencode($i)."'";
+        if ($i = $this->subject->getField('iconString', true, true))
+            $pt[] = "\ticon: '".rawurlencode($i)."'";
         if ($tt = $this->subject->renderTooltip())
         {
             $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($tt[0])."'";
@@ -1186,14 +1186,14 @@ class SpellPage extends GenericPage
             return false;
 
         $item = DB::Aowow()->selectRow('
-            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.iconString, quality,
+            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.name AS iconString, quality,
             IF ( (spellId1 > 0 AND spellCharges1 < 0) OR
                  (spellId2 > 0 AND spellCharges2 < 0) OR
                  (spellId3 > 0 AND spellCharges3 < 0) OR
                  (spellId4 > 0 AND spellCharges4 < 0) OR
                  (spellId5 > 0 AND spellCharges5 < 0), 1, 0) AS consumed
             FROM    ?_items i
-            LEFT JOIN ?_icons ic ON ic.id = i.displayId
+            LEFT JOIN ?_icons ic ON ic.id = i.iconId
             WHERE   i.id = ?d',
             $_iId
         );
@@ -1238,9 +1238,9 @@ class SpellPage extends GenericPage
             SELECT  reagent1,      reagent2,      reagent3,      reagent4,      reagent5,      reagent6,      reagent7,      reagent8,
                     reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8,
                     name_loc0,     name_loc2,     name_loc3,     name_loc6,     name_loc8,
-                    s.id AS ARRAY_KEY, iconString
+                    s.id AS ARRAY_KEY, ic.name AS iconString
             FROM    ?_spell s
-            JOIN    ?_icons si ON iconId = si.id
+            JOIN    ?_icons ic ON s.iconId = ic.id
             WHERE   (effect1CreateItemId = ?d AND effect1Id = 24)',// OR
                     // (effect2CreateItemId = ?d AND effect2Id = 24) OR
                     // (effect3CreateItemId = ?d AND effect3Id = 24)',

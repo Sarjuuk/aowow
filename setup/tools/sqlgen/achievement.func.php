@@ -16,14 +16,47 @@ if (!CLI)
 $customData = array(
     1956 => ['itemExtra' => 44738]
 );
-$reqDBC = ['achievement_category', 'achievement'];
+$reqDBC = ['achievement_category', 'achievement', 'spellicon'];
 
 function achievement(array $ids = [])
 {
     if ($ids)
         DB::Aowow()->query('DELETE FROM ?_achievement WHERE id IN (?a)', $ids);
     else
-        DB::Aowow()->query('INSERT IGNORE INTO ?_achievement SELECT a.id, 2 - a.faction, a.map, 0, 0, a.category, ac.parentCategory, a.points, a.orderInGroup, a.iconId, a.flags, a.reqCriteriaCount, a.refAchievement, 0, 0, a.name_loc0, a.name_loc2, a.name_loc3, a.name_loc6, a.name_loc8, a.description_loc0, a.description_loc2, a.description_loc3, a.description_loc6, a.description_loc8, a.reward_loc0, a.reward_loc2, a.reward_loc3, a.reward_loc6, a.reward_loc8 FROM dbc_achievement a LEFT JOIN dbc_achievement_category ac ON ac.id = a.category');
+    {
+        DB::Aowow()->query('
+            REPLACE INTO
+                ?_achievement
+            SELECT
+                a.id,
+                2 - a.faction,
+                a.map,
+                0,
+                0,
+                a.category,
+                ac.parentCategory,
+                a.points,
+                a.orderInGroup,
+                IFNULL(i.id, 0),
+                a.iconId,
+                a.flags,
+                a.reqCriteriaCount,
+                a.refAchievement,
+                0,
+                0,
+                a.name_loc0,        a.name_loc2,        a.name_loc3,        a.name_loc6,        a.name_loc8,
+                a.description_loc0, a.description_loc2, a.description_loc3, a.description_loc6, a.description_loc8,
+                a.reward_loc0,      a.reward_loc2,      a.reward_loc3,      a.reward_loc6,      a.reward_loc8
+            FROM
+                dbc_achievement a
+            LEFT JOIN
+                dbc_achievement_category ac ON ac.id = a.category
+            LEFT JOIN
+                dbc_spellicon si ON si.id = a.iconId
+            LEFT JOIN
+                ?_icons i ON LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) = i.name
+        ');
+    }
 
     // serverside achievements
     $serverAchievements = DB::World()->select('SELECT ID, IF(requiredFaction = -1, 3, IF(requiredFaction = 0, 2, 1)) AS "faction", mapID, points, flags, count, refAchievement FROM achievement_dbc{ WHERE id IN (?a)}',

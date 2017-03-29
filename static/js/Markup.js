@@ -27,6 +27,11 @@ MarkupSourceMap[MARKUP_SOURCE_LIVE] = 'live';
 MarkupSourceMap[MARKUP_SOURCE_PTR]  = 'ptr';
 MarkupSourceMap[MARKUP_SOURCE_BETA] = 'beta';
 
+var MarkupDomainRegexMap = {
+    betaPtrLang: /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/,
+    lang: /^(www|fr|de|es|ru)$/                             // Aowowo - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
+};
+
 var Markup = {
     MODE_COMMENT:    MARKUP_MODE_COMMENT,
     MODE_REPLY:         MARKUP_MODE_REPLY,
@@ -193,8 +198,8 @@ var Markup = {
                 unnamed:  { req: true,  valid: /^[0-9]+$/ },
                 diff:     { req: false, valid: /^[0-9]+$/ },
                 icon:     { req: false, valid: /^false$/ },
-                domain:   { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:     { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
                 tempname: { req: false }
 
             },
@@ -347,8 +352,8 @@ var Markup = {
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
                 icon:    { req: false, valid: /^false$/i },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -444,8 +449,8 @@ var Markup = {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
                 amount:  { req: false, valid: /^[0-9\:]+$/ },
                 icon:    { req: false, valid: /^false$/i },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
@@ -605,8 +610,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -645,8 +650,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -685,8 +690,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^-?[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
@@ -727,8 +732,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -921,7 +926,8 @@ var Markup = {
                 preset : { req: false, valid: /\S+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
-            presets: {
+            presets:
+            {
                 boss:   g_staticUrl + '/images/icons/boss.gif',
                 heroic: g_staticUrl + '/images/icons/heroic.gif'
             },
@@ -980,6 +986,80 @@ var Markup = {
                 }
             }
         },
+        icondb:
+        {
+            empty: true,
+            allowInReplies: true,
+            attr:
+            {
+                unnamed:  { req: true,  valid: /^[0-9]+$/ },
+                block:    { req: false, valid: /^(true|false)$/ },
+                size:     { req: false, valid: /^(tiny|small|medium|large)$/ },
+                name:     { req: false, valid: /^true$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
+                diff:     { req: false, valid: /^[0-9]+$/ },
+                tempname: { req: false }
+            },
+            validate: function(attr)
+            {
+                if ((attr.domain || attr.site) && Markup.dbpage)
+                    return false;
+                return true
+            },
+            toHtml: function(attr) {
+                var size = attr.size ? attr.size : 'small';
+                var hasName = attr.name == 'true';
+                var id = attr.unnamed;
+                var domain = Markup._getDatabaseDomainInfo(attr);
+                var url = domain[0];
+                var href = url + '?icon=' + id;
+                var rel = [];
+                var tempname = null;
+
+                if (attr.diff);
+                    rel.push('diff=' + attr.diff);
+                if (attr.tempname)
+                    tempname = attr.tempname;
+
+                if (g_icons[id] && g_icons[id].name)
+                {
+                    // href += '/' + $WH.urlize(g_icons[id].name);         AoWoW  - not used
+                    var icon = g_icons[id];
+                    if (hasName)
+                    {
+                        if (size == 'tiny')
+                            return '<a href="' + href + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + icon.icon.toLowerCase() + '.gif" align="absmiddle"' : '') + Markup._addGlobalAttributes(attr) + '> ' + Markup._safeHtml(icon.name) + '</a>'
+                        else
+                        {
+                            var a = $WH.ce('a', { href: href });
+                            var div = $WH.ce('div', null, a);
+                            $WH.ae(a, Icon.create(icon.name, Icon.sizeIds[size], null, false, null, null, null, null, true));
+                            a.innerHTML += Markup._safeHtml(icon.name);
+
+                            return div.innerHTML;
+                        }
+                    }
+                    else
+                    {
+                        var div = $WH.ce('div');
+                        $WH.ae(div, Icon.create(icon.name, Icon.sizeIds[size], null, href, null, null, null, null, attr.block != 'true'));
+
+                        return div.innerHTML;
+                    }
+                }
+
+                return '<a href="' + href + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[29][0] + ' #' + id + ')')) + '</a>';
+            },
+            toText: function(attr)
+            {
+                var id = attr.unnamed;
+
+                if(g_icons[id] && g_icons[id].name)
+                    return Markup._safeHtml(g_icons[id].name);
+                return LANG.types[29][0] + ' #' + id;
+            }
+        },
         iconlist:
         {
             empty: false,
@@ -988,7 +1068,7 @@ var Markup = {
             rtrim: true,
             attr:
             {
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain: { req: false, valid: MarkupDomainRegexMap.lang }
             },
             taglessSkip: true,
             allowedClass: MARKUP_CLASS_STAFF,
@@ -1187,8 +1267,8 @@ var Markup = {
             {
                 unnamed:  { req: true,  valid: /^[0-9]+$/ },
                 icon:     { req: false, valid: /^false$/i },
-                domain:   { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:     { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
                 tempname: { req: false }
             },
             validate: function(attr)
@@ -1234,8 +1314,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^-?[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1656,8 +1736,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1697,8 +1777,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1820,8 +1900,8 @@ var Markup = {
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
                 icon:    { req: false, valid: /^false$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1881,8 +1961,8 @@ var Markup = {
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
                 icon:    { req: false, valid: /^false$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2045,8 +2125,8 @@ var Markup = {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
                 gender:  { req: false, valid: /^(0|1)$/ },
                 icon:    { req: false, valid: /^false$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2263,8 +2343,8 @@ var Markup = {
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
                 icon:    { req: false, valid: /^false$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2335,7 +2415,7 @@ var Markup = {
                 type:    { req: false, valid: /\S+/ },
                 src2:    { req: false, valid: /\S+/ },
                 type2:   { req: false, valid: /\S+/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function (attr)
             {
@@ -2498,8 +2578,8 @@ var Markup = {
                 unnamed:  { req: true, valid: /^[0-9]+$/ },
                 diff:     { req: false, valid: /^[0-9]+$/ },
                 icon:     { req: false, valid: /^false$/ },
-                domain:   { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:     { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
                 buff:     { req: false, valid: /^true$/ },
                 tempname: { req: false }
             },
@@ -2563,8 +2643,8 @@ var Markup = {
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
                 icon:    { req: false, valid: /^false$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -3368,8 +3448,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -3408,8 +3488,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true,  valid: /^[0-9]+$/ },
-                domain:  { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site:    { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {

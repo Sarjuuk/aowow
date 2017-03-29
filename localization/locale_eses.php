@@ -202,6 +202,8 @@ $lang = array(
         'faction'       => "facción",
         'factions'      => "Facciones",
         'cooldown'      => "%s de reutilización",
+        'icon'          => "icono",
+        'icons'         => "Iconos",
         'item'          => "objeto",
         'items'         => "Objetos",
         'itemset'       => "conjunto de objetos",
@@ -682,6 +684,9 @@ $lang = array(
             ),
            -2 => "Sin categoría"
         )
+    ),
+    'icon'  => array(
+        'notFound'      => "Este icono no existe."
     ),
     'title' => array(
         'notFound'      => "Este título no existe.",

@@ -202,6 +202,8 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s de recharge",
+        'icon'          => "icône",
+        'icons'         => "Icônes",
         'item'          => "objet",
         'items'         => "Objets",
         'itemset'       => "ensemble d'objets",
@@ -375,7 +377,7 @@ $lang = array(
         'newPassDiff'   => "Votre nouveau mot de passe doit être différent de l'ancien." // message_newpassdifferent
     ),
     'user' => array(
-        'notFound'      => "Utilisateur \"%s\" non trouvé !",
+        'notFound'      => "Utilisateur \"%s\" non trouvé!",
         'removed'       => "(Supprimé)",
         'joinDate'      => "Inscription",
         'lastLogin'     => "Dernière visite",
@@ -680,6 +682,9 @@ $lang = array(
                 -368 => "Invasion du fléau",            -241 => "Tournoi"),
            -2 => "Non classés"
         )
+    ),
+    'icon'  => array(
+        'notFound'      => "Cette icône n'existe pas."
     ),
     'title' => array(
         'notFound'      => "Ce titre n'existe pas.",

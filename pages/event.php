@@ -336,7 +336,7 @@ class EventPage extends GenericPage
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
 
         if ($this->subject->getField('iconString') != 'trade_engineering')
-            $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+            $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
 
         $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
         $x .= "});";

@@ -812,6 +812,20 @@ var mn_sounds = [
     [50,"Zone Ambience","?sounds&filter=ty=50"],
     [28,"Zone Music","?sounds&filter=ty=28"]
 ];
+mn_icons = [
+    [3, "Достижения", "?icons&filter=cr=3;crs=1;crv=0"],
+    // [4, "Боевые питомцы", "?icons&filter=cr=4;crs=1;crv=0"],
+    // [5, "Способности Боевого Питомца", "?icons&filter=cr=5;crs=1;crv=0"],
+    [11, "Классы", "?icons&filter=cr=11;crs=1;crv=0"],
+    [6, "Валюта", "?icons&filter=cr=6;crs=1;crv=0"],
+    // [7, "Способности Гарнизона", "?icons&filter=cr=7;crs=1;crv=0"],
+    // [8, "Здания гарнизона", "?icons&filter=cr=8;crs=1;crv=0"],
+    [1, "Предметы", "?icons&filter=cr=1;crs=1;crv=0"],
+    [9, "Питомцы охотников", "?icons&filter=cr=9;crs=1;crv=0"],
+    [2, "Заклинания", "?icons&filter=cr=2;crs=1;crv=0"],
+    // [10, "Угрозы", "?icons&filter=cr=10;crs=1;crv=0"],
+    [13, "Неиспользуемые", "?icons&filter=cr=13;crs=3;crv=0"]
+];
 var mn_talentCalc = [
     [6,"Рыцарь смерти","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Друид","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -862,25 +876,30 @@ var mn_petCalc = [
     [42,"Червь","?petcalc#mm",,{tinyIcon:"Ability_Hunter_Pet_Worm"}]
 ];
 var mn_database = [
-    [9,"Достижения","?achievements",mn_achievements],
-    [12,"Классы","?classes",mn_classes],
-    [15,"Валюта","?currencies", mn_currencies],
-    [7,"Фракции","?factions",mn_factions],
-    [8,"Питомцы охотников","?pets",mn_pets],
+    [, "Предметы"],
     [2,"Комплекты","?itemsets",mn_itemSets],
     [0,"Предметы","?items",mn_items],
-    [4,"НИП","?npcs",mn_npcs],
-    [5,"Объекты","?objects",mn_objects],
+    [101,"Улучшения","?enchantments",mn_enchantments],
+    [, "Персонаж"],
+    [9,"Достижения","?achievements",mn_achievements],
+    [12,"Классы","?classes",mn_classes],
+    [8,"Питомцы охотников","?pets",mn_pets],
     [14,"Профессии и навыки","?skills",mn_skills],
-    [3,"Задания","?quests",mn_quests],
     [13,"Расы","?races",mn_races],
     [1,"Заклинания","?spells",mn_spells],
     [10,"Звания","?titles",mn_titles],
+    [100,"Эмоции","?emotes",null],
+    [, "Игровой мир"],
+    [15,"Валюта","?currencies", mn_currencies],
+    [7,"Фракции","?factions",mn_factions],
+    [4,"НИП","?npcs",mn_npcs],
+    [5,"Объекты","?objects",mn_objects],
+    [3,"Задания","?quests",mn_quests],
     [11,"Игровые события","?events",mn_holidays],
     [6,"Местности","?zones",mn_zones],
-    [19,"Звуки","?sounds",mn_sounds],
-    [100,"Эмоции","?emotes",null],
-    [101,"Улучшения","?enchantments",mn_enchantments]
+    [, "Другое"],
+    [31, "Иконки", ":wowhead.com/icons", mn_icons],
+    [19,"Звуки","?sounds",mn_sounds]
 ];
 var mn_tools = [
     [0,"Расчёт талантов","?talent",mn_talentCalc],
@@ -2418,6 +2437,7 @@ var LANG = {
     dps:                    "УВС",
     earned:                 "Заработано",
     enchant:                "Чары",
+    entitycount:            "$2: $1",
     exp:                    "Опыт",
     faction:                "Фракция",
     gains:                  "Бонус",
@@ -2511,6 +2531,7 @@ var LANG = {
     tp:                     "Очков",
     trending:               "Актуальное",
     type:                   "Тип",
+    unused:                 "Неиспользуемые",
     up:                     "Выше",
     cooldown:               "Восстановление",
     duration:               "Длительность",
@@ -2644,11 +2665,14 @@ var LANG = {
     lvnodata_vi2: "<a>Будьте первым</a>, кто предложит видео к этой странице!",
     lvnodata_vi3: "<a>Войдите</a>, чтобы предложить видео, или <a>зарегистрируйтесь</a>, если у вас еще нет учетной записи.",
 
+    lvnote_sort: "Сортировать: ",
+
     lvnote_tryfiltering: "Попробуйте <a>отфильтровать</a> результаты",
     lvnote_trynarrowing: "Попытайтесь сузить поиск",
     lvnote_upgradesfor:  'Предметы лучше, чем <a href="?item=$1" class="q$2"><b>$3</b></a>.',
     lvnote_witherrors:   "Некоторые фильтры в вашем поиске некорректны и были проигнорированы.",
 
+    lvnote_entitiesfound:     "Найдено $2: $1 (показано: $3)",
     lvnote_itemsfound:        "Найдено предметов: $1 (показано: $2)",
     lvnote_itemsetsfound:     "Найдено комплектов: $1 (показано: $2)",
     lvnote_npcsfound:         "Найдено НИП: $1 (показано: $2)",
@@ -3267,6 +3291,7 @@ var LANG = {
          16: ["Статистика",     "характеристика",  "Характеристики",  "характеристики"],
          17: ["Валюта",         "валюта",          "Валюта",          "валюта"],
          19: ["Звук",           "звук",            "Звуки",           "звуки"],
+         29: ["Иконка",         "иконка",          "Иконки",          "иконки"],
         501: ["Эмоция",         "эмоция",          "Эмоции",          "эмоции"],
         502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"]
     },
@@ -3942,6 +3967,23 @@ var LANG = {
         teamname5v5:          "Название команды 5х5",
         teamrtng5v5:          "Рейтинг Арены среди команд 5х5",
         teamcontrib5v5:       "Очки команды арены 5х5"
+    },
+
+    fiicons: {                                              // derived from from LANG.filters_icons
+        sepgeneral:         "Общее",
+        sepuses:            "Используется",
+        used:               "Использовано (раз)",
+        items:              "Используется Предметы",
+        spells:             "Используется Заклинания",
+        achievements:       "Используется Достижения",
+        battlepets:         "Используется Боевые питомцы",
+        battlepetabilities: "Используется Способности Боевого Питомца",
+        currencies:         "Используется Валюта",
+        missionabilities:   "Используется Способности соратников/кораблей",
+        garrisonbuildings:  "Используется Здания гарнизона",
+        hunterpets:         "Используется Питомцы охотников",
+        threats:            "Используется Угрозы",
+        classes:            "Используется Классы"
     },
 
     // custom

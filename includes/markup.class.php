@@ -21,14 +21,15 @@ class Markup
 
     public function parseGlobalsFromText(&$jsg = [])
     {
-        if (preg_match_all('/(?<!\\\\)\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|statistic|title|event|class|race|skill|currency|emote|enchantment|money|sound)=(-?\d+)[^\]]*\]/i', $this->text, $matches, PREG_SET_ORDER))
+        if (preg_match_all('/(?<!\\\\)\[(npc|object|item|itemset|quest|spell|zone|faction|pet|achievement|statistic|title|event|class|race|skill|currency|emote|enchantment|money|sound|icondb)=(-?\d+)[^\]]*\]/i', $this->text, $matches, PREG_SET_ORDER))
         {
             foreach ($matches as $match)
             {
                 if ($match[1] == 'statistic')
                     $match[1] = 'achievement';
-
-                if ($match[1] == 'money')
+                else if ($match[1] == 'icondb')
+                    $match[1] = 'icon';
+                else if ($match[1] == 'money')
                 {
                     if (stripos($match[0], 'items'))
                     {
@@ -50,7 +51,6 @@ class Markup
                         }
                     }
                 }
-
                 else if ($type = array_search($match[1], Util::$typeStrings))
                     $this->jsGlobals[$type][$match[2]] = $match[2];
             }

@@ -197,6 +197,8 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s cooldown",
+        'icon'          => "icon",
+        'icons'         => "icons",
         'item'          => "item",
         'items'         => "Items",
         'itemset'       => "item Set",
@@ -676,6 +678,9 @@ $lang = array(
             ),
            -2 => "Uncategorized"
         )
+    ),
+    'icon'  => array(
+        'notFound'      => "This icon doesn't exist."
     ),
     'title' => array(
         'notFound'      => "This title doesn't exist.",

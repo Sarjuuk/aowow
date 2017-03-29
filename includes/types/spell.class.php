@@ -53,9 +53,9 @@ class SpellList extends BaseType
 
     protected       $queryBase   = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_spell s';
     protected       $queryOpts   = array(
-                        's'   => [['src', 'sr', 'si', 'si', 'sia']],             //  6: TYPE_SPELL
-                        'si'  => ['j' => ['?_icons si  ON si.id  = s.iconId',    true], 's' => ', IFNULL (si.iconString,  "inv_misc_questionmark") AS iconString'],
-                        'sia' => ['j' => ['?_icons sia ON sia.id = s.iconIdAlt', true], 's' => ', sia.iconString AS iconStringAlt'],
+                        's'   => [['src', 'sr', 'ic', 'ica']],  //  6: TYPE_SPELL
+                        'ic'  => ['j' => ['?_icons ic  ON ic.id  = s.iconId',    true], 's' => ', ic.name AS iconString'],
+                        'ica' => ['j' => ['?_icons ica ON ica.id = s.iconIdAlt', true], 's' => ', ica.name AS iconStringAlt'],
                         'sr'  => ['j' => ['?_spellrange sr ON sr.id = s.rangeId'], 's' => ', sr.rangeMinHostile, sr.rangeMinFriend, sr.rangeMaxHostile, sr.rangeMaxFriend, sr.name_loc0 AS rangeText_loc0, sr.name_loc2 AS rangeText_loc2, sr.name_loc3 AS rangeText_loc3, sr.name_loc6 AS rangeText_loc6, sr.name_loc8 AS rangeText_loc8'],
                         'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                     );
@@ -125,6 +125,9 @@ class SpellList extends BaseType
 
             unset($_curTpl['skillLine1']);
             unset($_curTpl['skillLine2OrMask']);
+
+            if (!$_curTpl['iconString'])
+                $_curTpl['iconString'] = 'inv_misc_questionmark';
         }
 
         if ($foo)
@@ -2163,7 +2166,7 @@ class SpellListFilter extends Filter
         12 => [FILTER_CR_FLAG,    'cuFlags',          SPELL_CU_LAST_RANK      ],    // lastrank
         13 => [FILTER_CR_NUMERIC, 'rankNo',                                   ],    // rankno
         14 => [FILTER_CR_NUMERIC, 'id',               null,               true],    // id
-        15 => [FILTER_CR_STRING,  'si.iconString',                            ],    // icon
+        15 => [FILTER_CR_STRING,  'ic.name',                                  ],    // icon
         19 => [FILTER_CR_FLAG,    'attributes0',      0x80000                 ],    // scaling
         25 => [FILTER_CR_BOOLEAN, 'skillLevelYellow'                          ],    // rewardsskillups
         11 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_COMMENT      ],    // hascomments

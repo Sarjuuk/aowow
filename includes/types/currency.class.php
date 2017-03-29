@@ -13,8 +13,18 @@ class CurrencyList extends BaseType
     protected       $queryBase = 'SELECT *, c.id AS ARRAY_KEY FROM ?_currencies c';
     protected       $queryOpts = array(
                         'c' => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.id = c.iconId', true], 's' => ', ic.iconString']
+                        'ic' => ['j' => ['?_icons ic ON ic.id = c.iconId', true], 's' => ', ic.name AS iconString']
                     );
+
+    public function __construct($conditions = [])
+    {
+        parent::__construct($conditions);
+
+        foreach ($this->iterate() as &$_curTpl)
+            if (!$_curTpl['iconString'])
+                $_curTpl['iconString'] = 'inv_misc_questionmark';
+    }
+
 
     public function getListviewData()
     {

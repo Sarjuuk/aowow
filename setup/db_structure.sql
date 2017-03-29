@@ -177,7 +177,8 @@ CREATE TABLE `aowow_achievement` (
   `parentCat` smallint(6) NOT NULL,
   `points` tinyint(3) unsigned NOT NULL,
   `orderInGroup` tinyint(3) unsigned NOT NULL,
-  `iconId` mediumint(8) unsigned NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT '0',
   `flags` smallint(5) unsigned NOT NULL,
   `reqCriteriaCount` tinyint(3) unsigned NOT NULL,
   `refAchievement` smallint(5) unsigned NOT NULL,
@@ -198,7 +199,8 @@ CREATE TABLE `aowow_achievement` (
   `reward_loc3` varchar(92) NOT NULL,
   `reward_loc6` varchar(83) NOT NULL,
   `reward_loc8` varchar(95) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -540,7 +542,7 @@ CREATE TABLE `aowow_currencies` (
   `id` int(16) NOT NULL,
   `category` mediumint(8) NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
-  `iconId` mediumint(9) NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `itemId` int(16) NOT NULL,
   `cap` mediumint(8) unsigned NOT NULL,
   `name_loc0` varchar(64) NOT NULL,
@@ -553,7 +555,8 @@ CREATE TABLE `aowow_currencies` (
   `description_loc3` varchar(256) NOT NULL,
   `description_loc6` varchar(256) NOT NULL,
   `description_loc8` varchar(256) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -716,7 +719,8 @@ CREATE TABLE `aowow_glyphproperties` (
   `id` smallint(5) unsigned NOT NULL,
   `spellId` mediumint(11) unsigned NOT NULL,
   `typeFlags` tinyint(3) unsigned NOT NULL,
-  `iconId` smallint(5) unsigned NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1146,6 +1150,7 @@ CREATE TABLE `aowow_items` (
   `name_loc3` varchar(127) DEFAULT NULL,
   `name_loc6` varchar(127) DEFAULT NULL,
   `name_loc8` varchar(127) DEFAULT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spellVisualId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `quality` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1293,7 +1298,8 @@ CREATE TABLE `aowow_items` (
   KEY `idx_name` (`name_loc0`),
   KEY `items_index` (`class`),
   KEY `idx_model` (`displayId`),
-  KEY `idx_faction` (`requiredFaction`)
+  KEY `idx_faction` (`requiredFaction`).
+  KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1488,7 +1494,7 @@ CREATE TABLE `aowow_pet` (
   `name_loc3` varchar(64) NOT NULL,
   `name_loc6` varchar(64) NOT NULL,
   `name_loc8` varchar(64) NOT NULL,
-  `iconString` varchar(128) NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
   `skillLineId` mediumint(9) NOT NULL,
   `spellId1` mediumint(9) NOT NULL,
   `spellId2` mediumint(9) NOT NULL,
@@ -1497,7 +1503,8 @@ CREATE TABLE `aowow_pet` (
   `armor` mediumint(9) NOT NULL,
   `damage` mediumint(9) NOT NULL,
   `health` mediumint(9) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1891,7 +1898,8 @@ CREATE TABLE `aowow_skillline` (
   `description_loc3` text NOT NULL,
   `description_loc6` text NOT NULL,
   `description_loc8` text NOT NULL,
-  `iconId` smallint(5) unsigned NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT '0',
   `professionMask` smallint(5) unsigned NOT NULL,
   `recipeSubClass` tinyint(3) unsigned NOT NULL,
   `specializations` varchar(30) NOT NULL COMMENT 'space-separated spellIds',
@@ -2126,8 +2134,9 @@ CREATE TABLE `aowow_spell` (
   `effect1BonusMultiplier` float NOT NULL,
   `effect2BonusMultiplier` float NOT NULL,
   `effect3BonusMultiplier` float NOT NULL,
-  `iconId` smallint(5) unsigned NOT NULL,
-  `iconIdAlt` mediumint(9) NOT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `iconIdAlt` smallint(5) unsigned NOT NULL DEFAULT '0',
   `rankNo` tinyint(3) unsigned NOT NULL,
   `spellVisualId` smallint(5) unsigned NOT NULL,
   `name_loc0` varchar(85) NOT NULL,
@@ -2173,7 +2182,8 @@ CREATE TABLE `aowow_spell` (
   KEY `category` (`typeCat`),
   KEY `spell` (`id`) USING BTREE,
   KEY `effects` (`effect1Id`,`effect2Id`,`effect3Id`),
-  KEY `items` (`effect1CreateItemId`,`effect2CreateItemId`,`effect3CreateItemId`)
+  KEY `items` (`effect1CreateItemId`,`effect2CreateItemId`,`effect3CreateItemId`),
+  KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2656,7 +2666,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1490789226,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1490815302,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

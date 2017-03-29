@@ -32,7 +32,8 @@ $reqDBC = [
     'skillraceclassinfo',
     'talent',
     'talenttab',
-    'glyphproperties'
+    'glyphproperties',
+    'spellicon'
 ];
 
 function spell()
@@ -85,8 +86,8 @@ function spell()
             EffectSpellClassMaskA1,                 EffectSpellClassMaskA2,                 EffectSpellClassMaskA3,
             EffectSpellClassMaskB1,                 EffectSpellClassMaskB2,                 EffectSpellClassMaskB3,
             EffectSpellClassMaskC1,                 EffectSpellClassMaskC2,                 EffectSpellClassMaskC3,
-            0 AS spellVisualId1,                    0 AS spellVisualId2,
-            0 AS iconId,                            0 AS iconIdActive,
+            0 AS iconId,                            0 AS iconIdAlt,
+            0 AS rankId,                            0 AS spellVisualId1,
             CONCAT("Serverside - ",Comment) AS name_loc0,CONCAT("Serverside - ",Comment) AS name_loc2,CONCAT("Serverside - ",Comment) AS name_loc3,CONCAT("Serverside - ",Comment) AS name_loc6,CONCAT("Serverside - ",Comment) AS name_loc8,
             "" AS rank_loc0,                        "" AS rank_loc2,                        "" AS rank_loc3,                        "" AS rank_loc6,                        "" AS rank_loc8,
             "" AS description_loc0,                 "" AS description_loc2,                 "" AS description_loc3,                 "" AS description_loc6,                 "" AS description_loc8,
@@ -175,9 +176,8 @@ function spell()
             effect1SpellClassMaskC,                 effect2SpellClassMaskC,                 effect3SpellClassMaskC,
             effect1DamageMultiplier,                effect2DamageMultiplier,                effect3DamageMultiplier,
             effect1BonusMultiplier,                 effect2BonusMultiplier,                 effect3BonusMultiplier,
-            iconId,                                 0 AS iconIdAlt,
-            0 AS rankId,
-            spellVisualId1,
+            0 AS iconId,                            iconId AS iconIdBak,                    0 AS iconIdAlt,
+            0 AS rankId,                            spellVisualId1,
             name_loc0,          name_loc2,          name_loc3,          name_loc6,          name_loc8,
             rank_loc0,          rank_loc2,          rank_loc3,          rank_loc6,          rank_loc8,
             description_loc0,   description_loc2,   description_loc3,   description_loc6,   description_loc8,
@@ -285,6 +285,8 @@ function spell()
         ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,        learnedAt = 1
         ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2         not used for now
     */
+
+    CLISetup::log(' - linking with skillineability');
 
     $results  = DB::Aowow()->select('SELECT spellId AS ARRAY_KEY, Id AS ARRAY_KEY2, skillLineId, reqRaceMask, reqClassMask, reqSkillLevel, acquireMethod, skillLevelGrey, skillLevelYellow FROM dbc_skilllineability sla');
     foreach ($results as $spellId => $sets)
@@ -443,6 +445,8 @@ function spell()
     /* talent related */
     /******************/
 
+    CLISetup::log(' - linking with talent');
+
     for ($i = 1; $i < 6; $i++)
     {
         // classMask
@@ -462,6 +466,8 @@ function spell()
     /*********/
     /* Other */
     /*********/
+
+    CLISetup::log(' - misc fixups & icons');
 
     // FU [FixUps]
     DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', 1 << 10, 760);      // Draenai Racials
@@ -494,7 +500,7 @@ function spell()
     $itemInfo   = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $itemSpells);
     foreach ($itemSpells as $sId => $itemId)
         if (isset($itemInfo[$itemId]))
-            DB::Aowow()->query('UPDATE ?_spell SET iconIdAlt = ?d, cuFlags = cuFlags | ?d WHERE id = ?d', -$itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
+            DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconIdAlt = ?d, s.cuFlags = s.cuFlags | ?d WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND s.id = ?d', -$itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
 
     // apply specializations [trainerTemplate => reqSpell]
     $specs = array(
@@ -516,10 +522,14 @@ function spell()
 
     DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = id WHERE id IN (?a)', [9788, 9787, 20222, 20219, 10660, 10656, 10658, 26797, 26798, 26801, 17039, 17040, 17041]);
 
+    // setting icons
+    DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
 
     /**************/
     /* Categories */
     /**************/
+
+    CLISetup::log(' - applying categories');
 
     // player talents (-2)
     DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -2 WHERE t.tabId NOT IN (409, 410, 411) AND (s.Id = t.rank1 OR s.Id = t.rank2 OR s.Id = t.rank3 OR s.Id = t.rank4 OR s.Id = t.rank5)');
@@ -635,6 +645,8 @@ function spell()
     /* Glyphs */
     /**********/
 
+    CLISetup::log(' - fixing glyph data');
+
     // glyphSpell => affectedSpell
     $glyphAffects = array(
         63959 => 50842,                                         // Pestilence
@@ -667,8 +679,10 @@ function spell()
     );
 
     $queryIcons = '
-        SELECT    s.id, s.name_loc0, s.skillLine1 as skill, s.iconId as icon, s.typeCat * s.typeCat AS prio
+        SELECT    s.id, s.name_loc0, s.skillLine1 as skill, ic.id as icon, s.typeCat * s.typeCat AS prio
         FROM      ?_spell s
+        LEFT JOIN dbc_spellicon si ON s.iconIdBak = si.id
+        LEFT JOIN ?_icons ic ON ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))
         WHERE     [WHERE] AND (s.cuFlags & ?d) = 0 AND s.typeCat IN (0, 7, -2)  -- not triggered; class spells first, talents second, unk last
         ORDER BY  prio DESC
     ';
@@ -704,10 +718,8 @@ function spell()
         // first: manuall replace
         if ($applyId == 57144)                              // has no skillLine.. :/
         {
-            $icons = [
-                'skill' => 253,
-                'icon'  => 163                              // ability_poisonsting
-            ];
+            DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic SET s.skillLine1 = ?d, s.iconIdAlt = ic.id WHERE s.id = ?d AND ic.name = ?', 253, 57144, 'ability_poisonsting');
+            continue;
         }
 
         // second: search by name and Family equality

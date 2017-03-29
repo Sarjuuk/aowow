@@ -4880,6 +4880,10 @@ function Listview(opt) {
         this.createNote = this.template.createNote;
     }
 
+    if (this.sortOptions == null && this.template.sortOptions != null) {
+        this.sortOptions = this.template.sortOptions;
+    }
+
     if (this.customFilter == null && this.template.customFilter != null) {
         this.customFilter = this.template.customFilter;
     }
@@ -5042,12 +5046,23 @@ function Listview(opt) {
         });
     }
 
-    for (var i = 0, len = this.columns.length; i < len; ++i) {
-        var col = this.columns[i];
-        if (visibleCols[col.id] != null || (!col.hidden && hiddenCols[col.id] == null)) {
-            this.visibility.push(i);
+    if ($.isArray(this.sortOptions)) {
+        for (var i = 0, len = this.sortOptions.length; i < len; ++i) {
+            var sortOpt = this.sortOptions[i];
+            if (visibleCols[sortOpt.id] != null || (!sortOpt.hidden && hiddenCols[sortOpt.id] == null)) {
+                this.visibility.push(i);
+            }
         }
     }
+    else {
+        for (var i = 0, len = this.columns.length; i < len; ++i) {
+            var col = this.columns[i];
+            if (visibleCols[col.id] != null || (!col.hidden && hiddenCols[col.id] == null)) {
+                this.visibility.push(i);
+            }
+        }
+    }
+
 
     // ************************
     // Sort
@@ -5160,6 +5175,7 @@ Listview.MODE_CHECKBOX = 1;
 Listview.MODE_DIV      = 2;
 Listview.MODE_TILED    = 3;
 Listview.MODE_CALENDAR = 4;
+Listview.MODE_FLEXGRID = 5;
 
 Listview.prototype = {
     initialize: function() {
@@ -5204,6 +5220,29 @@ Listview.prototype = {
                 this.mainContainer.className = 'listview-mode-div';
             }
         }
+        else if (this.mode == Listview.MODE_FLEXGRID) {
+            /* iconDB todo evaluate */
+            this.mainContainer = this.mainDiv = $WH.ce('div', { className: 'listview-mode-flexgrid' });
+            this.mainContainer.setAttribute('data-cell-min-width', this.template.cellMinWidth);
+            if (this.clickable)
+                this.mainContainer.className += ' clickable';
+
+            var layout = $('.layout');
+            var totalWidth = parseInt(layout.css('max-width')) - (parseInt(layout.css('padding-left')) || 0) - (parseInt(layout.css('padding-right')) || 0);
+            var slots = Math.floor(totalWidth / this.template.cellMinWidth);
+            var extraStyle = '.listview-mode-flexgrid[data-cell-min-width="' + this.template.cellMinWidth + '"] > div {min-width:' + this.template.cellMinWidth + "px;width:" + (100 / slots) + "%}";
+            while (slots--)
+            {
+                if (slots)
+                {
+                    extraStyle += "\n@media screen and (max-width: " + (((slots + 1) * this.template.cellMinWidth) - 1 + 40) + "px) {";
+                    extraStyle += '\n    .listview-mode-flexgrid[data-cell-min-width="' + this.template.cellMinWidth + '"] > div {width:' + (100 / slots) + "%}";
+                    extraStyle += "\n}"
+                }
+            }
+
+            $("<style/>").text(extraStyle).appendTo(document.head)
+        }
         else {
             this.mainContainer = this.table = $WH.ce('table');
             this.thead = $WH.ce('thead');
@@ -5229,6 +5268,9 @@ Listview.prototype = {
                 }
 
                 $WH.ae(this.mainContainer, colGroup);
+
+                if (this.sortOptions)
+                    setTimeout((function() { this.updateSortArrow() }).bind(this), 0);
             }
             else {
                 if (!this.noStyle) {
@@ -5339,6 +5381,51 @@ Listview.prototype = {
         $WH.ae(this.thead, tr);
     },
 
+    createSortOptions: function(parent) {
+        if (!$.isArray(this.sortOptions))
+            return;
+
+        var div = $WH.ce('div');
+        div.className = 'listview-sort-options';
+        div.innerHTML = LANG.lvnote_sort;
+        var sp = $WH.ce('span');
+        sp.className = 'listview-sort-options-choices';
+        var activeSort = null;
+        if ($.isArray(this.sort))
+            activeSort = this.sort[0];
+
+        var a;
+        var sorts = [];
+        for (var i = 0; i < this.sortOptions.length; i++)
+        {
+            if (this.sortOptions[i].hidden)
+                continue;
+
+            a = $WH.ce('a');
+            a.href = 'javascript:;';
+            a.innerHTML = this.sortOptions[i].name;
+            a.onclick = this.sortGallery.bind(this, a, i + 1);
+            if (activeSort === i + 1)
+                a.className = 'active';
+
+            sorts.push(a)
+        }
+
+        for (i = 0; i < sorts.length; i++)
+            $WH.ae(sp, sorts[i]);
+
+
+        $WH.ae(div, sp);
+        $WH.aef(parent, div);
+    },
+
+    sortGallery: function(el, colNo) {
+        var btn = $(el);
+        btn.siblings('a').removeClass('active');
+        btn.addClass('active');
+        this.sortBy(colNo);
+    },
+
     createBands: function() {
         var
             bandTop = $WH.ce('div'),
@@ -5369,6 +5456,8 @@ Listview.prototype = {
         else if (this.createNote) {
             this.createNote(noteTop, noteBot);
         }
+
+        this.createSortOptions(noteTop);
 
         if (this.debug) {
             $WH.ae(noteTop, $WH.ct(" ("));
@@ -5608,7 +5697,20 @@ Listview.prototype = {
     },
 
     refreshRows: function() {
-        var target = (this.mode == Listview.MODE_DIV ? this.mainContainer : this.tbody);
+        var target = null;
+        switch (this.mode) {
+            case Listview.MODE_DIV:
+                target = this.mainContainer;
+                break;
+            case Listview.MODE_FLEXGRID:
+                target = this.mainDiv;
+                break;
+            default:
+                target = this.tbody
+        }
+        if (!target)
+            return;
+
         $WH.ee(target);
 
         if (this.nRowsVisible == 0) {
@@ -5669,6 +5771,24 @@ Listview.prototype = {
         var nItemsToDisplay = endi - starti;
 
         if (this.mode == Listview.MODE_DIV) {
+            for (var j = 0; j < nItemsToDisplay; ++j) {
+                var
+                    i = starti + j,
+                    row = this.data[i];
+
+                if (!row) {
+                    break;
+                }
+
+                if (row.__hidden || row.__deleted) {
+                    ++nItemsToDisplay;
+                    continue;
+                }
+
+                $WH.ae(this.mainDiv, this.getDiv(i));
+            }
+        }
+        else if (this.mode == Listview.MODE_FLEXGRID) {
             for (var j = 0; j < nItemsToDisplay; ++j) {
                 var
                     i = starti + j,
@@ -6344,7 +6464,8 @@ Listview.prototype = {
     },
 
     sortBy: function(colNo) {
-        if (colNo <= 0 || colNo > this.columns.length) {
+        var sorts = this.sortOptions || this.columns;
+        if (colNo <= 0 || colNo > sorts.length) {
             return;
         }
 
@@ -6353,7 +6474,7 @@ Listview.prototype = {
         }
         else {
             var defaultSort = -1;
-            if (this.columns[colNo-1].type == 'text') {
+            if (sorts[colNo-1].type == 'text') {
                 defaultSort = 1;
             }
 
@@ -6373,6 +6494,7 @@ Listview.prototype = {
 
         Listview.sort = this.sort;
         Listview.columns = this.columns;
+        Listview.sortOptions = this.sortOptions;
 
         if (this.indexCreated) {
             this.data.sort(Listview.sortIndexedRows.bind(this));
@@ -6425,10 +6547,11 @@ Listview.prototype = {
                 var sort = [];
                 var matches= _.match(/(\+|\-)[0-9]+/g);
                 if (matches != null) {
+                    var sorts = this.sortOptions || this.columns;
                     for (var i = matches.length - 1; i >= 0; --i) {
                         var colNo = parseInt(matches[i]) | 0;
                         var _ = Math.abs(colNo);
-                        if (_ <= 0 || _ > this.columns.length) {
+                        if (_ <= 0 || _ > sorts.length) {
                             break;
                         }
                         this.addSort(sort, colNo);
@@ -6509,13 +6632,26 @@ Listview.prototype = {
     },
 
     updateSortArrow: function() {
-        if (!this.sort.length || !this.thead || this.mode == Listview.MODE_TILED || this.mode == Listview.MODE_CALENDAR) {
+        if (!this.sort.length || !this.thead || this.mode == Listview.MODE_CALENDAR /* || this.searchSort */) {
             return;
         }
 
         var i = $WH.in_array(this.visibility, Math.abs(this.sort[0]) - 1);
 
         if (i == -1) {
+            return;
+        }
+
+        if (this.mode == Listview.MODE_TILED) {
+            if (!this.sortOptions)
+                return;
+
+            var a = $('.listview-sort-options a', this.noteTop).get(i);
+            if (this.lsa && this.lsa != a)
+                this.lsa.className = '';
+
+            a.className = this.sort[0] < 0 ? 'active sortdesc' : 'active sortasc';
+            this.lsa = a;
             return;
         }
 
@@ -6874,7 +7010,7 @@ Listview.sortRows = function(a, b) {
 Listview.sortIndexedRows = function(a, b) {
     var
         sort = Listview.sort,
-        cols = Listview.columns,
+        cols = Listview.sortOptions || Listview.columns,
         res;
 
     for (var idx in sort) {
@@ -11379,6 +11515,156 @@ Listview.templates = {
                 }
             }
         ]
+    },
+
+    icongallery:
+    {
+        sort: [1],
+        mode: Listview.MODE_FLEXGRID,
+        clickable: false,
+        nItemsPerPage: 150,
+        cellMinWidth: 85,
+        poundable: 1,
+        sortOptions: [{
+            id: 'name',
+            name: LANG.name,
+            sortFunc: function(f, c) {
+                return $WH.stringCompare(f.name, c.name)
+            }
+        }],
+        columns: [],
+        value: 'name',
+        compute: function(_icon, td, tr) {
+            var cell = $WH.ce('div');
+            cell.className = 'icon-cell';
+            $(cell).mouseenter(function() {
+                setTimeout((function() { this.className += ' animate'; }).bind(this), 1);
+            }).mouseleave(function() {
+                this.className = this.className.replace(/ *animate\b/, '');
+            });
+
+            $WH.ae(cell, Icon.create(_icon.icon, 2, null, this.getItemLink(_icon)));
+
+            var overlay = $WH.ce('div', { className: 'icon-cell-overlay' });
+            $(overlay).mouseleave(function() {
+                $('.fa-check', this).removeClass('fa-check').addClass('fa-clipboard');
+            });
+            $WH.ae(overlay, Icon.create(_icon.icon, 2, null, this.getItemLink(_icon)));
+
+            var ovlName = $WH.ce('div', { className: 'icon-cell-overlay-name' });
+            var o = function()
+            {
+                this.focus();
+                this.select();
+            };
+
+            $WH.ae(ovlName, $WH.ce('input', {
+                type: 'text',
+                value: _icon.name,
+                onclick: o,
+                onfocus: o
+            }));
+
+
+            /* Aowow - we do not use FA
+            $WH.ae(ovlName, $WH.g_createButton(null, null, {
+                'class': 'fa fa-fw fa-clipboard',
+                'float': false,
+                'no-margin': true,
+                click: function() {
+                    var v = $(this);
+                    var y = v.siblings('input[type="text"]');
+                    y.focus().select();
+                    var w = false;
+                    try
+                    {
+                        if (!document.execCommand('copy'))
+                            w = true;
+                    }
+                    catch (u) { w = true; }
+
+                    y.blur();
+
+                    if (w)
+                    {
+                        v.css({ 'pointer-events': 'none' })
+                        .removeClass('fa-clipboard')
+                        .addClass('fa-exclamation-triangle')
+                        .blur()
+                        .effect('shake', { distance: 5 });
+
+                        setTimeout(function() { $('.icon-cell-overlay-name .btn').fadeOut(1000) }, 600);
+                    }
+                    else
+                        v.removeClass('fa-clipboard').addClass('fa-check');
+                }
+            }));
+            */
+
+            $WH.ae(ovlName, $WH.ce('input', {
+                type:      'button',
+                className: 'button-copy',
+                onclick:   function() {
+                    var btn = $(this);
+                    var iName = btn.siblings('input[type="text"]');
+                    iName.focus().select();
+                    var error = false;
+                    try
+                    {
+                        if (!document.execCommand('copy'))
+                            error = true;
+                    }
+                    catch (x) { error = true; }
+
+                    iName.blur();
+
+                    if (error)
+                    {
+                        btn.css({
+                            'pointer-events': 'none',
+                            'background-image': 'url(' + g_staticUrl + '/images/icons/report.png)'
+                        }).blur();
+
+                        setTimeout(function() { $('.icon-cell-overlay-name .button-copy').fadeOut(1000) }, 600);
+                    }
+                    else
+                        btn.css('background-image', 'url(' + g_staticUrl + '/images/icons/tick.png)');
+                }
+            }));
+            /* end replacement */
+
+            $WH.ae(overlay, ovlName);
+            var t = $WH.ce('div', { className: 'icon-cell-overlay-counts' });
+            var types = [3, 6, 10, 17, 9, 13];
+            var c = 0;
+            for (var h = 0, m; m = types[h]; h++) {
+                var p = g_types[m] + 'count';
+                if (_icon[p]) {
+                    c += _icon[p];
+                    var g = g_types[m];
+                    var s = _icon[p] == 1 ? LANG.types[m][1] : LANG.types[m][3];
+
+                    $WH.ae(t, $WH.ce('div', null, $WH.ce('a', {
+                        href: this.getItemLink(_icon) + '#used-by-' + g,
+                        innerHTML: $WH.sprintf(LANG.entitycount, _icon[p], s)
+                    })))
+                }
+            }
+
+            if (!c)
+                $WH.ae(t, $WH.ce('div', { innerHTML: LANG.unused }));
+
+            $WH.ae(overlay, t);
+            var k = $WH.ce('div', { className: 'icon-cell-overlay-placer' }, overlay);
+            $WH.ae(cell, k);
+            $WH.ae(td, cell);
+        },
+        sortFunc: function(a, b) {
+            return $WH.stringCompare(a.name, b.name);
+        },
+        getItemLink: function(icon) {
+            return "?icon=" + icon.id;
+        }
     },
 
     topusers:
@@ -20873,6 +21159,10 @@ var Links = new function() {
         item: 1
     };
 
+    var extraTypes = {
+        29: 'icondb'
+    };
+
     this.onShow = function() {
         if (location.hash && location.hash != '#links') {
             oldHash = location.hash;
@@ -20934,7 +21224,7 @@ var Links = new function() {
             'wowheadurl': g_host +'?' + type + '=' + opt.typeId,
             'armoryurl': 'http://us.battle.net/wow/en/' + type + '/' + opt.typeId,
             'ingamelink': link,
-            'markuptag': '[' + type + '=' + opt.typeId + ']'
+            'markuptag': '[' + (extraTypes[opt.type] || type) + '=' + opt.typeId + ']'
         };
 
         dialog.show('links', {
@@ -21403,8 +21693,9 @@ AudioControls = function () {
     function createButton(text, disabled) {
         return $WH.g_createButton(text, null, {
             disabled: disabled,
-            'float': false,
-            style: 'margin:0 12px; display:inline-block'
+            // 'float': false,                              Aowow - adapted style
+            // style: 'margin:0 12px; display:inline-block'
+            style: 'margin:0 12px; display:inline-block; float:inherit; '
         });
     }
 };
@@ -22085,6 +22376,7 @@ var
     g_skills             = {},
     g_gatheredcurrencies = {},
     g_sounds             = {},
+    g_icons              = {},
     g_enchantments       = {},
     g_emotes             = {};
 
@@ -22106,6 +22398,7 @@ var g_types = {
      15: 'skill',
      17: 'currency',
      19: 'sound',
+     29: 'icon',
     501: 'emote',
     502: 'enchantment'
 };

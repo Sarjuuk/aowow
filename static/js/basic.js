@@ -2259,7 +2259,7 @@ $WH.g_createButton = function(text, href, opts)
         href = 'javascript:;';
 
     if (typeof opts['float'] != 'undefined' && !opts['float'])
-        styles.push('float:inherit');
+        styles.push('float:right');
 
     if (typeof opts.style == 'string')
         styles.push(opts.style);
@@ -2267,7 +2267,7 @@ $WH.g_createButton = function(text, href, opts)
     if (typeof opts.click == 'function' && !opts.disabled)
         func = opts.click;
 
-    var btn = RedButton.create(text, !opts.disabled, func);
+    var btn = RedButton.create(text || '\0', !opts.disabled, func);
 
     if (styles.length)
         $(btn).attr('style', styles.join(';'));

@@ -403,6 +403,22 @@ var fi_filters = {
         { id: 20,  name: 'teamcontrib5v5',      type: 'num' }
     ],
 
+    icons: [
+        { id: 9999, name: 'sepuses' },
+        { id: 13,   name: 'used',                   type: 'num' },
+        { id: 1,    name: 'items',                  type: 'num' },
+        { id: 2,    name: 'spells',                 type: 'num' },
+        { id: 3,    name: 'achievements',           type: 'num' },
+     // { id: 4,    name: 'battlepets',             type: 'num' },
+     // { id: 5,    name: 'battlepetabilities',     type: 'num' },
+        { id: 6,    name: 'currencies',             type: 'num' },
+     // { id: 7,    name: 'garrisonabilities',      type: 'num' },
+     // { id: 8,    name: 'garrisonbuildings',      type: 'num' },
+        { id: 9,    name: 'hunterpets',             type: 'num' },
+     // { id: 10,   name: 'garrisonmissionthreats', type: 'num' },
+        { id: 11,   name: 'classes',                type: 'num' }
+    ],
+
     // custom
     enchantments: [
         { id: 1,   name: 'sepgeneral' },

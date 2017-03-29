@@ -40,7 +40,7 @@ function currencies(array $ids = [])
         else
         {
             CLISetup::log('item #'.$itemId.' required by currency #'.$cId.' not in item_template', CLISetup::LOG_WARN);
-            $strings = ['name_loc0' => 'Item #'.$itemId.' not in DB', 'iconId' => -1240, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3];
+            $strings = ['name_loc0' => 'Item #'.$itemId.' not in DB', 'iconId' => 0, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3];
         }
 
         DB::Aowow()->query('UPDATE ?_currencies SET ?a WHERE itemId = ?d', $strings, $itemId);
@@ -49,7 +49,18 @@ function currencies(array $ids = [])
     // apply icons
     $displayIds  = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, displayid FROM item_template WHERE entry IN (?a)', $moneyItems);
     foreach ($displayIds as $itemId => $iconId)
-        DB::Aowow()->query('UPDATE ?_currencies SET iconId = ?d WHERE itemId = ?d', -$iconId, $itemId);
+        DB::Aowow()->query('
+            UPDATE
+                ?_currencies c,
+                ?_icons i,
+                dbc_itemdisplayinfo idi
+            SET
+                c.iconId = i.id
+            WHERE
+                i.name = LOWER(idi.inventoryIcon1) AND
+                idi.id = ?d AND
+                c.itemId = ?d
+        ', $iconId, $itemId);
 
     return true;
 }

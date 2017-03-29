@@ -812,6 +812,20 @@ var mn_sounds = [
     [50,"Zone Ambience","?sounds&filter=ty=50"],
     [28,"Zone Music","?sounds&filter=ty=28"]
 ];
+mn_icons = [
+    [3, "Logros", "?icons&filter=cr=3;crs=1;crv=0"],
+    // [4, "Mascotas de duelo", "?icons&filter=cr=4;crs=1;crv=0"],
+    // [5, "Habilidades de mascota de batalla", "?icons&filter=cr=5;crs=1;crv=0"],
+    [11, "Clases", "?icons&filter=cr=11;crs=1;crv=0"],
+    [6, "Monedas", "?icons&filter=cr=6;crs=1;crv=0"],
+    // [8, "Construcciones de Ciudadela", "/icons?filter=cr=8;crs=1;crv=0"],
+    [1, "Objetos", "?icons&filter=cr=1;crs=1;crv=0"],
+    [9, "Mascotas de cazador", "?icons&filter=cr=9;crs=1;crv=0"],
+    // [7, "Habilidades del cuartel", "?icons&filter=cr=7;crs=1;crv=0"],
+    [2, "Hechizos", "?icons&filter=cr=2;crs=1;crv=0"],
+    // [10, "Amenazas", "?icons&filter=cr=10;crs=1;crv=0"],
+    [13, "Sin uso", "?icons&filter=cr=13;crs=3;crv=0"]
+];
 var mn_talentCalc = [
     [6,"Caballero de la muerte","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druida","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -862,25 +876,30 @@ var mn_petCalc = [
     [42,"Gusano","?petcalc#mm",,{tinyIcon:"Ability_Hunter_Pet_Worm"}]
 ];
 var mn_database = [
-    [9,"Logros","?achievements",mn_achievements],
-    [12,"Clases","?classes",mn_classes],
-    [15,"Monedas","?currencies", mn_currencies],
-    [7,"Facciones","?factions",mn_factions],
-    [8,"Mascotas de cazador","?pets",mn_pets],
+    [, "Objetos"],
     [2,"Conjuntos de objetos","?itemsets",mn_itemSets],
     [0,"Objetos","?items",mn_items],
-    [4,"PNJs","?npcs",mn_npcs],
-    [5,"Entidades","?objects",mn_objects],
+    [101,"Encantamientos","?enchantments",mn_enchantments],
+    [, "Personaje"],
+    [9,"Logros","?achievements",mn_achievements],
+    [12,"Clases","?classes",mn_classes],
+    [100,"Emociones","?emotes",null],
+    [8,"Mascotas de cazador","?pets",mn_pets],
     [14,"Profesiones y habilidades","?skills",mn_skills],
-    [3,"Misiones","?quests",mn_quests],
     [13,"Razas","?races",mn_races],
     [1,"Hechizos","?spells",mn_spells],
-    [19,"Sonidos","?sounds",mn_sounds],
     [10,"Títulos","?titles",mn_titles],
+    [, "Mundo"],
+    [15,"Monedas","?currencies", mn_currencies],
+    [7,"Facciones","?factions",mn_factions],
+    [4,"PNJs","?npcs",mn_npcs],
+    [5,"Entidades","?objects",mn_objects],
+    [3,"Misiones","?quests",mn_quests],
     [11,"Eventos del mundo","?events",mn_holidays],
     [6,"Zonas","?zones",mn_zones],
-    [100,"Emociones","?emotes",null],
-    [101,"Encantamientos","?enchantments",mn_enchantments]
+    [, "Otros"],
+    [31, "Iconos", "?icons", mn_icons],
+    [19,"Sonidos","?sounds",mn_sounds]
 ];
 var mn_tools = [
     [0,"Calculadora de talentos","?talent",mn_talentCalc],
@@ -2429,6 +2448,7 @@ var LANG = {
     dps:                    "DPS",
     earned:                 "Logrados",
     enchant:                "Encantar",
+    entitycount:            "$1 $2",
     exp:                    "Exp.",
     faction:                "Facción",
     gains:                  "Ganancias",
@@ -2521,6 +2541,7 @@ var LANG = {
     tp:                     "PI",
     trending:               "Tendencia",
     type:                   "Tipo",
+    unused:                 "Sin uso",
     up:                     "Arriba",
     cooldown:               "Reutilización",
     duration:               "Duración",
@@ -2654,11 +2675,14 @@ var LANG = {
     lvnodata_vi2: "¡Sé el primero en <a>sugerir un vídeo</a> para esta página!",
     lvnodata_vi3: "Por favor <a>inicia sesión</a> para sugerir un vídeo, o <a>crea tu cuenta</a> si aun no tienes una.",
 
+    lvnote_sort: "Ordenar por: ",
+
     lvnote_tryfiltering: "Trata de <a>filtrar</a> tus resultados",
     lvnote_trynarrowing: "Trata de ser más específica(o) en tu búsqueda",
     lvnote_upgradesfor:  'Buscando mejoras para <a href="?item=$1" class="q$2"><b>$3</b></a>.',
     lvnote_witherrors:   "Algunos filtros en tus búsquedas eran inválidos y han sido ignorados.",
 
+    lvnote_entitiesfound:     "Se encontraron $1 $2 (se muestran $3)",
     lvnote_itemsfound:        "$1 objetos encontrados (mostrando $2)",
     lvnote_itemsetsfound:     "$1 conjuntos de objetos encontrados (mostrando $2)",
     lvnote_npcsfound:         "$1 PNJs encontrados (mostrando $2)",
@@ -3277,6 +3301,7 @@ var LANG = {
          16: ["Atributo",            "atributo",             "Atributos",            "atributos"],
          17: ["Monedas",             "monedas",              "Monedas",              "monedas"],
          19: ["Sonido",              "sonido",               "Sonidos",              "sonidos"],
+         29: ["Icono",               "icono",                "Iconos",               "íconos"],
         501: ["Emoción",             "emoción",              "Emociones",            "emociones"],
         502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"]
     },
@@ -3952,6 +3977,23 @@ var LANG = {
         teamname5v5:          "Nombre de equipo de arena 5v5",
         teamrtng5v5:          "Puntuación de equipo de arena 5v5",
         teamcontrib5v5:       "Contribución de equipo de arena 5v5"
+    },
+
+    fiicons: {                                              // derived from from LANG.filters_icons
+        sepgeneral:         "General",
+        sepuses:            "Usos",
+        used:               "Veces Usado",
+        items:              "Usado(a) por Objetos",
+        spells:             "Usado(a) por Hechizos",
+        achievements:       "Usado(a) por Logros",
+     // battlepets:         "Usado(a) por Mascotas de duelo",
+     // battlepetabilities: "Usado(a) por Habilidades de mascota(s) de duelo",
+        currencies:         "Usado(a) por Monedas",
+     // missionabilities:   "Usado(a) por Aptitudes de misión",
+     // garrisonbuildings:  "Usado(a) por Construcciones de Ciudadela",
+        hunterpets:         "Usado(a) por Mascotas de cazador",
+     // threats:            "Usado(a) por Amenazas",
+        classes:            "Usado(a) por Clases"
     },
 
     // custom

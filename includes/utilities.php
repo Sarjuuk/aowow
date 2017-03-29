@@ -40,6 +40,7 @@ class Util
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
         'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
+        TYPE_ICON        => 'IconList',
         TYPE_EMOTE       => 'EmoteList',
         TYPE_ENCHANTMENT => 'EnchantmentList'
     );
@@ -48,6 +49,7 @@ class Util
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
         null,           'sound',
+        TYPE_ICON        => 'icon',
         TYPE_USER        => 'user',
         TYPE_EMOTE       => 'emote',
         TYPE_ENCHANTMENT => 'enchantment'
@@ -195,6 +197,7 @@ class Util
 
     public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
     public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static $tryFilteringEntityString = '$$WH.sprintf(LANG.lvnote_entitiesfound, %s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
     public static $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
     public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 

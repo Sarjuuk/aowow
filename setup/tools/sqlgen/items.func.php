@@ -36,6 +36,7 @@ function items(array $ids = [])
             SoundOverrideSubclass,
             IFNULL(sg.id, 0) AS subSubClass,
             name,                   IFNULL(li.name_loc2, ""), IFNULL(li.name_loc3, ""), IFNULL(li.name_loc6, ""), IFNULL(li.name_loc8, ""),
+            0 AS iconId,
             displayid,
             0 AS spellVisualId,
             Quality,
@@ -152,6 +153,9 @@ function items(array $ids = [])
 
     // get modelString
     DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi SET i.model = IF(idi.leftModelName = "", idi.rightModelName, idi.leftModelName) WHERE i.displayId = idi.id');
+
+    // get iconId
+    DB::Aowow()->query('UPDATE ?_items i, dbc_itemdisplayinfo idi, ?_icons ic SET i.iconId = ic.id WHERE i.displayId = idi.id AND LOWER(idi.inventoryIcon1) = ic.name');
 
     // unify slots:  Robes => Chest; Ranged (right) => Ranged
     DB::Aowow()->query('UPDATE ?_items SET slot = 15 WHERE slotbak = 26');

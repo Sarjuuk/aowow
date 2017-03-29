@@ -12,8 +12,8 @@ class SkillList extends BaseType
 
     protected       $queryBase = 'SELECT *, sl.id AS ARRAY_KEY FROM ?_skillline sl';
     protected       $queryOpts = array(
-                        'sl' => [['si']],
-                        'si' => ['j' => '?_icons si ON si.id = sl.iconId', 's' => ', si.iconString'],
+                        'sl' => [['ic']],
+                        'ic' => ['j' => ['?_icons ic ON ic.id = sl.iconId', true], 's' => ', ic.name AS iconString'],
                     );
 
     public function __construct($conditions = [])
@@ -32,6 +32,9 @@ class SkillList extends BaseType
                 while (count($_) < 5)
                     $_[] = 0;
             }
+
+            if (!$_curTpl['iconId'])
+                $_curTpl['iconString'] = 'inv_misc_questionmark';
         }
     }
 

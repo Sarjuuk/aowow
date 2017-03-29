@@ -39,6 +39,8 @@ switch ($pageCall)
     case 'factions':
     // case 'guild':
     // case 'guilds':
+    case 'icon':
+    case 'icons':
     case 'item':
     case 'items':
     case 'itemset':
@@ -64,7 +66,7 @@ switch ($pageCall)
     case 'search':                                          // tool: searches
     case 'skill':
     case 'skills':
-    case 'sound':                                           // db: sounds for zone, creature, spell, ...
+    case 'sound':
     case 'sounds':
     case 'spell':
     case 'spells':

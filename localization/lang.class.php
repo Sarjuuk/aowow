@@ -19,6 +19,7 @@ class Lang
     private static $event;
     private static $faction;
     private static $gameObject;
+    private static $icon;
     private static $item;
     private static $itemset;
     private static $npc;

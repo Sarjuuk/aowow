@@ -27,7 +27,7 @@ class ItemList extends BaseType
     protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
     protected       $queryOpts  = array(                    // 3 => TYPE_ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
-                        'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = -`i`.`displayId`', true], 's' => ', ic.iconString'],
+                        'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.name AS iconString'],
                         'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
                         's'   => ['j' => ['?_spell      `s`   ON `s`.`effect1CreateItemId` = `i`.`id`', true], 'g' => 'i.id'],
                         'e'   => ['j' => ['?_events     `e`   ON `e`.`id` = `i`.`eventId`', true], 's' => ', e.holidayId'],
@@ -715,10 +715,10 @@ class ItemList extends BaseType
         if (!empty($enhance['g']))
         {
             $gems = DB::Aowow()->select('
-                SELECT it.id AS ARRAY_KEY, ic.iconString, ae.*, it.gemColorMask AS colorMask
+                SELECT it.id AS ARRAY_KEY, ic.name AS iconString, ae.*, it.gemColorMask AS colorMask
                 FROM   ?_items it
                 JOIN   ?_itemenchantment ae ON ae.id = it.gemEnchantmentId
-                JOIN   ?_icons ic ON ic.id = -it.displayId
+                JOIN   ?_icons ic ON ic.id = it.iconId
                 WHERE  it.id IN (?a)',
                 $enhance['g']);
             foreach ($enhance['g'] as $k => $v)
@@ -1775,7 +1775,7 @@ class ItemListFilter extends Filter
          59 => [FILTER_CR_NUMERIC,   'durability',             null,                    true], // dura
         104 => [FILTER_CR_STRING,    'description',            true                         ], // flavortext
           7 => [FILTER_CR_BOOLEAN,   'description_loc0',       true                         ], // hasflavortext
-        142 => [FILTER_CR_STRING,    'ic.iconString',                                       ], // icon
+        142 => [FILTER_CR_STRING,    'ic.name',                                             ], // icon
          12 => [FILTER_CR_BOOLEAN,   'itemset',                                             ], // partofset
          13 => [FILTER_CR_BOOLEAN,   'randomEnchant',                                       ], // randomlyenchanted
          14 => [FILTER_CR_BOOLEAN,   'pageTextId',                                          ], // readable

@@ -450,6 +450,14 @@ if (!CLI)
 
         if ($missing = array_diff(array_map('strtolower', $dbcEntries), array_map('strtolower', $allPaths)))
         {
+            // hide affected icons from listviews
+            $iconNames = array_map(function($path) {
+                preg_match('/\/([^\/]+)\.blp$/i', $path, $m);
+                return $m ? $m[1] : null;
+            }, $missing);
+            var_dump($iconNames);
+            DB::Aowow()->query('UPDATE ?_icons SET cuFlags = cuFlags | ?d WHERE name IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, $iconNames);
+
             asort($missing);
             CLISetup::log('the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', CLISetup::LOG_WARN);
             foreach ($missing as $m)

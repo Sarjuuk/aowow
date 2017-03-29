@@ -202,6 +202,8 @@ $lang = array(
         'faction'       => "Fraktion",
         'factions'      => "Fraktionen",
         'cooldown'      => "%s Abklingzeit",
+        'icon'          => "Icon",
+        'icons'         => "Icons",
         'item'          => "Gegenstand",
         'items'         => "Gegenstände",
         'itemset'       => "Ausrüstungsset",
@@ -681,6 +683,9 @@ $lang = array(
             ),
            -2 => "Nicht kategorisiert"
        )
+    ),
+    'icon'  => array(
+        'notFound'      => "Dieses Icon existiert nicht."
     ),
     'title' => array(
         'notFound'      => "Dieser Titel existiert nicht.",
