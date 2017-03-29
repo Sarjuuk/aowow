@@ -208,6 +208,11 @@ define('CC_FLAG_APPROVED',                  0x8);
 define('SOUND_TYPE_OGG',                    1);
 define('SOUND_TYPE_MP3',                    2);
 
+define('CONTRIBUTE_CO',                     0x1);
+define('CONTRIBUTE_SS',                     0x2);
+define('CONTRIBUTE_VI',                     0x4);
+define('CONTRIBUTE_ANY',                    CONTRIBUTE_CO | CONTRIBUTE_SS | CONTRIBUTE_VI);
+
 /*
  * Game
  */

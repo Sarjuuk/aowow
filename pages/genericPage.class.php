@@ -16,6 +16,8 @@ trait DetailPage
 
     protected $subject       = null;                        // so it will not get cached
 
+    protected $contribute    = CONTRIBUTE_ANY;
+
     protected function generateCacheKey($withStaff = true)
     {
         $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
@@ -286,6 +288,10 @@ class GenericPage
 
         if (method_exists($this, 'postCache'))              // e.g. update dates for events and such
             $this->postCache();
+
+        // determine contribute tabs
+        if (isset($this->subject))
+            $this->contribute = $this->subject::$contribute;
 
         if (!empty($this->hasComContent))                   // get comments, screenshots, videos
         {

@@ -165,9 +165,12 @@ class UtilityPage extends GenericPage
                 if (!User::isInGroup(U_GROUP_EMPLOYEE))
                     $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-                foreach (Util::$typeClasses as $classStr)
+                foreach (Util::$typeClasses as $type => $classStr)
                 {
                     if (!$classStr)
+                        continue;
+
+                    if (!($classStr::$contribute & CONTRIBUTE_SS))
                         continue;
 
                     $typeObj = new $classStr($cnd);

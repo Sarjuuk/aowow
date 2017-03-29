@@ -17,6 +17,8 @@ abstract class BaseType
     protected $queryBase = '';
     protected $queryOpts = [];
 
+    public static $contribute = CONTRIBUTE_ANY;
+
     /*
     *   condition as array [expression, value, operator]
     *       expression:    str   - must match fieldname;

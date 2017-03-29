@@ -77,8 +77,12 @@ class AjaxComment extends AjaxHandler
     // i .. have problems believing, that everything uses nifty ajax while adding comments requires a brutal header(Loacation: <wherever>), yet, thats how it is
     protected function handleCommentAdd()
     {
-        if (!$this->_get['typeid'] || !$this->_get['type'] || !isset(Util::$typeStrings[$this->_get['type']]))
+        if (!$this->_get['typeid'] || !$this->_get['type'] || !isset(Util::$typeClasses[$this->_get['type']]))
             return;                                         // whatever, we cant even send him back
+
+        // this type cannot be commented on
+        if (!(get_class_vars(Util::$typeClasses[$this->_get['type']])['contribute'] & CONTRIBUTE_CO))
+            return;
 
         // trim to max length
         if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->_post['commentbody']) > (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)))
@@ -94,7 +98,7 @@ class AjaxComment extends AjaxHandler
                 DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
 
                 // flag target with hasComment
-                if (Util::$typeClasses[$this->_get['type']] && ($tbl = get_class_vars(Util::$typeClasses[$this->_get['type']])['dataTable']))
+                if ($tbl = get_class_vars(Util::$typeClasses[$this->_get['type']])['dataTable'])
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->_get['typeid']);
             }
         }

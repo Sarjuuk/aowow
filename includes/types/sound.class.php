@@ -8,11 +8,12 @@ class SoundList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type      = TYPE_SOUND;
-    public static   $brickFile = 'sound';
-    public static   $dataTable = '?_sounds';
+    public static   $type       = TYPE_SOUND;
+    public static   $brickFile  = 'sound';
+    public static   $dataTable  = '?_sounds';
+    public static   $contribute = CONTRIBUTE_CO;
 
-    protected       $queryBase = 'SELECT *, s.id AS ARRAY_KEY FROM ?_sounds s';
+    protected       $queryBase  = 'SELECT *, s.id AS ARRAY_KEY FROM ?_sounds s';
 
     private         $fileBuffer = [];
     private static  $fileTypes  = array(

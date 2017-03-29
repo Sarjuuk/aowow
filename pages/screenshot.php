@@ -47,6 +47,10 @@ class ScreenshotPage extends GenericPage
             if (empty(Util::$typeClasses[$m[1]]))
                 $this->error();
 
+            // this type cannot receive screenshots
+            if (!(get_class_vars(Util::$typeClasses[$m[1]])['contribute'] & CONTRIBUTE_SS))
+                $this->error();
+
             $t = Util::$typeClasses[$m[1]];
             $c = [['id', intVal($m[2])]];
 

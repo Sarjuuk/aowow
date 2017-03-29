@@ -62,12 +62,16 @@ if (!empty($this->user)):
         echo '                us_addProfilesTab('.Util::toJSON($this->user['profileData']).");\n";
     endif;
 elseif ($relTabs):
-?>
-                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_comments});
-                new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_screenshots});
-                if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))
-                    new Listview({template: 'video', id: 'videos', name: LANG.tab_videos, tabs: <?=$tabVar; ?>, parent: 'lv-generic', data: lv_videos});
-<?php
+    if ($this->contribute & CONTRIBUTE_CO):
+        echo "                new Listview({template: 'comment', id: 'comments', name: LANG.tab_comments, tabs: ".$tabVar.", parent: 'lv-generic', data: lv_comments});\n";
+    endif;
+    if ($this->contribute & CONTRIBUTE_SS):
+        echo "                new Listview({template: 'screenshot', id: 'screenshots', name: LANG.tab_screenshots, tabs: ".$tabVar.", parent: 'lv-generic', data: lv_screenshots});\n";
+    endif;
+    if ($this->contribute & CONTRIBUTE_VI):
+        echo "                if (lv_videos.length || (g_user && g_user.roles & (U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO)))\n";
+        echo "                    new Listview({template: 'video', id: 'videos', name: LANG.tab_videos, tabs: ".$tabVar.", parent: 'lv-generic', data: lv_videos});\n";
+    endif;
 endif;
 
 if ($isTabbed):
