@@ -36,9 +36,12 @@ class DB
         if ($options['prefix'])
             $interface->setIdentPrefix($options['prefix']);
 
-        // kill STRICT_TRANS_TABLES and STRICT_ALL_TABLES off. It prevents usage of implicit default values.
+        // disable STRICT_TRANS_TABLES and STRICT_ALL_TABLES off. It prevents usage of implicit default values.
         if ($idx == DB_AOWOW)
-            $interface->query('SET SESSION sql_mode = \'NO_ENGINE_SUBSTITUTION\'');
+            $interface->query("SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
+        // disable ONLY_FULL_GROUP_BY (Allows for non-aggregated selects in a group-by query)
+        else
+            $interface->query("SET SESSION sql_mode = ''");
 
         self::$interfaceCache[$idx] = &$interface;
         self::$connectionCache[$idx] = true;
