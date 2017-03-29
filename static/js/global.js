@@ -15869,7 +15869,7 @@ Listview.templates = {
                     td.style.borderLeft = 'none';
 
                     // force minimum width to fix overlap display bug
-                    td.style.width = '225px';
+                    td.style.width = '270px';
 
                     var wrapper = $WH.ce('div');
 
