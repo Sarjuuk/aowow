@@ -2575,6 +2575,17 @@ CREATE TABLE `aowow_items_sounds` (
   PRIMARY KEY (`soundId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='actually .. its only weapon related sounds in here';
 
+DROP TABLE IF EXISTS `aowow_spelloverride`;
+CREATE TABLE `aowow_spelloverride` (
+  `id` smallint(5) unsigned NOT NULL,
+  `spellId1` mediumint(8) unsigned NULL DEFAULT NULL,
+  `spellId2` mediumint(8) unsigned NULL DEFAULT NULL,
+  `spellId3` mediumint(8) unsigned NULL DEFAULT NULL,
+  `spellId4` mediumint(8) unsigned NULL DEFAULT NULL,
+  `spellId5` mediumint(8) unsigned NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
@@ -2668,7 +2679,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1490815302,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1490912250,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

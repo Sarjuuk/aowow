@@ -1,0 +1,11 @@
+CREATE TABLE `aowow_spelloverride` (
+    `id` SMALLINT(5) UNSIGNED NOT NULL,
+    `spellId1` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL,
+    `spellId2` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL,
+    `spellId3` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL,
+    `spellId4` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL,
+    `spellId5` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) COLLATE='utf8_general_ci' ENGINE=InnoDB;
+
+UPDATE `aowow_dbversion` SET `sql` = CONCAT(IFNULL(`sql`, ''), ' spelloverride');

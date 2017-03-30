@@ -347,7 +347,7 @@ class Util
         128 => 'Apply Area Aura Friend',
         129 => 'Apply Area Aura Enemy',
         130 => 'Redirect Threat',
-        131 => 'Unknown Effect',
+        131 => 'Play Sound',
         132 => 'Play Music',
         133 => 'Unlearn Specialization',
         134 => 'Kill Credit2',

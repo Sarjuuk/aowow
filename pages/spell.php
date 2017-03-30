@@ -502,6 +502,29 @@ class SpellPage extends GenericPage
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
 
+        // tab: used by - spell
+        if ($so = DB::Aowow()->selectCell('SELECT id FROM ?_spelloverride WHERE spellId1 = ?d OR spellId2 = ?d OR spellId3 = ?d OR spellId4 = ?d OR spellId5 = ?d', $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id))
+        {
+            $conditions = array(
+                'OR',
+                ['AND', ['effect1AuraId', 293], ['effect1MiscValue', $so]],
+                ['AND', ['effect2AuraId', 293], ['effect2MiscValue', $so]],
+                ['AND', ['effect3AuraId', 293], ['effect3MiscValue', $so]]
+            );
+            $ubSpells = new SpellList($conditions);
+            if (!$ubSpells->error)
+            {
+                $this->lvTabs[] = ['spell', array(
+                    'data' => array_values($ubSpells->getListviewData()),
+                    'id'   => 'used-by-spell',
+                    'name' => '$LANG.tab_usedby'
+                )];
+
+                $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
+            }
+        }
+
+
         // tab: used by - itemset
         $conditions = array(
             'OR',
@@ -1566,9 +1589,10 @@ class SpellPage extends GenericPage
             // .. from spell
             else if (in_array($i, $spellIdx) || $effId == 133)
             {
-                $_ = $this->subject->getField('effect'.$i.'TriggerSpell');
-                if (!$_)
-                    $_ = $this->subject->getField('effect'.$i.'MiscValue');
+                if ($effId == 155)
+                    $_ = $effMV;
+                else
+                    $_ = $this->subject->getField('effect'.$i.'TriggerSpell');
 
                 $trig = new SpellList(array(['s.id', (int)$_]));
 
@@ -1748,8 +1772,9 @@ class SpellPage extends GenericPage
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
+                case 131:                                   // Play Music
                 case 132:                                   // Play Sound
-                    $foo['sound'] = $effMV;
+                    $foo['markup'] = '[sound='.$effMV.']';
                     break;
                 case 103:                                   // Reputation
                     $_ = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
@@ -1768,6 +1793,8 @@ class SpellPage extends GenericPage
                 {
                     if (($effMV || $effId == 97) && $effId != 155)
                         $foo['name'] .= ' ('.$effMV.')';
+
+                    break;
                 }
                 // Aura
                 case 6:                                     // Simple
@@ -1999,6 +2026,21 @@ class SpellPage extends GenericPage
                                 $n = FactionList::getName($effMV);
                                 $bar          = ' ('.($n ? '<a href="?faction='.$effMV.'">'.$n.'</a>' : Util::ucFirst(Lang::game('faction')).' #'.$effMV).')';
                                 break;                      // also breaks for 139
+                            case 293:                       // Override Spells
+                                if ($so = DB::Aowow()->selectRow('SELECT spellId1, spellId2, spellId3, spellId4, spellId5 FROM ?_spelloverride WHERE id = ?d', $effMV))
+                                {
+                                    $buff = [];
+                                    for ($i = 1; $i < 6; $i++)
+                                    {
+                                        if ($x = $so['spellId'.$i])
+                                        {
+                                            $this->extendGlobalData([TYPE_SPELL => [$x]]);
+                                            $buff[] = '[spell='.$x.']';
+                                        }
+                                    }
+                                    $foo['markup'] = implode(', ', $buff);
+                                }
+                                break;
                         }
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 

@@ -14,6 +14,7 @@ if (!CLI)
         $files  = DB::Aowow()->selectCol('SELECT ABS(id) AS ARRAY_KEY, CONCAT(path, "/", `file`) FROM ?_sounds_files');
         $nFiles = count($files);
         $itr    = $i = 0;
+        $step   = 1000;
         foreach ($files as $fileId => $filePath)
         {
             $i++;

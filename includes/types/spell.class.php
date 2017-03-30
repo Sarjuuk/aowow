@@ -37,6 +37,7 @@ class SpellList extends BaseType
         'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
         'teach'      => [36, 57, /*133*/                                    ]   // learn spell, learn pet spell, /*unlearn specialization*/
     );
+
     public static   $auras       = array(
         'heal'       => [ 4,  8, 62, 69,  97, 226                           ],  // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
         'damage'     => [ 3,  4, 15, 53,  89, 162, 226                      ],  // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
@@ -661,7 +662,7 @@ class SpellList extends BaseType
         $idx = [];
         for ($i = 1; $i < 4; $i++)
             if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['trigger']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['trigger']))
-                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0 || $this->curTpl['effect'.$i.'MiscValue'] > 0)
+                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0 || ($this->curTpl['effect'.$i.'Id'] == 155 && $this->curTpl['effect'.$i.'MiscValue'] > 0))
                     $idx[] = $i;
 
         return $idx;
@@ -2004,7 +2005,7 @@ class SpellList extends BaseType
 
                 // play sound effect
                 for ($i = 1; $i < 4; $i++)
-                    if ($this->getField('effect'.$i.'Id') == 132)
+                    if ($this->getField('effect'.$i.'Id') == 131 || $this->getField('effect'.$i.'Id') == 132)
                         $data[TYPE_SOUND][$this->getField('effect'.$i.'MiscValue')] = $this->getField('effect'.$i.'MiscValue');
             }
 

@@ -212,9 +212,9 @@ foreach ($this->effects as $i => $e):
         echo "<small>".$smallBuf."</small>\n";
     endif;
 
-    if (isset($e['sound'])):
-        echo '<br/><div id="spelleffectsound-'.$i.'" style="display: inline-block"></div><script type="text/javascript">//<![CDATA[
-$WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectsound-'.$i.'\').innerHTML = Markup.toHtml(\'[sound='.$e['sound'].']\');});
+    if (isset($e['markup'])):
+        echo '<br/><div id="spelleffectmarkup-'.$i.'" style="display: inline-block"></div><script type="text/javascript">//<![CDATA[
+$WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML = Markup.toHtml(\''.$e['markup'].'\');});
 //]]></script>';
     endif;
 

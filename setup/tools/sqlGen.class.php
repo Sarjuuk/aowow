@@ -37,6 +37,7 @@ class SqlGen
         'scalingstatdistribution'  => ['scalingstatdistribution',       true,  null, null],
         'scalingstatvalues'        => ['scalingstatvalues',             true,  null, null],
         'spellfocusobject'         => ['spellfocusobject',              false, null, null],
+        'spelloverride'            => ['overridespelldata',             false, null, null],
         'spellrange'               => ['spellrange',                    false, null, null],
         'spellvariables'           => ['spelldescriptionvariables',     false, null, null],
         'totemcategory'            => ['totemcategory',                 false, null, null],
