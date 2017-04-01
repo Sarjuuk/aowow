@@ -430,9 +430,9 @@ class ItemList extends BaseType
         interactive (set to place javascript/anchors to manipulate level and ratings or link to filters (static tooltips vs popup tooltip))
         subOf (tabled layout doesn't work if used as sub-tooltip in other item or spell tooltips; use line-break instead)
     */
-    public function getField($field, $localized = false, $enhance = [])
+    public function getField($field, $localized = false, $silent = false, $enhance = [])
     {
-        $res = parent::getField($field, $localized);
+        $res = parent::getField($field, $localized, $silent);
 
         if ($field == 'name' && !empty($enhance['r']))
             if ($this->getRandEnchantForItem($enhance['r']))

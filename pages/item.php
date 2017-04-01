@@ -1008,7 +1008,7 @@ class ItemPage extends genericPage
             return '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})';
 
         $x  = '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true, $this->enhancedTT))."',\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true, false, $this->enhancedTT))."',\n";
         $x .= "\tquality: ".$this->subject->getField('quality').",\n";
         $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip(false, 0, $this->enhancedTT))."'\n";
