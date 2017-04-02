@@ -1300,7 +1300,7 @@ CREATE TABLE `aowow_items` (
   KEY `idx_name` (`name_loc0`),
   KEY `items_index` (`class`),
   KEY `idx_model` (`displayId`),
-  KEY `idx_faction` (`requiredFaction`).
+  KEY `idx_faction` (`requiredFaction`),
   KEY `iconId` (`iconId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
