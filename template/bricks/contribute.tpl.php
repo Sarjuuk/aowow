@@ -1,5 +1,5 @@
 <?php
-if (!empty($this->contribute));
+if (!empty($this->contribute)):
 ?>
 <div class="clear"></div>
 <div class="text">
