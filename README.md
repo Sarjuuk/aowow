@@ -19,26 +19,24 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 ## Requirements
 
 + Webserver running PHP ≥ 5.5.0 including extensions:
- + SimpleXML
- + GD
- + Mysqli
- + mbString
+  + SimpleXML
+  + GD
+  + Mysqli
+  + mbString
 + MySQL ≥ 5.5.30
 + [TDB 335.62](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.62)
 + Tools require cmake: Please refer to the individual repositories for detailed information
- + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor)
- + [BLPConverter](https://github.com/Sarjuuk/BLPConverter)
- + [FFmpeg](https://ffmpeg.org/download.html)
- + WIN users may find it easier to use these alternatives
-   + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [BLPConverter](https://github.com/PatrickCyr/BLPConverter) / [SoX](https://sourceforge.net/projects/sox/files/sox/)
+  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [BLPConverter](https://github.com/Sarjuuk/BLPConverter) / [FFmpeg](https://ffmpeg.org/download.html)
+  + WIN users may find it easier to use these alternatives
+     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [BLPConverter](https://github.com/PatrickCyr/BLPConverter) / [SoX](https://sourceforge.net/projects/sox/files/sox/)
 
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
 
 #### Highly Recommended
 + setting the following configuration values on your TrintyCore server will greatly increase the accuracy of spawn points
-> Calculate.Creature.Zone.Area.Data = 1  
-> Calculate.Gameoject.Zone.Area.Data = 1
+  > Calculate.Creature.Zone.Area.Data = 1  
+  > Calculate.Gameoject.Zone.Area.Data = 1
 
 
 ## Install
@@ -49,7 +47,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
   import `setup/db_structure.sql` into the AoWoW-DB `mysql -p {your-db-here} < setup/db_structure.sql`
 4. see to it, that the web server is able to write the following directories: `cache/`, `static/` and `config/`
 5. compile the MPQExtractor
-  extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (suffix: 1 -> 9 -> A -> Z)
+  extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (suffix: 1 -> 9 -> A -> Z)  
    .. for every locale you are going to use:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
@@ -70,12 +68,17 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
    
    .. optionaly (for other uses):
    > \<localeCode>/Interface/GLUES/LOADINGSCREENS/  
-6. reencode the audio files. WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.
-   example for ffmpeg
+6. reencode the audio files. WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
+   example for ffmpeg:
    ```
    cd path/to/mpqdata/<localeCode>  
    find -name "*.wav" -exec ffmpeg -hide_banner -y -i {} -acodec libvorbis {}.ogg \;          # file.wav -> file.wav.ogg  
    find -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {}.mp3 \;  # file.mp3 -> file.mp3.mp3  
+   ```
+   if you are short on disk space, you could also do it like this (deletes original file immediatly after conversion):
+   ```
+   cd path/to/mpqdata/<localeCode>  
+   find -name "*.wav" | xargs -I % sh -c 'ffmpeg -hide_banner -y -i "%" -acodec libvorbis "%.ogg"; rm "%";' && find -name "*.mp3" | xargs -I % sh -c 'ffmpeg -hide_banner -y -i "%" -f mp3 -acodec libmp3lame "%.mp3"; rm "%";'
    ```
 
 7. run the initial setup from the CLI `php aowow --firstrun`. It should guide you through with minimal input required from your end.
