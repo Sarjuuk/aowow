@@ -1627,7 +1627,7 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
 
                 $(chooseSpells)
                     .append('<input type="checkbox" id="known-' + i + '" />')
-                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '">' + g_spells[i]['name_' + Locale.getName()] + (g_spells[i]['rank_' + Locale.getName()] ? ' (' + g_spells[i]['rank_' + Locale.getName()] + ')' : '') + '</a></label>')
+                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '&domain=' + Locale.current.domain + '">' + g_spells[i]['name_' + Locale.getName()] + (g_spells[i]['rank_' + Locale.getName()] ? ' (' + g_spells[i]['rank_' + Locale.getName()] + ')' : '') + '</a></label>')
                     .append('<br />');
 
                 $('#known-' + i).change($WH.g_tooltipSpellsChange.bind(this));

@@ -29,4 +29,4 @@ if (!empty($this->contribute)):
 ?>
     tabsContribute.flush();
 </script>
-<? endif; ?>
+<?php endif; ?>

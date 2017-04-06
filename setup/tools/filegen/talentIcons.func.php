@@ -15,7 +15,7 @@ if (!CLI)
     function talentIcons()
     {
         $success   = true;
-        $query     = 'SELECT ic.iconString FROM ?_icons ic JOIN dbc_spell s ON s.iconId = ic.Id JOIN dbc_talent t ON t.rank1 = s.Id JOIN dbc_talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC';
+        $query     = 'SELECT ic.name AS iconString FROM ?_icons ic JOIN ?_spell s ON s.iconId = ic.Id JOIN dbc_talent t ON t.rank1 = s.id JOIN dbc_talenttab tt ON tt.Id = t.tabId WHERE tt.?# = ?d AND tt.tabNumber = ?d ORDER BY t.row, t.column, t.petCategory1 ASC';
         $dims      = 36; //v-pets
         $filenames = ['icons', 'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'];
 

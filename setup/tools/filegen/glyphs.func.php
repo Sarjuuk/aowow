@@ -32,7 +32,7 @@ if (!CLI)
                    i.subclass AS classs,
                    i.requiredLevel AS level,
                    s1.Id AS glyphSpell,
-                   ic.iconString AS icon,
+                   ic.name AS icon,
                    s1.skillLine1 AS skillId,
                    s2.Id AS glyphEffect,
                    s2.Id AS ARRAY_KEY

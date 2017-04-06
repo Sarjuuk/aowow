@@ -65,7 +65,7 @@ if (!CLI)
                 effect1MiscValue,
                 equippedItemClass, equippedItemInventoryTypeMask, equippedItemSubClassMask,
                 skillLine1,
-                IFNULL(i.iconString, "inv_misc_questionmark") AS iconString,
+                IFNULL(i.name, "inv_misc_questionmark") AS iconString,
                 name_loc0, name_loc2, name_loc3, name_loc6, name_loc8
             FROM
                 ?_spell s

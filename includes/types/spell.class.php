@@ -1471,12 +1471,12 @@ class SpellList extends BaseType
             }
             list($formOutVal, $formOutStr, $ratingId) = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10), $scaling);
 
-            if ($ratingId && is_numeric($formOutVal) && $this->interactive)
+            if ($ratingId && Util::checkNumeric($formOutVal) && $this->interactive)
                 $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));
-            else if ($ratingId && is_numeric($formOutVal))
+            else if ($ratingId && Util::checkNumeric($formOutVal))
                 $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal)));
             else
-                $resolved = sprintf($formOutStr, is_numeric($formOutVal) ? abs($formOutVal) : $formOutVal);
+                $resolved = sprintf($formOutStr, Util::checkNumeric($formOutVal) ? abs($formOutVal) : $formOutVal);
 
             $data = substr_replace($data, $resolved, $formStartPos, ($formCurPos - $formStartPos));
         }
