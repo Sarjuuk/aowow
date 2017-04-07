@@ -874,7 +874,7 @@ class QuestPage extends GenericPage
 
         $this->gains         = $this->createGains();
         $this->mail          = $this->createMail($maTab, $startEnd);
-        $this->rewards       = $this->createRewards();
+        $this->rewards       = $this->createRewards($_side);
         $this->objectives    = $this->subject->parseText('objectives', false);
         $this->details       = $this->subject->parseText('details', false);
         $this->offerReward   = $this->subject->parseText('offerReward', false);
@@ -1028,7 +1028,7 @@ class QuestPage extends GenericPage
         exit();
     }
 
-    private function createRewards()
+    private function createRewards($side)
     {
         $rewards = [];
 
@@ -1088,9 +1088,9 @@ class QuestPage extends GenericPage
             }
         }
 
-        if (!empty($this->subject->rewards[$this->typeId][TYPE_ITEM][TYPE_CURRENCY]))
+        if (!empty($this->subject->rewards[$this->typeId][TYPE_CURRENCY]))
         {
-            $rc      = $this->subject->rewards[$this->typeId][TYPE_ITEM][TYPE_CURRENCY];
+            $rc      = $this->subject->rewards[$this->typeId][TYPE_CURRENCY];
             $rewCurr = new CurrencyList(array(['id', array_keys($rc)]));
             if (!$rewCurr->error)
             {
@@ -1102,7 +1102,7 @@ class QuestPage extends GenericPage
                         'id'        => $id,
                         'name'      => $rewCurr->getField('name', true),
                         'quality'   => 1,
-                        'qty'       => $rc[$id] * ($_side == 2 ? -1 : 1), // toggles the icon
+                        'qty'       => $rc[$id] * ($side == 2 ? -1 : 1), // toggles the icon
                         'globalStr' => 'g_gatheredcurrencies'
                     );
                 }

@@ -102,7 +102,7 @@ class CurrencyPage extends GenericPage
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
-                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", 'Listview.extraCols.cost'];
+                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
                     $holidays  = [];
 
                     foreach ($sbData as $k => &$row)
