@@ -229,7 +229,8 @@ class GenericPage
             case 0: // no params works always
                 return true;
             case 1: // null is valid               || value in a 1-dim-array                         || key for a n-dim-array
-                return $this->category[0] === null || in_array($this->category[0], $this->validCats) || !empty($this->validCats[$this->category[0]]);
+                $filtered = array_filter($this->validCats, function ($x) { return is_int($x); });
+                return $this->category[0] === null || in_array($this->category[0], $filtered) || !empty($this->validCats[$this->category[0]]);
             case 2: // first param has to be a key. otherwise invalid
                 if (!isset($this->validCats[$this->category[0]]))
                     return false;

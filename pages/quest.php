@@ -258,8 +258,14 @@ class QuestPage extends GenericPage
         $_ = $chain[0][0];
         while ($_)
         {
-            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask FROM ?_quests WHERE nextQuestIdChain = ?d', $_['typeId']))
+            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask FROM ?_quests WHERE nextQuestIdChain = ?d', $_['typeId']))
             {
+                if ($_['error'])
+                {
+                    trigger_error('Quest '.$_['typeId'].' is in a chain with itself');
+                    break;
+                }
+
                 $n = Util::localizedString($_, 'name');
                 array_unshift($chain, array(
                     array(
@@ -275,8 +281,11 @@ class QuestPage extends GenericPage
         $_ = end($chain)[0];
         while ($_)
         {
-            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask, nextQuestIdChain AS _next FROM ?_quests WHERE id = ?d', $_['_next']))
+            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask, nextQuestIdChain AS _next FROM ?_quests WHERE id = ?d', $_['_next']))
             {
+                if ($_['error'])                                // error already triggered
+                    break;
+
                 $n = Util::localizedString($_, 'name');
                 array_push($chain, array(
                     array(
@@ -471,6 +480,7 @@ class QuestPage extends GenericPage
                     'id'        => $i,
                     'name'      => $pair[1] ?: Util::localizedString($olGOData->getEntry($i), 'name'),
                     'qty'       => $pair[0] > 1 ? $pair[0] : 0,
+                    'extraText' => ''
                 );
             }
         }

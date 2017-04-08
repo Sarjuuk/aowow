@@ -92,9 +92,9 @@ if ($this->reputation):
 
         foreach ($set[1] as $itr):
             if ($itr['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
-                $qty = $itr['qty'][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($itr['qty'][1] > 0 ? '+' : '').$itr['qty'][1]);
+                $qty = intVal($itr['qty'][0]) . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($itr['qty'][1] > 0 ? '+' : '').intVal($itr['qty'][1]));
             else
-                $qty = array_sum($itr['qty']);
+                $qty = intVal(array_sum($itr['qty']));
 
             echo '<li><div'.($itr['qty'][0] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$qty.'</span> '.Lang::npc('repWith') .
                 ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'][0] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';

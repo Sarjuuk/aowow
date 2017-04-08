@@ -54,15 +54,15 @@ class ItemPage extends genericPage
 
             // allow lookup by name for xml
             if (!is_numeric($param))
-                $conditions = [['name_loc'.User::$localeId, utf8_encode(urldecode($param))]];
-
-            if (!is_numeric($param))
-                $this->typeId = $this->subject->id;
+                $conditions = [['name_loc'.User::$localeId, urldecode($param)]];
         }
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
             $this->notFound();
+
+        if (!is_numeric($param))
+            $this->typeId = $this->subject->id;
 
         $this->name = $this->subject->getField('name', true);
 

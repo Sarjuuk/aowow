@@ -881,7 +881,10 @@ class NpcPage extends GenericPage
 
             if ($row['spillover'])
             {
-                $spillover[$factions->getField('cat')] = [intVal(array_sum($row['qty']) / 2), $row['maxRank']];
+                $spillover[$factions->getField('cat')] = array(
+                    [ $set['qty'][0] / 2, $set['qty'][1] / 2 ],
+                    $row['maxRank']
+                );
                 $set['spillover'] = $factions->getField('cat');
             }
 

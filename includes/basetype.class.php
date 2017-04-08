@@ -818,13 +818,32 @@ abstract class Filter
                     if (strpos($term, $c.'=') === 0)
                     {
                         $$c = explode(':', explode('=', $term)[1]);
-                        $this->formData['setCriteria'][$c] = $$c;      // todo (high): move to checks
                         unset($tmp[$i]);
                     }
                 }
             }
 
-            for ($i = 0; $i < max(count($cr), count($crv), count($crs)); $i++)
+            // handle erronous input
+            if (count($cr) != count($crv) || count($cr) != count($crs))
+            {
+                // use min provided criterion as basis
+                $min = min(count($cr), count($crv), count($crs));
+                if (count($cr) > $min)
+                    array_splice($cr, $min);
+
+                if (count($crv) > $min)
+                    array_splice($crv, $min);
+
+                if (count($crs) > $min)
+                    array_splice($crs, $min);
+
+                $this->error = true;
+            }
+
+            foreach (self::$criteria as $c)
+                $this->formData['setCriteria'][$c] = $$c;
+
+            for ($i = 0; $i < count($cr); $i++)
             {
                 if (!isset($cr[$i])  || !isset($crs[$i]) || !isset($crv[$i]) ||
                     !intVal($cr[$i]) ||  $crs[$i] === '' ||  $crv[$i] === '')
