@@ -56,7 +56,7 @@ class CLISetup
 
             // alternative data source (no quotes, use forward slash)
             if (!empty($_['mpqDataDir']))
-                self::$srcDir = str_replace(['\\', '"', '\''], ['/', '', ''], $_['mpqDataDir']);
+                self::$srcDir = self::nicePath($_['mpqDataDir']);
 
             // optional limit handled locales
             if (!empty($_['locales']))
@@ -314,18 +314,20 @@ class CLISetup
         if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'dbc_'.$name) && DB::Aowow()->selectCell('SELECT count(1) FROM ?#', 'dbc_'.$name))
             return true;
 
-        $dbc = new DBC($name, self::$tmpDBC);
+        $dbc = new DBC($name, ['temporary' => self::$tmpDBC]);
         if ($dbc->error)
-            return false;
-
-        if ($dbc->readFromFile())
         {
-            $dbc->writeToDB();
-            return true;
+            self::log('SqlGen::generate() - required DBC '.$name.'.dbc not found!', self::LOG_ERROR);
+            return false;
         }
 
-        self::log('SqlGen::generate() - required DBC '.$name.'.dbc found neither in DB nor as file!', self::LOG_ERROR);
-        return false;
+        if (!$dbc->readFile())
+        {
+            self::log('SqlGen::generate() - DBC '.$name.'.dbc could not be written to DB!', self::LOG_ERROR);
+            return false;
+        }
+
+        return true;
     }
 
     public static function nicePath(/* $file = '', ...$pathParts */)
@@ -358,8 +360,21 @@ class CLISetup
         else
             CLISetup::log('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLISetup::LOG_ERROR);
 
-        if ($path[0] == DIRECTORY_SEPARATOR)
-            $path = substr($path, 1);
+        $path = trim($path);
+
+        // resolve *nix home shorthand
+        if (!self::$win)
+        {
+            if (preg_match('/^~(\w+)\/.*/i', $path, $m))
+                $path = '/home/'.substr($path, 1);
+            else if (substr($path, 0, 2) == '~/')
+                $path = getenv('HOME').substr($path, 1);
+            else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
+                $path = substr($path, 1);
+        }
+
+        // remove quotes (from erronous user input)
+        $path = str_replace(['"', "'"], ['', ''], $path);
 
         return $path;
     }

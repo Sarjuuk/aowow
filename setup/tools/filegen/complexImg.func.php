@@ -615,6 +615,9 @@ if (!CLI)
 
                     if ($map)
                         imagedestroy($map);
+
+                    // this takes a while; ping mysql just in case
+                    DB::Aowow()->selectCell('SELECT 1');
                 }
             }
         }

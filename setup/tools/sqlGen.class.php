@@ -164,15 +164,11 @@ class SqlGen
             $tbl = self::$tables[$tableName];               // shorthand
             CLISetup::log('SqlGen::generate() - copying '.$tbl[0].'.dbc into aowow_'.$tableName);
 
-            $dbc = new DBC($tbl[0], CLISetup::$tmpDBC);
+            $dbc = new DBC($tbl[0], ['temporary' => CLISetup::$tmpDBC, 'tableName' => 'aowow_'.$tableName]);
             if ($dbc->error)
                 return false;
 
-            $dbcData = $dbc->readArbitrary($tbl[1]);
-            foreach ($dbcData as $row)
-                DB::Aowow()->query('REPLACE INTO ?_'.$tableName.' (?#) VALUES (?a)', array_keys($row), array_values($row));
-
-            return !!$dbcData;
+            return !!$dbc->readFile();
         }
         else if (file_exists('setup/tools/sqlgen/'.$tableName.'.func.php'))
         {
