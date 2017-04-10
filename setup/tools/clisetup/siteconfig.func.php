@@ -301,7 +301,10 @@ function siteconfig()
                                     continue 2;
 
                                 // @eval .. some dafault values are supplied as bitmask or the likes
-                                if (DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', @eval('return ('.trim(explode('default:', $info[0])[1]).');'), strtolower($conf['key'])))
+                                $val = trim(explode('default:', $info[0])[1]);
+                                if (!($conf['flags'] & CON_FLAG_TYPE_STRING))
+                                    $val = @eval('return ('.$val.');');
+                                if (DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, strtolower($conf['key'])))
                                 {
                                     CLISetup::log("default value restored", CLISetup::LOG_OK);
                                     sleep(1);

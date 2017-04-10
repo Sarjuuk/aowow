@@ -249,7 +249,7 @@ class DBC
     private $tableName   = '';
 
     private $dataBuffer  = [];
-    private $bufferSize  = 1000;
+    private $bufferSize  = 500;
 
     private $fileRefs    = [];
 

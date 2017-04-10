@@ -93,14 +93,14 @@ if (!CLI)
 
         foreach (CLISetup::$localeIds as $lId)
         {
-            set_time_limit(120);
-
             User::useLocale($lId);
             Lang::load(Util::$localeStrings[$lId]);
 
             $enchantsOut = [];
             foreach ($enchantSpells as $esId => $es)
             {
+                set_time_limit(5);
+
                 $eId = $es['effect1MiscValue'];
                 if (!$enchantments->getEntry($eId))
                 {
