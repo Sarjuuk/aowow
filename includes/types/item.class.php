@@ -686,10 +686,22 @@ class ItemList extends BaseType
                 continue;
 
             // base stat
-            if ($type >= ITEM_MOD_AGILITY && $type <= ITEM_MOD_STAMINA)
-                $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::item('statType', $type).'</span><br />';
-            else                                            // rating with % for reqLevel
-                $green[] = $this->parseRating($type, $qty, $interactive, $causesScaling);
+            switch ($type)
+            {
+                case ITEM_MOD_MANA:
+                case ITEM_MOD_HEALTH:
+                    // $type += 1;                          // i think i fucked up somewhere mapping item_mods: offsets may be required somewhere
+                case ITEM_MOD_AGILITY:
+                case ITEM_MOD_STRENGTH:
+                case ITEM_MOD_INTELLECT:
+                case ITEM_MOD_SPIRIT:
+                case ITEM_MOD_STAMINA:
+                    $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::item('statType', $type).'</span><br />';
+                    break;
+                default:                                    // rating with % for reqLevel
+                    $green[] = $this->parseRating($type, $qty, $interactive, $causesScaling);
+
+            }
         }
 
         // magic resistances
