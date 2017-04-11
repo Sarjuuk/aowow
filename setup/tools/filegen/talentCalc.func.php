@@ -43,7 +43,7 @@ if (!CLI)
 
             for ($l = 0; $l < count($tabs); $l++)
             {
-                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`Id` = s.`iconId` AND t.`tabId`= ?d AND s.`Id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['Id']);
+                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['id']);
                 $result[$l] = array(
                     'n' => Util::localizedString($tabs[$l], 'name'),
                     't' => []
@@ -53,7 +53,7 @@ if (!CLI)
                 {
                     $petFamId           = log($tabs[$l]['creatureFamilyMask'], 2);
                     $result[$l]['icon'] = $petFamIcons[$petFamId];
-                    $petCategories      = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, categoryEnumID FROM dbc_creaturefamily WHERE petTalentType = ?d', $petFamId);
+                    $petCategories      = DB::Aowow()->SelectCol('SELECT id AS ARRAY_KEY, categoryEnumID FROM dbc_creaturefamily WHERE petTalentType = ?d', $petFamId);
                     $result[$l]['f']    = array_keys($petCategories);
                 }
 
@@ -186,7 +186,7 @@ if (!CLI)
             // PetCalc
             if (empty($petIcons))
             {
-                $pets = DB::Aowow()->SelectCol('SELECT Id AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS iconString FROM dbc_creaturefamily WHERE petTalentType IN (0, 1, 2)');
+                $pets = DB::Aowow()->SelectCol('SELECT id AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS iconString FROM dbc_creaturefamily WHERE petTalentType IN (0, 1, 2)');
                 $petIcons = Util::toJSON($pets);
             }
 

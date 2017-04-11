@@ -27,7 +27,7 @@ $reqDBC = ['itemdisplayinfo', 'currencytypes'];
 function currencies(array $ids = [])
 {
     if (!$ids)
-        DB::Aowow()->query('REPLACE INTO ?_currencies (id, category, itemId) SELECT Id, category, itemId FROM dbc_currencytypes');
+        DB::Aowow()->query('REPLACE INTO ?_currencies (id, category, itemId) SELECT id, category, itemId FROM dbc_currencytypes');
 
     $moneyItems = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM dbc_currencytypes{ WHERE id IN (?a)}', $ids ?: DBSIMPLE_SKIP);
 

@@ -102,15 +102,15 @@ function quests(array $ids = [])
         LEFT JOIN
             quest_request_items qri ON q.ID = qri.ID
         LEFT JOIN
-            locales_quest lq ON q.ID = lq.Id
+            locales_quest lq ON q.ID = lq.id
         LEFT JOIN
             game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
         LEFT JOIN
             disables d ON d.entry = q.ID AND d.sourceType = 1
         WHERE
-            q.Id > ?d
+            q.id > ?d
         {
-            AND q.Id IN (?a)
+            AND q.id IN (?a)
         }
         ORDER BY
             q.ID ASC
@@ -136,7 +136,7 @@ function quests(array $ids = [])
         UPDATE
             ?_quests q
         LEFT JOIN
-            dbc_questfactionreward rep ON rep.Id = IF(rewardFactionValue?d > 0, 1, 2)
+            dbc_questfactionreward rep ON rep.id = IF(rewardFactionValue?d > 0, 1, 2)
         SET
             rewardFactionValue?d = (CASE ABS(rewardFactionValue?d)
                 WHEN 0 THEN rep.Field1   WHEN 1 THEN rep.Field2   WHEN 2 THEN rep.Field3   WHEN 3 THEN rep.Field4   WHEN 4 THEN rep.Field5

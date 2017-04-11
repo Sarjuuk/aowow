@@ -32,7 +32,7 @@ function taxi()                                             // path & nodes
         {
             if ($_['startNodeId'] == $p['endNodeId'] AND $_['endNodeId'] == $p['startNodeId'])
             {
-                DB::Aowow()->query('DELETE FROM ?_taxipath WHERE Id = ?d', $j);
+                DB::Aowow()->query('DELETE FROM ?_taxipath WHERE id = ?d', $j);
                 unset($paths[$j]);
                 unset($paths[$i]);
                 break;
@@ -137,13 +137,13 @@ function taxi()                                             // path & nodes
     // fetch reactions per faction
     $factions = DB::Aowow()->query('
         SELECT
-            Id AS ARRAY_KEY,
+            id AS ARRAY_KEY,
             IF(enemyFactionId1 = 1 OR enemyFactionId2 = 1 OR enemyFactionId3 = 1 OR enemyFactionId4 = 1 OR hostileMask & 0x3, -1, 1) AS reactA,
             IF(enemyFactionId1 = 2 OR enemyFactionId2 = 2 OR enemyFactionId3 = 2 OR enemyFactionId4 = 2 OR hostileMask & 0x5, -1, 1) AS reactH
         FROM
             dbc_factiontemplate
         WHERE
-            Id IN (?a)',
+            id IN (?a)',
         array_column($fNodes, 'faction')
     );
 

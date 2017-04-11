@@ -33,7 +33,7 @@ function races()
         REPLACE INTO
             ?_races
         SELECT
-            Id, 0, flags, 0, factionId, 0, 0, baseLanguage, IF(side = 2, 0, side + 1), fileString, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, expansion
+            id, 0, flags, 0, factionId, 0, 0, baseLanguage, IF(side = 2, 0, side + 1), fileString, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, expansion
         FROM
             dbc_chrraces';
 

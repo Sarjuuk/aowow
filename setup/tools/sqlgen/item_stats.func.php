@@ -169,7 +169,7 @@ function item_stats(array $ids = [])
 function enchantment_stats()
 {
     $statCols   = DB::Aowow()->selectCol('SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` LIKE "%item_stats"');
-    $enchants   = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM dbc_spellitemenchantment');
+    $enchants   = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_spellitemenchantment');
     $spells     = [];
     $spellStats = [];
 

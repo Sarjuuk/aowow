@@ -33,7 +33,7 @@ if (!CLI)
         $success    = true;
         $locations  = [];
         $petList    = DB::Aowow()->Select(
-           'SELECT    cr. id,
+           'SELECT    cr.id,
                       cr.name_loc0, cr.name_loc2, cr.name_loc3, cr.name_loc6, cr.name_loc8,
                       cr.minLevel,
                       cr.maxLevel,
@@ -46,7 +46,7 @@ if (!CLI)
                       LOWER(SUBSTRING_INDEX(cf.iconString, "\\\\", -1)) AS icon,
                       cf.petTalentType AS type
             FROM      ?_creature cr
-            JOIN      ?_factiontemplate  ft ON ft.Id = cr.faction
+            JOIN      ?_factiontemplate  ft ON ft.id = cr.faction
             JOIN      dbc_creaturefamily cf ON cf.id = cr.family
             WHERE     cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
             ORDER BY  cr.id ASC');
