@@ -105,6 +105,7 @@ class NpcPage extends GenericPage
                 $mapType = 1;
         }
 
+
         /***********/
         /* Infobox */
         /***********/
@@ -302,6 +303,7 @@ class NpcPage extends GenericPage
         if ($stats)
             $infobox[] = Lang::npc('stats').($modes ? ' ('.Lang::npc('modes', $mapType, 0).')' : null).Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
+
         /****************/
         /* Main Content */
         /****************/
@@ -328,6 +330,10 @@ class NpcPage extends GenericPage
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['type' => TYPE_NPC, 'typeId' => $this->typeId, 'displayId' => $this->subject->getRandomModelId()]
         );
+
+        if ($this->subject->getField('humanoid'))
+            $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
+
 
         /**************/
         /* Extra Tabs */

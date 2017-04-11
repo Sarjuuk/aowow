@@ -30,6 +30,7 @@ function creature(array $ids = [])
             modelid1, modelid2, modelid3, modelid4,
             "" AS textureString,                            -- textureString
             0 AS modelId,                                   -- modelId
+            0 AS humanoid,                                  -- uses creaturedisplayinfoextra
             "" AS iconString,                               -- iconString
             ct.name, IFNULL(ctl2.`Name`, "")  AS n2, IFNULL(ctl3.`Name`, "")  AS n3, IFNULL(ctl6.`Name`, "")  AS n6, IFNULL(ctl8.`Name`, "")  AS n8,
             subname, IFNULL(ctl2.`Title`, "") AS t2, IFNULL(ctl3.`Title`, "") AS t3, IFNULL(ctl6.`Title`, "") AS t6, IFNULL(ctl8.`Title`, "") AS t8,
@@ -125,7 +126,8 @@ function creature(array $ids = [])
         SET
             c.textureString = IFNULL(cdie.textureString, cdi.skin1),
             c.modelId = cdi.modelId,
-            c.iconString = cdi.iconString';
+            c.iconString = cdi.iconString,
+            c.humanoid = IF(cdie.id IS NULL, 0, 1)';
 
     $lastMax = 0;
     while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
