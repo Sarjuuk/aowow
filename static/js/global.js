@@ -11517,8 +11517,7 @@ Listview.templates = {
         ]
     },
 
-    icongallery:
-    {
+    icongallery: {
         sort: [1],
         mode: Listview.MODE_FLEXGRID,
         clickable: false,
@@ -11667,8 +11666,7 @@ Listview.templates = {
         }
     },
 
-    topusers:
-    {
+    topusers: {
         sort: ['reputation'],
         searchable: 1,
         filtrable: 0,
@@ -15996,7 +15994,7 @@ Listview.templates = {
             if (displayId) {
                 var a = $WH.ce('a');
                 a.href = 'javascript:;';
-                a.rel = this.genericlinktype + '=' + model.id;
+                a.rel = this.genericlinktype + '=' + model.id + ' domain=' + Locale.get().domain ;
                 a.onclick = this.template.modelShow.bind(this.template, type, typeId, displayId, slot, false);
 
                 var img = $WH.ce('img');

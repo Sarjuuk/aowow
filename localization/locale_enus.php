@@ -3,7 +3,12 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+
+
 // comments in CAPS point to items in \Interface\FrameXML\GlobalStrings.lua - lowercase sources are contextual
+
+
+
 $lang = array(
     // page variables
     'timeUnits' => array(
@@ -910,8 +915,6 @@ $lang = array(
         'locked'        => "Locked",                        // LOCKED
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroic",                        // ITEM_HEROIC
-        'unique'        => "Unique",                        // ITEM_UNIQUE / ITEM_UNIQUE_MULTIPLE / ITEM_LIMIT_CATEGORY
-        'uniqueEquipped'=> "Unique-Equipped",               // ITEM_LIMIT_CATEGORY_MULTIPLE / ITEM_UNIQUE_EQUIPPABLE
         'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
         'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
         'fap'           => "Feral Attack Power",
@@ -937,11 +940,11 @@ $lang = array(
         'consumable'    => "Consumable",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
-        'millable'      => "Millable",
+        'millable'      => "Millable",                      // ITEM_MILLABLE
         'noEquipCD'     => "No equip cooldown",
-        'prospectable'  => "Prospectable",
-        'disenchantable'=> "Disenchantable",
-        'cantDisenchant'=> "Cannot be disenchanted",
+        'prospectable'  => "Prospectable",                  // ITEM_PROSPECTABLE
+        'disenchantable'=> "Disenchantable",                // ITEM_DISENCHANT_ANY_SKILL
+        'cantDisenchant'=> "Cannot be disenchanted",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
         'repairCost'    => "Repair cost",                   // REPAIR_COST
         'tool'          => "Tool",
         'cost'          => "Cost",                          // COSTS_LABEL
@@ -958,6 +961,8 @@ $lang = array(
         'tabOther'      => "Other",
         'reqMinLevel'   => "Requires Level %d",             // ITEM_MIN_LEVEL
         'reqLevelRange' => "Requires level %d to %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
+        'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
+        'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Speed",                         // SPEED
         'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
         'damage'        => array(                           // *DAMAGE_TEMPLATE*

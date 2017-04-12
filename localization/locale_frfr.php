@@ -222,7 +222,6 @@ $lang = array(
         'requires'      => "%s requis",
         'requires2'     => "Requiert",
         'reqLevel'      => "Niveau %s requis",
-        'reqLevelHlm'   => "Niveau %d à %d (%d) requis",
         'reqSkillLevel' => "Niveau de compétence requis",
         'level'         => "Niveau",
         'school'        => "École",
@@ -679,7 +678,8 @@ $lang = array(
             ),
             7 => array( "Divers",
                 -365 => "Guerre d'Ahn'Qiraj",          -1010 => "Chercheur de donjons",           -1 => "Épique",                       -344 => "Légendaire",                   -367 => "Réputation",
-                -368 => "Invasion du fléau",            -241 => "Tournoi"),
+                -368 => "Invasion du fléau",            -241 => "Tournoi"
+            ),
            -2 => "Non classés"
         )
     ),
@@ -915,26 +915,18 @@ $lang = array(
         'locked'        => "Verrouillé",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Héroïque",
-        'unique'        => "Unique",
-        'uniqueEquipped'=> "Unique - Equipé",
         'startQuest'    => "Cet objet permet de lancer une quête",
         'bagSlotString' => "%s %d emplacements",
-        'dps'           => "dégâts par seconde",
-        'dps2'          => "dégâts par seconde",
-        'addsDps'       => "Ajoute",
         'fap'           => "puissance d'attaque en combat farouche",
-        'durability'    => "Durabilité",
+        'durability'    => "Durabilité %d / %d",
         'realTime'      => "temps réel",
         'conjured'      => "Objet invoqué",
-        'damagePhys'    => "Dégâts : %s",
-        'damageMagic'   => "%s points de dégâts (%s)",
-        'speed'         => "Vitesse",
         'sellPrice'     => "Prix de Vente",
-        'itemLevel'     => "Niveau d'objet",
+        'itemLevel'     => "Niveau d'objet %d",
         'randEnchant'   => "&lt;Enchantement aléatoire&gt",
         'readClick'     => "&lt;Clique Droit pour Lire&gt",
         'openClick'     => "&lt;Clic Droit pour Ouvrir&gt",
-        'set'           => "Set",
+        'set'           => "(%d) Ensemble : %s",
         'partyLoot'     => "Butin de groupe",
         'smartLoot'     => "Butin intelligent",
         'indestructible'=> "Ne peut être détruit",
@@ -967,6 +959,18 @@ $lang = array(
         'buyout'        => "Vente immédiate",
         'each'          => "chacun",
         'tabOther'      => "Autre",
+        'reqMinLevel'   => "Niveau %d requis",
+        'reqLevelRange' => "Niveau %d à %d (%s) requis",
+        'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
+        'uniqueEquipped'=> ["Unique - Equipé", null,          "Unique - Equipé: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
+        'speed'         => "Vitesse",
+        'dps'           => "(%.1f dégâts par seconde)",
+        'damage'        => array(                           // *DAMAGE_TEMPLATE*
+                            //  basic,                      basic /w school,                                add basic,                              add basic /w school
+            'single'    => ["%d Dégâts",                    "%d points de dégâts (%s)",                     "+ %d points de dégâts",                "+ %d points de dégâts (%s)"             ],
+            'range'     => ["Dégâts : %d - %d",             "%d - %d points de dégâts (%s)",                "+ %d - %d points de dégâts",           "+%d - %d points de dégâts (%s)"         ],
+            'ammo'      => ["Ajoute %g dégâts par seconde", "Ajoute %g points de dégâts (%s) par seconde",  "+ %g points de dégâts par seconde",    "+ %g points de dégâts (%s) par seconde" ]
+        ),
         'gems'          => "Gemmes",
         'socketBonus'   => "Bonus de châsse",
         'socket'        => array(
@@ -1071,8 +1075,8 @@ $lang = array(
             13 => "Clés",
         ),
         'statType'      => array(
-            "Augmente vos points de mana de %d.",
-            "Augmente vos points de vie de %d.",
+            "Mana",
+            "Vie",
             null,
             "Agilité",
             "Force",

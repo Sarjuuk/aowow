@@ -528,20 +528,17 @@ class ItemList extends BaseType
             $x .= '<br /><!--bo-->'.Lang::item('bonding', $this->curTpl['bonding']);
 
         // unique || unique-equipped || unique-limited
-        if ($this->curTpl['maxCount'] > 0)
-        {
-            $x .= '<br />'.Lang::item('unique');
-
-            // not for currency tokens
-            if ($this->curTpl['maxCount'] > 1 && $this->curTpl['bagFamily'] != 8192)
-                $x .= ' ('.$this->curTpl['maxCount'].')';
-        }
+        if ($this->curTpl['maxCount'] == 1)
+            $x .= '<br />'.Lang::item('unique', 0);
+        // not for currency tokens
+        else if ($this->curTpl['maxCount'] && $this->curTpl['bagFamily'] != 8192)
+            $x .= '<br />'.sprintf(Lang::item('unique', 1), $this->curTpl['maxCount']);
         else if ($_flags & ITEM_FLAG_UNIQUEEQUIPPED)
-            $x .= '<br />'.Lang::item('uniqueEquipped');
+            $x .= '<br />'.Lang::item('uniqueEquipped', 0);
         else if ($this->curTpl['itemLimitCategory'])
         {
             $limit = DB::Aowow()->selectRow("SELECT * FROM ?_itemlimitcategory WHERE id = ?", $this->curTpl['itemLimitCategory']);
-            $x .= '<br />'.($limit['isGem'] ? Lang::item('uniqueEquipped') : Lang::item('unique')).Lang::main('colon').Util::localizedString($limit, 'name').' ('.$limit['count'].')';
+            $x .= '<br />'.sprintf(Lang::item($limit['isGem'] ? 'uniqueEquipped' : 'unique', 2), Util::localizedString($limit, 'name'), $limit['count']);
         }
 
         // max duration
