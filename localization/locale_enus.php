@@ -4,6 +4,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+
+// comments in CAPS point to items in \Interface\FrameXML\GlobalStrings.lua - lowercase sources are contextual
+
+
+
 $lang = array(
     // page variables
     'timeUnits' => array(
@@ -217,7 +222,6 @@ $lang = array(
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
-        'reqLevelHlm'   => "Requires Level %s",
         'reqSkillLevel' => "Required skill level",
         'level'         => "Level",
         'school'        => "School",
@@ -232,14 +236,14 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
-        'pvp'           => "PvP",
-        'honorPoints'   => "Honor Points",
-        'arenaPoints'   => "Arena Points",
+        'pvp'           => "PvP",                           // PVP
+        'honorPoints'   => "Honor Points",                  // HONOR_POINTS
+        'arenaPoints'   => "Arena Points",                  // ARENA_POINTS
         'heroClass'     => "Hero class",
         'resource'      => "Resource",
         'resources'     => "Resources",
-        'role'          => "Role",
-        'roles'         => "Roles",
+        'role'          => "Role",                          // ROLE
+        'roles'         => "Roles",                         // LFG_TOOLTIP_ROLES
         'specs'         => "Specs",
         '_roles'        => ["Healer", "Melee DPS", "Ranged DPS", "Tank"],
 
@@ -255,20 +259,20 @@ $lang = array(
             "Milled",                       "Mined",                        "Prospected",                   "Pickpocketed",                 "Salvaged",                     "Skinned",
             "In-Game Store"
         ),
-        'languages'     => array(
+        'languages'     => array(                           // Languages.dbc
              1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",
              9 => "Titan",                  10 => "Thalassian",             11 => "Draconic",               12 => "Kalimag",                13 => "Gnomish",                14 => "Troll",
             33 => "Gutterspeak",            35 => "Draenei",                36 => "Zombie",                 37 => "Gnomish Binary",         38 => "Goblin Binary"
         ),
-        'gl'            => [null, "Major", "Minor"],
+        'gl'            => [null, "Major", "Minor"],                                                                                                                                // MAJOR_GLYPH, MINOR_GLYPH
         'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
-        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],
-        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],
-        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],
-        'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],
-        'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],
-        'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],
-        'st'            => array(
+        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],                         // RESISTANCE?_NAME
+        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],                                                          // SpellDispalType.dbc
+        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],                                                                                     // STRING_SCHOOL_*
+        'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],                                   // ChrClasses.dbc
+        'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],     // ChrRaces.dbc
+        'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],                                                              // FACTION_STANDING_LABEL*
+        'st'            => array(                           // SpellShapeshiftForm.dbc
             "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
             null,                           null,                           "Dire Bear Form",               null,                           null,                           null,
             null,                           "Shadowdance",                  null,                           null,                           "Ghostwolf",                    "Battle Stance",
@@ -276,7 +280,7 @@ $lang = array(
             null,                           null,                           null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
             "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
         ),
-        'me'            => array(
+        'me'            => array(                           // SpellMechanic.dbc .. not quite
             null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
             "Gripped",                      "Rooted",                       "Pacified",                     "Silenced",                     "Asleep",                       "Ensnared",
             "Stunned",                      "Frozen",                       "Incapacitated",                "Bleeding",                     "Healing",                      "Polymorphed",
@@ -284,12 +288,12 @@ $lang = array(
             "Horrified",                    "Invulnerable",                 "Interrupted",                  "Dazed",                        "Discovery",                    "Invulnerable",
             "Sapped",                       "Enraged"
         ),
-        'ct'            => array(
+        'ct'            => array(                           // CreatureType.dbc
             "Uncategorized",                "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",                    "Giant",
             "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",                   "Not specified",                "Totem",
             "Non-combat Pet",               "Gas Cloud"
         ),
-        'fa'            => array(
+        'fa'            => array(                           // CreatureFamily.dbc
              1 => "Wolf",                    2 => "Cat",                     3 => "Spider",                  4 => "Bear",                    5 => "Boar",                    6 => "Crocolisk",
              7 => "Carrion Bird",            8 => "Crab",                    9 => "Gorilla",                11 => "Raptor",                 12 => "Tallstrider",            20 => "Scorpid",
             21 => "Turtle",                 24 => "Bat",                    25 => "Hyena",                  26 => "Bird of Prey",           27 => "Wind Serpent",           30 => "Dragonhawk",
@@ -297,7 +301,7 @@ $lang = array(
             38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
             45 => "Core Hound",             46 => "Spirit Beast"
         ),
-        'pvpRank'       => array(
+        'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",
             "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
             "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
@@ -552,7 +556,7 @@ $lang = array(
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'questLevel'    => "Level %s",
         'requirements'  => "Requirements",
-        'reqMoney'      => "Required money",
+        'reqMoney'      => "Required money",                // REQUIRED_MONEY
         'money'         => "Money",
         'additionalReq' => "Additional requirements to obtain this quest",
         'reqRepWith'    => 'Your reputation with <a href="?faction=%d">%s</a> must be %s %s',
@@ -588,7 +592,7 @@ $lang = array(
         'enabledByQ'    => "Enabled by",
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
-        'theTitle'      => 'the title "%s"',
+        'theTitle'      => 'the title "%s"',                                        // REWARD_TITLE
         'mailDelivery'  => "You will receive this letter%s%s",
         'mailBy'        => ' by <a href="?npc=%d">%s</a>',
         'mailIn'        => " after %s",
@@ -596,11 +600,11 @@ $lang = array(
         'experience'    => "experience",
         'expConvert'    => "(or %s if completed at level %d)",
         'expConvert2'   => "%s if completed at level %d",
-        'chooseItems'   => "You will be able to choose one of these rewards",
-        'receiveItems'  => "You will receive",
-        'receiveAlso'   => "You will also receive",
-        'spellCast'     => "The following spell will be cast on you",
-        'spellLearn'    => "You will learn",
+        'chooseItems'   => "You will be able to choose one of these rewards",       // REWARD_CHOICES
+        'receiveItems'  => "You will receive",                                      // REWARD_ITEMS_ONLY
+        'receiveAlso'   => "You will also receive",                                 // REWARD_ITEMS
+        'spellCast'     => "The following spell will be cast on you",               // REWARD_AURA
+        'spellLearn'    => "You will learn",                                        // REWARD_SPELL
         'bonusTalents'  => "talent points",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'attachment'    => "Attachment",
@@ -786,21 +790,21 @@ $lang = array(
         'procChance'    => "Proc chance",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost",
-        'remaining'     => "%s remaining",
-        'untilCanceled' => "until canceled",
-        'castIn'        => "%s sec cast",
-        'instantPhys'   => "Instant",
-        'instantMagic'  => "Instant cast",
-        'channeled'     => "Channeled",
-        'range'         => "%s yd range",
-        'meleeRange'    => "Melee Range",
-        'unlimRange'    => "Unlimited Range",
-        'reagents'      => "Reagents",
-        'tools'         => "Tools",
+        'remaining'     => "%s remaining",                  // SPELL_TIME_REMAINING_*
+        'untilCanceled' => "until cancelled",               // SPELL_DURATION_UNTIL_CANCELLED
+        'castIn'        => "%s sec cast",                   // SPELL_CAST_TIME_SEC
+        'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
+        'instantMagic'  => "Instant cast",                  // SPELL_CAST_TIME_INSTANT
+        'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED
+        'range'         => "%s yd range",                   // SPELL_RANGE / SPELL_RANGE_DUAL
+        'meleeRange'    => "Melee Range",                   // MELEE_RANGE
+        'unlimRange'    => "Unlimited Range",               // SPELL_RANGE_UNLIMITED
+        'reagents'      => "Reagents",                      // SPELL_REAGENTS
+        'tools'         => "Tools",                         // SPELL_TOTEMS
         'home'          => "&lt;Inn&gt;",
         'pctCostOf'     => "of base %s",
-        'costPerSec'    => ", plus %s per sec",
-        'costPerLevel'  => ", plus %s per level",
+        'costPerSec'    => ", plus %s per sec",             // see 'powerTypes'
+        'costPerLevel'  => ", plus %s per level",           // not used?
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",
@@ -808,12 +812,12 @@ $lang = array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
             'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
-        'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
+        'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"], // RUNE_COST_* / COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(
-            // conventional
+            // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER / *_COST / *COST_PER_TIME
               -2 => "Health",              0 => "Mana",                1 => "Rage",                2 => "Focus",               3 => "Energy",              4 => "Happiness",
-               5 => "Rune",                6 => "Runic Power",
-            // powerDisplay
+               5 => "Runes",               6 => "Runic Power",
+            // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
               -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
         ),
@@ -823,12 +827,12 @@ $lang = array(
             'recipes' => '<a href="?items=9.%s">recipe items</a>',
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">crafted items</a>'
         ),
-        'cat'           => array(
-              7 => "Class Skills",      // classList
-            -13 => "Glyphs",            // classList
+        'cat'           => array(                           // as per menu in locale_enus.js
+              7 => "Class Skills",                          // classList
+            -13 => "Glyphs",                                // classList
             -11 => array("Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"),
              -4 => "Racial Traits",
-             -2 => "Talents",           // classList
+             -2 => "Talents",                               // classList
              -6 => "Companions",
              -5 => "Mounts",
              -3 => array(
@@ -859,12 +863,12 @@ $lang = array(
              -9 => "GM Abilities",
               0 => "Uncategorized"
         ),
-        'armorSubClass' => array(
+        'armorSubClass' => array(                           // ItemSubClass.dbc/2
             "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
             null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
             "Sigils"
         ),
-        'weaponSubClass' => array(                          // ordered by content firts, then alphabeticaly
+        'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content firts, then alphabeticaly
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
@@ -893,7 +897,7 @@ $lang = array(
             "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
             "Mainhand Weapon Skill",                "Offhand Weapon Skill",                 "Ranged Weapon Skill",                  "Expertise",                            "Armor Penetration"
         ),
-        'lockType'      => array(
+        'lockType'      => array(                           // lockType.dbc
             null,                                   "Lockpicking",                          "Herbalism",                            "Mining",                               "Disarm Trap",
             "Open",                                 "Treasure (DND)",                       "Calcified Elven Gems (DND)",           "Close",                                "Arm Trap",
             "Quick Open",                           "Quick Close",                          "Open Tinkering",                       "Open Kneeling",                        "Open Attacking",
@@ -905,32 +909,24 @@ $lang = array(
     ),
     'item' => array(
         'notFound'      => "This item doesn't exist.",
-        'armor'         => "%s Armor",
-        'block'         => "%s Block",
-        'charges'       => "Charges",
-        'locked'        => "Locked",
+        'armor'         => "%s Armor",                      // ARMOR_TEMPLATE
+        'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE
+        'charges'       => "Charges",                       // ITEM_SPELL_CHARGES
+        'locked'        => "Locked",                        // LOCKED
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
-        'heroic'        => "Heroic",
-        'unique'        => "Unique",
-        'uniqueEquipped'=> "Unique-Equipped",
-        'startQuest'    => "This Item Begins a Quest",
-        'bagSlotString' => "%d Slot %s",
-        'dps'           => "damage per second",
-        'dps2'          => "damage per second",
-        'addsDps'       => "Adds",
+        'heroic'        => "Heroic",                        // ITEM_HEROIC
+        'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
+        'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
         'fap'           => "Feral Attack Power",
-        'durability'    => "Durability",
+        'durability'    => "Durability %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
-        'conjured'      => "Conjured Item",
-        'damagePhys'    => "%s Damage",
-        'damageMagic'   => "%s %s Damage",
-        'speed'         => "Speed",
-        'sellPrice'     => "Sell Price",
-        'itemLevel'     => "Item Level",
-        'randEnchant'   => "&lt;Random enchantment&gt",
-        'readClick'     => "&lt;Right Click To Read&gt",
-        'openClick'     => "&lt;Right Click To Open&gt",
-        'set'           => "Set",
+        'conjured'      => "Conjured Item",                 // ITEM_CONJURED
+        'sellPrice'     => "Sell Price",                    // SELL_PRICE
+        'itemLevel'     => "Item Level %d",                 // ITEM_LEVEL
+        'randEnchant'   => "&lt;Random enchantment&gt",     // ITEM_RANDOM_ENCHANT
+        'readClick'     => "&lt;Right Click To Read&gt",    // ITEM_READABLE
+        'openClick'     => "&lt;Right Click To Open&gt",    // ITEM_OPENABLE
+        'set'           => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -944,31 +940,43 @@ $lang = array(
         'consumable'    => "Consumable",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
-        'millable'      => "Millable",
+        'millable'      => "Millable",                      // ITEM_MILLABLE
         'noEquipCD'     => "No equip cooldown",
-        'prospectable'  => "Prospectable",
-        'disenchantable'=> "Disenchantable",
-        'cantDisenchant'=> "Cannot be disenchanted",
-        'repairCost'    => "Repair cost",
+        'prospectable'  => "Prospectable",                  // ITEM_PROSPECTABLE
+        'disenchantable'=> "Disenchantable",                // ITEM_DISENCHANT_ANY_SKILL
+        'cantDisenchant'=> "Cannot be disenchanted",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
+        'repairCost'    => "Repair cost",                   // REPAIR_COST
         'tool'          => "Tool",
-        'cost'          => "Cost",
+        'cost'          => "Cost",                          // COSTS_LABEL
         'content'       => "Content",
         '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
         'slot'          => "Slot",
-        '_quality'      => "Quality",
+        '_quality'      => "Quality",                       // QUALITY
         'usableBy'      => "Usable by",
-        'buyout'        => "Buyout price",
+        'buyout'        => "Buyout price",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
+        'reqMinLevel'   => "Requires Level %d",             // ITEM_MIN_LEVEL
+        'reqLevelRange' => "Requires level %d to %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
+        'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
+        'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
+        'speed'         => "Speed",                         // SPEED
+        'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
+        'damage'        => array(                           // *DAMAGE_TEMPLATE*
+                        //  basic,                          basic /w school,                add basic,                  add basic /w school
+            'single'    => ["%d Damage",                    "%d %s Damage",                 "+ %d Damage",              "+%d %s Damage"             ],
+            'range'     => ["%d - %d Damage",               "%d - %d %s Damage",            "+ %d - %d Damage",         "+%d - %d %s Damage"        ],
+            'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
+        ),
         'gems'          => "Gems",
-        'socketBonus'   => "Socket Bonus",
-        'socket'        => array(
+        'socketBonus'   => "Socket Bonus",                  // ITEM_SOCKET_BONUS
+        'socket'        => array(                           // EMPTY_SOCKET_*
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
         ),
-        'gemColors'     => array(
+        'gemColors'     => array(                           // *_GEM
             "meta",                 "red",              "yellow",               "blue"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
@@ -981,24 +989,24 @@ $lang = array(
             "Requires personal and team arena rating of %d<br>in 3v3 or 5v5 brackets",
             "Requires personal and team arena rating of %d<br>in 5v5 brackets"
         ),
-        'quality'       => array(
+        'quality'       => array(                           // ITEM_QUALITY?_DESC
             "Poor",                 "Common",           "Uncommon",             "Rare",
             "Epic",                 "Legendary",        "Artifact",             "Heirloom"
         ),
-        'trigger'       => array(
+        'trigger'       => array(                           // ITEM_SPELL_TRIGGER_*
             "Use: ",                "Equip: ",          "Chance on hit: ",      "",                             "",
             "",                     ""
         ),
-        'bonding'       => array(
+        'bonding'       => array(                           // ITEM_BIND_*
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
             "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),
-        "bagFamily"     => array(
+        "bagFamily"     => array(                           // ItemSubClass.dbc/1
             "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
             "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
             "Gem Bag",              "Mining Bag"
         ),
-        'inventoryType' => array(
+        'inventoryType' => array(                           // INVTYPE_*
             null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
             "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
             "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand", /*Shield*/
@@ -1006,23 +1014,23 @@ $lang = array(
             null, /*Robe*/          "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
             "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
         ),
-        'armorSubClass' => array(
+        'armorSubClass' => array(                           // ItemSubClass.dbc/2
             "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
             null,                   "Shield",           "Libram",               "Idol",                         "Totem",
             "Sigil"
         ),
-        'weaponSubClass'=> array(
+        'weaponSubClass'=> array(                           // ItemSubClass.dbc/4
             "Axe",                  "Axe",              "Bow",                  "Gun",                          "Mace",
             "Mace",                 "Polearm",          "Sword",                "Sword",                        null,
             "Staff",                null,               null,                   "Fist Weapon",                  "Miscellaneous",
             "Dagger",               "Thrown",           null,                   "Crossbow",                     "Wand",
             "Fishing Pole"
         ),
-        'projectileSubClass' => array(
+        'projectileSubClass' => array(                      // ItemSubClass.dbc/6
             null,                   null,               "Arrow",                "Bullet",                        null
         ),
         'elixirType'    => [null, "Battle", "Guardian"],
-        'cat'           => array(                           // ordered by content first, then alphabeticaly
+        'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
              2 => "Weapons",                                // self::$spell['weaponSubClass']
              4 => array("Armor", array(
                  1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
@@ -1066,9 +1074,9 @@ $lang = array(
             12 => "Quest",
             13 => "Keys",
         ),
-        'statType'      => array(
-            "Increases your Mana by %d.",
-            "Increases your Health by %d.",
+        'statType'      => array(                           // ITEM_MOD_*
+            "Mana",
+            "Health",
             null,
             "Agility",
             "Strength",
@@ -1076,7 +1084,7 @@ $lang = array(
             "Spirit",
             "Stamina",
             null, null, null, null,
-            "Improves defense rating by %d.",
+            "Increases defense rating by %d.",
             "Increases your dodge rating by %d.",
             "Increases your parry rating by %d.",
             "Increases your shield block rating by %d.",
@@ -1101,17 +1109,17 @@ $lang = array(
             "Improves critical avoidance rating by %d.",
             "Increases your resilience rating by %d.",
             "Increases your haste rating by %d.",
-            "Improves expertise rating by %d.",
-            "Improves attack power by %d.",
-            "Improves ranged attack power by %d.",
-            "Improves attack power by %d in Cat, Bear, Dire Bear, and Moonkin forms only.",
-            "Improves damage done by magical spells and effects by up to %d.",
-            "Improves healing done by magical spells and effects by up to %d.",
+            "Increases expertise rating by %d.",
+            "Increases attack power by %d.",
+            "Increases ranged attack power by %d.",
+            "Increases attack power by %d in Cat, Bear, Dire Bear, and Moonkin forms only.",
+            "Increases damage done by magical spells and effects by up to %d.",
+            "Increases healing done by magical spells and effects by up to %d.",
             "Restores %d mana per 5 sec.",
             "Increases your armor penetration rating by %d.",
-            "Improves spell power by %d.",
+            "Increases spell power by %d.",
             "Restores %d health per 5 sec.",
-            "Improves spell penetration by %d.",
+            "Increases spell penetration by %d.",
             "Increases the block value of your shield by %d.",
             "Unknown Bonus #%d (%d)",
         )
