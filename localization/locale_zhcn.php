@@ -4,6 +4,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+
+
+
+
+
 $lang = array(
     // page variables
     'timeUnits' => array(
@@ -910,8 +915,6 @@ $lang = array(
         'locked'        => "Locked",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "英雄级别",
-        'unique'        => "Unique",
-        'uniqueEquipped'=> "Unique-Equipped",
         'startQuest'    => "This Item Begins a Quest",
         'bagSlotString' => "%d Slot %s",
         'fap'           => "Feral Attack Power",
@@ -937,11 +940,11 @@ $lang = array(
         'consumable'    => "Consumable",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
-        'millable'      => "Millable",
+        'millable'      => "可研磨",
         'noEquipCD'     => "No equip cooldown",
-        'prospectable'  => "Prospectable",
-        'disenchantable'=> "Disenchantable",
-        'cantDisenchant'=> "Cannot be disenchanted",
+        'prospectable'  => "可选矿",
+        'disenchantable'=> "可分解",
+        'cantDisenchant'=> "无法分解",
         'repairCost'    => "修理花费",
         'tool'          => "Tool",
         'cost'          => "花费",
@@ -953,11 +956,13 @@ $lang = array(
         'slot'          => "Slot",
         '_quality'      => "质量",
         'usableBy'      => "Usable by",
-        'buyout'        => "Buyout price",
+        'buyout'        => "一口价",
         'each'          => "each",
         'tabOther'      => "Other",
         'reqMinLevel'   => "需要等级 %d",
         'reqLevelRange' => "需要等级 %d到%d （%s）",
+        'unique'        => ["唯一",   "唯一（%d）", "唯一：%s（%d）"   ],
+        'uniqueEquipped'=> ["装备唯一", null,     "装备唯一：%s （%d）"],
         'speed'         => "速度",
         'dps'           => "（每秒伤害%.1f）",
         'damage'        => array(

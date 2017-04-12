@@ -1,3 +1,16 @@
+/* >>> custom >>> */
+@font-face {
+    font-family: ZYHei;
+    src: url(../ZYHei.ttf) format('truetype');
+}
+
+.wowhead-tooltip td, .wowhead-tooltip th {
+    font-family: ZYHei;
+    font-size: 15px;
+    line-height: 20px;
+}
+/* <<< custom <<< */
+
 div.modelviewer-quality div {
     float: left;
     width: 61px;
