@@ -8,6 +8,8 @@ class ItemList extends BaseType
 {
     use ListviewHelper;
 
+    const           CHR_PLUS    = 43;
+
     public static   $type       = TYPE_ITEM;
     public static   $brickFile  = 'item';
     public static   $dataTable  = '?_items';
@@ -591,31 +593,40 @@ class ItemList extends BaseType
             $x .= '<br />';
 
         // Weapon/Ammunition Stats                          (not limited to weapons (see item:1700))
-        $speed   = $this->curTpl['delay'] / 1000;
-        $dmgmin1 = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
-        $dmgmax1 = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
-        $dps     = $speed ? ($dmgmin1 + $dmgmax1) / (2 * $speed) : 0;
+        $speed  = $this->curTpl['delay'] / 1000;
+        $sc1    = $this->curTpl['dmgType1'];
+        $sc2    = $this->curTpl['dmgType2'];
+        $dmgmin = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
+        $dmgmax = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
+        $dps    = $speed ? ($dmgmin + $dmgmax) / (2 * $speed) : 0;
 
-        if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin1 && $dmgmax1)
-            $x .= Lang::item('addsDps').' '.number_format(($dmgmin1 + $dmgmax1) / 2, 1).' '.Lang::item('dps2').'<br />';
+        if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin && $dmgmax)
+        {
+            if ($sc1)
+                $x .= sprintf(Lang::item('damage', 'ammo', 1), ($dmgmin + $dmgmax) / 2, Lang::game('sc', $sc1)).'<br />';
+            else
+                $x .= sprintf(Lang::item('damage', 'ammo', 0), ($dmgmin + $dmgmax) / 2).'<br />';
+        }
         else if ($dps)
         {
-            if ($_class == ITEM_CLASS_WEAPON)
-            {
-                $x .= '<table width="100%"><tr>';
-                $x .= '<td><!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::game('sc', $this->curTpl['dmgType1'])).'</td>';
-                $x .= '<th>'.Lang::item('speed').' <!--spd-->'.number_format($speed, 2).'</th>'; // do not use localized format here!
-                $x .= '</tr></table>';
-            }
+            if ($this->curTpl['dmgMin1'] == $this->curTpl['dmgMax1'])
+                $dmg = sprintf(Lang::item('damage', 'single', $sc1 ? 1 : 0), $this->curTpl['dmgMin1'], $sc1 ? Lang::game('sc', $sc1) : null);
             else
-                $x .= '<!--dmg-->'.sprintf($this->curTpl['dmgType1'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin1'].' - '.$this->curTpl['dmgMax1'], Lang::game('sc', $this->curTpl['dmgType1'])).'<br />';
+                $dmg = sprintf(Lang::item('damage', 'range', $sc1 ? 1 : 0), $this->curTpl['dmgMin1'], $this->curTpl['dmgMax1'], $sc1 ? Lang::game('sc', $sc1) : null);
+
+            if ($_class == ITEM_CLASS_WEAPON)               // do not use localized format here!
+                $x .= '<table width="100%"><tr><td><!--dmg-->'.$dmg.'</td><th>'.Lang::item('speed').' <!--spd-->'.number_format($speed, 2).'</th></tr></table>';
+            else
+                $x .= '<!--dmg-->'.$dmg.'<br />';
 
             // secondary damage is set
-            if ($this->curTpl['dmgMin2'])
-                $x .= '+'.sprintf($this->curTpl['dmgType2'] ? Lang::item('damageMagic') : Lang::item('damagePhys'), $this->curTpl['dmgMin2'].' - '.$this->curTpl['dmgMax2'], Lang::game('sc', $this->curTpl['dmgType2'])).'<br />';
+            if (($this->curTpl['dmgMin2'] || $this->curTpl['dmgMax2']) && $this->curTpl['dmgMin2'] != $this->curTpl['dmgMax2'])
+                $x .= sprintf(Lang::item('damage', 'range', $sc2 ? 3 : 2), $this->curTpl['dmgMin2'], $this->curTpl['dmgMax2'], $sc2 ? Lang::game('sc', $sc2) : null).'<br />';
+            else if ($this->curTpl['dmgMin2'])
+                $x .= sprintf(Lang::item('damage', 'single', $sc2 ? 3 : 2), $this->curTpl['dmgMin2'], $sc2 ? Lang::game('sc', $sc2) : null).'<br />';
 
             if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<!--dps-->('.number_format($dps, 1).' '.Lang::item('dps').')<br />'; // do not use localized format here!
+                $x .= '<!--dps-->'.sprintf(Lang::item('dps'), $dps).'<br />'; // do not use localized format here!
 
             // display FeralAttackPower if set
             if ($fap = $this->getFeralAP())
@@ -797,7 +808,7 @@ class ItemList extends BaseType
 
         // durability
         if ($dur = $this->curTpl['durability'])
-            $x .= Lang::item('durability').' '.$dur.' / '.$dur.'<br />';
+            $x .= sprintf(Lang::item('durability'), $dur, $dur).'<br />';
 
         // required classes
         if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg, $__))
@@ -829,9 +840,9 @@ class ItemList extends BaseType
 
         // required level
         if (($_flags & ITEM_FLAG_ACCOUNTBOUND) && $_quality == ITEM_QUALITY_HEIRLOOM)
-            $x .= sprintf(Lang::game('reqLevelHlm'), ' 1'.Lang::game('valueDelim').MAX_LEVEL.' ('.($interactive ? sprintf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL).')').'<br />';
+            $x .= sprintf(Lang::item('reqLevelRange'), 1, MAX_LEVEL, ($interactive ? sprintf(Util::$changeLevelString, MAX_LEVEL) : '<!--lvl-->'.MAX_LEVEL)).'<br />';
         else if ($_reqLvl > 1)
-            $x .= sprintf(Lang::game('reqLevel'), $_reqLvl).'<br />';
+            $x .= sprintf(Lang::item('reqMinLevel'), $_reqLvl).'<br />';
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
         if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating)
@@ -839,7 +850,7 @@ class ItemList extends BaseType
 
         // item level
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
-            $x .= Lang::item('itemLevel').' '.$this->curTpl['itemLevel'].'<br />';
+            $x .= sprintf(Lang::item('itemLevel'), $this->curTpl['itemLevel']).'<br />';
 
         // required skill
         if ($reqSkill = $this->curTpl['requiredSkill'])
@@ -990,7 +1001,7 @@ class ItemList extends BaseType
                         $setSpells[$i] = $setSpells[$j];
                         $setSpells[$j] = $tmp;
                     }
-                    $xSet .= '<span>('.$setSpells[$i]['bonus'].') '.Lang::item('set').': <a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a></span>';
+                    $xSet .= '<span>'.sprintf(Lang::item('set'), $setSpells[$i]['bonus'], '<a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a>').'</span>';
                     if ($i < count($setSpells) - 1)
                         $xSet .= '<br />';
                 }

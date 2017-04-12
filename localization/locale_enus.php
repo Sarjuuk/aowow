@@ -217,7 +217,6 @@ $lang = array(
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
-        'reqLevelHlm'   => "Requires Level %s",
         'reqSkillLevel' => "Required skill level",
         'level'         => "Level",
         'school'        => "School",
@@ -915,22 +914,16 @@ $lang = array(
         'uniqueEquipped'=> "Unique-Equipped",               // ITEM_LIMIT_CATEGORY_MULTIPLE / ITEM_UNIQUE_EQUIPPABLE
         'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
         'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
-        'dps'           => "damage per second",             // DPS_TEMPLATE
-        'dps2'          => "damage per second",             // AMMO_DAMAGE_TEMPLATE / AMMO_SCHOOL_DAMAGE_TEMPLATE
-        'addsDps'       => "Adds",                          // > part of dps2 <
         'fap'           => "Feral Attack Power",
-        'durability'    => "Durability",                    // DURABILITY_TEMPLATE
+        'durability'    => "Durability %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
         'conjured'      => "Conjured Item",                 // ITEM_CONJURED
-        'damagePhys'    => "%s Damage",                     // SINGLE_DAMAGE_TEMPLATE / DAMAGE_TEMPLATE
-        'damageMagic'   => "%s %s Damage",                  // SINGLE_DAMAGE_TEMPLATE_WITH_SCHOOL / DAMAGE_TEMPLATE_WITH_SCHOOL
-        'speed'         => "Speed",                         // SPEED
         'sellPrice'     => "Sell Price",                    // SELL_PRICE
-        'itemLevel'     => "Item Level",                    // ITEM_LEVEL
+        'itemLevel'     => "Item Level %d",                 // ITEM_LEVEL
         'randEnchant'   => "&lt;Random enchantment&gt",     // ITEM_RANDOM_ENCHANT
         'readClick'     => "&lt;Right Click To Read&gt",    // ITEM_READABLE
         'openClick'     => "&lt;Right Click To Open&gt",    // ITEM_OPENABLE
-        'set'           => "Set",                           // ITEM_SET_BONUS_GRAY
+        'set'           => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -963,6 +956,16 @@ $lang = array(
         'buyout'        => "Buyout price",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
+        'reqMinLevel'   => "Requires Level %d",             // ITEM_MIN_LEVEL
+        'reqLevelRange' => "Requires level %d to %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
+        'speed'         => "Speed",                         // SPEED
+        'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
+        'damage'        => array(                           // *DAMAGE_TEMPLATE*
+                        //  basic,                          basic /w school,                add basic,                  add basic /w school
+            'single'    => ["%d Damage",                    "%d %s Damage",                 "+ %d Damage",              "+%d %s Damage"             ],
+            'range'     => ["%d - %d Damage",               "%d - %d %s Damage",            "+ %d - %d Damage",         "+%d - %d %s Damage"        ],
+            'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
+        ),
         'gems'          => "Gems",
         'socketBonus'   => "Socket Bonus",                  // ITEM_SOCKET_BONUS
         'socket'        => array(                           // EMPTY_SOCKET_*
@@ -993,7 +996,7 @@ $lang = array(
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
             "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),
-        "bagFamily"     => array(                           // ItemSubClass.dbc/11
+        "bagFamily"     => array(                           // ItemSubClass.dbc/1
             "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
             "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
             "Gem Bag",              "Mining Bag"

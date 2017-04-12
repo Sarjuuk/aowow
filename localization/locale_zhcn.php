@@ -123,7 +123,7 @@ $lang = array(
         'ignoredTerms'  => "The following words were ignored in your search: %s",
 
         // formating
-        'colon'         => ': ',
+        'colon'         => '：',
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t H:i",
 
@@ -217,7 +217,6 @@ $lang = array(
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
-        'reqLevelHlm'   => "Requires Level %s",
         'reqSkillLevel' => "Required skill level",
         'level'         => "Level",
         'school'        => "School",
@@ -910,27 +909,21 @@ $lang = array(
         'charges'       => "Charges",
         'locked'        => "Locked",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
-        'heroic'        => "Heroic",
+        'heroic'        => "英雄级别",
         'unique'        => "Unique",
         'uniqueEquipped'=> "Unique-Equipped",
         'startQuest'    => "This Item Begins a Quest",
         'bagSlotString' => "%d Slot %s",
-        'dps'           => "damage per second",
-        'dps2'          => "damage per second",
-        'addsDps'       => "Adds",
         'fap'           => "Feral Attack Power",
-        'durability'    => "Durability",
+        'durability'    => "耐久度 %d / %d",
         'realTime'      => "real time",
-        'conjured'      => "Conjured Item",
-        'damagePhys'    => "%s Damage",
-        'damageMagic'   => "%s %s Damage",
-        'speed'         => "Speed",
-        'sellPrice'     => "Sell Price",
-        'itemLevel'     => "Item Level",
-        'randEnchant'   => "&lt;Random enchantment&gt",
-        'readClick'     => "&lt;Right Click To Read&gt",
-        'openClick'     => "&lt;Right Click To Open&gt",
-        'set'           => "Set",
+        'conjured'      => "魔法制造的物品",
+        'sellPrice'     => "卖价",
+        'itemLevel'     => "物品等级%d",
+        'randEnchant'   => "&lt;随机附魔&gt",
+        'readClick'     => "&lt;右键点击阅读&gt",
+        'openClick'     => "&lt;右键点击打开&gt",
+        'set'           => "(%d) 套装：%s",
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -949,73 +942,83 @@ $lang = array(
         'prospectable'  => "Prospectable",
         'disenchantable'=> "Disenchantable",
         'cantDisenchant'=> "Cannot be disenchanted",
-        'repairCost'    => "Repair cost",
+        'repairCost'    => "修理花费",
         'tool'          => "Tool",
-        'cost'          => "Cost",
+        'cost'          => "花费",
         'content'       => "Content",
         '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
         'slot'          => "Slot",
-        '_quality'      => "Quality",
+        '_quality'      => "质量",
         'usableBy'      => "Usable by",
         'buyout'        => "Buyout price",
         'each'          => "each",
         'tabOther'      => "Other",
+        'reqMinLevel'   => "需要等级 %d",
+        'reqLevelRange' => "需要等级 %d到%d （%s）",
+        'speed'         => "速度",
+        'dps'           => "（每秒伤害%.1f）",
+        'damage'        => array(
+                        //  basic,          basic /w school,    add basic,      add basic /w school
+            'single'    => ["%d点伤害",        "%d点%s伤害",          "+ %d伤害",       "+%d %s伤害"          ],
+            'range'     => ["%d - %d伤害",    "%d - %d 点%s伤害",    "+ %d - %d伤害",  "+%d - %d 点%s伤害"    ],
+            'ammo'      => ["每秒伤害提高%g",     "每秒增加%g点%s系伤害",     "每秒伤害+%g",      "每秒+%g点%s伤害"        ]
+        ),
         'gems'          => "Gems",
-        'socketBonus'   => "Socket Bonus",
+        'socketBonus'   => "镶孔奖励：",
         'socket'        => array(
-            "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
+            "多彩插槽",                 "红色插槽",             "黄色插槽",                 "蓝色插槽",                 -1 => "棱彩插槽"
         ),
         'gemColors'     => array(
-            "meta",                 "red",              "yellow",               "blue"
+            "多彩",                   "红色",               "黄色",                   "蓝色"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => ["less than %d %s gem", "less than %d %s gems"],
-            3 => "more %s gems than %s gems",
-            5 => ["at least %d %s gem", "at least %d %s gems"]
+            2 => ["少于%d颗%s宝石", "少于%d颗%s宝石"],
+            3 => "%s宝石的数量多于%s宝石",
+            5 => ["至少%d颗%s宝石", "至少%d颗%s宝石"]
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
-            "Requires personal and team arena rating of %d",
-            "Requires personal and team arena rating of %d<br>in 3v3 or 5v5 brackets",
-            "Requires personal and team arena rating of %d<br>in 5v5 brackets"
+            "需要个人竞技场等级和战队竞技场等级达到%d",
+            "需要3v3或5v5的个人竞技场等级和战队竞技场等级达到%d<br>",
+            "需要5v5的个人竞技场等级和战队竞技场等级达到%d<br>"
         ),
         'quality'       => array(
-            "Poor",                 "Common",           "Uncommon",             "Rare",
-            "Epic",                 "Legendary",        "Artifact",             "Heirloom"
+            "粗糙",                   "普通",               "优秀",                   "精良",
+            "史诗",                   "传说",               "神器",                   "传家宝"
         ),
         'trigger'       => array(
-            "Use: ",                "Equip: ",          "Chance on hit: ",      "",                             "",
+            "使用： ",                 "装备： ",             "击中时可能： ",              "",                             "",
             "",                     ""
         ),
         'bonding'       => array(
-            "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
-            "Binds when used",                          "Quest Item",                                           "Quest Item"
+            "账号绑定",                                     "拾取后绑定",                                                "装备后绑定",
+            "使用后绑定",                                    "任务物品",                                                 "任务物品"
         ),
         "bagFamily"     => array(
-            "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
-            "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
-            "Gem Bag",              "Mining Bag"
+            "容器",                   "箭袋",               "弹药袋",                  "灵魂袋",                          "制皮材料包",
+            "铭文包",                  "草药袋",              "附魔材料袋",                "工程学材料袋",                       null, /*Key*/
+            "宝石袋",                  "矿石袋"
         ),
         'inventoryType' => array(
-            null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
-            "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
-            "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand", /*Shield*/
-            "Ranged",               "Back",             "Two-Hand",             "Bag",                          "Tabard",
-            null, /*Robe*/          "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
-            "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
+            null,                   "头部",               "颈部",                   "肩部",                           "衬衣",
+            "胸部",                   "腰部",               "腿部",                   "脚",                            "手腕",
+            "手",                    "手指",               "饰品",                   "单手",                           "副手", /*Shield*/
+            "远程",                   "背部",               "双手",                   "背包",                           "战袍",
+            null, /*Robe*/          "主手",               "副手",                   "副手物品",                         "弹药",
+            "投掷",                   null, /*Ranged2*/   "箭袋",                   "圣物"
         ),
         'armorSubClass' => array(
-            "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
-            null,                   "Shield",           "Libram",               "Idol",                         "Totem",
-            "Sigil"
+            "其它",                   "布甲",               "皮甲",                   "锁甲",                           "板甲",
+            null,                   "盾牌",               "圣契",                   "神像",                           "图腾",
+            "魔印"
         ),
         'weaponSubClass'=> array(
-            "斧",                   "斧",               "弓",                   "枪械",                         "锤",
-            "锤",                   "长柄武器",         "剑",                    "剑",                           null,
-            "法杖",                 null,               null,                   "拳套",                         "其它",
-            "匕首",                 "投掷武器",         null,                   "弩",                           "魔杖",
+            "斧",                    "斧",                "弓",                    "枪械",                           "锤",
+            "锤",                    "长柄武器",             "剑",                    "剑",                            null,
+            "法杖",                   null,               null,                   "拳套",                           "其它",
+            "匕首",                   "投掷武器",             null,                   "弩",                            "魔杖",
             "鱼竿"
         ),
         'projectileSubClass' => array(
