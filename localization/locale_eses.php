@@ -605,7 +605,7 @@ $lang = array(
         'receiveAlso'   => "También recibirás",
         'spellCast'     => "Te van a lanzar el siguiente hechizo",
         'spellLearn'    => "Aprenderás",
-        'bonusTalents'  => "puntos de talento",
+        'bonusTalents'  => "%d |4punto:puntos; de talento",
         'spellDisplayed'=> ' (mostrando <a href="?spell=%d">%s</a>)',
         'attachment'    => "Adjunto",
         'questInfo'     => array(
@@ -911,12 +911,12 @@ $lang = array(
         'notFound'      => "Este objeto no existe.",
         'armor'         => "%s armadura",
         'block'         => "%s bloqueo",
-        'charges'       => "cargas",
+        'charges'       => "%d |4carga:cargas;",
         'locked'        => "Cerrado",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroico",
         'startQuest'    => "Este objeto inicia una misión",
-        'bagSlotString' => "%s de %d casillas",
+        'bagSlotString' => '%2$s de %1$d casillas',
         'fap'           => "poder de ataque feral",
         'durability'    => "Durabilidad %d / %d",
         'realTime'      => "tiempo real",
@@ -926,7 +926,8 @@ $lang = array(
         'randEnchant'   => "&lt;Encantamiento aleatorio&gt",
         'readClick'     => "&lt;Click derecho para leer&gt",
         'openClick'     => "&lt;Click derecho para abrir&gt",
-        'set'           => "(%d) Bonif.: %s",
+        'setBonus'      => "(%d) Bonif.: %s",
+        'setName'       => "%s (%d/%d)",
         'partyLoot'     => "Despojo de grupo",
         'smartLoot'     => "Botín inteligente",
         'indestructible'=> "No puede ser destruido",
@@ -980,14 +981,14 @@ $lang = array(
             "meta",                 "roja(s)",          "amarilla(s)",              "azul(es)"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => ["menos de %d %s gema", "menos de %d %s gemas"],
+            2 => "menos de %d |4gema:gemas; %s",
             3 => "más gemas %s que gemas %s",
-            5 => ["al menos %d %s gema", "al menos %d %s gemas"]
+            5 => "al menos %d |4gema:gemas; %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",
-            "Requiere un índice de arena personal y de equipo de %d<br>en la rama de 3c3 o de 5c5",
-            "Requiere un índice de arena personal y de equipo de %d<br>en la rama de 5c5"
+            "Requiere un índice de arena personal y de equipo de %d|nen la rama de 3c3 o de 5c5",
+            "Requiere un índice de arena personal y de equipo de %d|nen la rama de 5c5"
         ),
         'quality'       => array(
             "Pobre",                "Común",            "Poco Común",               "Raro",

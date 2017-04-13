@@ -592,7 +592,7 @@ $lang = array(
         'enabledByQ'    => "Enabled by",
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
-        'theTitle'      => 'the title "%s"',                                        // REWARD_TITLE
+        'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
         'mailDelivery'  => "You will receive this letter%s%s",
         'mailBy'        => ' by <a href="?npc=%d">%s</a>',
         'mailIn'        => " after %s",
@@ -605,7 +605,7 @@ $lang = array(
         'receiveAlso'   => "You will also receive",                                 // REWARD_ITEMS
         'spellCast'     => "The following spell will be cast on you",               // REWARD_AURA
         'spellLearn'    => "You will learn",                                        // REWARD_SPELL
-        'bonusTalents'  => "talent points",
+        'bonusTalents'  => "%d talent |4point:points;",                             // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'attachment'    => "Attachment",
         'questInfo'     => array(
@@ -911,7 +911,7 @@ $lang = array(
         'notFound'      => "This item doesn't exist.",
         'armor'         => "%s Armor",                      // ARMOR_TEMPLATE
         'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE
-        'charges'       => "Charges",                       // ITEM_SPELL_CHARGES
+        'charges'       => "%d |4Charge:Charges;",          // ITEM_SPELL_CHARGES
         'locked'        => "Locked",                        // LOCKED
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroic",                        // ITEM_HEROIC
@@ -926,7 +926,8 @@ $lang = array(
         'randEnchant'   => "&lt;Random enchantment&gt",     // ITEM_RANDOM_ENCHANT
         'readClick'     => "&lt;Right Click To Read&gt",    // ITEM_READABLE
         'openClick'     => "&lt;Right Click To Open&gt",    // ITEM_OPENABLE
-        'set'           => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
+        'setBonus'      => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
+        'setName'       => "%s (%d/%d)",                    // ITEM_SET_NAME
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -980,14 +981,14 @@ $lang = array(
             "meta",                 "red",              "yellow",               "blue"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => ["less than %d %s gem", "less than %d %s gems"],
+            2 => "less than %d %s |4gem:gems;",
             3 => "more %s gems than %s gems",
-            5 => ["at least %d %s gem", "at least %d %s gems"]
+            5 => "at least %d %s |4gem:gems;"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requires personal and team arena rating of %d",
-            "Requires personal and team arena rating of %d<br>in 3v3 or 5v5 brackets",
-            "Requires personal and team arena rating of %d<br>in 5v5 brackets"
+            "Requires personal and team arena rating of %d|nin 3v3 or 5v5 brackets",
+            "Requires personal and team arena rating of %d|nin 5v5 brackets"
         ),
         'quality'       => array(                           // ITEM_QUALITY?_DESC
             "Poor",                 "Common",           "Uncommon",             "Rare",
