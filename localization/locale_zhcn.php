@@ -909,14 +909,14 @@ $lang = array(
     ),
     'item' => array(
         'notFound'      => "This item doesn't exist.",
-        'armor'         => "%s Armor",
-        'block'         => "%s Block",
-        'charges'       => "Charges",
-        'locked'        => "Locked",
+        'armor'         => "%d点护甲",
+        'block'         => "%d格挡",
+        'charges'       => "%d次",
+        'locked'        => "已锁",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "英雄级别",
-        'startQuest'    => "This Item Begins a Quest",
-        'bagSlotString' => "%d Slot %s",
+        'startQuest'    => "该物品将触发一个任务",
+        'bagSlotString' => "%d格%s",
         'fap'           => "Feral Attack Power",
         'durability'    => "耐久度 %d / %d",
         'realTime'      => "real time",
@@ -926,7 +926,8 @@ $lang = array(
         'randEnchant'   => "&lt;随机附魔&gt",
         'readClick'     => "&lt;右键点击阅读&gt",
         'openClick'     => "&lt;右键点击打开&gt",
-        'set'           => "(%d) 套装：%s",
+        'setBonus'      => "(%d) 套装：%s",
+        'setName'       => "%s（%d/%d）",
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -980,14 +981,14 @@ $lang = array(
             "多彩",                   "红色",               "黄色",                   "蓝色"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => ["少于%d颗%s宝石", "少于%d颗%s宝石"],
+            2 => "少于%d颗%s宝石",
             3 => "%s宝石的数量多于%s宝石",
-            5 => ["至少%d颗%s宝石", "至少%d颗%s宝石"]
+            5 => "至少%d颗%s宝石"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "需要个人竞技场等级和战队竞技场等级达到%d",
-            "需要3v3或5v5的个人竞技场等级和战队竞技场等级达到%d<br>",
-            "需要5v5的个人竞技场等级和战队竞技场等级达到%d<br>"
+            "需要3v3或5v5的个人竞技场等级和战队竞技场等级达到%d|n",
+            "需要5v5的个人竞技场等级和战队竞技场等级达到%d|n"
         ),
         'quality'       => array(
             "粗糙",                   "普通",               "优秀",                   "精良",

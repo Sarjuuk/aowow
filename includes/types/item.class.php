@@ -8,8 +8,6 @@ class ItemList extends BaseType
 {
     use ListviewHelper;
 
-    const           CHR_PLUS    = 43;
-
     public static   $type       = TYPE_ITEM;
     public static   $brickFile  = 'item';
     public static   $dataTable  = '?_items';
@@ -939,7 +937,7 @@ class ItemList extends BaseType
             if (!$itemset->error && $itemset->pieceToSet)
             {
                 $pieces = DB::Aowow()->select('
-                    SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
+                    SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc4, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
                     FROM   ?_items a, ?_items b
                     WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
                     GROUP BY b.id;',
@@ -949,7 +947,7 @@ class ItemList extends BaseType
                 foreach ($pieces as $k => &$p)
                     $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
 
-                $xSet = '<br /><span class="q">'.Lang::item('setName', '<a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a>', 0, count($pieces)).'</span>';
+                $xSet = '<br /><span class="q">'.Lang::item('setName', ['<a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a>', 0, count($pieces)]).'</span>';
 
                 if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
                 {
