@@ -605,7 +605,7 @@ $lang = array(
         'receiveAlso'   => "Vous recevrez également",
         'spellCast'     => "Vous allez être la cible du sort suivant",
         'spellLearn'    => "Vous apprendrez",
-        'bonusTalents'  => "points de talent",
+        'bonusTalents'  => "%d |4point:points; de talent",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
         'attachment'    => "[Attachment]",
         'questInfo'     => array(
@@ -911,12 +911,12 @@ $lang = array(
         'notFound'      => "Cet objet n'existe pas.",
         'armor'         => "Armure : %s",
         'block'         => "Bloquer : %s",
-        'charges'       => "Charges",
+        'charges'       => "%d |4charge:charges;",
         'locked'        => "Verrouillé",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Héroïque",
         'startQuest'    => "Cet objet permet de lancer une quête",
-        'bagSlotString' => "%s %d emplacements",
+        'bagSlotString' => '%2$s %1$d |4emplacement:emplacements;',
         'fap'           => "puissance d'attaque en combat farouche",
         'durability'    => "Durabilité %d / %d",
         'realTime'      => "temps réel",
@@ -926,7 +926,8 @@ $lang = array(
         'randEnchant'   => "&lt;Enchantement aléatoire&gt",
         'readClick'     => "&lt;Clique Droit pour Lire&gt",
         'openClick'     => "&lt;Clic Droit pour Ouvrir&gt",
-        'set'           => "(%d) Ensemble : %s",
+        'setBonus'      => "(%d) Ensemble : %s",
+        'setName'       => "%s (%d/%d)",
         'partyLoot'     => "Butin de groupe",
         'smartLoot'     => "Butin intelligent",
         'indestructible'=> "Ne peut être détruit",
@@ -980,14 +981,14 @@ $lang = array(
             "Méta",                 "rouge(s)",         "jaune(s)",             "bleue(s)"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => ["moins de %d gemme %s", "moins de %d gemmes %s"],
-            3 => "plus de gemmes %s que de %s",             // plus de gemmes %s que |2 %s
-            5 => ["au moins %d gemme %s", "au moins %d gemmes %s"]
+            2 => "moins de %d |4gemme:gemmes; %s",
+            3 => "plus de gemmes %s que |2 %s",
+            5 => "au moins %d |4gemme:gemmes; %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Nécessite une cote d'arène personnelle et en équipe de %d",
-            "Nécessite une cote d'arène personnelle et en équipe de %d<br>en arène de 3c3 ou 5c5.",
-            "Nécessite une cote d'arène personnelle et en équipe de %d<br>en arène de 5c5."
+            "Nécessite une cote d'arène personnelle et en équipe de %d|nen arène de 3c3 ou 5c5.",
+            "Nécessite une cote d'arène personnelle et en équipe de %d|nen arène de 5c5."
         ),
         'quality'       => array(
             "Médiocre",             "Classique",        "Bonne",                "Rare",

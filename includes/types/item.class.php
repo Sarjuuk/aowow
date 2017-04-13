@@ -556,12 +556,7 @@ class ItemList extends BaseType
         if ($this->curTpl['slots'] > 0)
         {
             $fam = $this->curTpl['bagFamily'] ? log($this->curTpl['bagFamily'], 2) + 1 : 0;
-
-            // word order differs <_<
-            if (in_array(User::$localeId, [LOCALE_FR, LOCALE_ES, LOCALE_RU]))
-                $x .= '<br />'.sprintf(Lang::item('bagSlotString'), Lang::item('bagFamily', $fam), $this->curTpl['slots']);
-            else
-                $x .= '<br />'.sprintf(Lang::item('bagSlotString'), $this->curTpl['slots'], Lang::item('bagFamily', $fam));
+            $x .= '<br />'.Lang::item('bagSlotString', [$this->curTpl['slots'], Lang::item('bagFamily', $fam)]);
         }
 
         if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]))
@@ -635,10 +630,10 @@ class ItemList extends BaseType
             if ($interactive)
                 $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
 
-            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.sprintf(Lang::item('armor'), intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span></span><br />';
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])]).'</span></span><br />';
         }
         else if (($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
-            $x .= '<span><!--amr-->'.sprintf(Lang::item('armor'), intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])).'</span><br />';
+            $x .= '<span><!--amr-->'.Lang::item('armor', [intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])]).'</span><br />';
 
         // Block (note: block value from field block and from field stats or parsed from itemSpells are displayed independently)
         if ($this->curTpl['tplBlock'])
@@ -660,17 +655,21 @@ class ItemList extends BaseType
                         if (!$gemCnd['color'.$i])
                             continue;
 
+                        $vspfArgs = [];
                         switch ($gemCnd['comparator'.$i])
                         {
                             case 2:                         // requires less <color> than (<value> || <comparecolor>) gems
                             case 5:                         // requires at least <color> than (<value> || <comparecolor>) gems
-                                $sp = (int)$gemCnd['value'.$i] > 1;
-                                $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', $gemCnd['comparator'.$i], $sp), $gemCnd['value'.$i], Lang::item('gemColors', $gemCnd['color'.$i] - 1)).'</span><br />';
+                                $vspfArgs = [$gemCnd['value'.$i], Lang::item('gemColors', $gemCnd['color'.$i] - 1)];
                                 break;
                             case 3:                         // requires more <color> than (<value> || <comparecolor>) gems
-                                $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', 3), Lang::item('gemColors', $gemCnd['color'.$i] - 1), Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)).'</span><br />';
+                                $vspfArgs = [Lang::item('gemColors', $gemCnd['color'.$i] - 1), Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)];
                                 break;
+                            default:
+                                continue;
                         }
+
+                        $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.Lang::item('gemConditions', $gemCnd['comparator'.$i], $vspfArgs).'</span><br />';
                     }
                 }
             }
@@ -948,7 +947,7 @@ class ItemList extends BaseType
                 foreach ($pieces as $k => &$p)
                     $p = '<span><!--si'.$p['equiv'].'--><a href="?item='.$k.'">'.Util::localizedString($p, 'name').'</a></span>';
 
-                $xSet = '<br /><span class="q"><a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a> (0/'.count($pieces).')</span>';
+                $xSet = '<br /><span class="q">'.Lang::item('setName', ['<a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a>', 0, count($pieces)]).'</span>';
 
                 if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
                 {
@@ -996,7 +995,7 @@ class ItemList extends BaseType
                         $setSpells[$i] = $setSpells[$j];
                         $setSpells[$j] = $tmp;
                     }
-                    $xSet .= '<span>'.sprintf(Lang::item('set'), $setSpells[$i]['bonus'], '<a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a>').'</span>';
+                    $xSet .= '<span>'.Lang::item('setBonus', [$setSpells[$i]['bonus'], '<a href="?spell='.$setSpells[$i]['entry'].'">'.$setSpells[$i]['tooltip'].'</a>']).'</span>';
                     if ($i < count($setSpells) - 1)
                         $xSet .= '<br />';
                 }
@@ -1058,9 +1057,9 @@ class ItemList extends BaseType
         if ($this->curTpl['pageTextId'])
             $xMisc[] = '<span class="q2">'.Lang::item('readClick').'</span>';
 
-        // charges (i guess checking first spell is enough (single charges not shown))
-        if ($this->curTpl['spellCharges1'] > 1 || $this->curTpl['spellCharges1'] < -1)
-            $xMisc[] = '<span class="q1">'.abs($this->curTpl['spellCharges1']).' '.Lang::item('charges').'</span>';
+        // charges (i guess checking first spell is enough)
+        if ($this->curTpl['spellCharges1'])
+            $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges1'])]).'</span>';
 
         // list required reagents
         if (isset($xCraft))

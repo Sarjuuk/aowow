@@ -605,7 +605,7 @@ $lang = array(
         'receiveAlso'   => "Ihr bekommt außerdem",
         'spellCast'     => "Der folgende Zauber wird auf Euch gewirkt",
         'spellLearn'    => "Ihr erlernt",
-        'bonusTalents'  => "Talentpunkte",
+        'bonusTalents'  => "%d |4Talentpunkt:Talentpunkte;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
         'attachment'    => "Anlage",
         'questInfo'     => array(
@@ -911,14 +911,14 @@ $lang = array(
         'notFound'      => "Dieser Gegenstand existiert nicht .",
         'armor'         => "%s Rüstung",
         'block'         => "%s Blocken",
-        'charges'       => "Aufladungen",
+        'charges'       => "%d |4Aufladung:Aufladungen;",
         'locked'        => "Verschlossen",
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "Heroisch",
         'startQuest'    => "Dieser Gegenstand startet eine Quest",
-        'bagSlotString' => "%d Platz %s",
+        'bagSlotString' => '%1$d Platz %2$s',
         'fap'           => "Angriffskraft in Tiergestalt",
-        'durability'    => "Haltbarkeit %1$d / %2$d",
+        'durability'    => 'Haltbarkeit %1$d / %2$d',
         'realTime'      => "Realzeit",
         'conjured'      => "Herbeigezauberter Gegenstand",
         'sellPrice'     => "Verkaufspreis",
@@ -926,7 +926,8 @@ $lang = array(
         'randEnchant'   => "&lt;Zufällige Verzauberung&gt",
         'readClick'     => "&lt;Zum Lesen rechtsklicken&gt",
         'openClick'     => "&lt;Zum Öffnen rechtsklicken&gt",
-        'set'           => "(%d) Set: %s",
+        'setBonus'      => "(%d) Set: %s",
+        'setName'       => '%1$s (%2$d/%3$d)',
         'partyLoot'     => "Gruppenloot",
         'smartLoot'     => "Intelligente Beuteverteilung",
         'indestructible'=> "Kann nicht zerstört werden",
@@ -980,14 +981,14 @@ $lang = array(
             "Meta",                 "Rot",              "Gelb",                 "Blau"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua; 2 not in use (use as PH)
-            2 => ["weniger als %d Edelstein der Kategorie %s", "weniger als %d Edelsteine der Kategorie %s"],
+            2 => "weniger als %d |4Edelstein:Edelsteine; der Kategorie %s",
             3 => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
-            5 => ["mindestens %d Edelstein der Kategorie %s", "mindestens %d Edelsteine der Kategorie %s"]
+            5 => "mindestens %d |4Edelstein:Edelsteine; der Kategorie %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",
-            "Benötigt eine persönliche und eine Teamwertung von %d<br>in 3v3- oder 5v5-Turnieren",
-            "Benötigt eine persönliche und eine Teamwertung von %d<br>in 5v5-Turnieren"
+            "Benötigt eine persönliche und eine Teamwertung von %d|nin 3v3- oder 5v5-Turnieren",
+            "Benötigt eine persönliche und eine Teamwertung von %d|nin 5v5-Turnieren"
         ),
         'quality'       => array(
             "Schlecht",             "Verbreitet",       "Selten",               "Rar",

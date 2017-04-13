@@ -190,11 +190,11 @@ if ($g = $this->gains):
     endif;
 
     if (!empty($g['title'])):
-        echo '                        <li><div>'.sprintf(Lang::quest('theTitle'), $g['title'])."</div></li>\n";
+        echo '                        <li><div>'.Lang::quest('theTitle', [$g['title']])."</div></li>\n";
     endif;
 
     if (!empty($g['tp'])):
-        echo '                        <li><div>'.$g['tp'].' '.Lang::quest('bonusTalents')."</div></li>\n";
+        echo '                        <li><div>'.Lang::quest('bonusTalents', [$g['tp']])."</div></li>\n";
     endif;
 
     echo "                    </ul>\n";
