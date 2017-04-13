@@ -382,7 +382,7 @@ class Lang
         // french preposition : de
         // |2 <word>
         $var = preg_replace_callback('/\|2\s(\w)/i', function ($m) {
-            if (in_array(strtolower($m[1], ['a', 'e', 'h', 'i', 'o', 'u'])))
+            if (in_array(strtolower($m[1]), ['a', 'e', 'h', 'i', 'o', 'u']))
                 return "d'".$m[1];
             else
                 return 'de '.$m[1];
