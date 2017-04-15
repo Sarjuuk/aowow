@@ -630,11 +630,8 @@ class SpellPage extends GenericPage
                         $lv[$bar]['condition'][0][$this->typeId][] = [[CND_SPELL, $extraItem['requiredSpecialization']]];
                         $this->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
                         $extraCols[] = '$Listview.extraCols.condition';
-                        if ($max = $extraItem['additionalMaxNum'])
-                        {
-                            $lv[$bar]['mincount'] = 1;
-                            $lv[$bar]['maxcount'] = $max;
-                        }
+                        if ($max = ($extraItem['additionalMaxNum'] - 1))
+                            $lv[$bar]['stack'] = [1, $max];
 
                         break;                              // skill_extra_item_template can only contain 1 item
                     }

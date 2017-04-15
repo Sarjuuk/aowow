@@ -7,6 +7,8 @@ if (!defined('AOWOW_REVISION'))
  * Page
  */
 
+define('E_AOWOW',                           E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+
 // TypeIds
 define('TYPE_NPC',                          1);
 define('TYPE_OBJECT',                       2);
@@ -171,6 +173,13 @@ define('FILTER_CR_NUMERIC',                 3);
 define('FILTER_CR_STRING',                  4);
 define('FILTER_CR_ENUM',                    5);
 define('FILTER_CR_STAFFFLAG',               6);
+define('FILTER_CR_CALLBACK',                7);
+define('FILTER_CR_NYI_PH',                  999);
+define('FILTER_V_EQUAL',                    8);
+define('FILTER_V_RANGE',                    9);
+define('FILTER_V_LIST',                     10);
+define('FILTER_V_CALLBACK',                 11);
+define('FILTER_V_REGEX',                    12);
 
 define('FILTER_ENUM_ANY',                   -2323);
 define('FILTER_ENUM_NONE',                  -2324);
@@ -213,6 +222,12 @@ define('CONTRIBUTE_CO',                     0x1);
 define('CONTRIBUTE_SS',                     0x2);
 define('CONTRIBUTE_VI',                     0x4);
 define('CONTRIBUTE_ANY',                    CONTRIBUTE_CO | CONTRIBUTE_SS | CONTRIBUTE_VI);
+
+define('NUM_ANY',                           0);
+define('NUM_CAST_INT',                      1);
+define('NUM_CAST_FLOAT',                    2);
+define('NUM_REQ_INT',                       3);
+define('NUM_REQ_FLOAT',                     4);
 
 /*
  * Game

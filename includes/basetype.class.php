@@ -754,16 +754,16 @@ trait spawnHelper
 
 abstract class Filter
 {
-    private static  $pattern   = "/[\p{C}]/ui";             // delete unprintable characters
-    private static  $wCards    = ['*' => '%', '?' => '_'];
-    private static  $criteria  = ['cr', 'crs', 'crv'];      // [cr]iterium, [cr].[s]ign, [cr].[v]alue
+    private static  $wCards      = ['*' => '%', '?' => '_'];
 
-    public          $error     = false;                     // erronous search fields
+    public          $error       = false;                   // erronous search fields
 
-    private         $cndSet    = [];
+    private         $cndSet      = [];
 
-    protected       $fiData    = ['c' => [], 'v' =>[]];
-    protected       $formData  =  array(                    // data to fill form fields
+    protected       $parentCats  = [];                      // used to validate ty-filter
+    protected       $inputFields = [];                      // list of input fields defined per page
+    protected       $fiData      = ['c' => [], 'v' =>[]];
+    protected       $formData    =  array(                  // data to fill form fields
                         'form'           => [],             // base form - unsanitized
                         'setCriteria'    => [],             // dynamic criteria list             - index checked
                         'setWeights'     => [],             // dynamic weights list              - index checked
@@ -771,130 +771,24 @@ abstract class Filter
                         'reputationCols' => []              // simlar and exclusive to extraCols - added as required
                     );
 
-    // parse the provided request into a usable format; recall self with GET-params if nessecary
-    public function __construct()
+    // parse the provided request into a usable format
+    public function __construct($fromPOST = false, $opts = [])
     {
-        // prefer POST over GET, translate to url
-        if (!empty($_POST))
+        if (!empty($opts['parentCats']))
+            $this->parentCats = $opts['parentCats'];
+
+        if ($fromPOST)
+            $this->evaluatePOST();
+        else
         {
-            foreach ($_POST as $k => $v)
+            // an error occured, while processing POST
+            if (isset($_SESSION['fiError']))
             {
-                if (is_array($v))                           // array -> max depths:1
-                {
-                    if (in_array($k, ['cr', 'wt']) && empty($v[0]))
-                        continue;
-
-                    $sub = [];
-                    foreach ($v as $sk => $sv)
-                        $sub[$sk] = Util::checkNumeric($sv) ? $sv : urlencode($sv);
-
-                    if (!empty($sub) && in_array($k, self::$criteria))
-                        $this->fiData['c'][$k] = $sub;
-                    else if (!empty($sub))
-                        $this->fiData['v'][$k] = $sub;
-                }
-                else                                        // stings and integer
-                {
-                    if (in_array($k, self::$criteria))
-                        $this->fiData['c'][$k] = Util::checkNumeric($v) ? $v : urlencode($v);
-                    else
-                        $this->fiData['v'][$k] = Util::checkNumeric($v) ? $v : urlencode($v);
-                }
+                $this->error = $_SESSION['fiError'] == get_class($this);
+                unset($_SESSION['fiError']);
             }
 
-            // do get request
-            header('Location: '.HOST_URL.'?'.$_SERVER['QUERY_STRING'].'='.$this->urlize(), true, 302);
-        }
-        // sanitize input and build sql
-        else if (!empty($_GET['filter']))
-        {
-            $tmp = explode(';', $_GET['filter']);
-            $cr  = $crs = $crv = [];
-
-            foreach (self::$criteria as $c)
-            {
-                foreach ($tmp as $i => $term)
-                {
-                    if (strpos($term, $c.'=') === 0)
-                    {
-                        $$c = explode(':', explode('=', $term)[1]);
-                        unset($tmp[$i]);
-                    }
-                }
-            }
-
-            // handle erronous input
-            if (count($cr) != count($crv) || count($cr) != count($crs))
-            {
-                // use min provided criterion as basis
-                $min = min(count($cr), count($crv), count($crs));
-                if (count($cr) > $min)
-                    array_splice($cr, $min);
-
-                if (count($crv) > $min)
-                    array_splice($crv, $min);
-
-                if (count($crs) > $min)
-                    array_splice($crs, $min);
-
-                $this->error = true;
-            }
-
-            foreach (self::$criteria as $c)
-                $this->formData['setCriteria'][$c] = $$c;
-
-            for ($i = 0; $i < count($cr); $i++)
-            {
-                if (!isset($cr[$i])  || !isset($crs[$i]) || !isset($crv[$i]) ||
-                    !intVal($cr[$i]) ||  $crs[$i] === '' ||  $crv[$i] === '')
-                {
-                    $this->error = true;
-                    continue;
-                }
-
-                $this->sanitize($crv[$i]);
-
-                if ($crv[$i] !== '')
-                {
-                    $this->fiData['c']['cr'][]  = intVal($cr[$i]);
-                    $this->fiData['c']['crs'][] = intVal($crs[$i]);
-                    $this->fiData['c']['crv'][] = $crv[$i];
-                }
-                else
-                    $this->error = true;
-
-            }
-
-            foreach ($tmp as $v)
-            {
-                if (!strstr($v, '='))
-                    continue;
-
-                $w = explode('=', $v);
-
-                if (strstr($w[1], ':'))
-                {
-                    $tmp2 = explode(':', $w[1]);
-
-                    $this->formData['form'][$w[0]] = $tmp2;
-
-                    array_walk($tmp2, function(&$v) {
-                        $v = intVal($v);
-                    });
-                    $this->fiData['v'][$w[0]] = $tmp2;
-                }
-                else
-                {
-                    $this->formData['form'][$w[0]] = $w[1];
-
-                    $this->sanitize($w[1]);
-
-                    if ($w[1] !== '')
-                        $this->fiData['v'][$w[0]] = $w[1];
-                    else
-                        $this->error = true;
-                }
-            }
+            $this->evaluateGET();
         }
     }
 
@@ -904,7 +798,25 @@ abstract class Filter
         return ['formData'];
     }
 
-    public function urlize(array $override = [], array $addCr = [])
+    private function &criteriaIterator()
+    {
+        if (!$this->fiData['c'])
+            return;
+
+        for ($i = 0; $i < count($this->fiData['c']['cr']); $i++)
+        {
+            // throws a notice if yielded directly "Only variable references should be yielded by reference"
+            $v = [&$this->fiData['c']['cr'][$i], &$this->fiData['c']['crs'][$i], &$this->fiData['c']['crv'][$i]];
+            yield $i => $v;
+        }
+    }
+
+
+    /***********************/
+    /* get prepared values */
+    /***********************/
+
+    public function getFilterString(array $override = [], array $addCr = [])
     {
         $_ = [];
         foreach (array_merge($this->fiData['c'], $this->fiData['v'], $override) as $k => $v)
@@ -932,79 +844,315 @@ abstract class Filter
         return implode(';', $_);
     }
 
-    // todo: kill data, that is unexpected or points to wrong indizes
-    private function evaluateFilter()
+    public function getExtraCols()
     {
-        // values
-        $this->cndSet = $this->createSQLForValues();
-
-        // criteria
-        foreach ($this->criteriaIterator() as &$_cr)
-            $this->cndSet[] = $this->createSQLForCriterium($_cr);
-
-        if ($this->cndSet)
-            array_unshift($this->cndSet, empty($this->fiData['v']['ma']) ? 'AND' : 'OR');
+        return $this->formData['extraCols'];
     }
 
-    public function getForm($key = null, $raw = false)
+    public function getSetCriteria()
     {
-        $form = [];
+        return $this->formData['setCriteria'];
+    }
 
-        if (!$this->formData)
-            return $form;
+    public function getSetWeights()
+    {
+        return $this->formData['setWeights'];
+    }
 
-        foreach ($this->formData as $name => $data)
-        {
-            if (!$data || ($key && $name != $key))
-                continue;
+    public function getReputationCols()
+    {
+        return $this->formData['reputationCols'];
+    }
 
-            switch ($name)
-            {
-                case 'setCriteria':
-                    if ($data || $raw)
-                        $form[$name] = $raw ? $data : 'fi_setCriteria('.Util::toJSON($data['cr']).', '.Util::toJSON($data['crs']).', '.Util::toJSON($data['crv']).');';
-                    else
-                        $form[$name] = 'fi_setCriteria([], [], []);';
-                    break;
-                case 'extraCols':
-                    $form[$name] = $raw ? $data : 'fi_extraCols = '.Util::toJSON(array_unique($data)).';';
-                    break;
-                case 'setWeights':
-                    $form[$name] = $raw ? $data : 'fi_setWeights('.Util::toJSON($data).', 0, 1, 1);';
-                    break;
-                case 'form':
-                case 'reputationCols':
-                    if ($key == $name)                      // only if explicitely specified
-                        $form[$name] = $data;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return $key ? (empty($form[$key]) ? [] : $form[$key]) : $form;
+    public function getForm()
+    {
+        return $this->formData['form'];
     }
 
     public function getConditions()
     {
         if (!$this->cndSet)
-            $this->evaluateFilter();
+        {
+            // values
+            $this->cndSet = $this->createSQLForValues();
+
+            // criteria
+            foreach ($this->criteriaIterator() as &$_cr)
+                $this->cndSet[] = $this->createSQLForCriterium($_cr);
+
+            if ($this->cndSet)
+                array_unshift($this->cndSet, empty($this->fiData['v']['ma']) ? 'AND' : 'OR');
+        }
 
         return $this->cndSet;
     }
 
-    // santas little helper..
-    private function &criteriaIterator()
+
+    /**********************/
+    /* input sanitization */
+    /**********************/
+
+    private function evaluatePOST()
     {
-        if (!$this->fiData['c'])
+        // doesn't need to set formData['form']; this happens in GET-step
+
+        foreach ($this->inputFields as $inp => list($type, $valid, $asArray))
+        {
+            if (!isset($_POST[$inp]) || $_POST[$inp] === '')
+                continue;
+
+            $val = $_POST[$inp];
+            $k   = in_array($inp, ['cr', 'crs', 'crv']) ? 'c' : 'v';
+
+            if ($asArray)
+            {
+                $buff = [];
+                foreach ((array)$val as $v)
+                    if ($v !== '' && $this->checkInput($type, $valid, $v))
+                       $buff[] = $v;
+
+                if ($buff)
+                    $this->fiData[$k][$inp] = $buff;
+            }
+            else if ($this->checkInput($type, $valid, $val))
+                $this->fiData[$k][$inp] = $val;
+        }
+
+        $this->setWeights();
+        $this->setCriteria();
+    }
+
+    private function evaluateGET()
+    {
+        if (empty($_GET['filter']))
             return;
 
-        for ($i = 0; $i < count($this->fiData['c']['cr']); $i++)
+        // squash into usable format
+        $post = [];
+        foreach (explode(';', $_GET['filter']) as $f)
         {
-            // throws a notice if yielded directly "Only variable references should be yielded by reference"
-            $v = [&$this->fiData['c']['cr'][$i], &$this->fiData['c']['crs'][$i], &$this->fiData['c']['crv'][$i]];
-            yield $i => $v;
+            if (!strstr($f, '='))
+            {
+                $this->error = true;
+                continue;
+            }
+
+            $_ = explode('=', $f);
+            $post[$_[0]] = $_[1];
         }
+
+        $cr = $crs = $crv = [];
+        foreach ($this->inputFields as $inp => list($type, $valid, $asArray))
+        {
+            if (!isset($post[$inp]) || $post[$inp] === '')
+                continue;
+
+            $val = $post[$inp];
+            $k   = in_array($inp, ['cr', 'crs', 'crv']) ? 'c' : 'v';
+
+            if ($asArray)
+            {
+                $buff = [];
+                foreach (explode(':', $val) as $v)
+                    if ($v !== '' && $this->checkInput($type, $valid, $v))
+                       $buff[] = $v;
+
+                if ($buff)
+                {
+                    if ($k == 'v')
+                        $this->formData['form'][$inp] = $buff;
+
+                    $this->fiData[$k][$inp] = array_map(function ($x) { return strtr($x, Filter::$wCards); }, $buff);
+                }
+            }
+            else if ($this->checkInput($type, $valid, $val))
+            {
+                if ($k == 'v')
+                    $this->formData['form'][$inp] = $val;
+
+                $this->fiData[$k][$inp] = strtr($val, Filter::$wCards);
+            }
+        }
+
+        $this->setWeights();
+        $this->setCriteria();
+    }
+
+    private function setCriteria()                          // [cr]iterium, [cr].[s]ign, [cr].[v]alue
+    {
+        if (empty($this->fiData['c']['cr']) && empty($this->fiData['c']['crs']) && empty($this->fiData['c']['crv']))
+            return;
+        else if (empty($this->fiData['c']['cr']) || empty($this->fiData['c']['crs']) || empty($this->fiData['c']['crv']))
+        {
+            unset($this->fiData['c']['cr']);
+            unset($this->fiData['c']['crs']);
+            unset($this->fiData['c']['crv']);
+
+            $this->error = true;
+
+            return;
+        }
+
+        $_cr  = &$this->fiData['c']['cr'];
+        $_crs = &$this->fiData['c']['crs'];
+        $_crv = &$this->fiData['c']['crv'];
+
+        if (count($_cr) != count($_crv) || count($_cr) != count($_crs))
+        {
+            // use min provided criterion as basis
+            $min = min(count($_cr), count($_crv), count($_crs));
+            if (count($_cr) > $min)
+                array_splice($_cr, $min);
+
+            if (count($_crv) > $min)
+                array_splice($_crv, $min);
+
+            if (count($_crs) > $min)
+                array_splice($_crs, $min);
+
+            $this->error = true;
+        }
+
+        for ($i = 0; $i < count($_cr); $i++)
+        {
+            //  conduct filter specific checks & casts here
+            $unsetme = false;
+            if (isset($this->genericFilter[$_cr[$i]]))
+            {
+                $gf = $this->genericFilter[$_cr[$i]];
+                switch ($gf[0])
+                {
+                    case FILTER_CR_NUMERIC:
+                        $_ = $_crs[$i];
+                        if (!Util::checkNumeric($_crv[$i], $gf[2]) || !$this->int2Op($_))
+                            $unsetme = true;
+                        break;
+                    case FILTER_CR_BOOLEAN:
+                    case FILTER_CR_FLAG:
+                    case FILTER_CR_STAFFFLAG:
+                        $_ = $_crs[$i];
+                        if (!$this->int2Bool($_))
+                            $unsetme = true;
+                        break;
+                    case FILTER_CR_ENUM:
+                        if (!Util::checkNumeric($_crs[$i], NUM_REQ_INT))
+                            $unsetme = true;
+                        break;
+                }
+            }
+
+            if (!$unsetme && intval($_cr[$i]) && $_crs[$i] !== '' && $_crv[$i] !== '')
+                continue;
+
+            unset($_cr[$i]);
+            unset($_crs[$i]);
+            unset($_crv[$i]);
+
+            $this->error = true;
+        }
+
+        $this->formData['setCriteria'] = array(
+            'cr'  => $_cr,
+            'crs' => $_crs,
+            'crv' => $_crv
+        );
+    }
+
+    private function setWeights()
+    {
+        if (empty($this->fiData['v']['wt']) && empty($this->fiData['v']['wtv']))
+            return;
+
+        $_wt  = &$this->fiData['v']['wt'];
+        $_wtv = &$this->fiData['v']['wtv'];
+
+        if (empty($_wt) && !empty($_wtv))
+        {
+            unset($_wtv);
+            $this->error = true;
+            return;
+        }
+
+        if (empty($_wtv) && !empty($_wt))
+        {
+            unset($_wt);
+            $this->error = true;
+            return;
+        }
+
+        $nwt  = count($_wt);
+        $nwtv = count($_wtv);
+
+        if ($nwt > $nwtv)
+        {
+            array_splice($_wt, $nwtv);
+            $this->error = true;
+        }
+        else if ($nwtv > $nwt)
+        {
+            array_splice($_wtv, $nwt);
+            $this->error = true;
+        }
+
+        $this->formData['setWeights'] = [$_wt, $_wtv];
+    }
+
+    protected function checkInput($type, $valid, &$val, $recursive = false)
+    {
+        switch ($type)
+        {
+            case FILTER_V_EQUAL:
+                if (gettype($valid) == 'integer')
+                    $val = intval($val);
+                else if (gettype($valid) == 'double')
+                    $val = floatval($val);
+                else /* if (gettype($valid) == 'string') */
+                    $var = strval($val);
+
+                if ($valid == $val)
+                    return true;
+
+                break;
+            case FILTER_V_LIST:
+                if (!Util::checkNumeric($val, NUM_CAST_INT))
+                    return false;
+
+                foreach ($valid as $k => $v)
+                {
+                    if (gettype($v) != 'array')
+                        continue;
+
+                    if ($this->checkInput(FILTER_V_RANGE, $v, $val, true))
+                        return true;
+
+                    unset($valid[$k]);
+                }
+
+                if (in_array($val, $valid))
+                    return true;
+
+                break;
+            case FILTER_V_RANGE:
+                if (Util::checkNumeric($val, NUM_CAST_INT) && $val >= $valid[0] && $val <= $valid[1])
+                    return true;
+
+                break;
+            case FILTER_V_CALLBACK:
+                if ($this->$valid($val))
+                    return true;
+
+                break;
+            case FILTER_V_REGEX:
+                if (!preg_match($valid, $val))
+                    return true;
+
+                break;
+        }
+
+        if (!$recursive)
+            $this->error = true;
+
+        return false;
     }
 
     protected function modularizeString(array $fields, $string = '', $exact = false)
@@ -1072,36 +1220,22 @@ abstract class Filter
         }
     }
 
-    protected function list2Mask($list, $noOffset = false)
+    protected function list2Mask(array $list, $noOffset = false)
     {
         $mask = 0x0;
         $o    = $noOffset ? 0 : 1;                          // schoolMask requires this..?
 
-        if (!is_array($list))
-            $mask = (1 << (intVal($list) - $o));
-        else
-            foreach ($list as $itm)
-                $mask += (1 << (intVal($itm) - $o));
+        foreach ($list as $itm)
+            $mask += (1 << (intval($itm) - $o));
 
         return $mask;
     }
 
-    protected function isSaneNumeric(&$val, $castInt = true)
-    {
-        if ($castInt && is_float($val))
-            $val = intVal($val);
 
-        if (is_int($val) || (is_float($val) && $val >= 0.0))
-            return true;
-
-        return false;
-    }
-
-    private function sanitize(&$str)
-    {
-        $str = preg_replace(Filter::$pattern, '', trim($str));
-        $str = Util::checkNumeric($str) ? $str : strtr($str, Filter::$wCards);
-    }
+    /**************************/
+    /* create conditions from */
+    /*    generic criteria    */
+    /**************************/
 
     private function genericBoolean($field, $op, $isString)
     {
@@ -1134,7 +1268,7 @@ abstract class Filter
 
     private function genericNumeric($field, &$value, $op, $castInt)
     {
-        if (!$this->isSaneNumeric($value, $castInt))
+        if (!Util::checkNumeric($value, $castInt))
             return null;
 
         if ($this->int2Op($op))
@@ -1165,7 +1299,7 @@ abstract class Filter
         switch ($gen[0])
         {
             case FILTER_CR_NUMERIC:
-                $result = $this->genericNumeric($gen[1], $cr[2], $cr[1], empty($gen[2]));
+                $result = $this->genericNumeric($gen[1], $cr[2], $cr[1], $gen[2]);
                 break;
             case FILTER_CR_FLAG:
                 $result = $this->genericBooleanFlags($gen[1], $gen[2], $cr[1]);
@@ -1183,16 +1317,39 @@ abstract class Filter
             case FILTER_CR_ENUM:
                 if (isset($this->enums[$cr[0]][$cr[1]]))
                     $result = $this->genericEnum($gen[1], $this->enums[$cr[0]][$cr[1]]);
-                else if (intVal($cr[1]) != 0)
-                    $result = $this->genericEnum($gen[1], intVal($cr[1]));
+                else if (intval($cr[1]) != 0)
+                    $result = $this->genericEnum($gen[1], intval($cr[1]));
                 break;
+            case FILTER_CR_CALLBACK:
+                $result = $this->{$gen[1]}($cr, $gen[2], $gen[3]);
+                break;
+            case FILTER_CR_NYI_PH:                          // do not limit with not implemented filters
+                if (is_int($gen[2]))
+                    return [$gen[2]];
+
+                // for nonsensical values; compare against 0
+                if ($this->int2Op($cr[1]) && Util::checkNumeric($cr[2]))
+                {
+                    if ($cr[1] == '=')
+                        $cr[1] = '==';
+
+                    return eval('return ('.$cr[2].' '.$cr[1].' 0);') ? [1] : [0];
+                }
+                else
+                    return [0];
         }
 
-        if ($result && !empty($gen[3]))
+        if ($result && $gen[0] == FILTER_CR_NUMERIC && !empty($gen[3]))
             $this->formData['extraCols'][] = $cr[0];
 
         return $result;
     }
+
+
+    /***********************************/
+    /*     create conditions from      */
+    /* non-generic values and criteria */
+    /***********************************/
 
     abstract protected function createSQLForCriterium(&$cr);
     abstract protected function createSQLForValues();

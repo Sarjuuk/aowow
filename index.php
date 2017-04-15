@@ -82,7 +82,7 @@ switch ($pageCall)
     case 'cookie':                                          // lossless cookies and user settings
     case 'contactus':
     case 'comment':
-    // case 'filter':                                       // just a note: this would be accessed from filtrable pages as ?filter=typeStr (with POST-data) and forwards back to page with GET-data .. why? Hell if i know..
+    case 'filter':                                          // pre-evaluate filter POST-data; sanitize and forward as GET-data
     case 'go-to-comment':                                   // find page the comment is on and forward
     case 'locale':                                          // subdomain-workaround, change the language
         $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));

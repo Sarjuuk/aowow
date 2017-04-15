@@ -81,13 +81,14 @@ class ItemsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new ItemListFilter();
         $this->getCategoryFromUrl($pageParam);
+
+        $this->filterObj = new ItemListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('items'));
-        $this->subCat = $pageParam !== NULL ? '='.$pageParam : '';
+        $this->subCat = $pageParam !== null ? '='.$pageParam : '';
     }
 
     protected function generateContent()
@@ -107,9 +108,19 @@ class ItemsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['initData'] = ['init' => 'items'];
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
+
+        $xCols = $this->filterObj->getExtraCols();
+        if ($xCols)
+            $this->filter['initData']['ec'] = $xCols;
+
+        if ($x = $this->filterObj->getSetWeights())
+            $this->filter['initData']['sw'] = $x;
 
         $menu = $this->createExtraMenus();
         foreach ($menu['type'][0] as $k => $str)
@@ -123,13 +134,12 @@ class ItemsPage extends GenericPage
         if (isset($this->filter['slot'][INVTYPE_SHIELD]))   // "Off Hand" => "Shield"
             $this->filter['slot'][INVTYPE_SHIELD] = Lang::item('armorSubClass', 6);
 
-        $xCols = $this->filterObj->getForm('extraCols', true);
 
         $infoMask = ITEMINFO_JSON;
         if (array_intersect([63, 64, 125], $xCols))         // 63:buyPrice; 64:sellPrice; 125:reqarenartng
             $infoMask |= ITEMINFO_VENDOR;
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($xCols)
             $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.(isset($this->filter['gm']) ? $this->filter['gm'] : 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
 
         if ($this->filterObj->error)
@@ -157,7 +167,7 @@ class ItemsPage extends GenericPage
         /*************************/
 
         $upgItemData = [];
-        if (!empty($this->filter['upg']) && !empty($this->filter['fi']['setWeights']))
+        if (!empty($this->filter['upg']) && !empty($this->filterObj->getSetWeights()))
         {
             $upgItems = new ItemList(array(['id', array_keys($this->filter['upg'])]), ['extraOpts' => $this->filterObj->extraOpts]);
             if (!$upgItems->error)
@@ -352,7 +362,7 @@ class ItemsPage extends GenericPage
                 $tabData['tabs'] = '$tabsGroups';
             }
 
-            if (!empty($this->filter['fi']['setWeights']))
+            if (!empty($this->filterObj->getSetWeights()))
                 if ($items->hasSetFields(['armor']))
                     $tabData['visibleCols'][] = 'armor';
 
@@ -449,7 +459,7 @@ class ItemsPage extends GenericPage
             $this->path[] = $c;
 
         // if slot-dropdown is available && Armor && $path points to Armor-Class
-        $form = $this->filterObj->getForm('form');
+        $form = $this->filterObj->getForm();
         if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
             $this->path[] = $form['sl'];
         else if (!empty($this->category[0]) && $this->category[0] == 0 && isset($form['ty']) && !is_array($form['ty']))
@@ -461,7 +471,7 @@ class ItemsPage extends GenericPage
     {
         $gemScores = [];
 
-        if (empty($this->filter['fi']['setWeights']))
+        if (empty($this->filterObj->getSetWeights()))
             return [];
 
         if (!empty($this->filter['gm']))

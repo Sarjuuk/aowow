@@ -96,7 +96,6 @@ class Util
     public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
     public static $tryFilteringEntityString = '$$WH.sprintf(LANG.lvnote_entitiesfound, %s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
     public static $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
-    public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
 
@@ -496,31 +495,37 @@ class Util
     }
 
     // note: valid integer > 32bit are returned as float
-    public static function checkNumeric(&$data)
+    public static function checkNumeric(&$data, $typeCast = NUM_ANY)
     {
         if ($data === null)
             return false;
         else if (!is_array($data))
         {
             $data = trim($data);
+            if (preg_match('/^-?\d*,\d+$/', $data))
+                $data = strtr($data, ',', '.');
 
             if (is_numeric($data))
             {
-                $data += 0;
-                return true;
-            }
-            else if (preg_match('/^\d*,\d+$/', $data))
-            {
-                $data = floatVal(strtr($data, ',', '.'));
+                $data += 0;                                 // becomes float or int
+
+                if ((is_float($data) && $typeCast == NUM_REQ_INT) ||
+                    (is_int($data) && $typeCast == NUM_REQ_FLOAT))
+                    return false;
+
+                if (is_float($data) && $typeCast == NUM_CAST_INT)
+                    $data = intval($data);
+
+                if (is_int($data) && $typeCast == NUM_CAST_FLOAT)
+                    $data = floatval($data);
+
                 return true;
             }
 
             return false;
         }
 
-        array_walk($data, function(&$item, $key) {
-            self::checkNumeric($item);
-        });
+        array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
 
         return false;                                       // always false for passed arrays
     }

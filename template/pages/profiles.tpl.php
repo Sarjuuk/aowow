@@ -15,7 +15,7 @@ $this->brick('pageTemplate');
 # for some arcane reason a newline (\n) means, the first childNode is a text instead of the form for the following div
 ?>
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block' ?>;"><form
-                action="?profiles&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                action="?filter=profiles" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">
                         <div style="float: left"><?php echo Util::ucFirst(Lang::game('class')).Lang::main('colon'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['cl[]'].selectedIndex = -1; return false" onmousedown="return false"><?php echo Lang::main('clear'); ?></a></small>

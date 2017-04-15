@@ -2159,65 +2159,50 @@ class SpellListFilter extends Filter
 
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_NUMERIC, 'powerCostPercent',                         ],    // prcntbasemanarequired
-         3 => [FILTER_CR_BOOLEAN, 'spellFocusObject'                          ],    // requiresnearbyobject
-         4 => [FILTER_CR_NUMERIC, 'trainingcost'                              ],    // trainingcost
-         5 => [FILTER_CR_BOOLEAN, 'reqSpellId'                                ],    // requiresprofspec
-        10 => [FILTER_CR_FLAG,    'cuFlags',          SPELL_CU_FIRST_RANK     ],    // firstrank
-        12 => [FILTER_CR_FLAG,    'cuFlags',          SPELL_CU_LAST_RANK      ],    // lastrank
-        13 => [FILTER_CR_NUMERIC, 'rankNo',                                   ],    // rankno
-        14 => [FILTER_CR_NUMERIC, 'id',               null,               true],    // id
-        15 => [FILTER_CR_STRING,  'ic.name',                                  ],    // icon
-        19 => [FILTER_CR_FLAG,    'attributes0',      0x80000                 ],    // scaling
-        25 => [FILTER_CR_BOOLEAN, 'skillLevelYellow'                          ],    // rewardsskillups
-        11 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_COMMENT      ],    // hascomments
-         8 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_SCREENSHOT   ],    // hasscreenshots
-        17 => [FILTER_CR_FLAG,    'cuFlags',          CUSTOM_HAS_VIDEO        ],    // hasvideos
+         1 => [FILTER_CR_CALLBACK, 'cbCost',           null,                 null], // costAbs [op] [int]
+         2 => [FILTER_CR_NUMERIC,  'powerCostPercent', NUM_CAST_INT              ], // prcntbasemanarequired
+         3 => [FILTER_CR_BOOLEAN,  'spellFocusObject'                            ], // requiresnearbyobject
+         4 => [FILTER_CR_NUMERIC,  'trainingcost',     NUM_CAST_INT              ], // trainingcost
+         5 => [FILTER_CR_BOOLEAN,  'reqSpellId'                                  ], // requiresprofspec
+         8 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+         9 => [FILTER_CR_CALLBACK, 'cbSource',         null,                 null], // source [enum]
+        10 => [FILTER_CR_FLAG,     'cuFlags',          SPELL_CU_FIRST_RANK       ], // firstrank
+        11 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
+        12 => [FILTER_CR_FLAG,     'cuFlags',          SPELL_CU_LAST_RANK        ], // lastrank
+        13 => [FILTER_CR_NUMERIC,  'rankNo',           NUM_CAST_INT              ], // rankno
+        14 => [FILTER_CR_NUMERIC,  'id',               NUM_CAST_INT,         true], // id
+        15 => [FILTER_CR_STRING,   'ic.name',                                    ], // icon
+        17 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
+        19 => [FILTER_CR_FLAG,     'attributes0',      0x80000                   ], // scaling
+        20 => [FILTER_CR_CALLBACK, 'cbReagents',       null,                 null], // has Reagents [yn]
+        25 => [FILTER_CR_BOOLEAN,  'skillLevelYellow'                            ]  // rewardsskillups
+    );
+
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'cr'    => [FILTER_V_RANGE,    [1, 25],                                         true ], // criteria ids
+        'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
+        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                  false], // name / text - only printable chars, no delimiter
+        'ex'    => [FILTER_V_EQUAL,    'on',                                            false], // extended name search
+        'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
+        'minle' => [FILTER_V_RANGE,    [1, 99],                                         false], // spell level min
+        'maxle' => [FILTER_V_RANGE,    [1, 99],                                         false], // spell level max
+        'minrs' => [FILTER_V_RANGE,    [1, 999],                                        false], // required skill level min
+        'maxrs' => [FILTER_V_RANGE,    [1, 999],                                        false], // required skill level max
+        'ra'    => [FILTER_V_LIST,     [[1, 8], 10, 11],                                false], // races
+        'cl'    => [FILTER_V_CALLBACK, 'cbClasses',                                     true ], // classes
+        'gl'    => [FILTER_V_CALLBACK, 'cbGlyphs',                                      true ], // glyph type
+        'sc'    => [FILTER_V_RANGE,    [0, 6],                                          true ], // magic schools
+        'dt'    => [FILTER_V_LIST,     [[1, 6], 9],                                     false], // dispel types
+        'me'    => [FILTER_V_RANGE,    [1, 31],                                         false]  // mechanics
     );
 
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-        {
             if ($genCr = $this->genericCriterion($cr))
                 return $genCr;
-
-            unset($cr);
-            $this->error = true;
-            return [1];
-        }
-
-        switch ($cr[0])
-        {
-            case 1:                                         // costAbs [op] [int]
-                if (!$this->isSaneNumeric($cr[2]))
-                    break;
-
-                if (!$this->int2Op($cr[1]))
-                    break;
-
-                return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
-            case 9:                                         // source [enum]
-                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
-                if ($_ !== null)
-                {
-                    if (is_int($_))                         // specific
-                        return ['src.src'.$_, null, '!'];
-                    else if ($_)                            // any
-                        return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src6', null, '!'], ['src.src7', null, '!'], ['src.src9', null, '!']];
-                    else if (!$_)                           // none
-                        return ['AND', ['src.src1', null], ['src.src2', null], ['src.src4', null], ['src.src5', null], ['src.src6', null], ['src.src7', null], ['src.src9', null]];
-                }
-                break;
-            case 20:                                        // has Reagents [yn]
-                if ($this->int2Bool($cr[1]))
-                {
-                    if ($cr[1])
-                        return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
-                    else
-                        return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
-                }
-        }
 
         unset($cr);
         $this->error = true;
@@ -2244,97 +2229,108 @@ class SpellListFilter extends Filter
 
         // spellLevel min                                   todo (low): talentSpells (typeCat -2) commonly have spellLevel 1 (and talentLevel >1) -> query is inaccurate
         if (isset($_v['minle']))
-        {
-            if (is_int($_v['minle']) && $_v['minle'] > 0)
-                $parts[] = ['spellLevel', $_v['minle'], '>='];
-            else
-                unset($_v['minle']);
-        }
+            $parts[] = ['spellLevel', $_v['minle'], '>='];
 
         // spellLevel max
         if (isset($_v['maxle']))
-        {
-            if (is_int($_v['maxle']) && $_v['maxle'] > 0)
-                $parts[] = ['spellLevel', $_v['maxle'], '<='];
-            else
-                unset($_v['maxle']);
-        }
+            $parts[] = ['spellLevel', $_v['maxle'], '<='];
 
         // skillLevel min
         if (isset($_v['minrs']))
-        {
-            if (is_int($_v['minrs']) && $_v['minrs'] > 0)
-                $parts[] = ['learnedAt', $_v['minrs'], '>='];
-            else
-                unset($_v['minrs']);
-        }
+            $parts[] = ['learnedAt', $_v['minrs'], '>='];
 
         // skillLevel max
         if (isset($_v['maxrs']))
-        {
-            if (is_int($_v['maxrs']) && $_v['maxrs'] > 0)
-                $parts[] = ['learnedAt', $_v['maxrs'], '<='];
-            else
-                unset($_v['maxrs']);
-        }
+            $parts[] = ['learnedAt', $_v['maxrs'], '<='];
 
         // race
         if (isset($_v['ra']))
-        {
-            if (in_array($_v['ra'], [1, 2, 3, 4, 5, 6, 7, 8, 10, 11]))
-                $parts[] = ['AND', [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask($_v['ra']), '&']];
-            else
-                unset($_v['ra']);
-        }
+            $parts[] = ['AND', [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
 
         // class [list]
         if (isset($_v['cl']))
-        {
-            $_ = (array)$_v['cl'];
-            if (!array_diff($_, [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]))
-                $parts[] = ['reqClassMask', $this->list2Mask($_), '&'];
-            else
-                unset($_v['cl']);
-        }
+            $parts[] = ['reqClassMask', $this->list2Mask($_v['cl']), '&'];
 
         // school [list]
         if (isset($_v['sc']))
-        {
-            $_ = (array)$_v['sc'];
-            if (!array_diff($_, [0, 1, 2, 3, 4, 5, 6]))
-                $parts[] = ['schoolMask', $this->list2Mask($_, true), '&'];
-            else
-                unset($_v['sc']);
-        }
+            $parts[] = ['schoolMask', $this->list2Mask($_v['sc'], true), '&'];
 
         // glyph type [list]                                wonky, admittedly, but consult SPELL_CU_* in defines and it makes sense
         if (isset($_v['gl']))
-        {
-            if (in_array($_v['gl'], [1, 2]))
-                $parts[] = ['cuFlags', ($this->list2Mask($_v['gl']) << 6), '&'];
-            else
-                unset($_v['gl']);
-        }
+            $parts[] = ['cuFlags', ($this->list2Mask($_v['gl']) << 6), '&'];
 
         // dispel type
         if (isset($_v['dt']))
-        {
-            if (in_array($_v['dt'], [1, 2, 3, 4, 5, 6, 9]))
-                $parts[] = ['dispelType', $_v['dt']];
-            else
-                unset($_v['dt']);
-        }
+            $parts[] = ['dispelType', $_v['dt']];
 
         // mechanic
         if (isset($_v['me']))
-        {
-            if ($_v['me'] > 0 && $_v['me'] < 32)
-                $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
-            else
-                unset($_v['me']);
-        }
+            $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
 
         return $parts;
+    }
+
+    protected function cbClasses(&$val)
+    {
+        if (!$this->parentCats || !in_array($this->parentCats[0], [-13, -2, 7]))
+            return false;
+
+        if (!Util::checkNumeric($val, NUM_REQ_INT))
+            return false;
+
+        $type  = FILTER_V_LIST;
+        $valid = [[1, 9], 11];
+
+        return $this->checkInput($type, $valid, $val);
+    }
+
+    protected function cbGlyphs(&$val)
+    {
+        if (!$this->parentCats || $this->parentCats[0] != -13)
+            return false;
+
+        if (!Util::checkNumeric($val, NUM_REQ_INT))
+            return false;
+
+        $type  = FILTER_V_LIST;
+        $valid = [1, 2];
+
+        return $this->checkInput($type, $valid, $val);
+    }
+
+    protected function cbCost($cr)
+    {
+        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
+            return false;
+
+        return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
+    }
+
+    protected function cbSource($cr)
+    {
+        if (!isset($this->enums[$cr[0]][$cr[1]]))
+            return false;
+
+        $_ = $this->enums[$cr[0]][$cr[1]];
+        if (is_int($_))                         // specific
+            return ['src.src'.$_, null, '!'];
+        else if ($_)                            // any
+            return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src6', null, '!'], ['src.src7', null, '!'], ['src.src9', null, '!']];
+        else if (!$_)                           // none
+            return ['AND', ['src.src1', null], ['src.src2', null], ['src.src4', null], ['src.src5', null], ['src.src6', null], ['src.src7', null], ['src.src9', null]];
+
+        return false;
+    }
+
+    protected function cbReagents($cr)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])
+            return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
+        else
+            return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
     }
 }
 

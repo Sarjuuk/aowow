@@ -26,7 +26,7 @@ require_once 'pages/genericPage.class.php';
 
 // autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {
-    $class = strtolower(str_replace('Filter', '', $class));
+    $class = strtolower(str_replace('ListFilter', 'List', $class));
 
     if (class_exists($class))                               // already registered
         return;
@@ -117,7 +117,7 @@ foreach ($sets as $k => $v)
 
 
 // handle non-fatal errors and notices
-error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
+error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? E_AOWOW : 0);
 set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 {
     $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
@@ -149,7 +149,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
         );
 
     return true;
-}, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+}, E_AOWOW);
 
 // handle exceptions
 set_exception_handler(function ($ex)

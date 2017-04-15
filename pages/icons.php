@@ -48,9 +48,12 @@ class IconsPage extends GenericPage
         $this->extendGlobalData($icons->getJSGlobals());
 
         // recreate form selection
-        $this->filter          = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['initData'] = ['init' => 'icons'];
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
 
         if ($icons->getMatches() > $sqlLimit)
         {
@@ -66,7 +69,7 @@ class IconsPage extends GenericPage
 
     protected function generateTitle()
     {
-        $setCrt = $this->filterObj->getForm('setCriteria', true);
+        $setCrt = $this->filterObj->getSetCriteria();
         $title  = $this->name;
         if (isset($setCrt['cr']) && count($setCrt['cr']) == 1)
         {
@@ -98,7 +101,7 @@ class IconsPage extends GenericPage
 
     protected function generatePath()
     {
-        $setCrt = $this->filterObj->getForm('setCriteria', true);
+        $setCrt = $this->filterObj->getSetCriteria();
         if (isset($setCrt['cr']) && count($setCrt['cr']) == 1)
             $this->path[] = $setCrt['cr'][0];
     }
