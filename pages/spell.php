@@ -1606,7 +1606,7 @@ class SpellPage extends GenericPage
             }
 
             // Effect Name
-            $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Util::$spellEffectStrings[$effId]) : Util::$spellEffectStrings[$effId]).Lang::main('colon');
+            $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Lang::spell('effects', $effId)) : Lang::spell('effects', $effId)).Lang::main('colon');
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
@@ -1806,9 +1806,9 @@ class SpellPage extends GenericPage
                 case 129:                                   // AA Enemy
                 case 143:                                   // AA Owner
                 {
-                    if ($effAura > 0 && isset(Util::$spellAuraStrings[$effAura]))
+                    if ($effAura > 0 && ($aurName = Lang::spell('auras', $effAura)))
                     {
-                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, Util::$spellAuraStrings[$effAura]) : Util::$spellAuraStrings[$effAura];
+                        $foo['name'] .= User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'AuraId: '.$effAura, $aurName) : $aurName;
 
                         $bar = $effMV;
                         switch ($effAura)
@@ -1865,19 +1865,13 @@ class SpellPage extends GenericPage
                                 }
                                 break;
                             case 37:                        // Effect immunity
-                                if (isset(Util::$spellEffectStrings[$effMV]))
-                                {
-                                    $_ = Util::$spellEffectStrings[$effMV];
+                                if ($_ = Lang::spell('effects', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
-                                }
 
                                 break;
                             case 38:                        // Aura immunity
-                                if (isset(Util::$spellAuraStrings[$effMV]))
-                                {
-                                    $_ = Util::$spellAuraStrings[$effMV];
+                                if ($_ = Lang::spell('auras', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, Lang::spell('_value').Lang::main('colon').$effMV, $_) : $_;
-                                }
 
                                 break;
                             case 41:                        // Dispel Immunity

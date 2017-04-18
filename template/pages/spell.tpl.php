@@ -160,7 +160,7 @@ if (!empty($this->items)):
 ?>
                     <tr>
                         <th><?=Lang::game('requires2');?></th>
-                        <td colspan="3"><?=(User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode(' | ', $this->items[0]), $this->items[1]) : $this->items[1]);?></td>
+                        <td colspan="3"><?=(User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode('<br />', $this->items[0]), $this->items[1]) : $this->items[1]);?></td>
                     </tr>
 <?php
 endif;
