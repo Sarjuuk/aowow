@@ -710,7 +710,7 @@ class ItemList extends BaseType
         }
 
         // magic resistances
-        foreach (Util::$resistanceFields as $j => $rowName)
+        foreach (Game::$resistanceFields as $j => $rowName)
             if ($rowName && $this->curTpl[$rowName] != 0)
                 $x .= '+'.$this->curTpl[$rowName].' '.Lang::game('resistances', $j).'<br />';
 
@@ -773,9 +773,9 @@ class ItemList extends BaseType
             $text      = $pop ? Util::localizedString($gems[$pop], 'name') : Lang::item('socket', $colorId);
 
             if ($interactive)
-                $x .= '<a href="?items=3&amp;filter=cr=81;crs='.($colorId + 1).';crv=0" class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</a><br />';
+                $x .= '<a href="?items=3&amp;filter=cr=81;crs='.($colorId + 1).';crv=0" class="socket-'.Game::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</a><br />';
             else
-                $x .= '<span class="socket-'.Util::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</span><br />';
+                $x .= '<span class="socket-'.Game::$sockets[$colorId].' q'.$col.'" '.$icon.'>'.$text.'</span><br />';
         }
 
         // fill extra socket
@@ -1192,7 +1192,7 @@ class ItemList extends BaseType
         {
             $this->itemMods[$this->id] = [];
 
-            foreach (Util::$itemMods as $mod)
+            foreach (Game::$itemMods as $mod)
             {
                 if (isset($this->curTpl[$mod]) && ($_ = floatVal($this->curTpl[$mod])))
                 {
@@ -1555,7 +1555,7 @@ class ItemList extends BaseType
             'subclass'    => $this->curTpl['subClass'],
             'subsubclass' => $this->curTpl['subSubClass'],
             'heroic'      => ($this->curTpl['flags'] & 0x8) >> 3,
-            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? 3 - ($this->curTpl['flagsExtra'] & 0x3) : Util::sideByRaceMask($this->curTpl['requiredRace']),
+            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? 3 - ($this->curTpl['flagsExtra'] & 0x3) : Game::sideByRaceMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
             'level'       => $this->curTpl['itemLevel'],

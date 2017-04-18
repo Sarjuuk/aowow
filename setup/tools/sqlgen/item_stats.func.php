@@ -128,7 +128,7 @@ class ItemStatSetup extends ItemList
                 {
                     if (!$v)
                         continue;
-                    if ($str = Util::$itemMods[$k])
+                    if ($str = Game::$itemMods[$k])
                         $updateFields[$str] = number_format($v, 2, '.', '');
                 }
             }
@@ -210,7 +210,7 @@ function enchantment_stats()
                 case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
                     if (!empty($spellStats[$obj]))
                         foreach ($spellStats[$obj] as $mod => $val)
-                            if ($str = Util::$itemMods[$mod])
+                            if ($str = Game::$itemMods[$mod])
                                 Util::arraySumByKey($result[$eId], [$str => $val]);
 
                     $obj = null;
@@ -255,7 +255,7 @@ function enchantment_stats()
             }
 
             if ($obj !== null)
-                if ($str = Util::$itemMods[$obj])       // check if we use these mods
+                if ($str = Game::$itemMods[$obj])       // check if we use these mods
                     Util::arraySumByKey($result[$eId], [$str => $val]);
         }
 

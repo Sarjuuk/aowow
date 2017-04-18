@@ -113,7 +113,7 @@ class EnchantmentPage extends GenericPage
                     if ($_obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
                         $_obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
 
-                    $this->effects[$i]['tip'] = [$_obj, Util::$itemMods[$_obj]];
+                    $this->effects[$i]['tip'] = [$_obj, Game::$itemMods[$_obj]];
                     // DO NOT BREAK!
                 case 2:
                 case 6:

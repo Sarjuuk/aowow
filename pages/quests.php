@@ -19,7 +19,7 @@ class QuestsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->validCats = Util::$questClasses;             // needs reviewing (not allowed to set this as default)
+        $this->validCats = Game::$questClasses;             // needs reviewing (not allowed to set this as default)
 
         $this->filterObj = new QuestListFilter();
         $this->getCategoryFromUrl($pageParam);

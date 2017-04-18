@@ -35,7 +35,7 @@ class QuestList extends BaseType
             $_curTpl['cat1'] = $_curTpl['zoneOrSort'];      // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
-            foreach (Util::$questClasses as $k => $arr)
+            foreach (Game::$questClasses as $k => $arr)
             {
                 if (in_array($_curTpl['cat1'], $arr))
                 {
@@ -172,7 +172,7 @@ class QuestList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            if (!(Util::sideByRaceMask($this->curTpl['reqRaceMask']) & $side))
+            if (!(Game::sideByRaceMask($this->curTpl['reqRaceMask']) & $side))
                 continue;
 
             list($series, $first) = DB::Aowow()->SelectRow(
@@ -209,7 +209,7 @@ class QuestList extends BaseType
                 'level'     => $this->curTpl['level'],
                 'reqlevel'  => $this->curTpl['minLevel'],
                 'name'      => $this->getField('name', true),
-                'side'      => Util::sideByRaceMask($this->curTpl['reqRaceMask']),
+                'side'      => Game::sideByRaceMask($this->curTpl['reqRaceMask']),
                 'wflags'    => 0x0,
                 'xp'        => $this->curTpl['rewardXP']
             );

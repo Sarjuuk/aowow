@@ -363,7 +363,7 @@ class NpcPage extends GenericPage
         {
             $skill = 0;
             $mask  = 0x0;
-            foreach (Util::$skillLineMask[-1] as $idx => $pair)
+            foreach (Game::$skillLineMask[-1] as $idx => $pair)
             {
                 if ($pair[0] != $_)
                     continue;

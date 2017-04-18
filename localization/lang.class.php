@@ -190,7 +190,7 @@ class Lang
 
     public static function getReputationLevelForPoints($pts)
     {
-        $_ = Util::getReputationLevelForPoints($pts);
+        $_ = Game::getReputationLevelForPoints($pts);
 
         return self::game('rep', $_);
     }

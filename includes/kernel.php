@@ -13,7 +13,8 @@ mb_internal_encoding('UTF-8');
 
 require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
-require_once 'includes/utilities.php';                      // misc™ data 'n func
+require_once 'includes/utilities.php';                      // helper functions
+require_once 'includes/game.php';                           // game related data & functions
 require_once 'includes/user.class.php';
 require_once 'includes/markup.class.php';                   // manipulate markup text
 require_once 'includes/database.class.php';                 // wrap DBSimple

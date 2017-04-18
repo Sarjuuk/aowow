@@ -330,7 +330,7 @@ class ItemPage extends genericPage
 
         // pageText
         $pageText = [];
-        if ($this->pageText = Util::getPageText($this->subject->getField('pageTextId')))
+        if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
         {
             $this->addJS('Book.js');
             $this->addCSS(['path' => 'Book.css']);
@@ -346,7 +346,7 @@ class ItemPage extends genericPage
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
             BUTTON_UPGRADE => ($_cu ? ['class' => $_class, 'slot' => $_slot] : false),
             BUTTON_LINKS   => array(
-                'linkColor' => 'ff'.Util::$rarityColorStings[$this->subject->getField('quality')],
+                'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->getField('quality')],
                 'linkId'    => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0',
                 'linkName'  => $this->name,
                 'type'      => $this->type,
@@ -879,7 +879,7 @@ class ItemPage extends genericPage
                     foreach ($_ as $idx)
                         $ids[] = $indirectSpells->getField('effect'.$idx.'TriggerSpell');
 
-            $ids = array_merge($ids, Util::getTaughtSpells($indirect));
+            $ids = array_merge($ids, Game::getTaughtSpells($indirect));
         }
 
         if ($ids)
@@ -1087,7 +1087,7 @@ class ItemPage extends genericPage
             {
                 $j = '';
                 foreach ($onUse as $idx => $qty)
-                    $j .= ',"'.Util::$itemMods[$idx].'":'.$qty;
+                    $j .= ',"'.Game::$itemMods[$idx].'":'.$qty;
 
                 $xml->addChild('jsonUse')->addCData(substr($j, 1));
             }

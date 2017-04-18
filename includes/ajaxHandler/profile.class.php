@@ -251,7 +251,7 @@ class AjaxProfile extends AjaxHandler
                     {
                         if (is_array($v))
                             $mods[] = $v;
-                        else if ($str = @Util::$itemMods[$k])
+                        else if ($str = @Game::$itemMods[$k])
                             $mods[$str] = $v;
                     }
                 }

@@ -956,7 +956,7 @@ class SpellPage extends GenericPage
         }
 
         // tab: teaches
-        if ($ids = Util::getTaughtSpells($this->subject))
+        if ($ids = Game::getTaughtSpells($this->subject))
         {
             $teaches = new SpellList(array(['id', $ids]));
             if (!$teaches->error)

@@ -80,7 +80,7 @@ function titles()
         if ($data['eventEntry'])
             DB::Aowow()->query('UPDATE ?_titles SET eventId = ?d WHERE id = ?d', $data['eventEntry'], $tId);
 
-        $side = Util::sideByRaceMask($data['AllowableRaces']);
+        $side = Game::sideByRaceMask($data['AllowableRaces']);
         if ($side == 3)
             continue;
 

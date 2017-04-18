@@ -107,7 +107,7 @@ if (!CLI)
                     {
                         foreach ($v as $sk => $sv)
                         {
-                            if ($str = Util::$itemMods[$sk])
+                            if ($str = Game::$itemMods[$sk])
                             {
                                 $setOut['setbonus'][$k][$str] = $sv;
                                 unset($setOut['setbonus'][$k][$sk]);

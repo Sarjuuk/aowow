@@ -58,7 +58,7 @@ class EnchantmentList extends BaseType
             $curTpl['dps'] = floatVal($curTpl['dps']);
 
             // remove zero-stats
-            foreach (Util::$itemMods as $str)
+            foreach (Game::$itemMods as $str)
                 if ($curTpl[$str] == 0)                     // empty(0.0f) => true .. yeah, sure
                     unset($curTpl[$str]);
 
@@ -128,7 +128,7 @@ class EnchantmentList extends BaseType
     {
         $data = [];
 
-        foreach (Util::$itemMods as $str)
+        foreach (Game::$itemMods as $str)
             if (isset($this->curTpl[$str]))
                 $data[$str] = $this->curTpl[$str];
 
@@ -151,7 +151,7 @@ class EnchantmentList extends BaseType
                     case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
                         if (!empty($spellStats[$obj]))
                             foreach ($spellStats[$obj] as $mod => $_)
-                                if ($str = Util::$itemMods[$mod])
+                                if ($str = Game::$itemMods[$mod])
                                     Util::arraySumByKey($data, [$str => 0]);
 
                         $obj = null;
@@ -194,7 +194,7 @@ class EnchantmentList extends BaseType
                 }
 
                 if ($obj !== null)
-                    if ($str = Util::$itemMods[$obj])       // check if we use these mods
+                    if ($str = Game::$itemMods[$obj])       // check if we use these mods
                         Util::arraySumByKey($data, [$str => 0]);
             }
         }

@@ -131,7 +131,7 @@ class SpellsPage extends GenericPage
                         $xCond = null;
                         for ($i = -2; $i < 0; $i++)
                         {
-                            foreach (Util::$skillLineMask[$i] as $idx => $pair)
+                            foreach (Game::$skillLineMask[$i] as $idx => $pair)
                             {
                                 if ($pair[1] == $this->category[1])
                                 {

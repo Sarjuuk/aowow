@@ -110,7 +110,7 @@ class SpellList extends BaseType
             $_curTpl['skillLines'] = [];
             if ($_curTpl['skillLine1'] < 0)
             {
-                foreach (Util::$skillLineMask[$_curTpl['skillLine1']] as $idx => $pair)
+                foreach (Game::$skillLineMask[$_curTpl['skillLine1']] as $idx => $pair)
                     if ($_curTpl['skillLine2OrMask'] & (1 << $idx))
                         $_curTpl['skillLines'][] = $pair[1];
             }
@@ -165,7 +165,7 @@ class SpellList extends BaseType
                     {
                         $mods = [];
                         foreach ($json as $str => $val)
-                            if ($val && ($idx = array_search($str, Util::$itemMods)))
+                            if ($val && ($idx = array_search($str, Game::$itemMods)))
                                 $mods[$idx] = $val;
 
                         if ($mods)
@@ -260,7 +260,7 @@ class SpellList extends BaseType
                         break;
                     case 189:                               // CombatRating MiscVal:ratingMask
                     case 220:
-                        if ($mod = Util::itemModByRatingMask($mv))
+                        if ($mod = Game::itemModByRatingMask($mv))
                             Util::arraySumByKey($stats, [$mod => $pts]);
                         break;
                     case 143:                               // Resistance MiscVal:school
@@ -981,7 +981,7 @@ class SpellList extends BaseType
                 // Aura giving combat ratings
                 $rType = 0;
                 if ($aura == 189)
-                    if ($rType = Util::itemModByRatingMask($mv))
+                    if ($rType = Game::itemModByRatingMask($mv))
                         $usesScalingRating = true;
                 // Aura end
 
@@ -1071,7 +1071,7 @@ class SpellList extends BaseType
                 // Aura giving combat ratings
                 $rType = 0;
                 if ($aura == 189)
-                    if ($rType = Util::itemModByRatingMask($mv))
+                    if ($rType = Game::itemModByRatingMask($mv))
                         $usesScalingRating = true;
                 // Aura end
 

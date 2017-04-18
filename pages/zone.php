@@ -498,7 +498,7 @@ class ZonePage extends GenericPage
         {
             $tabData = ['quest', ['data' => array_values($questsLV)]];
 
-            foreach (Util::$questClasses as $parent => $children)
+            foreach (Game::$questClasses as $parent => $children)
             {
                 if (in_array($this->typeId, $children))
                 {

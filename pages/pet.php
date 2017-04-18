@@ -120,7 +120,7 @@ class PetPage extends GenericPage
 
         // tab: spells
         $mask = 0x0;
-        foreach (Util::$skillLineMask[-1] as $idx => $pair)
+        foreach (Game::$skillLineMask[-1] as $idx => $pair)
         {
             if ($pair[0] == $this->typeId)
             {

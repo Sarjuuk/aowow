@@ -348,9 +348,9 @@ function spell()
                 $update['skillLine1'] = $lines[0];
                 break;
             default:
-                for ($i = -count(Util::$skillLineMask); $i < 0; $i++)
+                for ($i = -count(Game::$skillLineMask); $i < 0; $i++)
                 {
-                    foreach (Util::$skillLineMask[$i] as $k => $pair)
+                    foreach (Game::$skillLineMask[$i] as $k => $pair)
                     {
                         if (in_array($pair[1], $lines))
                         {
@@ -537,8 +537,8 @@ function spell()
     // pet spells (-3)
     DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -3 WHERE (s.cuFlags & 0x3) = 0 AND s.skillline1 IN (?a)',
         array_merge(
-            array_column(Util::$skillLineMask[-1], 1),      // hunter pets
-            array_column(Util::$skillLineMask[-2], 1),      // warlock pets
+            array_column(Game::$skillLineMask[-1], 1),      // hunter pets
+            array_column(Game::$skillLineMask[-2], 1),      // warlock pets
             [270, 782],                                     // hunter generic, DK - Ghoul
             [-1, -2]                                        // super categories
         )

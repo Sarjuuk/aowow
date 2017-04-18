@@ -194,7 +194,7 @@ class ObjectPage extends GenericPage
         /****************/
 
         // pageText
-        if ($this->pageText = Util::getPageText($next = $this->subject->getField('pageTextId')))
+        if ($this->pageText = Game::getPageText($next = $this->subject->getField('pageTextId')))
         {
             $this->addCSS(['path' => 'Book.css']);
             $this->addJS('Book.js');
