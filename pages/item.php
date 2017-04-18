@@ -330,25 +330,7 @@ class ItemPage extends genericPage
 
         // pageText
         $pageText = [];
-        if ($next = $this->subject->getField('pageTextId'))
-        {
-            while ($next)
-            {
-                if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
-                {
-                    $next = $row['NextPageID'];
-                    $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
-                }
-                else
-                {
-                    trigger_error('Referenced PageTextId #'.$next.' is not in DB', E_USER_WARNING);
-                    break;
-                }
-            }
-        }
-
-        // add conditional js & css
-        if ($pageText)
+        if ($this->pageText = Util::getPageText($this->subject->getField('pageTextId')))
         {
             $this->addJS('Book.js');
             $this->addCSS(['path' => 'Book.css']);
@@ -356,7 +338,6 @@ class ItemPage extends genericPage
 
         $this->headIcons  = [$this->subject->getField('iconString'), $this->subject->getField('stackable')];
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->pageText   = $pageText;
         $this->tooltip    = $this->subject->renderTooltip(true);
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,

@@ -1635,6 +1635,26 @@ class Util
 
         return self::$realms;
     }
+
+    public static function getPageText($ptId)
+    {
+        $pages = [];
+        while ($ptId)
+        {
+            if ($row = DB::World()->selectRow('SELECT ptl.Text AS Text_loc?d, pt.* FROM page_text pt LEFT JOIN page_text_locale ptl ON pt.ID = ptl.ID AND locale = ? WHERE pt.ID = ?d', User::$localeId, User::$localeString, $ptId))
+            {
+                $ptId = $row['NextPageID'];
+                $pages[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+            }
+            else
+            {
+                trigger_error('Referenced PageTextId #'.$ptId.' is not in DB', E_USER_WARNING);
+                break;
+            }
+        }
+
+        return $pages;
+    }
 }
 
 ?>

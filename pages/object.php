@@ -194,26 +194,7 @@ class ObjectPage extends GenericPage
         /****************/
 
         // pageText
-        $pageText = [];
-        if ($next = $this->subject->getField('pageTextId'))
-        {
-            while ($next)
-            {
-                if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
-                {
-                    $next = $row['NextPageID'];
-                    $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
-                }
-                else
-                {
-                    trigger_error('Referenced PageTextId #'.$next.' is not in DB', E_USER_WARNING);
-                    break;
-                }
-            }
-        }
-
-        // add conditional js & css
-        if ($pageText)
+        if ($this->pageText = Util::getPageText($next = $this->subject->getField('pageTextId')))
         {
             $this->addCSS(['path' => 'Book.css']);
             $this->addJS('Book.js');
@@ -244,7 +225,6 @@ class ObjectPage extends GenericPage
         }
 
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->pageText    = $pageText;
         $this->map         = $map;
         $this->relBoss     = $relBoss;
         $this->redButtons  = array(
