@@ -24,7 +24,7 @@ $customData = array(
     3849 => ['parentAreaId' => 3523, 'parentX' => 70.5, 'parentY' => 69.6],
     3847 => ['parentAreaId' => 3523, 'parentX' => 71.7, 'parentY' => 55.1],
     3848 => ['parentAreaId' => 3523, 'parentX' => 74.3, 'parentY' => 57.8],
-    3456 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7]
+    3845 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7]
 );
 $reqDBC = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist'];
 
