@@ -22,15 +22,7 @@
 
 if ($this->accessory):
     echo '                <div>'.Lang::npc('accessoryFor').' ';
-
-    $n = count($this->accessory);
-    foreach ($this->accessory as $i => $ac):
-        if ($n > 1 && $i > 0):
-            echo ($i == $n - 1) ? Lang::main('and') : ', ';
-        endif;
-        echo '<a href="?npc='.$ac[0].'">'.$ac[1].'</a>';
-    endforeach;
-
+    echo Lang::concat($this->accessory, true, function ($v, $k) { return '<a href="?npc='.$v[0].'">'.$v[1].'</a>'; });
     echo ".</div>\n";
 endif;
 

@@ -721,7 +721,8 @@ $lang = array(
     'pet'      => array(
         'notFound'      => "Diese Tierart existiert nicht.",
         'exotic'        => "Exotisch",
-        'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"]
+        'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"],
+        'food'          => ["Fleisch", "Fisch", "Käse", "Brot", "Fungus", "Obst", "Rohes Fleisch", "Roher Fisch"]
     ),
     'faction' => array(
         'notFound'      => "Diese Fraktion existiert nicht.",

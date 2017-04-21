@@ -708,7 +708,7 @@ class ZonePage extends GenericPage
         $soundIds  = [];
         $zoneMusic = DB::Aowow()->select('
             SELECT
-                x.soundId, x.worldStateId, x.worldStateValue
+                x.soundId AS ARRAY_KEY, x.soundId, x.worldStateId, x.worldStateValue
             FROM (
                 SELECT ambienceDay   AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
                 SELECT ambienceNight AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
@@ -734,13 +734,13 @@ class ZonePage extends GenericPage
                 $data    = $music->getListviewData();
                 $tabData = [];
 
-                if (array_filter(array_column($soundIds, 'worldStateId')))
+                if (array_filter(array_column($zoneMusic, 'worldStateId')))
                 {
                     $tabData['extraCols']  = ['$Listview.extraCols.condition'];
 
-                    foreach ($soundIds as $sData)
-                    if ($sData['worldStateId'])
-                        $data[$sData['soundId']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $sData['worldStateId'], $sData['worldStateValue']]];
+                    foreach ($soundIds as $sId)
+                        if (!empty($zoneMusic[$sId]['worldStateId']))
+                            $data[$sId]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $zoneMusic[$sId]['worldStateId'], $zoneMusic[$sId]['worldStateValue']]];
                 }
 
                 $tabData['data'] = array_values($data);

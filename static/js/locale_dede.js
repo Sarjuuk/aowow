@@ -1382,7 +1382,7 @@ var g_pet_types = {
 
 var g_pet_foods = {
       1: 'Fleisch',
-      2: 'Fish',
+      2: 'Fisch',
       4: 'Käse',
       8: 'Brot',
      16: 'Fungus',

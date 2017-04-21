@@ -139,7 +139,7 @@ class NpcPage extends GenericPage
         // Classification
         if ($_ = $this->subject->getField('rank'))          //  != NPC_RANK_NORMAL
         {
-            $str = $_typeFlags & 0x4 ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
+            $str = $this->subject->isBoss() ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
             $infobox[] = Lang::npc('classification').Lang::main('colon').$str;
         }
 

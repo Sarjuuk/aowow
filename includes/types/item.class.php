@@ -1366,7 +1366,7 @@ class ItemList extends BaseType
                 return null;
         }
         // level independant Bonus
-        else if (in_array($type, Util::$lvlIndepRating))
+        else if (in_array($type, Game::$lvlIndepRating))
             return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
         // rating-Bonuses
         else

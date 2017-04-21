@@ -57,7 +57,7 @@ class SkillList extends BaseType
                 'name'            => Util::jsEscape($this->getField('name', true)),
                 'profession'      => $this->curTpl['professionMask'],
                 'recipeSubclass'  => $this->curTpl['recipeSubClass'],
-                'specializations' => Util::toJSON($this->curTpl['specializations']),
+                'specializations' => Util::toJSON($this->curTpl['specializations'], JSON_NUMERIC_CHECK),
                 'icon'            => Util::jsEscape($this->curTpl['iconString'])
             );
         }

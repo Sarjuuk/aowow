@@ -7,15 +7,10 @@ elseif (!empty($this->map['data'])):
     elseif ($this->type != TYPE_ZONE):
         echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : ($this->type == TYPE_SOUND ? Lang::sound('foundIn') : Lang::npc('foundIn'))).' <span id="mapper-zone-generic">';
 
-        $n = count($this->map['mapperData']);
-        $i = 0;
-        foreach ($this->map['mapperData'] as $areaId => $areaData):
-            if ($n > 1 && $i++ > 0):
-                echo $i < $n ? ', ' : Lang::main('and');
-            endif;
-
-            echo '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$this->map['extra'][$areaId].'</a>&nbsp;('.reset($areaData)['count'].')';
-        endforeach;
+        $extra = $this->map['extra'];
+        echo Lang::concat($this->map['mapperData'], true, function ($areaData, $areaId) use ($extra) {
+            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$extra[$areaId].'</a>&nbsp;('.reset($areaData)['count'].')';
+        });
 
         echo ".</span></div>\n";
     endif;

@@ -721,7 +721,8 @@ $lang = array(
     'pet'      => array(
         'notFound'      => "Esta familia de mascotas no existe.",
         'exotic'        => "Exótica",
-        'cat'           => ["Ferocidad", "Tenacidad", "Astucia"]
+        'cat'           => ["Ferocidad", "Tenacidad", "Astucia"],
+        'food'          => ["Carne", "Pescado", "Queso", "Pan", "Hongo", "Fruta", "Carne cruda", "Pescado crudo"]
     ),
     'faction' => array(
         'notFound'      => "Esta facción no existe.",

@@ -350,7 +350,7 @@ class ObjectPage extends GenericPage
             if ($goLoot->getByContainer(LOOT_GAMEOBJECT, $_))
             {
                 $extraCols   = $goLoot->extraCols;
-                $extraCols[] = 'Listview.extraCols.percent';
+                $extraCols[] = '$Listview.extraCols.percent';
                 $hiddenCols  = ['source', 'side', 'slot', 'reqlevel'];
 
                 $this->extendGlobalData($goLoot->jsGlobals);
@@ -375,7 +375,7 @@ class ObjectPage extends GenericPage
                     'id'        => 'contains',
                     'name'      => '$LANG.tab_contains',
                     'sort'      => ['-percent', 'name'],
-                    'extraCols' => ['$Listview.extraCols.percent']
+                    'extraCols' => $extraCols
                 );
 
                 if ($hiddenCols)

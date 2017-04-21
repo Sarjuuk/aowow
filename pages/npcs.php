@@ -99,6 +99,10 @@ class NpcsPage extends GenericPage
         array_unshift($this->title, $this->name);
         if ($this->category)
             array_unshift($this->title, Lang::npc('cat', $this->category[0]));
+
+        $form = $this->filterObj->getForm();
+        if (isset($form['fa']) && !is_array($form['fa']))
+            array_unshift($this->title, Lang::game('fa', $form['fa']));
     }
 
     protected function generatePath()
@@ -106,7 +110,7 @@ class NpcsPage extends GenericPage
         if ($this->category)
             $this->path[] = $this->category[0];
 
-        $form = $this->filterObj->getForm('form');
+        $form = $this->filterObj->getForm();
         if (isset($form['fa']) && !is_array($form['fa']))
             $this->path[] = $form['fa'];
     }

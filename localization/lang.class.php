@@ -90,6 +90,29 @@ class Lang
         return self::vspf($var, $vspfArgs);
     }
 
+    public static function concat($args, $useAnd = true, $callback = null)
+    {
+        $b = '';
+        $i = 0;
+        $n = count($args);
+        foreach ($args as $k => $arg)
+        {
+            if (is_callable($callback))
+                $b .= $callback($arg, $k);
+            else
+                $b .= $arg;
+
+            if ($n > 1 && $i < ($n - 2))
+                $b .= ', ';
+            else if ($n > 1 && $i == $n - 2)
+                $b .= Lang::main($useAnd ? 'and' : 'or');
+
+            $i++;
+        }
+
+        return $b;
+    }
+
     public static function sort($prop, $group, $method = SORT_NATURAL)
     {
 

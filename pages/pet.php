@@ -103,7 +103,7 @@ class PetPage extends GenericPage
         // tab: diet
         $list = [];
         $mask = $this->subject->getField('foodMask');
-        for ($i = 1; $i < 7; $i++)
+        for ($i = 1; $i < 9; $i++)
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
