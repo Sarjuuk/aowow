@@ -10,11 +10,13 @@ class ZonePage extends GenericPage
 {
     use detailPage;
 
-    protected $path     = [0, 6];
-    protected $tabId    = 0;
-    protected $type     = TYPE_ZONE;
-    protected $tpl      = 'detail-page-generic';
-    protected $js       = ['ShowOnMap.js'];
+    protected $path      = [0, 6];
+    protected $tabId     = 0;
+    protected $type      = TYPE_ZONE;
+    protected $tpl       = 'detail-page-generic';
+    protected $js        = ['ShowOnMap.js'];
+
+    protected $zoneMusic = [];
 
     public function __construct($pageCall, $id)
     {
@@ -708,13 +710,13 @@ class ZonePage extends GenericPage
         $soundIds  = [];
         $zoneMusic = DB::Aowow()->select('
             SELECT
-                x.soundId AS ARRAY_KEY, x.soundId, x.worldStateId, x.worldStateValue
+                x.soundId AS ARRAY_KEY, x.soundId, x.worldStateId, x.worldStateValue, x.type
             FROM (
-                SELECT ambienceDay   AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
-                SELECT ambienceNight AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
-                SELECT musicDay      AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicDay      > 0 UNION
-                SELECT musicNight    AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND musicNight    > 0 UNION
-                SELECT intro         AS soundId, worldStateId, worldStateValue FROM ?_zones_sounds WHERE id IN (?a) AND intro         > 0
+                SELECT ambienceDay   AS soundId, worldStateId, worldStateValue, 1 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
+                SELECT ambienceNight AS soundId, worldStateId, worldStateValue, 1 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
+                SELECT musicDay      AS soundId, worldStateId, worldStateValue, 2 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND musicDay      > 0 UNION
+                SELECT musicNight    AS soundId, worldStateId, worldStateValue, 2 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND musicNight    > 0 UNION
+                SELECT intro         AS soundId, worldStateId, worldStateValue, 3 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND intro         > 0
             ) x
             GROUP BY
                 x.soundId, x.worldStateId, x.worldStateValue
@@ -731,6 +733,7 @@ class ZonePage extends GenericPage
             $music = new SoundList(array(['id', array_unique($soundIds)]));
             if (!$music->error)
             {
+                // tab
                 $data    = $music->getListviewData();
                 $tabData = [];
 
@@ -748,6 +751,29 @@ class ZonePage extends GenericPage
                 $this->lvTabs[] = ['sound', $tabData];
 
                 $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
+
+                // audio controls
+                // ambience
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 1; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['ambience'][] = $f;
+
+                // music
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 2; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['music'][] = $f;
+
+                // intro
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 3; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['intro'][] = $f;
+
             }
         }
     }

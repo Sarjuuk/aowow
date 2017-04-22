@@ -711,6 +711,9 @@ $lang = array(
         'notFound'      => "Este sonido no existe.",
         'foundIn'       => "Este sonido se puede encontrar en",
         'goToPlaylist'  => "Ir a mi lista de reproducción",
+        'music'         => "Música",
+        'intro'         => "Música de introducción",
+        'ambience'      => "Ambiente",
         'cat'           => array(
             null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
             "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
