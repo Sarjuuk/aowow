@@ -285,6 +285,8 @@ class SpellPage extends GenericPage
 
         if (($_ = $this->subject->getField('recoveryTime')) && $_ > 0)
             $this->cooldown = Util::formatTime($_);
+        else if (($_ = $this->subject->getField('recoveryCategory')) && $_ > 0)
+            $this->cooldown = Util::formatTime($_);
 
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
             $this->duration = Util::formatTime($_);
