@@ -455,7 +455,7 @@ if (!CLI)
                 preg_match('/\/([^\/]+)\.blp$/i', $path, $m);
                 return $m ? $m[1] : null;
             }, $missing);
-            var_dump($iconNames);
+
             DB::Aowow()->query('UPDATE ?_icons SET cuFlags = cuFlags | ?d WHERE name IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, $iconNames);
 
             asort($missing);
