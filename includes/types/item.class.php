@@ -2540,7 +2540,7 @@ class ItemListFilter extends Filter
         if (preg_match('/\W/i', $v))
             return false;
 
-        return isset(Util::$itemFilter[$val]);
+        return isset(Util::$itemFilter[$v]);
     }
 }
 

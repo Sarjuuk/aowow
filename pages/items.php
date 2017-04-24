@@ -380,7 +380,7 @@ class ItemsPage extends GenericPage
                 {
                     case 1:
                         $override['sl'] = $group;
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$cls.'\', \''.$this->filterObj->urlize($override).'\')';
+                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$cls.'\', \''.$this->filterObj->getFilterString($override).'\')';
                         break;
                     case 2:
                         if ($group > 0)
@@ -391,11 +391,11 @@ class ItemsPage extends GenericPage
                         else
                             $override['maxle'] = abs($group) - 1;
 
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$cls.'\', \''.$this->filterObj->urlize($override).'\')';
+                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$cls.'\', \''.$this->filterObj->getFilterString($override).'\')';
                         break;
                     case 3:
                         if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
-                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$cls.'\', \''.$this->filterObj->urlize($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
+                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$cls.'\', \''.$this->filterObj->getFilterString($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
 
                         break;
                 }
