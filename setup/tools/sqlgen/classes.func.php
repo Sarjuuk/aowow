@@ -24,7 +24,7 @@ $reqDBC = ['spell', 'charbaseinfo', 'skillraceclassinfo', 'skilllineability', 'c
 
 function classes()
 {
-    $classes = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM dbc_chrclasses');
+    $classes = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_chrclasses');
 
     // add raceMask
     $races = DB::Aowow()->select('SELECT classId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask FROM dbc_charbaseinfo GROUP BY classId');

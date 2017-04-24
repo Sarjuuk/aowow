@@ -39,9 +39,8 @@ class SoundsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
+        $this->filter          = $this->filterObj->getForm();
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
 
         $sounds = new SoundList($conditions);
         $tabData = [];
@@ -66,15 +65,15 @@ class SoundsPage extends GenericPage
 
     protected function generateTitle()
     {
-        $form = $this->filterObj->getForm('form');
-        if (isset($form['ty']) && !is_array($form['ty']))
-            array_unshift($this->title, Lang::sound('cat', $form['ty']));
+        $form = $this->filterObj->getForm();
+        if (isset($form['ty']) && count($form['ty']) == 1)
+            array_unshift($this->title, Lang::sound('cat', $form['ty'][0]));
     }
 
     protected function generatePath()
     {
-        $form = $this->filterObj->getForm('form');
-        if (isset($form['ty']) && !is_array($form['ty']))
+        $form = $this->filterObj->getForm();
+        if (isset($form['ty']) && count($form['ty']) == 1)
             $this->path[] = $form['ty'];
     }
 }

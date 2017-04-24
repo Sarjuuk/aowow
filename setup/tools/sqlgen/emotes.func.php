@@ -46,7 +46,7 @@ function emotes(/*array $ids = [] */)
     }
 
     $_= DB::Aowow()->query('REPLACE INTO ?_emotes SELECT
-            et.Id,
+            et.id,
             LOWER(et.command),
             IF(e.animationId, 1, 0),
             0,                                              -- cuFlags
@@ -56,13 +56,13 @@ function emotes(/*array $ids = [] */)
         FROM
             dbc_emotestext et
         LEFT JOIN
-            dbc_emotes e ON e.Id = et.emoteId
+            dbc_emotes e ON e.id = et.emoteId
         LEFT JOIN
-            dbc_emotestextdata etdT  ON etdT.Id  = et.targetId
+            dbc_emotestextdata etdT  ON etdT.id  = et.targetId
         LEFT JOIN
-            dbc_emotestextdata etdNT ON etdNT.Id = et.noTargetId
+            dbc_emotestextdata etdNT ON etdNT.id = et.noTargetId
         LEFT JOIN
-            dbc_emotestextdata etdS  ON etdS.Id  = et.selfId'
+            dbc_emotestextdata etdS  ON etdS.id  = et.selfId'
     );
 
     if (!$_)

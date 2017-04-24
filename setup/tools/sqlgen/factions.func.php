@@ -72,7 +72,7 @@ function factions()
         UPDATE
             ?_factions f
         JOIN
-            (SELECT ft.factionId, GROUP_CONCAT(ft.Id SEPARATOR " ") AS tplIds FROM dbc_factiontemplate ft GROUP BY ft.factionId) temp ON f.id = temp.factionId
+            (SELECT ft.factionId, GROUP_CONCAT(ft.id SEPARATOR " ") AS tplIds FROM dbc_factiontemplate ft GROUP BY ft.factionId) temp ON f.id = temp.factionId
         SET
             f.templateIds = temp.tplIds';
 
@@ -98,7 +98,7 @@ function factions()
         JOIN
             dbc_faction f ON f.id = x.id
         LEFT JOIN
-            dbc_factiontemplate ft ON f.Id = ft.factionId
+            dbc_factiontemplate ft ON f.id = ft.factionId
         SET
             cuFlags = cuFlags | ?d
         WHERE

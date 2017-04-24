@@ -40,8 +40,8 @@ function spell()
 {
     $ssQuery = '
         SELECT
-            Id AS ARRAY_KEY,
-            Id,
+            id AS ARRAY_KEY,
+            id,
             0 AS category,
             Dispel,
             Mechanic,
@@ -113,13 +113,13 @@ function spell()
         FROM
             spell_dbc
         WHERE
-            Id > ?d
+            id > ?d
         LIMIT
             ?d';
 
     $baseQuery = '
         SELECT
-            s.Id,
+            s.id,
             category,
             dispelType,
             mechanic,
@@ -142,7 +142,7 @@ function spell()
             powerPerSecond,
             powerPerSecondPerLevel,
             IFNULL (src.runicPowerGain, 0) AS powerGainRunicPower,
-            IF (src.Id IS NULL, 0, (src.costBlood << 8) | (src.costUnholy << 4) | src.costFrost) AS powerCostRunes,
+            IF (src.id IS NULL, 0, (src.costBlood << 8) | (src.costUnholy << 4) | src.costFrost) AS powerCostRunes,
             rangeId,
             stackAmount,
             tool1,              tool2,
@@ -202,19 +202,19 @@ function spell()
         FROM
             dbc_spell s
         LEFT JOIN
-            dbc_spellcasttimes sct ON s.castTimeId      = sct.Id
+            dbc_spellcasttimes sct ON s.castTimeId      = sct.id
         LEFT JOIN
-            dbc_spellrunecost  src ON s.runeCostId      = src.Id
+            dbc_spellrunecost  src ON s.runeCostId      = src.id
         LEFT JOIN
-            dbc_spellduration   sd ON s.durationId      = sd.Id
+            dbc_spellduration   sd ON s.durationId      = sd.id
         LEFT JOIN
-            dbc_spellradius    sr1 ON s.effect1RadiusId = sr1.Id
+            dbc_spellradius    sr1 ON s.effect1RadiusId = sr1.id
         LEFT JOIN
-            dbc_spellradius    sr2 ON s.effect2RadiusId = sr2.Id
+            dbc_spellradius    sr2 ON s.effect2RadiusId = sr2.id
         LEFT JOIN
-            dbc_spellradius    sr3 ON s.effect3RadiusId = sr3.Id
+            dbc_spellradius    sr3 ON s.effect3RadiusId = sr3.id
         WHERE
-            s.Id > ?d
+            s.id > ?d
         LIMIT
             ?d';
 
@@ -225,7 +225,7 @@ function spell()
     CLISetup::log(' - merging serverside spells into spell.dbc');
     while ($spells = DB::World()->select($ssQuery, $lastMax, SqlGen::$stepSize))
     {
-        $newMax = max(array_column($spells, 'Id'));
+        $newMax = max(array_column($spells, 'id'));
 
         CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
 
@@ -243,7 +243,7 @@ function spell()
     CLISetup::log(' - filling aowow_spell');
     while ($spells = DB::Aowow()->select($baseQuery, $lastMax, SqlGen::$stepSize))
     {
-        $newMax = max(array_column($spells, 'Id'));
+        $newMax = max(array_column($spells, 'id'));
 
         CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
 
@@ -288,7 +288,7 @@ function spell()
 
     CLISetup::log(' - linking with skillineability');
 
-    $results  = DB::Aowow()->select('SELECT spellId AS ARRAY_KEY, Id AS ARRAY_KEY2, skillLineId, reqRaceMask, reqClassMask, reqSkillLevel, acquireMethod, skillLevelGrey, skillLevelYellow FROM dbc_skilllineability sla');
+    $results  = DB::Aowow()->select('SELECT spellId AS ARRAY_KEY, id AS ARRAY_KEY2, skillLineId, reqRaceMask, reqClassMask, reqSkillLevel, acquireMethod, skillLevelGrey, skillLevelYellow FROM dbc_skilllineability sla');
     foreach ($results as $spellId => $sets)
     {
         $names   = array_keys(current($sets));
@@ -348,9 +348,9 @@ function spell()
                 $update['skillLine1'] = $lines[0];
                 break;
             default:
-                for ($i = -count(Util::$skillLineMask); $i < 0; $i++)
+                for ($i = -count(Game::$skillLineMask); $i < 0; $i++)
                 {
-                    foreach (Util::$skillLineMask[$i] as $k => $pair)
+                    foreach (Game::$skillLineMask[$i] as $k => $pair)
                     {
                         if (in_array($pair[1], $lines))
                         {
@@ -367,7 +367,7 @@ function spell()
     // fill learnedAt, trainingCost from trainer
     if ($trainer = DB::World()->select('SELECT SpellID AS ARRAY_KEY, MIN(ReqSkillRank) AS reqSkill, MIN(MoneyCost) AS cost, COUNT(*) AS count FROM npc_trainer GROUP BY SpellID'))
     {
-        $spells = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE Id IN (?a)', array_keys($trainer));
+        $spells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($trainer));
         $links  = [];
 
         // todo (med): this skips some spells (e.g. riding)
@@ -490,7 +490,7 @@ function spell()
 
     // altIcons and quality for craftSpells
     $itemSpells = DB::Aowow()->selectCol('
-        SELECT    s.Id AS ARRAY_KEY, effect1CreateItemId
+        SELECT    s.id AS ARRAY_KEY, effect1CreateItemId
         FROM      dbc_spell s
         LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
         LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
@@ -532,13 +532,13 @@ function spell()
     CLISetup::log(' - applying categories');
 
     // player talents (-2)
-    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -2 WHERE t.tabId NOT IN (409, 410, 411) AND (s.Id = t.rank1 OR s.Id = t.rank2 OR s.Id = t.rank3 OR s.Id = t.rank4 OR s.Id = t.rank5)');
+    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -2 WHERE t.tabId NOT IN (409, 410, 411) AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3 OR s.id = t.rank4 OR s.id = t.rank5)');
 
     // pet spells (-3)
     DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -3 WHERE (s.cuFlags & 0x3) = 0 AND s.skillline1 IN (?a)',
         array_merge(
-            array_column(Util::$skillLineMask[-1], 1),      // hunter pets
-            array_column(Util::$skillLineMask[-2], 1),      // warlock pets
+            array_column(Game::$skillLineMask[-1], 1),      // hunter pets
+            array_column(Game::$skillLineMask[-2], 1),      // warlock pets
             [270, 782],                                     // hunter generic, DK - Ghoul
             [-1, -2]                                        // super categories
         )
@@ -554,9 +554,9 @@ function spell()
     DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -6 WHERE s.skillLine1 = 778');
 
     // pet talents (-7)
-    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x10 WHERE t.tabId = 409 AND (s.Id = t.rank1 OR s.Id = t.rank2 OR s.Id = t.rank3)');
-    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x08 WHERE t.tabId = 410 AND (s.Id = t.rank1 OR s.Id = t.rank2 OR s.Id = t.rank3)');
-    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x20 WHERE t.tabId = 411 AND (s.Id = t.rank1 OR s.Id = t.rank2 OR s.Id = t.rank3)');
+    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x10 WHERE t.tabId = 409 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
+    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x08 WHERE t.tabId = 410 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
+    DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -7, s.cuFlags = s.cuFlags | 0x20 WHERE t.tabId = 411 AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3)');
 
     // internal (-9) by faaaaaar not complete
     DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -9 WHERE s.skillLine1 = 769');
@@ -689,8 +689,8 @@ function spell()
 
     $effects = DB::Aowow()->select('
         SELECT
-             s2.Id AS ARRAY_KEY,
-             s1.Id,
+             s2.id AS ARRAY_KEY,
+             s1.id,
              s1.name_loc0,
              s1.spellFamilyId,
              s1.spellFamilyFlags1,      s1.spellFamilyFlags2,       s1.spellFamilyFlags3,
@@ -701,11 +701,11 @@ function spell()
         FROM
             dbc_glyphproperties gp
         JOIN
-            ?_spell s1 ON s1.Id = gp.spellId
+            ?_spell s1 ON s1.id = gp.spellId
         JOIN
             ?_spell s2 ON s2.effect1MiscValue = gp.id AND s2.effect1Id = 74
         WHERE
-            gp.typeFlags IN (0, 1) -- AND s2.Id In (58271, 56297, 56289, 63941, 58275)
+            gp.typeFlags IN (0, 1) -- AND s2.id In (58271, 56297, 56289, 63941, 58275)
     ');
 
     foreach ($effects as $applyId => $glyphEffect)
@@ -754,7 +754,7 @@ function spell()
         if ($icons)
             DB::Aowow()->query('UPDATE ?_spell s SET s.skillLine1 = ?d, s.iconIdAlt = ?d WHERE s.id = ?d', $icons['skill'], $icons['icon'], $applyId);
         else
-            CLISetup::log('could not match '.$glyphEffect['name_loc0'].' ('.$glyphEffect['Id'].') with affected spells', CLISetup::LOG_WARN);
+            CLISetup::log('could not match '.$glyphEffect['name_loc0'].' ('.$glyphEffect['id'].') with affected spells', CLISetup::LOG_WARN);
     }
 
     // hide unused glyphs

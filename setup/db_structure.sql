@@ -445,6 +445,7 @@ CREATE TABLE `aowow_creature` (
   `displayId4` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `textureString` varchar(50) DEFAULT NULL,
   `modelId` mediumint(8) NOT NULL,
+  `humanoid` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `iconString` varchar(50) DEFAULT NULL COMMENT 'first texture of first model for search (up to 11 other skins omitted..)',
   `name_loc0` varchar(100) NOT NULL DEFAULT '0',
   `name_loc2` varchar(100) DEFAULT NULL,
@@ -2738,7 +2739,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1490912250,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1491915060,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

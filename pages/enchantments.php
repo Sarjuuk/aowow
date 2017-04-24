@@ -19,8 +19,8 @@ class EnchantmentsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new EnchantmentListFilter();
         $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new EnchantmentListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -49,11 +49,14 @@ class EnchantmentsPage extends GenericPage
         $this->extendGlobalData($ench->getJSGlobals());
 
         // recreate form selection
-        $this->filter          = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['initData'] = ['init' => 'enchantments'];
 
-        $xCols = $this->filterObj->getForm('extraCols', true);
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
+
+        $xCols = $this->filterObj->getExtraCols();
         foreach (Util::$itemFilter as $fiId => $str)
             if (array_column($tabData['data'], $str))
                 $xCols[] = $fiId;
@@ -62,9 +65,9 @@ class EnchantmentsPage extends GenericPage
             $xCols[] = 34;
 
         if ($xCols)
-            $this->filter['fi']['extraCols'] =  "fi_extraCols = ".Util::toJSON(array_values(array_unique($xCols))).";";
+            $this->filter['initData']['ec'] = array_values(array_unique($xCols));
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($xCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         if ($ench->getMatches() > CFG_SQL_LIMIT_DEFAULT)

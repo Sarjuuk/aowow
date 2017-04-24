@@ -224,24 +224,26 @@ class GenericPage
         if (!isset($this->category) || empty($this->validCats))
             return true;
 
-        switch (count($this->category))
+        $c = $this->category;                               // shorthand
+
+        switch (count($c))
         {
             case 0: // no params works always
                 return true;
-            case 1: // null is valid               || value in a 1-dim-array                         || key for a n-dim-array
+            case 1: // null is valid  || value in a 1-dim-array     || (key for a n-dim-array           && ( has more subcats                 || no further subCats ))
                 $filtered = array_filter($this->validCats, function ($x) { return is_int($x); });
-                return $this->category[0] === null || in_array($this->category[0], $filtered) || !empty($this->validCats[$this->category[0]]);
+                return $c[0] === null || in_array($c[0], $filtered) || (!empty($this->validCats[$c[0]]) && (is_array($this->validCats[$c[0]]) || $this->validCats[$c[0]] === true));
             case 2: // first param has to be a key. otherwise invalid
-                if (!isset($this->validCats[$this->category[0]]))
+                if (!isset($this->validCats[$c[0]]))
                     return false;
 
                 // check if the sub-array is n-imensional
-                if (count($this->validCats[$this->category[0]]) == count($this->validCats[$this->category[0]], COUNT_RECURSIVE))
-                    return in_array($this->category[1], $this->validCats[$this->category[0]]); // second param is value in second level array
+                if (is_array($this->validCats[$c[0]]) && count($this->validCats[$c[0]]) == count($this->validCats[$c[0]], COUNT_RECURSIVE))
+                    return in_array($c[1], $this->validCats[$c[0]]); // second param is value in second level array
                 else
-                    return isset($this->validCats[$this->category[0]][$this->category[1]]);    // check if params is key of another array
+                    return isset($this->validCats[$c[0]][$c[1]]);    // check if params is key of another array
             case 3: // 3 params MUST point to a specific value
-                return isset($this->validCats[$this->category[0]][$this->category[1]]) && in_array($this->category[2], $this->validCats[$this->category[0]][$this->category[1]]);
+                return isset($this->validCats[$c[0]][$c[1]]) && in_array($c[2], $this->validCats[$c[0]][$c[1]]);
         }
 
         return false;

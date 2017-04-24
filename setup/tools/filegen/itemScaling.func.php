@@ -93,7 +93,7 @@ if (!CLI)
             $v = $v ?: '0 AS idx'.$k;                       // NULL => 0 (plus some index so we can have 2x 0)
         });
 
-        $data = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, '.implode(', ', $fields).'  FROM dbc_scalingstatvalues');
+        $data = DB::Aowow()->select('SELECT id AS ARRAY_KEY, '.implode(', ', $fields).'  FROM dbc_scalingstatvalues');
         foreach ($data as &$d)
             $d = array_values($d);                          // strip indizes
 
@@ -102,7 +102,7 @@ if (!CLI)
 
     function itemScalingSD()
     {
-        $data = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM dbc_scalingstatdistribution');
+        $data = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_scalingstatdistribution');
         foreach ($data as &$row)
         {
             $row = array_values($row);

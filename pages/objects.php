@@ -20,8 +20,8 @@ class ObjectsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new GameObjectListFilter();
         $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new GameObjectListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -42,9 +42,12 @@ class ObjectsPage extends GenericPage
             $conditions[] = ['typeCat', (int)$this->category[0]];
 
         // recreate form selection
-        $this->filter = $this->filterObj->getForm('form');
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['initData'] = ['init' => 'objects'];
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;

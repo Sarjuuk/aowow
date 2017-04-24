@@ -171,33 +171,39 @@ class ItemsetListFilter extends Filter
 {
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_NUMERIC, 'id',        null,                 true], // id
-         3 => [FILTER_CR_NUMERIC, 'npieces',                             ], // pieces
-         4 => [FILTER_CR_STRING,  'bonusText', true                      ], // bonustext
-         5 => [FILTER_CR_BOOLEAN, 'heroic',                              ], // heroic
-         6 => [FILTER_CR_ENUM,    'e.holidayId',                         ], // relatedevent
-         8 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_COMMENT        ], // hascomments
-         9 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        10 => [FILTER_CR_FLAG,    'cuFlags',   CUSTOM_HAS_VIDEO          ], // hasvideos
+         2 => [FILTER_CR_NUMERIC, 'id',          NUM_CAST_INT,         true], // id
+         3 => [FILTER_CR_NUMERIC, 'npieces',     NUM_CAST_INT              ], // pieces
+         4 => [FILTER_CR_STRING,  'bonusText',   true                      ], // bonustext
+         5 => [FILTER_CR_BOOLEAN, 'heroic',                                ], // heroic
+         6 => [FILTER_CR_ENUM,    'e.holidayId',                           ], // relatedevent
+         8 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
+         9 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        10 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
+        12 => [FILTER_CR_NYI_PH,  null,          1                         ]  // available to players [yn] - ugh .. scan loot, quest and vendor templates and write to ?_itemset
+    );
+
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'cr'    => [FILTER_V_RANGE, [2, 12],                                       true ], // criteria ids
+        'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 424]], true ], // criteria operators
+        'crv'   => [FILTER_V_REGEX, '/[\p{C};:]/ui',                               true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, '/[\p{C};]/ui',                                false], // name / description - only printable chars, no delimiter
+        'ma'    => [FILTER_V_EQUAL, 1,                                             false], // match any / all filter
+        'qu'    => [FILTER_V_RANGE, [0, 7],                                        true ], // quality
+        'ty'    => [FILTER_V_RANGE, [1, 12],                                       true ], // set type
+        'minle' => [FILTER_V_RANGE, [1, 999],                                      false], // min item level
+        'maxle' => [FILTER_V_RANGE, [1, 999],                                      false], // max itemlevel
+        'minrl' => [FILTER_V_RANGE, [1, MAX_LEVEL],                                false], // min required level
+        'maxrl' => [FILTER_V_RANGE, [1, MAX_LEVEL],                                false], // max required level
+        'cl'    => [FILTER_V_LIST,  [[1, 9], 11],                                  false], // class
+        'ta'    => [FILTER_V_RANGE, [1, 30],                                       false]  // tag / content group
     );
 
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-        {
             if ($genCR = $this->genericCriterion($cr))
                 return $genCR;
-
-            unset($cr);
-            $this->error = true;
-            return [1];
-        }
-
-        switch ($cr[0])
-        {
-            case 12:                                        // available to players [yn]                ugh .. scan loot, quest and vendor templates and write to ?_itemset
-/* todo */      return [1];
-        }
 
         unset($cr);
         $this->error = true;
@@ -216,65 +222,35 @@ class ItemsetListFilter extends Filter
 
         // quality [enum]
         if (isset($_v['qu']))
-            $parts[] = ['quality', (array)$_v['qu']];
+            $parts[] = ['quality', $_v['qu']];
 
         // type [enum]
         if (isset($_v['ty']))
-            $parts[] = ['type', (array)$_v['ty']];
+            $parts[] = ['type', $_v['ty']];
 
         // itemLevel min [int]
         if (isset($_v['minle']))
-        {
-            if (is_int($_v['minle']) && $_v['minle'] > 0)
-                $parts[] = ['minLevel', $_v['minle'], '>='];
-            else
-                unset($_v['minle']);
-        }
+            $parts[] = ['minLevel', $_v['minle'], '>='];
 
         // itemLevel max [int]
         if (isset($_v['maxle']))
-        {
-            if (is_int($_v['maxle']) && $_v['maxle'] > 0)
-                $parts[] = ['maxLevel', $_v['maxle'], '<='];
-            else
-                unset($_v['maxle']);
-        }
+            $parts[] = ['maxLevel', $_v['maxle'], '<='];
 
         // reqLevel min [int]
         if (isset($_v['minrl']))
-        {
-            if (is_int($_v['minrl']) && $_v['minrl'] > 0)
-                $parts[] = ['reqLevel', $_v['minrl'], '>='];
-            else
-                unset($_v['minrl']);
-        }
+            $parts[] = ['reqLevel', $_v['minrl'], '>='];
 
         // reqLevel max [int]
         if (isset($_v['maxrl']))
-        {
-            if (is_int($_v['maxrl']) && $_v['maxrl'] > 0)
-                $parts[] = ['reqLevel', $_v['maxrl'], '<='];
-            else
-                unset($_v['maxrl']);
-        }
+            $parts[] = ['reqLevel', $_v['maxrl'], '<='];
 
         // class [enum]
         if (isset($_v['cl']))
-        {
-            if (in_array($_v['cl'], [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]))
-                $parts[] = ['classMask', $this->list2Mask($_v['cl']), '&'];
-            else
-                unset($_v['cl']);
-        }
+            $parts[] = ['classMask', $this->list2Mask([$_v['cl']]), '&'];
 
         // tag [enum]
         if (isset($_v['ta']))
-        {
-            if ($_v['ta'] > 0 && $_v['ta'] < 31)
-                $parts[] = ['contentGroup', intVal($_v['ta'])];
-            else
-                unset($_v['ta']);
-        }
+            $parts[] = ['contentGroup', intVal($_v['ta'])];
 
         return $parts;
     }

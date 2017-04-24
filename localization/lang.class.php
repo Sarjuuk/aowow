@@ -78,7 +78,39 @@ class Lang
             $var = $var[$arg];
         }
 
+        // meh :x
+        if ($var === null && $prop == 'spell' && count($args) == 1)
+        {
+            if ($args[0] == 'effects')
+                $var = self::$$prop['unkEffect'];
+            else if ($args[0] == 'auras')
+                $var = self::$$prop['unkAura'];
+        }
+
         return self::vspf($var, $vspfArgs);
+    }
+
+    public static function concat($args, $useAnd = true, $callback = null)
+    {
+        $b = '';
+        $i = 0;
+        $n = count($args);
+        foreach ($args as $k => $arg)
+        {
+            if (is_callable($callback))
+                $b .= $callback($arg, $k);
+            else
+                $b .= $arg;
+
+            if ($n > 1 && $i < ($n - 2))
+                $b .= ', ';
+            else if ($n > 1 && $i == $n - 2)
+                $b .= Lang::main($useAnd ? 'and' : 'or');
+
+            $i++;
+        }
+
+        return $b;
     }
 
     public static function sort($prop, $group, $method = SORT_NATURAL)
@@ -181,7 +213,7 @@ class Lang
 
     public static function getReputationLevelForPoints($pts)
     {
-        $_ = Util::getReputationLevelForPoints($pts);
+        $_ = Game::getReputationLevelForPoints($pts);
 
         return self::game('rep', $_);
     }
@@ -383,7 +415,7 @@ class Lang
         // french preposition : de
         // |2 <word>
         $var = preg_replace_callback('/\|2\s(\w)/i', function ($m) {
-            if (in_array(strtolower($m[1], ['a', 'e', 'h', 'i', 'o', 'u'])))
+            if (in_array(strtolower($m[1]), ['a', 'e', 'h', 'i', 'o', 'u']))
                 return "d'".$m[1];
             else
                 return 'de '.$m[1];

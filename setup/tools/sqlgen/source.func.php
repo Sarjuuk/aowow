@@ -356,8 +356,8 @@ function source(array $ids = [])
 
     $spellBuff   = [];
     $itemBuff    = [];
-    $xCostH      = DB::Aowow()->selectCol('SELECT Id FROM dbc_itemextendedcost WHERE reqHonorPoints > 0 AND reqArenaPoints = 0');
-    $xCostA      = DB::Aowow()->selectCol('SELECT Id FROM dbc_itemextendedcost WHERE reqArenaPoints > 0');
+    $xCostH      = DB::Aowow()->selectCol('SELECT id FROM dbc_itemextendedcost WHERE reqHonorPoints > 0 AND reqArenaPoints = 0');
+    $xCostA      = DB::Aowow()->selectCol('SELECT id FROM dbc_itemextendedcost WHERE reqArenaPoints > 0');
     $vendorQuery = 'SELECT n.item AS ARRAY_KEY, SUM(n.qty) AS qty, it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2 FROM (
                         SELECT item, COUNT(1) AS qty FROM npc_vendor WHERE ExtendedCost IN (?a) GROUP BY item
                         UNION
@@ -477,7 +477,7 @@ function source(array $ids = [])
 
     $spellBuff  = [];
     $itemBuff   = [];
-    $xCostIds   = DB::Aowow()->selectCol('SELECT Id FROM dbc_itemextendedcost WHERE reqHonorPoints <> 0 OR reqArenaPoints <> 0');
+    $xCostIds   = DB::Aowow()->selectCol('SELECT id FROM dbc_itemextendedcost WHERE reqHonorPoints <> 0 OR reqArenaPoints <> 0');
     $vendors    = DB::World()->select(
         'SELECT n.item AS ARRAY_KEY, n.npc, SUM(n.qty) AS qty, it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2 FROM (
             SELECT item, entry AS npc, COUNT(1) AS qty FROM npc_vendor WHERE ExtendedCost NOT IN (?a) GROUP BY item
@@ -1088,7 +1088,7 @@ function source(array $ids = [])
     CLISetup::log('   * #6  Trainer');
     if ($tNpcs = DB::World()->select('SELECT SpellID AS ARRAY_KEY, ID AS entry, COUNT(1) AS qty FROM npc_trainer WHERE SpellID > 0 GROUP BY ARRAY_KEY'))
     {
-        $tSpells = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE Id IN (?a)', array_keys($tNpcs));
+        $tSpells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($tNpcs));
         $buff    = [];
 
         // todo (med): this skips some spells (e.g. riding)
@@ -1126,9 +1126,9 @@ function source(array $ids = [])
     #  9: Talent
     CLISetup::log('   * #9  Talent');
     $tSpells = DB::Aowow()->select('
-        SELECT s.Id AS ARRAY_KEY, s.effect1Id, s.effect2Id, s.effect3Id, s.effect1TriggerSpell, s.effect2TriggerSpell, s.effect3TriggerSpell
+        SELECT s.id AS ARRAY_KEY, s.effect1Id, s.effect2Id, s.effect3Id, s.effect1TriggerSpell, s.effect2TriggerSpell, s.effect3TriggerSpell
         FROM   dbc_talent t
-        JOIN   dbc_spell s ON s.Id = t.rank1
+        JOIN   dbc_spell s ON s.id = t.rank1
         WHERE  t.rank2 < 1 AND (t.talentSpell = 1 OR (s.effect1Id = 36 OR s.effect2Id = 36 OR s.effect3Id = 36))
     ');
 
@@ -1155,7 +1155,7 @@ function source(array $ids = [])
         if (!$recurse)
             break;
 
-        $tSpells = DB::Aowow()->select('SELECT Id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE Id IN (?a)', array_keys($recurse));
+        $tSpells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($recurse));
     }
 
     DB::Aowow()->query(queryfy('[V]', $buff, $insBasic), 9, 9, 9);

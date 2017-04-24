@@ -105,6 +105,7 @@ class NpcPage extends GenericPage
                 $mapType = 1;
         }
 
+
         /***********/
         /* Infobox */
         /***********/
@@ -138,7 +139,7 @@ class NpcPage extends GenericPage
         // Classification
         if ($_ = $this->subject->getField('rank'))          //  != NPC_RANK_NORMAL
         {
-            $str = $_typeFlags & 0x4 ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
+            $str = $this->subject->isBoss() ? '[span class=icon-boss]'.Lang::npc('rank', $_).'[/span]' : Lang::npc('rank', $_);
             $infobox[] = Lang::npc('classification').Lang::main('colon').$str;
         }
 
@@ -302,6 +303,7 @@ class NpcPage extends GenericPage
         if ($stats)
             $infobox[] = Lang::npc('stats').($modes ? ' ('.Lang::npc('modes', $mapType, 0).')' : null).Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
+
         /****************/
         /* Main Content */
         /****************/
@@ -328,6 +330,10 @@ class NpcPage extends GenericPage
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['type' => TYPE_NPC, 'typeId' => $this->typeId, 'displayId' => $this->subject->getRandomModelId()]
         );
+
+        if ($this->subject->getField('humanoid'))
+            $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
+
 
         /**************/
         /* Extra Tabs */
@@ -357,7 +363,7 @@ class NpcPage extends GenericPage
         {
             $skill = 0;
             $mask  = 0x0;
-            foreach (Util::$skillLineMask[-1] as $idx => $pair)
+            foreach (Game::$skillLineMask[-1] as $idx => $pair)
             {
                 if ($pair[0] != $_)
                     continue;

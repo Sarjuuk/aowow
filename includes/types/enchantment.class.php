@@ -58,7 +58,7 @@ class EnchantmentList extends BaseType
             $curTpl['dps'] = floatVal($curTpl['dps']);
 
             // remove zero-stats
-            foreach (Util::$itemMods as $str)
+            foreach (Game::$itemMods as $str)
                 if ($curTpl[$str] == 0)                     // empty(0.0f) => true .. yeah, sure
                     unset($curTpl[$str]);
 
@@ -128,7 +128,7 @@ class EnchantmentList extends BaseType
     {
         $data = [];
 
-        foreach (Util::$itemMods as $str)
+        foreach (Game::$itemMods as $str)
             if (isset($this->curTpl[$str]))
                 $data[$str] = $this->curTpl[$str];
 
@@ -151,7 +151,7 @@ class EnchantmentList extends BaseType
                     case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
                         if (!empty($spellStats[$obj]))
                             foreach ($spellStats[$obj] as $mod => $_)
-                                if ($str = Util::$itemMods[$mod])
+                                if ($str = Game::$itemMods[$mod])
                                     Util::arraySumByKey($data, [$str => 0]);
 
                         $obj = null;
@@ -194,7 +194,7 @@ class EnchantmentList extends BaseType
                 }
 
                 if ($obj !== null)
-                    if ($str = Util::$itemMods[$obj])       // check if we use these mods
+                    if ($str = Game::$itemMods[$obj])       // check if we use these mods
                         Util::arraySumByKey($data, [$str => 0]);
             }
         }
@@ -244,78 +244,86 @@ class EnchantmentListFilter extends Filter
     );
 
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-          2 => [FILTER_CR_NUMERIC, 'id',                 null,                 true], // id
+          2 => [FILTER_CR_NUMERIC, 'id',                 NUM_CAST_INT,         true], // id
           3 => [FILTER_CR_ENUM,    'skillLine'                                     ], // requiresprof
-          4 => [FILTER_CR_NUMERIC, 'skillLevel',                                   ], // reqskillrank
+          4 => [FILTER_CR_NUMERIC, 'skillLevel',         NUM_CAST_INT              ], // reqskillrank
           5 => [FILTER_CR_BOOLEAN, 'conditionId'                                   ], // hascondition
          10 => [FILTER_CR_FLAG,    'cuFlags',            CUSTOM_HAS_COMMENT        ], // hascomments
          11 => [FILTER_CR_FLAG,    'cuFlags',            CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
          12 => [FILTER_CR_FLAG,    'cuFlags',            CUSTOM_HAS_VIDEO          ], // hasvideos
-         21 => [FILTER_CR_NUMERIC, 'is.agi',             null,                 true], // agi
-         23 => [FILTER_CR_NUMERIC, 'is.int',             null,                 true], // int
-         22 => [FILTER_CR_NUMERIC, 'is.sta',             null,                 true], // sta
-         24 => [FILTER_CR_NUMERIC, 'is.spi',             null,                 true], // spi
-         20 => [FILTER_CR_NUMERIC, 'is.str',             null,                 true], // str
-        115 => [FILTER_CR_NUMERIC, 'is.health',          null,                 true], // health
-        116 => [FILTER_CR_NUMERIC, 'is.mana',            null,                 true], // mana
-         60 => [FILTER_CR_NUMERIC, 'is.healthrgn',       null,                 true], // healthrgn
-         61 => [FILTER_CR_NUMERIC, 'is.manargn',         null,                 true], // manargn
-         41 => [FILTER_CR_NUMERIC, 'is.armor'   ,        null,                 true], // armor
-         44 => [FILTER_CR_NUMERIC, 'is.blockrtng',       null,                 true], // blockrtng
-         43 => [FILTER_CR_NUMERIC, 'is.block',           null,                 true], // block
-         42 => [FILTER_CR_NUMERIC, 'is.defrtng',         null,                 true], // defrtng
-         45 => [FILTER_CR_NUMERIC, 'is.dodgertng',       null,                 true], // dodgertng
-         46 => [FILTER_CR_NUMERIC, 'is.parryrtng',       null,                 true], // parryrtng
-         79 => [FILTER_CR_NUMERIC, 'is.resirtng',        null,                 true], // resirtng
-         77 => [FILTER_CR_NUMERIC, 'is.atkpwr',          null,                 true], // atkpwr
-         97 => [FILTER_CR_NUMERIC, 'is.feratkpwr',       null,                 true], // feratkpwr
-        114 => [FILTER_CR_NUMERIC, 'is.armorpenrtng',    null,                 true], // armorpenrtng
-         96 => [FILTER_CR_NUMERIC, 'is.critstrkrtng',    null,                 true], // critstrkrtng
-        117 => [FILTER_CR_NUMERIC, 'is.exprtng',         null,                 true], // exprtng
-        103 => [FILTER_CR_NUMERIC, 'is.hastertng',       null,                 true], // hastertng
-        119 => [FILTER_CR_NUMERIC, 'is.hitrtng',         null,                 true], // hitrtng
-         94 => [FILTER_CR_NUMERIC, 'is.splpen',          null,                 true], // splpen
-        123 => [FILTER_CR_NUMERIC, 'is.splpwr',          null,                 true], // splpwr
-         52 => [FILTER_CR_NUMERIC, 'is.arcsplpwr',       null,                 true], // arcsplpwr
-         53 => [FILTER_CR_NUMERIC, 'is.firsplpwr',       null,                 true], // firsplpwr
-         54 => [FILTER_CR_NUMERIC, 'is.frosplpwr',       null,                 true], // frosplpwr
-         55 => [FILTER_CR_NUMERIC, 'is.holsplpwr',       null,                 true], // holsplpwr
-         56 => [FILTER_CR_NUMERIC, 'is.natsplpwr',       null,                 true], // natsplpwr
-         57 => [FILTER_CR_NUMERIC, 'is.shasplpwr',       null,                 true], // shasplpwr
-         32 => [FILTER_CR_NUMERIC, 'is.dps',             true,                 true], // dps
-         34 => [FILTER_CR_NUMERIC, 'is.dmg',             true,                 true], // dmg
-         25 => [FILTER_CR_NUMERIC, 'is.arcres',          null,                 true], // arcres
-         26 => [FILTER_CR_NUMERIC, 'is.firres',          null,                 true], // firres
-         28 => [FILTER_CR_NUMERIC, 'is.frores',          null,                 true], // frores
-         30 => [FILTER_CR_NUMERIC, 'is.holres',          null,                 true], // holres
-         27 => [FILTER_CR_NUMERIC, 'is.natres',          null,                 true], // natres
-         29 => [FILTER_CR_NUMERIC, 'is.shares',          null,                 true], // shares
-         37 => [FILTER_CR_NUMERIC, 'is.mleatkpwr',       null,                 true], // mleatkpwr
-         84 => [FILTER_CR_NUMERIC, 'is.mlecritstrkrtng', null,                 true], // mlecritstrkrtng
-         78 => [FILTER_CR_NUMERIC, 'is.mlehastertng',    null,                 true], // mlehastertng
-         95 => [FILTER_CR_NUMERIC, 'is.mlehitrtng',      null,                 true], // mlehitrtng
-         38 => [FILTER_CR_NUMERIC, 'is.rgdatkpwr',       null,                 true], // rgdatkpwr
-         40 => [FILTER_CR_NUMERIC, 'is.rgdcritstrkrtng', null,                 true], // rgdcritstrkrtng
-        101 => [FILTER_CR_NUMERIC, 'is.rgdhastertng',    null,                 true], // rgdhastertng
-         39 => [FILTER_CR_NUMERIC, 'is.rgdhitrtng',      null,                 true], // rgdhitrtng
-         49 => [FILTER_CR_NUMERIC, 'is.splcritstrkrtng', null,                 true], // splcritstrkrtng
-        102 => [FILTER_CR_NUMERIC, 'is.splhastertng',    null,                 true], // splhastertng
-         48 => [FILTER_CR_NUMERIC, 'is.splhitrtng',      null,                 true], // splhitrtng
-         51 => [FILTER_CR_NUMERIC, 'is.spldmg',          null,                 true], // spldmg
-         50 => [FILTER_CR_NUMERIC, 'is.splheal',         null,                 true]  // splheal
+         20 => [FILTER_CR_NUMERIC, 'is.str',             NUM_CAST_INT,         true], // str
+         21 => [FILTER_CR_NUMERIC, 'is.agi',             NUM_CAST_INT,         true], // agi
+         22 => [FILTER_CR_NUMERIC, 'is.sta',             NUM_CAST_INT,         true], // sta
+         23 => [FILTER_CR_NUMERIC, 'is.int',             NUM_CAST_INT,         true], // int
+         24 => [FILTER_CR_NUMERIC, 'is.spi',             NUM_CAST_INT,         true], // spi
+         25 => [FILTER_CR_NUMERIC, 'is.arcres',          NUM_CAST_INT,         true], // arcres
+         26 => [FILTER_CR_NUMERIC, 'is.firres',          NUM_CAST_INT,         true], // firres
+         27 => [FILTER_CR_NUMERIC, 'is.natres',          NUM_CAST_INT,         true], // natres
+         28 => [FILTER_CR_NUMERIC, 'is.frores',          NUM_CAST_INT,         true], // frores
+         29 => [FILTER_CR_NUMERIC, 'is.shares',          NUM_CAST_INT,         true], // shares
+         30 => [FILTER_CR_NUMERIC, 'is.holres',          NUM_CAST_INT,         true], // holres
+         32 => [FILTER_CR_NUMERIC, 'is.dps',             NUM_CAST_FLOAT,       true], // dps
+         34 => [FILTER_CR_NUMERIC, 'is.dmg',             NUM_CAST_FLOAT,       true], // dmg
+         37 => [FILTER_CR_NUMERIC, 'is.mleatkpwr',       NUM_CAST_INT,         true], // mleatkpwr
+         38 => [FILTER_CR_NUMERIC, 'is.rgdatkpwr',       NUM_CAST_INT,         true], // rgdatkpwr
+         39 => [FILTER_CR_NUMERIC, 'is.rgdhitrtng',      NUM_CAST_INT,         true], // rgdhitrtng
+         40 => [FILTER_CR_NUMERIC, 'is.rgdcritstrkrtng', NUM_CAST_INT,         true], // rgdcritstrkrtng
+         41 => [FILTER_CR_NUMERIC, 'is.armor'   ,        NUM_CAST_INT,         true], // armor
+         42 => [FILTER_CR_NUMERIC, 'is.defrtng',         NUM_CAST_INT,         true], // defrtng
+         43 => [FILTER_CR_NUMERIC, 'is.block',           NUM_CAST_INT,         true], // block
+         44 => [FILTER_CR_NUMERIC, 'is.blockrtng',       NUM_CAST_INT,         true], // blockrtng
+         45 => [FILTER_CR_NUMERIC, 'is.dodgertng',       NUM_CAST_INT,         true], // dodgertng
+         46 => [FILTER_CR_NUMERIC, 'is.parryrtng',       NUM_CAST_INT,         true], // parryrtng
+         48 => [FILTER_CR_NUMERIC, 'is.splhitrtng',      NUM_CAST_INT,         true], // splhitrtng
+         49 => [FILTER_CR_NUMERIC, 'is.splcritstrkrtng', NUM_CAST_INT,         true], // splcritstrkrtng
+         50 => [FILTER_CR_NUMERIC, 'is.splheal',         NUM_CAST_INT,         true], // splheal
+         51 => [FILTER_CR_NUMERIC, 'is.spldmg',          NUM_CAST_INT,         true], // spldmg
+         52 => [FILTER_CR_NUMERIC, 'is.arcsplpwr',       NUM_CAST_INT,         true], // arcsplpwr
+         53 => [FILTER_CR_NUMERIC, 'is.firsplpwr',       NUM_CAST_INT,         true], // firsplpwr
+         54 => [FILTER_CR_NUMERIC, 'is.frosplpwr',       NUM_CAST_INT,         true], // frosplpwr
+         55 => [FILTER_CR_NUMERIC, 'is.holsplpwr',       NUM_CAST_INT,         true], // holsplpwr
+         56 => [FILTER_CR_NUMERIC, 'is.natsplpwr',       NUM_CAST_INT,         true], // natsplpwr
+         57 => [FILTER_CR_NUMERIC, 'is.shasplpwr',       NUM_CAST_INT,         true], // shasplpwr
+         60 => [FILTER_CR_NUMERIC, 'is.healthrgn',       NUM_CAST_INT,         true], // healthrgn
+         61 => [FILTER_CR_NUMERIC, 'is.manargn',         NUM_CAST_INT,         true], // manargn
+         77 => [FILTER_CR_NUMERIC, 'is.atkpwr',          NUM_CAST_INT,         true], // atkpwr
+         78 => [FILTER_CR_NUMERIC, 'is.mlehastertng',    NUM_CAST_INT,         true], // mlehastertng
+         79 => [FILTER_CR_NUMERIC, 'is.resirtng',        NUM_CAST_INT,         true], // resirtng
+         84 => [FILTER_CR_NUMERIC, 'is.mlecritstrkrtng', NUM_CAST_INT,         true], // mlecritstrkrtng
+         94 => [FILTER_CR_NUMERIC, 'is.splpen',          NUM_CAST_INT,         true], // splpen
+         95 => [FILTER_CR_NUMERIC, 'is.mlehitrtng',      NUM_CAST_INT,         true], // mlehitrtng
+         96 => [FILTER_CR_NUMERIC, 'is.critstrkrtng',    NUM_CAST_INT,         true], // critstrkrtng
+         97 => [FILTER_CR_NUMERIC, 'is.feratkpwr',       NUM_CAST_INT,         true], // feratkpwr
+        101 => [FILTER_CR_NUMERIC, 'is.rgdhastertng',    NUM_CAST_INT,         true], // rgdhastertng
+        102 => [FILTER_CR_NUMERIC, 'is.splhastertng',    NUM_CAST_INT,         true], // splhastertng
+        103 => [FILTER_CR_NUMERIC, 'is.hastertng',       NUM_CAST_INT,         true], // hastertng
+        114 => [FILTER_CR_NUMERIC, 'is.armorpenrtng',    NUM_CAST_INT,         true], // armorpenrtng
+        115 => [FILTER_CR_NUMERIC, 'is.health',          NUM_CAST_INT,         true], // health
+        116 => [FILTER_CR_NUMERIC, 'is.mana',            NUM_CAST_INT,         true], // mana
+        117 => [FILTER_CR_NUMERIC, 'is.exprtng',         NUM_CAST_INT,         true], // exprtng
+        119 => [FILTER_CR_NUMERIC, 'is.hitrtng',         NUM_CAST_INT,         true], // hitrtng
+        123 => [FILTER_CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true]  // splpwr
+    );
+
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'cr'    => [FILTER_V_RANGE,    [2, 123],       true ], // criteria ids
+        'crs'   => [FILTER_V_RANGE,    [1, 15],        true ], // criteria operators
+        'crv'   => [FILTER_V_RANGE,    [0, 99999],     true ], // criteria values - only numerals
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui', false], // name - only printable chars, no delimiter
+        'ma'    => [FILTER_V_EQUAL,    1,              false], // match any / all filter
+        'ty'    => [FILTER_V_RANGE,    [1, 8],         true ]  // types
     );
 
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-        {
             if ($genCr = $this->genericCriterion($cr))
                 return $genCr;
 
-            unset($cr);
-            $this->error = true;
-            return [1];
-        }
+        unset($cr);
+        $this->error = true;
+        return [1];
     }
 
     protected function createSQLForValues()

@@ -256,7 +256,7 @@ if (!CLI)
             {
                 // [classMask, creatureFamilyMask, tabNr, textureStr]
 
-                $tTabs = DB::Aowow()->select('SELECT tt.creatureFamilyMask, tt.textureFile, tt.tabNumber, cc.fileString FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.Id = (LOG(2, tt.classMask) + 1)');
+                $tTabs = DB::Aowow()->select('SELECT tt.creatureFamilyMask, tt.textureFile, tt.tabNumber, cc.fileString FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.id = (LOG(2, tt.classMask) + 1)');
                 $order = array(
                     ['-TopLeft',    '-TopRight'],
                     ['-BottomLeft', '-BottomRight']
@@ -336,7 +336,7 @@ if (!CLI)
                 3789 => 1, 1477 => 1, 3959 => 0, 3845 => 1, 2717 => 1, 3923 => 1, 3607 => 1, 3836 => 1, 2159 => 1, 4075 => 0
             );
 
-            $wmo = DB::Aowow()->select('SELECT *, worldMapAreaId AS ARRAY_KEY, Id AS ARRAY_KEY2 FROM dbc_worldmapoverlay WHERE textureString <> ""');
+            $wmo = DB::Aowow()->select('SELECT *, worldMapAreaId AS ARRAY_KEY, id AS ARRAY_KEY2 FROM dbc_worldmapoverlay WHERE textureString <> ""');
             $wma = DB::Aowow()->select('SELECT * FROM dbc_worldmaparea');
             if (!$wma || !$wmo)
             {
@@ -351,7 +351,7 @@ if (!CLI)
                 if ($a['areaId'])
                     continue;
 
-                switch ($a['Id'])
+                switch ($a['id'])
                 {
                     case 13:  $a['areaId'] = -6; break;     // Kalimdor
                     case 14:  $a['areaId'] = -3; break;     // Eastern Kingdoms
@@ -359,7 +359,7 @@ if (!CLI)
                     case 485: $a['areaId'] = -5; break;     // Northrend
                 }
             }
-            array_unshift($wma, ['Id' => -1, 'areaId' => -1, 'nameINT' => 'World'], ['Id' => -4, 'areaId' => -4, 'nameINT' => 'Cosmic']);
+            array_unshift($wma, ['id' => -1, 'areaId' => -1, 'nameINT' => 'World'], ['id' => -4, 'areaId' => -4, 'nameINT' => 'Cosmic']);
 
             $sumMaps = count(CLISetup::$localeIds) * count($wma);
 
@@ -415,7 +415,7 @@ if (!CLI)
                     $curMap   = $progressArea + count($wma) * $progressLoc;
                     $progress = ' - ' . str_pad($curMap.'/'.($sumMaps), 10) . str_pad('('.number_format($curMap * 100 / $sumMaps, 2).'%)', 9);
 
-                    $wmaId      = $areaEntry['Id'];
+                    $wmaId      = $areaEntry['id'];
                     $zoneId     = $areaEntry['areaId'];
                     $textureStr = $areaEntry['nameINT'];
 

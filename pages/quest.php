@@ -55,7 +55,7 @@ class QuestPage extends GenericPage
         $_minLevel     = $this->subject->getField('minLevel');
         $_flags        = $this->subject->getField('flags');
         $_specialFlags = $this->subject->getField('specialFlags');
-        $_side         = Util::sideByRaceMask($this->subject->getField('reqRaceMask'));
+        $_side         = Game::sideByRaceMask($this->subject->getField('reqRaceMask'));
 
         /***********/
         /* Infobox */
@@ -269,7 +269,7 @@ class QuestPage extends GenericPage
                 $n = Util::localizedString($_, 'name');
                 array_unshift($chain, array(
                     array(
-                        'side'    => Util::sideByRaceMask($_['reqRaceMask']),
+                        'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
                         'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
@@ -289,7 +289,7 @@ class QuestPage extends GenericPage
                 $n = Util::localizedString($_, 'name');
                 array_push($chain, array(
                     array(
-                        'side'    => Util::sideByRaceMask($_['reqRaceMask']),
+                        'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
                         'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n,
@@ -315,7 +315,7 @@ class QuestPage extends GenericPage
             {
                 $n = $list->getField('name', true);
                 $chain[] = array(array(
-                    'side'    => Util::sideByRaceMask($list->getField('reqRaceMask')),
+                    'side'    => Game::sideByRaceMask($list->getField('reqRaceMask')),
                     'typeStr' => Util::$typeStrings[TYPE_QUEST],
                     'typeId'  => $id,
                     'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
@@ -955,13 +955,13 @@ class QuestPage extends GenericPage
         $cnd = [];
         if ($_ = $this->subject->getField('reqMinRepFaction'))
         {
-            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [CND_REPUTATION_RANK, $_, 1 << Util::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))];
+            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))];
             $this->extendGlobalIds(TYPE_FACTION, $_);
         }
 
         if ($_ = $this->subject->getField('reqMaxRepFaction'))
         {
-            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [-CND_REPUTATION_RANK, $_, 1 << Util::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))];
+            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [-CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))];
             $this->extendGlobalIds(TYPE_FACTION, $_);
         }
 

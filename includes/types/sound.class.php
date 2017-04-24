@@ -109,6 +109,12 @@ class SoundListFilter extends Filter
         return [1];
     }
 
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'na' => [FILTER_V_REGEX, '/[\p{C};]/ui',                                                         false], // name - only printable chars, no delimiter
+        'ty' => [FILTER_V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
+    );
+
     protected function createSQLForValues()
     {
         $parts = [];
@@ -121,15 +127,7 @@ class SoundListFilter extends Filter
 
         // type [list]
         if (isset($_v['ty']))
-        {
-            if ($_ = array_intersect((array)$_v['ty'], [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53]))
-                $parts[] = ['cat', $_];
-            else
-            {
-                $this->error = true;
-                unset($_v['ty']);
-            }
-        }
+            $parts[] = ['cat', $_v['ty']];
 
         return $parts;
     }

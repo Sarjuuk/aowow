@@ -98,11 +98,11 @@ function spawns()                                           // and waypoints
                  'FROM gameobject c',
                  ' - assembling '.CLISetup::bold('gameobject').' spawns'];
 
-    $query[3] = ['SELECT Id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
+    $query[3] = ['SELECT id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
                  'FROM dbc_soundemitters',
                  ' - assembling '.CLISetup::bold('sound emitter').' spawns'];
 
-    $query[4] = ['SELECT Id AS "guid", 503 AS "type", Id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
+    $query[4] = ['SELECT id AS "guid", 503 AS "type", id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
                  'FROM dbc_areatrigger',
                  ' - assembling '.CLISetup::bold('areatrigger').' spawns'];
 
@@ -118,15 +118,15 @@ function spawns()                                           // and waypoints
                  'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
                  ' - assembling waypoints from '.CLISetup::bold('waypoint_data')];
 
-    $queryPost = 'SELECT dm.Id, wma.areaId, IFNULL(dm.floor, 0) AS floor, ' .
-                 '100 - ROUND(IF(dm.Id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`, ' .
-                 '100 - ROUND(IF(dm.Id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)), 1) AS `posY`, ' .
-                 '((abs(IF(dm.Id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50) / 50) * ' .
-                 ' (abs(IF(dm.Id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50) / 50)) AS quality ' .
+    $queryPost = 'SELECT dm.id, wma.areaId, IFNULL(dm.floor, 0) AS floor, ' .
+                 '100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`, ' .
+                 '100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)), 1) AS `posY`, ' .
+                 '((abs(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50) / 50) * ' .
+                 ' (abs(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50) / 50)) AS quality ' .
                  'FROM dbc_worldmaparea wma ' .
                  'LEFT JOIN dbc_dungeonmap dm ON dm.mapId = IF(?d AND (wma.mapId NOT IN (0, 1, 530, 571) OR wma.areaId = 4395), wma.mapId, -1) ' .
                  'WHERE wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0) ' .
-                 'HAVING (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9) ' . // AND (dm.Id IS NULL OR ?d) ' .
+                 'HAVING (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9) ' . // AND (dm.id IS NULL OR ?d) ' .
                  'ORDER BY quality ASC';
 
 
@@ -277,7 +277,7 @@ function spawns()                                           // and waypoints
     /* restrict difficulty displays */
     /********************************/
 
-    DB::Aowow()->query('UPDATE ?_spawns s, dbc_worldmaparea wma, dbc_map m SET s.spawnMask = 0 WHERE s.areaId = wma.areaId AND wma.mapId = m.Id AND m.areaType IN (0, 3, 4)');
+    DB::Aowow()->query('UPDATE ?_spawns s, dbc_worldmaparea wma, dbc_map m SET s.spawnMask = 0 WHERE s.areaId = wma.areaId AND wma.mapId = m.id AND m.areaType IN (0, 3, 4)');
 
     return true;
 }

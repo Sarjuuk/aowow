@@ -11,7 +11,6 @@ class SoundPage extends GenericPage
     use DetailPage;
 
     protected $type          = TYPE_SOUND;
-    protected $typeId        = 0;
     protected $tpl           = 'sound';
     protected $path          = [0, 19];
     protected $tabId         = 0;
@@ -27,10 +26,11 @@ class SoundPage extends GenericPage
         // special case
         if (!$id && isset($_GET['playlist']))
         {
-            $this->special = true;
-            $this->name    = Lang::sound('cat', 1000);
-            $this->cat     = 1000;
-            $this->typeId  = -1000;
+            $this->special       = true;
+            $this->name          = Lang::sound('cat', 1000);
+            $this->cat           = 1000;
+            $this->articleUrl    = 'sound&playlist';
+            $this->hasComContent = false;
         }
         // regular case
         else

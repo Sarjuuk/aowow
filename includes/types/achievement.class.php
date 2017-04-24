@@ -281,61 +281,41 @@ class AchievementListFilter extends Filter
               321 => -1,   424 => -1,   301 => -1
         )
     );
+
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_BOOLEAN,   'reward_loc0',    true                      ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',         true                      ], // rewardtext
-         7 => [FILTER_CR_BOOLEAN,   'chainId',                                  ], // partseries
-         9 => [FILTER_CR_NUMERIC,   'id',             null,                 true], // id
-        10 => [FILTER_CR_STRING,    'ic.name',                                  ], // icon
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // flags
-        14 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_COMMENT        ], // hascomments
-        15 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        16 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_VIDEO          ], // hasvideos
+         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
+         3 => [FILTER_CR_STRING,    'reward',      true                             ], // rewardtext
+         4 => [FILTER_CR_NYI_PH,    null,          1,                               ], // location [enum]
+         5 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_FIRST_SERIES, null], // first in series [yn]
+         6 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_LAST_SERIES,  null], // last in series [yn]
+         7 => [FILTER_CR_BOOLEAN,   'chainId',                                      ], // partseries
+         9 => [FILTER_CR_NUMERIC,   'id',          NUM_CAST_INT,                true], // id
+        10 => [FILTER_CR_STRING,    'ic.name',                                      ], // icon
+        11 => [FILTER_CR_CALLBACK,  'cbRelEvent', null,                         null], // related event [enum]
+        14 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT               ], // hascomments
+        15 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT            ], // hasscreenshots
+        16 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO                 ], // hasvideos
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                                        ]  // flags
+    );
+
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'cr'    => [FILTER_V_RANGE, [2, 18],                                         true ], // criteria ids
+        'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
+        'crv'   => [FILTER_V_REGEX, '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, '/[\p{C};]/ui',                                  false], // name / description - only printable chars, no delimiter
+        'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // extended name search
+        'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
+        'si'    => [FILTER_V_LIST,  [1, 2, 3, -1, -2],                               false], // side
+        'minpt' => [FILTER_V_RANGE, [1, 99],                                         false], // required level min
+        'maxpt' => [FILTER_V_RANGE, [1, 99],                                         false]  // required level max
     );
 
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-        {
             if ($genCr = $this->genericCriterion($cr))
                 return $genCr;
-
-            unset($cr);
-            $this->error = true;
-            return [1];
-        }
-
-        switch ($cr[0])
-        {
-            case 4:                                         // location [enum]
-/* todo */      return [1];                                 // no plausible locations parsed yet
-            case 5:                                         // first in series [yn]
-                if ($this->int2Bool($cr[1]))
-                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&'], 0]];
-
-                break;
-            case 6:                                         // last in series [yn]
-                if ($this->int2Bool($cr[1]))
-                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&'], 0]];
-
-                break;
-            case 11:                                        // Related Event [enum]
-                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
-                if ($_ !== null)
-                {
-                    if (is_int($_))
-                        return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
-                    else
-                    {
-                        $ids = array_filter($this->enums[$cr[0]], function($x) {
-                            return is_int($x) && $x > 0;
-                        });
-
-                        return ['category', $ids, $_ ? null : '!'];
-                    }
-                }
-                break;
-        }
 
         unset($cr);
         $this->error = true;
@@ -362,44 +342,56 @@ class AchievementListFilter extends Filter
 
         // points min
         if (isset($_v['minpt']))
-        {
-            if ($this->isSaneNumeric($_v['minpt']))
-                $parts[] = ['points', $_v['minpt'],  '>='];
-            else
-                unset($_v['minpt']);
-        }
+            $parts[] = ['points', $_v['minpt'],  '>='];
 
         // points max
         if (isset($_v['maxpt']))
-        {
-            if ($this->isSaneNumeric($_v['maxpt']))
-                $parts[] = ['points', $_v['maxpt'],  '<='];
-            else
-                unset($_v['maxpt']);
-        }
+            $parts[] = ['points', $_v['maxpt'],  '<='];
 
         // faction (side)
         if (isset($_v['si']))
         {
             switch ($_v['si'])
             {
-                case 3:                                     // both
-                    $parts[] = ['faction', 0];
-                    break;
                 case -1:                                    // faction, exclusive both
                 case -2:
                     $parts[] = ['faction', -$_v['si']];
                     break;
                 case 1:                                     // faction, inclusive both
                 case 2:
-                    $parts[] = ['OR', ['faction', 0], ['faction', $_v['si']]];
+                case 3:                                     // both
+                    $parts[] = ['faction', $_v['si'], '&'];
                     break;
-                default:
-                    unset($_v['si']);
             }
         }
 
         return $parts;
+    }
+
+    protected function cbRelEvent($cr, $value)
+    {
+        if (!isset($this->enums[$cr[0]][$cr[1]]))
+            return false;
+
+        $_ = $this->enums[$cr[0]][$cr[1]];
+        if (is_int($_))
+            return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
+        else
+        {
+            $ids = array_filter($this->enums[$cr[0]], function($x) { return is_int($x) && $x > 0; });
+
+            return ['category', $ids, $_ ? null : '!'];
+        }
+
+        return false;
+    }
+
+    protected function cbSeries($cr, $value)
+    {
+        if ($this->int2Bool($cr[1]))
+            return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', $value, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', $value, '&'], 0]];
+
+        return false;
     }
 }
 

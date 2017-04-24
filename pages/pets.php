@@ -15,7 +15,7 @@ class PetsPage extends GenericPage
     protected $path          = [0, 8];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $validCats     = [1, 2, 3];
+    protected $validCats     = [0, 1, 2];
 
     public function __construct($pageCall, $pageParam)
     {

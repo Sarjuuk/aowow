@@ -198,7 +198,7 @@ class ScreenshotPage extends GenericPage
         if (count($dims) != 4)
             return 3;
 
-        Util::checkNumeric($dims);
+        Util::checkNumeric($dims, NUM_REQ_INT);
 
         // actually crop the image
         $srcImg = imagecreatefromjpeg($fullPath);

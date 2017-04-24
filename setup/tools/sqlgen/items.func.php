@@ -207,7 +207,7 @@ function items(array $ids = [])
     DB::Aowow()->query('UPDATE ?_items SET class = 12 WHERE classBak = 15 AND startQuest <> 0 AND name_loc0 NOT LIKE "sayge\'s fortune%"');
 
     // move perm. enchantments into appropriate cat/subcat
-    DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.Id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
+    DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.class = 0, i.subClass = 6 WHERE s.id = i.spellId1 AND s.effect1Id = 53 AND i.classBak = 12');
 
     // move some generic recipes into appropriate sub-categories
     $skillz = array(

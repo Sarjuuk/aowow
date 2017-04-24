@@ -103,7 +103,7 @@ class PetPage extends GenericPage
         // tab: diet
         $list = [];
         $mask = $this->subject->getField('foodMask');
-        for ($i = 1; $i < 7; $i++)
+        for ($i = 1; $i < 9; $i++)
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
@@ -120,7 +120,7 @@ class PetPage extends GenericPage
 
         // tab: spells
         $mask = 0x0;
-        foreach (Util::$skillLineMask[-1] as $idx => $pair)
+        foreach (Game::$skillLineMask[-1] as $idx => $pair)
         {
             if ($pair[0] == $this->typeId)
             {

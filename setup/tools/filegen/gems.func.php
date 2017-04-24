@@ -27,7 +27,7 @@ if (!CLI)
     function gems()
     {
         // sketchy, but should work
-        // Id < 36'000 || ilevel < 70 ? BC : WOTLK
+        // id < 36'000 || ilevel < 70 ? BC : WOTLK
         $gems   = DB::Aowow()->Select(
            'SELECT    i.id AS itemId,
                       i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc4, i.name_loc6, i.name_loc8,

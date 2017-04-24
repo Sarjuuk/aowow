@@ -190,7 +190,7 @@ class SkillPage extends GenericPage
             CFG_SQL_LIMIT_NONE
         );
 
-        foreach (Util::$skillLineMask as $line1 => $sets)
+        foreach (Game::$skillLineMask as $line1 => $sets)
             foreach ($sets as $idx => $set)
                 if ($set[1] == $this->typeId)
                 {
@@ -236,12 +236,12 @@ class SkillPage extends GenericPage
         if (in_array($this->cat, [-5, 6, 7, 8, 9, 11]))
         {
             $list = [];
-            if (!empty(Util::$trainerTemplates[TYPE_SKILL][$this->typeId]))
-                $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', Util::$trainerTemplates[TYPE_SKILL][$this->typeId]);
+            if (!empty(Game::$trainerTemplates[TYPE_SKILL][$this->typeId]))
+                $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', Game::$trainerTemplates[TYPE_SKILL][$this->typeId]);
             else
             {
                 $mask = 0;
-                foreach (Util::$skillLineMask[-3] as $idx => $pair)
+                foreach (Game::$skillLineMask[-3] as $idx => $pair)
                     if ($pair[1] == $this->typeId)
                         $mask |= 1 << $idx;
 

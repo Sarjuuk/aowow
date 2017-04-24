@@ -19,8 +19,8 @@ class ItemsetsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new ItemsetListFilter();
         $this->getCategoryFromUrl($pageParam);
+        $this->filterObj = new ItemsetListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -29,6 +29,8 @@ class ItemsetsPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $conditions = [];
 
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
@@ -41,15 +43,20 @@ class ItemsetsPage extends GenericPage
         $this->extendGlobalData($itemsets->getJSGlobals());
 
         // recreate form selection
-        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['initData'] = ['init' => 'itemsets'];
 
-        $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
+
+        $xCols = $this->filterObj->getExtraCols();
+        if ($xCols)
+            $this->filter['initData']['ec'] = $xCols;
 
         $tabData = ['data' => array_values($itemsets->getListviewData())];
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($xCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded

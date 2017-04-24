@@ -32,7 +32,7 @@ function sounds(/*array $ids = [] */)
         content: e.g. Tavern Music
     */
 
-    // WMOAreaTable.dbc/Id => AreaTable.dbc/Id
+    // WMOAreaTable.dbc/id => AreaTable.dbc/id
     $worldStateZoneSoundFix = array(
         18153 => 2119,
         18154 => 2119,
@@ -56,7 +56,7 @@ function sounds(/*array $ids = [] */)
     // .mp3 => audio/mpeg
 
     $query = '
-        SELECT Id AS `id`, `type` AS `cat`, `name`, 0 AS cuFlags,
+        SELECT id AS `id`, `type` AS `cat`, `name`, 0 AS cuFlags,
             `file1` AS soundFile1, `file2` AS soundFile2, `file3` AS soundFile3, `file4` AS soundFile4, `file5` AS soundFile5,
             `file6` AS soundFile6, `file7` AS soundFile7, `file8` AS soundFile8, `file9` AS soundFile9, `file10` AS soundFile10,
             path, flags
@@ -196,7 +196,7 @@ function sounds(/*array $ids = [] */)
         INSERT INTO
             ?_creature_sounds (`id`, `greeting`, `farewell`, `angry`, `exertion`, `exertioncritical`, `injury`, `injurycritical`, `death`, `stun`, `stand`, `aggro`, `wingflap`, `wingglide`, `alert`, `fidget`, `customattack`, `loop`, `jumpstart`, `jumpend`, `petattack`, `petorder`, `petdismiss`, `birth`, `spellcast`, `submerge`, `submerged`)
         SELECT
-            cdi.Id,
+            cdi.id,
             IFNULL(ns.greetSoundId, 0),
             IFNULL(ns.byeSoundId,   0),
             IFNULL(ns.angrySoundId, 0),
@@ -226,13 +226,13 @@ function sounds(/*array $ids = [] */)
         FROM
             dbc_creaturedisplayinfo cdi
         LEFT JOIN
-            dbc_creaturemodeldata cmd ON cmd.Id = cdi.modelId
+            dbc_creaturemodeldata cmd ON cmd.id = cdi.modelId
         LEFT JOIN
-            dbc_creaturesounddata csdA ON cdi.creatureSoundId = csdA.Id
+            dbc_creaturesounddata csdA ON cdi.creatureSoundId = csdA.id
         LEFT JOIN
-            dbc_creaturesounddata csdB ON cmd.creatureSoundId = csdB.Id
+            dbc_creaturesounddata csdB ON cmd.creatureSoundId = csdB.id
         LEFT JOIN
-            dbc_npcsounds ns ON cdi.npcSoundId = ns.Id
+            dbc_npcsounds ns ON cdi.npcSoundId = ns.id
     ');
 
 
@@ -250,9 +250,9 @@ function sounds(/*array $ids = [] */)
     DB::Aowow()->query('TRUNCATE ?_spell_sounds');
     DB::Aowow()->query('
         INSERT INTO
-            ?_spell_sounds (`Id`, `precast`, `cast`, `impact`, `state`, `statedone`, `channel`, `missile`, `animation`, `casterimpact`, `targetimpact`, `missiletargeting`, `instantarea`, `impactarea`, `persistentarea`)
+            ?_spell_sounds (`id`, `precast`, `cast`, `impact`, `state`, `statedone`, `channel`, `missile`, `animation`, `casterimpact`, `targetimpact`, `missiletargeting`, `instantarea`, `impactarea`, `persistentarea`)
         SELECT
-            sv.Id,
+            sv.id,
             IFNULL(svk1.soundId, 0),
             IFNULL(svk2.soundId, 0),
             IFNULL(svk3.soundId, 0),
@@ -270,29 +270,29 @@ function sounds(/*array $ids = [] */)
         FROM
             dbc_spellvisual sv
         LEFT JOIN
-            dbc_spellvisualkit svk1  ON svk1.Id  = sv.precastKitId
+            dbc_spellvisualkit svk1  ON svk1.id  = sv.precastKitId
         LEFT JOIN
-            dbc_spellvisualkit svk2  ON svk2.Id  = sv.castKitId
+            dbc_spellvisualkit svk2  ON svk2.id  = sv.castKitId
         LEFT JOIN
-            dbc_spellvisualkit svk3  ON svk3.Id  = sv.impactKitId
+            dbc_spellvisualkit svk3  ON svk3.id  = sv.impactKitId
         LEFT JOIN
-            dbc_spellvisualkit svk4  ON svk4.Id  = sv.stateKitId
+            dbc_spellvisualkit svk4  ON svk4.id  = sv.stateKitId
         LEFT JOIN
-            dbc_spellvisualkit svk5  ON svk5.Id  = sv.statedoneKitId
+            dbc_spellvisualkit svk5  ON svk5.id  = sv.statedoneKitId
         LEFT JOIN
-            dbc_spellvisualkit svk6  ON svk6.Id  = sv.channelKitId
+            dbc_spellvisualkit svk6  ON svk6.id  = sv.channelKitId
         LEFT JOIN
-            dbc_spellvisualkit svk7  ON svk7.Id  = sv.casterImpactKitId
+            dbc_spellvisualkit svk7  ON svk7.id  = sv.casterImpactKitId
         LEFT JOIN
-            dbc_spellvisualkit svk8  ON svk8.Id  = sv.targetImpactKitId
+            dbc_spellvisualkit svk8  ON svk8.id  = sv.targetImpactKitId
         LEFT JOIN
-            dbc_spellvisualkit svk9  ON svk9.Id  = sv.missileTargetingKitId
+            dbc_spellvisualkit svk9  ON svk9.id  = sv.missileTargetingKitId
         LEFT JOIN
-            dbc_spellvisualkit svk10 ON svk10.Id = sv.instantAreaKitId
+            dbc_spellvisualkit svk10 ON svk10.id = sv.instantAreaKitId
         LEFT JOIN
-            dbc_spellvisualkit svk11 ON svk11.Id = sv.impactAreaKitId
+            dbc_spellvisualkit svk11 ON svk11.id = sv.impactAreaKitId
         LEFT JOIN
-            dbc_spellvisualkit svk12 ON svk12.Id = sv.persistentAreaKitId
+            dbc_spellvisualkit svk12 ON svk12.id = sv.persistentAreaKitId
     ');
 
 

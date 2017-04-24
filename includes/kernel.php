@@ -13,7 +13,8 @@ mb_internal_encoding('UTF-8');
 
 require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
-require_once 'includes/utilities.php';                      // misc™ data 'n func
+require_once 'includes/utilities.php';                      // helper functions
+require_once 'includes/game.php';                           // game related data & functions
 require_once 'includes/user.class.php';
 require_once 'includes/markup.class.php';                   // manipulate markup text
 require_once 'includes/database.class.php';                 // wrap DBSimple
@@ -25,7 +26,7 @@ require_once 'pages/genericPage.class.php';
 
 // autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {
-    $class = strtolower(str_replace('Filter', '', $class));
+    $class = strtolower(str_replace('ListFilter', 'List', $class));
 
     if (class_exists($class))                               // already registered
         return;
@@ -116,7 +117,7 @@ foreach ($sets as $k => $v)
 
 
 // handle non-fatal errors and notices
-error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
+error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? E_AOWOW : 0);
 set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 {
     $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
@@ -148,7 +149,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
         );
 
     return true;
-}, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+}, E_AOWOW);
 
 // handle exceptions
 set_exception_handler(function ($ex)

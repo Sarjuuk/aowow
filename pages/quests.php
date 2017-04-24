@@ -19,10 +19,10 @@ class QuestsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->validCats = Util::$questClasses;             // needs reviewing (not allowed to set this as default)
+        $this->validCats = Game::$questClasses;             // needs reviewing (not allowed to set this as default)
 
-        $this->filterObj = new QuestListFilter();
         $this->getCategoryFromUrl($pageParam);
+        $this->filterObj = new QuestListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -50,15 +50,26 @@ class QuestsPage extends GenericPage
         $this->extendGlobalData($quests->getJSGlobals());
 
         // recreate form selection
-        $this->filter = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['initData'] = ['init' => 'quests'];
+
+        $rCols = $this->filterObj->getReputationCols();
+        $xCols = $this->filterObj->getExtraCols();
+        if ($rCols)
+            $this->filter['initData']['rc'] = $rCols;
+
+        if ($xCols)
+            $this->filter['initData']['ec'] = $xCols;
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
 
         $tabData = ['data' => array_values($quests->getListviewData())];
 
-        if ($_ = $this->filterObj->getForm('reputationCols'))
-            $tabData['extraCols'] = '$fi_getReputationCols('.json_encode($_, JSON_NUMERIC_CHECK).')';
-        else if (!empty($this->filter['fi']['extraCols']))
+        if ($rCols)
+            $tabData['extraCols'] = '$fi_getReputationCols('.json_encode($rCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')';
+        else if ($xCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded

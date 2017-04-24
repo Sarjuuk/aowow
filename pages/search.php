@@ -40,7 +40,6 @@ class SearchPage extends GenericPage
     protected $search        = '';                          // output
     protected $invalid       = [];
 
-    private   $statWeight    = ['wt' => null, 'wtv' => null];
     private   $maxResults    = CFG_SQL_LIMIT_SEARCH;
     private   $searchMask    = 0x0;
     private   $query         = '';                          // lookup
@@ -63,15 +62,6 @@ class SearchPage extends GenericPage
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
             $this->error();
-
-        // statWeight for JSON-search
-        if (isset($_GET['wt']) && isset($_GET['wtv']))
-        {
-            $this->statWeight = array(
-                'wt'  => explode(':', $_GET['wt']),
-                'wtv' => explode(':', $_GET['wtv'])
-            );
-        }
 
         // select search mode
         if (isset($_GET['json']))
@@ -577,8 +567,12 @@ class SearchPage extends GenericPage
             if ($_ = array_filter($slots))
                 $cnd[] = ['slot', $_];
 
+            // trick ItemListFilter into evaluating weights
+            if (isset($_GET['wt']) && isset($_GET['wtv']))
+                $_GET['filter'] = 'wt='.$_GET['wt'].';wtv='.$_GET['wtv'];
+
             $itemFilter = new ItemListFilter();
-            if ($_ = $itemFilter->createConditionsForWeights($this->statWeight))
+            if ($_ = $itemFilter->createConditionsForWeights())
             {
                 $miscData['extraOpts'] = $itemFilter->extraOpts;
                 $cnd = array_merge($cnd, [$_]);
