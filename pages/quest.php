@@ -115,7 +115,7 @@ class QuestPage extends GenericPage
         // type (maybe expand uppon?)
         $_ = [];
         if ($_flags & QUEST_FLAG_DAILY)
-            $_[] = Lang::quest('daily');
+            $_[] = '[tooltip=tooltip_dailyquest]'.Lang::quest('daily').'[/tooltip]';
         else if ($_flags & QUEST_FLAG_WEEKLY)
             $_[] = Lang::quest('weekly');
         else if ($_specialFlags & QUEST_FLAG_SPECIAL_MONTHLY)

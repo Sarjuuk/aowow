@@ -21969,7 +21969,7 @@ function g_urlize(str, allowLocales, profile) {
             "Ñ": "N",
             "Ò": "O", "Ó": "O", "Ö": "O", "Ô": "O",
             "Ú": "U", "Ü": "U", "Û": "U", "Ù": "U",
-            "œ": "Oe"
+            "Œ": "Oe"
         };
         for (var character in accents) {
             str = str.replace(new RegExp(character, "g"), accents[character]);
@@ -22667,7 +22667,7 @@ var ConditionList = new function() {
                          break;
                      }
                      else                           // create mask from id and resolve in case 32
-                        entry[1] == (1 << entry[1]);
+                        entry[1] = (1 << entry[1]);
             case 32: param[0] = _listing(entry[1], g_world_object_types, '$1'); break;
             case 36: break;
             case 27:

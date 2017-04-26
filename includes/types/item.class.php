@@ -543,7 +543,13 @@ class ItemList extends BaseType
 
         // max duration
         if ($dur = $this->curTpl['duration'])
-            $x .= "<br />".Lang::game('duration').Lang::main('colon').Util::formatTime(abs($dur) * 1000).($this->curTpl['flagsCustom'] & 0x1 ? ' ('.Lang::item('realTime').')' : null);
+        {
+            $rt = '';
+            if ($this->curTpl['flagsCustom'] & 0x1)
+                $rt = $interactive ? ' ('.sprintf(Util::$dfnString, 'LANG.tooltip_realduration', Lang::item('realTime')).')' : ' ('.Lang::item('realTime').')';
+
+            $x .= "<br />".Lang::game('duration').Lang::main('colon').Util::formatTime(abs($dur) * 1000).$rt;
+        }
 
         // required holiday
         if ($eId = $this->curTpl['eventId'])
