@@ -44,7 +44,7 @@ if (!empty($this->transfer)):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
 
-if ($this->zoneMusic):
+if (!empty($this->zoneMusic)):
 ?>
                 <div class="clear">
 <?php

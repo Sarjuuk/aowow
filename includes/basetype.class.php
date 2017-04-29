@@ -713,7 +713,7 @@ trait spawnHelper
     public function getSpawns($mode)
     {
         // only Creatures, GOs and SoundEmitters can be spawned
-        if (!self::$type || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
+        if (!self::$type || !$this->getfoundIDs() || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
             return [];
 
         switch ($mode)

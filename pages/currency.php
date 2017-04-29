@@ -54,7 +54,7 @@ class CurrencyPage extends GenericPage
         /* Infobox */
         /**********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
 
         if ($_ = $this->subject->getField('cap'))
             $infobox[] = Lang::currency('cap').Lang::main('colon').Lang::nf($_);
