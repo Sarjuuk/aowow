@@ -31,7 +31,7 @@ class SpellList extends BaseType
     );
 
     public static   $effects     = array(
-        'heal'       => [ 0,  3,  10,  67,  75, 136                         ],  // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
+        'heal'       => [ 0,/*3,*/10,  67,  75, 136                         ],  // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
         'damage'     => [ 0,  2,   3,   9,  62                              ],  // <no effect>, Dummy, School Damage, Health Leech, Power Burn
         'itemCreate' => [24, 34,  59,  66, 157                              ],  // createItem, changeItem, randomItem, createManaGem, createItem2
         'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
@@ -730,6 +730,11 @@ class SpellList extends BaseType
         $spn   = $SPN   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.natsplpwr[0]', Lang::spell('traitShort', 'natsplpwr')) : Lang::spell('traitShort', 'natsplpwr');
         $sps   = $SPS   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.shasplpwr[0]', Lang::spell('traitShort', 'shasplpwr')) : Lang::spell('traitShort', 'shasplpwr');
         $bh    = $BH    = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.splheal[0]',   Lang::spell('traitShort', 'splheal'))   : Lang::spell('traitShort', 'splheal');
+        $spi   = $SPI   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.spi[0]',       Lang::spell('traitShort', 'spi'))       : Lang::spell('traitShort', 'spi');
+        $sta   = $STA   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.sta[0]',       Lang::spell('traitShort', 'sta'))       : Lang::spell('traitShort', 'sta');
+        $str   = $STR   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.str[0]',       Lang::spell('traitShort', 'str'))       : Lang::spell('traitShort', 'str');
+        $agi   = $AGI   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.agi[0]',       Lang::spell('traitShort', 'agi'))       : Lang::spell('traitShort', 'agi');
+        $int   = $INT   = $this->interactive ? sprintf(Util::$dfnString, 'LANG.traits.int[0]',       Lang::spell('traitShort', 'int'))       : Lang::spell('traitShort', 'int');
 
         // only 'ron test spell', guess its %-dmg mod; no idea what bc2 might be
         $pa    = '<$PctArcane>';                            // %arcane
@@ -1261,6 +1266,11 @@ class SpellList extends BaseType
         game variables (optionally replace with textVars)
             $PlayerName - Cpt. Obvious
             $PL / $pl   - PlayerLevel
+            $STR        - Strength Attribute (not seen)
+            $AGI        - Agility Attribute (not seen)
+            $STA        - Stamina Attribute (not seen)
+            $INT        - Intellect Attribute (not seen)
+            $SPI        - Spirit Attribute
             $AP         - Atkpwr
             $RAP        - RngAtkPwr
             $HND        - hands used by weapon (1H, 2H) => (1, 2)

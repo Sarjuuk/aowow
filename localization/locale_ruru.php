@@ -883,7 +883,8 @@ $lang = array(
         ),
         'traitShort'    => array(
             'atkpwr'    => "СА",                    'rgdatkpwr' => "Сил",                   'splpwr'    => "СЗ",                    'arcsplpwr' => "Урон",                  'firsplpwr' => "Урон",
-            'frosplpwr' => "Урон",                  'holsplpwr' => "Урон",                  'natsplpwr' => "Урон",                  'shasplpwr' => "Урон",                  'splheal'   => "Исцеление"
+            'frosplpwr' => "Урон",                  'holsplpwr' => "Урон",                  'natsplpwr' => "Урон",                  'shasplpwr' => "Урон",                  'splheal'   => "Исцеление",
+            'str'       => "Сила",                  'agi'       => "Ловк",                  'sta'       => "Выно",                  'int'       => "Инт",                   'spi'       => "Дух"
         ),
         'spellModOp'    => array(
             "DAMAGE",                               "DURATION",                             "THREAT",                               "EFFECT1",                              "CHARGES",

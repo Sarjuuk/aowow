@@ -883,7 +883,8 @@ $lang = array(
         ),
         'traitShort'    => array(
             'atkpwr'    => "PA",                    'rgdatkpwr' => "PAD",                   'splpwr'    => "PS",                    'arcsplpwr' => "PArc",                  'firsplpwr' => "PFeu",
-            'frosplpwr' => "PGiv",                  'holsplpwr' => "PSac",                  'natsplpwr' => "PNat",                  'shasplpwr' => "POmb",                  'splheal'   => "Soins"
+            'frosplpwr' => "PGiv",                  'holsplpwr' => "PSac",                  'natsplpwr' => "PNat",                  'shasplpwr' => "POmb",                  'splheal'   => "Soins",
+            'str'       => "For",                   'agi'       => "Agi",                   'sta'       => "End",                   'int'       => "Int",                   'spi'       => "Esp"
         ),
         'spellModOp'    => array(
             "DAMAGE",                               "DURATION",                             "THREAT",                               "EFFECT1",                              "CHARGES",
