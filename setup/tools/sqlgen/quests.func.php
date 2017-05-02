@@ -10,7 +10,7 @@ if (!CLI)
 /* deps:
  * quest_template
  * quest_template_addon
- * locales_quest
+ * quest_template_locale
  * game_event
  * game_event_seasonal_questrelation
  * disables
@@ -66,33 +66,33 @@ function quests(array $ids = [])
             RewardTitle,
             RewardTalents,
             RewardArenaPoints,
-            RewardItem1,                        RewardItem2,                            RewardItem3,                            RewardItem4,
-            RewardAmount1,                      RewardAmount2,                          RewardAmount3,                          RewardAmount4,
-            RewardChoiceItemID1,                RewardChoiceItemID2,                    RewardChoiceItemID3,                    RewardChoiceItemID4,                    RewardChoiceItemID5,                    RewardChoiceItemID6,
-            RewardChoiceItemQuantity1,          RewardChoiceItemQuantity2,              RewardChoiceItemQuantity3,              RewardChoiceItemQuantity4,              RewardChoiceItemQuantity5,              RewardChoiceItemQuantity6,
-            RewardFactionID1,                   RewardFactionID2,                       RewardFactionID3,                       RewardFactionID4,                       RewardFactionID5,
+            RewardItem1,                        RewardItem2,                         RewardItem3,                         RewardItem4,
+            RewardAmount1,                      RewardAmount2,                       RewardAmount3,                       RewardAmount4,
+            RewardChoiceItemID1,                RewardChoiceItemID2,                 RewardChoiceItemID3,                 RewardChoiceItemID4,                 RewardChoiceItemID5,                  RewardChoiceItemID6,
+            RewardChoiceItemQuantity1,          RewardChoiceItemQuantity2,           RewardChoiceItemQuantity3,           RewardChoiceItemQuantity4,           RewardChoiceItemQuantity5,            RewardChoiceItemQuantity6,
+            RewardFactionID1,                   RewardFactionID2,                    RewardFactionID3,                    RewardFactionID4,                    RewardFactionID5,
             IF (RewardFactionOverride1 <> 0, RewardFactionOverride1 / 100, RewardFactionValue1),
             IF (RewardFactionOverride2 <> 0, RewardFactionOverride2 / 100, RewardFactionValue2),
             IF (RewardFactionOverride3 <> 0, RewardFactionOverride3 / 100, RewardFactionValue3),
             IF (RewardFactionOverride4 <> 0, RewardFactionOverride4 / 100, RewardFactionValue4),
             IF (RewardFactionOverride5 <> 0, RewardFactionOverride5 / 100, RewardFactionValue5),
-            LogTitle,                           IFNULL(lq.Title_loc2, ""),              IFNULL(lq.Title_loc3, ""),              IFNULL(lq.Title_loc6, ""),              IFNULL(lq.Title_loc8, ""),
-            LogDescription,                     IFNULL(lq.Objectives_loc2, ""),         IFNULL(lq.Objectives_loc3, ""),         IFNULL(lq.Objectives_loc6, ""),         IFNULL(lq.Objectives_loc8, ""),
-            QuestDescription,                   IFNULL(lq.Details_loc2, ""),            IFNULL(lq.Details_loc3, ""),            IFNULL(lq.Details_loc6, ""),            IFNULL(lq.Details_loc8, ""),
-            AreaDescription,                    IFNULL(lq.EndText_loc2, ""),            IFNULL(lq.EndText_loc3, ""),            IFNULL(lq.EndText_loc6, ""),            IFNULL(lq.EndText_loc8, ""),
-            IFNULL(qor.RewardText, ""),         IFNULL(lq.OfferRewardText_loc2, ""),    IFNULL(lq.OfferRewardText_loc3, ""),    IFNULL(lq.OfferRewardText_loc6, ""),    IFNULL(lq.OfferRewardText_loc8, ""),
-            IFNULL(qri.CompletionText, ""),     IFNULL(lq.RequestItemsText_loc2, ""),   IFNULL(lq.RequestItemsText_loc3, ""),   IFNULL(lq.RequestItemsText_loc6, ""),   IFNULL(lq.RequestItemsText_loc8, ""),
-            QuestCompletionLog,                 IFNULL(lq.CompletedText_loc2, ""),      IFNULL(lq.CompletedText_loc3, ""),      IFNULL(lq.CompletedText_loc6, ""),      IFNULL(lq.CompletedText_loc8, ""),
-            RequiredNpcOrGo1,                   RequiredNpcOrGo2,                       RequiredNpcOrGo3,                       RequiredNpcOrGo4,
-            RequiredNpcOrGoCount1,              RequiredNpcOrGoCount2,                  RequiredNpcOrGoCount3,                  RequiredNpcOrGoCount4,
-            ItemDrop1,                          ItemDrop2,                              ItemDrop3,                              ItemDrop4,
-            ItemDropQuantity1,                  ItemDropQuantity2,                      ItemDropQuantity3,                      ItemDropQuantity4,
-            RequiredItemId1,                    RequiredItemId2,                        RequiredItemId3,                        RequiredItemId4,                        RequiredItemId5,                        RequiredItemId6,
-            RequiredItemCount1,                 RequiredItemCount2,                     RequiredItemCount3,                     RequiredItemCount4,                     RequiredItemCount5,                     RequiredItemCount6,
-            ObjectiveText1,                     IFNULL(lq.ObjectiveText1_loc2, ""),     IFNULL(lq.ObjectiveText1_loc3, ""),     IFNULL(lq.ObjectiveText1_loc6, ""),     IFNULL(lq.ObjectiveText1_loc8, ""),
-            ObjectiveText2,                     IFNULL(lq.ObjectiveText2_loc2, ""),     IFNULL(lq.ObjectiveText2_loc3, ""),     IFNULL(lq.ObjectiveText2_loc6, ""),     IFNULL(lq.ObjectiveText2_loc8, ""),
-            ObjectiveText3,                     IFNULL(lq.ObjectiveText3_loc2, ""),     IFNULL(lq.ObjectiveText3_loc3, ""),     IFNULL(lq.ObjectiveText3_loc6, ""),     IFNULL(lq.ObjectiveText3_loc8, ""),
-            ObjectiveText4,                     IFNULL(lq.ObjectiveText4_loc2, ""),     IFNULL(lq.ObjectiveText4_loc3, ""),     IFNULL(lq.ObjectiveText4_loc6, ""),     IFNULL(lq.ObjectiveText4_loc8, "")
+            q.LogTitle,                         IFNULL(qtl2.Title, ""),              IFNULL(qtl3.Title, ""),              IFNULL(qtl6.Title, ""),              IFNULL(qtl8.Title, ""),
+            q.LogDescription,                   IFNULL(qtl2.Objectives, ""),         IFNULL(qtl3.Objectives, ""),         IFNULL(qtl6.Objectives, ""),         IFNULL(qtl8.Objectives, ""),
+            q.QuestDescription,                 IFNULL(qtl2.Details, ""),            IFNULL(qtl3.Details, ""),            IFNULL(qtl6.Details, ""),            IFNULL(qtl8.Details, ""),
+            q.AreaDescription,                  IFNULL(qtl2.EndText, ""),            IFNULL(qtl3.EndText, ""),            IFNULL(qtl6.EndText, ""),            IFNULL(qtl8.EndText, ""),
+            IFNULL(qor.RewardText, ""),         IFNULL(qtl2.OfferRewardText, ""),    IFNULL(qtl3.OfferRewardText, ""),    IFNULL(qtl6.OfferRewardText, ""),    IFNULL(qtl8.OfferRewardText, ""),
+            IFNULL(qri.CompletionText, ""),     IFNULL(qtl2.RequestItemsText, ""),   IFNULL(qtl3.RequestItemsText, ""),   IFNULL(qtl6.RequestItemsText, ""),   IFNULL(qtl8.RequestItemsText, ""),
+            q.QuestCompletionLog,               IFNULL(qtl2.CompletedText, ""),      IFNULL(qtl3.CompletedText, ""),      IFNULL(qtl6.CompletedText, ""),      IFNULL(qtl8.CompletedText, ""),
+            RequiredNpcOrGo1,                   RequiredNpcOrGo2,                    RequiredNpcOrGo3,                    RequiredNpcOrGo4,
+            RequiredNpcOrGoCount1,              RequiredNpcOrGoCount2,               RequiredNpcOrGoCount3,               RequiredNpcOrGoCount4,
+            ItemDrop1,                          ItemDrop2,                           ItemDrop3,                           ItemDrop4,
+            ItemDropQuantity1,                  ItemDropQuantity2,                   ItemDropQuantity3,                   ItemDropQuantity4,
+            RequiredItemId1,                    RequiredItemId2,                     RequiredItemId3,                     RequiredItemId4,                     RequiredItemId5,                      RequiredItemId6,
+            RequiredItemCount1,                 RequiredItemCount2,                  RequiredItemCount3,                  RequiredItemCount4,                  RequiredItemCount5,                   RequiredItemCount6,
+            q.ObjectiveText1,                   IFNULL(qtl2.ObjectiveText1, ""),     IFNULL(qtl3.ObjectiveText1, ""),     IFNULL(qtl6.ObjectiveText1, ""),     IFNULL(qtl8.ObjectiveText1, ""),
+            q.ObjectiveText2,                   IFNULL(qtl2.ObjectiveText2, ""),     IFNULL(qtl3.ObjectiveText2, ""),     IFNULL(qtl6.ObjectiveText2, ""),     IFNULL(qtl8.ObjectiveText2, ""),
+            q.ObjectiveText3,                   IFNULL(qtl2.ObjectiveText3, ""),     IFNULL(qtl3.ObjectiveText3, ""),     IFNULL(qtl6.ObjectiveText3, ""),     IFNULL(qtl8.ObjectiveText3, ""),
+            q.ObjectiveText4,                   IFNULL(qtl2.ObjectiveText4, ""),     IFNULL(qtl3.ObjectiveText4, ""),     IFNULL(qtl6.ObjectiveText4, ""),     IFNULL(qtl8.ObjectiveText4, "")
         FROM
             quest_template q
         LEFT JOIN
@@ -102,7 +102,13 @@ function quests(array $ids = [])
         LEFT JOIN
             quest_request_items qri ON q.ID = qri.ID
         LEFT JOIN
-            locales_quest lq ON q.ID = lq.id
+            quest_template_locale qtl2 ON q.ID = qtl2.ID AND qtl2.locale = "frFR"
+        LEFT JOIN
+            quest_template_locale qtl3 ON q.ID = qtl3.ID AND qtl3.locale = "deDE"
+        LEFT JOIN
+            quest_template_locale qtl6 ON q.ID = qtl6.ID AND qtl6.locale = "esES"
+        LEFT JOIN
+            quest_template_locale qtl8 ON q.ID = qtl8.ID AND qtl8.locale = "ruRU"
         LEFT JOIN
             game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
         LEFT JOIN

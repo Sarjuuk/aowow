@@ -61,7 +61,7 @@ class SqlGen
         'events'                   => [null, null, null,                             ['game_event', 'game_event_prerequisite']],
         'objects'                  => [null, null, null,                             ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem']],
         'pet'                      => [null, null, ['icons'],                        ['creature_template', 'creature']],
-        'quests'                   => [null, null, null,                             ['quest_template', 'quest_template_addon', 'locales_quest', 'game_event', 'game_event_seasonal_questrelation', 'disables']],
+        'quests'                   => [null, null, null,                             ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'disables']],
         'quests_startend'          => [null, null, null,                             ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template']],
         'spell'                    => [null, null, ['icons'],                        ['skill_discovery_template', 'item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'npc_trainer', 'disables', 'spell_ranks', 'spell_dbc']],
         'spelldifficulty'          => [null, null, null,                             ['spelldifficulty_dbc']],
