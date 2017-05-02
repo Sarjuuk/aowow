@@ -9,7 +9,7 @@ if (!CLI)
 
 /* deps:
  * item_template
- * locales_item
+ * item_template_locale
  * spell_group
  * game_event
 */
@@ -35,7 +35,7 @@ function items(array $ids = [])
             subclass,               subclass AS subClassBak,
             SoundOverrideSubclass,
             IFNULL(sg.id, 0) AS subSubClass,
-            name,                   IFNULL(li.name_loc2, ""), IFNULL(li.name_loc3, ""), IFNULL(li.name_loc6, ""), IFNULL(li.name_loc8, ""),
+            it.name,                IFNULL(itl2.Name, ""),  IFNULL(itl3.Name, ""),  IFNULL(itl6.Name, ""),  IFNULL(itl8.Name, ""),
             0 AS iconId,
             displayid,
             0 AS spellVisualId,
@@ -84,7 +84,7 @@ function items(array $ids = [])
             spellid_4,              spelltrigger_4,         spellcharges_4,         spellppmRate_4,         spellcooldown_4,        spellcategory_4,        spellcategorycooldown_4,
             spellid_5,              spelltrigger_5,         spellcharges_5,         spellppmRate_5,         spellcooldown_5,        spellcategory_5,        spellcategorycooldown_5,
             bonding,
-            it.description,         IFNULL(li.description_loc2, ""), IFNULL(li.description_loc3, ""), IFNULL(li.description_loc6, ""), IFNULL(li.description_loc8, ""),
+            it.description,         IFNULL(itl2.Description, ""), IFNULL(itl3.Description, ""), IFNULL(itl6.Description, ""), IFNULL(itl8.Description, ""),
             PageText,
             LanguageID,
             startquest,
@@ -119,7 +119,13 @@ function items(array $ids = [])
         FROM
             item_template it
         LEFT JOIN
-            locales_item li ON li.entry = it.entry
+            item_template_locale itl2 ON it.entry = itl2.ID AND itl2.locale = "frFR"
+        LEFT JOIN
+            item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
+        LEFT JOIN
+            item_template_locale itl6 ON it.entry = itl6.ID AND itl6.locale = "esES"
+        LEFT JOIN
+            item_template_locale itl8 ON it.entry = itl8.ID AND itl8.locale = "ruRU"
         LEFT JOIN
             spell_group sg ON sg.spell_id = it.spellid_1 AND it.class = 0 AND it.subclass = 2 AND sg.id IN (1, 2)
         LEFT JOIN

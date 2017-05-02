@@ -9,7 +9,7 @@ if (!CLI)
 
 /* deps:
  * item_template
- * locales_item
+ * item_template_locale
 */
 
 // hide test tokens and move them to unused
@@ -32,7 +32,25 @@ function currencies(array $ids = [])
     $moneyItems = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM dbc_currencytypes{ WHERE id IN (?a)}', $ids ?: DBSIMPLE_SKIP);
 
     // apply names & cap
-    $moneyNames = DB::World()->select('SELECT it.entry AS ARRAY_KEY, name AS name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, it.maxCount AS cap FROM item_template it LEFT JOIN locales_item li ON li.entry = it.entry WHERE it.entry IN (?a)', $moneyItems);
+    $moneyNames = DB::World()->select('
+        SELECT
+            it.entry AS ARRAY_KEY,
+            it.name AS name_loc0, IFNULL(itl2.Name, "") AS name_loc2, IFNULL(itl3.Name, "") AS name_loc3, IFNULL(itl6.Name, "") AS name_loc6, IFNULL(itl8.Name, "") AS name_loc8,
+            it.maxCount AS cap
+        FROM
+            item_template it
+        LEFT JOIN
+            item_template_locale itl2 ON it.entry = itl2.ID AND itl2.locale = "frFR"
+        LEFT JOIN
+            item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
+        LEFT JOIN
+            item_template_locale itl6 ON it.entry = itl6.ID AND itl6.locale = "esES"
+        LEFT JOIN
+            item_template_locale itl8 ON it.entry = itl8.ID AND itl8.locale = "ruRU"
+        WHERE
+            it.entry IN (?a)',
+        $moneyItems);
+
     foreach ($moneyItems as $cId => $itemId)
     {
         if (!empty($moneyNames[$itemId]))
