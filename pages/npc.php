@@ -972,10 +972,7 @@ class NpcPage extends GenericPage
                 ct.TextRange AS `range`,
                 IFNULL(bct.`Language`, ct.`language`) AS lang,
                 IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`text`, ""))) AS text_loc0,
-                IFNULL(NULLIF(lbct.MaleText_loc2, ""), IFNULL(NULLIF(lbct.FemaleText_loc2, ""), IFNULL(lct.text_loc2, ""))) AS text_loc2,
-                IFNULL(NULLIF(lbct.MaleText_loc3, ""), IFNULL(NULLIF(lbct.FemaleText_loc3, ""), IFNULL(lct.text_loc3, ""))) AS text_loc3,
-                IFNULL(NULLIF(lbct.MaleText_loc6, ""), IFNULL(NULLIF(lbct.FemaleText_loc6, ""), IFNULL(lct.text_loc6, ""))) AS text_loc6,
-                IFNULL(NULLIF(lbct.MaleText_loc8, ""), IFNULL(NULLIF(lbct.FemaleText_loc8, ""), IFNULL(lct.text_loc8, ""))) AS text_loc8,
+               {IFNULL(NULLIF(bctl.MaleText, ""), IFNULL(NULLIF(bctl.FemaleText, ""), IFNULL(lct.text_loc?d, ""))) AS text_loc?d,}
                 IF(bct.SoundId > 0, bct.SoundId, ct.sound) AS soundId
             FROM
                 creature_text ct
@@ -983,11 +980,11 @@ class NpcPage extends GenericPage
                 locales_creature_text lct ON ct.entry = lct.entry AND ct.groupid = lct.groupid AND ct.id = lct.id
             LEFT JOIN
                 broadcast_text bct ON ct.BroadcastTextId = bct.ID
-            LEFT JOIN
-                locales_broadcast_text lbct ON ct.BroadcastTextId = lbct.ID
+           {LEFT JOIN
+                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
             WHERE
                 ct.entry = ?d',
-            $this->typeId
+            User::$localeId ?: DBSIMPLE_SKIP, User::$localeId, User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP, $this->typeId
         );
 
         foreach ($quoteSrc as $text)
