@@ -968,23 +968,26 @@ class NpcPage extends GenericPage
         $quotes   = [];
         $quoteSrc = DB::World()->select('
             SELECT
-                ct.groupid AS ARRAY_KEY, ct.id as ARRAY_KEY2, ct.`type`,
+                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2, ct.`Type`,
                 ct.TextRange AS `range`,
-                IFNULL(bct.`Language`, ct.`language`) AS lang,
-                IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.MaleText, ""), IFNULL(NULLIF(bctl.FemaleText, ""), IFNULL(lct.text_loc?d, ""))) AS text_loc?d,}
-                IF(bct.SoundId > 0, bct.SoundId, ct.sound) AS soundId
+                IFNULL(bct.`Language`, ct.`Language`) AS lang,
+                IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
+               {IFNULL(NULLIF(bctl.MaleText, ""), IFNULL(NULLIF(bctl.FemaleText, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
+                IF(bct.SoundId > 0, bct.SoundId, ct.Sound) AS soundId
             FROM
                 creature_text ct
-            LEFT JOIN
-                locales_creature_text lct ON ct.entry = lct.entry AND ct.groupid = lct.groupid AND ct.id = lct.id
+           {LEFT JOIN
+                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
             LEFT JOIN
                 broadcast_text bct ON ct.BroadcastTextId = bct.ID
            {LEFT JOIN
                 broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
             WHERE
-                ct.entry = ?d',
-            User::$localeId ?: DBSIMPLE_SKIP, User::$localeId, User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP, $this->typeId
+                ct.CreatureID = ?d',
+            User::$localeId ?: DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            $this->typeId
         );
 
         foreach ($quoteSrc as $text)
@@ -1000,7 +1003,7 @@ class NpcPage extends GenericPage
                     continue;
 
                 // fixup .. either set %s for emotes or dont >.<
-                if (in_array($t['type'], [2, 16]) && strpos($msg, '%s') === false)
+                if (in_array($t['Type'], [2, 16]) && strpos($msg, '%s') === false)
                     $msg = '%s '.$msg;
 
                 // fixup: bad case-insensivity
@@ -1009,11 +1012,11 @@ class NpcPage extends GenericPage
                 $line = array(
                     'range' => $t['range'],
                     'type'  => 2,                           // [type: 0, 12] say: yellow-ish
-                    'lang'  => !empty($t['language']) ? Lang::game('languages', $t['language']) : null,
+                    'lang'  => !empty($t['lang']) ? Lang::game('languages', $t['lang']) : null,
                     'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
                 );
 
-                switch ($t['type'])
+                switch ($t['Type'])
                 {
                     case  1:                                // yell:
                     case 14: $line['type'] = 1; break;      // - dark red
