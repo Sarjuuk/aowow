@@ -531,9 +531,9 @@ function source(array $ids = [])
             it.class, it.subclass, it.spellid_1, it.spelltrigger_1, it.spellid_2, it.spelltrigger_2,
             COUNT(1) AS qty
         FROM (
-            SELECT IFNULL(IF(mlt.Reference > 0, -mlt.Reference, mlt.Item), ar.item) AS item, ar.entry
-            FROM achievement_reward ar LEFT JOIN mail_loot_template mlt ON mlt.entry = ar.mailTemplate
-            WHERE ar.mailTemplate > 0 OR ar.item > 0
+            SELECT IFNULL(IF(mlt.Reference > 0, -mlt.Reference, mlt.Item), ar.ItemID) AS item, ar.ID AS entry
+            FROM achievement_reward ar LEFT JOIN mail_loot_template mlt ON mlt.entry = ar.MailTemplateID
+            WHERE ar.MailTemplateID > 0 OR ar.ItemID > 0
         ) src
         LEFT JOIN
             item_template it ON src.item = it.entry
@@ -1186,10 +1186,10 @@ function source(array $ids = [])
     # 12: Achievement
     CLISetup::log('   * #12 Achievement');
     $sets = DB::World()->select('
-        SELECT titleId AS ARRAY_KEY, MIN(entry) AS srcId, NULLIF(MAX(entry), MIN(entry)) AS altSrcId FROM (
-            SELECT title_A as `titleId`, entry FROM achievement_reward WHERE title_A <> 0
+        SELECT titleId AS ARRAY_KEY, MIN(ID) AS srcId, NULLIF(MAX(ID), MIN(ID)) AS altSrcId FROM (
+            SELECT TitleA AS `titleId`, ID FROM achievement_reward WHERE TitleA <> 0
             UNION
-            SELECT title_H as `titleId`, entry FROM achievement_reward WHERE title_H <> 0
+            SELECT TitleH AS `titleId`, ID FROM achievement_reward WHERE TitleH <> 0
         ) AS x GROUP BY titleId'
     );
     foreach ($sets as $tId => $set)

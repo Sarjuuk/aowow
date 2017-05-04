@@ -34,7 +34,22 @@ class AchievementList extends BaseType
 
         // post processing
         $rewards = DB::World()->select('
-            SELECT ar.entry AS ARRAY_KEY, ar.*, lar.* FROM achievement_reward ar LEFT JOIN locales_achievement_reward lar ON lar.entry = ar.entry WHERE ar.entry IN (?a)',
+            SELECT
+                ar.ID AS ARRAY_KEY, ar.TitleA, ar.TitleH, ar.ItemID, ar.Sender AS sender, ar.MailTemplateID,
+                ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
+                ar.Text    AS text_loc0,    IFNULL(arl2.Text,    "") AS text_loc2,    IFNULL(arl3.Text,    "") AS text_loc3,    IFNULL(arl6.Text,    "") AS text_loc6,    IFNULL(arl8.Text,    "") AS text_loc8
+            FROM
+                achievement_reward ar
+            LEFT JOIN
+                achievement_reward_locale arl2 ON arl2.ID = ar.ID AND arl2.Locale = "frFR"
+            LEFT JOIN
+                achievement_reward_locale arl3 ON arl3.ID = ar.ID AND arl3.Locale = "deDE"
+            LEFT JOIN
+                achievement_reward_locale arl6 ON arl6.ID = ar.ID AND arl6.Locale = "esES"
+            LEFT JOIN
+                achievement_reward_locale arl8 ON arl8.ID = ar.ID AND arl8.Locale = "ruRU"
+            WHERE
+                ar.ID IN (?a)',
             $this->getFoundIDs()
         );
 
@@ -46,7 +61,7 @@ class AchievementList extends BaseType
             {
                 $_curTpl = array_merge($rewards[$_id], $_curTpl);
 
-                if ($rewards[$_id]['mailTemplate'])
+                if ($rewards[$_id]['MailTemplateID'])
                 {
                     // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
                     // $mailSrc = new Loot();
@@ -55,22 +70,22 @@ class AchievementList extends BaseType
                         // $_curTpl['rewards'][] = [TYPE_ITEM, $loot['id']];
 
                     // lets just assume for now, that mailRewards for achievements do not contain references
-                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['mailTemplate']);
+                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['MailTemplateID']);
                     foreach ($mailRew AS $mr)
                         $_curTpl['rewards'][] = [TYPE_ITEM, $mr];
                 }
             }
 
             //"rewards":[[11,137],[3,138]]   [type, typeId]
-            if (!empty($_curTpl['item']))
-                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['item']];
+            if (!empty($_curTpl['ItemID']))
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['ItemID']];
             if (!empty($_curTpl['itemExtra']))
                 $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['itemExtra']];
-            if (!empty($_curTpl['title_A']))
-                $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_A']];
-            if (!empty($_curTpl['title_H']))
-                if (empty($_curTpl['title_A']) || $_curTpl['title_A'] != $_curTpl['title_H'])
-                    $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_H']];
+            if (!empty($_curTpl['TitleA']))
+                $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['TitleA']];
+            if (!empty($_curTpl['TitleH']))
+                if (empty($_curTpl['TitleA']) || $_curTpl['TitleA'] != $_curTpl['TitleH'])
+                    $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['TitleH']];
 
             // icon
             $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';

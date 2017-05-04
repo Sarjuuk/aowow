@@ -74,7 +74,7 @@ function titles()
 
     // update side
     $questInfo = DB::World()->select($questQuery);
-    $sideUpd   = DB::World()->selectCol('SELECT IF (title_A, title_A, title_H) AS ARRAY_KEY, BIT_OR(IF(title_A, 1, 2)) AS side FROM achievement_reward WHERE (title_A <> 0 AND title_H = 0) OR (title_H <> 0 AND title_A = 0) GROUP BY ARRAY_KEY HAVING side <> 3');
+    $sideUpd   = DB::World()->selectCol('SELECT IF(TitleA, TitleA, TitleH) AS ARRAY_KEY, BIT_OR(IF(TitleA, 1, 2)) AS side FROM achievement_reward WHERE (TitleA <> 0 AND TitleH = 0) OR (TitleH <> 0 AND TitleA = 0) GROUP BY ARRAY_KEY HAVING side <> 3');
     foreach ($questInfo as $tId => $data)
     {
         if ($data['eventEntry'])

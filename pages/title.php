@@ -114,7 +114,7 @@ class TitlePage extends GenericPage
         }
 
         // tab: achievement source
-        if ($aIds = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE title_A = ?d OR title_H = ?d', $this->typeId, $this->typeId))
+        if ($aIds = DB::World()->selectCol('SELECT ID FROM achievement_reward WHERE TitleA = ?d OR TitleH = ?d', $this->typeId, $this->typeId))
         {
             $acvs = new AchievementList(array(['id', $aIds]));
             if (!$acvs->error)

@@ -530,7 +530,7 @@ class Loot
 
                     // achievement part
                     $conditions = array(['itemExtra', $this->entry]);
-                    if ($ar = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE item = ?d{ OR mailTemplate IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
+                    if ($ar = DB::World()->selectCol('SELECT ID FROM achievement_reward WHERE ItemID = ?d{ OR MailTemplateID IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
                         array_push($conditions, ['id', $ar], 'OR');
 
                     $srcObj = new AchievementList($conditions);
