@@ -56,7 +56,7 @@
     endif;
     if (!User::$id):
 ?>
-            <small>Vous n'êtes pas connecté(e). Veuillez vous <a href="?account=siginin">connecter</a> pour envoyer une capture d'écran.</small>
+            <small>Vous n'êtes pas connecté(e). Veuillez vous <a href="?account=signin">connecter</a> pour envoyer une capture d'écran.</small>
 <?php
     endif;
 ?>
@@ -83,7 +83,7 @@
     endif;
     if (!User::$id):
 ?>
-            <small>Vous n'êtes pas connecté(e). Veuillez vous <a href="?account=siginin">connecter</a> pour envoyer une vidéo.</small>
+            <small>Vous n'êtes pas connecté(e). Veuillez vous <a href="?account=signin">connecter</a> pour envoyer une vidéo.</small>
 <?php
     endif;
 ?>

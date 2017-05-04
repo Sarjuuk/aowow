@@ -73,8 +73,13 @@ class AccountPage extends GenericPage
         switch ($this->category[0])
         {
             case 'forgotpassword':
-                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)    // only recover own accounts
-                    $this->error();
+                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)
+                {
+                    if (CFG_ACC_EXT_RECOVER_URL)
+                        header('Location: '.CFG_ACC_EXT_RECOVER_URL, true, 302);
+                    else
+                        $this->error();
+                }
 
                 $this->tpl = 'acc-recover';
                 $this->resetPass = false;
@@ -85,8 +90,13 @@ class AccountPage extends GenericPage
                 $this->head = sprintf(Lang::account('recoverPass'), $nStep);
                 break;
             case 'forgotusername':
-                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)    // only recover own accounts
-                    $this->error();
+                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)
+                {
+                    if (CFG_ACC_EXT_RECOVER_URL)
+                        header('Location: '.CFG_ACC_EXT_RECOVER_URL, true, 302);
+                    else
+                        $this->error();
+                }
 
                 $this->tpl = 'acc-recover';
                 $this->resetPass = false;
@@ -123,8 +133,16 @@ class AccountPage extends GenericPage
 
                 break;
             case 'signup':
-                if (!CFG_ACC_ALLOW_REGISTER || CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)
+                if (!CFG_ACC_ALLOW_REGISTER)
                     $this->error();
+
+                if (CFG_ACC_AUTH_MODE != AUTH_MODE_SELF)
+                {
+                    if (CFG_ACC_EXT_CREATE_URL)
+                        header('Location: '.CFG_ACC_EXT_CREATE_URL, true, 302);
+                    else
+                        $this->error();
+                }
 
                 $this->tpl = 'acc-signUp';
                 $nStep = 1;
