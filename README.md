@@ -24,7 +24,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
   + Mysqli
   + mbString
 + MySQL ≥ 5.5.30
-+ [TDB 335.63](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.63) - including world updates up to 24.04.2017
++ [TDB 335.63](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.63) - including world updates up to 04.05.2017
 + Tools require cmake: Please refer to the individual repositories for detailed information
   + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [BLPConverter](https://github.com/Sarjuuk/BLPConverter) / [FFmpeg](https://ffmpeg.org/download.html)
   + WIN users may find it easier to use these alternatives
