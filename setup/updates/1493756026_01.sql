@@ -1,1 +1,1 @@
-UPDATE aowow_dbversion SET `sql` = CONCAT(IFNULL(`sql`, ''), 'quests');
+UPDATE aowow_dbversion SET `sql` = CONCAT(IFNULL(`sql`, ''), ' quests');
