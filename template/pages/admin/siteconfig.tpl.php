@@ -100,7 +100,7 @@
 
             $(_status).append(CreateAjaxLoader());
 
-            new Ajax('?admin=siteconfig&action=add&key=' + key + '&val=' + value, {
+            new Ajax('?admin=siteconfig&action=add&key=' + key + '&val=' + escape(value), {
                 method: 'get',
                 onSuccess: function(xhr) {
                     $WH.ee(_status);
@@ -201,7 +201,7 @@
 
             $(_status).append(CreateAjaxLoader());
 
-            new Ajax('?admin=siteconfig&action=update&key=' + id + '&val=' + value, {
+            new Ajax('?admin=siteconfig&action=update&key=' + id + '&val=' + escape(value), {
                 method: 'get',
                 onSuccess: function(xhr) {
                     $WH.ee(_status);
