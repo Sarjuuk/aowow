@@ -64,7 +64,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
    > \<localeCode>/Interface/PvPRankBadges  
    > \<localeCode>/Interface/FlavorImages  
    > \<localeCode>/Interface/Calendar/Holidays/  
-   > \<localeCode>/Sounds/  
+   > \<localeCode>/Sound/  
    
    .. optionaly (for other uses):
    > \<localeCode>/Interface/GLUES/LOADINGSCREENS/  

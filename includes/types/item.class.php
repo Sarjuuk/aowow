@@ -51,13 +51,15 @@ class ItemList extends BaseType
                 $this->json[$this->id]['itemset'] = $miscData['pcsToSet'][$this->id];
 
             // unify those pesky masks
-            $_ = &$_curTpl['requiredClass'];
-            if ($_ < 0 || ($_ & CLASS_MASK_ALL) == CLASS_MASK_ALL)
+            $_  = &$_curTpl['requiredClass'];
+            $_ &= CLASS_MASK_ALL;
+            if ($_ < 0 || $_ == CLASS_MASK_ALL)
                 $_ = 0;
             unset($_);
 
             $_ = &$_curTpl['requiredRace'];
-            if ($_ < 0 || ($_ & RACE_MASK_ALL) == RACE_MASK_ALL)
+            $_ &= RACE_MASK_ALL;
+            if ($_ < 0 || $_ == RACE_MASK_ALL)
                 $_ = 0;
             unset($_);
 
@@ -1917,7 +1919,7 @@ class ItemListFilter extends Filter
 
     public function createConditionsForWeights()
     {
-        if (!$this->fiData['v']['wt'])
+        if (empty($this->fiData['v']['wt']))
             return null;
 
         $this->wtCnd = [];
