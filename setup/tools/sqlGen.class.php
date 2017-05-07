@@ -21,9 +21,9 @@ if (!CLI)
 
 class SqlGen
 {
-    const MODE_NORMAL   = 0;
-    const MODE_FIRSTRUN = 1;
-    const MODE_UPDATE   = 2;
+    const MODE_NORMAL   = 1;
+    const MODE_FIRSTRUN = 2;
+    const MODE_UPDATE   = 3;
 
     private static $tables = array(                         // [dbcName, saveDbc, AowowDeps, TCDeps]
         'achievementcategory'      => ['achievement_category',          false, null, null],
@@ -78,6 +78,7 @@ class SqlGen
     public  static $cliOpts   = [];
     private static $shortOpts = 'h';
     private static $longOpts  = ['sql::', 'help', 'sync:']; // general
+    private static $mode      = 0;
 
     public static $subScripts = [];
 
@@ -109,6 +110,8 @@ class SqlGen
             CLISetup::log('No valid locale specified. Check your config or --locales parameter, if used', CLISetup::LOG_ERROR);
             exit;
         }
+
+        self::$mode = $mode;
     }
 
     private static function handleCLIOpts(&$doTbls)
@@ -200,6 +203,11 @@ class SqlGen
         else
             CLISetup::log(sprintf(ERR_MISSING_INCL, $tableName, 'setup/tools/sqlgen/'.$tableName.'.func.php'), CLISetup::LOG_ERROR);
 
+    }
+
+    public static function getMode()
+    {
+        return self::$mode;
     }
 }
 

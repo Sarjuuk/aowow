@@ -319,25 +319,29 @@ class AjaxAdmin extends AjaxHandler
     {
         $key = trim($this->_get['key']);
         $val = trim(urldecode($this->_get['val']));
+        $msg = '';
 
         if (!strlen($key))
             return 'empty option name given';
 
-        $flags = DB::Aowow()->selectCell('SELECT `flags` FROM ?_config WHERE `key` = ?', $key);
-        if (!$flags)
+        $cfg = DB::Aowow()->selectRow('SELECT `flags`, `value` FROM ?_config WHERE `key` = ?', $key);
+        if (!$cfg)
             return 'configuration option not found';
 
-        if (!($flags & CON_FLAG_TYPE_STRING) && !strlen($val))
+        if (!($cfg['flags'] & CON_FLAG_TYPE_STRING) && !strlen($val))
             return 'empty value given';
-        else if ($flags & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
+        else if ($cfg['flags'] & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
             return "value must be integer";
-        else if ($flags & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
+        else if ($cfg['flags'] & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
             return "value must be float";
-        else if ($flags & CON_FLAG_TYPE_BOOL)
+        else if ($cfg['flags'] & CON_FLAG_TYPE_BOOL)
             $val = (int)!!$val;                 // *snort* bwahahaa
 
         DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, $key);
-        return '';
+        if (!$this->confOnChange($key, $val, $msg))
+            DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $cfg['value'], $key);
+
+        return $msg;
     }
 
     protected function wtSave()
@@ -442,5 +446,47 @@ class AjaxAdmin extends AjaxHandler
             return $val;
 
         return null;
+    }
+
+    private function confOnChange($key, $val, &$msg)
+    {
+        $fn = $buildList = null;
+
+        switch ($key)
+        {
+            case 'battlegroup':
+                $buildList = 'realms,realmMenu';
+                break;
+            case 'name_short':
+                $buildList = 'searchboxBody,demo,searchplugin';
+                break;
+            case 'site_host':
+                $buildList = 'searchplugin,demo,power,searchboxBody';
+                break;
+            case 'static_host':
+                $buildList = 'searchplugin,power,searchboxBody,searchboxScript';
+                break;
+            case 'profiler_queue':
+                $fn = function($x) use (&$msg) {
+                    if (!$x)
+                        return true;
+
+                    return Profiler::queueStart($msg);
+                };
+                break;
+            default:                                        // nothing to do, everything is fine
+                return true;
+        }
+
+        if ($buildList)
+        {
+            // we need to use exec as build() can only be run from CLI
+            exec('php aowow --build='.$buildList, $out);
+            foreach ($out as $o)
+                if (strstr($o, 'ERR'))
+                    $msg .= explode('0m]', $o)[1]."<br />\n";
+        }
+
+        return $fn ? $fn($val) : true;
     }
 }

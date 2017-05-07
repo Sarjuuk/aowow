@@ -16,8 +16,8 @@ function firstrun()
     require_once 'setup/tools/sqlGen.class.php';
     require_once 'setup/tools/fileGen.class.php';
 
-    SqlGen::init(true);
-    FileGen::init(true);
+    SqlGen::init(SqlGen::MODE_FIRSTRUN);
+    FileGen::init(FileGen::MODE_FIRSTRUN);
 
     /****************/
     /* define steps */

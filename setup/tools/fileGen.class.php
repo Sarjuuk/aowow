@@ -10,9 +10,9 @@ if (!CLI)
 
 class FileGen
 {
-    const MODE_NORMAL   = 0;
-    const MODE_FIRSTRUN = 1;
-    const MODE_UPDATE   = 2;
+    const MODE_NORMAL   = 1;
+    const MODE_FIRSTRUN = 2;
+    const MODE_UPDATE   = 3;
 
     public  static $tplPath = 'setup/tools/filegen/templates/';
 
@@ -23,6 +23,7 @@ class FileGen
         'icons',   'glyphs',    'pagetexts', 'loadingscreens',              // whole images
         'artwork', 'talentbgs', 'maps',      'spawn-maps',     'area-maps'  // images from image parts
     );
+    private static $mode      = 0;
 
     public static $subScripts = [];
     public static $tplFiles   = array(
@@ -107,6 +108,8 @@ class FileGen
 
         CLISetup::log('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
         CLISetup::log();
+
+        self::$mode = $mode;
     }
 
     private static function handleCLIOpts(&$doScripts)
@@ -271,6 +274,10 @@ class FileGen
         return $success;
     }
 
+    public static function getMode()
+    {
+        return self::$mode;
+    }
 }
 
 ?>
