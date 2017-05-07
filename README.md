@@ -26,9 +26,9 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 + MySQL ≥ 5.5.30
 + [TDB 335.63](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.63) - including world updates up to 04.05.2017
 + Tools require cmake: Please refer to the individual repositories for detailed information
-  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [BLPConverter](https://github.com/Sarjuuk/BLPConverter) / [FFmpeg](https://ffmpeg.org/download.html)
+  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / [BLPConverter](https://github.com/Sarjuuk/BLPConverter) (optional)
   + WIN users may find it easier to use these alternatives
-     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [BLPConverter](https://github.com/PatrickCyr/BLPConverter) / [SoX](https://sourceforge.net/projects/sox/files/sox/)
+     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / [BLPConverter](https://github.com/PatrickCyr/BLPConverter) (optional)
 
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
@@ -41,13 +41,27 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 ## Install
 
-1. Acquire this repository `git clone git@github.com:Sarjuuk/aowow.git aowow`
-2. Acquire the required tool MPQExtractor: `git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`
-3. Prepare the DB, check that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.
-  import `setup/db_structure.sql` into the AoWoW-DB `mysql -p {your-db-here} < setup/db_structure.sql`
-4. see to it, that the web server is able to write the following directories: `cache/`, `static/` and `config/`
-5. compile the MPQExtractor
-  extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (suffix: 1 -> 9 -> A -> Z)  
+#### 1. Acquire the required repositories
+`git clone git@github.com:Sarjuuk/aowow.git aowow`  
+`git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
+
+#### 2. Prepare the database  
+Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
+Import `setup/db_structure.sql` into the AoWoW database `mysql -p {your-db-here} < setup/db_structure.sql`  
+
+#### 3. Server created files
+See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
+ * `cache/`
+ * `config/`
+ * `static/download/`
+ * `static/widgets/`
+ * `static/js/`
+ * `static/uploads/`
+ * `static/images/wow/`
+ * `datasets/`  
+ 
+#### 4. Extract the client archives (MPQs)
+Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (base mpq -> patch-mpq: 1 -> 9 -> A -> Z). The required paths are scattered across the archives. Overwrite older files if asked to.  
    .. for every locale you are going to use:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
@@ -66,29 +80,27 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
    > \<localeCode>/Interface/Calendar/Holidays/  
    > \<localeCode>/Sound/  
    
-   .. optionaly (for other uses):
+   .. optionaly (not used in AoWoW):
    > \<localeCode>/Interface/GLUES/LOADINGSCREENS/  
-6. reencode the audio files. WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
-   example for ffmpeg:
-   ```
-   cd path/to/mpqdata/<localeCode>  
-   find -name "*.wav" -exec ffmpeg -hide_banner -y -i {} -acodec libvorbis {}.ogg \;          # file.wav -> file.wav.ogg  
-   find -name "*.mp3" -exec ffmpeg -hide_banner -y -i {} -f mp3 -acodec libmp3lame {}.mp3 \;  # file.mp3 -> file.mp3.mp3  
-   ```
-   if you are short on disk space, you could also do it like this (deletes original file immediatly after conversion):
-   ```
-   cd path/to/mpqdata/<localeCode>  
-   find -name "*.wav" | xargs -I % sh -c 'ffmpeg -hide_banner -y -i "%" -acodec libvorbis "%.ogg"; rm "%";' && find -name "*.mp3" | xargs -I % sh -c 'ffmpeg -hide_banner -y -i "%" -f mp3 -acodec libmp3lame "%.mp3"; rm "%";'
-   ```
 
-7. run the initial setup from the CLI `php aowow --firstrun`. It should guide you through with minimal input required from your end.
-  This will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.
+#### 5. Reencode the audio files
+WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
+ * [example for WIN](https://gist.github.com/Sarjuuk/d77b203f7b71d191509afddabad5fc9f)  
+ * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
+
+#### 6. Run the initial setup from the CLI
+`php aowow --firstrun`.  
+This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
+When you've created your admin account you are done.
 
 
 ## Troubleshooting
 
 Q: The Page appears white, without any styles.  
 A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined poperly. Either way this can be fixed via config `php aowow --siteconfig`
+
+Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
+A: You are using cache optimization modules for php, that are in confict with each other. (Zend OPcache, XCache, ..) Disable all but one.
 
 Q: Some generated images appear distorted or have alpha-channel issues.  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
