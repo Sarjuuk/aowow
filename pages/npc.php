@@ -478,7 +478,7 @@ class NpcPage extends GenericPage
                         {
                             $this->extendGlobalIds(TYPE_SKILL, $_);
                             if (!isset($extra[0]))
-                                $extra[0] = 'Listview.extraCols.condition';
+                                $extra[0] = '$Listview.extraCols.condition';
 
                             $data[$sId]['condition'][0][$this->typeId][] = [[CND_SKILL, $_, $train['reqSkillValue']]];
                         }
@@ -486,7 +486,7 @@ class NpcPage extends GenericPage
                         if ($_ = $train['reqLevel'])
                         {
                             if (!isset($extra[1]))
-                                $extra[1] = "Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
+                                $extra[1] = "\$Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
 
                             $data[$sId]['reqLevel'] = $_;
                         }
@@ -529,7 +529,7 @@ class NpcPage extends GenericPage
                 {
                     $this->extendGlobalData($sc[1]);
 
-                    $extraCols[] = 'Listview.extraCols.condition';
+                    $extraCols[] = '$Listview.extraCols.condition';
 
                     foreach ($lvData as $id => &$row)
                         foreach ($sc[0] as $srcType => $cndData)
