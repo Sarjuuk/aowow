@@ -18,7 +18,7 @@ class SimpleXML extends SimpleXMLElement
 
 class Util
 {
-    const FILE_ACCESS = 0755;
+    const FILE_ACCESS = 0777;
 
     public static $localeStrings            = array(        // zero-indexed
         'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'

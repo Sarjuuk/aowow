@@ -466,6 +466,11 @@ class AjaxAdmin extends AjaxHandler
             case 'static_host':
                 $buildList = 'searchplugin,power,searchboxBody,searchboxScript';
                 break;
+            case 'locales':
+                $buildList = 'locales';
+                $msg .= ' * remember to rebuild all static files for the language you just added.<br />';
+                $msg .= ' * you can speed this up by supplying the regionCode to the setup: <pre class="q1">--locales=<regionCodes,> -f</pre>';
+                break;
             case 'profiler_queue':
                 $fn = function($x) use (&$msg) {
                     if (!$x)

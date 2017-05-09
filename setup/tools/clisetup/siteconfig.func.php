@@ -41,6 +41,11 @@ function siteconfig()
             case 'static_host':
                 array_push($updScripts, 'searchplugin', 'power', 'searchboxBody', 'searchboxScript');
                 break;
+            case 'locales':
+                array_push($updScripts, 'locales');
+                CLISetup::log(' * remember to rebuild all static files for the language you just added.', CLISetup::LOG_INFO);
+                CLISetup::log(' * you can speed this up by supplying the regionCode to the setup: '.CLISetup::bold('--locales=<regionCodes,> -f'));
+                break;
             case 'profiler_queue':
                 $fn = function($x) {
                     if (!$x)
