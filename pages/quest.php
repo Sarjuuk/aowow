@@ -662,10 +662,13 @@ class QuestPage extends GenericPage
 
         // PSA: 'redundant' data is on purpose (e.g. creature required for kill, also dropps item required to collect)
 
-        // external event / areatrigger
+        // external events
+        $endTextWrapper = '%s';
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
+            // areatrigger
             if ($atir = DB::World()->selectCell('SELECT id FROM areatrigger_involvedrelation WHERE quest = ?d', $this->typeId))
+            {
                 if ($atsp = DB::AoWoW()->selectRow('SELECT guid, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_AREATRIGGER, $atir))
                     $mObjectives[$atsp['areaId']] = array(
                         'zone'     => 'Zone #'.$atsp['areaId'],
@@ -683,6 +686,11 @@ class QuestPage extends GenericPage
                             )
                         )
                     );
+            }
+            // complete-spell
+            else if ($endSpell = new SpellList(array('OR', ['AND', ['effect1Id', 16], ['effect1MiscValue', $this->typeId]], ['AND', ['effect2Id', 16], ['effect2MiscValue', $this->typeId]], ['AND', ['effect3Id', 16], ['effect3MiscValue', $this->typeId]])))
+                if (!$endSpell->error)
+                    $endTextWrapper = '<a href="?spell='.$endSpell->id.'">%s</a>';
         }
 
         // ..adding creature kill requirements
@@ -890,7 +898,7 @@ class QuestPage extends GenericPage
         $this->offerReward   = $this->subject->parseText('offerReward', false);
         $this->requestItems  = $this->subject->parseText('requestItems', false);
         $this->completed     = $this->subject->parseText('completed', false);
-        $this->end           = $this->subject->parseText('end', false);
+        $this->end           = sprintf($endTextWrapper, $this->subject->parseText('end', false));
         $this->suggestedPl   = $this->subject->getField('suggestedPlayers');
         $this->unavailable   = $_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW;
         $this->redButtons    = array(
