@@ -110,6 +110,8 @@ A: Image compression is beyond my understanding, so i am unable to fix these iss
 Q: How can i get the modelviewer to work?  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
 
+Q: I'm getting random javascript errors!  
+A: Some server configurations or external services (like Cloudflare) come with modules, that automaticly minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
 ## Thanks
 
