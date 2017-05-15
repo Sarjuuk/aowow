@@ -274,10 +274,10 @@ $lang = array(
         'rep'           => ["Hasserfüllt", "Feindselig", "Unfreundlich", "Neutral", "Freundlich", "Wohlwollend", "Respektvoll", "Ehrfürchtig"],
         'st'            => array(
             "Vorgabe",                      "Katzengestalt",                "Baum des Lebens",              "Reisegestalt",                 "Wassergestalt",                "Bärengestalt",
-            null,                           null,                           "Terrorbärengestalt",           null,                           null,                            null,
-            null,                           "Schattentanz",                 null,                           null,                           "Geisterwolf",                  "Kampfhaltung",
-            "Verteidigungshaltung",         "Berserkerhaltung",             null,                           null,                           "Metamorphosis",                null,
-            null,                           null,                           null,                           "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
+            "Umgebung",                     "Ghul",                         "Terrorbärengestalt",           "Steves Ghul",                  "Skelett von Tharon'ja",        "Dunkelmond-Test der Stärke",
+            "BLB Spieler",                  "Schattentanz",                 "Kreatur - Bär",                "Kreatur - Katze",              "Geisterwolf",                  "Kampfhaltung",
+            "Verteidigungshaltung",         "Berserkerhaltung",             "Test",                         "Zombie",                       "Metamorphosis",                null,
+            null,                           "Untotes Wesen",                "Raserei",                      "Schnelle Fluggestalt",         "Schattengestalt",              "Fluggestalt",
             "Verstohlenheit",               "Mondkingestalt",               "Geist der Erlösung"
         ),
         'me'            => array(

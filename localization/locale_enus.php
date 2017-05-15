@@ -272,12 +272,12 @@ $lang = array(
         'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],                                   // ChrClasses.dbc
         'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],     // ChrRaces.dbc
         'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],                                                              // FACTION_STANDING_LABEL*
-        'st'            => array(                           // SpellShapeshiftForm.dbc
+        'st'            => array(                           // SpellShapeshiftForm.dbc // with minor deviations on 27, 28
             "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
-            null,                           null,                           "Dire Bear Form",               null,                           null,                           null,
-            null,                           "Shadowdance",                  null,                           null,                           "Ghostwolf",                    "Battle Stance",
-            "Defensive Stance",             "Berserker Stance",             null,                           null,                           "Metamorphosis",                null,
-            null,                           null,                           null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
+            "Ambient",                      "Ghoul",                        "Dire Bear Form",               "Steve's Ghoul",                "Tharon'ja Skeleton",           "Darkmoon - Test of Strength",
+            "BLB Player",                   "Shadowdance",                  "Creature - Bear",              "Creature - Cat",               "Ghostwolf",                    "Battle Stance",
+            "Defensive Stance",             "Berserker Stance",             "Test",                         "Zombie",                       "Metamorphosis",                null,
+            null,                           "Undead",                       "Frenzy",                       "Swift Flight Form",            "Shadow Form",                  "Flight Form",
             "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
         ),
         'me'            => array(                           // SpellMechanic.dbc .. not quite

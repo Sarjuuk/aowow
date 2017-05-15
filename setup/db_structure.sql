@@ -1858,11 +1858,6 @@ DROP TABLE IF EXISTS `aowow_shapeshiftforms`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_shapeshiftforms` (
   `Id` bigint(20) NOT NULL,
-  `name_loc0` text NOT NULL,
-  `name_loc2` text NOT NULL,
-  `name_loc3` text NOT NULL,
-  `name_loc6` text NOT NULL,
-  `name_loc8` text NOT NULL,
   `flags` bigint(20) NOT NULL,
   `creatureType` bigint(20) NOT NULL,
   `displayIdA` bigint(20) NOT NULL,
@@ -1875,6 +1870,7 @@ CREATE TABLE `aowow_shapeshiftforms` (
   `spellId6` bigint(20) NOT NULL,
   `spellId7` bigint(20) NOT NULL,
   `spellId8` bigint(20) NOT NULL,
+  `comment`  varchar(30) NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

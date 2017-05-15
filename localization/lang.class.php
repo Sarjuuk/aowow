@@ -257,7 +257,7 @@ class Lang
 
     public static function getStances($stanceMask)
     {
-        $stanceMask &= 0xFC27909F;                          // clamp to available stances/forms..
+        $stanceMask &= 0xFF37F6FF;                          // clamp to available stances/forms..
 
         $tmp = [];
         $i   = 1;

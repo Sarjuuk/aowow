@@ -274,10 +274,10 @@ $lang = array(
         'rep'           => ["Détesté", "Hostile", "Inamical", "Neutre", "Amical", "Honoré", "Révéré", "Exalté"],
         'st'            => array(
             "Défaut",                       "Forme de félin",               "Arbre de vie",                 "Forme de voyage",              "Forme aquatique",              "Forme d'ours",
-            null,                           null,                           "Forme d'ours redoutable",      null,                           null,                           null,
-            null,                           "Danse de l'ombre",             null,                           null,                           "Loup fantôme",                 "Posture de combat",
-            "Posture défensive",            "Posture berserker",            null,                           null,                           "Métamorphe",                   null,
-            null,                           null,                           null,                           "Forme de vol rapide",          "Forme d'Ombre",                "Forme de vol",
+            "Ambiant",                      "Goule",                        "Forme d'ours redoutable",      "Goule de Steve",               "Squelette de Tharon'ja",       "Sombrelune - épreuve de force",
+            "Joueur BLB",                   "Danse de l'ombre",             "Créature - Ours",              "Créature - Félin",             "Loup fantôme",                 "Posture de combat",
+            "Posture défensive",            "Posture berserker",            "Test",                         "Zombie",                       "Métamorphe",                   null,
+            null,                           "Mort-vivant",                  "Frénésie",                     "Forme de vol rapide",          "Forme d'Ombre",                "Forme de vol",
             "Camouflage",                   "Forme de sélénien",            "Esprit de rédemption"
         ),
         'me'            => array(

@@ -274,10 +274,10 @@ $lang = array(
         'rep'           => ["Odiado", "Hostil", "Adverso", "Neutral", "Amistoso", "Honorable", "Reverenciado", "Exaltado"],
         'st'            => array(
             "Defecto",                      "Forma felina",                 "Árbol de vida",                "Forma de viaje",               "Forma acuática",               "Forma de oso",
-            null,                           null,                           "Forma de oso temible",         null,                           null,                           null,
-            null,                           "Danza de las Sombras",         null,                           null,                           "Lobo fantasmal",               "Actitud de batalla",
-            "Actitud defensiva",            "Actitud rabiosa",              null,                           null,                           "Metamorfosis",                 null,
-            null,                           null,                           null,                           "Forma de vuelo presto",        "Forma de las Sombras",         "Forma de vuelo",
+            "Ambiente",                     "Necrófago",                    "Forma de oso temible",         "Steve's Ghoul",                "Esqueleto Tharon'ja",          "Luna Negra - Prueba de fuerza",
+            "BLB Player",                   "Danza de las Sombras",         "Criatura: oso",                "Criatura: felino",             "Lobo fantasmal",               "Actitud de batalla",
+            "Actitud defensiva",            "Actitud rabiosa",              "Test",                         "Zombi",                        "Metamorfosis",                 null,
+            null,                           "No-muerto",                    "Furia",                        "Forma de vuelo presto",        "Forma de las Sombras",         "Forma de vuelo",
             "Sigilo",                       "Forma de lechúcico lunar",     "Espíritu redentor"
         ),
         'me'            => array(

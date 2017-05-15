@@ -280,7 +280,7 @@ class SpellPage extends GenericPage
         if ($_ = $this->subject->getField('rangeMinHostile'))
             $this->range = $_.' - '.$this->range;
 
-        if ($this->subject->getField('attributes2') & 0x80000)
+        if (!($this->subject->getField('attributes2') & 0x80000))
             $this->stances = Lang::getStances($this->subject->getField('stanceMask'));
 
         if (($_ = $this->subject->getField('recoveryTime')) && $_ > 0)

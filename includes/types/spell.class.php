@@ -475,7 +475,7 @@ class SpellList extends BaseType
                             'typeId'       => 0,
                             'displayId'    => $st['model2'] ? $st['model'.rand(1, 2)] : $st['model1'],
                             'creatureType' => $st['creatureType'],
-                            'displayName'  => Util::localizedString($st, 'name')
+                            'displayName'  => Lang::game('st', $effMV)
                         );
                     }
                 }
