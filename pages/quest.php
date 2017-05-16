@@ -336,7 +336,7 @@ class QuestPage extends GenericPage
             ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
-            ['closesQ',    array(['exclusiveGroup', 0, '!'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
+            ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
 
             // During the quest available these quests (Quests that are available only at run time this quest)
             ['enablesQ',   array(['prevQuestId', -$this->typeId])],
