@@ -48,12 +48,15 @@ if (!CLI)
         $threshold = 95;                                    // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
         $runTime   = ini_get('max_execution_time');
         $locStr    = null;
-        $dbcPath   = CLISetup::$srcDir.'%sDBFilesClient/';
         $imgPath   = CLISetup::$srcDir.'%sInterface/';
         $destDir   = 'static/images/wow/';
         $success   = true;
-        $paths     = ['WorldMap/', 'TalentFrame/', 'Glues/Credits/'];
         $modeMask  = 0x7;                                   // talentBGs, regular maps, spawn-related alphaMaps
+        $paths     = array(
+            0x16 => ['WorldMap/',     true,  null],
+            0x01 => ['TalentFrame/',  false, null],
+            0x08 => ['Glues/Credits/',false, null]
+        );
 
         $createAlphaImage = function($w, $h)
         {
@@ -185,66 +188,93 @@ if (!CLI)
             imagedestroy($tmp);
         };
 
-        $checkSourceDirs = function($sub, &$missing = []) use ($imgPath, $dbcPath, $paths, &$modeMask)
+        $checkSourceDirs = function($sub) use ($imgPath, &$paths, $modeMask)
         {
             $hasMissing = false;
-            foreach ($paths as $idx => $subDir)
+            foreach ($paths as $idx => list($subDir, $isLocalized, $realPath))
             {
-                if ($idx == 0 && !($modeMask & 0x16))       // map related
-                    continue;
-                else if ($idx == 1 && !($modeMask & 0x1))   // talentBGs
-                    continue;
-                else if ($idx == 2 && !($modeMask & 0x8))   // artwork
+                if ($realPath && !$isLocalized)
                     continue;
 
                 $p = sprintf($imgPath, $sub).$subDir;
-                if (!CLISetup::fileExists($p))
+                if (CLISetup::fileExists($p))
                 {
-                    $hasMissing = true;
-                    $missing[]  = $p;
+                    if ($isLocalized)
+                        $paths[$idx][2][substr($sub, 0, -1)] = $p;
+                    else
+                        $paths[$idx][2] = $p;
                 }
-            }
-
-            if ($modeMask & 0x17)
-            {
-                $p = sprintf($dbcPath, $sub);
-                if (!CLISetup::fileExists($p))
-                {
+                else
                     $hasMissing = true;
-                    $missing[]  = $p;
-                }
             }
 
             return !$hasMissing;
         };
 
-
         // do not change order of params!
         if ($_ = FileGen::hasOpt('talentbgs', 'maps', 'spawn-maps', 'artwork', 'area-maps'))
             $modeMask = $_;
 
+        foreach ($paths as $mode => $__)
+            if (!($mode & $modeMask))
+                unset($paths[$mode]);
+
         foreach (CLISetup::$expectedPaths as $xp => $__)
         {
+            if (!in_array($locId, CLISetup::$localeIds))
+                continue;
+
             if ($xp)                                        // if in subDir add trailing slash
                 $xp .= '/';
 
-            if ($checkSourceDirs($xp, $missing))
-            {
-                $locStr = $xp;
-                break;
-            }
+            $checkSourceDirs($xp);                          // do not break; maps are localized
         }
+
+        $locList = [];
+        foreach (CLISetup::$expectedPaths as $xp => $locId)
+            if (in_array($locId, CLISetup::$localeIds))
+                $locList[] = $xp;
+
+        CLISetup::log('required resources overview:', CLISetup::LOG_INFO);
+        foreach ($paths as list($path, $isLocalized, $realPath))
+        {
+            if (!$realPath)
+                CLISetup::log(CLISetup::red('MISSING').' - '.str_pad($path, 14).' @ '.sprintf($imgPath, '['.implode(',', $locList).']/').$path);
+            else if ($isLocalized)
+            {
+                $foundLoc = [];
+                foreach (CLISetup::$localeIds as $locId)
+                    foreach (CLISetup::$expectedPaths as $xp => $lId)
+                        if ($locId == $lId && isset($realPath[$xp]) && !isset($foundLoc[$locId]))
+                            $foundLoc[$locId] = $xp;
+
+                if ($diff = array_diff(CLISetup::$localeIds, array_keys($foundLoc)))
+                {
+                    $buff = [];
+                    foreach ($diff as $d)
+                        $buff[] = CLISetup::yellow(Util::$localeStrings[$d]);
+                    foreach ($foundLoc as $str)
+                        $buff[] = CLISetup::green($str);
+
+                    CLISetup::log(CLISetup::yellow('PARTIAL').' - '.str_pad($path, 14).' @ '.sprintf($imgPath, '['.implode(',', $buff).']/').$path);
+                }
+                else
+                    CLISetup::log(CLISetup::green(' FOUND ').' - '.str_pad($path, 14).' @ '.sprintf($imgPath, '['.implode(',', $foundLoc).']/').$path);
+            }
+            else
+                CLISetup::log(CLISetup::green(' FOUND ').' - '.str_pad($path, 14).' @ '.$realPath);
+        }
+
+        CLISetup::log();
 
         // if no subdir had sufficient data, diaf
-        if ($locStr === null)
+        if (count(array_filter(array_column($paths, 2))) != count($paths))
         {
             CLISetup::log('one or more required directories are missing:', CLISetup::LOG_ERROR);
-            foreach ($missing as $m)
-                CLISetup::log(' - '.$m, CLISetup::LOG_ERROR);
-
             return;
         }
-
+        else
+            sleep(1);
 
         /**************/
         /* TalentTabs */
@@ -291,7 +321,7 @@ if (!CLI)
                             continue;
                         }
 
-                        $im = $assembleImage(sprintf($imgPath, $locStr).'TalentFrame/'.$tt['textureFile'], $order, 256 + 44, 256 + 75);
+                        $im = $assembleImage($paths[0x1][2].'/'.$tt['textureFile'], $order, 256 + 44, 256 + 75);
                         if (!$im)
                         {
                             CLISetup::log(' - could not assemble file '.$tt['textureFile'], CLISetup::LOG_ERROR);
@@ -390,16 +420,12 @@ if (!CLI)
                 $locDirs   = array_reverse(array_filter(CLISetup::$expectedPaths, function($var) use ($l) { return !$var || $var == $l; }), true);
                 foreach ($locDirs as $mapLoc => $__)
                 {
-                    if ($mapLoc)                            // and trailing slash again
-                        $mapLoc .= '/';
+                    if(!isset($paths[0x16][2][$mapLoc]))
+                        continue;
 
-                    $p = sprintf($imgPath, $mapLoc).$paths[0];
-                    if (CLISetup::fileExists($p))
-                    {
-                        CLISetup::log(' - using files from '.($mapLoc ?: '/').' for locale '.Util::$localeStrings[$l], CLISetup::LOG_INFO);
-                        $mapSrcDir = $p.'/';
-                        break;
-                    }
+                    CLISetup::log(' - using files from '.($mapLoc ?: '/').' for locale '.Util::$localeStrings[$l], CLISetup::LOG_INFO);
+                    $mapSrcDir = $paths[0x16][2][$mapLoc].'/';
+                    break;
                 }
 
                 if ($mapSrcDir === null)
@@ -654,8 +680,7 @@ if (!CLI)
                 );
 
                 $imgGroups = [];
-                $srcPath   = sprintf($imgPath, $locStr).'Glues/Credits/';
-                $files     = CLISetup::filesInPath($srcPath);
+                $files     = CLISetup::filesInPath('/'.str_replace('/', '\\/', $paths[0x8][2]).'/i', true);
                 foreach ($files as $f)
                 {
                     if (preg_match('/([^\/]+)(\d).blp/i', $f, $m))
@@ -699,7 +724,7 @@ if (!CLI)
                         continue;
                     }
 
-                    $im = $assembleImage($srcPath.$file, $order[$fmt], count($order[$fmt][0]) * 256, count($order[$fmt]) * 256);
+                    $im = $assembleImage($paths[0x8][2].'/'.$file, $order[$fmt], count($order[$fmt][0]) * 256, count($order[$fmt]) * 256);
                     if (!$im)
                     {
                         CLISetup::log(' - could not assemble file '.$name, CLISetup::LOG_ERROR);

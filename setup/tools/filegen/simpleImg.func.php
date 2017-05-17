@@ -53,9 +53,7 @@ if (!CLI)
             return true;
         }
 
-        $locStr   = null;
         $groups   = [];
-        $dbcPath  = CLISetup::$srcDir.'%sDBFilesClient/';
         $imgPath  = CLISetup::$srcDir.'%sInterface/';
         $destDir  = 'static/images/wow/';
         $success  = true;
@@ -77,19 +75,19 @@ if (!CLI)
             ['loadingscreens/original/', '.png', 0,    0, 0],
             ['loadingscreens/small/',    '.jpg', 0,  244, 0]
         );
-        $paths    = array(                                  // src, [dest, ext, srcSize, destSize, borderOffset], pattern, isIcon, tileSize
-             0 => ['Icons/',                                                $iconDirs,                                        '/*.[bB][lL][pP]',                true,   0],
-             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]], '/UI-Glyph-Rune*.blp',            true,   0],
-             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                     '/UI-{Backpack,PaperDoll}-*.blp', true,   0],
-             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                        '',                               true,  64],
-             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                        '',                               true,  64],
-             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                        '',                               true,  64],
-          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]], '',                               true,  32],
-             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]], '/*.[bB][lL][pP]',                false,  0],
-            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                    '/*{rt,a,y,h,s}.[bB][lL][pP]',    true,   0],
-            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                  '/[lL][oO]*.[bB][lL][pP]',        false,  0]
+        $paths    = array(                                  // src, [dest, ext, srcSize, destSize, borderOffset], pattern, isIcon, tileSize, resourcePath
+             0 => ['Icons/',                                                $iconDirs,                                        '/.*\.blp$',                         true,   0, null],
+             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]], '/UI-Glyph-Rune-?\d+.blp$',          true,   0, null],
+             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                     '/UI-(Backpack|PaperDoll)-.*\.blp$', true,   0, null],
+             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                        '',                                  true,  64, null],
+             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                        '',                                  true,  64, null],
+             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                        '',                                  true,  64, null],
+          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]], '',                                  true,  32, null],
+             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
+             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
+             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
+            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                    '/.*(start|[ayhs])\.blp$',           true,   0, null],
+            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                  '/lo.*\.blp$',                       false,  0, null]
         );
         // textures are composed of 64x64 icons
         // numeric indexed arrays mimick the position on the texture
@@ -192,24 +190,19 @@ if (!CLI)
             return $ok;
         };
 
-        $checkSourceDirs = function($sub, &$missing = []) use ($imgPath, $dbcPath, $paths)
+        $checkSourceDirs = function($sub) use ($imgPath, &$paths)
         {
             $hasMissing = false;
-            foreach (array_column($paths, 0) as $subDir)
+            foreach ($paths as $pathIdx => list($subDir, , , , , $realPath))
             {
-                $p = sprintf($imgPath, $sub).$subDir;
-                if (!CLISetup::fileExists($p))
-                {
-                    $hasMissing = true;
-                    $missing[]  = $p;
-                }
-            }
+                if ($realPath)
+                    continue;
 
-            $p = sprintf($dbcPath, $sub);
-            if (!CLISetup::fileExists($p))
-            {
-                $hasMissing = true;
-                $missing[]  = $p;
+                $p = sprintf($imgPath, $sub).$subDir;
+                if (CLISetup::fileExists($p))
+                    $paths[$pathIdx][5] = $p;
+                else
+                    $hasMissing = true;
             }
 
             return !$hasMissing;
@@ -232,27 +225,42 @@ if (!CLI)
                 if (!in_array($k, $groups))
                     unset($paths[$k]);
 
-        foreach (CLISetup::$expectedPaths as $xp => $__)
+        foreach (CLISetup::$expectedPaths as $xp => $locId)
         {
+            if (!in_array($locId, CLISetup::$localeIds))
+                continue;
+
             if ($xp)                                        // if in subDir add trailing slash
                 $xp .= '/';
 
-            if ($checkSourceDirs($xp, $missing))
-            {
-                $locStr = $xp;
+            if ($checkSourceDirs($xp))
                 break;
-            }
         }
+
+        $locList = [];
+        foreach (CLISetup::$expectedPaths as $xp => $locId)
+            if (in_array($locId, CLISetup::$localeIds))
+                $locList[] = $xp;
+
+        CLISetup::log('required resources overview:', CLISetup::LOG_INFO);
+        foreach ($paths as list($path, , , , , $realPath))
+        {
+            if ($realPath)
+                CLISetup::log(CLISetup::green(' FOUND ').' - '.str_pad($path, 53).' @ '.$realPath);
+            else
+                CLISetup::log(CLISetup::red('MISSING').' - '.str_pad($path, 53).' @ '.sprintf($imgPath, '['.implode(',', $locList).']/').$path);
+        }
+
+        CLISetup::log();
 
         // if no subdir had sufficient data, diaf
-        if ($locStr === null)
+        if (count(array_filter(array_column($paths, 5))) != count($paths))
         {
             CLISetup::log('one or more required directories are missing:', CLISetup::LOG_ERROR);
-            foreach ($missing as $m)
-                CLISetup::log(' - '.$m, CLISetup::LOG_ERROR);
-
             return;
         }
+        else
+            sleep(1);
 
         // init directories
         foreach (array_column($paths, 1) as $subDirs)
@@ -276,31 +284,36 @@ if (!CLI)
                 $siRows = DB::Aowow()->selectCol('SELECT iconPath FROM dbc_spellicon');
 
             foreach ($siRows as $icon)
-                $dbcEntries[] = strtolower(sprintf('setup/mpqdata/%s', $locStr).strtr($icon, ['\\' => '/']).'.blp');
+            {
+                if (stristr($icon, $paths[0][0]))           // Icons/
+                    $dbcEntries[] = strtolower($paths[0][5].substr(strrchr($icon, '\\'), 1));
+                else if (stristr($icon, $paths[1][0]))      // Spellbook/
+                    $dbcEntries[] = strtolower($paths[1][5].substr(strrchr($icon, '\\'), 1));
+            }
         }
 
         if (isset($paths[0]))
         {
             $itemIcons = DB::Aowow()->selectCol('SELECT inventoryIcon1 FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> ""');
             foreach ($itemIcons as $icon)
-                $dbcEntries[] = strtolower(sprintf($imgPath, $locStr).'Icons/'.$icon.'.blp');
+                $dbcEntries[] = strtolower($paths[0][5].'/'.$icon.'.blp');
 
             $eventIcons = DB::Aowow()->selectCol('SELECT textureString FROM dbc_holidays WHERE textureString <> ""');
             foreach ($eventIcons as $icon)
-                $dbcEntries[] = strtolower(sprintf($imgPath, $locStr).'Calendar/Holidays/'.$icon.'Start.blp');
+                $dbcEntries[] = strtolower($paths[10][5].'/'.$icon.'Start.blp');
         }
 
         // case-insensitive array_unique *vomits silently into a corner*
         $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));
 
         $allPaths = [];
-        foreach ($paths as $i => list($inPath, $outInfo, $pattern, $isIcon, $tileSize))
+        foreach ($paths as $i => list($inPath, $outInfo, $pattern, $isIcon, $tileSize, $path))
         {
-            $path = sprintf($imgPath, $locStr).$inPath;
-            if (!CLISetup::fileExists($path))
-                continue;
+            $search = $path.$pattern;
+            if ($pattern)
+                $search = '/'.str_replace('/', '\\/', $search).'/i';
 
-            $files    = glob($path.$pattern, GLOB_BRACE);
+            $files    = CLISetup::filesInPath($search, !!$pattern);
             $allPaths = array_merge($allPaths, $files);
 
             CLISetup::log('processing '.count($files).' files in '.$path.'...');
