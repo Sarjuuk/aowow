@@ -685,31 +685,33 @@ class SpellPage extends GenericPage
                     unset($linkedSpells[$k]);
                 }
 
-                $groups  = $linkedSpells + $extraSpells;
-                $stacks = new SpellList(array(['s.id', array_keys($groups)]));
-
-                if (!$stacks->error)
+                // todo (high): fixme - querys have erronous edge-cases (see spell: 13218)
+                if ($groups = $linkedSpells + $extraSpells)
                 {
-                    $data = $stacks->getListviewData();
-                    foreach ($data as $k => $d)
-                        $data[$k]['stackRule'] = $groups[$k];
+                    $stacks = new SpellList(array(['s.id', array_keys($groups)]));
+                    if (!$stacks->error)
+                    {
+                        $data = $stacks->getListviewData();
+                        foreach ($data as $k => $d)
+                            $data[$k]['stackRule'] = $groups[$k];
 
-                    if (!$stacks->hasSetFields(['skillLines']))
-                        $sH = ['skill'];
+                        if (!$stacks->hasSetFields(['skillLines']))
+                            $sH = ['skill'];
 
-                    $tabData = array(
-                        'data'        => array_values($data),
-                        'id'          => 'spell-group-stack',
-                        'name'        => Lang::spell('stackGroup'),
-                        'visibleCols' => ['stackRules']
-                    );
+                        $tabData = array(
+                            'data'        => array_values($data),
+                            'id'          => 'spell-group-stack',
+                            'name'        => Lang::spell('stackGroup'),
+                            'visibleCols' => ['stackRules']
+                        );
 
-                    if (isset($sH))
-                        $tabData['hiddenCols'] = $sH;
+                        if (isset($sH))
+                            $tabData['hiddenCols'] = $sH;
 
-                    $this->lvTabs[] = ['spell', $tabData];
+                        $this->lvTabs[] = ['spell', $tabData];
 
-                    $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                        $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                    }
                 }
             }
         }
