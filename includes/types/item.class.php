@@ -947,7 +947,7 @@ class ItemList extends BaseType
             if (!$itemset->error && $itemset->pieceToSet)
             {
                 $pieces = DB::Aowow()->select('
-                    SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
+                    SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc4, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
                     FROM   ?_items a, ?_items b
                     WHERE  a.slotBak = b.slotBak AND a.itemset = b.itemset AND b.id IN (?a)
                     GROUP BY b.id;',

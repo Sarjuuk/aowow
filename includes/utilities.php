@@ -21,11 +21,11 @@ class Util
     const FILE_ACCESS = 0777;
 
     public static $localeStrings            = array(        // zero-indexed
-        'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
+        'enus',         null,           'frfr',         'dede',         'zhcn',         null,           'eses',         null,           'ruru'
     );
 
     public static $subDomains               = array(
-        'www',          null,           'fr',           'de',           null,           null,           'es',           null,           'ru'
+        'www',          null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
     );
 
     public static $typeClasses              = array(

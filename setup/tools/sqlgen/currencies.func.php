@@ -35,7 +35,7 @@ function currencies(array $ids = [])
     $moneyNames = DB::World()->select('
         SELECT
             it.entry AS ARRAY_KEY,
-            it.name AS name_loc0, IFNULL(itl2.Name, "") AS name_loc2, IFNULL(itl3.Name, "") AS name_loc3, IFNULL(itl6.Name, "") AS name_loc6, IFNULL(itl8.Name, "") AS name_loc8,
+            it.name AS name_loc0, IFNULL(itl2.Name, "") AS name_loc2, IFNULL(itl3.Name, "") AS name_loc3, IFNULL(itl4.Name, "") AS name_loc4,  IFNULL(itl6.Name, "") AS name_loc6, IFNULL(itl8.Name, "") AS name_loc8,
             it.maxCount AS cap
         FROM
             item_template it
@@ -43,6 +43,8 @@ function currencies(array $ids = [])
             item_template_locale itl2 ON it.entry = itl2.ID AND itl2.locale = "frFR"
         LEFT JOIN
             item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
+        LEFT JOIN
+            item_template_locale itl4 ON it.entry = itl3.ID AND itl4.locale = "zhCN"
         LEFT JOIN
             item_template_locale itl6 ON it.entry = itl6.ID AND itl6.locale = "esES"
         LEFT JOIN

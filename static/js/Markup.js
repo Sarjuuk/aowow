@@ -29,7 +29,7 @@ MarkupSourceMap[MARKUP_SOURCE_BETA] = 'beta';
 
 var MarkupDomainRegexMap = {
     betaPtrLang: /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/,
-    lang: /^(www|fr|de|es|ru)$/                             // Aowowo - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
+    lang: /^(www|fr|de|cn|es|ru)$/                          // Aowowo - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
 };
 
 var Markup = {
@@ -75,6 +75,7 @@ var Markup = {
         'mop': 'beta',
         'fr': 'frfr',
         'de': 'dede',
+        'cn': 'zhcn',
         'es': 'eses',
         'ru': 'ruru',
         'pt': 'ptbr'
