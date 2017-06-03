@@ -3,6 +3,7 @@
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
+mb_internal_encoding("UTF-8");
 
 // use as example. File is generated from setup.
 
