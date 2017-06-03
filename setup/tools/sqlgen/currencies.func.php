@@ -44,7 +44,7 @@ function currencies(array $ids = [])
         LEFT JOIN
             item_template_locale itl3 ON it.entry = itl3.ID AND itl3.locale = "deDE"
         LEFT JOIN
-            item_template_locale itl4 ON it.entry = itl3.ID AND itl4.locale = "zhCN"
+            item_template_locale itl4 ON it.entry = itl4.ID AND itl4.locale = "zhCN"
         LEFT JOIN
             item_template_locale itl6 ON it.entry = itl6.ID AND itl6.locale = "esES"
         LEFT JOIN
