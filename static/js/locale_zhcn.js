@@ -273,7 +273,7 @@ var mn_npcs = [
         [1,"狼","?npcs=1&filter=fa=1"],
         [42,"蠕虫","?npcs=1&filter=fa=42"]
     ]],
-    [8,"小生物"],
+    [8,"小动物"],
     [3,"恶魔"],
     [2,"龙类"],
     [4,"元素"],
@@ -568,9 +568,9 @@ var mn_spells = [
         [3,"猎人",,[[50,"野兽控制",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"射击",,,{tinyIcon:"Ability_Marksmanship"}],[51,"生存技能",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],
         [8,"法师",,[[237,"奥术",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"火焰",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"冰霜",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],
         [2,"圣骑士",,[[594,"神圣",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"防护",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"惩戒",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],
-        [5,"牧师",,[[613,"戒律",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"神圣",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"暗影魔法",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
+        [5,"牧师",,[[613,"戒律",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"神圣",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"暗影",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
         [4,"潜行者",,[[253,"刺杀",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[38,"战斗",,,{tinyIcon:"Ability_BackStab"}],[39,"敏锐",,,{tinyIcon:"Ability_Stealth"}]],{className:"c4",tinyIcon:"class_rogue"}],
-        [7,"萨满祭司",,[[375,"元素战斗",,,{tinyIcon:"Spell_Nature_Lightning"}],[373,"增强",,,{tinyIcon:"Spell_Nature_LightningShield"}],[374,"恢复",,,{tinyIcon:"Spell_Nature_MagicImmunity"}]],{className:"c7",tinyIcon:"class_shaman"}],
+        [7,"萨满祭司",,[[375,"元素",,,{tinyIcon:"Spell_Nature_Lightning"}],[373,"增强",,,{tinyIcon:"Spell_Nature_LightningShield"}],[374,"恢复",,,{tinyIcon:"Spell_Nature_MagicImmunity"}]],{className:"c7",tinyIcon:"class_shaman"}],
         [9,"术士",,[[355,"痛苦",,,{tinyIcon:"Spell_Shadow_DeathCoil"}],[354,"恶魔学识",,,{tinyIcon:"Spell_Shadow_Metamorphosis"}],[593,"毁灭",,,{tinyIcon:"Spell_Shadow_RainOfFire"}]],{className:"c9",tinyIcon:"class_warlock"}],
         [1,"战士",,[[26,"武器",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"狂怒",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"防护",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]
     ]],
@@ -591,11 +591,11 @@ var mn_spells = [
         [6,"武器"],
         [10,"语言"]
     ]],
-    [-4,"种族特性"],
+    [-4,"种族特长"],
     [-2,"天赋",,[
         [6,"死亡骑士",,[[770,"鲜血",,,{tinyIcon:"Spell_Deathknight_BloodPresence"}],[771,"冰霜",,,{tinyIcon:"Spell_Deathknight_FrostPresence"}],[772,"邪恶",,,{tinyIcon:"Spell_Deathknight_UnholyPresence"}],[776,"符文熔铸"]],{className:"c6",tinyIcon:"class_deathknight"}],
         [11,"德鲁伊",,[[574,"平衡",,,{tinyIcon:"Spell_Nature_StarFall"}],[134,"野性战斗",,,{tinyIcon:"Ability_Racial_BearForm"}],[573,"恢复",,,{tinyIcon:"Spell_Nature_HealingTouch"}]],{className:"c11",tinyIcon:"class_druid"}],
-        [3,"猎人",,[[50,"野兽控制",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"射击",,,{tinyIcon:"Ability_Marksmanship"}],[51,"生存技能",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],
+        [3,"猎人",,[[50,"野兽控制",,,{tinyIcon:"Ability_Hunter_BeastTaming"}],[163,"射击",,,{tinyIcon:"Ability_Marksmanship"}],[51,"生存",,,{tinyIcon:"Ability_Hunter_SwiftStrike"}]],{className:"c3",tinyIcon:"class_hunter"}],
         [8,"法师",,[[237,"奥术",,,{tinyIcon:"Spell_Holy_MagicalSentry"}],[8,"火焰",,,{tinyIcon:"Spell_Fire_FireBolt02"}],[6,"冰霜",,,{tinyIcon:"Spell_Frost_FrostBolt02"}]],{className:"c8",tinyIcon:"class_mage"}],
         [2,"圣骑士",,[[594,"神圣",,,{tinyIcon:"Spell_Holy_HolyBolt"}],[267,"防护",,,{tinyIcon:"Spell_Holy_DevotionAura"}],[184,"惩戒",,,{tinyIcon:"Spell_Holy_AuraOfLight"}]],{className:"c2",tinyIcon:"class_paladin"}],
         [5,"牧师",,[[613,"戒律",,,{tinyIcon:"Spell_Holy_WordFortitude"}],[56,"神圣",,,{tinyIcon:"Spell_Holy_GuardianSpirit"}],[78,"暗影魔法",,,{tinyIcon:"Spell_Shadow_ShadowWordPain"}]],{className:"c5",tinyIcon:"class_priest"}],
@@ -605,7 +605,7 @@ var mn_spells = [
         [1,"战士",,[[26,"武器",,,{tinyIcon:"Ability_Rogue_Eviscerate"}],[256,"狂怒",,,{tinyIcon:"Ability_Warrior_InnerRage"}],[257,"防护",,,{tinyIcon:"INV_Shield_06"}]],{className:"c1",tinyIcon:"class_warrior"}]
     ]],
     [,"宠物"],
-    [-6,"伙伴"],
+    [-6,"小伙伴"],
     [-5,"坐骑"],
     [-3,"宠物能力",,[
         [,"死亡骑士"],
@@ -844,7 +844,7 @@ var mn_sounds = [
     [31,"叙事","?sounds&filter=ty=31"], //Narration
     [30,"叙事音乐","?sounds&filter=ty=30"],
     [13,"自然","?sounds&filter=ty=13"],
-    [14,"物件","?sounds&filter=ty=14"],
+    [14,"对象","?sounds&filter=ty=14"],
     [9,"拿起/放下","?sounds&filter=ty=9"],
     [26,"法术失败","?sounds&filter=ty=26"],
     [1,"法术","?sounds&filter=ty=1"],
@@ -1010,7 +1010,7 @@ var mn_community = [
     [7,"博客","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
     [4,"IRC频道","http://webchat.quakenet.org/",null,{tinyIcon: g_staticUrl + "/images/icons/irc.png"}],
     [,"社区"],
-    [10, "网站声誉", "?reputation", mn_reputation],
+    [10, "网站声望", "?reputation", mn_reputation],
     [11, "Top Users", "?top-users"],
     [,"社交"],
     [6,"Facebook页面","http://www.facebook.com",null,{tinyIcon: g_staticUrl + "/images/icons/facebook.png"}],
@@ -1028,13 +1028,13 @@ var mn_more = [
         [2,"截图：提示和技巧","?help=screenshots-tips-tricks"],
         [3,"Stat Weighting","?help=stat-weighting"],
         [4,"天赋模拟器","?help=talent-calculator"],
-        [7,"Markup Guide","?help=markup-guide"]
+        [7,"标记指南","?help=markup-guide"]
     ]],
-    [7,"What's New","?whats-new"],
+    [7,"新内容","?whats-new"],
     [,"Goodies"],
-    [16, "Search Box","?searchbox"],
-    [8,"Search Plugins (FF, IE7, ...)","?searchplugins"],
-    [10,"Tooltips","?tooltips"]
+    [16, "搜索框","?searchbox"],
+    [8,"搜索插件(FF, IE7, ...)","?searchplugins"],
+    [10,"工具提示","?tooltips"]
 ];
 var mn_path = [
     [0,"数据库",,mn_database],
@@ -1284,7 +1284,7 @@ var g_item_subclasses = {
         "-2": "护甲徽记",
         0: "垃圾",
         1: "施法材料",
-        2: "伙伴",
+        2: "小伙伴",
         3: "节日",
         4: "其他（杂货）",
         5: "坐骑"
@@ -1331,32 +1331,32 @@ var g_itemset_notes = {
      1: '地下城套装1',
      2: '地下城套装2',
     14: '地下城套装3',
-     3: 'T1副本套装',
-     4: 'T2副本套装',
-     5: 'T3副本套装',
-    12: 'T4副本套装',
-    13: 'T5副本套装',
-    18: 'T6副本套装',
-    23: 'T7副本套装',
-    25: 'T8副本套装',
-    27: 'T9副本套装',
-    29: 'T10副本套装',
+     3: 'T1团队副本套装',
+     4: 'T2团队副本套装',
+     5: 'T3团队副本套装',
+    12: 'T4团队副本套装',
+    13: 'T5团队副本套装',
+    18: 'T6团队副本套装',
+    23: 'T7团队副本套装',
+    25: 'T8团队副本套装',
+    27: 'T9团队副本套装',
+    29: 'T10团队副本套装',
      6: '60级PVP稀有套装',
      7: '60级PVP稀有套装（旧）',
      8: '60级PVP史诗套装',
     16: '70级PVP稀有套装',
-    21: '70级PVP稀有套装 2',
-    17: '竞技场第1季套装',
-    19: '竞技场第2季套装',
-    20: '竞技场第3季套装',
-    22: '竞技场第4季套装',
-    24: '竞技场第5季套装',
-    26: '竞技场第6季套装',
-    28: '竞技场第7季套装',
-    30: '竞技场第8季套装',
+    21: '70级PVP稀有套装2',
+    17: '竞技场第1赛季套装',
+    19: '竞技场第2赛季套装',
+    20: '竞技场第3赛季套装',
+    22: '竞技场第4赛季套装',
+    24: '竞技场第5赛季套装',
+    26: '竞技场第6赛季套装',
+    28: '竞技场第7赛季套装',
+    30: '竞技场第8赛季套装',
     15: '阿拉希盆地套装',
      9: '安其拉废墟套装',
-    10: '安其拉神庙团本套装',
+    10: '安其拉神庙套装',
     11: '祖尔格拉布套装'
 };
 
@@ -1695,7 +1695,7 @@ var g_quest_types = {
     62: '团队副本',
     81: '地下城',
     82: '世界事件',
-    83: '传奇',
+    83: '传说',
     84: '护送',  //Escort
     85: '英雄',
     88: '团队副本(10)',
@@ -1723,7 +1723,7 @@ var g_sources = {
     12: "成就",
     // aowow: note - 13 is string from serverside table, used by titles
     14: "黑市",
-    15: "取消附魔",
+    15: "分解",
     16: "钓鱼",
     17: "采集",
     18: "研磨",
@@ -1756,9 +1756,9 @@ var g_spell_categories = {
     "-11": "精通",
      "-8": "NPC能力",
      "-7": "宠物天赋",
-     "-6": "伙伴",
+     "-6": "小伙伴",
      "-5": "坐骑",
-     "-4": "种族特性",
+     "-4": "种族特长",
      "-3": "宠物能力",
      "-2": "天赋",
         7: "技能",
@@ -1928,9 +1928,9 @@ var g_spell_skills = {
 };
 
 var g_skill_categories = {
-    "-6": "伙伴",
+    "-6": "小伙伴",
     "-5": "坐骑",
-    "-4": "种族特性",
+    "-4": "种族特长",
        5: '属性',
        6: "武器技能",
        7: "技能",
@@ -2358,17 +2358,17 @@ var g_drunk_states = {
 
 var g_operators = {
     0: 'exact',
-    1: 'more than',
-    2: 'less than',
+    1: '超过',
+    2: '小于',
     3: 'more than or exact',
     4: 'less than or exact'
 };
 
 var g_world_object_types = {
-    3: 'Creature',
-    4: 'Player',
-    5: 'Object',
-    7: 'Player Corpse'
+    3: '生物',
+    4: '玩家',
+    5: '对象',
+    7: '玩家尸体'
 };
 
 var g_condition_types = {
@@ -2403,11 +2403,11 @@ var g_conditions = {
      2: 'The Player $owns: does not own; $1',
      3: 'The Player $has:does not have; $1 equipped',
      4: 'The Player is$: not; in $1',                                       // also used by 22, 23
-     5: 'The Player\'s standing with $1 is$: not; $2',
+     5: '玩家声望关系和$1是$:不是;$2',
      6: 'The Player is$: not; $1',
      7: 'The Player $knows: does not know; $1',
      8: 'The Player has$: not; finished $1',
-     9: 'The Player has$: not; accepted $1',
+     9: '玩家已经$:没有;接受$1',  //The Player has$: not; accepted $1
     10: 'The Player is$: not; $1',
     11: 'WorldState #$1 is$: not; $2',
     12: '$1 must$: not; be active',
@@ -2463,8 +2463,8 @@ var LANG = {
     date_months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     date_days:   ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
 
-    amount:                 "Amount",
-    abilities:              "Abilities",
+    amount:                 "数量",
+    abilities:              "能力",
     activity:               "活动",
     add:                    "添加",
     animation:              "动画",  //Animation
@@ -2482,20 +2482,20 @@ var LANG = {
     close:                  "关闭",
     completed:              "Completed",
     contactus:              "联系我们",
-    cost:                   "Cost",
+    cost:                   "成本",
     count:                  "Count",
     currency:               "货币",
-    daily:                  "Daily",
-    weekly:                 "Weekly",
-    damage:                 "Damage",
+    daily:                  "每日",
+    weekly:                 "每周",
+    damage:                 "伤害",
     'delete':               "删除",
     diet:                   "Diet",
     dps:                    "DPS",
     earned:                 "Earned",
     enchant:                "Enchant",
     entitycount:            "$1 $2",
-    exp:                    "Exp.",
-    faction:                "Faction",
+    exp:                    "经验",
+    faction:                "阵营",
     gains:                  "Gains",
     gender:                 "性别",
     gems:                   "Gems",
@@ -2504,8 +2504,8 @@ var LANG = {
     group:                  "Group",
     guild:                  "公会",
     guildleader:            "公会会长",
-    guildrank:              "Guild Rank",
-    health:                 "Health",
+    guildrank:              "公会等级", //Guild Rank
+    health:                 "生命值",
     help:                   "帮助",
     heroiclevel:            "英雄等级",
     icon:                   "图标",
@@ -2517,7 +2517,7 @@ var LANG = {
     losses:                 "Losses",
     members:                "成员",
     model:                  "模型",
-    money:                  "Money",
+    money:                  "金钱",
     name:                   "名字",
     next:                   "下一页",  //Next
     no:                     "否",
@@ -2525,12 +2525,12 @@ var LANG = {
     original:               "Original",
     players:                "玩家",
     previous:               "上一页",//Previous
-    quality:                "Quality",
+    quality:                "质量",
     race:                   "种族",
     races:                  "种族",
     rankno:                 "等级$1",  //Rank 
     rating:                 "等级",
-    react:                  "React",
+    react:                  "反应",
     ready:                  "准备",
     realm:                  "服务器",
     reagents:               "Reagents",
@@ -2542,27 +2542,27 @@ var LANG = {
     reputation:             "声望",
     rewards:                "奖励",
     petfamily:              "宠物家族",
-    pieces:                 "Pieces",
-    points:                 "Points",
+    pieces:                 "件",
+    points:                 "点数",
     posted:                 "Posted",
     posts:                  "Posts",
-    premiumupgrade:         "Premium Upgrade",
+    premiumupgrade:         "高级升级",
     preview:                "预览",
-    privateprofile:         "Private",
+    privateprofile:         "私人",
     prize:                  "Prize",
     profiler:               "Profiler",
-    progress:               "Progress",
+    progress:               "进行", //Progress
     purge:                  "Purge",
-    publicprofile:          "Public",
+    publicprofile:          "公开",
     relevance:              "Relevance",
     replies:                "Replies",
     report:                 "Report",
     report_tooltip:         "This post needs moderator attention.",
     replyreportwarning_tip: "Are you sure you want to report this reply as inappropriate to the moderators?",
-    school:                 "School",
+    school:                 "类型",  //School
     score:                  "分数",
     settings:               "设置",
-    side:                   "Side",
+    side:                   "阵营",
     signature:              "签名",
     signout:                "Sign Out",
     sockets:                "Sockets",
@@ -2574,7 +2574,7 @@ var LANG = {
     slots:                  "部位",
     smartloot:              "Smart loot",
     speed:                  "速度",
-    stack:                  "Stack",
+    stack:                  "堆叠",  //stack
     standing:               "Standing",
     stock:                  "Stock",
     statistic:              "统计", //Statistic
@@ -2620,9 +2620,9 @@ var LANG = {
     source_quests:   "任务",
     source_vendors:  "Vendors",
 
-    infobox_noneyet:    "None yet &ndash; $1!",
-    infobox_submitone:  "Submit one",
-    infobox_suggestone: "Suggest one",
+    infobox_noneyet:    "没有 &ndash; $1!",  //None yet
+    infobox_submitone:  "提交一个",
+    infobox_suggestone: "建议一个",
     infobox_showall:    "显示所有($1)",
 
     lvclass_hero: "英雄职业",
@@ -2680,7 +2680,7 @@ var LANG = {
     lvquest_pickone:    "选择一个：",
     lvquest_alsoget:    "Also get: ",
     lvquest_removed:    "Removed",                          // original
-    lvquest_disabled:   "Disabled",                         // replacement
+    lvquest_disabled:   "禁用",                         // replacement
     lvquest_autoaccept: "自动接受",
     lvquest_hostile:    "(敌意)",
     lvquest_xp:         "$1 XP",
@@ -2696,15 +2696,15 @@ var LANG = {
     lvpage_next:     "下一页",
     lvpage_last:     "最后一页",
 
-    lvsearchresults:          "Search within results...",
-    lvsearchdisplayedresults: "Search within displayed results...",
+    lvsearchresults:          "在结果中搜索...",
+    lvsearchdisplayedresults: "在显示的结果内搜索...",
 
-    lvscreenshot_submit: "Submit a screenshot",
+    lvscreenshot_submit: "提交截图",
     lvscreenshot_from:   "From ",
-    lvscreenshot_hires:  "View",
-    lvscreenshot_hires2: " higher resolution version ($1x$2)",
+    lvscreenshot_hires:  "查看",
+    lvscreenshot_hires2: " 更高分辨率的版本 ($1x$2)",
 
-    lvvideo_suggest: "Suggest a video",
+    lvvideo_suggest: "建议视频",
     lvvideo_from:    "From ",
 
     lvnodata:     "没有数据可以显示。",
@@ -2721,12 +2721,12 @@ var LANG = {
     lvnodata_vi2: "成为本页第一个<a>发表视频</a>的人！",  //suggest video
     lvnodata_vi3: "请<a>登录</a>以发表视频，或如果你还没有账号的话请先<a>注册</a>。",
 
-    lvnote_sort: "Sort by: ",
+    lvnote_sort: "排序：",
 
     lvnote_tryfiltering: "Try <a>filtering</a> your results",
-    lvnote_trynarrowing: "Try narrowing your search",
+    lvnote_trynarrowing: "试图缩小你的搜索范围",
     lvnote_upgradesfor:  'Finding upgrades for <a href="?item=$1" class="q$2"><b>$3</b></a>.',
-    lvnote_witherrors:   "Some filters in your search were invalid and have been ignored.",
+    lvnote_witherrors:   "搜索中的一些过滤器无效并且已被忽略。", //Some filters in your search were invalid and have been ignored.
 
     lvnote_entitiesfound:     "$1 $2 found ($3 displayed)",
     lvnote_itemsfound:        "$1 items found ($2 displayed)",
@@ -2818,7 +2818,7 @@ var LANG = {
 
     button_compare:      "比较",
     button_delete:       "删除",
-    button_deselect:     "Deselect",
+    button_deselect:     "取消选择", //Deselect
     button_edit:         "编辑",
     button_equip:        "装备",
     button_exclude:      "排除",
@@ -2949,8 +2949,8 @@ var LANG = {
     tooltip_combatrating:              "$1&nbsp;@&nbsp;L$2",
     tooltip_completionavail:           "$1 that the Blizzard API does not indicate<br />your character has completed.",
     tooltip_completionunavail:         "$1 (or equivalents) that the Blizzard API<br />indicates your character has completed.",
-    tooltip_consumedonuse:             "Consumed when used",
-    tooltip_customrating:              "Custom rating",
+    tooltip_consumedonuse:             "当使用时消耗", //Consumed when used
+    tooltip_customrating:              "自定义等级", //Custom rating
     tooltip_dailyquest:                "你每天只能完成最多<br />25个每日任务。",
     tooltip_downrate:                  "Poor/redundant",
     tooltip_equip:                     "Display this item on your pinned character.",
@@ -2960,28 +2960,28 @@ var LANG = {
     tooltip_extendedquestsearch:       "Check this option to search in the<br />objectives and description as well.",
     tooltip_extendedspellsearch:       "Check this option to search in the<br />description and buff as well.",
     tooltip_flight:                    "Flight",
-    tooltip_gotopage:                  "Click to go to a specific page",
+    tooltip_gotopage:                  "点击以进入特定页面",
     tooltip_ground:                    "Ground",
     tooltip_heroclass:                 "Players who have a character of at least level<br />55 on the account they play are able to create<br />a new level-55 hero class character.",
     tooltip_heroicmodeavailable:       "英雄模式可用",
     tooltip_honorpoints:               "荣誉点数",
     tooltip_hordeonly:                 "仅限部落",
     tooltip_autores:                   "When you release your spirit after death,<br />you will resurrect automatically without having<br />to go back to your corpse.",
-    tooltip_itemnotfound:              "Item not found :(",
+    tooltip_itemnotfound:              "物品未找到", //Item not found :(
     tooltip_loading:                   "加载中...",
-    tooltip_lvheader1:                 "Click to sort",
-    tooltip_lvheader2:                 "Right-click to filter",
+    tooltip_lvheader1:                 "点击以排序",
+    tooltip_lvheader2:                 "右击以过滤",
     tooltip_lvheader3:                 "Shift-click to filter",
-    tooltip_noresponse:                "No response from server :(",
+    tooltip_noresponse:                "服务器没有反应",//No response from server :(
     tooltip_normal:                    "Normal",
     tooltip_notconsumedonuse:          "Not consumed when used",
-    tooltip_npcnotfound:               "NPC not found :(",
-    tooltip_objectnotfound:            "Object not found :(",
+    tooltip_npcnotfound:               "NPC未找到",
+    tooltip_objectnotfound:            "对象未找到",
     tooltip_partyloot:                 "When this item drops, each<br />member of the group can loot one.",
     tooltip_pending:                   "Pending",
     tooltip_ppbheroic:                 "英雄",
     tooltip_ppbraid:                   "raid",
-    tooltip_questnotfound:             "Quest not found :(",
+    tooltip_questnotfound:             "任务未找到",
     tooltip_refundable:                "May be returned for a refund at a vendor<br />if within two hours after the purchase.",
     tooltip_repgain:                   "Reputation gain",
     tooltip_reqenchanting:             "Required Enchanting skill",
@@ -2990,7 +2990,7 @@ var LANG = {
     tooltip_reqlevel:                  "要求等级",
     tooltip_reqlockpicking:            "Required Lockpicking skill",
     tooltip_smartloot:                 "Only available to players who have<br />the profession and don't already<br />have the recipe.",
-    tooltip_deprecated:                "Cannot be used or equipped",
+    tooltip_deprecated:                "不能使用或装备",
     tooltip_realduration:              "The item's duration is real time, not play time.<br />It will keep ticking while logged off.",
     tooltip_cannotrollneed:            "You cannot roll Need on this item.",
     tooltip_spellnotfound:             "法术未找到", //Spell not found :(
@@ -3002,7 +3002,7 @@ var LANG = {
     tooltip_uprate:                    "Insightful/funny",
     tooltip_zonelink:                  "Clicking on this link will<br />take you to the zone page.",
 
-    reputationhistory: "历史声誉",
+    reputationhistory: "历史声望",
     reputationaction:  "Reputation Action",
 
     outofdate_stc: "过时的",
@@ -3013,7 +3013,7 @@ var LANG = {
     tab_achievements:        "成就",
     tab_addyourcomment:      "添加你的评论",
     tab_giveyourfeedback:    "给出你的反馈",
-    tab_armorproficiencies:  "Armor Proficiency",
+    tab_armorproficiencies:  "护甲精通", //Armor Proficiency
     tab_article:             "文章",
     tab_articles:            "文章",
     tab_avatars:             "Avatars",
@@ -3025,22 +3025,22 @@ var LANG = {
     tab_classes:             "职业",
     tab_comments:            "评论",
     tab_replies:             "回复",
-    tab_companions:          "Companions",
-    tab_containedin:         "Contained in",
-    tab_contains:            "Contains",
-    tab_controlledabilities: "Controlled abilities",
+    tab_companions:          "小伙伴", //Companions
+    tab_containedin:         "包含在",
+    tab_contains:            "包含",
+    tab_controlledabilities: "控制能力", //Controlled abilities
     tab_crafteditems:        "Crafted items",
-    tab_createdby:           "Created by",
+    tab_createdby:           "Created by", //Created by
     tab_criteriaof:          "Criteria of",
     tab_currencyfor:         "Currency for",
     tab_currencies:          "货币",
-    tab_disenchantedfrom:    "Disenchanted from",
-    tab_disenchanting:       "Disenchanting",
+    tab_disenchantedfrom:    "分解自", //Disenchanted from
+    tab_disenchanting:       "分解",  //    Disenchanting
     tab_droppedby:           "掉落自", //Dropped by
-    tab_creates:             "Creates",
+    tab_creates:             "Creates", //Creates
     tab_drops:               "掉落",  //Drops
-    tab_encounter:           "Encounter",
-    tab_ends:                "Ends",
+    tab_encounter:           "遭遇", //Encounter
+    tab_ends:                "结束",
     tab_factions:            "阵营",
     tab_fishedin:            "Fished in",
     tab_fishing:             "Fishing",
@@ -3048,10 +3048,10 @@ var LANG = {
     tab_gatheredfrom:        "Gathered from",
     tab_gatheredfromnpc:     "Gathered from NPC",
     tab_glyphs:              "雕文",
-    tab_armorspecializations:"Armor specializations",
-    tab_engineering:         "Engineering",
-    tab_englishcomments:     "English comments",
-    tab_herbalism:           "Herbalism",
+    tab_armorspecializations:"护甲专精",  //Armor specializations
+    tab_engineering:         "工程学",  //Engineering
+    tab_englishcomments:     "英语评论",
+    tab_herbalism:           "草药学", //Herbalism
     tab_heroicdrops:         "英雄掉落",  //Heroic drops
     tab_heroicXdrops:        "英雄$1掉落",
     tab_heroic:              "英雄",
@@ -3082,8 +3082,8 @@ var LANG = {
     tab_noteworthy:          "Noteworthy",
     tab_npcs:                "NPC",  //NPCs
     tab_npcabilities:        "NPC能力",  //abilities
-    tab_objectiveof:         "Objective of",
-    tab_objects:             "物件",  //Objects
+    tab_objectiveof:         "目标", //Objective of
+    tab_objects:             "对象",  //Objects
     tab_pets:                "猎人宠物",
     tab_pickpocketedfrom:    "Pickpocketed from",
     tab_pickpocketing:       "Pickpocketing",
@@ -3096,53 +3096,53 @@ var LANG = {
     tab_questrewards:        "任务奖励",
     tab_quests:              "任务",
     tab_races:               "种族",
-    tab_racialtraits:        "Racial traits",
+    tab_racialtraits:        "种族特长",
     tab_reagentfor:          "Reagent for",
     tab_recipes:             "Recipes",
     tab_recipeitems:         "Recipe items",
     tab_replies:             "Replies",
     tab_commentreplies:      "Comment Replies",
     tab_requiredby:          "Required by",
-    tab_rewardfrom:          "Reward from",
-    tab_samemodelas:         "Same model as",
+    tab_rewardfrom:          "奖励自", //Reward from
+    tab_samemodelas:         "同一模型", //Same model as
     tab_salvagedfrom:        "Salvaged from",
     tab_screenshots:         "截图",
-    tab_seealso:             "See also",
-    tab_sells:               "Sells",
-    tab_sharedcooldown:      "Shared cooldown",
-    tab_signatureimages:     "Signature backgrounds",
-    tab_signatures:          "Signatures",
+    tab_seealso:             "参见",
+    tab_sells:               "出售", //Sells
+    tab_sharedcooldown:      "共享冷却时间",
+    tab_signatureimages:     "签名背景",
+    tab_signatures:          "签名",
     tab_skills:              "技能",
-    tab_skinnedfrom:         "Skinned from",
-    tab_skinning:            "Skinning",
+    tab_skinnedfrom:         "剥皮自",
+    tab_skinning:            "剥皮",
     tab_soldby:              "出售人",  //Sold by
     tab_spells:              "法术",
-    tab_starts:              "Starts",
+    tab_starts:              "开始",
     tab_startsquest:         "开始任务",
-    tab_submitascreenshot:   "Submit a screenshot",
-    tab_suggestavideo:       "Suggest a video",
+    tab_submitascreenshot:   "提交截图",
+    tab_suggestavideo:       "建议视频",  //Suggest a video
     tab_summonedby:          "Summoned by",
-    tab_statistics:          "Statistics",
+    tab_statistics:          "统计", //Statistics
     tab_talents:             "天赋",
-    tab_tameable:            "Tameable",
-    tab_taughtby:            "Taught by",
-    tab_teaches:             "Teaches",
+    tab_tameable:            "可驯服的",  //Tameable
+    tab_taughtby:            "学习自",  //Taught by
+    tab_teaches:             "学习", //Teaches
     tab_titles:              "头衔",
     tab_toolfor:             "Tool for",
     tab_topics:              "主题",
-    tab_trainers:            "Trainers",
-    tab_triggeredby:         "Triggered by",
+    tab_trainers:            "训练师", //Trainers
+    tab_triggeredby:         "触发由", //Triggered by
     tab_uncategorizedspells: "未归类法术",
     tab_unlocks:             "解锁",
-    tab_usedby:              "Used by",
+    tab_usedby:              "使用者", //used by
     tab_videos:              "视频",
     tab_weaponskills:        "武器技能",
     tab_world:               "世界",
     tab_zones:               "区域",
 
     numberofupvotesreceived_tip: "Number of upvotes received",
-    deletethisreply_stc:         "Delete this reply",
-    editthisreply_stc:           "Edit this reply",
+    deletethisreply_stc:         "删除此回复",
+    editthisreply_stc:           "编辑回复",
     save:                        "保存",
     reportthisreply_stc:         "Report this reply to the moderators",
     deletereplyconfirmation_tip: "Are you sure you want to permanently delete this reply?",
@@ -3151,7 +3151,7 @@ var LANG = {
     downvote_tip:                "This comment is not helpful (click again to undo)",
     downvote_tip:                "This comment is not helpful (click again to undo)",
     commentdeleted_tip:          "This comment has been deleted; it is now visible only to you and to moderators.",
-    addreply:                    "Add reply",
+    addreply:                    "添加回复",
     replylength1_format:         "Enter at least $1 characters",
     replylength2_format:         "$1 to go&hellip;",
     replylength3_format:         "$1 characters remaining",
@@ -3169,7 +3169,7 @@ var LANG = {
     addshow1morereply_stc:     "Add / Show 1 more reply",
     addshowmorereplies_format: "Add / Show $1 more replies",
 
-    menu_browse: "Browse",
+    menu_browse: "浏览",
 
     mapper_tipzoom:  "提示：点击放大地图",
     mapper_tippin:   "提示：点击地图添加/删除pins",
@@ -3207,7 +3207,7 @@ var LANG = {
     som_nothing:         "Nothing",
     som_questgivers:     "任务给予者",
     som_viewnpc:         "点击这里以查看这个NPC",
-    som_viewobj:         "点击这里以查看这个物件",
+    som_viewobj:         "点击这里以查看这个对象",
     som_view:            "点击这里以查看...",
     som_startsquest:     "Starts the following quest:",
     som_startsquestpl:   "Starts the following quests:",
@@ -3223,23 +3223,23 @@ var LANG = {
         daily:          "任务给予者（每日）",
         alliancequests: "任务给予者",
         hordequests:    "任务给予者",
-        repair:         "Repairers",
+        repair:         "修理工", //Repairers
         rare:           "稀有NPC",
         auctioneer:     "拍卖行",
         banker:         "Bankers",
-        battlemaster:   "Battlemasters",
+        battlemaster:   "战场管理员", //Battlemasters
         innkeeper:      "旅店老板",
-        guildmaster:    "Guild masters",
+        guildmaster:    "公会管理员",
         stablemaster:   "Stable Masters",
-        flightmaster:   "Flight Masters",
-        trainer:        "Trainers",
+        flightmaster:   "飞行管理员",
+        trainer:        "训练师",
         vendor:         "Vendors",
         book:           "Books",
         herb:           "Herbs",
         forge:          "Forges",
         anvil:          "Anvils",
-        vein:           "Mineral Veins",
-        spirithealer:   "Spirit Healers",
+        vein:           "矿脉",
+        spirithealer:   "灵魂医者",
         boss:           "首领"
     },
 
@@ -3330,7 +3330,7 @@ var LANG = {
 
     types: {
           1: ["NPC",         "NPC" ,         "NPC",         "NPC"],
-          2: ["物件",      "物件",       "物件",      "物件"],  //Object
+          2: ["对象",      "对象",       "对象",      "对象"],  //Object
           3: ["物品",        "物品",         "物品",        "物品"],
           4: ["物品套装",    "物品套装",     "物品套装",    "物品套装"],
           5: ["任务",       "任务",        "任务",       "任务"],
@@ -3352,9 +3352,9 @@ var LANG = {
         502: ["附魔", "附魔",  "附魔", "附魔"]
     },
 
-    timeunitssg: ["year", "month", "week", "day", "hour", "minute", "second"],
-    timeunitspl: ["years", "months", "weeks", "days", "hours", "minutes", "seconds"],
-    timeunitsab: ["yr", "mo", "wk", "day", "hr", "min", "sec"],
+    timeunitssg: ["年", "月", "周", "天", "小时", "分钟", "秒"],
+    timeunitspl: ["年", "月", "周", "天", "小时", "分钟", "秒"],
+    timeunitsab: ["年", "月", "周", "天", "小时", "分钟", "秒"],
 
     presets: {
         pve:       "PvE",
@@ -3393,59 +3393,59 @@ var LANG = {
     },
 
     traits: {
-        agi:                ["Agility", "Agi", "Agi"],
+        agi:                ["敏捷", "敏捷", "敏捷"],
         arcres:             ["Arcane Resistance", "Arcane Resist", "ArcR"],
         arcsplpwr:          ["Arcane spell power", "Arcane Power", "ArcP"],
-        armor:              ["Armor", "Armor", "Armor"],
-        armorbonus:         ["Additional armor", "Bonus Armor", "AddAr"],
-        armorpenrtng:       ["Armor penetration rating", "Armor Pen", "Pen"],
-        atkpwr:             ["Attack power", "AP", "AP"],
+        armor:              ["护甲", "护甲", "护甲"],
+        armorbonus:         ["额外护甲", "额外护甲", "额外护甲"],
+        armorpenrtng:       ["护甲穿透等级", "护甲穿透", "穿透"],
+        atkpwr:             ["攻击强度", "攻击强度", "攻击强度"],
         avgbuyout:          ["Average buyout price", "Buyout", "AH"],
         avgmoney:           ["Average money contained", "Money", "Money"],
-        block:              ["Block value", "Block Value", "BkVal"],
-        blockrtng:          ["Block rating", "Block", "Block"],
-        buyprice:           ["Buy price (coppers)", "Buy", "Buy"],
-        cooldown:           ["Cooldown (seconds)", "Cooldown", "CD"],
-        critstrkrtng:       ["Critical strike rating", "Crit", "Crit"],
-        defrtng:            ["Defense rating", "Defense", "Def"],
-        dmg:                ["Weapon damage", "Damage", "Dmg"],
-        dmgmax1:            ["Maximum damage", "Max Damage", "Max"],
-        dmgmin1:            ["Minimum damage", "Min Damage", "Min"],
-        dodgertng:          ["Dodge rating", "Dodge", "Dodge"],
-        dps:                ["Damage per second", "DPS", "DPS"],
-        dura:               ["Durability", "Durability", "Dura"],
+        block:              ["格挡值", "格挡值", "格挡值"],
+        blockrtng:          ["格挡等级", "格挡", "格挡"],
+        buyprice:           ["购买价格（铜）", "购买", "购买"],
+        cooldown:           ["冷却时间（秒）", "冷却时间", "冷却时间"],
+        critstrkrtng:       ["暴击等级", "暴击", "暴击"],
+        defrtng:            ["防御等级", "防御", "防御"],
+        dmg:                ["武器伤害", "伤害", "伤害"],
+        dmgmax1:            ["最大伤害", "最大伤害", "最大"],
+        dmgmin1:            ["最小伤害", "最小伤害", "最小"],
+        dodgertng:          ["躲闪等级", "躲闪", "躲闪"],
+        dps:                ["每秒伤害", "DPS", "DPS"],
+        dura:               ["耐久度", "耐久度", "耐久度"],
         exprtng:            ["Expertise rating", "Expertise", "Exp"],
         feratkpwr:          ["Feral attack power", "Feral AP", "FAP"],
-        firres:             ["Fire Resistance", "Fire Resist", "FirR"],
+        firres:             ["火焰抗性", "火焰抗性", "火焰抗性"],
         firsplpwr:          ["Fire spell power", "Fire Power", "FireP"],
         frores:             ["Frost Resistance", "Frost Resist", "FroR"],
         frosplpwr:          ["Frost spell power", "Frost Power", "FroP"],
-        hastertng:          ["Haste rating", "Haste", "Haste"],
-        health:             ["Health", "Health", "Hlth"],
+        hastertng:          ["急速等级", "急速", "急速"],
+        health:             ["生命值", "生命值", "生命值"],
         healthrgn:          ["Health regeneration", "HP5", "HP5"],
-        hitrtng:            ["Hit rating", "Hit", "Hit"],
+        hitrtng:            ["命中等级", "命中", "命中"],
         holres:             ["Holy Resistance", "Holy Resist", "HolR"],
         holsplpwr:          ["Holy spell power", "Holy Power", "HolP"],
-        "int":              ["Intellect", "Int", "Int"],
-        level:              ["Level", "Level", "Lvl"],
-        mana:               ["Mana", "Mana", "Mana"],
+        "int":              ["智力", "智力", "智力"],
+        level:              ["等级", "等级", "等级"],
+        mana:               ["法力值", "法力值", "法力值"],
         manargn:            ["Mana regeneration", "MP5", "MP5"],
-        mleatkpwr:          ["Melee attack power", "Melee AP", "AP"],
-        mlecritstrkrtng:    ["Melee critical strike rating", "Melee Crit", "Crit"],
-        mledmgmax:          ["Melee maximum damage", "Melee Max Damage", "Max"],
-        mledmgmin:          ["Melee minimum damage", "Melee Min Damage", "Min"],
+        mleatkpwr:          ["近战攻击强度", "近战攻击强度", "攻击强度"],
+        mlecritstrkrtng:    ["近战攻击等级", "近战暴击", "暴击"],
+        mledmgmax:          ["近战最大伤害", "近战最大伤害", "最大"],
+        mledmgmin:          ["近战最小伤害", "近战最小伤害", "最小"],
         mledps:             ["Melee DPS", "Melee DPS", "DPS"],
         mlehastertng:       ["Melee haste rating", "Melee Haste", "Haste"],
         mlehitrtng:         ["Melee hit rating", "Melee Hit", "Hit"],
         mlespeed:           ["Melee speed", "Melee Speed", "Speed"],
         natres:             ["Nature Resistance", "Nature Resist", "NatR"],
         natsplpwr:          ["Nature spell power", "Nature Power", "NatP"],
-        nsockets:           ["Number of sockets", "Sockets", "Sockt"],
-        parryrtng:          ["Parry rating", "Parry", "Parry"],
+        nsockets:           ["插槽数", "插槽", "插槽"],
+        parryrtng:          ["招架等级", "招架", "招架"],
         reqarenartng:       ["Required personal and team arena rating", "Req Rating", "Rating"],
-        reqlevel:           ["Required level", "Req Level", "Level"],
-        reqskillrank:       ["Required skill level", "Req Skill", "Skill"],
-        resirtng:           ["Resilience rating", "Resilience", "Resil"],
+        reqlevel:           ["要求等级", "要求等级", "等级"],
+        reqskillrank:       ["要求技能等级", "要求技能", "技能"],
+        resirtng:           ["韧性等级", "韧性", "韧性"],
         rgdatkpwr:          ["Ranged attack power", "Ranged AP", "RAP"],
         rgdcritstrkrtng:    ["Ranged critical strike rating", "Ranged Crit", "Crit"],
         rgddmgmax:          ["Ranged maximum damage", "Ranged Max Damage", "Max"],
@@ -3463,26 +3463,26 @@ var LANG = {
         sepoffensivestats:  "Offensive stats",
         sepresistances:     "Resistances",
         sepweaponstats:     "Weapon stats",
-        shares:             ["Shadow Resistance", "Shadow Resist", "ShaR"],
+        shares:             ["暗影抗性", "暗影抗性", "暗影抗性"],
         shasplpwr:          ["Shadow spell power", "Shadow Power", "ShaP"],
-        speed:              ["Speed", "Speed", "Speed"],
-        spi:                ["Spirit", "Spi", "Spi"],
+        speed:              ["速度", "速度", "速度"],
+        spi:                ["精神", "精神", "精神"],
         splcritstrkrtng:    ["Spell critical strike rating", "Spell Crit", "Crit"],
-        spldmg:             ["Damage done by spells", "Spell Damage", "Dmg"],
-        splheal:            ["Healing done by spells", "Healing", "Heal"],
-        splpwr:             ["Spell power", "Spell Power", "SP"],
-        splhastertng:       ["Spell haste rating", "Spell Haste", "Haste"],
-        splhitrtng:         ["Spell hit rating", "Spell Hit", "Hit"],
-        splpen:             ["Spell penetration", "Spell Pen", "Pen"],
-        sta:                ["Stamina", "Sta", "Sta"],
-        str:                ["Strength", "Str", "Str"]
+        spldmg:             ["由法术造成的伤害", "法术伤害", "伤害"],
+        splheal:            ["由法术造成的治疗", "治疗", "治疗"],
+        splpwr:             ["法术强度", "法术强度", "法术强度"],
+        splhastertng:       ["法术急速等级", "法术急速", "急速"],
+        splhitrtng:         ["法术命中等级", "法术命中", "命中"],
+        splpen:             ["法术穿透", "法术穿透", "穿透"],
+        sta:                ["耐力", "耐力", "耐力"],
+        str:                ["力量", "力量", "力量"]
     },
 
-    fishow: "Create a filter",
-    fihide: "Hide filter options",
+    fishow: "创建一个过滤器",
+    fihide: "隐藏过滤器选项",
 
-    fiany:  "Any",
-    finone: "None",
+    fiany:  "任何",
+    finone: "无",
 
     firemove: "移除",
     ficlear:  "清除",  //clear
@@ -3570,7 +3570,7 @@ var LANG = {
                             [5, "Engineering"],                     [6, "First Aid"],                       [13, "Fishing"],                        [14, "Herbalism"],                      [15, "Inscription"],
                             [7, "Jewelcrafting"],                   [8, "Leatherworking"],                  [9, "Mining"],                          [10, "Tailoring"],                      [12, "No"]
                         ],
-        expansion:      [   [3, "巫妖王之怒"],          [2, "燃烧的远征"],             [1, "None"]                             ],  //1，None
+        expansion:      [   [3, "巫妖王之怒"],          [2, "燃烧的远征"],             [1, "无"]                             ],  //1，None
         totemcategory:  [
                             [3, "Air Totem"],                       [14, "Arclight Spanner"],               [162, "Blacksmith Hammer"],             [168, "Bladed Pickaxe"],                [141, "Drums"],
                             [2, "Earth Totem"],                     [4, "Fire Totem"],                      [169, "Flint and Tinder"],              [161, "Gnomish Army Knife"],            [15, "Gyromatic Micro-Adjustor"],
@@ -3663,26 +3663,26 @@ var LANG = {
                             [45659, "Spaulders of the Wayward Conqueror"],                          [45660, "Spaulders of the Wayward Protector"],                          [45661, "Spaulders of the Wayward Vanquisher"],
                             [34212, "Sunglow Vest"],                                                [34351, "Tranquil Majesty Wraps"],                                      [34215, "Warharness of Reckless Fury"]
                         ],
-        queststart:     [   [3, "物品"],                            [1, "NPC"],                             [2, "物件"]                           ],
-        questend:       [   [1, "NPC"],                             [2, "物件"]                           ],
+        queststart:     [   [3, "物品"],                            [1, "NPC"],                             [2, "对象"]                           ],
+        questend:       [   [1, "NPC"],                             [2, "对象"]                           ],
         spellsource:    [
                             [1, "任何"],                             [3, "Crafted"],                         [9, "Discovery"],                       [4, "掉落"],                            [6, "任务"],
-                            [10, "天赋"],                         [8, "Trainer"],                         [7, "Vendor"],                          [2, "None"]
+                            [10, "天赋"],                         [8, "Trainer"],                         [7, "Vendor"],                          [2, "无"]
                         ],
         itemsource:     [
                             [1, "任何"],                             [11, "成就"],                    [3, "Crafted"],                         [4, "掉落"],                            [10, "事件"],
-                            [5, "PvP"],                             [6, "任务"],                           [9, "Starter"],                         [7, "Vendor"],                          [2, "None"]
+                            [5, "PvP"],                             [6, "任务"],                           [9, "Starter"],                         [7, "Vendor"],                          [2, "无"]
                         ],
         glyphtype:      [   [1, "主要"],                           [2, "次要"]                            ],
         classs:         [
                             [12, "任何"],                            [6, "死亡骑士"],                    [11, "德鲁伊"],                          [3, "猎人"],                          [8, "法师"],
                             [2, "圣骑士"],                         [5, "牧师"],                          [4, "潜行者"],                           [7, "萨满祭司"],                          [9, "术士"],
-                            [1, "战士"],                         [13, "None"]
+                            [1, "战士"],                         [13, "无"]
                         ],
         race:           [
                             [12, "任何"],                            [10, "血精灵"],                      [11, "德莱尼"],                        [3, "矮人"],                           [7, "侏儒"],
                             [1, "人类"],                           [4, "暗夜精灵"],                       [2, "兽人"],                             [6, "牛头人"],                          [8, "巨魔"],
-                            [5, "亡灵"],                          [13, "None"]
+                            [5, "亡灵"],                          [13, "无"]
                         ],
         disenchanting:  [
                             [34057, "Abyss Crystal"],               [22445, "Arcane Dust"],                 [11176, "Dream Dust"],                  [34052, "Dream Shard"],                 [11082, "Greater Astral Essence"],
@@ -3714,21 +3714,21 @@ var LANG = {
         bindonpickup:            "拾取后绑定",
         bindonuse:               "使用后绑定",
         bindtoaccount:           "账号绑定",
-        classspecific:           "职业特性",  //Class-specific
+        classspecific:           "职业特长",  //Class-specific
         conjureditem:            "Conjured item",
         cooldown:                "冷却时间(秒)",
         damagetype:              "伤害类型",
         deprecated:              "过时的",
-        disenchantable:          "Disenchantable",
+        disenchantable:          "分解",
         disenchantsinto:         "Disenchants into...",
-        dura:                    "Durability",
+        dura:                    "耐久度",
         effecttext:              "Effect text",
         fitsgemslot:             "Fits a gem slot",
         flavortext:              "Flavor text",
-        glyphtype:               "Glyph type",
+        glyphtype:               "雕文类型",
         hasflavortext:           "Has a flavor text",
         hassockets:              "Has sockets",
-        heroicitem:              "Heroic item",
+        heroicitem:              "英雄物品",
         icon:                    "图标",
         id:                      "ID",
         locked:                  "Locked",
@@ -3740,14 +3740,14 @@ var LANG = {
         partyloot:               "Party loot",
         prospectable:            "Prospectable",
         questitem:               "任务物品",
-        racespecific:            "种族特性",
+        racespecific:            "种族特长",
         randomenchants:          "随机附魔(of the...)",
-        randomlyenchanted:       "Randomly enchanted",
+        randomlyenchanted:       "随机附魔",
         readable:                "Readable",
         reagentforability:       "Reagent for ability/profession",
-        refundable:              "Refundable",
+        refundable:              "可退还的",
         relatedevent:            "与世界事件相关",
-        repaircost:              "Repair cost (coppers)",
+        repaircost:              "修理费用 (铜)",
         reqskillrank:            "要求技能等级",
         requiresevent:           "要求世界事件",
         requiresprof:            "要求专业",
@@ -3764,7 +3764,7 @@ var LANG = {
         usablewhenshapeshifted:  "Usable when shapeshifted",
 
         sepsource:               "来源",
-        craftedprof:             "Crafted by a profession",
+        craftedprof:             "专业制造", //Crafted by a profession
         dropsin:                 "掉落自...",
         dropsinheroic:           "掉落于英雄模式... （地下城）",
         dropsinheroic10:         "掉落于英雄10人模式... （团队副本）",
@@ -3826,12 +3826,12 @@ var LANG = {
         faction:             "阵营",
         relatedevent:        "Related world event",
         foundin:             "Found in...",
-        health:              "Health",
-        mana:                "Mana",
+        health:              "生命值",
+        mana:                "法力值",
         instanceboss:        "Instance boss",
-        startsquest:         "Starts a quest",
-        endsquest:           "Ends a quest",
-        usemodel:            "Uses model #...",
+        startsquest:         "开始任务",
+        endsquest:           "结束任务",
+        usemodel:            "使用模型 #...",
         useskin:             "使用皮肤...",
         id:                  "ID",
 
@@ -3902,19 +3902,19 @@ var LANG = {
         timer:                   "Timer (seconds)",
         availabletoplayers:      "对玩家可用",
         id:                      "ID",
-        classspecific:           "职业特性",
-        racespecific:            "种族特性",
+        classspecific:           "职业特长",
+        racespecific:            "种族特长",
 
-        sepgainsrewards:         "Gains/rewards",
-        experiencegained:        "Experience gained",
-        arenagained:             "Arena points gained",
-        honorgained:             "Honor gained",
-        itemchoices:             "Item choices",
-        itemrewards:             "Item rewards",
-        moneyrewarded:           "Money rewarded",
-        spellrewarded:           "Spell rewarded",
-        titlerewarded:           "Title rewarded",
-        currencyrewarded:        "Currency rewarded...",
+        sepgainsrewards:         "收益/奖励",  //Gains/rewards
+        experiencegained:        "获得经验",
+        arenagained:             "获得竞技场点数",  //Arena points gained
+        honorgained:             "获得荣誉",
+        itemchoices:             "物品选择",
+        itemrewards:             "物品奖励",
+        moneyrewarded:           "金钱奖励",
+        spellrewarded:           "法术奖励",
+        titlerewarded:           "头衔奖励",
+        currencyrewarded:        "货币奖励...",
         increasesrepwith:        "Increases reputation with...",
         decreasesrepwith:        "Decreases reputation with...",
 
@@ -3935,18 +3935,18 @@ var LANG = {
 
     fispells: {
         sepgeneral:            "General",
-        prcntbasemanarequired: "% of base mana required",
-        firstrank:             "First rank",
-        lastrank:              "Last rank",
-        rankno:                "Rank #...",
+        prcntbasemanarequired: "需要%的基础法力值",
+        firstrank:             "第一等级",
+        lastrank:              "最后等级",
+        rankno:                "等级 #...",
         rewardsskillups:       "Rewards skill points",
         manaenergyragecost:    "Mana/energy/rage cost",
         requiresnearbyobject:  "Requires a nearby object",
         hasreagents:           "Has reagents",
-        scaling:               "Scales with level",
+        scaling:               "根据等级缩放", //Scales with level
         requiresprofspec:      "Requires a profession specialization",
-        source:                "Source",
-        trainingcost:          "Training cost",
+        source:                "来源",
+        trainingcost:          "训练成本",
         id:                    "ID",
         icon:                  "图标",
 
@@ -4116,24 +4116,24 @@ var LANG = {
 
     lvnote_clicksubcatg: "Click on a subcategory below to filter the other tabs.",
 
-    button_save:      "Save",
+    button_save:      "保存",
     button_saveas:    "Save as",
     button_bookmark:  "Bookmark",
     button_pin:       "Pin",
     button_unpin:     "Unpin",
     button_claimchar: "Claim character",
     button_resync:    "Resync",
-    button_signature: "Signature",
+    button_signature: "签名",
 
     button_customprofile: "Custom profile",
     button_armorychar:    "Manage character",
 
     pr_clienttab:    "$1<br /><span class=\"q1\">If this is your character, you can track your<br />$2 using the Wowhead Client!</span><br /><span class=\"q2\">Click to learn more</span>",
     pr_lookup:       "Lookup: ",
-    pr_noneitem:     "None",
-    pr_nonegem:      "None",
-    pr_noneenchant:  "None",
-    pr_nonepet:      "None",
+    pr_noneitem:     "无",
+    pr_nonegem:      "无",
+    pr_noneenchant:  "无",
+    pr_nonepet:      "无",
     pr_specifyitem:  "Please enter an item name to search for.",
     pr_searching:    'Searching for items named "$1"...',
     pr_noresults:    'No results found for "$1"!',
@@ -4197,9 +4197,9 @@ var LANG = {
     pr_qf_profiles:       "Profiles: ",
     pr_qf_playedtime:     "Played time: ",
     pr_qf_gearscore:      "Gear score: ",
-    pr_qf_itemlevel:      "Item Level: ",
-    pr_qf_talents:        "Talents: ",
-    pr_qf_achievements:   "Achievements: ",
+    pr_qf_itemlevel:      "物品等级：",
+    pr_qf_talents:        "天赋：",
+    pr_qf_achievements:   "成就：",
     pr_qf_xvxteam:        "$1v$1 team: ",
     pr_qf_updated:        "Updated ",
     pr_qf_resynced:       "Resynced ",
@@ -4270,15 +4270,15 @@ var LANG = {
     pr_inv_socket:      "$1 socket",
     pr_inv_sockets:     "$1 sockets",
 
-    pr_print_none:      "None",
+    pr_print_none:      "无",
     pr_print_yes:       "是",
     pr_print_no:        "否",
     pr_print_normal:    "Normal",
     pr_print_heroic:    "英雄",
 
-    pr_stats_warning:    "Warning: Some statistics (particularly dodge) may not be entirely accurate.",
+    pr_stats_warning:    "警告：一些统计数据（尤其是闪避）可能不完全准确。",
 
-    pr_stats_title:       "Statistics",
+    pr_stats_title:       "统计",
     pr_stats_base:        "Base",
     pr_stats_melee:       "Melee",
     pr_stats_ranged:      "Ranged",
@@ -4430,7 +4430,7 @@ var LANG = {
     su_viewin3d:     "在3D里查看",
     su_split:        "Split",
 
-    su_customscale:  "Custom scale #$1",
+    su_customscale:  "自定义缩放 #$1",
     su_comparing:    "Comparing ",
     su_comparewith:  "和",  // with 
 
@@ -4455,22 +4455,22 @@ var LANG = {
     achievements_label:  "成就：",
 
     tc_rank:        "级别$1/$2",
-    tc_tier:        "Requires $1 points in $2 Talents",
-    tc_prereq:      "Requires $1 point in $2",
-    tc_prereqpl:    "Requires $1 points in $2",
+    tc_tier:        "要求$1点数在$2天赋中",
+    tc_prereq:      "要求$1点数在$2中",
+    tc_prereqpl:    "要求$1点数在$2中",
     tc_learn:       "点击以学习",
     tc_unlearn:     "右击以遗忘",
     tc_unlearn2:    "Shift-click to unlearn",
     tc_nextrank:    "下一级别：",
-    tc_inccap:      "Click to raise the level cap to 80",
-    tc_deccap:      "Click to decrease the level cap to 70",
+    tc_inccap:      "点击以提高等级上限到80",
+    tc_deccap:      "点击以降低等级上限到70",
     tc_addbon:      "Click to add 4 bonus points from<br />the Beast Mastery talent",
     tc_rembon:      "Click to remove the bonus<br />points from Beast Mastery",
     tc_level:       "等级%s",
 
     tc_point:       "点数",
     tc_points:      "点数",
-    tc_none:        "None",
+    tc_none:        "无",
     tc_printh:      "等级$1 $2",
 
     tc_link:        "链接到这个build",
@@ -4483,7 +4483,7 @@ var LANG = {
     tc_ptsleft:     "点数剩余：",
     tc_ptsspent:    "点数花费：",
     tc_reqlevel:    "要求等级：",
-    tc_levelcap:    "Level cap: ",
+    tc_levelcap:    "等级上限：",
     tc_bonuspts:    "Bonus points: ",
     tc_help:        "帮助",
     tc_import:      "导入",
@@ -4501,7 +4501,7 @@ var LANG = {
     tc_addgly:      "Click to inscribe your spellbook",
     tc_remgly:      "右击以移除",
     tc_remgly2:     "Shift-click to remove",
-    tc_nonegly:     "None",
+    tc_nonegly:     "无",
     tc_glyphnote:   "Some glyphs were filtered out due to the specified level restriction.",
 
     tc_viewtalents: "查看天赋树",
@@ -4519,7 +4519,7 @@ var LANG = {
 
     charactersremaining_format: "$1 characters remaining.",
 
-    reputationtip: "声誉点数",
+    reputationtip: "声望点数",
 
     // Context-less terms
     added:       "Added",
