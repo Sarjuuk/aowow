@@ -1452,7 +1452,7 @@ var g_object_types = {
 var g_reputation_standings = {
     0: "仇恨",
     1: "敌对",
-    2: "敌意",
+    2: "冷淡",
     3: "中立",
     4: "友善",
     5: "尊敬",
@@ -1933,7 +1933,7 @@ var g_skill_categories = {
     "-4": "种族特长",
        5: '属性',
        6: "武器技能",
-       7: "技能",
+       7: "职业技能",
        8: "护甲精通",
        9: "辅助专业",
       10: "语言",
@@ -2286,7 +2286,7 @@ var g_title_categories = {
     0: "一般",
     1: "PvP",
     2: "声望",
-    3: "地下城与团队副本",
+    3: "地下城与团队",
     4: "任务",
     5: "专业",
     6: "世界事件"
@@ -2372,30 +2372,30 @@ var g_world_object_types = {
 };
 
 var g_condition_types = {
-     1: ['Looting',        '如果满足条件，这个物品可以被[npc=$1]掉落。'],                                 // CND_SRC_CREATURE_LOOT_TEMPLATE
-     2: ['Disenchanting',  '如果满足条件，this item can be found when disenchanting [item=$1].'],                  // CND_SRC_DISENCHANT_LOOT_TEMPLATE
-     3: ['Fishing',        '如果满足条件，fishing in [zone=$1] can yield this item.'],                             // CND_SRC_FISHING_LOOT_TEMPLATE
-     4: ['Object Opening', '如果满足条件，this item can be found in [object=$1].'],                                // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
-     5: ['Item Opening',   '如果满足条件，this item can be found in [item=$1].'],                                  // CND_SRC_ITEM_LOOT_TEMPLATE
-     6: ['Mail Attachm.',  '如果满足条件，this item can be attached to this mail.'],                               // CND_SRC_MAIL_LOOT_TEMPLATE
-     7: ['Milling',        '如果满足条件，this item can be milled from [item=$1].'],                               // CND_SRC_MILLING_LOOT_TEMPLATE
-     8: ['Pickpocketing',  '如果满足条件，this item can be picked from [npc=$1].'],                                // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
-     9: ['Prospecting',    '如果满足条件，this item can be prospected from [item=$1].'],                           // CND_SRC_PROSPECTING_LOOT_TEMPLATE
+     1: ['Looting',        'If the conditions are met, this item can be dropped by [npc=$1].'],                                 // CND_SRC_CREATURE_LOOT_TEMPLATE
+     2: ['Disenchanting',  'If the conditions are met, this item can be found when disenchanting [item=$1].'],                  // CND_SRC_DISENCHANT_LOOT_TEMPLATE
+     3: ['Fishing',        'If the conditions are met, fishing in [zone=$1] can yield this item.'],                             // CND_SRC_FISHING_LOOT_TEMPLATE
+     4: ['Object Opening', 'If the conditions are met, this item can be found in [object=$1].'],                                // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
+     5: ['Item Opening',   'If the conditions are met, this item can be found in [item=$1].'],                                  // CND_SRC_ITEM_LOOT_TEMPLATE
+     6: ['Mail Attachm.',  'If the conditions are met, this item can be attached to this mail.'],                               // CND_SRC_MAIL_LOOT_TEMPLATE
+     7: ['Milling',        'If the conditions are met, this item can be milled from [item=$1].'],                               // CND_SRC_MILLING_LOOT_TEMPLATE
+     8: ['Pickpocketing',  'If the conditions are met, this item can be picked from [npc=$1].'],                                // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
+     9: ['Prospecting',    'If the conditions are met, this item can be prospected from [item=$1].'],                           // CND_SRC_PROSPECTING_LOOT_TEMPLATE
     10: ['Ref. Looting',   ''],                                                                                                 // CND_SRC_REFERENCE_LOOT_TEMPLATE
-    11: ['Skinning',       '如果满足条件，this item can be skinned from [npc=$1].'],                               // CND_SRC_SKINNING_LOOT_TEMPLATE
-    12: ['Crafting',       '如果满足条件，casting [spell=$1] may also create this item.'],                         // CND_SRC_SPELL_LOOT_TEMPLATE
+    11: ['Skinning',       'If the conditions are met, this item can be skinned from [npc=$1].'],                               // CND_SRC_SKINNING_LOOT_TEMPLATE
+    12: ['Crafting',       'If the conditions are met, casting [spell=$1] may also create this item.'],                         // CND_SRC_SPELL_LOOT_TEMPLATE
     13: ['Auto Target',    'Only targets matching the conditions can be affected by the spell.'],                               // CND_SRC_SPELL_IMPLICIT_TARGET
     14: ['Gossip',         'Display the related Gossip entry on [npc=$2], if the conditions are met.'],                         // CND_SRC_GOSSIP_MENU
     15: ['Gossip Menu',    'Display the related Gossip menu, if the conditions are met.'],                                      // CND_SRC_GOSSIP_MENU_OPTION
     16: ['Vehicle',        'This Creature can be used as a vehicle, if the conditions are met.'],                               // CND_SRC_CREATURE_TEMPLATE_VEHICLE
     17: ['Spell',          'This Spell can only be cast, if the conditions are met.'],                                          // CND_SRC_SPELL
-    18: ['Spell Click',    '如果满足条件，[npc=$2] casts [spell=$1] if clicked on.'],                              // CND_SRC_SPELL_CLICK_EVENT
+    18: ['Spell Click',    'If the conditions are met, [npc=$2] casts [spell=$1] if clicked on.'],                              // CND_SRC_SPELL_CLICK_EVENT
     19: ['Quest Accept',   'The Player can accept this quest, if the condition is met.'],                                       // CND_SRC_QUEST_SHOW_MARK
     20: ['Quest Sign',     'A [icon name=quest_startend]&nbsp;[/icon] will be shown for this quest, if the condition is met.'], // CND_SRC_QUEST_ACCEPT
-    21: ['Vehicle Spell',  '如果满足条件，vehicle [npc=$2] has [spell=$1] available.'],                            // CND_SRC_VEHICLE_SPELL
-    22: ['SmartAI',        '如果满足条件，the creatures AI may perform additional actions.'],                      // CND_SRC_SMART_EVENT
-    23: ['Vendor',         '如果满足条件，the vendor will have this item available.'],                             // CND_SRC_NPC_VENDOR
-    24: ['Spell Proc',     '如果满足条件，the spell is allowed to proc.']                                          // CND_SRC_SPELL_PROC
+    21: ['Vehicle Spell',  'If the conditions are met, vehicle [npc=$2] has [spell=$1] available.'],                            // CND_SRC_VEHICLE_SPELL
+    22: ['SmartAI',        'If the conditions are met, the creatures AI may perform additional actions.'],                      // CND_SRC_SMART_EVENT
+    23: ['Vendor',         'If the conditions are met, the vendor will have this item available.'],                             // CND_SRC_NPC_VENDOR
+    24: ['Spell Proc',     'If the conditions are met, the spell is allowed to proc.']                                          // CND_SRC_SPELL_PROC
 };
 
 var g_conditions = {
@@ -2404,7 +2404,7 @@ var g_conditions = {
      3: 'The Player $has:does not have; $1 equipped',
      4: 'The Player is$: not; in $1',                                       // also used by 22, 23
      5: '玩家声望关系和$1是$:不是;$2',
-     6: 'The Player is$: not; $1',
+     6: '玩家是$:不是;$1',
      7: 'The Player $knows: does not know; $1',
      8: 'The Player has$: not; finished $1',
      9: '玩家已经$:没有;接受$1',  //The Player has$: not; accepted $1
@@ -2482,7 +2482,7 @@ var LANG = {
     close:                  "关闭",
     completed:              "Completed",
     contactus:              "联系我们",
-    cost:                   "成本",
+    cost:                   "花费",
     count:                  "Count",
     currency:               "货币",
     daily:                  "每日",
@@ -2533,7 +2533,7 @@ var LANG = {
     react:                  "反应",
     ready:                  "准备",
     realm:                  "服务器",
-    reagents:               "Reagents",
+    reagents:               "材料",
     region:                 "区域",
     rejected:               "Rejected",
     rep:                    "声望",
@@ -2565,7 +2565,7 @@ var LANG = {
     side:                   "阵营",
     signature:              "签名",
     signout:                "Sign Out",
-    sockets:                "Sockets",
+    sockets:                "插槽",
     source:                 "来源", //source
     skill:                  "技能",
     skillpoints:            "技能点数",
@@ -2575,13 +2575,13 @@ var LANG = {
     smartloot:              "Smart loot",
     speed:                  "速度",
     stack:                  "堆叠",  //stack
-    standing:               "Standing",
+    standing:               "关系",
     stock:                  "Stock",
     statistic:              "统计", //Statistic
     subject:                "Subject",
     submit:                 "提交",
     talents:                "天赋",
-    territory:              "Territory",  //Territory
+    territory:              "领地",  //Territory
     tier:                   "Tier",
     topics:                 "Topics",
     tp:                     "TP",
@@ -2618,7 +2618,7 @@ var LANG = {
     source_bossdrop: "首领掉落",
     source_zonedrop: "区域掉落",
     source_quests:   "任务",
-    source_vendors:  "Vendors",
+    source_vendors:  "商人",
 
     infobox_noneyet:    "没有 &ndash; $1!",  //None yet
     infobox_submitone:  "提交一个",
@@ -2669,7 +2669,7 @@ var LANG = {
     lvitem_raid10:     "10",
     lvitem_raid25:     "25",
     lvitem_heroicitem: "英雄",
-    lvitem_vendorin:   "Vendor in ",
+    lvitem_vendorin:   "商人在",
     lvitem_reqlevel:   "需要", //Req. 
 
     lvnpc_alliance: "联盟", //A
@@ -2682,7 +2682,7 @@ var LANG = {
     lvquest_removed:    "Removed",                          // original
     lvquest_disabled:   "禁用",                         // replacement
     lvquest_autoaccept: "自动接受",
-    lvquest_hostile:    "(敌意)",
+    lvquest_hostile:    "(冷淡)",
     lvquest_xp:         "$1 XP",
 
     lvzone_xman: "$1-player",
@@ -2937,11 +2937,11 @@ var LANG = {
     tooltip_allianceonly:              "仅限联盟",
     tooltip_arenapoints:               "竞技场点数",
     tooltip_armorbonus:                "Has $1 bonus armor.",
-    tooltip_avgmoneycontained:         "Average money contained",
-    tooltip_avgmoneydropped:           "Average money dropped",
+    tooltip_avgmoneycontained:         "平均包含金钱", //Average money contained
+    tooltip_avgmoneydropped:           "平均掉落金钱", //Average money dropped
     tooltip_banned_rating:             "You have been banned from rating comments.",
     tooltip_too_many_votes:            "You have reached the daily voting cap. Come back tomorrow!",
-    tooltip_buyoutprice:               "Average buyout price (AH)",
+    tooltip_buyoutprice:               "平均一口价(AH)",
     tooltip_changelevel2:              "拖动以更改等级",
     tooltip_changelevel:               "点击以更改等级",
     tooltip_colfilter1:                "Filter: $1",
@@ -3029,22 +3029,22 @@ var LANG = {
     tab_containedin:         "包含在",
     tab_contains:            "包含",
     tab_controlledabilities: "控制能力", //Controlled abilities
-    tab_crafteditems:        "Crafted items",
-    tab_createdby:           "Created by", //Created by
-    tab_criteriaof:          "Criteria of",
-    tab_currencyfor:         "Currency for",
+    tab_crafteditems:        "制造物品", //Crafted items
+    tab_createdby:           "制造自", //Created by
+    tab_criteriaof:          "达成条件自", //Criteria of
+    tab_currencyfor:         "货币用于", //Currency for
     tab_currencies:          "货币",
     tab_disenchantedfrom:    "分解自", //Disenchanted from
     tab_disenchanting:       "分解",  //    Disenchanting
     tab_droppedby:           "掉落自", //Dropped by
-    tab_creates:             "Creates", //Creates
+    tab_creates:             "制造", //Creates
     tab_drops:               "掉落",  //Drops
     tab_encounter:           "遭遇", //Encounter
     tab_ends:                "结束",
     tab_factions:            "阵营",
-    tab_fishedin:            "Fished in",
-    tab_fishing:             "Fishing",
-    tab_gallery:             "Gallery",
+    tab_fishedin:            "钓鱼自",
+    tab_fishing:             "钓鱼",
+    tab_gallery:             "画廊", //Gallery
     tab_gatheredfrom:        "Gathered from",
     tab_gatheredfromnpc:     "Gathered from NPC",
     tab_glyphs:              "雕文",
@@ -3072,14 +3072,14 @@ var LANG = {
     tab_minedfrom:           "Mined from",
     tab_minedfromnpc:        "Mined from NPC",
     tab_mining:              "Mining",
-    tab_modifiedby:          "Modified by",
-    tab_modifies:            "Modifies",
+    tab_modifiedby:          "修改自",
+    tab_modifies:            "修改", //Modifies
     tab_mounts:              "坐骑",
     tab_normaldrops:         "普通掉落",
     tab_normalXdrops:        "普通$1掉落",
     tab_normal:              "普通",  //Normal
     tab_normalX:             "普通$1",
-    tab_noteworthy:          "Noteworthy",
+    tab_noteworthy:          "值得注意的", //Noteworthy
     tab_npcs:                "NPC",  //NPCs
     tab_npcabilities:        "NPC能力",  //abilities
     tab_objectiveof:         "目标", //Objective of
@@ -3090,14 +3090,14 @@ var LANG = {
     tab_proficiencies:       "Proficiencies",
     tab_professions:         "专业", //Professions
     tab_profiles:            "Profiles",
-    tab_prospectedfrom:      "Prospected from",
-    tab_prospecting:         "Prospecting",
-    tab_providedfor:         "Provided for",
+    tab_prospectedfrom:      "采矿自",
+    tab_prospecting:         "采矿", //Prospecting
+    tab_providedfor:         "提供用于", //Provided for
     tab_questrewards:        "任务奖励",
     tab_quests:              "任务",
     tab_races:               "种族",
     tab_racialtraits:        "种族特长",
-    tab_reagentfor:          "Reagent for",
+    tab_reagentfor:          "材料用于",
     tab_recipes:             "Recipes",
     tab_recipeitems:         "Recipe items",
     tab_replies:             "Replies",
@@ -3233,7 +3233,7 @@ var LANG = {
         stablemaster:   "Stable Masters",
         flightmaster:   "飞行管理员",
         trainer:        "训练师",
-        vendor:         "Vendors",
+        vendor:         "商人", //Vendors
         book:           "Books",
         herb:           "Herbs",
         forge:          "Forges",
@@ -3273,8 +3273,8 @@ var LANG = {
     markup_help2:   "You see:",
 
     ct_dialog_captcha:        "Please enter the code above: ",
-    ct_dialog_contactwowhead: "Contact us",
-    ct_dialog_description:    "Description",
+    ct_dialog_contactwowhead: "联系我们",
+    ct_dialog_description:    "描述",
     ct_dialog_desc_caption:   "Please be as specific as possible.",
     ct_dialog_email:          "Email address: ",
     ct_dialog_email_caption:  "Only if you want to be contacted.",
@@ -3394,13 +3394,13 @@ var LANG = {
 
     traits: {
         agi:                ["敏捷", "敏捷", "敏捷"],
-        arcres:             ["Arcane Resistance", "Arcane Resist", "ArcR"],
+        arcres:             ["奥术抗性", "奥术抗性", "奥术抗性"],
         arcsplpwr:          ["Arcane spell power", "Arcane Power", "ArcP"],
         armor:              ["护甲", "护甲", "护甲"],
         armorbonus:         ["额外护甲", "额外护甲", "额外护甲"],
         armorpenrtng:       ["护甲穿透等级", "护甲穿透", "穿透"],
         atkpwr:             ["攻击强度", "攻击强度", "攻击强度"],
-        avgbuyout:          ["Average buyout price", "Buyout", "AH"],
+        avgbuyout:          ["平均一口价", "一口价", "AH"],
         avgmoney:           ["Average money contained", "Money", "Money"],
         block:              ["格挡值", "格挡值", "格挡值"],
         blockrtng:          ["格挡等级", "格挡", "格挡"],
@@ -3412,24 +3412,24 @@ var LANG = {
         dmgmax1:            ["最大伤害", "最大伤害", "最大"],
         dmgmin1:            ["最小伤害", "最小伤害", "最小"],
         dodgertng:          ["躲闪等级", "躲闪", "躲闪"],
-        dps:                ["每秒伤害", "DPS", "DPS"],
+        dps:                ["每秒伤害", "每秒伤害", "每秒伤害"],
         dura:               ["耐久度", "耐久度", "耐久度"],
-        exprtng:            ["Expertise rating", "Expertise", "Exp"],
-        feratkpwr:          ["Feral attack power", "Feral AP", "FAP"],
+        exprtng:            ["精准等级", "精准", "精准"],
+        feratkpwr:          ["在猎豹、熊、巨熊和枭兽形态下的攻击强度", "变形形态下的攻击强度", "变形形态下的攻击强度"],
         firres:             ["火焰抗性", "火焰抗性", "火焰抗性"],
         firsplpwr:          ["Fire spell power", "Fire Power", "FireP"],
-        frores:             ["Frost Resistance", "Frost Resist", "FroR"],
+        frores:             ["冰霜抗性", "冰霜抗性", "冰霜抗性"],
         frosplpwr:          ["Frost spell power", "Frost Power", "FroP"],
         hastertng:          ["急速等级", "急速", "急速"],
         health:             ["生命值", "生命值", "生命值"],
-        healthrgn:          ["Health regeneration", "HP5", "HP5"],
+        healthrgn:          ["每5秒回复生命值", "每5秒回复生命值", "每5秒回复生命值"], //["Health regeneration", "HP5", "HP5"],
         hitrtng:            ["命中等级", "命中", "命中"],
-        holres:             ["Holy Resistance", "Holy Resist", "HolR"],
+        holres:             ["神圣抗性", "神圣抗性", "神圣抗性"],
         holsplpwr:          ["Holy spell power", "Holy Power", "HolP"],
         "int":              ["智力", "智力", "智力"],
         level:              ["等级", "等级", "等级"],
         mana:               ["法力值", "法力值", "法力值"],
-        manargn:            ["Mana regeneration", "MP5", "MP5"],
+        manargn:            ["每5秒回复法力值", "每5秒回复法力值", "每5秒回复法力值"], //["Mana regeneration", "MP5", "MP5"],
         mleatkpwr:          ["近战攻击强度", "近战攻击强度", "攻击强度"],
         mlecritstrkrtng:    ["近战攻击等级", "近战暴击", "暴击"],
         mledmgmax:          ["近战最大伤害", "近战最大伤害", "最大"],
@@ -3438,7 +3438,7 @@ var LANG = {
         mlehastertng:       ["Melee haste rating", "Melee Haste", "Haste"],
         mlehitrtng:         ["Melee hit rating", "Melee Hit", "Hit"],
         mlespeed:           ["Melee speed", "Melee Speed", "Speed"],
-        natres:             ["Nature Resistance", "Nature Resist", "NatR"],
+        natres:             ["自然抗性", "自然抗性", "自然抗性"],
         natsplpwr:          ["Nature spell power", "Nature Power", "NatP"],
         nsockets:           ["插槽数", "插槽", "插槽"],
         parryrtng:          ["招架等级", "招架", "招架"],
@@ -3446,7 +3446,7 @@ var LANG = {
         reqlevel:           ["要求等级", "要求等级", "等级"],
         reqskillrank:       ["要求技能等级", "要求技能", "技能"],
         resirtng:           ["韧性等级", "韧性", "韧性"],
-        rgdatkpwr:          ["Ranged attack power", "Ranged AP", "RAP"],
+        rgdatkpwr:          ["远程攻击强度", "远程攻击强度", "远程攻击强度"],
         rgdcritstrkrtng:    ["Ranged critical strike rating", "Ranged Crit", "Crit"],
         rgddmgmax:          ["Ranged maximum damage", "Ranged Max Damage", "Max"],
         rgddmgmin:          ["Ranged minimum damage", "Ranged Min Damage", "Min"],
@@ -3558,11 +3558,11 @@ var LANG = {
                             [66, "Zul'Drak"],                       [1176, "Zul'Farrak"],                   [1977, "Zul'Gurub"]
                         ],
         resistance:     [
-                            [6, "Arcane"],                          [2, "Fire"],                            [3, "Nature"],                          [4, "Frost"],                           [5, "Shadow"],
-                            [1, "Holy"],                            [0, "Physical"]
+                            [6, "奥术"],                          [2, "火焰"],                            [3, "自然"],                          [4, "冰霜"],                           [5, "暗影"],
+                            [1, "神圣"],                            [0, "物理"]
                         ],
         gem:            [
-                            [5, "Yes"],                             [1, "Meta"],                            [2, "Red"],                             [3, "Yellow"],                          [4, "Blue"],
+                            [5, "Yes"],                             [1, "多彩"],                            [2, "红色"],                             [3, "黄色"],                          [4, "蓝色"],
                             [6, "No"]
                         ],
         profession:     [
@@ -3667,11 +3667,11 @@ var LANG = {
         questend:       [   [1, "NPC"],                             [2, "对象"]                           ],
         spellsource:    [
                             [1, "任何"],                             [3, "Crafted"],                         [9, "Discovery"],                       [4, "掉落"],                            [6, "任务"],
-                            [10, "天赋"],                         [8, "Trainer"],                         [7, "Vendor"],                          [2, "无"]
+                            [10, "天赋"],                         [8, "训练师"],                         [7, "商人"],                          [2, "无"]
                         ],
         itemsource:     [
                             [1, "任何"],                             [11, "成就"],                    [3, "Crafted"],                         [4, "掉落"],                            [10, "事件"],
-                            [5, "PvP"],                             [6, "任务"],                           [9, "Starter"],                         [7, "Vendor"],                          [2, "无"]
+                            [5, "PvP"],                             [6, "任务"],                           [9, "Starter"],                         [7, "商人"],                          [2, "无"]
                         ],
         glyphtype:      [   [1, "主要"],                           [2, "次要"]                            ],
         classs:         [
@@ -3708,18 +3708,18 @@ var LANG = {
     fiitems: {
         sepgeneral:              "一般",
         availabletoplayers:      "对玩家可用",
-        avgbuyout:               "Average buyout price",
+        avgbuyout:               "平均一口价",
         avgmoney:                "Average money contained",
         bindonequip:             "装备后绑定",
         bindonpickup:            "拾取后绑定",
         bindonuse:               "使用后绑定",
         bindtoaccount:           "账号绑定",
         classspecific:           "职业特长",  //Class-specific
-        conjureditem:            "Conjured item",
+        conjureditem:            "魔法制造物品", //Conjured item
         cooldown:                "冷却时间(秒)",
         damagetype:              "伤害类型",
         deprecated:              "过时的",
-        disenchantable:          "分解",
+        disenchantable:          "可分解",
         disenchantsinto:         "Disenchants into...",
         dura:                    "耐久度",
         effecttext:              "Effect text",
@@ -3732,13 +3732,13 @@ var LANG = {
         icon:                    "图标",
         id:                      "ID",
         locked:                  "Locked",
-        millable:                "Millable",
+        millable:                "可研磨",
         notavailable:            "对玩家不可用",
         objectivequest:          "任务目标",
         openable:                "Openable",
         partofset:               "物品套装的一部分",
         partyloot:               "Party loot",
-        prospectable:            "Prospectable",
+        prospectable:            "可选矿", //Prospectable
         questitem:               "任务物品",
         racespecific:            "种族特长",
         randomenchants:          "随机附魔(of the...)",
@@ -3760,8 +3760,8 @@ var LANG = {
         tool:                    "工具",
         unique:                  "唯一",  //Unique
         uniqueequipped:          "装备唯一",  //Unique-Equipped
-        usableinarenas:          "Usable in arenas",
-        usablewhenshapeshifted:  "Usable when shapeshifted",
+        usableinarenas:          "可在竞技场状态下使用",
+        usablewhenshapeshifted:  "可在变形形态下使用",
 
         sepsource:               "来源",
         craftedprof:             "专业制造", //Crafted by a profession
@@ -3792,8 +3792,8 @@ var LANG = {
         rewardedbyachievement:   "Rewarded by an achievement",
         rewardedbyfactionquest:  "Rewarded by a quest",
         rewardedbyquestin:       "Rewarded by a quest in...",
-        soldbynpc:               "Sold by NPC #...",
-        soldbyvendor:            "Sold by a vendor",
+        soldbynpc:               "由NPC出售#...",
+        soldbyvendor:            "由商人出售",
 
         sepcommunity:            "社区",
         hascomments:             "Has comments",
@@ -3856,8 +3856,8 @@ var LANG = {
         talentunlearner:     "Talent unlearner",
         tabardvendor:        "Tabard vendor",
         stablemaster:        "Stable master",
-        trainer:             "Trainer",
-        vendor:              "Vendor",
+        trainer:             "训练师",
+        vendor:              "商人",
 
         sepcommunity:        "社区",
         hascomments:         "Has comments",
@@ -3946,7 +3946,7 @@ var LANG = {
         scaling:               "根据等级缩放", //Scales with level
         requiresprofspec:      "Requires a profession specialization",
         source:                "来源",
-        trainingcost:          "训练成本",
+        trainingcost:          "训练花费",
         id:                    "ID",
         icon:                  "图标",
 
@@ -4140,7 +4140,7 @@ var LANG = {
     pr_region:       "(Region)",
     pr_realm:        "(Realm)",
     pr_selectregion: "Select a region",
-    pr_vendorsin:    "Vendors in ",
+    pr_vendorsin:    "商人在",
     pr_yes:          "Yes",
     pr_dungeons:     "Dungeons",
 
@@ -4172,7 +4172,7 @@ var LANG = {
     pr_tip_quests:   "Note: <span class=\"tip\">Certain</span> quests aren't tracked by Blizzard's API.",
 
     pr_header_noname:    "Noname",
-    pr_header_character: 'Level $1 <a href="?race=$4">$2</a> <a href="?class=$5" class="c$5">$3</a>',
+    pr_header_character: '等级 $1 <a href="?race=$4">$2</a> <a href="?class=$5" class="c$5">$3</a>',
     pr_header_edit:      "编辑",
     pr_header_armory:    "Armory",
     pr_header_help:      "帮助",
@@ -4267,8 +4267,8 @@ var LANG = {
     pr_inv_gems:        "$1 gems",
     pr_inv_enchant:     "$1 enchant",
     pr_inv_enchants:    "$1 enchants",
-    pr_inv_socket:      "$1 socket",
-    pr_inv_sockets:     "$1 sockets",
+    pr_inv_socket:      "$1插槽", // socket
+    pr_inv_sockets:     "$1插槽",
 
     pr_print_none:      "无",
     pr_print_yes:       "是",
@@ -4421,7 +4421,7 @@ var LANG = {
 
     su_preset:       "Preset: ",
     su_name:         "Name: ",
-    su_level:        "Level: ",
+    su_level:        "等级：",
     su_addweight:    "Add another weight",
     su_applyweight:  "添加",
     su_resetweight:  "重置",
@@ -4524,7 +4524,7 @@ var LANG = {
     // Context-less terms
     added:       "Added",
     build:       "Build",
-    calculators: "Calculators",
+    calculators: "计算器", //Calculators
     patch:       "Patch",
 
     sound_activities: {
@@ -4564,7 +4564,7 @@ var LANG = {
         impact:            "碰撞",
         state:             "状态",
         statedone:         "完成",
-        channel:           "Channeled",
+        channel:           "需引导", //Channeled
         casterimpact:      "Caster impact",
         targetimpact:      "Target impact",
         castertargeting:   "Caster targeting",

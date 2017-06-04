@@ -266,12 +266,12 @@ $lang = array(
         ),
         'gl'            => [null, "主要", "次要"],                                                                                                                               // MAJOR_GLYPH, MINOR_GLYPH
         'si'            => [1 => "联盟", -1 => "仅限联盟", 2 => "部落", -2 => "仅限部落", 3 => "双方"],
-        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],                         // RESISTANCE?_NAME
+        'resistances'   => [null, '神圣抗性', '火焰抗性', '自然抗性', '冰霜抗性', '暗影抗性', '奥术抗性'],                         // RESISTANCE?_NAME
         'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],                                                          // SpellDispalType.dbc
-        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],                                                                                     // STRING_SCHOOL_*
+        'sc'            => ["物理", "神圣", "火焰", "自然", "冰霜", "暗影", "奥术"],                                                                                     // STRING_SCHOOL_*
         'cl'            => [null, "战士", "圣骑士", "猎人", "潜行者", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],                                   // ChrClasses.dbc
         'ra'            => [-2 => "部落", -1 => "联盟", "双方", "人类", "兽人", "矮人", "暗夜精灵", "亡灵", "牛头人", "侏儒", "巨魔", null, "血精灵", "德莱尼"],     // ChrRaces.dbc
-        'rep'           => ["仇恨", "敌对", "敌意", "中立", "友善", "尊敬", "崇敬", "崇拜"],                                                              // FACTION_STANDING_LABEL*
+        'rep'           => ["仇恨", "敌对", "冷淡", "中立", "友善", "尊敬", "崇敬", "崇拜"],                                                              // FACTION_STANDING_LABEL*
         'st'            => array(                           // SpellShapeshiftForm.dbc // with minor deviations on 27, 28
             "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
             "Ambient",                      "Ghoul",                        "Dire Bear Form",               "Steve's Ghoul",                "Tharon'ja Skeleton",           "Darkmoon - Test of Strength",
@@ -289,17 +289,17 @@ $lang = array(
             "Sapped",                       "Enraged"
         ),
         'ct'            => array(                           // CreatureType.dbc
-            "Uncategorized",                "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",                    "Giant",
-            "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",                   "Not specified",                "Totem",
-            "Non-combat Pet",               "Gas Cloud"
+            "未分类",                "野兽",                        "龙类",                    "恶魔",                        "元素生物",                    "巨人",
+            "亡灵",                       "人型生物",                     "小动物",                      "机械",                   "未指定",                "图腾",
+            "非战斗宠物",               "气体云雾"
         ),
         'fa'            => array(                           // CreatureFamily.dbc
-             1 => "Wolf",                    2 => "Cat",                     3 => "Spider",                  4 => "Bear",                    5 => "Boar",                    6 => "Crocolisk",
-             7 => "Carrion Bird",            8 => "Crab",                    9 => "Gorilla",                11 => "Raptor",                 12 => "Tallstrider",            20 => "Scorpid",
-            21 => "Turtle",                 24 => "Bat",                    25 => "Hyena",                  26 => "Bird of Prey",           27 => "Wind Serpent",           30 => "Dragonhawk",
-            31 => "Ravager",                32 => "Warp Stalker",           33 => "Sporebat",               34 => "Nether Ray",             35 => "Serpent",                37 => "Moth",
-            38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
-            45 => "Core Hound",             46 => "Spirit Beast"
+             1 => "狼",                    2 => "豹",                     3 => "蜘蛛",                  4 => "熊",                    5 => "野猪",                    6 => "鳄鱼",
+             7 => "食腐鸟",            8 => "螃蟹",                    9 => "猩猩",                11 => "迅猛龙",                 12 => "陆行鸟",            20 => "蝎子",
+            21 => "海龟",                 24 => "蝙蝠",                    25 => "土狼",                  26 => "猛禽",           27 => "风蛇",           30 => "龙鹰",
+            31 => "掠食者",                32 => "迁跃捕猎者",           33 => "孢子蝠",               34 => "虚空鳐",             35 => "蛇",                37 => "蛾子",
+            38 => "奇美拉",               39 => "魔暴龙",              41 => "异种虫",               42 => "蠕虫",                   43 => "犀牛",                  44 => "巨蜂",
+            45 => "熔岩犬",             46 => "灵魂兽"
         ),
         'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",
@@ -443,12 +443,12 @@ $lang = array(
         'accessoryFor'  => "This NPC is an accessory for vehicle",
         'quotes'        => "引用",  //Quotes
         'gainsDesc'     => "杀死这个NPC后你将得到",
-        'repWith'       => "点声望点数", //reputation with
+        'repWith'       => "点声望点数在", //reputation with
         'stopsAt'       => "在%s停止",
         'vehicle'       => "载具",  //Vehicle
         'stats'         => "状态",  //Stats
-        'melee'         => "Melee",
-        'ranged'        => "Ranged",
+        'melee'         => "近战", //Melee
+        'ranged'        => "远程", //Ranged
         'armor'         => "护甲",
         'foundIn'       => "这个NPC能在以下地区找到：",
         'tameable'      => "可驯服的(%s)",
@@ -480,14 +480,14 @@ $lang = array(
         'criteria'      => "达成条件",  //Criteria
         'points'        => "点数",
         'series'        => "系列",  //Series
-        'outOf'         => "out of",
+        'outOf'         => "out of", //out of
         'criteriaType'  => "Criterium Type-Id:",
         'itemReward'    => "你将得到",
         'titleReward'   => '你将被授予头衔"<a href="?title=%d">%s</a>"',
         'slain'         => "杀死", //slain
         'reqNumCrt'     => "要求",
         'rfAvailable'   => "Available on realm: ",
-        '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        '_transfer'     => '这个成就将被转换到<a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
     ),
     'chrClass' => array(
         'notFound'      => "这个职业不存在。"
@@ -505,7 +505,7 @@ $lang = array(
         'Kalimdor'      => "卡利姆多",
         'Outland'       => "外域",
         'Northrend'     => "诺森德",
-        'Instances'     => "地下城和团队副本",  //Instances
+        'Instances'     => "副本",  //Instances
         'Dungeons'      => "地下城",
         'Raids'         => "团队副本",
         'More'          => "更多",
@@ -533,14 +533,14 @@ $lang = array(
         'attunement'    => ["Attunement", "Heroic attunement"],
         'key'           => ["钥匙", "英雄钥匙"],
         'location'      => "位置",
-        'raidFaction'   => "Raid faction",
+        'raidFaction'   => "团队副本阵营", //Raid faction
         'boss'          => "最终首领",
         'reqLevels'     => "要求等级： [tooltip=instancereqlevel_tip]%d[/tooltip], [tooltip=lfgreqlevel_tip]%d[/tooltip]",
         'zonePartOf'    => "这个区域是[zone=%s]的一部分。",
         'autoRez'       => "自动复活",
         'city'          => "城市",
-        'territory'     => "Territory",
-        'instanceType'  => "Instance类型",
+        'territory'     => "领地",
+        'instanceType'  => "副本类型",
         'hcAvailable'   => "英雄模式可用&nbsp;(%d)",
         'numPlayers'    => "玩家人数",
         'noMap'         => "这个区域没有可用地图。",
@@ -594,7 +594,7 @@ $lang = array(
         'gainsDesc'     => "完成这个任务后，你将获得",
         'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
         'mailDelivery'  => "你会收到这封信%s%s",
-        'mailBy'        => '由<a href="?npc=%d">%s</a>',
+        'mailBy'        => '由<a href="?npc=%d">%s</a>所写',
         'mailIn'        => " after %s",
         'unavailable'   => "这项任务已被标记为过时，无法获得或完成。",
         'experience'    => "经验",
@@ -651,16 +651,16 @@ $lang = array(
                 3715 => "The Steamvault",                717 => "The Stockade",                 3716 => "The Underbog",                 4415 => "The Violet Hold",              4723 => "Trial of the Champion",
                 1337 => "Uldaman",                       206 => "Utgarde Keep",                 1196 => "Utgarde Pinnacle",              718 => "Wailing Caverns",              1176 => "Zul'Farrak"
             ),
-            3 => array( "Raids",
-                3959 => "Black Temple",                 2677 => "Blackwing Lair",               3923 => "Gruul's Lair",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
+            3 => array( "团队副本",
+                3959 => "黑暗神殿",                 2677 => "黑翼之巢",               3923 => "格鲁尔的巢穴",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
                 3457 => "Karazhan",                     3836 => "Magtheridon's Lair",           2717 => "Molten Core",                  3456 => "Naxxramas",                    2159 => "Onyxia's Lair",
                 3429 => "Ruins of Ahn'Qiraj",           3607 => "Serpentshrine Cavern",         4075 => "Sunwell Plateau",              3428 => "Temple of Ahn'Qiraj",          3842 => "The Eye",
                 4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "Ulduar",                       4603 => "Vault of Archavon",
                 3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
             ),
-            4 => array( "Classes",
-                -372 => "Death Knight",                 -263 => "Druid",                        -261 => "Hunter",                       -161 => "Mage",                         -141 => "圣骑士",
-                -262 => "Priest",                       -162 => "Rogue",                         -82 => "Shaman",                        -61 => "Warlock",                       -81 => "战士"
+            4 => array( "职业",
+                -372 => "死亡骑士",                 -263 => "德鲁伊",                        -261 => "猎人",                       -161 => "Mage",                         -141 => "圣骑士",
+                -262 => "Priest",                       -162 => "Rogue",                         -82 => "萨满祭司",                        -61 => "术士",                       -81 => "战士"
                     ),
             5 => array( "Professions",
                 -181 => "Alchemy",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
@@ -688,23 +688,23 @@ $lang = array(
     ),
     'title' => array(
         'notFound'      => "这个头衔不存在。",
-        '_transfer'     => 'This title will be converted to <a href="?title=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        '_transfer'     => '这个头衔将被转换到<a href="?title=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
-            "General",      "PvP",    "声望",       "Dungeons & Raids",     "任务",       "专业",      "世界事件"
+            "一般",      "PvP",    "声望",       "地下城与团队",     "任务",       "专业",      "世界事件"
         )
     ),
     'skill' => array(
         'notFound'      => "这个技能不存在。",
         'cat'           => array(
-            -6 => "Companions",         -5 => "Mounts",             -4 => "Racial Traits",      5 => "Attributes",          6 => "Weapon Skills",       7 => "Class Skills",        8 => "Armor Proficiencies",
-             9 => "Secondary Skills",   10 => "Languages",          11 => "Professions"
+            -6 => "小伙伴",         -5 => "坐骑",             -4 => "种族特长",      5 => "属性",          6 => "武器技能",       7 => "职业技能",        8 => "护甲精通",
+             9 => "辅助专业",   10 => "语言",          11 => "专业"
         )
     ),
     'currency' => array(
         'notFound'      => "这个货币不存在。",
-        'cap'           => "Total cap",
+        'cap'           => "总共上限", //Total cap
         'cat'           => array(
-            1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
+            1 => "其它", 2 => "PvP", 4 => "经典旧世", 21 => "巫妖王之怒", 22 => "地下城与团队", 23 => "燃烧的远征", 41 => "测试", 3 => "未使用"
         )
     ),
     'sound' => array(
@@ -729,17 +729,17 @@ $lang = array(
     ),
     'faction' => array(
         'notFound'      => "这个阵营不存在。",
-        'spillover'     => "声望溢出",
+        'spillover'     => "声望额外效果",
         'spilloverDesc' => "获得这个阵营的声望也将按比例获得下列阵营的声望。", //Gaining reputation with this faction also yields a proportional gain with the factions listed below.
-        'maxStanding'   => "Max. Standing",
-        'quartermaster' => "Quartermaster",
-        'customRewRate' => "Custom Reward Rate",
-        '_transfer'     => 'The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        'maxStanding'   => "最大关系",
+        'quartermaster' => "军需官",
+        'customRewRate' => "自定义奖励率",
+        '_transfer'     => '这个阵营的声望将被转换到<a href="?faction=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
-            1118 => ["Classic", 469 => "联盟", 169 => "Steamwheedle Cartel", 67 => "部落", 891 => "Alliance Forces", 892 => "Horde Forces"],
-            980  => ["The Burning Crusade", 936 => "Shattrath City"],
-            1097 => ["Wrath of the Lich King", 1052 => "Horde Expedition", 1117 => "Sholazar Basin", 1037 => "Alliance Vanguard"],
-            0    => "Other"
+            1118 => ["经典旧世", 469 => "联盟", 169 => "热砂港", 67 => "部落", 891 => "联盟部队", 892 => "部落部队"],
+            980  => ["燃烧的远征", 936 => "沙塔斯城"],
+            1097 => ["巫妖王之怒", 1052 => "部落先遣军", 1117 => "索拉查盆地", 1037 => "联盟先遣军"],
+            0    => "其他"
         )
     ),
     'itemset' => array(
@@ -750,7 +750,7 @@ $lang = array(
         '_conveyBonus'  => "穿更多这个套装的部分将会提供给你角色奖励。", //Wearing more pieces of this set will convey bonuses to your character.
         '_pieces'       => "件",  //pieces
         '_unavailable'  => "这个物品套装对玩家不可用。",
-        '_tag'          => "Tag",
+        '_tag'          => "标签",
         'summary'       => "摘要",
         'notes'         => array(
             null,                                   "地下城套装1",                        "地下城套装2",                        "T1团队副本套装",
@@ -770,7 +770,7 @@ $lang = array(
     'spell' => array(
         'notFound'      => "这个法术不存在。",
         '_spellDetails' => "法术细节", //Spell Details
-        '_cost'         => "成本", //Cost
+        '_cost'         => "花费", //Cost
         '_range'        => "范围",
         '_castTime'     => "施法时间",
         '_cooldown'     => "冷却时间",
@@ -784,26 +784,26 @@ $lang = array(
         '_gcdCategory'  => "GCD类别",
         '_value'        => "值",
         '_radius'       => "半径",
-        '_interval'     => "Interval",
+        '_interval'     => "Interval", //Interval
         '_inSlot'       => "in slot",
         '_collapseAll'  => "折叠全部",
         '_expandAll'    => "展开全部",
-        '_transfer'     => 'This spell will be converted to <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'discovered'    => "Learned via discovery",
         'ppm'           => "%s每分钟触发几率",
         'procChance'    => "触发几率",
         'starter'       => "Starter spell",
         'trainingCost'  => "训练成本",
         'remaining'     => "持续%s",                  // SPELL_TIME_REMAINING_*  //remaining
-        'untilCanceled' => "直到被取消",               // SPELL_DURATION_UNTIL_CANCELLED
-        'castIn'        => "%s秒施法",                   // SPELL_CAST_TIME_SEC
+        'untilCanceled' => "直到主动取消",               // SPELL_DURATION_UNTIL_CANCELLED
+        'castIn'        => "%s秒施法时间",                   // SPELL_CAST_TIME_SEC
         'instantPhys'   => "瞬发",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'instantMagic'  => "瞬发",                  // SPELL_CAST_TIME_INSTANT
-        'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED
-        'range'         => "%s码",                   // SPELL_RANGE / SPELL_RANGE_DUAL
+        'channeled'     => "需引导",                     // SPELL_CAST_CHANNELED
+        'range'         => "%s码范围",                   // SPELL_RANGE / SPELL_RANGE_DUAL
         'meleeRange'    => "近战范围",                   // MELEE_RANGE
         'unlimRange'    => "无限范围",               // SPELL_RANGE_UNLIMITED
-        'reagents'      => "Reagents",                      // SPELL_REAGENTS
+        'reagents'      => "材料",                      // SPELL_REAGENTS
         'tools'         => "工具",                         // SPELL_TOTEMS
         'home'          => "&lt;旅店&gt;", //Inn
         'pctCostOf'     => "的基础%s",  //of base 
@@ -816,11 +816,11 @@ $lang = array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
             'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
-        'powerRunes'    => ["冰霜", "邪恶", "鲜血", "Death"], // RUNE_COST_* / COMBAT_TEXT_RUNE_*
+        'powerRunes'    => ["冰霜", "邪恶", "鲜血", "死亡"], // RUNE_COST_* / COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(
             // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER / *_COST / *COST_PER_TIME
-              -2 => "生命值",              0 => "法力值",                1 => "怒气值",                2 => "集中值",               3 => "能量值",              4 => "Happiness",
-               5 => "符文值",               6 => "符文能量值",
+              -2 => "生命值",              0 => "法力值",                1 => "怒气",                2 => "集中",               3 => "能量",              4 => "快乐值",
+               5 => "符文",               6 => "符文能量",
             // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
               -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
@@ -887,7 +887,7 @@ $lang = array(
             'str'       => "Str",                   'agi'       => "Agi",                   'sta'       => "Sta",                   'int'       => "Int",                   'spi'       => "Spi"
         ),
         'spellModOp'    => array(
-            "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "Charges",
+            "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "可使用次数",
             "Range",                                "Radius",                               "Critical Hit Chance",                  "All Effects",                          "Casting Time loss",
             "Casting Time",                         "Cooldown",                             "Effect 2",                             "Ignore Armor",                         "Cost",
             "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
@@ -896,7 +896,7 @@ $lang = array(
             "Refund Cost on Fail"
         ),
         'combatRating'  => array(
-            "Weapon Skill",                         "Defense Skill",                        "Dodge",                                "Parry",                                "Block",
+            "武器技能",                         "防御",                        "躲闪",                                "招架",                                "格挡",
             "Melee Hit Chance",                     "Ranged Hit Chance",                    "Spell Hit Chance",                     "Critical Melee Hit Chance",            "Critical Ranged Hit Chance",
             "Critical Spell Hit Chance",            "Taken Melee Hit Chance",               "Taken Ranged Hit Chance",              "Taken Spell Hit Chance",               "Taken Critical Melee Hit Chance",
             "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
@@ -929,7 +929,7 @@ $lang = array(
 /*78+    */ 'Attack',                   'Sanctuary',                'Add Combo Points',         'Create House',             'Bind Sight',               'Duel',
 /*84+    */ 'Stuck',                    'Summon Player',            'Activate Object',          'WMO Damage',               'WMO Repair',               'WMO Change',
 /*90+    */ 'Kill Credit',              'Threat All',               'Enchant Held Item',        'Force Deselect',           'Self Resurrect',           'Skinning',
-/*96+    */ 'Charge',                   'Cast Button',              'Knock Back',               'Disenchant',               'Inebriate',                'Feed Pet',
+/*96+    */ '可使用次数',                   'Cast Button',              'Knock Back',               'Disenchant',               'Inebriate',                'Feed Pet',
 /*102+   */ 'Dismiss Pet',              'Reputation',               'Summon Object Slot1',      'Summon Object Slot2',      'Summon Object Slot3',      'Summon Object Slot4',
 /*108+   */ 'Dispel Mechanic',          'Summon Dead Pet',          'Destroy All Totems',       'Durability Damage',        'Summon Demon',             'Resurrect Flat',
 /*114+   */ 'Attack Me',                'Durability Damage Percent','Skin Player Corpse',       'Spirit Heal',              'Skill',                    'Apply Area Aura Pet',
@@ -1012,31 +1012,31 @@ $lang = array(
     ),
     'item' => array(
         'notFound'      => "这个物品不存在。",
-        'armor'         => "%s护甲",                      // ARMOR_TEMPLATE
-        'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE
-        'charges'       => "%d |4Charge:Charges;",          // ITEM_SPELL_CHARGES
+        'armor'         => "%s点护甲",                      // ARMOR_TEMPLATE
+        'block'         => "%s格挡",                      // SHIELD_BLOCK_TEMPLATE
+        'charges'       => "%d |4次:次;",          // ITEM_SPELL_CHARGES
         'locked'        => "Locked",                        // LOCKED
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
         'heroic'        => "英雄",                        // ITEM_HEROIC
-        'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
-        'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
-        'fap'           => "Feral攻击强度",
+        'startQuest'    => "该物品将触发一个任务",      // ITEM_STARTS_QUEST
+        'bagSlotString' => "%d格%s",                    // CONTAINER_SLOTS
+        'fap'           => "在猎豹、熊、巨熊和枭兽形态下的攻击强度",
         'durability'    => "耐久度 %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
-        'conjured'      => "Conjured Item",                 // ITEM_CONJURED
-        'sellPrice'     => "出售价格",                    // SELL_PRICE
+        'conjured'      => "魔法制造物品",                 // ITEM_CONJURED
+        'sellPrice'     => "卖价",                    // SELL_PRICE
         'itemLevel'     => "物品等级%d",                 // ITEM_LEVEL
         'randEnchant'   => "&lt;随机附魔&gt",     // ITEM_RANDOM_ENCHANT
-        'readClick'     => "&lt;右击以读取&gt",    // ITEM_READABLE
-        'openClick'     => "&lt;右击以打开&gt",    // ITEM_OPENABLE
-        'setBonus'      => "(%d)件：%s",                  // ITEM_SET_BONUS_GRAY
+        'readClick'     => "&lt;右键点击阅读&gt",    // ITEM_READABLE
+        'openClick'     => "&lt;右键点击打开&gt",    // ITEM_OPENABLE
+        'setBonus'      => "(%d) 套装：%s",                  // ITEM_SET_BONUS_GRAY
         'setName'       => "%s (%d/%d)",                    // ITEM_SET_NAME
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "不能被摧毁",
         'deprecated'    => "过时的",
-        'useInShape'    => "Usable when shapeshifted",
-        'useInArena'    => "Usable in arenas",
+        'useInShape'    => "可在变形形态下使用", //shapeshifted=变形
+        'useInArena'    => "可在竞技场状态下使用",
         'refundable'    => "可退还的",
         'noNeedRoll'    => "Cannot roll Need",
         'atKeyring'     => "Can be placed in the keyring",
@@ -1044,23 +1044,23 @@ $lang = array(
         'consumable'    => "消耗品",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
-        'millable'      => "Millable",                      // ITEM_MILLABLE
+        'millable'      => "可研磨",                      // ITEM_MILLABLE
         'noEquipCD'     => "No equip cooldown",
-        'prospectable'  => "Prospectable",                  // ITEM_PROSPECTABLE
-        'disenchantable'=> "分解",                // ITEM_DISENCHANT_ANY_SKILL
-        'cantDisenchant'=> "不能分解",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
+        'prospectable'  => "可选矿",                  // ITEM_PROSPECTABLE
+        'disenchantable'=> "可分解",                // ITEM_DISENCHANT_ANY_SKILL
+        'cantDisenchant'=> "无法分解",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
         'repairCost'    => "修理费用",                   // REPAIR_COST
         'tool'          => "Tool",
-        'cost'          => "成本",                          // COSTS_LABEL  //Cost
+        'cost'          => "花费",                          // COSTS_LABEL  //Cost
         'content'       => "内容",
         '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "这个物品对玩家不可用。",
         '_rndEnchants'  => "随机附魔",  //Random Enchantments
         '_chance'       => "（%s%%几率）",
         'slot'          => "Slot",
-        '_quality'      => "Quality",                       // QUALITY
+        '_quality'      => "质量",                       // QUALITY
         'usableBy'      => "Usable by",
-        'buyout'        => "Buyout price",                  // BUYOUT_PRICE
+        'buyout'        => "一口价",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
         'reqMinLevel'   => "需要等级 %d",             // ITEM_MIN_LEVEL
@@ -1068,7 +1068,7 @@ $lang = array(
         'unique'        => ["唯一",          "唯一(%d)", "唯一：%s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
         'uniqueEquipped'=> ["装备唯一", null,          "装备唯一：%s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "速度",                         // SPEED
-        'dps'           => "(%.1f伤害每秒)",      // DPS_TEMPLATE
+        'dps'           => "（每秒伤害%.1f）",      // DPS_TEMPLATE
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                         //  basic,                          basic /w school,                add basic,                  add basic /w school
             'single'    => ["%d 伤害",                    "%d %s 伤害",                 "+ %d 伤害",              "+%d %s 伤害"             ],
@@ -1076,7 +1076,7 @@ $lang = array(
             'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
         ),
         'gems'          => "宝石",
-        'socketBonus'   => "插槽奖励",                  // ITEM_SOCKET_BONUS
+        'socketBonus'   => "镶孔奖励",                  // ITEM_SOCKET_BONUS
         'socket'        => array(                           // EMPTY_SOCKET_*
             "多彩插槽",          "红色插槽",       "黄色插槽",        "蓝色插槽",          -1 => "棱彩插槽"
         ),
@@ -1084,14 +1084,14 @@ $lang = array(
             "多彩",                 "红色",              "黄色",               "蓝色"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => "less than %d %s |4gem:gems;",
-            3 => "more %s gems than %s gems",
-            5 => "at least %d %s |4gem:gems;"
+            2 => "少于%d%s|4颗:颗;宝石",
+            3 => "%s宝石数量多于%s宝石",  //more %s gems than %s gems
+            5 => "至少%d%s|4颗:颗;宝石"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
-            "需要个人和竞技场队伍等级达到%d",   //Requires personal and team arena rating of 
-            "需要个人和竞技场队伍等级达到%d|n在3v3或5v5 brackets",
-            "需要个人和竞技场队伍等级达到%d|n在5v5 brackets"
+            "需要个人竞技场等级达到%d",   //Requires personal and team arena rating of 
+            "需要3v3或5v5的个人竞技场等级达到%d|n",
+            "需要5v5的个人竞技场等级达到%d|n"
         ),
         'quality'       => array(                           // ITEM_QUALITY?_DESC
             "粗糙",                   "普通",               "优秀",                   "精良",
