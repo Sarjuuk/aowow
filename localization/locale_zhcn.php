@@ -427,7 +427,7 @@ $lang = array(
         'trap'          => "Trap",
         'triggeredBy'   => "触发由",  //Triggered by
         'capturePoint'  => "Capture Point",
-        'foundIn'       => "这个对象可被找到在",
+        'foundIn'       => "这个对象能在以下地区找到：",
         'restock'       => "Restocks every %s."
     ),
     'npc' => array(
@@ -1053,7 +1053,7 @@ $lang = array(
         'tool'          => "Tool",
         'cost'          => "花费",                          // COSTS_LABEL  //Cost
         'content'       => "内容",
-        '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         '_unavailable'  => "这个物品对玩家不可用。",
         '_rndEnchants'  => "随机附魔",  //Random Enchantments
         '_chance'       => "（%s%%几率）",

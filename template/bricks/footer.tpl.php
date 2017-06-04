@@ -21,6 +21,12 @@ if (User::isInGroup(U_GROUP_EMPLOYEE) && ($this->time || isset($this->mysql) || 
     echo "            </table>\n";
 endif;
 ?>
+			<div class="footer-links linklist">
+				<a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|<a href="https://github.com/Sarjuuk/aowow" target="_blank">Github</a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
+			</div>
+			<div class="footer-copy">
+				&#12484; <?=date("Y"); ?> Aowow<br />rev. <?=AOWOW_REVISION; ?>
+			</div>
         </div>
     </div><!-- #wrapper .nosidebar -->
     </div><!-- #layout-inner -->
