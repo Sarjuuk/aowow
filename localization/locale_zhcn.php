@@ -102,7 +102,7 @@ $lang = array(
         'cappedHint'    => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
         'groupBy'       => "按组",
         'gb'            => array(
-            ["None", "none"],         ["Slot", "slot"],       ["Level", "level"],     ["Source", "source"]
+            ["无", "none"],         ["Slot", "slot"],       ["等级", "level"],     ["来源", "source"]
         ),
         'compareTool'   => "物品比较工具",
         'talentCalc'    => "天赋模拟器",
@@ -130,7 +130,7 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i",
+        'dateFmtLong'   => "Y/m/d H:i",  //Y/m/d \a\\t H:i
 
         // error
         'intError'      => "发生内部错误。",
@@ -166,7 +166,7 @@ $lang = array(
         'thanks'        => array(
             'contrib' => "非常感谢你的贡献！",
             'goBack'  => '<a href="?%s=%d">点击这里</a>返回上一页。',
-            'note'    => "注意: 你的截图在显示在网站前需要审核。这需要最多72小时。"
+            'note'    => "注意: 你的截图显示在网站前需要审核。这需要最多72小时。"
         ),
         'error'         => array(
             'unkFormat'   => "未知图像格式。",
@@ -256,29 +256,29 @@ $lang = array(
             "未知",                      "制造",                      "掉落",                         "PvP",                          "任务",                        "出售",
             "训练师",                      "探索",                    "赎回",                   "天赋",                       "Starter",                      "事件",
             "成就",                  null,                           "黑市",                 "Disenchanted",                 "钓鱼",                       "采集",
-            "研磨",                       "采矿",                        "勘探",                   "Pickpocketed",                 "回收",                     "剥皮",
+            "研磨",                       "采矿",                        "勘探",                   "偷窃",                 "回收",                     "剥皮",
             "游戏内商城"
         ),
         'languages'     => array(
-             1 => "兽人语",                  2 => "达纳苏斯语",              3 => "牛头人语",                 6 => "Dwarvish",                7 => "通用语",                  8 => "Demonic",
-             9 => "泰坦语",                  10 => "萨拉斯语",             11 => "龙语",               12 => "Kalimag",                13 => "侏儒语",                14 => "巨魔语",
-            33 => "亡灵语",            35 => "德莱尼语",                36 => "Zombie",                 37 => "Gnomish Binary",         38 => "Goblin Binary"
+             1 => "兽人语",                  2 => "达纳苏斯语",              3 => "牛头人语",                 6 => "矮人语",                7 => "通用语",                  8 => "恶魔语",
+             9 => "泰坦语",                  10 => "萨拉斯语",             11 => "龙语",               12 => "卡利姆多语",                13 => "侏儒语",                14 => "巨魔语",
+            33 => "亡灵语",            35 => "德莱尼语",                36 => "僵尸语",                 37 => "侏儒二进制",         38 => "地精二进制"
         ),
         'gl'            => [null, "主要", "次要"],                                                                                                                               // MAJOR_GLYPH, MINOR_GLYPH
         'si'            => [1 => "联盟", -1 => "仅限联盟", 2 => "部落", -2 => "仅限部落", 3 => "双方"],
         'resistances'   => [null, '神圣抗性', '火焰抗性', '自然抗性', '冰霜抗性', '暗影抗性', '奥术抗性'],                         // RESISTANCE?_NAME
-        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],                                                          // SpellDispalType.dbc
+        'dt'            => [null, "魔法", "诅咒", "疾病", "中毒", "潜行", "隐形", null, null, "激怒"],                                                          // SpellDispalType.dbc
         'sc'            => ["物理", "神圣", "火焰", "自然", "冰霜", "暗影", "奥术"],                                                                                     // STRING_SCHOOL_*
         'cl'            => [null, "战士", "圣骑士", "猎人", "潜行者", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],                                   // ChrClasses.dbc
         'ra'            => [-2 => "部落", -1 => "联盟", "双方", "人类", "兽人", "矮人", "暗夜精灵", "亡灵", "牛头人", "侏儒", "巨魔", null, "血精灵", "德莱尼"],     // ChrRaces.dbc
         'rep'           => ["仇恨", "敌对", "冷淡", "中立", "友善", "尊敬", "崇敬", "崇拜"],                                                              // FACTION_STANDING_LABEL*
-        'st'            => array(                           // SpellShapeshiftForm.dbc // with minor deviations on 27, 28
-            "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
-            "Ambient",                      "Ghoul",                        "Dire Bear Form",               "Steve's Ghoul",                "Tharon'ja Skeleton",           "Darkmoon - Test of Strength",
-            "BLB Player",                   "Shadowdance",                  "Creature - Bear",              "Creature - Cat",               "Ghostwolf",                    "Battle Stance",
-            "Defensive Stance",             "Berserker Stance",             "Test",                         "Zombie",                       "Metamorphosis",                null,
-            null,                           "Undead",                       "Frenzy",                       "Swift Flight Form",            "Shadow Form",                  "Flight Form",
-            "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
+        'st'            => array(                           // SpellShapeshiftForm.dbc // with minor deviations on 27, 28  形态=form
+            "Default",                      "猎豹形态",                     "生命之树形态",                 "旅行形态",                  "水生形态",                 "熊形态",
+            "小动物",                      "食尸鬼",                        "巨熊形态",               "斯蒂文的食尸鬼",                "萨隆亚的骷髅",           "Darkmoon - Test of Strength",
+            "BLB Player",                   "暗影之舞",                  "Creature - Bear",              "Creature - Cat",               "幽魂之狼",                    "战斗姿态",
+            "防御姿态",             "狂暴姿态",             "测试",                         "僵尸",                       "恶魔变身",                null,
+            null,                           "亡灵",                       "狂乱",                       "史诗飞行形态",            "暗影形态",                  "飞行形态",
+            "潜行",                      "枭兽形态",                 "救赎之魂"
         ),
         'me'            => array(                           // SpellMechanic.dbc .. not quite
             null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
@@ -302,11 +302,11 @@ $lang = array(
             45 => "熔岩犬",             46 => "灵魂兽"
         ),
         'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
-            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
-            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
-            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
+            null,                                                           "下士 / 斥候",                                              "下士 / 步兵",
+            "中士 / 中士",                                          "军士长 / 高阶军士",                            "士官长 / 一等军士长",
+            "骑士 / 石头守卫",                                         "骑士中尉 / 血卫士",                              "骑士队长 / 军团士兵",
+            "护卫骑士 / 百夫长",                                  "少校 / 勇士",                              "司令 / 中将",
+            "统帅 / 将军",                                            "元帅 / 督军",                                      "大元帅 / 高阶督军"
         ),
     ),
     'account' => array(
@@ -330,7 +330,7 @@ $lang = array(
         'accCreate'     => '没有账号？<a href="?account=signup">现在创建一个！</a>',
 
         // recovery
-        'recoverUser'   => "Username Request",
+        'recoverUser'   => "用户名需求",
         'recoverPass'   => "密码重置：步骤 %s / 2",
         'newPass'       => "新密码",
 
@@ -342,8 +342,8 @@ $lang = array(
         'ipAddress'     => "IP地址",
         'lastIP'        => "last used IP",
         'myAccount'     => "我的账号",
-        'editAccount'   => "Simply use the forms below to update your account information",
-        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+        'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
+        'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
 
         // bans
         'accBanned'     => "这个账号已被关闭",
@@ -359,31 +359,31 @@ $lang = array(
         'createAccSent' => "电子邮件发送到<b>%s</b>。只需按照说明创建你的帐户。",
         'recovUserSent' => "电子邮件发送到<b>%s</b>。只需按照说明恢复你的用户名。",
         'recovPassSent' => "电子邮件发送到<b>%s</b>。只需按照说明重置你的密码。",
-        'accActivated'  => '你的帐户已被激活。<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
-        'userNotFound'  => "The username you entered does not exists.",
-        'wrongPass'     => "That password is not vaild.",
+        'accActivated'  => '你的帐户已被激活。<br>继续<a href="?account=signin&token=%s">登录</a>',
+        'userNotFound'  => "输入的用户名不存在。",
+        'wrongPass'     => "密码无效。",
         // 'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
-        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
-        'errNameLength' => "Your username must be at least 4 characters long.", // message_usernamemin
-        'errNameChars'  => "Your username can only contain letters and numbers.", // message_usernamenotvalid
-        'errPassLength' => "Your password must be at least 6 characters long.", // message_passwordmin
-        'passMismatch'  => "The passwords you entered do not match.",
-        'nameInUse'     => "That username is already taken.",
-        'mailInUse'     => "That email is already registered to an account.",
-        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
-        'passCheckFail' => "Passwords do not match.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Your new password must be different than your previous one." // message_newpassdifferent
+        'loginExceeded' => "这个IP最大登录次数已超过。请在%s后再次尝试。",
+        'signupExceeded'=> "这个IP最大注册次数已超过。请在%s后再次尝试。",
+        'errNameLength' => "你的用户名必须至少4个字符长度。", // message_usernamemin
+        'errNameChars'  => "你的用户名只能包含字母和数字。", // message_usernamenotvalid
+        'errPassLength' => "你的密码必须至少6个字符长度。", // message_passwordmin
+        'passMismatch'  => "你输入的密码不匹配。",
+        'nameInUse'     => "用户名已被占用。",
+        'mailInUse'     => "该电子邮件已注册到一个帐户。",
+        'isRecovering'  => "此帐户已恢复。按照电子邮件中的说明或等待%s后令牌过期。",
+        'passCheckFail' => "密码不匹配。", // message_passwordsdonotmatch
+        'newPassDiff'   => "你的新密码必须与以前的密码不同。" // message_newpassdifferent
     ),
     'user' => array(
         'notFound'      => "用户 \"%s\" 未找到",
         'removed'       => "(已移除)",
         'joinDate'      => "加入",
         'lastLogin'     => "上次访问",
-        'userGroups'    => "Role",
+        'userGroups'    => "角色", //Role
         'consecVisits'  => "Consecutive visits",
-        'publicDesc'    => "Public Description",
-        'profileTitle'  => "%s's Profile",
+        'publicDesc'    => "公共描述", //Public Description
+        'profileTitle'  => "%s的简介",
         'contributions' => "Contributions",
         'uploads'       => "Data uploads",
         'comments'      => "评论",
@@ -392,7 +392,7 @@ $lang = array(
         'posts'         => "Forum posts"
     ),
     'mail' => array(
-        'tokenExpires'  => "This token expires in %s.",
+        'tokenExpires'  => "此令牌将在%s过期。",
         'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
@@ -417,10 +417,10 @@ $lang = array(
     ),
     'gameObject' => array(
         'notFound'      => "这个对象不存在。",
-        'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
-        'type'          => [              9 => "Book",  3 => "Container",  -5 => "Chest",  25 => "",              -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],
+        'cat'           => [0 => "其他", 9 => "书籍", 3 => "容器", -5 => "宝箱", 25 => "钓鱼水池", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => "工具"],
+        'type'          => [              9 => "书籍",  3 => "容器",  -5 => "宝箱",  25 => "",              -3 => "草药",  -4 => "矿脉",  -2 => "任务", -6 => ""],
         'unkPosition'   => "这个对象的位置未知。",
-        'npcLootPH'     => '这个<b>%s</b>包含战利品由于与<a href="?npc=%d">%s</a>的作战。在他/她/它死亡后刷新。',
+        'npcLootPH'     => '这个<b>%s</b>包含战利品，与<a href="?npc=%d">%s</a>的作战后，在他/她/它死亡后刷新。',
         'key'           => "Key",
         'focus'         => "Spell Focus",
         'focusDesc'     => "Spells requiring this Focus can be cast near this Object",
@@ -463,8 +463,8 @@ $lang = array(
             2 => ["10人普通", "25人普通", "10人英雄", "25人英雄"]
         ),
         'cat'           => array(
-            "未分类",            "野兽",                   "龙类",               "恶魔",                   "元素",               "巨人",                   "亡灵",                   "人型",
-            "小动物",                 "机械",              "Not specified",            "图腾",                   "非战斗宠物",          "气体云雾"
+            "未分类",            "野兽",                   "龙类",               "恶魔",                   "元素",               "巨人",                   "亡灵",                   "人型生物",
+            "小动物",                 "机械",              "未指定",            "图腾",                   "非战斗宠物",          "气体云雾"
         ),
     ),
     'event' => array(
@@ -563,11 +563,11 @@ $lang = array(
         'reqRepMin'     => "至少",
         'reqRepMax'     => "低于",
         'progress'      => "进行", //Progress
-        'provided'      => "Provided",
-        'providedItem'  => "Provided item",
+        'provided'      => "提供的", //Provided
+        'providedItem'  => "提供的物品",
         'completion'    => "完成",
         'description'   => "描述",
-        'playerSlain'   => "Players slain",  //Players slain
+        'playerSlain'   => "玩家被杀",  //Players slain
         'profession'    => "专业",
         'timer'         => "Timer",
         'loremaster'    => "博学者",  //Loremaster
@@ -580,19 +580,19 @@ $lang = array(
         'notSharable'   => "不可共享的",
         'repeatable'    => "可重复的",
         'reqQ'          => "要求",
-        'reqQDesc'      => "To take this quest, you must complete all these quests",
-        'reqOneQ'       => "Requires one of",
-        'reqOneQDesc'   => "To take this quest, you must complete one of the following quests",
-        'opensQ'        => "Opens Quests",
-        'opensQDesc'    => "Completing this quest is requires to take this quests",
-        'closesQ'       => "Closes Quests",
-        'closesQDesc'   => "After completing this quest, you will not be able to take these quests",
+        'reqQDesc'      => "要完成这个任务，你必须完成所有这些任务",
+        'reqOneQ'       => "需要其中之一",
+        'reqOneQDesc'   => "要完成此任务，必须完成下列任务之一",
+        'opensQ'        => "打开任务",
+        'opensQDesc'    => "完成此任务需要接取到这个任务",
+        'closesQ'       => "关闭任务",
+        'closesQDesc'   => "完成此任务后，您将无法接取到这些任务",
         'enablesQ'      => "Enables",
         'enablesQDesc'  => "When this quest is active, these quests are also available",
         'enabledByQ'    => "Enabled by",
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "完成这个任务后，你将获得",
-        'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
+        'theTitle'      => '头衔 "%s"',                                        // partly REWARD_TITLE
         'mailDelivery'  => "你会收到这封信%s%s",
         'mailBy'        => '由<a href="?npc=%d">%s</a>所写',
         'mailIn'        => " after %s",
@@ -600,10 +600,10 @@ $lang = array(
         'experience'    => "经验",
         'expConvert'    => "（或%s如果在等级%d完成）",
         'expConvert2'   => "%s如果在等级%d完成",
-        'chooseItems'   => "你将能够选择其中的一个奖励",       // REWARD_CHOICES
+        'chooseItems'   => "你可以从这些奖励品中选择一件",       // REWARD_CHOICES
         'receiveItems'  => "你将得到",                                      // REWARD_ITEMS_ONLY
-        'receiveAlso'   => "你也将得到",                                 // REWARD_ITEMS
-        'spellCast'     => "下面的法术将会被施放在你身上",               // REWARD_AURA
+        'receiveAlso'   => "你还将得到",                                 // REWARD_ITEMS
+        'spellCast'     => "该法术将被施放在你身上",               // REWARD_AURA
         'spellLearn'    => "你将学会",                                        // REWARD_SPELL
         'bonusTalents'  => "%d天赋|4点数:点数;",                             // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
@@ -616,29 +616,29 @@ $lang = array(
             0 => array( "东部王国",
                   36 => "奥特兰克山脉",              45 => "阿拉希高地",                3 => "荒芜之地",                       25 => "黑石山",              4 => "诅咒之地",
                   46 => "燃烧平原",               279 => "达拉然巨坑",                 41 => "逆风小径",                2257 => "矿道地铁",                    1 => "丹莫罗",
-                  10 => "Duskwood",                      139 => "Eastern Plaguelands",            12 => "Elwynn Forest",                3430 => "Eversong Woods",               3433 => "Ghostlands",
-                 267 => "Hillsbrad Foothills",          1537 => "Ironforge",                    4080 => "Isle of Quel'Danas",             38 => "Loch Modan",                     44 => "Redridge Mountains",
-                  51 => "Searing Gorge",                3487 => "Silvermoon City",               130 => "Silverpine Forest",            1519 => "Stormwind City",                 33 => "Stranglethorn Vale",
-                   8 => "Swamp of Sorrows",               47 => "The Hinterlands",              4298 => "The Scarlet Enclave",            85 => "Tirisfal Glades",              1497 => "Undercity",
-                  28 => "Western Plaguelands",            40 => "Westfall",                       11 => "Wetlands"
+                  10 => "暮色森林",                      139 => "东瘟疫之地",            12 => "艾尔文森林",                3430 => "永歌森林",               3433 => "幽魂之地",
+                 267 => "希尔斯布莱德丘陵",          1537 => "铁炉堡",                    4080 => "奎尔丹纳斯岛",             38 => "洛克莫丹",                     44 => "赤脊山",
+                  51 => "灼热峡谷",                3487 => "银月城",               130 => "银松森林",            1519 => "暴风城",                 33 => "荆棘谷",
+                   8 => "悲伤沼泽",               47 => "辛特兰",              4298 => "东瘟疫之地：血色领地",            85 => "提瑞斯法林地",              1497 => "幽暗城",
+                  28 => "西瘟疫之地",            40 => "西部荒野",                       11 => "湿地"
             ),
-            1 => array( "Kalimdor",
+            1 => array( "卡利姆多",
                   331 => "Ashenvale",                     16 => "Azshara",                      3524 => "Azuremyst Isle",               3525 => "Bloodmyst Isle",                148 => "Darkshore",
                  1657 => "Darnassus",                    405 => "Desolace",                       14 => "Durotar",                        15 => "Dustwallow Marsh",              361 => "Felwood",
                   357 => "Feralas",                      493 => "Moonglade",                     215 => "Mulgore",                      1637 => "Orgrimmar",                    1377 => "Silithus",
                   406 => "Stonetalon Mountains",         440 => "Tanaris",                       141 => "Teldrassil",                     17 => "The Barrens",                  3557 => "The Exodar",
                   457 => "The Veiled Sea",               400 => "Thousand Needles",             1638 => "Thunder Bluff",                 490 => "Un'Goro Crater",                618 => "Winterspring"
              ),
-            8 => array( "Outland",
+            8 => array( "外域",
                 3522 => "Blade's Edge Mountains",       3483 => "Hellfire Peninsula",           3518 => "Nagrand",                      3523 => "Netherstorm",                  3520 => "Shadowmoon Valley",
                  703 => "Shattrath City",               3679 => "Skettis",                      3519 => "Terokkar Forest",              3521 => "Zangarmarsh"
             ),
-           10 => array( "Northrend",
+           10 => array( "诺森德",
                 3537 => "Borean Tundra",                2817 => "Crystalsong Forest",           4395 => "Dalaran",                        65 => "Dragonblight",                  394 => "Grizzly Hills",
                  495 => "Howling Fjord",                4742 => "Hrothgar's Landing",            210 => "Icecrown",                     3711 => "Sholazar Basin",                 67 => "The Storm Peaks",
                 4197 => "Wintergrasp",                    66 => "Zul'Drak"
             ),
-            2 => array( "Dungeons",
+            2 => array( "地下城",
                 4494 => "Ahn'kahet: The Old Kingdom",   3790 => "Auchenai Crypts",              4277 => "Azjol-Nerub",                   719 => "Blackfathom Deeps",            1584 => "Blackrock Depths",
                 1583 => "Blackrock Spire",              1941 => "Caverns of Time",              3905 => "Coilfang Reservoir",           2557 => "Dire Maul",                    4196 => "Drak'Tharon Keep",
                  721 => "Gnomeregan",                   4416 => "Gundrak",                      4272 => "Halls of Lightning",           4820 => "Halls of Reflection",          4264 => "Halls of Stone",
@@ -659,8 +659,8 @@ $lang = array(
                 3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
             ),
             4 => array( "职业",
-                -372 => "死亡骑士",                 -263 => "德鲁伊",                        -261 => "猎人",                       -161 => "Mage",                         -141 => "圣骑士",
-                -262 => "Priest",                       -162 => "Rogue",                         -82 => "萨满祭司",                        -61 => "术士",                       -81 => "战士"
+                -372 => "死亡骑士",                 -263 => "德鲁伊",                        -261 => "猎人",                       -161 => "法师",                         -141 => "圣骑士",
+                -262 => "牧师",                       -162 => "潜行者",                         -82 => "萨满祭司",                        -61 => "术士",                       -81 => "战士"
                     ),
             5 => array( "Professions",
                 -181 => "Alchemy",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
@@ -715,10 +715,10 @@ $lang = array(
         'intro'         => "介绍音乐",
         'ambience'      => "背景音乐",
         'cat'           => array(
-            null,              "法术",            "用户界面", "脚步",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
-            "NPC Combat",      null,                "错误",         "Nature",      "Objects",         null,      "死亡",          "NPC Greetings", null,         "Armor",
-            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
-            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "我的播放列表"
+            null,              "法术",            "用户界面", "脚步",   "武器碰撞", null,      "武器格挡", null,            null,         "拿起/放下",
+            "NPC攻击",      null,                "错误",         "自然",      "对象",         null,      "死亡",          "NPC问候", null,         "护甲",
+            "Footstep Splash", "水(角色)", "水",          "交易技能", "环境气氛",   "装饰物", "法术失败",   "NPC循环",     "区域音乐", "表情",
+            "叙事音乐", "叙事",         50 => "区域气氛", 52 => "发射器", 53 => "载具", 1000 => "我的播放列表"
         )
     ),
     'pet'      => array(
@@ -745,7 +745,7 @@ $lang = array(
     'itemset' => array(
         'notFound'      => "这个物品套装不存在。",
         '_desc'         => "<b>%s</b>是<b>%s</b>。它包含%s件。",
-        '_descTagless'  => "<b>%s</b> is an item set that contains %s pieces.",
+        '_descTagless'  => "<b>%s</b>是物品套装包含%s件。",
         '_setBonuses'   => "套装奖励",
         '_conveyBonus'  => "穿更多这个套装的部分将会提供给你角色奖励。", //Wearing more pieces of this set will convey bonuses to your character.
         '_pieces'       => "件",  //pieces
@@ -763,8 +763,8 @@ $lang = array(
             "竞技场第7赛季套装",                   "T10团队副本套装",                     "竞技场第8赛季套装"
         ),
         'types'         => array(
-            null,               "Cloth",                "Leather",              "Mail",                     "Plate",                    "Dagger",                   "Ring",
-            "Fist Weapon",      "One-Handed Axe",       "One-Handed Mace",      "One-Handed Sword",         "Trinket",                  "Amulet"
+            null,               "布甲",                "皮甲",              "锁甲",                     "板甲",                    "匕首",                   "戒指",
+            "拳套",      "单手斧",       "单手锤",      "单手剑",         "饰品",                  "Amulet"
         )
     ),
     'spell' => array(
@@ -828,8 +828,8 @@ $lang = array(
         'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",
             'link'    => "或",
-            'recipes' => '<a href="?items=9.%s">recipe items</a>',
-            'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">crafted items</a>'
+            'recipes' => '<a href="?items=9.%s">制作物品</a>',
+            'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">手工制作物品</a>'
         ),
         'cat'           => array(                           // as per menu in locale_enus.js
               7 => "职业技能",                          // classList
@@ -840,46 +840,46 @@ $lang = array(
              -6 => "小伙伴", //Companions
              -5 => "坐骑",
              -3 => array(
-                "Pet Skills",               782 => "Ghoul",             270 => "Generic",               653 => "Bat",                       210 => "Bear",                  655 => "Bird of Prey",          211 => "Boar",
-                213 => "Carrion Bird",      209 => "Cat",               780 => "Chimaera",              787 => "Core Hound",                214 => "Crab",                  212 => "Crocolisk",             781 => "Devilsaur",
-                763 => "Dragonhawk",        215 => "Gorilla",           654 => "Hyena",                 775 => "Moth",                      764 => "Nether Ray",            217 => "Raptor",                767 => "Ravager",
-                786 => "Rhino",             236 => "Scorpid",           768 => "Serpent",               783 => "Silithid",                  203 => "Spider",                788 => "Spirit Beast",          765 => "Sporebat",
-                218 => "Tallstrider",       251 => "Turtle",            766 => "Warp Stalker",          785 => "Wasp",                      656 => "Wind Serpent",          208 => "Wolf",                  784 => "Worm",
-                761 => "Felguard",          189 => "Felhunter",         188 => "Imp",                   205 => "Succubus",                  204 => "Voidwalker"
+                "宠物技能",               782 => "食尸鬼",             270 => "通用",               653 => "蝙蝠",                       210 => "熊",                  655 => "猛禽",          211 => "野猪",
+                213 => "食腐鸟",      209 => "豹",               780 => "奇美拉",              787 => "熔岩犬",                214 => "螃蟹",                  212 => "鳄鱼",             781 => "魔暴龙",
+                763 => "龙鹰",        215 => "猩猩",           654 => "土狼",                 775 => "蛾子",                      764 => "虚空鳐",            217 => "迅猛龙",                767 => "掠食者",
+                786 => "犀牛",             236 => "蝎子",           768 => "蛇",               783 => "异种虫",                  203 => "蜘蛛",                788 => "灵魂兽",          765 => "孢子蝠",
+                218 => "陆行鸟",       251 => "海龟",            766 => "迁跃捕猎者",          785 => "巨蜂",                      656 => "风蛇",          208 => "狼",                  784 => "蠕虫",
+                761 => "恶魔卫士",          189 => "地狱猎犬",         188 => "小鬼",                   205 => "魅魔",                  204 => "虚空行者"
             ),
-             -7 => ["Pet Talents", 410 => "Cunning", 411 => "Ferocity", 409 => "Tenacity"],
+             -7 => ["宠物天赋", 410 => "狡诈", 411 => "狂野", 409 => "坚韧"],
              11 => array(
-                "Professions",
-                171 => "Alchemy",
-                164 => ["Blacksmithing", 9788 => "Armorsmithing", 9787 => "Weaponsmithing", 17041 => "Master Axesmithing", 17040 => "Master Hammersmithing", 17039 => "Master Swordsmithing"],
-                333 => "Enchanting",
-                202 => ["Engineering", 20219 => "Gnomish Engineering", 20222 => "Goblin Engineering"],
-                182 => "Herbalism",
-                773 => "Inscription",
-                755 => "Jewelcrafting",
-                165 => ["Leatherworking", 10656 => "Dragonscale Leatherworking", 10658 => "Elemental Leatherworking", 10660 => "Tribal Leatherworking"],
-                186 => "Mining",
-                393 => "Skinning",
-                197 => ["Tailoring", 26798 => "Mooncloth Tailoring", 26801 => "Shadoweave Tailoring", 26797 => "Spellfire Tailoring"],
+                "专业",
+                171 => "炼金术",
+                164 => ["锻造", 9788 => "防具锻造", 9787 => "武器锻造", 17041 => "大师级铸斧", 17040 => "大师级铸锤", 17039 => "大师级铸剑"],
+                333 => "附魔",
+                202 => ["工程学", 20219 => "侏儒工程学", 20222 => "地精工程学"],
+                182 => "草药学",
+                773 => "铭文",
+                755 => "珠宝加工",
+                165 => ["制皮", 10656 => "龙鳞制皮", 10658 => "元素制皮", 10660 => "部族制皮"],
+                186 => "采矿",
+                393 => "剥皮",
+                197 => ["裁缝", 26798 => "月布裁缝", 26801 => "暗纹裁缝", 26797 => "魔焰裁缝"],
             ),
-              9 => ["Secondary Skills", 185 => "Cooking", 129 => "First Aid", 356 => "Fishing", 762 => "Riding"],
-             -8 => "NPC Abilities",
-             -9 => "GM Abilities",
-              0 => "Uncategorized"
+              9 => ["辅助专业", 185 => "烹饪", 129 => "急救", 356 => "钓鱼", 762 => "骑术"],
+             -8 => "NPC能力",
+             -9 => "GM能力",
+              0 => "未分类"
         ),
         'armorSubClass' => array(                           // ItemSubClass.dbc/2
-            "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
-            null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
-            "Sigils"
+            "杂项",                        "布甲",                          "皮甲",                        "锁甲",                           "板甲",
+            null,                                   "盾牌",                              "圣契",                              "神像",                                "图腾",
+            "魔印"
         ),
         'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content firts, then alphabeticaly
-            15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
-             6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
-             2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
-            20 => "Fishing Poles",                  14 => "Miscellaneous"
+            15 => "匕首",                        13 => "拳套",                    0 => "单手斧",                 4 => "单手杖",                7 => "单手剑",
+             6 => "长柄武器",                       10 => "法杖",                          1 => "双手斧",                 5 => "双手锤",                8 => "双手剑",
+             2 => "弓",                           18 => "弩",                       3 => "枪",                           16 => "投掷",                         19 => "魔杖",
+            20 => "鱼竿",                  14 => "杂项"
         ),
         'subClassMasks' => array(
-            0x02A5F3 => "近战武器",             0x0060 => "Shield",                     0x04000C => "Ranged Weapon",            0xA091 => "单手近战武器"
+            0x02A5F3 => "近战武器",             0x0060 => "盾牌",                     0x04000C => "远程武器",            0xA091 => "单手近战武器"
         ),
         'traitShort'    => array(
             'atkpwr'    => "AP",                    'rgdatkpwr' => "RAP",                   'splpwr'    => "SP",                    'arcsplpwr' => "ArcP",                  'firsplpwr' => "FireP",
@@ -887,11 +887,11 @@ $lang = array(
             'str'       => "Str",                   'agi'       => "Agi",                   'sta'       => "Sta",                   'int'       => "Int",                   'spi'       => "Spi"
         ),
         'spellModOp'    => array(
-            "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "可使用次数",
-            "Range",                                "Radius",                               "Critical Hit Chance",                  "All Effects",                          "Casting Time loss",
-            "Casting Time",                         "Cooldown",                             "Effect 2",                             "Ignore Armor",                         "Cost",
+            "伤害",                               "持续时间",                             "Thread",                               "效果1",                             "可使用次数",
+            "范围",                                "半径",                               "Critical Hit Chance",                  "所有效果",                          "Casting Time loss",
+            "Casting Time",                         "冷却时间",                             "效果2",                             "无视护甲",                         "花费",
             "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
-            "Multiplier (Damage)",                  "Global Cooldown",                      "Damage over Time",                     "Effect 3",                             "Multiplier (Bonus)",
+            "Multiplier (Damage)",                  "公共冷却时间",                      "Damage over Time",                     "效果3",                             "Multiplier (Bonus)",
             null,                                   "Procs per Minute",                     "Multiplier (Value)",                   "Chance to Resist Dispel",              "Critical Damage Bonus2",
             "Refund Cost on Fail"
         ),
@@ -913,18 +913,18 @@ $lang = array(
         'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"],
         'unkEffect'     => '未知效果',  //Unknown Effect
         'effects'       => array(
-/*0-5    */ '无',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
-/*6+     */ 'Apply Aura',               'Environmental Damage',     'Power Drain',              'Health Leech',             'Heal',                     'Bind',
-/*12+    */ 'Portal',                   'Ritual Base',              'Ritual Specialize',        'Ritual Activate Portal',   'Quest Complete',           'Weapon Damage NoSchool',
-/*18+    */ 'Resurrect',                'Add Extra Attacks',        'Dodge',                    'Evade',                    'Parry',                    'Block',
-/*24+    */ 'Create Item',              'Can Use Weapon',           'Defense',                  'Persistent Area Aura',     'Summon',                   'Leap',
-/*30+    */ 'Energize',                 'Weapon Damage Percent',    'Trigger Missile',          'Open Lock',                'Summon Change Item',       'Apply Area Aura Party',
-/*36+    */ 'Learn Spell',              'Spell Defense',            'Dispel',                   'Language',                 'Dual Wield',               'Jump',
+/*0-5    */ '无',                     '杀死',                '类型伤害',            'Dummy',                    '传送门',          '传送单位',
+/*6+     */ '应用光环',               '环境伤害',     'Power Drain',              'Health Leech',             'Heal',                     'Bind',
+/*12+    */ 'Portal',                   'Ritual Base',              'Ritual Specialize',        'Ritual Activate Portal',   '任务完成',           'Weapon Damage NoSchool',
+/*18+    */ '复活',                'Add Extra Attacks',        '躲闪',                    '闪避',                    '招架',                    '格挡',
+/*24+    */ '创建物品',              '可以使用武器',           '防御',                  'Persistent Area Aura',     '召唤',                   'Leap',
+/*30+    */ 'Energize',                 '武器伤害百分比',    'Trigger Missile',          'Open Lock',                'Summon Change Item',       'Apply Area Aura Party',
+/*36+    */ '学习法术',              '法术防御',            '驱散',                   'Language',                 'Dual Wield',               'Jump',
 /*42+    */ 'Jump Dest',                'Teleport Units Face Caster','Skill Step',              'Add Honor',                'Spawn',                    'Trade Skill',
 /*48+    */ 'Stealth',                  'Detect',                   'Trans Door',               'Force Critical Hit',       'Guarantee Hit',            'Enchant Item Permanent',
 /*54+    */ 'Enchant Item Temporary',   'Tame Creature',            'Summon Pet',               'Learn Pet Spell',          'Weapon Damage Flat',       'Create Random Item',
 /*60+    */ 'Proficiency',              'Send Event',               'Power Burn',               'Threat',                   'Trigger Spell',            'Apply Area Aura Raid',
-/*66+    */ 'Create Mana Gem',          'Heal Max Health',          'Interrupt Cast',           'Distract',                 'Pull',                     'Pickpocket',
+/*66+    */ 'Create Mana Gem',          'Heal Max Health',          'Interrupt Cast',           'Distract',                 'Pull',                     '偷窃',
 /*72+    */ 'Add Farsight',             'Untrain Talents',          'Apply Glyph',              'Heal Mechanical',          'Summon Object Wild',       'Script Effect',
 /*78+    */ 'Attack',                   'Sanctuary',                'Add Combo Points',         'Create House',             'Bind Sight',               'Duel',
 /*84+    */ 'Stuck',                    'Summon Player',            'Activate Object',          'WMO Damage',               'WMO Repair',               'WMO Change',
@@ -1039,18 +1039,18 @@ $lang = array(
         'useInArena'    => "可在竞技场状态下使用",
         'refundable'    => "可退还的",
         'noNeedRoll'    => "Cannot roll Need",
-        'atKeyring'     => "Can be placed in the keyring",
+        'atKeyring'     => "可以放在钥匙链",
         'worth'         => "Worth",
         'consumable'    => "消耗品",
-        'nonConsumable' => "Non-consumable",
+        'nonConsumable' => "非消耗品",
         'accountWide'   => "Account-wide",
         'millable'      => "可研磨",                      // ITEM_MILLABLE
-        'noEquipCD'     => "No equip cooldown",
+        'noEquipCD'     => "没有装备的冷却时间",
         'prospectable'  => "可选矿",                  // ITEM_PROSPECTABLE
         'disenchantable'=> "可分解",                // ITEM_DISENCHANT_ANY_SKILL
         'cantDisenchant'=> "无法分解",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
         'repairCost'    => "修理费用",                   // REPAIR_COST
-        'tool'          => "Tool",
+        'tool'          => "工具",
         'cost'          => "花费",                          // COSTS_LABEL  //Cost
         'content'       => "内容",
         '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
@@ -1061,8 +1061,8 @@ $lang = array(
         '_quality'      => "质量",                       // QUALITY
         'usableBy'      => "Usable by",
         'buyout'        => "一口价",                  // BUYOUT_PRICE
-        'each'          => "each",
-        'tabOther'      => "Other",
+        'each'          => "每个", //each
+        'tabOther'      => "其他",
         'reqMinLevel'   => "需要等级 %d",             // ITEM_MIN_LEVEL
         'reqLevelRange' => "需要等级 %d 到 %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
         'unique'        => ["唯一",          "唯一(%d)", "唯一：%s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
@@ -1073,7 +1073,7 @@ $lang = array(
                         //  basic,                          basic /w school,                add basic,                  add basic /w school
             'single'    => ["%d 伤害",                    "%d %s 伤害",                 "+ %d 伤害",              "+%d %s 伤害"             ],
             'range'     => ["%d - %d 伤害",               "%d - %d %s 伤害",            "+ %d - %d 伤害",         "+%d - %d %s 伤害"        ],
-            'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
+            'ammo'      => ["增加 %g 伤害每秒",    "增加 %g %s 伤害每秒", "+ %g 伤害每秒",   "+ %g %s 伤害每秒" ]
         ),
         'gems'          => "宝石",
         'socketBonus'   => "镶孔奖励",                  // ITEM_SOCKET_BONUS
@@ -1133,38 +1133,38 @@ $lang = array(
         'projectileSubClass' => array(                      // ItemSubClass.dbc/6
             null,                   null,               "箭",                   "子弹",                         null
         ),
-        'elixirType'    => [null, "Battle", "Guardian"],
+        'elixirType'    => [null, "战斗", "守护"],
         'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
              2 => "武器",                                // self::$spell['weaponSubClass']
              4 => array("护甲", array(
                  1 => "布甲",                 2 => "皮甲",           3 => "锁甲",              4 => "板甲",             6 => "盾牌",                 7 => "圣契",
                  8 => "圣像",                       9 => "图腾",                 10 => "魔印",                 -6 => "斗篷",                 -5 => "副手",        -8 => "衬衫",
-                -7 => "战袍",                    -3 => "项链",                -2 => "戒指",                  -4 => "饰品",                0 => "Miscellaneous (Armor)",
+                -7 => "战袍",                    -3 => "项链",                -2 => "戒指",                  -4 => "饰品",                0 => "杂项（护甲）",
             )),
-             1 => array("Containers", array(
-                 0 => "Bags",                        3 => "Enchanting Bags",         4 => "Engineering Bags",        5 => "Gem Bags",                2 => "Herb Bags",               8 => "Inscription Bags",
-                 7 => "Leatherworking Bags",         6 => "Mining Bags",             1 => "Soul Bags"
+             1 => array("容器", array(
+                 0 => "背包",                        3 => "附魔材料包",         4 => "工程学材料包",        5 => "宝石袋",                2 => "草药包",               8 => "铭文包",
+                 7 => "制皮材料包",         6 => "矿石袋",             1 => "灵魂袋"
             )),
-             0 => array("Consumables", array(
-                -3 => "Item Enhancements (Temporary)",                               6 => "Item Enhancements (Permanent)",                           2 => ["Elixirs", [1 => "Battle Elixirs", 2 => "Guardian Elixirs"]],
-                 1 => "Potions",                     4 => "Scrolls",                 7 => "Bandages",                0 => "Consumables",             3 => "Flasks",                  5 => "Food & Drinks",
-                 8 => "Other (Consumables)"
+             0 => array("消耗品", array(
+                -3 => "物品强化（临时）",                               6 => "物品强化（永久）",                           2 => ["药剂", [1 => "战斗药剂", 2 => "守护药剂"]],
+                 1 => "药水",                     4 => "卷轴",                 7 => "绷带",                0 => "消耗品",             3 => "合剂",                  5 => "食物和饮料",
+                 8 => "其他（消耗品）"
             )),
             16 => array("雕文", array(
                  1 => "战士雕文",              2 => "圣骑士雕文",          3 => "猎人雕文",           4 => "潜行者雕文",            5 => "牧师雕文",           6 => "死亡骑士雕文",
                  7 => "萨满祭司雕文",               8 => "法师雕文",             9 => "术士雕文",         11 => "德鲁伊雕文"
             )),
-             7 => array("贸易货物", array(
-                14 => "护甲附魔",          5 => "Cloth",                   3 => "Devices",                10 => "Elemental",              12 => "Enchanting",              2 => "Explosives",
-                 9 => "Herbs",                       4 => "Jewelcrafting",           6 => "Leather",                13 => "Materials",               8 => "Meat",                    7 => "Metal & Stone",
-                 1 => "Parts",                      15 => "Weapon Enchantments",    11 => "Other (Trade Goods)"
+             7 => array("杂货", array(
+                14 => "护甲附魔",          5 => "布甲",                   3 => "装置",                10 => "元素",              12 => "附魔",              2 => "爆炸物",
+                 9 => "草药",                       4 => "珠宝加工",           6 => "皮甲",                13 => "原料",               8 => "肉类",                    7 => "金属和矿石",
+                 1 => "零件",                      15 => "武器附魔",    11 => "其他（杂货）"
              )),
-             6 => ["弹药", [                  2 => "Arrows",                  3 => "Bullets"     ]],
-            11 => ["Quivers",     [                  2 => "Quivers",                 3 => "Ammo Pouches"]],
+             6 => ["弹药", [                  2 => "箭",                  3 => "子弹"     ]],
+            11 => ["箭袋",     [                  2 => "箭袋",                 3 => "弹药袋"]],
              9 => array("配方", array(
-                 0 => "Books",                       6 => "Alchemy Recipes",         4 => "Blacksmithing Plans",     5 => "Cooking Recipes",         8 => "Enchanting Formulae",     3 => "Engineering Schematics",
-                 7 => "First Aid Books",             9 => "Fishing Books",          11 => "Inscription Techniques", 10 => "Jewelcrafting Designs",   1 => "Leatherworking Patterns",12 => "Mining Guides",
-                 2 => "Tailoring Patterns"
+                 0 => "书籍",                       6 => "炼金术配方",         4 => "锻造设计图",     5 => "烹饪配方",         8 => "附魔公式",     3 => "工程学图纸",
+                 7 => "急救书籍",             9 => "钓鱼书籍",          11 => "铭文", 10 => "珠宝加工设计图",   1 => "制皮",12 => "采矿",
+                 2 => "裁缝"
             )),
              3 => array("宝石", array(
                  6 => "多彩宝石",                   0 => "红色宝石",                1 => "蓝色宝石",               2 => "黄色宝石",             3 => "紫色宝石",             4 => "绿色宝石",
