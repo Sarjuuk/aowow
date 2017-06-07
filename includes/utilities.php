@@ -411,11 +411,11 @@ class Util
 
         // locale not enUS; aowow-type localization available; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && !empty($data[$field.'_loc0']))
-            return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
+            return $silent ? $data[$field.'_loc0'] : ''.$data[$field.'_loc0'].'';
 
         // locale not enUS; TC localization; add brackets if not silent
         else if (User::$localeId != LOCALE_EN && !empty($data[$field]))
-            return $silent ? $data[$field] : '['.$data[$field].']';
+            return $silent ? $data[$field] : ''.$data[$field].'';
 
         // locale enUS; TC localization; return normal
         else if (User::$localeId == LOCALE_EN && !empty($data[$field]))
