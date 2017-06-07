@@ -1688,9 +1688,9 @@ var g_quest_sorts = {
 };
 
 var g_quest_types = {
-     0: 'Normal',
-     1: 'Group',
-    21: 'Life',
+     0: '普通', //Normal
+     1: '组队',
+    21: '传记',
     41: 'PvP',
     62: '团队副本',
     81: '地下城',

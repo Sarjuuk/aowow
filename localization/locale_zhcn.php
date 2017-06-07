@@ -281,12 +281,12 @@ $lang = array(
             "潜行",                      "枭兽形态",                 "救赎之魂"
         ),
         'me'            => array(                           // SpellMechanic.dbc .. not quite
-            null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
-            "Gripped",                      "Rooted",                       "Pacified",                     "Silenced",                     "Asleep",                       "Ensnared",
-            "Stunned",                      "Frozen",                       "Incapacitated",                "Bleeding",                     "Healing",                      "Polymorphed",
-            "Banished",                     "Shielded",                     "Shackled",                     "Mounted",                      "Seduced",                      "Turned",
-            "Horrified",                    "Invulnerable",                 "Interrupted",                  "Dazed",                        "Discovery",                    "Invulnerable",
-            "Sapped",                       "Enraged"
+            null,                           "被魅惑",                      "迷惑",                  "被缴械",                     "被吸引",                   "逃跑",
+            "笨拙",                      "被定身",                       "平静",                     "沉默",                     "沉睡",                       "诱捕",
+            "昏迷",                      "冻结",                       "瘫痪",                "流血",                     "治疗",                      "被变形",
+            "被放逐",                     "被防护",                     "被禁锢",                     "骑乘",                      "被诱惑",                      "转向",
+            "惊骇",                    "无敌",                 "被打断",                  "眩晕",                        "被发现",                    "无敌",
+            "被闷棍",                       "激怒"
         ),
         'ct'            => array(                           // CreatureType.dbc
             "未分类",                "野兽",                        "龙类",                    "恶魔",                        "元素生物",                    "巨人",
@@ -340,7 +340,7 @@ $lang = array(
 
         // dashboard
         'ipAddress'     => "IP地址",
-        'lastIP'        => "last used IP",
+        'lastIP'        => "上次使用IP地址",
         'myAccount'     => "我的账号",
         'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
         'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
@@ -435,12 +435,12 @@ $lang = array(
         'classification'=> "分类",   //Classification
         'petFamily'     => "宠物家族",
         'react'         => "反应",  //React
-        'worth'         => "Worth",
+        'worth'         => "价值",  //Worth
         'unkPosition'   => "这个NPC的位置未知。",
         'difficultyPH'  => "这个NPC是不同模式下的占位符，是",
         'seat'          => "Seat",
-        'accessory'     => "Accessories",
-        'accessoryFor'  => "This NPC is an accessory for vehicle",
+        'accessory'     => "附件",
+        'accessoryFor'  => "这个NPC是载具的附件",
         'quotes'        => "引用",  //Quotes
         'gainsDesc'     => "杀死这个NPC后你将得到",
         'repWith'       => "点声望点数在", //reputation with
@@ -480,7 +480,7 @@ $lang = array(
         'criteria'      => "达成条件",  //Criteria
         'points'        => "点数",
         'series'        => "系列",  //Series
-        'outOf'         => "out of", //out of
+        'outOf'         => "/", //out of
         'criteriaType'  => "Criterium Type-Id:",
         'itemReward'    => "你将得到",
         'titleReward'   => '你将被授予头衔"<a href="?title=%d">%s</a>"',
@@ -587,10 +587,10 @@ $lang = array(
         'opensQDesc'    => "完成此任务需要接取到这个任务",
         'closesQ'       => "关闭任务",
         'closesQDesc'   => "完成此任务后，您将无法接取到这些任务",
-        'enablesQ'      => "Enables",
-        'enablesQDesc'  => "When this quest is active, these quests are also available",
-        'enabledByQ'    => "Enabled by",
-        'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
+        'enablesQ'      => "可用",
+        'enablesQDesc'  => "当这个任务是活跃的，这些任务也可用",
+        'enabledByQ'    => "启用自",
+        'enabledByQDesc'=> "只有当这些任务中的一个活跃时，这个任务才可用",
         'gainsDesc'     => "完成这个任务后，你将获得",
         'theTitle'      => '头衔 "%s"',                                        // partly REWARD_TITLE
         'mailDelivery'  => "你会收到这封信%s%s",
@@ -609,7 +609,7 @@ $lang = array(
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'attachment'    => "附件",
         'questInfo'     => array(
-             0 => "Normal",              1 => "Group",              21 => "Life",               41 => "PvP",                62 => "团队副本",               81 => "地下城",            82 => "世界事件",
+             0 => "普通",              1 => "组队",              21 => "传记",               41 => "PvP",                62 => "团队副本",               81 => "地下城",            82 => "世界事件",
             83 => "传说",          84 => "护送",             85 => "英雄",             88 => "团队副本(10)",          89 => "团队副本(25)"
         ),
         'cat'           => array(
