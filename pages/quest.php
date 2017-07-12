@@ -258,7 +258,7 @@ class QuestPage extends GenericPage
         $_ = $chain[0][0];
         while ($_)
         {
-            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask FROM ?_quests WHERE nextQuestIdChain = ?d', $_['typeId']))
+            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, reqRaceMask FROM ?_quests WHERE nextQuestIdChain = ?d', $_['typeId']))
             {
                 if ($_['error'])
                 {
@@ -281,7 +281,7 @@ class QuestPage extends GenericPage
         $_ = end($chain)[0];
         while ($_)
         {
-            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, reqRaceMask, nextQuestIdChain AS _next FROM ?_quests WHERE id = ?d', $_['_next']))
+            if ($_ = DB::Aowow()->selectRow('SELECT id AS typeId, IF(id = nextQuestIdChain, 1, 0) AS error, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, reqRaceMask, nextQuestIdChain AS _next FROM ?_quests WHERE id = ?d', $_['_next']))
             {
                 if ($_['error'])                                // error already triggered
                     break;

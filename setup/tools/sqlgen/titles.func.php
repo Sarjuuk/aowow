@@ -49,7 +49,7 @@ function titles()
         WHERE
             qt.RewardTitle <> 0';
 
-    DB::Aowow()->query('REPLACE INTO ?_titles SELECT id, 0, 0, 0, 0, 0, 0, 0, bitIdx, male_loc0, male_loc2, male_loc3, male_loc6, male_loc8, female_loc0, female_loc2, female_loc3, female_loc6, female_loc8 FROM dbc_chartitles');
+    DB::Aowow()->query('REPLACE INTO ?_titles SELECT id, 0, 0, 0, 0, 0, 0, 0, bitIdx, male_loc0, male_loc2, male_loc3, male_loc4, male_loc6, male_loc8, female_loc0, female_loc2, female_loc3, female_loc4, female_loc6, female_loc8 FROM dbc_chartitles');
 
     // hide unused titles
     DB::Aowow()->query('UPDATE ?_titles SET cuFlags = ?d WHERE id BETWEEN 85 AND 123 AND id NOT IN (113, 120, 121, 122)', CUSTOM_EXCLUDE_FOR_LISTVIEW);

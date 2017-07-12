@@ -76,23 +76,23 @@ function quests(array $ids = [])
             IF (RewardFactionOverride3 <> 0, RewardFactionOverride3 / 100, RewardFactionValue3),
             IF (RewardFactionOverride4 <> 0, RewardFactionOverride4 / 100, RewardFactionValue4),
             IF (RewardFactionOverride5 <> 0, RewardFactionOverride5 / 100, RewardFactionValue5),
-            q.LogTitle,                         IFNULL(qtl2.Title, ""),              IFNULL(qtl3.Title, ""),              IFNULL(qtl6.Title, ""),              IFNULL(qtl8.Title, ""),
-            q.LogDescription,                   IFNULL(qtl2.Objectives, ""),         IFNULL(qtl3.Objectives, ""),         IFNULL(qtl6.Objectives, ""),         IFNULL(qtl8.Objectives, ""),
-            q.QuestDescription,                 IFNULL(qtl2.Details, ""),            IFNULL(qtl3.Details, ""),            IFNULL(qtl6.Details, ""),            IFNULL(qtl8.Details, ""),
-            q.AreaDescription,                  IFNULL(qtl2.EndText, ""),            IFNULL(qtl3.EndText, ""),            IFNULL(qtl6.EndText, ""),            IFNULL(qtl8.EndText, ""),
-            IFNULL(qor.RewardText, ""),         IFNULL(qtl2.OfferRewardText, ""),    IFNULL(qtl3.OfferRewardText, ""),    IFNULL(qtl6.OfferRewardText, ""),    IFNULL(qtl8.OfferRewardText, ""),
-            IFNULL(qri.CompletionText, ""),     IFNULL(qtl2.RequestItemsText, ""),   IFNULL(qtl3.RequestItemsText, ""),   IFNULL(qtl6.RequestItemsText, ""),   IFNULL(qtl8.RequestItemsText, ""),
-            q.QuestCompletionLog,               IFNULL(qtl2.CompletedText, ""),      IFNULL(qtl3.CompletedText, ""),      IFNULL(qtl6.CompletedText, ""),      IFNULL(qtl8.CompletedText, ""),
+            q.LogTitle,                         IFNULL(qtl2.Title, ""),              IFNULL(qtl3.Title, ""),              IFNULL(qtl4.Title, ""),		IFNULL(qtl6.Title, ""),              IFNULL(qtl8.Title, ""),
+            q.LogDescription,                   IFNULL(qtl2.Objectives, ""),         IFNULL(qtl3.Objectives, ""),         IFNULL(qtl4.Objectives, ""), 		IFNULL(qtl6.Objectives, ""),         IFNULL(qtl8.Objectives, ""),
+            q.QuestDescription,                 IFNULL(qtl2.Details, ""),            IFNULL(qtl3.Details, ""),            IFNULL(qtl4.Details, ""),		IFNULL(qtl6.Details, ""),            IFNULL(qtl8.Details, ""),
+            q.AreaDescription,                  IFNULL(qtl2.EndText, ""),            IFNULL(qtl3.EndText, ""),            IFNULL(qtl4.EndText, ""),      	IFNULL(qtl6.EndText, ""),            IFNULL(qtl8.EndText, ""),
+            IFNULL(qor.RewardText, ""),         IFNULL(qtl2.OfferRewardText, ""),    IFNULL(qtl3.OfferRewardText, ""),    IFNULL(qtl4.OfferRewardText, ""),     IFNULL(qtl6.OfferRewardText, ""),    IFNULL(qtl8.OfferRewardText, ""),
+            IFNULL(qri.CompletionText, ""),     IFNULL(qtl2.RequestItemsText, ""),   IFNULL(qtl3.RequestItemsText, ""),   IFNULL(qtl4.RequestItemsText, ""),    IFNULL(qtl6.RequestItemsText, ""),   IFNULL(qtl8.RequestItemsText, ""),
+            q.QuestCompletionLog,               IFNULL(qtl2.CompletedText, ""),      IFNULL(qtl3.CompletedText, ""),      IFNULL(qtl4.CompletedText, ""),       IFNULL(qtl6.CompletedText, ""),      IFNULL(qtl8.CompletedText, ""),
             RequiredNpcOrGo1,                   RequiredNpcOrGo2,                    RequiredNpcOrGo3,                    RequiredNpcOrGo4,
             RequiredNpcOrGoCount1,              RequiredNpcOrGoCount2,               RequiredNpcOrGoCount3,               RequiredNpcOrGoCount4,
             ItemDrop1,                          ItemDrop2,                           ItemDrop3,                           ItemDrop4,
             ItemDropQuantity1,                  ItemDropQuantity2,                   ItemDropQuantity3,                   ItemDropQuantity4,
             RequiredItemId1,                    RequiredItemId2,                     RequiredItemId3,                     RequiredItemId4,                     RequiredItemId5,                      RequiredItemId6,
             RequiredItemCount1,                 RequiredItemCount2,                  RequiredItemCount3,                  RequiredItemCount4,                  RequiredItemCount5,                   RequiredItemCount6,
-            q.ObjectiveText1,                   IFNULL(qtl2.ObjectiveText1, ""),     IFNULL(qtl3.ObjectiveText1, ""),     IFNULL(qtl6.ObjectiveText1, ""),     IFNULL(qtl8.ObjectiveText1, ""),
-            q.ObjectiveText2,                   IFNULL(qtl2.ObjectiveText2, ""),     IFNULL(qtl3.ObjectiveText2, ""),     IFNULL(qtl6.ObjectiveText2, ""),     IFNULL(qtl8.ObjectiveText2, ""),
-            q.ObjectiveText3,                   IFNULL(qtl2.ObjectiveText3, ""),     IFNULL(qtl3.ObjectiveText3, ""),     IFNULL(qtl6.ObjectiveText3, ""),     IFNULL(qtl8.ObjectiveText3, ""),
-            q.ObjectiveText4,                   IFNULL(qtl2.ObjectiveText4, ""),     IFNULL(qtl3.ObjectiveText4, ""),     IFNULL(qtl6.ObjectiveText4, ""),     IFNULL(qtl8.ObjectiveText4, "")
+            q.ObjectiveText1,                   IFNULL(qtl2.ObjectiveText1, ""),     IFNULL(qtl3.ObjectiveText1, ""),     IFNULL(qtl4.ObjectiveText1, ""),     IFNULL(qtl6.ObjectiveText1, ""),     IFNULL(qtl8.ObjectiveText1, ""),
+            q.ObjectiveText2,                   IFNULL(qtl2.ObjectiveText2, ""),     IFNULL(qtl3.ObjectiveText2, ""),     IFNULL(qtl4.ObjectiveText2, ""),     IFNULL(qtl6.ObjectiveText2, ""),     IFNULL(qtl8.ObjectiveText2, ""),
+            q.ObjectiveText3,                   IFNULL(qtl2.ObjectiveText3, ""),     IFNULL(qtl3.ObjectiveText3, ""),     IFNULL(qtl4.ObjectiveText3, ""),     IFNULL(qtl6.ObjectiveText3, ""),     IFNULL(qtl8.ObjectiveText3, ""),
+            q.ObjectiveText4,                   IFNULL(qtl2.ObjectiveText4, ""),     IFNULL(qtl3.ObjectiveText4, ""),     IFNULL(qtl4.ObjectiveText4, ""),     IFNULL(qtl6.ObjectiveText4, ""),     IFNULL(qtl8.ObjectiveText4, "")
         FROM
             quest_template q
         LEFT JOIN
@@ -105,6 +105,8 @@ function quests(array $ids = [])
             quest_template_locale qtl2 ON q.ID = qtl2.ID AND qtl2.locale = "frFR"
         LEFT JOIN
             quest_template_locale qtl3 ON q.ID = qtl3.ID AND qtl3.locale = "deDE"
+        LEFT JOIN
+            quest_template_locale qtl4 ON q.ID = qtl4.ID AND qtl4.locale = "zhCN"
         LEFT JOIN
             quest_template_locale qtl6 ON q.ID = qtl6.ID AND qtl6.locale = "esES"
         LEFT JOIN

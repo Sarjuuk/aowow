@@ -36,14 +36,16 @@ class AchievementList extends BaseType
         $rewards = DB::World()->select('
             SELECT
                 ar.ID AS ARRAY_KEY, ar.TitleA, ar.TitleH, ar.ItemID, ar.Sender AS sender, ar.MailTemplateID,
-                ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
-                ar.Text    AS text_loc0,    IFNULL(arl2.Text,    "") AS text_loc2,    IFNULL(arl3.Text,    "") AS text_loc3,    IFNULL(arl6.Text,    "") AS text_loc6,    IFNULL(arl8.Text,    "") AS text_loc8
+                ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl4.Subject, "") AS subject_loc4, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
+                ar.Text    AS text_loc0,    IFNULL(arl2.Text,    "") AS text_loc2,    IFNULL(arl3.Text,    "") AS text_loc3,  IFNULL(arl4.Text,    "") AS text_loc4,   IFNULL(arl6.Text,    "") AS text_loc6,    IFNULL(arl8.Text,    "") AS text_loc8
             FROM
                 achievement_reward ar
             LEFT JOIN
                 achievement_reward_locale arl2 ON arl2.ID = ar.ID AND arl2.Locale = "frFR"
             LEFT JOIN
                 achievement_reward_locale arl3 ON arl3.ID = ar.ID AND arl3.Locale = "deDE"
+			LEFT JOIN
+                achievement_reward_locale arl4 ON arl4.ID = ar.ID AND arl4.Locale = "zhCN"
             LEFT JOIN
                 achievement_reward_locale arl6 ON arl6.ID = ar.ID AND arl6.Locale = "esES"
             LEFT JOIN

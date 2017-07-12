@@ -1208,7 +1208,7 @@ class SpellPage extends GenericPage
             return false;
 
         $item = DB::Aowow()->selectRow('
-            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.name AS iconString, quality,
+            SELECT  name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, i.id, ic.name AS iconString, quality,
             IF ( (spellId1 > 0 AND spellCharges1 < 0) OR
                  (spellId2 > 0 AND spellCharges2 < 0) OR
                  (spellId3 > 0 AND spellCharges3 < 0) OR
@@ -1259,7 +1259,7 @@ class SpellPage extends GenericPage
         $spells = DB::Aowow()->select('
             SELECT  reagent1,      reagent2,      reagent3,      reagent4,      reagent5,      reagent6,      reagent7,      reagent8,
                     reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8,
-                    name_loc0,     name_loc2,     name_loc3,     name_loc6,     name_loc8,
+                    name_loc0,     name_loc2,     name_loc3,     name_loc4,     name_loc6,     name_loc8,
                     s.id AS ARRAY_KEY, ic.name AS iconString
             FROM    ?_spell s
             JOIN    ?_icons ic ON s.iconId = ic.id

@@ -217,10 +217,10 @@ class ObjectPage extends GenericPage
         if ($_ = DB::Aowow()->selectCell('SELECT ABS(npcId) FROM ?_loot_link WHERE objectId = ?d', $this->typeId))
         {
             // difficulty dummy
-            if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', $_, $_, $_))
+            if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', $_, $_, $_))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
             // base creature
-            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $_))
+            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $_))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 

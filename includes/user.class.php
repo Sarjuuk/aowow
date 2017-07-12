@@ -170,10 +170,11 @@ class User
         {
             $loc = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
             switch ($loc) {
-                case 'ru': $loc = LOCALE_RU; break;
-                case 'es': $loc = LOCALE_ES; break;
-                case 'de': $loc = LOCALE_DE; break;
                 case 'fr': $loc = LOCALE_FR; break;
+                case 'de': $loc = LOCALE_DE; break;
+                case 'zh': $loc = LOCALE_CN; break;         // may cause issues in future with zh-tw
+                case 'es': $loc = LOCALE_ES; break;
+                case 'ru': $loc = LOCALE_RU; break;
                 default:   $loc = LOCALE_EN;
             }
         }

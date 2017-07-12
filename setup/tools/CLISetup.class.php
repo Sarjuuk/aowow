@@ -39,6 +39,7 @@ class CLISetup
         ''     => LOCALE_EN,    'enGB' => LOCALE_EN,    'enUS' => LOCALE_EN,
         'frFR' => LOCALE_FR,
         'deDE' => LOCALE_DE,
+        'zhCN' => LOCALE_CN,    'enCN' => LOCALE_CN,
         'esES' => LOCALE_ES,    'esMX' => LOCALE_ES,
         'ruRU' => LOCALE_RU
     );
@@ -62,8 +63,8 @@ class CLISetup
             if (!empty($_['locales']))
             {
                 // engb and enus are identical for all intents and purposes
-                $from = ['engb', 'esmx'];
-                $to   = ['enus', 'eses'];
+                $from = ['engb', 'esmx', 'encn'];
+                $to   = ['enus', 'eses', 'zhcn'];
                 $_['locales'] = str_ireplace($from, $to, strtolower($_['locales']));
 
                 self::$locales = array_intersect(Util::$localeStrings, explode(',', $_['locales']));

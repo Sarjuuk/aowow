@@ -50,9 +50,9 @@ function emotes(/*array $ids = [] */)
             LOWER(et.command),
             IF(e.animationId, 1, 0),
             0,                                              -- cuFlags
-            etdT.text_loc0,  etdT.text_loc2,  etdT.text_loc3,  etdT.text_loc6,  etdT.text_loc8,
-            etdNT.text_loc0, etdNT.text_loc2, etdNT.text_loc3, etdNT.text_loc6, etdNT.text_loc8,
-            etdS.text_loc0,  etdS.text_loc2,  etdS.text_loc3,  etdS.text_loc6,  etdS.text_loc8
+            etdT.text_loc0,  etdT.text_loc2,  etdT.text_loc3,  etdT.text_loc4,  etdT.text_loc6,  etdT.text_loc8,
+            etdNT.text_loc0, etdNT.text_loc2, etdNT.text_loc3, etdNT.text_loc4, etdNT.text_loc6, etdNT.text_loc8,
+            etdS.text_loc0,  etdS.text_loc2,  etdS.text_loc3,  etdS.text_loc4,  etdS.text_loc6,  etdS.text_loc8
         FROM
             dbc_emotestext et
         LEFT JOIN

@@ -40,7 +40,7 @@ class SkillList extends BaseType
 
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_skillline WHERE id = ?d', $id);
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_skillline WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 
