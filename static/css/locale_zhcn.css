@@ -1,9 +1,11 @@
 @charset "utf-8";
 /* CN typographic fix */
+/*
 * { font-family: 微软雅黑, Microsoft YaHei, Helvetica, Tahoma, StSun, 宋体, SimSun, sans-serif !important; text-transform: none !important; letter-spacing: 0 !important }
 
 html,
 body { font-family: 微软雅黑, Microsoft YaHei, Helvetica, Tahoma, StSun, 宋体, SimSun, sans-serif }
+*/
 
 .toptabs a big {
     font-size: 14px;
