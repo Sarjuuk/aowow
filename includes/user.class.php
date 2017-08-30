@@ -293,11 +293,11 @@ class User
                     return AUTH_INTERNAL_ERR;
 
                 require 'config/extAuth.php';
-                $result = extAuth($name, $pass, $extId);
+                $result = extAuth($name, $pass, $extId, $extGroup);
 
                 if ($result == AUTH_OK && $extId)
                 {
-                    if ($_ = self::checkOrCreateInDB($extId, $name))
+                    if ($_ = self::checkOrCreateInDB($extId, $name, $extGroup))
                         $user = $_;
                     else
                         return AUTH_INTERNAL_ERR;
@@ -320,18 +320,28 @@ class User
     }
 
     // create a linked account for our settings if nessecary
-    private static function checkOrCreateInDB($extId, $name)
+    private static function checkOrCreateInDB($extId, $name, $userGroup = -1)
     {
-        if ($_ = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE extId = ?d', $extId))
-            return $_;
+        if (!intVal($extId))
+            return 0;
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, joinDate, prevIP, prevLogin, locale, status) VALUES (?d, ?, ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d)',
+        $userGroup = intVal($userGroup);
+
+        if ($_ = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE extId = ?d', $extId))
+        {
+            if ($userGroup >= U_GROUP_NONE)
+                DB::Aowow()->query('UPDATE ?_account SET userGroups = ?d WHERE extId = ?d', $userGroup, $extId);
+            return $_;
+        }
+
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (extId, user, displayName, joinDate, prevIP, prevLogin, locale, status, userGroups) VALUES (?d, ?, ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
             isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : '',
             User::$localeId,
-            ACC_STATUS_OK
+            ACC_STATUS_OK,
+            $userGroup >= U_GROUP_NONE ? $userGroup : U_GROUP_NONE
         );
 
         if ($newId)
