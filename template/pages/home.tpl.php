@@ -21,7 +21,7 @@
 <?php $this->brick('announcement'); ?>
 
         <div class="home-search" id="home-search">
-            <form method="get" action="">
+            <form method="get">
                 <input type="text" name="search" />
             </form>
         </div>
@@ -85,6 +85,6 @@ endif;
 
 <?php $this->brick('pageTemplate'); ?>
 
-    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?=Lang::main('jsError'); ?></div></noscript>
+    <noscript><div id="noscript-bg"></div><div id="noscript-text"><b><?=Lang::main('jsError'); ?></b></div></noscript>
 </body>
 </html>
