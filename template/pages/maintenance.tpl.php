@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+<?
+header($_SERVER["SERVER_PROTOCOL"].' 503 Service Temporarily Unavailable');
+header('Retry-After: 10800');         // 3 hours
+?><!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="pragma" content="no-cache" />
