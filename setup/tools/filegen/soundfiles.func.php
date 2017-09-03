@@ -26,10 +26,8 @@ if (!CLI)
                 DB::Aowow()->selectCell('SELECT 1');        // keep mysql busy or it may go away
             }
 
-            if (stristr($filePath, '.wav'))                 // expected file.wav.ogg
-                $filePath .= '.ogg';
-            else                                            // expected file.mp3.mp3
-                $filePath .= '.mp3';
+            // expect converted files as file.wav_ or file.mp3_
+            $filePath .= '_';
 
             // just use the first locale available .. there is no support for multiple audio files anyway
             foreach (CLISetup::$expectedPaths as $locStr => $__)
