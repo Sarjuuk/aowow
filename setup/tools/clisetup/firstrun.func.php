@@ -141,37 +141,67 @@ function firstrun()
     function testSelf(&$error)
     {
         $error = [];
-        $test  = function($url, &$rCode)
+        $test  = function(&$protocol, &$host, $testFile, &$rCode)
         {
-            $res = get_headers($url, true);
+            $res = get_headers($protocol.$host.$testFile, true);
 
-            if (preg_match("/HTTP\/[0-9\.]+\s+([0-9]+)/", $res[0], $m))
+            if (!preg_match("/HTTP\/[0-9\.]+\s+([0-9]+)/", $res[0], $m))
+                return false;
+
+            $rCode = $m[1];
+
+            if ($rCode == 200)
+                return true;
+
+            if ($rCode == 301 || $rCode == 302)
             {
-                $rCode = $m[1];
-                return $m[1] == 200;
+                if (!empty($res['Location']) && preg_match("/(https?:\/\/)(.*)".strtr($testFile, ['/' => '\/', '.' => '\.'])."/i", $res['Location'], $n))
+                {
+                    $protocol = $n[1];
+                    $host     = $n[2];
+                }
+
+                return false;
             }
 
             $rCode = 0;
             return false;
         };
 
-        $res  = DB::Aowow()->selectCol('SELECT `key` AS ARRAY_KEY, value FROM ?_config WHERE `key` IN ("site_host", "static_host", "force_ssl")');
-        $prot = $res['force_ssl'] ? 'https://' : 'http://';
-        if ($res['site_host'])
-        {
-            if (!$test($prot.$res['site_host'].'/README.md', $resp))
-                $error[] = ' * could not access '.$prot.$res['site_host'].'/README.md ['.$resp.']';
-        }
-        else
-            $error[] = ' * SITE_HOST is empty';
+        $res   = DB::Aowow()->selectCol('SELECT `key` AS ARRAY_KEY, value FROM ?_config WHERE `key` IN ("site_host", "static_host", "force_ssl")');
+        $prot  = $res['force_ssl'] ? 'https://' : 'http://';
+        $cases = array(
+            'site_host'   => [$prot, $res['site_host'],   '/README.md'],
+            'static_host' => [$prot, $res['static_host'], '/css/aowow.css']
+        );
 
-        if ($res['static_host'])
+        foreach ($cases as $conf => list($protocol, $host, $testFile))
         {
-            if (!$test($prot.$res['static_host'].'/css/aowow.css', $resp))
-                $error[] = ' * could not access '.$prot.$res['static_host'].'/css/aowow.css ['.$resp.']';
+            if ($host)
+            {
+                if (!$test($protocol, $host, $testFile, $resp))
+                {
+                    if ($resp == 301 || $resp == 302)
+                    {
+                        CLISetup::log('self test received status '.CLISetup::bold($resp).' (page moved) for '.$conf.', pointing to: '.$protocol.$host.$testFile, CLISetup::LOG_WARN);
+                        $inp = ['x' => ['should '.CLISetup::bold($conf).' be set to '.CLISetup::bold($host).' and force_ssl be updated?', true, '/y|n/i']];
+                        if (!CLISetup::readInput($inp, true) || !$inp || strtolower($inp['x']) == 'n')
+                            $error[] = ' * could not access '.$protocol.$host.$testFile.' ['.$resp.']';
+                        else
+                        {
+                            DB::Aowow()->query('UPDATE ?_config SET `value` = ?  WHERE `key` = ?', $host, $conf);
+                            DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "force_ssl"', intVal($protocol == 'https://'));
+                        }
+
+                        CLISetup::log();
+                    }
+                    else
+                        $error[] = ' * could not access '.$protocol.$host.$testFile.' ['.$resp.']';
+                }
+            }
+            else
+                $error[] = ' * '.strtoupper($conf).' is empty';
         }
-        else
-            $error[] = ' * STATIC_HOST is empty';
 
         return empty($error);
     }
