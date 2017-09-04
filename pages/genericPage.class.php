@@ -864,7 +864,7 @@ class GenericPage
                 $type = $cache['isString'];
                 $data = $cache['data'];
 
-                if ($cache['timestamp'] + CFG_CACHE_DECAY <= time() || $cache['revision'] < AOWOW_REVISION)
+                if ($cache['timestamp'] + CFG_CACHE_DECAY <= time() || $cache['revision'] != AOWOW_REVISION)
                     $cache = null;
                 else
                     $this->cacheLoaded = [CACHE_MODE_MEMCACHED, $cache['timestamp']];
@@ -887,7 +887,7 @@ class GenericPage
 
             list($time, $rev, $type) = explode(' ', $cache[0]);
 
-            if ($time + CFG_CACHE_DECAY <= time() || $rev < AOWOW_REVISION)
+            if ($time + CFG_CACHE_DECAY <= time() || $rev != AOWOW_REVISION)
                 $cache = null;
             else
             {
