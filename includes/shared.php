@@ -1,6 +1,7 @@
 <?php
 
 define('AOWOW_REVISION', 26);
+define('BROWSER_CACHE_VERSION', '1e8g4h3');				// cache version for css and js files
 define('CLI', PHP_SAPI === 'cli');
 
 
