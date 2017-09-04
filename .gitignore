@@ -1,3 +1,6 @@
+# Git
+*.orig
+
 # cache
 /cache/template/*
 /setup/generated/alphaMaps/*.png
