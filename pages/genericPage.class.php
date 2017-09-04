@@ -510,7 +510,7 @@ class GenericPage
     public function maintenance()                           // display brb gnomes
     {
         header('HTTP/1.0 503 Service Temporarily Unavailable', true, 503);
-        header('Retry-After: '.(3 * HOURS));
+        header('Retry-After: '.(3 * HOUR));
 
         $this->display('maintenance');
         exit();
