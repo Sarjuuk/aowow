@@ -293,7 +293,9 @@ class User
                     return AUTH_INTERNAL_ERR;
 
                 require 'config/extAuth.php';
-                $result = extAuth($name, $pass, $extId, $extGroup);
+
+                $extGroup = -1;
+                $result   = extAuth($name, $pass, $extId, $extGroup);
 
                 if ($result == AUTH_OK && $extId)
                 {
