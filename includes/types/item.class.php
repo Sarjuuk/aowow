@@ -640,10 +640,10 @@ class ItemList extends BaseType
             if ($interactive)
                 $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
 
-            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])]).'</span></span><br />';
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [intVal($this->curTpl['armor'] - $this->curTpl['armorDamageModifier'])]).'</span></span><br />';
         }
-        else if (($this->curTpl['armor'] + $this->curTpl['armorDamageModifier']) > 0)
-            $x .= '<span><!--amr-->'.Lang::item('armor', [intVal($this->curTpl['armor'] + $this->curTpl['armorDamageModifier'])]).'</span><br />';
+        else if (($this->curTpl['armor'] - $this->curTpl['armorDamageModifier']) > 0)
+            $x .= '<span><!--amr-->'.Lang::item('armor', [intVal($this->curTpl['armor'] - $this->curTpl['armorDamageModifier'])]).'</span><br />';
 
         // Block (note: block value from field block and from field stats or parsed from itemSpells are displayed independently)
         if ($this->curTpl['tplBlock'])
@@ -1620,7 +1620,7 @@ class ItemList extends BaseType
         }
 
         if ($this->curTpl['armorDamageModifier'] > 0)
-            $json['armor'] += $this->curTpl['armorDamageModifier'];
+            $json['armor'] -= $this->curTpl['armorDamageModifier'];
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
