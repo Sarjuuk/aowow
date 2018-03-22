@@ -299,7 +299,7 @@ class AchievementListFilter extends Filter
 
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
          2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',      true                             ], // rewardtext
+         3 => [FILTER_CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
          4 => [FILTER_CR_NYI_PH,    null,          1,                               ], // location [enum]
          5 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_FIRST_SERIES, null], // first in series [yn]
          6 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_LAST_SERIES,  null], // last in series [yn]

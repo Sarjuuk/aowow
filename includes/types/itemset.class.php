@@ -173,7 +173,7 @@ class ItemsetListFilter extends Filter
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
          2 => [FILTER_CR_NUMERIC, 'id',          NUM_CAST_INT,         true], // id
          3 => [FILTER_CR_NUMERIC, 'npieces',     NUM_CAST_INT              ], // pieces
-         4 => [FILTER_CR_STRING,  'bonusText',   true                      ], // bonustext
+         4 => [FILTER_CR_STRING,  'bonusText',   STR_LOCALIZED             ], // bonustext
          5 => [FILTER_CR_BOOLEAN, 'heroic',                                ], // heroic
          6 => [FILTER_CR_ENUM,    'e.holidayId',                           ], // relatedevent
          8 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments

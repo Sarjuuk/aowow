@@ -218,6 +218,7 @@ define('CC_FLAG_APPROVED',                  0x8);
 define('SOUND_TYPE_OGG',                    1);
 define('SOUND_TYPE_MP3',                    2);
 
+define('CONTRIBUTE_NONE',                   0x0);
 define('CONTRIBUTE_CO',                     0x1);
 define('CONTRIBUTE_SS',                     0x2);
 define('CONTRIBUTE_VI',                     0x4);
@@ -228,6 +229,10 @@ define('NUM_CAST_INT',                      1);
 define('NUM_CAST_FLOAT',                    2);
 define('NUM_REQ_INT',                       3);
 define('NUM_REQ_FLOAT',                     4);
+
+define('STR_LOCALIZED',                     0x1);
+define('STR_MATCH_EXACT',                   0x2);
+define('STR_ALLOW_SHORT',                   0x4);
 
 /*
  * Game
@@ -389,6 +394,7 @@ define('SPELL_SCHOOL_NATURE',               3);
 define('SPELL_SCHOOL_FROST',                4);
 define('SPELL_SCHOOL_SHADOW',               5);
 define('SPELL_SCHOOL_ARCANE',               6);
+define('SPELL_MAGIC_SCHOOLS',               0x7E);
 define('SPELL_ALL_SCHOOLS',                 0x7F);
 
 // CharacterSlot
