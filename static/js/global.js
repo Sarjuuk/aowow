@@ -586,7 +586,9 @@ var PageTemplate = new function()
             var menuItem = [character.id, character.name, g_getProfileUrl(character), null,
             {
                 className: (character.pinned ? 'icon-star-right ' : '') + 'c' + character.classs,
-                tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, character.id, 'tiny')
+             // tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, character.id, 'tiny')
+             // aowow: profileId should not be nessecary here
+                tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, 0, 'tiny')
             }];
 
             submenu.push(menuItem);
@@ -15445,7 +15447,16 @@ Listview.templates = {
                         i.style.padding = '0';
                         i.style.borderRight = 'none';
 
-                        $WH.ae(i, Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : profile.id, 'medium'), 1, null, this.getItemLink(profile)));
+                     // $WH.ae(i, Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : profile.id, 'medium'), 1, null, this.getItemLink(profile)));
+                     // aowow . i dont know .. i dont know... char icon requests are strange
+                        var ic = Icon.create($WH.g_getProfileIcon(profile.race, profile.classs, profile.gender, profile.level, profile.icon ? profile.icon : 0, 'medium'), 1, null, this.getItemLink(profile));
+                        // aowow - custom
+                        if (profile.captain) {
+                            tr.className = 'mergerow';
+                            ic.className += ' ' + ic.className + '-gold';
+                        }
+
+                        $WH.ae(i, ic);
                         $WH.ae(tr, i);
 
                         td.style.borderLeft = 'none';
@@ -15731,6 +15742,18 @@ Listview.templates = {
                 compute: function(profile, td) {
                     return profile.games - profile.wins;
                 },
+                sortFunc: function(a, b, col) {
+                    var
+                        lossA = a.games - a.wins,
+                        lossB = b.games - b.wins;
+
+                    if (lossA > lossB)
+                        return 1;
+                    if (lossA < lossB)
+                        return -1;
+
+                    return 0;
+                },
                 hidden: 1
             },
             {
@@ -15738,7 +15761,15 @@ Listview.templates = {
                 name: LANG.guildrank,
                 value: 'guildrank',
                 compute: function(profile, td) {
-                    if (profile.guildrank > 0) {
+                    // >>> aowow - real rank names >>>
+                    if (typeof guild_ranks !== "undefined" && guild_ranks[profile.guildrank]) {
+                        var sp = $WH.ce('span', null, $WH.ct(guild_ranks[profile.guildrank]));
+                        g_addTooltip(sp, $WH.sprintf(LANG.rankno, profile.guildrank));
+                        $WH.ae(td, sp);
+                    }
+                    // if (profile.guildrank > 0) {
+                    // <<< aowow - real rank names <<<
+                    else if (profile.guildrank > 0) {
                         return $WH.sprintf(LANG.rankno, profile.guildrank);
                     }
                     else if (profile.guildrank == 0) {
@@ -15764,20 +15795,6 @@ Listview.templates = {
                 id: 'rating',
                 name: LANG.rating,
                 value: 'rating',
-                compute: function(profile, td) {
-                    if (profile.roster) {
-                        return profile.arenateam[profile.roster].rating;
-                    }
-
-                    return profile.rating;
-                },
-                sortFunc: function(a, b, col) {
-                    if (a.roster && b.roster) {
-                        return $WH.strcmp(a.arenateam[a.roster].rating, b.arenateam[b.roster].rating);
-                    }
-
-                    return $WH.strcmp(a.rating, b.rating);
-                },
                 hidden: 1
             },
             {
@@ -15856,6 +15873,9 @@ Listview.templates = {
                     a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild);
                     $WH.ae(a, $WH.ct(profile.guild));
                     $WH.ae(td, a);
+                },
+                sortFunc: function(a, b, col) {
+                    return $WH.strcmp(a.guild, b.guild);
                 }
             }
         ],

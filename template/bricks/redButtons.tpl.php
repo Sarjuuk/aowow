@@ -71,3 +71,12 @@ endif;
 if (isset($this->redButtons[BUTTON_EQUIP])):
     echo '<div id="equip-pinned-button"></div>'; /* content is added by jScript */
 endif;
+
+// resync profiler content
+if (isset($this->redButtons[BUTTON_RESYNC])):
+    if ($b = $this->redButtons[BUTTON_RESYNC]):
+        echo '<a href="javascript:;" class="button-red" onclick="pr_resyncRoster('.$b[0].',\''.$b[1].'\')"><em><b><i>'.Lang::profiler('resync').'</i></b><span>'.Lang::profiler('resync').'</span></em></a>';
+    else:
+        echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::profiler('resync').'</i></b><span>'.Lang::profiler('resync').'</span></em></a>';
+    endif;
+endif;

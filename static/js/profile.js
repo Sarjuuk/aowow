@@ -232,7 +232,7 @@ function pr_updateStatus(page, div, id, request, tryAgain)
                             div.innerHTML += ' ' + LANG.pr_queue_noprocess;
                         }
 
-                        div.innerHTML += '<a id="close-profiler-notification" class="announcement-close" href="javascript:;" onclick="$(\'.profiler-message\').remove(); return false;">';
+                        div.innerHTML += '<a id="close-profiler-notification" class="announcement-close" href="javascript:;" onclick="$(\'.profiler-message\').hide(); return false;">';
                         div.innerHTML += '<br />' + (status < 3 && !refresh && !nresyncs ? LANG.pr_queue_addqueue : (status > 2 ? $WH.sprintf(LANG['pr_queue_status' + status], LANG['pr_error_armory' + errcode], profile) : $WH.sprintf(LANG['pr_queue_status' + status], count, duration, profile)));
                         div.style.backgroundImage = '';
 
@@ -245,6 +245,7 @@ function pr_updateStatus(page, div, id, request, tryAgain)
                     if (status == 4) {
                         $('a', div).click(tryAgain);
                     }
+
                     else if (refresh && !action) {
                         setTimeout(pr_updateStatus.bind(null, page, div, id, request, tryAgain), refresh);
                         working = true;
@@ -262,7 +263,8 @@ function pr_updateStatus(page, div, id, request, tryAgain)
             }
 
             if (a.length > 2) { // Multiple status returned
-                div.innerHTML = LANG.pr_queue_resyncreq + (!processes ? ' ' + LANG.pr_queue_noprocess : '') + '<br />' + $WH.sprintf(LANG['pr_queue_batch'], statusTotal[1], statusTotal[2], statusTotal[3], statusTotal[4]);
+                div.innerHTML  = '<a id="close-profiler-notification" class="announcement-close" href="javascript:;" onclick="$(\'.profiler-message\').hide(); return false;">';
+                div.innerHTML += LANG.pr_queue_resyncreq + (!processes ? ' ' + LANG.pr_queue_noprocess : '') + '<br />' + $WH.sprintf(LANG['pr_queue_batch'], statusTotal[1], statusTotal[2], statusTotal[3], statusTotal[4]);
             }
         }
     });
@@ -277,7 +279,7 @@ function pr_resyncRoster(id, mode)
     div.style.display = '';
 
     new Ajax(
-        '/' + mode + '=resync&id=' + id + '&profile',
+        '?' + mode + '=resync&id=' + id + '&profile',
         {
             method: 'POST',
             onSuccess: function(xhr, opt)
@@ -302,28 +304,46 @@ function pr_initRosterListview() {
         this.mode = 1;
         this.createCbControls = function (c, b) {
             if (!b && this.data.length < 15) {
-                return
+                return;
             }
-            var a = $WH.ce("input");
-            a.type = "button";
-            a.value = LANG.button_resync;
-            a.onclick = (function () {
-                var e = this.getCheckedRows();
-                if (!e.length) {
-                    alert(LANG.message_nocharacterselected)
-                } else {
-                    var d = "";
-                    $WH.array_walk(e, function (f) {
-                        d += f.id + ","
+
+            var
+                iSelectAll = $WH.ce('input'),
+                iDeselect  = $WH.ce('input'),
+                iResync    = $WH.ce('input');
+
+            iSelectAll.type = iDeselect.type = iResync.type = 'button';
+
+            iSelectAll.value = LANG.button_selectall;
+            iDeselect.value  = LANG.button_deselect;
+            iResync.value    = LANG.button_resync;
+
+            iSelectAll.onclick = Listview.cbSelect.bind(this, true);
+            iDeselect.onclick  = Listview.cbSelect.bind(this, false);
+            iResync.onclick    = (function () {
+                var rows = this.getCheckedRows();
+                if (!rows.length) {
+                    alert(LANG.message_nocharacterselected);
+                }
+                else {
+                    var buff = '';
+                    $WH.array_walk(rows, function (x) {
+                        buff += x.id + ',';
                     });
-                    d = $WH.rtrim(d, ",");
-                    if (d != "") {
-                        new Ajax("?profile=resync&id=" + d)
-                    } (Listview.cbSelect.bind(this, false))();
-                    alert(LANG.message_characterresync)
+
+                    buff = $WH.rtrim(buff, ',');
+                    if (buff != '') {
+                        new Ajax('?profile=resync&id=' + buff);
+                    }
+
+                    (Listview.cbSelect.bind(this, false))();
+                    alert(LANG.message_characterresync);
                 }
             }).bind(this);
-            $WH.ae(c, a)
+
+            $WH.ae(c, iSelectAll);
+            $WH.ae(c, iDeselect);
+            $WH.ae(c, iResync);
         }
     }
 }
@@ -391,17 +411,12 @@ function pr_getGearScoreQuality(level, gearScore, relics, slotId, use2h)
             totalMod *= 2;
     }
 
-    if(level > 80)
-        baseScore = ((level - 80) * 12) + 293;
-    else if(level > 70)
-        baseScore = ((level - 70) *  6) + 140;
+    if(level > 70)
+        baseScore = ((level - 70) *  9.5) + 105;
     else if(level > 60)
-        baseScore = ((level - 60) *  4) +  80;
+        baseScore = ((level - 60) *  4.5) +  60;
     else
         baseScore = level + 5;
-
-    if(level <= 80)
-        baseScore *= 1.2;
 
     if(gearScore >= baseScore * totalMod * 1.25)
         quality = 5; // Legendary
@@ -627,7 +642,8 @@ function pr_onBreadcrumbUpdate() // Add character lookup textbox to the breadcru
 
 function pr_DirectLookup(form, browse)
 {
-    var    region  = $('*[name="rg"]', form),
+    var
+        region  = $('*[name="rg"]', form),
         server  = $('*[name="sv"]', form),
         name    = $('*[name="na"]', form),
         usePath;
@@ -638,7 +654,7 @@ function pr_DirectLookup(form, browse)
     if(browse)
     {
         if(region.val() || server.val() || name.val())
-            location.href = '?profiles' + (region.val() ? '=' + region.val() + (server.val() ? '.' + g_urlize(server.val(), false, true) : '') : '') + (name.val() ? '?filter=na=' + name.val() + ';ex=on' : '');
+            location.href = '?profiles' + (region.val() ? '=' + region.val() + (server.val() ? '.' + g_urlize(server.val(), false, true) : '') : '') + (name.val() ? '&filter=na=' + name.val() + ';ex=on' : '');
         return false;
     }
 

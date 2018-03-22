@@ -110,15 +110,6 @@ $lang = array(
         'chooseClass'   => "Wählt eine Klasse",
         'chooseFamily'  => "Wählt eine Tierart",
 
-        // profiler
-        'realm'         => "Realm",
-        'region'        => "Region",
-        'viewCharacter' => "Charakter anzeigen",
-        '_cpHead'       => "Charakter-Profiler",
-        '_cpHint'       => "Der <b>Charakter-Profiler</b> gibt Euch die Möglichkeit, Euren Charakter zu editieren, bessere Ausrüstung zu finden, Eure Gearscore zu überprüfen, und mehr!",
-        '_cpHelp'       => "Um loszulegen, folgt einfach den untenstehenden Schritten. Falls Ihr mehr Informationen benötigt, schaut auf unserer ausführlichen <a href=\"?help=profiler\">Hilfeseite</a> nach.",
-        '_cpFooter'     => "Falls Ihr eine genauere Suche möchtet, probiert unsere <a href=\"?profiles\">erweiterten Suchoptionen</a>. Ihr könnt außerdem ein <a href=\"?profile&amp;new\">neues individuelles Profil</a> erstellen.",
-
         // search
         'search'        => "Suche",
         'searchButton'  => "Suche",
@@ -155,6 +146,34 @@ $lang = array(
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
             )
         )
+    ),
+    'profiler' => array(
+        'realm'         => "Realm",
+        'region'        => "Region",
+        'viewCharacter' => "Charakter anzeigen",
+        '_cpHint'       => "Der <b>Charakter-Profiler</b> gibt Euch die Möglichkeit, Euren Charakter zu editieren, bessere Ausrüstung zu finden, Eure Gearscore zu überprüfen, und mehr!",
+        '_cpHelp'       => "Um loszulegen, folgt einfach den untenstehenden Schritten. Falls Ihr mehr Informationen benötigt, schaut auf unserer ausführlichen <a href=\"?help=profiler\">Hilfeseite</a> nach.",
+        '_cpFooter'     => "Falls Ihr eine genauere Suche möchtet, probiert unsere <a href=\"?profiles\">erweiterten Suchoptionen</a>. Ihr könnt außerdem ein <a href=\"?profile&amp;new\">neues individuelles Profil</a> erstellen.",
+        'firstUseTitle' => "%s von %s",
+        'complexFilter' => "Komplexer Filter ausgewählt! Suchergebnisse sind auf gecachte Charaktere beschränkt.",
+
+        'resync'        => "Resynchronisieren",
+        'guildRoster'   => "Gildenliste für &lt;%s&gt;",
+        'arenaRoster'   => "Arena-Teamliste für &lt;%s&gt",
+        'atCaptain'     => "Teamkapitän",
+
+        'profiler'      => "Charakter-Profiler",
+        'arenaTeams'    => "Arena Teams",
+        'guilds'        => "Gilden",
+
+        'notFound'      => array(
+            'guild'     => "Diese Gilde existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
+            'arenateam' => "Dieses Arena Team existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
+            'profile'   => "Dieser Charakter existiert nicht oder wurde noch nicht in die Datenbank übernommen."
+        ),
+        'dummyNPCs'     => array(
+            100001 => "Luftschiffkampf", 200001 => "Bestien von Nordend", 200002 => "Fraktionschampions", 200003 => "Zwillingsval'kyr"
+        ),
     ),
     'screenshot' => array(
         'submission'    => "Screenshot-Einsendung",

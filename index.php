@@ -22,8 +22,8 @@ switch ($pageCall)
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
-    // case 'arena-team':
-    // case 'arena-teams':
+    case 'arena-team':
+    case 'arena-teams':
     case 'class':
     case 'classes':
     case 'currency':
@@ -37,8 +37,8 @@ switch ($pageCall)
     case 'events':
     case 'faction':
     case 'factions':
-    // case 'guild':
-    // case 'guilds':
+    case 'guild':
+    case 'guilds':
     case 'icon':
     case 'icons':
     case 'item':

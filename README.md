@@ -113,6 +113,10 @@ A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and 
 Q: I'm getting random javascript errors!  
 A: Some server configurations or external services (like Cloudflare) come with modules, that automaticly minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
+Q: Some search results within the profiler act rather strange. How does it work?
+A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run agains the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
+
+
 ## Thanks
 
 @mix: for providing the php-script to parse .blp and .dbc into usable images and tables

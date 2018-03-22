@@ -467,25 +467,25 @@
 }
 
 .iconlist th {
-    padding: 0;
+    padding: 0 !important;
 }
 
 .iconlist ul li {
     list-style-position: inside;
     list-style-type: square;
-    padding-left: 13px;
+    padding-left: 13px !important;
 }
 
 .iconlist td {
-    padding: 4px 0 6px 0;
+    padding: 4px 0 6px 0 !important;
 }
 
 .iconlist var {
-    font-size: 1px;
+    font-size: 1px !important;
 }
 
 .iconlist .iconsmall {
-    margin-right: 4px;
+    margin-right: 4px !important;
 }
 
 .iconlist a.disclosure-on, .iconlist a.disclosure-off {
@@ -494,14 +494,18 @@
 }
 
 .iconlist .iconlist ul li {
-    padding-left: 10px;
+    padding-left: 10px !important;
 }
 
 .iconlist .iconlist th, .iconlist .iconlist td {
-    font-size: 11px;
+    font-size: 11px !important;
 }
 
-.iconlist-col table th li { list-style-position:outside;padding:0;margin-left:20px; }
+.iconlist-col table th li {
+    list-style-position: outside;
+    padding: 0 !important;
+    margin-left: 20px !important;
+}
 
 /*
 Note: For IE6, only include things that break/distort the site in a major way, as we're not supposed to support IE6 anymore.

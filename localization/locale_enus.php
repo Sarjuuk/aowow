@@ -110,15 +110,6 @@ $lang = array(
         'chooseClass'   => "Choose a class",
         'chooseFamily'  => "Choose a pet family",
 
-        // profiler
-        'realm'         => "Realm",
-        'region'        => "Region",
-        'viewCharacter' => "View Character",
-        '_cpHead'       => "Character Profiler",
-        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
-        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
-        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
-
         // search
         'search'        => "Search",
         'searchButton'  => "Search",
@@ -155,6 +146,34 @@ $lang = array(
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
             )
         )
+    ),
+    'profiler' => array(
+        'realm'         => "Realm",
+        'region'        => "Region",
+        'viewCharacter' => "View Character",
+        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
+        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
+        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
+        'firstUseTitle' => "%s of %s",
+        'complexFilter' => "Complex filter selected! Search results are limited to cached Characters.",
+
+        'resync'        => "Resync",
+        'guildRoster'   => "Guild Roster for &lt;%s&gt;",
+        'arenaRoster'   => "Arena Team Roster for &lt;%s&gt",
+        'atCaptain'     => "Arena Team Captain",
+
+        'profiler'      => "Character Profiler",
+        'arenaTeams'    => "Arena Teams",
+        'guilds'        => "Guilds",
+
+        'notFound'      => array(
+            'guild'     => "This Guild doesn't exist or is not yet in the database.",
+            'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
+            'profile'   => "This character doesn't exist or is not yet in the database."
+        ),
+        'dummyNPCs'     => array(
+            100001 => "Gunship Battle", 200001 => "Northrend Beasts", 200002 => "Faction Champions", 200003 => "Val'kyr Twins"
+        ),
     ),
     'screenshot' => array(
         'submission'    => "Screenshot Submission",

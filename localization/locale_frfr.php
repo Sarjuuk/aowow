@@ -110,15 +110,6 @@ $lang = array(
         'chooseClass'   => "Choisissez une classe",
         'chooseFamily'  => "Choisissez un familier",
 
-        // profiler
-        'realm'         => "Royaume",
-        'region'        => "Région",
-        'viewCharacter' => "Voir Personnage",
-        '_cpHead'       => "Profiler de Personnage",
-        '_cpHint'       => "Le <b>Profiler de Personnage</b> vous permets de modifier votre personnage, trouver des améliorations d'équipement, vérifier votre score d'équipement et plus!",
-        '_cpHelp'       => "Pour débuter, suivez simplement les étapes ci-dessous. Si vous voulez plus d'information, lisez notre <a href=\"?help=profiler\">page d'aide</a> détaillée.",
-        '_cpFooter'     => "Si vous voulez une recherche plus raffinée, essayez nos options de <a href=\"?profiles\">recherche avancée</a>. Vous pouvez aussi créer un <a href=\"?profile&amp;new\">nouveau profile personnalisé</a>.",
-
         // search
         'search'        => "Recherche",
         'searchButton'  => "Rechercher",
@@ -155,6 +146,34 @@ $lang = array(
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
             )
         )
+    ),
+    'profiler' => array(
+        'realm'         => "Royaume",
+        'region'        => "Région",
+        'viewCharacter' => "Voir Personnage",
+        '_cpHint'       => "Le <b>Profiler de Personnage</b> vous permets de modifier votre personnage, trouver des améliorations d'équipement, vérifier votre score d'équipement et plus!",
+        '_cpHelp'       => "Pour débuter, suivez simplement les étapes ci-dessous. Si vous voulez plus d'information, lisez notre <a href=\"?help=profiler\">page d'aide</a> détaillée.",
+        '_cpFooter'     => "Si vous voulez une recherche plus raffinée, essayez nos options de <a href=\"?profiles\">recherche avancée</a>. Vous pouvez aussi créer un <a href=\"?profile&amp;new\">nouveau profile personnalisé</a>.",
+        'firstUseTitle' => "%s de %s",
+        'complexFilter' => "[Complex filter selected! Search results are limited to cached Characters.]",
+
+        'resync'        => "Resynchronisation",
+        'guildRoster'   => "Liste des membres pour la guilde de  &lt;%s&gt",
+        'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost
+        'atCaptain'     => "Capitaine d'équipe",
+
+        'profiler'      => "Profiler de Personnage",
+        'arenaTeams'    => "Équipes d'Aréna",
+        'guilds'        => "Guildes",
+
+        'notFound'      => array(
+            'guild'     => "[This Guild doesn't exist or is not yet in the database.]",
+            'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
+            'profile'   => "[This character doesn't exist or is not yet in the database.]"
+        ),
+        'dummyNPCs'     => array(
+            100001 => "Bataille des canonnières", 200001 => "Bêtes du Norfendre", 200002 => "Champions de faction", 200003 => "Les jumelles val'kyrs"
+        ),
     ),
     'screenshot' => array(
         'submission'    => "Envoi d'une capture d'écran",

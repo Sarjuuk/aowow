@@ -217,8 +217,31 @@ class UserPage extends GenericPage
 
         // forum -> latest replies [unused]
 
-        // Characters [todo]
-        $this->user['characterData'] = [];
+        $conditions = array(
+            ['OR', ['cuFlags', PROFILER_CU_PUBLISHED, '&'], ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&']],
+            [['cuFlags', PROFILER_CU_DELETED, '&'], 0],
+            ['OR', ['user', $this->user['id']], ['ap.accountId', $this->user['id']]]
+        );
+
+        if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            $conditions = array_slice($conditions, 2);
+        else if (User::$id == $this->user['id'])
+            array_shift($conditions);
+
+        $profiles = new LocalProfileList($conditions);
+        if (!$profiles->error)
+        {
+            $this->addJS('?data=weight-presets&t='.$_SESSION['dataKey']);
+
+            // Characters
+            if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER))
+                $this->user['characterData'] = $chars;
+
+            // Profiles
+            if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE))
+                $this->user['profileData'] = $prof;
+        }
+
         /*
             us_addCharactersTab([
                 {
@@ -248,8 +271,6 @@ class UserPage extends GenericPage
             ]);
         */
 
-        // Profiles [todo]
-        $this->user['profileData'] = [];
     }
 
     protected function generateTitle()
