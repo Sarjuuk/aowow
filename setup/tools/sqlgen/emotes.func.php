@@ -41,7 +41,7 @@ function emotes(/*array $ids = [] */)
             }
         }
 
-        CLISetup::log('GlobalStrings.lua not found for selected locale '.CLISetup::bold(Util::$localeStrings[$lId]), CLISetup::LOG_WARN);
+        CLI::write('GlobalStrings.lua not found for selected locale '.CLI::bold(Util::$localeStrings[$lId]), CLI::LOG_WARN);
         $allOK = false;
     }
 

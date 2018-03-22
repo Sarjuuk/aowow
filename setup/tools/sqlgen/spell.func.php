@@ -222,12 +222,12 @@ function spell()
 
     // merge serverside spells into dbc_spell (should not affect other scripts)
     $lastMax = 0;
-    CLISetup::log(' - merging serverside spells into spell.dbc');
+    CLI::write(' - merging serverside spells into spell.dbc');
     while ($spells = DB::World()->select($ssQuery, $lastMax, SqlGen::$stepSize))
     {
         $newMax = max(array_column($spells, 'id'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 
@@ -240,12 +240,12 @@ function spell()
 
     // merge everything into aowow_spell
     $lastMax = 0;
-    CLISetup::log(' - filling aowow_spell');
+    CLI::write(' - filling aowow_spell');
     while ($spells = DB::Aowow()->select($baseQuery, $lastMax, SqlGen::$stepSize))
     {
         $newMax = max(array_column($spells, 'id'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 
@@ -286,7 +286,7 @@ function spell()
         ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2         not used for now
     */
 
-    CLISetup::log(' - linking with skillineability');
+    CLI::write(' - linking with skillineability');
 
     $results  = DB::Aowow()->select('SELECT spellId AS ARRAY_KEY, id AS ARRAY_KEY2, skillLineId, reqRaceMask, reqClassMask, reqSkillLevel, acquireMethod, skillLevelGrey, skillLevelYellow FROM dbc_skilllineability sla');
     foreach ($results as $spellId => $sets)
@@ -445,7 +445,7 @@ function spell()
     /* talent related */
     /******************/
 
-    CLISetup::log(' - linking with talent');
+    CLI::write(' - linking with talent');
 
     for ($i = 1; $i < 6; $i++)
     {
@@ -467,7 +467,7 @@ function spell()
     /* Other */
     /*********/
 
-    CLISetup::log(' - misc fixups & icons');
+    CLI::write(' - misc fixups & icons');
 
     // FU [FixUps]
     DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', 1 << 10, 760);      // Draenai Racials
@@ -529,7 +529,7 @@ function spell()
     /* Categories */
     /**************/
 
-    CLISetup::log(' - applying categories');
+    CLI::write(' - applying categories');
 
     // player talents (-2)
     DB::Aowow()->query('UPDATE ?_spell s, dbc_talent t SET s.typeCat = -2 WHERE t.tabId NOT IN (409, 410, 411) AND (s.id = t.rank1 OR s.id = t.rank2 OR s.id = t.rank3 OR s.id = t.rank4 OR s.id = t.rank5)');
@@ -645,7 +645,7 @@ function spell()
     /* Glyphs */
     /**********/
 
-    CLISetup::log(' - fixing glyph data');
+    CLI::write(' - fixing glyph data');
 
     // glyphSpell => affectedSpell
     $glyphAffects = array(
@@ -754,7 +754,7 @@ function spell()
         if ($icons)
             DB::Aowow()->query('UPDATE ?_spell s SET s.skillLine1 = ?d, s.iconIdAlt = ?d WHERE s.id = ?d', $icons['skill'], $icons['icon'], $applyId);
         else
-            CLISetup::log('could not match '.$glyphEffect['name_loc0'].' ('.$glyphEffect['id'].') with affected spells', CLISetup::LOG_WARN);
+            CLI::write('could not match '.$glyphEffect['name_loc0'].' ('.$glyphEffect['id'].') with affected spells', CLI::LOG_WARN);
     }
 
     // hide unused glyphs

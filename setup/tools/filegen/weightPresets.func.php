@@ -24,7 +24,7 @@ if (!CLI)
                 $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
             else
             {
-                CLISetup::log('WeightScale \''.CLISetup::bold($s['name']).'\' has no data set. Skipping...', CLISetup::LOG_WARN);
+                CLI::write('WeightScale \''.CLI::bold($s['name']).'\' has no data set.', CLI::LOG_WARN);
                 $wtPresets[$s['class']]['pve'][$s['name']] = ['__icon' => $s['icon']];
             }
         }

@@ -23,7 +23,7 @@ require_once 'setup/tools/imagecreatefromblp.func.php';
 function finish()
 {
     if (!getopt('d', ['delete']))                           // generated with TEMPORARY keyword. Manual deletion is not needed
-        CLISetup::log('generated dbc_* - tables kept available', CLISetup::LOG_INFO);
+        CLI::write('generated dbc_* - tables kept available', CLI::LOG_INFO);
 
     die("\n");
 }

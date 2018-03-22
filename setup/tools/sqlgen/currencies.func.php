@@ -57,7 +57,7 @@ function currencies(array $ids = [])
             $strings = $moneyNames[$itemId];
         else
         {
-            CLISetup::log('item #'.$itemId.' required by currency #'.$cId.' not in item_template', CLISetup::LOG_WARN);
+            CLI::write('item #'.$itemId.' required by currency #'.$cId.' not in item_template', CLI::LOG_WARN);
             $strings = ['name_loc0' => 'Item #'.$itemId.' not in DB', 'iconId' => 0, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3];
         }
 

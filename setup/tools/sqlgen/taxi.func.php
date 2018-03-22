@@ -151,7 +151,7 @@ function taxi()                                             // path & nodes
     {
         if (empty($n['faction']))
         {
-            CLISetup::log(' - ['.$n['id'].'] "'.$n['name_loc0'].'" has no NPC assigned ... skipping', CLISetup::LOG_WARN);
+            CLI::write(' - ['.$n['id'].'] "'.$n['name_loc0'].'" has no NPC assigned ... skipping', CLI::LOG_WARN);
             continue;
         }
 

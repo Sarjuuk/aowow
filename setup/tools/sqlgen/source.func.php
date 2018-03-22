@@ -112,11 +112,11 @@ function source(array $ids = [])
     /* Item & inherited Spells */
     /***************************/
 
-    CLISetup::log(' - Items & Spells [inherited]');
+    CLI::write(' - Items & Spells [inherited]');
     # also everything from items that teach spells, is src of spell
     # todo: check if items have learn-spells (effect: 36)
 
-    CLISetup::log('   * resolve ref-loot tree');
+    CLI::write('   * resolve ref-loot tree');
     $refLoot = DB::World()->select('
         SELECT
             rlt.Entry AS ARRAY_KEY,
@@ -163,7 +163,7 @@ function source(array $ids = [])
     ###############
     #  1: Crafted #
     ###############
-    CLISetup::log('   * #1  Crafted');
+    CLI::write('   * #1  Crafted');
 
     $spellBuff  = [];
     $itemBuff   = [];
@@ -204,7 +204,7 @@ function source(array $ids = [])
     ############
     #  2: Drop #
     ############
-    CLISetup::log('   * #2  Drop');
+    CLI::write('   * #2  Drop');
 
     $spellBuff    = [];
     $itemBuff     = [];
@@ -346,7 +346,7 @@ function source(array $ids = [])
     ###########
     #  3: PvP # (Vendors w/ xCost Arena/Honor)
     ###########
-    CLISetup::log('   * #3  PvP');
+    CLI::write('   * #3  PvP');
 
 // var g_sources_pvp = {
     // 1: 'Arena',
@@ -391,7 +391,7 @@ function source(array $ids = [])
     #############
     #  4: Quest #
     #############
-    CLISetup::log('   * #4  Quest');
+    CLI::write('   * #4  Quest');
 
     $spellBuff  = [];
     $itemBuff   = [];
@@ -473,7 +473,7 @@ function source(array $ids = [])
     ##############
     #  5: Vendor # (w/o xCost Arena/Honor)
     ##############
-    CLISetup::log('   * #5  Vendor');
+    CLI::write('   * #5  Vendor');
 
     $spellBuff  = [];
     $itemBuff   = [];
@@ -507,7 +507,7 @@ function source(array $ids = [])
     ###############
     # 10: Starter #
     ###############
-    CLISetup::log('   * #10 Starter');
+    CLI::write('   * #10 Starter');
 
     if ($pcii = DB::World()->select('SELECT ?d, itemid, 1 FROM playercreateinfo_item', TYPE_ITEM))
         DB::Aowow()->query(queryfy('[V]', $pcii, $insBasic), 10, 10, 10);
@@ -519,7 +519,7 @@ function source(array $ids = [])
     ###################
     # 12: Achievement #
     ###################
-    CLISetup::log('   * #12 Achievement');
+    CLI::write('   * #12 Achievement');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -581,7 +581,7 @@ function source(array $ids = [])
     ####################
     # 15: Disenchanted #
     ####################
-    CLISetup::log('   * #15 Disenchanted');
+    CLI::write('   * #15 Disenchanted');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -634,7 +634,7 @@ function source(array $ids = [])
     ##############
     # 16: Fished #
     ##############
-    CLISetup::log('   * #16 Fished');
+    CLI::write('   * #16 Fished');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -685,7 +685,7 @@ function source(array $ids = [])
     ################
     # 17: Gathered #
     ################
-    CLISetup::log('   * #17 Gathered');
+    CLI::write('   * #17 Gathered');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -740,7 +740,7 @@ function source(array $ids = [])
     ##############
     # 18: Milled #
     ##############
-    CLISetup::log('   * #18 Milled');
+    CLI::write('   * #18 Milled');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -791,7 +791,7 @@ function source(array $ids = [])
     #############
     # 19: Mined #
     #############
-    CLISetup::log('   * #19 Mined');
+    CLI::write('   * #19 Mined');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -846,7 +846,7 @@ function source(array $ids = [])
     ##################
     # 20: Prospected #
     ##################
-    CLISetup::log('   * #20 Prospected');
+    CLI::write('   * #20 Prospected');
 
     $spellBuff    = [];
     $itemBuff     = [];
@@ -897,7 +897,7 @@ function source(array $ids = [])
     ##################
     # 21: Pickpocket #
     ##################
-    CLISetup::log('   * #21 Pickpocket');
+    CLI::write('   * #21 Pickpocket');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -947,7 +947,7 @@ function source(array $ids = [])
     ################
     # 22: Salvaged #
     ################
-    CLISetup::log('   * #22 Salvaged');
+    CLI::write('   * #22 Salvaged');
 
     $spellBuff   = [];
     $itemBuff    = [];
@@ -998,7 +998,7 @@ function source(array $ids = [])
     ###############
     # 23: Skinned #
     ###############
-    CLISetup::log('   * #23 Skinned');
+    CLI::write('   * #23 Skinned');
 
     $spellBuff = [];
     $itemBuff  = [];
@@ -1054,10 +1054,10 @@ function source(array $ids = [])
     /* Spell */
     /*********/
 
-    CLISetup::log(' - Spells [original]');
+    CLI::write(' - Spells [original]');
 
     #  4: Quest
-    CLISetup::log('   * #4  Quest');
+    CLI::write('   * #4  Quest');
     $quests = DB::World()->select('
         SELECT spell AS ARRAY_KEY, id, SUM(qty) AS qty, BIT_OR(side) AS side FROM (
             SELECT IF(RewardSpell = 0, RewardDisplaySpell, RewardSpell) AS spell, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE IF(RewardSpell = 0, RewardDisplaySpell, RewardSpell) > 0 GROUP BY spell
@@ -1085,7 +1085,7 @@ function source(array $ids = [])
     }
 
     #  6: Trainer
-    CLISetup::log('   * #6  Trainer');
+    CLI::write('   * #6  Trainer');
     if ($tNpcs = DB::World()->select('SELECT SpellID AS ARRAY_KEY, ID AS entry, COUNT(1) AS qty FROM npc_trainer WHERE SpellID > 0 GROUP BY ARRAY_KEY'))
     {
         $tSpells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($tNpcs));
@@ -1118,13 +1118,13 @@ function source(array $ids = [])
     }
 
     #  7: Discovery
-    CLISetup::log('   * #7  Discovery');
+    CLI::write('   * #7  Discovery');
     // 61756: Northrend Inscription Research (FAST QA VERSION);
     if ($disco = DB::World()->select('SELECT ?d, spellId, 1 FROM skill_discovery_template WHERE reqSpell <> ?d', TYPE_SPELL, 61756))
         DB::Aowow()->query(queryfy('[V]', $disco, $insBasic), 7, 7, 7);
 
     #  9: Talent
-    CLISetup::log('   * #9  Talent');
+    CLI::write('   * #9  Talent');
     $tSpells = DB::Aowow()->select('
         SELECT s.id AS ARRAY_KEY, s.effect1Id, s.effect2Id, s.effect3Id, s.effect1TriggerSpell, s.effect2TriggerSpell, s.effect3TriggerSpell
         FROM   dbc_talent t
@@ -1136,7 +1136,7 @@ function source(array $ids = [])
     $buff = [];
     while ($tSpells)
     {
-        CLISetup::log('     - '.++$n.'. pass');
+        CLI::write('     - '.++$n.'. pass');
 
         $recurse = [];
         foreach ($tSpells as $tId => $spell)
@@ -1161,7 +1161,7 @@ function source(array $ids = [])
     DB::Aowow()->query(queryfy('[V]', $buff, $insBasic), 9, 9, 9);
 
     # 10: Starter
-    CLISetup::log('   * #10 Starter');
+    CLI::write('   * #10 Starter');
     /* acquireMethod
         ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,        learnedAt = 1 && source10 = 1
         ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
@@ -1176,15 +1176,15 @@ function source(array $ids = [])
     /* Titles */
     /**********/
 
-    CLISetup::log(' - Titles');
+    CLI::write(' - Titles');
 
     #  4: Quest
-    CLISetup::log('   * #4  Quest');
+    CLI::write('   * #4  Quest');
     if ($quests = DB::World()->select('SELECT ?d, RewardTitle, 1, ?d, ID FROM quest_template WHERE RewardTitle > 0', TYPE_TITLE, TYPE_QUEST))
         DB::Aowow()->query(queryfy('[V]', $quests, $insMore), 4, 4, 4);
 
     # 12: Achievement
-    CLISetup::log('   * #12 Achievement');
+    CLI::write('   * #12 Achievement');
     $sets = DB::World()->select('
         SELECT titleId AS ARRAY_KEY, MIN(ID) AS srcId, NULLIF(MAX(ID), MIN(ID)) AS altSrcId FROM (
             SELECT TitleA AS `titleId`, ID FROM achievement_reward WHERE TitleA <> 0
@@ -1201,7 +1201,7 @@ function source(array $ids = [])
     }
 
     # 13: Source-String
-    CLISetup::log('   * #13 cuStrings');
+    CLI::write('   * #13 cuStrings');
     $src13 = [null, 42, 52, 71, 80, 157, 163, 167, 169, 177];
     foreach ($src13 as $src => $tId)
         if ($tId)

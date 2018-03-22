@@ -46,7 +46,7 @@ function sounds(/*array $ids = [] */)
     /* M A I N */
     /***********/
 
-    CLISetup::log(' - sounds main data');
+    CLI::write(' - sounds main data');
 
     // file extraction and conversion manually
     // moving files in build step. data here is purely structural
@@ -74,7 +74,7 @@ function sounds(/*array $ids = [] */)
     {
         $newMax = max(array_column($sounds, 'id'));
 
-        CLISetup::log('   * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write('   * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 
@@ -94,7 +94,7 @@ function sounds(/*array $ids = [] */)
             $hasDupes = false;
             for ($i = 1; $i < 11; $i++)
             {
-                $nicePath = CLISetup::nicePath($s['soundFile'.$i], $s['path']);
+                $nicePath = CLI::nicePath($s['soundFile'.$i], $s['path']);
                 if ($s['soundFile'.$i] && array_key_exists($nicePath, $soundIndex))
                 {
                     $s['soundFile'.$i] = $soundIndex[$nicePath];
@@ -131,7 +131,7 @@ function sounds(/*array $ids = [] */)
                 // i call bullshit
                 else if ($s['soundFile'.$i])
                 {
-                    CLISetup::log('   - sound group #'.$s['id'].' "'.$s['name'].'" has invalid sound file "'.$s['soundFile'.$i].'" on index '.$i.'! Skipping...', CLISetup::LOG_WARN);
+                    CLI::write('   - sound group #'.$s['id'].' "'.$s['name'].'" has invalid sound file "'.$s['soundFile'.$i].'" on index '.$i.'! Skipping...', CLI::LOG_WARN);
                     $s['soundFile'.$i] = null;
                 }
                 // empty case
@@ -141,7 +141,7 @@ function sounds(/*array $ids = [] */)
 
             if (!$fileSets && !$hasDupes)
             {
-                CLISetup::log('   - sound group #'.$s['id'].' "'.$s['name'].'" contains no sound files! Skipping...', CLISetup::LOG_WARN);
+                CLI::write('   - sound group #'.$s['id'].' "'.$s['name'].'" contains no sound files! Skipping...', CLI::LOG_WARN);
                 continue;
             }
             else if ($fileSets)
@@ -160,7 +160,7 @@ function sounds(/*array $ids = [] */)
     /* VocalUI Sounds */
     /******************/
 
-    CLISetup::log(' - linking to race');
+    CLI::write(' - linking to race');
 
     DB::Aowow()->query('TRUNCATE ?_races_sounds');
     DB::Aowow()->query('INSERT IGNORE INTO ?_races_sounds SELECT raceId, soundIdMale,   1 FROM dbc_vocaluisounds WHERE soundIdMale <> soundIdFemale AND soundIdMale   > 0');
@@ -173,7 +173,7 @@ function sounds(/*array $ids = [] */)
     /* Emote Sound */
     /***************/
 
-    CLISetup::log(' - linking to emotes');
+    CLI::write(' - linking to emotes');
 
     DB::Aowow()->query('TRUNCATE ?_emotes_sounds');
     DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_sounds SELECT emotesTextId, raceId, gender + 1, soundId FROM dbc_emotestextsound');
@@ -183,7 +183,7 @@ function sounds(/*array $ids = [] */)
     /* Creature Sounds */
     /*******************/
 
-    CLISetup::log(' - linking to creatures');
+    CLI::write(' - linking to creatures');
 
     // currently ommitting:
     //      * footsteps (matrix of: creature + terrain + humidity)
@@ -240,7 +240,7 @@ function sounds(/*array $ids = [] */)
     /* Spell Sounds */
     /****************/
 
-    CLISetup::log(' - linking to spells');
+    CLI::write(' - linking to spells');
 
     // issues: (probably because of 335-data)
     //      * animate is probably wrong
@@ -300,7 +300,7 @@ function sounds(/*array $ids = [] */)
     /* Zone Sounds */
     /***************/
 
-    CLISetup::log(' - linking to zones');
+    CLI::write(' - linking to zones');
 
     // omiting data from WMOAreaTable, as its at the moment impossible to link to actual zones
 
@@ -358,7 +358,7 @@ function sounds(/*array $ids = [] */)
     /* Item Sounds */
     /***************/
 
-    CLISetup::log(' - linking to items');
+    CLI::write(' - linking to items');
 
     DB::Aowow()->query('
         UPDATE

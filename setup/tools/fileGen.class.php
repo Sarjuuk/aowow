@@ -95,19 +95,19 @@ class FileGen
 
         if (!CLISetup::$localeIds /* todo: && this script has localized text */)
         {
-            CLISetup::log('No valid locale specified. Check your config or --locales parameter, if used', CLISetup::LOG_ERROR);
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
             exit;
         }
 
         // create directory structure
-        CLISetup::log('FileGen::init() - creating required directories');
+        CLI::write('FileGen::init() - creating required directories');
         $pathOk = 0;
         foreach (self::$reqDirs as $rd)
             if (CLISetup::writeDir($rd))
                 $pathOk++;
 
-        CLISetup::log('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
-        CLISetup::log();
+        CLI::write('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
+        CLI::write();
 
         self::$mode = $mode;
     }
@@ -196,11 +196,11 @@ class FileGen
             require_once 'setup/tools/filegen/'.$key.'.func.php';
         else if (empty(self::$tplFiles[$key]))
         {
-            CLISetup::log(sprintf(ERR_MISSING_INCL, $key, 'setup/tools/filegen/'.$key.'.func.php', CLISetup::LOG_ERROR));
+            CLI::write(sprintf(ERR_MISSING_INCL, $key, 'setup/tools/filegen/'.$key.'.func.php', CLI::LOG_ERROR));
             return false;
         }
 
-        CLISetup::log('FileGen::generate() - gathering data for '.$key);
+        CLI::write('FileGen::generate() - gathering data for '.$key);
 
         if (!empty(self::$tplFiles[$key]))
         {
@@ -228,9 +228,9 @@ class FileGen
                         else
                         {
                             $funcOK = false;
-                            CLISetup::log('No function for was registered for placeholder '.$func.'().', CLISetup::LOG_ERROR);
+                            CLI::write('No function for was registered for placeholder '.$func.'().', CLI::LOG_ERROR);
                             if (!array_reduce(get_included_files(), function ($inArray, $itr) use ($func) { return $inArray || false !== strpos($itr, $func); }, false))
-                                CLISetup::log('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
+                                CLI::write('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
                         }
                     }
                 }
@@ -240,7 +240,7 @@ class FileGen
                         $success = true;
             }
             else
-                CLISetup::log(sprintf(ERR_READ_FILE, CLISetup::bold(FileGen::$tplPath.$file.'.in')), CLISetup::LOG_ERROR);
+                CLI::write(sprintf(ERR_READ_FILE, CLI::bold(FileGen::$tplPath.$file.'.in')), CLI::LOG_ERROR);
         }
         else if (!empty(self::$datasets[$key]))
         {
@@ -254,7 +254,7 @@ class FileGen
                 $success = $key($updateIds);
             }
             else
-                CLISetup::log(' - subscript \''.$key.'\' not defined in included file', CLISetup::LOG_ERROR);
+                CLI::write(' - subscript \''.$key.'\' not defined in included file', CLI::LOG_ERROR);
         }
 
         set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script

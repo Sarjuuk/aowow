@@ -86,8 +86,8 @@ if (!CLI)
         $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
         if ($enchantments->error)
         {
-            CLISetup::log('Required table ?_itemenchantment seems to be empty! Leaving enchants()...', CLISetup::LOG_ERROR);
-            CLISetup::log();
+            CLI::write('Required table ?_itemenchantment seems to be empty! Leaving enchants()...', CLI::LOG_ERROR);
+            CLI::write();
             return false;
         }
 
@@ -106,7 +106,7 @@ if (!CLI)
                 $eId = $es['effect1MiscValue'];
                 if (!$enchantments->getEntry($eId))
                 {
-                    CLISetup::log(' * could not find enchantment #'.$eId.' referenced by spell #'.$esId, CLISetup::LOG_WARN);
+                    CLI::write(' * could not find enchantment #'.$eId.' referenced by spell #'.$esId, CLI::LOG_WARN);
                     continue;
                 }
 

@@ -61,7 +61,7 @@ if (!CLI)
         }
 
         if (!$set)
-            CLISetup::log(' - realmMenu: Auth-DB not set up .. menu will be empty', CLISetup::LOG_WARN);
+            CLI::write(' - realmMenu: Auth-DB not set up .. menu will be empty', CLI::LOG_WARN);
 
         if (!($set & 0x1))
             array_pop($menu);

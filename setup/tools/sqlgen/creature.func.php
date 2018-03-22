@@ -134,7 +134,7 @@ function creature(array $ids = [])
     {
         $newMax = max(array_column($npcs, 'entry'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 

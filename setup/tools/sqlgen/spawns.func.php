@@ -92,31 +92,31 @@ function spawns()                                           // and waypoints
 
     $query[1] = ['SELECT c.guid, 1 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, IFNULL(ca.path_id, 0) AS pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
                  'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
-                 ' - assembling '.CLISetup::bold('creature').' spawns'];
+                 ' - assembling '.CLI::bold('creature').' spawns'];
 
     $query[2] = ['SELECT c.guid, 2 AS "type", c.id AS typeId, ABS(c.spawntimesecs) AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
                  'FROM gameobject c',
-                 ' - assembling '.CLISetup::bold('gameobject').' spawns'];
+                 ' - assembling '.CLI::bold('gameobject').' spawns'];
 
     $query[3] = ['SELECT id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
                  'FROM dbc_soundemitters',
-                 ' - assembling '.CLISetup::bold('sound emitter').' spawns'];
+                 ' - assembling '.CLI::bold('sound emitter').' spawns'];
 
     $query[4] = ['SELECT id AS "guid", 503 AS "type", id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
                  'FROM dbc_areatrigger',
-                 ' - assembling '.CLISetup::bold('areatrigger').' spawns'];
+                 ' - assembling '.CLI::bold('areatrigger').' spawns'];
 
     $query[5] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
                  'FROM creature c JOIN script_waypoint w ON c.id = w.entry',
-                 ' - assembling waypoints from '.CLISetup::bold('script_waypoint')];
+                 ' - assembling waypoints from '.CLI::bold('script_waypoint')];
 
     $query[6] = ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
                  'FROM creature c JOIN waypoints w ON c.id = w.entry',
-                 ' - assembling waypoints from '.CLISetup::bold('waypoints')];
+                 ' - assembling waypoints from '.CLI::bold('waypoints')];
 
     $query[7] = ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
                  'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
-                 ' - assembling waypoints from '.CLISetup::bold('waypoint_data')];
+                 ' - assembling waypoints from '.CLI::bold('waypoint_data')];
 
     $queryPost = 'SELECT dm.id, wma.areaId, IFNULL(dm.floor, 0) AS floor, ' .
                  '100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`, ' .
@@ -153,7 +153,7 @@ function spawns()                                           // and waypoints
 
     foreach ($query as $idx => $q)
     {
-        CLISetup::log($q[1]);
+        CLI::write($q[1]);
 
         $n   = 0;
         $sum = 0;
@@ -166,7 +166,7 @@ function spawns()                                           // and waypoints
         foreach ($queryResult as $spawn)
         {
             if (!$n)
-                CLISetup::log(' * sets '.($sum + 1).' - '.($sum += SqlGen::$stepSize));
+                CLI::write(' * sets '.($sum + 1).' - '.($sum += SqlGen::$stepSize));
 
             if ($n++ > SqlGen::$stepSize)
                 $n = 0;
@@ -187,7 +187,7 @@ function spawns()                                           // and waypoints
 
             if (!$points)                                   // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
             {
-                CLISetup::log('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$spawn['areaId'].'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLISetup::LOG_WARN);
+                CLI::write('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$spawn['areaId'].'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
                 continue;
             }
 
@@ -267,10 +267,10 @@ function spawns()                                           // and waypoints
             }
         }
         if ($matches)
-            CLISetup::log(' * assigned '.$matches.' accessories on '.++$n.'. pass on vehicle accessories');
+            CLI::write(' * assigned '.$matches.' accessories on '.++$n.'. pass on vehicle accessories');
     }
     if ($accessories)
-        CLISetup::log(count($accessories).' accessories could not be fitted onto a spawned vehicle.', CLISetup::LOG_WARN);
+        CLI::write(count($accessories).' accessories could not be fitted onto a spawned vehicle.', CLI::LOG_WARN);
 
 
     /********************************/

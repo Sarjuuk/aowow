@@ -160,7 +160,7 @@ function quests(array $ids = [])
     {
         $newMax = max(array_column($quests, 'ID'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 

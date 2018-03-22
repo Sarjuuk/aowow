@@ -16,6 +16,258 @@ class SimpleXML extends SimpleXMLElement
     }
 }
 
+
+class CLI
+{
+    const CHR_BELL      = 7;
+    const CHR_BACK      = 8;
+    const CHR_TAB       = 9;
+    const CHR_LF        = 10;
+    const CHR_CR        = 13;
+    const CHR_ESC       = 27;
+    const CHR_BACKSPACE = 127;
+
+    const LOG_OK        = 0;
+    const LOG_WARN      = 1;
+    const LOG_ERROR     = 2;
+    const LOG_INFO      = 3;
+
+    private static $logHandle   = null;
+    private static $hasReadline = null;
+
+
+    /***********/
+    /* logging */
+    /***********/
+
+    public static function initLogFile($file = '')
+    {
+        if (!$file)
+            return;
+
+        $file = self::nicePath($file);
+        if (!file_exists($file))
+            self::$logHandle = fopen($file, 'w');
+        else
+        {
+            $logFileParts = pathinfo($file);
+
+            $i = 1;
+            while (file_exists($logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '')))
+                $i++;
+
+            $file = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
+            self::$logHandle = fopen($file, 'w');
+        }
+    }
+
+    public static function red($str)
+    {
+        return OS_WIN ? $str : "\e[31m".$str."\e[0m";
+    }
+
+    public static function green($str)
+    {
+        return OS_WIN ? $str : "\e[32m".$str."\e[0m";
+    }
+
+    public static function yellow($str)
+    {
+        return OS_WIN ? $str : "\e[33m".$str."\e[0m";
+    }
+
+    public static function blue($str)
+    {
+        return OS_WIN ? $str : "\e[36m".$str."\e[0m";
+    }
+
+    public static function bold($str)
+    {
+        return OS_WIN ? $str : "\e[1m".$str."\e[0m";
+    }
+
+    public static function write($txt = '', $lvl = -1)
+    {
+        $msg = "\n";
+        if ($txt)
+        {
+            $msg = str_pad(date('H:i:s'), 10);
+            switch ($lvl)
+            {
+                case self::LOG_ERROR:                       // red      critical error
+                    $msg .= '['.self::red('ERR').']   ';
+                    break;
+                case self::LOG_WARN:                        // yellow   notice
+                    $msg .= '['.self::yellow('WARN').']  ';
+                    break;
+                case self::LOG_OK:                          // green    success
+                    $msg .= '['.self::green('OK').']    ';
+                    break;
+                case self::LOG_INFO:                        // blue     info
+                    $msg .= '['.self::blue('INFO').']  ';
+                    break;
+                default:
+                    $msg .= '        ';
+            }
+
+            $msg .= $txt."\n";
+        }
+
+        echo $msg;
+
+        if (self::$logHandle)                               // remove highlights for logging
+            fwrite(self::$logHandle, preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg));
+
+        flush();
+    }
+
+    public static function nicePath(/* $file = '', ...$pathParts */)
+    {
+        $path = '';
+
+        switch (func_num_args())
+        {
+            case 0:
+                return '';
+            case 1:
+                $path = func_get_arg(0);
+                break;
+            default:
+                $args = func_get_args();
+                $file = array_shift($args);
+                $path = implode(DIRECTORY_SEPARATOR, $args).DIRECTORY_SEPARATOR.$file;
+        }
+
+        if (DIRECTORY_SEPARATOR == '/')                     // *nix
+        {
+            $path = str_replace('\\', '/', $path);
+            $path = preg_replace('/\/+/i', '/', $path);
+        }
+        else if (DIRECTORY_SEPARATOR == '\\')               // win
+        {
+            $path = str_replace('/', '\\', $path);
+            $path = preg_replace('/\\\\+/i', '\\', $path);
+        }
+        else
+            CLI::write('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLI::LOG_ERROR);
+
+        $path = trim($path);
+
+        // resolve *nix home shorthand
+        if (!OS_WIN)
+        {
+            if (preg_match('/^~(\w+)\/.*/i', $path, $m))
+                $path = '/home/'.substr($path, 1);
+            else if (substr($path, 0, 2) == '~/')
+                $path = getenv('HOME').substr($path, 1);
+            else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
+                $path = substr($path, 1);
+        }
+
+        // remove quotes (from erronous user input)
+        $path = str_replace(['"', "'"], ['', ''], $path);
+
+        return $path;
+    }
+
+
+    /**************/
+    /* read input */
+    /**************/
+
+    /*
+        since the CLI on WIN ist not interactive, the following things have to be considered
+        you do not receive keystrokes but whole strings upon pressing <Enter> (wich also appends a \r)
+        as such <ESC> and probably other control chars can not be registered
+        this also means, you can't hide input at all, least process it
+    */
+
+    public static function readInput(&$fields, $singleChar = false)
+    {
+        // first time set
+        if (self::$hasReadline === null)
+            self::$hasReadline = function_exists('readline_callback_handler_install');
+
+        // prevent default output if able
+        if (self::$hasReadline)
+            readline_callback_handler_install('', function() { });
+
+        foreach ($fields as $name => $data)
+        {
+            $vars = ['desc', 'isHidden', 'validPattern'];
+            foreach ($vars as $idx => $v)
+                $$v = isset($data[$idx]) ? $data[$idx] : false;
+
+            $charBuff = '';
+
+            if ($desc)
+                echo "\n".$desc.": ";
+
+            while (true) {
+                $r = [STDIN];
+                $w = $e = null;
+                $n = stream_select($r, $w, $e, 200000);
+
+                if ($n && in_array(STDIN, $r)) {
+                    $char  = stream_get_contents(STDIN, 1);
+                    $keyId = ord($char);
+
+                    // ignore this one
+                    if ($keyId == self::CHR_TAB)
+                        continue;
+
+                    // WIN sends \r\n as sequence, ignore one
+                    if ($keyId == self::CHR_CR && OS_WIN)
+                        continue;
+
+                    // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
+                    if ($keyId == self::CHR_ESC)
+                    {
+                        echo chr(self::CHR_BELL);
+                        return false;
+                    }
+                    else if ($keyId == self::CHR_BACKSPACE)
+                    {
+                        if (!$charBuff)
+                            continue;
+
+                        $charBuff = mb_substr($charBuff, 0, -1);
+                        if (!$isHidden && self::$hasReadline)
+                            echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
+                    }
+                    else if ($keyId == self::CHR_LF)
+                    {
+                        $fields[$name] = $charBuff;
+                        break;
+                    }
+                    else if (!$validPattern || preg_match($validPattern, $char))
+                    {
+                        $charBuff .= $char;
+                        if (!$isHidden && self::$hasReadline)
+                            echo $char;
+
+                        if ($singleChar && self::$hasReadline)
+                        {
+                            $fields[$name] = $charBuff;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        echo chr(self::CHR_BELL);
+
+        foreach ($fields as $f)
+            if (strlen($f))
+                return true;
+
+        $fields = null;
+        return true;
+    }
+}
+
+
 class Util
 {
     const FILE_ACCESS = 0777;

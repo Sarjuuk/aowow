@@ -171,7 +171,7 @@ function itemset()
                     $items[$vId][$piece['slot'].$itemId] = $itemId;
                 else
                 {
-                    CLISetup::log("set: ".$setId." ilvl: ".$piece['ItemLevel']." - conflict between item: ".$items[$vId][$piece['slot']]." and item: ".$itemId." choosing lower itemId", CLISetup::LOG_WARN);
+                    CLI::write("set: ".$setId." ilvl: ".$piece['ItemLevel']." - conflict between item: ".$items[$vId][$piece['slot']]." and item: ".$itemId." choosing lower itemId", CLI::LOG_WARN);
 
                     if ($items[$vId][$piece['slot']] > $itemId)
                         $items[$vId][$piece['slot']] = $itemId;
@@ -243,7 +243,7 @@ function itemset()
                 foreach ($subset as $slot => $item)
                 {
                     if (isset($temp[$slot]) && $temp[$slot] < $item)
-                        CLISetup::log("set: ".$setId." - conflict between item: ".$item." and item: ".$temp[$slot]." choosing lower itemId", CLISetup::LOG_WARN);
+                        CLI::write("set: ".$setId." - conflict between item: ".$item." and item: ".$temp[$slot]." choosing lower itemId", CLI::LOG_WARN);
                     else if ($slot == 13 || $slot = 11)     // special case
                         $temp[] = $item;
                     else

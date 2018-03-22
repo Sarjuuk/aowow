@@ -44,7 +44,7 @@ if (!CLI)
 
                 if (empty($icons))
                 {
-                    CLISetup::log('talentIcons - query for '.$v.' tree: '.$k.' returned empty', CLISetup::LOG_ERROR);
+                    CLI::write('talentIcons - query for '.$v.' tree: '.$k.' returned empty', CLI::LOG_ERROR);
                     $success = false;
                     continue;
                 }
@@ -56,7 +56,7 @@ if (!CLI)
                         $imgFile = 'static/images/wow/icons/medium/'.strtolower($icons[$i]).'.jpg';
                         if (!file_exists($imgFile))
                         {
-                            CLISetup::log('talentIcons - raw image '.CLISetup::bold($imgFile). ' not found', CLISetup::LOG_ERROR);
+                            CLI::write('talentIcons - raw image '.CLI::bold($imgFile). ' not found', CLI::LOG_ERROR);
                             $success = false;
                             break;
                         }
@@ -80,17 +80,17 @@ if (!CLI)
                     }
 
                     if (@imagejpeg($res, $outFile))
-                        CLISetup::log(sprintf(ERR_NONE, CLISetup::bold($outFile)), CLISetup::LOG_OK);
+                        CLI::write(sprintf(ERR_NONE, CLI::bold($outFile)), CLI::LOG_OK);
                     else
                     {
                         $success = false;
-                        CLISetup::log('talentIcons - '.CLISetup::bold($outFile.'.jpg').' could not be written', CLISetup::LOG_ERROR);
+                        CLI::write('talentIcons - '.CLI::bold($outFile.'.jpg').' could not be written', CLI::LOG_ERROR);
                     }
                 }
                 else
                 {
                     $success = false;
-                    CLISetup::log('talentIcons - image resource not created', CLISetup::LOG_ERROR);
+                    CLI::write('talentIcons - image resource not created', CLI::LOG_ERROR);
                     continue;
                 }
             }

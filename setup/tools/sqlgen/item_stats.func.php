@@ -142,10 +142,10 @@ function item_stats(array $ids = [])
 {
     $offset = 0;
 
-    CLISetup::log(' - applying stats for enchantments');
+    CLI::write(' - applying stats for enchantments');
     $enchStats = enchantment_stats();
-    CLISetup::log('   '.count($enchStats).' enchantments parsed');
-    CLISetup::log(' - applying stats for items');
+    CLI::write('   '.count($enchStats).' enchantments parsed');
+    CLI::write(' - applying stats for items');
 
     while (true)
     {
@@ -156,7 +156,7 @@ function item_stats(array $ids = [])
         $max = max($items->getFoundIDs());
         $num = count($items->getFoundIDs());
 
-        CLISetup::log(' * sets '.($offset + 1).' - '.($max));
+        CLI::write(' * sets '.($offset + 1).' - '.($max));
 
         $offset = $max;
 

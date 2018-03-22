@@ -27,7 +27,7 @@ if (!CLI)
             $file = $path.'.png';
             if (CLISetup::fileExists($file))
             {
-                CLISetup::log('manually converted png file present for '.$path.'.', CLISetup::LOG_INFO);
+                CLI::write('manually converted png file present for '.$path.'.', CLI::LOG_INFO);
                 $result = imagecreatefrompng($file);
             }
 
@@ -174,7 +174,7 @@ if (!CLI)
                     $ok = imagepng($dest, $name.$ext);
                     break;
                 default:
-                    CLISetup::log($done.' - unsupported file fromat: '.$ext, CLISetup::LOG_WARN);
+                    CLI::write($done.' - unsupported file fromat: '.$ext, CLI::LOG_WARN);
             }
 
             imagedestroy($dest);
@@ -182,10 +182,10 @@ if (!CLI)
             if ($ok)
             {
                 chmod($name.$ext, Util::FILE_ACCESS);
-                CLISetup::log($done.' - image '.$name.$ext.' written', CLISetup::LOG_OK);
+                CLI::write($done.' - image '.$name.$ext.' written', CLI::LOG_OK);
             }
             else
-                CLISetup::log($done.' - could not create image '.$name.$ext, CLISetup::LOG_ERROR);
+                CLI::write($done.' - could not create image '.$name.$ext, CLI::LOG_ERROR);
 
             return $ok;
         };
@@ -242,21 +242,24 @@ if (!CLI)
             if (in_array($locId, CLISetup::$localeIds))
                 $locList[] = $xp;
 
-        CLISetup::log('required resources overview:', CLISetup::LOG_INFO);
+        CLI::write('required resources overview:', CLI::LOG_INFO);
         foreach ($paths as list($path, , , , , $realPath))
         {
             if ($realPath)
-                CLISetup::log(CLISetup::green(' FOUND ').' - '.str_pad($path, 53).' @ '.$realPath);
+                CLI::write(CLI::green(' FOUND ').' - '.str_pad($path, 53).' @ '.$realPath);
             else
-                CLISetup::log(CLISetup::red('MISSING').' - '.str_pad($path, 53).' @ '.sprintf($imgPath, '['.implode(',', $locList).']/').$path);
+                CLI::write(CLI::red('MISSING').' - '.str_pad($path, 53).' @ '.sprintf($imgPath, '['.implode(',', $locList).']/').$path);
         }
 
-        CLISetup::log();
+        CLI::write();
 
         // if no subdir had sufficient data, diaf
         if (count(array_filter(array_column($paths, 5))) != count($paths))
         {
-            CLISetup::log('one or more required directories are missing:', CLISetup::LOG_ERROR);
+            CLI::write('one or more required directories are missing:', CLI::LOG_ERROR);
+            foreach ($missing as $m)
+                CLI::write(' - '.$m, CLI::LOG_ERROR);
+
             return;
         }
         else
@@ -316,7 +319,7 @@ if (!CLI)
             $files    = CLISetup::filesInPath($search, !!$pattern);
             $allPaths = array_merge($allPaths, $files);
 
-            CLISetup::log('processing '.count($files).' files in '.$path.'...');
+            CLI::write('processing '.count($files).' files in '.$path.'...');
 
             $j = 0;
             foreach ($files as $f)
@@ -336,7 +339,7 @@ if (!CLI)
                     else if (!$tileSize)
                     {
                         $j += count($outInfo);
-                        CLISetup::log('skipping extraneous file '.$img.' (+'.count($outInfo).')');
+                        CLI::write('skipping extraneous file '.$img.' (+'.count($outInfo).')');
                         continue;
                     }
                 }
@@ -357,7 +360,7 @@ if (!CLI)
 
                                 if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$dest.$img.$ext))
                                 {
-                                    CLISetup::log($done.' - file '.$dest.$img.$ext.' was already processed');
+                                    CLI::write($done.' - file '.$dest.$img.$ext.' was already processed');
                                     continue;
                                 }
 
@@ -404,10 +407,10 @@ if (!CLI)
                             imagecopyresampled($dest, $src, 5, 0, 64 + 1, 32 + 1, 10, 16, 18, 28);
 
                             if (imagegif($dest, $destDir.$dest.'quest_startend.gif'))
-                                CLISetup::log('                extra - image '.$destDir.$dest.'quest_startend.gif written', CLISetup::LOG_OK);
+                                CLI::write('                extra - image '.$destDir.$dest.'quest_startend.gif written', CLI::LOG_OK);
                             else
                             {
-                                CLISetup::log('                extra - could not create image '.$destDir.$dest.'quest_startend.gif', CLISetup::LOG_ERROR);
+                                CLI::write('                extra - could not create image '.$destDir.$dest.'quest_startend.gif', CLI::LOG_ERROR);
                                 $success = false;
                             }
 
@@ -426,7 +429,7 @@ if (!CLI)
 
                         if (!isset(FileGen::$cliOpts['force']) && file_exists($destDir.$dest.$img.$ext))
                         {
-                            CLISetup::log($done.' - file '.$dest.$img.$ext.' was already processed');
+                            CLI::write($done.' - file '.$dest.$img.$ext.' was already processed');
                             continue;
                         }
 
@@ -472,9 +475,9 @@ if (!CLI)
             DB::Aowow()->query('UPDATE ?_icons SET cuFlags = cuFlags | ?d WHERE name IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, $iconNames);
 
             asort($missing);
-            CLISetup::log('the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', CLISetup::LOG_WARN);
+            CLI::write('the following '.count($missing).' images where referenced by DBC but not in the mpqData directory. They may need to be converted by hand later on.', CLI::LOG_WARN);
             foreach ($missing as $m)
-                CLISetup::log(' - '.$m);
+                CLI::write(' - '.$m);
         }
 
         return $success;

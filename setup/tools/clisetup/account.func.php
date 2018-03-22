@@ -22,18 +22,18 @@ function account()
     User::useLocale(LOCALE_EN);
     Lang::load(Util::$localeStrings[LOCALE_EN]);
 
-    if (CLISetup::readInput($fields))
+    if (CLI::readInput($fields))
     {
-        CLISetup::log();
+        CLI::write();
 
         if (!User::isValidName($fields['name'], $e))
-            CLISetup::log(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLISetup::LOG_ERROR);
+            CLI::write(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLI::LOG_ERROR);
         else if (!User::isValidPass($fields['pass1'], $e))
-            CLISetup::log(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLISetup::LOG_ERROR);
+            CLI::write(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLI::LOG_ERROR);
         else if ($fields['pass1'] != $fields['pass2'])
-            CLISetup::log(Lang::account('passMismatch'), CLISetup::LOG_ERROR);
+            CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
         else if ($_ = DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE user = ? AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $fields['name'], ACC_STATUS_NEW, ACC_STATUS_NEW))
-            CLISetup::log(Lang::account('nameInUse'), CLISetup::LOG_ERROR);
+            CLI::write(Lang::account('nameInUse'), CLI::LOG_ERROR);
         else
         {
             // write to db
@@ -49,16 +49,16 @@ function account()
                 $newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $fields['name']);
                 Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
-                CLISetup::log("account ".$fields['name']." created successfully", CLISetup::LOG_OK);
+                CLI::write("account ".$fields['name']." created successfully", CLI::LOG_OK);
             }
             else                                            // something went wrong
-                CLISetup::log(Lang::main('intError'), CLISetup::LOG_ERROR);
+                CLI::write(Lang::main('intError'), CLI::LOG_ERROR);
         }
     }
     else
     {
-        CLISetup::log();
-        CLISetup::log("account creation aborted", CLISetup::LOG_INFO);
+        CLI::write();
+        CLI::write("account creation aborted", CLI::LOG_INFO);
     }
 }
 

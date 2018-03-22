@@ -263,7 +263,7 @@ class DBC
         $file = strtolower($file);
         if (empty($this->_fields[$file]) || empty($this->_formats[$file]))
         {
-            CLISetup::log('no structure known for '.$file.'.dbc, aborting.', CLISetup::LOG_ERROR);
+            CLI::write('no structure known for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
             return;
         }
 
@@ -274,7 +274,7 @@ class DBC
 
         if (count($this->fields) != strlen(str_ireplace('x', '', $this->format)))
         {
-            CLISetup::log('known field types ['.count($this->fields).'] and names ['.strlen(str_ireplace('x', '', $this->format)).'] do not match for '.$file.'.dbc, aborting.', CLISetup::LOG_ERROR);
+            CLI::write('known field types ['.count($this->fields).'] and names ['.strlen(str_ireplace('x', '', $this->format)).'] do not match for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
             return;
         }
 
@@ -299,7 +299,7 @@ class DBC
             if ($foundMask & (1 << $locId))
                 continue;
 
-            $fullPath = CLISetup::nicePath($this->file.'.dbc', CLISetup::$srcDir, $locStr, 'DBFilesClient');
+            $fullPath = CLI::nicePath($this->file.'.dbc', CLISetup::$srcDir, $locStr, 'DBFilesClient');
             if (!CLISetup::fileExists($fullPath))
                 continue;
 
@@ -310,7 +310,7 @@ class DBC
 
         if (!$this->fileRefs)
         {
-            CLISetup::log('no suitable files found for '.$file.'.dbc, aborting.', CLISetup::LOG_ERROR);
+            CLI::write('no suitable files found for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
             return;
         }
 
@@ -319,19 +319,19 @@ class DBC
         $x = array_unique(array_column($headers, 'recordCount'));
         if (count($x) != 1)
         {
-            CLISetup::log('some DBCs have differenct record counts ('.implode(', ', $x).' respectively). cannot merge!', CLISetup::LOG_ERROR);
+            CLI::write('some DBCs have differenct record counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
             return;
         }
         $x = array_unique(array_column($headers, 'fieldCount'));
         if (count($x) != 1)
         {
-            CLISetup::log('some DBCs have differenct field counts ('.implode(', ', $x).' respectively). cannot merge!', CLISetup::LOG_ERROR);
+            CLI::write('some DBCs have differenct field counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
             return;
         }
         $x = array_unique(array_column($headers, 'recordSize'));
         if (count($x) != 1)
         {
-            CLISetup::log('some DBCs have differenct record sizes ('.implode(', ', $x).' respectively). cannot merge!', CLISetup::LOG_ERROR);
+            CLI::write('some DBCs have differenct record sizes ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
             return;
         }
 
@@ -345,11 +345,11 @@ class DBC
 
         $this->createTable();
 
-        CLISetup::log(' - reading '.($this->localized ? 'and merging ' : '').$this->file.'.dbc for locales '.implode(', ', array_keys($this->fileRefs)));
+        CLI::write(' - reading '.($this->localized ? 'and merging ' : '').$this->file.'.dbc for locales '.implode(', ', array_keys($this->fileRefs)));
 
         if (!$this->read())
         {
-            CLISetup::log(' - DBC::read() returned with error', CLISetup::LOG_ERROR);
+            CLI::write(' - DBC::read() returned with error', CLI::LOG_ERROR);
             return false;
         }
 
@@ -374,7 +374,7 @@ class DBC
 
         if (fread($handle, 4) != 'WDBC')
         {
-            CLISetup::log('file '.$this->curFile.' has incorrect magic bytes', CLISetup::LOG_ERROR);
+            CLI::write('file '.$this->curFile.' has incorrect magic bytes', CLI::LOG_ERROR);
             fclose($handle);
             return false;
         }
@@ -387,14 +387,14 @@ class DBC
         $filesize = filesize($this->curFile);
         if ($filesize < 20)
         {
-            CLISetup::log('file '.$this->curFile.' is too small for a DBC file', CLISetup::LOG_ERROR);
+            CLI::write('file '.$this->curFile.' is too small for a DBC file', CLI::LOG_ERROR);
             return false;
         }
 
         $header = $this->readHeader($handle);
         if (!$header)
         {
-            CLISetup::log('cannot open file '.$this->curFile, CLISetup::LOG_ERROR);
+            CLI::write('cannot open file '.$this->curFile, CLI::LOG_ERROR);
             return false;
         }
 
@@ -406,14 +406,14 @@ class DBC
 
         if ($header['recordCount'] * $header['recordSize'] + $header['stringSize'] + 20 != $filesize)
         {
-            CLISetup::log('file '.$this->curFile.' has incorrect size '.$filesize.': '.$debugStr, CLISetup::LOG_ERROR);
+            CLI::write('file '.$this->curFile.' has incorrect size '.$filesize.': '.$debugStr, CLI::LOG_ERROR);
             fclose($handle);
             return false;
         }
 
         if ($header['fieldCount'] != strlen($this->format))
         {
-            CLISetup::log('incorrect format string ('.$this->format.') specified for file '.$this->curFile.' fieldCount='.$header['fieldCount'], CLISetup::LOG_ERROR);
+            CLI::write('incorrect format string ('.$this->format.') specified for file '.$this->curFile.' fieldCount='.$header['fieldCount'], CLI::LOG_ERROR);
             fclose($handle);
             return false;
         }
@@ -519,7 +519,7 @@ class DBC
 
             if (!isset($unpackFmt[$ch]))
             {
-                CLISetup::log('unknown format parameter \''.$ch.'\' in format string', CLISetup::LOG_ERROR);
+                CLI::write('unknown format parameter \''.$ch.'\' in format string', CLI::LOG_ERROR);
                 return false;
             }
 
@@ -541,7 +541,7 @@ class DBC
 
         if ($recSize != $header['recordSize'])
         {
-            CLISetup::log('format string size ('.$recSize.') for file '.$this->file.' does not match actual size ('.$header['recordSize'].')', CLISetup::LOG_ERROR);
+            CLI::write('format string size ('.$recSize.') for file '.$this->file.' does not match actual size ('.$header['recordSize'].')', CLI::LOG_ERROR);
             return false;
         }
 

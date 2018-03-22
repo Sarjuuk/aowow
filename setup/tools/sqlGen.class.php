@@ -107,7 +107,7 @@ class SqlGen
 
         if (!CLISetup::$localeIds /* && this script has localized text */)
         {
-            CLISetup::log('No valid locale specified. Check your config or --locales parameter, if used', CLISetup::LOG_ERROR);
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
             exit;
         }
 
@@ -158,14 +158,14 @@ class SqlGen
     {
         if (!isset(self::$tables[$tableName]))
         {
-            CLISetup::log('SqlGen::generate - invalid table given', CLISetup::LOG_ERROR);
+            CLI::write('SqlGen::generate - invalid table given', CLI::LOG_ERROR);
             return false;
         }
 
         if (!empty(self::$tables[$tableName][0]))           // straight copy from dbc source
         {
             $tbl = self::$tables[$tableName];               // shorthand
-            CLISetup::log('SqlGen::generate() - copying '.$tbl[0].'.dbc into aowow_'.$tableName);
+            CLI::write('SqlGen::generate() - copying '.$tbl[0].'.dbc into aowow_'.$tableName);
 
             $dbc = new DBC($tbl[0], ['temporary' => CLISetup::$tmpDBC, 'tableName' => 'aowow_'.$tableName]);
             if ($dbc->error)
@@ -177,7 +177,7 @@ class SqlGen
         {
             $customData = $reqDBC = [];
 
-            CLISetup::log('SqlGen::generate() - filling aowow_'.$tableName.' with data');
+            CLI::write('SqlGen::generate() - filling aowow_'.$tableName.' with data');
 
             require_once 'setup/tools/sqlgen/'.$tableName.'.func.php';
 
@@ -196,12 +196,12 @@ class SqlGen
                         DB::Aowow()->query('UPDATE ?_'.$tableName.' SET ?a WHERE id = ?d', $data, $id);
             }
             else
-                CLISetup::log(' - subscript \''.$tableName.'\' not defined in included file', CLISetup::LOG_ERROR);
+                CLI::write(' - subscript \''.$tableName.'\' not defined in included file', CLI::LOG_ERROR);
 
             return $success;
         }
         else
-            CLISetup::log(sprintf(ERR_MISSING_INCL, $tableName, 'setup/tools/sqlgen/'.$tableName.'.func.php'), CLISetup::LOG_ERROR);
+            CLI::write(sprintf(ERR_MISSING_INCL, $tableName, 'setup/tools/sqlgen/'.$tableName.'.func.php'), CLI::LOG_ERROR);
 
     }
 

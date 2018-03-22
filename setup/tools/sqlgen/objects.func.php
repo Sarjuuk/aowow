@@ -110,7 +110,7 @@ function objects(array $ids = [])
     {
         $newMax = max(array_column($objects, 'entry'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 
