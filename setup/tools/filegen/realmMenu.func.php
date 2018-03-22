@@ -42,21 +42,24 @@ if (!CLI)
         $subUS = [];
         $set   = 0x0;
         $menu  = [
-            ['us', 'US & Oceanic', null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]],
-            ['eu', 'Europe',       null,[[Util::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]]
+            // skip usage of battlegroup
+            // ['us', Lang::profiler('regions', 'us'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]],
+            // ['eu', Lang::profiler('regions', 'eu'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]]
+            ['us', Lang::profiler('regions', 'us'), null, &$subUS],
+            ['eu', Lang::profiler('regions', 'eu'), null, &$subEU]
         ];
 
-        foreach (Util::getRealms() as $row)
+        foreach (Profiler::getRealms() as $row)
         {
             if ($row['region'] == 'eu')
             {
                 $set |= 0x1;
-                $subEU[] = [Util::urlize($row['name']), $row['name']];
+                $subEU[] = [Profiler::urlize($row['name']), $row['name']];
             }
             else if ($row['region'] == 'us')
             {
                 $set |= 0x2;
-                $subUS[] = [Util::urlize($row['name']), $row['name']];
+                $subUS[] = [Profiler::urlize($row['name']), $row['name']];
             }
         }
 

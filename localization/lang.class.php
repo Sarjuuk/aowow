@@ -9,6 +9,7 @@ class Lang
     private static $mail;
     private static $game;
     private static $maps;
+    private static $profiler;
     private static $screenshot;
     private static $privileges;
 
@@ -48,6 +49,13 @@ class Lang
         // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
         self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
+
+        // not localized .. for whatever reason
+        self::$profiler['regions'] = array(
+            'eu' => "Europe",
+            'us' => "US & Oceanic"
+        );
+
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 
@@ -252,7 +260,12 @@ class Lang
             if ($mask & (1 << $k) && $str)
                 $tmp[] = $str;
 
-        return implode(', ', $tmp);
+        if (!$tmp && $class == ITEM_CLASS_ARMOR)
+            return self::spell('cat', -11, 8);
+        else if (!$tmp && $class == ITEM_CLASS_WEAPON)
+            return self::spell('cat', -11, 6);
+        else
+            return implode(', ', $tmp);
     }
 
     public static function getStances($stanceMask)

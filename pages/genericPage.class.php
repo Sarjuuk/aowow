@@ -73,6 +73,88 @@ trait ListPage
     }
 }
 
+trait TrProfiler
+{
+    protected $region      = '';
+    protected $realm       = '';
+    protected $realmId     = 0;
+    protected $battlegroup = '';                            // not implemented, since no pserver supports it
+    protected $subjectName = '';
+    protected $subjectGUID = 0;
+    protected $sumSubjects = 0;
+
+    protected $doResync    = null;
+
+    protected function getSubjectFromUrl($str)
+    {
+        if (!$str)
+            return;
+
+        // cat[0] is always region
+        // cat[1] is realm or bGroup (must be realm if cat[2] is set)
+        // cat[2] is arena-team, guild or player
+        $cat = explode('.', $str, 3);
+
+        $cat = array_map('urldecode', $cat);
+
+        if (count($cat) > 3)
+            return;
+
+        if ($cat[0] !== 'eu' && $cat[0] !== 'us')
+            return;
+
+        $this->region = $cat[0];
+
+        // if ($cat[1] == Profiler::urlize(CFG_BATTLEGROUP))
+            // $this->battlegroup = CFG_BATTLEGROUP;
+        if (isset($cat[1]))
+        {
+            foreach (Profiler::getRealms() as $rId => $r)
+            {
+                if (Profiler::urlize($r['name']) == $cat[1])
+                {
+                    $this->realm   = $r['name'];
+                    $this->realmId = $rId;
+                    if (isset($cat[2]) && mb_strlen($cat[2]) >= 3)
+                        $this->subjectName = $cat[2];       // cannot reconstruct original name from urlized form; match against special name field
+
+                    break;
+                }
+            }
+        }
+    }
+
+    protected function initialSync()
+    {
+        $this->prepareContent();
+
+        $this->notFound = array(
+            'title' => sprintf(Lang::profiler('firstUseTitle'), $this->subjectName, $this->realm),
+            'msg'   => ''
+        );
+        $this->hasComContent = false;
+        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
+
+        if (isset($this->tabId))
+            $this->pageTemplate['activeTab'] = $this->tabId;
+
+        $this->display('text-page-generic');
+        exit();
+    }
+
+    protected function generatePath()
+    {
+        if ($this->region)
+        {
+            $this->path[] = $this->region;
+
+            if ($this->realm)
+                $this->path[] = Profiler::urlize($this->realm);
+            // else
+                // $this->path[] = Profiler::urlize(CFG_BATTLEGROUP);
+        }
+    }
+}
 
 class GenericPage
 {
@@ -148,7 +230,7 @@ class GenericPage
         if ($pageParam)
             $this->fullParams .= '='.$pageParam;
 
-        if (CFG_CACHE_DIR && Util::checkOrCreateDirectory(CFG_CACHE_DIR))
+        if (CFG_CACHE_DIR && Util::writeDir(CFG_CACHE_DIR))
             $this->cacheDir = mb_substr(CFG_CACHE_DIR, -1) != '/' ? CFG_CACHE_DIR.'/' : CFG_CACHE_DIR;
 
         // force page refresh

@@ -2311,7 +2311,7 @@ class ItemListFilter extends Filter
         if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
             return false;
 
-        foreach (Util::getRealms() as $rId => $__)
+        foreach (Profiler::getRealms() as $rId => $__)
         {
             // todo: do something sensible..
             // // todo (med): get the avgbuyout into the listview

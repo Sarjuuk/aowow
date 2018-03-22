@@ -340,33 +340,226 @@ class SpellList extends BaseType
 
     public function getProfilerMods()
     {
+        // weapon hand check: param: slot, class, subclass, value
+        $whCheck = '$function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
+
         $data = $this->getStatGain();                       // flat gains
+        foreach ($data as $id => &$spellData)
+        {
+            foreach ($spellData as $modId => $val)
+            {
+                if (!isset(Game::$itemMods[$modId]))
+                    continue;
+
+                if ($modId == ITEM_MOD_EXPERTISE_RATING)    // not a rating .. pure expertise
+                    $spellData['exp'] = $val;
+                else
+                    $spellData[Game::$itemMods[$modId]] = $val;
+
+                unset($spellData[$modId]);
+            }
+
+            // apply weapon restrictions
+            $this->getEntry($id);
+            $class    = $this->getField('equippedItemClass');
+            $subClass = $this->getField('equippedItemSubClassMask');
+            $slot     = $subClass & 0x5000C ? 18 : 16;
+            if ($class != ITEM_CLASS_WEAPON || !$subClass)
+                continue;
+
+            foreach ($spellData as $json => $pts)
+                $spellData[$json] = [1, 'functionOf', sprintf($whCheck, $slot, $class, $subClass, $pts)];
+        }
+
+        // 4 possible modifiers found
+        // <statistic> => [0.15, 'functionOf', <funcName:int>]
+        // <statistic> => [0.33, 'percentOf', <statistic>]
+        // <statistic> => [123, 'add']
+        // <statistic> => <value>  ...  as from getStatGain()
+
+        $modXByStat = function (&$arr, $stat, $pts) use (&$mv)
+        {
+            if ($mv == STAT_STRENGTH)
+                $arr[$stat ?: 'str'] = [$pts / 100, 'percentOf', 'str'];
+            else if ($mv == STAT_AGILITY)
+                $arr[$stat ?: 'agi'] = [$pts / 100, 'percentOf', 'agi'];
+            else if ($mv == STAT_STAMINA)
+                $arr[$stat ?: 'sta'] = [$pts / 100, 'percentOf', 'sta'];
+            else if ($mv == STAT_INTELLECT)
+                $arr[$stat ?: 'int'] = [$pts / 100, 'percentOf', 'int'];
+            else if ($mv == STAT_SPIRIT)
+                $arr[$stat ?: 'spi'] = [$pts / 100, 'percentOf', 'spi'];
+        };
+
+        $modXBySchool = function (&$arr, $stat, $val, $mask = null) use (&$mv)
+        {
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_HOLY))
+                $arr['hol'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'hol'.$stat];
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_FIRE))
+                $arr['fir'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fir'.$stat];
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_NATURE))
+                $arr['nat'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'nat'.$stat];
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_FROST))
+                $arr['fro'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fro'.$stat];
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_SHADOW))
+                $arr['sha'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'sha'.$stat];
+            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_ARCANE))
+                $arr['arc'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'arc'.$stat];
+        };
+
+        $jsonStat = function ($stat)
+        {
+            if ($stat == STAT_STRENGTH)
+                return 'str';
+            if ($stat == STAT_AGILITY)
+                return 'agi';
+            if ($stat == STAT_STAMINA)
+                return 'sta';
+            if ($stat == STAT_INTELLECT)
+                return 'int';
+            if ($stat == STAT_SPIRIT)
+                return 'spi';
+        };
 
         foreach ($this->iterate() as $id => $__)
         {
+            // Priest: Spirit of Redemption is a spell but also a passive. *yaaayyyy*
+            if (($this->getField('cuFlags') & SPELL_CU_TALENTSPELL) && $id != 20711)
+                continue;
+
+            // curious cases of OH MY FUCKING GOD WHY?!
+            if ($id == 16268)                               // Shaman - Spirit Weapons (parry is normaly stored in g_statistics)
+            {
+                $data[$id]['parrypct'] = [5, 'add'];
+                continue;
+            }
+
+            if ($id == 20550)                               // Tauren - Endurance (dependant on base health) ... if you are looking for something elegant, look away!
+            {
+                $data[$id]['health'] = [0.05, 'functionOf', '$function(p) { return g_statistics.combo[p.classs][p.level][5]; }'];
+                continue;
+            }
+
             for ($i = 1; $i < 4; $i++)
             {
-                $pts = $this->calculateAmountForCurrent($i)[1];
-                $mv  = $this->curTpl['effect'.$i.'MiscValue'];
-                $au  = $this->curTpl['effect'.$i.'AuraId'];
+                $pts      = $this->calculateAmountForCurrent($i)[1];
+                $mv       = $this->getField('effect'.$i.'MiscValue');
+                $mvB      = $this->getField('effect'.$i.'MiscValueB');
+                $au       = $this->getField('effect'.$i.'AuraId');
+                $class    = $this->getField('equippedItemClass');
+                $subClass = $this->getField('equippedItemSubClassMask');
+
 
                 /*  ISSUE!
                     mods formated like ['<statName>' => [<points>, 'percentOf', '<statName>']] are applied as multiplier and not
                     as a flat value (that is equal to the percentage, like they should be). So the stats-table won't show the actual deficit
                 */
 
-                switch ($this->curTpl['effect'.$i.'AuraId'])
+                switch ($au)
                 {
-                    case 101:
-                        $data[$id][] = ['armor' => [$pts / 100, 'percentOf', 'armor']];
+                    case 101:                               // Mod Resistance Percent
+                    case 142:                               // Mod Base Resistance Percent
+                        if ($mv == 1)                       // Armor only if explicitly specified only affects armor from equippment
+                            $data[$id]['armor'] = [$pts / 100, 'percentOf', ['armor', 0]];
+                        else if ($mv)
+                            $modXBySchool($data[$id], 'res', $pts);
                         break;
-                    case 13:                                // damage done flat
-                        // per magic school, omit physical
+                    case 182:                               // Mod Resistance Of Stat Percent
+                        if ($mv == 1)                       // Armor only if explicitly specified
+                            $data[$id]['armor'] = [$pts / 100, 'percentOf', $jsonStat($mvB)];
+                        else if ($mv)
+                            $modXBySchool($data[$id], 'res', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
                         break;
-                    case 30:                                // mod skill
-                        // diff between character skills and trade skills
+                    case 137:                               // mod stat percent
+                        if ($mv > -1)                       // one stat
+                            $modXByStat($data[$id], null, $pts);
+                        else if ($mv < 0)                   // all stats
+                            for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
+                                $data[$id][Game::$itemMods[$iMod]] = [$pts / 100, 'percentOf', Game::$itemMods[$iMod]];
                         break;
-                    case 36:                                // shapeshift
+                    case 174:                               // Mod Spell Damage Of Stat Percent
+                        $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
+                        $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
+                        break;
+                    case 212:                               // Mod Ranged Attack Power Of Stat Percent
+                        $modXByStat($data[$id], 'rgdatkpwr', $pts);
+                        break;
+                    case 268:                               // Mod Attack Power Of Stat Percent
+                        $modXByStat($data[$id], 'mleatkpwr', $pts);
+                        break;
+                    case 175:                               // Mod Spell Healing Of Stat Percent
+                        $modXByStat($data[$id], 'splheal', $pts);
+                        break;
+                    case 219:                               // Mod Mana Regeneration from Stat
+                        $modXByStat($data[$id], 'manargn', $pts);
+                        break;
+                    case 134:                               // Mod Mana Regeneration Interrupt
+                        $data[$id]['icmanargn'] = [$pts / 100, 'percentOf', 'oocmanargn'];
+                        break;
+                    case 57:                                // Mod Spell Crit Chance
+                    case 71:                                // Mod Spell Crit Chance School
+                        $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
+                        $modXBySchool($data[$id], 'splcritstrkpct', [$pts, 'add']);
+                        if (($mv & SPELL_MAGIC_SCHOOLS) == SPELL_MAGIC_SCHOOLS)
+                            $data[$id]['splcritstrkpct'] = [$pts, 'add'];
+                        break;
+                    case 285:                               // Mod Attack Power Of Armor
+                        $data[$id]['mleatkpwr'] = [1 / $pts, 'percentOf', 'fullarmor'];
+                        $data[$id]['rgdatkpwr'] = [1 / $pts, 'percentOf', 'fullarmor'];
+                        break;
+                    case 52:                                // Mod Physical Crit Percent
+                        if ($class < 1 || ($class == ITEM_CLASS_WEAPON && ($subClass & 0x5000C)))
+                            $data[$id]['rgdcritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 18, $class, $subClass, $pts)];
+                            // $data[$id]['rgdcritstrkpct'] = [$pts, 'add'];
+                        if ($class < 1 || ($class == ITEM_CLASS_WEAPON && ($subClass & 0xA5F3)))
+                            $data[$id]['mlecritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 16, $class, $subClass, $pts)];
+                            // $data[$id]['mlecritstrkpct'] = [$pts, 'add'];
+                        break;
+                    case 47:                                // Mod Parry Percent
+                        $data[$id]['parrypct'] = [$pts, 'add'];
+                        break;
+                    case 49:                                // Mod Dodge Percent
+                        $data[$id]['dodgepct'] = [$pts, 'add'];
+                        break;
+                    case 51:                                // Mod Block Percent
+                        $data[$id]['blockpct'] = [$pts, 'add'];
+                        break;
+                    case 132:                               // Mod Increase Energy Percent
+                        if ($mv == POWER_HEALTH)
+                            $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
+                        else if ($mv == POWER_ENERGY)
+                            $data[$id]['energy'] = [$pts / 100, 'percentOf', 'energy'];
+                        else if ($mv == POWER_MANA)
+                            $data[$id]['mana'] = [$pts / 100, 'percentOf', 'mana'];
+                        else if ($mv == POWER_RAGE)
+                            $data[$id]['rage'] = [$pts / 100, 'percentOf', 'rage'];
+                        else if ($mv == POWER_RUNIC_POWER)
+                            $data[$id]['runic'] = [$pts / 100, 'percentOf', 'runic'];
+                        break;
+                    case 133:                               // Mod Increase Health Percent
+                        $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
+                        break;
+                    case 150:                               // Mod Shield Blockvalue Percent
+                        $data[$id]['block'] = [$pts / 100, 'percentOf', 'block'];
+                        break;
+                    case 290:                               // Mod Crit Percent
+                        $data[$id]['mlecritstrkpct'] = [$pts, 'add'];
+                        $data[$id]['rgdcritstrkpct'] = [$pts, 'add'];
+                        $data[$id]['splcritstrkpct'] = [$pts, 'add'];
+                        break;
+                    case 237:                               // Mod Spell Damage Of Attack Power
+                        $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
+                        $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', 'mleatkpwr']);
+                        break;
+                    case 238:                               // Mod Spell Healing Of Attack Power
+                        $data[$id]['splheal'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
+                        break;
+                    case 166:                               // Mod Attack Power Percent [ingmae only melee..?]
+                        $data[$id]['mleatkpwr'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
+                        break;
+                    case 88:                                // Mod Health Regeneration Percent
+                        $data[$id]['healthrgn'] = [$pts / 100, 'percentOf', 'healthrgn'];
+                        break;
                 }
             }
         }

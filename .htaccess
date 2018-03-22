@@ -10,6 +10,10 @@ Order Deny,Allow
     ForceType application/x-httpd-php
 </Files>
 
+<Files "prQueue">
+    ForceType application/x-httpd-php
+</Files>
+
 # Block view of some folders
 Options -Indexes
 DirectoryIndex index.php

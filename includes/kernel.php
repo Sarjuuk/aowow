@@ -20,6 +20,7 @@ require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/utilities.php';                      // helper functions
 require_once 'includes/game.php';                           // game related data & functions
+require_once 'includes/profiler.class.php';
 require_once 'includes/user.class.php';
 require_once 'includes/markup.class.php';                   // manipulate markup text
 require_once 'includes/database.class.php';                 // wrap DBSimple
@@ -43,10 +44,18 @@ spl_autoload_register(function ($class) {
     {
         require_once 'includes/basetype.class.php';
 
-        if (file_exists('includes/types/'.strtr($class, ['list' => '']).'.class.php'))
-            require_once 'includes/types/'.strtr($class, ['list' => '']).'.class.php';
+        $cl = strtr($class, ['list' => '']);
+        if ($cl == 'remoteprofile' || $cl == 'localprofile')
+            $cl = 'profile';
+        if ($cl == 'remotearenateam' || $cl == 'localarenateam')
+            $cl = 'arenateam';
+        if ($cl == 'remoteguild' || $cl == 'localguild')
+            $cl = 'guild';
+
+        if (file_exists('includes/types/'.$cl.'.class.php'))
+            require_once 'includes/types/'.$cl.'.class.php';
         else
-            throw new Exception('could not register type class: '.$class);
+            throw new Exception('could not register type class: '.$cl);
 
         return;
     }
@@ -206,7 +215,7 @@ if (!CLI)
         die('error: SITE_HOST or STATIC_HOST not configured');
 
     // Setup Session
-    if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
+    if (CFG_SESSION_CACHE_DIR && Util::writeDir(CFG_SESSION_CACHE_DIR))
         session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);

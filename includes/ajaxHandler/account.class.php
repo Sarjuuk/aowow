@@ -7,12 +7,15 @@ class AjaxAccount extends AjaxHandler
 {
     protected $validParams = ['exclude', 'weightscales'];
     protected $_post       = array(
-        // 'groups' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
+        'groups' => [FILTER_SANITIZE_NUMBER_INT, null],
         'save'   => [FILTER_SANITIZE_NUMBER_INT, null],
         'delete' => [FILTER_SANITIZE_NUMBER_INT, null],
         'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
         'name'   => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
         'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
+        'reset'  => [FILTER_SANITIZE_NUMBER_INT, null],
+        'mode'   => [FILTER_SANITIZE_NUMBER_INT, null],
+        'type'   => [FILTER_SANITIZE_NUMBER_INT, null],
     );
     protected $_get        = array(
         'locale' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkLocale']]
@@ -37,10 +40,41 @@ class AjaxAccount extends AjaxHandler
 
     protected function handleExclude()
     {
-        // profiler completion exclude handler
-        // $this->_post['groups'] = bitMask of excludeGroupIds when using .. excludeGroups .. duh
-        // should probably occur in g_user.excludegroups (dont forget to also set g_users.settings = {})
-        return '';
+        if (!User::$id)
+            return;
+
+        if ($this->_post['mode'] == 1)                      // directly set exludes
+        {
+            $type = $this->_post['type'];
+            $ids  = $this->_post['id'];
+
+            if (!isset(Util::$typeStrings[$type]) || empty($ids))
+                return;
+
+            // ready for some bullshit? here it comes!
+            // we don't get signaled whether an id should be added to or removed from either includes or excludes
+            // so we throw everything into one table and toggle the mode if its already in here
+
+            $includes = DB::Aowow()->selectCol('SELECT typeId FROM ?_profiler_excludes WHERE type = ?d AND typeId IN (?a)', $type, $ids);
+
+            foreach ($ids as $typeId)
+                DB::Aowow()->query('INSERT INTO ?_account_excludes (`userId`, `type`, `typeId`, `mode`) VALUES (?a) ON DUPLICATE KEY UPDATE mode = (mode ^ 0x3)', array(
+                    User::$id, $type, $typeId, in_array($includes, $typeId) ? 2 : 1
+                ));
+
+            return;
+        }
+        else if ($this->_post['reset'] == 1)                // defaults to unavailable
+        {
+            $mask = PR_EXCLUDE_GROUP_UNAVAILABLE;
+            DB::Aowow()->query('DELETE FROM ?_account_excludes WHERE userId = ?d', User::$id);
+        }
+        else                                                // clamp to real groups
+            $mask = $this->_post['groups'] & PR_EXCLUDE_GROUP_ANY;
+
+        DB::Aowow()->query('UPDATE ?_account SET excludeGroups = ?d WHERE id = ?d', $mask, User::$id);
+
+        return;
     }
 
     protected function handleWeightscales()

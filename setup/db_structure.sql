@@ -42,6 +42,7 @@ CREATE TABLE `aowow_account` (
   `avatar` varchar(50) NOT NULL DEFAULT '' COMMENT 'icon-string for internal or id for upload',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT 'user can obtain custom titles',
   `description` text NOT NULL COMMENT 'markdown formated',
+  `excludeGroups` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT 'profiler - completion exclude bitmask',
   `userPerms` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'bool isAdmin',
   `status` tinyint(4) unsigned NOT NULL DEFAULT '0' COMMENT 'flag, see defines',
   `statusTimer` int(10) unsigned NOT NULL DEFAULT '0',
@@ -296,28 +297,6 @@ CREATE TABLE `aowow_articles` (
   `quickInfo` text COMMENT 'Markdown formated',
   UNIQUE KEY `type` (`type`,`typeId`,`locale`),
   UNIQUE KEY `locale_url` (`locale`,`url`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `aowow_characters`
---
-
-DROP TABLE IF EXISTS `aowow_characters`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_characters` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `race` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
-  `gender` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `description` varchar(150) NOT NULL,
-  `iconString` varchar(50) NOT NULL,
-  `titleId` tinyint(3) unsigned NOT NULL,
-  `guildId` mediumint(8) unsigned NOT NULL,
-  `guildRank` tinyint(3) unsigned NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2271,6 +2250,7 @@ DROP TABLE IF EXISTS `aowow_talents`;
 CREATE TABLE `aowow_talents` (
   `id` smallint(5) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL,
+  `petTypeMask` tinyint(3) unsigned NOT NULL,
   `tab` tinyint(3) unsigned NOT NULL,
   `row` tinyint(3) unsigned NOT NULL,
   `col` tinyint(3) unsigned NOT NULL,
@@ -2625,7 +2605,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_account_weightscales` WRITE;
 /*!40000 ALTER TABLE `aowow_account_weightscales` DISABLE KEYS */;
-INSERT INTO `aowow_account_weightscales` VALUES (1,0,'arms',1,'ability_rogue_eviscerate'),(2,0,'fury',1,'ability_warrior_innerrage'),(3,0,'prot',1,'ability_warrior_defensivestance'),(4,0,'holy',2,'spell_holy_holybolt'),(5,0,'prot',2,'ability_paladin_shieldofthetempl'),(6,0,'retrib',2,'spell_holy_auraoflight'),(7,0,'beast',3,'ability_hunter_beasttaming'),(8,0,'marks',3,'ability_marksmanship'),(9,0,'surv',3,'ability_hunter_swiftstrike'),(10,0,'assas',4,'ability_rogue_eviscerate'),(11,0,'combat',4,'ability_backstab'),(12,0,'subtle',4,'ability_stealth'),(13,0,'disc',5,'spell_holy_wordfortitude'),(14,0,'holy',5,'spell_holy_guardianspirit'),(15,0,'shadow',5,'spell_shadow_shadowwordpain'),(16,0,'blooddps',6,'spell_deathknight_bloodpresence'),(17,0,'frostdps',6,'spell_deathknight_frostpresence'),(18,0,'frosttank',6,'spell_deathknight_frostpresence'),(19,0,'unholydps',6,'spell_deathknight_unholypresence'),(20,0,'elem',7,'spell_nature_lightning'),(21,0,'enhance',7,'spell_nature_lightningshield'),(22,0,'resto',7,'spell_nature_magicimmunity'),(23,0,'arcane',8,'spell_holy_magicalsentry'),(24,0,'fire',8,'spell_fire_firebolt02'),(25,0,'frost',8,'spell_frost_frostbolt02'),(26,0,'afflic',9,'spell_shadow_deathcoil'),(27,0,'demo',9,'spell_shadow_metamorphosis'),(28,0,'destro',9,'spell_shadow_rainoffire'),(29,0,'balance',11,'spell_nature_starfall'),(30,0,'feraltank',11,'ability_racial_bearform'),(31,0,'resto',11,'spell_nature_healingtouch'),(32,0,'feraldps',11,'ability_druid_catform');
+INSERT INTO `aowow_account_weightscales` VALUES (1,0,'arms',1,'ability_rogue_eviscerate'),(2,0,'fury',1,'ability_warrior_innerrage'),(3,0,'prot',1,'ability_warrior_defensivestance'),(4,0,'holy',2,'spell_holy_holybolt'),(5,0,'prot',2,'ability_paladin_shieldofthetemplar'),(6,0,'retrib',2,'spell_holy_auraoflight'),(7,0,'beast',3,'ability_hunter_beasttaming'),(8,0,'marks',3,'ability_marksmanship'),(9,0,'surv',3,'ability_hunter_swiftstrike'),(10,0,'assas',4,'ability_rogue_eviscerate'),(11,0,'combat',4,'ability_backstab'),(12,0,'subtle',4,'ability_stealth'),(13,0,'disc',5,'spell_holy_wordfortitude'),(14,0,'holy',5,'spell_holy_guardianspirit'),(15,0,'shadow',5,'spell_shadow_shadowwordpain'),(16,0,'blooddps',6,'spell_deathknight_bloodpresence'),(17,0,'frostdps',6,'spell_deathknight_frostpresence'),(18,0,'frosttank',6,'spell_deathknight_frostpresence'),(19,0,'unholydps',6,'spell_deathknight_unholypresence'),(20,0,'elem',7,'spell_nature_lightning'),(21,0,'enhance',7,'spell_nature_lightningshield'),(22,0,'resto',7,'spell_nature_magicimmunity'),(23,0,'arcane',8,'spell_holy_magicalsentry'),(24,0,'fire',8,'spell_fire_firebolt02'),(25,0,'frost',8,'spell_frost_frostbolt02'),(26,0,'afflic',9,'spell_shadow_deathcoil'),(27,0,'demo',9,'spell_shadow_metamorphosis'),(28,0,'destro',9,'spell_shadow_rainoffire'),(29,0,'balance',11,'spell_nature_starfall'),(30,0,'feraltank',11,'ability_racial_bearform'),(31,0,'resto',11,'spell_nature_healingtouch'),(32,0,'feraldps',11,'ability_druid_catform');
 /*!40000 ALTER TABLE `aowow_account_weightscales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2666,7 +2646,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_config` WRITE;
 /*!40000 ALTER TABLE `aowow_config` DISABLE KEYS */;
-INSERT INTO `aowow_config` VALUES ('sql_limit_search','500',1,129,'default: 500 - max results for search'),('sql_limit_default','300',1,129,'default: 300 - max results for listviews'),('sql_limit_quicksearch','10',1,129,'default: 10  - max results for suggestions'),('sql_limit_none','0',1,129,'default: 0 - unlimited results (i wouldn\'t change that mate)'),('ttl_rss','60',1,129,'default: 60 - time to live for RSS (in seconds)'),('name','Aowow Database Viewer (ADV)',1,136,' - website title'),('name_short','Aowow',1,136,' - feed title'),('board_url','http://www.wowhead.com/forums?board=',1,136,' - another halfbaked  javascript thing..'),('contact_email','feedback@aowow.org',1,136,' - displayed sender for auth-mails, ect'),('battlegroup','Pure Pwnage',1,136,' - pretend, we belong to a battlegroup to satisfy profiler-related Jscripts'),('debug','0',1,132,'default: 0 - disable cache, enable sql-errors, enable error_reporting'),('maintenance','1',1,132,'default: 0 - display brb gnomes and block access for non-staff'),('user_max_votes','50',1,129,'default: 50 - vote limit per day'),('force_ssl','0',1,132,'default: 0 - enforce SSL, if the server is behind a load balancer'),('locales','333',1,161,'default: 0x14D - allowed locales - 0:English, 2:French, 3:German, 6:Spanish, 8:Russian'),('screenshot_min_size','200',1,129,'default: 200 - minimum dimensions of uploaded screenshots in px (yes, it\'s square)'),('site_host','',1,136,' - points js to executable files'),('static_host','',1,136,' - points js to images & scripts'),('cache_decay','25200',2,129,'default: 60 * 60 * 7 - time to keep cache in seconds'),('cache_mode','1',2,161,'default: 1 - set cache method - 0:filecache, 1:memcached'),('cache_dir','',2,136,'default: cache/template - generated pages are saved here (requires CACHE_MODE: filecache)'),('acc_failed_auth_block','900',3,129,'default: 15 * 60 - how long an account is closed after exceeding FAILED_AUTH_COUNT (in seconds)'),('acc_failed_auth_count','5',3,129,'default: 5 - how often invalid passwords are tolerated'),('acc_allow_register','1',3,132,'default: 1 - allow/disallow account creation (requires AUTH_MODE: aowow)'),('acc_auth_mode','0',3,145,'default: 0 - source to auth against - 0:aowow, 1:TC auth-table, 2:external script'),('acc_create_save_decay','604800',3,129,'default: 604800 - time in wich an unconfirmed account cannot be overwritten by new registrations'),('acc_recovery_decay','300',3,129,'default: 300 - time to recover your account and new recovery requests are blocked'),('session_timeout_delay','3600',4,129,'default: 60 * 60 - non-permanent session times out in time() + X'),('session.gc_maxlifetime','604800',4,200,'default: 7*24*60*60 - lifetime of session data'),('session.gc_probability','1',4,200,'default: 0 - probability to remove session data on garbage collection'),('session.gc_divisor',100,4,200,'default: 100 - probability to remove session data on garbage collection'),('session_cache_dir','',4,136,'default:  - php sessions are saved here. Leave empty to use php default directory.'),('rep_req_upvote','125',5,129,'default: 125 - required reputation to upvote comments'),('rep_req_downvote','250',5,129,'default: 250 -  required reputation to downvote comments'),('rep_req_comment','75',5,129,'default: 75 - required reputation to write a comment'),('rep_req_reply','75',5,129,'default: 75 - required reputation to write a reply'),('rep_req_supervote','2500',5,129,'default: 2500 - required reputation for double vote effect'),('rep_req_votemore_base','2000',5,129,'default: 2000 - gains more votes past this threshold'),('rep_reward_register','100',5,129,'default: 100 - activated an account'),('rep_reward_upvoted','5',5,129,'default: 5 - comment received upvote'),('rep_reward_downvoted','0',5,129,'default: 0 - comment received downvote'),('rep_reward_good_report','10',5,129,'default: 10 - filed an accepted report'),('rep_reward_bad_report','0',5,129,'default: 0 - filed a rejected report'),('rep_reward_dailyvisit','5',5,129,'default: 5 - daily visit'),('rep_reward_user_warned','-50',5,129,'default: -50 - moderator imposed a warning'),('rep_reward_comment','1',5,129,'default: 1 - created a comment (not a reply) '),('rep_req_premium','25000',5,129,'default: 25000 - required reputation for premium status through reputation'),('rep_reward_upload','10',5,129,'default: 10 - suggested / uploaded video / screenshot was approved'),('rep_reward_article','100',5,129,'default: 100 - submitted an approved article/guide'),('rep_reward_user_suspended','-200',5,129,'default: -200 - moderator revoked rights'),('rep_req_votemore_add','250',5,129,'default: 250 - required reputation per additional vote past threshold'),('serialize_precision','5',0,65,' - some derelict code, probably unused'),('memory_limit','1500M',0,200,'default: 1500M - parsing spell.dbc is quite intense'),('default_charset','UTF-8',0,72,'default: UTF-8'),('analytics_user','',6,136,'default:  - enter your GA-user here to track site stats');
+INSERT INTO `aowow_config` VALUES ('sql_limit_search','500',1,129,'default: 500 - max results for search'),('sql_limit_default','300',1,129,'default: 300 - max results for listviews'),('sql_limit_quicksearch','10',1,129,'default: 10  - max results for suggestions'),('sql_limit_none','0',1,129,'default: 0 - unlimited results (i wouldn\'t change that mate)'),('ttl_rss','60',1,129,'default: 60 - time to live for RSS (in seconds)'),('name','Aowow Database Viewer (ADV)',1,136,' - website title'),('name_short','Aowow',1,136,' - feed title'),('board_url','http://www.wowhead.com/forums?board=',1,136,' - another halfbaked  javascript thing..'),('contact_email','feedback@aowow.org',1,136,' - displayed sender for auth-mails, ect'),('battlegroup','Pure Pwnage',1,136,' - pretend, we belong to a battlegroup to satisfy profiler-related Jscripts'),('debug','0',1,132,'default: 0 - disable cache, enable sql-errors, enable error_reporting'),('maintenance','1',1,132,'default: 0 - display brb gnomes and block access for non-staff'),('user_max_votes','50',1,129,'default: 50 - vote limit per day'),('force_ssl','0',1,132,'default: 0 - enforce SSL, if the server is behind a load balancer'),('locales','333',1,161,'default: 0x14D - allowed locales - 0:English, 2:French, 3:German, 6:Spanish, 8:Russian'),('screenshot_min_size','200',1,129,'default: 200 - minimum dimensions of uploaded screenshots in px (yes, it\'s square)'),('site_host','',1,136,' - points js to executable files'),('static_host','',1,136,' - points js to images & scripts'),('cache_decay','25200',2,129,'default: 60 * 60 * 7 - time to keep cache in seconds'),('cache_mode','1',2,161,'default: 1 - set cache method - 0:filecache, 1:memcached'),('cache_dir','',2,136,'default: cache/template - generated pages are saved here (requires CACHE_MODE: filecache)'),('acc_failed_auth_block','900',3,129,'default: 15 * 60 - how long an account is closed after exceeding FAILED_AUTH_COUNT (in seconds)'),('acc_failed_auth_count','5',3,129,'default: 5 - how often invalid passwords are tolerated'),('acc_allow_register','1',3,132,'default: 1 - allow/disallow account creation (requires AUTH_MODE: aowow)'),('acc_auth_mode','0',3,145,'default: 0 - source to auth against - 0:aowow, 1:TC auth-table, 2:external script'),('acc_create_save_decay','604800',3,129,'default: 604800 - time in wich an unconfirmed account cannot be overwritten by new registrations'),('acc_recovery_decay','300',3,129,'default: 300 - time to recover your account and new recovery requests are blocked'),('session_timeout_delay','3600',4,129,'default: 60 * 60 - non-permanent session times out in time() + X'),('session.gc_maxlifetime','604800',4,200,'default: 7*24*60*60 - lifetime of session data'),('session.gc_probability','1',4,200,'default: 0 - probability to remove session data on garbage collection'),('session.gc_divisor',100,4,200,'default: 100 - probability to remove session data on garbage collection'),('session_cache_dir','',4,136,'default:  - php sessions are saved here. Leave empty to use php default directory.'),('rep_req_upvote','125',5,129,'default: 125 - required reputation to upvote comments'),('rep_req_downvote','250',5,129,'default: 250 -  required reputation to downvote comments'),('rep_req_comment','75',5,129,'default: 75 - required reputation to write a comment'),('rep_req_reply','75',5,129,'default: 75 - required reputation to write a reply'),('rep_req_supervote','2500',5,129,'default: 2500 - required reputation for double vote effect'),('rep_req_votemore_base','2000',5,129,'default: 2000 - gains more votes past this threshold'),('rep_reward_register','100',5,129,'default: 100 - activated an account'),('rep_reward_upvoted','5',5,129,'default: 5 - comment received upvote'),('rep_reward_downvoted','0',5,129,'default: 0 - comment received downvote'),('rep_reward_good_report','10',5,129,'default: 10 - filed an accepted report'),('rep_reward_bad_report','0',5,129,'default: 0 - filed a rejected report'),('rep_reward_dailyvisit','5',5,129,'default: 5 - daily visit'),('rep_reward_user_warned','-50',5,129,'default: -50 - moderator imposed a warning'),('rep_reward_comment','1',5,129,'default: 1 - created a comment (not a reply) '),('rep_req_premium','25000',5,129,'default: 25000 - required reputation for premium status through reputation'),('rep_reward_upload','10',5,129,'default: 10 - suggested / uploaded video / screenshot was approved'),('rep_reward_article','100',5,129,'default: 100 - submitted an approved article/guide'),('rep_reward_user_suspended','-200',5,129,'default: -200 - moderator revoked rights'),('rep_req_votemore_add','250',5,129,'default: 250 - required reputation per additional vote past threshold'),('serialize_precision','5',0,65,' - some derelict code, probably unused'),('memory_limit','1500M',0,200,'default: 1500M - parsing spell.dbc is quite intense'),('default_charset','UTF-8',0,72,'default: UTF-8'),('analytics_user','',6,136,'default:  - enter your GA-user here to track site stats'),('profiler_queue',0,7,0x84,'default: 0 - enable/disable profiler queue'),('profiler_queue_delay',3000,7,0x81,'default: 3000 - min. delay between queue cycles (in ms)'),('profiler_resync_ping',5000,7,0x81,'default: 5000 - how often the javascript asks for for updates, when queued (in ms)'),('profiler_resync_delay',3600,7,0x81,'default: 1*60*60 - how often a character can be refreshed (in sec)');
 /*!40000 ALTER TABLE `aowow_config` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2676,7 +2656,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1504448041,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1521735363,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2729,3 +2709,215 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2015-10-31 13:22:30
+
+SET FOREIGN_KEY_CHECKS=0;
+
+DROP TABLE IF EXISTS `aowow_profiler_sync`;
+CREATE TABLE `aowow_profiler_sync` (
+  `realm` tinyint(3) unsigned NOT NULL,
+  `realmGUID` int(10) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `typeId` int(10) unsigned NOT NULL,
+  `requestTime` int(10) unsigned NOT NULL,
+  `status` tinyint(3) unsigned NOT NULL,
+  `errorCode` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `realm_realmGUID_type_typeId` (`realm`,`realmGUID`,`type`),
+  UNIQUE KEY `type_typeId` (`type`,`typeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_guild`;
+CREATE TABLE `aowow_profiler_guild` (
+  `id` int(10) unsigned NOT NULL,
+  `realm` int(10) unsigned NOT NULL DEFAULT '0',
+  `realmGUID` int(10) unsigned NOT NULL DEFAULT '0',
+  `cuFlags` int(10) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(26) NOT NULL DEFAULT '',
+  `nameUrl` varchar(26) NOT NULL DEFAULT '',
+  `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `emblemColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `borderColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `backgroundColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `info` varchar(500) NOT NULL DEFAULT '',
+  `createDate` int(10) unsigned NOT NULL DEFAULT '0',
+  INDEX `name` (`name`),
+  INDEX `guild` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_guild_rank`;
+CREATE TABLE `aowow_profiler_guild_rank` (
+  `guildId` int(10) unsigned NOT NULL DEFAULT '0',
+  `rank` tinyint(3) unsigned NOT NULL,
+  `name` varchar(20) NOT NULL DEFAULT '',
+  PRIMARY KEY (`guildId`,`rank`),
+  INDEX `rank` (`rank`),
+  CONSTRAINT `FK_aowow_profiler_guild_rank_aowow_profiler_guild` FOREIGN KEY (`guildId`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_profiles`;
+CREATE TABLE `aowow_profiler_profiles` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `realm` tinyint(3) unsigned DEFAULT NULL,
+  `realmGUID` int(11) unsigned DEFAULT NULL,
+  `cuFlags` int(11) unsigned NOT NULL DEFAULT '0',
+  `sourceId` int(11) unsigned DEFAULT NULL,
+  `sourceName` varchar(50) DEFAULT NULL,
+  `copy` int(10) unsigned DEFAULT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `user` int(11) unsigned DEFAULT NULL,
+  `name` varchar(50) NOT NULL,
+  `race` tinyint(3) unsigned NOT NULL,
+  `class` tinyint(3) unsigned NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL,
+  `gender` tinyint(3) unsigned NOT NULL,
+  `guild` int(10) unsigned NULL,
+  `guildrank` tinyint(3) unsigned DEFAULT NULL COMMENT '0: guild master',
+  `skincolor` tinyint(3) unsigned NOT NULL,
+  `hairstyle` tinyint(3) unsigned NOT NULL,
+  `haircolor` tinyint(3) unsigned NOT NULL,
+  `facetype` tinyint(3) unsigned NOT NULL,
+  `features` tinyint(3) unsigned NOT NULL,
+  `nomodelMask` int(11) unsigned NOT NULL DEFAULT '0',
+  `title` tinyint(3) unsigned NOT NULL,
+  `description` text NULL,
+  `playedtime` int(11) unsigned NOT NULL,
+  `gearscore` smallint(5) unsigned NOT NULL,
+  `achievementpoints` smallint(5) unsigned NOT NULL,
+  `lastupdated` int(11) NOT NULL,
+  `talenttree1` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 1st tree',
+  `talenttree2` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 2nd tree',
+  `talenttree3` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 3rd tree',
+  `talentbuild1` varchar(105) NOT NULL,
+  `talentbuild2` varchar(105) NOT NULL,
+  `glyphs1` varchar(45) NOT NULL,
+  `glyphs2` varchar(45) NOT NULL,
+  `activespec` tinyint(1) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `realm_realmGUID_name` (`realm`,`realmGUID`,`name`),
+  INDEX `user` (`user`),
+  INDEX `guild` (`guild`),
+  CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_items`;
+CREATE TABLE `aowow_profiler_items` (
+  `id` int(11) unsigned DEFAULT NULL,
+  `slot` tinyint(3) unsigned DEFAULT NULL,
+  `item` mediumint(8) unsigned DEFAULT NULL,
+  `subItem` smallint(6) DEFAULT NULL,
+  `permEnchant` mediumint(8) unsigned DEFAULT NULL,
+  `tempEnchant` mediumint(8) unsigned DEFAULT NULL,
+  `extraSocket` tinyint(3) unsigned DEFAULT NULL COMMENT 'not used .. the appropriate gem slot is set to -1 instead',
+  `gem1` mediumint(8) DEFAULT NULL,
+  `gem2` mediumint(8) DEFAULT NULL,
+  `gem3` mediumint(8) DEFAULT NULL,
+  `gem4` mediumint(8) DEFAULT NULL,
+  UNIQUE KEY `id_slot` (`id`,`slot`),
+  INDEX `id` (`id`),
+  INDEX `item` (`item`),
+  CONSTRAINT `FK_pr_items` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_arena_team`;
+CREATE TABLE `aowow_profiler_arena_team` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `realm` tinyint(3) unsigned NOT NULL,
+  `realmGUID` int(10) unsigned NOT NULL,
+  `name` varchar(24) NOT NULL,
+  `nameUrl` varchar(24) NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `cuFlags` int(11) unsigned NOT NULL,
+  `rating` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `seasonGames` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `seasonWins` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `weekGames` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `weekWins` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `rank` int(10) unsigned NOT NULL DEFAULT '0',
+  `backgroundColor` int(10) unsigned NOT NULL DEFAULT '0',
+  `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `emblemColor` int(10) unsigned NOT NULL DEFAULT '0',
+  `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `borderColor` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `realm_realmGUID` (`realm`,`realmGUID`),
+  INDEX `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_arena_team_member`;
+CREATE TABLE `aowow_profiler_arena_team_member` (
+  `arenaTeamId` int(10) unsigned NOT NULL DEFAULT '0',
+  `profileId` int(10) unsigned NOT NULL DEFAULT '0',
+  `captain` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `weekGames` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `weekWins` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `seasonGames` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `seasonWins` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `personalRating` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`arenaTeamId`,`profileId`),
+  INDEX `guid` (`profileId`),
+  CONSTRAINT `FK_aowow_profiler_arena_team_member_aowow_profiler_arena_team` FOREIGN KEY (`arenaTeamId`) REFERENCES `aowow_profiler_arena_team` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_aowow_profiler_arena_team_member_aowow_profiler_profiles` FOREIGN KEY (`profileId`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_completion`;
+CREATE TABLE `aowow_profiler_completion` (
+  `id` int(11) unsigned NOT NULL,
+  `type` smallint(6) unsigned NOT NULL,
+  `typeId` mediumint(9) NOT NULL,
+  `cur` int(11) DEFAULT NULL,
+  `max` int(11) DEFAULT NULL,
+  INDEX `id` (`id`),
+  INDEX `type` (`type`),
+  INDEX `typeId` (`typeId`),
+  CONSTRAINT `FK_pr_completion` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_pets`;
+CREATE TABLE `aowow_profiler_pets` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `owner` int(10) unsigned DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `family` tinyint(3) unsigned DEFAULT NULL,
+  `npc` smallint(5) unsigned DEFAULT NULL,
+  `displayId` smallint(5) unsigned DEFAULT NULL,
+  `talents` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `owner` (`owner`),
+  CONSTRAINT `FK_pr_pets` FOREIGN KEY (`owner`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `aowow_profiler_excludes`;
+CREATE TABLE `aowow_profiler_excludes` (
+  `type` smallint(5) unsigned NOT NULL,
+  `typeId` mediumint(8) unsigned NOT NULL,
+  `groups` smallint(5) unsigned NOT NULL COMMENT 'see exclude group defines',
+  `comment` varchar(50) NOT NULL COMMENT 'rebuilding profiler files will delete everything without a comment',
+  PRIMARY KEY (`type`,`typeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `aowow_profiler_excludes` (`type`,`typeId`,`groups`,`comment`) VALUES (6,459,1,'Gray Wolf'),(6,468,1,'White Stallion'),(6,471,1,'Palamino'),(6,472,1,'Pinto'),(6,578,1,'Black Wolf'),(6,579,1,'Red Wolf'),(6,581,1,'Winter Wolf'),(6,3363,1,'Nether Drake'),(6,6896,1,'Black Ram'),(6,6897,1,'Blue Ram'),(6,8980,1,'Skeletal Horse'),(6,10681,1,'Summon Cockatoo'),(6,10686,1,'Summon Prairie Chicken'),(6,10687,1,'Summon White Plymouth Rock'),(6,10699,1,'Summon Bronze Whelpling'),(6,10700,1,'Summon Faeling'),(6,10701,1,'Summon Dart Frog'),(6,10702,1,'Summon Island Frog'),(6,10705,1,'Summon Eagle Owl'),(6,10708,1,'Summon Snowy Owl'),(6,10710,1,'Summon Cottontail Rabbit'),(6,10712,1,'Summon Spotted Rabbit'),(6,10715,1,'Summon Blue Racer'),(6,10718,1,'Green Water Snake'),(6,10719,1,'Ribbon Snake'),(6,10720,1,'Scarlet Snake'),(6,10721,1,'Summon Elven Wisp'),(6,10795,1,'Ivory Raptor'),(6,10798,1,'Obsidian Raptor'),(6,15648,1,'Corrupted Kitten'),(6,15779,1,'White Mechanostrider Mod B'),(6,15780,1,'Green Mechanostrider'),(6,15781,1,'Steel Mechanostrider'),(6,16055,1,'Black Nightsaber'),(6,16056,1,'Ancient Frostsaber'),(6,16058,1,'Primal Leopard'),(6,16059,1,'Tawny Sabercat'),(6,16060,1,'Golden Sabercat'),(6,16080,1,'Red Wolf'),(6,16081,1,'Winter Wolf'),(6,16082,1,'Palomino'),(6,16083,1,'White Stallion'),(6,16084,1,'Mottled Red Raptor'),(6,17450,1,'Ivory Raptor'),(6,17455,1,'Purple Mechanostrider'),(6,17456,1,'Red and Blue Mechanostrider'),(6,17458,1,'Fluorescent Green Mechanostrider'),(6,17459,1,'Icy Blue Mechanostrider Mod A'),(6,17460,1,'Frost Ram'),(6,17461,1,'Black Ram'),(6,17468,1,'Pet Fish'),(6,17469,1,'Pet Stone'),(6,18363,1,'Riding Kodo'),(6,18991,1,'Green Kodo'),(6,18992,1,'Teal Kodo'),(6,19363,1,'Summon Mechanical Yeti'),(6,23220,1,'Swift Dawnsaber'),(6,23428,1,'Albino Snapjaw'),(6,23429,1,'Loggerhead Snapjaw'),(6,23430,1,'Olive Snapjaw'),(6,23431,1,'Leatherback Snapjaw'),(6,23432,1,'Hawksbill Snapjaw'),(6,23530,16,'Tiny Red Dragon'),(6,23531,16,'Tiny Green Dragon'),(6,24985,1,'Summon Baby Murloc (Blue)'),(6,24986,1,'Summon Baby Murloc (Green)'),(6,24987,1,'Summon Baby Murloc (Orange)'),(6,24988,4,'Lurky'),(6,24989,1,'Summon Baby Murloc (Pink)'),(6,24990,1,'Summon Baby Murloc (Purple)'),(6,25849,1,'Baby Shark'),(6,26067,1,'Summon Mechanical Greench'),(6,26391,1,'Tentacle Call'),(6,28828,1,'Nether Drake'),(6,29059,1,'Naxxramas Deathcharger'),(6,30152,1,'White Tiger Cub'),(6,30156,2,'Hippogryph Hatchling'),(6,30174,2,'Riding Turtle'),(6,32298,4,'Netherwhelp'),(6,32345,1,'Peep the Phoenix Mount'),(6,33050,128,'Magical Crawdad'),(6,33057,1,'Summon Mighty Mr. Pinchy'),(6,33630,1,'Blue Mechanostrider'),(6,34407,1,'Great Elite Elekk'),(6,35157,1,'Summon Spotted Rabbit'),(6,37015,1,'Swift Nether Drake'),(6,40319,16,'Lucky'),(6,40405,16,'Lucky'),(6,43688,1,'Amani War Bear'),(6,43810,1,'Frost Wyrm'),(6,44317,1,'Merciless Nether Drake'),(6,44744,1,'Merciless Nether Drake'),(6,45125,2,'Rocket Chicken'),(6,45174,16,'Golden Pig'),(6,45175,16,'Silver Pig'),(6,45890,1,'Scorchling'),(6,47037,1,'Swift War Elekk'),(6,48406,16,'Essence of Competition'),(6,48408,1,'Essence of Competition'),(6,48954,8,'Swift Zhevra'),(6,49322,8,'Swift Zhevra'),(6,49378,1,'Brewfest Riding Kodo'),(6,50869,1,'Brewfest Kodo'),(6,50870,1,'Brewfest Ram'),(6,51851,1,'Vampiric Batling'),(6,51960,1,'Frost Wyrm Mount'),(6,52615,4,'Frosty'),(6,53082,8,'Mini Tyrael'),(6,53768,1,'Haunted'),(6,54187,1,'Clockwork Rocket Bot'),(6,55068,1,'Mr. Chilly'),(6,58983,8,'Big Blizzard Bear'),(6,59572,1,'Black Polar Bear'),(6,59573,1,'Brown Polar Bear'),(6,59802,1,'Grand Ice Mammoth'),(6,59804,1,'Grand Ice Mammoth'),(6,59976,1,'Black Proto-Drake'),(6,60021,1,'Plagued Proto-Drake'),(6,60136,1,'Grand Caravan Mammoth'),(6,60140,1,'Grand Caravan Mammoth'),(6,61309,512,'Magnificent Flying Carpet'),(6,61442,1,'Swift Mooncloth Carpet'),(6,61444,1,'Swift Shadoweave Carpet'),(6,61446,1,'Swift Spellfire Carpete'),(6,61451,512,'Flying Carpet'),(6,61855,1,'Baby Blizzard Bear'),(6,62048,1,'Black Dragonhawk Mount'),(6,62514,1,'Alarming Clockbot'),(6,63318,8,'Murkimus the Gladiator'),(6,64351,1,'XS-001 Constructor Bot'),(6,64656,1,'Blue Skeletal Warhorse'),(6,64731,128,'Sea Turtle'),(6,65682,1,'Warbot'),(6,65917,2,'Magic Rooster'),(6,66030,8,'Grunty'),(6,66122,1,'Magic Rooster - dummy spell'),(6,66123,1,'Magic Rooster - dummy spell'),(6,66124,1,'Magic Rooster - dummy spell'),(6,66520,1,'Jade Tiger'),(6,66907,1,'Argent Warhorse'),(6,67527,16,'Onyx Panther'),(6,68767,2,'Tuskarr Kite'),(6,68810,2,'Spectral Tiger Cub'),(6,69002,1,'Onyxian Whelpling'),(6,69452,8,'Core Hound Pup'),(6,69535,4,'Gryphon Hatchling'),(6,69536,4,'Wind Rider Cub'),(6,69539,1,'Zipao Tiger'),(6,69541,4,'Pandaren Monk'),(6,69677,4,'Lil\' K.T.'),(6,74856,2,'Blazing Hippogryph'),(6,74918,2,'Wooly White Rhino'),(6,75596,512,'Frosty Flying Carpet'),(6,75613,1,'Celestial Dragon'),(6,75614,16,'Celestial Steed'),(6,75906,4,'Lil\' XT'),(6,75936,1,'Murkimus the Gladiator'),(6,75973,8,'X-53 Touring Rocket'),(6,78381,8,'Mini Thor'),(8,87,1024,'Bloodsail Buccaneers - max rank is honored'),(8,92,1024,'Gelkis Clan Centaur - max rank is friendly'),(8,93,1024,'Magram Clan Centaur - max rank is friendly');
+
+DROP TABLE IF EXISTS `aowow_account_profiles`;
+CREATE TABLE `aowow_account_profiles` (
+  `accountId` INT(10) UNSIGNED NOT NULL,
+  `profileId` INT(10) UNSIGNED NOT NULL,
+  `extraFlags` INT(10) UNSIGNED NOT NULL,
+  UNIQUE INDEX `accountId_profileId` (`accountId`, `profileId`),
+  INDEX `accountId` (`accountId`),
+  INDEX `profileId` (`profileId`),
+  CONSTRAINT `FK_account_id` FOREIGN KEY (`accountId`) REFERENCES `aowow_account` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT `FK_profile_id` FOREIGN KEY (`profileId`) REFERENCES `aowow_profiler_profiles` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) COLLATE='utf8_general_ci' ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS `aowow_account_excludes`;
+CREATE TABLE `aowow_account_excludes` (
+  `userId` INT(11) UNSIGNED NOT NULL,
+  `type` SMALLINT(5) UNSIGNED NOT NULL,
+  `typeId` MEDIUMINT(8) UNSIGNED NOT NULL,
+  `mode` TINYINT(2) UNSIGNED NOT NULL COMMENT '1: exclude; 2: include',
+  UNIQUE INDEX `userId_type_typeId` (`userId`, `type`, `typeId`),
+  INDEX `userId` (`userId`),
+  CONSTRAINT `FK_acc_excludes` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) COLLATE='utf8_general_ci' ENGINE=InnoDB;
+
+SET FOREIGN_KEY_CHECKS=1;

@@ -261,7 +261,7 @@ class ItemPage extends genericPage
 
         // avg auction buyout
         if (in_array($this->subject->getField('bonding'), [0, 2, 3]))
-            if ($_ = Util::getBuyoutForItem($this->typeId))
+            if ($_ = Profiler::getBuyoutForItem($this->typeId))
                 $infobox[] = '[tooltip=tooltip_buyoutprice]'.Lang::item('buyout.').'[/tooltip]'.Lang::main('colon').'[money='.$_.']'.$each;
 
         // avg money contained

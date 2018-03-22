@@ -28,7 +28,10 @@ define('TYPE_SKILL',                        15);
 define('TYPE_CURRENCY',                     17);
 define('TYPE_SOUND',                        19);
 define('TYPE_ICON',                         29);
+define('TYPE_PROFILE',                      100);
 // internal types (not published to js)
+define('TYPE_GUILD',                        101);
+define('TYPE_ARENA_TEAM',                   102);
 define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);
 define('TYPE_ENCHANTMENT',                  502);
@@ -165,6 +168,7 @@ define('BUTTON_FORUM',                      5);
 define('BUTTON_TALENT',                     6);
 define('BUTTON_EQUIP',                      7);
 define('BUTTON_PLAYLIST',                   8);
+define('BUTTON_RESYNC',                     9);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
@@ -204,10 +208,16 @@ define('NPCINFO_REP',                       0x4);
 
 define('ACHIEVEMENTINFO_PROFILE',           0x1);
 
+define('PROFILEINFO_PROFILE',               0x1);
+define('PROFILEINFO_CHARACTER',             0x2);
+define('PROFILEINFO_GUILD',                 0x10);          // like &roster
+define('PROFILEINFO_ARENA',                 0x20);
+
 define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
 define('SPAWNINFO_SHORT',                   2);
 define('SPAWNINFO_FULL',                    3);
 define('SPAWNINFO_QUEST',                   4);
+
 
 // Community Content
 define('CC_FLAG_STICKY',                    0x1);
@@ -286,6 +296,12 @@ define('QUEST_CU_SEASONAL',                 0x08);
 define('QUEST_CU_SKIP_LOG',                 0x10);
 define('QUEST_CU_AUTO_ACCEPT',              0x20);
 define('QUEST_CU_PVP_ENABLED',              0x40);
+
+define('PROFILER_CU_PUBLISHED',             0x01);
+define('PROFILER_CU_PINNED',                0x02);
+define('PROFILER_CU_DELETED',               0x04);
+define('PROFILER_CU_PROFILE',               0x08);
+define('PROFILER_CU_NEEDS_RESYNC',          0x10);
 
 define('MAX_LEVEL',                         80);
 define('WOW_BUILD',                         12340);
@@ -869,4 +885,31 @@ define('CND_DISTANCE_TO',     35);                          // distance to targe
 define('CND_ALIVE',           36);                          // target is alive:         NULL,           NULL,       NULL
 define('CND_HP_VAL',          37);                          // targets absolute health: amount,         operator,   NULL
 define('CND_HP_PCT',          38);                          // targets relative health: amount,         operator,   NULL
+
+// profiler queue interactions
+define('PR_QUEUE_STATUS_ENDED',   0);
+define('PR_QUEUE_STATUS_WAITING', 1);
+define('PR_QUEUE_STATUS_WORKING', 2);
+define('PR_QUEUE_STATUS_READY',   3);
+define('PR_QUEUE_STATUS_ERROR',   4);
+define('PR_QUEUE_ERROR_UNK',      0);
+define('PR_QUEUE_ERROR_CHAR',     1);
+define('PR_QUEUE_ERROR_ARMORY',   2);
+
+// profiler completion manager
+define('PR_EXCLUDE_GROUP_UNAVAILABLE',         0x001);
+define('PR_EXCLUDE_GROUP_TCG',                 0x002);
+define('PR_EXCLUDE_GROUP_COLLECTORS_EDITION',  0x004);
+define('PR_EXCLUDE_GROUP_PROMOTION',           0x008);
+define('PR_EXCLUDE_GROUP_WRONG_REGION',        0x010);
+define('PR_EXCLUDE_GROUP_REQ_ALLIANCE',        0x020);
+define('PR_EXCLUDE_GROUP_REQ_HORDE',           0x040);
+define('PR_EXCLUDE_GROUP_OTHER_FACTION',       PR_EXCLUDE_GROUP_REQ_ALLIANCE | PR_EXCLUDE_GROUP_REQ_HORDE);
+define('PR_EXCLUDE_GROUP_REQ_FISHING',         0x080);
+define('PR_EXCLUDE_GROUP_REQ_ENGINEERING',     0x100);
+define('PR_EXCLUDE_GROUP_REQ_TAILORING',       0x200);
+define('PR_EXCLUDE_GROUP_WRONG_PROFESSION',    PR_EXCLUDE_GROUP_REQ_FISHING | PR_EXCLUDE_GROUP_REQ_ENGINEERING | PR_EXCLUDE_GROUP_REQ_TAILORING);
+define('PR_EXCLUDE_GROUP_REQ_CANT_BE_EXALTED', 0x400);
+define('PR_EXCLUDE_GROUP_ANY',                 0x7FF);
+
 ?>

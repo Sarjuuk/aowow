@@ -370,7 +370,7 @@ class Util
     );
 
     public static $configCats               = array(
-        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics'
+        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler'
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
@@ -411,16 +411,6 @@ class Util
         self::$execTime = $newTime;
 
         return self::formatTime($tDiff * 1000, true);
-    }
-
-    public static function getBuyoutForItem($itemId)
-    {
-        if (!$itemId)
-            return 0;
-
-        // try, when having filled char-DB at hand
-        // return DB::Characters()->selectCell('SELECT SUM(a.buyoutprice) / SUM(ii.count) FROM auctionhouse a JOIN item_instance ii ON ii.guid = a.itemguid WHERE ii.itemEntry = ?d', $itemId);
-        return 0;
     }
 
     public static function formatMoney($qty)
@@ -809,42 +799,6 @@ class Util
         }
     }
 
-    public static function urlize($str)
-    {
-        $search  = ['<', '>', ' / ', "'", '(', ')'];
-        $replace = ['&lt;', '&gt;', '-', '', '', ''];
-        $str = str_replace($search, $replace, $str);
-
-        $accents = array(
-            "ß" => "ss",
-            "á" => "a", "ä" => "a", "à" => "a", "â" => "a",
-            "è" => "e", "ê" => "e", "é" => "e", "ë" => "e",
-            "í" => "i", "î" => "i", "ì" => "i", "ï" => "i",
-            "ñ" => "n",
-            "ò" => "o", "ó" => "o", "ö" => "o", "ô" => "o",
-            "ú" => "u", "ü" => "u", "û" => "u", "ù" => "u",
-            "œ" => "oe",
-            "Á" => "A", "Ä" => "A", "À" => "A", "Â" => "A",
-            "È" => "E", "Ê" => "E", "É" => "E", "Ë" => "E",
-            "Í" => "I", "Î" => "I", "Ì" => "I", "Ï" => "I",
-            "Ñ" => "N",
-            "Ò" => "O", "Ó" => "O", "Ö" => "O", "Ô" => "O",
-            "Ú" => "U", "Ü" => "U", "Û" => "U", "Ù" => "U",
-            "œ" => "Oe"
-        );
-        $str = strtr($str, $accents);
-        $str = trim($str);
-        $str = preg_replace('/[^a-z0-9]/i', '-', $str);
-
-        $str = str_replace('--', '-', $str);
-        $str = str_replace('--', '-', $str);
-
-        $str = rtrim($str, '-');
-        $str = strtolower($str);
-
-        return $str;
-    }
-
     public static function isValidEmail($email)
     {
         return preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', $email);
@@ -1168,38 +1122,86 @@ class Util
         return $json;
     }
 
-    public static function checkOrCreateDirectory($path)
+    public static function createSqlBatchInsert(array $data)
     {
-        // remove multiple slashes
-        $path = preg_replace('|/+|', '/', $path);
+        $nRows  = 100;
+        $nItems = count(reset($data));
+        $result = [];
+        $buff   = [];
 
-        if (!is_dir($path) && !@mkdir($path, self::FILE_ACCESS, true))
-            trigger_error('Could not create directory: '.$path, E_USER_ERROR);
-        else if (!is_writable($path) && !@chmod($path, self::FILE_ACCESS))
-            trigger_error('Cannot write into directory: '.$path, E_USER_ERROR);
-        else
-            return true;
+        if (!count($data))
+            return [];
 
-        return false;
-    }
-
-    private static $realms = [];
-    public static function getRealms()
-    {
-        if (DB::isConnectable(DB_AUTH) && !self::$realms)
+        foreach ($data as $d)
         {
-            self::$realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
-            foreach (self::$realms as $rId => $rData)
-            {
-                if (DB::isConnectable(DB_CHARACTERS . $rId))
-                    continue;
+            if (count($d) != $nItems)
+                return [];
 
-                unset(self::$realms[$rId]);
-                trigger_error('Realm #'.$rId.' ('.$rData['name'].') has no connection info set.', E_USER_NOTICE);
+            $d = array_map(function ($x) {
+                if ($x === null)
+                    return 'NULL';
+
+                return DB::Aowow()->escape($x);
+            }, $d);
+
+            $buff[] = implode(',', $d);
+
+            if (count($buff) >= $nRows)
+            {
+                $result[] = '('.implode('),(', $buff).')';
+                $buff = [];
             }
         }
 
-        return self::$realms;
+        if ($buff)
+            $result[] = '('.implode('),(', $buff).')';
+
+        return $result;
+    }
+
+    /*****************/
+    /* file handling */
+    /*****************/
+
+    public static function writeFile($file, $content)
+    {
+        $success = false;
+        if ($handle = @fOpen($file, "w"))
+        {
+            if (fWrite($handle, $content))
+                $success = true;
+            else
+                trigger_error('could not write to file', E_USER_ERROR);
+
+            fClose($handle);
+        }
+        else
+            trigger_error('could not create file', E_USER_ERROR);
+
+        if ($success)
+            @chmod($file, Util::FILE_ACCESS);
+
+        return $success;
+    }
+
+    public static function writeDir($dir)
+    {
+        // remove multiple slashes
+        $dir = preg_replace('|/+|', '/', $dir);
+
+        if (is_dir($dir))
+        {
+            if (!is_writable($dir) && !@chmod($dir, Util::FILE_ACCESS))
+                trigger_error('cannot write into directory', E_USER_ERROR);
+
+            return is_writable($dir);
+        }
+
+        if (@mkdir($dir, Util::FILE_ACCESS, true))
+            return true;
+
+        trigger_error('could not create directory', E_USER_ERROR);
+        return false;
     }
 
 

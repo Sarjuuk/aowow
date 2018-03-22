@@ -17,10 +17,12 @@ class User
     public static $dailyVotes   = 0;
     public static $ip           = null;
 
-    private static $reputation  = 0;
-    private static $dataKey     = '';
-    private static $expires     = false;
-    private static $passHash    = '';
+    private static $reputation    = 0;
+    private static $dataKey       = '';
+    private static $expires       = false;
+    private static $passHash      = '';
+    private static $excludeGroups = 1;
+    private static $profiles      = null;
 
     public static function init()
     {
@@ -54,7 +56,7 @@ class User
             return false;
 
         $query = DB::Aowow()->SelectRow('
-            SELECT    a.id, a.passHash, a.displayName, a.locale, a.userGroups, a.userPerms, a.allowExpire, BIT_OR(ab.typeMask) AS bans, IFNULL(SUM(r.amount), 0) as reputation, a.avatar, a.dailyVotes
+            SELECT    a.id, a.passHash, a.displayName, a.locale, a.userGroups, a.userPerms, a.allowExpire, BIT_OR(ab.typeMask) AS bans, IFNULL(SUM(r.amount), 0) as reputation, a.avatar, a.dailyVotes, a.excludeGroups
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab ON a.id = ab.userId AND ab.end > UNIX_TIMESTAMP()
             LEFT JOIN ?_account_reputation r ON a.id = r.userId
@@ -73,15 +75,26 @@ class User
             return false;
         }
 
-        self::$id          = intval($query['id']);
-        self::$displayName = $query['displayName'];
-        self::$passHash    = $query['passHash'];
-        self::$expires     = (bool)$query['allowExpire'];
-        self::$reputation  = $query['reputation'];
-        self::$banStatus   = $query['bans'];
-        self::$groups      = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userGroups']);
-        self::$perms       = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userPerms']);
-        self::$dailyVotes  = $query['dailyVotes'];
+        self::$id            = intval($query['id']);
+        self::$displayName   = $query['displayName'];
+        self::$passHash      = $query['passHash'];
+        self::$expires       = (bool)$query['allowExpire'];
+        self::$reputation    = $query['reputation'];
+        self::$banStatus     = $query['bans'];
+        self::$groups        = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userGroups']);
+        self::$perms         = $query['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($query['userPerms']);
+        self::$dailyVotes    = $query['dailyVotes'];
+        self::$excludeGroups = $query['excludeGroups'];
+
+        $conditions = array(
+            [['cuFlags', PROFILER_CU_DELETED, '&'], 0],
+            ['OR', ['user', self::$id], ['ap.accountId', self::$id]]
+        );
+
+        if (self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            array_shift($conditions);
+
+        self::$profiles = (new LocalProfileList($conditions));
 
         if ($query['avatar'])
             self::$avatar = $query['avatar'];
@@ -140,11 +153,11 @@ class User
                     $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
 
                 // check IPv4
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
                     break;
 
                 // check IPv6
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 | FILTER_FLAG_NO_RES_RANGE))
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
                     break;
             }
         }
@@ -565,6 +578,11 @@ class User
         $gUser['downvoteRep']       = CFG_REP_REQ_DOWNVOTE;
         $gUser['upvoteRep']         = CFG_REP_REQ_UPVOTE;
         $gUser['characters']        = self::getCharacters();
+        $gUser['excludegroups']     = self::$excludeGroups;
+        $gUser['settings']          = (new StdClass);       // profiler requires this to be set; has property premiumborder (NYI)
+
+        if ($_ = self::getProfilerExclusions())
+            $gUser = array_merge($gUser, $_);
 
         if ($_ = self::getProfiles())
             $gUser['profiles'] = $_;
@@ -593,36 +611,32 @@ class User
         return $result;
     }
 
+    public static function getProfilerExclusions()
+    {
+        $result = [];
+        $modes  = [1 => 'excludes', 2 => 'includes'];
+        foreach ($modes as $mode => $field)
+            if ($ex = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, typeId AS ARRAY_KEY2, typeId FROM ?_account_excludes WHERE mode = ?d AND userId = ?d', $mode, self::$id))
+                foreach ($ex as $type => $ids)
+                    $result[$field][$type] = array_values($ids);
+
+        return $result;
+    }
+
     public static function getCharacters()
     {
-        // existing chars on realm(s)
-        $characters = array(
-            // array(
-                // 'id'        => 22,
-                // 'name'      => 'Example Char',
-                // 'realmname' => 'Example Realm',
-                // 'region'    => 'eu',
-                // 'realm'     => 'example-realm',
-                // 'race'      => 6,
-                // 'classs'    => 11,
-                // 'level'     => 80,
-                // 'gender'    => 1,
-                // 'pinned'    => 1
-            // )
-        );
+        if (!self::$profiles)
+            return [];
 
-        return $characters;
+        return self::$profiles->getJSGlobals(PROFILEINFO_CHARACTER);
     }
 
     public static function getProfiles()
     {
-        // chars build in profiler
-        $profiles = array(
-            // array('id' => 21, 'name' => 'Example Profile 1', 'race' => 4,  'classs' => 5, 'level' => 72, 'gender' => 1, 'icon' => 'inv_axe_04'),
-            // array('id' => 23, 'name' => 'Example Profile 2', 'race' => 11, 'classs' => 3, 'level' => 17, 'gender' => 0)
-        );
+        if (!self::$profiles)
+            return [];
 
-        return $profiles;
+        return self::$profiles->getJSGlobals(PROFILEINFO_PROFILE);
     }
 
     public static function getCookies()

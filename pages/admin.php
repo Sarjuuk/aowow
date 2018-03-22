@@ -104,14 +104,14 @@ class AdminPage extends GenericPage
             $this->lvTabs[] = [null, array(
                 'data' => $t,
                 'name' => $n,
-                'id'   => Util::urlize($n)
+                'id'   => Profiler::urlize($n)
             )];
 
         foreach ($miscTab as $n => $t)
             $this->lvTabs[] = [null, array(
                 'data' => $t,
                 'name' => $n,
-                'id'   => Util::urlize($n)
+                'id'   => Profiler::urlize($n)
             )];
     }
 

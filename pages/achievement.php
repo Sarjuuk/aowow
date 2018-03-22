@@ -103,7 +103,7 @@ class AchievementPage extends GenericPage
         if ($this->subject->getField('flags') & 0x100 && DB::isConnectable(DB_AUTH))
         {
             $avlb = [];
-            foreach (Util::getRealms() AS $rId => $rData)
+            foreach (Profiler::getRealms() AS $rId => $rData)
                 if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE achievement = ?d LIMIT 1', $this->typeId))
                     $avlb[] = Util::ucWords($rData['name']);
 

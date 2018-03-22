@@ -31,7 +31,9 @@ if (!CLI)
     function talentCalc()
     {
         $success   = true;
-        $buildTree = function ($class) use (&$petFamIcons, &$tSpells)
+        $spellMods = (new SpellList(array(['typeCat', -2], CFG_SQL_LIMIT_NONE)))->getProfilerMods();
+
+        $buildTree = function ($class) use (&$petFamIcons, &$tSpells, $spellMods)
         {
             $petCategories = [];
 
@@ -41,43 +43,44 @@ if (!CLI)
             $tabs   = DB::Aowow()->select('SELECT * FROM dbc_talenttab WHERE classMask = ?d ORDER BY `tabNumber`, `creatureFamilyMask`', $mask);
             $result = [];
 
-            for ($l = 0; $l < count($tabs); $l++)
+            for ($tabIdx = 0; $tabIdx < count($tabs); $tabIdx++)
             {
-                $talents    = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$l]['id']);
-                $result[$l] = array(
-                    'n' => Util::localizedString($tabs[$l], 'name'),
+                $talents = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$tabIdx]['id']);
+                $result[$tabIdx] = array(
+                    'n' => Util::localizedString($tabs[$tabIdx], 'name'),
                     't' => []
                 );
 
                 if (!$class)
                 {
-                    $petFamId           = log($tabs[$l]['creatureFamilyMask'], 2);
-                    $result[$l]['icon'] = $petFamIcons[$petFamId];
+                    $petFamId           = log($tabs[$tabIdx]['creatureFamilyMask'], 2);
+                    $result[$tabIdx]['icon'] = $petFamIcons[$petFamId];
                     $petCategories      = DB::Aowow()->SelectCol('SELECT id AS ARRAY_KEY, categoryEnumID FROM dbc_creaturefamily WHERE petTalentType = ?d', $petFamId);
-                    $result[$l]['f']    = array_keys($petCategories);
+                    $result[$tabIdx]['f']    = array_keys($petCategories);
                 }
 
                 // talent dependencies go here
                 $depLinks = [];
                 $tNums    = [];
 
-                for ($j = 0; $j < count($talents); $j++)
+                for ($talentIdx = 0; $talentIdx < count($talents); $talentIdx++)
                 {
-                    $tNums[$talents[$j]['tId']] = $j;
+                    $tNums[$talents[$talentIdx]['tId']] = $talentIdx;
 
                     $d    = [];
                     $s    = [];
-                    $i    = $talents[$j]['tId'];
-                    $n    = Util::localizedString($talents[$j], 'name');
-                    $x    = $talents[$j]['column'];
-                    $y    = $talents[$j]['row'];
+                    $i    = $talents[$talentIdx]['tId'];
+                    $n    = Util::localizedString($talents[$talentIdx], 'name');
+                    $x    = $talents[$talentIdx]['column'];
+                    $y    = $talents[$talentIdx]['row'];
                     $r    = null;
                     $t    = [];
-                    $icon = $talents[$j]['iconString'];
-                    $m    = $talents[$j]['rank2'] == 0 ? 1 : (
-                                $talents[$j]['rank3'] == 0 ? 2 : (
-                                    $talents[$j]['rank4'] == 0 ? 3 : (
-                                        $talents[$j]['rank5'] == 0 ? 4 : 5
+                    $j    = [];
+                    $icon = $talents[$talentIdx]['iconString'];
+                    $m    = $talents[$talentIdx]['rank2'] == 0 ? 1 : (
+                                $talents[$talentIdx]['rank3'] == 0 ? 2 : (
+                                    $talents[$talentIdx]['rank4'] == 0 ? 3 : (
+                                        $talents[$talentIdx]['rank5'] == 0 ? 4 : 5
                                     )
                                 )
                             );
@@ -87,34 +90,38 @@ if (!CLI)
                     foreach ($petCategories as $k => $v)
                     {
                         // cant handle 64bit integer .. split
-                        if ($v >= 32 && ((1 << ($v - 32)) & $talents[$j]['petCategory2']))
+                        if ($v >= 32 && ((1 << ($v - 32)) & $talents[$talentIdx]['petCategory2']))
                             $f[] = $k;
-                        else if ($v < 32 && ((1 << $v) & $talents[$j]['petCategory1']))
+                        else if ($v < 32 && ((1 << $v) & $talents[$talentIdx]['petCategory1']))
                             $f[] = $k;
                     }
 
-                    for ($k = 0; $k <= ($m - 1); $k++)
+                    for ($itr = 0; $itr <= ($m - 1); $itr++)
                     {
-                        if (!$tSpells->getEntry($talents[$j]['rank'.($k + 1)]))
+                        if (!$tSpells->getEntry($talents[$talentIdx]['rank'.($itr + 1)]))
                             continue;
 
                         $d[] = $tSpells->parseText()[0];
-                        $s[] = $talents[$j]['rank'.($k + 1)];
+                        $s[] = $talents[$talentIdx]['rank'.($itr + 1)];
+                        if (isset($spellMods[$talents[$talentIdx]['rank'.($itr + 1)]]))
+                            $j[] = $spellMods[$talents[$talentIdx]['rank'.($itr + 1)]];
+                        else
+                            $j[] = null;
 
-                        if ($talents[$j]['talentSpell'])
+                        if ($talents[$talentIdx]['talentSpell'])
                             $t[] = $tSpells->getTalentHeadForCurrent();
                     }
 
-                    if ($talents[$j]['reqTalent'])
+                    if ($talents[$talentIdx]['reqTalent'])
                     {
                         // we didn't encounter the required talent yet => create reference
-                        if (!isset($tNums[$talents[$j]['reqTalent']]))
-                            $depLinks[$talents[$j]['reqTalent']] = $j;
+                        if (!isset($tNums[$talents[$talentIdx]['reqTalent']]))
+                            $depLinks[$talents[$talentIdx]['reqTalent']] = $talentIdx;
 
-                        $r = @[$tNums[$talents[$j]['reqTalent']], $talents[$j]['reqRank'] + 1];
+                        $r = @[$tNums[$talents[$talentIdx]['reqTalent']], $talents[$talentIdx]['reqRank'] + 1];
                     }
 
-                    $result[$l]['t'][$j] = array(
+                    $result[$tabIdx]['t'][$talentIdx] = array(
                         'i' => $i,
                         'n' => $n,
                         'm' => $m,
@@ -122,31 +129,32 @@ if (!CLI)
                         's' => $s,
                         'x' => $x,
                         'y' => $y,
+                        'j' => $j
                     );
 
                     if (isset($r))
-                        $result[$l]['t'][$j]['r'] = $r;
+                        $result[$tabIdx]['t'][$talentIdx]['r'] = $r;
 
                     if (!empty($t))
-                        $result[$l]['t'][$j]['t'] = $t;
+                        $result[$tabIdx]['t'][$talentIdx]['t'] = $t;
 
                     if (!empty($f))
-                        $result[$l]['t'][$j]['f'] = $f;
+                        $result[$tabIdx]['t'][$talentIdx]['f'] = $f;
 
                     if ($class)
-                        $result[$l]['t'][$j]['iconname'] = $icon;
+                        $result[$tabIdx]['t'][$talentIdx]['iconname'] = $icon;
 
                     // If this talent is a reference, add it to the array of talent dependencies
-                    if (isset($depLinks[$talents[$j]['tId']]))
+                    if (isset($depLinks[$talents[$talentIdx]['tId']]))
                     {
-                        $result[$l]['t'][$depLinks[$talents[$j]['tId']]]['r'][0] = $j;
-                        unset($depLinks[$talents[$j]['tId']]);
+                        $result[$tabIdx]['t'][$depLinks[$talents[$talentIdx]['tId']]]['r'][0] = $talentIdx;
+                        unset($depLinks[$talents[$talentIdx]['tId']]);
                     }
                 }
 
                 // Remove all dependencies for which the talent has not been found
                 foreach ($depLinks as $dep_link)
-                    unset($result[$l]['t'][$dep_link]['r']);
+                    unset($result[$tabIdx]['t'][$dep_link]['r']);
             }
 
             return $result;

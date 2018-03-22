@@ -222,8 +222,8 @@ abstract class BaseType
             if (!in_array($k, $prefixes))
                 unset($this->queryOpts[$k]);
 
-        // prepare usage of guids if using multiple DBs
-        if (count($this->dbNames) > 1)
+        // prepare usage of guids if using multiple realms (which have non-zoro indizes)
+        if (key($this->dbNames) != 0)
             $this->queryBase = preg_replace('/\s([^\s]+)\sAS\sARRAY_KEY/i', ' CONCAT("DB_IDX", ":", \1) AS ARRAY_KEY', $this->queryBase);
 
         // insert additional selected fields
@@ -277,10 +277,6 @@ abstract class BaseType
 
         if (!$this->templates)
             return;
-
-        // assign query results to template
-        foreach ($rows as $k => $tpl)
-            $this->templates[$k] = $tpl;
 
         // push first element for instant use
         $this->reset();
@@ -388,12 +384,8 @@ abstract class BaseType
 
     protected function extendQueryOpts($extra)              // needs to be called from __construct
     {
-
         foreach ($extra as $tbl => $sets)
         {
-            if (!isset($this->queryOpts[$tbl]))             // allow adding only to known tables
-                continue;
-
             foreach ($sets as $module => $value)
             {
                 if (!$value || !is_array($value))
@@ -419,7 +411,7 @@ abstract class BaseType
                         break;
                     // additional (arr)
                     case 'j':                               // join
-                        if (is_array($this->queryOpts[$tbl][$module]))
+                        if (!empty($this->queryOpts[$tbl][$module]) && is_array($this->queryOpts[$tbl][$module]))
                             $this->queryOpts[$tbl][$module][0][] = $value;
                         else
                             $this->queryOpts[$tbl][$module] = $value;
@@ -741,6 +733,32 @@ trait spawnHelper
         }
 
         return [];
+    }
+}
+
+trait profilerHelper
+{
+    public  static $type        = 0;                        // arena teams dont actually have one
+    public  static $brickFile   = 'profile';                // profile is multipurpose
+
+    private static $subjectGUID = 0;
+
+    public function selectRealms($fi)
+    {
+        $this->dbNames = [];
+
+        foreach(Profiler::getRealms() as $idx => $r)
+        {
+            if (!empty($fi['sv']) && Profiler::urlize($r['name']) != Profiler::urlize($fi['sv']) && intVal($fi['sv']) != $idx)
+                continue;
+
+            if (!empty($fi['rg']) && Profiler::urlize($r['region']) != Profiler::urlize($fi['rg']))
+                continue;
+
+            $this->dbNames[$idx] = 'Characters';
+        }
+
+        return !!$this->dbNames;
     }
 }
 
