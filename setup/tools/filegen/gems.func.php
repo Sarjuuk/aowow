@@ -20,7 +20,7 @@ if (!CLI)
             jsonequip:{"arcres":3,"avgbuyout":242980,"firres":3,"frores":3,"holres":3,"natres":3,"shares":3},
             colors:14,
             expansion:1
-            gearscore:8  // as if.....
+            gearscore:8  // if only..
         },
     */
 
@@ -35,13 +35,14 @@ if (!CLI)
                       i.quality,
                       ic.name AS icon,
                       i.gemEnchantmentId AS enchId,
-                      i.gemColorMask AS colors
+                      i.gemColorMask AS colors,
+                      i.requiredSkill,
+                      i.itemLevel
             FROM      ?_items i
             JOIN      ?_icons ic ON ic.id = i.iconId
             WHERE     i.gemEnchantmentId <> 0
             ORDER BY  i.id DESC');
         $success = true;
-
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
@@ -83,7 +84,8 @@ if (!CLI)
                     'enchantment' => $enchantments->getField('name', true),
                     'jsonequip'   => $enchantments->getStatGain(),
                     'colors'      => $pop['colors'],
-                    'expansion'   => $pop['expansion']
+                    'expansion'   => $pop['expansion'],
+                    'gearscore'   => Util::getGemScore($pop['itemLevel'], $pop['quality'], $pop['requiredSkill'] == 755, $pop['itemId'])
                 );
             }
 

@@ -2444,6 +2444,7 @@ var LANG = {
     gender:                 "Genre",
     gems:                   "Gemmes",
     gearscore:              "Équipement",
+    gearscore_real:         "Score d'équipement",
     glyphtype:              "Type de glyphe",
     group:                  "Groupe",
     guild:                  "Guilde",

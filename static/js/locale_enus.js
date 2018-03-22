@@ -2501,6 +2501,7 @@ var LANG = {
     gender:                 "Gender",
     gems:                   "Gems",
     gearscore:              "Gear",
+    gearscore_real:         "Gear score",
     glyphtype:              "Glyph type",
     group:                  "Group",
     guild:                  "Guild",

@@ -211,7 +211,7 @@ class SpellList extends BaseType
                         }
 
                         // full magic mask, also counts towards healing
-                        if ($mv == 0x7E)
+                        if ($mv == SPELL_MAGIC_SCHOOLS)
                         {
                             Util::arraySumByKey($stats, [ITEM_MOD_SPELL_POWER       => $pts]);
                             Util::arraySumByKey($stats, [ITEM_MOD_SPELL_DAMAGE_DONE => $pts]);
@@ -250,8 +250,10 @@ class SpellList extends BaseType
                     case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
                         if ($mv == POWER_HEALTH)
                             Util::arraySumByKey($stats, [ITEM_MOD_HEALTH      => $pts]);
-                        if ($mv == POWER_ENERGY)
+                        else if ($mv == POWER_ENERGY)
                             Util::arraySumByKey($stats, [ITEM_MOD_ENERGY      => $pts]);
+                        else if ($mv == POWER_RAGE)
+                            Util::arraySumByKey($stats, [ITEM_MOD_RAGE        => $pts]);
                         else if ($mv == POWER_MANA)
                             Util::arraySumByKey($stats, [ITEM_MOD_MANA        => $pts]);
                         else if ($mv == POWER_RUNIC_POWER)
@@ -625,24 +627,25 @@ class SpellList extends BaseType
         $add     = $ref->getField('effect'.$effIdx.'DieSides');
         $maxLvl  = $ref->getField('maxLevel');
         $baseLvl = $ref->getField('baseLevel');
-        $scaling = $this->curTpl['attributes1'] & 0x200;    // never a referenced spell, ALWAYS $this; SPELL_ATTR1_MELEE_COMBAT_SPELL: 0x200
 
-        if ($scaling)
+        if ($rppl)
         {
             if ($level > $maxLvl && $maxLvl > 0)
                 $level = $maxLvl;
             else if ($level < $baseLvl)
                 $level = $baseLvl;
 
-            $level -= $ref->getField('spellLevel');
+            if (!$ref->getField('atributes0') & 0x40)           // SPELL_ATTR0_PASSIVE
+                $level -= $ref->getField('spellLevel');
+
             $base  += (int)($level * $rppl);
         }
 
         return [
             $add ? $base + 1 : $base,
             $base + $add,
-            $scaling ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + max(1, $add)).':'.$rppl.'-->' : null,
-            $scaling ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + $add).':'.$rppl.'-->' : null
+            $rppl ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + max(1, $add)).':'.$rppl.'-->' : null,
+            $rppl ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + $add).':'.$rppl.'-->' : null
         ];
     }
 
@@ -1025,7 +1028,6 @@ class SpellList extends BaseType
 
                 $min  *= $duration / $periode;
                 $max  *= $duration / $periode;
-                $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -1065,8 +1067,6 @@ class SpellList extends BaseType
                 list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $srcSpell);
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
-
-                $equal = $min == $max;
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -1138,6 +1138,8 @@ class SpellList extends BaseType
         // handle excessively precise floats
         if (is_float($result[0]))
             $result[0] = round($result[0], 2);
+        if (isset($result[1]) && is_float($result[1]))
+            $result[1] = round($result[1], 2);
 
         return $result;
     }

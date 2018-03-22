@@ -15690,6 +15690,24 @@ Listview.templates = {
                 hidden: 1
             },
             {
+                id: 'gearscore',
+                name: LANG.gearscore,
+                tooltip: LANG.gearscore_real,
+                value: 'gearscore',
+                compute: function(profile, td)
+                {
+                    var level = (profile.level ? profile.level : (profile.members !== undefined ? 80 : 0));
+
+                    if (isNaN(profile.gearscore) || !level)
+                        return;
+
+                    td.className = 'q' + pr_getGearScoreQuality(level, profile.gearscore, ($WH.in_array([2, 6, 7, 11], profile.classs) != -1));
+
+                    return (profile.gearscore ? $WH.number_format(profile.gearscore) : 0);
+                },
+                hidden: 1
+            },
+            {
                 id: 'achievementpoints',
                 name: LANG.points,
                 value: 'achievementpoints',
@@ -17487,14 +17505,14 @@ var Icon = {
     sizes: ['small', 'medium', 'large'],
     sizes2: [18, 36, 56],
     premiumOffsets: [[-56, -36], [-56, 0], [0, 0]],
-        premiumBorderClasses: ['-premium', '-gold', '', '-premiumred', '-red'],
-        STANDARD_BORDER: 2,
-        privilegeBorderClasses: {
-            uncommon: '-q2',
-            rare: '-q3',
-            epic: '-q4',
-            legendary: '-q5'
-        },
+    premiumBorderClasses: ['-premium', '-gold', '', '-premiumred', '-red'],
+    STANDARD_BORDER: 2,
+    privilegeBorderClasses: {
+        uncommon: '-q2',
+        rare: '-q3',
+        epic: '-q4',
+        legendary: '-q5'
+    },
     create: function(name, size, UNUSED, url, num, qty, noBorder, rel) {
         var
             icon  = $WH.ce('div'),

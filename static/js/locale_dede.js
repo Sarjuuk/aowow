@@ -2454,6 +2454,7 @@ var LANG = {
     gender:                 "Geschlecht",
     gems:                   "Edelsteine",
     gearscore:              "Ausrüstung",
+    gearscore_real:         "Ausrüstungswertung",
     glyphtype:              "Glyphenart",
     group:                  "Gruppe",
     guild:                  "Gilde",

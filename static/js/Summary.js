@@ -155,7 +155,9 @@ function Summary(opt) {
         }
     }
 
-    this.initialize();
+    // aowow - data=item-scaling load is delayed from basic.js but required for heirlooms
+    // this.initialize();
+    setTimeout(this.initialize.bind(this), 250);
 }
 
 Summary.prototype = {

@@ -2444,6 +2444,7 @@ var LANG = {
     gender:                 "Пол",
     gems:                   "Самоцветы",
     gearscore:              "Экипировка",
+    gearscore_real:         "Очки экипировки",
     glyphtype:              "Тип символа",
     group:                  "Группа",
     guild:                  "Гильдия",

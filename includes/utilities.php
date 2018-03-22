@@ -20,6 +20,11 @@ class Util
 {
     const FILE_ACCESS = 0777;
 
+    const GEM_SCORE_BASE_WOTLK = 16;                        // rare quality wotlk gem score
+    const GEM_SCORE_BASE_BC    = 8;                         // rare quality bc gem score
+
+    private static $perfectGems             = null;
+
     public static $localeStrings            = array(        // zero-indexed
         'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
     );
@@ -945,6 +950,217 @@ class Util
         return self::$realms;
     }
 
+
+    /**************/
+    /* Good Skill */
+    /**************/
+
+    public static function getEquipmentScore($itemLevel, $quality, $slot, $nSockets = 0)
+    {
+        $score = $itemLevel;
+
+        // quality mod
+        switch ($quality)
+        {
+            case ITEM_QUALITY_POOR:
+                $score = 0;                                 // guessed as crap
+                break;
+            case ITEM_QUALITY_NORMAL:
+                $score = 0;                                 // guessed as crap
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                $score /= 2.0;
+                break;
+            case ITEM_QUALITY_RARE:
+                $score /= 1.8;
+                break;
+            case ITEM_QUALITY_EPIC:
+                $score /= 1.2;
+                break;
+            case ITEM_QUALITY_LEGENDARY:
+                $score /= 1;
+                break;
+            case ITEM_QUALITY_HEIRLOOM:                     // actual calculation in javascript .. still uses this as some sort of factor..?
+                break;
+            case ITEM_QUALITY_ARTIFACT:
+                break;
+        }
+
+        switch ($slot)
+        {
+            case INVTYPE_WEAPON:
+            case INVTYPE_WEAPONMAINHAND:
+            case INVTYPE_WEAPONOFFHAND:
+                $score *= 27/64;
+                break;
+            case INVTYPE_SHIELD:
+            case INVTYPE_HOLDABLE:
+                $score *= 9/16;
+                break;
+            case INVTYPE_HEAD:
+            case INVTYPE_CHEST:
+            case INVTYPE_LEGS:
+            case INVTYPE_2HWEAPON:
+                $score *= 1.0;
+                break;
+            case INVTYPE_SHOULDERS:
+            case INVTYPE_HANDS:
+            case INVTYPE_WAIST:
+            case INVTYPE_FEET:
+                $score *= 3/4;
+                break;
+            case INVTYPE_WRISTS:
+            case INVTYPE_NECK:
+            case INVTYPE_CLOAK:
+            case INVTYPE_FINGER:
+            case INVTYPE_TRINKET:
+                $score *= 9/16;
+                break;
+            case INVTYPE_THROWN:
+            case INVTYPE_RANGED:
+            case INVTYPE_RELIC:
+                $score *= 81/256;
+                break;
+            default:
+                $score *= 0.0;
+        }
+
+        // subtract sockets
+        if ($nSockets)
+        {
+            // items by expantion overlap in this range. luckily highlevel raid items are exclusivly epic or better
+            if ($itemLevel > 164 || ($itemLevel > 134 && $quality < ITEM_QUALITY_EPIC))
+                $score -= $nSockets * self::GEM_SCORE_BASE_WOTLK;
+            else
+                $score -= $nSockets * self::GEM_SCORE_BASE_BC;
+        }
+
+        return round(max(0.0, $score), 4);
+    }
+
+    public static function getGemScore($itemLevel, $quality, $profSpec = false, $itemId = 0)
+    {
+        // prepare score-lookup
+        if (empty(self::$perfectGems))
+            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = ?d', 55534);
+
+        // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
+        if ($profSpec)
+            return 32.0;
+        // epic - WotLK - base stats
+        if ($itemLevel == 80 && $quality == ITEM_QUALITY_EPIC)
+            return 20.0;
+        // rare - WotLK [GEM BASELINE!]
+        if ($itemLevel == 80 && $quality == ITEM_QUALITY_RARE)
+            return 16.0;
+        // uncommon - WotLK - inreased stats
+        if ($itemId > 0 && in_array($itemId, self::$perfectGems))
+            return 14.0;
+        // uncommon - WotLK - base stats
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_UNCOMMON)
+            return 12.0;
+        // epic - BC - vendored (PvP)
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_EPIC)
+            return 10.0;
+        // epic - BC - dropped / crafted
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_EPIC)
+            return 9.0;
+        // rare - BC - crafted
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_RARE)
+            return 8.0;
+        // rare - BC - vendored (pvp)
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_RARE)
+            return 7.0;
+        // uncommon - BC
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_UNCOMMON)
+            return 6.0;
+        // common - BC - vendored gems
+        if ($itemLevel == 55 && $quality == ITEM_QUALITY_COMMON)
+            return 4.0;
+
+        // dafuq..?
+        return 0.0;
+    }
+
+    public static function getEnchantmentScore($itemLevel, $quality, $profSpec = false, $idOverride = 0)
+    {
+        // some hardcoded values, that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
+        if (in_array($idOverride, [3327, 3328, 3872, 3873]))
+            return 20.0;
+
+        if ($profSpec)
+            return 40.0;
+
+        // other than the constraints (0 - 20 points; 40 for profession perks), everything in here is guesswork
+        $score = max(min($itemLevel, 80), 0);
+
+        switch ($quality)
+        {
+            case ITEM_QUALITY_HEIRLOOM:                 // because i say so!
+                $score = 80.0;
+                break;
+            case ITEM_QUALITY_RARE:
+                $score /= 1.2;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                $score /= 1.6;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                $score /= 2.5;
+                break;
+        }
+
+        return round(max(0.0, $score / 4), 4);
+    }
+
+    public static function fixWeaponScores($class, $talents, $mainHand, $offHand)
+    {
+        $mh = 1;
+        $oh = 1;
+
+        if ($mainHand) { // Main Hand Equipped
+            if ($offHand) { // Off Hand Equipped
+                if ($mainHand['slotbak'] == 21 || $mainHand['slotbak'] == 13) { // Main Hand, One Hand
+                    if ($offHand['slotbak'] == 22 || $offHand['slotbak'] == 13) { // Off Hand, One Hand
+                        if ($class == 6 || $class == 3 || $class == 4 || // Death Knight, Hunter, Rogue
+                           ($class == 7 && $talents['spent'][1] > 30 && $talents['spec'] == 2) || // Enhancement Shaman Over 39
+                           ($class == 1 && $talents['spent'][1] < 51 && $talents['spec'] == 2)) // Fury Warrior Under 60
+                        {
+                            $mh = 64 / 27;
+                            $oh = 64 / 27;
+                        }
+                    }
+                    else if ($offHand['slotbak'] == 23 || $offHand['slotbak'] == 14) { // Held in Off Hand, Shield
+                        if ($class == 5 || $class == 9 || $class == 8 || // Priest, Warlock, Mage
+                           ($class == 11 && ($talents['spec'] == 1 || $talents['spec'] == 3)) || // Balance Druid, Restoration Druid
+                           ($class == 7 && ($talents['spec'] == 1 || $talents['spec'] == 3)) || // Elemental Shaman, Restoration Shaman
+                           ($class == 2 && ($talents['spec'] == 1 || $talents['spec'] == 2)) || // Holy Paladin, Protection Paladin
+                           ($class == 1 && $talents['spec'] == 3))  // Protection Warrior
+                        {
+                            $mh = 64 / 27;
+                            $oh = 16 / 9;
+                        }
+                    }
+                }
+            }
+            else if ($mainHand['slotbak'] == 17) {  // Two Handed
+                if ($class == 5 || $class == 9 || $class == 8 || // Priest, Warlock, Mage
+                    $class == 11 || $class == 3 || $class == 6 || // Druid, Hunter, Death Knight
+                   ($class == 7 && $talents['spent'][1] < 31 && $talents['spec'] == 2) || // Enhancement Shaman Under 40
+                   ($class == 2 && $talents['spec'] == 3) || // Retribution Paladin
+                   ($class == 1 && $talents['spec'] == 1)) // Arms Warrior
+                {
+                    $mh = 2;
+                    $oh = 0;
+                }
+            }
+        }
+
+        return array(
+            round($mainHand['gearscore'] * $mh),
+            round($offHand['gearscore']  * $oh)
+        );
+    }
 }
 
 ?>

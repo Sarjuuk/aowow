@@ -1110,7 +1110,7 @@ class ItemList extends BaseType
         return $x;
     }
 
-    private function getRandEnchantForItem($randId)
+    public function getRandEnchantForItem($randId)
     {
         // is it available for this item? .. does it even exist?!
         if (empty($this->enhanceR))
@@ -1245,7 +1245,7 @@ class ItemList extends BaseType
 
         foreach ($this->json as $item => $json)
             foreach ($json as $k => $v)
-                if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
+                if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side', 'gearscore']))
                     unset($this->json[$item][$k]);
     }
 
@@ -1554,6 +1554,34 @@ class ItemList extends BaseType
         }
     }
 
+    public function getScoreTotal($class = 0, $spec = [], $mhItem = 0, $ohItem = 0)
+    {
+        if (!$class || !$spec)
+            return array_sum(array_column($this->json, 'gearscore'));
+
+        $score    = 0.0;
+        $mh = $oh = [];
+
+        foreach ($this->json as $j)
+        {
+            if ($j['id'] == $mhItem)
+                $mh = $j;
+            else if ($j['id'] == $ohItem)
+                $oh = $j;
+            else if ($j['gearscore'])
+            {
+                if ($j['slot'] == INVTYPE_RELIC)
+                    $score += 20;
+
+                $score += round($j['gearscore']);
+            }
+        }
+
+        $score += array_sum(Util::fixWeaponScores($class, $spec, $mh, $oh));
+
+        return $score;
+    }
+
     private function initJsonStats()
     {
         $json = array(
@@ -1622,9 +1650,14 @@ class ItemList extends BaseType
         if ($this->curTpl['armorDamageModifier'] > 0)
             $json['armor'] -= $this->curTpl['armorDamageModifier'];
 
+        if ($this->curTpl['class'] == ITEM_CLASS_ARMOR || $this->curTpl['class'] == ITEM_CLASS_WEAPON)
+            $json['gearscore'] = Util::getEquipmentScore($json['level'], $this->getField('quality'), $json['slot'], $json['nsockets']);
+        else if ($this->curTpl['class'] == ITEM_CLASS_GEM)
+            $json['gearscore'] = Util::getGemScore($json['level'], $this->getField('quality'), $this->getField('requiredSkill') == 755, $this->id);
+
         // clear zero-values afterwards
         foreach ($json as $k => $v)
-            if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side']))
+            if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side', 'gearscore']))
                 unset($json[$k]);
 
         Util::checkNumeric($json);
