@@ -10,7 +10,7 @@ class AjaxAccount extends AjaxHandler
         // 'groups' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
         'save'   => [FILTER_SANITIZE_NUMBER_INT, null],
         'delete' => [FILTER_SANITIZE_NUMBER_INT, null],
-        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
+        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
         'name'   => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
         'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
     );
@@ -52,7 +52,7 @@ class AjaxAccount extends AjaxHandler
 
             $id = 0;
 
-            if ($id = $this->_post['id'])
+            if ($this->_post['id'] && ($id = $this->_post['id'][0]))
             {
                 if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE userId = ?d AND id = ?d', User::$id, $id))
                     return 0;
@@ -81,8 +81,8 @@ class AjaxAccount extends AjaxHandler
 
             return $id;
         }
-        else if ($this->_post['delete'] && $this->_post['id'])
-            DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'], User::$id);
+        else if ($this->_post['delete'] && $this->_post['id'] && $this->_post['id'][0])
+            DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'][0], User::$id);
         else
             return 0;
     }

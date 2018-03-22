@@ -21,11 +21,6 @@ if (!defined('AOWOW_REVISION'))
         ]
     else
         => listviews
-
-todo    26: Listview - template: 'profile',     id: 'characters',    name: LANG.tab_characters,          visibleCols: ['race','classs','level','talents','gearscore','achievementpoints'],
-        27: Profiles..?
-        28: Guilds..?
-        29: Arena Teams..?
 */
 
 
@@ -1379,11 +1374,6 @@ class SearchPage extends GenericPage
 
         return false;
     }
-
-
-    // private function _searchCharacter($cndBase) { }      // 28 Characters $searchMask & 0x10000000
-    // private function _searchGuild($cndBase) { }          // 29 Guilds $searchMask & 0x20000000
-    // private function _searchArenaTeam($cndBase) { }      // 30 Arena Teams $searchMask & 0x40000000
 }
 
 ?>

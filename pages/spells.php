@@ -405,15 +405,15 @@ class SpellsPage extends GenericPage
             $hiddenCols[] = 'skill';
         if (($mask & 0x4))
             $visibleCols[] = 'trainingcost';
-        if (($mask & 0x8) && !in_array('singleclass', $visibleCols))
+        if (($mask & 0x8) && !in_array('classes', $visibleCols))
             $visibleCols[] = 'singleclass';
 
 
         if ($visibleCols)
-            $tabData['visibleCols'] = $visibleCols;
+            $tabData['visibleCols'] = array_unique($visibleCols);
 
         if ($hiddenCols)
-            $tabData['hiddenCols'] = $hiddenCols;
+            $tabData['hiddenCols'] = array_unique($hiddenCols);
 
         $this->lvTabs[] = ['spell', $tabData];
 

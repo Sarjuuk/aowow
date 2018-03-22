@@ -60,7 +60,7 @@ class AjaxData extends AjaxHandler
                     // &partial: im not doing this right
                     // it expects a full quest dump on first lookup but will query subCats again if clicked..?
                     // for now omiting the detail clicks with empty results and just set catg update
-                    $catg = $this->_get['catg'] ?: 'null';
+                    $catg = isset($this->_get['catg']) ? $this->_get['catg'] : 'null';
                     if ($catg == 'null')
                         $result .= $this->loadProfilerData($set);
                     else if ($this->_get['callback'])
@@ -79,7 +79,7 @@ class AjaxData extends AjaxHandler
 
                     break;
                 // locale independant
-                case 'quick-excludes':                              // generated per character in profiler
+                case 'quick-excludes':
                 case 'zones':
                 case 'weight-presets':
                 case 'item-scaling':
@@ -94,6 +94,7 @@ class AjaxData extends AjaxHandler
                 case 'talents':
                     if ($_ = $this->_get['class'])
                         $set .= "-".$_;
+                case 'achievements':
                 case 'pet-talents':
                 case 'glyphs':
                 case 'gems':
@@ -113,12 +114,12 @@ class AjaxData extends AjaxHandler
         return $result;
     }
 
-    private function checkSkill($val)
+    protected function checkSkill($val)
     {
         return array_intersect([171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356], explode(',', $val));
     }
 
-    private function checkCallback($val)
+    protected function checkCallback($val)
     {
         return substr($val, 0, 29) == '$WowheadProfiler.loadOnDemand';
     }

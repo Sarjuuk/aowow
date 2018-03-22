@@ -32,7 +32,6 @@ trait DetailPage
         return implode('_', $key);
     }
 
-
     protected function applyCCErrors()
     {
         if (!empty($_SESSION['error']['co']))
@@ -253,7 +252,7 @@ class GenericPage
     /* Prepare Page */
     /****************/
 
-    private function prepareContent()                       // get from cache ?: run generators
+    protected function prepareContent()                     // get from cache ?: run generators
     {
         if (!$this->loadCache())
         {
@@ -415,8 +414,8 @@ class GenericPage
                 'mode'   => 1,
                 'status' => 1,
                 'name'   => 'internal error',
-                'style'  => 'padding-left: 40px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                'text'   => '[span id=inputbox-error]'.implode("[br]", $_).'[/span]',
+                'style'  => 'color: #ff3333; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
+                'text'   => '[span]'.implode("[br]", $_).'[/span]'
             );
         }
 

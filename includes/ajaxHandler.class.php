@@ -53,10 +53,15 @@ class AjaxHandler
         return $this->contentType;
     }
 
+    protected function checkEmptySet($val)
+    {
+        return $val === '';                                 // parameter is expected to be empty
+    }
+
     protected function checkLocale($val)
     {
         if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
-            return intVal($val);
+            return intval($val);
 
         return null;
     }
@@ -64,9 +69,23 @@ class AjaxHandler
     protected function checkInt($val)
     {
         if (preg_match('/^-?\d+$/', $val))
-            return intVal($val);
+            return intval($val);
 
         return null;
+    }
+
+    protected function checkIdList($val)
+    {
+        if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
+            return array_map('intval', explode(',', $val));
+
+        return null;
+    }
+
+    protected function checkFulltext($val)
+    {
+        // trim non-printable chars
+        return preg_replace('/[\p{C}]/ui', '', $val);
     }
 }
 ?>

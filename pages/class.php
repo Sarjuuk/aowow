@@ -133,7 +133,7 @@ class ClassPage extends GenericPage
         $genSpells = new SpellList($conditions);
         if (!$genSpells->error)
         {
-            $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
             $this->lvTabs[] = ['spell', array(
                 'data'            => array_values($genSpells->getListviewData()),

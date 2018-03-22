@@ -185,7 +185,7 @@
             }
             else if (node.tagName == 'INPUT')                   // string or numeric
             {
-                if (node.value && node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1)
+                if (node.value && node.value.search(/[^\d\s\/\*\-\+\.]/i) == -1 && node.value.split('.').length < 3)
                     node.value = eval(node.value);
 
                 value = node.value;
