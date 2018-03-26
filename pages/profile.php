@@ -164,13 +164,12 @@ class ProfilePage extends GenericPage
         $ra         = $this->subject->getField('race');
         $cl         = $this->subject->getField('class');
         $gender     = $this->subject->getField('gender');
-        // $desc       = $this->subject->getField('description');
         $title      = '';
         if ($_ = $this->subject->getField('chosenTitle'))
             $title = (new TitleList(array(['bitIdx', $_])))->getField($gender ? 'female' : 'male', true);
 
         if ($this->isCustom)
-            $name .= ' (Custom Profile)';
+            $name .= Lang::profiler('customProfile');
         else if ($title)
             $name = sprintf($title, $name);
 

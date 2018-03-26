@@ -156,7 +156,7 @@ $lang = array(
         '_cpFooter'     => "Если вам нужен более точный поиск, вы можете использовать <a href=\"?profiles\">дополнительные опции</a>. Также, вы можете создать <a href=\"?profile&amp;new\">новый собственный профиль</a>.",
         'firstUseTitle' => "%s",                                    // yes, thats correct. No nonsense, just the name
         'complexFilter' => "[Complex filter selected! Search results are limited to cached Characters.]",
-
+        'customProfile' => " ([Custom Profile])",
         'resync'        => "Ресинхронизация",
         'guildRoster'   => "Список членов гильдии &lt;%s&gt",
         'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost

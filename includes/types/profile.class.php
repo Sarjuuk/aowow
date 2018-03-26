@@ -33,17 +33,16 @@ class ProfileList extends BaseType
                 'talenttree1'       => $this->getField('talenttree1'),
                 'talenttree2'       => $this->getField('talenttree2'),
                 'talenttree3'       => $this->getField('talenttree3'),
-                'talentspec'        => $this->getField('activespec') + 1,                   // 0 => 1; 1 => 2
+                'talentspec'        => $this->getField('activespec') + 1,                       // 0 => 1; 1 => 2
                 'achievementpoints' => $this->getField('achievementpoints'),
-                'guild'             => '$"'.$this->getField('guildname').'"',               // force this to be a string
+                'guild'             => '$"'.str_replace ('"', '', $this->curTpl['name']).'"',   // force this to be a string
                 'guildrank'         => $this->getField('guildrank'),
                 'realm'             => Profiler::urlize($this->getField('realmName')),
                 'realmname'         => $this->getField('realmName'),
-             // 'battlegroup'       => Profiler::urlize($this->getField('battlegroup')),    // was renamed to subregion somewhere around cata release
+             // 'battlegroup'       => Profiler::urlize($this->getField('battlegroup')),        // was renamed to subregion somewhere around cata release
              // 'battlegroupname'   => $this->getField('battlegroup'),
                 'gearscore'         => $this->getField('gearscore')
             );
-
 
             // for the lv this determins if the link is profile=<id> or profile=<region>.<realm>.<name>
             if ($this->isCustom())
@@ -92,7 +91,7 @@ class ProfileList extends BaseType
             $title = (new TitleList(array(['bitIdx', $_])))->getField($this->getField('gender') ? 'female' : 'male', true);
 
         if ($this->isCustom())
-            $name .= ' (Custom Profile)';
+            $name .= Lang::profiler('customProfile');
         else if ($title)
             $name = sprintf($title, $name);
 

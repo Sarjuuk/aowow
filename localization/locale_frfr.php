@@ -156,7 +156,7 @@ $lang = array(
         '_cpFooter'     => "Si vous voulez une recherche plus raffinée, essayez nos options de <a href=\"?profiles\">recherche avancée</a>. Vous pouvez aussi créer un <a href=\"?profile&amp;new\">nouveau profile personnalisé</a>.",
         'firstUseTitle' => "%s de %s",
         'complexFilter' => "[Complex filter selected! Search results are limited to cached Characters.]",
-
+        'customProfile' => " ([Custom Profile])",
         'resync'        => "Resynchronisation",
         'guildRoster'   => "Liste des membres pour la guilde de  &lt;%s&gt",
         'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost

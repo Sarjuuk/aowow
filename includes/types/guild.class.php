@@ -16,14 +16,14 @@ class GuildList extends BaseType
         foreach ($this->iterate() as $__)
         {
             $data[$this->id] = array(
-                'name'              => "$'".$this->curTpl['name']."'", // MUST be a string
+                'name'              => '$"'.str_replace ('"', '', $this->curTpl['name']).'"',   // MUST be a string, omit any quotes in name
                 'members'           => $this->curTpl['members'],
                 'faction'           => $this->curTpl['faction'],
                 'achievementpoints' => $this->getField('achievementpoints'),
                 'gearscore'         => $this->getField('gearscore'),
                 'realm'             => Profiler::urlize($this->curTpl['realmName']),
                 'realmname'         => $this->curTpl['realmName'],
-             // 'battlegroup'       => Profiler::urlize($this->curTpl['battlegroup']),  // was renamed to subregion somewhere around cata release
+             // 'battlegroup'       => Profiler::urlize($this->curTpl['battlegroup']),          // was renamed to subregion somewhere around cata release
              // 'battlegroupname'   => $this->curTpl['battlegroup'],
                 'region'            => Profiler::urlize($this->curTpl['region'])
             );

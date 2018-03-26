@@ -156,7 +156,7 @@ $lang = array(
         '_cpFooter'     => "Falls Ihr eine genauere Suche möchtet, probiert unsere <a href=\"?profiles\">erweiterten Suchoptionen</a>. Ihr könnt außerdem ein <a href=\"?profile&amp;new\">neues individuelles Profil</a> erstellen.",
         'firstUseTitle' => "%s von %s",
         'complexFilter' => "Komplexer Filter ausgewählt! Suchergebnisse sind auf gecachte Charaktere beschränkt.",
-
+        'customProfile' => " (Benutzerprofil)",
         'resync'        => "Resynchronisieren",
         'guildRoster'   => "Gildenliste für &lt;%s&gt;",
         'arenaRoster'   => "Arena-Teamliste für &lt;%s&gt",
