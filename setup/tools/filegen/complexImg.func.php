@@ -219,7 +219,7 @@ if (!CLI)
             if (!($mode & $modeMask))
                 unset($paths[$mode]);
 
-        foreach (CLISetup::$expectedPaths as $xp => $__)
+        foreach (CLISetup::$expectedPaths as $xp => $locId)
         {
             if (!in_array($locId, CLISetup::$localeIds))
                 continue;
@@ -426,7 +426,7 @@ if (!CLI)
                     if(!isset($paths[0x16][2][$mapLoc]))
                         continue;
 
-                    $p = sprintf($imgPath, $mapLoc).$paths[0];
+                    $p = sprintf($imgPath, $mapLoc.'/').$paths[0x16][0];
                     if (CLISetup::fileExists($p))
                     {
                         CLI::write(' - using files from '.($mapLoc ?: '/').' for locale '.Util::$localeStrings[$l], CLI::LOG_INFO);

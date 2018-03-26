@@ -4652,7 +4652,7 @@ function ProfilerInventory(_parent) {
                 style: 'outline: none'
             };
 
-            // swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
             // swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', _swfModel.id, '100%', '100%', '10.0.0', 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
 
             _mvInited = true;

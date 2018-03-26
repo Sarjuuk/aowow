@@ -233,20 +233,11 @@ class FileGen
                                 CLI::write('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
                         }
                     }
-
-                    if (fWrite($dest, $content))
-                    {
-                        CLI::write(sprintf(ERR_NONE, CLI::bold($destPath.$file)), CLI::LOG_OK);
-                        if ($content && $funcOK)
-                            $success = true;
-                    }
-                    else
-                        CLI::write(sprintf(ERR_WRITE_FILE, CLI::bold($destPath.$file)), CLI::LOG_ERROR);
-
-                    fClose($dest);
                 }
-                else
-                    CLI::write(sprintf(ERR_CREATE_FILE, CLI::bold($destPath.$file)), CLI::LOG_ERROR);
+
+                if ($content && $funcOK)
+                    if (CLISetup::writeFile($destPath.$file, $content))
+                        $success = true;
             }
             else
                 CLI::write(sprintf(ERR_READ_FILE, CLI::bold(FileGen::$tplPath.$file.'.in')), CLI::LOG_ERROR);

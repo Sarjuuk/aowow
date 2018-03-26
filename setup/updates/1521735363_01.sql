@@ -15,21 +15,22 @@ CREATE TABLE `aowow_profiler_sync` (
 
 DROP TABLE IF EXISTS `aowow_profiler_guild`;
 CREATE TABLE `aowow_profiler_guild` (
-  `id` int(10) unsigned NOT NULL,
-  `realm` int(10) unsigned NOT NULL DEFAULT '0',
-  `realmGUID` int(10) unsigned NOT NULL DEFAULT '0',
-  `cuFlags` int(10) unsigned NOT NULL DEFAULT '0',
-  `name` varchar(26) NOT NULL DEFAULT '',
-  `nameUrl` varchar(26) NOT NULL DEFAULT '',
-  `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `emblemColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `borderColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `backgroundColor` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `realm` int(10) unsigned NOT NULL,
+  `realmGUID` int(10) unsigned NOT NULL,
+  `cuFlags` int(10) unsigned NOT NULL DEFAULT 0,
+  `name` varchar(26) NOT NULL,
+  `nameUrl` varchar(26) NOT NULL,
+  `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `emblemColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `borderColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `backgroundColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `info` varchar(500) NOT NULL DEFAULT '',
-  `createDate` int(10) unsigned NOT NULL DEFAULT '0',
-  INDEX `name` (`name`),
-  INDEX `guild` (`id`)
+  `createDate` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
+  KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `aowow_profiler_guild_rank`;

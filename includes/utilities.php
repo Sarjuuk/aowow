@@ -1329,7 +1329,7 @@ class Util
         if ($itemLevel == 60 && $quality == ITEM_QUALITY_UNCOMMON)
             return 6.0;
         // common - BC - vendored gems
-        if ($itemLevel == 55 && $quality == ITEM_QUALITY_COMMON)
+        if ($itemLevel == 55 && $quality == ITEM_QUALITY_NORMAL)
             return 4.0;
 
         // dafuq..?
