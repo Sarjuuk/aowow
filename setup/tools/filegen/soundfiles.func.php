@@ -49,7 +49,7 @@ if (!CLI)
                 }
             }
 
-            CLI::write(' - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '<locale>')), CLI::LOG_WARN);
+            CLI::write(' - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '['.implode(',', CLISetup::$locales).']')), CLI::LOG_WARN);
             // flag as unusable in DB
             DB::Aowow()->query('UPDATE ?_sounds_files SET id = ?d WHERE ABS(id) = ?d', -$fileId, $fileId);
         }
