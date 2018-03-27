@@ -47,6 +47,9 @@ class AjaxProfile extends AjaxHandler
         if (!$this->params)
             return;
 
+        if (!CFG_PROFILER_ENABLE)
+            return;
+
         switch ($this->params[0])
         {
             case 'unlink':

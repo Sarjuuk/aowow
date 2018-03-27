@@ -17,6 +17,9 @@ class GuildsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        if (!CFG_PROFILER_ENABLE)
+            $this->error();
+
         $this->getSubjectFromUrl($pageParam);
 
         $this->filterObj = new GuildListFilter();

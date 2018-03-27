@@ -41,8 +41,8 @@ $error = function ($type, $typeId, $realmId)
 };
 
 
-// if (CFG_PROFILER_QUEUE) - wont work because it is not redefined if changed in config
-while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profiler_queue"'))
+// if (CFG_PROFILER_ENABLE) - wont work because it is not redefined if changed in config
+while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profiler_enable"'))
 {
     if (($tDiff = (microtime(true) - $tCycle)) < (CFG_PROFILER_QUEUE_DELAY / 1000))
     {

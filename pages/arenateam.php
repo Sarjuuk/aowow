@@ -20,6 +20,9 @@ class ArenaTeamPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        if (!CFG_PROFILER_ENABLE)
+            $this->error();
+
         $params = array_map('urldecode', explode('.', $pageParam));
         if ($params[0])
             $params[0] = Profiler::urlize($params[0]);

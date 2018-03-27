@@ -244,7 +244,7 @@ class Profiler
 
     public static function resyncStatus($type, array $subjectGUIDs)
     {
-        $response = [CFG_PROFILER_QUEUE ? 2 : 0];        // in theory you could have multiple queues; used as divisor for: (15 / x) + 2
+        $response = [CFG_PROFILER_ENABLE ? 2 : 0];          // in theory you could have multiple queues; used as divisor for: (15 / x) + 2
         if (!$subjectGUIDs)
             $response[] = [PR_QUEUE_STATUS_ENDED, 0, 0, PR_QUEUE_ERROR_CHAR];
         else

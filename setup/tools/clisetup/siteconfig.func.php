@@ -46,7 +46,8 @@ function siteconfig()
                 CLI::write(' * remember to rebuild all static files for the language you just added.', CLI::LOG_INFO);
                 CLI::write(' * you can speed this up by supplying the regionCode to the setup: '.CLI::bold('--locales=<regionCodes,> -f'));
                 break;
-            case 'profiler_queue':
+            case 'profiler_enable':
+                array_push($updScripts, 'realms', 'realmMenu');
                 $fn = function($x) {
                     if (!$x)
                         return true;
