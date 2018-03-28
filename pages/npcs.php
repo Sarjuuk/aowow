@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class NpcsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_NPC;
     protected $tpl           = 'npcs';

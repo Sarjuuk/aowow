@@ -11,7 +11,9 @@ class ProfilePage extends GenericPage
     use TrProfiler;
 
     protected $gDataKey  = true;
-    protected $mode     = CACHE_TYPE_PAGE;
+    protected $mode      = CACHE_TYPE_PAGE;
+
+    protected $type      = TYPE_PROFILE;
 
     protected $tabId     = 1;
     protected $path      = [1, 5, 1];
@@ -125,7 +127,7 @@ class ProfilePage extends GenericPage
 /*          Onyxia                                                                                                                            */
 /* ony  */  10184,
 /*          Flame Levi, Ignis, Razorscale, XT-002, Kologarn, Auriaya, Freya, Hodir, Mimiron, Thorim, Vezaxx, Yogg,  Algalon                   */
-/* uld  */  33113,      33118, 33186,      33293,  32930     33515,   32906, 32845, 33350,   32864,  33271,  33288, 32871
+/* uld  */  33113,      33118, 33186,      33293,  32930,    33515,   32906, 32845, 33350,   32864,  33271,  33288, 32871,
 /*          Anub,  Faerlina, Maexxna, Noth,  Heigan, Loatheb, Razuvious, Gothik, Patchwerk, Grobbulus, Gluth, Thaddius, Sapphiron, Kel'Thuzad */
 /* nax  */  15956, 15953,    15952,   15954, 15936,  16011,   16061,     16060,  16028,     15931,     15932, 15928,    15989,     15990
         );

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabid   0: Database g_initHeader()
 class EmotePage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_EMOTE;
     protected $typeId        = 0;

@@ -9692,7 +9692,9 @@ Listview.funcBox = {
             }
         }
 
-        if (achievementPoints > 0) {
+        // aowow: changed because legitemately passing zero APs from the profiler is a thing
+        // (achievementPoints > 0) {
+        if (typeof achievementPoints == 'number') {
             if (ns) {
                 $WH.ae(d, $WH.ct(' '));
             }

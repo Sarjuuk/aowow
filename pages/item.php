@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ItemPage extends genericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ITEM;
     protected $typeId        = 0;

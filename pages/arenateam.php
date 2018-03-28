@@ -12,6 +12,8 @@ class ArenaTeamPage extends GenericPage
 
     protected $lvTabs   = [];
 
+    protected $type     = TYPE_ARENA_TEAM;
+
     protected $tabId    = 1;
     protected $path     = [1, 5, 3];
     protected $tpl      = 'roster';

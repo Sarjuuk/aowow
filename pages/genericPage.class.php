@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-trait DetailPage
+trait TrDetailPage
 {
     protected $hasComContent = true;
     protected $category      = null;                        // not used on detail pages
@@ -48,7 +48,7 @@ trait DetailPage
 }
 
 
-trait ListPage
+trait TrListPage
 {
     protected $category  = null;
     protected $filter    = [];
@@ -84,6 +84,16 @@ trait TrProfiler
     protected $sumSubjects = 0;
 
     protected $doResync    = null;
+
+    protected function generateCacheKey($withStaff = true)
+    {
+        $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
+
+        //     mode,         type,        typeId,                         employee-flag, localeId,        category, filter
+        $key = [$this->mode, $this->type, $this->subject->getField('id'), $staff,        User::$localeId, '-1',     '-1'];
+
+        return implode('_', $key);
+    }
 
     protected function getSubjectFromUrl($str)
     {

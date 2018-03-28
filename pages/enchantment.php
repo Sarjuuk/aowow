@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId   0: Database    g_initHeader()
 class EnchantmentPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ENCHANTMENT;
     protected $typeId        = 0;

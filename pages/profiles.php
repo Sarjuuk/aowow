@@ -12,6 +12,8 @@ class ProfilesPage extends GenericPage
 
     protected $roster   = 0;                                // $_GET['roster'] = 1|2|3|4 .. 2,3,4 arenateam-size (4 => 5-man), 1 guild .. it puts a resync button on the lv...
 
+    protected $type     = TYPE_PROFILE;
+
     protected $tabId    = 1;
     protected $path     = [1, 5, 0];
     protected $tpl      = 'profiles';
@@ -34,7 +36,7 @@ class ProfilesPage extends GenericPage
             if ($this->realm && $r['name'] != $this->realm)
                 continue;
 
-            $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT count(*) FROM characters WHERE deleteInfos_Name IS NULL');
+            $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT count(*) FROM characters WHERE deleteInfos_Name IS NULL AND level <= ?d AND (extra_flags & ?) = 0', MAX_LEVEL, Profiler::CHAR_GMFLAGS);
             $realms[] = $idx;
         }
 

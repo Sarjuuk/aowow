@@ -12,6 +12,8 @@ class GuildPage extends GenericPage
 
     protected $lvTabs   = [];
 
+    protected $type     = TYPE_GUILD;
+
     protected $tabId    = 1;
     protected $path     = [1, 5, 2];
     protected $tpl      = 'roster';

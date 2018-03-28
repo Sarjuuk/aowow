@@ -35,7 +35,7 @@ class ProfileList extends BaseType
                 'talenttree3'       => $this->getField('talenttree3'),
                 'talentspec'        => $this->getField('activespec') + 1,                       // 0 => 1; 1 => 2
                 'achievementpoints' => $this->getField('achievementpoints'),
-                'guild'             => '$"'.str_replace ('"', '', $this->curTpl['name']).'"',   // force this to be a string
+                'guild'             => '$"'.str_replace ('"', '', $this->curTpl['guildname']).'"',// force this to be a string
                 'guildrank'         => $this->getField('guildrank'),
                 'realm'             => Profiler::urlize($this->getField('realmName')),
                 'realmname'         => $this->getField('realmName'),
@@ -181,7 +181,7 @@ class ProfileListFilter extends Filter
 
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
          2 => [FILTER_CR_NUMERIC,  'gearscore',         NUM_CAST_INT     ], // gearscore [num]
-         3 => [FILTER_CR_NUMERIC,  'achievementpoints', NUM_CAST_INT     ], // achievementpoints [num]
+         3 => [FILTER_CR_CALLBACK, 'cbAchievs',         null,        null], // achievementpoints [num]
          5 => [FILTER_CR_NUMERIC,  'talenttree1',       NUM_CAST_INT     ], // talenttree1 [num]
          6 => [FILTER_CR_NUMERIC,  'talenttree2',       NUM_CAST_INT     ], // talenttree2 [num]
          7 => [FILTER_CR_NUMERIC,  'talenttree3',       NUM_CAST_INT     ], // talenttree3 [num]
@@ -245,7 +245,7 @@ class ProfileListFilter extends Filter
         parent::__construct($fromPOST, $opts);
 
         if (!empty($this->fiData['c']['cr']))
-            if (array_intersect($this->fiData['c']['cr'], [2, 3, 5, 6, 7, 21]))
+            if (array_intersect($this->fiData['c']['cr'], [2, 5, 6, 7, 21]))
                 $this->useLocalList = true;
     }
 
@@ -435,6 +435,17 @@ class ProfileListFilter extends Filter
 
         return ['AND', ['at.type', $this->enums[-1][$cr[0]]], ['at.rating', $cr[2], $cr[1]]];
     }
+
+    protected function cbAchievs($cr)
+    {
+        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
+            return false;
+
+        if ($this->useLocalList)
+            return ['p.achievementpoints', $cr[2], $cr[1]];
+        else
+            return ['cap.counter', $cr[2], $cr[1]];
+    }
 }
 
 
@@ -442,9 +453,8 @@ class RemoteProfileList extends ProfileList
 {
     protected   $queryBase = 'SELECT `c`.*, `c`.`guid` AS ARRAY_KEY FROM characters c';
     protected   $queryOpts = array(
-                    'c'   => [['gm', 'g', 'ca', 'ct'], 'g' => 'ARRAY_KEY', 'o' => 'level DESC, name ASC'],
-                    'ca'  => ['j' => ['character_achievement ca ON ca.guid = c.guid', true], 's' => ', GROUP_CONCAT(DISTINCT ca.achievement SEPARATOR " ") AS _acvs'],
-                    'ct'  => ['j' => ['character_talent ct ON ct.guid = c.guid AND ct.spec = c.activespec', true], 's' => ', GROUP_CONCAT(DISTINCT ct.spell SEPARATOR " ") AS _talents'],
+                    'c'   => [['gm', 'g', 'cap']],                                                             // 12698: use criteria of Achievement 4496 as shortcut to get total achievement points
+                    'cap' => ['j' => ['character_achievement_progress cap ON cap.guid = c.guid AND cap.criteria = 12698', true], 's' => ', IFNULL(cap.counter, 0) AS achievementpoints'],
                     'gm'  => ['j' => ['guild_member gm ON gm.guid = c.guid', true], 's' => ', gm.rank AS guildrank'],
                     'g'   => ['j' => ['guild g ON g.guildid = gm.guildid', true], 's' => ', g.guildid AS guild, g.name AS guildname'],
                     'atm' => ['j' => ['arena_team_member atm ON atm.guid = c.guid', true], 's' => ', atm.personalRating AS rating'],
@@ -466,14 +476,12 @@ class RemoteProfileList extends ProfileList
             return;
 
         reset($this->dbNames);                              // only use when querying single realm
-        $realmId     = key($this->dbNames);
-        $realms      = Profiler::getRealms();
-        $acvCache    = [];
-        $talentCache = [];
-        $atCache     = [];
-        $distrib     = null;
-        $talentData  = [];
-        $limit       = CFG_SQL_LIMIT_DEFAULT;
+        $realmId      = key($this->dbNames);
+        $realms       = Profiler::getRealms();
+        $talentSpells = [];
+        $talentLookup = [];
+        $distrib      = null;
+        $limit        = CFG_SQL_LIMIT_DEFAULT;
 
         foreach ($conditions as $c)
             if (is_int($c))
@@ -486,7 +494,7 @@ class RemoteProfileList extends ProfileList
             $curTpl['battlegroup'] = CFG_BATTLEGROUP;
 
             // realm
-            $r = explode(':', $guid)[0];
+            list($r, $g) = explode(':', $guid);
             if (!empty($realms[$r]))
             {
                 $curTpl['realm']     = $r;
@@ -503,17 +511,9 @@ class RemoteProfileList extends ProfileList
             // temp id
             $curTpl['id'] = 0;
 
-            // achievement points pre
-            if ($acvs = explode(' ', $curTpl['_acvs']))
-                foreach ($acvs as $a)
-                    if ($a && !isset($acvCache[$a]))
-                        $acvCache[$a] = $a;
-
             // talent points pre
-            if ($talents = explode(' ', $curTpl['_talents']))
-                foreach ($talents as $t)
-                    if ($t && !isset($talentCache[$t]))
-                        $talentCache[$t] = $t;
+            $talentLookup[$r][$g] = [];
+            $talentSpells[] = $curTpl['class'];
 
             // equalize distribution
             if ($limit != CFG_SQL_LIMIT_NONE)
@@ -527,8 +527,10 @@ class RemoteProfileList extends ProfileList
             $curTpl['cuFlags'] = 0;
         }
 
-        if ($talentCache)
-            $talentData = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, rank FROM ?_talents WHERE spell IN (?a)', $talentCache);
+        foreach ($talentLookup as $realm => $chars)
+            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT guid AS ARRAY_KEY, spell AS ARRAY_KEY2, spec FROM character_talent ct WHERE guid IN (?a)', array_keys($chars));
+
+        $talentSpells = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, rank FROM ?_talents WHERE class IN (?a)', array_unique($talentSpells));
 
         if ($distrib !== null)
         {
@@ -536,9 +538,6 @@ class RemoteProfileList extends ProfileList
             foreach ($distrib as &$d)
                 $d = ceil($limit * $d / $total);
         }
-
-        if ($acvCache)
-            $acvCache = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, points FROM ?_achievement WHERE id IN (?a)', $acvCache);
 
         foreach ($this->iterate() as $guid => &$curTpl)
         {
@@ -554,22 +553,18 @@ class RemoteProfileList extends ProfileList
                 $limit--;
             }
 
-
-            $a  = explode(' ', $curTpl['_acvs']);
-            $t  = explode(' ', $curTpl['_talents']);
-            unset($curTpl['_acvs']);
-            unset($curTpl['_talents']);
-
-            // achievement points post
-            $curTpl['achievementpoints'] = array_sum(array_intersect_key($acvCache, array_combine($a, $a)));
+            list($r, $g) = explode(':', $guid);
 
             // talent points post
             $curTpl['talenttree1'] = 0;
             $curTpl['talenttree2'] = 0;
             $curTpl['talenttree3'] = 0;
-            foreach ($talentData as $spell => $data)
-                if (in_array($spell, $t))
+            if (!empty($talentLookup[$r][$g]))
+            {
+                $talents = array_filter($talentLookup[$r][$g], function($v) use ($curTpl) { return $curTpl['activespec'] == $v; } );
+                foreach (array_intersect_key($talentSpells, $talents) as $spell => $data)
                     $curTpl['talenttree'.($data['tab'] + 1)] += $data['rank'];
+            }
         }
     }
 

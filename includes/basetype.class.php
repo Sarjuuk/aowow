@@ -257,12 +257,24 @@ abstract class BaseType
 
         // execute query (finally)
         $mtch = 0;
+        $rows = [];
         // this is purely because of multiple realms per server
         foreach ($this->dbNames as $dbIdx => $n)
         {
             $query = str_replace('DB_IDX', $dbIdx, $this->queryBase);
 
-            if ($rows = DB::{$n}($dbIdx)->SelectPage($mtch, $query))
+            if (key($this->dbNames) === 0)
+            {
+                if ($rows = DB::{$n}($dbIdx)->select($query))
+                {
+                    $mtchQry = preg_replace('/SELECT .*? FROM/', 'SELECT count(1) FROM', $this->queryBase);
+                    $mtch    = DB::{$n}($dbIdx)->selectCell($mtchQry);
+                }
+            }
+            else
+                $rows = DB::{$n}($dbIdx)->SelectPage($mtch, $query);
+
+            if ($rows)
             {
                 $this->matches += $mtch;
                 foreach ($rows as $id => $row)

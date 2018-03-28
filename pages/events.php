@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class EventsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_WORLDEVENT;
     protected $tpl           = 'list-page-generic';

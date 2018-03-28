@@ -23,7 +23,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database    g_initHeader()
 class AchievementPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ACHIEVEMENT;
     protected $typeId        = 0;

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabid 0: Database g_initHeader()
 class PetsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_PET;
     protected $tpl           = 'list-page-generic';
