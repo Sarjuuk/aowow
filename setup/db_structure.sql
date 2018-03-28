@@ -25,31 +25,31 @@ DROP TABLE IF EXISTS `aowow_account`;
 CREATE TABLE `aowow_account` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `extId` int(10) unsigned NOT NULL COMMENT 'external user id',
-  `user` varchar(64) NOT NULL COMMENT 'login',
-  `passHash` varchar(128) NOT NULL,
-  `displayName` varchar(64) NOT NULL COMMENT 'nickname',
-  `email` varchar(64) NOT NULL,
+  `user` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'login',
+  `passHash` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `displayName` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'nickname',
+  `email` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `joinDate` int(10) unsigned NOT NULL COMMENT 'unixtime',
   `allowExpire` tinyint(1) unsigned NOT NULL,
   `dailyVotes` smallint(5) unsigned NOT NULL DEFAULT 0,
   `consecutiveVisits` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `curIP` varchar(45) NOT NULL,
-  `prevIP` varchar(45) NOT NULL,
+  `curIP` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prevIP` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `curLogin` int(15) unsigned NOT NULL COMMENT 'unixtime',
   `prevLogin` int(15) unsigned NOT NULL,
   `locale` tinyint(4) unsigned NOT NULL DEFAULT 0 COMMENT '0,2,3,6,8',
   `userGroups` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'bitmask',
-  `avatar` varchar(50) NOT NULL DEFAULT '' COMMENT 'icon-string for internal or id for upload',
-  `title` varchar(50) NOT NULL DEFAULT '' COMMENT 'user can obtain custom titles',
-  `description` text NOT NULL COMMENT 'markdown formated',
-  `excludeGroups` smallint(5) unsigned NOT NULL DEFAULT 1 COMMENT 'profiler - completion exclude bitmask',
+  `avatar` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'icon-string for internal or id for upload',
+  `title` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'user can obtain custom titles',
+  `description` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'markdown formated',
+  `excludeGroups` smallint(5) unsigned NOT NULL DEFAULT 1 COMMENT 'profiler - exclude bitmask',
   `userPerms` tinyint(4) unsigned NOT NULL DEFAULT 0 COMMENT 'bool isAdmin',
   `status` tinyint(4) unsigned NOT NULL DEFAULT 0 COMMENT 'flag, see defines',
   `statusTimer` int(10) unsigned NOT NULL DEFAULT 0,
-  `token` varchar(40) NOT NULL COMMENT 'creation & recovery',
+  `token` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'creation & recovery',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user` (`user`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,11 +66,11 @@ CREATE TABLE `aowow_account_banned` (
   `typeMask` tinyint(4) unsigned NOT NULL COMMENT 'ACC_BAN_*',
   `start` int(10) unsigned NOT NULL COMMENT 'unixtime',
   `end` int(10) unsigned NOT NULL COMMENT 'automatic unban @ unixtime',
-  `reason` varchar(255) NOT NULL,
+  `reason` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_acc_banned` (`userId`),
   CONSTRAINT `FK_acc_banned` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,12 +81,12 @@ DROP TABLE IF EXISTS `aowow_account_bannedips`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_bannedips` (
-  `ip` varchar(45) NOT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL COMMENT '0: onSignin; 1:onSignup',
   `count` smallint(6) NOT NULL COMMENT 'nFails',
   `unbanDate` int(11) NOT NULL COMMENT 'automatic remove @ unixtime',
   PRIMARY KEY (`ip`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,12 +98,12 @@ DROP TABLE IF EXISTS `aowow_account_cookies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_cookies` (
   `userId` int(10) unsigned NOT NULL,
-  `name` varchar(127) NOT NULL,
-  `data` text NOT NULL,
+  `name` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userId_name` (`userId`,`name`),
   CONSTRAINT `FK_acc_cookies` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,7 +121,7 @@ CREATE TABLE `aowow_account_excludes` (
   UNIQUE KEY `userId_type_typeId` (`userId`,`type`,`typeId`),
   KEY `userId` (`userId`),
   CONSTRAINT `FK_acc_excludes` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,7 +140,7 @@ CREATE TABLE `aowow_account_profiles` (
   KEY `profileId` (`profileId`),
   CONSTRAINT `FK_account_id` FOREIGN KEY (`accountId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_profile_id` FOREIGN KEY (`profileId`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,7 +160,7 @@ CREATE TABLE `aowow_account_reputation` (
   UNIQUE KEY `userId_action_source` (`userId`,`action`,`sourceA`,`sourceB`),
   KEY `userId` (`userId`),
   CONSTRAINT `FK_acc_rep` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT COMMENT='reputation log';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT COMMENT='reputation log';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,11 +172,11 @@ DROP TABLE IF EXISTS `aowow_account_weightscale_data`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_account_weightscale_data` (
   `id` int(32) NOT NULL,
-  `field` varchar(15) NOT NULL,
+  `field` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
   `val` smallint(6) unsigned NOT NULL,
   KEY `id` (`id`),
   CONSTRAINT `FK_acc_weightscales` FOREIGN KEY (`id`) REFERENCES `aowow_account_weightscales` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -189,13 +189,13 @@ DROP TABLE IF EXISTS `aowow_account_weightscales`;
 CREATE TABLE `aowow_account_weightscales` (
   `id` int(32) NOT NULL AUTO_INCREMENT,
   `userId` int(10) unsigned NOT NULL,
-  `name` varchar(32) NOT NULL,
+  `name` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `icon` varchar(48) NOT NULL DEFAULT '',
+  `icon` varchar(48) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`,`userId`),
   KEY `FK_acc_weights` (`userId`),
   CONSTRAINT `FK_acc_weights` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,24 +222,24 @@ CREATE TABLE `aowow_achievement` (
   `refAchievement` smallint(5) unsigned NOT NULL,
   `itemExtra` mediumint(8) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL COMMENT 'see defines.php for flags',
-  `name_loc0` varchar(78) NOT NULL,
-  `name_loc2` varchar(79) NOT NULL,
-  `name_loc3` varchar(86) NOT NULL,
-  `name_loc6` varchar(78) NOT NULL,
-  `name_loc8` varchar(76) NOT NULL,
-  `description_loc0` text NOT NULL,
-  `description_loc2` text NOT NULL,
-  `description_loc3` text NOT NULL,
-  `description_loc6` text NOT NULL,
-  `description_loc8` text NOT NULL,
-  `reward_loc0` varchar(74) NOT NULL,
-  `reward_loc2` varchar(88) NOT NULL,
-  `reward_loc3` varchar(92) NOT NULL,
-  `reward_loc6` varchar(83) NOT NULL,
-  `reward_loc8` varchar(95) NOT NULL,
+  `name_loc0` varchar(78) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(79) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(86) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(78) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(76) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reward_loc0` varchar(74) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reward_loc2` varchar(88) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reward_loc3` varchar(92) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reward_loc6` varchar(83) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reward_loc8` varchar(95) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `iconId` (`iconId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -252,14 +252,14 @@ DROP TABLE IF EXISTS `aowow_achievementcategory`;
 CREATE TABLE `aowow_achievementcategory` (
   `id` int(11) unsigned NOT NULL,
   `parentCategory` mediumint(9) NOT NULL,
-  `name_loc0` varchar(255) NOT NULL,
-  `name_loc2` varchar(255) NOT NULL,
-  `name_loc3` varchar(255) NOT NULL,
-  `name_loc6` varchar(255) NOT NULL,
-  `name_loc8` varchar(255) NOT NULL,
+  `name_loc0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_achievement` (`parentCategory`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -279,18 +279,18 @@ CREATE TABLE `aowow_achievementcriteria` (
   `value4` int(10) unsigned NOT NULL,
   `value5` int(10) unsigned NOT NULL,
   `value6` int(10) unsigned NOT NULL,
-  `name_loc0` varchar(92) NOT NULL,
-  `name_loc2` varchar(104) NOT NULL,
-  `name_loc3` varchar(128) NOT NULL,
-  `name_loc6` varchar(119) NOT NULL,
-  `name_loc8` varchar(118) NOT NULL,
+  `name_loc0` varchar(92) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(104) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(119) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(118) COLLATE utf8mb4_unicode_ci NOT NULL,
   `completionFlags` tinyint(3) unsigned NOT NULL,
   `groupFlags` tinyint(3) unsigned NOT NULL,
   `timeLimit` smallint(5) unsigned NOT NULL,
   `order` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_achievement` (`refAchievementId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -302,19 +302,19 @@ DROP TABLE IF EXISTS `aowow_announcements`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_announcements` (
   `id` int(16) NOT NULL AUTO_INCREMENT COMMENT 'iirc negative Ids cant be deleted',
-  `page` varchar(256) NOT NULL,
-  `name` varchar(256) NOT NULL,
+  `page` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `groupMask` smallint(5) unsigned NOT NULL,
-  `style` varchar(256) NOT NULL,
+  `style` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `mode` tinyint(4) unsigned NOT NULL COMMENT '0:pageTop; 1:contentTop',
   `status` tinyint(4) unsigned NOT NULL COMMENT '0:disabled; 1:enabled; 2:deleted',
-  `text_loc0` text NOT NULL,
-  `text_loc2` text NOT NULL,
-  `text_loc3` text NOT NULL,
-  `text_loc6` text NOT NULL,
-  `text_loc8` text NOT NULL,
+  `text_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -328,13 +328,13 @@ CREATE TABLE `aowow_articles` (
   `type` smallint(5) DEFAULT NULL,
   `typeId` mediumint(9) DEFAULT NULL,
   `locale` tinyint(4) unsigned NOT NULL,
-  `url` varchar(50) DEFAULT NULL,
+  `url` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `editAccess` smallint(5) unsigned NOT NULL DEFAULT 2,
-  `article` text DEFAULT NULL COMMENT 'Markdown formated',
-  `quickInfo` text DEFAULT NULL COMMENT 'Markdown formated',
+  `article` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Markdown formated',
+  `quickInfo` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Markdown formated',
   UNIQUE KEY `type` (`type`,`typeId`,`locale`),
   UNIQUE KEY `locale_url` (`locale`,`url`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -346,23 +346,23 @@ DROP TABLE IF EXISTS `aowow_classes`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_classes` (
   `id` int(16) NOT NULL,
-  `fileString` varchar(128) NOT NULL,
-  `name_loc0` varchar(128) NOT NULL,
-  `name_loc2` varchar(128) NOT NULL,
-  `name_loc3` varchar(128) NOT NULL,
-  `name_loc6` varchar(128) NOT NULL,
-  `name_loc8` varchar(128) NOT NULL,
+  `fileString` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `powerType` tinyint(4) NOT NULL,
   `raceMask` int(16) NOT NULL,
   `roles` int(16) NOT NULL,
-  `skills` varchar(32) NOT NULL,
+  `skills` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `flags` mediumint(16) NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
   `weaponTypeMask` int(32) NOT NULL,
   `armorTypeMask` int(32) NOT NULL,
   `expansion` tinyint(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,7 +378,7 @@ CREATE TABLE `aowow_comments` (
   `typeId` mediumint(9) NOT NULL COMMENT 'ID Of Page',
   `userId` int(10) unsigned DEFAULT NULL COMMENT 'User ID',
   `roles` smallint(5) unsigned NOT NULL,
-  `body` text NOT NULL COMMENT 'Comment text',
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Comment text',
   `date` int(11) NOT NULL COMMENT 'Comment timestap',
   `flags` smallint(6) NOT NULL DEFAULT 0 COMMENT 'deleted, outofdate, sticky',
   `replyTo` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Reply To, comment ID',
@@ -388,13 +388,13 @@ CREATE TABLE `aowow_comments` (
   `deleteUserId` int(10) unsigned NOT NULL DEFAULT 0,
   `deleteDate` int(10) unsigned NOT NULL DEFAULT 0,
   `responseUserId` int(10) unsigned NOT NULL DEFAULT 0,
-  `responseBody` text DEFAULT NULL,
+  `responseBody` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `responseRoles` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `type_typeId` (`type`,`typeId`),
   KEY `FK_acc_co` (`userId`),
   CONSTRAINT `FK_acc_co` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -413,7 +413,7 @@ CREATE TABLE `aowow_comments_rates` (
   KEY `FK_acc_co_rate_user` (`userId`),
   CONSTRAINT `FK_acc_co_rate` FOREIGN KEY (`commentId`) REFERENCES `aowow_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_acc_co_rate_user` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,13 +424,13 @@ DROP TABLE IF EXISTS `aowow_config`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_config` (
-  `key` varchar(25) NOT NULL,
-  `value` varchar(255) NOT NULL,
+  `key` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `cat` tinyint(3) unsigned NOT NULL DEFAULT 5,
   `flags` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `comment` varchar(255) NOT NULL,
+  `comment` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`key`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -452,20 +452,20 @@ CREATE TABLE `aowow_creature` (
   `displayId2` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `displayId3` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `displayId4` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `textureString` varchar(50) DEFAULT NULL,
+  `textureString` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `modelId` mediumint(8) NOT NULL,
   `humanoid` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  `iconString` varchar(50) DEFAULT NULL COMMENT 'first texture of first model for search (up to 11 other skins omitted..)',
-  `name_loc0` varchar(100) NOT NULL DEFAULT '0',
-  `name_loc2` varchar(100) DEFAULT NULL,
-  `name_loc3` varchar(100) DEFAULT NULL,
-  `name_loc6` varchar(100) DEFAULT NULL,
-  `name_loc8` varchar(100) DEFAULT NULL,
-  `subname_loc0` varchar(100) DEFAULT NULL,
-  `subname_loc2` varchar(100) DEFAULT NULL,
-  `subname_loc3` varchar(100) DEFAULT NULL,
-  `subname_loc6` varchar(100) DEFAULT NULL,
-  `subname_loc8` varchar(100) DEFAULT NULL,
+  `iconString` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'first texture of first model for search (up to 11 other skins omitted..)',
+  `name_loc0` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
+  `name_loc2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc8` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subname_loc0` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subname_loc2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subname_loc3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subname_loc6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `subname_loc8` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `minLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `maxLevel` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `exp` smallint(6) NOT NULL DEFAULT 0,
@@ -510,7 +510,7 @@ CREATE TABLE `aowow_creature` (
   `vehicleId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `minGold` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `maxGold` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `aiName` varchar(50) NOT NULL DEFAULT '',
+  `aiName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `healthMin` int(10) unsigned NOT NULL DEFAULT 1,
   `healthMax` int(10) unsigned NOT NULL DEFAULT 1,
   `manaMin` int(10) unsigned NOT NULL DEFAULT 1,
@@ -520,13 +520,13 @@ CREATE TABLE `aowow_creature` (
   `racialLeader` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `mechanicImmuneMask` int(10) unsigned NOT NULL DEFAULT 0,
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT 0,
-  `scriptName` varchar(50) NOT NULL DEFAULT '',
+  `scriptName` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name_loc0`),
   KEY `difficultyEntry1` (`difficultyEntry1`),
   KEY `difficultyEntry2` (`difficultyEntry2`),
   KEY `difficultyEntry3` (`difficultyEntry3`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -568,7 +568,7 @@ CREATE TABLE `aowow_creature_sounds` (
   `transform` smallint(5) unsigned NOT NULL,
   `transformanimated` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='!ATTENTION!\r\nthe primary key of this table is NOT a creatureId, but displayId\r\n\r\ncolumn names from LANG.sound_activities';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='!ATTENTION!\r\nthe primary key of this table is NOT a creatureId, but displayId\r\n\r\ncolumn names from LANG.sound_activities';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -580,14 +580,14 @@ DROP TABLE IF EXISTS `aowow_creature_waypoints`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_creature_waypoints` (
   `creatureOrPath` int(11) NOT NULL,
-  `point` tinyint(3) unsigned NOT NULL,
+  `point` smallint(5) unsigned NOT NULL,
   `areaId` smallint(5) unsigned NOT NULL,
   `floor` tinyint(3) unsigned NOT NULL,
   `posX` float unsigned NOT NULL,
   `posY` float unsigned NOT NULL,
   `wait` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`creatureOrPath`,`point`,`areaId`,`floor`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -604,19 +604,19 @@ CREATE TABLE `aowow_currencies` (
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `itemId` int(16) NOT NULL,
   `cap` mediumint(8) unsigned NOT NULL,
-  `name_loc0` varchar(64) NOT NULL,
-  `name_loc2` varchar(64) NOT NULL,
-  `name_loc3` varchar(64) NOT NULL,
-  `name_loc6` varchar(64) NOT NULL,
-  `name_loc8` varchar(64) NOT NULL,
-  `description_loc0` varchar(256) NOT NULL,
-  `description_loc2` varchar(256) NOT NULL,
-  `description_loc3` varchar(256) NOT NULL,
-  `description_loc6` varchar(256) NOT NULL,
-  `description_loc8` varchar(256) NOT NULL,
+  `name_loc0` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc0` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc2` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc3` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc6` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc8` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `iconId` (`iconId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -629,9 +629,9 @@ DROP TABLE IF EXISTS `aowow_dbversion`;
 CREATE TABLE `aowow_dbversion` (
   `date` int(10) unsigned NOT NULL DEFAULT 0,
   `part` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `sql` text DEFAULT NULL,
-  `build` text DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `sql` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `build` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -643,26 +643,26 @@ DROP TABLE IF EXISTS `aowow_emotes`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_emotes` (
   `id` smallint(5) unsigned NOT NULL,
-  `cmd` varchar(15) NOT NULL,
+  `cmd` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
   `isAnimated` tinyint(1) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
-  `target_loc0` varchar(65) DEFAULT NULL,
-  `target_loc2` varchar(70) DEFAULT NULL,
-  `target_loc3` varchar(95) DEFAULT NULL,
-  `target_loc6` varchar(90) DEFAULT NULL,
-  `target_loc8` varchar(70) DEFAULT NULL,
-  `noTarget_loc0` varchar(65) DEFAULT NULL,
-  `noTarget_loc2` varchar(110) DEFAULT NULL,
-  `noTarget_loc3` varchar(85) DEFAULT NULL,
-  `noTarget_loc6` varchar(75) DEFAULT NULL,
-  `noTarget_loc8` varchar(60) DEFAULT NULL,
-  `self_loc0` varchar(65) DEFAULT NULL,
-  `self_loc2` varchar(115) DEFAULT NULL,
-  `self_loc3` varchar(85) DEFAULT NULL,
-  `self_loc6` varchar(75) DEFAULT NULL,
-  `self_loc8` varchar(70) DEFAULT NULL,
+  `target_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_loc2` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_loc3` varchar(95) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_loc6` varchar(90) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `target_loc8` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `noTarget_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `noTarget_loc2` varchar(110) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `noTarget_loc3` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `noTarget_loc6` varchar(75) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `noTarget_loc8` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `self_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `self_loc2` varchar(115) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `self_loc3` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `self_loc6` varchar(75) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `self_loc8` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -675,10 +675,10 @@ DROP TABLE IF EXISTS `aowow_emotes_aliasses`;
 CREATE TABLE `aowow_emotes_aliasses` (
   `id` smallint(6) unsigned NOT NULL,
   `locales` smallint(6) unsigned NOT NULL,
-  `command` varchar(15) NOT NULL,
+  `command` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
   UNIQUE KEY `id_command` (`id`,`command`),
   KEY `id` (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -697,7 +697,7 @@ CREATE TABLE `aowow_emotes_sounds` (
   KEY `emoteId` (`emoteId`),
   KEY `raceId` (`raceId`),
   KEY `soundId` (`soundId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -709,15 +709,15 @@ DROP TABLE IF EXISTS `aowow_errors`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_errors` (
   `date` int(10) unsigned DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL,
+  `version` tinyint(3) unsigned NOT NULL,
   `phpError` smallint(5) unsigned NOT NULL,
-  `file` varchar(250) NOT NULL,
+  `file` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `line` smallint(5) unsigned NOT NULL,
-  `query` varchar(250) NOT NULL,
+  `query` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `userGroups` smallint(5) unsigned NOT NULL,
-  `message` text DEFAULT NULL,
+  `message` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`file`,`line`,`phpError`,`version`,`userGroups`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -735,11 +735,11 @@ CREATE TABLE `aowow_events` (
   `endTime` bigint(20) NOT NULL,
   `occurence` bigint(20) unsigned NOT NULL,
   `length` bigint(20) unsigned NOT NULL,
-  `requires` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `requires` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `holidayId` (`holidayId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -754,20 +754,20 @@ CREATE TABLE `aowow_factions` (
   `repIdx` smallint(5) unsigned NOT NULL,
   `side` tinyint(1) unsigned NOT NULL,
   `expansion` tinyint(1) unsigned NOT NULL,
-  `qmNpcIds` varchar(12) NOT NULL COMMENT 'space separated',
-  `templateIds` tinytext NOT NULL COMMENT 'space separated',
+  `qmNpcIds` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space separated',
+  `templateIds` text COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space separated',
   `cuFlags` int(10) unsigned NOT NULL,
   `parentFactionId` smallint(5) unsigned NOT NULL,
   `spilloverRateIn` float(8,2) NOT NULL,
   `spilloverRateOut` float(8,2) NOT NULL,
   `spilloverMaxRank` tinyint(3) unsigned NOT NULL,
-  `name_loc0` varchar(35) NOT NULL,
-  `name_loc2` varchar(49) NOT NULL,
-  `name_loc3` varchar(40) NOT NULL,
-  `name_loc6` varchar(50) NOT NULL,
-  `name_loc8` varchar(47) NOT NULL,
+  `name_loc0` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(49) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(47) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -783,7 +783,7 @@ CREATE TABLE `aowow_factiontemplate` (
   `A` tinyint(4) NOT NULL COMMENT 'Aliance: -1 - hostile, 1 - friendly, 0 - neutral',
   `H` tinyint(4) NOT NULL COMMENT 'Horde: -1 - hostile, 1 - friendly, 0 - neutral',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -800,7 +800,7 @@ CREATE TABLE `aowow_glyphproperties` (
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -814,22 +814,22 @@ CREATE TABLE `aowow_holidays` (
   `id` smallint(6) unsigned NOT NULL,
   `bossCreature` mediumint(8) unsigned NOT NULL,
   `achievementCatOrId` mediumint(9) NOT NULL,
-  `name_loc0` varchar(36) NOT NULL,
-  `name_loc2` varchar(42) NOT NULL,
-  `name_loc3` varchar(36) NOT NULL,
-  `name_loc6` varchar(49) NOT NULL,
-  `name_loc8` varchar(29) NOT NULL,
-  `description_loc0` text DEFAULT NULL,
-  `description_loc2` text DEFAULT NULL,
-  `description_loc3` text DEFAULT NULL,
-  `description_loc6` text DEFAULT NULL,
-  `description_loc8` text DEFAULT NULL,
+  `name_loc0` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(42) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(49) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(29) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `looping` tinyint(2) NOT NULL,
   `scheduleType` tinyint(2) NOT NULL,
-  `textureString` varchar(30) NOT NULL,
-  `iconString` varchar(51) NOT NULL,
+  `textureString` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `iconString` varchar(51) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -846,18 +846,18 @@ CREATE TABLE `aowow_home_featuredbox` (
   `startDate` int(10) unsigned NOT NULL DEFAULT 0,
   `endDate` int(10) unsigned NOT NULL DEFAULT 0,
   `extraWide` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `boxBG` varchar(150) DEFAULT NULL,
-  `altHomeLogo` varchar(150) DEFAULT NULL,
-  `altHeaderLogo` varchar(150) DEFAULT NULL,
-  `text_loc0` text NOT NULL,
-  `text_loc2` text NOT NULL,
-  `text_loc3` text NOT NULL,
-  `text_loc6` text NOT NULL,
-  `text_loc8` text NOT NULL,
+  `boxBG` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `altHomeLogo` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `altHeaderLogo` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `text_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_acc_hFBox` (`editorId`),
   CONSTRAINT `FK_acc_hFBox` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -871,15 +871,15 @@ CREATE TABLE `aowow_home_featuredbox_overlay` (
   `featureId` smallint(5) unsigned NOT NULL,
   `left` smallint(5) unsigned NOT NULL,
   `width` smallint(5) unsigned NOT NULL,
-  `url` varchar(150) NOT NULL,
-  `title_loc0` varchar(100) NOT NULL DEFAULT '',
-  `title_loc2` varchar(100) NOT NULL DEFAULT '',
-  `title_loc3` varchar(100) NOT NULL DEFAULT '',
-  `title_loc6` varchar(100) NOT NULL DEFAULT '',
-  `title_loc8` varchar(100) NOT NULL DEFAULT '',
+  `url` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_loc0` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_loc2` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_loc3` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_loc6` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `title_loc8` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   KEY `FK_home_featurebox` (`featureId`),
   CONSTRAINT `FK_home_featurebox` FOREIGN KEY (`featureId`) REFERENCES `aowow_home_featuredbox` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -894,15 +894,15 @@ CREATE TABLE `aowow_home_oneliner` (
   `editorId` int(10) unsigned DEFAULT NULL,
   `editDate` int(10) unsigned NOT NULL,
   `active` tinyint(1) unsigned NOT NULL,
-  `text_loc0` varchar(200) NOT NULL,
-  `text_loc2` varchar(200) NOT NULL,
-  `text_loc3` varchar(200) NOT NULL,
-  `text_loc6` varchar(200) NOT NULL,
-  `text_loc8` varchar(200) NOT NULL,
+  `text_loc0` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_acc_hOneliner` (`editorId`),
   CONSTRAINT `FK_acc_hOneliner` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -917,15 +917,15 @@ CREATE TABLE `aowow_home_titles` (
   `editorId` int(10) unsigned DEFAULT NULL,
   `editDate` int(10) unsigned NOT NULL,
   `active` tinyint(1) unsigned NOT NULL,
-  `title_loc0` varchar(100) NOT NULL,
-  `title_loc2` varchar(100) NOT NULL,
-  `title_loc3` varchar(100) NOT NULL,
-  `title_loc6` varchar(100) NOT NULL,
-  `title_loc8` varchar(100) NOT NULL,
+  `title_loc0` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_loc2` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_loc3` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_loc6` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title_loc8` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_acc_hTitles` (`editorId`),
   CONSTRAINT `FK_acc_hTitles` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -938,10 +938,10 @@ DROP TABLE IF EXISTS `aowow_icons`;
 CREATE TABLE `aowow_icons` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `cuFlags` int(11) unsigned NOT NULL DEFAULT 0,
-  `name` varchar(55) NOT NULL DEFAULT '',
+  `name` varchar(55) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5856 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1034,7 +1034,7 @@ CREATE TABLE `aowow_item_stats` (
   `natsplpwr` smallint(6) NOT NULL,
   `arcsplpwr` smallint(6) NOT NULL,
   PRIMARY KEY (`typeId`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1059,17 +1059,17 @@ CREATE TABLE `aowow_itemenchantment` (
   `object1` mediumint(9) unsigned NOT NULL,
   `object2` mediumint(9) unsigned NOT NULL,
   `object3` smallint(6) unsigned NOT NULL,
-  `name_loc0` varchar(65) NOT NULL,
-  `name_loc2` varchar(91) NOT NULL,
-  `name_loc3` varchar(84) NOT NULL,
-  `name_loc6` varchar(89) NOT NULL,
-  `name_loc8` varchar(96) NOT NULL,
+  `name_loc0` varchar(65) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(91) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(84) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(89) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(96) COLLATE utf8mb4_unicode_ci NOT NULL,
   `conditionId` tinyint(3) unsigned NOT NULL,
   `skillLine` smallint(5) unsigned NOT NULL,
   `skillLevel` smallint(5) unsigned NOT NULL,
   `requiredLevel` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1102,7 +1102,7 @@ CREATE TABLE `aowow_itemenchantmentcondition` (
   `value4` tinyint(4) unsigned zerofill NOT NULL,
   `value5` tinyint(4) unsigned zerofill NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1129,7 +1129,7 @@ CREATE TABLE `aowow_itemextendedcost` (
   `itemCount5` smallint(5) unsigned NOT NULL,
   `reqPersonalRating` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1141,15 +1141,15 @@ DROP TABLE IF EXISTS `aowow_itemlimitcategory`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_itemlimitcategory` (
   `id` tinyint(3) unsigned NOT NULL,
-  `name_loc0` varchar(31) NOT NULL,
-  `name_loc2` varchar(36) NOT NULL,
-  `name_loc3` varchar(34) NOT NULL,
-  `name_loc6` varchar(40) NOT NULL,
-  `name_loc8` varchar(35) NOT NULL,
+  `name_loc0` varchar(31) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(34) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
   `count` tinyint(3) unsigned NOT NULL,
   `isGem` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1161,12 +1161,12 @@ DROP TABLE IF EXISTS `aowow_itemrandomenchant`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_itemrandomenchant` (
   `id` smallint(6) NOT NULL,
-  `name_loc0` varchar(250) NOT NULL,
-  `name_loc2` varchar(250) NOT NULL,
-  `name_loc3` varchar(250) NOT NULL,
-  `name_loc6` varchar(250) NOT NULL,
-  `name_loc8` varchar(250) NOT NULL,
-  `nameINT` char(250) NOT NULL,
+  `name_loc0` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nameINT` char(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `enchantId1` smallint(5) unsigned NOT NULL,
   `enchantId2` smallint(5) unsigned NOT NULL,
   `enchantId3` smallint(5) unsigned NOT NULL,
@@ -1178,7 +1178,7 @@ CREATE TABLE `aowow_itemrandomenchant` (
   `allocationPct4` smallint(5) unsigned NOT NULL,
   `allocationPct5` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1206,7 +1206,7 @@ CREATE TABLE `aowow_itemrandomproppoints` (
   `uncommon4` smallint(5) unsigned NOT NULL,
   `uncommon5` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1224,11 +1224,11 @@ CREATE TABLE `aowow_items` (
   `subClassBak` tinyint(3) NOT NULL,
   `soundOverrideSubclass` tinyint(3) NOT NULL,
   `subSubClass` tinyint(3) NOT NULL,
-  `name_loc0` varchar(127) NOT NULL DEFAULT '',
-  `name_loc2` varchar(127) DEFAULT NULL,
-  `name_loc3` varchar(127) DEFAULT NULL,
-  `name_loc6` varchar(127) DEFAULT NULL,
-  `name_loc8` varchar(127) DEFAULT NULL,
+  `name_loc0` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `name_loc2` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc3` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc6` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc8` varchar(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `spellVisualId` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -1254,7 +1254,7 @@ CREATE TABLE `aowow_items` (
   `requiredFactionRank` smallint(5) unsigned NOT NULL DEFAULT 0,
   `maxCount` int(11) NOT NULL DEFAULT 0,
   `cuFlags` int(10) unsigned NOT NULL,
-  `model` varchar(50) NOT NULL,
+  `model` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `stackable` int(11) DEFAULT 1,
   `slots` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `statType1` tinyint(3) unsigned NOT NULL DEFAULT 0,
@@ -1333,11 +1333,11 @@ CREATE TABLE `aowow_items` (
   `spellCategory5` smallint(5) unsigned NOT NULL DEFAULT 0,
   `spellCategoryCooldown5` int(11) NOT NULL DEFAULT -1,
   `bonding` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `description_loc0` varchar(255) NOT NULL DEFAULT '',
-  `description_loc2` varchar(255) DEFAULT NULL,
-  `description_loc3` varchar(255) DEFAULT NULL,
-  `description_loc6` varchar(255) DEFAULT NULL,
-  `description_loc8` varchar(255) DEFAULT NULL,
+  `description_loc0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `description_loc2` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc3` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc6` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description_loc8` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pageTextId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `languageId` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `startQuest` mediumint(8) unsigned NOT NULL DEFAULT 0,
@@ -1363,7 +1363,7 @@ CREATE TABLE `aowow_items` (
   `duration` int(10) unsigned NOT NULL DEFAULT 0,
   `itemLimitCategory` smallint(6) NOT NULL DEFAULT 0,
   `eventId` smallint(5) unsigned NOT NULL,
-  `scriptName` varchar(64) NOT NULL DEFAULT '',
+  `scriptName` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `foodType` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `gemEnchantmentId` mediumint(8) NOT NULL,
   `minMoneyLoot` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1379,7 +1379,7 @@ CREATE TABLE `aowow_items` (
   KEY `idx_model` (`displayId`),
   KEY `idx_faction` (`requiredFaction`),
   KEY `iconId` (`iconId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1393,7 +1393,7 @@ CREATE TABLE `aowow_items_sounds` (
   `soundId` smallint(5) unsigned NOT NULL,
   `subClassMask` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`soundId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='actually .. its only weapon related sounds in here';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='actually .. its only weapon related sounds in here';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1407,11 +1407,11 @@ CREATE TABLE `aowow_itemset` (
   `id` int(16) NOT NULL,
   `refSetId` int(11) NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
-  `name_loc0` varchar(255) NOT NULL,
-  `name_loc2` varchar(255) NOT NULL,
-  `name_loc3` varchar(255) NOT NULL,
-  `name_loc6` varchar(255) NOT NULL,
-  `name_loc8` varchar(255) NOT NULL,
+  `name_loc0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `item1` mediumint(11) unsigned NOT NULL,
   `item2` mediumint(11) unsigned NOT NULL,
   `item3` mediumint(11) unsigned NOT NULL,
@@ -1438,12 +1438,12 @@ CREATE TABLE `aowow_itemset` (
   `bonus6` tinyint(1) unsigned NOT NULL,
   `bonus7` tinyint(1) unsigned NOT NULL,
   `bonus8` tinyint(1) unsigned NOT NULL,
-  `bonusText_loc0` varchar(256) NOT NULL,
-  `bonusText_loc2` varchar(256) NOT NULL,
-  `bonusText_loc3` varchar(256) NOT NULL,
-  `bonusText_loc6` varchar(256) NOT NULL,
-  `bonusText_loc8` varchar(256) NOT NULL,
-  `bonusParsed` varchar(256) NOT NULL COMMENT 'serialized itemMods',
+  `bonusText_loc0` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bonusText_loc2` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bonusText_loc3` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bonusText_loc6` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bonusText_loc8` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `bonusParsed` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'serialized itemMods',
   `npieces` tinyint(3) NOT NULL,
   `minLevel` smallint(6) NOT NULL,
   `maxLevel` smallint(6) NOT NULL,
@@ -1457,7 +1457,7 @@ CREATE TABLE `aowow_itemset` (
   `skillId` smallint(3) unsigned NOT NULL,
   `skillLevel` smallint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1485,7 +1485,7 @@ CREATE TABLE `aowow_lock` (
   `reqSkill4` mediumint(8) unsigned NOT NULL,
   `reqSkill5` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1500,7 +1500,7 @@ CREATE TABLE `aowow_loot_link` (
   `objectId` mediumint(8) unsigned NOT NULL,
   UNIQUE KEY `npcId` (`npcId`),
   KEY `objectId` (`objectId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1512,18 +1512,18 @@ DROP TABLE IF EXISTS `aowow_mailtemplate`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_mailtemplate` (
   `id` smallint(5) unsigned NOT NULL,
-  `subject_loc0` varchar(128) NOT NULL,
-  `subject_loc2` varchar(128) NOT NULL,
-  `subject_loc3` varchar(128) NOT NULL,
-  `subject_loc6` varchar(128) NOT NULL,
-  `subject_loc8` varchar(128) NOT NULL,
-  `text_loc0` text NOT NULL,
-  `text_loc2` text NOT NULL,
-  `text_loc3` text NOT NULL,
-  `text_loc6` text NOT NULL,
-  `text_loc8` text NOT NULL,
+  `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_loc6` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject_loc8` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1539,11 +1539,11 @@ CREATE TABLE `aowow_objects` (
   `typeCat` tinyint(3) NOT NULL DEFAULT 0,
   `event` smallint(5) unsigned NOT NULL DEFAULT 0,
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `name_loc0` varchar(100) DEFAULT NULL,
-  `name_loc2` varchar(100) DEFAULT NULL,
-  `name_loc3` varchar(100) DEFAULT NULL,
-  `name_loc6` varchar(100) DEFAULT NULL,
-  `name_loc8` varchar(100) DEFAULT NULL,
+  `name_loc0` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc8` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `faction` smallint(5) unsigned NOT NULL DEFAULT 0,
   `flags` int(10) unsigned NOT NULL DEFAULT 0,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1558,11 +1558,11 @@ CREATE TABLE `aowow_objects` (
   `onSuccessSpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `auraSpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `triggeredSpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `miscInfo` varchar(128) NOT NULL,
-  `ScriptOrAI` varchar(64) NOT NULL,
+  `miscInfo` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ScriptOrAI` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_name` (`name_loc0`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1582,11 +1582,11 @@ CREATE TABLE `aowow_pet` (
   `type` tinyint(4) NOT NULL,
   `exotic` tinyint(4) NOT NULL,
   `expansion` tinyint(4) NOT NULL,
-  `name_loc0` varchar(64) NOT NULL,
-  `name_loc2` varchar(64) NOT NULL,
-  `name_loc3` varchar(64) NOT NULL,
-  `name_loc6` varchar(64) NOT NULL,
-  `name_loc8` varchar(64) NOT NULL,
+  `name_loc0` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `skillLineId` mediumint(9) NOT NULL,
   `spellId1` mediumint(9) NOT NULL,
@@ -1598,7 +1598,7 @@ CREATE TABLE `aowow_pet` (
   `health` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `iconId` (`iconId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1612,8 +1612,8 @@ CREATE TABLE `aowow_profiler_arena_team` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `realm` tinyint(3) unsigned NOT NULL,
   `realmGUID` int(10) unsigned NOT NULL,
-  `name` varchar(24) NOT NULL,
-  `nameUrl` varchar(24) NOT NULL,
+  `name` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nameUrl` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `cuFlags` int(11) unsigned NOT NULL,
   `rating` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -1630,7 +1630,7 @@ CREATE TABLE `aowow_profiler_arena_team` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
   KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1653,7 +1653,7 @@ CREATE TABLE `aowow_profiler_arena_team_member` (
   KEY `guid` (`profileId`),
   CONSTRAINT `FK_aowow_profiler_arena_team_member_aowow_profiler_arena_team` FOREIGN KEY (`arenaTeamId`) REFERENCES `aowow_profiler_arena_team` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_aowow_profiler_arena_team_member_aowow_profiler_profiles` FOREIGN KEY (`profileId`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1673,7 +1673,7 @@ CREATE TABLE `aowow_profiler_completion` (
   KEY `type` (`type`),
   KEY `typeId` (`typeId`),
   CONSTRAINT `FK_pr_completion` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1687,9 +1687,9 @@ CREATE TABLE `aowow_profiler_excludes` (
   `type` smallint(5) unsigned NOT NULL,
   `typeId` mediumint(8) unsigned NOT NULL,
   `groups` smallint(5) unsigned NOT NULL COMMENT 'see exclude group defines',
-  `comment` varchar(50) NOT NULL COMMENT 'rebuilding profiler files will delete everything without a comment',
+  `comment` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'rebuilding profiler files will delete everything without a comment',
   PRIMARY KEY (`type`,`typeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1704,19 +1704,19 @@ CREATE TABLE `aowow_profiler_guild` (
   `realm` int(10) unsigned NOT NULL,
   `realmGUID` int(10) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0,
-  `name` varchar(26) NOT NULL,
-  `nameUrl` varchar(26) NOT NULL,
+  `name` varchar(26) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nameUrl` varchar(26) COLLATE utf8mb4_unicode_ci NOT NULL,
   `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `emblemColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `borderColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `backgroundColor` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `info` varchar(500) NOT NULL DEFAULT '',
+  `info` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `createDate` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
   KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1729,11 +1729,11 @@ DROP TABLE IF EXISTS `aowow_profiler_guild_rank`;
 CREATE TABLE `aowow_profiler_guild_rank` (
   `guildId` int(10) unsigned NOT NULL DEFAULT 0,
   `rank` tinyint(3) unsigned NOT NULL,
-  `name` varchar(20) NOT NULL DEFAULT '',
+  `name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`guildId`,`rank`),
   KEY `rank` (`rank`),
   CONSTRAINT `FK_aowow_profiler_guild_rank_aowow_profiler_guild` FOREIGN KEY (`guildId`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1759,7 +1759,7 @@ CREATE TABLE `aowow_profiler_items` (
   KEY `id` (`id`),
   KEY `item` (`item`),
   CONSTRAINT `FK_pr_items` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1772,15 +1772,15 @@ DROP TABLE IF EXISTS `aowow_profiler_pets`;
 CREATE TABLE `aowow_profiler_pets` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `owner` int(10) unsigned DEFAULT NULL,
-  `name` varchar(50) DEFAULT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `family` tinyint(3) unsigned DEFAULT NULL,
   `npc` smallint(5) unsigned DEFAULT NULL,
   `displayId` smallint(5) unsigned DEFAULT NULL,
-  `talents` varchar(20) DEFAULT NULL,
+  `talents` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `FK_pr_pets` FOREIGN KEY (`owner`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1796,11 +1796,11 @@ CREATE TABLE `aowow_profiler_profiles` (
   `realmGUID` int(11) unsigned DEFAULT NULL,
   `cuFlags` int(11) unsigned NOT NULL DEFAULT 0,
   `sourceId` int(11) unsigned DEFAULT NULL,
-  `sourceName` varchar(50) DEFAULT NULL,
+  `sourceName` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `copy` int(10) unsigned DEFAULT NULL,
-  `icon` varchar(50) DEFAULT NULL,
+  `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user` int(11) unsigned DEFAULT NULL,
-  `name` varchar(50) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `race` tinyint(3) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
@@ -1814,7 +1814,7 @@ CREATE TABLE `aowow_profiler_profiles` (
   `features` tinyint(3) unsigned NOT NULL,
   `nomodelMask` int(11) unsigned NOT NULL DEFAULT 0,
   `title` tinyint(3) unsigned NOT NULL,
-  `description` text DEFAULT NULL,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `playedtime` int(11) unsigned NOT NULL,
   `gearscore` smallint(5) unsigned NOT NULL,
   `achievementpoints` smallint(5) unsigned NOT NULL,
@@ -1822,17 +1822,17 @@ CREATE TABLE `aowow_profiler_profiles` (
   `talenttree1` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 1st tree',
   `talenttree2` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 2nd tree',
   `talenttree3` tinyint(4) unsigned NOT NULL COMMENT 'points spend in 3rd tree',
-  `talentbuild1` varchar(105) NOT NULL,
-  `talentbuild2` varchar(105) NOT NULL,
-  `glyphs1` varchar(45) NOT NULL,
-  `glyphs2` varchar(45) NOT NULL,
+  `talentbuild1` varchar(105) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `talentbuild2` varchar(105) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `glyphs1` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `glyphs2` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `activespec` tinyint(1) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID_name` (`realm`,`realmGUID`,`name`),
   KEY `user` (`user`),
   KEY `guild` (`guild`),
   CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1852,7 +1852,7 @@ CREATE TABLE `aowow_profiler_sync` (
   `errorCode` tinyint(3) unsigned NOT NULL DEFAULT 0,
   UNIQUE KEY `realm_realmGUID_type_typeId` (`realm`,`realmGUID`,`type`),
   UNIQUE KEY `type_typeId` (`type`,`typeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1938,41 +1938,41 @@ CREATE TABLE `aowow_quests` (
   `rewardFactionValue3` mediumint(8) NOT NULL DEFAULT 0,
   `rewardFactionValue4` mediumint(8) NOT NULL DEFAULT 0,
   `rewardFactionValue5` mediumint(8) NOT NULL DEFAULT 0,
-  `name_loc0` text DEFAULT NULL,
-  `name_loc2` text DEFAULT NULL,
-  `name_loc3` text DEFAULT NULL,
-  `name_loc6` text DEFAULT NULL,
-  `name_loc8` text DEFAULT NULL,
-  `objectives_loc0` text DEFAULT NULL,
-  `objectives_loc2` text DEFAULT NULL,
-  `objectives_loc3` text DEFAULT NULL,
-  `objectives_loc6` text DEFAULT NULL,
-  `objectives_loc8` text DEFAULT NULL,
-  `details_loc0` text DEFAULT NULL,
-  `details_loc2` text DEFAULT NULL,
-  `details_loc3` text DEFAULT NULL,
-  `details_loc6` text DEFAULT NULL,
-  `details_loc8` text DEFAULT NULL,
-  `end_loc0` text DEFAULT NULL,
-  `end_loc2` text DEFAULT NULL,
-  `end_loc3` text DEFAULT NULL,
-  `end_loc6` text DEFAULT NULL,
-  `end_loc8` text DEFAULT NULL,
-  `offerReward_loc0` text DEFAULT NULL,
-  `offerReward_loc2` text DEFAULT NULL,
-  `offerReward_loc3` text DEFAULT NULL,
-  `offerReward_loc6` text DEFAULT NULL,
-  `offerReward_loc8` text DEFAULT NULL,
-  `requestItems_loc0` text DEFAULT NULL,
-  `requestItems_loc2` text DEFAULT NULL,
-  `requestItems_loc3` text DEFAULT NULL,
-  `requestItems_loc6` text DEFAULT NULL,
-  `requestItems_loc8` text DEFAULT NULL,
-  `completed_loc0` text DEFAULT NULL,
-  `completed_loc2` text DEFAULT NULL,
-  `completed_loc3` text DEFAULT NULL,
-  `completed_loc6` text DEFAULT NULL,
-  `completed_loc8` text DEFAULT NULL,
+  `name_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectives_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectives_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectives_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectives_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectives_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `details_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `details_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `details_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `details_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `details_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `end_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `offerReward_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `offerReward_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `offerReward_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `offerReward_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `offerReward_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requestItems_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requestItems_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requestItems_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requestItems_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `requestItems_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `completed_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `completed_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `completed_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `completed_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `completed_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `reqNpcOrGo1` mediumint(8) NOT NULL DEFAULT 0,
   `reqNpcOrGo2` mediumint(8) NOT NULL DEFAULT 0,
   `reqNpcOrGo3` mediumint(8) NOT NULL DEFAULT 0,
@@ -2001,29 +2001,29 @@ CREATE TABLE `aowow_quests` (
   `reqItemCount4` smallint(5) unsigned NOT NULL DEFAULT 0,
   `reqItemCount5` smallint(5) unsigned NOT NULL DEFAULT 0,
   `reqItemCount6` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `objectiveText1_loc0` text DEFAULT NULL,
-  `objectiveText1_loc2` text DEFAULT NULL,
-  `objectiveText1_loc3` text DEFAULT NULL,
-  `objectiveText1_loc6` text DEFAULT NULL,
-  `objectiveText1_loc8` text DEFAULT NULL,
-  `objectiveText2_loc0` text DEFAULT NULL,
-  `objectiveText2_loc2` text DEFAULT NULL,
-  `objectiveText2_loc3` text DEFAULT NULL,
-  `objectiveText2_loc6` text DEFAULT NULL,
-  `objectiveText2_loc8` text DEFAULT NULL,
-  `objectiveText3_loc0` text DEFAULT NULL,
-  `objectiveText3_loc2` text DEFAULT NULL,
-  `objectiveText3_loc3` text DEFAULT NULL,
-  `objectiveText3_loc6` text DEFAULT NULL,
-  `objectiveText3_loc8` text DEFAULT NULL,
-  `objectiveText4_loc0` text DEFAULT NULL,
-  `objectiveText4_loc2` text DEFAULT NULL,
-  `objectiveText4_loc3` text DEFAULT NULL,
-  `objectiveText4_loc6` text DEFAULT NULL,
-  `objectiveText4_loc8` text DEFAULT NULL,
+  `objectiveText1_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText1_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText1_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText1_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText1_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText2_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText2_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText2_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText2_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText2_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText3_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText3_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText3_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText3_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText3_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText4_loc0` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText4_loc2` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText4_loc3` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText4_loc6` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `objectiveText4_loc8` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `nextQuestIdChain` (`nextQuestIdChain`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2040,7 +2040,7 @@ CREATE TABLE `aowow_quests_startend` (
   `method` tinyint(4) unsigned NOT NULL COMMENT '&0x1: starts; &0x2:ends',
   `eventId` smallint(6) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`type`,`typeId`,`questId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2060,15 +2060,15 @@ CREATE TABLE `aowow_races` (
   `leader` bigint(20) NOT NULL,
   `baseLanguage` bigint(20) NOT NULL,
   `side` int(3) NOT NULL,
-  `fileString` varchar(64) NOT NULL,
-  `name_loc0` varchar(64) NOT NULL,
-  `name_loc2` varchar(64) NOT NULL,
-  `name_loc3` varchar(64) NOT NULL,
-  `name_loc6` varchar(64) NOT NULL,
-  `name_loc8` varchar(64) NOT NULL,
+  `fileString` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc0` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expansion` int(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2085,7 +2085,7 @@ CREATE TABLE `aowow_races_sounds` (
   UNIQUE KEY `race_soundId_gender` (`raceId`,`soundId`,`gender`),
   KEY `race` (`raceId`),
   KEY `soundId` (`soundId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2103,16 +2103,16 @@ CREATE TABLE `aowow_reports` (
   `mode` tinyint(3) unsigned NOT NULL,
   `reason` tinyint(3) unsigned NOT NULL,
   `subject` mediumint(9) NOT NULL DEFAULT 0,
-  `ip` varchar(50) NOT NULL,
-  `description` text NOT NULL,
-  `userAgent` varchar(255) NOT NULL,
-  `appName` varchar(32) NOT NULL,
-  `url` varchar(255) NOT NULL,
-  `relatedUrl` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
+  `ip` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userAgent` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `appName` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `relatedUrl` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2146,7 +2146,7 @@ CREATE TABLE `aowow_scalingstatdistribution` (
   `modifier10` smallint(5) unsigned NOT NULL,
   `maxLevel` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2181,7 +2181,7 @@ CREATE TABLE `aowow_scalingstatvalues` (
   `mailChestArmor` smallint(5) unsigned NOT NULL,
   `plateChestArmor` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2199,7 +2199,7 @@ CREATE TABLE `aowow_screenshots` (
   `date` int(32) unsigned NOT NULL,
   `width` smallint(5) unsigned NOT NULL,
   `height` smallint(5) unsigned NOT NULL,
-  `caption` varchar(250) DEFAULT NULL,
+  `caption` varchar(250) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` tinyint(3) unsigned NOT NULL COMMENT 'see defines.php - CC_FLAG_*',
   `userIdApprove` int(10) unsigned DEFAULT NULL,
   `userIdDelete` int(10) unsigned DEFAULT NULL,
@@ -2207,7 +2207,7 @@ CREATE TABLE `aowow_screenshots` (
   KEY `type` (`type`,`typeId`),
   KEY `FK_acc_ss` (`userIdOwner`),
   CONSTRAINT `FK_acc_ss` FOREIGN KEY (`userIdOwner`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2231,9 +2231,9 @@ CREATE TABLE `aowow_shapeshiftforms` (
   `spellId6` bigint(20) NOT NULL,
   `spellId7` bigint(20) NOT NULL,
   `spellId8` bigint(20) NOT NULL,
-  `comment` varchar(30) DEFAULT NULL,
+  `comment` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2248,23 +2248,23 @@ CREATE TABLE `aowow_skillline` (
   `typeCat` tinyint(4) NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
   `categoryId` tinyint(3) unsigned NOT NULL,
-  `name_loc0` varchar(64) NOT NULL,
-  `name_loc2` varchar(64) NOT NULL,
-  `name_loc3` varchar(64) NOT NULL,
-  `name_loc6` varchar(64) NOT NULL,
-  `name_loc8` varchar(64) NOT NULL,
-  `description_loc0` text NOT NULL,
-  `description_loc2` text NOT NULL,
-  `description_loc3` text NOT NULL,
-  `description_loc6` text NOT NULL,
-  `description_loc8` text NOT NULL,
+  `name_loc0` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `iconIdBak` smallint(5) unsigned NOT NULL DEFAULT 0,
   `professionMask` smallint(5) unsigned NOT NULL,
   `recipeSubClass` tinyint(3) unsigned NOT NULL,
-  `specializations` varchar(30) NOT NULL COMMENT 'space-separated spellIds',
+  `specializations` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space-separated spellIds',
   PRIMARY KEY (`Id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2277,7 +2277,7 @@ DROP TABLE IF EXISTS `aowow_sounds`;
 CREATE TABLE `aowow_sounds` (
   `id` smallint(5) unsigned NOT NULL,
   `cat` tinyint(3) unsigned NOT NULL,
-  `name` varchar(100) NOT NULL,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL,
   `soundFile1` smallint(5) unsigned DEFAULT NULL,
   `soundFile2` smallint(5) unsigned DEFAULT NULL,
@@ -2293,7 +2293,7 @@ CREATE TABLE `aowow_sounds` (
   PRIMARY KEY (`id`),
   KEY `cat` (`cat`),
   KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2305,11 +2305,11 @@ DROP TABLE IF EXISTS `aowow_sounds_files`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_sounds_files` (
   `id` smallint(6) NOT NULL COMMENT '<0 not found in client files',
-  `file` varchar(75) NOT NULL,
-  `path` varchar(75) NOT NULL COMMENT 'in client',
+  `file` varchar(75) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `path` varchar(75) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'in client',
   `type` tinyint(1) unsigned NOT NULL COMMENT '1: ogg; 2: mp3',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2350,7 +2350,7 @@ CREATE TABLE `aowow_source` (
   `src23` tinyint(1) unsigned DEFAULT NULL COMMENT 'Skinned',
   `src24` tinyint(1) unsigned DEFAULT NULL COMMENT 'In-Game Store [not used]',
   PRIMARY KEY (`type`,`typeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2362,14 +2362,14 @@ DROP TABLE IF EXISTS `aowow_sourcestrings`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_sourcestrings` (
   `id` int(16) NOT NULL,
-  `source_loc0` varchar(128) NOT NULL,
-  `source_loc2` varchar(128) NOT NULL,
-  `source_loc3` varchar(128) NOT NULL,
-  `source_loc6` varchar(128) NOT NULL,
-  `source_loc8` varchar(128) NOT NULL,
+  `source_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_loc6` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `source_loc8` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `Id` (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2395,7 +2395,7 @@ CREATE TABLE `aowow_spawns` (
   KEY `type_idx` (`typeId`,`type`),
   KEY `zone_idx` (`areaId`),
   KEY `guid` (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2544,26 +2544,26 @@ CREATE TABLE `aowow_spell` (
   `iconIdAlt` smallint(5) unsigned NOT NULL DEFAULT 0,
   `rankNo` tinyint(3) unsigned NOT NULL,
   `spellVisualId` smallint(5) unsigned NOT NULL,
-  `name_loc0` varchar(85) NOT NULL,
-  `name_loc2` varchar(85) NOT NULL,
-  `name_loc3` varchar(85) NOT NULL,
-  `name_loc6` varchar(91) NOT NULL,
-  `name_loc8` varchar(50) NOT NULL,
-  `rank_loc0` varchar(21) NOT NULL,
-  `rank_loc2` varchar(24) NOT NULL,
-  `rank_loc3` varchar(22) NOT NULL,
-  `rank_loc6` varchar(27) NOT NULL,
-  `rank_loc8` varchar(29) NOT NULL,
-  `description_loc0` text NOT NULL,
-  `description_loc2` text NOT NULL,
-  `description_loc3` text NOT NULL,
-  `description_loc6` text NOT NULL,
-  `description_loc8` text NOT NULL,
-  `buff_loc0` text NOT NULL,
-  `buff_loc2` text NOT NULL,
-  `buff_loc3` text NOT NULL,
-  `buff_loc6` text NOT NULL,
-  `buff_loc8` text NOT NULL,
+  `name_loc0` varchar(85) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(85) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(85) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(91) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_loc0` varchar(21) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_loc2` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_loc3` varchar(22) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_loc6` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rank_loc8` varchar(29) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `buff_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `buff_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `buff_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `buff_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `buff_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `maxTargetLevel` tinyint(3) unsigned NOT NULL,
   `spellFamilyId` tinyint(3) unsigned NOT NULL,
   `spellFamilyFlags1` int(10) unsigned NOT NULL,
@@ -2589,7 +2589,7 @@ CREATE TABLE `aowow_spell` (
   KEY `effects` (`effect1Id`,`effect2Id`,`effect3Id`),
   KEY `items` (`effect1CreateItemId`,`effect2CreateItemId`,`effect3CreateItemId`),
   KEY `iconId` (`iconId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2620,7 +2620,7 @@ CREATE TABLE `aowow_spell_sounds` (
   `missile` smallint(5) unsigned NOT NULL COMMENT 'not predicted by js',
   `impactarea` smallint(5) unsigned NOT NULL COMMENT 'not predicted by js',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='!ATTENTION!\r\nthe primary key of this table is NOT a spellId, but spellVisualId\r\n\r\ncolumn names from LANG.sound_activities';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='!ATTENTION!\r\nthe primary key of this table is NOT a spellId, but spellVisualId\r\n\r\ncolumn names from LANG.sound_activities';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2639,7 +2639,7 @@ CREATE TABLE `aowow_spelldifficulty` (
   KEY `normal25` (`normal25`),
   KEY `heroic10` (`heroic10`),
   KEY `heroic25` (`heroic25`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2651,13 +2651,13 @@ DROP TABLE IF EXISTS `aowow_spellfocusobject`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_spellfocusobject` (
   `id` smallint(5) unsigned NOT NULL,
-  `name_loc0` varchar(83) NOT NULL,
-  `name_loc2` varchar(89) NOT NULL,
-  `name_loc3` varchar(95) NOT NULL,
-  `name_loc6` varchar(90) NOT NULL,
-  `name_loc8` varchar(91) NOT NULL,
+  `name_loc0` varchar(83) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(89) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(95) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(90) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(91) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2675,7 +2675,7 @@ CREATE TABLE `aowow_spelloverride` (
   `spellId4` bigint(20) NOT NULL,
   `spellId5` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2692,13 +2692,13 @@ CREATE TABLE `aowow_spellrange` (
   `rangeMaxHostile` smallint(5) unsigned NOT NULL,
   `rangeMaxFriend` smallint(5) unsigned NOT NULL,
   `rangeType` tinyint(3) unsigned NOT NULL,
-  `name_loc0` varchar(27) NOT NULL,
-  `name_loc2` varchar(27) NOT NULL,
-  `name_loc3` varchar(27) NOT NULL,
-  `name_loc6` varchar(27) NOT NULL,
-  `name_loc8` varchar(27) NOT NULL,
+  `name_loc0` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(27) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2710,9 +2710,9 @@ DROP TABLE IF EXISTS `aowow_spellvariables`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_spellvariables` (
   `id` tinyint(3) unsigned NOT NULL,
-  `vars` varchar(368) NOT NULL,
+  `vars` varchar(368) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2734,7 +2734,7 @@ CREATE TABLE `aowow_talents` (
   PRIMARY KEY (`id`,`rank`),
   KEY `spell` (`spell`),
   KEY `class` (`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2753,13 +2753,13 @@ CREATE TABLE `aowow_taxinodes` (
   `typeId` mediumint(9) unsigned NOT NULL,
   `reactA` tinyint(4) NOT NULL,
   `reactH` tinyint(4) NOT NULL,
-  `name_loc0` varchar(46) NOT NULL,
-  `name_loc2` varchar(62) NOT NULL,
-  `name_loc3` varchar(55) NOT NULL,
-  `name_loc6` varchar(63) NOT NULL,
-  `name_loc8` varchar(50) NOT NULL,
+  `name_loc0` varchar(46) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(62) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(55) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(63) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2774,7 +2774,7 @@ CREATE TABLE `aowow_taxipath` (
   `startNodeId` smallint(6) unsigned NOT NULL,
   `endNodeId` smallint(6) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2794,19 +2794,19 @@ CREATE TABLE `aowow_titles` (
   `src12Ext` mediumint(9) unsigned NOT NULL,
   `eventId` smallint(5) unsigned NOT NULL,
   `bitIdx` tinyint(3) unsigned NOT NULL,
-  `male_loc0` varchar(33) NOT NULL,
-  `male_loc2` varchar(35) NOT NULL,
-  `male_loc3` varchar(37) NOT NULL,
-  `male_loc6` varchar(34) NOT NULL,
-  `male_loc8` varchar(37) NOT NULL,
-  `female_loc0` varchar(33) NOT NULL,
-  `female_loc2` varchar(35) NOT NULL,
-  `female_loc3` varchar(39) NOT NULL,
-  `female_loc6` varchar(35) NOT NULL,
-  `female_loc8` varchar(41) NOT NULL,
+  `male_loc0` varchar(33) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `male_loc2` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `male_loc3` varchar(37) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `male_loc6` varchar(34) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `male_loc8` varchar(37) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `female_loc0` varchar(33) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `female_loc2` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `female_loc3` varchar(39) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `female_loc6` varchar(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `female_loc8` varchar(41) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `bitIdx` (`bitIdx`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2818,15 +2818,15 @@ DROP TABLE IF EXISTS `aowow_totemcategory`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_totemcategory` (
   `id` tinyint(3) unsigned NOT NULL,
-  `name_loc0` varchar(29) NOT NULL,
-  `name_loc2` varchar(45) NOT NULL,
-  `name_loc3` varchar(31) NOT NULL,
-  `name_loc6` varchar(36) NOT NULL,
-  `name_loc8` varchar(69) NOT NULL,
+  `name_loc0` varchar(29) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc2` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(31) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(36) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(69) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category` tinyint(3) unsigned NOT NULL,
   `categoryMask` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2842,8 +2842,8 @@ CREATE TABLE `aowow_videos` (
   `typeId` mediumint(9) NOT NULL,
   `userIdOwner` int(10) unsigned DEFAULT NULL,
   `date` int(32) NOT NULL,
-  `videoId` varchar(12) NOT NULL,
-  `caption` text DEFAULT NULL,
+  `videoId` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `caption` mediumtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` int(8) NOT NULL,
   `userIdApprove` int(10) unsigned DEFAULT NULL,
   `userIdeDelete` int(10) unsigned DEFAULT NULL,
@@ -2851,7 +2851,7 @@ CREATE TABLE `aowow_videos` (
   KEY `type` (`type`,`typeId`),
   KEY `FK_acc_vi` (`userIdOwner`),
   CONSTRAINT `FK_acc_vi` FOREIGN KEY (`userIdOwner`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2880,18 +2880,18 @@ CREATE TABLE `aowow_zones` (
   `levelHeroic` tinyint(3) unsigned NOT NULL,
   `levelMin` tinyint(4) unsigned NOT NULL,
   `levelMax` tinyint(4) unsigned NOT NULL,
-  `attunementsN` text NOT NULL COMMENT 'space separated; type:typeId',
-  `attunementsH` text NOT NULL COMMENT 'space separated; type:typeId',
+  `attunementsN` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space separated; type:typeId',
+  `attunementsH` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space separated; type:typeId',
   `parentAreaId` smallint(5) unsigned NOT NULL,
   `parentX` float NOT NULL,
   `parentY` float NOT NULL,
-  `name_loc0` varchar(120) NOT NULL COMMENT 'Map Name',
-  `name_loc2` varchar(120) NOT NULL,
-  `name_loc3` varchar(120) NOT NULL,
-  `name_loc6` varchar(120) NOT NULL,
-  `name_loc8` varchar(120) NOT NULL,
+  `name_loc0` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Map Name',
+  `name_loc2` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc3` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc6` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name_loc8` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2911,7 +2911,7 @@ CREATE TABLE `aowow_zones_sounds` (
   `worldStateId` smallint(5) unsigned NOT NULL,
   `worldStateValue` smallint(6) NOT NULL,
   KEY `id` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -2923,7 +2923,7 @@ CREATE TABLE `aowow_zones_sounds` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-26 18:57:18
+-- Dump completed on 2018-03-28 11:47:47
 -- MySQL dump 10.16  Distrib 10.2.10-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: aowow
@@ -3006,7 +3006,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1522146995,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1522230799,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

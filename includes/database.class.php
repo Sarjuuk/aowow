@@ -32,7 +32,7 @@ class DB
             die('Failed to connect to database.');
 
         $interface->setErrorHandler(['DB', 'errorHandler']);
-        $interface->query('SET NAMES ?', 'utf8');
+        $interface->query('SET NAMES ?', 'utf8mb4');
         if ($options['prefix'])
             $interface->setIdentPrefix($options['prefix']);
 
