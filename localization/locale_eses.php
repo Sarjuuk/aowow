@@ -172,7 +172,10 @@ $lang = array(
             'profile'   => "Este personaje no existe o no está aun en la base de datos.",
         ),
         'dummyNPCs'     => array(
-            100001 => "Batalla de naves de guerra", 200001 => "Bestias de Rasganorte", 200002 => "Campeones de facciones", 200003 => "Gemelas Val'kyr"
+            100001 => "Batalla de naves de guerra",
+            200001 => "Bestias de Rasganorte", 200002 => "Campeones de facciones", 200003 => "Gemelas Val'kyr",
+            300001 => "Los Cuatro Jinetes",
+            400001 => "La Asamblea de Hierro"
         ),
     ),
     'screenshot' => array(

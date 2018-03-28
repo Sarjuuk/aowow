@@ -116,21 +116,27 @@ class ProfilePage extends GenericPage
 
         // as demanded by the raid activity tracker
         $bossIds = array(
-/*          Halion                                                                                                                */
+/*          Halion                                                                                                                            */
 /* ruby */  39863,
-/*          Valanar, Lana'thel, Saurfang, Festergut, Deathwisper, Marrowgar, Putricide, Rotface, Sindragosa, Valithria, Lich King */
+/*          Valanar, Lana'thel, Saurfang, Festergut, Deathwisper, Marrowgar, Putricide, Rotface, Sindragosa, Valithria, Lich King             */
 /* icc  */  37970,   37955,     37813,    36626,     36855,       36612,     36678,     36627,   36853,      36789,     36597,
-/*          Jaraxxus, Anub'arak                                                                                                   */
+/*          Jaraxxus, Anub'arak                                                                                                               */
 /* toc  */  34780,    34564,
-/*          Onyxia                                                                                                                */
-/* ony  */  10184
+/*          Onyxia                                                                                                                            */
+/* ony  */  10184,
+/*          Flame Levi, Ignis, Razorscale, XT-002, Kologarn, Auriaya, Freya, Hodir, Mimiron, Thorim, Vezaxx, Yogg,  Algalon                   */
+/* uld  */  33113,      33118, 33186,      33293,  32930     33515,   32906, 32845, 33350,   32864,  33271,  33288, 32871
+/*          Anub,  Faerlina, Maexxna, Noth,  Heigan, Loatheb, Razuvious, Gothik, Patchwerk, Grobbulus, Gluth, Thaddius, Sapphiron, Kel'Thuzad */
+/* nax  */  15956, 15953,    15952,   15954, 15936,  16011,   16061,     16060,  16028,     15931,     15932, 15928,    15989,     15990
         );
         // some events have no singular creature to point to .. create dummy entries
         $dummyNPCs = [TYPE_NPC => array(
-            100001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 100001)],
-            200001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200001)],
-            200002 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200002)],
-            200003 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200003)]
+            100001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 100001)], // Gunship Battle
+            200001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200001)], // Northrend Beasts
+            200002 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200002)], // Faction Champions
+            200003 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200003)], // Val'kyr Twins
+            300001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 300001)], // The Four Horsemen
+            400001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 400001)]  // Assembly of Iron
         )];
 
         $this->extendGlobalIds(TYPE_NPC, $bossIds);

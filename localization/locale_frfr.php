@@ -172,7 +172,10 @@ $lang = array(
             'profile'   => "[This character doesn't exist or is not yet in the database.]"
         ),
         'dummyNPCs'     => array(
-            100001 => "Bataille des canonnières", 200001 => "Bêtes du Norfendre", 200002 => "Champions de faction", 200003 => "Les jumelles val'kyrs"
+            100001 => "Bataille des canonnières",
+            200001 => "Bêtes du Norfendre", 200002 => "Champions de faction", 200003 => "Les jumelles val'kyrs",
+            300001 => "Les Quatre Cavaliers",
+            400001 => "Mande-foudre Brundir"
         ),
     ),
     'screenshot' => array(

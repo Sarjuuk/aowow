@@ -172,7 +172,10 @@ $lang = array(
             'profile'   => "This character doesn't exist or is not yet in the database."
         ),
         'dummyNPCs'     => array(
-            100001 => "Gunship Battle", 200001 => "Northrend Beasts", 200002 => "Faction Champions", 200003 => "Val'kyr Twins"
+            100001 => "Gunship Battle",
+            200001 => "Northrend Beasts", 200002 => "Faction Champions", 200003 => "Val'kyr Twins",
+            300001 => "The Four Horsemen",
+            400001 => "Assembly of Iron"
         ),
     ),
     'screenshot' => array(
