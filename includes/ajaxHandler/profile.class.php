@@ -14,6 +14,7 @@ class AjaxProfile extends AjaxHandler
         'size'       => [FILTER_SANITIZE_STRING, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
         'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']],
         'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']],
+        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']]
     );
 
     protected $_post        = array(
@@ -714,6 +715,13 @@ class AjaxProfile extends AjaxHandler
         return null;
     }
 
+    protected function checkUser($val)
+    {
+        if (User::isValidName($val))
+            return $val
+
+        return null;
+    }
 }
 
 ?>

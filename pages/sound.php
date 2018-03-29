@@ -31,6 +31,7 @@ class SoundPage extends GenericPage
             $this->cat           = 1000;
             $this->articleUrl    = 'sound&playlist';
             $this->hasComContent = false;
+            $this->mode          = CACHE_TYPE_NONE;
         }
         // regular case
         else

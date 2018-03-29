@@ -29,6 +29,9 @@ class ProfilePage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        if (!CFG_PROFILER_ENABLE)
+            $this->error();
+
         $params = array_map('urldecode', explode('.', $pageParam));
         if ($params[0])
             $params[0] = Profiler::urlize($params[0]);
@@ -106,6 +109,8 @@ class ProfilePage extends GenericPage
         }
         else if (($params && $params[0]) || !isset($_GET['new']))
             $this->notFound();
+        else if (isset($_GET['new']))
+            $this->mode = CACHE_TYPE_NONE;
     }
 
     protected function generateContent()
