@@ -6,13 +6,19 @@
 </head>
 <body class="home<?=(User::isPremium() ? ' premium-logo' : null); ?>">
     <div id="layers"></div>
-<?php if (!empty($this->featuredBox['altHomeLogo'])):  ?>
-        <style type="text/css">
-        .home-logo {
-               background: url(<?=$this->featuredBox['altHomeLogo'];?>) no-repeat center 0 !important;
-               margin-bottom: 1px !important;
-        }
-        </style>
+<?php
+if ($this->homeTitle):
+    echo "    <script>document.title = '".$this->homeTitle."';</script>\n";
+endif;
+
+if (!empty($this->featuredBox['altHomeLogo'])):
+?>
+    <style type="text/css">
+    .home-logo {
+           background: url(<?=$this->featuredBox['altHomeLogo'];?>) no-repeat center 0 !important;
+           margin-bottom: 1px !important;
+    }
+    </style>
 <?php endif; ?>
     <div class="home-wrapper">
         <h1>Aowow</h1>

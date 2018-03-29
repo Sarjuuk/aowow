@@ -12,6 +12,7 @@ class HomePage extends GenericPage
 
     protected $featuredBox = [];
     protected $oneliner    = '';
+    protected $homeTitle   = '';
 
     public function __construct()
     {
@@ -52,8 +53,8 @@ class HomePage extends GenericPage
 
     protected function generateTitle()
     {
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_home_titles WHERE active = 1 AND title_loc?d <> "" ORDER BY RAND() LIMIT 1', User::$localeId))
-            $this->title[0] .= Lang::main('colon').Util::localizedString($_, 'title');
+        if ($_ = DB::Aowow()->selectCell('SELECT title FROM ?_home_titles WHERE active = 1 AND locale = ?d ORDER BY RAND() LIMIT 1', User::$localeId))
+            $this->homeTitle = CFG_NAME.Lang::main('colon').$_;
     }
 
     protected function generatePath() {}

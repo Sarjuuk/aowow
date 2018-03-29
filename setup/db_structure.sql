@@ -913,16 +913,14 @@ DROP TABLE IF EXISTS `aowow_home_titles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_home_titles` (
-  `id` smallint(5) unsigned NOT NULL,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `editorId` int(10) unsigned DEFAULT NULL,
   `editDate` int(10) unsigned NOT NULL,
   `active` tinyint(1) unsigned NOT NULL,
-  `title_loc0` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_loc2` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_loc3` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_loc6` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `title_loc8` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `locale` tinyint(3) unsigned NOT NULL,
+  `title` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `locale_title` (`locale`,`title`),
   KEY `FK_acc_hTitles` (`editorId`),
   CONSTRAINT `FK_acc_hTitles` FOREIGN KEY (`editorId`) REFERENCES `aowow_account` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -3006,7 +3004,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1522230799,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1522321543,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3028,6 +3026,16 @@ LOCK TABLES `aowow_home_featuredbox_overlay` WRITE;
 /*!40000 ALTER TABLE `aowow_home_featuredbox_overlay` DISABLE KEYS */;
 INSERT INTO `aowow_home_featuredbox_overlay` VALUES (2,405,100,'http://example.com','example overlay','','','','');
 /*!40000 ALTER TABLE `aowow_home_featuredbox_overlay` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `aowow_home_titles`
+--
+
+LOCK TABLES `aowow_home_titles` WRITE;
+/*!40000 ALTER TABLE `aowow_home_titles` DISABLE KEYS */;
+INSERT INTO `aowow_home_titles` VALUES (1,0,1522321542,1,0,'That\'s a 50 DKP plus!'),(2,0,1522321542,1,0,'We\'ve got what you need!'),(3,0,1522321542,1,0,'You haven\'t found the secret title yet.'),(4,0,1522321542,1,0,'...and knowing is half the battle!'),(5,0,1522321542,1,0,'Good news, everyone!'),(6,0,1522321542,1,0,'+1, Insightful'),(7,0,1522321542,1,0,'More effective than a [Booterang].'),(8,0,1522321542,1,0,'There is no cow level.'),(9,0,1522321542,1,0,'We\'ve got more style than a fashion designer who knows CSS.'),(10,0,1522321542,1,3,'Eure Fertigkeit in WoW hat sich auf 450 erhöht.'),(11,0,1522321542,1,0,'If you use your mouse to search, you won\'t be able to click on Rend.'),(12,0,1522321542,1,2,'Tout est dans l\'élégance.'),(13,0,1522321542,1,2,'Rend les chargements supportables depuis 2006.'),(14,0,1522321542,1,2,'Vous allez revenir.'),(15,0,1522321542,1,2,'Base de données extraordinaire'),(16,0,1522321542,1,2,'Si vous lisez ceci, arrêtez d\'appuyer sur F5.'),(17,0,1522321542,1,3,'Und der Tag ist gerettet.'),(18,0,1522321542,1,3,'Jetzt in allen bekannten Internetzen verfügbar!'),(19,0,1522321542,1,3,'Morgens, halb drei in Nordend'),(20,0,1522321542,1,3,'Macht auch Euren Webbrowser glücklich!'),(21,0,1522321542,1,3,'Hier findet Ihr sogar Mankriks Frau.'),(22,0,1522321542,1,6,'Base de datos extraordinaria de WoW'),(23,0,1522321542,1,6,'La única cosa en la que los ninjas y los piratas estan de acuerdo.'),(24,0,1522321542,1,6,'La elegancia lo es todo.'),(25,0,1522321542,1,6,'Hace feliz a los navegadores.'),(26,0,1522321542,1,8,'Ты ещё вернёшься.'),(27,0,1522321542,1,8,'Осваивание нового босса - 45 золота на ремонт. Персональный эпический предмет - 650 золотых'),(28,0,1522321542,1,8,'Не именной. Поделитесь им с друзьями!'),(29,0,1522321542,1,8,'Если вы здесь впервые, то вам необходимо воспользоваться поиском!'),(30,0,1522321542,1,8,'Приколы Мулгора без чата в Мулгоре.'),(31,0,1522321542,1,2,'Les trois premières lettres veulent tout dire.'),(32,0,1522321542,1,2,'Trouvez la femme de Mankrik grâce à lui.'),(33,0,1522321542,1,6,'Tu habilidad con WoW se ha incrementado a 450.'),(34,0,1522321542,1,6,'Buscando uno más: Tú'),(35,0,1522321542,1,8,'Первые три буквы говорят сами за себя.'),(36,0,1522321542,1,8,'У нас больше стиля, чем у дизайнера, знающего CSS.'),(37,0,1522321542,1,0,'Preventing wipes since 2006.'),(38,0,1522321542,1,0,'Never gonna give you up. Never gonna let you down.'),(39,0,1522321542,1,0,'The closest thing to an F1 key for WoW.'),(40,0,1522321542,1,2,'Non lié. Partagez-le avec vos amis !'),(41,0,1522321542,1,2,'Votre navigateur l\'adore !'),(42,0,1522321542,1,3,'Verhindert Wipes seit 2006.'),(43,0,1522321542,1,6,'+1, Utilidad'),(44,0,1522321542,1,6,'Épico, como tu líder de facción.'),(45,0,1522321542,1,8,'Он такой один...'),(46,0,1522321542,1,8,'Если вы это читаете, то прекратите обновлять страницу.'),(47,0,1522321542,1,0,'If you are reading this, stop pressing F5.'),(48,0,1522321542,1,2,'Chasse les jours pluvieux.'),(49,0,1522321542,1,3,'+1, Hilfreich'),(50,0,1522321542,1,3,'Episch - markant - dreifach verzaubert'),(51,0,1522321542,1,8,'Работает как положено.'),(52,0,1522321542,1,0,'Flagged for awesome.'),(53,0,1522321542,1,0,'Thrall-tested, Jaina-approved.'),(54,0,1522321542,1,8,'Всё дело в элегантности.'),(55,0,1522321542,1,0,'What does it mean?'),(56,0,1522321542,1,0,'YOU ARE NOW PREPARED!'),(57,0,1522321542,1,0,'srsly'),(58,0,1522321542,1,2,'C\'est comme prétendre être malade et aller à la plage, mais pour les bases de données.'),(59,0,1522321542,1,3,'Thrall-getestet, Jaina-genehmigt'),(60,0,1522321542,1,6,'Haciendo las pantallas de carga más soportables desde el 2006'),(61,0,1522321542,1,8,'Создан быть лидером.'),(62,0,1522321542,1,0,'You\'ll say \"Wow\" every time.'),(63,0,1522321542,1,0,'Dataz! We need more dataz!'),(64,0,1522321542,1,0,'Your skill in WoW has increased to 450.'),(65,0,1522321542,1,3,'Eleganz ist alles.'),(66,0,1522321542,1,8,'+1, Полезный'),(67,0,1522321542,1,8,'Ух ты!'),(68,0,1522321542,1,0,'Sometimes there is fire. You need to not be in it.'),(69,0,1522321542,1,0,'Working as intended.'),(70,0,1522321542,1,2,'La seule chose sur laquelle les ninjas et les pirates sont d\'accord.'),(71,0,1522321542,1,3,'Nicht seelengebunden. Teilt es mit Euren Freunden!'),(72,0,1522321542,1,8,'Теперь доступен во всех известных Интернетах!'),(73,0,1522321542,1,8,'Вы получаете добычу: [Легендарное Знание]'),(74,0,1522321542,1,0,'You\'ll be back.'),(75,0,1522321542,1,0,'Epic like your faction leader.'),(76,0,1522321542,1,3,'Manchmal gibt es Feuer. Ihr dürft nicht drin stehen.'),(77,0,1522321542,1,3,'Wer das hier lesen kann, drückt zu oft F5.'),(78,0,1522321542,1,6,'¡Datos! ¡Más Datos!'),(79,0,1522321542,1,8,'НЯМ НЯМ НЯМ'),(80,0,1522321542,1,2,'Testé par Thrall, approuvé par Jaina.'),(81,0,1522321542,1,8,'Сделайте его вашей новой расовой возможностью уже сегодня!'),(82,0,1522321542,1,0,'We do math, so you don\'t have to.'),(83,0,1522321542,1,0,'OM NOM NOM'),(84,0,1522321542,1,0,'Now available on all known internets!'),(85,0,1522321542,1,0,'We brake for dataz.'),(86,0,1522321542,1,3,'Neues von der Obstverkäuferfront'),(87,0,1522321542,1,6,'Las primeras tres palabras lo dicen todo.'),(88,0,1522321542,1,8,'Это как будто сказать всем, что ты болен, а самому пойти на пляж, - только для баз данных.'),(89,0,1522321542,1,8,'Меняем семечки на данные!'),(90,0,1522321542,1,0,'It\'s all about elegance.'),(91,0,1522321542,1,0,'Never underestimate the power of the Scout\'s code.'),(92,0,1522321542,1,6,'Elimina los días lluviosos.'),(93,0,1522321542,1,0,'You just won the game.'),(94,0,1522321542,1,8,'Данные! Нам надо больше данных!'),(95,0,1522321542,1,0,'WoW Database Extraordinaire'),(96,0,1522321542,1,0,'No longer soulbound. Can now be shared with friends!'),(97,0,1522321542,1,0,'The dataz you could be using.'),(98,0,1522321542,1,8,'Превосходен, как лидер вашей фракции.'),(99,0,1522321542,1,6,'¡Regresarás!');
+/*!40000 ALTER TABLE `aowow_home_titles` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
