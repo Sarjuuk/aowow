@@ -4659,14 +4659,21 @@ function ProfilerInventory(_parent) {
 
             _mvInited = true;
         }
-        else { /* aowow: the idea of this is to directly access the swf. it just doesn't work with the ZAMviewerfp11.swf */
+        /*
+            aowow: the idea of this is to directly access the swf.
+            though ZAMviewerfp11.swf is unpredictable af
+
+            custom: try/catch; check for empty equipList
+        */
+        else {
             _swfModel = $WH.ge(_swfModel.id);
 
             if (_swfModel.clearSlots) {
                 _swfModel.setAppearance(_profile.hairstyle, _profile.haircolor, _profile.facetype, _profile.skincolor, _profile.features, _profile.haircolor);
 
-                _swfModel.clearSlots(emptySlots);
-                _swfModel.attachList(equipList);
+                try { _swfModel.clearSlots(emptySlots); } catch (x) { }
+                if (equipList.length)
+                    _swfModel.attachList(equipList);
             }
         }
     }

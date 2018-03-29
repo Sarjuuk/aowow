@@ -87,7 +87,7 @@ while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profil
         case TYPE_GUILD:
             if (!Profiler::getGuildFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(TYPE_ARENA_GUILD, $row['realmGUID'], $row['realm']);
+                $error(TYPE_GUILD, $row['realmGUID'], $row['realm']);
                 continue 2;
             }
 

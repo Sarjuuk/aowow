@@ -118,7 +118,7 @@ class GuildPage extends GenericPage
         /**************/
 
         // tab: members
-        $member = new LocalProfileList(array(['p.guild', $this->subjectGUID]));
+        $member = new LocalProfileList(array(['p.guild', $this->subjectGUID], CFG_SQL_LIMIT_NONE));
         if (!$member->error)
         {
             $this->lvTabs[] = ['profile', array(

@@ -718,7 +718,7 @@ class AjaxProfile extends AjaxHandler
     protected function checkUser($val)
     {
         if (User::isValidName($val))
-            return $val
+            return $val;
 
         return null;
     }
