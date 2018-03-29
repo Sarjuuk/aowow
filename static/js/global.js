@@ -19886,9 +19886,6 @@ var ModelViewer = new function() {
         modelType,
         equipList = [],
         optBak,
-        _w,
-        _o,
-        _z,
         modelDiv,
         raceSel1,
         raceSel2,
@@ -19896,6 +19893,7 @@ var ModelViewer = new function() {
         oldHash,
         mode,
         readExtraPound,
+        animsLoaded = false,
 
     races = [
         {id: 10, name: g_chr_races[10], model: 'bloodelf' },
@@ -19915,25 +19913,19 @@ var ModelViewer = new function() {
         {id: 1, name: LANG.female, model: 'female' }
     ];
 
-    function clear() {
-        _w.style.display = 'none';
-        _o.style.display = 'none';
-        _z.style.display = 'none';
-    }
+    function clear() { }
 
     function getRaceSex() {
         var
             race,
             sex;
 
-        if (raceSel1.style.display == '') {
-            race = (raceSel1.selectedIndex >= 0 ? raceSel1.options[raceSel1.selectedIndex].value : '');
-        }
-        else {
-            race = (raceSel2.selectedIndex >= 0 ? raceSel2.options[raceSel2.selectedIndex].value : '');
-        }
+        if (raceSel1.is(':visible'))
+            race = (raceSel1[0].selectedIndex >= 0 ? raceSel1.val() : '');
+        else
+            race = (raceSel2[0].selectedIndex >= 0 ? raceSel2.val() : '');
 
-        sex = (sexSel.selectedIndex >= 0 ? sexSel.options[sexSel.selectedIndex].value : 0);
+        sex = (sexSel[0].selectedIndex >= 0 ? sexSel.val() : 0);
 
         return { r: race, s: sex };
     }
@@ -19945,54 +19937,31 @@ var ModelViewer = new function() {
     }
 
     function render() {
-        if (mode == 2 && !f()) {
-            mode = 0;
-        }
-        if (mode == 2) {
-            var G = '<object id="3dviewer-plugin" type="application/x-zam-wowmodel" width="600" height="400"><param name="model" value="' + model + '" /><param name="modelType" value="' + modelType + '" /><param name="contentPath" value="http://static.wowhead.com/modelviewer/" />';
-            if (modelType == 16 && equipList.length) {
-                G += '<param name="equipList" value="' + equipList.join(',') + '" />';
-            }
-            G += '<param name="bgColor" value="#181818" /></object>';
-            _z.innerHTML = G;
-            _z.style.display = '';
-        }
-        else if (mode == 1) {
-            var G = '<applet id="3dviewer-java" code="org.jdesktop.applet.util.JNLPAppletLauncher" width="600" height="400" archive="http://static.wowhead.com/modelviewer/applet-launcher.jar,http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jar,http://download.java.net/media/gluegen/webstart/gluegen-rt.jar,http://download.java.net/media/java3d/webstart/release/vecmath/latest/vecmath.jar,http://static.wowhead.com/modelviewer/ModelView510.jar"><param name="jnlp_href" value="http://static.wowhead.com/modelviewer/ModelView.jnlp"><param name="codebase_lookup" value="false"><param name="cache_option" value="no"><param name="subapplet.classname" value="modelview.ModelViewerApplet"><param name="subapplet.displayname" value="Model Viewer Applet"><param name="progressbar" value="true"><param name="jnlpNumExtensions" value="1"><param name="jnlpExtension1" value="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp"><param name="contentPath" value="http://static.wowhead.com/modelviewer/"><param name="model" value="' + model + '"><param name="modelType" value="' + modelType + '">';
-            if (modelType == 16 && equipList.length) {
-                G += '<param name="equipList" value="' + equipList.join(',') + '">';
-            }
-            G += '<param name="bgColor" value="#181818"></applet>';
-            _o.innerHTML = G;
-            _o.style.display = '';
-        }
-        else {
-            var flashVars = {
-                model: model,
-                modelType: modelType,
-                // contentPath: 'http://static.wowhead.com/modelviewer/'
-                contentPath: g_staticUrl + '/modelviewer/'
-            };
+        var flashVars = {
+            model: model,
+            modelType: modelType,
+            // contentPath: 'http://static.wowhead.com/modelviewer/'
+            contentPath: g_staticUrl + '/modelviewer/'
+        };
 
-            var params = {
-                quality: 'high',
-                allowscriptaccess: 'always',
-                allowfullscreen: true,
-                menu: false,
-                bgcolor: '#181818',
-                wmode: 'direct'
-            };
+        var params = {
+            quality: 'high',
+            allowscriptaccess: 'always',
+            allowfullscreen: true,
+            menu: false,
+            bgcolor: '#181818',
+            wmode: 'direct'
+        };
 
-            var attributes = { };
+        var attributes = { };
 
-            if (modelType == 16 && equipList.length) {
-                flashVars.equipList = equipList.join(',');
-            }
-
-            // swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
-            swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
-            _w.style.display = '';
+        if (modelType == 16 && equipList.length) {
+            flashVars.equipList = equipList.join(',');
         }
+
+        // swfobject.embedSWF('http://static.wowhead.com/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", 'http://static.wowhead.com/modelviewer/expressInstall.swf', flashVars, params, attributes);
+        swfobject.embedSWF(g_staticUrl + '/modelviewer/ZAMviewerfp11.swf', 'modelviewer-generic', '600', '400', "11.0.0", g_staticUrl + '/modelviewer/expressInstall.swf', flashVars, params, attributes);
+
         var
             foo  = getRaceSex(),
             race = foo.r,
@@ -20027,6 +19996,9 @@ var ModelViewer = new function() {
             if (optBak.extraPound != null) {
                 url += ':' + optBak.extraPound;
             }
+
+            animsLoaded = false,
+
             location.replace($WH.rtrim(url, ':'));
         }
     }
@@ -20038,11 +20010,10 @@ var ModelViewer = new function() {
             sex  = foo.s;
 
         if (!race) {
-            if (sexSel.style.display == 'none') {
+            if (!sexSel.is(':visible'))
                 return;
-            }
 
-            sexSel.style.display = 'none';
+            sexSel.hide();
 
             model = equipList[1];
             switch (optBak.slot) {
@@ -20057,15 +20028,12 @@ var ModelViewer = new function() {
             }
         }
         else {
-            if (sexSel.style.display == 'none') {
-                sexSel.style.display = '';
-            }
+            if (!sexSel.is(':visible'))
+                sexSel.show();
 
-            var foo = function(x) {
-                return x.id;
-            };
+            var foo = function(x) { return x.id; };
             var raceIndex = $WH.in_array(races, race, foo);
-            var sexIndex = $WH.in_array(sexes, sex, foo);
+            var sexIndex = $WH.in_array(sexes, sex,   foo);
 
             if (raceIndex != -1 && sexIndex != -1) {
                 model = races[raceIndex].model + sexes[sexIndex].model;
@@ -20079,25 +20047,50 @@ var ModelViewer = new function() {
         render();
     }
 
-    function j(newMode) {
-        if (newMode == mode) {
+    function onAnimationChange() {
+        var viewer = $('#modelviewer-generic');
+        if (viewer.length == 0)
+            return;
+        viewer = viewer[0];
+
+        var animList = $('select', animDiv);
+        if (animList.val() && viewer.isLoaded && viewer.isLoaded())
+            viewer.setAnimation(animList.val());
+    }
+
+    function onAnimationMouseover() {
+        if (animsLoaded)
+            return;
+
+        var viewer = $('#modelviewer-generic');
+        if (viewer.length == 0)
+            return;
+        viewer = viewer[0];
+
+        var animList = $('select', animDiv);
+        animList.empty();
+        if (!viewer.isLoaded || !viewer.isLoaded()) {
+            animList.append($('<option/>', { text: LANG.tooltip_loading, val: 0 }));
             return;
         }
 
-        g_setSelectedLink(this, 'modelviewer-mode');
-
-        clear();
-
-        if (mode == null) {
-            mode = newMode;
-            setTimeout(render, 50);
+        var anims = {};
+        var numAnims = viewer.getNumAnimations();
+        for(var i = 0; i < numAnims; ++i) {
+            var a = viewer.getAnimation(i);
+            if(a && a != 'EmoteUseStanding')
+                anims[a] = 1;
         }
-        else {
-            mode = newMode;
-            $WH.sc('modelviewer_mode', 7, newMode, '/', location.hostname);
-            // $WH.sc('modelviewer_mode', 7, newMode, '/', '.wowhead.com');
-            render();
-        }
+
+        var animArray = [];
+        for (var a in anims)
+            animArray.push(a);
+        animArray.sort();
+
+        for (var i = 0; i < animArray.length; ++i)
+            animList.append($('<option/>', { text: animArray[i], val: animArray[i] }));
+
+        animsLoaded = true;
     }
 
     function initRaceSex(allowNoRace, opt) {
@@ -20112,11 +20105,11 @@ var ModelViewer = new function() {
             race = opt.race;
             sex = opt.sex;
 
-            modelDiv.style.display = 'none';
+            modelDiv.hide();
             allowNoRace = 0;
         }
         else {
-            modelDiv.style.display = '';
+            modelDiv.show();
         }
 
         if (race == -1 && sex == -1) {
@@ -20126,7 +20119,7 @@ var ModelViewer = new function() {
                     if (isRaceSexValid(matches[1], matches[2])) {
                         race = matches[1];
                         sex  = matches[2];
-                        sexSel.style.display = '';
+                        sexSel.show();
                     }
                 }
             }
@@ -20136,12 +20129,11 @@ var ModelViewer = new function() {
             sel    = raceSel1;
             offset = 1;
 
-            raceSel1.style.display = '';
-            raceSel1.selectedIndex = -1;
-            raceSel2.style.display = 'none';
-            if (sex == -1) {
-                sexSel.style.display = 'none';
-            }
+            raceSel1.show();
+            raceSel1[0].selectedIndex = -1;
+            raceSel2.hide();
+            if (sex == -1)
+                sexSel.hide();
         }
         else {
             if (race == -1 && sex == -1) {
@@ -20181,22 +20173,19 @@ var ModelViewer = new function() {
             sel    = raceSel2;
             offset = 0;
 
-            raceSel1.style.display = 'none';
-            raceSel2.style.display = '';
-            sexSel.style.display   = '';
+            raceSel1.hide();
+            raceSel2.show();
+            sexSel.show();
         }
 
         if (sex != -1) {
-            sexSel.selectedIndex = sex;
+            sexSel[0].selectedIndex = sex;
         }
 
         if (race != -1 && sex != -1) {
-            var foo = function(x) {
-                return x.id;
-            };
-
+            var foo = function(x) { return x.id; };
             var raceIndex = $WH.in_array(races, race, foo);
-            var sexIndex  = $WH.in_array(sexes, sex, foo);
+            var sexIndex  = $WH.in_array(sexes, sex,  foo);
 
             if (raceIndex != -1 && sexIndex != -1) {
                 model = races[raceIndex].model + sexes[sexIndex].model;
@@ -20204,21 +20193,10 @@ var ModelViewer = new function() {
 
                 raceIndex += offset;
 
-                sel.selectedIndex = raceIndex;
-                sexSel.selectedIndex = sexIndex;
+                sel[0].selectedIndex = raceIndex;
+                sexSel[0].selectedIndex = sexIndex;
             }
         }
-    }
-
-    function f() {
-        var E = navigator.mimeTypes['application/x-zam-wowmodel'];
-        if (E) {
-            var D = E.enabledPlugin;
-            if (D) {
-                return true
-            }
-        }
-        return false
     }
 
     function onHide() {
@@ -20251,165 +20229,129 @@ var ModelViewer = new function() {
         if (first) {
             dest.className = 'modelviewer';
             var screen = $WH.ce('div');
-            _w = $WH.ce('div');
-            _o = $WH.ce('div');
-            _z = $WH.ce('div');
             var flashDiv = $WH.ce('div');
             flashDiv.id = 'modelviewer-generic';
-            $WH.ae(_w, flashDiv);
+            $WH.ae(screen, flashDiv);
             screen.className = 'modelviewer-screen';
-            _w.style.display = _o.style.display = _z.style.display = 'none';
-            $WH.ae(screen, _w);
-            $WH.ae(screen, _o);
-            $WH.ae(screen, _z);
             var screenbg = $WH.ce('div');
             screenbg.style.backgroundColor = '#181818';
             screenbg.style.margin = '0';
             $WH.ae(screenbg, screen);
             $WH.ae(dest, screenbg);
-            G = $WH.ce('a'),
-            E = $WH.ce('a');
-            G.className = 'modelviewer-help';
-            G.href = '?help=modelviewer';
-            G.target = '_blank';
-            $WH.ae(G, $WH.ce('span'));
-            E.className = 'modelviewer-close';
-            E.href = 'javascript:;';
-            E.onclick = Lightbox.hide;
-            $WH.ae(E, $WH.ce('span'));
-            $WH.ae(dest, E);
-            $WH.ae(dest, G);
-            var N = $WH.ce('div'),
-            F = $WH.ce('span'),
-            G = $WH.ce('a'),
-            E = $WH.ce('a');
-            N.className = 'modelviewer-quality';
-            G.href = E.href = 'javascript:;';
-            $WH.ae(G, $WH.ct('Flash'));
-            $WH.ae(E, $WH.ct('Java'));
-            G.onclick = j.bind(G, 0);
-            E.onclick = j.bind(E, 1);
-            $WH.ae(F, G);
-            $WH.ae(F, $WH.ct(' ' + String.fromCharCode(160)));
-            $WH.ae(F, E);
-            if (f()) {
-                var D = $WH.ce('a');
-                D.href = 'javascript:;';
-                $WH.ae(D, $WH.ct('Plugin'));
-                D.onclick = j.bind(D, 2);
-                $WH.ae(F, $WH.ct(' ' + String.fromCharCode(160)));
-                $WH.ae(F, D)
-            }
-            $WH.ae(N, $WH.ce('div'));
-            $WH.ae(N, F);
-            $WH.ae(dest, N);
 
-            modelDiv = $WH.ce('div');
-            modelDiv.className = 'modelviewer-model';
+            dest = $(dest);
 
-            var foo = function(a, b) {
-                return $WH.strcmp(a.name, b.name);
-            };
+            var leftDiv = $('<div/>', { css: { 'float': 'left' } });
 
+            animDiv = $('<div/>', { 'class': 'modelviewer-animation' });
+            var v = $('<var/>', { text: LANG.animation });
+            animDiv.append(v);
+
+            var select = $('<select/>', { change: onAnimationChange, mouseenter: onAnimationMouseover });
+            select.append($('<option/>', { text: LANG.dialog_mouseovertoload }));
+            animDiv.append(select);
+
+            dest.append(animDiv);
+
+            var a1 = $('<a/>', { 'class': 'modelviewer-help', href: '?help=modelviewer', target: '_blank' }),
+                a2 = $('<a/>', { 'class': 'modelviewer-close', href: 'javascript:;', click: Lightbox.hide });
+
+            a1.append($('<span/>'));
+            a2.append($('<span/>'));
+
+            modelDiv = $('<div/>', { 'class': 'modelviewer-model' });
+
+            var foo = function(a, b) { return $WH.strcmp(a.name, b.name); };
             races.sort(foo);
             sexes.sort(foo);
 
-            raceSel1 = $WH.ce('select');
-            raceSel2 = $WH.ce('select');
-            sexSel   = $WH.ce('select');
-            raceSel1.onchange = raceSel2.onchange = sexSel.onchange = onSelChange;
+            raceSel1 = $('<select/>', { change: onSelChange });
+            raceSel2 = $('<select/>', { change: onSelChange });
+            sexSel   = $('<select/>', { change: onSelChange });
 
-            $WH.ae(raceSel1, $WH.ce('option'));
-            for (var i = 0, len = races.length; i < len; ++i) {
-                var o = $WH.ce('option');
-                o.value = races[i].id;
-                $WH.ae(o, $WH.ct(races[i].name));
-                $WH.ae(raceSel1, o);
+            raceSel1.append($('<option/>'));
+            for(var i = 0, len = races.length; i < len; ++i)
+            {
+                var o = $('<option/>', { val: races[i].id, text: races[i].name });
+                raceSel1.append(o);
+            }
+            for(var i = 0, len = races.length; i < len; ++i)
+            {
+                var o = $('<option/>', { val: races[i].id, text: races[i].name });
+                raceSel2.append(o);
             }
 
-            for (var i = 0, len = races.length; i < len; ++i) {
-                var o = $WH.ce('option');
-                o.value = races[i].id;
-                $WH.ae(o, $WH.ct(races[i].name));
-                $WH.ae(raceSel2, o);
+            for(var i = 0, len = sexes.length; i < len; ++i)
+            {
+                var o = $('<option/>', { val: sexes[i].id, text: sexes[i].name });
+                sexSel.append(o);
             }
+            sexSel.hide();
 
-            for (var i = 0, len = sexes.length; i < len; ++i) {
-                var o = $WH.ce('option');
-                o.value = sexes[i].id;
-                $WH.ae(o, $WH.ct(sexes[i].name));
-                $WH.ae(sexSel, o);
-            }
-            sexSel.style.display = 'none';
-            $WH.ae(modelDiv, $WH.ce('div'));
-            $WH.ae(modelDiv, raceSel1);
-            $WH.ae(modelDiv, raceSel2);
-            $WH.ae(modelDiv, sexSel);
-            $WH.ae(dest, modelDiv);
-            d = $WH.ce('div');
-            d.className = 'clear';
-            $WH.ae(dest, d);
+            modelDiv.append($('<div/>'));
+            modelDiv.append(raceSel1);
+            modelDiv.append(raceSel2);
+            modelDiv.append(sexSel);
+
+            leftDiv.append(modelDiv);
+
+            var sp = $('<span/>');
+            sp.append('<small>Drag to rotate<br />Control (Windows) / Cmd (Mac) + drag to pan</small>');
+            leftDiv.append(sp);
+
+            dest.append(leftDiv);
+            dest.append(a2);
+            dest.append(a1);
+
+            d = $('<div/>', { 'class': 'clear' });
+            dest.append(d);
         }
 
         switch (opt.type) {
-        case 1: // NPC
-            modelDiv.style.display = 'none';
-            if (opt.humanoid) {
-                modelType = 32; // Humanoid NPC
-            }
-            else {
-                modelType = 8; // NPC
-            }
-            model = opt.displayId;
-            break;
-        case 2: // Object
-            modelDiv.style.display = 'none';
-            modelType = 64; // Object
-            model = opt.displayId;
-            break;
-        case 3: // Item
-            equipList = [opt.slot, opt.displayId];
-            if ($WH.in_array([4, 5, 6, 7, 8, 9, 10, 16, 19, 20], opt.slot) != -1) {
-                initRaceSex(0, opt)
-            }
-            else {
-                switch (opt.slot) {
-                case 1:
-                    modelType = 2; // Helm
-                    break;
-                case 3:
-                    modelType = 4; // Shoulder
-                    break;
-                default:
-                    modelType = 1; // Item
+            case 1: // NPC
+                modelDiv.hide();
+                if (opt.humanoid) {
+                    modelType = 32; // Humanoid NPC
                 }
-
+                else {
+                    modelType = 8; // NPC
+                }
                 model = opt.displayId;
-
-                initRaceSex(1, opt);
-            }
-            break;
-        case 4: // Item Set
-            equipList = opt.equipList;
-            initRaceSex(0, opt)
-        }
-
-        if (first) {
-            if ($WH.gc('modelviewer_mode') == '2' && f()) {
-                D.onclick()
-            } else {
-                if ($WH.gc('modelviewer_mode') == '1') {
-                    E.onclick()
-                } else {
-                    G.onclick()
+                break;
+            case 2: // Object
+                modelDiv.hide();
+                modelType = 64; // Object
+                model = opt.displayId;
+                break;
+            case 3: // Item
+                equipList = [opt.slot, opt.displayId];
+                if ($WH.in_array([4, 5, 6, 7, 8, 9, 10, 16, 19, 20], opt.slot) != -1) {
+                    initRaceSex(0, opt)
                 }
-            }
-        }
-        else {
+                else {
+                    switch (opt.slot) {
+                    case 1:
+                        modelType = 2; // Helm
+                        break;
+                    case 3:
+                        modelType = 4; // Shoulder
+                        break;
+                    default:
+                        modelType = 1; // Item
+                    }
 
-            clear();
-            setTimeout(render, 1);
+                    model = opt.displayId;
+
+                    initRaceSex(1, opt);
+                }
+                break;
+            case 4: // Item Set
+                equipList = opt.equipList;
+                initRaceSex(0, opt)
         }
+
+        clear();
+        setTimeout(render, 1);
 
         var trackCode = '';
         if (opt.fromTag)

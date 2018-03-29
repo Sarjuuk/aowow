@@ -2534,36 +2534,9 @@ div.modelviewer-screen {
     margin: 0 auto;
 }
 
-div.modelviewer-quality {
-    margin: 10px 10px 5px 0;
-    line-height: 22px;
-    height: 22px;
-    display: block;
-    float: left;
-}
-
-div.modelviewer-quality var {
-    float: left;
-    height: 22px;
-    display: block;
-    color: #a0a0a0;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-size: 15px;
-    font-style: normal;
-    margin-right: 10px;
-    font-family: Tahoma, sans-serif;
-}
-
-div.modelviewer-quality span {
-    float: left;
-    display: block;
-    line-height: 22px;
-}
-
 div.modelviewer-model {
-/*  clear: left;
-    padding: 5px 0 10px 0; */
+    clear: left;
+    padding: 5px 0 10px 0;
     padding: 10px 0;
 }
 
@@ -2586,13 +2559,16 @@ a.modelviewer-help {
     display: block;
     padding: 10px 0 10px 10px;
     margin-right: 10px;
+    margin-top:5px;
 }
 
 a.modelviewer-close {
     float: right;
     display: block;
     padding: 10px 0 10px 10px;
-}
+    clear:right;
+    margin-top:5px;
+ }
 
 /**********/
 /* LAYOUT */

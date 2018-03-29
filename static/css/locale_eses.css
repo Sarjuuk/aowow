@@ -3,16 +3,7 @@
     width, left, background-position values may need adjustment!
 */
 
-div.modelviewer-quality div {
-    float: left;
-    width: 70px;
-    height: 22px;
-    margin-right: 10px;
-    background: url(../images/eses/modelviewer-picshures.gif) left center no-repeat;
-}
-
 div.modelviewer-model div {
-    margin-left: 40px;
     margin-right: 5px;
     float: left;
     width: 80px;
