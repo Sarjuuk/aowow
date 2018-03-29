@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ZonePage extends GenericPage
 {
-    use detailPage;
+    use TrDetailPage;
 
     protected $path      = [0, 6];
     protected $tabId     = 0;
