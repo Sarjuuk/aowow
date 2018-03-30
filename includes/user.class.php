@@ -648,6 +648,36 @@ class User
 
         return $data;
     }
+
+    public static function getFavorites()
+    {
+        if (!self::$id)
+            return [];
+
+        $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_favorites WHERE `userId` = ?d', self::$id);
+        if (!$res)
+            return [];
+
+        $data = [];
+        foreach ($res as $type => $ids)
+        {
+            if (empty(Util::$typeClasses[$type]))
+                continue;
+
+            $tc = new Util::$typeClasses[$type]([['id', array_values($ids)]]);
+            if ($tc->error)
+                continue;
+
+            $entities = [];
+            foreach ($tc->iterate() as $id => $__)
+                $entities[] = [$id, $tc->getField('name', true)];
+
+            if ($entities)
+                $data[] = ['id' => $type, 'entities' => $entities];
+        }
+
+        return $data;
+    }
 }
 
 ?>

@@ -5,17 +5,20 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxAccount extends AjaxHandler
 {
-    protected $validParams = ['exclude', 'weightscales'];
+    protected $validParams = ['exclude', 'weightscales', 'favorites'];
     protected $_post       = array(
-        'groups' => [FILTER_SANITIZE_NUMBER_INT, null],
-        'save'   => [FILTER_SANITIZE_NUMBER_INT, null],
-        'delete' => [FILTER_SANITIZE_NUMBER_INT, null],
-        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
-        'name'   => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
-        'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
-        'reset'  => [FILTER_SANITIZE_NUMBER_INT, null],
-        'mode'   => [FILTER_SANITIZE_NUMBER_INT, null],
-        'type'   => [FILTER_SANITIZE_NUMBER_INT, null],
+        'groups'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'save'       => [FILTER_SANITIZE_NUMBER_INT, null],
+        'delete'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'id'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
+        'name'       => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
+        'scale'      => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
+        'reset'      => [FILTER_SANITIZE_NUMBER_INT, null],
+        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null],
+        'type'       => [FILTER_SANITIZE_NUMBER_INT, null],
+        'add'        => [FILTER_SANITIZE_NUMBER_INT, null],
+        'remove'     => [FILTER_SANITIZE_NUMBER_INT, null],
+     // 'sessionKey' => [FILTER_SANITIZE_NUMBER_INT, null]
     );
     protected $_get        = array(
         'locale' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkLocale']]
@@ -36,13 +39,12 @@ class AjaxAccount extends AjaxHandler
             $this->handler = 'handleExclude';
         else if ($this->params[0] == 'weightscales')
             $this->handler = 'handleWeightscales';
+        else if ($this->params[0] == 'favorites')
+            $this->handler = 'handleFavorites';
     }
 
     protected function handleExclude()
     {
-        if (!User::$id)
-            return;
-
         if ($this->_post['mode'] == 1)                      // directly set exludes
         {
             $type = $this->_post['type'];
@@ -119,6 +121,29 @@ class AjaxAccount extends AjaxHandler
             DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'][0], User::$id);
         else
             return 0;
+    }
+
+    protected function handleFavorites()
+    {
+        // omit usage of sessionKey
+        if (count($this->_post['id']) != 1 || empty($this->_post['id'][0]))
+            return;
+
+        $typeId = $this->_post['id'][0];
+
+        if ($type = $this->_post['add'])
+        {
+            if (empty(Util::$typeClasses[$type]))
+                return;
+
+            $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
+            if ($tc->error)
+                return;
+
+            DB::Aowow()->query('INSERT INTO ?_account_favorites (`userId`, `type`, `typeId`) VALUES (?d, ?d, ?d)', User::$id, $type, $typeId);
+        }
+        else if ($type = $this->_post['remove'])
+            DB::Aowow()->query('DELETE FROM ?_account_favorites WHERE `userId` = ?d AND `type` = ?d AND `typeId` = ?d', User::$id, $type, $typeId);
     }
 
     protected function checkScale($val)

@@ -3282,6 +3282,13 @@ var LANG = {
     myaccount_purgefailed:   "Löschen fehlgeschlagen :(",
     myaccount_purgesuccess:  "Bekanntmachungsdaten wurden erfolgreich gelöscht!",
 
+    favorites:           "Favoriten",
+    clicktologin:        "Klicken zum Einloggen",
+    favorites_login:     "Melden Sie sich an, um Ihre Favoriten in einem benutzerdefinierten Menü zu speichern!",
+    favorites_duplicate: "Diese(s/r) %s wurde bereits favorisiert!",
+    addtofavorites:      "Zu Favoriten hinzufügen",
+    removefromfavorites: "Aus Favoriten entfernen",
+
     types: {
           1: ["NPC",             "NPC" ,             "NPCs",             "NPCs"],
           2: ["Objekt",          "Objekt",           "Objekte",          "Objekte"],

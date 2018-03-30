@@ -107,6 +107,23 @@ CREATE TABLE `aowow_account_cookies` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_account_favorites`
+--
+
+DROP TABLE IF EXISTS `aowow_account_favorites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_account_favorites` (
+  `userId` int(11) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `typeId` mediumint(8) unsigned NOT NULL,
+  UNIQUE INDEX `userId_type_typeId` (`userId`, `type`, `typeId`),
+  KEY `userId` (`userId`),
+  CONSTRAINT `FK_acc_favorites` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_account_excludes`
 --
 
@@ -3004,7 +3021,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1522321543,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1522421325,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

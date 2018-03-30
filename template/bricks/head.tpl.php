@@ -52,7 +52,13 @@ endforeach;
 ?>
     <script type="text/javascript">
         var g_user = <?=Util::toJSON($this->gUser, JSON_UNESCAPED_UNICODE); ?>;
+<?php
+if ($this->gFavorites):
+    echo "        g_favorites = ".Util::toJSON($this->gFavorites).";\n";
+endif;
+?>
     </script>
+
 <?php
 if (CFG_ANALYTICS_USER):
 ?>

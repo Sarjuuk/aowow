@@ -265,7 +265,8 @@ class GenericPage
             if ($ahl = DB::Aowow()->selectCell('SELECT altHeaderLogo FROM ?_home_featuredbox WHERE ?d BETWEEN startDate AND endDate ORDER BY id DESC', time()))
                 $this->headerLogo = Util::defStatic($ahl);
 
-            $this->gUser   = User::getUserGlobals();
+            $this->gUser      = User::getUserGlobals();
+            $this->gFavorites = User::getFavorites();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
 
             if (!$this->isValidPage())

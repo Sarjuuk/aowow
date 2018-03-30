@@ -3330,6 +3330,13 @@ var LANG = {
     myaccount_purgefailed:   "Purge failed :(",
     myaccount_purgesuccess:  "Announcement data has been successfully purged!",
 
+    favorites:           "Favorites",
+    clicktologin:        "Click to log in",
+    favorites_login:     "Log in to save your favorites to a custom menu!",
+    favorites_duplicate: "This %s is already favorited!",
+    addtofavorites:      "Add to Favorites",
+    removefromfavorites: "Remove from Favorites",
+
     types: {
           1: ["NPC",         "NPC" ,         "NPCs",         "NPCs"],
           2: ["Object",      "object",       "Objects",      "objects"],

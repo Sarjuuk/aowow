@@ -4320,3 +4320,21 @@ input.button-copy {
 input.button-copy:hover {
     background-color: #444;
 }
+
+/* favicon fa-replacement custom */
+.fav-star {
+    cursor:pointer;
+    display: inline-block;
+    width: 22px;
+    height: 20px;
+    background: url(../images/icons/fav-star.png) 0px center no-repeat;
+    margin-left:10px;
+}
+
+.fav-star-0:hover {
+    background-position: -32px center;
+}
+
+.fav-star-1 {
+    background-position: -65px center;
+}

@@ -3283,6 +3283,13 @@ var LANG = {
     myaccount_purgefailed:   "La purga ha fallado :(",
     myaccount_purgesuccess:  "¡Se han purgado los datos de los anuncios correctamente!",
 
+    favorites:           "Favoritos",
+    clicktologin:        "Haz clic para iniciar sesión",
+    favorites_login:     "Inicia sesión para guardar tus favoritos a un menú personalizado!",
+    favorites_duplicate: "Este(a) %s ya está marcado como favorito!",
+    addtofavorites:      "Agregar a Favoritos",
+    removefromfavorites: "Quitar de favoritos",
+
     types: {
           1: ["PNJ",                 "PNJ" ,                 "PNJs",                 "PNJs"],
           2: ["Entidad",             "entidad",              "Entidades",            "entidades"],
