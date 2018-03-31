@@ -44,10 +44,11 @@ class ProfileList extends BaseType
                 'gearscore'         => $this->getField('gearscore')
             );
 
-            // for the lv this determins if the link is profile=<id> or profile=<region>.<realm>.<name>
-            if ($this->isCustom())
+            if ($addInfo & PROFILEINFO_USER)
                 $data[$this->id]['published'] = (int)!!($this->getField('cuFlags') & PROFILER_CU_PUBLISHED);
-            else
+
+            // for the lv this determins if the link is profile=<id> or profile=<region>.<realm>.<name>
+            if (!$this->isCustom())
                 $data[$this->id]['region']    = Profiler::urlize($this->getField('region'));
 
             if ($addInfo & PROFILEINFO_ARENA)

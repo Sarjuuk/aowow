@@ -212,6 +212,7 @@ define('PROFILEINFO_PROFILE',               0x1);
 define('PROFILEINFO_CHARACTER',             0x2);
 define('PROFILEINFO_GUILD',                 0x10);          // like &roster
 define('PROFILEINFO_ARENA',                 0x20);
+define('PROFILEINFO_USER',                  0x40);
 
 define('SPAWNINFO_ZONES',                   1);             // not a mask, mutually exclusive
 define('SPAWNINFO_SHORT',                   2);

@@ -286,6 +286,8 @@ class Profiler
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
         $profileId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
+        if (!$profileId)
+            return false;                                   // well ... it failed
 
         CLI::write('fetching char #'.$charGuid.' from realm #'.$realmId);
         CLI::write('writing...');

@@ -234,43 +234,13 @@ class UserPage extends GenericPage
             $this->addJS('?data=weight-presets&t='.$_SESSION['dataKey']);
 
             // Characters
-            if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER))
+            if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
                 $this->user['characterData'] = $chars;
 
             // Profiles
-            if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE))
+            if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE | PROFILEINFO_USER))
                 $this->user['profileData'] = $prof;
         }
-
-        /*
-            us_addCharactersTab([
-                {
-                    id:763,
-                    "name":"Lilywhite",
-                    "achievementpoints":"0",
-                    "guild":"whatever",
-                    "guildrank":"0",
-                    "realm":"draenor",
-                    "realmname":"Draenor",
-                    "battlegroup":"cyclone",
-                    "battlegroupname":"Cyclone",
-                    "region":"us",
-                    "level":"10",
-                    "race":"7",
-                    "gender":"0",
-                    "classs":"1",
-                    "faction":"0",
-                    "gearscore":"0",
-                    "talenttree1":"0",
-                    "talenttree2":"0",
-                    "talenttree3":"0",
-                    "talentspec":0,
-                    "published":1,
-                    "pinned":0
-                }
-            ]);
-        */
-
     }
 
     protected function generateTitle()
