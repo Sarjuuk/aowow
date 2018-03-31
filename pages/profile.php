@@ -93,10 +93,21 @@ class ProfilePage extends GenericPage
                     $this->notFound();
             }
             // 2) not yet synced but exists on realm (and not a gm character)
-            else if ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, IFNULL(g.name, "") AS guild, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS))
+            else if ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, g.guildid AS guildGUID, IFNULL(g.name, "") AS guildName, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS))
             {
                 $char['realm']   = $this->realmId;
                 $char['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+
+                if ($char['guildGUID'])
+                {
+                    // create empty guild if nessecary to satisfy foreign keys
+                    $char['guild'] = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $this->realmId, $char['guildGUID']);
+                    if (!$char['guild'])
+                        $char['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (realm, realmGUID, cuFlags, name) VALUES (?d, ?d, ?d, ?)', $this->realmId, $char['guildGUID'], PROFILER_CU_NEEDS_RESYNC, $char['guildName']);
+                }
+
+                unset($char['guildGUID']);
+                unset($char['guildName']);
 
                 // create entry from realm with enough basic info to disply tooltips
                 DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($char), array_values($char));
