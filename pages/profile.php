@@ -189,8 +189,8 @@ class ProfilePage extends GenericPage
         $cl         = $this->subject->getField('class');
         $gender     = $this->subject->getField('gender');
         $title      = '';
-        if ($_ = $this->subject->getField('chosenTitle'))
-            $title = (new TitleList(array(['bitIdx', $_])))->getField($gender ? 'female' : 'male', true);
+        if ($_ = $this->subject->getField('title'))
+            $title = (new TitleList(array(['id', $_])))->getField($gender ? 'female' : 'male', true);
 
         if ($this->isCustom)
             $name .= Lang::profiler('customProfile');
@@ -200,7 +200,7 @@ class ProfilePage extends GenericPage
         $x .= "\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($name)."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."',\n";
-        $x .= "\ticon: \$WH.g_getProfileIcon(".$ra.", ".$cl.", ".$gender.", ".$lvl."),\n";           // (race, class, gender, level, iconOrId, 'medium')
+        $x .= "\ticon: \$WH.g_getProfileIcon(".$ra.", ".$cl.", ".$gender.", ".$lvl.", '".$this->subject->getIcon()."'),\n";   // (race, class, gender, level, iconOrId, 'medium')
         $x .= "});";
 
         return $x;

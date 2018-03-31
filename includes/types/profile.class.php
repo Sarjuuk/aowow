@@ -81,15 +81,15 @@ class ProfileList extends BaseType
         return array_values($data);
     }
 
-    public function renderTooltip($interactive = false)
+    public function renderTooltip()
     {
         if (!$this->curTpl)
             return [];
 
         $title = '';
         $name  = $this->getField('name');
-        if ($_ = $this->getField('chosenTitle'))
-            $title = (new TitleList(array(['bitIdx', $_])))->getField($this->getField('gender') ? 'female' : 'male', true);
+        if ($_ = $this->getField('title'))
+            $title = (new TitleList(array(['id', $_])))->getField($this->getField('gender') ? 'female' : 'male', true);
 
         if ($this->isCustom())
             $name .= Lang::profiler('customProfile');
@@ -160,6 +160,56 @@ class ProfileList extends BaseType
     public function isCustom()
     {
         return $this->getField('cuFlags') & PROFILER_CU_PROFILE;
+    }
+
+    public function getIcon()
+    {
+        if ($_ = $this->getField('icon'))
+            return $_;
+
+        $str = 'chr_';
+
+        switch ($this->getField('race'))
+        {
+            case  1: $str .= 'human_';    break;
+            case  2: $str .= 'orc_';      break;
+            case  3: $str .= 'dwarf_';    break;
+            case  4: $str .= 'nightelf_'; break;
+            case  5: $str .= 'scourge_';  break;
+            case  6: $str .= 'tauren_';   break;
+            case  7: $str .= 'gnome_';    break;
+            case  8: $str .= 'troll_';    break;
+            case 10: $str .= 'bloodelf_'; break;
+            case 11: $str .= 'draenei_';  break;
+        }
+
+        switch ($this->getField('gender'))
+        {
+            case  0: $str .= 'male_';   break;
+            case  1: $str .= 'female_'; break;
+        }
+
+        switch ($this->getField('class'))
+        {
+            case  1: $str .= 'warrior0';     break;
+            case  2: $str .= 'paladin0';     break;
+            case  3: $str .= 'hunter0';      break;
+            case  4: $str .= 'rogue0';       break;
+            case  5: $str .= 'priest0';      break;
+            case  6: $str .= 'deathknight0'; break;
+            case  7: $str .= 'shaman0';      break;
+            case  8: $str .= 'mage0';        break;
+            case  9: $str .= 'warlock0';     break;
+            case 11: $str .= 'druid0';       break;
+        }
+
+        $level = $this->getField('level');
+        if ($level > 59)
+            $str .= floor(($level - 60) / 10) + 2;
+        else
+            $str .= 1;
+
+        return $str;
     }
 }
 
