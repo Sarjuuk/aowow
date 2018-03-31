@@ -3314,7 +3314,7 @@ var LANG = {
     },
 
     timeunitssg: ["Jahr", "Monat", "Woche", "Tag", "Stunde", "Minute", "Sekunde"],
-    timeunitspl: ["Jahre", "Monate", "Wochen", "Tagen", "Stunden", "Minuten", "Sekunden"],
+    timeunitspl: ["Jahre", "Monate", "Wochen", "Tage", "Stunden", "Minuten", "Sekunden"],
     timeunitsab: ["J.", "M.", "W.", "Tag", "Std.", "Min", "Sek."],
 
     presets: {
