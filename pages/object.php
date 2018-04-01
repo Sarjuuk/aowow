@@ -129,7 +129,7 @@ class ObjectPage extends GenericPage
         // lootinfo: [min, max, restock]
         if (($_ = $this->subject->getField('lootStack')) && $_[0])
         {
-            $buff = Lang::item('charges').Lang::main('colon').$_[0];
+            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').$_[0];
             if ($_[0] < $_[1])
                 $buff .= Lang::game('valueDelim').$_[1];
 

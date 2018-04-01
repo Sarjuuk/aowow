@@ -7562,7 +7562,6 @@ Listview.extraCols = {
                 var side = null;
                 var items = row.cost[2];
                 var currency = row.cost[1];
-                var achievementPoints = 0;
 
                 if (row.side != null) {
                     side = row.side;
@@ -7576,7 +7575,7 @@ Listview.extraCols = {
                     }
                 }
 
-                Listview.funcBox.appendMoney(td, money, side, items, currency, achievementPoints);
+                Listview.funcBox.appendMoney(td, money, side, items, currency);
             }
         },
         sortFunc: function(a, b, col) {
