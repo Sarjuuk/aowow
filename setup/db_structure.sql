@@ -769,6 +769,18 @@ DROP TABLE IF EXISTS `aowow_factions`;
 CREATE TABLE `aowow_factions` (
   `id` smallint(5) unsigned NOT NULL,
   `repIdx` smallint(5) unsigned NOT NULL,
+  `baseRepRaceMask1` smallint(5) unsigned NOT NULL,
+  `baseRepRaceMask2` smallint(5) unsigned NOT NULL,
+  `baseRepRaceMask3` smallint(5) unsigned NOT NULL,
+  `baseRepRaceMask4` smallint(5) unsigned NOT NULL,
+  `baseRepClassMask1` smallint(5) unsigned NOT NULL,
+  `baseRepClassMask2` smallint(5) unsigned NOT NULL,
+  `baseRepClassMask3` smallint(5) unsigned NOT NULL,
+  `baseRepClassMask4` smallint(5) unsigned NOT NULL,
+  `baseRepValue1` mediumint(8) NOT NULL,
+  `baseRepValue2` mediumint(8) NOT NULL,
+  `baseRepValue4` mediumint(8) NOT NULL,
+  `baseRepValue3` mediumint(8) NOT NULL,
   `side` tinyint(1) unsigned NOT NULL,
   `expansion` tinyint(1) unsigned NOT NULL,
   `qmNpcIds` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'space separated',
@@ -3021,7 +3033,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1522499481,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1522673572,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

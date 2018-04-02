@@ -108,7 +108,12 @@ switch ($pageCall)
         catch (Exception $e)                                // no, apparently not..
         {
             $class = $cleanName.'Page';
-            (new $class($pageCall, $pageParam))->display();
+            if (is_callable([$class, 'display']))
+                (new $class($pageCall, $pageParam))->display();
+            else if (isset($_GET['power']))
+                die('$WowheadPower.register(0, '.User::$localeId.', {})');
+            else                                            // in conjunction with a proper rewriteRule in .htaccess...
+                (new GenericPage($pageCall))->error();
         }
 
         break;

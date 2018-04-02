@@ -292,6 +292,8 @@ class Profiler
         CLI::write('fetching char #'.$charGuid.' from realm #'.$realmId);
         CLI::write('writing...');
 
+        $ra = (1 << ($char['race']  - 1));
+        $cl = (1 << ($char['class'] - 1));
 
         /*************/
         /* equipment */
@@ -478,7 +480,7 @@ class Profiler
         /* hunter pets */
         /***************/
 
-        if ((1 << ($char['class'] - 1)) == CLASS_HUNTER)
+        if ($cl == CLASS_HUNTER)
         {
             DB::Aowow()->query('DELETE FROM ?_profiler_pets WHERE owner = ?d', $profileId);
             $pets = DB::Characters($realmId)->select('SELECT id AS ARRAY_KEY, id, entry, modelId, name FROM character_pet WHERE owner = ?d', $charGuid);
@@ -557,9 +559,44 @@ class Profiler
 
 
         // reputation
-        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, faction AS typeId, standing AS cur FROM character_reputation WHERE guid = ?d AND (flags & 0xC) = 0', $profileId, TYPE_FACTION, $char['guid']))
-            foreach (Util::createSqlBatchInsert($reputation) as $rep)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$rep, array_keys($reputation[0]));
+
+        // get base values for this race/class
+        $reputation = [];
+        $baseRep    = DB::Aowow()->selectCol('
+            SELECT id AS ARRAY_KEY, baseRepValue1 FROM aowow_factions WHERE baseRepValue1 && (baseRepRaceMask1 & ?d || (!baseRepRaceMask1 AND baseRepClassMask1)) &&
+            ((baseRepClassMask1 & ?d) || !baseRepClassMask1) UNION
+            SELECT id AS ARRAY_KEY, baseRepValue2 FROM aowow_factions WHERE baseRepValue2 && (baseRepRaceMask2 & ?d || (!baseRepRaceMask2 AND baseRepClassMask2)) &&
+            ((baseRepClassMask2 & ?d) || !baseRepClassMask2) UNION
+            SELECT id AS ARRAY_KEY, baseRepValue3 FROM aowow_factions WHERE baseRepValue3 && (baseRepRaceMask3 & ?d || (!baseRepRaceMask3 AND baseRepClassMask3)) &&
+            ((baseRepClassMask3 & ?d) || !baseRepClassMask3) UNION
+            SELECT id AS ARRAY_KEY, baseRepValue4 FROM aowow_factions WHERE baseRepValue4 && (baseRepRaceMask4 & ?d || (!baseRepRaceMask4 AND baseRepClassMask4)) &&
+            ((baseRepClassMask4 & ?d) || !baseRepClassMask4)
+        ', $ra, $cl, $ra, $cl, $ra, $cl, $ra, $cl);
+
+        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, faction AS typeId, standing AS cur FROM character_reputation WHERE guid = ?d AND (flags & 0x4) = 0', $profileId, TYPE_FACTION, $char['guid']))
+        {
+            // merge back base values for encountered factions
+            foreach ($reputation as &$set)
+            {
+                if (empty($baseRep[$set['typeId']]))
+                    continue;
+
+                $set['cur'] += $baseRep[$set['typeId']];
+                unset($baseRep[$set['typeId']]);
+            }
+        }
+
+        // insert base values for not yet encountered factions
+        foreach ($baseRep as $id => $val)
+            $reputation[] = array(
+                'id'     => $profileId,
+                'type'   => TYPE_FACTION,
+                'typeId' => $id,
+                'cur'    => $val
+            );
+
+        foreach (Util::createSqlBatchInsert($reputation) as $rep)
+            DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$rep, array_keys($reputation[0]));
 
         CLI::write(' ..reputation');
 

@@ -53,6 +53,9 @@ function factions()
         SELECT
             f.id,
             f.repIdx,
+            baseRepRaceMask1,  baseRepRaceMask2,  baseRepRaceMask3,  baseRepRaceMask4,
+            baseRepClassMask1, baseRepClassMask2, baseRepClassMask3, baseRepClassMask4,
+            baseRepValue1,     baseRepValue2,     baseRepValue3,     baseRepValue4,
             IF(SUM(ft.ourMask & 0x6) / COUNT(1) = 0x4, 2, IF(SUM(ft.ourMask & 0x6) / COUNT(1) = 0x2, 1, 0)) as side,
             0,                                                  -- expansion
             "",                                                 -- quartermasterNpcIds
