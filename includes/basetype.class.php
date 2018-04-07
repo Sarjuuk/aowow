@@ -262,19 +262,7 @@ abstract class BaseType
         foreach ($this->dbNames as $dbIdx => $n)
         {
             $query = str_replace('DB_IDX', $dbIdx, $this->queryBase);
-
-            if (key($this->dbNames) === 0)
-            {
-                if ($rows = DB::{$n}($dbIdx)->select($query))
-                {
-                    $mtchQry = preg_replace('/SELECT .*? FROM/', 'SELECT count(1) FROM', $this->queryBase);
-                    $mtch    = DB::{$n}($dbIdx)->selectCell($mtchQry);
-                }
-            }
-            else
-                $rows = DB::{$n}($dbIdx)->SelectPage($mtch, $query);
-
-            if ($rows)
+            if ($rows  = DB::{$n}($dbIdx)->SelectPage($mtch, $query))
             {
                 $this->matches += $mtch;
                 foreach ($rows as $id => $row)
