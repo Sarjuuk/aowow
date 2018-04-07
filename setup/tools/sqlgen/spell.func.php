@@ -277,9 +277,9 @@ function spell()
     }
 
 
-    /******
-     * merge SkillLineAbility into Spell
-     ******/
+    /*************************************/
+    /* merge SkillLineAbility into Spell */
+    /*************************************/
 
     /* acquireMethod
         ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,        learnedAt = 1
@@ -525,6 +525,12 @@ function spell()
     // setting icons
     DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
 
+    // hide internal stuff from listviews
+    // QA*; *DND*; square brackets anything; *(NYI)*; *(TEST)*
+    // cant catch raw: NYI (uNYIelding); PH (PHasing)
+    DB::Aowow()->query('UPDATE ?_spell SET cuFlags = cuFlags | ?d WHERE name_loc0 LIKE "QA%" OR name_loc0 LIKE "%DND%" OR name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(NYI)%" OR name_loc0 LIKE "%(TEST)%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+
+
     /**************/
     /* Categories */
     /**************/
@@ -641,6 +647,7 @@ function spell()
 
     DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -8 WHERE s.typeCat = 0 AND s.id In (?a)', $world);
 
+
     /**********/
     /* Glyphs */
     /**********/
@@ -722,7 +729,7 @@ function spell()
             continue;
         }
 
-        // second: search by name and Family equality
+        // second: search by name and family equality
         if (!$icons)
         {
             $search = !empty($glyphAffects[$applyId]) ? $glyphAffects[$applyId] : str_replace('Glyph of ', '', $glyphEffect['name_loc0']);

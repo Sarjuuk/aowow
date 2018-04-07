@@ -146,9 +146,13 @@ if (!CLI)
             $condition = array(
                 CFG_SQL_LIMIT_NONE,
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
-                ['typeCat', -5]
+                ['typeCat', -5],
+                ['castTime', 0, '!']
             );
             $mountz = new SpellList($condition);
+
+            // we COULD go into aowow_sources to get the faction of the source and apply it to the spell. .. Or we could keep our sanity and assume TC did nothing wrong. haHA! no!
+            $factionSet = DB::World()->selectCol('SELECT alliance_id AS ARRAY_KEY, horde_id FROM player_factionchange_spells WHERE alliance_id IN (?a) OR horde_id IN (?a)', $mountz->getFoundIDs(), $mountz->getFoundIDs());
 
             foreach (CLISetup::$localeIds as $l)
             {
@@ -160,6 +164,13 @@ if (!CLI)
                 $buff = "var _ = g_spells;\n";
                 foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
                 {
+                    if (isset($factionSet[$id]))            // alliance owned
+                        $data['side'] = SIDE_ALLIANCE;
+                    else if (in_array($id, $factionSet))    // horde owned
+                        $data['side'] = SIDE_HORDE;
+                    else
+                        $data['side'] = SIDE_BOTH;
+
                     $data['quality'] = $data['name'][0];
                     $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";

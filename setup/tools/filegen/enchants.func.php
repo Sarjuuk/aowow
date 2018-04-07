@@ -174,6 +174,10 @@ if (!CLI)
                 $cI = &$castItems;                          // this construct is a bit .. unwieldy
                 foreach ($cI->iterate() as $__)
                 {
+                    if ($enchantments->getField('skillLevel'))
+                        if ($s = Util::getEnchantmentScore(0, -1, true, $eId))
+                            $ench['gearscore'] = $s;
+
                     if ($cI->getField('spellId1') != $esId)
                         continue;
 
