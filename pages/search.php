@@ -40,6 +40,7 @@ class SearchPage extends GenericPage
     private   $query         = '';                          // lookup
     private   $included      = [];
     private   $excluded      = [];
+    private   $statWeights   = [];
     private   $searches      = array(
         '_searchCharClass',   '_searchCharRace',    '_searchTitle',     '_searchWorldEvent',      '_searchCurrency',
         '_searchItemset',     '_searchItem',        '_searchAbility',   '_searchTalent',          '_searchGlyph',
@@ -57,6 +58,23 @@ class SearchPage extends GenericPage
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
             $this->error();
+
+        // sanitize stat weights
+        if (!empty($_GET['wt']) && !empty($_GET['wtv']))
+        {
+            $wt   = explode(':', $_GET['wt']);
+            $wtv  = explode(':', $_GET['wtv']);
+            $nwt  = count($wt);
+            $nwtv = count($wtv);
+
+            if ($nwt > $nwtv)
+                array_splice($wt, $nwtv);
+            else if ($nwtv > $nwt)
+                array_splice($wtv, $nwt);
+
+            if ($wt && $wtv)
+                $this->statWeights = [array_map('intVal', $wt), array_map('intVal', $wtv)];
+        }
 
         // select search mode
         if (isset($_GET['json']))
@@ -91,7 +109,9 @@ class SearchPage extends GenericPage
         $this->tokenizeQuery();
 
         // invalid conditions: not enough characters to search OR no types to search
-        if ((!$this->included || !($this->searchMask & SEARCH_MASK_ALL)) && !CFG_MAINTENANCE && !(($this->searchMask & SEARCH_TYPE_JSON) && intVal($this->search)))
+        if ((CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE)) ||
+            (!$this->included && ($this->searchMask & (SEARCH_TYPE_OPEN | SEARCH_TYPE_REGULAR))) ||
+            (($this->searchMask & SEARCH_TYPE_JSON) && !$this->included && !$this->statWeights))
         {
             $this->mode = CACHE_TYPE_NONE;
             $this->notFound();
@@ -558,13 +578,12 @@ class SearchPage extends GenericPage
             $cnd[] = $cndAdd;
 
             $slots = isset($_GET['slots']) ? explode(':', $_GET['slots']) : [];
-            array_walk($slots, function(&$v, $k) { $v = intVal($v); });
-            if ($_ = array_filter($slots))
+            if ($_ = array_filter(array_map('intVal', $slots)))
                 $cnd[] = ['slot', $_];
 
             // trick ItemListFilter into evaluating weights
-            if (isset($_GET['wt']) && isset($_GET['wtv']))
-                $_GET['filter'] = 'wt='.$_GET['wt'].';wtv='.$_GET['wtv'];
+            if ($this->statWeights)
+                $_GET['filter'] = 'wt='.implode(':', $this->statWeights[0]).';wtv='.implode(':', $this->statWeights[1]);
 
             $itemFilter = new ItemListFilter();
             if ($_ = $itemFilter->createConditionsForWeights())
