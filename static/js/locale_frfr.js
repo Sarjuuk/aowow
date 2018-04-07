@@ -2736,7 +2736,7 @@ var LANG = {
     lvnote_npcobjectheroic:         '<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque.',
     lvnote_npcobjectnormalX:        '<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Normal $4.',
     lvnote_npcobjectheroicX:        '<a href="?object=$1">$2</a> ont été ouvert $3 fois dans le mode Héroïque $4.',
-    lvnote_npcobjectsource:         "Butin contenu dans <a href=\"/object=$1\">$2</a>",
+    lvnote_npcobjectsource:         "Butin contenu dans <a href=\"?object=$1\">$2</a>",
     lvnote_npcherbgathering:        "Ce PNJ a été dépecé (Herboristerie) $1 fois.",
     lvnote_npcsalvaging:            "Ce PNJ a été récupéré avec Ingénierie $1 fois.",
     lvnote_npcmining:               "Ce PNJ a été dépecé (Minage) $1 fois.",
@@ -4126,7 +4126,7 @@ var LANG = {
     pr_tip_quests:   "Note: <span class=\"tip\">Certaines</span> quêtes ne sont pas retrouvables par les API de Blizzard.",
 
     pr_header_noname:    "Sans nom",
-    pr_header_character: "Niveau $1 <a href=\"/race=$4\">$2</a> <a href=\"/class=$5\" class=\"c$5\">$3</a>",
+    pr_header_character: "Niveau $1 <a href=\"?class=$4\">$2</a> <a href=\"?class=$5\" class=\"c$5\">$3</a>",
     pr_header_edit:      "Édition",
     pr_header_armory:    "Armurerie",
     pr_header_help:      "Aide",
@@ -4203,7 +4203,7 @@ var LANG = {
     pr_queue_addqueue:  "Ajout du personnage à la file d'attente de l'Armurerie...",
     pr_queue_status1:   "Position dans la file d'attente: <b>$1</b> &ndash; Temps estimé: <b>$2</b>",
     pr_queue_status2:   "Récupération du personnage en cours...",
-    pr_queue_status3:   "Les données sont prêtes ! <a href=\"/$2\" rel=\"np\">Rafraîchir pour voir</a>.",
+    pr_queue_status3:   "Les données sont prêtes ! <a href=\"?$2\" rel=\"np\">Rafraîchir pour voir</a>.",
     pr_queue_status4:   "Impossible de resynchroniser avec l'Armurerie: $1. Essayez <a href=\"javascript:;\">de resynchroniser</a> ce personnage à nouveau.",
     pr_queue_batch:     "File : <b>$1</b> - Opération en cours : <b>$2</b> - Prêt : <b>$3</b> - Erreur : <b>$4</b>",
 

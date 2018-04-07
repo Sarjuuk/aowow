@@ -4214,7 +4214,7 @@ var LANG = {
     pr_queue_addqueue:  "Añadiendo a la cola de la Armería...",
     pr_queue_status1:   "Posición en cola: <b>$1</b> &ndash; Tiempo estimado: <b>$2</b>",
     pr_queue_status2:   "Obteniendo datos...",
-    pr_queue_status3:   "¡Los datos están listos! <a href=\"/$2\" rel=\"np\">Recarga para ver</a>.",
+    pr_queue_status3:   "¡Los datos están listos! <a href=\"?$2\" rel=\"np\">Recarga para ver</a>.",
     pr_queue_status4:   "No se ha podido resincronizar con la Armería: $1. Intenta <a href=\"javascript:;\">resincronizar</a> de nuevo.",
     pr_queue_batch:     "Cola: <b>$1</b> – Procesando: <b>$2</b> – Listo: <b>$3</b> – Error: <b>$4</b>",
 
