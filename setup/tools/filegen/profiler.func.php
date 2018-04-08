@@ -171,6 +171,11 @@ if (!CLI)
                     else
                         $data['side'] = SIDE_BOTH;
 
+                    rsort($data['skill']);                  // riding (777) expected at pos 0
+
+                    if ($id == 54729)                       // special case: Winged Steed of the Ebon Blade; cast-item is DK only
+                        $data['reqclass'] = CLASS_DEATHKNIGHT;
+
                     $data['quality'] = $data['name'][0];
                     $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
