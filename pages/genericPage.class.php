@@ -107,9 +107,6 @@ trait TrProfiler
 
         $cat = array_map('urldecode', $cat);
 
-        if (count($cat) > 3)
-            return;
-
         if ($cat[0] !== 'eu' && $cat[0] !== 'us')
             return;
 
@@ -125,7 +122,7 @@ trait TrProfiler
                 {
                     $this->realm   = $r['name'];
                     $this->realmId = $rId;
-                    if (isset($cat[2]) && mb_strlen($cat[2]) >= 3)
+                    if (isset($cat[2]) && mb_strlen($cat[2]) >= 2)
                         $this->subjectName = $cat[2];       // cannot reconstruct original name from urlized form; match against special name field
 
                     break;

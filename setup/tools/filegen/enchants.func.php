@@ -55,8 +55,8 @@ if (!CLI)
 
     function enchants()
     {
-        // from g_item_slots: 13:"One-Hand", 26:"Ranged", 17:"Two-Hand",
-        $slotPointer   = [13, 17, 26, 26, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
+        // from g_item_slots: 13:"One-Hand", 15:"Ranged", 17:"Two-Hand",
+        $slotPointer   = [13, 17, 15, 15, 13, 17, 17, 13, 17, null, 17, null, null, 13, null, 13, null, null, null, null, 17];
         $castItems     = [];
         $successs      = true;
         $enchantSpells = DB::Aowow()->select('

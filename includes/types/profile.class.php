@@ -13,7 +13,7 @@ class ProfileList extends BaseType
         $data = [];
         foreach ($this->iterate() as $__)
         {
-            if ($this->getField('user') && User::$id != $this->getField('user') && !($this->getField('cuFlags') & PROFILER_CU_PUBLISHED))
+            if (!$this->getField('cuFlags') & PROFILER_CU_PUBLISHED && !User::isInGroup(U_GROUP_STAFF))
                 continue;
 
             if (($addInfo & PROFILEINFO_PROFILE) && !$this->isCustom())

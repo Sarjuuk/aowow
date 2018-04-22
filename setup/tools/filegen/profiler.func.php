@@ -152,7 +152,17 @@ if (!CLI)
             $mountz = new SpellList($condition);
 
             // we COULD go into aowow_sources to get the faction of the source and apply it to the spell. .. Or we could keep our sanity and assume TC did nothing wrong. haHA! no!
-            $factionSet = DB::World()->selectCol('SELECT alliance_id AS ARRAY_KEY, horde_id FROM player_factionchange_spells WHERE alliance_id IN (?a) OR horde_id IN (?a)', $mountz->getFoundIDs(), $mountz->getFoundIDs());
+            $factionSet   = DB::World()->selectCol('SELECT alliance_id AS ARRAY_KEY, horde_id FROM player_factionchange_spells WHERE alliance_id IN (?a) OR horde_id IN (?a)', $mountz->getFoundIDs(), $mountz->getFoundIDs());
+            $conditionSet = DB::World()->selectCol('SELECT SourceEntry AS ARRAY_KEY, ConditionValue1 FROM conditions WHERE SourceTypeOrReferenceId = ?d AND ConditionTypeOrReference = ?d AND SourceEntry IN (?a)', CND_SRC_SPELL, CND_SKILL, $mountz->getFoundIDs());
+
+            // get mounts for exclusion
+            foreach ($conditionSet as $mount => $skill)
+            {
+                if ($skill == 202)
+                    $exAdd(TYPE_SPELL, $mount, PR_EXCLUDE_GROUP_REQ_ENGINEERING);
+                else if ($skill == 197)
+                    $exAdd(TYPE_SPELL, $mount, PR_EXCLUDE_GROUP_REQ_TAILORING);
+            }
 
             foreach (CLISetup::$localeIds as $l)
             {
@@ -164,6 +174,12 @@ if (!CLI)
                 $buff = "var _ = g_spells;\n";
                 foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
                 {
+                    // two cases where the spell is unrestricted but the castitem has class restriction (too lazy to formulate ruleset)
+                    if ($id == 66906)                       // Argent Charger
+                        $data['reqclass'] = CLASS_PALADIN;
+                    else if ($id == 54729)                  // Winged Steed of the Ebon Blade
+                        $data['reqclass'] = CLASS_DEATHKNIGHT;
+
                     if (isset($factionSet[$id]))            // alliance owned
                         $data['side'] = SIDE_ALLIANCE;
                     else if (in_array($id, $factionSet))    // horde owned
@@ -172,9 +188,6 @@ if (!CLI)
                         $data['side'] = SIDE_BOTH;
 
                     rsort($data['skill']);                  // riding (777) expected at pos 0
-
-                    if ($id == 54729)                       // special case: Winged Steed of the Ebon Blade; cast-item is DK only
-                        $data['reqclass'] = CLASS_DEATHKNIGHT;
 
                     $data['quality'] = $data['name'][0];
                     $data['name']    = mb_substr($data['name'], 1);
