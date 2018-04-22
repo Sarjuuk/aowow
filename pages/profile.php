@@ -79,7 +79,7 @@ class ProfilePage extends GenericPage
 
             // 3 possibilities
             // 1) already synced to aowow
-            if ($subject = DB::Aowow()->selectRow('SELECT id, realmGUID, cuFlags FROM ?_profiler_profiles WHERE realm = ?d AND name = ?', $this->realmId, Util::ucFirst($this->subjectName)))
+            if ($subject = DB::Aowow()->selectRow('SELECT id, realmGUID, cuFlags FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $this->realmId, Util::ucFirst($this->subjectName)))
             {
                 if ($subject['cuFlags'] & PROFILER_CU_NEEDS_RESYNC)
                 {
