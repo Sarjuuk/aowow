@@ -1640,6 +1640,7 @@ class SpellPage extends GenericPage
             {
                 case 8:                                     // Power Drain
                 case 30:                                    // Energize
+                case 62:                                    // Power Burn
                 case 137:                                   // Energize Pct
                     $_ = Lang::spell('powerTypes', $effMV);
                     if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
