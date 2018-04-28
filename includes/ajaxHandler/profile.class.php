@@ -528,7 +528,7 @@ class AjaxProfile extends AjaxHandler
             $profile['pets'] = $pets;
 
         // source for custom profiles; profileId => [name, ownerId, iconString(optional)]
-        if ($customs = DB::Aowow()->select('SELECT id AS ARRAY_KEY, name, user, icon FROM ?_profiler_profiles WHERE sourceId = ?d AND sourceId <> id', $pBase['id']))
+        if ($customs = DB::Aowow()->select('SELECT id AS ARRAY_KEY, name, user, icon FROM ?_profiler_profiles WHERE sourceId = ?d AND sourceId <> id {AND (cuFlags & ?d) = 0}', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : PROFILER_CU_DELETED))
         {
             foreach ($customs as $id => $cu)
             {
