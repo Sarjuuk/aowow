@@ -640,10 +640,10 @@ class ItemList extends BaseType
             if ($interactive)
                 $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
 
-            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [intVal($this->curTpl['armor'] - $this->curTpl['armorDamageModifier'])]).'</span></span><br />';
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [$this->curTpl['armor']]).'</span></span><br />';
         }
-        else if (($this->curTpl['armor'] - $this->curTpl['armorDamageModifier']) > 0)
-            $x .= '<span><!--amr-->'.Lang::item('armor', [intVal($this->curTpl['armor'] - $this->curTpl['armorDamageModifier'])]).'</span><br />';
+        else if ($this->curTpl['armor'])
+            $x .= '<span><!--amr-->'.Lang::item('armor', [$this->curTpl['armor']]).'</span><br />';
 
         // Block (note: block value from field block and from field stats or parsed from itemSpells are displayed independently)
         if ($this->curTpl['tplBlock'])
@@ -1606,7 +1606,7 @@ class ItemList extends BaseType
             'frores'      => $this->curTpl['resFrost'],
             'shares'      => $this->curTpl['resShadow'],
             'arcres'      => $this->curTpl['resArcane'],
-            'armorbonus'  => $this->curTpl['armorDamageModifier'],
+            'armorbonus'  => max(0, intVal($this->curTpl['armorDamageModifier'])),
             'armor'       => $this->curTpl['armor'],
             'dura'        => $this->curTpl['durability'],
             'itemset'     => $this->curTpl['itemset'],
@@ -1646,9 +1646,6 @@ class ItemList extends BaseType
             if ($fap = $this->getFeralAP())
                 $json['feratkpwr'] = $fap;
         }
-
-        if ($this->curTpl['armorDamageModifier'] > 0)
-            $json['armor'] -= $this->curTpl['armorDamageModifier'];
 
         if ($this->curTpl['class'] == ITEM_CLASS_ARMOR || $this->curTpl['class'] == ITEM_CLASS_WEAPON)
             $json['gearscore'] = Util::getEquipmentScore($json['level'], $this->getField('quality'), $json['slot'], $json['nsockets']);
@@ -1785,7 +1782,7 @@ class ItemListFilter extends Filter
          38 => [FILTER_CR_NUMERIC,   'is.rgdatkpwr',           NUM_CAST_INT,            true          ], // rgdatkpwr
          39 => [FILTER_CR_NUMERIC,   'is.rgdhitrtng',          NUM_CAST_INT,            true          ], // rgdhitrtng
          40 => [FILTER_CR_NUMERIC,   'is.rgdcritstrkrtng',     NUM_CAST_INT,            true          ], // rgdcritstrkrtng
-         41 => [FILTER_CR_NUMERIC,   'is.armor'   ,            NUM_CAST_INT,            true          ], // armor
+         41 => [FILTER_CR_NUMERIC,   'is.armor',               NUM_CAST_INT,            true          ], // armor
          42 => [FILTER_CR_NUMERIC,   'is.defrtng',             NUM_CAST_INT,            true          ], // defrtng
          43 => [FILTER_CR_NUMERIC,   'is.block',               NUM_CAST_INT,            true          ], // block
          44 => [FILTER_CR_NUMERIC,   'is.blockrtng',           NUM_CAST_INT,            true          ], // blockrtng
