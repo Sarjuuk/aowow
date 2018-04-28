@@ -147,8 +147,11 @@ class ItemList extends BaseType
 
                     // no extended cost or additional gold required
                     if (!$costs || $this->getField('flagsExtra') & 0x04)
+                    {
+                        $this->getEntry($k);
                         if ($_ = $this->getField('buyPrice'))
                             $data[0] = $_;
+                    }
 
                     $vendors[$l] = $data;
                 }
@@ -259,6 +262,10 @@ class ItemList extends BaseType
         if ($addInfoMask & ITEMINFO_JSON)
             $this->extendJsonStats();
 
+        $extCosts = [];
+        if ($addInfoMask & ITEMINFO_VENDOR)
+            $extCosts = $this->getExtendedCost($miscData);
+
         foreach ($this->iterate() as $__)
         {
             foreach ($this->json[$this->id] as $k => $v)
@@ -294,9 +301,9 @@ class ItemList extends BaseType
             {
                 // just use the first results
                 // todo (med): dont use first result; search for the right one
-                if (!empty($this->getExtendedCost($miscData)[$this->id]))
+                if (!empty($extCosts[$this->id]))
                 {
-                    $cost     = reset($this->getExtendedCost($miscData)[$this->id]);
+                    $cost     = reset($extCosts[$this->id]);
                     $currency = [];
                     $tokens   = [];
 
