@@ -324,8 +324,8 @@ class ProfileListFilter extends Filter
         // name [str] - the table is case sensitive. Since i down't want to destroy indizes, lets alter the search terms
         if (!empty($_v['na']))
         {
-            $lower  = $this->modularizeString([$k.'.name'], Util::lower($_v['na']),   !empty($_v['ex']) && $_v['ex'] == 'on');
-            $proper = $this->modularizeString([$k.'.name'], Util::ucWords($_v['na']), !empty($_v['ex']) && $_v['ex'] == 'on');
+            $lower  = $this->modularizeString([$k.'.name'], Util::lower($_v['na']),   !empty($_v['ex']) && $_v['ex'] == 'on', true);
+            $proper = $this->modularizeString([$k.'.name'], Util::ucWords($_v['na']), !empty($_v['ex']) && $_v['ex'] == 'on', true);
 
             $parts[] = ['OR', $lower, $proper];
         }

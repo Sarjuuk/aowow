@@ -1827,7 +1827,7 @@ CREATE TABLE `aowow_profiler_profiles` (
   `copy` int(10) unsigned DEFAULT NULL,
   `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user` int(11) unsigned DEFAULT NULL,
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_bin NOT NULL,
   `race` tinyint(3) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
