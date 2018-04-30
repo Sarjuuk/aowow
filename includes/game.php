@@ -210,9 +210,7 @@ class Game
         );
 
         // return list of integers, not strings
-        array_walk($data, function (&$v, $k) {
-            $v = intVal($v);
-        });
+        $data = array_map('intVal', $data);
 
         return $data;
     }

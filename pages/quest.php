@@ -891,7 +891,7 @@ class QuestPage extends GenericPage
         /****************/
 
         $this->gains         = $this->createGains();
-        $this->mail          = $this->createMail($maTab, $startEnd);
+        $this->mail          = $this->createMail($startEnd);
         $this->rewards       = $this->createRewards($_side);
         $this->objectives    = $this->subject->parseText('objectives', false);
         $this->details       = $this->subject->parseText('details', false);
@@ -911,9 +911,6 @@ class QuestPage extends GenericPage
                 'typeId'    => $this->typeId
             )
         );
-
-        if ($maTab)
-            $this->lvTabs[] = $maTab;
 
         // factionchange-equivalent
         if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_quests WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
@@ -1210,14 +1207,14 @@ class QuestPage extends GenericPage
         return $rewards;
     }
 
-    private function createMail(&$attachmentTab, $startEnd)
+    private function createMail($startEnd)
     {
         $mail = [];
 
-        if ($_ = $this->subject->getField('rewardMailTemplateId'))
+        if ($rmtId = $this->subject->getField('rewardMailTemplateId'))
         {
             $delay  = $this->subject->getField('rewardMailDelay');
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $rmtId);
 
             $mail = array(
                 'delay'   => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
@@ -1238,19 +1235,23 @@ class QuestPage extends GenericPage
                 }
             }
 
-            $extraCols = ['$Listview.extraCols.percent'];
+            // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
             $mailLoot = new Loot();
-
-            if ($mailLoot->getByContainer(LOOT_MAIL, $_))
+            if ($mailLoot->getByContainer(LOOT_MAIL, $rmtId))
             {
+                $mail['attachments'] = [];
                 $this->extendGlobalData($mailLoot->jsGlobals);
-                $attachmentTab = ['item', array(
-                    'data'       => array_values($mailLoot->getResult()),
-                    'name'       => Lang::quest('attachment'),
-                    'id'         => 'mail-attachments',
-                    'extraCols'  => array_merge($extraCols, $mailLoot->extraCols),
-                    'hiddenCols' => ['side', 'slot', 'reqlevel']
-                )];
+                foreach ($mailLoot->getResult() as $loot)
+                {
+                    $mail['attachments'][] = array(
+                        'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                        'id'        => $loot['id'],
+                        'name'      => substr($loot['name'], 1),
+                        'quality'   => 7 - $loot['name'][0],
+                        'qty'       => $loot['stack'][0],
+                        'globalStr' => 'g_items'
+                    );
+                }
             }
         }
 
