@@ -636,71 +636,75 @@ $lang = array(
         ),
         'cat'           => array(
             0 => array( "Royaumes de l'est",
-                  10 => "Bois de la Pénombre",          3430 => "Bois des Chants éternels",       85 => "Clairières de Tirisfal",        267 => "Contreforts de Hautebrande",    279 => "Cratère de Dalaran",
-                   1 => "Dun Morogh",                     41 => "Défilé de Deuillevent",        1537 => "Forgefer",                       12 => "Forêt d'Elwynn",                130 => "Forêt des Pins argentés",
-                1497 => "Fossoyeuse",                     51 => "Gorge des Vents brûlants",       45 => "Hautes-terres d'Arathi",       1519 => "Hurlevent",                      44 => "Les Carmines",
-                  47 => "Les Hinterlands",                11 => "Les Paluns",                   3433 => "Les Terres fantômes",            38 => "Loch Modan",                   3487 => "Lune-d'argent",
-                 139 => "Maleterres de l'est",            28 => "Maleterres de l'ouest",        4298 => "Maleterres : l'enclave Écarlate", 8 => "Marais des Chagrins",            40 => "Marche de l'Ouest",
-                  25 => "Mont Rochenoire",                36 => "Montagnes d'Alterac",            46 => "Steppes ardentes",                4 => "Terres foudroyées",               3 => "Terres ingrates",
-                2257 => "Tram des profondeurs",           33 => "Vallée de Strangleronce",      4080 => "Île de Quel'Danas"
+                    1 => "Dun Morogh",                       3 => "Terres ingrates",                  4 => "Terres foudroyées",                8 => "Marais des Chagrins",              9 => "Vallée de Comté-du-nord",
+                   10 => "Bois de la Pénombre",             11 => "Les Paluns",                      12 => "Forêt d'Elwynn",                  25 => "Mont Rochenoire",                 28 => "Maleterres de l'ouest",
+                   33 => "Vallée de Strangleronce",         36 => "Montagnes d'Alterac",             38 => "Loch Modan",                      40 => "Marche de l'Ouest",               41 => "Défilé de Deuillevent",
+                   44 => "Les Carmines",                    45 => "Hautes-terres d'Arathi",          46 => "Steppes ardentes",                47 => "Les Hinterlands",                 51 => "Gorge des Vents brûlants",
+                   85 => "Clairières de Tirisfal",         130 => "Forêt des Pins argentés",        132 => "Vallée des Frigères",            139 => "Maleterres de l'est",            154 => "Le Glas",
+                  267 => "Contreforts de Hautebrande",    1497 => "Fossoyeuse",                    1519 => "Hurlevent",                     1537 => "Forgefer",                      2257 => "Tram des profondeurs",
+                 3430 => "Bois des Chants éternels",      3431 => "Île de Haut-soleil",            3433 => "Les Terres fantômes",           3487 => "Lune-d'argent",                 4080 => "Île de Quel'Danas",
+                 4298 => "L'enclave Écarlate"
             ),
             1 => array( "Kalimdor",
-                  16 => "Azshara",                       618 => "Berceau-de-l'Hiver",            490 => "Cratère d'Un'Goro",            1657 => "Darnassus",                      14 => "Durotar",
-                 405 => "Désolace",                      357 => "Féralas",                       361 => "Gangrebois",                   3557 => "L'Exodar",                     1638 => "Les Pitons du Tonnerre",
-                 406 => "Les Serres-Rocheuses",           17 => "Les Tarides",                    15 => "Marécage d'Âprefange",          400 => "Mille pointes",                 215 => "Mulgore",
-                1637 => "Orgrimmar",                     331 => "Orneval",                       493 => "Reflet-de-Lune",               1216 => "Repaire des Grumegueules",     1377 => "Silithus",
-                 148 => "Sombrivage",                    440 => "Tanaris",                       141 => "Teldrassil",                   3524 => "Île de Brume-azur",            3525 => "Île de Brume-sang"
-            ),
-            8 => array( "Outreterre",
-                3519 => "Forêt de Terokkar",            3522 => "Les Tranchantes",              3521 => "Marécage de Zangar",           3518 => "Nagrand",                      3483 => "Péninsule des Flammes infernales",
-                3523 => "Raz-de-Néant",                 3703 => "Shattrath",                    3679 => "Skettis",                      3520 => "Vallée d'Ombrelune"
-            ),
-           10 => array( "Norfendre",
-                4742 => "Accostage de Hrothgar",        3711 => "Bassin de Sholazar",           4395 => "Dalaran",                        65 => "Désolation des dragons",        495 => "Fjord Hurlant",
-                4024 => "Frimarra",                     4197 => "Joug-d'hiver",                  210 => "La Couronne de glace",          394 => "Les Grisonnes",                  67 => "Les pics Foudroyés",
-                3537 => "Toundra Boréenne",               66 => "Zul'Drak"
-            ),
-            6 => array( "Champs de bataille",
-                3358 => "Bassin d'Arathi",               -25 => "Champs de bataille",           3277 => "Goulet des Chanteguerres",     3820 => "L'Œil du cyclone",             4384 => "Rivage des Anciens",
-                2597 => "Vallée d'Alterac",             4710 => "Île des Conquérants"
-            ),
-            4 => array( "Classes",
-                 -82 => "Chaman",                       -261 => "Chasseur",                     -372 => "Chevalier de la mort",         -263 => "Druide",                        -61 => "Démoniste",
-                 -81 => "Guerrier",                     -161 => "Mage",                         -141 => "Paladin",                      -262 => "Prêtre",                       -162 => "Voleur"
+                   14 => "Durotar",                         15 => "Marécage d'Âprefange",            16 => "Azshara",                         17 => "Les Tarides",                    141 => "Teldrassil",
+                  148 => "Sombrivage",                     188 => "Sombrevallon",                   215 => "Mulgore",                        220 => "Mesa de Nuage rouge",            331 => "Orneval",
+                  357 => "Féralas",                        361 => "Gangrebois",                     363 => "Vallée des épreuves",            400 => "Mille pointes",                  405 => "Désolace",
+                  406 => "Les Serres-Rocheuses",           440 => "Tanaris",                        490 => "Cratère d'Un'Goro",              493 => "Reflet-de-Lune",                 618 => "Berceau-de-l'Hiver",
+                 1377 => "Silithus",                      1637 => "Orgrimmar",                     1638 => "Les Pitons du Tonnerre",        1657 => "Darnassus",                     1769 => "Repaire des Grumegueules",
+                 3524 => "Île de Brume-azur",             3525 => "Île de Brume-sang",             3526 => "Val d'Ammen",                   3557 => "L'Exodar",
             ),
             2 => array( "Donjons",
-                4494 => "Ahn'kahet : l'Ancien royaume", 4277 => "Azjol-Nérub",                   718 => "Cavernes des lamentations",    1196 => "Cime d'Utgarde",               2367 => "Contreforts de Hautebrande d'antan",
-                3790 => "Cryptes Auchenaï",              209 => "Donjon d'Ombrecroc",            206 => "Donjon d'Utgarde",             4196 => "Donjon de Drak'Tharon",        3845 => "Donjon de la Tempête",
-                4813 => "Fosse de Saron",                721 => "Gnomeregan",                   2437 => "Gouffre de Ragefeu",           1941 => "Grottes du temps",             4416 => "Gundrak",
-                2557 => "Hache-tripes",                  491 => "Kraal de Tranchebauge",        3848 => "L'Arcatraz",                   4228 => "L'Oculus",                     4100 => "L'Épuration de Stratholme",
-                4723 => "L'épreuve du champion",        3716 => "La Basse-tourbière",           3847 => "La Botanica",                  4809 => "La Forge des âmes",            3713 => "La Fournaise du sang",
-                 717 => "La Prison",                    3789 => "Labyrinthe des ombres",        3715 => "Le Caveau de la vapeur",       3849 => "Le Méchanar",                  4120 => "Le Nexus",
-                2366 => "Le Noir Marécage",             4415 => "Le fort Pourpre",              1581 => "Les Mortemines",               3714 => "Les Salles brisées",           3717 => "Les enclos aux esclaves",
-                4272 => "Les salles de Foudre",         4264 => "Les salles de Pierre",         3791 => "Les salles des Sethekk",       2100 => "Maraudon",                      796 => "Monastère écarlate",
-                1583 => "Pic Rochenoire",                719 => "Profondeurs de Brassenoire",   1584 => "Profondeurs de Rochenoire",    3562 => "Remparts des Flammes infernales", 3905 => "Réservoir de Glissecroc",
-                4820 => "Salles des Reflets",           2057 => "Scholomance",                   722 => "Souilles de Tranchebauge",     2017 => "Stratholme",                   1477 => "Temple englouti",
-                4131 => "Terrasse des Magistères",      3792 => "Tombes-mana",                  1337 => "Uldaman",                      1176 => "Zul'Farrak"
-            ),
-            5 => array( "Métiers",
-                -181 => "Alchimiste",                   -371 => "Calligraphie",                 -304 => "Cuisinier",                    -121 => "Forgeron",                      -24 => "Herboristerie",
-                -201 => "Ingénieur",                    -373 => "Joaillerie",                   -101 => "Pêcheur",                      -324 => "Secourisme",                   -264 => "Tailleur",
-                -182 => "Travailleur du cuir"
+                  206 => "Donjon d'Utgarde",               209 => "Donjon d'Ombrecroc",             491 => "Kraal de Tranchebauge",          717 => "La Prison",                      718 => "Cavernes des lamentations",
+                  719 => "Profondeurs de Brassenoire",     721 => "Gnomeregan",                     722 => "Souilles de Tranchebauge",       796 => "Monastère écarlate",            1176 => "Zul'Farrak",
+                 1196 => "Cime d'Utgarde",                1337 => "Uldaman",                       1417 => "Temple englouti",               1581 => "Les Mortemines",                1583 => "Pic Rochenoire",
+                 1584 => "Profondeurs de Rochenoire",     1941 => "Grottes du temps",              2017 => "Stratholme",                    2057 => "Scholomance",                   2100 => "Maraudon",
+                 2366 => "Le Noir Marécage",              2367 => "Contreforts de Hautebrande d'antan",2437 => "Gouffre de Ragefeu",        2557 => "Hache-tripes",                  3535 => "Citadelle des Flammes infernale",
+                 3562 => "Remparts des Flammes infernales",3688 => "Auchindoun",                   3713 => "La Fournaise du sang",          3714 => "Les Salles brisées",            3715 => "Le Caveau de la vapeur",
+                 3716 => "La Basse-tourbière",            3717 => "Les enclos aux esclaves",       3789 => "Labyrinthe des ombres",         3790 => "Cryptes Auchenaï",              3791 => "Les salles des Sethekk",
+                 3792 => "Tombes-mana",                   3842 => "Donjon de la Tempête",          3847 => "La Botanica",                   3848 => "L'Arcatraz",                    3849 => "Le Méchanar",
+                 3905 => "Réservoir de Glissecroc",       4100 => "L'Épuration de Stratholme",     4131 => "Terrasse des Magistères",       4196 => "Donjon de Drak'Tharon",         4228 => "L'Oculus",
+                 4264 => "Les salles de Pierre",          4265 => "Le Nexus",                      4272 => "Les salles de Foudre",          4277 => "Azjol-Nérub",                   4415 => "Le fort Pourpre",
+                 4416 => "Gundrak",                       4494 => "Ahn'kahet : l'Ancien royaume",  4522 => "Citadelle de la Couronne de glace",4723 => "L'épreuve du champion",      4809 => "La Forge des âmes",
+                 4813 => "Fosse de Saron",                4820 => "Salles des Reflets"
             ),
             3 => array( "Raids",
-                3428 => "Ahn'Qiraj",                    4603 => "Caveau d'Archavon",            4812 => "Citadelle de la Couronne de glace", 2717 => "Cœur du Magma",           3845 => "Donjon de la Tempête",
-                3457 => "Karazhan",                     4722 => "L'épreuve du croisé",          4500 => "L'Œil de l'éternité",          3836 => "Le repaire de Magtheridon",    4493 => "Le sanctum Obsidien",
-                4987 => "Le sanctum Rubis",             3456 => "Naxxramas",                    4075 => "Plateau du Puits de soleil",   3923 => "Repaire de Gruul",             2159 => "Repaire d'Onyxia",
-                2677 => "Repaire de l'Aile noire",      3429 => "Ruines d'Ahn'Qiraj",           3606 => "Sommet d'Hyjal",               3959 => "Temple noir",                  4273 => "Ulduar",
-                3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+                 1977 => "Zul'Gurub",                     2159 => "Repaire d'Onyxia",              2677 => "Repaire de l'Aile noire",       2717 => "Cœur du Magma",                 3428 => "Ahn'Qiraj",
+                 3429 => "Ruines d'Ahn'Qiraj",            3456 => "Naxxramas",                     3457 => "Karazhan",                      3606 => "Sommet d'Hyjal",                3607 => "Caverne du sanctuaire du Serpent",
+                 3805 => "Zul'Aman",                      3836 => "Le repaire de Magtheridon",     3845 => "Donjon de la Tempête",          3923 => "Repaire de Gruul",              3959 => "Temple noir",
+                 4075 => "Plateau du Puits de soleil",    4273 => "Ulduar",                        4493 => "Le sanctum Obsidien",           4500 => "L'Œil de l'éternité",           4603 => "Caveau d'Archavon",
+                 4722 => "L'épreuve du croisé",           4812 => "Citadelle de la Couronne de glace", 4987 => "Le sanctum Rubis"
             ),
-            9 => array( "Évènements mondiaux",
-                -370 => "Fête des Brasseurs",          -1002 => "Semaine des enfants",          -364 => "Foire de Sombrelune",           -41 => "Jour des Morts",              -1003 => "Sanssaint",
-                -1005 => "Fête des moissons",           -376 => "De l'amour dans l'air",        -366 => "Fête lunaire",                 -369 => "Solstice d'été",              -1006 => "Nouvel an",
-                -375 => "Bienfaits du pèlerin",         -374 => "Jardin des nobles",           -1001 => "Voile d'hiver"
+            4 => array( "Classes",
+                  -61 => "Démoniste",                      -81 => "Guerrier",                       -82 => "Chaman",                        -141 => "Paladin",                       -161 => "Mage",
+                 -162 => "Voleur",                        -261 => "Chasseur",                      -262 => "Prêtre",                        -263 => "Druide",                        -372 => "Chevalier de la mort"
+            ),
+            5 => array( "Métiers",
+                  -24 => "Herboristerie",                 -101 => "Pêcheur",                       -121 => "Forgeron",                      -181 => "Alchimiste",                    -182 => "Travailleur du cuir",
+                 -201 => "Ingénieur",                     -264 => "Tailleur",                      -304 => "Cuisinier",                     -324 => "Secourisme",                    -371 => "Calligraphie",
+                 -373 => "Joaillerie"
+            ),
+            6 => array( "Champs de bataille",
+                 2597 => "Vallée d'Alterac",              3277 => "Goulet des Chanteguerres",      3358 => "Bassin d'Arathi",               3820 => "L'Œil du cyclone",              4384 => "Rivage des Anciens",
+                 4710 => "Île des Conquérants",            -25 => "Champs de bataille"
             ),
             7 => array( "Divers",
-                -365 => "Guerre d'Ahn'Qiraj",          -1010 => "Chercheur de donjons",           -1 => "Épique",                       -344 => "Légendaire",                   -367 => "Réputation",
-                -368 => "Invasion du fléau",            -241 => "Tournoi"
+                   -1 => "Épique",                        -241 => "Tournoi",                       -344 => "Légendaire",                    -365 => "Guerre d'Ahn'Qiraj",            -367 => "Réputation",
+                 -368 => "Invasion",                     -1010 => "Chercheur de donjons"
+            ),
+            8 => array( "Outreterre",
+                 3483 => "Péninsule des Flammes infernale", 3518 => "Nagrand",                     3519 => "Forêt de Terokkar",             3520 => "Vallée d'Ombrelune",            3521 => "Marécage de Zangar",
+                 3522 => "Les Tranchantes",               3523 => "Raz-de-Néant",                  3679 => "Skettis",                       3703 => "Shattrath"
+            ),
+            9 => array( "Évènements mondiaux",
+                  -22 => "Saisonnier",                     -41 => "REUSE - vieil Uldaman",         -364 => "Foire de Sombrelune",           -366 => "Fête lunaire",                  -369 => "Solstice d'été",
+                 -370 => "Fête des Brasseurs",            -374 => "Jardin des nobles",             -375 => "Bienfaits du pèlerin",          -376 => "De l'amour dans l'air",        -1001 => "Voile d'hiver",
+                -1002 => "Semaine des enfants",          -1003 => "Sanssaint",                    -1005 => "Fête des moissons"
+
+            ),
+            10 => array( "Norfendre",
+                   65 => "Désolation des dragons",          66 => "Zul'Drak",                        67 => "Les pics Foudroyés",             210 => "La Couronne de glace",           394 => "Les Grisonnes",
+                  495 => "Fjord Hurlant",                 3537 => "Toundra Boréenne",              3711 => "Bassin de Sholazar",            4024 => "Frimarra",                      4197 => "Joug-d'hiver",
+                 4395 => "Dalaran",                       4742 => "Accostage de Hrothgar"
             ),
            -2 => "Non classés"
         )

@@ -183,38 +183,60 @@ function quests(array $ids = [])
     for ($i = 1; $i < 6; $i++)
         DB::Aowow()->query($repQuery, $i, $i, $i, $i, $ids ?: DBSIMPLE_SKIP);
 
-    // update zoneOrSort/QuestSortID .. well .. now "not documenting" bites me in the ass .. ~700 quests were changed, i don't know by what method
-    $eventSet = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday <> 0');
-    $holidaySorts   = array(
-        141 => -1001,       181 => -374,        201 => -1002,
-        301 => -101,        321 => -1005,       324 => -1003,
-        327 => -366,        341 => -369,        372 => -370,
-        374 => -364,        376 => -364,        404 => -375,
-        409 => -41,         423 => -376,        424 => -101
+    // zoneorsort for quests need updating
+    // partially points non-instanced area with identic name for instance quests
+    $subcats = array(
+        -221 => 440,                                        // Treasure Map => Tanaris
+        -284 => 0,                                          // Special => Misc (some quests get shuffled into seasonal)
+        151  => 0,                                          // Designer Island => Misc
+        22   => 0,                                          // Programmer Isle
+        35   => 33,                                         // Booty Bay => Stranglethorn Vale
+        131  => 132,                                        // Kharanos => Coldridge Valley
+        24   => 9,                                          // Northshire Abbey => Northshire Valley
+        279  => 36,                                         // Dalaran Crater => Alterac Mountains
+        4342 => 4298,                                       // Acherus: The Ebon Hold => The Scarlet Enclave
+        2079 => 15,                                         // Alcaz Island => Dustwallow Marsh
+        1939 => 440,                                        // Abyssal Sands => Tanaris
+        393  => 363,                                        // Darkspeer Strand => Valley of Trials
+        702  => 141,                                        // Rut'theran Village => Teldrassil
+        221  => 220,                                        // Camp Narache => Red Cloud Mesa
+        1116 => 357,                                        // Feathermoon Stronghold => Feralas
+        236  => 209,                                        // Shadowfang Keep
+        4769 => 4742,                                       // Hrothgar's Landing => Hrothgar's Landing
+        4613 => 4395,                                       // Dalaran City => Dalaran
+        4522 => 210,                                        // Icecrown Citadell => Icecrown
+        3896 => 3703,                                       // Aldor Rise => Shattrath City
+        3696 => 3522,                                       // The Barrier Hills => Blade's Edge Mountains
+        2839 => 2597,                                       // Alterac Valley
+        19   => 1977,                                       // Zul'Gurub
+        4445 => 4273,                                       // Ulduar
+        2300 => 1941,                                       // Caverns of Time
+        3545 => 3535,                                       // Hellfire Citadel
+        2562 => 3457,                                       // Karazhan
+        3840 => 3959,                                       // Black Temple
+        1717 => 491,                                        // Razorfen Kraul
+        978  => 1176,                                       // Zul'Farrak
+        133  => 721,                                        // Gnomeregan
+        3607 => 3905,                                       // Serpentshrine Cavern
+        3845 => 3842,                                       // Tempest Keep
+        1517 => 1337                                        // Uldaman
     );
+
+    foreach ($subcats as $child => $parent)
+        DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE zoneOrSortBak = ?d', $parent, $child);
+
+     // move quests liked to holidays into appropirate quests-sorts. create dummy sorts as needed
+    $eventSet = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday <> 0');
+    $holidaySorts = array(
+        141 => -1001,   181 => -374,    201 => -1002,       // Winter Veil      Noblegarden     Childrens Week
+        321 => -1005,   324 => -1003,   404 => -375,        // Harvest Fest.    Hallows End     Pilgrims Bounty
+        327 => -366,    341 => -369,    372 => -370,        // Lunar Fest.      Midsummer       Brewfest
+        423 => -376                                         // Love is in the Air
+    );
+
     foreach ($holidaySorts as $hId => $sort)
         if (!empty($eventSet[$hId]))
             DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE eventId = ?d{ AND id IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
-
-/*
-    zoneorsort for quests will need updating
-    points non-instanced area with identic name for instance quests
-
-    SELECT
-        DISTINCT CONCAT('[',q.zoneorsort,',"',a.name_loc0,'"],')
-    FROM
-        dbc_map m,
-        ?_quests q,
-        dbc_areatable a
-    WHERE
-        a.id = q.zoneOrSort AND
-        q.zoneOrSort > 0 AND
-        a.mapId = m.id AND
-        m.areaType = 1
-    ORDER BY
-        a.name_loc0
-    ASC;
-*/
 
     // 'special' special cases
     // fishing quests to stranglethorn extravaganza

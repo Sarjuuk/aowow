@@ -19,7 +19,7 @@ class QuestsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->validCats = Game::$questClasses;             // needs reviewing (not allowed to set this as default)
+        $this->validCats = Game::$questClasses;             // not allowed to set this as default
 
         $this->getCategoryFromUrl($pageParam);
         $this->filterObj = new QuestListFilter(false, ['parentCats' => $this->category]);
@@ -104,6 +104,30 @@ class QuestsPage extends GenericPage
     {
         foreach ($this->category as $c)
             $this->path[] = $c;
+
+        $hubs = array(
+            // Quest Hubs
+            3679 => 3519,   4024 => 3537,   25   => 46,     1769 => 361,
+            // Startzones: Horde
+            132  => 1,      9    => 12,     3431 => 3430,   154  => 85,
+            // Startzones: Alliance
+            3526 => 3524,   363  => 14,     220  => 215,    188  => 141,
+            // Group: Caverns of Time
+            2366 => 1941,   2367 => 1941,   4100 => 1941,
+            // Group: Hellfire Citadell
+            3562 => 3535,   3713 => 3535,   3714 => 3535,
+            // Group: Auchindoun
+            3789 => 3688,   3790 => 3688,   3791 => 3688,   3792 => 3688,
+            // Group: Tempest Keep
+            3847 => 3842,   3848 => 3842,   3849 => 3842,
+            // Group: Coilfang Reservoir
+            3715 => 3905,   3716 => 3905,   3717 => 3905,
+            // Group: Icecrown Citadel
+            4809 => 4522,   4813 => 4522,   4820 => 4522
+        );
+
+        if (isset($this->category[1]) && isset($hubs[$this->category[1]]))
+            array_splice($this->path, 3, 0, $hubs[$this->category[1]]);
     }
 }
 

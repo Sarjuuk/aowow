@@ -17592,6 +17592,9 @@ $(document).ready(function() // Locale is only known later
         [11], // Professions
         [9]   // Secondary Skills
     ]);
+
+    // aowow - why wasn't this sorted already..?
+    Menu.sortSubmenus(mn_quests, [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]]);
 });
 
 function MessageBox(parent, text) {

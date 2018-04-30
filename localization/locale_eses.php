@@ -636,71 +636,74 @@ $lang = array(
         ),
         'cat'           => array(
             0 => array( "Reinos del Este",
-                3430 => "Bosque Canción Eterna",         130 => "Bosque de Argénteos",            12 => "Bosque de Elwynn",               10 => "Bosque del Ocaso",             3487 => "Ciudad de Lunargenta",
-                1519 => "Ciudad de Ventormenta",          85 => "Claros de Tirisfal",            279 => "Cráter de Dalaran",               1 => "Dun Morogh",                   1497 => "Entrañas",
-                1537 => "Forjaz",                       4080 => "Isla de Quel'Danas",             51 => "La Garganta de Fuego",          267 => "Laderas de Trabalomas",          46 => "Las Estepas Ardientes",
-                   4 => "Las Tierras Devastadas",         38 => "Loch Modan",                     11 => "Los Humedales",                  25 => "Montaña Roca Negra",             44 => "Montañas Crestagrana",
-                  36 => "Montañas de Alterac",             8 => "Pantano de las Penas",           41 => "Paso de la Muerte",              40 => "Páramos de Poniente",            45 => "Tierras Altas de Arathi",
-                3433 => "Tierras Fantasma",                3 => "Tierras Inhóspitas",            139 => "Tierras de la Peste del Este",   28 => "Tierras de la Peste del Oeste",4298 => "Tierras de la Peste: El Enclave Escarlata",
-                  47 => "Tierras del Interior",         2257 => "Tranvía Subterráneo",            33 => "Vega de Tuercespina"
+                    1 => "Dun Morogh",                       3 => "Tierras Inhóspitas",               4 => "Las Tierras Devastadas",           8 => "Pantano de las Penas",             9 => "Valle de Villanorte",
+                   10 => "Bosque del Ocaso",                11 => "Los Humedales",                   12 => "Bosque de Elwynn",                25 => "Montaña Roca Negra",              28 => "Tierras de la Peste del Oeste",
+                   33 => "Vega de Tuercespina",             36 => "Montañas de Alterac",             38 => "Loch Modan",                      40 => "Páramos de Poniente",             41 => "Paso de la Muerte",
+                   44 => "Montañas Crestagrana",            45 => "Tierras Altas de Arathi",         46 => "Las Estepas Ardientes",           47 => "Tierras del Interior",            51 => "La Garganta de Fuego",
+                   85 => "Claros de Tirisfal",             130 => "Bosque de Argénteos",            132 => "Valle de Crestanevada",          139 => "Tierras de la Peste del Este",   154 => "Camposanto",
+                  267 => "Laderas de Trabalomas",         1497 => "Entrañas",                      1519 => "Ciudad de Ventormenta",         1537 => "Forjaz",                        2257 => "Tranvía Subterráneo",
+                 3430 => "Bosque Canción Eterna",         3431 => "Isla del Caminante del Sol",    3433 => "Tierras Fantasma",              3487 => "Ciudad de Lunargenta",          4080 => "Isla de Quel'Danas",
+                 4298 => "El Enclave Escarlata"
             ),
             1 => array( "Kalimdor",
-                  16 => "Azshara",                      1216 => "Bastión Fauces de Madera",     1638 => "Cima del Trueno",               493 => "Claro de la Luna",              148 => "Costa Oscura",
-                 490 => "Cráter de Un'Goro",             618 => "Cuna del Invierno",            1657 => "Darnassus",                     405 => "Desolace",                       14 => "Durotar",
-                3557 => "El Exodar",                     357 => "Feralas",                       361 => "Frondavil",                    3524 => "Isla Bruma Azur",              3525 => "Isla Bruma de Sangre",
-                 400 => "Las Mil Agujas",                 17 => "Los Baldíos",                    15 => "Marjal Revolcafango",           215 => "Mulgore",                      1637 => "Orgrimmar",
-                 406 => "Sierra Espolón",               1377 => "Silithus",                      440 => "Tanaris",                       141 => "Teldrassil",                    331 => "Vallefresno"
-            ),
-            8 => array( "Terrallende",
-                3519 => "Bosque de Terokkar",           3703 => "Ciudad de Shattrath",          3521 => "Marisma de Zangar",            3522 => "Montañas Filospada",           3518 => "Nagrand",
-                3483 => "Península del Fuego Infernal", 3679 => "Skettis",                      3523 => "Tormenta Abisal",              3520 => "Valle Sombraluna"
-            ),
-           10 => array( "Rasganorte",
-                  65 => "Cementerio de Dragones",        394 => "Colinas Pardas",               4197 => "Conquista del Invierno",        210 => "Corona de Hielo",              3711 => "Cuenca de Sholazar",
-                4395 => "Dalaran",                      4742 => "Desembarco de Hrothgar",        495 => "Fiordo Aquilonal",             4024 => "Gelidar",                        67 => "Las Cumbres Tormentosas",
-                3537 => "Tundra Boreal",                  66 => "Zul'Drak"
-            ),
-            6 => array( "Campos de batalla",
-                 -25 => "Campos de batalla",            3358 => "Cuenca de Arathi",             3277 => "Garganta Grito de Guerra",     4710 => "Isla de la Conquista",         3820 => "Ojo de la Tormenta",
-                4384 => "Playa de los Ancestros",       2597 => "Valle de Alterac"
-            ),
-            4 => array( "Clases",
-                 -61 => "Brujo",                        -372 => "Caballero de la Muerte",       -261 => "Cazador",                       -82 => "Chamán",                       -263 => "Druida",
-                 -81 => "Guerrero",                     -161 => "Mago",                         -141 => "Paladín",                      -162 => "Pícaro",                       -262 => "Sacerdote"
+                   14 => "Durotar",                         15 => "Marjal Revolcafango",             16 => "Azshara",                         17 => "Los Baldíos",                    141 => "Teldrassil",
+                  148 => "Costa Oscura",                   188 => "Cañada Umbría",                  215 => "Mulgore",                        220 => "Mesa de la Nube Roja",           331 => "Vallefresno",
+                  357 => "Feralas",                        361 => "Frondavil",                      363 => "Valle de los Retos",             400 => "Las Mil Agujas",                 405 => "Desolace",
+                  406 => "Sierra Espolón",                 440 => "Tanaris",                        490 => "Cráter de Un'Goro",              493 => "Claro de la Luna",               618 => "Cuna del Invierno",
+                 1377 => "Silithus",                      1637 => "Orgrimmar",                     1638 => "Cima del Trueno",               1657 => "Darnassus",                     1769 => "Bastión Fauces de Madera",
+                 3524 => "Isla Bruma Azur",               3525 => "Isla Bruma de Sangre",          3526 => "Valle Ammen",                   3557 => "El Exodar"
             ),
             2 => array( "Mazmorras",
-                4494 => "Ahn'kahet: El Antiguo Reino",  2367 => "Antiguas Laderas de Trabalomas", 4277 => "Azjol-Nerub",                4131 => "Bancal del Magister",           209 => "Castillo de Colmillo Oscuro",
-                 719 => "Cavernas de Brazanegra",       1941 => "Cavernas del Tiempo",          3535 => "Ciudadela del Fuego Infernal", 3790 => "Criptas Auchenai",              718 => "Cuevas de los Lamentos",
-                1583 => "Cumbre de Roca Negra",         4264 => "Cámaras de Piedra",            4820 => "Cámaras de Reflexión",         4272 => "Cámaras de Relámpagos",        3848 => "El Arcatraz",
-                4415 => "El Bastión Violeta",           3845 => "El Castillo de la Tempestad",  3713 => "El Horno de Sangre",           3847 => "El Invernáculo",               3849 => "El Mechanar",
-                4120 => "El Nexo",                      4228 => "El Oculus",                    4196 => "Fortaleza de Drak'Tharon",      206 => "Fortaleza de Utgarde",         4813 => "Foso de Saron",
-                 721 => "Gnomeregan",                   4416 => "Gundrak",                       491 => "Horado Rajacieno",             2366 => "La Ciénaga Negra",             3715 => "La Cámara de Vapor",
-                4809 => "La Forja de Almas",            2557 => "La Masacre",                   4100 => "La Matanza de Stratholme",     3716 => "La Sotiénaga",                 3789 => "Laberinto de las Sombras",
-                 717 => "Las Mazmorras",                1581 => "Las Minas de la Muerte",       3714 => "Las Salas Arrasadas",          2100 => "Maraudon",                      796 => "Monasterio Escarlata",
-                3562 => "Murallas del Fuego Infernal",  1196 => "Pináculo de Utgarde",          1584 => "Profundidades de Roca Negra",  4723 => "Prueba del Campeón",           3717 => "Recinto de los Esclavos",
-                3905 => "Reserva Colmillo Torcido",     3791 => "Salas Sethekk",                2057 => "Scholomance",                  2437 => "Sima Ígnea",                   2017 => "Stratholme",
-                1477 => "Templo Sumergido",             3792 => "Tumbas de Maná",               1337 => "Uldaman",                       722 => "Zahúrda Rajacieno",            1176 => "Zul'Farrak"
-            ),
-            5 => array( "Profesiones",
-                -181 => "Alquimia",                     -304 => "Cocina",                        -24 => "Herboristería",                -121 => "Herrería",                     -201 => "Ingeniería",
-                -371 => "Inscripción",                  -373 => "Joyería",                      -182 => "Peletería",                    -101 => "Pesca",                        -324 => "Primeros auxilios",
-                -264 => "Sastrería"
+                  206 => "Fortaleza de Utgarde",           209 => "Castillo de Colmillo Oscuro",    491 => "Horado Rajacieno",               717 => "Las Mazmorras",                  718 => "Cuevas de los Lamentos",
+                  719 => "Cavernas de Brazanegra",         721 => "Gnomeregan",                     722 => "Zahúrda Rajacieno",              796 => "Monasterio Escarlata",          1176 => "Zul'Farrak",
+                 1196 => "Pináculo de Utgarde",           1337 => "Uldaman",                       1417 => "Templo Sumergido",              1581 => "Las Minas de la Muerte",        1583 => "Cumbre de Roca Negra",
+                 1584 => "Profundidades de Roca Negra",   1941 => "Cavernas del Tiempo",           2017 => "Stratholme",                    2057 => "Scholomance",                   2100 => "Maraudon",
+                 2366 => "La Ciénaga Negra",              2367 => "Antiguas Laderas de Trabalomas",2437 => "Sima Ígnea",                    2557 => "La Masacre",                    3535 => "Ciudadela del Fuego Infernal",
+                 3562 => "Murallas del Fuego Infernal",   3688 => "Auchindoun",                    3713 => "El Horno de Sangre",            3714 => "Las Salas Arrasadas",           3715 => "La Cámara de Vapor",
+                 3716 => "La Sotiénaga",                  3717 => "Recinto de los Esclavos",       3789 => "Laberinto de las Sombras",      3790 => "Criptas Auchenai",              3791 => "Salas Sethekk",
+                 3792 => "Tumbas de Maná",                3842 => "El Castillo de la Tempestad",   3847 => "El Invernáculo",                3848 => "El Arcatraz",                   3849 => "El Mechanar",
+                 3905 => "Reserva Colmillo Torcido",      4100 => "La Matanza de Stratholme",      4131 => "Bancal del Magister",           4196 => "Fortaleza de Drak'Tharon",      4228 => "El Oculus",
+                 4264 => "Cámaras de Piedra",             4265 => "El Nexo",                       4272 => "Cámaras de Relámpagos",         4277 => "Azjol-Nerub",                   4415 => "El Bastión Violeta",
+                 4416 => "Gundrak",                       4494 => "Ahn'kahet: El Antiguo Reino",   4522 => "Ciudadela de la Corona de Hielo",4723 => "Prueba del Campeón",           4809 => "La Forja de Almas",
+                 4813 => "Foso de Saron",                 4820 => "Cámaras de Reflexión"
             ),
             3 => array( "Bandas",
-                3428 => "Ahn'Qiraj",                    3607 => "Caverna Santuario Serpiente",  4812 => "Ciudadela de la Corona de Hielo", 3842 => "El Castillo de la Tempestad", 4500 => "El Ojo de la Eternidad",
-                4493 => "El Sagrario Obsidiana",        3959 => "El Templo Oscuro",             2677 => "Guarida de Alanegra",          3923 => "Guarida de Gruul",             3836 => "Guarida de Magtheridon",
-                2159 => "Guarida de Onyxia",            3457 => "Karazhan",                     4603 => "La Cámara de Archavon",        3606 => "La Cima Hyjal",                4075 => "Meseta de La Fuente del Sol",
-                3456 => "Naxxramas",                    2717 => "Núcleo de Magma",              4722 => "Prueba del Cruzado",           3429 => "Ruinas de Ahn'Qiraj",          4273 => "Ulduar",
-                 805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+                 1977 => "Zul'Gurub",                     2159 => "Guarida de Onyxia",             2677 => "Guarida de Alanegra",           2717 => "Núcleo de Magma",               3428 => "Ahn'Qiraj",
+                 3429 => "Ruinas de Ahn'Qiraj",           3456 => "Naxxramas",                     3457 => "Karazhan",                      3606 => "La Cima Hyjal",                 3607 => "Caverna Santuario Serpiente",
+                 3805 => "Zul'Aman",                      3836 => "Guarida de Magtheridon",        3845 => "El Castillo de la Tempestad",   3923 => "Guarida de Gruul",              3959 => "Templo Oscuro",
+                 4075 => "Meseta de La Fuente del Sol",   4273 => "Ulduar",                        4493 => "El Sagrario Obsidiana",         4500 => "El Ojo de la Eternidad",        4603 => "La Cámara de Archavon",
+                 4722 => "Prueba del Cruzado",            4812 => "Ciudadela de la Corona de Hielo",4987 => "El Sagrario Rubí"
             ),
-            9 => array( "Eventos del mundo",
-                -370 => "Fiesta de la cerveza",        -1002 => "Los Niños",                    -364 => "Feria de la Luna Negra",        -41 => "Día de los Muertos",          -1003 => "Halloween",
-               -1005 => "Festival de la cosecha",       -376 => "Amor en el aire",              -366 => "Festival Lunar",               -369 => "Solsticio",                   -1006 => "Año nuevo",
-                -375 => "Generosidad",                  -374 => "Jardín Noble",                -1001 => "Festival de Invierno"
+            4 => array( "Clases",
+                  -61 => "Brujo",                          -81 => "Guerrero",                       -82 => "Chamán",                        -141 => "Paladín",                       -161 => "Mago",
+                 -162 => "Pícaro",                        -261 => "Cazador",                       -262 => "Sacerdote",                     -263 => "Druida",                        -372 => "Caballero de la Muerte"
+            ),
+            5 => array( "Profesiones",
+                  -24 => "Herboristería",                 -101 => "Pesca",                         -121 => "Herrería",                      -181 => "Alquimia",                      -182 => "Peletería",
+                 -201 => "Ingeniería",                    -264 => "Sastrería",                     -304 => "Cocina",                        -324 => "Primeros auxilios",             -371 => "Inscripción",
+                 -373 => "Joyería"
+            ),
+            6 => array( "Campos de batalla",
+                 2597 => "Valle de Alterac",              3277 => "Garganta Grito de Guerra",      3358 => "Cuenca de Arathi",              3820 => "Ojo de la Tormenta",            4384 => "Playa de los Ancestros",
+                 4710 => "Isla de la Conquista",           -25 => "Campos de batalla"
             ),
             7 => array( "Miscelánea",
-                -365 => "Guerra de Ahn'Qiraj",         -1010 => "Buscador de Mazmorras",          -1 => "Épica",                        -344 => "Legendaria",                   -367 => "Reputación",
-                -368 => "Invasión",                     -241 => "Torneo"
+                   -1 => "Épica",                         -241 => "Torneo",                        -344 => "Legendaria",                    -365 => "Guerra de Ahn'Qiraj",           -367 => "Reputación",
+                 -368 => "Invasión",                     -1010 => "Buscador de Mazmorras"
+            ),
+            8 => array( "Terrallende",
+                 3483 => "Península del Fuego Infernal",  3518 => "Nagrand",                       3519 => "Bosque de Terokkar",            3520 => "Valle Sombraluna",              3521 => "Marisma de Zangar",
+                 3522 => "Montañas Filospada",            3523 => "Tormenta Abisal",               3679 => "Skettis",                       3703 => "Ciudad de Shattrath"
+            ),
+            9 => array( "Eventos del mundo",
+                  -22 => "Estacional",                     -41 => "Día de los Muertos",            -364 => "Feria de la Luna Negra",        -366 => "Festival Lunar",                -369 => "Verano",
+                 -370 => "Fiesta de la cerveza",          -374 => "Jardín Noble",                  -375 => "Generosidad del Peregrino",     -376 => "Amor en el aire",              -1001 => "Festival de Invierno",
+                -1002 => "Los Niños",                    -1003 => "Halloween",                    -1005 => "Festival de la cosecha"
+            ),
+            10 => array( "Rasganorte",
+                   65 => "Cementerio de Dragones",          66 => "Zul'Drak",                        67 => "Las Cumbres Tormentosas",        210 => "Corona de Hielo",                394 => "Colinas Pardas",
+                  495 => "Fiordo Aquilonal",              3537 => "Tundra Boreal",                 3711 => "Cuenca de Sholazar",            4024 => "Gelidar",                       4197 => "Conquista del Invierno",
+                 4395 => "Dalaran",                       4742 => "Desembarco de Hrothgar"
             ),
            -2 => "Sin categoría"
         )

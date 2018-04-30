@@ -636,71 +636,75 @@ $lang = array(
         ),
         'cat'           => array(
             0 => array( "Eastern Kingdoms",
-                  36 => "Alterac Mountains",              45 => "Arathi Highlands",                3 => "Badlands",                       25 => "Blackrock Mountain",              4 => "Blasted Lands",
-                  46 => "Burning Steppes",               279 => "Dalaran Crater",                 41 => "Deadwind Pass",                2257 => "Deeprun Tram",                    1 => "Dun Morogh",
-                  10 => "Duskwood",                      139 => "Eastern Plaguelands",            12 => "Elwynn Forest",                3430 => "Eversong Woods",               3433 => "Ghostlands",
-                 267 => "Hillsbrad Foothills",          1537 => "Ironforge",                    4080 => "Isle of Quel'Danas",             38 => "Loch Modan",                     44 => "Redridge Mountains",
-                  51 => "Searing Gorge",                3487 => "Silvermoon City",               130 => "Silverpine Forest",            1519 => "Stormwind City",                 33 => "Stranglethorn Vale",
-                   8 => "Swamp of Sorrows",               47 => "The Hinterlands",              4298 => "The Scarlet Enclave",            85 => "Tirisfal Glades",              1497 => "Undercity",
-                  28 => "Western Plaguelands",            40 => "Westfall",                       11 => "Wetlands"
+                    1 => "Dun Morogh",                       3 => "Badlands",                         4 => "Blasted Lands",                    8 => "Swamp of Sorrows",                 9 => "Northshire Valley",
+                   10 => "Duskwood",                        11 => "Wetlands",                        12 => "Elwynn Forest",                   25 => "Blackrock Mountain",              28 => "Western Plaguelands",
+                   33 => "Stranglethorn Vale",              36 => "Alterac Mountains",               38 => "Loch Modan",                      40 => "Westfall",                        41 => "Deadwind Pass",
+                   44 => "Redridge Mountains",              45 => "Arathi Highlands",                46 => "Burning Steppes",                 47 => "The Hinterlands",                 51 => "Searing Gorge",
+                   85 => "Tirisfal Glades",                130 => "Silverpine Forest",              132 => "Coldridge Valley",               139 => "Eastern Plaguelands",            154 => "Deathknell",
+                  267 => "Hillsbrad Foothills",           1497 => "Undercity",                     1519 => "Stormwind City",                1537 => "Ironforge",                     2257 => "Deeprun Tram",
+                 3430 => "Eversong Woods",                3431 => "Sunstrider Isle",               3433 => "Ghostlands",                    3487 => "Silvermoon City",
+                 4080 => "Isle of Quel'Danas",
+                 4298 => "The Scarlet Enclave"
             ),
             1 => array( "Kalimdor",
-                  331 => "Ashenvale",                     16 => "Azshara",                      3524 => "Azuremyst Isle",               3525 => "Bloodmyst Isle",                148 => "Darkshore",
-                 1657 => "Darnassus",                    405 => "Desolace",                       14 => "Durotar",                        15 => "Dustwallow Marsh",              361 => "Felwood",
-                  357 => "Feralas",                      493 => "Moonglade",                     215 => "Mulgore",                      1637 => "Orgrimmar",                    1377 => "Silithus",
-                  406 => "Stonetalon Mountains",         440 => "Tanaris",                       141 => "Teldrassil",                     17 => "The Barrens",                  3557 => "The Exodar",
-                  457 => "The Veiled Sea",               400 => "Thousand Needles",             1638 => "Thunder Bluff",                 490 => "Un'Goro Crater",                618 => "Winterspring"
+                   14 => "Durotar",                         15 => "Dustwallow Marsh",                16 => "Azshara",                         17 => "The Barrens",                    141 => "Teldrassil",
+                  148 => "Darkshore",                      188 => "Shadowglen",                     215 => "Mulgore",                        220 => "Red Cloud Mesa",                 331 => "Ashenvale",
+                  357 => "Feralas",                        361 => "Felwood",                        363 => "Valley of Trials",               400 => "Thousand Needles",               405 => "Desolace",
+                  406 => "Stonetalon Mountains",           440 => "Tanaris",                        490 => "Un'Goro Crater",                 493 => "Moonglade",                      618 => "Winterspring",
+                 1377 => "Silithus",                      1637 => "Orgrimmar",                     1638 => "Thunder Bluff",                 1657 => "Darnassus",                     1769 => "Timbermaw Hold",
+                 3524 => "Azuremyst Isle",                3525 => "Bloodmyst Isle",                3526 => "Ammen Vale",                    3557 => "The Exodar",
              ),
-            8 => array( "Outland",
-                3522 => "Blade's Edge Mountains",       3483 => "Hellfire Peninsula",           3518 => "Nagrand",                      3523 => "Netherstorm",                  3520 => "Shadowmoon Valley",
-                 703 => "Shattrath City",               3679 => "Skettis",                      3519 => "Terokkar Forest",              3521 => "Zangarmarsh"
-            ),
-           10 => array( "Northrend",
-                3537 => "Borean Tundra",                2817 => "Crystalsong Forest",           4395 => "Dalaran",                        65 => "Dragonblight",                  394 => "Grizzly Hills",
-                 495 => "Howling Fjord",                4742 => "Hrothgar's Landing",            210 => "Icecrown",                     3711 => "Sholazar Basin",                 67 => "The Storm Peaks",
-                4197 => "Wintergrasp",                    66 => "Zul'Drak"
-            ),
             2 => array( "Dungeons",
-                4494 => "Ahn'kahet: The Old Kingdom",   3790 => "Auchenai Crypts",              4277 => "Azjol-Nerub",                   719 => "Blackfathom Deeps",            1584 => "Blackrock Depths",
-                1583 => "Blackrock Spire",              1941 => "Caverns of Time",              3905 => "Coilfang Reservoir",           2557 => "Dire Maul",                    4196 => "Drak'Tharon Keep",
-                 721 => "Gnomeregan",                   4416 => "Gundrak",                      4272 => "Halls of Lightning",           4820 => "Halls of Reflection",          4264 => "Halls of Stone",
-                3562 => "Hellfire Ramparts",            3535 => "Hellfire Citadel",             4131 => "Magisters' Terrace",           3792 => "Mana-Tombs",                   2100 => "Maraudon",
-                2367 => "Old Hillsbrad Foothills",      4813 => "Pit of Saron",                 2437 => "Ragefire Chasm",                722 => "Razorfen Downs",                491 => "Razorfen Kraul",
-                 796 => "Scarlet Monastery",            2057 => "Scholomance",                  3791 => "Sethekk Halls",                3789 => "Shadow Labyrinth",              209 => "Shadowfang Keep",
-                2017 => "Stratholme",                   1477 => "Sunken Temple",                3845 => "Tempest Keep",                 3848 => "The Arcatraz",                 2366 => "The Black Morass",
-                3713 => "The Blood Furnace",            3847 => "The Botanica",                 4100 => "The Culling of Stratholme",    1581 => "The Deadmines",                4809 => "The Forge of Souls",
-                3849 => "The Mechanar",                 4120 => "The Nexus",                    4228 => "The Oculus",                   3714 => "The Shattered Halls",          3717 => "The Slave Pens",
-                3715 => "The Steamvault",                717 => "The Stockade",                 3716 => "The Underbog",                 4415 => "The Violet Hold",              4723 => "Trial of the Champion",
-                1337 => "Uldaman",                       206 => "Utgarde Keep",                 1196 => "Utgarde Pinnacle",              718 => "Wailing Caverns",              1176 => "Zul'Farrak"
+                  206 => "Utgarde Keep",                   209 => "Shadowfang Keep",                491 => "Razorfen Kraul",                 717 => "The Stockade",                   718 => "Wailing Caverns",
+                  719 => "Blackfathom Deeps",              721 => "Gnomeregan",                     722 => "Razorfen Downs",                 796 => "Scarlet Monastery",             1176 => "Zul'Farrak",
+                 1196 => "Utgarde Pinnacle",              1337 => "Uldaman",                       1417 => "Sunken Temple",                 1581 => "The Deadmines",                 1583 => "Blackrock Spire",
+                 1584 => "Blackrock Depths",              1941 => "Caverns of Time",               2017 => "Stratholme",                    2057 => "Scholomance",                   2100 => "Maraudon",
+                 2366 => "The Black Morass",              2367 => "Old Hillsbrad Foothills",       2437 => "Ragefire Chasm",                2557 => "Dire Maul",                     3535 => "Hellfire Citadel",
+                 3562 => "Hellfire Ramparts",             3688 => "Auchindoun",                    3713 => "The Blood Furnace",             3714 => "The Shattered Halls",           3715 => "The Steamvault",
+                 3716 => "The Underbog",                  3717 => "The Slave Pens",                3789 => "Shadow Labyrinth",              3790 => "Auchenai Crypts",               3791 => "Sethekk Halls",
+                 3792 => "Mana-Tombs",                    3842 => "Tempest Keep",                  3847 => "The Botanica",                  3848 => "The Arcatraz",                  3849 => "The Mechanar",
+                 3905 => "Coilfang Reservoir",            4100 => "The Culling of Stratholme",     4131 => "Magisters' Terrace",            4196 => "Drak'Tharon Keep",              4228 => "The Oculus",
+                 4264 => "Halls of Stone",                4265 => "The Nexus",                     4272 => "Halls of Lightning",            4277 => "Azjol-Nerub",                   4415 => "The Violet Hold",
+                 4416 => "Gundrak",                       4494 => "Ahn'kahet: The Old Kingdom",    4522 => "Icecrown Citadel",              4723 => "Trial of the Champion",         4809 => "The Forge of Souls",
+                 4813 => "Pit of Saron",                  4820 => "Halls of Reflection"
             ),
             3 => array( "Raids",
-                3959 => "Black Temple",                 2677 => "Blackwing Lair",               3923 => "Gruul's Lair",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
-                3457 => "Karazhan",                     3836 => "Magtheridon's Lair",           2717 => "Molten Core",                  3456 => "Naxxramas",                    2159 => "Onyxia's Lair",
-                3429 => "Ruins of Ahn'Qiraj",           3607 => "Serpentshrine Cavern",         4075 => "Sunwell Plateau",              3428 => "Temple of Ahn'Qiraj",          3842 => "The Eye",
-                4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "Ulduar",                       4603 => "Vault of Archavon",
-                3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+                 1977 => "Zul'Gurub",                     2159 => "Onyxia's Lair",                 2677 => "Blackwing Lair",                2717 => "Molten Core",                   3428 => "Temple of Ahn'Qiraj",
+                 3429 => "Ruins of Ahn'Qiraj",            3456 => "Naxxramas",                     3457 => "Karazhan",                      3606 => "Hyjal Summit",                  3607 => "Serpentshrine Cavern",
+                 3805 => "Zul'Aman",                      3836 => "Magtheridon's Lair",            3845 => "Tempest Keep",                  3923 => "Gruul's Lair",                  3959 => "Black Temple",
+                 4075 => "Sunwell Plateau",               4273 => "Ulduar",                        4493 => "The Obsidian Sanctum",          4500 => "The Eye of Eternity",           4603 => "Vault of Archavon",
+                 4722 => "Trial of the Crusader",         4812 => "Icecrown Citadel",              4987 => "The Ruby Sanctum"
             ),
             4 => array( "Classes",
-                -372 => "Death Knight",                 -263 => "Druid",                        -261 => "Hunter",                       -161 => "Mage",                         -141 => "Paladin",
-                -262 => "Priest",                       -162 => "Rogue",                         -82 => "Shaman",                        -61 => "Warlock",                       -81 => "Warrior"
+                  -61 => "Warlock",                        -81 => "Warrior",                        -82 => "Shaman",                        -141 => "Paladin",                       -161 => "Mage",
+                 -162 => "Rogue",                         -261 => "Hunter",                        -262 => "Priest",                        -263 => "Druid",                         -372 => "Death Knight"
                     ),
             5 => array( "Professions",
-                -181 => "Alchemy",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
-                -101 => "Fishing",                       -24 => "Herbalism",                    -371 => "Inscription",                  -373 => "Jewelcrafting",                -182 => "Leatherworking",
-                -264 => "Tailoring"
+                  -24 => "Herbalism",                     -101 => "Fishing",                       -121 => "Blacksmithing",                 -181 => "Alchemy",                       -182 => "Leatherworking",
+                 -201 => "Engineering",                   -264 => "Tailoring",                     -304 => "Cooking",                       -324 => "First Aid",                     -371 => "Inscription",
+                 -373 => "Jewelcrafting"
             ),
             6 => array( "Battlegrounds",
-                 -25 => "All",                          2597 => "Alterac Valley",               3358 => "Arathi Basin",                 3820 => "Eye of the Storm",             4710 => "Isle of Conquest",
-                4384 => "Strand of the Ancients",       3277 => "Warsong Gulch"
-            ),
-            9 => array( "Seasonal",
-                -370 => "Brewfest",                    -1002 => "Children's Week",              -364 => "Darkmoon Faire",                -41 => "Day of the Dead",             -1003 => "Hallow's End",
-               -1005 => "Harvest Festival",             -376 => "Love is in the Air",           -366 => "Lunar Festival",               -369 => "Midsummer",                   -1006 => "New Year's Eve",
-                -375 => "Pilgrim's Bounty",             -374 => "Noblegarden",                 -1001 => "Winter Veil"
+                 2597 => "Alterac Valley",                3277 => "Warsong Gulch",                 3358 => "Arathi Basin",                  3820 => "Eye of the Storm",              4384 => "Strand of the Ancients",
+                 4710 => "Isle of Conquest",               -25 => "All"
             ),
             7 => array( "Miscellaneous",
-                -365 => "Ahn'Qiraj War Effort",         -241 => "Argent Tournament",           -1010 => "Dungeon Finder",                 -1 => "Epic",                         -344 => "Legendary",
-                -367 => "Reputation",                   -368 => "Scourge Invasion"
+                   -1 => "Epic",                          -241 => "Tournament",                    -344 => "Legendary",                     -365 => "Ahn'Qiraj War",                 -367 => "Reputation",
+                 -368 => "Invasion",                     -1010 => "Dungeon Finder"
+            ),
+            8 => array( "Outland",
+                 3483 => "Hellfire Peninsula",            3518 => "Nagrand",                       3519 => "Terokkar Forest",               3520 => "Shadowmoon Valley",             3521 => "Zangarmarsh",
+                 3522 => "Blade's Edge Mountains",        3523 => "Netherstorm",                   3679 => "Skettis",                       3703 => "Shattrath City"
+            ),
+            9 => array( "Seasonal",
+                  -22 => "Seasonal",                       -41 => "Day of the Dead",               -364 => "Darkmoon Faire",                -366 => "Lunar Festival",                -369 => "Midsummer",
+                 -370 => "Brewfest",                      -374 => "Noblegarden",                   -375 => "Pilgrim's Bounty",              -376 => "Love is in the Air",           -1001 => "Winter Veil",
+                -1002 => "Children's Week",              -1003 => "Hallow's End",                 -1005 => "Harvest Festival"
+            ),
+            10 => array( "Northrend",
+                   65 => "Dragonblight",                    66 => "Zul'Drak",                        67 => "The Storm Peaks",                210 => "Icecrown",                       394 => "Grizzly Hills",
+                  495 => "Howling Fjord",                 3537 => "Borean Tundra",                 3711 => "Sholazar Basin",                4024 => "Coldarra",                      4197 => "Wintergrasp",
+                 4395 => "Dalaran",                       4742 => "Hrothgar's Landing"
             ),
            -2 => "Uncategorized"
         )
