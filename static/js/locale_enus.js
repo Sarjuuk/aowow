@@ -374,6 +374,7 @@ var mn_quests = [
         [210, "Icecrown"],
         [394, "Grizzly Hills"],
         [495, "Howling Fjord"],
+        [2817, "Crystalsong Forest"],
         [3537, "Borean Tundra", , [[4024, "Coldarra", "?quests=10.4024"]]],
         [3711, "Sholazar Basin"],
         [4197, "Wintergrasp"],
@@ -1612,6 +1613,7 @@ var g_quest_sorts = {
        2597: 'Alterac Valley',
        2677: 'Blackwing Lair',
        2717: 'Molten Core',
+       2817: 'Crystalsong Forest',
        3277: 'Warsong Gulch',
        3358: 'Arathi Basin',
        3428: 'Temple of Ahn\'Qiraj',
@@ -1693,7 +1695,7 @@ var g_quest_sorts = {
        4812: 'Icecrown Citadel',
        4813: 'Pit of Saron',
        4820: 'Halls of Reflection',
-       4987: 'The Ruby Sanctum',
+       4987: 'The Ruby Sanctum'
 };
 
 var g_quest_types = {

@@ -642,8 +642,7 @@ $lang = array(
                    44 => "Redridge Mountains",              45 => "Arathi Highlands",                46 => "Burning Steppes",                 47 => "The Hinterlands",                 51 => "Searing Gorge",
                    85 => "Tirisfal Glades",                130 => "Silverpine Forest",              132 => "Coldridge Valley",               139 => "Eastern Plaguelands",            154 => "Deathknell",
                   267 => "Hillsbrad Foothills",           1497 => "Undercity",                     1519 => "Stormwind City",                1537 => "Ironforge",                     2257 => "Deeprun Tram",
-                 3430 => "Eversong Woods",                3431 => "Sunstrider Isle",               3433 => "Ghostlands",                    3487 => "Silvermoon City",
-                 4080 => "Isle of Quel'Danas",
+                 3430 => "Eversong Woods",                3431 => "Sunstrider Isle",               3433 => "Ghostlands",                    3487 => "Silvermoon City",               4080 => "Isle of Quel'Danas",
                  4298 => "The Scarlet Enclave"
             ),
             1 => array( "Kalimdor",
