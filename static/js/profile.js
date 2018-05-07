@@ -617,6 +617,8 @@ function pr_onBreadcrumbUpdate() // Add character lookup textbox to the breadcru
     i.className = 'search-character';
     i.type = 'text';
 
+    i.placeholder = LANG.tab_character + LANG.ellipsis;     // aowow - use placeholder text instead of background texture
+
     i.onfocus = function()
     {
         this.className = '';

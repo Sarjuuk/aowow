@@ -20112,7 +20112,7 @@ var MapViewer = new function()
         {
             tempParent = $WH.ce('div');
             tempParent.id = 'fewuiojfdksl';
-            $WH.ae(document.body, tempParent);
+            $WH.aef(document.body, tempParent);             // aowow - aef() insteead of ae() - rather scroll page to top instead of bottom
             var map = new Mapper({ parent: tempParent.id });
             map.setLink(opt.link, true);
             map.toggleZoom();

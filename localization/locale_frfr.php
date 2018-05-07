@@ -760,7 +760,7 @@ $lang = array(
         'maxStanding'   => "Niveau maximum",
         'quartermaster' => "Intendant",
         'customRewRate' => "Taux de récompense personnalisé",
-        '_transfer'     => 'La réputation de cette faction sera convertie en <a href="?faction=%d" class="q1">%s</a> si vous transférez vers <span class="icon-%s">%s</span>.]',
+        '_transfer'     => 'La réputation de cette faction sera convertie en <a href="?faction=%d" class="q1">%s</a> si vous transférez vers <span class="icon-%s">%s</span>.',
         'cat'           => array(
             1118 => ["Classique", 469 => "Alliance", 169 => "Cartel Gentepression", 67 => "Horde", 891 => "Forces de l'Alliance", 892 => "Forces de la Horde"],
             980  => ["The Burning Crusade", 936 => "Shattrath"],

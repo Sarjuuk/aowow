@@ -44,6 +44,13 @@ $error = function ($type, $realmGUID, $realmId)
 // if (CFG_PROFILER_ENABLE) - wont work because it is not redefined if changed in config
 while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profiler_enable"'))
 {
+    if (($tDiff = (microtime(true) - $tCycle)) < (CFG_PROFILER_QUEUE_DELAY / 1000))
+    {
+        $wait = (CFG_PROFILER_QUEUE_DELAY / 1000) - $tDiff;
+        CLI::write('sleeping '.Lang::nf($wait, 2).'s..');
+        usleep($wait * 1000 * 1000);
+    }
+
     $row = DB::Aowow()->selectRow('SELECT * FROM ?_profiler_sync WHERE status = ?d ORDER BY requestTime ASC', PR_QUEUE_STATUS_WAITING);
     if (!$row)
     {
@@ -95,13 +102,6 @@ while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profil
             DB::Aowow()->query('DELETE FROM ?_profiler_sync WHERE realm = ?d AND type = ?d AND typeId = ?d', $row['realm'], $row['type'], $row['typeId']);
             trigger_error('prQueue - unknown type #'.$row['type'].' to sync into profiler. Removing from queue...', E_USER_ERROR);
             CLI::write('unknown type #'.$row['type'].' to sync into profiler. Removing from queue...', CLI::LOG_ERROR);
-    }
-
-    if (($tDiff = (microtime(true) - $tCycle)) < (CFG_PROFILER_QUEUE_DELAY / 1000))
-    {
-        $wait = (CFG_PROFILER_QUEUE_DELAY / 1000) - $tDiff;
-        CLI::write('sleeping '.Lang::nf($wait, 2).'s..');
-        usleep($wait * 1000 * 1000);
     }
 
     $tCycle = microtime(true);

@@ -123,10 +123,11 @@
     background-position: left bottom;
 }
 
+/* aowow - use placeholder property instead of texture
 input.search-character {
     background: white url(../images/enus/character.gif) 0.2em center no-repeat !important;
 }
-
+*/
 /*********************************************/
 
 .profiler-header {
