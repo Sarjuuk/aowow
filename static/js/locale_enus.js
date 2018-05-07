@@ -3138,6 +3138,7 @@ var LANG = {
     tab_skills:              "Skills",
     tab_skinnedfrom:         "Skinned from",
     tab_skinning:            "Skinning",
+    tab_socketbonus:         "Socket Bonus",                // aowow - custom
     tab_soldby:              "Sold by",
     tab_spells:              "Spells",
     tab_starts:              "Starts",

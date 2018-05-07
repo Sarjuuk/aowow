@@ -3091,6 +3091,7 @@ var LANG = {
     tab_skills:              "Compétences",
     tab_skinnedfrom:         "Dépecé depuis",
     tab_skinning:            "Dépeçage",
+    tab_socketbonus:         "Bonus de châsse",             // aowow - custom
     tab_soldby:              "Vendu par",
     tab_spells:              "Sorts",
     tab_starts:              "Débute",

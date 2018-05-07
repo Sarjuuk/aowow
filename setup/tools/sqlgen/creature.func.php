@@ -32,8 +32,8 @@ function creature(array $ids = [])
             0 AS modelId,                                   -- modelId
             0 AS humanoid,                                  -- uses creaturedisplayinfoextra
             "" AS iconString,                               -- iconString
-            ct.name, IFNULL(ctl2.`Name`, "")  AS n2, IFNULL(ctl3.`Name`, "")  AS n3, IFNULL(ctl6.`Name`, "")  AS n6, IFNULL(ctl8.`Name`, "")  AS n8,
-            subname, IFNULL(ctl2.`Title`, "") AS t2, IFNULL(ctl3.`Title`, "") AS t3, IFNULL(ctl6.`Title`, "") AS t6, IFNULL(ctl8.`Title`, "") AS t8,
+            ct.name, IFNULL(ctl2.`Name`, "")  AS n2, IFNULL(ctl3.`Name`, "")  AS n3, IFNULL(ctl4.`Name`, "")  AS n4, IFNULL(ctl6.`Name`, "")  AS n6, IFNULL(ctl8.`Name`, "")  AS n8,
+            subname, IFNULL(ctl2.`Title`, "") AS t2, IFNULL(ctl3.`Title`, "") AS t3, IFNULL(ctl4.`Title`, "") AS t4, IFNULL(ctl6.`Title`, "") AS t6, IFNULL(ctl8.`Title`, "") AS t8,
             minLevel, maxLevel,
             exp,
             faction,
@@ -86,6 +86,8 @@ function creature(array $ids = [])
             creature_template_locale ctl2 ON ct.entry = ctl2.entry AND ctl2.`locale` = "frFR"
         LEFT JOIN
             creature_template_locale ctl3 ON ct.entry = ctl3.entry AND ctl3.`locale` = "deDE"
+        LEFT JOIN
+            creature_template_locale ctl4 ON ct.entry = ctl4.entry AND ctl4.`locale` = "zhCN"
         LEFT JOIN
             creature_template_locale ctl6 ON ct.entry = ctl6.entry AND ctl6.`locale` = "esES"
         LEFT JOIN

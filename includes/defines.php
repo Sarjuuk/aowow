@@ -155,6 +155,7 @@ define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GRO
 define('LOCALE_EN',                         0);
 define('LOCALE_FR',                         2);
 define('LOCALE_DE',                         3);
+define('LOCALE_CN',                         4);
 define('LOCALE_ES',                         6);
 define('LOCALE_RU',                         8);
 

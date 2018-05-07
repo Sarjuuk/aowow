@@ -909,6 +909,7 @@ $WH.g_getLocaleFromDomain = function(domain) {
 $WH.g_getLocaleFromDomain.L = {
     fr:  2,
     de:  3,
+    cn:  4,
     es:  6,
     ru:  8,
     www: 0

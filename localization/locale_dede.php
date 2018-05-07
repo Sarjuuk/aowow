@@ -1101,7 +1101,7 @@ $lang = array(
             'ammo'      => ["Verursacht %g zusätzlichen Schaden pro Sekunde.",  "Verursacht %g zusätzlichen %sschaden pro Sekunde", "+ %g Schaden pro Sekunde", "+ %g %sschaden pro Sekunde"]
         ),
         'gems'          => "Edelsteine",
-        'socketBonus'   => "Sockelbonus",
+        'socketBonus'   => "Sockelbonus: %s",
         'socket'        => array(
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"
         ),

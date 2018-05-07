@@ -3091,6 +3091,7 @@ var LANG = {
     tab_skills:              "Умения",
     tab_skinnedfrom:         "Снимается с",
     tab_skinning:            "Снятие шкур",
+    tab_socketbonus:         "При соответствии цвета",      // aowow - custom
     tab_soldby:              "Продается у",
     tab_spells:              "Заклинания",
     tab_starts:              "Начинает",

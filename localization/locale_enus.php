@@ -1101,7 +1101,7 @@ $lang = array(
             'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
         ),
         'gems'          => "Gems",
-        'socketBonus'   => "Socket Bonus",                  // ITEM_SOCKET_BONUS
+        'socketBonus'   => "Socket Bonus: %s",              // ITEM_SOCKET_BONUS
         'socket'        => array(                           // EMPTY_SOCKET_*
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
         ),

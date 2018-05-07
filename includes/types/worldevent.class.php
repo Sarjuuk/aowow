@@ -71,6 +71,7 @@ class WorldEventList extends BaseType
                 IFNULL(h.name_loc0, e.description) AS name_loc0,
                 h.name_loc2,
                 h.name_loc3,
+                h.name_loc4,
                 h.name_loc6,
                 h.name_loc8
             FROM

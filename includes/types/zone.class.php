@@ -54,7 +54,7 @@ class ZoneList extends BaseType
     // use if you JUST need the name
     public static function getName($id)
     {
-        $n = DB::Aowow()->selectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_zones WHERE id = ?d', $id );
+        $n = DB::Aowow()->selectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_zones WHERE id = ?d', $id );
         return Util::localizedString($n, 'name');
     }
 

@@ -2670,7 +2670,7 @@ var LANG = {
     lvpage_next:     "Siguiente ",
     lvpage_last:     "Última ",
 
-    lvsearchresults: "Buscar en resultados",
+    lvsearchresults:          "Buscar en resultados",
     lvsearchdisplayedresults: "Buscar en los resultados mostrados",
 
     lvscreenshot_submit: "Envia una captura de pantalla",
@@ -3089,6 +3089,7 @@ var LANG = {
     tab_skills:              "Habilidades",
     tab_skinnedfrom:         "Desollado de",
     tab_skinning:            "Desuello",
+    tab_socketbonus:         "Bono de ranura",              // aowow - custom
     tab_soldby:              "Vendido por",
     tab_spells:              "Hechizos",
     tab_starts:              "Empieza",

@@ -278,11 +278,11 @@ class Util
     private static $perfectGems             = null;
 
     public static $localeStrings            = array(        // zero-indexed
-        'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
+        'enus',         null,           'frfr',         'dede',         'zhcn',         null,           'eses',         null,           'ruru'
     );
 
     public static $subDomains               = array(
-        'www',          null,           'fr',           'de',           null,           null,           'es',           null,           'ru'
+        'www',          null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
     );
 
     public static $typeClasses              = array(
@@ -652,6 +652,10 @@ class Util
     // default back to enUS if localization unavailable
     public static function localizedString($data, $field, $silent = false)
     {
+        // only display placeholder markers for staff
+        if (!User::isInGroup(U_GROUP_EMPLOYEE | U_GROUP_TESTER | U_GROUP_LOCALIZER))
+            $silent = true;
+
         // default case: selected locale available
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];

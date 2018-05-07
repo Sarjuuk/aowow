@@ -3089,6 +3089,7 @@ var LANG = {
     tab_skills:              "Fertigkeiten",
     tab_skinnedfrom:         "Gekürschnert von",
     tab_skinning:            "Kürschnerei",
+    tab_socketbonus:         "Sockelbonus",                 // aowow - custom
     tab_soldby:              "Verkauft von",
     tab_spells:              "Zauber",
     tab_starts:              "Startet Quests",

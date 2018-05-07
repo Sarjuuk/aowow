@@ -1101,7 +1101,7 @@ $lang = array(
             'ammo'      => ["Añade %g daño por segundo",    "Añade %g %s daño por segundo", "+ %g daño por segundo",    "+ %g %s daño por segundo"]
         ),
         'gems'          => "Gemas",
-        'socketBonus'   => "Bono de ranura",
+        'socketBonus'   => "Bono de ranura: %s",
         'socket'        => array(
             "Ranura meta",          "Ranura roja",      "Ranura amarilla",          "Ranura azul",            -1 => "Ranura prismática"
         ),

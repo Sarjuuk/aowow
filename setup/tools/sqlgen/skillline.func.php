@@ -34,7 +34,7 @@ function skillline()
         REPLACE INTO
             ?_skillline
         SELECT
-            id, categoryId, 0, categoryId, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, description_loc0, description_loc2, description_loc3, description_loc6, description_loc8, 0, iconId, 0, 0, ""
+            id, categoryId, 0, categoryId, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, description_loc0, description_loc2, description_loc3, description_loc4, description_loc6, description_loc8, 0, iconId, 0, 0, ""
         FROM
             dbc_skillline';
 

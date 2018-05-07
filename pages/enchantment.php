@@ -195,7 +195,7 @@ class EnchantmentPage extends GenericPage
         {
             $this->lvTabs[] = ['item', array(
                 'data' => array_values($socketsList->getListviewData()),
-                'name' => '$LANG.tab_usedby + \' \' + \''.Lang::item('socketBonus').'\'',
+                'name' => '$LANG.tab_socketbonus',
                 'id'   => 'used-by-socketbonus',
             )];
 

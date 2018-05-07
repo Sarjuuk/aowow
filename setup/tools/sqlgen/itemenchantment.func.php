@@ -17,7 +17,7 @@ function itemenchantment()
         REPLACE INTO
             ?_itemenchantment
         SELECT
-            Id, charges, 0, 0, 0, type1, type2, type3, amount1, amount2, amount3, object1, object2, object3, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, conditionId, skillLine, skillLevel, requiredLevel
+            Id, charges, 0, 0, 0, type1, type2, type3, amount1, amount2, amount3, object1, object2, object3, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, conditionId, skillLine, skillLevel, requiredLevel
         FROM
             dbc_spellitemenchantment';
 

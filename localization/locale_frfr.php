@@ -1102,7 +1102,7 @@ $lang = array(
             'ammo'      => ["Ajoute %g dégâts par seconde", "Ajoute %g points de dégâts (%s) par seconde",  "+ %g points de dégâts par seconde",    "+ %g points de dégâts (%s) par seconde" ]
         ),
         'gems'          => "Gemmes",
-        'socketBonus'   => "Bonus de châsse",
+        'socketBonus'   => "Bonus de châsse: %s",
         'socket'        => array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"
         ),

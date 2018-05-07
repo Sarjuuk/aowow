@@ -63,7 +63,7 @@ function factions()
             0,                                                  -- cuFlags
             parentFaction,
             spilloverRateIn, spilloverRateOut, spilloverMaxRank,
-            name_loc0, name_loc2, name_loc3, name_loc6, name_loc8
+            name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8
         FROM
             dbc_faction f
         LEFT JOIN

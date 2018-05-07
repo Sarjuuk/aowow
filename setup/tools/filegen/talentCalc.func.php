@@ -45,7 +45,7 @@ if (!CLI)
 
             for ($tabIdx = 0; $tabIdx < count($tabs); $tabIdx++)
             {
-                $talents = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$tabIdx]['id']);
+                $talents = DB::Aowow()->select('SELECT t.id AS tId, t.*, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc4, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$tabIdx]['id']);
                 $result[$tabIdx] = array(
                     'n' => Util::localizedString($tabs[$tabIdx], 'name'),
                     't' => []
