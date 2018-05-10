@@ -185,45 +185,54 @@ class ItemPage extends genericPage
             $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::item('each').')[/color]' : null;
             $handled  = [];
             $costList = [];
-            foreach ($vendors as $npcId => $data)
+            foreach ($vendors as $npcId => $entries)
             {
-                $tokens   = [];
-                $currency = [];
-
-                if (!is_array($data))
-                    continue;
-
-                foreach ($data as $c => $qty)
+                foreach ($entries as $data)
                 {
-                    if (is_string($c))
-                    {
-                        unset($data[$c]);                   // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
+                    $tokens   = [];
+                    $currency = [];
+
+                    if (!is_array($data))
                         continue;
+
+                    foreach ($data as $c => $qty)
+                    {
+                        if (is_string($c))
+                        {
+                            unset($data[$c]);               // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
+                            continue;
+                        }
+
+                        if ($c < 0)                         // currency items (and honor or arena)
+                        {
+                            $currency[] = -$c.','.$qty;
+                            $this->extendGlobalIds(TYPE_CURRENCY, -$c);
+                        }
+                        else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
+                        {
+                            $tokens[$c] = $c.','.$qty;
+                            $this->extendGlobalIds(TYPE_ITEM, $c);
+                        }
                     }
 
-                    if ($c < 0)                             // currency items (and honor or arena)
-                        $currency[] = -$c.','.$qty;
-                    else if ($c > 0)                        // plain items (item1,count1,item2,count2,...)
-                        $tokens[$c] = $c.','.$qty;
+                    // display every cost-combination only once
+                    if (in_array(md5(serialize($data)), $handled))
+                        continue;
+
+                    $handled[] = md5(serialize($data));
+
+                    $cost = isset($data[0]) ? '[money='.$data[0] : '[money';
+
+                    if ($tokens)
+                        $cost .= ' items='.implode(',', $tokens);
+
+                    if ($currency)
+                        $cost .= ' currency='.implode(',', $currency);
+
+                    $cost .= ']';
+
+                    $costList[] = $cost;
                 }
-
-                // display every cost-combination only once
-                if (in_array(md5(serialize($data)), $handled))
-                    continue;
-
-                $handled[] = md5(serialize($data));
-
-                $cost = isset($data[0]) ? '[money='.$data[0] : '[money';
-
-                if ($tokens)
-                    $cost .= ' items='.implode(',', $tokens);
-
-                if ($currency)
-                    $cost .= ' currency='.implode(',', $currency);
-
-                $cost .= ']';
-
-                $costList[] = $cost;
             }
 
             if (count($costList) == 1)
@@ -760,7 +769,9 @@ class ItemPage extends genericPage
                 {
                     $currency = [];
                     $tokens   = [];
-                    foreach ($vendors[$k] as $id => $qty)
+
+                    // note: can only display one entry per row, so only use first entry of each vendor
+                    foreach ($vendors[$k][0] as $id => $qty)
                     {
                         if (is_string($id))
                             continue;
@@ -771,16 +782,10 @@ class ItemPage extends genericPage
                             $currency[] = [-$id, $qty];
                     }
 
-                    if ($currency)
-                        $this->extendGlobalIds(TYPE_CURRENCY, array_column($currency, 0));
+                    $row['stock'] = $vendors[$k][0]['stock'];
+                    $row['cost']  = [empty($vendors[$k][0][0]) ? 0 : $vendors[$k][0][0]];
 
-                    if ($tokens)
-                        $this->extendGlobalIds(TYPE_ITEM, array_column($tokens, 0));
-
-                    $row['stock'] = $vendors[$k]['stock'];
-                    $row['cost']  = [empty($vendors[$k][0]) ? 0 : $vendors[$k][0]];
-
-                    if ($e = $vendors[$k]['event'])
+                    if ($e = $vendors[$k][0]['event'])
                     {
                         if (count($extraCols) == 3)
                             $extraCols[] = '$Listview.extraCols.condition';

@@ -109,7 +109,8 @@ class CurrencyPage extends GenericPage
                     {
                         $items  = [];
                         $tokens = [];
-                        foreach ($vendors[$k] as $id => $qty)
+                        // note: can only display one entry per row, so only use first entry of each vendor
+                        foreach ($vendors[$k][0] as $id => $qty)
                         {
                             if (is_string($id))
                                 continue;
@@ -120,16 +121,16 @@ class CurrencyPage extends GenericPage
                                 $items[] = [-$id, $qty];
                         }
 
-                        if ($vendors[$k]['event'])
+                        if ($vendors[$k][0]['event'])
                         {
                             if (count($extraCols) == 3)             // not already pushed
                                 $extraCols[] = '$Listview.extraCols.condition';
 
-                            $this->extendGlobalIds(TYPE_WORLDEVENT, $vendors[$k]['event']);
-                            $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k]['event']]];
+                            $this->extendGlobalIds(TYPE_WORLDEVENT, $vendors[$k][0]['event']);
+                            $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k][0]['event']]];
                         }
 
-                        $row['stock'] = $vendors[$k]['stock'];
+                        $row['stock'] = $vendors[$k][0]['stock'];
                         $row['stack'] = $itemObj->getField('buyCount');
                         $row['cost']  = array(
                             $itemObj->getField('buyPrice'),

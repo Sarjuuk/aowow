@@ -90,70 +90,83 @@ class ItemList extends BaseType
 
         if (empty($this->vendors))
         {
-            $itemz = DB::World()->select('
-                SELECT   nv.item AS ARRAY_KEY1, nv.entry AS ARRAY_KEY2,            0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
+            $itemz      = [];
+            $xCostData  = [];
+            $rawEntries = DB::World()->select('
+                SELECT   nv.item,       nv.entry,             0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item AS ARRAY_KEY1,     c.id AS ARRAY_KEY2, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                SELECT genv.item, c.id AS `entry`, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 array_keys($this->templates),
                 empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
                 array_keys($this->templates)
             );
 
-            $xCosts = [];
-            foreach ($itemz as $i => $vendors)
-                $xCosts = array_merge($xCosts, array_column($vendors, 'extendedCost'));
+            foreach ($rawEntries as $costEntry)
+            {
+                if ($costEntry['extendedCost'])
+                    $xCostData[] = $costEntry['extendedCost'];
 
-            if ($xCosts)
-                $xCosts = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_itemextendedcost WHERE id IN (?a)', $xCosts);
+                if (!isset($itemz[$costEntry['item']][$costEntry['entry']]))
+                    $itemz[$costEntry['item']][$costEntry['entry']] = [$costEntry];
+                else
+                    $itemz[$costEntry['item']][$costEntry['entry']][] = $costEntry;
+            }
+
+            if ($xCostData)
+                $xCostData = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_itemextendedcost WHERE id IN (?a)', $xCostData);
 
             $cItems = [];
             foreach ($itemz as $k => $vendors)
             {
-                foreach ($vendors as $l => $vInfo)
+                foreach ($vendors as $l => $vendor)
                 {
-                    $costs = [];
-                    if (!empty($xCosts[$vInfo['extendedCost']]))
-                        $costs = $xCosts[$vInfo['extendedCost']];
-
-                    $data   = array(
-                        'stock'      => $vInfo['maxcount'] ?: -1,
-                        'event'      => $vInfo['eventId'],
-                        'reqRating'  => $costs ? $costs['reqPersonalRating'] : 0,
-                        'reqBracket' => $costs ? $costs['reqArenaSlot']      : 0
-                    );
-
-                    // hardcode arena(103) & honor(104)
-                    if (!empty($costs['reqArenaPoints']))
+                    foreach ($vendor as $m => $vInfo)
                     {
-                        $data[-103] = $costs['reqArenaPoints'];
-                        $this->jsGlobals[TYPE_CURRENCY][103] = 103;
-                    }
+                        $costs = [];
+                        if (!empty($xCostData[$vInfo['extendedCost']]))
+                            $costs = $xCostData[$vInfo['extendedCost']];
 
-                    if (!empty($costs['reqHonorPoints']))
-                    {
-                        $data[-104] = $costs['reqHonorPoints'];
-                        $this->jsGlobals[TYPE_CURRENCY][104] = 104;
-                    }
+                        $data   = array(
+                            'stock'      => $vInfo['maxcount'] ?: -1,
+                            'event'      => $vInfo['eventId'],
+                            'reqRating'  => $costs ? $costs['reqPersonalRating'] : 0,
+                            'reqBracket' => $costs ? $costs['reqArenaSlot']      : 0
+                        );
 
-                    for ($i = 1; $i < 6; $i++)
-                    {
-                        if (!empty($costs['reqItemId'.$i]) && $costs['itemCount'.$i] > 0)
+                        // hardcode arena(103) & honor(104)
+                        if (!empty($costs['reqArenaPoints']))
                         {
-                            $data[$costs['reqItemId'.$i]] = $costs['itemCount'.$i];
-                            $cItems[] = $costs['reqItemId'.$i];
+                            $data[-103] = $costs['reqArenaPoints'];
+                            $this->jsGlobals[TYPE_CURRENCY][103] = 103;
                         }
-                    }
 
-                    // no extended cost or additional gold required
-                    if (!$costs || $this->getField('flagsExtra') & 0x04)
-                    {
-                        $this->getEntry($k);
-                        if ($_ = $this->getField('buyPrice'))
-                            $data[0] = $_;
-                    }
+                        if (!empty($costs['reqHonorPoints']))
+                        {
+                            $data[-104] = $costs['reqHonorPoints'];
+                            $this->jsGlobals[TYPE_CURRENCY][104] = 104;
+                        }
 
-                    $vendors[$l] = $data;
+                        for ($i = 1; $i < 6; $i++)
+                        {
+                            if (!empty($costs['reqItemId'.$i]) && $costs['itemCount'.$i] > 0)
+                            {
+                                $data[$costs['reqItemId'.$i]] = $costs['itemCount'.$i];
+                                $cItems[] = $costs['reqItemId'.$i];
+                            }
+                        }
+
+                        // no extended cost or additional gold required
+                        if (!$costs || $this->getField('flagsExtra') & 0x04)
+                        {
+                            $this->getEntry($k);
+                            if ($_ = $this->getField('buyPrice'))
+                                $data[0] = $_;
+                        }
+
+                        $vendor[$m] = $data;
+                    }
+                    $vendors[$l] = $vendor;
                 }
 
                 $itemz[$k] = $vendors;
@@ -167,33 +180,37 @@ class ItemList extends BaseType
                     foreach ($jsData as $k => $v)
                         $this->jsGlobals[$type][$k] = $v;
 
-                foreach ($itemz as $id => $vendors)
+                foreach ($itemz as $itemId => $vendors)
                 {
-                    foreach ($vendors as $l => $costs)
+                    foreach ($vendors as $npcId => $costData)
                     {
-                        foreach ($costs as $k => $v)
+                        foreach ($costData as $itr => $cost)
                         {
-                            if (in_array($k, $cItems))
+                            foreach ($cost as $k => $v)
                             {
-                                $found = false;
-                                foreach ($moneyItems->iterate() as $__)
+                                if (in_array($k, $cItems))
                                 {
-                                    if ($moneyItems->getField('itemId') == $k)
+                                    $found = false;
+                                    foreach ($moneyItems->iterate() as $__)
                                     {
-                                        unset($costs[$k]);
-                                        $costs[-$moneyItems->id] = $v;
-                                        $found = true;
-                                        break;
+                                        if ($moneyItems->getField('itemId') == $k)
+                                        {
+                                            unset($cost[$k]);
+                                            $cost[-$moneyItems->id] = $v;
+                                            $found = true;
+                                            break;
+                                        }
                                     }
-                                }
 
-                                if (!$found)
-                                    $this->jsGlobals[TYPE_ITEM][$k] = $k;
+                                    if (!$found)
+                                        $this->jsGlobals[TYPE_ITEM][$k] = $k;
+                                }
                             }
+                            $costData[$itr] = $cost;
                         }
-                        $vendors[$l] = $costs;
+                        $vendors[$npcId] = $costData;
                     }
-                    $itemz[$id] = $vendors;
+                    $itemz[$itemId] = $vendors;
                 }
             }
 
@@ -209,28 +226,31 @@ class ItemList extends BaseType
         foreach ($result as $itemId => &$data)
         {
             $reqRating = [];
-            foreach ($data as $npcId => $costs)
+            foreach ($data as $npcId => $entries)
             {
-                if ($tok || $cur)                           // bought with specific token or currency
+                foreach ($entries as $costs)
                 {
-                    $valid = false;
-                    foreach ($costs as $k => $qty)
+                    if ($tok || $cur)                           // bought with specific token or currency
                     {
-                        if ((!$tok || $k == $tok) && (!$cur || $k == -$cur))
+                        $valid = false;
+                        foreach ($costs as $k => $qty)
                         {
-                            $valid = true;
-                            break;
+                            if ((!$tok || $k == $tok) && (!$cur || $k == -$cur))
+                            {
+                                $valid = true;
+                                break;
+                            }
                         }
+
+                        if (!$valid)
+                            unset($data[$npcId]);
                     }
 
-                    if (!$valid)
-                        unset($data[$npcId]);
+                    // reqRating ins't really a cost .. so pass it by ref instead of return
+                    // use highest total value
+                    if (isset($data[$npcId]) && $costs['reqRating'] && (!$reqRating || $reqRating[0] < $costs['reqRating']))
+                        $reqRating = [$costs['reqRating'], $costs['reqBracket']];
                 }
-
-                // reqRating ins't really a cost .. so pass it by ref instead of return
-                // use highest total value
-                if (isset($data[$npcId]) && $costs['reqRating'] && (!$reqRating || $reqRating[0] < $costs['reqRating']))
-                    $reqRating = [$costs['reqRating'], $costs['reqBracket']];
             }
 
             if ($reqRating)
@@ -266,6 +286,7 @@ class ItemList extends BaseType
         if ($addInfoMask & ITEMINFO_VENDOR)
             $extCosts = $this->getExtendedCost($miscData);
 
+        $extCostOther = [];
         foreach ($this->iterate() as $__)
         {
             foreach ($this->json[$this->id] as $k => $v)
@@ -300,42 +321,51 @@ class ItemList extends BaseType
             if ($addInfoMask & ITEMINFO_VENDOR)
             {
                 // just use the first results
-                // todo (med): dont use first result; search for the right one
+                // todo (med): dont use first vendor; search for the right one
                 if (!empty($extCosts[$this->id]))
                 {
-                    $cost     = reset($extCosts[$this->id]);
-                    $currency = [];
-                    $tokens   = [];
-
-                    foreach ($cost as $k => $qty)
+                    $cost = reset($extCosts[$this->id]);
+                    foreach ($cost as $itr => $entries)
                     {
-                        if (is_string($k))
-                            continue;
+                        $currency = [];
+                        $tokens   = [];
+                        $costArr  = [];
 
-                        if ($k > 0)
-                            $tokens[] = [$k, $qty];
-                        else if ($k < 0)
-                            $currency[] = [-$k, $qty];
+                        foreach ($entries as $k => $qty)
+                        {
+                            if (is_string($k))
+                                continue;
+
+                            if ($k > 0)
+                                $tokens[] = [$k, $qty];
+                            else if ($k < 0)
+                                $currency[] = [-$k, $qty];
+                        }
+
+                        $costArr['stock'] = $entries['stock'];// display as column in lv
+                        $costArr['avail'] = $entries['stock'];// display as number on icon
+                        $costArr['cost']  = [empty($entries[0]) ? 0 : $entries[0]];
+
+                        if ($entries['event'])
+                        {
+                            $this->jsGlobals[TYPE_WORLDEVENT][$entries['event']] = $entries['event'];
+                            $costArr['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $entries['event']]];
+                        }
+
+                        if ($currency || $tokens)           // fill idx:3 if required
+                            $costArr['cost'][] = $currency;
+
+                        if ($tokens)
+                            $costArr['cost'][] = $tokens;
+
+                        if (!empty($entries['reqRating']))
+                            $costArr['reqarenartng'] = $entries['reqRating'];
+
+                        if ($itr > 0)
+                            $extCostOther[$this->id][] = $costArr;
+                        else
+                            $data[$this->id] = array_merge($data[$this->id], $costArr);
                     }
-
-                    $data[$this->id]['stock'] = $cost['stock']; // display as column in lv
-                    $data[$this->id]['avail'] = $cost['stock']; // display as number on icon
-                    $data[$this->id]['cost']  = [empty($cost[0]) ? 0 : $cost[0]];
-
-                    if ($cost['event'])
-                    {
-                        $this->jsGlobals[TYPE_WORLDEVENT][$cost['event']] = $cost['event'];
-                        $row['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $cost['event']]];
-                    }
-
-                    if ($currency || $tokens)               // fill idx:3 if required
-                        $data[$this->id]['cost'][] = $currency;
-
-                    if ($tokens)
-                        $data[$this->id]['cost'][] = $tokens;
-
-                    if (!empty($cost['reqRating']))
-                        $data[$this->id]['reqarenartng'] = $cost['reqRating'];
                 }
 
                 if ($x = $this->curTpl['buyPrice'])
@@ -396,6 +426,10 @@ class ItemList extends BaseType
             if (!empty($this->curTpl['cooldown']))
                 $data[$this->id]['cooldown'] = $this->curTpl['cooldown'] / 1000;
         }
+
+        foreach ($extCostOther as $itemId => $duplicates)
+            foreach ($duplicates as $d)
+                $data[] = array_merge($data[$itemId], $d);  // we dont really use keys on data, but this may cause errors in future
 
         /* even more complicated crap
             modelviewer {type:X, displayid:Y, slot:z} .. not sure, when to set

@@ -17,6 +17,8 @@ abstract class BaseType
     protected $queryBase = '';
     protected $queryOpts = [];
 
+    private   $itrStack  = [];
+
     public static $contribute = CONTRIBUTE_ANY;
 
     /*
@@ -287,7 +289,7 @@ abstract class BaseType
 
     public function &iterate()
     {
-        $oldIdx = $this->id;
+        $this->itrStack[] = $this->id;
 
         // reset on __construct
         $this->reset();
@@ -304,6 +306,7 @@ abstract class BaseType
 
         // fforward to old index
         $this->reset();
+        $oldIdx = array_pop($this->itrStack);
         do
         {
             if (key($this->templates) != $oldIdx)
@@ -311,6 +314,7 @@ abstract class BaseType
 
             $this->curTpl = current($this->templates);
             $this->id     = key($this->templates);
+            next($this->templates);
             break;
         }
         while (next($this->templates));
