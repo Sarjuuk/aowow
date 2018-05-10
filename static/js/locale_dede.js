@@ -610,7 +610,11 @@ var mn_spells = [
     ]],
     [,"Begleiter"],
     [-6,"Haustiere"],
-    [-5,"Reittiere"],
+    [-5,"Reittiere",,[
+        [1,"Reittiere"],
+        [2,"Flugreittiere"],
+        [3,"Verschiedene"]
+    ]],
     [-3,"Begleiterfertigkeiten",,[
         [,"Todesritter"],
         [782,"Ghul",,,{tinyIcon:"Spell_Shadow_AnimateDead"}],

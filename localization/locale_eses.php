@@ -863,7 +863,7 @@ $lang = array(
              -4 => "Habilidades de raza",
              -2 => "Talentos",
              -6 => "Compañeros",
-             -5 => "Monturas",
+             -5 => ["Monturas", 1=> "Monturas terrestres", 2 => "Monturas voladoras", 3 => "Miscelánea"],
              -3 => array(
                 "Habilidades de mascota",   782 => "Necrófago",         270 => "Genérico",              766 => "Acechador deformado",       203 => "Araña",                 655 => "Ave rapaz",             785 => "Avispa",
                 788 => "Bestia espíritu",   787 => "Can del Núcleo",    214 => "Cangrejo",              213 => "Carroñero",                 212 => "Crocolisco",            781 => "Demosaurio",            767 => "Devastador",

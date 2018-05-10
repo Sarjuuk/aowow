@@ -610,7 +610,11 @@ var mn_spells = [
     ]],
     [,"Pets"],
     [-6,"Companions"],
-    [-5,"Mounts"],
+    [-5,"Mounts",,[
+        [1,"Ground Mounts"],
+        [2,"Flying Mounts"],
+        [3,"Miscellaneous"]
+    ]],
     [-3,"Pet Skills",,[
         [,"Death Knight"],
         [782,"Ghoul",,,{tinyIcon:"Spell_Shadow_AnimateDead"}],

@@ -859,11 +859,11 @@ $lang = array(
         'cat'           => array(                           // as per menu in locale_enus.js
               7 => "Class Skills",                          // classList
             -13 => "Glyphs",                                // classList
-            -11 => array("Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"),
+            -11 => ["Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"],
              -4 => "Racial Traits",
              -2 => "Talents",                               // classList
              -6 => "Companions",
-             -5 => "Mounts",
+             -5 => ["Mounts", 1 => "Ground Mounts", 2 => "Flying Mounts", 3 => "Miscellaneous"],
              -3 => array(
                 "Pet Skills",               782 => "Ghoul",             270 => "Generic",               653 => "Bat",                       210 => "Bear",                  655 => "Bird of Prey",          211 => "Boar",
                 213 => "Carrion Bird",      209 => "Cat",               780 => "Chimaera",              787 => "Core Hound",                214 => "Crab",                  212 => "Crocolisk",             781 => "Devilsaur",

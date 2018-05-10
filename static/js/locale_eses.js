@@ -610,7 +610,11 @@ var mn_spells = [
     ]],
     [,"Mascotas"],
     [-6,"Compañeros"],
-    [-5,"Monturas"],
+    [-5,"Monturas",,[
+        [1,"Monturas terrestres"],
+        [2,"Monturas voladoras"],
+        [3,"Miscelánea"]
+    ]],
     [-3,"Habilidades de mascota",,[
         [,"Caballero de la muerte"],
         [782,"Necrófago",,,{tinyIcon:"Spell_Shadow_AnimateDead"}],

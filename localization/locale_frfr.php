@@ -864,7 +864,7 @@ $lang = array(
              -4 => "Traits raciaux",
              -2 => "Talents",
              -6 => "Compagnons",
-             -5 => "Montures",
+             -5 => ["Montures", 1=> "Montures Terrestres", 2 => "Montures volantes", 3 => "Divers"],
              -3 => array(
                 "Habilité de familier",     782 => "Goule",             270 => "Générique",             203 => "Araignée",                  213 => "Charognard",            653 => "Chauve-souris",         787 => "Chien du Magma",
                 780 => "Chimère",           214 => "Crabe",             212 => "Crocilisque",           781 => "Diablosaure",               788 => "Esprit de bête",        763 => "Faucon-dragon",         209 => "Félin",

@@ -863,7 +863,7 @@ $lang = array(
              -4 => "Völkerfertigkeiten",
              -2 => "Talente",
              -6 => "Haustiere",
-             -5 => "Reittiere",
+             -5 => ["Reittiere", 1 => "Reittiere", 2 => "Flugreittiere", 3 => "Verschiedene"],
              -3 => array(
                 "Begleiterfertigkeiten",    782 => "Ghul",              270 => "Allgemein",             213 => "Aasvogel",                  210 => "Bär",                   763 => "Drachenfalke",          211 => "Eber",
                 767 => "Felshetzer",        653 => "Fledermaus",        788 => "Geisterbestie",         215 => "Gorilla",                   654 => "Hyäne",                 209 => "Katze",                 787 => "Kernhund",

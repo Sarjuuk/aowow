@@ -31,7 +31,7 @@ class SpellsPage extends GenericPage
         ),
         -3  => [782, 270, 653, 210, 655, 211, 213, 209, 780, 787, 214, 212, 781, 763, 215, 654, 775, 764, 217, 767, 786, 236, 768, 783, 203, 788, 765, 218, 251, 766, 785, 656, 208, 784, 761, 189, 188, 205, 204],  // Pet Spells => Skill
         -4  => true,                                        // Racial Traits
-        -5  => true,                                        // Mounts
+        -5  => [1, 2, 3],                                   // Mounts [Ground, Flying, Misc]
         -6  => true,                                        // Companions
         -7  => [409, 410, 411],                             // PetTalents => TalentTabId
         -8  => true,                                        // NPC Abilities
@@ -102,6 +102,7 @@ class SpellsPage extends GenericPage
         $conditions   = [];
         $visibleCols  = [];
         $hiddenCols   = [];
+        $extraCols    = [];
         $tabData      = ['data' => []];
 
         // the next lengthy ~250 lines determine $conditions and lvParams
@@ -171,6 +172,26 @@ class SpellsPage extends GenericPage
                 case -9:                                    // GM Spells
                     array_push($visibleCols, 'level');
                 case -5:                                    // Mounts
+                    array_push($extraCols, "\$Listview.funcBox.createSimpleCol('speed', 'speed', '90px', 'speed')");
+
+                    if (isset($this->category[1]))
+                    {
+                        switch ($this->category[1])
+                        {
+                            case 1:
+                                $conditions[] = ['OR',
+                                    ['AND', ['effect2AuraId', 32], ['effect3AuraId', 207, '!']],
+                                    ['AND', ['effect3AuraId', 32], ['effect2AuraId', 207, '!']]
+                                ];
+                                break;
+                            case 2:
+                                $conditions[] = ['OR', ['effect2AuraId', 207], ['effect3AuraId', 207]];
+                                break;
+                            case 3:
+                                $conditions[] = ['AND', ['effect2AuraId', 32, '!'], ['effect2AuraId', 207, '!'], ['effect3AuraId', 32, '!'],['effect3AuraId', 207, '!']];
+                                break;
+                        }
+                    }
                 case -6:                                    // Companions
                     $conditions[] = ['s.typeCat', $this->category[0]];
 
@@ -365,7 +386,29 @@ class SpellsPage extends GenericPage
         $spells = new SpellList($conditions);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        $tabData['data'] = array_values($spells->getListviewData());
+
+        $lvData = $spells->getListviewData();
+
+        // add speed-data for mounts
+        if ($this->category && $this->category[0] == -5)
+        {
+            foreach ($spells->iterate() as $spellId => $__)
+            {
+                $lvData[$spellId]['speed'] = 0;
+
+                if (in_array($spells->getField('effect2AuraId'), [32, 207, 58]))
+                    $lvData[$spellId]['speed'] = $spells->getField('effect2BasePoints') + 1;
+                if (in_array($spells->getField('effect3AuraId'), [32, 207, 58]))
+                    $lvData[$spellId]['speed'] = max($lvData[$spellId]['speed'], $spells->getField('effect3BasePoints') + 1);
+
+                if (!$lvData[$spellId]['speed'] && ($spells->getField('effect2AuraId') == 4 || $spells->getField('effect3AuraId') == 4))
+                    $lvData[$spellId]['speed'] = '?';
+                else
+                    $lvData[$spellId]['speed'] = '+'.$lvData[$spellId]['speed'].'%';
+            }
+        }
+
+        $tabData['data'] = array_values($lvData);
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
@@ -377,6 +420,8 @@ class SpellsPage extends GenericPage
             $this->filter['initData']['ec'] = $ec;
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
         }
+        else if ($extraCols)
+            $tabData['extraCols'] = $extraCols;
 
         if ($sc = $this->filterObj->getSetCriteria())
         {

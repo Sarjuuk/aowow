@@ -102,11 +102,19 @@ class SpellPage extends GenericPage
                 break;
             case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
                 if ($cf & SPELL_CU_PET_TALENT_TYPE0)
-                    $this->path[] = 411;                         // Ferocity
+                    $this->path[] = 411;                    // Ferocity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE1)
-                    $this->path[] = 409;                         // Tenacity
+                    $this->path[] = 409;                    // Tenacity
                 else if ($cf & SPELL_CU_PET_TALENT_TYPE2)
-                    $this->path[] = 410;                         // Cunning
+                    $this->path[] = 410;                    // Cunning
+                break;
+            case -5:
+                if ($this->subject->getField('effect2AuraId') == 207 || $this->subject->getField('effect3AuraId') == 207)
+                    $this->path[] = 2;                      // flying (also contains 32, so checked first)
+                else if ($this->subject->getField('effect2AuraId') == 32 || $this->subject->getField('effect3AuraId') == 32)
+                    $this->path[] = 1;                      // ground
+                else
+                    $this->path[] = 3;                      // misc
         }
     }
 

@@ -610,7 +610,11 @@ var mn_spells = [
     ]],
     [,"Familiers"],
     [-6,"Compagnons"],
-    [-5,"Montures"],
+    [-5,"Montures",,[
+        [1,"Montures Terrestres"],
+        [2,"Montures volantes"],
+        [3,"Divers"]
+    ]],
     [-3,"Habilité de familier",,[
         [,"Chevalier de la mort"],
         [782,"Goule",,,{tinyIcon:"Spell_Shadow_AnimateDead"}],
