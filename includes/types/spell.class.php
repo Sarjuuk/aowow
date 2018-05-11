@@ -31,7 +31,7 @@ class SpellList extends BaseType
     );
 
     public static   $effects     = array(
-        'heal'       => [ 0,/*3,*/10,  67,  75, 136                         ],  // <no effect>, Dummy, Heal, Heal Max Health, Heal Mechanical, Heal Percent
+        'heal'       => [ 0,/*3,*/10,  67,  75, 136                         ],  // <no effect>, /*Dummy*/, Heal, Heal Max Health, Heal Mechanical, Heal Percent
         'damage'     => [ 0,  2,   3,   9,  62                              ],  // <no effect>, Dummy, School Damage, Health Leech, Power Burn
         'itemCreate' => [24, 34,  59,  66, 157                              ],  // createItem, changeItem, randomItem, createManaGem, createItem2
         'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
@@ -813,7 +813,7 @@ class SpellList extends BaseType
     // formulae base from TC
     private function calculateAmountForCurrent($effIdx, $altTpl = null)
     {
-        $ref     = $altTpl ? $altTpl : $this;
+        $ref     = $altTpl ?: $this;
         $level   = $this->charLevel;
         $rppl    = $ref->getField('effect'.$effIdx.'RealPointsPerLevel');
         $base    = $ref->getField('effect'.$effIdx.'BasePoints');
@@ -821,6 +821,7 @@ class SpellList extends BaseType
         $maxLvl  = $ref->getField('maxLevel');
         $baseLvl = $ref->getField('baseLevel');
 
+        /* when should level scaling be actively worked into tooltips?
         if ($rppl)
         {
             if ($level > $maxLvl && $maxLvl > 0)
@@ -833,6 +834,7 @@ class SpellList extends BaseType
 
             $base  += (int)($level * $rppl);
         }
+        */
 
         return [
             $add ? $base + 1 : $base,
