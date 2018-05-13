@@ -349,26 +349,6 @@ class AjaxAdmin extends AjaxHandler
         if (!$this->_post['id'] || !$this->_post['__icon'])
             return 3;
 
-        $writeFile = function($file, $content)
-        {
-            $success = false;
-            if ($handle = @fOpen($file, "w"))
-            {
-                if (fWrite($handle, $content))
-                    $success = true;
-
-                fClose($handle);
-            }
-            else
-                die('me no file');
-
-            if ($success)
-                @chmod($file, Util::FILE_ACCESS);
-
-            return $success;
-        };
-
-
         // save to db
 
         DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE id = ?d', $this->_post['id']);
@@ -388,23 +368,10 @@ class AjaxAdmin extends AjaxHandler
 
         // write dataset
 
-        $wtPresets = [];
-        $scales    = DB::Aowow()->select('SELECT id, name, icon, class FROM ?_account_weightscales WHERE userId = 0 ORDER BY class, id ASC');
-
-        foreach ($scales as $s)
-        {
-            $weights = DB::Aowow()->selectCol('SELECT field AS ARRAY_KEY, val FROM ?_account_weightscale_data WHERE id = ?d', $s['id']);
-            if (!$weights)
-                continue;
-
-            $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
-        }
-
-        $toFile = "var wt_presets = ".Util::toJSON($wtPresets).";";
-        $file   = 'datasets/weight-presets';
-
-        if (!$writeFile($file, $toFile))
-            return 2;
+        exec('php aowow --build=weightPresets', $out);
+        foreach ($out as $o)
+            if (strstr($o, 'ERR'))
+                return 2;
 
 
         // all done
