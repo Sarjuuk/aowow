@@ -13,7 +13,7 @@ class ProfileList extends BaseType
         $data = [];
         foreach ($this->iterate() as $__)
         {
-            if (!$this->getField('cuFlags') & PROFILER_CU_PUBLISHED && !User::isInGroup(U_GROUP_STAFF))
+            if (!$this->isVisibleToUser())
                 continue;
 
             if (($addInfo & PROFILEINFO_PROFILE) && !$this->isCustom())
@@ -115,7 +115,7 @@ class ProfileList extends BaseType
 
         foreach ($this->iterate() as $id => $__)
         {
-            if (($addMask & PROFILEINFO_PROFILE) && ($this->getField('cuFlags') & PROFILER_CU_PROFILE))
+            if (($addMask & PROFILEINFO_PROFILE) && $this->isCustom())
             {
                 $profile = array(
                     'id'     => $this->getField('id'),
@@ -134,7 +134,7 @@ class ProfileList extends BaseType
                 continue;
             }
 
-            if ($addMask & PROFILEINFO_CHARACTER && !($this->getField('cuFlags') & PROFILER_CU_PROFILE))
+            if ($addMask & PROFILEINFO_CHARACTER && !$this->isCustom())
             {
                 if (!isset($realms[$this->getField('realm')]))
                     continue;
@@ -160,6 +160,20 @@ class ProfileList extends BaseType
     public function isCustom()
     {
         return $this->getField('cuFlags') & PROFILER_CU_PROFILE;
+    }
+
+    public function isVisibleToUser()
+    {
+        if (!$this->isCustom() || User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            return true;
+
+        if ($this->subject->getField('cuFlags') & PROFILER_CU_DELETED)
+            return false;
+
+        if (User::$id == $this->getField('user'))
+            return true;
+
+        return (bool)($this->getField('cuFlags') & PROFILER_CU_PUBLISHED);
     }
 
     public function getIcon()
