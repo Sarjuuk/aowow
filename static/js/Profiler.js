@@ -1788,7 +1788,8 @@ function Profiler() {
                 statisticId = raid.kills[i][0],
                 nameId = raid.kills[i][1],
                 nKills = (_profile.statistics[statisticId] | 0),
-                name = (raid.zone ? g_npcs[nameId]['name_' + Locale.getName()] : g_zones[nameId]);
+                // name = (raid.zone ? g_npcs[nameId]['name_' + Locale.getName()] : g_zones[nameId]); // aowow - original
+                name = (g_zones[nameId] ? g_zones[nameId] : g_npcs[nameId]['name_' + Locale.getName()]);
 
             if (!name) {
                 continue;
