@@ -589,6 +589,10 @@ class RemoteProfileList extends ProfileList
                     $distrib[$curTpl['realm']]++;
             }
 
+            // char is pending rename
+            if ($curTpl['at_login'] & 0x1)
+                $curTpl['name'] = 'RENAME-'.$curTpl['name'];
+
             $curTpl['cuFlags'] = 0;
         }
 

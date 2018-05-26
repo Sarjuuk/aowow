@@ -1886,7 +1886,7 @@ CREATE TABLE `aowow_profiler_profiles` (
   `glyphs2` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
   `activespec` tinyint(1) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `realm_realmGUID_name` (`realm`,`realmGUID`,`name`),
+  UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
   KEY `user` (`user`),
   KEY `guild` (`guild`),
   CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -3090,7 +3090,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1525094405,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1527333496,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

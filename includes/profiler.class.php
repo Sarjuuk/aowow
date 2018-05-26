@@ -401,6 +401,9 @@ class Profiler
             'achievementpoints' => 0
         );
 
+        // char is flagged for rename
+        if ($char['at_login'] & 0x1)
+            $data['name'] = 'RENAME-'.$data['name'];
 
         /********************/
         /* talents + glyphs */
