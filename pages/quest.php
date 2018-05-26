@@ -1217,10 +1217,11 @@ class QuestPage extends GenericPage
             $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $rmtId);
 
             $mail = array(
-                'delay'   => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
-                'sender'  => null,
-                'text'    => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))      : null,
-                'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
+                'delay'       => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
+                'sender'      => null,
+                'attachments' => [],
+                'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))     : null,
+                'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
             );
 
             foreach ($startEnd as $se)
@@ -1239,7 +1240,6 @@ class QuestPage extends GenericPage
             $mailLoot = new Loot();
             if ($mailLoot->getByContainer(LOOT_MAIL, $rmtId))
             {
-                $mail['attachments'] = [];
                 $this->extendGlobalData($mailLoot->jsGlobals);
                 foreach ($mailLoot->getResult() as $loot)
                 {

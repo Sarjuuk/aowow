@@ -2062,7 +2062,7 @@ class SpellPage extends GenericPage
 
                     }
                     else if ($effAura > 0)
-                        $foo['name'] .= Lang::main('colon').'Unknown Aura ('.$effAura.')';
+                        $foo['name'] .= 'Unknown Aura ('.$effAura.')';
 
                     break;
                 }

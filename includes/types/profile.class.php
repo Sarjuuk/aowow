@@ -167,7 +167,7 @@ class ProfileList extends BaseType
         if (!$this->isCustom() || User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
             return true;
 
-        if ($this->subject->getField('cuFlags') & PROFILER_CU_DELETED)
+        if ($this->getField('cuFlags') & PROFILER_CU_DELETED)
             return false;
 
         if (User::$id == $this->getField('user'))

@@ -252,7 +252,7 @@ class Lang
         }
 
         if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
-            return self::spell('cat', -5);
+            return self::spell('cat', -5, 0);
 
         $tmp  = [];
         $strs = self::spell($class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass');

@@ -567,20 +567,22 @@ class AchievementPage extends GenericPage
 
             $reqCss = true;
             $mail   = array(
-                'delay'   => null,
-                'sender'  => null,
-                'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
-                'text'    => Util::parseHtmlText(Util::localizedString($letter, 'text', true))
+                'delay'       => null,
+                'sender'      => null,
+                'attachments' => [],
+                'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
+                'text'        => Util::parseHtmlText(Util::localizedString($letter, 'text', true))
             );
         }
         else if ($_ = Util::parseHtmlText($this->subject->getField('text', true, true)))
         {
             $reqCss = true;
             $mail   = array(
-                'delay'   => null,
-                'sender'  => null,
-                'subject' => Util::parseHtmlText($this->subject->getField('subject', true, true)),
-                'text'    => $_
+                'delay'       => null,
+                'sender'      => null,
+                'attachments' => [],
+                'subject'     => Util::parseHtmlText($this->subject->getField('subject', true, true)),
+                'text'        => $_
             );
         }
 

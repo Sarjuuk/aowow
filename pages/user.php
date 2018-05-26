@@ -13,6 +13,7 @@ class UserPage extends GenericPage
 
     protected $typeId   = 0;
     protected $pageName = '';
+    protected $user     = [];
 
     public function __construct($pageCall, $pageParam)
     {
@@ -37,6 +38,10 @@ class UserPage extends GenericPage
 
     protected function generateContent()
     {
+        if (!$this->user)                                   // shouldn't happen .. but did
+            return;
+
+
         /***********/
         /* Infobox */
         /***********/
@@ -245,6 +250,9 @@ class UserPage extends GenericPage
 
     protected function generateTitle()
     {
+        if (!$this->user)                                   // shouldn't happen .. but did
+            return;
+
         array_unshift($this->title, sprintf(Lang::user('profileTitle'), $this->user['displayName']));
     }
 
