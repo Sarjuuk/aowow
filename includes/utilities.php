@@ -1427,7 +1427,7 @@ class Util
             'createDate'  => time(),
             'mode'        => $mode,
             'reason'      => $reason,
-            'subject'     => $subject,
+            'subject'     => $subject ?: 0,                 // not set for utility, tools and misc pages
             'ip'          => User::$ip,
             'description' => $desc,
             'userAgent'   => $userAgent ?: $_SERVER['HTTP_USER_AGENT'],

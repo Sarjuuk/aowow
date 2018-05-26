@@ -36,9 +36,11 @@ class AjaxData extends AjaxHandler
         foreach ($this->params as $set)
         {
             // requires valid token to hinder automated access
-            if ($set != 'item-scaling')
-                if (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey'])
-                    continue;
+            if ($set != 'item-scaling' && (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey']))
+            {
+                trigger_error('AjaxData::handleData - session data key empty or expired', E_USER_ERROR);
+                continue;
+            }
 
             switch ($set)
             {
@@ -107,6 +109,7 @@ class AjaxData extends AjaxHandler
                     $result .= "\n\n";
                     break;
                 default:
+                    trigger_error('AjaxData::handleData - invalid file "'.$set.'" in request', E_USER_ERROR);
                     break;
             }
         }

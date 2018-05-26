@@ -129,6 +129,10 @@ $lang = array(
         'genericError'  => "Ha ocurrido un error; refresca la página e inténtalo de nuevo. Si el error persiste manda un correo a <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Has sido baneado y no podrás valorar comentarios.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Has alcanzado el límite diario de votos. Vuelve mañana.", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "Ya has reportado esto.", # LANG.ct_resp_error7
+        'textTooShort'  => "[Your message is too short.]",
+        'cannotComment' => "[You have been banned from writing comments.]",
+        'textLength'    => "[Your comment has %d characters and must have at least %d and at most %d characters.]",
 
         'moreTitles'    => array(
             'reputation'    => "Reputación de la web",

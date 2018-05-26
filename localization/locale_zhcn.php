@@ -130,6 +130,10 @@ $lang = array(
         'genericError'  => "发生错误，请刷新页面再试一次。如果错误持续存在，请联系<a href=\"#contact\">反馈</a>。", # LANG.genericerror
         'bannedRating'  => "你评级评论的权力已被冻结。", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "你已经达到每日投票上限。请明天再来！", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "您已报告。", # LANG.ct_resp_error7
+        'textTooShort'  => "[Your message is too short.]",
+        'cannotComment' => "[You have been banned from writing comments.]",
+        'textLength'    => "[Your comment has %d characters and must have at least %d and at most %d characters.]",
 
         'moreTitles'    => array(
             'reputation'    => "网站声望",

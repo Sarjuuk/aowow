@@ -102,20 +102,36 @@ class AjaxProfile extends AjaxHandler
     protected function handleLink()                         // links char with account
     {
         if (!User::$id || empty($this->_get['id']))
+        {
+            trigger_error('AjaxProfile::handleLink - profileId empty or user not logged in', E_USER_ERROR);
             return;
+        }
 
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user']);
-        else if ($this->_get['user'])
-            return;
+        {
+            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            {
+                trigger_error('AjaxProfile::handleLink - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+                return;
+            }
+        }
 
         if ($this->undo)
             DB::Aowow()->query('DELETE FROM ?_account_profiles WHERE accountId = ?d AND profileId IN (?a)', $uid, $this->_get['id']);
         else
+        {
             foreach ($this->_get['id'] as $prId)            // only link characters, not custom profiles
+            {
                 if ($prId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE id = ?d AND realm IS NOT NULL', $prId))
                     DB::Aowow()->query('INSERT IGNORE INTO ?_account_profiles VALUES (?d, ?d, 0)', $uid, $prId);
+                else
+                {
+                    trigger_error('AjaxProfile::handleLink - profile #'.$prId.' is custom or does not exist', E_USER_ERROR);
+                    return;
+                }
+            }
+        }
     }
 
     /*  params
@@ -126,17 +142,24 @@ class AjaxProfile extends AjaxHandler
     protected function handlePin()                          // (un)favorite
     {
         if (!User::$id || empty($this->_get['id'][0]))
+        {
+            trigger_error('AjaxProfile::handlePin - profileId empty or user not logged in', E_USER_ERROR);
             return;
+        }
 
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user']);
-        else if ($this->_get['user'])
-            return;
+        {
+            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            {
+                trigger_error('AjaxProfile::handlePin - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+                return;
+            }
+        }
 
         // since only one character can be pinned at a time we can reset everything
         DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags & ?d WHERE accountId = ?d', ~PROFILER_CU_PINNED, $uid);
-        // and set a single char if nesecary
+        // and set a single char if necessary
         if (!$this->undo)
             DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags | ?d WHERE profileId = ?d AND accountId = ?d',  PROFILER_CU_PINNED, $this->_get['id'][0], $uid);
     }
@@ -149,13 +172,20 @@ class AjaxProfile extends AjaxHandler
     protected function handlePrivacy()                      // public visibility
     {
         if (!User::$id || empty($this->_get['id'][0]))
+        {
+            trigger_error('AjaxProfile::handlePrivacy - profileId empty or user not logged in', E_USER_ERROR);
             return;
+        }
 
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user']);
-        else if ($this->_get['user'])
-            return;
+        {
+            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            {
+                trigger_error('AjaxProfile::handlePrivacy - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
+                return;
+            }
+        }
 
         if ($this->undo)
         {
@@ -182,7 +212,10 @@ class AjaxProfile extends AjaxHandler
         $s     = $this->_get['size'] ?: 'medium';
 
         if (!$this->_get['id'] || !preg_match('/^([0-9]+)\.(jpg|gif)$/', $this->_get['id'][0], $matches) || !in_array($s, array_keys($sizes)))
+        {
+            trigger_error('AjaxProfile::handleAvatar - malformed request received', E_USER_ERROR);
             return;
+        }
 
         $this->contentType = 'image/'.$matches[2];
 
@@ -206,6 +239,8 @@ class AjaxProfile extends AjaxHandler
             $src = imageCreateFromJpeg(printf($aPath, $id));
             imagecopymerge($dest, $src, 0, 0, $offsetX, $offsetY, $sizes[$s], $sizes[$s], 100);
         }
+        else
+            trigger_error('AjaxProfile::handleAvatar - avatar file #'.$id.' not found', E_USER_ERROR);
 
         if ($matches[2] == 'gif')
             imageGif($dest);
@@ -223,8 +258,12 @@ class AjaxProfile extends AjaxHandler
     protected function handleResync()
     {
         if ($chars = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_profiles WHERE id IN (?a)', $this->_get['id']))
+        {
             foreach ($chars as $c)
                 Profiler::scheduleResync(TYPE_PROFILE, $c['realm'], $c['realmGUID']);
+        }
+        else
+            trigger_error('AjaxProfile::handleResync - profiles '.implode(', ', $this->_get['id']).' not found in db', E_USER_ERROR);
 
         return '1';
     }
@@ -261,6 +300,12 @@ class AjaxProfile extends AjaxHandler
             $ids = DB::Aowow()->selectCol('SELECT profileId FROM ?_profiler_arena_team_member WHERE arenaTeamId IN (?a)', $this->_get['id']);
         else
             $ids = $this->_get['id'];
+
+        if (!$ids)
+        {
+            trigger_error('AjaxProfile::handleStatus - no profileIds to resync'.($this->_get['guild'] ? ' for guild #'.$this->_get['guild'] : ($this->_get['arena-team'] ? ' for areana team #'.$this->_get['arena-team'] : '')), E_USER_ERROR);
+            return Util::toJSON([1, [PR_QUEUE_STATUS_ERROR, 0, 0, PR_QUEUE_ERROR_CHAR]]);
+        }
 
         $response = Profiler::resyncStatus(TYPE_PROFILE, $ids);
         return Util::toJSON($response);
@@ -407,8 +452,11 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handleDelete()                       // kill a profile
     {
-        if (!$this->_get['id'])
+        if (!User::$id || !$this->_get['id'])
+        {
+            trigger_error('AjaxProfile::handleDelete - profileId empty or user not logged in', E_USER_ERROR);
             return;
+        }
 
         // only flag as deleted; only custom profiles
         DB::Aowow()->query(
@@ -434,12 +482,15 @@ class AjaxProfile extends AjaxHandler
         // everything else goes through data.php .. strangely enough
 
         if (!$this->_get['id'])
+        {
+            trigger_error('AjaxProfile::handleLoad - profileId empty', E_USER_ERROR);
             return;
+        }
 
         $pBase = DB::Aowow()->selectRow('SELECT pg.name AS guildname, p.* FROM ?_profiler_profiles p LEFT JOIN ?_profiler_guild pg ON pg.id = p.guild WHERE p.id = ?d', $this->_get['id'][0]);
         if (!$pBase)
         {
-            trigger_error('Profiler::handleLoad() - called with invalid profileId #'.$this->_get['id'][0], E_USER_WARNING);
+            trigger_error('Profiler::handleLoad - called with invalid profileId #'.$this->_get['id'][0], E_USER_WARNING);
             return;
         }
 

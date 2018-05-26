@@ -129,6 +129,10 @@ $lang = array(
         'genericError'  => "An error has occurred; refresh the page and try again. If the error persists email <a href=\"#contact\">feedback</a>", # LANG.genericerror
         'bannedRating'  => "You have been banned from rating comments.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "You have reached the daily voting cap. Come back tomorrow!", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "You've already reported this.", # LANG.ct_resp_error7
+        'textTooShort'  => "Your message is too short.",
+        'cannotComment' => "You have been banned from writing comments.",
+        'textLength'    => "Your comment has %d characters and must have at least %d and at most %d characters.",
 
         'moreTitles'    => array(
             'reputation'    => "Website Reputation",

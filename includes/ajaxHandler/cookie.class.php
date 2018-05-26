@@ -29,8 +29,14 @@ class AjaxCookie extends AjaxHandler
     protected function handleCookie()
     {
         if (User::$id && $this->params && $this->_get[$this->params[0]])
+        {
             if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->_get[$this->params[0]]))
                 return 0;
+            else
+                trigger_error('AjaxCookie::handleCookie - write to db failed', E_USER_ERROR);
+        }
+        else
+            trigger_error('AjaxCookie::handleCookie - malformed request received', E_USER_ERROR);
 
         return null;
     }

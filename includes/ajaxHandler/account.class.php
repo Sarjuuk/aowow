@@ -51,7 +51,10 @@ class AjaxAccount extends AjaxHandler
             $ids  = $this->_post['id'];
 
             if (!isset(Util::$typeStrings[$type]) || empty($ids))
+            {
+                trigger_error('AjaxAccount::handleExclude - invalid type #'.$type.(empty($ids) ? ' or id-list empty' : ''), E_USER_ERROR);
                 return;
+            }
 
             // ready for some bullshit? here it comes!
             // we don't get signaled whether an id should be added to or removed from either includes or excludes
@@ -84,14 +87,20 @@ class AjaxAccount extends AjaxHandler
         if ($this->_post['save'])
         {
             if (!$this->_post['scale'])
+            {
+                trigger_error('AjaxAccount::handleWeightscales - scaleId empty', E_USER_ERROR);
                 return 0;
+            }
 
             $id = 0;
 
             if ($this->_post['id'] && ($id = $this->_post['id'][0]))
             {
                 if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE userId = ?d AND id = ?d', User::$id, $id))
+                {
+                    trigger_error('AjaxAccount::handleWeightscales - scale #'.$id.' not in db or owned by user #'.User::$id, E_USER_ERROR);
                     return 0;
+                }
 
                 DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE id = ?d', $this->_post['name'], $id);
             }
@@ -120,25 +129,37 @@ class AjaxAccount extends AjaxHandler
         else if ($this->_post['delete'] && $this->_post['id'] && $this->_post['id'][0])
             DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'][0], User::$id);
         else
+        {
+            trigger_error('AjaxAccount::handleWeightscales - malformed request received', E_USER_ERROR);
             return 0;
+        }
     }
 
     protected function handleFavorites()
     {
         // omit usage of sessionKey
         if (count($this->_post['id']) != 1 || empty($this->_post['id'][0]))
+        {
+            trigger_error('AjaxAccount::handleFavorites - malformed request received', E_USER_ERROR);
             return;
+        }
 
         $typeId = $this->_post['id'][0];
 
         if ($type = $this->_post['add'])
         {
             if (empty(Util::$typeClasses[$type]))
+            {
+                trigger_error('AjaxAccount::handleFavorites - invalid type #'.$type, E_USER_ERROR);
                 return;
+            }
 
             $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
             if ($tc->error)
+            {
+                trigger_error('AjaxAccount::handleFavorites - invalid typeId #'.$typeId.' for type '.$tc::$brickFile, E_USER_ERROR);
                 return;
+            }
 
             DB::Aowow()->query('INSERT INTO ?_account_favorites (`userId`, `type`, `typeId`) VALUES (?d, ?d, ?d)', User::$id, $type, $typeId);
         }

@@ -118,7 +118,10 @@ class AjaxAdmin extends AjaxHandler
     protected function ssApprove()
     {
         if (!$this->_get['id'])
+        {
+            trigger_error('AjaxAdmin::ssApprove - screenshotId empty', E_USER_ERROR);
             return '';
+        }
 
         // create resized and thumb version of screenshot
         $resized = [772, 618];
@@ -128,11 +131,14 @@ class AjaxAdmin extends AjaxHandler
         foreach ($this->_get['id'] as $id)
         {
             // must not be already approved
-            if ($_ = DB::Aowow()->selectRow('SELECT userIdOwner, date, type, typeId FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
+            if ($ssEntry = DB::Aowow()->selectRow('SELECT userIdOwner, date, type, typeId FROM ?_screenshots WHERE (status & ?d) = 0 AND id = ?d', CC_FLAG_APPROVED, $id))
             {
                 // should also error-log
                 if (!file_exists(sprintf($path, 'pending', $id)))
+                {
+                    trigger_error('AjaxAdmin::ssApprove - screenshot #'.$id.' exists in db but not as file', E_USER_ERROR);
                     continue;
+                }
 
                 $srcImg = imagecreatefromjpeg(sprintf($path, 'pending', $id));
                 $srcW   = imagesx($srcImg);
@@ -170,11 +176,13 @@ class AjaxAdmin extends AjaxHandler
 
                 // set as approved in DB and gain rep (once!)
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
-                Util::gainSiteReputation($_['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $_['date']]);
+                Util::gainSiteReputation($ssEntry['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $ssEntry['date']]);
                 // flag DB entry as having screenshots
-                if (Util::$typeClasses[$_['type']] && ($tbl = get_class_vars(Util::$typeClasses[$_['type']])['dataTable']))
-                    DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $_['typeId']);
+                if (Util::$typeClasses[$ssEntry['type']] && ($tbl = get_class_vars(Util::$typeClasses[$ssEntry['type']])['dataTable']))
+                    DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $ssEntry['typeId']);
             }
+            else
+                trigger_error('AjaxAdmin::ssApprove - screenshot #'.$id.' not in db or already approved', E_USER_ERROR);
         }
 
         return '';
@@ -185,7 +193,10 @@ class AjaxAdmin extends AjaxHandler
     protected function ssSticky()
     {
         if (!$this->_get['id'])
+        {
+            trigger_error('AjaxAdmin::ssSticky - screenshotId empty', E_USER_ERROR);
             return '';
+        }
 
         // approve soon to be sticky screenshots
         $this->ssApprove();
@@ -211,7 +222,10 @@ class AjaxAdmin extends AjaxHandler
     protected function ssDelete()
     {
         if (!$this->_get['id'])
+        {
+            trigger_error('AjaxAdmin::ssDelete - screenshotId empty', E_USER_ERROR);
             return '';
+        }
 
         $path = 'static/uploads/screenshots/%s/%d.jpg';
 
@@ -259,7 +273,10 @@ class AjaxAdmin extends AjaxHandler
     protected function ssRelocate()
     {
         if (!$this->_get['id'] || !$this->_get['typeid'])
+        {
+            trigger_error('AjaxAdmin::ssRelocate - screenshotId or typeId empty', E_USER_ERROR);
             return '';
+        }
 
         $id                     = $this->_get['id'][0];
         list($type, $oldTypeId) = array_values(DB::Aowow()->selectRow('SELECT type, typeId FROM ?_screenshots WHERE id = ?d', $id));
@@ -279,6 +296,8 @@ class AjaxAdmin extends AjaxHandler
             if($ssInfo || !$ssInfo['hasMore'])
                 DB::Aowow()->query('UPDATE '.$tc::$dataTable.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $oldTypeId);
         }
+        else
+            trigger_error('AjaxAdmin::ssRelocate - invalid typeId #'.$typeId.' for type '.$tc::$brickFile, E_USER_ERROR);
 
         return '';
     }

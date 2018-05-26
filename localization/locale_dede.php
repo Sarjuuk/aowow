@@ -129,6 +129,10 @@ $lang = array(
         'genericError'  => "Ein Fehler trat auf; aktualisiert die Seite und versucht es nochmal. Wenn der Fehler bestehen bleibt, bitte meldet es bei <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Ihr wurdet davon gesperrt, Kommentare zu bewerten.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Ihr habt die tägliche Grenze für erlaubte Bewertungen erreicht. Kommt morgen mal wieder!", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "Ihr habt dies bereits gemeldet.", # LANG.ct_resp_error7
+        'textTooShort'  => "Eure Nachricht ist zu kurz.",
+        'cannotComment' => "Ihr wurdet davon gesperrt, Kommentare zu verfassen.",
+        'textLength'    => "Euer Kommentar ist %d Zeichen lang und muss mindestens %d Zeichen und höchstens %d Zeichen lang sein.",
 
         'moreTitles'    => array(
             'reputation'    => "Benutzerruf",

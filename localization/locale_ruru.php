@@ -129,6 +129,10 @@ $lang = array(
         'genericError'  => "Произошла ошибка; обновите страницу и попробуйте снова. Если ситуация повторяется, отправьте сообщение на <a href='#contact'>feedback</a>", # LANG.genericerror
         'bannedRating'  => "Вам была заблокирована возможность оценивать комментарии.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "Вы сегодня проголосовали слишком много раз! Вы сможете продолжить завтра.", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "Вы уже подали на это жалобу.", # LANG.ct_resp_error7
+        'textTooShort'  => "[Your message is too short.]",
+        'cannotComment' => "[You have been banned from writing comments.]",
+        'textLength'    => "[Your comment has %d characters and must have at least %d and at most %d characters.]",
 
         'moreTitles'    => array(
             'reputation'    => "Репутация на сайте",

@@ -7,6 +7,8 @@
             <li><div>Stellt Eure Fragen bitte in unseren <a href="?forums">Foren</a>, wenn Ihr eine schnellere Antwort wünscht.</div></li>
             </ul>
 <?php
+    echo $this->coError ? '            <div class="msg-failure">'.$this->coError."</div>\n            <div class=\"pad\"></div>\n" : '';
+
     if (User::canComment()):
 ?>
             <form name="addcomment" action="?comment=add&amp;type=<?php echo $this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">

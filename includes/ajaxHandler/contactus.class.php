@@ -54,10 +54,16 @@ class AjaxContactus extends AjaxHandler
         );
 
         if ($mode === null || $rsn === null || $ua === null || $app === null || $url === null)
-            return 'required field missing';
+        {
+            trigger_error('AjaxContactus::handleContactUs - malformed contact request received', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         if (!isset($contexts[$mode]) || !in_array($rsn, $contexts[$mode]))
-            return 'mode invalid';
+        {
+            trigger_error('AjaxContactus::handleContactUs - report has invalid context (mode:'.$mode.' / reason:'.$rsn.')', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         if (!$desc)
             return 3;
@@ -66,7 +72,10 @@ class AjaxContactus extends AjaxHandler
             return 2;
 
         if (!User::$id && !User::$ip)
-            return 'your ip could not be determined';
+        {
+            trigger_error('AjaxContactus::handleContactUs - could not determine IP for anonymous user', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         // check already reported
         $field = User::$id ? 'userId' : 'ip';
@@ -76,6 +85,7 @@ class AjaxContactus extends AjaxHandler
         if (Util::createReport($mode, $rsn, $subj, $desc, $ua, $app, $url, $this->_post['relatedurl'], $this->_post['email']))
             return 0;
 
-        return 'save to db unsuccessful';
+        trigger_error('AjaxContactus::handleContactUs - write to db failed', E_USER_ERROR);
+        return Lang::main('intError');
     }
 }
