@@ -41,6 +41,7 @@ class AjaxContactus extends AjaxHandler
         $app  = $this->_post['appname'];
         $url  = $this->_post['page'];
         $desc = $this->_post['desc'];
+        $subj = $this->_post['id'];
 
         $contexts = array(
             [1, 2, 3, 4, 5, 6, 7, 8],
@@ -69,30 +70,10 @@ class AjaxContactus extends AjaxHandler
 
         // check already reported
         $field = User::$id ? 'userId' : 'ip';
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $this->_post['id'], $field, User::$id ?: User::$ip))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $subj, $field, User::$id ?: User::$ip))
             return 7;
 
-        $update = array(
-            'userId'      => User::$id,
-            'mode'        => $mode,
-            'reason'      => $rsn,
-            'ip'          => User::$ip,
-            'description' => $desc,
-            'userAgent'   => $ua,
-            'appName'     => $app,
-            'url'         => $url
-        );
-
-        if ($_ = $this->_post['id'])
-            $update['subject'] = $_;
-
-        if ($_ = $this->_post['relatedurl'])
-            $update['relatedurl'] = $_;
-
-        if ($_ = $this->_post['email'])
-            $update['email'] = $_;
-
-        if (DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update)))
+        if (Util::createReport($mode, $rsn, $subj, $desc, $ua, $app, $url, $this->_post['relatedurl'], $this->_post['email']))
             return 0;
 
         return 'save to db unsuccessful';

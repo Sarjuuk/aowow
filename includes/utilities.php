@@ -1419,6 +1419,32 @@ class Util
             round($offHand['gearscore']  * $oh)
         );
     }
+
+    static function createReport($mode, $reason, $subject, $desc, $userAgent = null, $appName = null, $url = null, $relUrl = null, $email = null)
+    {
+        $update = array(
+            'userId'      => User::$id,
+            'createDate'  => time(),
+            'mode'        => $mode,
+            'reason'      => $reason,
+            'subject'     => $subject,
+            'ip'          => User::$ip,
+            'description' => $desc,
+            'userAgent'   => $userAgent ?: $_SERVER['HTTP_USER_AGENT'],
+            'appName'     => $appName ?: (get_browser(null, true)['browser'] ?: '')
+        );
+
+        if ($url)
+            $update['url'] = $url;
+
+        if ($relUrl)
+            $update['relatedurl'] = $relUrl;
+
+        if ($email)
+            $update['email'] = $email;
+
+        return DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update));
+    }
 }
 
 ?>

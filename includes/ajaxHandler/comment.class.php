@@ -255,22 +255,15 @@ class AjaxComment extends AjaxHandler
             else
                 $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x4 WHERE id = ?d', $this->_post['id'][0]);
         }
+        else if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND `userId` = ?d', 1, 17, $this->_post['id'][0], User::$id))
+            return 'You\'ve already reported this.';        // ct_resp_error7
         else if (User::$id && !$this->_post['reason'] || mb_strlen($this->_post['reason']) < self::REPLY_LENGTH_MIN)
             return 'Your message is too short.';
-        else if (User::$id)                               // only report as outdated
-        {
-            $ok = DB::Aowow()->query(
-                'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 17, ?d, ?, "<automated comment report>", ?, ?)',
-                User::$id,
-                $this->_post['id'][0],
-                User::$ip,
-                $_SERVER['HTTP_USER_AGENT'],
-                get_browser(null, true)['browser']
-            );
-        }
+        else if (User::$id)                                 // only report as outdated
+            $ok = Util::createReport(1, 17, $this->_post['id'][0], '[Outdated Comment] '.$this->_post['reason']);
 
-        if ($ok)                                          // this one is very special; as in: completely retarded
-            return 'ok';                                  // the script expects the actual characters 'ok' not some string like "ok"
+        if ($ok)                                            // this one is very special; as in: completely retarded
+            return 'ok';                                    // the script expects the actual characters 'ok' not some string like "ok"
 
         return Lang::main('genericError');
     }
@@ -342,14 +335,7 @@ class AjaxComment extends AjaxHandler
         if (!User::$id || !$this->_post['id'])
             return;
 
-        DB::Aowow()->query(
-            'INSERT INTO ?_reports (userId, mode, reason, subject, ip, description, userAgent, appName) VALUES (?d, 1, 19, ?d, ?, "<automated commentreply report>", ?, ?)',
-            User::$id,
-            $this->_post['id'][0],
-            User::$ip,
-            $_SERVER['HTTP_USER_AGENT'],
-            get_browser(null, true)['browser']
-        );
+        Util::createReport(1, 19, $this->_post['id'][0], '[General Reply Report]');
     }
 
     protected function handleReplyUpvote()

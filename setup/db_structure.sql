@@ -2170,6 +2170,7 @@ CREATE TABLE `aowow_reports` (
   `userId` mediumint(8) unsigned NOT NULL,
   `assigned` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `status` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0:new; 1:solved; 2:rejected',
+  `createDate` int(10) unsigned NOT NULL,
   `mode` tinyint(3) unsigned NOT NULL,
   `reason` tinyint(3) unsigned NOT NULL,
   `subject` mediumint(9) NOT NULL DEFAULT 0,
@@ -3090,7 +3091,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1527333496,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1527343033,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
