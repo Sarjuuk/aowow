@@ -1278,12 +1278,17 @@ abstract class Filter
         return null;
     }
 
-    private function genericBooleanFlags($field, $value, $op)
+    private function genericBooleanFlags($field, $value, $op, $matchAny = false)
     {
-        if ($this->int2Bool($op))
-            return [[$field, $value, '&'], $op ? $value : 0];
+        if (!$this->int2Bool($op))
+            return null;
 
-        return null;
+        if (!$op)
+            return [[$field, $value, '&'], 0];
+        else if ($matchAny)
+            return [[$field, $value, '&'], 0, '!'];
+        else
+            return [[$field, $value, '&'], $value];
     }
 
     private function genericString($field, $value, $strFlags)
@@ -1321,11 +1326,8 @@ abstract class Filter
 
     protected function genericCriterion(&$cr)
     {
-        $gen    = $this->genericFilter[$cr[0]];
+        $gen    = array_pad($this->genericFilter[$cr[0]], 4, null);
         $result = null;
-
-        if(!isset($gen[2]))
-            $gen[2] = 0;
 
         switch ($gen[0])
         {
@@ -1333,7 +1335,7 @@ abstract class Filter
                 $result = $this->genericNumeric($gen[1], $cr[2], $cr[1], $gen[2]);
                 break;
             case FILTER_CR_FLAG:
-                $result = $this->genericBooleanFlags($gen[1], $gen[2], $cr[1]);
+                $result = $this->genericBooleanFlags($gen[1], $gen[2], $cr[1], $gen[3]);
                 break;
             case FILTER_CR_STAFFFLAG:
                 if (User::isInGroup(U_GROUP_EMPLOYEE) && $cr[1] >= 0)

@@ -2496,8 +2496,9 @@ CREATE TABLE `aowow_spell` (
   `typeCat` smallint(6) NOT NULL,
   `stanceMask` int(10) unsigned NOT NULL,
   `stanceMaskNot` int(10) unsigned NOT NULL,
+  `targets` mediumint(8) unsigned NOT NULL,
   `spellFocusObject` smallint(5) unsigned NOT NULL,
-  `castTime` mediumint(8) unsigned NOT NULL,
+  `castTime` float unsigned NOT NULL,
   `recoveryTime` int(10) unsigned NOT NULL,
   `recoveryCategory` int(10) unsigned NOT NULL,
   `startRecoveryTime` mediumint(8) unsigned NOT NULL,
@@ -2511,7 +2512,7 @@ CREATE TABLE `aowow_spell` (
   `spellLevel` tinyint(3) unsigned NOT NULL,
   `talentLevel` tinyint(3) unsigned NOT NULL,
   `duration` int(16) NOT NULL DEFAULT 0,
-  `powerType` tinyint(4) NOT NULL,
+  `powerType` smallint(5) NOT NULL,
   `powerCost` smallint(5) unsigned NOT NULL,
   `powerCostPerLevel` tinyint(3) unsigned NOT NULL,
   `powerCostPercent` tinyint(3) unsigned NOT NULL,
@@ -3091,7 +3092,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1527343033,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1528316366,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

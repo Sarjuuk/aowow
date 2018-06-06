@@ -448,10 +448,10 @@ class SpellsPage extends GenericPage
             $visibleCols[] = 'reagents';
         if (!($mask & 0x2) && $this->category && !in_array($this->category[0], [9, 11]))
             $hiddenCols[] = 'skill';
-        if (($mask & 0x4))
+        if ($mask & 0x4)
             $visibleCols[] = 'trainingcost';
-        if (($mask & 0x8) && !in_array('classes', $visibleCols))
-            $visibleCols[] = 'singleclass';
+        if (($mask & 0x8) && !in_array('singleclass', $visibleCols))
+            $visibleCols[] = 'classes';
 
 
         if ($visibleCols)

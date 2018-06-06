@@ -760,11 +760,11 @@ class SpellList extends BaseType
         {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
             $runes = [];
             if ($_ = (($rCost & 0x300) >> 8))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
+                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
             if ($_ = (($rCost & 0x030) >> 4))
                 $runes[] = $_.' '.Lang::spell('powerRunes', 1);
             if ($_ =  ($rCost & 0x003))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
+                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
 
             $str .= implode(', ', $runes);
         }
@@ -789,7 +789,7 @@ class SpellList extends BaseType
         if ($this->isChanneledSpell())
             return Lang::spell('channeled');
         else if ($this->curTpl['castTime'] > 0)
-            return $short ? sprintf(Lang::spell('castIn'), $this->curTpl['castTime'] / 1000) : Util::formatTime($this->curTpl['castTime']);
+            return $short ? sprintf(Lang::spell('castIn'), $this->curTpl['castTime']) : Util::formatTime($this->curTpl['castTime'] * 1000);
         // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
@@ -2256,7 +2256,7 @@ class SpellList extends BaseType
     public function getCastingTimeForBonus($asDOT = false)
     {
         $areaTargets = [7, 8, 15, 16, 20, 24, 30, 31, 33, 34, 37, 54, 56, 59, 104, 108];
-        $castingTime = $this->IsChanneledSpell() ? $this->curTpl['duration'] : $this->curTpl['castTime'];
+        $castingTime = $this->IsChanneledSpell() ? $this->curTpl['duration'] : ($this->curTpl['castTime'] * 1000);
 
         if (!$castingTime)
             return 3500;
@@ -2293,7 +2293,7 @@ class SpellList extends BaseType
         if ($overTime > 0 && $castingTime > 0 && $isDirect)
         {
             // mainly for DoTs which are 3500 here otherwise
-            $originalCastTime = $this->curTpl['castTime'];
+            $originalCastTime = $this->curTpl['castTime'] * 1000;
             if ($this->curTpl['attributes0'] & 0x2)         // requires Ammo
                 $originalCastTime += 500;
 
@@ -2349,9 +2349,11 @@ class SpellList extends BaseType
 
 class SpellListFilter extends Filter
 {
-    // sources in filter and general use different indizes
-    private $enums = array(
-        9 => array(
+    const MAX_SPELL_EFFECT = 167;
+    const MAX_SPELL_AURA   = 316;
+
+    protected $enums = array(
+        9 => array(                                         // sources index
             1  => true,                                     // Any
             2  => false,                                    // None
             3  =>  1,                                       // Crafted
@@ -2361,33 +2363,144 @@ class SpellListFilter extends Filter
             8  =>  6,                                       // Trainer
             9  =>  7,                                       // Discovery
             10 =>  9                                        // Talent
+        ),
+        40 => array(                                        // damage class index
+            1 => 0,                                         // none
+            2 => 1,                                         // magic
+            3 => 2,                                         // melee
+            4 => 3                                          // ranged
+        ),
+        45 => array(                                        // power type index
+          // 1 => ??,                                       // burning embers
+          // 2 => ??,                                       // chi
+          // 3 => ??,                                       // demonic fury
+             4 => POWER_ENERGY,                             // energy
+             5 => POWER_FOCUS,                              // focus
+             6 => POWER_HEALTH,                             // health
+          // 7 => ??,                                       // holy power
+             8 => POWER_MANA,                               // mana
+             9 => POWER_RAGE,                               // rage
+            10 => POWER_RUNE,                               // runes
+            11 => POWER_RUNIC_POWER,                        // runic power
+         // 12 => ??,                                       // shadow orbs
+         // 13 => ??,                                       // soul shard
+            14 => POWER_HAPPINESS,                          // happiness        v custom v
+            15 => -1,                                       // ammo
+            16 => -41,                                      // pyrite
+            17 => -61,                                      // steam pressure
+            18 => -101,                                     // heat
+            19 => -121,                                     // ooze
+            20 => -141,                                     // blood power
+            21 => -142                                      // wrath
         )
     );
 
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         1 => [FILTER_CR_CALLBACK, 'cbCost',           null,                 null], // costAbs [op] [int]
-         2 => [FILTER_CR_NUMERIC,  'powerCostPercent', NUM_CAST_INT              ], // prcntbasemanarequired
-         3 => [FILTER_CR_BOOLEAN,  'spellFocusObject'                            ], // requiresnearbyobject
-         4 => [FILTER_CR_NUMERIC,  'trainingcost',     NUM_CAST_INT              ], // trainingcost
-         5 => [FILTER_CR_BOOLEAN,  'reqSpellId'                                  ], // requiresprofspec
-         8 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-         9 => [FILTER_CR_CALLBACK, 'cbSource',         null,                 null], // source [enum]
-        10 => [FILTER_CR_FLAG,     'cuFlags',          SPELL_CU_FIRST_RANK       ], // firstrank
-        11 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
-        12 => [FILTER_CR_FLAG,     'cuFlags',          SPELL_CU_LAST_RANK        ], // lastrank
-        13 => [FILTER_CR_NUMERIC,  'rankNo',           NUM_CAST_INT              ], // rankno
-        14 => [FILTER_CR_NUMERIC,  'id',               NUM_CAST_INT,         true], // id
-        15 => [FILTER_CR_STRING,   'ic.name',                                    ], // icon
-        17 => [FILTER_CR_FLAG,     'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
-        19 => [FILTER_CR_FLAG,     'attributes0',      0x80000                   ], // scaling
-        20 => [FILTER_CR_CALLBACK, 'cbReagents',       null,                 null], // has Reagents [yn]
-        25 => [FILTER_CR_BOOLEAN,  'skillLevelYellow'                            ]  // rewardsskillups
+         1  => [FILTER_CR_CALLBACK,  'cbCost',                                                  ], // costAbs [op] [int]
+         2  => [FILTER_CR_NUMERIC,   'powerCostPercent', NUM_CAST_INT                           ], // prcntbasemanarequired
+         3  => [FILTER_CR_BOOLEAN,   'spellFocusObject'                                         ], // requiresnearbyobject
+         4  => [FILTER_CR_NUMERIC,   'trainingcost',     NUM_CAST_INT                           ], // trainingcost
+         5  => [FILTER_CR_BOOLEAN,   'reqSpellId'                                               ], // requiresprofspec
+         8  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
+         9  => [FILTER_CR_CALLBACK,  'cbSource',                                                ], // source [enum]
+        10  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_FIRST_RANK                    ], // firstrank
+        11  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT                     ], // hascomments
+        12  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_LAST_RANK                     ], // lastrank
+        13  => [FILTER_CR_NUMERIC,   'rankNo',           NUM_CAST_INT                           ], // rankno
+        14  => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,                true      ], // id
+        15  => [FILTER_CR_STRING,    'ic.name',                                                 ], // icon
+        17  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO                       ], // hasvideos
+        19  => [FILTER_CR_FLAG,      'attributes0',      0x80000                                ], // scaling
+        20  => [FILTER_CR_CALLBACK,  'cbReagents',                                              ], // has Reagents [yn]
+     // 22  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // proficiencytype [proficiencytype]  pointless
+        25  => [FILTER_CR_BOOLEAN,   'skillLevelYellow'                                         ], // rewardsskillups
+        27  => [FILTER_CR_FLAG,      'attributes1',      0x0044,                      true      ], // channeled [yn]
+        28  => [FILTER_CR_NUMERIC,   'castTime',         NUM_CAST_FLOAT                         ], // casttime [num]
+        29  => [FILTER_CR_CALLBACK,  'cbAuraNames',                                             ], // appliesaura [effectauranames]
+     // 31  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // usablewhenshapeshifted [yn]  pointless
+        33  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes0',               0x10000000], // combatcastable [yn]
+        34  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes2',               0x20000000], // chancetocrit [yn]
+        35  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes3',               0x00040000], // chancetomiss [yn]
+        36  => [FILTER_CR_FLAG,      'attributes3',      0x00100000                             ], // persiststhroughdeath [yn]
+        38  => [FILTER_CR_FLAG,      'attributes0',      0x00020000                             ], // requiresstealth [yn]
+        39  => [FILTER_CR_CALLBACK,  'cbSpellstealable', 'attributes4',               0x00000040], // spellstealable [yn]
+        40  => [FILTER_CR_ENUM,      'damageClass'                                              ], // damagetype [damagetype]
+        41  => [FILTER_CR_FLAG,      'stanceMask',       (1 << (22 - 1))                        ], // requiresmetamorphosis [yn]
+        42  => [FILTER_CR_FLAG,      'attributes5',      0x00000008                             ], // usablewhenstunned [yn]
+        44  => [FILTER_CR_CALLBACK,  'cbUsableInArena'                                          ], // usableinarenas [yn]
+        45  => [FILTER_CR_ENUM,      'powerType'                                                ], // resourcetype [resourcetype]
+     // 46  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // disregardimmunity [yn]
+        47  => [FILTER_CR_FLAG,      'attributes1',      0x00010000                             ], // disregardschoolimmunity [yn]
+        48  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x0004000C,                  false     ], // reqrangedweapon [yn]
+        49  => [FILTER_CR_FLAG,      'attributes0',      0x00000004                             ], // onnextswingplayers [yn]
+        50  => [FILTER_CR_FLAG,      'attributes0',      0x00000040                             ], // passivespell [yn]
+        51  => [FILTER_CR_FLAG,      'attributes1',      0x10000000                             ], // hiddenaura [yn]
+        52  => [FILTER_CR_FLAG,      'attributes0',      0x00000400                             ], // onnextswingnpcs [yn]
+        53  => [FILTER_CR_FLAG,      'attributes0',      0x00001000                             ], // daytimeonly [yn]
+        54  => [FILTER_CR_FLAG,      'attributes0',      0x00002000                             ], // nighttimeonly [yn]
+        55  => [FILTER_CR_FLAG,      'attributes0',      0x00004000                             ], // indoorsonly [yn]
+        56  => [FILTER_CR_FLAG,      'attributes0',      0x00008000                             ], // outdoorsonly [yn]
+        57  => [FILTER_CR_FLAG,      'attributes0',      0x80000000                             ], // uncancellableaura [yn]
+        58  => [FILTER_CR_FLAG,      'attributes0',      0x00080000                             ], // damagedependsonlevel [yn]
+        59  => [FILTER_CR_FLAG,      'attributes0',      0x00100000                             ], // stopsautoattack [yn]
+        60  => [FILTER_CR_FLAG,      'attributes0',      0x00200000                             ], // cannotavoid [yn]
+        61  => [FILTER_CR_FLAG,      'attributes0',      0x00800000                             ], // usabledead [yn]
+        62  => [FILTER_CR_FLAG,      'attributes0',      0x01000000                             ], // usablemounted [yn]
+        63  => [FILTER_CR_FLAG,      'attributes0',      0x02000000                             ], // delayedrecoverystarttime [yn]
+        64  => [FILTER_CR_FLAG,      'attributes0',      0x08000000                             ], // usablesitting [yn]
+        65  => [FILTER_CR_FLAG,      'attributes1',      0x00000002                             ], // usesallpower [yn]
+        66  => [FILTER_CR_FLAG,      'attributes1',      0x00000044,                  true      ], // channeled [yn] redundancy much...?
+        67  => [FILTER_CR_FLAG,      'attributes1',      0x00000080                             ], // cannotreflect [yn]
+        68  => [FILTER_CR_FLAG,      'attributes1',      0x00000020                             ], // usablestealthed [yn]
+        69  => [FILTER_CR_FLAG,      'attributes0',      0x04000000                             ], // harmful [yn]
+        70  => [FILTER_CR_FLAG,      'attributes1',      0x00000100                             ], // targetnotincombat [yn]
+        71  => [FILTER_CR_FLAG,      'attributes1',      0x00000400                             ], // nothreat [yn]
+        72  => [FILTER_CR_FLAG,      'attributes1',      0x00001000                             ], // pickpocket [yn]
+        73  => [FILTER_CR_FLAG,      'attributes1',      0x00008000                             ], // dispelauraonimmunity [yn]
+        74  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00100000,                  false     ], // reqfishingpole [yn]
+        75  => [FILTER_CR_FLAG,      'attributes2',      0x00000040                             ], // requntappedtarget [yn]
+     // 76  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // targetownitem [yn]  // the flag for this has to be somewhere....
+        77  => [FILTER_CR_FLAG,      'attributes2',      0x00080000                             ], // doesntreqshapeshift [yn]
+        78  => [FILTER_CR_FLAG,      'attributes2',      0x80000000                             ], // foodbuff [yn]
+        79  => [FILTER_CR_FLAG,      'attributes3',      0x00000100                             ], // targetonlyplayer [yn]
+        80  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONMAINHAND, true      ], // reqmainhand [yn]
+        81  => [FILTER_CR_FLAG,      'attributes3',      0x00020000                             ], // doesntengagetarget [yn]
+        82  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00080000,                  false     ], // reqwand [yn]
+        83  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONOFFHAND,  true      ], // reqoffhand [yn]
+        84  => [FILTER_CR_FLAG,      'attributes0',      0x00000100                             ], // nolog [yn]
+        85  => [FILTER_CR_FLAG,      'attributes4',      0x00000004                             ], // auratickswhileloggedout [yn]
+        87  => [FILTER_CR_FLAG,      'attributes5',      0x00000200                             ], // startstickingatapplication [yn]
+        88  => [FILTER_CR_FLAG,      'attributes5',      0x00040000                             ], // usableconfused [yn]
+        89  => [FILTER_CR_FLAG,      'attributes5',      0x00020000                             ], // usablefeared [yn]
+        90  => [FILTER_CR_FLAG,      'attributes6',      0x00000002                             ], // onlyarena [yn]
+        91  => [FILTER_CR_FLAG,      'attributes6',      0x00000800                             ], // notinraid [yn]
+        92  => [FILTER_CR_FLAG,      'attributes7',      0x00000004                             ], // paladinaura [yn]
+        93  => [FILTER_CR_FLAG,      'attributes7',      0x00000020                             ], // totemspell [yn]
+        95  => [FILTER_CR_CALLBACK,  'cbBandageSPell'                                           ], // bandagespell [yn] ...don't ask
+        96  => [FILTER_CR_STAFFFLAG, 'attributes0'                                              ], // flags1 [flags]
+        97  => [FILTER_CR_STAFFFLAG, 'attributes1'                                              ], // flags2 [flags]
+        98  => [FILTER_CR_STAFFFLAG, 'attributes2'                                              ], // flags3 [flags]
+        99  => [FILTER_CR_STAFFFLAG, 'attributes3'                                              ], // flags4 [flags]
+        100 => [FILTER_CR_STAFFFLAG, 'attributes4'                                              ], // flags5 [flags]
+        101 => [FILTER_CR_STAFFFLAG, 'attributes5'                                              ], // flags6 [flags]
+        102 => [FILTER_CR_STAFFFLAG, 'attributes6'                                              ], // flags7 [flags]
+        103 => [FILTER_CR_STAFFFLAG, 'attributes7'                                              ], // flags8 [flags]
+        104 => [FILTER_CR_STAFFFLAG, 'targets'                                                  ], // flags9 [flags]
+        105 => [FILTER_CR_STAFFFLAG, 'stanceMaskNot'                                            ], // flags10 [flags]
+        106 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags1'                                        ], // flags11 [flags]
+        107 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags2'                                        ], // flags12 [flags]
+        108 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags3'                                        ], // flags13 [flags]
+        109 => [FILTER_CR_CALLBACK,  'cbEffectNames',                                           ], // effecttype [effecttype]
+     // 110 => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // scalingap [yn]  // unreasonably complex for now
+     // 111 => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // scalingsp [yn]  // unreasonably complex for now
+        114 => [FILTER_CR_CALLBACK,  'cbReqFaction'                                             ], // requiresfaction [side]
+        116 => [FILTER_CR_BOOLEAN,   'startRecoveryTime'                                        ]  // onGlobalCooldown [yn]
     );
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'    => [FILTER_V_RANGE,    [1, 25],                                         true ], // criteria ids
+        'cr'    => [FILTER_V_RANGE,    [1, 116],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [FILTER_V_REGEX,    '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
         'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                  false], // name / text - only printable chars, no delimiter
@@ -2510,7 +2623,10 @@ class SpellListFilter extends Filter
         if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
             return false;
 
-        return ['OR', ['AND', ['powerType', [1, 6]], ['powerCost', (10 * $cr[2]), $cr[1]]], ['AND', ['powerType', [1, 6], '!'], ['powerCost', $cr[2], $cr[1]]]];
+        return ['OR',
+            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $cr[2]), $cr[1]]],
+            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $cr[2], $cr[1]]]
+        ];
     }
 
     protected function cbSource($cr)
@@ -2538,6 +2654,104 @@ class SpellListFilter extends Filter
             return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
         else
             return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
+    }
+
+    protected function cbAuraNames($cr)
+    {
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT) || $cr[1] <= 0 || $cr[1] > self::MAX_SPELL_AURA)
+            return false;
+
+        return ['OR', ['effect1AuraId', $cr[1]], ['effect2AuraId', $cr[1]], ['effect3AuraId', $cr[1]]];
+    }
+
+    protected function cbEffectNames($cr)
+    {
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT) || $cr[1] <= 0 || $cr[1] > self::MAX_SPELL_EFFECT)
+            return false;
+
+        return ['OR', ['effect1Id', $cr[1]], ['effect2Id', $cr[1]], ['effect3Id', $cr[1]]];
+    }
+
+    protected function cbInverseFlag($cr, $field, $flag)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])
+            return [[$field, $flag, '&'], 0];
+        else
+            return [$field, $flag, '&'];
+    }
+
+    protected function cbSpellstealable($cr, $field, $flag)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])
+            return ['AND', [[$field, $flag, '&'], 0], ['dispelType', 1]];
+        else
+            return ['OR', [$field, $flag, '&'], ['dispelType', 1, '!']];
+    }
+
+    protected function cbReqFaction($cr)
+    {
+        switch ($cr[1])
+        {
+            case 1:                                         // yes
+                return ['reqRaceMask', 0, '!'];
+            case 2:                                         // alliance
+                return ['AND', [['reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
+            case 3:                                         // horde
+                return ['AND', [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['reqRaceMask', RACE_MASK_HORDE, '&']];
+            case 4:                                         // both
+                return ['AND', ['reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['reqRaceMask', RACE_MASK_HORDE, '&']];
+            case 5:                                         // no
+                return ['reqRaceMask', 0];
+            default:
+                return false;
+        }
+    }
+
+    protected function cbEquippedWeapon($cr, $mask, $useInvType)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        $field = $useInvType ? 'equippedItemInventoryTypeMask' : 'equippedItemSubClassMask';
+
+        if ($cr[1])
+            return ['AND', ['equippedItemClass', ITEM_CLASS_WEAPON], [$field, $mask, '&']];
+        else
+            return ['OR', ['equippedItemClass', ITEM_CLASS_WEAPON, '!'], [[$field, $mask, '&'], 0]];
+    }
+
+    protected function cbUsableInArena($cr)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])
+            return  ['AND',
+                        [['attributes4', 0x00010000, '&'], 0],
+                        ['OR', ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', 0x00020000, '&']]
+                    ];
+        else
+            return  ['OR',
+                        ['attributes4', 0x00010000, '&'],
+                        ['AND', ['recoveryTime', 10 * MINUTE * 1000, '>'], [['attributes4', 0x00020000, '&'], 0]]
+                    ];
+    }
+
+    protected function cbBandageSpell($cr)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])                                         // match exact, not as flag
+            return ['AND', ['attributes1', 0x00004044], ['effect1ImplicitTargetA', 21]];
+        else
+            return ['OR', ['attributes1', 0x00004044, '!'], ['effect1ImplicitTargetA', 21, '!']];
     }
 }
 

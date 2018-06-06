@@ -273,7 +273,7 @@ class SpellPage extends GenericPage
         $this->powerCost   = $this->subject->createPowerCostForCurrent();
         $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
         $this->name        = $this->subject->getField('name', true);
-        $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount')];
+        $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : '')];
         $this->level       = $this->subject->getField('spellLevel');
         $this->rangeName   = $this->subject->getField('rangeText', true);
         $this->range       = $this->subject->getField('rangeMaxHostile');
@@ -352,7 +352,7 @@ class SpellPage extends GenericPage
             }
         }
 
-        // tab: modifies $this
+        // tab: [$this] modifies
         $sub = ['OR'];
         $conditions = [
             ['s.typeCat', [0, -9, -8], '!'],                // uncategorized (0), GM (-9), NPC-Spell (-8); NPC includes totems, lightwell and others :/
@@ -362,8 +362,8 @@ class SpellPage extends GenericPage
 
         for ($i = 1; $i < 4; $i++)
         {
-            // Flat Mods (107), Pct Mods (108), No Reagent Use (256) .. include dummy..? (4)
-            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), [107, 108, 256, 286 /*, 4*/]))
+            // include dummy..? (4)
+            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), [107, 108, 256, 286, 195, 262, 263, 272, 274, 275, 316 /*, 4*/]))
                 continue;
 
             $m1 = $this->subject->getField('effect1SpellClassMask'.$j[$i]);
@@ -399,7 +399,7 @@ class SpellPage extends GenericPage
             }
         }
 
-        // tab: modified by $this
+        // tab: [$this is] modified by
         $sub = ['OR'];
         $conditions = [
             ['s.spellFamilyId', $this->subject->getField('spellFamilyId')],
@@ -417,7 +417,7 @@ class SpellPage extends GenericPage
 
             $sub[] = array(
                 'AND',
-                ['s.effect'.$i.'AuraId', [107, 108, 256, 286 /*, 4*/]],
+                ['s.effect'.$i.'AuraId', [107, 108, 256, 286, 195, 262, 263, 272, 274, 275, 316 /*, 4*/]],
                 [
                     'OR',
                     ['s.effect1SpellClassMask'.$j[$i], $m1, '&'],
@@ -1616,7 +1616,10 @@ class SpellPage extends GenericPage
             }
 
             // Effect Name
-            $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, Lang::spell('effects', $effId)) : Lang::spell('effects', $effId)).Lang::main('colon');
+            if ($_ = Lang::spell('effects', $effId))
+                $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, $_) : Lang::spell('effects', $effId)).Lang::main('colon');
+            else
+                $foo['name'] = 'Unknow Effect (#'.$effId.')';
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
@@ -1839,6 +1842,7 @@ class SpellPage extends GenericPage
                             case 35:                        // Mod Increase Power
                             case 85:                        // Mod Power Regeneration
                             case 110:                       // Mod Power Regeneration Pct
+                            case 132:                       // Mod Increase Energy Percent
                                 if ($_ = Lang::spell('powerTypes', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
 
@@ -1966,6 +1970,13 @@ class SpellPage extends GenericPage
                             case 310:                       // Mod Creature AoE Damage Avoidance
                             case 237:                       // Mod Spell Damage Of Attack Power
                             case 238:                       // Mod Spell Healing Of Attack Power
+                            case 242:                       // Mod Spell & Healing Power by % of Int
+                            case 259:                       // Mod Periodic Healing Taken %
+                            case 267:                       // Cancel Aura Buffer at % of Caster Health
+                            case 269:                       // Ignore Target Resistance
+                            case 285:                       // Mod Attack Power by School Resistance
+                            case 300:                       // Share Damage %
+                            case 301:                       // Mod Absorb School Healing
                                 if ($_ = Lang::getMagicSchools($effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').Util::asHex($effMV), $_) : $_;
 
@@ -1981,11 +1992,6 @@ class SpellPage extends GenericPage
                             case 107:                       // Flat Modifier
                             case 108:                       // Pct Modifier
                                 if ($_ = Lang::spell('spellModOp', $effMV))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
-
-                                break;
-                            case 132:                       // Mod Increase Energy Percent
-                                if ($_ = Lang::spell('powerTypes', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
@@ -2015,8 +2021,20 @@ class SpellPage extends GenericPage
 
                                 break;
                             case 249:                       // Convert Rune
+                                $from = $effMV;
+                                if ($_ = Lang::spell('powerRunes', $effMV))
+                                    $from = $_;
+
+                                $to = $effMVB;
                                 if ($_ = Lang::spell('powerRunes', $effMVB))
-                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValueB'.Lang::main('colon').$effMVB, $_) : $_;
+                                    $to = $_;
+
+                                if (User::isInGroup(U_GROUP_EMPLOYEE))
+                                    $bar = sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $from).' => '.sprintf(Util::$dfnString, 'MiscValueB'.Lang::main('colon').$effMVB, $to);
+                                else
+                                    $bar = $from.' => '.$to;
+
+                                $effMVB = 0;
 
                                 break;
                             case 78:                        // Mounted
@@ -2041,9 +2059,9 @@ class SpellPage extends GenericPage
                                 if ($so = DB::Aowow()->selectRow('SELECT spellId1, spellId2, spellId3, spellId4, spellId5 FROM ?_spelloverride WHERE id = ?d', $effMV))
                                 {
                                     $buff = [];
-                                    for ($i = 1; $i < 6; $i++)
+                                    for ($j = 1; $j < 6; $j++)
                                     {
-                                        if ($x = $so['spellId'.$i])
+                                        if ($x = $so['spellId'.$j])
                                         {
                                             $this->extendGlobalData([TYPE_SPELL => [$x]]);
                                             $buff[] = '[spell='.$x.']';
@@ -2052,6 +2070,40 @@ class SpellPage extends GenericPage
                                     $foo['markup'] = implode(', ', $buff);
                                 }
                                 break;
+                            case 202:                       // Ignore Combat Result
+                            case 248:                       // Mod Combat Result Chance
+                                $what = '';
+                                switch ($effMV)
+                                {
+                                    case 2:                 // Dodged
+                                        $what = Lang::spell('combatRating', 2);
+                                        break;
+                                    case 3:                 // Blocked
+                                        $what = Lang::spell('combatRating', 4);
+                                        break;
+                                    case 4:                 // Parried
+                                        $what = Lang::spell('combatRating', 3);
+                                        break;
+                                    case 0;                 // Evaded
+                                    case 1:                 // Missed
+                                    case 5:                 // Glanced
+                                    case 6:                 // Crited'ed..ed
+                                    case 7:                 // Crushed
+                                    case 8:                 // Regular
+                                    default:
+                                        trigger_error('hitero unused case #'.$effMV.' found for aura 202');
+                                }
+
+                                if ($what)
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $what) : $what;
+
+                                break;
+                            case 233:                       // Change other Humanoid Display
+                            case 273:                       // X-Ray
+                            case 304:                       // Fake Inebriate
+                                $bar = ' ('.Lang::game('npc').' #'.$effMV.')';
+                                if ($n = CreatureList::getName($effMV))
+                                    $bar = ' (<a href="?npc='.$effMV.'">'.$n.'</a>)';
                         }
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 
