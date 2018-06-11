@@ -43,9 +43,11 @@ class SoundList extends BaseType
 
         if ($this->fileBuffer)
         {
-            $files = DB::Aowow()->select('SELECT id AS ARRAY_KEY, `id`, `file` AS title, `type` FROM ?_sounds_files sf WHERE id IN (?a)', array_keys($this->fileBuffer));
+            $files = DB::Aowow()->select('SELECT id AS ARRAY_KEY, `id`, `file` AS title, `type`, `path` FROM ?_sounds_files sf WHERE id IN (?a)', array_keys($this->fileBuffer));
             foreach ($files as $id => $data)
             {
+                // 3.3.5 bandaid - need fullpath to play via wow API, remove for cata and later
+                $data['path']  = str_replace('\\', '\\\\', $data['path'] ? $data['path'] . '\\' . $data['title'] : $data['title']);
                 // skipp file extension
                 $data['title'] = substr($data['title'], 0, -4);
                 // enum to string

@@ -109,8 +109,8 @@ function sounds(/*array $ids = [] */)
 
                     $fileSets[] = array(
                         $soundFileIdx,
-                        strtolower($s['soundFile'.$i]),
-                        strtolower($s['path']),
+                        $s['soundFile'.$i],
+                        $s['path'],
                         SOUND_TYPE_OGG
                     );
                     $s['soundFile'.$i] = $soundFileIdx;
@@ -122,8 +122,8 @@ function sounds(/*array $ids = [] */)
 
                     $fileSets[] = array(
                         $soundFileIdx,
-                        strtolower($s['soundFile'.$i]),
-                        strtolower($s['path']),
+                        $s['soundFile'.$i],
+                        $s['path'],
                         SOUND_TYPE_MP3
                     );
                     $s['soundFile'.$i] = $soundFileIdx;

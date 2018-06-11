@@ -88,7 +88,7 @@ class SoundPage extends GenericPage
         }
 
         // get full path ingame for sound (workaround for missing PlaySoundKit())
-        $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path`, CONCAT(sf.`path`, "\\\\", sf.`file`), sf.`file`) FROM ?_sounds_files sf JOIN ?_sounds s ON s.soundFile1 = sf.id WHERE s.id = ?d', $this->typeId);
+        $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path` <> "", CONCAT(sf.`path`, "\\\\", sf.`file`), sf.`file`) FROM ?_sounds_files sf JOIN ?_sounds s ON s.soundFile1 = sf.id WHERE s.id = ?d', $this->typeId);
 
         $this->map          = $map;
         $this->headIcons  = [$this->subject->getField('iconString')];

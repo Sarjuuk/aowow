@@ -106,8 +106,9 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
 
                     function showSoundLink(idx)
                     {
-                        var data = { 'ingamelink': '/script PlaySoundKitID(<?=$this->typeId; ?>)' };
-                        sounddialog.show('sound', { data: data, onSubmit: function() { return false; } });
+                        // var data = { 'ingamelink': '/script PlaySoundKitID(<?=$this->typeId; ?>)' }; // aowow - PlaySoundKitID() not available in 3.3.5
+                        var data = { 'ingamelink': '/script PlaySoundFile("' + soundpaths[idx].path + '", "master")' };
+                        sounddialog.show('sound', { data: data, onSubmit: $WH.rf });
                     }
 
                     (new AudioControls()).init(soundpaths,$WH.ge('mainsound'));
@@ -119,7 +120,7 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
                             var li = $WH.ce('li');
                             var a = $WH.ce('a');
                             a.href = 'javascript:;';
-                            $WH.aE(a, 'click', (function(xy){return function(){showSoundLink(xy);}})(x));
+                            $WH.aE(a, 'click', (function(xy) { return function() { showSoundLink(xy); } })(x));
                             $WH.st(a, soundpaths[x].title);
                             $WH.ae(li, a);
                             $WH.ae(ol, li);
