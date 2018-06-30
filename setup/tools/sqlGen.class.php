@@ -54,6 +54,7 @@ class SqlGen
         'skillline'                => [null, null, ['icons'],                        null],
         'emotes'                   => [null, null, null,                             null],
         'sounds'                   => [null, null, null,                             null],
+        'areatrigger'              => [null, null, null,                             ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon']],
         'itemenchantment'          => [null, null, null,                             ['spell_enchant_proc_data']],
         'achievement'              => [null, null, ['icons'],                        ['dbc_achievement', 'disables']],
         'creature'                 => [null, null, null,                             ['creature_template', 'creature_template_locale', 'creature_classlevelstats', 'instance_encounters']],

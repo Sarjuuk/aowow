@@ -15,6 +15,7 @@ class Lang
 
     // types
     private static $achievement;
+    private static $areatrigger;
     private static $chrClass;
     private static $currency;
     private static $event;

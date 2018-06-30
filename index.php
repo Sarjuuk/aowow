@@ -22,6 +22,8 @@ switch ($pageCall)
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
+    case 'areatrigger':
+    case 'areatriggers':
     case 'arena-team':
     case 'arena-teams':
     case 'class':

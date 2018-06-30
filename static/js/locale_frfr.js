@@ -820,7 +820,7 @@ var mn_sounds = [
     [50,"Zone Ambience","?sounds&filter=ty=50"],
     [28,"Zone Music","?sounds&filter=ty=28"]
 ];
-mn_icons = [
+var mn_icons = [
     [3, "Hauts faits", "?icons&filter=cr=3;crs=1;crv=0"],
     // [4, "Mascottes de combat", "?icons&filter=cr=4;crs=1;crv=0"],
     // [5, "Capacités de Familiers en Combat", "?icons&filter=cr=5;crs=1;crv=0"],
@@ -834,6 +834,16 @@ mn_icons = [
     // [10, "Menaces", "?icons&filter=cr=10;crs=1;crv=0"],
     [13, "Inutilisé", "?icons&filter=cr=13;crs=3;crv=0"]
 ];
+// aowow - custom start
+var mn_areatrigger = [
+    [0, 'Unused', '?areatriggers&filter=ty=0'],
+    [1, 'Tavern', '?areatriggers&filter=ty=1'],
+    [2, 'Teleporter', '?areatriggers&filter=ty=2'],
+    [3, 'Quest Objective', '?areatriggers&filter=ty=3'],
+    [4, 'Smart Trigger', '?areatriggers&filter=ty=4'],
+    [5, 'Script', '?areatriggers&filter=ty=5']
+];
+// aowow - custom end
 var mn_talentCalc = [
     [6,"Chevalier de la mort","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -2326,7 +2336,16 @@ var g_socket_names = {
     14: 'Châsse prismatique'
 };
 
-/* custom */
+/* aowow custom */
+var g_trigger_types = {
+    0: 'Unused',
+    1: 'Tavern',
+    2: 'Teleporter',
+    3: 'Quest Objective',
+    4: 'Smart Trigger',
+    5: 'Script'
+};
+
 // DRUNK_MESSAGE_*
 var g_drunk_states = {
     0: 'sober',
@@ -2411,7 +2430,7 @@ var g_conditions = {
     37: 'The target\'s health is$: not; $2 $1',
     37: 'The target\'s health is$: not; $2 $1%'
 };
-/* end custom */
+/* end aowow custom */
 
 var LANG = {
     alltime_stc:   "A chaque fois",
@@ -3221,7 +3240,8 @@ var LANG = {
         anvil:          "Enclume",
         vein:           "Filons de minerai",
         spirithealer:   "Esprits soigneurs",
-        boss:           "Boss"
+        boss:           "Boss",
+        areatrigger:    "Areatrigger"                       // aowow - custom
     },
 
     markup_b:       "Gras",
@@ -4120,7 +4140,7 @@ var LANG = {
         paladinaura:                "Aura de paladin",
         totemspell:                 "Totem",
         bandagespell:               "Sort de bandage",
-        onGlobalCooldown:           "Sur le temps de recharge global"
+        onGlobalCooldown:           "Sur le temps de recharge global",
 
         sepcommunity:               "Communauté",
         hascomments:                "A des commentaires",
@@ -4226,7 +4246,7 @@ var LANG = {
         classes:            "Utilisé par des Classes"
     },
 
-    // custom
+    // aowow custom
     fienchantments: {
         id:             "ID",
         hascondition:   "[Requires a combination of gems]",
@@ -4235,8 +4255,14 @@ var LANG = {
         sepcommunity:   "Communauté",
         hascomments:    "A des commentaires",
         hasscreenshots: "A des captures d'écrans",
-        hasvideos:      "A des vidéos",
+        hasvideos:      "A des vidéos"
     },
+
+    fiareatrigger: {
+        sepgeneral: "Général",
+        id:         "ID"
+    },
+    // end aowow custom
 
     pr_notice:     'Première fois? Ne soyez pas gêné! Visitez notre <a href="?help=profiler" target="_blank">page d\'aide</a>! &nbsp; <small class="q0"><a href="javascript:;">close</a></small>',
     pr_datasource: 'Les données dans cette table ont été updatées $2 par <a href="?user=$1" target="_blank">$1</a>.',

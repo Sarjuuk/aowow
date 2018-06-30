@@ -62,7 +62,7 @@ class IconsPage extends GenericPage
         }
 
         if ($this->filterObj->error)
-            $tabData['_errors'] = '$1';
+            $tabData['_errors'] = 1;
 
         $this->lvTabs[] = ['icongallery', $tabData];
     }

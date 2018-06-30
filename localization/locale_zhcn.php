@@ -205,6 +205,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "成就",
         'achievements'  => "成就",
+        'areatrigger'   => "areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "职业",
         'classes'       => "职业",
         'currency'      => "货币",
@@ -441,6 +443,11 @@ $lang = array(
             1 => "触发法术",              3 => "装备法术",             7 => "使用法术",               8 => "棱形插槽",
             5 => "统计",              2 => "武器伤害",           6 => "DPS",                     4 => "防御"
         )
+    ),
+    'areatrigger' => array(
+        'notFound'      => "This areatrigger doesn't exist.",
+        'foundIn'       => "This areatrigger can be found in",
+        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'notFound'      => "这个对象不存在。",

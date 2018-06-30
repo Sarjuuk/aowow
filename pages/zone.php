@@ -171,6 +171,7 @@ class ZonePage extends GenericPage
         // we cannot fetch spawns via lists. lists are grouped by entry
         $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_NPC);
+        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_AREATRIGGER) : [];
 
         $conditions = [CFG_SQL_LIMIT_NONE, ['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
@@ -178,6 +179,7 @@ class ZonePage extends GenericPage
 
         $objectSpawns   = new GameObjectList($conditions);
         $creatureSpawns = new CreatureList($conditions);
+        $atSpawns       = new AreaTriggerList($conditions);
 
         $questsLV = $rewardsLV = [];
 
@@ -374,6 +376,24 @@ class ZonePage extends GenericPage
                                 'quests'        => array_values($_)
                             ));
                 }
+            }
+
+            foreach ($aSpawns as $spawn)
+            {
+                $tpl = $atSpawns->getEntry($spawn['typeId']);
+                if (!$tpl)
+                    continue;
+
+                $n  = Util::localizedString($tpl, 'name');
+
+                $addToSOM('areatrigger', array(
+                    'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                    'level'         => $spawn['floor'],
+                    'name'          => $tpl['name'] ?: 'Unnamed AT #'.$spawn['typeId'],
+                    'type'          => TYPE_AREATRIGGER,
+                    'id'            => $spawn['typeId'],
+                    'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])
+                ));
             }
 
             // remove unwanted indizes

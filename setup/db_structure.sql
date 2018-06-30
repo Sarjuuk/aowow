@@ -341,6 +341,31 @@ CREATE TABLE `aowow_announcements` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_areatrigger`
+--
+
+DROP TABLE IF EXISTS `aowow_areatrigger`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_areatrigger` (
+  `id` int(10) unsigned NOT NULL,
+  `cuFlags` int(10) unsigned NOT NULL,
+  `type` smallint(5) unsigned NOT NULL,
+  `name` varchar(100) NULL DEFAULT NULL,
+  `orientation` float NOT NULL,
+  `quest` mediumint(8) unsigned NULL DEFAULT NULL,
+  `teleportA` smallint(5) unsigned NULL DEFAULT NULL,
+  `teleportX` float unsigned NULL DEFAULT NULL,
+  `teleportY` float unsigned NULL DEFAULT NULL,
+  `teleportO` float NULL DEFAULT NULL,
+  `teleportF` tinyint(4) unsigned NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `quest` (`quest`),
+  INDEX `type` (`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE='utf8mb4_general_ci' ;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_articles`
 --
 
@@ -3092,7 +3117,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1528316366,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1531668312,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -338,13 +338,7 @@ class EnchantmentListFilter extends Filter
 
         // type
         if (isset($_v['ty']))
-        {
-            $_ = (array)$_v['ty'];
-            if (!array_diff($_, [1, 2, 3, 4, 5, 6, 7, 8]))
-                $parts[] = ['OR', ['type1', $_], ['type2', $_], ['type3', $_]];
-            else
-                unset($_v['ty']);
-        }
+            $parts[] = ['OR', ['type1', $_v['ty']], ['type2', $_v['ty']], ['type3', $_v['ty']]];
 
         return $parts;
     }

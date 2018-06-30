@@ -198,6 +198,7 @@ class GenericPage
 
     private   $lvTemplates  = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_achievements'  ],
+        'areatrigger'       => ['template' => 'areatrigger',       'id' => 'areatrigger',     'parent' => 'lv-generic', 'data' => [],                                     ],
         'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_calendar'      ],
         'class'             => ['template' => 'classs',            'id' => 'classes',         'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_classes'       ],
         'commentpreview'    => ['template' => 'commentpreview',    'id' => 'comments',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_comments'      ],
@@ -383,7 +384,7 @@ class GenericPage
             $this->postCache();
 
         // determine contribute tabs
-        if (isset($this->subject))
+        if (isset($this->subject) && !isset($this->contribute))
         {
             $x = get_class($this->subject);
             $this->contribute = $x::$contribute;

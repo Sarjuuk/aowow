@@ -1445,6 +1445,40 @@ class Util
 
         return DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update));
     }
+
+    // orientation is 2*M_PI for a full circle, increasing counterclockwise
+    static function O2Deg($o)
+    {
+        // orientation values can exceed boundaries (for whatever reason)
+        while ($o < 0)
+            $o += 2*M_PI;
+
+        while ($o >= 2*M_PI)
+            $o -= 2*M_PI;
+
+        $deg = 360 * (1 - ($o / (2*M_PI) ) );
+        if ($deg == 360)
+            $deg = 0;
+
+        $dir  = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        $desc = '';
+        foreach ($dir as $f => $d)
+        {
+            if (!$f)
+                continue;
+
+            if ( ($deg >= (45 * $f) - 22.5) && ($deg <= (45 * $f) + 22.5) )
+            {
+                $desc = $d;
+                break;
+            }
+        }
+
+        if (!$desc)
+            $desc = $dir[0];
+
+        return [(int)$deg, $desc];
+    }
 }
 
 ?>

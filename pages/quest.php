@@ -667,25 +667,35 @@ class QuestPage extends GenericPage
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
-            if ($atir = DB::World()->selectCell('SELECT id FROM areatrigger_involvedrelation WHERE quest = ?d', $this->typeId))
+            if ($atir = DB::Aowow()->selectCol('SELECT id FROM ?_areatrigger WHERE type = ?d AND quest = ?d', AT_TYPE_OBJECTIVE, $this->typeId))
             {
-                if ($atsp = DB::AoWoW()->selectRow('SELECT guid, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_AREATRIGGER, $atir))
-                    $mObjectives[$atsp['areaId']] = array(
-                        'zone'     => 'Zone #'.$atsp['areaId'],
-                        'mappable' => 1,
-                        'levels'   => array (
-                            $atsp['floor'] => array (
-                                array (
-                                    'type'      => -1,      // TYPE_AREATRIGGER is internal, the javascript doesn't know it
-                                    'point'     => 'requirement',
-                                    'name'      => $this->subject->parseText('end', false),
-                                    'coord'     => [$atsp['posX'], $atsp['posY']],
-                                    'coords'    => [[$atsp['posX'], $atsp['posY']]],
-                                    'objective' => $objectiveIdx++
-                                )
-                            )
-                        )
-                    );
+                if ($atSpawns = DB::AoWoW()->select('SELECT typeId AS ARRAY_KEY, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', TYPE_AREATRIGGER, $atir))
+                {
+                    foreach ($atSpawns as $atId => $atsp)
+                    {
+                        $atSpawn = array (
+                                'type'      => User::isInGroup(U_GROUP_STAFF) ? TYPE_AREATRIGGER : -1,
+                                'id'        => $atId,
+                                'point'     => 'requirement',
+                                'name'      => $this->subject->parseText('end', false),
+                                'coord'     => [$atsp['posX'], $atsp['posY']],
+                                'coords'    => [[$atsp['posX'], $atsp['posY']]],
+                                'objective' => $objectiveIdx++
+                            );
+
+                        if (isset($mObjectives[$atsp['areaId']]['levels'][$atsp['floor']]))
+                        {
+                            $mObjectives[$atsp['areaId']]['levels'][$atsp['floor']][] = $atSpawn;
+                            continue;
+                        }
+
+                        $mObjectives[$atsp['areaId']] = array(
+                            'zone'     => 'Zone #'.$atsp['areaId'],
+                            'mappable' => 1,
+                            'levels'   => [$atsp['floor'] => [$atSpawn]]
+                        );
+                    }
+                }
             }
             // complete-spell
             else if ($endSpell = new SpellList(array('OR', ['AND', ['effect1Id', 16], ['effect1MiscValue', $this->typeId]], ['AND', ['effect2Id', 16], ['effect2MiscValue', $this->typeId]], ['AND', ['effect3Id', 16], ['effect3MiscValue', $this->typeId]])))

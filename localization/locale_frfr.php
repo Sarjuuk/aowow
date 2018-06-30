@@ -204,6 +204,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "haut fait",
         'achievements'  => "Hauts faits",
+        'areatrigger'   => "areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "classe",
         'classes'       => "Classes",
         'currency'      => "monnaies",
@@ -440,6 +442,11 @@ $lang = array(
             1 => "Sort proc",               3 => "Sort équipé",             7 => "Sort utilisé",            8 => "Châsse prismatique",
             5 => "Statistiques",            2 => "Dégâts d'arme",           6 => "DPS",                     4 => "Défense"
         )
+    ),
+    'areatrigger' => array(
+        'notFound'      => "This areatrigger doesn't exist.",
+        'foundIn'       => "This areatrigger can be found in",
+        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'notFound'      => "Cette entité n'existe pas.",

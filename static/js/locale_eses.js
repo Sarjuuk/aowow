@@ -820,7 +820,7 @@ var mn_sounds = [
     [50,"Zone Ambience","?sounds&filter=ty=50"],
     [28,"Zone Music","?sounds&filter=ty=28"]
 ];
-mn_icons = [
+var mn_icons = [
     [3, "Logros", "?icons&filter=cr=3;crs=1;crv=0"],
     // [4, "Mascotas de duelo", "?icons&filter=cr=4;crs=1;crv=0"],
     // [5, "Habilidades de mascota de batalla", "?icons&filter=cr=5;crs=1;crv=0"],
@@ -834,6 +834,16 @@ mn_icons = [
     // [10, "Amenazas", "?icons&filter=cr=10;crs=1;crv=0"],
     [13, "Sin uso", "?icons&filter=cr=13;crs=3;crv=0"]
 ];
+// aowow - custom start
+var mn_areatrigger = [
+    [0, 'Unused', '?areatriggers&filter=ty=0'],
+    [1, 'Tavern', '?areatriggers&filter=ty=1'],
+    [2, 'Teleporter', '?areatriggers&filter=ty=2'],
+    [3, 'Quest Objective', '?areatriggers&filter=ty=3'],
+    [4, 'Smart Trigger', '?areatriggers&filter=ty=4'],
+    [5, 'Script', '?areatriggers&filter=ty=5']
+];
+// aowow - custom end
 var mn_talentCalc = [
     [6,"Caballero de la muerte","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druida","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -2327,6 +2337,16 @@ var g_socket_names = {
     14: 'Ranura prismática'
 };
 
+/* aowow custom */
+var g_trigger_types = {
+    0: 'Unused',
+    1: 'Tavern',
+    2: 'Teleporter',
+    3: 'Quest Objective',
+    4: 'Smart Trigger',
+    5: 'Script'
+};
+
 // DRUNK_MESSAGE_*
 var g_drunk_states = {
     0: 'sobrio',
@@ -2411,6 +2431,7 @@ var g_conditions = {
     37: 'La salud del objetivo/s esta$: no; $2 $1',
     37: 'La salud del objetivo/s esta$: no; $2 $1%'
 };
+/* end aowow custom */
 
 var LANG = {
     alltime_stc:   "Todo el tiempo",
@@ -3219,7 +3240,8 @@ var LANG = {
         anvil:          "Yunques",
         vein:           "Venas de minerales",
         spirithealer:   "Espíritus sanadores",
-        boss:           "Jefes"
+        boss:           "Jefes",
+        areatrigger:    "Areatrigger"                       // aowow - custom
     },
 
     markup_b:       "Negrita",
@@ -4225,7 +4247,7 @@ var LANG = {
         classes:            "Usado(a) por Clases"
     },
 
-    // custom
+    // aowow custom
     fienchantments: {
         id:             "ID",
         hascondition:   "[Requires a combination of gems]",
@@ -4234,8 +4256,14 @@ var LANG = {
         sepcommunity:   "Comunidad",
         hascomments:    "Tiene comentarios",
         hasscreenshots: "Tiene capturas de pantalla",
-        hasvideos:      "Tiene vídeos",
+        hasvideos:      "Tiene vídeos"
     },
+
+    fiareatrigger: {
+        sepgeneral: "General",
+        id:         "ID"
+    },
+    // end aowow custom
 
     pr_notice:     '¿La primera vez? &ndash; ¡No temas! ¡Visita nuestra <a href="?help=profiler" target="_blank">página de ayuda</a>! &nbsp; <small class="q0"><a href="javascript:;">cerrar</a></small>',
     pr_datasource: 'Los datos de esta pestaña se actualizarón por última vez el $2 por <a href="?user=$1" target="_blank">$1</a>.',

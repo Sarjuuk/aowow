@@ -19,7 +19,7 @@
     $this->brick('redButtons');
 ?>
 
-                <h1<?php echo isset($this->expansion) ? ' class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name; ?></h1>
+                <h1<?=(isset($this->expansion) ? ' class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name); ?></h1>
 
 <?php
     $this->brick('article');
@@ -30,7 +30,7 @@ if (isset($this->extraText)):
 ?>
     <div id="text-generic" class="left"></div>
     <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("<?php echo $this->extraText; ?>", "text-generic", {
+        Markup.printHtml("<?=$this->extraText; ?>", "text-generic", {
             allow: Markup.CLASS_ADMIN,
             dbpage: true
         });
@@ -85,7 +85,7 @@ if (!empty($this->zoneMusic)):
 <?php
 endif;
 ?>
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 <?php
     $this->brick('lvTabs', ['relTabs' => true]);

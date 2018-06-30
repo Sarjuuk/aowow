@@ -575,6 +575,7 @@ trait spawnHelper
         $wpSum  = [];
         $wpIdx  = 0;
         $spawns = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE type = ?d AND typeId = ?d", self::$type, $this->id);
+
         if (!$spawns)
             return;
 
@@ -637,7 +638,13 @@ trait spawnHelper
                     $info[4] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
                 }
 
-                $footer = '<span class="q2">Click to move to different floor</span>';
+                if (self::$type == TYPE_AREATRIGGER)
+                {
+                    $o = Util::O2Deg($this->getField('orientation'));
+                    $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
+                }
+
+                // $footer = '<span class="q2">Click to move to different floor</span>';
             }
 
             if ($info)
@@ -709,7 +716,7 @@ trait spawnHelper
     public function getSpawns($mode)
     {
         // only Creatures, GOs and SoundEmitters can be spawned
-        if (!self::$type || !$this->getfoundIDs() || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND))
+        if (!self::$type || !$this->getfoundIDs() || (self::$type != TYPE_NPC && self::$type != TYPE_OBJECT && self::$type != TYPE_SOUND && self::$type != TYPE_AREATRIGGER))
             return [];
 
         switch ($mode)

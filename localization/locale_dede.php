@@ -204,6 +204,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "Erfolg",
         'achievements'  => "Erfolge",
+        'areatrigger'   => "Areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "Klasse",
         'classes'       => "Klassen",
         'currency'      => "Währung",
@@ -440,6 +442,11 @@ $lang = array(
             1 => "Zauber (Auslösung)",      3 => "Zauber (Anlegen)",        7 => "Zauber (Benutzen)",       8 => "Prismatischer Sockel",
             5 => "Statistik",               2 => "Waffenschaden",           6 => "DPS",                     4 => "Verteidigung"
         )
+    ),
+    'areatrigger' => array(
+        'notFound'      => "Dieser Areatrigger existiert nicht.",
+        'foundIn'       => "Dieser Areatrigger befindet sich in",
+        'types'         => ['Unbenutzt', 'Gasthaus', 'Teleporter', 'Questziel', 'Smarter Trigger', 'Script']
     ),
     'gameObject' => array(
         'notFound'      => "Dieses Objekt existiert nicht.",

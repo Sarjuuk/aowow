@@ -22626,7 +22626,8 @@ var g_types = {
      19: 'sound',
      29: 'icon',
     501: 'emote',
-    502: 'enchantment'
+    502: 'enchantment',
+    503: 'areatrigger'
 };
 
 // Items

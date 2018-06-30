@@ -35,6 +35,9 @@ class AjaxFilter extends AjaxHandler
             case 'achievements':
                 $this->filter = (new AchievementListFilter(true, $opts));
                 break;
+            case 'areatriggers':
+                $this->filter = (new AreaTriggerListFilter(true, $opts));
+                break;
             case 'enchantments':
                 $this->filter = (new EnchantmentListFilter(true, $opts));
                 break;

@@ -204,6 +204,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "logro",
         'achievements'  => "Logros",
+        'areatrigger'   => "areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "clase",
         'classes'       => "Clases",
         'currency'      => "monedas",
@@ -437,9 +439,14 @@ $lang = array(
         'activation'    => "Activación",
         'notFound'      => "Este encantamiento no existe.",
         'types'         => array(
-            1 => "Prob. Hechizo",            3 => "Equipar Hechizo",           7 => "Usar Hechizo",             8 => "Ranura prismática",
+            1 => "Prob. Hechizo",           3 => "Equipar Hechizo",         7 => "Usar Hechizo",            8 => "Ranura prismática",
             5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
         )
+    ),
+    'areatrigger' => array(
+        'notFound'      => "This areatrigger doesn't exist.",
+        'foundIn'       => "This areatrigger can be found in",
+        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'notFound'      => "Este entidad no existe.",

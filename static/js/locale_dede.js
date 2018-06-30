@@ -834,6 +834,16 @@ mn_icons = [
     // [10, "Bedrohungen", "?icons&filter=cr=10;crs=1;crv=0"],
     [13, "Ungenutzt", "?icons&filter=cr=13;crs=3;crv=0"]
 ];
+// aowow - custom start
+var mn_areatrigger = [
+    [0, 'Unbenutzt', '?areatriggers&filter=ty=0'],
+    [1, 'Gasthaus', '?areatriggers&filter=ty=1'],
+    [2, 'Teleporter', '?areatriggers&filter=ty=2'],
+    [3, 'Questziel', '?areatriggers&filter=ty=3'],
+    [4, 'Smarter Trigger', '?areatriggers&filter=ty=4'],
+    [5, 'Script', '?areatriggers&filter=ty=5']
+];
+// aowow - custom end
 var mn_talentCalc = [
     [6,"Todesritter","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -907,7 +917,8 @@ var mn_database = [
     [11,"Weltereignisse","?events",mn_holidays],
     [, "Anderes"],
     [19,"Klänge","?sounds",mn_sounds],
-    [31, "Icons", "?icons", mn_icons]
+    [31, "Icons", "?icons", mn_icons],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}]     // aowow - custom
 ];
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],
@@ -2326,7 +2337,17 @@ var g_socket_names = {
     14: 'Prismatischer Sockel'
 };
 
-/* custom */
+/* aowow custom */
+var g_trigger_types = {
+    0: 'Unbenutzt',
+    1: 'Gasthaus',
+    2: 'Teleporter',
+    3: 'Questziel',
+    4: 'Smarter Trigger',
+    5: 'Script'
+};
+
+// DRUNK_MESSAGE_*
 var g_drunk_states = {
     0: 'nüchtern',
     1: 'beschwipst',
@@ -2410,7 +2431,7 @@ var g_conditions = {
     37: 'Die Gesundheit des Ziels ist$: nicht; $2 $1',
     37: 'Die Gesundheit des Ziels ist$: nicht; $2 $1%'
 };
-/* end custom */
+/* end aowow custom */
 
 var LANG = {
     alltime_stc:   "Allzeit",
@@ -3219,7 +3240,8 @@ var LANG = {
         anvil:          "Amboss",
         vein:           "Erzadern",
         spirithealer:   "Geistheiler",
-        boss:           "Bosse"
+        boss:           "Bosse",
+        areatrigger:    "Areatrigger"                       // aowow - custom
     },
 
     markup_b:       "Fett",
@@ -4223,7 +4245,7 @@ var LANG = {
         classes:            "Genutzt von Klassen"
     },
 
-    // custom
+    // aowow custom
     fienchantments: {
         id:             "ID",
         hascondition:   "Benötigt Edelsteinkombination",
@@ -4234,6 +4256,12 @@ var LANG = {
         hasscreenshots: "Has screenshots",
         hasvideos:      "Has videos"
     },
+
+    fiareatrigger: {
+        sepgeneral: "Allgemein",
+        id:         "ID"
+    },
+    // end aowow custom
 
     pr_notice:     'Zum ersten Mal hier? &ndash; Seid nicht schüchtern! Schaut ruhig mal auf unserer <a href="?help=profiler" target="_blank">Hilfeseite</a> (zurzeit noch unübersetzt) nach! &nbsp; <small class="q0"><a href="javascript:;">Schließen</a></small>',
     pr_datasource: 'Daten in dieser Registerkarte wurden das letzte Mal $2 von <a href="?user=$1" target="_blank">$1</a> aktualisiert.',

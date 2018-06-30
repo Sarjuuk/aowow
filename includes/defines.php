@@ -35,7 +35,7 @@ define('TYPE_ARENA_TEAM',                   102);
 define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);
 define('TYPE_ENCHANTMENT',                  502);
-define('TYPE_AREATRIGGER',                  503);           // not for display, but indexing in ?_spawns-table
+define('TYPE_AREATRIGGER',                  503);
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);
@@ -914,4 +914,11 @@ define('PR_EXCLUDE_GROUP_WRONG_PROFESSION',    PR_EXCLUDE_GROUP_REQ_FISHING | PR
 define('PR_EXCLUDE_GROUP_REQ_CANT_BE_EXALTED', 0x400);
 define('PR_EXCLUDE_GROUP_ANY',                 0x7FF);
 
+// Areatrigger types
+define('AT_TYPE_NONE',      0);
+define('AT_TYPE_TAVERN',    1);
+define('AT_TYPE_TELEPORT',  2);
+define('AT_TYPE_OBJECTIVE', 3);
+define('AT_TYPE_SMART',     4);
+define('AT_TYPE_SCRIPT',    5);
 ?>

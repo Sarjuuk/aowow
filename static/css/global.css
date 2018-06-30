@@ -591,7 +591,7 @@ html.ie678 .line var {
     -webkit-box-shadow: 0px 0px 3px black;
 }
 
-.line.flipped {
+.line .flipped {
     -o-transform: scaleY(-1);
     -moz-transform: scaleY(-1);
     -webkit-transform: scaleY(-1);

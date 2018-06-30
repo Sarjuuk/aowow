@@ -365,7 +365,7 @@ class ObjectPage extends GenericPage
                     if (!$lv['quest'])
                         continue;
 
-                    $extraCols[] = 'Listview.extraCols.condition';
+                    $extraCols[] = '$Listview.extraCols.condition';
                     $reqQuest[$lv['id']] = 0;
                     $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }

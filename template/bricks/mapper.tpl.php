@@ -5,7 +5,21 @@ elseif (!empty($this->map['data'])):
     if ($this->type == TYPE_QUEST) :
         echo "            <div id=\"mapper-zone-generic\"></div>\n";
     elseif ($this->type != TYPE_ZONE):
-        echo '            <div>'.($this->type == TYPE_OBJECT ? Lang::gameObject('foundIn') : ($this->type == TYPE_SOUND ? Lang::sound('foundIn') : Lang::npc('foundIn'))).' <span id="mapper-zone-generic">';
+        echo '            <div>';
+
+        if ($this->type == TYPE_OBJECT):
+            echo Lang::gameObject('foundIn');
+        elseif ($this->type == TYPE_SOUND):
+            echo Lang::sound('foundIn');
+        elseif ($this->type == TYPE_NPC):
+            echo Lang::npc('foundIn');
+        elseif ($this->type == TYPE_AREATRIGGER):
+            echo Lang::areatrigger('foundIn');
+        else:
+            echo "UNKNOWN TYPE";
+        endif;
+
+        echo ' <span id="mapper-zone-generic">';
 
         $extra = $this->map['extra'];
         echo Lang::concat($this->map['mapperData'], true, function ($areaData, $areaId) use ($extra) {

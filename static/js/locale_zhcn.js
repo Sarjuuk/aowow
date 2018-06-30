@@ -867,7 +867,7 @@ var mn_sounds = [
     [50,"区域气氛","?sounds&filter=ty=50"],
     [28,"区域音乐","?sounds&filter=ty=28"]
 ];
-mn_icons = [
+var mn_icons = [
     [3, "成就", "?icons&filter=cr=3;crs=1;crv=0"],
     // [4, "战斗宠物", "?icons&filter=cr=4;crs=1;crv=0"],
     // [5, "对战宠物能力", "?icons&filter=cr=5;crs=1;crv=0"],
@@ -881,6 +881,16 @@ mn_icons = [
     // [10, "威胁", "?icons&filter=cr=10;crs=1;crv=0"],
     [13, "未使用", "?icons&filter=cr=13;crs=3;crv=0"]
 ];
+// aowow - custom start
+var mn_areatrigger = [
+    [0, 'Unused', '?areatriggers&filter=ty=0'],
+    [1, 'Tavern', '?areatriggers&filter=ty=1'],
+    [2, 'Teleporter', '?areatriggers&filter=ty=2'],
+    [3, 'Quest Objective', '?areatriggers&filter=ty=3'],
+    [4, 'Smart Trigger', '?areatriggers&filter=ty=4'],
+    [5, 'Script', '?areatriggers&filter=ty=5']
+];
+// aowow - custom end
 var mn_talentCalc = [
     [6,"死亡骑士","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"德鲁伊","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -2374,7 +2384,16 @@ var g_socket_names = {
     14: '棱彩插槽'
 };
 
-/* custom */
+/* aowow custom */
+var g_trigger_types = {
+    0: 'Unused',
+    1: 'Tavern',
+    2: 'Teleporter',
+    3: 'Quest Objective',
+    4: 'Smart Trigger',
+    5: 'Script'
+};
+
 // DRUNK_MESSAGE_*
 var g_drunk_states = {
     0: 'sober',
@@ -2459,7 +2478,7 @@ var g_conditions = {
     37: 'The target\'s health is$: not; $2 $1',
     37: 'The target\'s health is$: not; $2 $1%'
 };
-/* end custom */
+/* end aowow custom */
 
 var LANG = {
     alltime_stc:   "全天候",
@@ -3270,6 +3289,7 @@ var LANG = {
         vein:           "矿点",
         spirithealer:   "灵魂医者",
         boss:           "首领",
+        areatrigger:    "Areatrigger"                       // aowow - custom
     },
 
     markup_b:       "勇敢",
@@ -4252,7 +4272,7 @@ var LANG = {
         classes: "被$1使用".replace("$1", "职业")
     },
 
-    // custom
+    // aowow custom
     fienchantments: {
         id:             "ID",
         hascondition:   "Requires a combination of gems",
@@ -4261,8 +4281,14 @@ var LANG = {
         sepcommunity:   "社区",
         hascomments:    "有评论",
         hasscreenshots: "有截屏",
-        hasvideos:      "有视频",
+        hasvideos:      "有视频"
     },
+
+    fiareatrigger: {
+        sepgeneral: "一般",
+        id:         "ID"
+    },
+    // end aowow custom
 
     pr_notice:     'First time? &ndash; Don\'t be shy! Just check out our <a href="?help=profiler" target="_blank">Help page</a>! &nbsp; <small class="q0"><a href="javascript:;">close</a></small>', // enUS
     pr_datasource: 'Data in this tab was last updated $2 by <a href="?user=$1" target="_blank">$1</a>.', // enUS

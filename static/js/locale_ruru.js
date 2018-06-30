@@ -820,7 +820,7 @@ var mn_sounds = [
     [50,"Zone Ambience","?sounds&filter=ty=50"],
     [28,"Zone Music","?sounds&filter=ty=28"]
 ];
-mn_icons = [
+var mn_icons = [
     [3, "Достижения", "?icons&filter=cr=3;crs=1;crv=0"],
     // [4, "Боевые питомцы", "?icons&filter=cr=4;crs=1;crv=0"],
     // [5, "Способности Боевого Питомца", "?icons&filter=cr=5;crs=1;crv=0"],
@@ -834,6 +834,16 @@ mn_icons = [
     // [10, "Угрозы", "?icons&filter=cr=10;crs=1;crv=0"],
     [13, "Неиспользуемые", "?icons&filter=cr=13;crs=3;crv=0"]
 ];
+// aowow - custom start
+var mn_areatrigger = [
+    [0, 'Unused', '?areatriggers&filter=ty=0'],
+    [1, 'Tavern', '?areatriggers&filter=ty=1'],
+    [2, 'Teleporter', '?areatriggers&filter=ty=2'],
+    [3, 'Quest Objective', '?areatriggers&filter=ty=3'],
+    [4, 'Smart Trigger', '?areatriggers&filter=ty=4'],
+    [5, 'Script', '?areatriggers&filter=ty=5']
+];
+// aowow - custom end
 var mn_talentCalc = [
     [6,"Рыцарь смерти","?talent#j",,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Друид","?talent#0",,{className:"c11",tinyIcon:"class_druid"}],
@@ -2326,7 +2336,16 @@ var g_socket_names = {
     14: 'Бесцветное гнездо'
 };
 
-/* custom */
+/* aowow custom */
+var g_trigger_types = {
+    0: 'Unused',
+    1: 'Tavern',
+    2: 'Teleporter',
+    3: 'Quest Objective',
+    4: 'Smart Trigger',
+    5: 'Script'
+};
+
 // DRUNK_MESSAGE_*
 var g_drunk_states = {
     0: 'sober',
@@ -2411,7 +2430,7 @@ var g_conditions = {
     37: 'The target\'s health is$: not; $2 $1',
     37: 'The target\'s health is$: not; $2 $1%'
 };
-/* end custom */
+/* end aowow custom */
 
 var LANG = {
     alltime_stc:   "Все время",
@@ -3221,7 +3240,8 @@ var LANG = {
         anvil:          "Наковальни",
         vein:           "Полезные ископаемые",
         spirithealer:   "Целители душ",
-        boss:           "Боссы"
+        boss:           "Боссы",
+        areatrigger:    "Areatrigger"                       // aowow - custom
     },
 
     markup_b:       "Жирный",
@@ -4230,7 +4250,7 @@ var LANG = {
         classes:            "Используется Классы"
     },
 
-    // custom
+    // aowow custom
     fienchantments: {
         id:             "Номер",
         hascondition:   "[Requires a combination of gems]",
@@ -4239,8 +4259,14 @@ var LANG = {
         sepcommunity:   "Сообщество",
         hascomments:    "Есть комментарии",
         hasscreenshots: "Есть изображения",
-        hasvideos:      "Есть видео",
+        hasvideos:      "Есть видео"
     },
+
+    fiareatrigger: {
+        sepgeneral: "Общее",
+        id:         "ID"
+    },
+    // end aowow custom
 
     pr_notice:     'Первый раз? &ndash; Не стесняйтесь! Взгляните на <a href="?help=profiler" target="_blank">страницу помощи</a>! &nbsp; <small class="q0"><a href="javascript:;">закрыть</a></small>',
     pr_datasource: 'Данные в этой вкладке были последний раз обновлены пользователем <a href="?user=$1" target="_blank">$1</a> $2.',

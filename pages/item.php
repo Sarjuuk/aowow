@@ -484,7 +484,7 @@ class ItemPage extends genericPage
                     if (!$lv['quest'])
                         continue;
 
-                    $sf[4] = array_merge($sf[4], ['Listview.extraCols.condition']);
+                    $sf[4] = array_merge($sf[4], ['$Listview.extraCols.condition']);
 
                     $reqQuest[$lv['id']] = 0;
 

@@ -204,6 +204,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "достижение",
         'achievements'  => "Достижения",
+        'areatrigger'   => "areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "класс",
         'classes'       => "Классы",
         'currency'      => "валюта",
@@ -440,6 +442,11 @@ $lang = array(
             1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Бесцветное гнездо",
             5 => "Характеристики",          2 => "Урон оружия",             6 => "УВС",                     4 => "Защита"
         )
+    ),
+    'areatrigger' => array(
+        'notFound'      => "This areatrigger doesn't exist.",
+        'foundIn'       => "This areatrigger can be found in",
+        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
         'notFound'      => "Такой объект не существует.",

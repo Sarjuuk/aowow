@@ -16,9 +16,14 @@ class SoundsPage extends GenericPage
     protected $tabId     = 0;
     protected $mode      = CACHE_TYPE_PAGE;
     protected $validCats = [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53];
+    protected $js        = ['filters.js'];
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->getCategoryFromUrl($pageParam);;
+        if (isset($this->category[0]))
+            header('Location: ?sounds&filter=ty='.$this->category[0], true, 302);
+
         $this->filterObj = new SoundListFilter();
 
         parent::__construct($pageCall, $pageParam);
@@ -28,8 +33,6 @@ class SoundsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addJs('filters.js');
-
         $this->redButtons = array(
             BUTTON_WOWHEAD  => true,
             BUTTON_PLAYLIST => true
@@ -42,8 +45,8 @@ class SoundsPage extends GenericPage
         $this->filter          = $this->filterObj->getForm();
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
 
-        $sounds = new SoundList($conditions);
         $tabData = [];
+        $sounds  = new SoundList($conditions);
         if (!$sounds->error)
         {
             $tabData['data'] = array_values($sounds->getListviewData());
@@ -65,6 +68,8 @@ class SoundsPage extends GenericPage
 
     protected function generateTitle()
     {
+        array_unshift($this->title, $this->name);
+
         $form = $this->filterObj->getForm();
         if (isset($form['ty']) && count($form['ty']) == 1)
             array_unshift($this->title, Lang::sound('cat', $form['ty'][0]));

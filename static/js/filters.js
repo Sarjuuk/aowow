@@ -505,7 +505,7 @@ var fi_filters = {
         { id: 11,   name: 'classes',                type: 'num' }
     ],
 
-    // custom
+    // aowow custom
     enchantments: [
         { id: 1,   name: 'sepgeneral' },
         { id: 2,   name: 'id',                  type: 'num', before: 'name' },
@@ -579,7 +579,14 @@ var fi_filters = {
         { id: 10,  name: 'hascomments',         type: 'yn' },
         { id: 11,  name: 'hasscreenshots',      type: 'yn' },
         { id: 12,  name: 'hasvideos',           type: 'yn' }
+    ],
+
+    areatrigger: [
+        { id: 1, name: 'sepgeneral'             },
+        { id: 2, name: 'id',        type: 'num' }
     ]
+
+    // end aowow custom
 };
 
 function fi_toggle() {
