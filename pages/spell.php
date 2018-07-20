@@ -512,6 +512,32 @@ class SpellPage extends GenericPage
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
 
+        // tab: shared cooldown
+        if ($this->subject->getField('recoveryCategory'))
+        {
+            $conditions = array(
+                ['id', $this->typeId, '!'],
+                ['category', $this->subject->getField('category')],
+                ['recoveryCategory', 0, '>'],
+            );
+
+            // limit shared cooldowns to same player class for regulat users
+            if (!User::isInGroup(U_GROUP_STAFF) && $this->subject->getField('spellFamilyId'))
+                $conditions[] = ['spellFamilyId', $this->subject->getField('spellFamilyId')];
+
+            $cdSpells = new SpellList($conditions);
+            if (!$cdSpells->error)
+            {
+                $this->lvTabs[] = ['spell', array(
+                    'data' => array_values($cdSpells->getListviewData()),
+                    'name' => '$LANG.tab_sharedcooldown',
+                    'id'   => 'shared-cooldown'
+                )];
+
+                $this->extendGlobalData($cdSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+            }
+        }
+
         // tab: used by - spell
         if ($so = DB::Aowow()->selectCell('SELECT id FROM ?_spelloverride WHERE spellId1 = ?d OR spellId2 = ?d OR spellId3 = ?d OR spellId4 = ?d OR spellId5 = ?d', $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id))
         {

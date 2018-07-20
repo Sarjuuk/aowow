@@ -908,10 +908,21 @@ class ItemPage extends genericPage
         }
 
         // tab: Shared cooldown
-        $cdCats = [];
+        $cdCats    = [];
+        $useSpells = [];
         for ($i = 1; $i < 6; $i++)
+        {
+            // as defined on item
             if ($this->subject->getField('spellId'.$i) > 0 && $this->subject->getField('spellCategory'.$i) > 0)
                 $cdCats[] = $this->subject->getField('spellCategory'.$i);
+
+            // as defined in spell
+            if ($this->subject->getField('spellId'.$i) > 0)
+                $useSpells[] = $this->subject->getField('spellId'.$i);
+        }
+        if ($useSpells)
+            if ($_ = DB::Aowow()->selectCol('SELECT category FROM ?_spell WHERE id IN (?a) AND recoveryCategory > 0', $useSpells))
+                $cdCats += $_;
 
         if ($cdCats)
         {
@@ -926,6 +937,11 @@ class ItemPage extends genericPage
                     ['spellCategory5', $cdCats],
                 ]
             );
+
+            if ($spellsByCat = DB::Aowow()->selectCol('SELECT id FROM ?_spell WHERE category IN (?a)', $cdCats))
+                for ($i = 1; $i < 6; $i++)
+                    $conditions[1][] = ['spellId'.$i, $spellsByCat];
+
             $cdItems = new ItemList($conditions);
             if (!$cdItems->error)
             {
@@ -938,7 +954,6 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
             }
         }
-
 
         // tab: sounds
         $soundIds = [];
