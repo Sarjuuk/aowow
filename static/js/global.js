@@ -11267,6 +11267,12 @@ Listview.templates = {
                     var wrapper = $WH.ce('div');
                     var a = $WH.ce('a');
 
+                    // aowow - custom for unnamed objects
+                    if (!object.name){
+                        object.name = 'Unnamed Object #' + object.id;
+                        a.className += 'q0';
+                    }
+
                     a.style.fontFamily = 'Verdana, sans-serif';
                     a.href = this.getItemLink(object);
                     $WH.ae(a, $WH.ct(object.name));

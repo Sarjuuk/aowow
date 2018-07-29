@@ -3813,6 +3813,10 @@ var LANG = {
                             [15, "Munition"],                       [16, "Pyrit"],                          [17, "Dampfdruck"],                     [18, "Hitze"],
                             [19, "Schlamm"],                        [20, "Blutmacht"],                      [21, "Wrath"]
                         ],
+        spellfocus:     [
+                            [1, "Amboss"],                          [2, "Webstuhl"],                        [3, "Schmiede"],                        [4, "Kochstelle"],                      [663, "Alchemielabor"],
+                            [883, "Mondbrunnen"]
+                        ],
         flags:          [
                             [1, '0x00000001'],                      [2, '0x00000002'],                      [3, '0x00000004'],                      [4, '0x00000008'],                      [5, '0x00000010'],
                             [6, '0x00000020'],                      [7, '0x00000040'],                      [8, '0x00000080'],                      [9, '0x00000100'],                      [10,'0x00000200'],
@@ -3995,6 +3999,7 @@ var LANG = {
         startsquest:           "Startet eine Quest",
         endsquest:             "Beendet eine Quest",
         id:                    "ID",
+        spellfocus:            "Zauberfokus",
 
         seploot:               "Loot",
         averagemoneycontained: "Durchschnittlich enthaltene Geldmenge",

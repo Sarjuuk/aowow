@@ -3860,6 +3860,10 @@ var LANG = {
                             [15, "Ammo"],                           [16, "Pyrite"],                         [17, "Steam Pressure"],                 [18, "Heat"],
                             [19, "Ooze"],                           [20, "Blood Power"],                    [21, "Wrath"]
                         ],
+        spellfocus:     [
+                            [1, "Anvil"],                           [2, "Loom"],                            [3, "Forge"],                           [4, "Cooking Fire"],                    [663, "Alchemy Lab"],
+                            [883, "Moonwell"],
+                        ],
         flags:          [
                             [1, '0x00000001'],                      [2, '0x00000002'],                      [3, '0x00000004'],                      [4, '0x00000008'],                      [5, '0x00000010'],
                             [6, '0x00000020'],                      [7, '0x00000040'],                      [8, '0x00000080'],                      [9, '0x00000100'],                      [10,'0x00000200'],
@@ -4042,6 +4046,7 @@ var LANG = {
         startsquest:           "Starts a quest",
         endsquest:             "Ends a quest",
         id:                    "ID",
+        spellfocus:            "Spell Focus",
 
         seploot:               "Loot",
         averagemoneycontained: "Average money contained",

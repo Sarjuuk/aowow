@@ -28,7 +28,7 @@ Listview.templates.areatrigger = {
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = this.getItemLink(areatrigger);
                 if (!areatrigger.name){
-                    areatrigger.name = 'Unnamed'
+                    areatrigger.name = 'Unnamed Areatrigger'
                     a.className = 'q0';
                 }
 

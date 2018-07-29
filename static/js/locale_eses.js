@@ -3815,6 +3815,10 @@ var LANG = {
                             [15, "Munición"],                       [16, "Pirita"],                         [17, "Presión de vapor"],               [18, "Calor"],
                             [19, "Moco"],                           [20, "Poder de sangre"],                [21, "Cólera"]
                         ],
+        spellfocus:     [
+                            [1, "Yunque"],                          [2, "Telar"],                           [3, "Forja"],                           [4, "Lumbre"],                          [663, "Laboratorio de alquimia"],
+                            [883, "Poza de la Luna"]
+                        ],
         flags:          [
                             [1, '0x00000001'],                      [2, '0x00000002'],                      [3, '0x00000004'],                      [4, '0x00000008'],                      [5, '0x00000010'],
                             [6, '0x00000020'],                      [7, '0x00000040'],                      [8, '0x00000080'],                      [9, '0x00000100'],                      [10,'0x00000200'],
@@ -3997,6 +4001,7 @@ var LANG = {
         startsquest:           "Empieza una misión",
         endsquest:             "Termina una misión",
         id:                    "ID",
+        spellfocus:            "Foco del hechizo",
 
         seploot:               "Botín",
         averagemoneycontained: "Cantidad promedio de dinero contenido",

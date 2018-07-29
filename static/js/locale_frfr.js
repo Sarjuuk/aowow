@@ -3814,6 +3814,10 @@ var LANG = {
                             [15, "Munitions"],                      [16, "Pyrite"],                         [17, "Pression vapeur"],                [18, "Chaleur"],
                             [19, "Limon"],                          [20, "Puissance de sang"],              [21, "Courroux"]
                         ],
+        spellfocus:     [
+                            [1, "Enclume"],                         [2, "Métier à tisser"],                 [3, "Forge"],                           [4, "Feu de cuisine"],                  [663, "Laboratoire d'alchimie"],
+                            [883, "Puits de lune"]
+                        ],
         flags:          [
                             [1, '0x00000001'],                      [2, '0x00000002'],                      [3, '0x00000004'],                      [4, '0x00000008'],                      [5, '0x00000010'],
                             [6, '0x00000020'],                      [7, '0x00000040'],                      [8, '0x00000080'],                      [9, '0x00000100'],                      [10,'0x00000200'],
@@ -3996,6 +4000,7 @@ var LANG = {
         startsquest:           "Débute une quête",
         endsquest:             "Termine une quête",
         id:                    "ID",
+        spellfocus:            "Focus de sort",
 
         seploot:               "Butin",
         averagemoneycontained: "Argent contenu en moyenne",

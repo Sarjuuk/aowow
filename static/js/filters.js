@@ -258,6 +258,7 @@ var fi_filters = {
         { id: 7,   name: 'requiredskilllevel',  type: 'num' },
         { id: 2,   name: 'startsquest',         type: 'side' },
         { id: 3,   name: 'endsquest',           type: 'side' },
+        { id: 50,  name: 'spellfocus',          type: 'spellfocus-any+none' },
 
         { id: 9,   name: 'seploot' },
         { id: 5,   name: 'averagemoneycontained',   type: 'num' },
