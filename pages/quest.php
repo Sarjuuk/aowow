@@ -137,7 +137,7 @@ class QuestPage extends GenericPage
         }
 
         // races
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $__, $jsg, $n, false))
+        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, $n, false))
         {
             $this->extendGlobalIds(TYPE_RACE, $jsg);
             $t = $n == 1 ? Lang::game('race') : Lang::game('races');

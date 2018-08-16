@@ -866,14 +866,13 @@ class ItemList extends BaseType
         }
 
         // required races
-        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $__, $jsg, $__))
+        if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $jsg, $__))
         {
             foreach ($jsg as $js)
                 if (empty($this->jsGlobals[TYPE_RACE][$js]))
                     $this->jsGlobals[TYPE_RACE][$js] = $js;
 
-            if ($races != Lang::game('ra', 0))              // not "both", but display combinations like: troll, dwarf
-                $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
+            $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
         }
 
         // required honorRank (not used anymore)

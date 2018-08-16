@@ -336,29 +336,20 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$side = 0, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getRaceString($raceMask, &$ids = [], &$n = 0, $asHTML = true)
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
         if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
             return false;
 
+        if (!$raceMask)
+            return false;
+
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
         $br   = $asHTML ? '' : '[br]';
-
-        if (!$raceMask)
-        {
-            $side |= SIDE_BOTH;
-            return self::game('ra', 0);
-        }
-
-        if ($raceMask & RACE_MASK_HORDE)
-            $side |= SIDE_HORDE;
-
-        if ($raceMask & RACE_MASK_ALLIANCE)
-            $side |= SIDE_ALLIANCE;
 
         if ($raceMask == RACE_MASK_HORDE)
             return self::game('ra', -2);
