@@ -33,7 +33,8 @@ class QuestPage extends GenericPage
         if ($this->subject->error)
             $this->notFound();
 
-        $this->name = $this->subject->getField('name', true);
+        // may contain htmlesque tags
+        $this->name = htmlentities($this->subject->getField('name', true));
     }
 
     protected function generatePath()
@@ -46,7 +47,8 @@ class QuestPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('quest')));
+        // page title already escaped
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('quest')));
     }
 
     protected function generateContent()
