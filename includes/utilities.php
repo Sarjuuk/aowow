@@ -522,7 +522,7 @@ class Util
     }
 
     // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText($text)
+    public static function parseHtmlText($text , $markdown = false)
     {
         if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
@@ -531,7 +531,7 @@ class Util
                 '</HTML>'   => '',
                 '<BODY>'    => '',
                 '</BODY>'   => '',
-                '<BR></BR>' => '<br />'
+                '<BR></BR>' => $markdown ? '[br]' : '<br />'
             );
 
             // html may contain 'Pictures' and FlavorImages and "stuff"
@@ -542,7 +542,7 @@ class Util
             );
         }
         else
-            $text = strtr($text, ["\n" => '<br />', "\r" => '']);
+            $text = strtr($text, ["\n" => $markdown ? '[br]' : '<br />', "\r" => '']);
 
         $from = array(
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
@@ -551,34 +551,45 @@ class Util
             '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
             '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
             '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
-            '/\$(\d+)w/ui'                                  // worldState(?)-ref found on some pageTexts        $1234w
+            '/\$(\d+)w/ui',                                 // worldState(?)-ref found on some pageTexts        $1234w
+            '/\$c/i',                                       // class-ref
+            '/\$r/i',                                       // race-ref
+            '/\$n/i',                                       // name-ref
+            '/\$b/i',                                       // line break
+            '/\|n/i'                                        // what .. the fuck .. another type of line terminator? (only in spanish though)
         );
 
-        $to = array(
+        $toMD = array(
+            '[icon name=\2]',
+            '[span color=#\1>\2[/span]',
+            '&lt;\1/\2&gt;',
+            '',
+            '\1',
+            '&lt;\1&gt;',
+            '[span class=q0>WorldState #\1[/span]',
+            '&lt;'.Lang::game('class').'&gt;',
+            '&lt;'.Lang::game('race').'&gt;',
+            '&lt;'.Lang::main('name').'&gt;',
+            '[br]',
+            ''
+        );
+
+        $toHTML = array(
             '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/\2.gif)">',
             '<span style="color: #\1">\2</span>',
             '&lt;\1/\2&gt;',
             '',
             '\1',
             '&lt;\1&gt;',
-            '<span class="q0">WorldState #\1</span>'
+            '<span class="q0">WorldState #\1</span>',
+            '&lt;'.Lang::game('class').'&gt;',
+            '&lt;'.Lang::game('race').'&gt;',
+            '&lt;'.Lang::main('name').'&gt;',
+            '<br />',
+            ''
         );
 
-        $text = preg_replace($from, $to, $text);
-
-        $pairs = array(
-            '$c' => '&lt;'.Lang::game('class').'&gt;',
-            '$C' => '&lt;'.Lang::game('class').'&gt;',
-            '$r' => '&lt;'.Lang::game('race').'&gt;',
-            '$R' => '&lt;'.Lang::game('race').'&gt;',
-            '$n' => '&lt;'.Lang::main('name').'&gt;',
-            '$N' => '&lt;'.Lang::main('name').'&gt;',
-            '$b' => '<br />',
-            '$B' => '<br />',
-            '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
-        );
-
-        return strtr($text, $pairs);
+        return preg_replace($from, $markdown ? $toMD : $toHTML, $text);
     }
 
     public static function asHex($val)
@@ -1286,7 +1297,7 @@ class Util
         // subtract sockets
         if ($nSockets)
         {
-            // items by expantion overlap in this range. luckily highlevel raid items are exclusivly epic or better
+            // items by expansion overlap in this range. luckily highlevel raid items are exclusivly epic or better
             if ($itemLevel > 164 || ($itemLevel > 134 && $quality < ITEM_QUALITY_EPIC))
                 $score -= $nSockets * self::GEM_SCORE_BASE_WOTLK;
             else
@@ -1460,7 +1471,7 @@ class Util
         if ($deg == 360)
             $deg = 0;
 
-        $dir  = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        $dir  = Lang::game('orientation');
         $desc = '';
         foreach ($dir as $f => $d)
         {
@@ -1478,6 +1489,23 @@ class Util
             $desc = $dir[0];
 
         return [(int)$deg, $desc];
+    }
+
+    static function mask2bits($bitmask, $offset = 0)
+    {
+        $bits = [];
+        $i    = 0;
+        while ($bitmask)
+        {
+            if ($bitmask & (1 << $i))
+            {
+                $bitmask &= ~(1 << $i);
+                $bits[] = ($i + $offset);
+            }
+            $i++;
+        }
+
+        return $bits;
     }
 }
 

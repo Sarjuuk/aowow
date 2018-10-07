@@ -479,19 +479,115 @@ define('NPC_RANK_RARE_ELITE',               2);
 define('NPC_RANK_BOSS',                     3);
 define('NPC_RANK_RARE',                     4);
 
+define('NPC_FLAG_GOSSIP',                   0x00000001);
+define('NPC_FLAG_QUEST_GIVER',              0x00000002);
 define('NPC_FLAG_TRAINER',                  0x00000010);
 define('NPC_FLAG_CLASS_TRAINER',            0x00000020);
+define('NPC_PROFESSION_TRAINER',            0x00000040);
 define('NPC_FLAG_VENDOR',                   0x00000080);
+define('NPC_FLAG_VENDOR_AMMO',              0x00000100);
+define('NPC_FLAG_VENDOR_FOOD',              0x00000200);
+define('NPC_FLAG_VENDOR_POISON',            0x00000400);
+define('NPC_FLAG_VENDOR_REAGENT',           0x00000800);
 define('NPC_FLAG_REPAIRER',                 0x00001000);
 define('NPC_FLAG_FLIGHT_MASTER',            0x00002000);
 define('NPC_FLAG_SPIRIT_HEALER',            0x00004000);    // civil
 define('NPC_FLAG_SPIRIT_GUIDE',             0x00008000);    // battleground
 define('NPC_FLAG_INNKEEPER',                0x00010000);
 define('NPC_FLAG_BANKER',                   0x00020000);
+define('NPC_FLAG_PETITIONER',               0x00040000);
 define('NPC_FLAG_GUILD_MASTER',             0x00080000);
 define('NPC_FLAG_BATTLEMASTER',             0x00100000);
 define('NPC_FLAG_AUCTIONEER',               0x00200000);
 define('NPC_FLAG_STABLE_MASTER',            0x00400000);
+define('NPC_FLAG_GUILD_BANK',               0x00800000);
+define('NPC_FLAG_SPELLCLICK',               0x01000000);
+define('NPC_FLAG_MAILBOX',                  0x04000000);
+
+define('UNIT_FLAG_SERVER_CONTROLLED',       0x00000001);    //
+define('UNIT_FLAG_NON_ATTACKABLE',          0x00000002);    //
+define('UNIT_FLAG_REMOVE_CLIENT_CONTROL',   0x00000004);    //
+define('UNIT_FLAG_PVP_ATTACKABLE',          0x00000008);    // Allows to apply PvP rules to attackable state in addition to faction dependent state
+define('UNIT_FLAG_RENAME',                  0x00000010);    //
+define('UNIT_FLAG_PREPARATION',             0x00000020);    // Don't take reagents for spells with SPELL_ATTR_EX5_NO_REAGENT_WHILE_PREP
+define('UNIT_FLAG_UNK_6',                   0x00000040);    // not sure what it does, but it is needed to cast nontriggered spells in smart_scripts
+define('UNIT_FLAG_NOT_ATTACKABLE_1',        0x00000080);    // UNIT_FLAG_PVP_ATTACKABLE| UNIT_FLAG_NOT_ATTACKABLE_1 is NON_PVP_ATTACKABLE
+define('UNIT_FLAG_IMMUNE_TO_PC',            0x00000100);    // disables combat/assistance with PlayerCharacters (PC)
+define('UNIT_FLAG_IMMUNE_TO_NPC',           0x00000200);    // disables combat/assistance with NonPlayerCharacters (NPC)
+define('UNIT_FLAG_LOOTING',                 0x00000400);    // Loot animation
+define('UNIT_FLAG_PET_IN_COMBAT',           0x00000800);    // In combat? 2.0.8
+define('UNIT_FLAG_PVP',                     0x00001000);    // Changed in 3.0.3
+define('UNIT_FLAG_SILENCED',                0x00002000);    // Can't cast spells
+define('UNIT_FLAG_CANNOT_SWIM',             0x00004000);    // 2.0.8
+define('UNIT_FLAG_UNK_15',                  0x00008000);    // Only Swim ('OnlySwim' from UnitFlags.cs in WPP)
+define('UNIT_FLAG_UNK_16',                  0x00010000);    // No Attack 2 ('NoAttack2' from UnitFlags.cs in WPP)
+define('UNIT_FLAG_PACIFIED',                0x00020000);    // Creature will not attack
+define('UNIT_FLAG_STUNNED',                 0x00040000);    // 3.0.3 ok
+define('UNIT_FLAG_IN_COMBAT',               0x00080000);    // ('AffectingCombat' from UnitFlags.cs in WPP)
+define('UNIT_FLAG_TAXI_FLIGHT',             0x00100000);    // Disable casting at client side spell not allowed by taxi flight (mounted?), probably used with   0x4 flag
+define('UNIT_FLAG_DISARMED',                0x00200000);    // 3.0.3, disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
+define('UNIT_FLAG_CONFUSED',                0x00400000);    // Confused.
+define('UNIT_FLAG_FLEEING',                 0x00800000);    // ('Feared' from UnitFlags.cs in WPP)
+define('UNIT_FLAG_PLAYER_CONTROLLED',       0x01000000);    // Used in spell Eyes of the Beast for pet... let attack by controlled creature. Also used by Vehicles (PCV).
+define('UNIT_FLAG_NOT_SELECTABLE',          0x02000000);    // Can't be selected by mouse or with /target {name} command.
+define('UNIT_FLAG_SKINNABLE',               0x04000000);    // Skinnable
+define('UNIT_FLAG_MOUNT',                   0x08000000);    // The client seems to handle it perfectly. Also used when making custom mounts.
+define('UNIT_FLAG_UNK_28',                  0x10000000);    // (PreventKneelingWhenLooting from UnitFlags.cs in WPP)
+define('UNIT_FLAG_UNK_29',                  0x20000000);    // Used in Feign Death spell or NPC will play dead. (PreventEmotes)
+define('UNIT_FLAG_SHEATHE',                 0x40000000);    //
+define('UNIT_FLAG_UNK_31',                  0x80000000);    //
+
+define('UNIT_FLAG2_FEIGN_DEATH',            0x00000001);    //
+define('UNIT_FLAG2_UNK1',                   0x00000002);    // Hide unit model (show only player equip)
+define('UNIT_FLAG2_IGNORE_REPUTATION',      0x00000004);    //
+define('UNIT_FLAG2_COMPREHEND_LANG',        0x00000008);    //
+define('UNIT_FLAG2_MIRROR_IMAGE',           0x00000010);    //
+define('UNIT_FLAG2_INSTANTLY_APPEAR_MODEL', 0x00000020);    // Unit model instantly appears when summoned (does not fade in)
+define('UNIT_FLAG2_FORCE_MOVEMENT',         0x00000040);    //
+define('UNIT_FLAG2_DISARM_OFFHAND',         0x00000080);    //
+define('UNIT_FLAG2_DISABLE_PRED_STATS',     0x00000100);    // Player has disabled predicted stats (Used by raid frames)
+define('UNIT_FLAG2_DISARM_RANGED',          0x00000400);    // this does not disable ranged weapon display (maybe additional flag needed?)
+define('UNIT_FLAG2_REGENERATE_POWER',       0x00000800);    //
+define('UNIT_FLAG2_RESTRICT_PARTY_INTERACTION', 0x1000);    // Restrict interaction to party or raid
+define('UNIT_FLAG2_PREVENT_SPELL_CLICK',    0x00002000);    // Prevent spellclick
+define('UNIT_FLAG2_ALLOW_ENEMY_INTERACT',   0x00004000);    //
+define('UNIT_FLAG2_DISABLE_TURN',           0x00008000);    //
+define('UNIT_FLAG2_UNK2',                   0x00010000);    //
+define('UNIT_FLAG2_PLAY_DEATH_ANIM',        0x00020000);    // Plays special death animation upon death
+define('UNIT_FLAG2_ALLOW_CHEAT_SPELLS',     0x00040000);    // allows casting spells with AttributesEx7 & SPELL_ATTR7_IS_CHEAT_SPELL
+
+// UNIT_FIELD_BYTES_1 - idx 0 (UnitStandStateType)
+define('UNIT_STAND_STATE_STAND',            0);
+define('UNIT_STAND_STATE_SIT',              1);
+define('UNIT_STAND_STATE_SIT_CHAIR',        2);
+define('UNIT_STAND_STATE_SLEEP',            3);
+define('UNIT_STAND_STATE_SIT_LOW_CHAIR',    4);
+define('UNIT_STAND_STATE_SIT_MEDIUM_CHAIR', 5);
+define('UNIT_STAND_STATE_SIT_HIGH_CHAIR',   6);
+define('UNIT_STAND_STATE_DEAD',             7);
+define('UNIT_STAND_STATE_KNEEL',            8);
+define('UNIT_STAND_STATE_SUBMERGED',        9);
+
+// UNIT_FIELD_BYTES_1 - idx 2 (UnitStandFlags)
+define('UNIT_STAND_FLAGS_UNK1',             0x01);
+define('UNIT_STAND_FLAGS_CREEP',            0x02);
+define('UNIT_STAND_FLAGS_UNTRACKABLE',      0x04);
+define('UNIT_STAND_FLAGS_UNK4',             0x08);
+define('UNIT_STAND_FLAGS_UNK5',             0x10);
+
+// UNIT_FIELD_BYTES_1 - idx 3 (UnitBytes1_Flags)
+define('UNIT_BYTE1_FLAG_ALWAYS_STAND',      0x01);
+define('UNIT_BYTE1_FLAG_HOVER',             0x02);
+define('UNIT_BYTE1_FLAG_UNK_3',             0x04);
+
+define('UNIT_DYNFLAG_LOOTABLE',                  0x01);     //
+define('UNIT_DYNFLAG_TRACK_UNIT',                0x02);     // Creature's location will be seen as a small dot in the minimap
+define('UNIT_DYNFLAG_TAPPED',                    0x04);     // Makes creatures name appear grey (Lua_UnitIsTapped)
+define('UNIT_DYNFLAG_TAPPED_BY_PLAYER',          0x08);     // Lua_UnitIsTappedByPlayer usually used by PCVs (Player Controlled Vehicles)
+define('UNIT_DYNFLAG_SPECIALINFO',               0x10);     //
+define('UNIT_DYNFLAG_DEAD',                      0x20);     // Makes the creature appear dead (this DOES NOT make the creature's name grey or not attack players).
+define('UNIT_DYNFLAG_REFER_A_FRIEND',            0x40);     //
+define('UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST', 0x80);     // Lua_UnitIsTappedByAllThreatList
 
 // quest
 define('QUEST_FLAG_STAY_ALIVE',             0x00001);
@@ -550,6 +646,20 @@ define('OBJECT_BARBER_CHAIR',               32);
 define('OBJECT_DESTRUCTIBLE_BUILDING',      33);
 define('OBJECT_GUILD_BANK',                 34);
 define('OBJECT_TRAPDOOR',                   35);
+
+define('GO_FLAG_IN_USE',          0x0001);                  // Gameobject in use - Disables interaction while being animated
+define('GO_FLAG_LOCKED',          0x0002);                  // Makes the Gameobject Locked. Requires a key, spell, or event to be opened. "Locked" appears in tooltip
+define('GO_FLAG_INTERACT_COND',   0x0004);                  // Untargetable, cannot interact
+define('GO_FLAG_TRANSPORT',       0x0008);                  // Gameobject can transport (boat, elevator, car)
+define('GO_FLAG_NOT_SELECTABLE',  0x0010);                  // Not selectable (Not even in GM-mode)
+define('GO_FLAG_NODESPAWN',       0x0020);                  // Never despawns. Typical for gameobjects with on/off state (doors for example)
+define('GO_FLAG_TRIGGERED',       0x0040);                  // typically, summoned objects. Triggered by spell or other events
+define('GO_FLAG_DAMAGED',         0x0200);                  // Gameobject has been siege damaged
+define('GO_FLAG_DESTROYED',       0x0400);                  // Gameobject has been destroyed
+
+define('GO_STATE_ACTIVE',             0);                   // show in world as used and not reset (closed door open)
+define('GO_STATE_READY',              1);                   // show in world as ready (closed door close)
+define('GO_STATE_ACTIVE_ALTERNATIVE', 2);                   // show in world as used in alt way and not reset (closed door open by cannon fire)
 
 // InventoryType
 define('INVTYPE_NON_EQUIP',                 0);
@@ -887,6 +997,294 @@ define('CND_DISTANCE_TO',     35);                          // distance to targe
 define('CND_ALIVE',           36);                          // target is alive:         NULL,           NULL,       NULL
 define('CND_HP_VAL',          37);                          // targets absolute health: amount,         operator,   NULL
 define('CND_HP_PCT',          38);                          // targets relative health: amount,         operator,   NULL
+
+// TrinityCore - SmartAI
+define('SAI_SRC_TYPE_CREATURE',    0);
+define('SAI_SRC_TYPE_OBJECT',      1);
+define('SAI_SRC_TYPE_AREATRIGGER', 2);
+define('SAI_SRC_TYPE_ACTIONLIST',  9);
+
+define('SAI_EVENT_FLAG_NO_REPEAT',     0x0001);
+define('SAI_EVENT_FLAG_DIFFICULTY_0',  0x0002);
+define('SAI_EVENT_FLAG_DIFFICULTY_1',  0x0004);
+define('SAI_EVENT_FLAG_DIFFICULTY_2',  0x0008);
+define('SAI_EVENT_FLAG_DIFFICULTY_3',  0x0010);
+define('SAI_EVENT_FLAG_NO_RESET',      0x0100);
+define('SAI_EVENT_FLAG_WHILE_CHARMED', 0x0200);
+
+define('SAI_EVENT_UPDATE_IC',               0);             // In combat.
+define('SAI_EVENT_UPDATE_OOC',              1);             // Out of combat.
+define('SAI_EVENT_HEALT_PCT',               2);             // Health Percentage
+define('SAI_EVENT_MANA_PCT',                3);             // Mana Percentage
+define('SAI_EVENT_AGGRO',                   4);             // On Creature Aggro
+define('SAI_EVENT_KILL',                    5);             // On Creature Kill
+define('SAI_EVENT_DEATH',                   6);             // On Creature Death
+define('SAI_EVENT_EVADE',                   7);             // On Creature Evade Attack
+define('SAI_EVENT_SPELLHIT',                8);             // On Creature/Gameobject Spell Hit
+define('SAI_EVENT_RANGE',                   9);             // On Target In Range
+define('SAI_EVENT_OOC_LOS',                 10);            // On Target In Distance Out of Combat
+define('SAI_EVENT_RESPAWN',                 11);            // On Creature/Gameobject Respawn
+define('SAI_EVENT_TARGET_HEALTH_PCT',       12);            // On Target Health Percentage
+define('SAI_EVENT_VICTIM_CASTING',          13);            // On Target Casting Spell
+define('SAI_EVENT_FRIENDLY_HEALTH',         14);            // On Friendly Health Deficit
+define('SAI_EVENT_FRIENDLY_IS_CC',          15);            //
+define('SAI_EVENT_FRIENDLY_MISSING_BUFF',   16);            // On Friendly Lost Buff
+define('SAI_EVENT_SUMMONED_UNIT',           17);            // On Creature/Gameobject Summoned Unit
+define('SAI_EVENT_TARGET_MANA_PCT',         18);            // On Target Mana Percentage
+define('SAI_EVENT_ACCEPTED_QUEST',          19);            // On Target Accepted Quest
+define('SAI_EVENT_REWARD_QUEST',            20);            // On Target Rewarded Quest
+define('SAI_EVENT_REACHED_HOME',            21);            // On Creature Reached Home
+define('SAI_EVENT_RECEIVE_EMOTE',           22);            // On Receive Emote.
+define('SAI_EVENT_HAS_AURA',                23);            // On Creature Has Aura
+define('SAI_EVENT_TARGET_BUFFED',           24);            // On Target Buffed With Spell
+define('SAI_EVENT_RESET',                   25);            // After Combat, On Respawn or Spawn
+define('SAI_EVENT_IC_LOS',                  26);            // On Target In Distance In Combat
+define('SAI_EVENT_PASSENGER_BOARDED',       27);            //
+define('SAI_EVENT_PASSENGER_REMOVED',       28);            //
+define('SAI_EVENT_CHARMED',                 29);            // On Creature Charmed
+define('SAI_EVENT_CHARMED_TARGET',          30);            // On Target Charmed
+define('SAI_EVENT_SPELLHIT_TARGET',         31);            // On Target Spell Hit
+define('SAI_EVENT_DAMAGED',                 32);            // On Creature Damaged
+define('SAI_EVENT_DAMAGED_TARGET',          33);            // On Target Damaged
+define('SAI_EVENT_MOVEMENTINFORM',          34);            // WAYPOINT_MOTION_TYPE = 2,  POINT_MOTION_TYPE = 8
+define('SAI_EVENT_SUMMON_DESPAWNED',        35);            // On Summoned Unit Despawned
+define('SAI_EVENT_CORPSE_REMOVED',          36);            // On Creature Corpse Removed
+define('SAI_EVENT_AI_INIT',                 37);            //
+define('SAI_EVENT_DATA_SET',                38);            // On Creature/Gameobject Data Set, Can be used with SMART_ACTION_SET_DATA
+define('SAI_EVENT_WAYPOINT_START',          39);            // On Creature Waypoint ID Started
+define('SAI_EVENT_WAYPOINT_REACHED',        40);            // On Creature Waypoint ID Reached
+// define('SAI_EVENT_TRANSPORT_ADDPLAYER',     41);         //
+// define('SAI_EVENT_TRANSPORT_ADDCREATURE',   42);         //
+// define('SAI_EVENT_TRANSPORT_REMOVE_PLAYER', 43);         //
+// define('SAI_EVENT_TRANSPORT_RELOCATE',      44);         //
+// define('SAI_EVENT_INSTANCE_PLAYER_ENTER',   45);         //
+define('SAI_EVENT_AREATRIGGER_ONTRIGGER',   46);            //
+// define('SAI_EVENT_QUEST_ACCEPTED',          47);         // On Target Quest Accepted
+// define('SAI_EVENT_QUEST_OBJ_COMPLETION',    48);         // On Target Quest Objective Completed
+// define('SAI_EVENT_QUEST_COMPLETION',        49);         // On Target Quest Completed
+// define('SAI_EVENT_QUEST_REWARDED',          50);         // On Target Quest Rewarded
+// define('SAI_EVENT_QUEST_FAIL',              51);         // On Target Quest Field
+define('SAI_EVENT_TEXT_OVER',               52);            // On TEXT_OVER Event Triggered After SMART_ACTION_TALK
+define('SAI_EVENT_RECEIVE_HEAL',            53);            // On Creature Received Healing
+define('SAI_EVENT_JUST_SUMMONED',           54);            // On Creature Just spawned
+define('SAI_EVENT_WAYPOINT_PAUSED',         55);            // On Creature Paused at Waypoint ID
+define('SAI_EVENT_WAYPOINT_RESUMED',        56);            // On Creature Resumed after Waypoint ID
+define('SAI_EVENT_WAYPOINT_STOPPED',        57);            // On Creature Stopped On Waypoint ID
+define('SAI_EVENT_WAYPOINT_ENDED',          58);            // On Creature Waypoint Path Ended
+define('SAI_EVENT_TIMED_EVENT_TRIGGERED',   59);            //
+define('SAI_EVENT_UPDATE',                  60);            //
+define('SAI_EVENT_LINK',                    61);            // Used to link together multiple events as a chain of events.
+define('SAI_EVENT_GOSSIP_SELECT',           62);            // On gossip clicked (gossip_menu_option335).
+define('SAI_EVENT_JUST_CREATED',            63);            //
+define('SAI_EVENT_GOSSIP_HELLO',            64);            // On Right-Click Creature/Gameobject that have gossip enabled.
+define('SAI_EVENT_FOLLOW_COMPLETED',        65);            //
+define('SAI_EVENT_EVENT_PHASE_CHANGE',      66);            // On event phase mask set
+define('SAI_EVENT_IS_BEHIND_TARGET',        67);            // On Creature is behind target.
+define('SAI_EVENT_GAME_EVENT_START',        68);            // On game_event started.
+define('SAI_EVENT_GAME_EVENT_END',          69);            // On game_event ended.
+define('SAI_EVENT_GO_STATE_CHANGED',        70);            //
+define('SAI_EVENT_GO_EVENT_INFORM',         71);            //
+define('SAI_EVENT_ACTION_DONE',             72);            //
+define('SAI_EVENT_ON_SPELLCLICK',           73);            //
+define('SAI_EVENT_FRIENDLY_HEALTH_PCT',     74);            //
+define('SAI_EVENT_DISTANCE_CREATURE',       75);            // On creature guid OR any instance of creature entry is within distance.
+define('SAI_EVENT_DISTANCE_GAMEOBJECT',     76);            // On gameobject guid OR any instance of gameobject entry is within distance.
+define('SAI_EVENT_COUNTER_SET',             77);            // If the value of specified counterID is equal to a specified value
+
+define('SAI_ACTION_NONE',                               0);   //  Do nothing
+define('SAI_ACTION_TALK',                               1);   //  Param2 in Milliseconds.
+define('SAI_ACTION_SET_FACTION',                        2);   //  Sets faction to creature.
+define('SAI_ACTION_MORPH_TO_ENTRY_OR_MODEL',            3);   //  Take DisplayID of creature (param1) OR Turn to DisplayID (param2) OR Both = 0 for Demorph
+define('SAI_ACTION_SOUND',                              4);   //  TextRange = 0 only sends sound to self, TextRange = 1 sends sound to everyone in visibility range
+define('SAI_ACTION_PLAY_EMOTE',                         5);   //  Play Emote
+define('SAI_ACTION_FAIL_QUEST',                         6);   //  Fail Quest of Target
+define('SAI_ACTION_OFFER_QUEST',                        7);   //  Add Quest to Target
+define('SAI_ACTION_SET_REACT_STATE',                    8);   //  React State. Can be Passive (0), Defensive (1), Aggressive (2), Assist (3).
+define('SAI_ACTION_ACTIVATE_GOBJECT',                   9);   //  Activate Object
+define('SAI_ACTION_RANDOM_EMOTE',                       10);  //  Play Random Emote
+define('SAI_ACTION_CAST',                               11);  //  Cast Spell ID at Target
+define('SAI_ACTION_SUMMON_CREATURE',                    12);  //  Summon Unit
+define('SAI_ACTION_THREAT_SINGLE_PCT',                  13);  //  Change Threat Percentage for Single Target
+define('SAI_ACTION_THREAT_ALL_PCT',                     14);  //  Change Threat Percentage for All Enemies
+define('SAI_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS',    15);  //
+// define('SAI_ACTION_SET_INGAME_PHASE_ID',             16);  //  For 4.3.4 + only
+define('SAI_ACTION_SET_EMOTE_STATE',                    17);  //  Play Emote Continuously
+define('SAI_ACTION_SET_UNIT_FLAG',                      18);  //  Can set Multi-able flags at once
+define('SAI_ACTION_REMOVE_UNIT_FLAG',                   19);  //  Can Remove Multi-able flags at once
+define('SAI_ACTION_AUTO_ATTACK',                        20);  //  Stop or Continue Automatic Attack.
+define('SAI_ACTION_ALLOW_COMBAT_MOVEMENT',              21);  //  Allow or Disable Combat Movement
+define('SAI_ACTION_SET_EVENT_PHASE',                    22);  //
+define('SAI_ACTION_INC_EVENT_PHASE',                    23);  //  Set param1 OR param2 (not both). Value 0 has no effect.
+define('SAI_ACTION_EVADE',                              24);  //  Evade Incoming Attack
+define('SAI_ACTION_FLEE_FOR_ASSIST',                    25);  //  If you want the fleeing NPC to say '%s attempts to run away in fear' on flee, use 1 on param1. 0 for no message.
+define('SAI_ACTION_CALL_GROUPEVENTHAPPENS',             26);  //
+define('SAI_ACTION_COMBAT_STOP',                        27);  //
+define('SAI_ACTION_REMOVEAURASFROMSPELL',               28);  //  0 removes all auras
+define('SAI_ACTION_FOLLOW',                             29);  //  Follow Target
+define('SAI_ACTION_RANDOM_PHASE',                       30);  //
+define('SAI_ACTION_RANDOM_PHASE_RANGE',                 31);  //
+define('SAI_ACTION_RESET_GOBJECT',                      32);  //  Reset Gameobject
+define('SAI_ACTION_CALL_KILLEDMONSTER',                 33);  //  This is the ID from quest_template.RequiredNpcOrGo
+define('SAI_ACTION_SET_INST_DATA',                      34);  //  Set Instance Data
+// define('SAI_ACTION_SET_INST_DATA64',                 35);  //  Set Instance Data uint64
+define('SAI_ACTION_UPDATE_TEMPLATE',                    36);  //  Updates creature_template to given entry
+define('SAI_ACTION_DIE',                                37);  //  Kill Target
+define('SAI_ACTION_SET_IN_COMBAT_WITH_ZONE',            38);  //
+define('SAI_ACTION_CALL_FOR_HELP',                      39);  //  If you want the NPC to say '%s calls for help!'. Use 1 on param1, 0 for no message.
+define('SAI_ACTION_SET_SHEATH',                         40);  //
+define('SAI_ACTION_FORCE_DESPAWN',                      41);  //  Despawn Target after param1 in Milliseconds. If you want to set respawn time set param2 in seconds.
+define('SAI_ACTION_SET_INVINCIBILITY_HP_LEVEL',         42);  //  If you use both params, only percent will be used.
+define('SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL',            43);  //  Mount to Creature Entry (param1) OR Mount to Creature Display (param2) Or both = 0 for Unmount
+define('SAI_ACTION_SET_INGAME_PHASE_MASK',              44);  //
+define('SAI_ACTION_SET_DATA',                           45);  //  Set Data For Target, can be used with SMART_EVENT_DATA_SET
+// define('SAI_ACTION_UNUSED_46',                       46);  //
+define('SAI_ACTION_SET_VISIBILITY',                     47);  //  Makes creature Visible = 1  or  Invisible = 0
+define('SAI_ACTION_SET_ACTIVE',                         48);  //
+define('SAI_ACTION_ATTACK_START',                       49);  //  Allows basic melee swings to creature.
+define('SAI_ACTION_SUMMON_GO',                          50);  //  Spawns Gameobject, use target_type to set spawn position.
+define('SAI_ACTION_KILL_UNIT',                          51);  //  Kills Creature.
+define('SAI_ACTION_ACTIVATE_TAXI',                      52);  //  Sends player to flight path. You have to be close to Flight Master, which gives Taxi ID you need.
+define('SAI_ACTION_WP_START',                           53);  //  Creature starts Waypoint Movement. Use waypoints table to create movement.
+define('SAI_ACTION_WP_PAUSE',                           54);  //  Creature pauses its Waypoint Movement for given time.
+define('SAI_ACTION_WP_STOP',                            55);  //  Creature stops its Waypoint Movement.
+define('SAI_ACTION_ADD_ITEM',                           56);  //  Adds item(s) to player.
+define('SAI_ACTION_REMOVE_ITEM',                        57);  //  Removes item(s) from player.
+define('SAI_ACTION_INSTALL_AI_TEMPLATE',                58);  //
+define('SAI_ACTION_SET_RUN',                            59);  //
+define('SAI_ACTION_SET_DISABLE_GRAVITY',                60);  //  Only works for creatures with inhabit air.
+define('SAI_ACTION_SET_SWIM',                           61);  //
+define('SAI_ACTION_TELEPORT',                           62);  //  Continue this action with the TARGET_TYPE column. Use any target_type (except 0), and use target_x, target_y, target_z, target_o as the coordinates
+define('SAI_ACTION_SET_COUNTER',                        63);  //
+define('SAI_ACTION_STORE_TARGET_LIST',                  64);  //
+define('SAI_ACTION_WP_RESUME',                          65);  //  Creature continues in its Waypoint Movement.
+define('SAI_ACTION_SET_ORIENTATION',                    66);  //
+define('SAI_ACTION_CREATE_TIMED_EVENT',                 67);  //
+define('SAI_ACTION_PLAYMOVIE',                          68);  //
+define('SAI_ACTION_MOVE_TO_POS',                        69);  //  PointId is called by SMART_EVENT_MOVEMENTINFORM. Continue this action with the TARGET_TYPE column. Use any target_type, and use target_x, target_y, target_z, target_o as the coordinates
+define('SAI_ACTION_ENABLE_TEMP_GOBJ',                   70);  //  Always action_param1>0 For npcs use action_type=133
+define('SAI_ACTION_EQUIP',                              71);  //  only slots with mask set will be sent to client, bits are 1, 2, 4, leaving mask 0 is defaulted to mask 7 (send all), Slots1-3 are only used if no Param1 is set
+define('SAI_ACTION_CLOSE_GOSSIP',                       72);  //  Closes gossip window.
+define('SAI_ACTION_TRIGGER_TIMED_EVENT',                73);  //
+define('SAI_ACTION_REMOVE_TIMED_EVENT',                 74);  //
+define('SAI_ACTION_ADD_AURA',                           75);  //  Adds aura to player(s). Use target_type 17 to make AoE aura.
+define('SAI_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT',        76);  //  WARNING: CAN CRASH CORE, do not use if you dont know what you are doing
+define('SAI_ACTION_RESET_SCRIPT_BASE_OBJECT',           77);  //
+define('SAI_ACTION_CALL_SCRIPT_RESET',                  78);  //
+define('SAI_ACTION_SET_RANGED_MOVEMENT',                79);  //  Sets movement to follow at a specific range to the target.
+define('SAI_ACTION_CALL_TIMED_ACTIONLIST',              80);  //
+define('SAI_ACTION_SET_NPC_FLAG',                       81);  //
+define('SAI_ACTION_ADD_NPC_FLAG',                       82);  //
+define('SAI_ACTION_REMOVE_NPC_FLAG',                    83);  //
+define('SAI_ACTION_SIMPLE_TALK',                        84);  //  Makes a player say text. SMART_EVENT_TEXT_OVER is not triggered and whispers can not be used.
+define('SAI_ACTION_INVOKER_CAST',                       85);  //  if avaliable, last used invoker will cast spellId with castFlags on targets
+define('SAI_ACTION_CROSS_CAST',                         86);  //  This action is used to make selected caster (in CasterTargetType) to cast spell. Actual target is entered in target_type as normally.
+define('SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST',       87);  //  Will select one entry from the ones provided. 0 is ignored.
+define('SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST', 88);  //  0 is ignored.
+define('SAI_ACTION_RANDOM_MOVE',                        89);  //  Creature moves to random position in given radius.
+define('SAI_ACTION_SET_UNIT_FIELD_BYTES_1',             90);  //
+define('SAI_ACTION_REMOVE_UNIT_FIELD_BYTES_1',          91);  //
+define('SAI_ACTION_INTERRUPT_SPELL',                    92);  //  This action allows you to interrupt the current spell being cast. If you do not set the spellId, the core will find the current spell depending on the withDelay and the withInstant values.
+define('SAI_ACTION_SEND_GO_CUSTOM_ANIM',                93);  //
+define('SAI_ACTION_SET_DYNAMIC_FLAG',                   94);  //
+define('SAI_ACTION_ADD_DYNAMIC_FLAG',                   95);  //
+define('SAI_ACTION_REMOVE_DYNAMIC_FLAG',                96);  //
+define('SAI_ACTION_JUMP_TO_POS',                        97);  //
+define('SAI_ACTION_SEND_GOSSIP_MENU',                   98);  //  Can be used together with 'SMART_EVENT_GOSSIP_HELLO' to set custom gossip.
+define('SAI_ACTION_GO_SET_LOOT_STATE',                  99);  //
+define('SAI_ACTION_SEND_TARGET_TO_TARGET',              100); //  Send targets previously stored with SMART_ACTION_STORE_TARGET, to another npc/go, the other npc/go can then access them as if it was its own stored list
+define('SAI_ACTION_SET_HOME_POS',                       101); //  Use with SMART_TARGET_SELF or SMART_TARGET_POSITION
+define('SAI_ACTION_SET_HEALTH_REGEN',                   102); //  Sets the current creatures health regen on or off.
+define('SAI_ACTION_SET_ROOT',                           103); //  Enables or disables creature movement
+define('SAI_ACTION_SET_GO_FLAG',                        104); //  oldFlag = newFlag
+define('SAI_ACTION_ADD_GO_FLAG',                        105); //  oldFlag |= newFlag
+define('SAI_ACTION_REMOVE_GO_FLAG',                     106); //  oldFlag &= ~newFlag
+define('SAI_ACTION_SUMMON_CREATURE_GROUP',              107); //  Use creature_summon_groups table. SAI target has no effect, use 0
+define('SAI_ACTION_SET_POWER',                          108); //
+define('SAI_ACTION_ADD_POWER',                          109); //
+define('SAI_ACTION_REMOVE_POWER',                       110); //
+define('SAI_ACTION_GAME_EVENT_STOP',                    111); //
+define('SAI_ACTION_GAME_EVENT_START',                   112); //
+define('SAI_ACTION_START_CLOSEST_WAYPOINT',             113); //  Make target follow closest waypoint to its location
+define('SAI_ACTION_MOVE_OFFSET',                        114); //  Use  target_x,  target_y,  target_z With target_type=1
+define('SAI_ACTION_RANDOM_SOUND',                       115); //
+define('SAI_ACTION_SET_CORPSE_DELAY',                   116); //
+define('SAI_ACTION_DISABLE_EVADE',                      117); //
+define('SAI_ACTION_GO_SET_GO_STATE',                    118); //
+define('SAI_ACTION_SET_CAN_FLY',                        119); //
+define('SAI_ACTION_REMOVE_AURAS_BY_TYPE',               120); //
+define('SAI_ACTION_SET_SIGHT_DIST',                     121); //
+define('SAI_ACTION_FLEE',                               122); //
+define('SAI_ACTION_ADD_THREAT',                         123); //
+define('SAI_ACTION_LOAD_EQUIPMENT',                     124); //
+define('SAI_ACTION_TRIGGER_RANDOM_TIMED_EVENT',         125); //
+define('SAI_ACTION_REMOVE_ALL_GAMEOBJECTS',             126); //
+define('SAI_ACTION_STOP_MOTION',                        127); //
+// define('SAI_ACTION_PLAY_ANIMKIT',                    128); //  // don't use on 3.3.5a
+// define('SAI_ACTION_SCENE_PLAY',                      129); //  // don't use on 3.3.5a
+// define('SAI_ACTION_SCENE_CANCEL',                    130); //  // don't use on 3.3.5a
+define('SAI_ACTION_SPAWN_SPAWNGROUP',                   131); //
+define('SAI_ACTION_DESPAWN_SPAWNGROUP',                 132); //
+define('SAI_ACTION_RESPAWN_BY_SPAWNID',                 133); //  Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)
+
+define('SAI_CAST_FLAG_INTERRUPT_PREV', 0x01);
+define('SAI_CAST_FLAG_TRIGGERED',      0x02);
+// define('SAI_CAST_FORCE_CAST',          0x04);               // Forces cast even if creature is out of mana or out of range
+// define('SAI_CAST_NO_MELEE_IF_OOM',     0x08);               // Prevents creature from entering melee if out of mana or out of range
+// define('SAI_CAST_FORCE_TARGET_SELF',   0x10);               // the target to cast this spell on itself
+define('SAI_CAST_FLAG_AURA_MISSING',   0x20);
+define('SAI_CAST_FLAG_COMBAT_MOVE',    0x40);
+
+define('SAI_REACT_PASSIVE',    0);
+define('SAI_REACT_DEFENSIVE',  1);
+define('SAI_REACT_AGGRESSIVE', 2);
+define('SAI_REACT_ASSIST',     3);
+
+define('SAI_SUMMON_TIMED_OR_DEAD_DESPAWN',   1);
+define('SAI_SUMMON_TIMED_OR_CORPSE_DESPAWN', 2);
+define('SAI_SUMMON_TIMED_DESPAWN',           3);
+define('SAI_SUMMON_TIMED_DESPAWN_OOC',       4);
+define('SAI_SUMMON_CORPSE_DESPAWN',          5);
+define('SAI_SUMMON_CORPSE_TIMED_DESPAWN',    6);
+define('SAI_SUMMON_DEAD_DESPAWN',            7);
+define('SAI_SUMMON_MANUAL_DESPAWN',          8);
+
+define('SAI_TARGET_NONE',                   0);             //  None.
+define('SAI_TARGET_SELF',                   1);             //  Self cast.
+define('SAI_TARGET_VICTIM',                 2);             //  Our current target. (ie: highest aggro)
+define('SAI_TARGET_HOSTILE_SECOND_AGGRO',   3);             //  Second highest aggro.
+define('SAI_TARGET_HOSTILE_LAST_AGGRO',     4);             //  Dead last on aggro.
+define('SAI_TARGET_HOSTILE_RANDOM',         5);             //  Just any random target on our threat list.
+define('SAI_TARGET_HOSTILE_RANDOM_NOT_TOP', 6);             //  Any random target except top threat.
+define('SAI_TARGET_ACTION_INVOKER',         7);             //  Unit who caused this Event to occur.
+define('SAI_TARGET_POSITION',               8);             //  Use xyz from event params.
+define('SAI_TARGET_CREATURE_RANGE',         9);             //  (Random?) creature with specified ID within specified range.
+define('SAI_TARGET_CREATURE_GUID',          10);            //  Creature with specified GUID.
+define('SAI_TARGET_CREATURE_DISTANCE',      11);            //  Creature with specified ID within distance. (Different from #9?)
+define('SAI_TARGET_STORED',                 12);            //  Uses pre-stored target(list)
+define('SAI_TARGET_GAMEOBJECT_RANGE',       13);            //  (Random?) object with specified ID within specified range.
+define('SAI_TARGET_GAMEOBJECT_GUID',        14);            //  Object with specified GUID.
+define('SAI_TARGET_GAMEOBJECT_DISTANCE',    15);            //  Object with specified ID within distance. (Different from #13?)
+define('SAI_TARGET_INVOKER_PARTY',          16);            //  Invoker's party members
+define('SAI_TARGET_PLAYER_RANGE',           17);            //  (Random?) player within specified range.
+define('SAI_TARGET_PLAYER_DISTANCE',        18);            //  (Random?) player within specified distance. (Different from #17?)
+define('SAI_TARGET_CLOSEST_CREATURE',       19);            //  Closest creature with specified ID within specified range.
+define('SAI_TARGET_CLOSEST_GAMEOBJECT',     20);            //  Closest object with specified ID within specified range.
+define('SAI_TARGET_CLOSEST_PLAYER',         21);            //  Closest player within specified range.
+define('SAI_TARGET_ACTION_INVOKER_VEHICLE', 22);            //  Unit's vehicle who caused this Event to occur
+define('SAI_TARGET_OWNER_OR_SUMMONER',      23);            //  Unit's owner or summoner
+define('SAI_TARGET_THREAT_LIST',            24);            //  All units on creature's threat list
+define('SAI_TARGET_CLOSEST_ENEMY',          25);            //  Any attackable target (creature or player) within maxDist
+define('SAI_TARGET_CLOSEST_FRIENDLY',       26);            //  Any friendly unit (creature, player or pet) within maxDist
+define('SAI_TARGET_LOOT_RECIPIENTS',        27);            //  All tagging players
+define('SAI_TARGET_FARTHEST',               28);            //  Farthest unit on the threat list
+define('SAI_TARGET_VEHICLE_ACCESSORY',      29);            //  Vehicle can target unit in given seat
+
+define('SAI_TEMPLATE_BASIC',          0);                   //
+define('SAI_TEMPLATE_CASTER',         1);                   //  +JOIN: target_param1 as castFlag
+define('SAI_TEMPLATE_TURRET',         2);                   //  +JOIN: target_param1 as castflag
+define('SAI_TEMPLATE_PASSIVE',        3);                   //
+define('SAI_TEMPLATE_CAGED_GO_PART',  4);                   //
+define('SAI_TEMPLATE_CAGED_NPC_PART', 5);                   //
 
 // profiler queue interactions
 define('PR_QUEUE_STATUS_ENDED',   0);

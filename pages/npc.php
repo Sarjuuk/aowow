@@ -317,14 +317,40 @@ class NpcPage extends GenericPage
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
         }
 
-        // consider pooled spawns
+        // smart AI
+        $sai = null;
+        if ($this->subject->getField('aiName') == 'SmartAI')
+        {
+            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->name]);
+            if (!$sai->prepare())                           // no smartAI found .. check per guid
+            {
+                // at least one of many
+                $guids = DB::World()->selectCol('SELECT guid FROM creature WHERE id = ?d', $this->typeId);
+                while ($_ = array_pop($guids))
+                {
+                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    if ($sai->prepare())
+                        break;
+                }
+            }
 
+            if ($sai->prepare())
+            {
+                foreach ($sai->getJSGlobals() as $type => $typeIds)
+                    $this->extendGlobalIds($type, $typeIds);
+            }
+            else
+                trigger_error('Creature has SmartAI set in template but no SmartAI defined.');
+        }
+
+        // consider pooled spawns
         $this->map          = $map;
         $this->infobox      = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->placeholder  = $placeholder;
         $this->accessory    = $accessory;
         $this->quotes       = $this->getQuotes();
         $this->reputation   = $this->getOnKillRep($_altIds, $mapType);
+        $this->smartAI      = $sai ? $sai->getMarkdown() : null;
         $this->redButtons   = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
@@ -338,9 +364,6 @@ class NpcPage extends GenericPage
         /**************/
         /* Extra Tabs */
         /**************/
-
-        // tab: SAI
-            // hmm, how should this look like
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
@@ -990,7 +1013,7 @@ class NpcPage extends GenericPage
             $this->typeId
         );
 
-        foreach ($quoteSrc as $text)
+        foreach ($quoteSrc as $grp => $text)
         {
             $group = [];
             foreach ($text as $t)
@@ -1035,7 +1058,7 @@ class NpcPage extends GenericPage
             }
 
             if ($group)
-                $quotes[] = $group;
+                $quotes[$grp] = $group;
         }
 
         return [$quotes, $nQuotes];

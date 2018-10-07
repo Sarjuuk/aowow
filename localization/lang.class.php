@@ -12,6 +12,8 @@ class Lang
     private static $profiler;
     private static $screenshot;
     private static $privileges;
+    private static $smartAI;
+    private static $unit;
 
     // types
     private static $achievement;

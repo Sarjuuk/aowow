@@ -909,7 +909,7 @@ var Markup = {
             },
             fromHtml: function(str)
             {
-                return str.replace(/<(i|em)\b[\s\S]*?>([\s\S]*?)<\/\1>/gi, '[i]$1[/i]');
+                return str.replace(/<(i|em)\b[\s\S]*?>([\s\S]*?)<\/\1>/gi, '[i]$2[/i]');
             }
         },
         icon:
@@ -2735,7 +2735,9 @@ var Markup = {
             toHtml: function(attr) {
                 attr.id = g_urlize(attr.name);
                 var x = Markup.preview;
-                var str = '<div class="clear"></div><div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
+                // Aowow - clear fucks with text layout near infobox
+                // var str = '<div class="clear"></div><div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
+                var str = '<div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
                 str += '<div';
                 if(attr.width)
                     str += ' style="width: ' + attr.width + '"';
@@ -2750,7 +2752,8 @@ var Markup = {
 
                     str += '<div id="tab-' + attr.id + '-' + tab.id + '" style="display: none">';
                     str += tab.content;
-                    str += '<div class="clear"></div>';
+                    // Aowow - clear fucks with text layout near infobox
+                    // str += '<div class="clear"></div>';
                     str += '</div>';
                 }
 
@@ -2823,11 +2826,11 @@ var Markup = {
                     for(var i = 0; i < m.length; ++i)
                     {
                         var border  = m[i][1].match(/border[:="]+\s*([0-9]+)/i),
-                            width   = m[i][1].match(/width[:="]+\s*([0-9]+)/i),
+                            width   = m[i][1].match(/width[:="]+\s*([0-9]+(%|em|px)?)/i),
                             spacing = m[i][1].match(/cellspacing="([\s\S]+?)"/i),
                             padding = m[i][1].match(/cellpadding="([\s\S]+?)"/i);
 
-                        str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n" + Array(depth + 1).join("\t") + '[table' + (border ? ' border=' + border[1] : '') + (width ? ' width=' + width[1] : '') + (spacing ? ' cellspacing=' + spacing[1] : '') + (padding ? ' cellpadding=' + padding[1] : '') + ']' + Markup.tags.table.fromHtml(m[i][0], depth + 1) + "\n" + Array(depth + 1).join("\t") + '[/table]');
+                        str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n" + Array(depth + 1).join("\t") + '[table' + (border ? ' border=' + border[1] : '') + (width ? ' width=' + width[1] + (width[2] ? '' : 'px') : '') + (spacing ? ' cellspacing=' + spacing[1] : '') + (padding ? ' cellpadding=' + padding[1] : '') + ']' + Markup.tags.table.fromHtml(m[i][0], depth + 1) + "\n" + Array(depth + 1).join("\t") + '[/table]');
                     }
                 }
 
@@ -2901,13 +2904,13 @@ var Markup = {
                     {
                         for(var i = 0; i < m.length; ++i)
                         {
-                            var width   = m[i][1].match(/width[:="]+\s*([0-9]+)/i),
-                                align   = m[i][1].match(/align="([\s\S]+?)"/i),
+                            var width   = m[i][1].match(/width[:="]+\s*([0-9]+(%|em|px)?)/i),
+                                align   = m[i][1].match(/\balign="([\s\S]+?)"/i),
                                 valign  = m[i][1].match(/valign="([\s\S]+?)"/i),
                                 colspan = m[i][1].match(/colspan="([\s\S]+?)"/i),
                                 rowspan = m[i][1].match(/rowspan="([\s\S]+?)"/i);
 
-                            str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n\t\t" + Array(depth + 1).join("\t") + '[td' + (t[j] == 'th' ? '=header' : '') + (width ? ' width=' + width[1] : '') + (align ? ' align=' + align[1] : '') + (valign ? ' valign=' + valign[1] : '') + (colspan ? ' colspan=' + colspan[1] : '') + (rowspan ? ' rowspan=' + rowspan[1] : '') + ']' + Markup.tags.td.fromHtml(m[i][0], depth + 1) + '[/td]');
+                            str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n\t\t" + Array(depth + 1).join("\t") + '[td' + (t[j] == 'th' ? '=header' : '') + (width ? ' width=' + width[1] + (width[2] ? '' : 'px') : '') + (align ? ' align=' + align[1] : '') + (valign ? ' valign=' + valign[1] : '') + (colspan ? ' colspan=' + colspan[1] : '') + (rowspan ? ' rowspan=' + rowspan[1] : '') + ']' + Markup.tags.td.fromHtml(m[i][0], depth + 1) + '[/td]');
                         }
                     }
                 }

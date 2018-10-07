@@ -26,6 +26,7 @@ require_once 'includes/markup.class.php';                   // manipulate markup
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/community.class.php';                // handle comments, screenshots and videos
 require_once 'includes/loot.class.php';                     // build lv-tabs containing loot-information
+require_once 'includes/smartAI.class.php';
 require_once 'localization/lang.class.php';
 require_once 'pages/genericPage.class.php';
 

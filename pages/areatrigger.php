@@ -93,8 +93,20 @@ class AreaTriggerPage extends GenericPage
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
         }
 
-        $this->map = $map;
-        $this->infobox   = false;
+        // smart AI
+        $sai = null;
+        if ($_type == AT_TYPE_SMART)
+        {
+            $sai = new SmartAI(SAI_SRC_TYPE_AREATRIGGER, $this->typeId, ['name' => $this->name, 'teleportA' => $this->subject->getField('teleportA')]);
+            if ($sai->prepare())
+                foreach ($sai->getJSGlobals() as $type => $typeIds)
+                    $this->extendGlobalIds($type, $typeIds);
+        }
+
+
+        $this->map        = $map;
+        $this->infobox    = false;
+        $this->extraText  = $sai ? $sai->getMarkdown() : null;
         $this->redButtons = array(
             BUTTON_LINKS   => false,
             BUTTON_WOWHEAD => false
@@ -129,88 +141,6 @@ class AreaTriggerPage extends GenericPage
             {
                 $this->lvTabs[] = ['areatrigger', ['data' => array_values($relTrigger->getListviewData()), 'name' => Util::ucFirst(Lang::game('areatrigger'))], 'areatrigger'];
             }
-        }
-        else if ($_type == AT_TYPE_SMART)
-        {
-            // sourceType:2 [Areatrigger] implies eventTypes: 46, 61 [onTrigger, Linked]
-            $scripts = DB::World()->select('SELECT id, action_type, action_param1, action_param2, action_param3, action_param4, target_type, target_param1, target_param2 FROM smart_scripts WHERE entryorguid = ?d AND source_type = ?d ORDER BY id ASC', $this->typeId, 2);
-
-            $tbl = '';
-
-            foreach ($scripts as $sc)
-            {
-                $action = '';
-                $resolveTarget = function ($type, $guid) {
-                    switch ($type)
-                    {
-                        case  7:                                // invoker
-                            return 'Invoker';
-                        case 10:                                // creature guid <param1> entry <param2>
-                            if ($id = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $guid))
-                            {
-                                $this->extendGlobalIds(TYPE_NPC, $id);
-                                return '[npc='.$id.'] (GUID: '.$guid.')';
-                            }
-                            else
-                                return 'Unknown NPC with GUID: '.$guid;
-                        case 14:                                // object guid <param1> entry <param2>
-                            if ($id = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $guid))
-                            {
-                                $this->extendGlobalIds(TYPE_OBJECT, $id);
-                                return '[object='.$id.'] (GUID: '.$guid.')';
-                            }
-                            else
-                                return 'Unknown GameObject with GUID: '.$guid;
-                        default:
-                            return 'Unhandled target #'.$type;
-                    }
-                };
-
-                switch ($sc['action_type'])
-                {
-                    case 15:                                // complete quest <param1> for {target}
-                        $this->extendGlobalIds(TYPE_QUEST, $sc['action_param1']);
-                        $action = '[quest='.$sc['action_param1'].'] is completed for '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    case 33:                                // kill credit <param1> for {target}
-                        $this->extendGlobalIds(TYPE_NPC, $sc['action_param1']);
-                        $action = 'A kill of [npc='.$sc['action_param1'].'] is credited to '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    case 45:                                // set data <param2> in field <param1> in {target}
-                        $action = '\"'.$sc['action_param2'].'\" ist stored in field '.$sc['action_param1'].' of '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    case 51:                                // kill {target}
-                        $action = $resolveTarget($sc['target_type'], $sc['target_param1']).' dies!';
-                        break;
-                    case 62:                                // {target} is teleported to map <param1> [resolved coords already stored in areatrigger entry]
-                        $this->extendGlobalIds(TYPE_ZONE, $this->subject->getField('teleportA'));
-                        $action = $resolveTarget($sc['target_type'], $sc['target_param1']).' is teleported to [zone='.$this->subject->getField('teleportA').'].';
-                        break;
-                    case 64:                                // store {target} in <param1>
-                        $action = 'Store '.$resolveTarget($sc['target_type'], $sc['target_param1']).' as target in \"'.$sc['action_param1'].'\".';
-                        break;
-                    case 70:                                // respawn GO for <param1> sec
-                        $action = $resolveTarget($sc['target_type'], $sc['target_param1']).' is respawned for '.Util::formatTime($sc['action_param1'] * 1000).'.';
-                        break;
-                    case 85:                                // invoker cast spell <param1> with flags <param2>, <param3> at {target}
-                        $this->extendGlobalIds(TYPE_SPELL, $sc['action_param1']);
-                        $action = 'Invoker casts [spell='.$sc['action_param1'].'] at '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    case 86:                                // entity by TargetingBlock(param3, param4, param5, param6) cross cast spell <param1> at {target}
-                        $this->extendGlobalIds(TYPE_SPELL, $sc['action_param1']);
-                        $action = $resolveTarget($sc['action_param3'], $sc['action_param4']).' casts [spell='.$sc['action_param1'].'] at '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    case 100:                               // send targets stored in <param1> to entity {target}
-                        $action = 'Send targets stored in \"'.$sc['action_param1'].'\" to '.$resolveTarget($sc['target_type'], $sc['target_param1']).'.';
-                        break;
-                    default:
-                        $action = 'Unhandled action '.$sc['action_type'];
-                }
-
-                $tbl .= '[tr][td]'.$sc['id'].'[/td][td]'.$action.'[/td][/tr]';
-            }
-
-            $this->extraText = '[pad][h3]On Trigger: SmartAI[h3][table class=grid width=750px]'.$tbl.'[/table]';
         }
     }
 }

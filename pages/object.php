@@ -182,10 +182,13 @@ class ObjectPage extends GenericPage
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            if ($_ = $this->subject->getField('ScriptName'))
-                $infobox[] = 'Script'.Lang::main('colon').$_;
-            else if ($_ = $this->subject->getField('AIName'))
-                $infobox[] = 'AI'.Lang::main('colon').$_;
+            if ($_ = $this->subject->getField('ScriptOrAI'))
+            {
+                if ($_ == 'SmartGameObjectAI')
+                    $infobox[] = 'AI'.Lang::main('colon').$_;
+                else
+                    $infobox[] = 'Script'.Lang::main('colon').$_;
+            }
         }
 
 
@@ -224,9 +227,36 @@ class ObjectPage extends GenericPage
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
-        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        // smart AI
+        $sai = null;
+        if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
+        {
+            $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, $this->typeId, ['name' => $this->name]);
+            if (!$sai->prepare())                           // no smartAI found .. check per guid
+            {
+                // at least one of many
+                $guids = DB::World()->selectCol('SELECT guid FROM gameobject WHERE id = ?d LIMIT 1', $this->typeId);
+                while ($_ = array_pop($guids))
+                {
+                    $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, -$_, ['name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    if ($sai->prepare())
+                        break;
+                }
+            }
+
+            if ($sai->prepare())
+            {
+                foreach ($sai->getJSGlobals() as $type => $typeIds)
+                    $this->extendGlobalIds($type, $typeIds);
+            }
+            else
+                trigger_error('Gameobject has AIName set in template but no SmartAI defined.');
+        }
+
         $this->map         = $map;
+        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->relBoss     = $relBoss;
+        $this->smartAI     = $sai ? $sai->getMarkdown() : null;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
