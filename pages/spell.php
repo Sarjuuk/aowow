@@ -1825,7 +1825,22 @@ class SpellPage extends GenericPage
                     $foo['name'] .= $_;
 
                     break;
-                case 123:                                   // Send Taxi - effMV is taxiPathId. We only use paths for flightmasters for now, so spell-triggered paths are not in the table
+                case 123:                                   // Send Taxi
+                    $_ = DB::Aowow()->selectRow('
+                        SELECT tn1.name_loc0 AS start_loc0, tn1.name_loc?d AS start_loc?d, tn2.name_loc0 AS end_loc0, tn2.name_loc?d AS end_loc?d
+                        FROM ?_taxipath tp
+                        JOIN ?_taxinodes tn1 ON tp.startNodeId = tn1.id
+                        JOIN ?_taxinodes tn2 ON tp.endNodeId = tn2.id
+                        WHERE tp.id = ?d',
+                        User::$localeId, User::$localeId, User::$localeId, User::$localeId, $effMV
+                    );
+                    if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
+                        $foo['name'] .= sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, ' (<span class="breadcrumb-arrow">'.Util::localizedString($_, 'start').'</span>'.Util::localizedString($_, 'end').')');
+                    else if ($_)
+                        $foo['name'] .= ' (<span class="breadcrumb-arrow">'.Util::localizedString($_, 'start').'</span>'.Util::localizedString($_, 'end').')';
+                    else
+                        $foo['name'] .= ' ('.$effMV.')';
+                    break;
                 default:
                 {
                     if (($effMV || $effId == 97) && $effId != 155)

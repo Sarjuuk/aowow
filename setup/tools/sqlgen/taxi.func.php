@@ -59,24 +59,24 @@ function taxi()                                             // path & nodes
             tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc4, tn.name_loc6, tn.name_loc8,
             tn.mapId AS origMap,
             tn.posX AS origPosX,
-            tn.posY AS origPosY
+            tn.posY AS origPosY,
+            IF (tn.id NOT IN (15, 148, 225, 235) AND
+                (
+                    tn.id IN (64, 250) OR
+                    (
+                        tn.name_loc0 NOT LIKE "%Transport%" AND
+                        tn.name_loc0 NOT LIKE "%Quest%" AND
+                        tn.name_loc0 NOT LIKE "%Start%" AND
+                        tn.name_loc0 NOT LIKE "%End%"
+                    )
+                ), 0, 1) AS scripted
         FROM
             dbc_taxinodes tn
         JOIN
             dbc_worldmaparea wma ON ( tn.mapId = wma.mapId AND tn.posX BETWEEN wma.bottom AND wma.top AND tn.posY BETWEEN wma.right AND wma.left)
         WHERE
             wma.areaId = 0 AND
-            wma.mapId = tn.mapId AND
-            tn.id NOT IN (15, 148, 225, 235) AND
-            (
-                tn.id IN (64, 250) OR
-                (
-                    tn.name_loc0 NOT LIKE "%Transport%" AND
-                    tn.name_loc0 NOT LIKE "%Quest%" AND
-                    tn.name_loc0 NOT LIKE "%Start%" AND
-                    tn.name_loc0 NOT LIKE "%End%"
-                )
-            )
+            wma.mapId = tn.mapId
         UNION
         SELECT
             tn.id,
@@ -90,7 +90,11 @@ function taxi()                                             // path & nodes
             tn.name_loc0, tn.name_loc2, tn.name_loc3, tn.name_loc4, tn.name_loc6, tn.name_loc8,
             tn.mapId AS origMap,
             tn.posX AS origPosX,
-            tn.posY AS origPosY
+            tn.posY AS origPosY,
+            IF (tn.name_loc0 NOT LIKE "%Transport%" AND tn.name_loc0 NOT LIKE "%Quest%" AND tn.name_loc0 NOT LIKE "%Start%" AND tn.name_loc0 NOT LIKE "%End%",
+                0,
+                1
+            ) AS scripted
         FROM
             dbc_taxinodes tn
         JOIN
@@ -99,11 +103,8 @@ function taxi()                                             // path & nodes
             dbc_worldmaparea wma ON ( wmt.targetMapId = wma.mapId AND tn.posX + wmt.offsetX BETWEEN wma.bottom AND wma.top AND tn.posY + wmt.offsetY BETWEEN wma.right AND wma.left)
         WHERE
             wma.areaId = 0 AND
-            wmt.sourcemapId = tn.mapId AND
-                tn.name_loc0 NOT LIKE "%Transport%" AND
-                tn.name_loc0 NOT LIKE "%Quest%" AND
-                tn.name_loc0 NOT LIKE "%Start%" AND
-                tn.name_loc0 NOT LIKE "%End%"');
+            wmt.sourcemapId = tn.mapId'
+    );
 
     // all available flightmaster
     $fMaster = DB::World()->select(
@@ -149,19 +150,21 @@ function taxi()                                             // path & nodes
 
     foreach ($fNodes as $n)
     {
-        if (empty($n['faction']))
-        {
-            CLI::write(' - ['.$n['id'].'] "'.$n['name_loc0'].'" has no NPC assigned ... skipping', CLI::LOG_WARN);
-            continue;
-        }
+        // if (empty($n['faction']))
+        // {
+            // CLI::write(' - ['.$n['id'].'] "'.$n['name_loc0'].'" has no NPC assigned ... skipping', CLI::LOG_WARN);
+            // continue;
+        // }
 
-        if (isset($factions[$n['faction']]))
+        if ($n['scripted'] || empty($n['faction']))
+            $n['type'] = $n['typeId'] = 0;
+        else if (isset($factions[$n['faction']]))
         {
             $n['reactA'] = $factions[$n['faction']]['reactA'];
             $n['reactH'] = $factions[$n['faction']]['reactH'];
         }
 
-        unset($n['faction'], $n['origMap'], $n['origPosX'], $n['origPosY'], $n['dist']);
+        unset($n['faction'], $n['origMap'], $n['origPosX'], $n['origPosY'], $n['dist'], $n['scripted']);
 
         DB::Aowow()->query('REPLACE INTO ?_taxinodes VALUES (?a)', array_values($n));
     }

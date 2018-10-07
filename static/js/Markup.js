@@ -1641,7 +1641,7 @@ var Markup = {
                         '" onclick="ModelViewer.show({ type: 1, displayId: ' + attr.npc + ', slot: ' + attr.slot + ', ' + (attr.humanoid ? 'humanoid: 1, ' : '') +
                         'displayAd: 1, fromTag: 1' + (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/npc/' + attr.npc + '.png" width="150" height="150') + ' ';
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/npc/' + attr.npc + '.png" width="150" height="150"') + ' ';
                     if(classes.length)
                         str += 'class="' + classes.join(' ') + '"';
                     if(styles.length)
@@ -1654,7 +1654,7 @@ var Markup = {
                     str = '<a' + Markup._addGlobalAttributes(attr) + ' href="#modelviewer:2:' + attr.object + '" onclick="ModelViewer.show({ type: 2, displayId: ' +
                         attr.object + ', displayAd: 1, fromTag: 1' + (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/obj/' + attr.object + '.png" width="150" height="150') + ' ';
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/obj/' + attr.object + '.png" width="150" height="150"') + ' ';
                     if(classes.length)
                         str += 'class="' + classes.join(' ') + '"';
                     if(styles.length)
@@ -1668,7 +1668,7 @@ var Markup = {
                         '" onclick="ModelViewer.show({ type: 3, displayId: ' + attr.item + ', slot: ' + attr.slot + ', displayAd: 1, fromTag: 1' +
                         (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/item/' + attr.item + '.png" width="150" height="150') + ' ';
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/item/' + attr.item + '.png" width="150" height="150"') + ' ';
                     if(classes.length)
                         str += 'class="' + classes.join(' ') + '"';
                     if(styles.length)
@@ -2465,7 +2465,7 @@ var Markup = {
                         return '';
 
                     src = attr.src;
-                    title = attr.title ? attr.title: '(Unknown)';
+                    title = attr.title ? attr.title : '(Unknown)';
                     if (attr.hasOwnProperty('type'))
                         type = attr.type;
                     else

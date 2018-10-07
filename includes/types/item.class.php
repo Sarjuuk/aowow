@@ -253,9 +253,6 @@ class ItemList extends BaseType
                 }
             }
 
-            if ($reqRating)
-                $data['reqRating'] = $reqRating[0];
-
             if (empty($data))
                 unset($result[$itemId]);
         }

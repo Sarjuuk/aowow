@@ -89,7 +89,7 @@ class ZonesPage extends GenericPage
         if ($mapFile)
         {
             $somData = ['flightmaster' => []];
-            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE mapId = ?d ', $spawnMap);
+            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE mapId = ?d AND type <> 0 AND typeId <> 0', $spawnMap);
             $paths   = DB::Aowow()->select('
                         SELECT  IF(tn1.reactA = tn1.reactH AND tn2.reactA = tn2.reactH, 1, 0) AS neutral,
                                 tp.startNodeId AS startId,
