@@ -80,8 +80,8 @@ function quests(array $ids = [])
             q.LogDescription,                   IFNULL(qtl2.Objectives, ""),         IFNULL(qtl3.Objectives, ""),         IFNULL(qtl4.Objectives, ""),         IFNULL(qtl6.Objectives, ""),         IFNULL(qtl8.Objectives, ""),
             q.QuestDescription,                 IFNULL(qtl2.Details, ""),            IFNULL(qtl3.Details, ""),            IFNULL(qtl4.Details, ""),            IFNULL(qtl6.Details, ""),            IFNULL(qtl8.Details, ""),
             q.AreaDescription,                  IFNULL(qtl2.EndText, ""),            IFNULL(qtl3.EndText, ""),            IFNULL(qtl4.EndText, ""),            IFNULL(qtl6.EndText, ""),            IFNULL(qtl8.EndText, ""),
-            IFNULL(qor.RewardText, ""),         IFNULL(qtl2.OfferRewardText, ""),    IFNULL(qtl3.OfferRewardText, ""),    IFNULL(qtl4.OfferRewardText, ""),    IFNULL(qtl6.OfferRewardText, ""),    IFNULL(qtl8.OfferRewardText, ""),
-            IFNULL(qri.CompletionText, ""),     IFNULL(qtl2.RequestItemsText, ""),   IFNULL(qtl3.RequestItemsText, ""),   IFNULL(qtl4.RequestItemsText, ""),   IFNULL(qtl6.RequestItemsText, ""),   IFNULL(qtl8.RequestItemsText, ""),
+            IFNULL(qor.RewardText, ""),         IFNULL(qorl2.RewardText, ""),        IFNULL(qorl3.RewardText, ""),        IFNULL(qorl4.RewardText, ""),        IFNULL(qorl6.RewardText, ""),        IFNULL(qorl8.RewardText, ""),
+            IFNULL(qri.CompletionText, ""),     IFNULL(qril2.CompletionText, ""),    IFNULL(qril3.CompletionText, ""),    IFNULL(qril4.CompletionText, ""),    IFNULL(qril6.CompletionText, ""),    IFNULL(qril8.CompletionText, ""),
             q.QuestCompletionLog,               IFNULL(qtl2.CompletedText, ""),      IFNULL(qtl3.CompletedText, ""),      IFNULL(qtl4.CompletedText, ""),      IFNULL(qtl6.CompletedText, ""),      IFNULL(qtl8.CompletedText, ""),
             RequiredNpcOrGo1,                   RequiredNpcOrGo2,                    RequiredNpcOrGo3,                    RequiredNpcOrGo4,
             RequiredNpcOrGoCount1,              RequiredNpcOrGoCount2,               RequiredNpcOrGoCount3,               RequiredNpcOrGoCount4,
@@ -96,12 +96,6 @@ function quests(array $ids = [])
         FROM
             quest_template q
         LEFT JOIN
-            quest_template_addon qa ON q.ID = qa.ID
-        LEFT JOIN
-            quest_offer_reward qor ON q.ID = qor.ID
-        LEFT JOIN
-            quest_request_items qri ON q.ID = qri.ID
-        LEFT JOIN
             quest_template_locale qtl2 ON q.ID = qtl2.ID AND qtl2.locale = "frFR"
         LEFT JOIN
             quest_template_locale qtl3 ON q.ID = qtl3.ID AND qtl3.locale = "deDE"
@@ -111,6 +105,32 @@ function quests(array $ids = [])
             quest_template_locale qtl6 ON q.ID = qtl6.ID AND qtl6.locale = "esES"
         LEFT JOIN
             quest_template_locale qtl8 ON q.ID = qtl8.ID AND qtl8.locale = "ruRU"
+        LEFT JOIN
+            quest_offer_reward qor ON q.ID = qor.ID
+        LEFT JOIN
+            quest_offer_reward_locale qorl2 ON q.ID = qorl2.ID AND qorl2.locale = "frFR"
+        LEFT JOIN
+            quest_offer_reward_locale qorl3 ON q.ID = qorl3.ID AND qorl3.locale = "deDE"
+        LEFT JOIN
+            quest_offer_reward_locale qorl4 ON q.ID = qorl4.ID AND qorl4.locale = "zhCN"
+        LEFT JOIN
+            quest_offer_reward_locale qorl6 ON q.ID = qorl6.ID AND qorl6.locale = "esES"
+        LEFT JOIN
+            quest_offer_reward_locale qorl8 ON q.ID = qorl8.ID AND qorl8.locale = "ruRU"
+        LEFT JOIN
+            quest_request_items qri ON q.ID = qri.ID
+        LEFT JOIN
+            quest_request_items_locale qril2 ON q.ID = qril2.ID AND qril2.locale = "frFR"
+        LEFT JOIN
+            quest_request_items_locale qril3 ON q.ID = qril3.ID AND qril3.locale = "deDE"
+        LEFT JOIN
+            quest_request_items_locale qril4 ON q.ID = qril4.ID AND qril4.locale = "zhCN"
+        LEFT JOIN
+            quest_request_items_locale qril6 ON q.ID = qril6.ID AND qril6.locale = "esES"
+        LEFT JOIN
+            quest_request_items_locale qril8 ON q.ID = qril8.ID AND qril8.locale = "ruRU"
+        LEFT JOIN
+            quest_template_addon qa ON q.ID = qa.ID
         LEFT JOIN
             game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
         LEFT JOIN
