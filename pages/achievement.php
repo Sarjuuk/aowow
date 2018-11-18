@@ -259,9 +259,13 @@ class AchievementPage extends GenericPage
         $scripts  = [];
 
         // serverside extra-Data
-        $crtIds = array_column($this->subject->getCriteria(), 'id');
-        Util::checkNumeric($crtIds);
-        $crtExtraData = DB::World()->select('SELECT criteria_id AS ARRAY_KEY, type AS ARRAY_KEY2, value1, value2, ScriptName FROM achievement_criteria_data WHERE criteria_id IN (?a)', $crtIds);
+        if ($crtIds = array_column($this->subject->getCriteria(), 'id'))
+        {
+            Util::checkNumeric($crtIds);
+            $crtExtraData = DB::World()->select('SELECT criteria_id AS ARRAY_KEY, type AS ARRAY_KEY2, value1, value2, ScriptName FROM achievement_criteria_data WHERE criteria_id IN (?a)', $crtIds);
+        }
+        else
+            $crtExtraData = [];
 
         foreach ($this->subject->getCriteria() as $i => $crt)
         {
