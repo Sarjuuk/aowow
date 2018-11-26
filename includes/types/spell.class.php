@@ -684,18 +684,19 @@ class SpellList extends BaseType
             $nModels = new CreatureList(array(['id', array_column($displays[TYPE_NPC], 1)]));
             foreach ($nModels->iterate() as $nId => $__)
             {
-                $srcId = 0;
-                foreach ($displays[TYPE_NPC] as $srcId => $set)
-                    if ($set[1] == $nId)
-                        break;
-
-                foreach ($set[0] as $idx)
+                foreach ($displays[TYPE_NPC] as $srcId => list($indizes, $npcId))
                 {
-                    $results[$srcId][$idx] = array(
-                        'typeId'      => $nId,
-                        'displayId'   => $nModels->getRandomModelId(),
-                        'displayName' => $nModels->getField('name', true)
-                    );
+                    if ($npcId == $nId)
+                    {
+                        foreach ($indizes as $idx)
+                        {
+                            $results[$srcId][$idx] = array(
+                                'typeId'      => $nId,
+                                'displayId'   => $nModels->getRandomModelId(),
+                                'displayName' => $nModels->getField('name', true)
+                            );
+                        }
+                    }
                 }
             }
         }
@@ -705,18 +706,19 @@ class SpellList extends BaseType
             $oModels = new GameObjectList(array(['id', array_column($displays[TYPE_OBJECT], 1)]));
             foreach ($oModels->iterate() as $oId => $__)
             {
-                $srcId = 0;
-                foreach ($displays[TYPE_OBJECT] as $srcId => $set)
-                    if ($set[1] == $oId)
-                        break;
-
-                foreach ($set[0] as $idx)
+                foreach ($displays[TYPE_OBJECT] as $srcId => list($indizes, $objId))
                 {
-                    $results[$srcId][$idx] = array(
-                        'typeId'      => $oId,
-                        'displayId'   => $oModels->getField('displayId'),
-                        'displayName' => $oModels->getField('name', true)
-                    );
+                    if ($objId == $oId)
+                    {
+                        foreach ($indizes as $idx)
+                        {
+                            $results[$srcId][$idx] = array(
+                                'typeId'      => $oId,
+                                'displayId'   => $oModels->getField('displayId'),
+                                'displayName' => $oModels->getField('name', true)
+                            );
+                        }
+                    }
                 }
             }
         }
