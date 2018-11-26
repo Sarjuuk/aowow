@@ -454,7 +454,7 @@ class Profiler
         if ($gemItems)
         {
             $gemScores = new ItemList(array(['id', array_column($gemItems, 0)]));
-            foreach ($gemItems as list($itemId, $mult))
+            foreach ($gemItems as [$itemId, $mult])
                 if (isset($gemScores->json[$itemId]['gearscore']))
                     $data['gearscore'] += $gemScores->json[$itemId]['gearscore'] * $mult;
         }

@@ -684,7 +684,7 @@ class SpellList extends BaseType
             $nModels = new CreatureList(array(['id', array_column($displays[TYPE_NPC], 1)]));
             foreach ($nModels->iterate() as $nId => $__)
             {
-                foreach ($displays[TYPE_NPC] as $srcId => list($indizes, $npcId))
+                foreach ($displays[TYPE_NPC] as $srcId => [$indizes, $npcId])
                 {
                     if ($npcId == $nId)
                     {
@@ -706,7 +706,7 @@ class SpellList extends BaseType
             $oModels = new GameObjectList(array(['id', array_column($displays[TYPE_OBJECT], 1)]));
             foreach ($oModels->iterate() as $oId => $__)
             {
-                foreach ($displays[TYPE_OBJECT] as $srcId => list($indizes, $objId))
+                foreach ($displays[TYPE_OBJECT] as $srcId => [$indizes, $objId])
                 {
                     if ($objId == $oId)
                     {
@@ -1209,7 +1209,7 @@ class SpellList extends BaseType
                 break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
-                list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
                 $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
                 $duration = $srcSpell->getField('duration');
 
@@ -1261,7 +1261,7 @@ class SpellList extends BaseType
                 break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
-                list($min, $max, $modStrMin, $modStrMax) = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
 
@@ -1381,7 +1381,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if we dont increment further..
             }
 
-            list($formOutStr, $fSuffix, $fRating) = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
+            [$formOutStr, $fSuffix, $fRating] = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -1678,7 +1678,7 @@ class SpellList extends BaseType
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            list($formOutVal, $formOutStr, $ratingId) = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10), $scaling);
+            [$formOutVal, $formOutStr, $ratingId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10), $scaling);
 
             if ($ratingId && Util::checkNumeric($formOutVal) && $this->interactive)
                 $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));

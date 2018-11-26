@@ -184,7 +184,7 @@ class MorePage extends GenericPage
             'copper'  => 0
         );
 
-        foreach ($tabs as list($t, $tabId, $tabName))
+        foreach ($tabs as [$t, $tabId, $tabName])
         {
             // stuff received
             $res = DB::Aowow()->select('

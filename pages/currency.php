@@ -87,7 +87,7 @@ class CurrencyPage extends GenericPage
             {
                 $this->extendGlobalData($lootTabs->jsGlobals);
 
-                foreach ($lootTabs->iterate() as list($file, $tabData))
+                foreach ($lootTabs->iterate() as [$file, $tabData])
                     $this->lvTabs[] = [$file, $tabData];
             }
 

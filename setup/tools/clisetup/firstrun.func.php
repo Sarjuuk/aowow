@@ -127,7 +127,7 @@ function firstrun()
 
             $port = 0;
             if (strstr($AoWoWconf[$what]['host'], ':'))
-                list($AoWoWconf[$what]['host'], $port) = explode(':', $AoWoWconf[$what]['host']);
+                [$AoWoWconf[$what]['host'], $port] = explode(':', $AoWoWconf[$what]['host']);
 
             if ($link = @mysqli_connect($AoWoWconf[$what]['host'], $AoWoWconf[$what]['user'], $AoWoWconf[$what]['pass'], $AoWoWconf[$what]['db'], $port ?: $defPort))
                 mysqli_close($link);
@@ -175,7 +175,7 @@ function firstrun()
             'static_host' => [$prot, $res['static_host'], '/css/aowow.css']
         );
 
-        foreach ($cases as $conf => list($protocol, $host, $testFile))
+        foreach ($cases as $conf => [$protocol, $host, $testFile])
         {
             if ($host)
             {

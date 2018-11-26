@@ -264,7 +264,7 @@ class UtilityPage extends GenericPage
         {
             $item = $channel->addChild('item');
 
-            foreach ($row as $key => list($isCData, $attrib, $text))
+            foreach ($row as $key => [$isCData, $attrib, $text])
             {
                 if ($isCData && $text)
                     $child = $item->addChild($key)->addCData($text);

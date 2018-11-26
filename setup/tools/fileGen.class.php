@@ -157,10 +157,10 @@ class FileGen
                 self::$cliOpts[$opt] = true;
     }
 
-    public static function hasOpt(/* ...$opt */)
+    public static function hasOpt(string ...$opts) : int
     {
         $result = 0x0;
-        foreach (func_get_args() as $idx => $arg)
+        foreach ($opts as $idx => $arg)
         {
             if (!is_string($arg))
                 continue;
@@ -204,7 +204,7 @@ class FileGen
 
         if (!empty(self::$tplFiles[$key]))
         {
-            list($file, $destPath, $deps) = self::$tplFiles[$key];
+            [$file, $destPath, $deps] = self::$tplFiles[$key];
 
             if ($content = file_get_contents(FileGen::$tplPath.$file.'.in'))
             {

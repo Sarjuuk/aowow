@@ -450,7 +450,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($lootTabs->jsGlobals);
 
-            foreach ($lootTabs->iterate() as $idx => list($file, $tabData))
+            foreach ($lootTabs->iterate() as $idx => [$file, $tabData])
             {
                 if (!$tabData['data'])
                     continue;

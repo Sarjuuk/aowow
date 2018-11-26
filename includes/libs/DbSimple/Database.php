@@ -144,9 +144,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * mixed select(string $query [, $arg1] [,$arg2] ...)
      * Execute query and return the result.
      */
-    public function select($query)
+    public function select(...$args)
     {
-        $args = func_get_args();
         $total = false;
         return $this->_query($args, $total);
     }
@@ -157,10 +156,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * Total number of found rows (independent to LIMIT) is returned in $total
      * (in most cases second query is performed to calculate $total).
      */
-    public function selectPage(&$total, $query)
+    public function selectPage(&$total, ...$args)
     {
-        $args = func_get_args();
-        array_shift($args);
         $total = true;
         return $this->_query($args, $total);
     }
@@ -173,9 +170,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * because PHP DOES NOT generates notice on $row['abc'] if $row === null
      * or $row === false (but, if $row is empty array, notice is generated).
      */
-    public function selectRow()
+    public function selectRow(...$args)
     {
-        $args = func_get_args();
         $total = false;
         $rows = $this->_query($args, $total);
         if (!is_array($rows)) return $rows;
@@ -188,9 +184,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * array selectCol(string $query [, $arg1] [,$arg2] ...)
      * Return the first column of query result as array.
      */
-    public function selectCol()
+    public function selectCol(...$args)
     {
-        $args = func_get_args();
         $total = false;
         $rows = $this->_query($args, $total);
         if (!is_array($rows)) return $rows;
@@ -203,9 +198,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * Return the first cell of the first column of query result.
      * If no one row selected, return null.
      */
-    public function selectCell()
+    public function selectCell(...$args)
     {
-        $args = func_get_args();
         $total = false;
         $rows = $this->_query($args, $total);
         if (!is_array($rows)) return $rows;
@@ -221,9 +215,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * mixed query(string $query [, $arg1] [,$arg2] ...)
      * Alias for select(). May be used for INSERT or UPDATE queries.
      */
-    public function query()
+    public function query(...$args)
     {
-        $args = func_get_args();
         $total = false;
         return $this->_query($args, $total);
     }
@@ -246,9 +239,8 @@ abstract class DbSimple_Database extends DbSimple_LastError
      * Нужно для сложных запросов, состоящих из кусков, которые полезно сохранить
      *
      */
-    public function subquery()
+    public function subquery(...$args)
     {
-        $args = func_get_args();
         $this->_expandPlaceholders($args,$this->_placeholderNativeArgs !== null);
         return new DbSimple_SubQuery($args);
     }

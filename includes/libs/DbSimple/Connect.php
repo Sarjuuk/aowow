@@ -159,9 +159,8 @@ class DbSimple_Connect
 	 *
 	 * @param string $query запрос
 	 */
-	public function addInit($query)
+	public function addInit(...$args)
 	{
-		$args = func_get_args();
 		if ($this->DbSimple !== null)
 			return call_user_func_array(array(&$this->DbSimple, 'query'), $args);
 		$this->init[] = $args;

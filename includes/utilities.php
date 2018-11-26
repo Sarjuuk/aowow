@@ -121,22 +121,14 @@ class CLI
         flush();
     }
 
-    public static function nicePath(/* $file = '', ...$pathParts */)
+    public static function nicePath(string $file, string ...$pathParts) : string
     {
         $path = '';
 
-        switch (func_num_args())
-        {
-            case 0:
-                return '';
-            case 1:
-                $path = func_get_arg(0);
-                break;
-            default:
-                $args = func_get_args();
-                $file = array_shift($args);
-                $path = implode(DIRECTORY_SEPARATOR, $args).DIRECTORY_SEPARATOR.$file;
-        }
+        if (!$pathParts)
+            return $file;
+
+        $path = implode(DIRECTORY_SEPARATOR, $pathParts).DIRECTORY_SEPARATOR.$file;
 
         if (DIRECTORY_SEPARATOR == '/')                     // *nix
         {
@@ -792,18 +784,13 @@ class Util
         return false;                                       // always false for passed arrays
     }
 
-    public static function arraySumByKey(&$ref)
+    public static function arraySumByKey(array &$ref, array ...$adds) : void
     {
-        $nArgs = func_num_args();
-        if (!is_array($ref) || $nArgs < 2)
+        if (!$adds)
             return;
 
-        for ($i = 1; $i < $nArgs; $i++)
+        foreach ($adds as $arr)
         {
-            $arr = func_get_arg($i);
-            if (!is_array($arr))
-                continue;
-
             foreach ($arr as $k => $v)
             {
                 if (!isset($ref[$k]))
@@ -853,18 +840,14 @@ class Util
         return $hash;
     }
 
-    public static function mergeJsGlobals(&$master)
+    public static function mergeJsGlobals(array &$master, array ...$adds) : bool
     {
-        $args = func_get_args();
-        if (count($args) < 2)                               // insufficient args
+        if (!$adds)                                         // insufficient args
             return false;
 
-        if (!is_array($master))
-            $master = [];
-
-        for ($i = 1; $i < count($args); $i++)               // skip first (master) entry
+        foreach ($adds as $arr)
         {
-            foreach ($args[$i] as $type => $data)
+            foreach ($arr as $type => $data)
             {
                 // bad data or empty
                 if (empty(Util::$typeStrings[$type]) || !is_array($data) || !$data)

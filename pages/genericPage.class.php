@@ -392,6 +392,7 @@ class GenericPage
 
         if (!empty($this->hasComContent))                   // get comments, screenshots, videos
         {
+            $jsGlobals = [];
             $this->community = CommunityContent::getAll($this->type, $this->typeId, $jsGlobals);
             $this->extendGlobalData($jsGlobals);            // as comments are not cached, those globals cant be either
             $this->applyGlobals();
@@ -746,6 +747,9 @@ class GenericPage
 
     public function extendGlobalData($data, $extra = null)  // add jsGlobals or typeIds (can be mixed in one array: TYPE => [mixeddata]) to display on the page
     {
+    if ($data === null)
+        throw new ErrorException('ffffuuuu.....!');
+
         foreach ($data as $type => $globals)
         {
             if (!is_array($globals) || !$globals)
@@ -975,7 +979,7 @@ class GenericPage
             if (substr_count($cache[0], ' ') < 2)
                 return false;
 
-            list($time, $rev, $type) = explode(' ', $cache[0]);
+            [$time, $rev, $type] = explode(' ', $cache[0]);
 
             if ($time + CFG_CACHE_DECAY <= time() || $rev != AOWOW_REVISION)
                 $cache = null;

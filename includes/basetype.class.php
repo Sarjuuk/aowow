@@ -294,7 +294,7 @@ abstract class BaseType
         // reset on __construct
         $this->reset();
 
-        while (list($id, $_) = each($this->templates))
+        foreach ($this->templates as $id => $__)
         {
             $this->id     = $id;
             $this->curTpl = &$this->templates[$id];         // do not use $tpl from each(), as we want to be referenceable
@@ -931,7 +931,7 @@ abstract class Filter
     {
         // doesn't need to set formData['form']; this happens in GET-step
 
-        foreach ($this->inputFields as $inp => list($type, $valid, $asArray))
+        foreach ($this->inputFields as $inp => [$type, $valid, $asArray])
         {
             if (!isset($_POST[$inp]) || $_POST[$inp] === '')
                 continue;
@@ -977,7 +977,7 @@ abstract class Filter
         }
 
         $cr = $crs = $crv = [];
-        foreach ($this->inputFields as $inp => list($type, $valid, $asArray))
+        foreach ($this->inputFields as $inp => [$type, $valid, $asArray])
         {
             if (!isset($post[$inp]) || $post[$inp] === '')
                 continue;

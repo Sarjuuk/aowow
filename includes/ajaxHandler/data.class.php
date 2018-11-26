@@ -6,12 +6,12 @@ if (!defined('AOWOW_REVISION'))
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkLocale']],
-        't'         => [FILTER_SANITIZE_STRING,     0xC],   // FILTER_FLAG_STRIP_LOW | *_HIGH
-        'catg'      => [FILTER_SANITIZE_NUMBER_INT, null],
-        'skill'     => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkSkill']],
-        'class'     => [FILTER_SANITIZE_NUMBER_INT, null],
-        'callback'  => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkCallback']]
+        'locale'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkLocale']     ],
+        't'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
+        'catg'      => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
+        'skill'     => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkSkill']         ],
+        'class'     => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
+        'callback'  => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkCallback']      ]
     );
 
     public function __construct(array $params)
@@ -28,7 +28,7 @@ class AjaxData extends AjaxHandler
     /* responses
         <string>
     */
-    protected function handleData()
+    protected function handleData() : string
     {
         $result = '';
 
@@ -117,17 +117,17 @@ class AjaxData extends AjaxHandler
         return $result;
     }
 
-    protected function checkSkill($val)
+    protected function checkSkill(string $val) : array
     {
         return array_intersect([171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356], explode(',', $val));
     }
 
-    protected function checkCallback($val)
+    protected function checkCallback(string $val) : bool
     {
-        return substr($val, 0, 29) == '$WowheadProfiler.loadOnDemand';
+        return substr($val, 0, 29) === '$WowheadProfiler.loadOnDemand';
     }
 
-    private function loadProfilerData($file, $catg = 'null')
+    private function loadProfilerData(string $file, string $catg = 'null') : string
     {
         $result = '';
         if ($this->_get['callback'])

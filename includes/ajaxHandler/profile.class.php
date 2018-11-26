@@ -9,36 +9,36 @@ class AjaxProfile extends AjaxHandler
 
     protected $validParams = ['link', 'unlink', 'pin', 'unpin', 'public', 'private', 'avatar', 'resync', 'status', 'save', 'delete', 'purge', 'summary', 'load'];
     protected $_get        = array(
-        'id'         => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkIdList']],
-        'items'      => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkItemList']],
-        'size'       => [FILTER_SANITIZE_STRING, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
-        'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']],
-        'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']],
-        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']]
+        'id'         => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkIdList']         ],
+        'items'      => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkItemList']       ],
+        'size'       => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH],
+        'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']       ],
+        'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']       ],
+        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']           ]
     );
 
     protected $_post        = array(
-        'name'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']],
-        'level'        => [FILTER_SANITIZE_NUMBER_INT, null],
-        'class'        => [FILTER_SANITIZE_NUMBER_INT, null],
-        'race'         => [FILTER_SANITIZE_NUMBER_INT, null],
-        'gender'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'nomodel'      => [FILTER_SANITIZE_NUMBER_INT, null],
-        'talenttree1'  => [FILTER_SANITIZE_NUMBER_INT, null],
-        'talenttree2'  => [FILTER_SANITIZE_NUMBER_INT, null],
-        'talenttree3'  => [FILTER_SANITIZE_NUMBER_INT, null],
-        'activespec'   => [FILTER_SANITIZE_NUMBER_INT, null],
-        'talentbuild1' => [FILTER_SANITIZE_STRING,     0xC],// FILTER_FLAG_STRIP_LOW | *_HIGH
-        'glyphs1'      => [FILTER_SANITIZE_STRING,     0xC],
-        'talentbuild2' => [FILTER_SANITIZE_STRING,     0xC],
-        'glyphs2'      => [FILTER_SANITIZE_STRING,     0xC],
-        'icon'         => [FILTER_SANITIZE_STRING,     0xC],
-        'description'  => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']],
-        'source'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'copy'         => [FILTER_SANITIZE_NUMBER_INT, null],
-        'public'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'gearscore'    => [FILTER_SANITIZE_NUMBER_INT, null],
-        'inv'          => [FILTER_CALLBACK,            ['options' => 'AjaxProfile::checkItemString', 'flags' => FILTER_REQUIRE_ARRAY]],
+        'name'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']                                       ],
+        'level'        => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'class'        => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'race'         => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'gender'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'nomodel'      => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'talenttree1'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'talenttree2'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'talenttree3'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'activespec'   => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'talentbuild1' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'glyphs1'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'talentbuild2' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'glyphs2'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'icon'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'description'  => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']                                       ],
+        'source'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'copy'         => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'public'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'gearscore'    => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
+        'inv'          => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned', 'flags' => FILTER_REQUIRE_ARRAY]],
     );
 
     public function __construct(array $params)
@@ -99,7 +99,7 @@ class AjaxProfile extends AjaxHandler
             user: <string> [optional]
         return: null
     */
-    protected function handleLink()                         // links char with account
+    protected function handleLink() : void                  // links char with account
     {
         if (!User::$id || empty($this->_get['id']))
         {
@@ -139,7 +139,7 @@ class AjaxProfile extends AjaxHandler
             user: <string> [optional]
         return: null
     */
-    protected function handlePin()                          // (un)favorite
+    protected function handlePin() : void                   // (un)favorite
     {
         if (!User::$id || empty($this->_get['id'][0]))
         {
@@ -169,7 +169,7 @@ class AjaxProfile extends AjaxHandler
             user: <string> [optional]
         return: null
     */
-    protected function handlePrivacy()                      // public visibility
+    protected function handlePrivacy() : void               // public visibility
     {
         if (!User::$id || empty($this->_get['id'][0]))
         {
@@ -204,7 +204,7 @@ class AjaxProfile extends AjaxHandler
             size: <string> [optional]
         return: image-header
     */
-    protected function handleAvatar()                       // image
+    protected function handleAvatar() : void                // image
     {
         // something happened in the last years: those textures do not include tiny icons
         $sizes = [/* 'tiny' => 15, */'small' => 18, 'medium' => 36, 'large' => 56];
@@ -246,8 +246,6 @@ class AjaxProfile extends AjaxHandler
             imageGif($dest);
         else
             imageJpeg($dest);
-
-        return;
     }
 
     /*  params
@@ -255,7 +253,7 @@ class AjaxProfile extends AjaxHandler
             user: <string> [optional, not used]
         return: 1
     */
-    protected function handleResync()
+    protected function handleResync() : string
     {
         if ($chars = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_profiles WHERE id IN (?a)', $this->_get['id']))
         {
@@ -291,7 +289,7 @@ class AjaxProfile extends AjaxHandler
                 1: char does not exist
                 2: armory gone
     */
-    protected function handleStatus()
+    protected function handleStatus() : string
     {
         // roster resync for this guild was requested -> get char list
         if ($this->_get['guild'])
@@ -319,12 +317,12 @@ class AjaxProfile extends AjaxHandler
             proileId [onSuccess]
             -1       [onError]
     */
-    protected function handleSave()                         // unKill a profile
+    protected function handleSave() : string                // unKill a profile
     {
         // todo (med): detail check this post-data
         $cuProfile = array(
             'user'         => User::$id,
-            // 'userName'     => User::$displayName,
+         // 'userName'     => User::$displayName,
             'name'         => $this->_post['name'],
             'level'        => $this->_post['level'],
             'class'        => $this->_post['class'],
@@ -442,7 +440,7 @@ class AjaxProfile extends AjaxHandler
             }
         }
 
-        return $charId;
+        return (string)$charId;
     }
 
     /*  params
@@ -450,7 +448,7 @@ class AjaxProfile extends AjaxHandler
         return
             null
     */
-    protected function handleDelete()                       // kill a profile
+    protected function handleDelete() : void                // kill a profile
     {
         if (!User::$id || !$this->_get['id'])
         {
@@ -475,7 +473,7 @@ class AjaxProfile extends AjaxHandler
         return
             lots...
     */
-    protected function handleLoad()
+    protected function handleLoad() : string
     {
         // titles, achievements, characterData, talents, pets
         // and some onLoad-hook to .. load it registerProfile($data)
@@ -484,18 +482,18 @@ class AjaxProfile extends AjaxHandler
         if (!$this->_get['id'])
         {
             trigger_error('AjaxProfile::handleLoad - profileId empty', E_USER_ERROR);
-            return;
+            return '';
         }
 
         $pBase = DB::Aowow()->selectRow('SELECT pg.name AS guildname, p.* FROM ?_profiler_profiles p LEFT JOIN ?_profiler_guild pg ON pg.id = p.guild WHERE p.id = ?d', $this->_get['id'][0]);
         if (!$pBase)
         {
             trigger_error('Profiler::handleLoad - called with invalid profileId #'.$this->_get['id'][0], E_USER_WARNING);
-            return;
+            return '';
         }
 
         if (($pBase['cuFlags'] & PROFILER_CU_DELETED) && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            return;
+            return '';
 
 
         $rData = [];
@@ -746,32 +744,23 @@ class AjaxProfile extends AjaxHandler
         return
             null
     */
-    protected function handlePurge() { }                    // removes completion data (as uploaded by the wowhead client) Just fail silently if someone triggers this manually
+    protected function handlePurge() : void { }             // removes completion data (as uploaded by the wowhead client) Just fail silently if someone triggers this manually
 
-    protected function checkItemList($val)
+    protected function checkItemList($val) : array
     {
         // expecting item-list
         if (preg_match('/\d+(:\d+)*/', $val))
-            return array_map('intval', explode(':', $val));
+            return array_map('intVal', explode(':', $val));
 
-        return null;
+        return [];
     }
 
-    protected function checkItemString($val)
-    {
-        // expecting item-list
-        if (preg_match('/\d+(,\d+)*/', $val))
-            return array_map('intval', explode(',', $val));
-
-        return null;
-    }
-
-    protected function checkUser($val)
+    protected function checkUser(string $val) : string
     {
         if (User::isValidName($val))
             return $val;
 
-        return null;
+        return '';
     }
 }
 

@@ -191,7 +191,7 @@ if (!CLI)
         $checkSourceDirs = function($sub) use ($imgPath, &$paths, $modeMask)
         {
             $hasMissing = false;
-            foreach ($paths as $idx => list($subDir, $isLocalized, $realPath))
+            foreach ($paths as $idx => [$subDir, $isLocalized, $realPath])
             {
                 if ($realPath && !$isLocalized)
                     continue;
@@ -236,7 +236,7 @@ if (!CLI)
                 $locList[] = $xp;
 
         CLI::write('required resources overview:', CLI::LOG_INFO);
-        foreach ($paths as list($path, $isLocalized, $realPath))
+        foreach ($paths as [$path, $isLocalized, $realPath])
         {
             if (!$realPath)
                 CLI::write(CLI::red('MISSING').' - '.str_pad($path, 14).' @ '.sprintf($imgPath, '['.implode(',', $locList).']/').$path);

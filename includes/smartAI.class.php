@@ -69,8 +69,8 @@ class SmartAI
             if ($ts = $this->getTalkSource())
                 $this->getQuotes($ts);
 
-            list($evtBody, $evtFooter) = $this->event();
-            list($actBody, $actFooter) = $this->action();
+            [$evtBody, $evtFooter] = $this->event();
+            [$actBody, $actFooter] = $this->action();
 
             if ($ef = $this->eventFlags())
             {
@@ -174,9 +174,11 @@ class SmartAI
 
     private function &iterate() : iterable
     {
-        while (list($id, $_) = each($this->rawData))
+        reset($this->rawData);
+
+        foreach ($this->rawData as $k => $__)
         {
-            $this->itr = &$this->rawData[$id];
+            $this->itr = &$this->rawData[$k];
 
             yield $this->itr;
         }

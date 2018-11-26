@@ -13,7 +13,7 @@ if (!CLI)
 
 function update()
 {
-    list($date, $part) = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
+    [$date, $part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
 
     CLI::write('checking sql updates');
 
@@ -21,7 +21,7 @@ function update()
     foreach (glob('setup/updates/*.sql') as $file)
     {
         $pi = pathinfo($file);
-        list($fDate, $fPart) = explode('_', $pi['filename']);
+        [$fDate, $fPart] = explode('_', $pi['filename']);
 
         $fData = intVal($fDate);
 
@@ -59,7 +59,7 @@ function update()
     CLI::write($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date', CLI::LOG_OK);
 
     // fetch sql/build after applying updates, as they may contain sync-prompts
-    list($sql, $build) = array_values(DB::Aowow()->selectRow('SELECT `sql`, `build` FROM ?_dbversion'));
+    [$sql, $build] = array_values(DB::Aowow()->selectRow('SELECT `sql`, `build` FROM ?_dbversion'));
 
     sleep(1);
 

@@ -7,7 +7,7 @@ class AjaxArenaTeam extends AjaxHandler
 {
     protected $validParams = ['resync', 'status'];
     protected $_get        = array(
-        'id'     => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkIdList']],
+        'id'      => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkIdList']  ],
         'profile' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkEmptySet']],
     );
 
@@ -35,7 +35,7 @@ class AjaxArenaTeam extends AjaxHandler
             profile: <empty> [optional, also get related chars]
         return: 1
     */
-    protected function handleResync()
+    protected function handleResync() : string
     {
         if ($teams = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_arena_team WHERE id IN (?a)', $this->_get['id']))
             foreach ($teams as $t)
@@ -72,7 +72,7 @@ class AjaxArenaTeam extends AjaxHandler
                 1: char does not exist
                 2: armory gone
     */
-    protected function handleStatus()
+    protected function handleStatus() : string
     {
         $response = Profiler::resyncStatus(TYPE_ARENA_TEAM, $this->_get['id']);
         return Util::toJSON($response);

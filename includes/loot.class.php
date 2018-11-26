@@ -44,8 +44,8 @@ class Loot
     {
         reset($this->results);
 
-        while (list($k, $__) = each($this->results))
-            yield $k => $this->results[$k];
+        foreach ($this->results as $k => ['id' => $id])
+            yield $id => $this->results[$k];
     }
 
     public function getResult()
@@ -134,7 +134,7 @@ class Loot
                 // bandaid.. remove when propperly handling lootmodes
                 if (!in_array($entry['Reference'], $handledRefs))
                 {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['Reference'], $handledRefs, /*$entry['GroupId'],*/ 0, $entry['Chance'] / 100);
+                    [$data, $raw] = self::getByContainerRecursive(LOOT_REFERENCE, $entry['Reference'], $handledRefs, /*$entry['GroupId'],*/ 0, $entry['Chance'] / 100);
 
                     $handledRefs[] = $entry['Reference'];
 

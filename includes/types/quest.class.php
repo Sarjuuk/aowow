@@ -175,7 +175,7 @@ class QuestList extends BaseType
             if (!(Game::sideByRaceMask($this->curTpl['reqRaceMask']) & $side))
                 continue;
 
-            list($series, $first) = DB::Aowow()->SelectRow(
+            [$series, $first] = DB::Aowow()->SelectRow(
                 'SELECT IF(prev.id OR cur.nextQuestIdChain, 1, 0) AS "0", IF(prev.id IS NULL AND cur.nextQuestIdChain, 1, 0) AS "1" FROM ?_quests cur LEFT JOIN ?_quests prev ON prev.nextQuestIdChain = cur.id WHERE cur.id = ?d',
                 $this->id
             );

@@ -90,8 +90,10 @@ switch ($pageCall)
         $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));
         try                                                 // can it be handled as ajax?
         {
+            $out   = '';
             $class = 'Ajax'.$cleanName;
             $ajax  = new $class(explode('.', $pageParam));
+
             if ($ajax->handle($out))
             {
                 Util::sendNoCacheHeader();

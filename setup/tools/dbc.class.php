@@ -561,7 +561,7 @@ class DBC
             if ($this->isGameTable)
                 $row[-1] = $i;
 
-            foreach ($this->fileRefs as $locId => list($handle, $fullPath, $header))
+            foreach ($this->fileRefs as $locId => [$handle, $fullPath, $header])
             {
                 $rec = unpack($unpackStr, fread($handle, $header['recordSize']));
 

@@ -7,20 +7,20 @@ class AjaxAdmin extends AjaxHandler
 {
     protected $validParams = ['screenshots', 'siteconfig', 'weight-presets'];
     protected $_get        = array(
-        'action' => [FILTER_SANITIZE_STRING,     0xC],          // FILTER_FLAG_STRIP_LOW | *_HIGH
-        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkId']],
-        'key'    => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']],
-        'all'    => [FILTER_UNSAFE_RAW,          null],
-        'type'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
-        'typeid' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
-        'user'   => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkUser']],
-        'val'    => [FILTER_UNSAFE_RAW,          null]
+        'action' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH   ],
+        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned']],
+        'key'    => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']             ],
+        'all'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
+        'type'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
+        'typeid' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
+        'user'   => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkUser']            ],
+        'val'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ]
     );
     protected $_post       = array(
-        'alt'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'id'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'alt'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                 ],
+        'id'     => [FILTER_SANITIZE_NUMBER_INT, null                                  ],
         'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkScale']],
-        '__icon' => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']],
+        '__icon' => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']  ]
     );
 
     public function __construct(array $params)
@@ -75,7 +75,7 @@ class AjaxAdmin extends AjaxHandler
 
     // get all => null (optional)
     // evaled response .. UNK
-    protected function ssList()
+    protected function ssList() : string
     {
         // ssm_screenshotPages
         // ssm_numPagesFound
@@ -89,7 +89,7 @@ class AjaxAdmin extends AjaxHandler
 
     // get: [type => type, typeId => typeId] || [user => username]
     // evaled response .. UNK
-    protected function ssManage()
+    protected function ssManage() : string
     {
         $res = [];
 
@@ -104,23 +104,21 @@ class AjaxAdmin extends AjaxHandler
 
     // get: id => SSid
     // resp: ''
-    protected function ssEditAlt()
+    protected function ssEditAlt() : void
     {
         // doesn't need to be htmlEscaped, ths javascript does that
         if ($this->_get['id'] && $this->_post['alt'] !== null)
             DB::Aowow()->query('UPDATE ?_screenshots SET caption = ? WHERE id = ?d', trim($this->_post['alt']), $this->_get['id'][0]);
-
-        return '';
     }
 
     // get: id => comma-separated SSids
     // resp: ''
-    protected function ssApprove()
+    protected function ssApprove() : void
     {
         if (!$this->_get['id'])
         {
             trigger_error('AjaxAdmin::ssApprove - screenshotId empty', E_USER_ERROR);
-            return '';
+            return;
         }
 
         // create resized and thumb version of screenshot
@@ -185,17 +183,17 @@ class AjaxAdmin extends AjaxHandler
                 trigger_error('AjaxAdmin::ssApprove - screenshot #'.$id.' not in db or already approved', E_USER_ERROR);
         }
 
-        return '';
+        return;
     }
 
     // get: id => comma-separated SSids
     // resp: ''
-    protected function ssSticky()
+    protected function ssSticky() : void
     {
         if (!$this->_get['id'])
         {
             trigger_error('AjaxAdmin::ssSticky - screenshotId empty', E_USER_ERROR);
-            return '';
+            return;
         }
 
         // approve soon to be sticky screenshots
@@ -212,19 +210,17 @@ class AjaxAdmin extends AjaxHandler
             // toggle sticky status
             DB::Aowow()->query('UPDATE ?_screenshots SET `status` = IF(`status` & ?d, `status` & ~?d, `status` | ?d) WHERE id = ?d AND `status` & ?d', CC_FLAG_STICKY, CC_FLAG_STICKY, CC_FLAG_STICKY, $id, CC_FLAG_APPROVED);
         }
-
-        return '';
     }
 
     // get: id => comma-separated SSids
     // resp: ''
     // 2 steps: 1) remove from sight, 2) remove from disk
-    protected function ssDelete()
+    protected function ssDelete() : void
     {
         if (!$this->_get['id'])
         {
             trigger_error('AjaxAdmin::ssDelete - screenshotId empty', E_USER_ERROR);
-            return '';
+            return;
         }
 
         $path = 'static/uploads/screenshots/%s/%d.jpg';
@@ -264,22 +260,20 @@ class AjaxAdmin extends AjaxHandler
             if ($toUnflag && Util::$typeClasses[$type] && ($tbl = get_class_vars(Util::$typeClasses[$type])['dataTable']))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id IN (?a)', CUSTOM_HAS_SCREENSHOT, array_keys($toUnflag));
         }
-
-        return '';
     }
 
     // get: id => ssId, typeid => typeId    (but not type..?)
     // resp: ''
-    protected function ssRelocate()
+    protected function ssRelocate() : void
     {
         if (!$this->_get['id'] || !$this->_get['typeid'])
         {
             trigger_error('AjaxAdmin::ssRelocate - screenshotId or typeId empty', E_USER_ERROR);
-            return '';
+            return;
         }
 
         $id                     = $this->_get['id'][0];
-        list($type, $oldTypeId) = array_values(DB::Aowow()->selectRow('SELECT type, typeId FROM ?_screenshots WHERE id = ?d', $id));
+        [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT type, typeId FROM ?_screenshots WHERE id = ?d', $id));
         $typeId                 = (int)$this->_get['typeid'];
 
         $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
@@ -298,11 +292,9 @@ class AjaxAdmin extends AjaxHandler
         }
         else
             trigger_error('AjaxAdmin::ssRelocate - invalid typeId #'.$typeId.' for type '.$tc::$brickFile, E_USER_ERROR);
-
-        return '';
     }
 
-    protected function confAdd()
+    protected function confAdd() : string
     {
         $key = trim($this->_get['key']);
         $val = trim(urldecode($this->_get['val']));
@@ -323,7 +315,7 @@ class AjaxAdmin extends AjaxHandler
         return '';
     }
 
-    protected function confRemove()
+    protected function confRemove() : string
     {
         if (!$this->_get['key'])
             return 'invalid configuration option given';
@@ -334,7 +326,7 @@ class AjaxAdmin extends AjaxHandler
             return 'option name is either protected or was not found';
     }
 
-    protected function confUpdate()
+    protected function confUpdate() : string
     {
         $key = trim($this->_get['key']);
         $val = trim(urldecode($this->_get['val']));
@@ -353,8 +345,8 @@ class AjaxAdmin extends AjaxHandler
             return "value must be integer";
         else if ($cfg['flags'] & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
             return "value must be float";
-        else if ($cfg['flags'] & CON_FLAG_TYPE_BOOL)
-            $val = (int)!!$val;                 // *snort* bwahahaa
+        else if ($cfg['flags'] & CON_FLAG_TYPE_BOOL && $val != '1')
+            $val = '0';
 
         DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, $key);
         if (!$this->confOnChange($key, $val, $msg))
@@ -363,51 +355,37 @@ class AjaxAdmin extends AjaxHandler
         return $msg;
     }
 
-    protected function wtSave()
+    protected function wtSave() : string
     {
         if (!$this->_post['id'] || !$this->_post['__icon'])
-            return 3;
+            return '3';
 
         // save to db
-
         DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE id = ?d', $this->_post['id']);
         DB::Aowow()->query('UPDATE ?_account_weightscales SET `icon`= ? WHERE `id` = ?d', $this->_post['__icon'], $this->_post['id']);
 
         foreach (explode(',', $this->_post['scale']) as $s)
         {
-            list($k, $v) = explode(':', $s);
+            [$k, $v] = explode(':', $s);
 
             if (!in_array($k, Util::$weightScales) || $v < 1)
                 continue;
 
             if (DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $this->_post['id'], $k, $v) === null)
-                return 1;
+                return '1';
         }
 
-
         // write dataset
-
         exec('php aowow --build=weightPresets', $out);
         foreach ($out as $o)
             if (strstr($o, 'ERR'))
-                return 2;
-
+                return '2';
 
         // all done
-
-        return 0;
+        return '0';
     }
 
-    protected function checkId($val)
-    {
-        // expecting id-list
-        if (preg_match('/\d+(,\d+)*/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return null;
-    }
-
-    protected function checkKey($val)
+    protected function checkKey(string $val) : string
     {
         // expecting string
         if (preg_match('/[^a-z0-9_\.\-]/i', $val))
@@ -416,25 +394,25 @@ class AjaxAdmin extends AjaxHandler
         return strtolower($val);
     }
 
-    protected function checkUser($val)
+    protected function checkUser($val) : string
     {
         $n = Util::lower(trim(urldecode($val)));
 
         if (User::isValidName($n))
             return $n;
 
-        return null;
+        return '';
     }
 
-    protected function checkScale($val)
+    protected function checkScale($val) : string
     {
         if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
             return $val;
 
-        return null;
+        return '';
     }
 
-    private function confOnChange($key, $val, &$msg)
+    private function confOnChange(string $key, string $val, string &$msg) : bool
     {
         $fn = $buildList = null;
 
@@ -482,3 +460,5 @@ class AjaxAdmin extends AjaxHandler
         return $fn ? $fn($val) : true;
     }
 }
+
+?>

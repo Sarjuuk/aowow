@@ -171,7 +171,7 @@ class SearchPage extends GenericPage
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
             $foundTotal = 0;
-            foreach ($this->lvTabs as list($file, $tabData, $_, $osInfo))
+            foreach ($this->lvTabs as [$file, $tabData, , $osInfo])
                 $foundTotal += count($tabData['data']);
 
             if ($foundTotal == 1)                           // only one match -> redirect to find
@@ -300,13 +300,13 @@ class SearchPage extends GenericPage
             [], [], [], [], [], [], []
         );
 
-        foreach ($this->lvTabs as list($_, $_, $_, $osInfo))
+        foreach ($this->lvTabs as [ , , , $osInfo])
             $foundTotal += $osInfo[2];
 
         if (!$foundTotal || $asError)
             return '["'.Util::jsEscape($this->search).'", []]';
 
-        foreach ($this->lvTabs as list($_, $tabData, $_, $osInfo))
+        foreach ($this->lvTabs as [ , $tabData, , $osInfo])
         {
             $max = max(1, intVal($limit * $osInfo[2] / $foundTotal));
             $limit -= $max;

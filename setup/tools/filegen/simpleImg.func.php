@@ -193,7 +193,7 @@ if (!CLI)
         $checkSourceDirs = function($sub) use ($imgPath, &$paths)
         {
             $hasMissing = false;
-            foreach ($paths as $pathIdx => list($subDir, , , , , $realPath))
+            foreach ($paths as $pathIdx => [$subDir, , , , , $realPath])
             {
                 if ($realPath)
                     continue;
@@ -243,7 +243,7 @@ if (!CLI)
                 $locList[] = $xp;
 
         CLI::write('required resources overview:', CLI::LOG_INFO);
-        foreach ($paths as list($path, , , , , $realPath))
+        foreach ($paths as [$path, , , , , $realPath])
         {
             if ($realPath)
                 CLI::write(CLI::green(' FOUND ').' - '.str_pad($path, 53).' @ '.$realPath);
@@ -310,7 +310,7 @@ if (!CLI)
         $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));
 
         $allPaths = [];
-        foreach ($paths as $i => list($inPath, $outInfo, $pattern, $isIcon, $tileSize, $path))
+        foreach ($paths as $i => [$inPath, $outInfo, $pattern, $isIcon, $tileSize, $path])
         {
             $search = $path.$pattern;
             if ($pattern)
@@ -346,7 +346,7 @@ if (!CLI)
 
                 $nFiles = count($outInfo) * ($tileSize ? array_sum(array_map('count', $cuNames[$i])) : count($files));
 
-                foreach ($outInfo as list($dest, $ext, $srcSize, $destSize, $borderOffset))
+                foreach ($outInfo as [$dest, $ext, $srcSize, $destSize, $borderOffset])
                 {
                     if ($tileSize)
                     {

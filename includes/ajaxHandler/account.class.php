@@ -7,18 +7,18 @@ class AjaxAccount extends AjaxHandler
 {
     protected $validParams = ['exclude', 'weightscales', 'favorites'];
     protected $_post       = array(
-        'groups'     => [FILTER_SANITIZE_NUMBER_INT, null],
-        'save'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'delete'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'groups'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'save'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'delete'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
         'id'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
-        'name'       => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']],
-        'scale'      => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale']],
-        'reset'      => [FILTER_SANITIZE_NUMBER_INT, null],
-        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'type'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'add'        => [FILTER_SANITIZE_NUMBER_INT, null],
-        'remove'     => [FILTER_SANITIZE_NUMBER_INT, null],
-     // 'sessionKey' => [FILTER_SANITIZE_NUMBER_INT, null]
+        'name'       => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']  ],
+        'scale'      => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale'] ],
+        'reset'      => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'type'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'add'        => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+        'remove'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
+     // 'sessionKey' => [FILTER_SANITIZE_NUMBER_INT, null                                     ]
     );
     protected $_get        = array(
         'locale' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkLocale']]
@@ -43,7 +43,7 @@ class AjaxAccount extends AjaxHandler
             $this->handler = 'handleFavorites';
     }
 
-    protected function handleExclude()
+    protected function handleExclude() : void
     {
         if ($this->_post['mode'] == 1)                      // directly set exludes
         {
@@ -78,18 +78,16 @@ class AjaxAccount extends AjaxHandler
             $mask = $this->_post['groups'] & PR_EXCLUDE_GROUP_ANY;
 
         DB::Aowow()->query('UPDATE ?_account SET excludeGroups = ?d WHERE id = ?d', $mask, User::$id);
-
-        return;
     }
 
-    protected function handleWeightscales()
+    protected function handleWeightscales() : string
     {
         if ($this->_post['save'])
         {
             if (!$this->_post['scale'])
             {
                 trigger_error('AjaxAccount::handleWeightscales - scaleId empty', E_USER_ERROR);
-                return 0;
+                return '0';
             }
 
             $id = 0;
@@ -99,7 +97,7 @@ class AjaxAccount extends AjaxHandler
                 if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE userId = ?d AND id = ?d', User::$id, $id))
                 {
                     trigger_error('AjaxAccount::handleWeightscales - scale #'.$id.' not in db or owned by user #'.User::$id, E_USER_ERROR);
-                    return 0;
+                    return '0';
                 }
 
                 DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE id = ?d', $this->_post['name'], $id);
@@ -108,7 +106,7 @@ class AjaxAccount extends AjaxHandler
             {
                 $nScales = DB::Aowow()->selectCell('SELECT COUNT(id) FROM ?_account_weightscales WHERE userId = ?d', User::$id);
                 if ($nScales >= 5)                          // more or less hard-defined in LANG.message_weightscalesaveerror
-                    return 0;
+                    return '0';
 
                 $id = DB::Aowow()->query('INSERT INTO ?_account_weightscales (`userId`, `name`) VALUES (?d, ?)', User::$id, $this->_post['name']);
             }
@@ -117,25 +115,25 @@ class AjaxAccount extends AjaxHandler
 
             foreach (explode(',', $this->_post['scale']) as $s)
             {
-                list($k, $v) = explode(':', $s);
+                [$k, $v] = explode(':', $s);
                 if (!in_array($k, Util::$weightScales) || $v < 1)
                     continue;
 
                 DB::Aowow()->query('INSERT INTO ?_account_weightscale_data VALUES (?d, ?, ?d)', $id, $k, $v);
             }
 
-            return $id;
+            return (string)$id;
         }
         else if ($this->_post['delete'] && $this->_post['id'] && $this->_post['id'][0])
             DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'][0], User::$id);
         else
         {
             trigger_error('AjaxAccount::handleWeightscales - malformed request received', E_USER_ERROR);
-            return 0;
+            return '0';
         }
     }
 
-    protected function handleFavorites()
+    protected function handleFavorites() : void
     {
         // omit usage of sessionKey
         if (count($this->_post['id']) != 1 || empty($this->_post['id'][0]))
@@ -167,18 +165,20 @@ class AjaxAccount extends AjaxHandler
             DB::Aowow()->query('DELETE FROM ?_account_favorites WHERE `userId` = ?d AND `type` = ?d AND `typeId` = ?d', User::$id, $type, $typeId);
     }
 
-    protected function checkScale($val)
+    protected function checkScale(string $val) : string
     {
         if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
             return $val;
 
-        return null;
+        return '';
     }
 
-    protected function checkName($val)
+    protected function checkName(string $val) : string
     {
         $var = trim(urldecode($val));
 
         return filter_var($var, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
     }
 }
+
+?>

@@ -27,7 +27,7 @@ function build($syncMe = null)
         CLI::write();
 
         // files with template
-        foreach (FileGen::$tplFiles as $name => list($file, $destPath, $deps))
+        foreach (FileGen::$tplFiles as $name => [$file, $destPath, $deps])
         {
             $reqDBC = [];
 

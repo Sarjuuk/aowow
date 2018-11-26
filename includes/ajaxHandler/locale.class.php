@@ -21,7 +21,7 @@ class AjaxLocale extends AjaxHandler
     /* responses
         header()
     */
-    protected function handleLocale()
+    protected function handleLocale() : string
     {
         User::setLocale($this->_get['locale']);
         User::save();

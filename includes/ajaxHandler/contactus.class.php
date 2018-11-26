@@ -6,15 +6,15 @@ if (!defined('AOWOW_REVISION'))
 class AjaxContactus extends AjaxHandler
 {
     protected $_post = array(
-        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'reason'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null                 ],
+        'reason'     => [FILTER_SANITIZE_NUMBER_INT, null                 ],
         'ua'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
         'appname'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'page'       => [FILTER_SANITIZE_URL,        null],
+        'page'       => [FILTER_SANITIZE_URL,        null                 ],
         'desc'       => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'id'         => [FILTER_SANITIZE_NUMBER_INT, null],
-        'relatedurl' => [FILTER_SANITIZE_URL,        null],
-        'email'      => [FILTER_SANITIZE_EMAIL,      null]
+        'id'         => [FILTER_SANITIZE_NUMBER_INT, null                 ],
+        'relatedurl' => [FILTER_SANITIZE_URL,        null                 ],
+        'email'      => [FILTER_SANITIZE_EMAIL,      null                 ]
     );
 
     public function __construct(array $params)
@@ -33,7 +33,7 @@ class AjaxContactus extends AjaxHandler
         7: already reported
         $: prints response
     */
-    protected function handleContactUs()
+    protected function handleContactUs() : string
     {
         $mode = $this->_post['mode'];
         $rsn  = $this->_post['reason'];
@@ -89,3 +89,5 @@ class AjaxContactus extends AjaxHandler
         return Lang::main('intError');
     }
 }
+
+?>

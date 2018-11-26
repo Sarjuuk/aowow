@@ -72,7 +72,7 @@ switch ($cmd)                                               // we accept only on
         finish();
     case 'update':
         require_once 'setup/tools/clisetup/update.func.php';
-        list($s, $b) = update();                            // return true if we do not rebuild stuff
+        [$s, $b] = update();                                // return true if we do not rebuild stuff
         if (!$s && !$b)
             return;
     case 'sync':

@@ -29,7 +29,7 @@ class AreaTriggerPage extends GenericPage
 
         $this->subject = new AreaTriggerList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Util::ucFirst(Lang::game('areatrigger')), Lang::areatriger('notFound'));
+            $this->notFound(Util::ucFirst(Lang::game('areatrigger')), Lang::areatrigger('notFound'));
 
         $this->name = $this->subject->getField('name') ?: 'AT #'.$this->typeId;
     }

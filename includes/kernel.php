@@ -221,7 +221,12 @@ if (!CLI)
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');
-    session_start();
+    if (!session_start())
+    {
+        trigger_error('failed to start session', E_USER_ERROR);
+        exit;
+    }
+
     if (!empty($AoWoWconf['aowow']) && User::init())
         User::save();                                       // save user-variables in session
 

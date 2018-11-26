@@ -18,7 +18,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 
 ## Requirements
 
-+ Webserver running PHP ≥ 7.0.1 including extensions:
++ Webserver running PHP ≥ 7.1 including extensions:
   + SimpleXML
   + GD
   + Mysqli

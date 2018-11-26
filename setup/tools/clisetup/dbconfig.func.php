@@ -30,7 +30,7 @@ function dbconfig()
         $port    = 0;
 
         if (strstr($dbInfo['host'], ':'))
-            list($dbInfo['host'], $port) = explode(':', $dbInfo['host']);
+            [$dbInfo['host'], $port] = explode(':', $dbInfo['host']);
 
         if ($dbInfo['host'])
         {

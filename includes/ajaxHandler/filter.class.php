@@ -84,7 +84,7 @@ class AjaxFilter extends AjaxHandler
         $this->handler = 'handleFilter';
     }
 
-    protected function handleFilter()
+    protected function handleFilter() : string
     {
         $url = '?'.$this->page;
 
@@ -106,5 +106,6 @@ class AjaxFilter extends AjaxHandler
         // do get request
         return $url;
     }
-
 }
+
+?>

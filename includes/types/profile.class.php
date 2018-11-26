@@ -559,7 +559,7 @@ class RemoteProfileList extends ProfileList
             $curTpl['battlegroup'] = CFG_BATTLEGROUP;
 
             // realm
-            list($r, $g) = explode(':', $guid);
+            [$r, $g] = explode(':', $guid);
             if (!empty($realms[$r]))
             {
                 $curTpl['realm']     = $r;
@@ -622,7 +622,7 @@ class RemoteProfileList extends ProfileList
                 $limit--;
             }
 
-            list($r, $g) = explode(':', $guid);
+            [$r, $g] = explode(':', $guid);
 
             // talent points post
             $curTpl['talenttree1'] = 0;

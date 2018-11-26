@@ -385,7 +385,7 @@ class QuestPage extends GenericPage
             $this->extendGlobalData($olItemData->getJSGlobals(GLOBALINFO_SELF));
 
             $providedRequired = false;
-            foreach ($olItems as $i => list($itemId, $qty, $provided))
+            foreach ($olItems as $i => [$itemId, $qty, $provided])
             {
                 if (!$i || !$itemId || !in_array($itemId, $olItemData->getFoundIDs()))
                     continue;
@@ -568,11 +568,11 @@ class QuestPage extends GenericPage
                 */
 
                 $nSources = 0;
-                foreach ($lootTabs->iterate() as list($type, $data))
+                foreach ($lootTabs->iterate() as [$type, $data])
                     if ($type == 'creature' || $type == 'object')
                         $nSources += count(array_filter($data['data'], function($val) { return $val['percent'] >= 1.0; }));
 
-                foreach ($lootTabs->iterate() as $idx => list($file, $tabData))
+                foreach ($lootTabs->iterate() as $idx => [$file, $tabData])
                 {
                     if (!$tabData['data'])
                         continue;
@@ -653,7 +653,7 @@ class QuestPage extends GenericPage
 
         // POI objectives
         // also map olItems to objectiveIdx so every container gets the same pin color
-        foreach ($olItems as $i => list($itemId, $qty, $provided))
+        foreach ($olItems as $i => [$itemId, $qty, $provided])
         {
             if (!$provided && $itemId)
             {

@@ -11,16 +11,16 @@ class AjaxComment extends AjaxHandler
     const REPLY_LENGTH_MAX   = 600;
 
     protected $_post = array(
-        'id'          => [FILTER_CALLBACK,            ['options' => 'AjaxComment::checkId']],
-        'body'        => [FILTER_UNSAFE_RAW,          null],// escaped by json_encode
-        'commentbody' => [FILTER_UNSAFE_RAW,          null],// escaped by json_encode
-        'response'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'reason'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'remove'      => [FILTER_SANITIZE_NUMBER_INT, null],
-        'commentId'   => [FILTER_SANITIZE_NUMBER_INT, null],
-        'replyId'     => [FILTER_SANITIZE_NUMBER_INT, null],
-        'sticky'      => [FILTER_SANITIZE_NUMBER_INT, null],
-     // 'username'    => [FILTER_SANITIZE_STRING,     0xC]  // FILTER_FLAG_STRIP_LOW | *_HIGH
+        'id'          => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned']],
+        'body'        => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
+        'commentbody' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
+        'response'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                            ],
+        'reason'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                            ],
+        'remove'      => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
+        'commentId'   => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
+        'replyId'     => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
+        'sticky'      => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
+     // 'username'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH   ]
     );
 
     protected $_get  = array(
@@ -75,19 +75,19 @@ class AjaxComment extends AjaxHandler
     }
 
     // i .. have problems believing, that everything uses nifty ajax while adding comments requires a brutal header(Loacation: <wherever>), yet, thats how it is
-    protected function handleCommentAdd()
+    protected function handleCommentAdd() : string
     {
         if (!$this->_get['typeid'] || !$this->_get['type'] || !isset(Util::$typeClasses[$this->_get['type']]))
         {
             trigger_error('AjaxComment::handleCommentAdd - malforemd request received', E_USER_ERROR);
-            return;                                         // whatever, we cant even send him back
+            return '';                                      // whatever, we cant even send him back
         }
 
         // this type cannot be commented on
         if (!(get_class_vars(Util::$typeClasses[$this->_get['type']])['contribute'] & CONTRIBUTE_CO))
         {
             trigger_error('AjaxComment::handleCommentAdd - tried to comment on unsupported type #'.$this->_get['type'], E_USER_ERROR);
-            return;
+            return '';
         }
 
         // trim to max length
@@ -125,7 +125,7 @@ class AjaxComment extends AjaxHandler
         return '?'.Util::$typeStrings[$this->_get['type']].'='.$this->_get['typeid'].'#comments';
     }
 
-    protected function handleCommentEdit()
+    protected function handleCommentEdit() : void
     {
         if (!User::canComment() && !User::isInGroup(U_GROUP_MODERATOR))
         {
@@ -162,7 +162,7 @@ class AjaxComment extends AjaxHandler
         DB::Aowow()->query('UPDATE ?_comments SET editCount = editCount + 1, ?a WHERE id = ?d', $update, $this->_get['id']);
     }
 
-    protected function handleCommentDelete()
+    protected function handleCommentDelete() : void
     {
         if (!$this->_post['id'] || !User::$id)
         {
@@ -190,13 +190,10 @@ class AjaxComment extends AjaxHandler
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
         else
-        {
             trigger_error('AjaxComment::handleCommentDelete - user #'.User::$id.' could not flag comment #'.$this->_post['id'].' as deleted', E_USER_ERROR);
-            return;
-        }
     }
 
-    protected function handleCommentUndelete()
+    protected function handleCommentUndelete() : void
     {
         if (!$this->_post['id'] || !User::$id)
         {
@@ -219,13 +216,10 @@ class AjaxComment extends AjaxHandler
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
         else
-        {
             trigger_error('AjaxComment::handleCommentUndelete - user #'.User::$id.' could not unflag comment #'.$this->_post['id'].' as deleted', E_USER_ERROR);
-            return;
-        }
     }
 
-    protected function handleCommentRating()
+    protected function handleCommentRating() : string
     {
         if (!$this->_get['id'])
             return Util::toJSON(['success' => 0]);
@@ -236,7 +230,7 @@ class AjaxComment extends AjaxHandler
             return Util::toJSON(['success' => 1, 'up' => 0, 'down' => 0]);
     }
 
-    protected function handleCommentVote()
+    protected function handleCommentVote() : string
     {
         if (!User::$id || !$this->_get['id'] || !$this->_get['rating'])
             return Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);
@@ -272,7 +266,7 @@ class AjaxComment extends AjaxHandler
         return Util::toJSON(['error' => 0]);
     }
 
-    protected function handleCommentSticky()
+    protected function handleCommentSticky() : void
     {
         if (!$this->_post['id'] || !User::isInGroup(U_GROUP_MODERATOR))
         {
@@ -286,7 +280,7 @@ class AjaxComment extends AjaxHandler
             DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d', CC_FLAG_STICKY, $this->_post['id'][0]);
     }
 
-    protected function handleCommentOutOfDate()
+    protected function handleCommentOutOfDate() : string
     {
         $this->contentType = 'text/plain';
 
@@ -319,12 +313,12 @@ class AjaxComment extends AjaxHandler
         return Lang::main('intError');
     }
 
-    protected function handleCommentShowReplies()
+    protected function handleCommentShowReplies() : string
     {
         return Util::toJSON(!$this->_get['id'] ? [] : CommunityContent::getCommentReplies($this->_get['id']));
     }
 
-    protected function handleReplyAdd()
+    protected function handleReplyAdd() : string
     {
         $this->contentType = 'text/plain';
 
@@ -347,7 +341,7 @@ class AjaxComment extends AjaxHandler
         return Lang::main('intError');
     }
 
-    protected function handleReplyEdit()
+    protected function handleReplyEdit() : string
     {
         $this->contentType = 'text/plain';
 
@@ -371,7 +365,7 @@ class AjaxComment extends AjaxHandler
         return Lang::main('intError');
     }
 
-    protected function handleReplyDetach()
+    protected function handleReplyDetach() : void
     {
         if (!$this->_post['id'] || !User::isInGroup(U_GROUP_MODERATOR))
         {
@@ -382,7 +376,7 @@ class AjaxComment extends AjaxHandler
         DB::Aowow()->query('UPDATE ?_comments c1, ?_comments c2 SET c1.replyTo = 0, c1.type = c2.type, c1.typeId = c2.typeId WHERE c1.replyTo = c2.id AND c1.id = ?d', $this->_post['id'][0]);
     }
 
-    protected function handleReplyDelete()
+    protected function handleReplyDelete() : void
     {
         if (!User::$id || !$this->_post['id'])
         {
@@ -396,7 +390,7 @@ class AjaxComment extends AjaxHandler
             trigger_error('AjaxComment::handleReplyDelete - deleting comment #'.$this->_post['id'][0].' by user #'.User::$id.' from db failed', E_USER_ERROR);
     }
 
-    protected function handleReplyFlag()
+    protected function handleReplyFlag() : void
     {
         if (!User::$id || !$this->_post['id'])
         {
@@ -407,7 +401,7 @@ class AjaxComment extends AjaxHandler
         Util::createReport(1, 19, $this->_post['id'][0], '[General Reply Report]');
     }
 
-    protected function handleReplyUpvote()
+    protected function handleReplyUpvote() : void
     {
         if (!$this->_post['id'] || !User::canUpvote())
         {
@@ -438,7 +432,7 @@ class AjaxComment extends AjaxHandler
             trigger_error('AjaxComment::handleReplyUpvote - write to db failed', E_USER_ERROR);
     }
 
-    protected function handleReplyDownvote()
+    protected function handleReplyDownvote() : void
     {
         if (!$this->_post['id'] || !User::canDownvote())
         {
@@ -468,14 +462,6 @@ class AjaxComment extends AjaxHandler
         else
             trigger_error('AjaxComment::handleReplyDownvote - write to db failed', E_USER_ERROR);
     }
-
-    protected function checkId($val)
-    {
-        // expecting id-list
-        if (preg_match('/\d+(,\d+)*/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return null;
-    }
 }
+
 ?>

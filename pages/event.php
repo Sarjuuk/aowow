@@ -355,7 +355,7 @@ class EventPage extends GenericPage
             $this->saveCache($tt);
         }
 
-        list($start, $end) = $this->postCache();
+        [$start, $end] = $this->postCache();
 
         header('Content-type: application/x-javascript; charset=utf-8');
         die(sprintf($tt, $start, $end));
