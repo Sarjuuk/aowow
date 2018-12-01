@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "折叠全部",
         '_expandAll'    => "展开全部",
         '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
         'ppm'           => "%s每分钟触发几率",
         'procChance'    => "触发几率",

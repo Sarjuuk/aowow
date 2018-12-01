@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "Collapse All",
         '_expandAll'    => "Expand All",
         '_transfer'     => 'This spell will be converted to <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
         'ppm'           => "%s procs per minute",
         'procChance'    => "Proc chance",

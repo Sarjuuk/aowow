@@ -22903,7 +22903,7 @@ var ConditionList = new function() {
                      }
                      else                           // create mask from id and resolve in case 32
                         entry[1] = (1 << entry[1]);
-            case 32: param[0] = _listing(entry[1], g_world_object_types, '$1'); break;
+            case 32: param[0] = _listing(entry[1], g_world_object_types, '$2'); break;
             case 36: break;
             case 27:
             case 37:

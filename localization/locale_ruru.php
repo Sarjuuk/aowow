@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "Свернуть все",
         '_expandAll'    => "Развернуть все",
         '_transfer'     => 'Этот предмет превратится в <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Изучается путём освоения местности",
         'ppm'           => "Срабатывает %s раз в минуту",
         'procChance'    => "Шанс срабатывания",

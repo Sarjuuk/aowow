@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "Replier Tout",
         '_expandAll'    => "Déplier Tout",
         '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Appris via une découverte",
         'ppm'           => "%s déclenchements par minute",
         'procChance'    => "Chance",

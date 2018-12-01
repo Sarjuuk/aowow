@@ -1687,6 +1687,16 @@ class SpellPage extends GenericPage
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
+                case 11:                                    // Bind
+                    if (!$effMV && User::isInGroup(U_GROUP_EMPLOYEE))
+                        $foo['name'] .= sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, '(current zone)');
+                    else if (!$effMV)
+                        $foo['name'] .= '('.Lang::spell('currentArea').')';
+                    else if ($_ = ZoneList::getName($effMV))
+                        $foo['name'] .= '(<a href="?zone='.$effMV.'">'.$_.'</a>)';
+                    else
+                        $foo['name'] .= Util::ucFirst(Lang::game('zone')).' #'.$effMV;;
+                    break;
                 case 16:                                    // QuestComplete
                     if ($_ = QuestList::getName($effMV))
                         $foo['name'] .= '(<a href="?quest='.$effMV.'">'.$_.'</a>)';
@@ -1794,6 +1804,7 @@ class SpellPage extends GenericPage
 
                     $foo['name'] .= ' ('.$_.')';
                     break;
+                case 44:                                    // Learn Skill Step
                 case 118:                                   // Require Skill
                     if ($_ = SkillList::getName($effMV))
                         $foo['name'] .= '(<a href="?skill='.$effMV.'">'.$_.'</a>)';

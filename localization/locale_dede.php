@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "Alle einklappen",
         '_expandAll'    => "Alle ausklappen",
         '_transfer'     => 'Dieser Zauber wird mit <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+        'currentArea'   => '&lt;Momentanes Gebiet&gt;',
         'discovered'    => "Durch Geistesblitz erlernt",
         'ppm'           => "%s Auslösungen pro Minute",
         'procChance'    => "Procchance",

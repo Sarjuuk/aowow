@@ -1227,6 +1227,7 @@ $lang = array(
         '_collapseAll'  => "Contraer todo",
         '_expandAll'    => "Expandier todo",
         '_transfer'     => 'Este hechizo será convertido a <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Aprendido via descubrimiento",
         'ppm'           => "%s procs por minuto",
         'procChance'    => "Probabilidad de que accione",

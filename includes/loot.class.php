@@ -44,8 +44,8 @@ class Loot
     {
         reset($this->results);
 
-        foreach ($this->results as $k => ['id' => $id])
-            yield $id => $this->results[$k];
+        foreach ($this->results as $k => $__)
+            yield $k => $this->results[$k];
     }
 
     public function getResult()
@@ -627,7 +627,6 @@ class Loot
 
             $this->results[$tabId] = [$data[0], $tabData];
         }
-
 
         return true;
     }
