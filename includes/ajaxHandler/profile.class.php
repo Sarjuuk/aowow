@@ -9,12 +9,12 @@ class AjaxProfile extends AjaxHandler
 
     protected $validParams = ['link', 'unlink', 'pin', 'unpin', 'public', 'private', 'avatar', 'resync', 'status', 'save', 'delete', 'purge', 'summary', 'load'];
     protected $_get        = array(
-        'id'         => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkIdList']         ],
-        'items'      => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkItemList']       ],
-        'size'       => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH],
-        'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']       ],
-        'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']       ],
-        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']           ]
+        'id'         => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkIdList']     ],
+        'items'      => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkItemList']   ],
+        'size'       => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
+        'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']   ],
+        'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']   ],
+        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']       ]
     );
 
     protected $_post        = array(
@@ -28,11 +28,11 @@ class AjaxProfile extends AjaxHandler
         'talenttree2'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
         'talenttree3'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
         'activespec'   => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'talentbuild1' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
-        'glyphs1'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
-        'talentbuild2' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
-        'glyphs2'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
-        'icon'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_LOW_HIGH                                ],
+        'talentbuild1' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
+        'glyphs1'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
+        'talentbuild2' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
+        'glyphs2'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
+        'icon'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
         'description'  => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']                                       ],
         'source'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
         'copy'         => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],

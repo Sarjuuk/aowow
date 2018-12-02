@@ -135,15 +135,16 @@ trait TrProfiler
     {
         $this->prepareContent();
 
-        $this->notFound = array(
+        $this->hasComContent = false;
+        $this->notFound      = array(
             'title' => sprintf(Lang::profiler('firstUseTitle'), $this->subjectName, $this->realm),
             'msg'   => ''
         );
-        $this->hasComContent = false;
-        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 
         if (isset($this->tabId))
             $this->pageTemplate['activeTab'] = $this->tabId;
+
+        $this->sumSQLStats();
 
         $this->display('text-page-generic');
         exit();
@@ -399,7 +400,7 @@ class GenericPage
         }
 
         $this->time = microtime(true) - $this->time;
-        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
+        $this->sumSQLStats();
     }
 
     public function addJS($name, $unshift = false)
@@ -555,6 +556,11 @@ class GenericPage
         header('Location: ?account=signin'.$next, true, 302);
     }
 
+    protected function sumSQLStats()
+    {
+        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
+    }
+
     /*******************/
     /* Special Display */
     /*******************/
@@ -563,15 +569,16 @@ class GenericPage
     {
         array_unshift($this->title, Lang::main('nfPageTitle'));
 
+        $this->hasComContent = false;
         $this->notFound      = array(
             'title' =>          isset($this->typeId) ? Util::ucFirst($title).' #'.$this->typeId    : $title,
             'msg'   => !$msg && isset($this->typeId) ? sprintf(Lang::main('pageNotFound'), $title) : $msg
         );
-        $this->hasComContent = false;
-        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
 
         if (isset($this->tabId))
             $this->pageTemplate['activeTab'] = $this->tabId;
+
+        $this->sumSQLStats();
 
         header('HTTP/1.0 404 Not Found', true, 404);
 
@@ -590,7 +597,7 @@ class GenericPage
 
         $this->addArticle();
 
-        Util::arraySumByKey($this->mysql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
+        $this->sumSQLStats();
 
         header('HTTP/1.0 404 Not Found', true, 404);
 

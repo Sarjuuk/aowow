@@ -241,7 +241,7 @@ if (!CLI)
     }
 
     // parse page-parameters .. sanitize before use!
-    $str = explode('&', $_SERVER['QUERY_STRING'], 2)[0];
+    $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING']), 2)[0];
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
     $pageParam = isset($_[1]) ? $_[1] : null;
