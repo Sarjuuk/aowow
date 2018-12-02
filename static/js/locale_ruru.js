@@ -4618,8 +4618,10 @@ var LANG = {
     pr_note_missing:       "Отсутствует",
     pr_note_normal:        "Обычный",
     pr_note_exotic:        "Экзотический",
-
+    pr_note_gearscore:     "Очки экипировки",
     pr_note_weighted:      "Взвешено",    /* some relic text..? */
+
+    pr_note_pendingrename: "Pending Rename",
 
     su_note_stats:         "Характеристики",
     su_note_other:         "Другое",

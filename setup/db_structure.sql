@@ -1884,6 +1884,7 @@ CREATE TABLE `aowow_profiler_profiles` (
   `icon` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user` int(11) unsigned DEFAULT NULL,
   `name` varchar(50) COLLATE utf8mb4_bin NOT NULL,
+  `renameItr` tinyint(3) unsigned NOT NULL,
   `race` tinyint(3) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
@@ -1914,6 +1915,7 @@ CREATE TABLE `aowow_profiler_profiles` (
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
   KEY `user` (`user`),
   KEY `guild` (`guild`),
+  KEY `name` (`name`),
   CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3117,7 +3119,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1531668312,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1543774779,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -24,8 +24,9 @@ class ProfilePage extends GenericPage
         ['path' => 'Profiler.css']
     );
 
-    private   $isCustom  = false;
-    private   $profile   = null;
+    private   $isCustom = false;
+    private   $profile  = null;
+    private   $rnItr    = 0;
 
     public function __construct($pageCall, $pageParam)
     {
@@ -71,26 +72,37 @@ class ProfilePage extends GenericPage
             // names MUST be ucFirst. Since we don't expect partial matches, search this way
             $this->profile = $params;
 
+            // pending rename
+            if (preg_match('/([^\-]+)-(\d+)/i', $this->subjectName, $m))
+            {
+                $this->subjectName = $m[1];
+                $this->rnItr = $m[2];
+            }
+
             // 3 possibilities
             // 1) already synced to aowow
-            if ($subject = DB::Aowow()->selectRow('SELECT id, realmGUID, cuFlags FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $this->realmId, Util::ucFirst($this->subjectName)))
+            if ($subject = DB::Aowow()->selectRow('SELECT id, realmGUID, cuFlags FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ? AND renameItr = ?d', $this->realmId, Util::ucFirst($this->subjectName), $this->rnItr))
             {
+                $this->subjectGUID = $subject['id'];
+
                 if ($subject['cuFlags'] & PROFILER_CU_NEEDS_RESYNC)
                 {
                     $this->handleIncompleteData($params, $subject['realmGUID']);
                     return;
                 }
 
-                $this->subjectGUID = $subject['id'];
-                $this->subject     = new LocalProfileList(array(['id', $subject['id']]));
+                $this->subject = new LocalProfileList(array(['id', $subject['id']]));
                 if ($this->subject->error)
                     $this->notFound();
             }
             // 2) not yet synced but exists on realm (and not a gm character)
-            else if ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, g.guildid AS guildGUID, IFNULL(g.name, "") AS guildName, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS))
+            else if (!$this->rnItr && ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, g.guildid AS guildGUID, IFNULL(g.name, "") AS guildName, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS)))
             {
                 $char['realm']   = $this->realmId;
                 $char['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+
+                if ($char['at_login'] & 0x1)
+                    $char['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $realmId, $char['name']);
 
                 if ($char['guildGUID'])
                 {
@@ -104,7 +116,8 @@ class ProfilePage extends GenericPage
                 unset($char['guildName']);
 
                 // create entry from realm with enough basic info to disply tooltips
-                DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($char), array_values($char));
+                DB::Aowow()->query('REPLACE INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($char), array_values($char));
+                $this->subjectGUID = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $this->realmId, $char['realmGUID']);
 
                 $this->handleIncompleteData($params, $char['realmGUID']);
             }
@@ -224,7 +237,7 @@ class ProfilePage extends GenericPage
     {
         if ($this->mode == CACHE_TYPE_TOOLTIP)      // enable tooltip display with basic data we just added
         {
-            $this->subject = new LocalProfileList(array(['name', Util::ucFirst($this->subjectName)]), ['sv' => $params[1]]);
+            $this->subject = new LocalProfileList(array(['id', $this->subjectGUID]), ['sv' => $params[1]]);
             if ($this->subject->error)
                 $this->notFound();
 

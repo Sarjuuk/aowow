@@ -4618,6 +4618,8 @@ var LANG = {
     pr_note_gearscore:     "Ausrüstungswertung",
     pr_note_weighted:      "Gewogen",
 
+    pr_note_pendingrename: "Name freigegeben",
+
     su_note_stats:         "Werte",
     su_note_other:         "Anderes",
 

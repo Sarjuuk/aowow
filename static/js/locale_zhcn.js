@@ -4645,6 +4645,8 @@ var LANG = {
     pr_note_gearscore:     "装备",
     pr_note_weighted:      "Weighted",
 
+    pr_note_pendingrename: "Pending Rename",
+
     su_note_stats:          "任务基本属性",
     su_note_other:          "其他",
 

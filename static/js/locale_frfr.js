@@ -4619,6 +4619,8 @@ var LANG = {
     pr_note_gearscore:     "Score d'équipement",
     pr_note_weighted:      "Valorisé",    /* some relic text..? */
 
+    pr_note_pendingrename: "Pending Rename",
+
     su_note_stats:         "Statistiques",
     su_note_other:         "Autre",
 

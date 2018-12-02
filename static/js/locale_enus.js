@@ -4665,6 +4665,8 @@ var LANG = {
     pr_note_gearscore:     "Gear score",
     pr_note_weighted:      "Weighted",
 
+    pr_note_pendingrename: "Pending Rename",
+
     su_note_stats:          "Stats",
     su_note_other:          "Other",
 

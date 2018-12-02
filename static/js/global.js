@@ -15769,6 +15769,12 @@ Listview.templates = {
                         $WH.ae(d, $WH.ct(LANG.privateprofile));
                     }
 
+                    // aowow custom
+                    if (profile.renameItr) {
+                        $WH.ae(s, $WH.ct(LANG.pr_note_pendingrename));
+                    }
+                    // end aowow custom
+
                     $WH.ae(wrapper, d);
                     $WH.ae(td, wrapper);
                 },
@@ -17641,7 +17647,8 @@ function g_cleanCharacterName(name) {
 
 function g_getProfileUrl(profile) {
     if (profile.region) { // Armory character
-        return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name);
+        // return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name);  // aowow custom
+        return '?profile=' + profile.region + '.' + profile.realm + '.' + g_cleanCharacterName(profile.name) + (profile.renameItr ? '-' + profile.renameItr : '');
     }
     else { // Custom profile
         return '?profile=' + profile.id;

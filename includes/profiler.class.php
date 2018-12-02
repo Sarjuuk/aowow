@@ -375,6 +375,7 @@ class Profiler
             'realm'             =>  $realmId,
             'realmGUID'         =>  $charGuid,
             'name'              =>  $char['name'],
+            'renameItr'         => 0,
             'race'              =>  $char['race'],
             'class'             =>  $char['class'],
             'level'             =>  $char['level'],
@@ -403,7 +404,10 @@ class Profiler
 
         // char is flagged for rename
         if ($char['at_login'] & 0x1)
-            $data['name'] = 'RENAME-'.$data['name'];
+        {
+            $ri = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d AND name = ?', $realmId, $charGuid, $char['name']);
+            $data['renameItr'] = $ri ? ++$ri : 1;
+        }
 
         /********************/
         /* talents + glyphs */

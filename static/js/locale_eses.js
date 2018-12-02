@@ -4620,6 +4620,8 @@ var LANG = {
     pr_note_gearscore:     "Puntuación de equipo",
     pr_note_weighted:      "Valorado",
 
+    pr_note_pendingrename: "Pending Rename",
+
     su_note_stats:         "Estadisticas",
     su_note_other:         "Otros",
 

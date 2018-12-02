@@ -64,12 +64,17 @@ class ProfileList extends BaseType
                 $data[$this->id][$col] = $this->getField($col);
 
             if ($addInfo & PROFILEINFO_PROFILE)
+            {
                 if ($_ = $this->getField('description'))
                     $data[$this->id]['description'] = $_;
 
-            if ($addInfo & PROFILEINFO_PROFILE)
                 if ($_ = $this->getField('icon'))
                     $data[$this->id]['icon'] = $_;
+            }
+
+            if ($addInfo & PROFILEINFO_CHARACTER)
+                if ($_ = $this->getField('renameItr'))
+                    $data[$this->id]['renameItr'] = $_;
 
             if ($this->getField('cuFlags') & PROFILER_CU_PINNED)
                 $data[$this->id]['pinned'] = 1;
@@ -591,7 +596,19 @@ class RemoteProfileList extends ProfileList
 
             // char is pending rename
             if ($curTpl['at_login'] & 0x1)
-                $curTpl['name'] = 'RENAME-'.$curTpl['name'];
+            {
+                if (!isset($this->rnItr[$curTpl['name']]))
+                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $r, $curTpl['name']) ?: 0;
+
+                // already saved as "pending rename"
+                if ($rnItr = DB::Aowow()->selectCell('SELECT renameItr FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $r, $g))
+                    $curTpl['renameItr'] = $rnItr;
+                // not yet recognized: get max itr
+                else
+                    $curTpl['renameItr'] = ++$this->rnItr[$curTpl['name']];
+            }
+            else
+                $curTpl['renameItr'] = 0;
 
             $curTpl['cuFlags'] = 0;
         }
@@ -657,6 +674,7 @@ class RemoteProfileList extends ProfileList
                 'realm'     => $this->getField('realm'),
                 'realmGUID' => $this->getField('guid'),
                 'name'      => $this->getField('name'),
+                'renameItr' => $this->getField('renameItr'),
                 'race'      => $this->getField('race'),
                 'class'     => $this->getField('class'),
                 'level'     => $this->getField('level'),
@@ -696,7 +714,7 @@ class RemoteProfileList extends ProfileList
         if ($baseData)
         {
             foreach (Util::createSqlBatchInsert($baseData) as $ins)
-                DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_profiles (?#) VALUES '.$ins, array_keys(reset($baseData)));
+                DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE name = VALUES(name), renameItr = VALUES(renameItr)', array_keys(reset($baseData)));
 
             // merge back local ids
             $localIds = DB::Aowow()->select(
