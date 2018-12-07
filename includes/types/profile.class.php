@@ -287,8 +287,8 @@ class ProfileListFilter extends Filter
     protected $inputFields = array(
         'cr'     => [FILTER_V_RANGE,    [1, 36],                                        true ], // criteria ids
         'crs'    => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 5000]], true ], // criteria operators
-        'crv'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                 true ], // criteria values
-        'na'     => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                 false], // name - only printable chars, no delimiter
+        'crv'    => [FILTER_V_REGEX,    '/[\p{C}:;%\\\\]/ui',                           true ], // criteria values
+        'na'     => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
         'ma'     => [FILTER_V_EQUAL,    1,                                              false], // match any / all filter
         'ex'     => [FILTER_V_EQUAL,    'on',                                           false], // only match exact
         'si'     => [FILTER_V_LIST,     [1, 2],                                         false], // side

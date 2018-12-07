@@ -105,7 +105,7 @@ class SoundListFilter extends Filter
 {
     // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'na' => [FILTER_V_REGEX, '/[\p{C};]/ui',                                                         false], // name - only printable chars, no delimiter
+        'na' => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                                                    false], // name - only printable chars, no delimiter
         'ty' => [FILTER_V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
     );
 

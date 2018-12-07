@@ -1948,10 +1948,10 @@ class ItemListFilter extends Filter
         'gm'    => [FILTER_V_LIST,     [2, 3, 4],                                       false], // gem rarity for weight calculation
         'cr'    => [FILTER_V_RANGE,    [1, 177],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
+        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
         'upg'   => [FILTER_V_RANGE,    [1, 999999],                                     true ], // upgrade item ids
         'gb'    => [FILTER_V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                  false], // name - only printable chars, no delimiter
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                             false], // name - only printable chars, no delimiter
         'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
         'ub'    => [FILTER_V_LIST,     [[1, 9], 11],                                    false], // usable by classId
         'qu'    => [FILTER_V_RANGE,    [0, 7],                                          true ], // quality ids

@@ -307,12 +307,12 @@ class EnchantmentListFilter extends Filter
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'    => [FILTER_V_RANGE,    [2, 123],       true ], // criteria ids
-        'crs'   => [FILTER_V_RANGE,    [1, 15],        true ], // criteria operators
-        'crv'   => [FILTER_V_RANGE,    [0, 99999],     true ], // criteria values - only numerals
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui', false], // name - only printable chars, no delimiter
-        'ma'    => [FILTER_V_EQUAL,    1,              false], // match any / all filter
-        'ty'    => [FILTER_V_RANGE,    [1, 8],         true ]  // types
+        'cr'    => [FILTER_V_RANGE,    [2, 123],            true ], // criteria ids
+        'crs'   => [FILTER_V_RANGE,    [1, 15],             true ], // criteria operators
+        'crv'   => [FILTER_V_RANGE,    [0, 99999],          true ], // criteria values - only numerals
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui', false], // name - only printable chars, no delimiter
+        'ma'    => [FILTER_V_EQUAL,    1,                   false], // match any / all filter
+        'ty'    => [FILTER_V_RANGE,    [1, 8],              true ]  // types
     );
 
     protected function createSQLForCriterium(&$cr)

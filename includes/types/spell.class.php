@@ -2504,8 +2504,8 @@ class SpellListFilter extends Filter
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE,    [1, 116],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                  false], // name / text - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                             false], // name / text - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL,    'on',                                            false], // extended name search
         'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
         'minle' => [FILTER_V_RANGE,    [1, 99],                                         false], // spell level min

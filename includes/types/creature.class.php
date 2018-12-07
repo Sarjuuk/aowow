@@ -335,8 +335,8 @@ class CreatureListFilter extends Filter
     protected $inputFields = array(
         'cr'    => [FILTER_V_LIST,     [[1, 3],[5, 12], 15, 16, [18, 25], [27, 29], [31, 35], 37, 38, [40, 44]], true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 9999]],                           true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    '/[\p{C}:;]/ui',                                                          true ], // criteria values - only printable chars, no delimiter
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                                           false], // name / subname - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX,    '/[\p{C}:;%\\\\]/ui',                                                     true ], // criteria values - only printable chars, no delimiter
+        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                                                      false], // name / subname - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL,    'on',                                                                     false], // also match subname
         'ma'    => [FILTER_V_EQUAL,    1,                                                                        false], // match any / all filter
         'fa'    => [FILTER_V_CALLBACK, 'cbPetFamily',                                                            true ], // pet family [list]  -  cat[0] == 1

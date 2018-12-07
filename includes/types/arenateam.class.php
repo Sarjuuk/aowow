@@ -47,7 +47,7 @@ class ArenaTeamListFilter extends Filter
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'na'     => [FILTER_V_REGEX,    '/[\p{C};]/ui',                                 false], // name - only printable chars, no delimiter
+        'na'     => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
         'ma'     => [FILTER_V_EQUAL,    1,                                              false], // match any / all filter
         'ex'     => [FILTER_V_EQUAL,    'on',                                           false], // only match exact
         'si'     => [FILTER_V_LIST,     [1, 2],                                         false], // side

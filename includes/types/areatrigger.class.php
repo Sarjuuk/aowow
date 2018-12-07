@@ -70,12 +70,12 @@ class AreaTriggerListFilter extends Filter
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'  => [FILTER_V_LIST,  [2],            true ], // criteria ids
-        'crs' => [FILTER_V_RANGE, [1, 6],         true ], // criteria operators
-        'crv' => [FILTER_V_RANGE, [0, 99999],     true ], // criteria values - all criteria are numeric here
-        'na'  => [FILTER_V_REGEX, '/[\p{C};]/ui', false], // name - only printable chars, no delimiter
-        'ma'  => [FILTER_V_EQUAL, 1,              false], // match any / all filter
-        'ty'  => [FILTER_V_RANGE, [0, 5],         true ]  // types
+        'cr'  => [FILTER_V_LIST,  [2],                true ], // criteria ids
+        'crs' => [FILTER_V_RANGE, [1, 6],             true ], // criteria operators
+        'crv' => [FILTER_V_RANGE, [0, 99999],         true ], // criteria values - all criteria are numeric here
+        'na'  => [FILTER_V_REGEX, '/[\p{C};\\\\]/ui', false], // name - only printable chars, no delimiter
+        'ma'  => [FILTER_V_EQUAL, 1,                  false], // match any / all filter
+        'ty'  => [FILTER_V_RANGE, [0, 5],             true ]  // types
     );
 
     protected function createSQLForCriterium(&$cr)

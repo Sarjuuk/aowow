@@ -135,7 +135,7 @@ class IconListFilter extends Filter
         'cr'    => [FILTER_V_LIST,  [1, 2, 3, 6, 9, 11, 13], true ], // criteria ids
         'crs'   => [FILTER_V_RANGE, [1, 6],                  true ], // criteria operators
         'crv'   => [FILTER_V_RANGE, [0, 99999],              true ], // criteria values - all criteria are numeric here
-        'na'    => [FILTER_V_REGEX, '/[\p{C};]/ui',          false], // name - only printable chars, no delimiter
+        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',     false], // name - only printable chars, no delimiter
         'ma'    => [FILTER_V_EQUAL, 1,                       false]  // match any / all filter
     );
 

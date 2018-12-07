@@ -319,8 +319,8 @@ class AchievementListFilter extends Filter
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE, [2, 18],                                         true ], // criteria ids
         'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, '/[\p{C};:]/ui',                                 true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX, '/[\p{C};]/ui',                                  false], // name / description - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX, '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                             false], // name / description - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // extended name search
         'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
         'si'    => [FILTER_V_LIST,  [1, 2, 3, -1, -2],                               false], // side

@@ -53,8 +53,8 @@ class SearchPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->search = trim(urlDecode($pageParam));
-        $this->query  = strtr($this->search, '?*', '_%');
+        $this->search =
+        $this->query  = trim(urlDecode($pageParam));
 
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
@@ -124,23 +124,25 @@ class SearchPage extends GenericPage
         if (!$this->query)
             return;
 
-        foreach (explode(' ', $this->query) as $p)
+        foreach (explode(' ', $this->query) as $raw)
         {
-            if (!$p)                                        // multiple spaces
+            $clean = str_replace(['\\', '%'], '', $raw);
+
+            if (!$clean)                                    // multiple spaces
                 continue;
-            else if ($p[0] == '-')
+            else if ($clean[0] == '-')
             {
-                if (mb_strlen($p) < 4)
-                    $this->invalid[] = mb_substr($p, 1);
+                if (mb_strlen($clean) < 4)
+                    $this->invalid[] = mb_substr($raw, 1);
                 else
-                    $this->excluded[] = mb_substr($p, 1);
+                    $this->excluded[] = mb_substr(str_replace('_', '\\_', $clean), 1);
             }
-            else if ($p !== '')
+            else if ($clean !== '')
             {
-                if (mb_strlen($p) < 3)
-                    $this->invalid[] = $p;
+                if (mb_strlen($clean) < 3)
+                    $this->invalid[] = $raw;
                 else
-                    $this->included[] = $p;
+                    $this->included[] = str_replace('_', '\\_', $clean);
             }
         }
     }

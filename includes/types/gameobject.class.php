@@ -170,7 +170,7 @@ class GameObjectListFilter extends Filter
         'cr'  => [FILTER_V_LIST,  [[1, 5], 7, 11, 13, 15, 16, 18, 50],            true ], // criteria ids
         'crs' => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv' => [FILTER_V_RANGE, [0, 99999],                                     true ], // criteria values - only numeric input values expected
-        'na'  => [FILTER_V_REGEX, '/[\p{C};]/ui',                                 false], // name - only printable chars, no delimiter
+        'na'  => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
         'ma'  => [FILTER_V_EQUAL, 1,                                              false]  // match any / all filter
     );
 

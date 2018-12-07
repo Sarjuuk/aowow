@@ -1204,9 +1204,9 @@ abstract class Filter
             foreach ($parts as $p)
             {
                 if ($p[0] == '-' && (mb_strlen($p) > 3 || $shortStr))
-                    $sub[] = [$f, sprintf($exPH, mb_substr($p, 1)), '!'];
+                    $sub[] = [$f, sprintf($exPH, str_replace('_', '\\_', mb_substr($p, 1))), '!'];
                 else if ($p[0] != '-' && (mb_strlen($p) > 2 || $shortStr))
-                    $sub[] = [$f, sprintf($exPH, $p)];
+                    $sub[] = [$f, sprintf($exPH, str_replace('_', '\\_', $p))];
             }
 
             // single cnd?

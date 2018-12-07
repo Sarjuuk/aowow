@@ -2593,7 +2593,7 @@ var LANG = {
     user:                   "Benutzer",
     views:                  "Ansichten",
     userpage:               "Benutzerseite",
-    wins:                   "Siegt",
+    wins:                   "Siege",
     when:                   "Wann",
     today:                  "heute",
     yes:                    "Ja",

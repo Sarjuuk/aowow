@@ -469,7 +469,7 @@ class QuestListFilter extends Filter
         'cr'    => [FILTER_V_RANGE, [1, 45],                                         true ], // criteria ids
         'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [FILTER_V_REGEX, '/\D/',                                          true ], // criteria values - only numerals
-        'na'    => [FILTER_V_REGEX, '/[\p{C};]/ui',                                  false], // name / text - only printable chars, no delimiter
+        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                             false], // name / text - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // also match subname
         'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
         'minle' => [FILTER_V_RANGE, [1, 99],                                         false], // min quest level
