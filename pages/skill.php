@@ -45,10 +45,24 @@ class SkillPage extends GenericPage
 
     protected function generateContent()
     {
+        /***********/
+        /* Infobox */
+        /**********/
+
+        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
+
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         /****************/
         /* Main Content */
         /****************/
 
+        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,

@@ -58,6 +58,13 @@ class PetPage extends GenericPage
         if ($this->subject->getField('exotic'))
             $infobox[] = '[url=?spell=53270]'.Lang::pet('exotic').'[/url]';
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         /****************/
         /* Main Content */
         /****************/

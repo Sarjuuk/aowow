@@ -99,6 +99,13 @@ class AchievementPage extends GenericPage
                 $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
         }
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         // realm first available?
         if ($this->subject->getField('flags') & 0x100 && DB::isConnectable(DB_AUTH))
         {

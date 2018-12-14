@@ -10,7 +10,7 @@ class CurrencyList extends BaseType
     public static   $brickFile = 'currency';
     public static   $dataTable = '?_currencies';
 
-    protected       $queryBase = 'SELECT *, c.id AS ARRAY_KEY FROM ?_currencies c';
+    protected       $queryBase = 'SELECT c.*, c.id AS ARRAY_KEY FROM ?_currencies c';
     protected       $queryOpts = array(
                         'c' => [['ic']],
                         'ic' => ['j' => ['?_icons ic ON ic.id = c.iconId', true], 's' => ', ic.name AS iconString']

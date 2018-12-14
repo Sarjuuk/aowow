@@ -10,7 +10,7 @@ class SkillList extends BaseType
     public static   $brickFile = 'skill';
     public static   $dataTable = '?_skillline';
 
-    protected       $queryBase = 'SELECT *, sl.id AS ARRAY_KEY FROM ?_skillline sl';
+    protected       $queryBase = 'SELECT sl.*, sl.id AS ARRAY_KEY FROM ?_skillline sl';
     protected       $queryOpts = array(
                         'sl' => [['ic']],
                         'ic' => ['j' => ['?_icons ic ON ic.id = sl.iconId', true], 's' => ', ic.name AS iconString'],

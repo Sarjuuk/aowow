@@ -232,6 +232,13 @@ class SpellPage extends GenericPage
         if ($cost = $this->subject->getField('trainingCost'))
             $infobox[] = Lang::spell('trainingCost').Lang::main('colon').'[money='.$cost.'][/li]';
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         // used in mode
         foreach ($this->difficulties as $n => $id)
             if ($id == $this->typeId)                       // "Mode" seems to be multilingual acceptable

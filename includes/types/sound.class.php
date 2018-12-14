@@ -13,7 +13,7 @@ class SoundList extends BaseType
     public static   $dataTable  = '?_sounds';
     public static   $contribute = CONTRIBUTE_CO;
 
-    protected       $queryBase  = 'SELECT *, s.id AS ARRAY_KEY FROM ?_sounds s';
+    protected       $queryBase  = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_sounds s';
 
     private         $fileBuffer = [];
     private static  $fileTypes  = array(

@@ -56,8 +56,16 @@ class CurrencyPage extends GenericPage
 
         $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
 
+        // cap
         if ($_ = $this->subject->getField('cap'))
             $infobox[] = Lang::currency('cap').Lang::main('colon').Lang::nf($_);
+
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
 
         /****************/
         /* Main Content */

@@ -665,8 +665,8 @@ class GenericPage
             {
                 foreach ($data as $k => $v)
                 {
-                    // localizes expected fields
-                    if (in_array($k, ['name', 'namefemale']))
+                    // localizes expected fields .. except for icons .. icons are special
+                    if (in_array($k, ['name', 'namefemale']) && $struct[0]  != 'g_icons')
                     {
                         $data[$k.'_'.User::$localeString] = $v;
                         unset($data[$k]);
@@ -754,8 +754,8 @@ class GenericPage
 
     public function extendGlobalData($data, $extra = null)  // add jsGlobals or typeIds (can be mixed in one array: TYPE => [mixeddata]) to display on the page
     {
-    if ($data === null)
-        throw new ErrorException('ffffuuuu.....!');
+        if ($data === null)
+            throw new ErrorException('ffffuuuu.....!');
 
         foreach ($data as $type => $globals)
         {
@@ -848,6 +848,7 @@ class GenericPage
                 case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
                 case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
+                case TYPE_ICON:        $obj = new IconList($cnd);        break;
                 // "um, eh":, he ums and ehs.
                 case TYPE_USER:        $obj = new UserList($cnd);        break;
                 case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;

@@ -10,7 +10,7 @@ class CharRaceList extends BaseType
     public static   $brickFile = 'race';
     public static   $dataTable = '?_races';
 
-    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_races r';
+    protected       $queryBase = 'SELECT r.*, id AS ARRAY_KEY FROM ?_races r';
 
     public function getListviewData()
     {

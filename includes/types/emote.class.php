@@ -10,7 +10,7 @@ class EmoteList extends BaseType
     public static   $brickFile = 'emote';
     public static   $dataTable = '?_emotes';
 
-    protected       $queryBase = 'SELECT *, e.id AS ARRAY_KEY FROM ?_emotes e';
+    protected       $queryBase = 'SELECT e.*, e.id AS ARRAY_KEY FROM ?_emotes e';
 
     public function __construct($conditions = [])
     {

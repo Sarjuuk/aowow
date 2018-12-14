@@ -948,6 +948,14 @@ a.dialog-right {
 #statweight-help div { position: absolute; right: -9px; top: -33px; }
 #fi_weight { margin-top: 10px; padding-top: 12px; border-top: 1px solid #484848; }
 
+span.iconsmall,
+span.iconmedium,
+span.iconlarge,
+span.iconblizzard {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .iconsmall,
 .iconmedium,
 .iconlarge,

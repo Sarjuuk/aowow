@@ -17785,6 +17785,11 @@ ProgressBar.prototype.getContainer = function()
 var Icon = {
     sizes: ['small', 'medium', 'large'],
     sizes2: [18, 36, 56],
+    sizeIds: {
+        small:  0,
+        medium: 1,
+        large:  2
+    },
     premiumOffsets: [[-56, -36], [-56, 0], [0, 0]],
     premiumBorderClasses: ['-premium', '-gold', '', '-premiumred', '-red'],
     STANDARD_BORDER: 2,
@@ -17794,9 +17799,9 @@ var Icon = {
         epic: '-q4',
         legendary: '-q5'
     },
-    create: function(name, size, UNUSED, url, num, qty, noBorder, rel) {
+    create: function(name, size, UNUSED, url, num, qty, noBorder, rel, span) {
         var
-            icon  = $WH.ce('div'),
+            icon  = $WH.ce(span ? 'span' : 'div'),
             image = $WH.ce('ins'),
             tile  = $WH.ce('del');
 
@@ -17829,9 +17834,11 @@ var Icon = {
             if (!avatarIcon) {
                 icon.onclick = Icon.onClick;
 
-                var a = $WH.ce('a');
-                a.href = "javascript:;";
-                $WH.ae(icon, a);
+                if (url !== false) {
+                    var a = $WH.ce('a');
+                    a.href = "javascript:;";
+                    $WH.ae(icon, a);
+                }
             }
         }
 

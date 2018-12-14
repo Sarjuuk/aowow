@@ -10,7 +10,7 @@ class CharClassList extends BaseType
     public static   $brickFile = 'class';
     public static   $dataTable = '?_classes';
 
-    protected       $queryBase = 'SELECT *, id AS ARRAY_KEY FROM ?_classes c';
+    protected       $queryBase = 'SELECT c.*, id AS ARRAY_KEY FROM ?_classes c';
 
     public function __construct($conditions = [])
     {

@@ -1025,7 +1025,7 @@ var Markup = {
 
                 if (g_icons[id] && g_icons[id].name)
                 {
-                    // href += '/' + $WH.urlize(g_icons[id].name);         AoWoW  - not used
+                    // href += '/' + $WH.urlize(g_icons[id].name);         AoWoW  - SEO not used
                     var icon = g_icons[id];
                     if (hasName)
                     {

@@ -144,6 +144,13 @@ class ItemPage extends genericPage
             if ($si != 3)
                 $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($si == 1 ? 'alliance' : 'horde').']'.Lang::game('si', $si).'[/span]';
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         // consumable / not consumable
         if (!$_slot)
         {
