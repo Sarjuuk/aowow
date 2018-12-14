@@ -1236,17 +1236,16 @@ class QuestPage extends GenericPage
                 'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
             );
 
-            foreach ($startEnd as $se)
-            {
-                if (!($se['method'] & 0x2) || $se['type'] != TYPE_NPC)
-                    continue;
+            $senderTypeId = 0;
+            if ($_= DB::World()->selectCell('SELECT RewardMailSenderEntry FROM quest_mail_sender WHERE QuestId = ?d', $this->typeId))
+                $senderTypeId = $_;
+            else
+                foreach ($startEnd as $se)
+                    if (($se['method'] & 0x2) && $se['type'] == TYPE_NPC)
+                        $senderTypeId = $se['typeId'];
 
-                if ($ti = CreatureList::getName($se['typeId']))
-                {
-                    $mail['sender'] = sprintf(Lang::quest('mailBy'), $se['typeId'], $ti);
-                    break;
-                }
-            }
+            if ($ti = CreatureList::getName($senderTypeId))
+                $mail['sender'] = sprintf(Lang::quest('mailBy'), $senderTypeId, $ti);
 
             // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
             $mailLoot = new Loot();
