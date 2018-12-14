@@ -38,7 +38,7 @@ function creature(array $ids = [])
             exp,
             faction,
             npcflag,
-            rank,
+            IF(rank > 4, 0, rank),
             dmgSchool,
             DamageModifier,
             BaseAttackTime,
