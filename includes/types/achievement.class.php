@@ -63,11 +63,13 @@ class AchievementList extends BaseType
             {
                 $_curTpl = array_merge($rewards[$_id], $_curTpl);
 
+                $_curTpl['mailTemplate'] = $rewards[$_id]['MailTemplateID'];
+
                 if ($rewards[$_id]['MailTemplateID'])
                 {
                     // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
                     // $mailSrc = new Loot();
-                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['mailTemplate']);
+                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['MailTemplateID']);
                     // foreach ($mailSrc->iterate() as $loot)
                         // $_curTpl['rewards'][] = [TYPE_ITEM, $loot['id']];
 
