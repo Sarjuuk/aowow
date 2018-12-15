@@ -6,7 +6,6 @@ class Lang
     private static $main;
     private static $account;
     private static $user;
-    private static $mail;
     private static $game;
     private static $maps;
     private static $profiler;
@@ -26,6 +25,7 @@ class Lang
     private static $icon;
     private static $item;
     private static $itemset;
+    private static $mail;
     private static $npc;
     private static $pet;
     private static $quest;
@@ -122,6 +122,33 @@ class Lang
         }
 
         return $b;
+    }
+
+    public static function trimTextClean(string $text, int $length = 100) : string
+    {
+        // remove line breaks
+        $text = strtr($text, ["\n" => ' ', "\r" => ' ']);
+
+        // limit whitespaces to one at a time
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        // limit previews to 100 chars + whatever it takes to make the last word full
+        if ($length > 0 && mb_strlen($text) > $length)
+        {
+            $n = 0;
+            $b = [];
+            $parts = explode(' ', $text);
+            while ($n < $length && $parts)
+            {
+                $_   = array_shift($parts);
+                $n  += mb_strlen($_);
+                $b[] = $_;
+            }
+
+            $text = implode(' ', $b).'…';
+        }
+
+        return $text;
     }
 
     public static function sort($prop, $group, $method = SORT_NATURAL)

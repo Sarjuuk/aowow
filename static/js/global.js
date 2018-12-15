@@ -22647,7 +22647,8 @@ var g_types = {
      29: 'icon',
     501: 'emote',
     502: 'enchantment',
-    503: 'areatrigger'
+    503: 'areatrigger',
+    504: 'mail'
 };
 
 // Items

@@ -964,7 +964,8 @@ var mn_database = [
     [, "Other"],
     [31, "Icons", "?icons", mn_icons],
     [19,"Sounds","?sounds",mn_sounds],
-    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}]     // aowow - custom
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Talent Calculator","?talent",mn_talentCalc],
@@ -3405,7 +3406,9 @@ var LANG = {
          19: ["Sound",       "sound",        "Sounds",       "sounds"],
          29: ["Icon",        "icon",         "Icons",        "icons"],
         501: ["Emote",       "emote",        "Emotes",       "emotes"],
-        502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"]
+        502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"],
+        503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
+        504: ["Mail",        "mail",         "Mails",        "mails"]
     },
 
     timeunitssg: ["year", "month", "week", "day", "hour", "minute", "second"],

@@ -48,6 +48,8 @@ switch ($pageCall)
     case 'itemset':
     case 'itemsets':
     case 'maps':                                            // tool: map listing
+    case 'mail':
+    case 'mails':
     case 'npc':
     case 'npcs':
     case 'object':

@@ -572,12 +572,13 @@ class AchievementPage extends GenericPage
 
         if ($_ = $this->subject->getField('mailTemplate'))
         {
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE id = ?d', $_);
             if (!$letter)
                 return [];
 
             $reqCss = true;
             $mail   = array(
+                'id'          => $_,
                 'delay'       => null,
                 'sender'      => null,
                 'attachments' => [],
@@ -589,6 +590,7 @@ class AchievementPage extends GenericPage
         {
             $reqCss = true;
             $mail   = array(
+                'id'          => -$this->typeId,
                 'delay'       => null,
                 'sender'      => null,
                 'attachments' => [],
@@ -598,7 +600,7 @@ class AchievementPage extends GenericPage
         }
 
         if ($_ = CreatureList::getName($this->subject->getField('sender')))
-            $mail['sender'] = sprintf(Lang::quest('mailBy'), $this->subject->getField('sender'), $_);
+            $mail['sender'] = sprintf(Lang::mail('mailBy'), $this->subject->getField('sender'), $_);
 
         return $mail;
     }

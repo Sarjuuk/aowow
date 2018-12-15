@@ -917,7 +917,9 @@ var mn_database = [
     [6,"Местности","?zones",mn_zones],
     [, "Другое"],
     [31, "Иконки", ":wowhead.com/icons", mn_icons],
-    [19,"Звуки","?sounds",mn_sounds]
+    [19,"Звуки","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Расчёт талантов","?talent",mn_talentCalc],
@@ -3357,7 +3359,9 @@ var LANG = {
          19: ["Звук",           "звук",            "Звуки",           "звуки"],
          29: ["Иконка",         "иконка",          "Иконки",          "иконки"],
         501: ["Эмоция",         "эмоция",          "Эмоции",          "эмоции"],
-        502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"]
+        502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"],
+        503: ["Areatrigger",    "areatrigger",     "Areatriggers",    "areatriggers"],
+        504: ["Mail",           "mail",            "Mails",           "mails"]
     },
 
     timeunitssg: ["год", "месяц", "неделя", "день", "час", "минута", "секунда"],

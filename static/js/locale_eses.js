@@ -917,7 +917,9 @@ var mn_database = [
     [6,"Zonas","?zones",mn_zones],
     [, "Otros"],
     [31, "Iconos", "?icons", mn_icons],
-    [19,"Sonidos","?sounds",mn_sounds]
+    [19,"Sonidos","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Calculadora de talentos","?talent",mn_talentCalc],
@@ -3357,7 +3359,9 @@ var LANG = {
          19: ["Sonido",              "sonido",               "Sonidos",              "sonidos"],
          29: ["Icono",               "icono",                "Iconos",               "íconos"],
         501: ["Emoción",             "emoción",              "Emociones",            "emociones"],
-        502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"]
+        502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"],
+        503: ["Areatrigger",         "areatrigger",          "Areatriggers",         "areatriggers"],
+        504: ["Mail",                "mail",                 "Mails",                "mails"]
     },
 
     timeunitssg: ["año", "mes", "semana", "día", "hora", "minuto", "segundo"],

@@ -1226,10 +1226,11 @@ class QuestPage extends GenericPage
         if ($rmtId = $this->subject->getField('rewardMailTemplateId'))
         {
             $delay  = $this->subject->getField('rewardMailDelay');
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $rmtId);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE id = ?d', $rmtId);
 
             $mail = array(
-                'delay'       => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
+                'id'          => $rmtId,
+                'delay'       => $delay  ? sprintf(Lang::mail('mailIn'), Util::formatTime($delay * 1000)) : null,
                 'sender'      => null,
                 'attachments' => [],
                 'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))     : null,
@@ -1245,7 +1246,7 @@ class QuestPage extends GenericPage
                         $senderTypeId = $se['typeId'];
 
             if ($ti = CreatureList::getName($senderTypeId))
-                $mail['sender'] = sprintf(Lang::quest('mailBy'), $senderTypeId, $ti);
+                $mail['sender'] = sprintf(Lang::mail('mailBy'), $senderTypeId, $ti);
 
             // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
             $mailLoot = new Loot();

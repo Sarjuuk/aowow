@@ -1070,7 +1070,7 @@ SqlGen::register(new class extends SetupScript
                     continue;
 
                 $effects   = $tSpells[$spellId];
-                $trainerId = $npc['entry'] > 200000 || $npc['qty'] > 1 ? null : $npc['entry'];
+                $trainerId = $npc['entry'] > 200000 || $npc['qty'] > 1 ? 0 : $npc['entry'];
 
                 $triggered = false;
                 for ($i = 1; $i <= 3; $i++)

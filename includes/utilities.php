@@ -6,11 +6,11 @@ if (!defined('AOWOW_REVISION'))
 
 class SimpleXML extends SimpleXMLElement
 {
-    public function addCData($str)
+    public function addCData(string $cData) : SimpleXMLElement
     {
         $node = dom_import_simplexml($this);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($str));
+        $node->appendChild($no->createCDATASection($cData));
 
         return $this;
     }
@@ -40,7 +40,7 @@ class CLI
     /* logging */
     /***********/
 
-    public static function initLogFile($file = '')
+    public static function initLogFile(string $file = '') : void
     {
         if (!$file)
             return;
@@ -61,32 +61,32 @@ class CLI
         }
     }
 
-    public static function red($str)
+    public static function red(string $str) : string
     {
         return OS_WIN ? $str : "\e[31m".$str."\e[0m";
     }
 
-    public static function green($str)
+    public static function green(string $str) : string
     {
         return OS_WIN ? $str : "\e[32m".$str."\e[0m";
     }
 
-    public static function yellow($str)
+    public static function yellow(string $str) : string
     {
         return OS_WIN ? $str : "\e[33m".$str."\e[0m";
     }
 
-    public static function blue($str)
+    public static function blue(string $str) : string
     {
         return OS_WIN ? $str : "\e[36m".$str."\e[0m";
     }
 
-    public static function bold($str)
+    public static function bold(string $str) : string
     {
         return OS_WIN ? $str : "\e[1m".$str."\e[0m";
     }
 
-    public static function write($txt = '', $lvl = -1)
+    public static function write(string $txt = '', int $lvl = -1) : void
     {
         $msg = "\n";
         if ($txt)
@@ -121,14 +121,22 @@ class CLI
         flush();
     }
 
-    public static function nicePath(string $file, string ...$pathParts) : string
+    public static function nicePath(string $fileOrPath, string ...$pathParts) : string
     {
         $path = '';
 
-        if (!$pathParts)
-            return $file;
+        if ($pathParts)
+        {
+            foreach ($pathParts as &$pp)
+                $pp = trim($pp);
 
-        $path = implode(DIRECTORY_SEPARATOR, $pathParts).DIRECTORY_SEPARATOR.$file;
+            $path .= implode(DIRECTORY_SEPARATOR, $pathParts);
+        }
+
+        $path .= ($path ? DIRECTORY_SEPARATOR : '').trim($fileOrPath);
+
+        // remove quotes (from erronous user input)
+        $path = str_replace(['"', "'"], ['', ''], $path);
 
         if (DIRECTORY_SEPARATOR == '/')                     // *nix
         {
@@ -143,8 +151,6 @@ class CLI
         else
             CLI::write('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLI::LOG_ERROR);
 
-        $path = trim($path);
-
         // resolve *nix home shorthand
         if (!OS_WIN)
         {
@@ -155,9 +161,6 @@ class CLI
             else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
                 $path = substr($path, 1);
         }
-
-        // remove quotes (from erronous user input)
-        $path = str_replace(['"', "'"], ['', ''], $path);
 
         return $path;
     }
@@ -174,7 +177,7 @@ class CLI
         this also means, you can't hide input at all, least process it
     */
 
-    public static function readInput(&$fields, $singleChar = false)
+    public static function readInput(array &$fields, bool $singleChar = false) : bool
     {
         // first time set
         if (self::$hasReadline === null)
@@ -283,7 +286,9 @@ class Util
         'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
         TYPE_ICON        => 'IconList',
         TYPE_EMOTE       => 'EmoteList',
-        TYPE_ENCHANTMENT => 'EnchantmentList'
+        TYPE_ENCHANTMENT => 'EnchantmentList',
+        TYPE_AREATRIGGER => 'AreatriggerList',
+        TYPE_MAIL        => 'MailList'
     );
 
     public static $typeStrings              = array(        // zero-indexed
@@ -293,7 +298,9 @@ class Util
         TYPE_ICON        => 'icon',
         TYPE_USER        => 'user',
         TYPE_EMOTE       => 'emote',
-        TYPE_ENCHANTMENT => 'enchantment'
+        TYPE_ENCHANTMENT => 'enchantment',
+        TYPE_AREATRIGGER => 'areatrigger',
+        TYPE_MAIL        => 'mail'
     );
 
     # todo (high): find a sensible way to write data here on setup
@@ -369,12 +376,12 @@ class Util
     public static $wowheadLink              = '';
     private static $notes                   = [];
 
-    public static function addNote($uGroupMask, $str)
+    public static function addNote(int $uGroupMask, string $str) : void
     {
         self::$notes[] = [$uGroupMask, $str];
     }
 
-    public static function getNotes()
+    public static function getNotes() : array
     {
         $notes = [];
 
@@ -387,16 +394,16 @@ class Util
 
     private static $execTime = 0.0;
 
-    public static function execTime($set = false)
+    public static function execTime(bool $set = false) : string
     {
         if ($set)
         {
             self::$execTime = microTime(true);
-            return;
+            return '';
         }
 
         if (!self::$execTime)
-            return;
+            return '';
 
         $newTime        = microTime(true);
         $tDiff          = $newTime - self::$execTime;
@@ -405,7 +412,7 @@ class Util
         return self::formatTime($tDiff * 1000, true);
     }
 
-    public static function formatMoney($qty)
+    public static function formatMoney(int $qty) : string
     {
         $money = '';
 
@@ -429,7 +436,7 @@ class Util
         return $money;
     }
 
-    public static function parseTime($sec)
+    public static function parseTime(int $sec) : array
     {
         $time = ['d' => 0, 'h' => 0, 'm' => 0, 's' => 0, 'ms' => 0];
 
@@ -463,9 +470,9 @@ class Util
         return $time;
     }
 
-    public static function formatTime($base, $short = false)
+    public static function formatTime(int $msec, bool $short = false) : string
     {
-        $s = self::parseTime($base / 1000);
+        $s = self::parseTime($msec / 1000);
         $fmt = [];
 
         if ($short)
@@ -514,7 +521,7 @@ class Util
     }
 
     // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText($text , $markdown = false)
+    public static function parseHtmlText(string $text, bool $markdown = false) : string
     {
         if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
@@ -554,14 +561,14 @@ class Util
         $toMD = array(
             '[icon name=\2]',
             '[span color=#\1>\2[/span]',
-            '&lt;\1/\2&gt;',
+            '<\1/\2>',
             '',
             '\1',
-            '&lt;\1&gt;',
+            '<\1>',
             '[span class=q0>WorldState #\1[/span]',
-            '&lt;'.Lang::game('class').'&gt;',
-            '&lt;'.Lang::game('race').'&gt;',
-            '&lt;'.Lang::main('name').'&gt;',
+            '<'.Lang::game('class').'>',
+            '<'.Lang::game('race').'>',
+            '<'.Lang::main('name').'>',
             '[br]',
             ''
         );
@@ -584,7 +591,7 @@ class Util
         return preg_replace($from, $markdown ? $toMD : $toHTML, $text);
     }
 
-    public static function asHex($val)
+    public static function asHex($val) : string
     {
         $_ = decHex($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
@@ -593,7 +600,7 @@ class Util
         return '0x'.strToUpper($_);
     }
 
-    public static function asBin($val)
+    public static function asBin($val) : string
     {
         $_ = decBin($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
@@ -653,7 +660,7 @@ class Util
     }
 
     // default back to enUS if localization unavailable
-    public static function localizedString($data, $field, $silent = false)
+    public static function localizedString(array $data, string $field, bool $silent = false) : string
     {
         // only display placeholder markers for staff
         if (!User::isInGroup(U_GROUP_EMPLOYEE | U_GROUP_TESTER | U_GROUP_LOCALIZER))
@@ -681,7 +688,7 @@ class Util
     }
 
     // for item and spells
-    public static function setRatingLevel($level, $type, $val)
+    public static function setRatingLevel(int $level, int $type, int $val) : string
     {
         if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING, ITEM_MOD_RESILIENCE_RATING]) && $level < 34)
             $level = 34;

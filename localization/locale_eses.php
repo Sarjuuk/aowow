@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "Objetos",
         'itemset'       => "conjunto de objetos",
         'itemsets'      => "Conjuntos de objetos",
+        'mail'          => "mail",
+        'mails'         => "Mails",
         'mechanic'      => "Mecanica",
         'mechAbbr'      => "Mec.",
         'meetingStone'  => "Roca de encuentro",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "Comentarios",
         'screenshots'   => "Capturas de pantalla",
         'videos'        => "Vídeos",
-        'posts'         => "Mensajes en los foros"
-    ),
-    'mail' => array(
+        'posts'         => "Mensajes en los foros",
+        // user mail
         'tokenExpires'  => "Este token expira en %s",
         'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
         'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "Para aceptar esta misión debes haber tener activa alguna de estas misiones",
         'gainsDesc'     => "Cuando completes esta misión ganarás",
         'theTitle'      => 'el título "%s"',
-        'mailDelivery'  => "Usted recibirá esta carta%s%s",
-        'mailBy'        => ' del <a href="?npc=%d">%s</a>',
-        'mailIn'        => " después de %s",
         'unavailable'   => "Esta misión fue marcada como obsoleta y no puede ser obtenida o completada.",
         'experience'    => "experiencia",
         'expConvert'    => "(o %s si se completa al nivel %d)",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "Aprenderás",
         'bonusTalents'  => "%d |4punto:puntos; de talento",
         'spellDisplayed'=> ' (mostrando <a href="?spell=%d">%s</a>)',
-        'attachment'    => "Adjunto",
         'questInfo'     => array(
              0 => "Normal",              1 => "Élite",              21 => "Vida",               41 => "JcJ",                62 => "Banda",              81 => "Mazmorra",           82 => "Evento del mundo",
             83 => "Legendaria",         84 => "Escolta",            85 => "Heroica",            88 => "Banda (10)",         89 => "Banda (25)"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
             "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Mi Lista de Reproducción"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "This mail doesn't exist.",
+        'attachment'    => "Adjunto",
+        'mailDelivery'  => "Usted recibirá esta carta%s%s",
+        'mailBy'        => ' del <a href="?npc=%d">%s</a>',
+        'mailIn'        => " después de %s",
+        'delay'         => "Delay",
+        'sender'        => "Sender",
+        'untitled'      => "Untitled Mail"
     ),
     'pet'      => array(
         'notFound'      => "Esta familia de mascotas no existe.",

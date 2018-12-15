@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "Objets",
         'itemset'       => "ensemble d'objets",
         'itemsets'      => "Ensembles d'objets",
+        'mail'          => "mail",
+        'mails'         => "Mails",
         'mechanic'      => "Mécanique",
         'mechAbbr'      => "Mécan.",
         'meetingStone'  => "Pierre de rencontre",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "Commentaires",
         'screenshots'   => "Captures d'écran",
         'videos'        => "Vidéos",
-        'posts'         => "Messages sur le forum"
-    ),
-    'mail' => array(
+        'posts'         => "Messages sur le forum",
+        // user mail
         'tokenExpires'  => "This token expires in %s.",
         'accConfirm'    => ["Activation de compte",             "Bienvenue sur ".CFG_NAME_SHORT."!\r\n\r\nCliquez sur le lien ci-dessous pour activer votre compte.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
         'recoverUser'   => ["Récupération d'utilisateur",       "Suivez ce lien pour vous connecter.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "Vous pouvez faire cette quête seulement quand cette quête est active",
         'gainsDesc'     => "Lors de l'achèvement de cette quête vous gagnerez",
         'theTitle'      => '"%s"',                          // empty on purpose!
-        'mailDelivery'  => "Vous recevrez cette lettre%s%s",
-        'mailBy'        => ' de <a href="?npc=%d">%s</a>',
-        'mailIn'        => " après %s",
         'unavailable'   => "Cette quête est marquée comme obsolète et ne peut être obtenue ou accomplie.",
         'experience'    => "points d'expérience",
         'expConvert'    => "(ou %s si completé au niveau %d)",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "Vous apprendrez",
         'bonusTalents'  => "%d |4point:points; de talent",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
-        'attachment'    => "[Attachment]",
         'questInfo'     => array(
              0 => "Standard",            1 => "Groupe",             21 => "Vie",                41 => "JcJ",                62 => "Raid",               81 => "Donjon",             82 => "Évènement mondial",
             83 => "Légendaire",         84 => "Escorte",            85 => "Héroïque",           88 => "Raid (10)",          89 => "Raid (25)"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
             "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Ma playlist"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "This mail doesn't exist.",
+        'attachment'    => "[Attachment]",
+        'mailDelivery'  => "Vous recevrez cette lettre%s%s",
+        'mailBy'        => ' de <a href="?npc=%d">%s</a>',
+        'mailIn'        => " après %s",
+        'delay'         => "Delay",
+        'sender'        => "Sender",
+        'untitled'      => "Untitled Mail"
     ),
     'pet'      => array(
         'notFound'      => "Cette famille de familiers n'existe pas.",

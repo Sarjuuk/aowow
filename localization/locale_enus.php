@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "Items",
         'itemset'       => "item Set",
         'itemsets'      => "Item Sets",
+        'mail'          => "mail",
+        'mails'         => "Mails",
         'mechanic'      => "Mechanic",
         'mechAbbr'      => "Mech.",
         'meetingStone'  => "Meeting Stone",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "Comments",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'posts'         => "Forum posts"
-    ),
-    'mail' => array(
+        'posts'         => "Forum posts",
+        // user mail
         'tokenExpires'  => "This token expires in %s.",
         'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
         'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
-        'mailDelivery'  => "You will receive this letter%s%s",
-        'mailBy'        => ' by <a href="?npc=%d">%s</a>',
-        'mailIn'        => " after %s",
         'unavailable'   => "This quest was marked obsolete and cannot be obtained or completed.",
         'experience'    => "experience",
         'expConvert'    => "(or %s if completed at level %d)",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "You will learn",                                        // REWARD_SPELL
         'bonusTalents'  => "%d talent |4point:points;",                             // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
-        'attachment'    => "Attachment",
         'questInfo'     => array(
              0 => "Normal",              1 => "Group",              21 => "Life",               41 => "PvP",                62 => "Raid",               81 => "Dungeon",            82 => "World Event",
             83 => "Legendary",          84 => "Escort",             85 => "Heroic",             88 => "Raid (10)",          89 => "Raid (25)"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
             "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "My Playlist"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "This mail doesn't exist.",
+        'attachment'    => "Attachment",
+        'mailDelivery'  => 'You will receive <a href="?mail=%d">this letter</a>%s%s',
+        'mailBy'        => ' by <a href="?npc=%d">%s</a>',
+        'mailIn'        => " after %s",
+        'delay'         => "Delay",
+        'sender'        => "Sender",
+        'untitled'      => "Untitled Mail"
     ),
     'pet'      => array(
         'notFound'      => "This pet family doesn't exist.",

@@ -24,9 +24,9 @@ function firstrun()
     /****************/
 
     $steps = array(
-        // clisetup/, params, test script result,  introText,                                                                   errorText
+        // clisetup, params, test function, introText, errorText
         ['dbconfig',          null,                      'testDB',    'Please enter your database credentials.', 'could not establish connection to:'],
-        ['siteconfig',        null,                      'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT OR LOCALES.', 'could not access:'],
+        ['siteconfig',        null,                      'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.', 'could not access:'],
         // sql- and build- stuff here
         ['SqlGen::generate',  'achievementcategory',      null, null, null],
         ['SqlGen::generate',  'achievementcriteria',      null, null, null],
@@ -37,7 +37,7 @@ function firstrun()
         ['SqlGen::generate',  'itemlimitcategory',        null, null, null],
         ['SqlGen::generate',  'itemrandomproppoints',     null, null, null],
         ['SqlGen::generate',  'lock',                     null, null, null],
-        ['SqlGen::generate',  'mailtemplate',             null, null, null],
+        ['SqlGen::generate',  'mails',                    null, null, null],
         ['SqlGen::generate',  'scalingstatdistribution',  null, null, null],
         ['SqlGen::generate',  'scalingstatvalues',        null, null, null],
         ['SqlGen::generate',  'spellfocusobject',         null, null, null],
@@ -184,7 +184,7 @@ function firstrun()
                     if ($resp == 301 || $resp == 302)
                     {
                         CLI::write('self test received status '.CLI::bold($resp).' (page moved) for '.$conf.', pointing to: '.$protocol.$host.$testFile, CLI::LOG_WARN);
-                        $inp = ['x' => ['should '.CLI::bold($conf).' be set to '.CLI::bold($host).' and force_ssl be updated?', true, '/y|n/i']];
+                        $inp = ['x' => ['should '.CLI::bold($conf).' be set to '.CLI::bold($host).' and force_ssl be updated? (y/n)', true, '/y|n/i']];
                         if (!CLI::readInput($inp, true) || !$inp || strtolower($inp['x']) == 'n')
                             $error[] = ' * could not access '.$protocol.$host.$testFile.' ['.$resp.']';
                         else

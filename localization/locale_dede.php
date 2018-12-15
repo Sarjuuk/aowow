@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "Gegenstände",
         'itemset'       => "Ausrüstungsset",
         'itemsets'      => "Ausrüstungssets",
+        'mail'          => "Brief",
+        'mails'         => "Briefe",
         'mechanic'      => "Auswirkung",
         'mechAbbr'      => "Ausw.",
         'meetingStone'  => "Versammlungsstein",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "Kommentare",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'posts'         => "Forenbeiträge"
-    ),
-    'mail' => array(
+        'posts'         => "Forenbeiträge",
+        // user mail
         'tokenExpires'  => "Das Token wird in %s verfallen.",
         'accConfirm'    => ["Kontobestätigung",     "Willkommen bei ".CFG_NAME_SHORT."!\r\n\r\nKlicke auf den Link um euren Account zu aktivieren.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
         'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "Ihr könnt diese Quest nur annehmen, wenn eins der nachfolgenden Quests aktiv ist",
         'gainsDesc'     => "Bei Abschluss dieser Quest erhaltet Ihr",
         'theTitle'      => 'den Titel "%s"',
-        'mailDelivery'  => "Ihr werdet diesen Brief%s%s erhalten",
-        'mailBy'        => ' von <a href="?npc=%d">%s</a>',
-        'mailIn'        => " nach %s",
         'unavailable'   => "Diese Quest wurde als nicht genutzt markiert und kann weder erhalten noch vollendet werden.",
         'experience'    => "Erfahrung",
         'expConvert'    => "(oder %s, wenn auf Stufe %d vollendet)",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "Ihr erlernt",
         'bonusTalents'  => "%d |4Talentpunkt:Talentpunkte;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
-        'attachment'    => "Anlage",
         'questInfo'     => array(
               0 => "Normal",             1 => "Gruppe",             21 => "Leben",              41 => "PvP",                62 => "Schlachtzug",        81 => "Dungeon",            82 => "Weltereignis",
              83 => "Legendär",          84 => "Eskorte",            85 => "Heroisch",           88 => "Schlachtzug (10)",   89 => "Schlachtzug (25)"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
             "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Meine Playlist"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "Dieser Brief existiert nicht.",
+        'attachment'    => "Anlage",
+        'mailDelivery'  => 'Ihr werdet <a href="?mail=%d">diesen Brief</a>%s%s erhalten',
+        'mailBy'        => ' von <a href="?npc=%d">%s</a>',
+        'mailIn'        => " nach %s",
+        'delay'         => "Verzögerung",
+        'sender'        => "Absender",
+        'untitled'      => "Unbetitelter Brief"
     ),
     'pet'      => array(
         'notFound'      => "Diese Tierart existiert nicht.",

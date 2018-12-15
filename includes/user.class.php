@@ -671,7 +671,7 @@ class User
 
             $entities = [];
             foreach ($tc->iterate() as $id => $__)
-                $entities[] = [$id, $tc->getField('name', true)];
+                $entities[] = [$id, $tc->getField('name', true, true)];
 
             if ($entities)
                 $data[] = ['id' => $type, 'entities' => $entities];

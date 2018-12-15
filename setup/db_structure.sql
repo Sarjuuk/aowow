@@ -1583,13 +1583,13 @@ CREATE TABLE `aowow_loot_link` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `aowow_mailtemplate`
+-- Table structure for table `aowow_mails`
 --
 
-DROP TABLE IF EXISTS `aowow_mailtemplate`;
+DROP TABLE IF EXISTS `aowow_mails`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_mailtemplate` (
+CREATE TABLE `aowow_mails` (
   `id` smallint(5) unsigned NOT NULL,
   `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1597,12 +1597,12 @@ CREATE TABLE `aowow_mailtemplate` (
   `subject_loc4` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc6` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc8` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc4` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc0` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc4` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` text COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

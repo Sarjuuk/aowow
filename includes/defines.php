@@ -36,6 +36,7 @@ define('TYPE_USER',                         500);
 define('TYPE_EMOTE',                        501);
 define('TYPE_ENCHANTMENT',                  502);
 define('TYPE_AREATRIGGER',                  503);
+define('TYPE_MAIL',                         504);
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);

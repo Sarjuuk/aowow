@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "Предметы",
         'itemset'       => "комплект",
         'itemsets'      => "Комплекты",
+        'mail'          => "mail",
+        'mails'         => "Mails",
         'mechanic'      => "Механика",
         'mechAbbr'      => "Механика",
         'meetingStone'  => "Камень встреч",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "Комментарии",
         'screenshots'   => "Скриншоты",
         'videos'        => "Видео",
-        'posts'         => "Сообщений на форумах"
-    ),
-    'mail' => array(
+        'posts'         => "Сообщений на форумах",
+        // user mail
         'tokenExpires'  => "This token expires in %s.",
         'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "Вы можете получить это задание, только когда эти задания доступны",
         'gainsDesc'     => "По завершении этого задания, вы получите",
         'theTitle'      => '"%s"',                          // empty on purpose!
-        'mailDelivery'  => "Вы получите это письмо%s%s",
-        'mailBy'        => ' от <a href="?npc=%d">%s</a>',
-        'mailIn'        => " через %s",
         'unavailable'   => "пометили это задание как устаревшее — его нельзя получить или выполнить.",
         'experience'    => "опыта",
         'expConvert'    => "(или %s на %d-м уровне)",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "Вы изучите",
         'bonusTalents'  => "%d |4очко талантов:очка талантов:очков талантов;",
         'spellDisplayed'=> ' (показано: <a href="?spell=%d">%s</a>)',
-        'attachment'    => "[Attachment]",
         'questInfo'     => array(
               0 => "Обычный",            1 => "Группа",             21 => "Жизнь",              41 => "PvP",                62 => "Рейд",               81 => "Подземелье",         82 => "Игровое событие",
              83 => "Легенда",           84 => "Сопровождение",      85 => "Героическое",        88 => "Рейд (10)",          89 => "Рейд (25)"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
             "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "Мой плейлист"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "This mail doesn't exist.",
+        'attachment'    => "[Attachment]",
+        'mailDelivery'  => "Вы получите это письмо%s%s",
+        'mailBy'        => ' от <a href="?npc=%d">%s</a>',
+        'mailIn'        => " через %s",
+        'delay'         => "Delay",
+        'sender'        => "Sender",
+        'untitled'      => "Untitled Mail"
     ),
     'pet'      => array(
         'notFound'      => "Такой породы питомцев не существует.",

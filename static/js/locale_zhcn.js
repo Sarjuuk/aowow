@@ -610,7 +610,6 @@ var mn_spells = [
     ]],
     [,"宠物"],
     [-6,"伙伴"],
-    [-5,""],
     [-5,"坐骑",,[
         [1,"陆地坐骑"],
         [2,"飞行坐骑"],
@@ -964,7 +963,9 @@ var mn_database = [
     [6,"地区","?zones",mn_zones],
     [, "其他"],
     [31,"图标", "?icons", mn_icons],
-    [19,"声音","?sounds",mn_sounds]
+    [19,"声音","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"天赋模拟器","?talent",mn_talentCalc],
@@ -3405,7 +3406,9 @@ var LANG = {
          19: ["声音",        "音效",         "声音",          "声音"],
          29: ["图标",        "图标",         "图标",          "图标"],
         501: ["表情",        "表情",         "表情",          "表情"],
-        502: ["附魔",        "附魔",         "附魔",          "附魔"]
+        502: ["附魔",        "附魔",         "附魔",          "附魔"],
+        503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
+        504: ["Mail",        "mail",         "Mails",        "mails"]
     },
 
     timeunitssg: ["年", "月", "周", "天", "小时", "分钟", "秒"],

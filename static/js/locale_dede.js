@@ -918,7 +918,8 @@ var mn_database = [
     [, "Anderes"],
     [19,"Klänge","?sounds",mn_sounds],
     [31, "Icons", "?icons", mn_icons],
-    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}]     // aowow - custom
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Briefe', '?mails']                               // aowow - custom
 ];
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],
@@ -3357,7 +3358,9 @@ var LANG = {
          19: ["Klang",           "Klang",            "Klänge",           "Klänge"],
          29: ["Icon",            "Icon",             "Icons",            "Icons"],
         501: ["Emote",           "Emote",            "Emotes",           "Emotes"],
-        502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"]
+        502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"],
+        503: ["Areatrigger",     "Areatrigger",      "Areatrigger",      "Areatrigger"],
+        504: ["Brief",           "Brief",            "Briefe",           "Briefe"]
     },
 
     timeunitssg: ["Jahr", "Monat", "Woche", "Tag", "Stunde", "Minute", "Sekunde"],

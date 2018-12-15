@@ -236,6 +236,8 @@ $lang = array(
         'items'         => "物品",
         'itemset'       => "套装",
         'itemsets'      => "套装",
+        'mail'          => "mail",
+        'mails'         => "Mails",
         'mechanic'      => "机制",
         'mechAbbr'      => "机制",
         'meetingStone'  => "集合石",
@@ -783,9 +785,8 @@ $lang = array(
         'comments'      => "评论",
         'screenshots'   => "截图",
         'videos'        => "视频",
-        'posts'         => "Forum posts"
-    ),
-    'mail' => array(
+        'posts'         => "Forum posts",
+        // user mail
         'tokenExpires'  => "此令牌将在%s过期。",
         'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
         'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
@@ -1028,9 +1029,6 @@ $lang = array(
         'enabledByQDesc'=> "只有当这些任务中的一个活跃时，这个任务才可用",
         'gainsDesc'     => "完成这个任务后，你将获得",
         'theTitle'      => '头衔 "%s"',
-        'mailDelivery'  => "你会收到这封信%s%s",
-        'mailBy'        => '由<a href="?npc=%d">%s</a>所写',
-        'mailIn'        => " after %s",
         'unavailable'   => "这项任务已被标记为过时，无法获得或完成。",
         'experience'    => "经验",
         'expConvert'    => "（或%s如果在等级%d完成）",
@@ -1042,7 +1040,6 @@ $lang = array(
         'spellLearn'    => "你将学会",
         'bonusTalents'  => "%d天赋|4点数:点数;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
-        'attachment'    => "附件",
         'questInfo'     => array(
              0 => "普通",              1 => "组队",              21 => "职业",               41 => "PvP",                62 => "团队",               81 => "地下城",            82 => "世界事件",
             83 => "传说",          84 => "护送",             85 => "英雄",             88 => "团队（10）",          89 => "团队（25）"
@@ -1158,6 +1155,16 @@ $lang = array(
             "Footstep Splash", "水(角色)", "水",          "交易技能", "环境气氛",   "装饰物", "法术失败",   "NPC循环",     "区域音乐", "表情",
             "叙事音乐", "叙事",         50 => "区域气氛", 52 => "发射器", 53 => "载具", 1000 => "我的播放列表"
         )
+    ),
+    'mail' => array(
+        'notFound'      => "This mail doesn't exist.",
+        'attachment'    => "附件",
+        'mailDelivery'  => 'You will receive <a href="?mail=%d">this letter</a>%s%s', // "你会收到这封信%s%s",
+        'mailBy'        => '由<a href="?npc=%d">%s</a>所写',
+        'mailIn'        => " after %s",
+        'delay'         => "Delay",
+        'sender'        => "Sender",
+        'untitled'      => "Untitled Mail"
     ),
     'pet'      => array(
         'notFound'      => "这个宠物家族不存在。",
