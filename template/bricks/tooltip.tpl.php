@@ -1,7 +1,7 @@
     <div id="ic<?php echo $this->typeId; ?>" style="float: left"></div>
-    <div id="tt<?php echo $this->typeId; ?>" class="wowhead-tooltip" style="float: left; padding-top: 1px"></div>
+    <div id="tt<?php echo $this->typeId; ?>" class="wowhead-tooltip" style="float: left; padding-top: 1px; width: 320px; visibility: visible;"></div>
     <div style="clear: left"></div>
-    <div id="sl<?php echo $this->typeId; ?>" style="margin-left: 70px; margin-top: 4px;"></div>
+    <div id="sl<?php echo $this->typeId; ?>" style="margin-left: 70px; margin-top: 4px; width: 314px;"></div>
     <div id="ks<?php echo $this->typeId; ?>" style="margin-left: 70px; margin-top: 4px;"></div>
 
 <?php
