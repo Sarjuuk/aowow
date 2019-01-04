@@ -78,6 +78,8 @@ class SpellPage extends GenericPage
             case -13:
                 if ($cl = $this->subject->getField('reqClassMask'))
                     $this->path[] = log($cl, 2) + 1;
+                else if ($cl = array_search($this->subject->getField('spellFamilyId'), Game::$class2SpellFamily))
+                    $this->path[] = $cl;
 
                 if ($cat == -13)
                     $this->path[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;

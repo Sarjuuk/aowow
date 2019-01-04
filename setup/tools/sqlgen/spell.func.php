@@ -593,7 +593,7 @@ function spell()
     DB::Aowow()->query('UPDATE ?_spell s SET s.cuFlags = ?d WHERE s.typeCat = 7 AND (
         s.name_loc0 LIKE "%passive%" OR s.name_loc0 LIKE "%effect%" OR s.name_loc0 LIKE "%improved%" OR s.name_loc0 LIKE "%prototype%" OR                                          -- can probably be extended
         (s.id NOT IN (47241, 59879, 59671) AND s.baseLevel <= 1 AND s.reqclassMask = 0)  OR                                                                                        -- can probably still be extended
-        (s.SpellFamilyId = 15 AND s.SpellDescriptionVariableId <> 84) OR                                                                                                           -- DK: Skill Coil
+        (s.SpellFamilyId = 15 AND s.SpellFamilyFlags1 & 0x2000 AND s.SpellDescriptionVariableId <> 84) OR                                                                          -- DK: Skill Coil
         (s.SpellFamilyId = 10 AND s.SpellFamilyFlags2 & 0x1000000 AND s.attributes1 = 0) OR                                                                                        -- Paladin: Bacon of Light hmm.. Bacon.... :]
         (s.SpellFamilyId = 6  AND s.SpellFamilyFlags3 & 0x4000) OR                                                                                                                 -- Priest: Lolwell Renew
         (s.SpellFamilyId = 6  AND s.SpellFamilyFlags1 & 0x8000000 AND s.rank_loc0 <> "") OR                                                                                        -- Priest: Bling Bling
@@ -601,7 +601,7 @@ function spell()
         (s.SpellfamilyId = 11 AND s.SpellFamilyFlags1 & 3 AND s.attributes1 = 1024) OR                                                                                             -- Shaman: Lightning Overload procs
         (s.attributes0 = 0x20000000 AND s.attributes3 = 0x10000000) OR                                                                                                             -- Master Demonologist (FamilyId = 0)
         s.id IN (47633, 22845, 29442, 31643, 44450, 32841, 20154, 34919, 27813, 27817, 27818, 30708, 30874, 379, 21169, 19483, 29886, 58889, 23885, 29841, 29842, 64380, 58427) OR -- Misc
-        s.id IN (48954, 17567, 66175, 66122, 66123, 66124)                                                                                                                         -- Misc cont.
+        s.id IN (48954, 17567, 66175, 66122, 66123, 66124, 52374, 49575, 56816, 50536)                                                                                             -- Misc cont.
     )', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
     foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11] as $classId)

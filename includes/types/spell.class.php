@@ -759,14 +759,14 @@ class SpellList extends BaseType
         $pt = $this->curTpl['powerType'];
 
         if ($pt == POWER_RUNE && ($rCost = ($this->curTpl['powerCostRunes'] & 0x333)))
-        {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
+        {   // Frost 2|1 - Unholy 2|1 - Blood 2|1
             $runes = [];
             if ($_ = (($rCost & 0x300) >> 8))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
+                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
             if ($_ = (($rCost & 0x030) >> 4))
                 $runes[] = $_.' '.Lang::spell('powerRunes', 1);
             if ($_ =  ($rCost & 0x003))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
+                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
 
             $str .= implode(', ', $runes);
         }
