@@ -24,8 +24,8 @@
 }
 
 .profiler-home input[type="text"],
-.profiler-home a: link,
-.profiler-home a: visited {
+.profiler-home a:link,
+.profiler-home a:visited {
     font-family: Helvetica,Arial,sans-serif;
 }
 
@@ -41,7 +41,7 @@
     width: 105px;
 }
 
-.profiler-home input[type="text"]: focus {
+.profiler-home input[type="text"]:focus {
     outline: none;
 }
 
@@ -82,7 +82,7 @@
     text-indent: 6px;
 }
 
-.profiler-autocomplete span: hover,
+.profiler-autocomplete span:hover,
 .profiler-autocomplete span.active {
     background: #383838;
     border-bottom: solid 1px #202020;
@@ -119,7 +119,7 @@
     display: block;
 }
 
-.profiler-charlookup-go: hover {
+.profiler-charlookup-go:hover {
     background-position: left bottom;
 }
 
@@ -149,7 +149,7 @@ input.search-character {
     text-decoration: none;
 }
 
-.profiler-header a: hover {
+.profiler-header a:hover {
     text-decoration: underline;
 }
 
@@ -502,15 +502,15 @@ a.profiler-header-editlink {
     text-decoration: none;
 }
 
-.profiler-inventory-stats a: hover {
+.profiler-inventory-stats a:hover {
     background-color: #222222;
 }
 
-.profiler-inventory-stats a: hover em {
+.profiler-inventory-stats a:hover em {
     text-decoration: underline;
 }
 
-.profiler-inventory-stats a: hover span {
+.profiler-inventory-stats a:hover span {
     text-decoration: underline;
 }
 
@@ -608,8 +608,8 @@ a.profiler-pets-button {
     border-radius: 6px;
 }
 
-a.profiler-talents-button: hover,
-a.profiler-pets-button: hover {
+a.profiler-talents-button:hover,
+a.profiler-pets-button:hover {
     background-color: #484848;
     border-color: #181818;
     text-decoration: underline;
@@ -628,8 +628,8 @@ a.profiler-pets-button small {
     color: #CCCCCC;
 }
 
-a.profiler-talents-button: hover small,
-a.profiler-pets-button: hover small {
+a.profiler-talents-button:hover small,
+a.profiler-pets-button:hover small {
     color: white;
 }
 
@@ -733,7 +733,7 @@ h2 .disclosure-on,h2 .disclosure-off {
     color: white;
 }
 
-.profiler-achievements-summary a: hover {
+.profiler-achievements-summary a:hover {
     background-color: #222222;
 }
 
@@ -741,11 +741,11 @@ h2 .disclosure-on,h2 .disclosure-off {
     background-color: #282828;
 }
 
-.profiler-achievements-summary a: hover em {
+.profiler-achievements-summary a:hover em {
     text-decoration: underline;
 }
 
-.profiler-achievements-summary a.selected: hover em {
+.profiler-achievements-summary a.selected:hover em {
     text-decoration: none;
 }
 
@@ -878,19 +878,19 @@ a.profiler-achievements-total-right {
     background: url(../images/Profiler/button-grey.png) -204px 0 no-repeat;
 }
 
-.profiler-button: hover       { background-position: left -48px;  }
-.profiler-button: hover em    { background-position: right -48px; }
-.profiler-button: active       { background-position: left -72px;  }
-.profiler-button: active em    { background-position: right -72px; }
-.profiler-button.selected    { background-position: left -24px;  }
-.profiler-button.selected em { background-position: right -24px; }
+.profiler-button:hover        { background-position: left -48px;  }
+.profiler-button:hover em     { background-position: right -48px; }
+.profiler-button:active       { background-position: left -72px;  }
+.profiler-button:active em    { background-position: right -72px; }
+.profiler-button.selected     { background-position: left -24px;  }
+.profiler-button.selected em  { background-position: right -24px; }
 
 .profiler-option-left em          { background-position: -120px 0; }
-.profiler-option-left: hover em    { background-position: -120px -48px; }
-.profiler-option-left: active em    { background-position: -120px -72px; }
+.profiler-option-left:hover em    { background-position: -120px -48px; }
+.profiler-option-left:active em   { background-position: -120px -72px; }
 .profiler-option-left.selected em { background-position: -120px -24px; }
 
 .profiler-option-right i          { background-position: -204px 0; }
-.profiler-option-right: hover i    { background-position: -204px -48px; }
-.profiler-option-right: active i    { background-position: -204px -72px; }
+.profiler-option-right:hover i    { background-position: -204px -48px; }
+.profiler-option-right:active i   { background-position: -204px -72px; }
 .profiler-option-right.selected i { background-position: -204px -24px; }
