@@ -17,6 +17,7 @@ define('ERR_MISSING_INCL', 'required function %s() could not be found at %s');
 
 
 require_once 'setup/tools/CLISetup.class.php';
+require_once 'setup/tools/setupScript.class.php';
 require_once 'setup/tools/dbc.class.php';
 require_once 'setup/tools/imagecreatefromblp.func.php';
 

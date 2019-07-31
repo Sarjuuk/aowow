@@ -7,32 +7,35 @@ if (!CLI)
     die('not in cli mode');
 
 
-$customData = array(
-);
-$reqDBC = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
-
-function icons()
+SqlGen::register(new class extends SetupScript
 {
-    DB::Aowow()->query('TRUNCATE ?_icons');
-    DB::Aowow()->query('ALTER TABLE ?_icons AUTO_INCREMENT = 1');
+    protected $command = 'icons';
 
-    $baseQuery = '
-        INSERT INTO ?_icons (`name`) SELECT x FROM
-        (
-            (SELECT LOWER(SUBSTRING_INDEX(iconPath, "\\\\", -1)) AS x FROM dbc_spellicon WHERE iconPath LIKE "%icons%")
-            UNION
-            (SELECT LOWER(inventoryIcon1) AS x FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> "")
-            UNION
-            (SELECT LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS x FROM dbc_creaturefamily WHERE iconString LIKE "%icons%")
-        ) y
-        GROUP BY
-            x
-        ORDER BY
-            x ASC';
+    protected $dbcSourceFiles = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
 
-    DB::Aowow()->query($baseQuery);
+    public function generate(array $ids = []) : bool
+    {
+        DB::Aowow()->query('TRUNCATE ?_icons');
+        DB::Aowow()->query('ALTER TABLE ?_icons AUTO_INCREMENT = 1');
 
-    return true;
-}
+        $baseQuery = '
+            INSERT INTO ?_icons (`name`) SELECT x FROM
+            (
+                (SELECT LOWER(SUBSTRING_INDEX(iconPath, "\\\\", -1)) AS x FROM dbc_spellicon WHERE iconPath LIKE "%icons%")
+                UNION
+                (SELECT LOWER(inventoryIcon1) AS x FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> "")
+                UNION
+                (SELECT LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS x FROM dbc_creaturefamily WHERE iconString LIKE "%icons%")
+            ) y
+            GROUP BY
+                x
+            ORDER BY
+                x ASC';
+
+        DB::Aowow()->query($baseQuery);
+
+        return true;
+    }
+});
 
 ?>
