@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class SkillPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_SKILL;
     protected $typeId        = 0;
@@ -45,14 +45,28 @@ class SkillPage extends GenericPage
 
     protected function generateContent()
     {
+        /***********/
+        /* Infobox */
+        /**********/
+
+        $infobox = Lang::getInfoBoxForFlags(intval($this->subject->getField('cuFlags')));
+
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         /****************/
         /* Main Content */
         /****************/
 
+        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
         if ($_ = $this->subject->getField('description', true))
@@ -190,7 +204,7 @@ class SkillPage extends GenericPage
             CFG_SQL_LIMIT_NONE
         );
 
-        foreach (Util::$skillLineMask as $line1 => $sets)
+        foreach (Game::$skillLineMask as $line1 => $sets)
             foreach ($sets as $idx => $set)
                 if ($set[1] == $this->typeId)
                 {
@@ -236,12 +250,12 @@ class SkillPage extends GenericPage
         if (in_array($this->cat, [-5, 6, 7, 8, 9, 11]))
         {
             $list = [];
-            if (!empty(Util::$trainerTemplates[TYPE_SKILL][$this->typeId]))
-                $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', Util::$trainerTemplates[TYPE_SKILL][$this->typeId]);
+            if (!empty(Game::$trainerTemplates[TYPE_SKILL][$this->typeId]))
+                $list = DB::World()->selectCol('SELECT DISTINCT ID FROM npc_trainer WHERE SpellID IN (?a) AND ID < 200000', Game::$trainerTemplates[TYPE_SKILL][$this->typeId]);
             else
             {
                 $mask = 0;
-                foreach (Util::$skillLineMask[-3] as $idx => $pair)
+                foreach (Game::$skillLineMask[-3] as $idx => $pair)
                     if ($pair[1] == $this->typeId)
                         $mask |= 1 << $idx;
 

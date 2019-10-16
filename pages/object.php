@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ObjectPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_OBJECT;
     protected $typeId        = 0;
@@ -129,7 +129,7 @@ class ObjectPage extends GenericPage
         // lootinfo: [min, max, restock]
         if (($_ = $this->subject->getField('lootStack')) && $_[0])
         {
-            $buff = Lang::item('charges').Lang::main('colon').$_[0];
+            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').$_[0];
             if ($_[0] < $_[1])
                 $buff .= Lang::game('valueDelim').$_[1];
 
@@ -182,10 +182,13 @@ class ObjectPage extends GenericPage
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            if ($_ = $this->subject->getField('ScriptName'))
-                $infobox[] = 'Script'.Lang::main('colon').$_;
-            else if ($_ = $this->subject->getField('AIName'))
-                $infobox[] = 'AI'.Lang::main('colon').$_;
+            if ($_ = $this->subject->getField('ScriptOrAI'))
+            {
+                if ($_ == 'SmartGameObjectAI')
+                    $infobox[] = 'AI'.Lang::main('colon').$_;
+                else
+                    $infobox[] = 'Script'.Lang::main('colon').$_;
+            }
         }
 
 
@@ -194,26 +197,7 @@ class ObjectPage extends GenericPage
         /****************/
 
         // pageText
-        $pageText = [];
-        if ($next = $this->subject->getField('pageTextId'))
-        {
-            while ($next)
-            {
-                if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
-                {
-                    $next = $row['NextPageID'];
-                    $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
-                }
-                else
-                {
-                    trigger_error('Referenced PageTextId #'.$next.' is not in DB', E_USER_WARNING);
-                    break;
-                }
-            }
-        }
-
-        // add conditional js & css
-        if ($pageText)
+        if ($this->pageText = Game::getPageText($next = $this->subject->getField('pageTextId')))
         {
             $this->addCSS(['path' => 'Book.css']);
             $this->addJS('Book.js');
@@ -243,13 +227,39 @@ class ObjectPage extends GenericPage
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
-        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->pageText    = $pageText;
+        // smart AI
+        $sai = null;
+        if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
+        {
+            $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, $this->typeId, ['name' => $this->name]);
+            if (!$sai->prepare())                           // no smartAI found .. check per guid
+            {
+                // at least one of many
+                $guids = DB::World()->selectCol('SELECT guid FROM gameobject WHERE id = ?d LIMIT 1', $this->typeId);
+                while ($_ = array_pop($guids))
+                {
+                    $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, -$_, ['name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    if ($sai->prepare())
+                        break;
+                }
+            }
+
+            if ($sai->prepare())
+            {
+                foreach ($sai->getJSGlobals() as $type => $typeIds)
+                    $this->extendGlobalIds($type, $typeIds);
+            }
+            else
+                trigger_error('Gameobject has AIName set in template but no SmartAI defined.');
+        }
+
         $this->map         = $map;
+        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->relBoss     = $relBoss;
+        $this->smartAI     = $sai ? $sai->getMarkdown() : null;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true,
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $this->typeId]
         );
 
@@ -370,7 +380,7 @@ class ObjectPage extends GenericPage
             if ($goLoot->getByContainer(LOOT_GAMEOBJECT, $_))
             {
                 $extraCols   = $goLoot->extraCols;
-                $extraCols[] = 'Listview.extraCols.percent';
+                $extraCols[] = '$Listview.extraCols.percent';
                 $hiddenCols  = ['source', 'side', 'slot', 'reqlevel'];
 
                 $this->extendGlobalData($goLoot->jsGlobals);
@@ -385,7 +395,7 @@ class ObjectPage extends GenericPage
                     if (!$lv['quest'])
                         continue;
 
-                    $extraCols[] = 'Listview.extraCols.condition';
+                    $extraCols[] = '$Listview.extraCols.condition';
                     $reqQuest[$lv['id']] = 0;
                     $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
                 }
@@ -395,7 +405,7 @@ class ObjectPage extends GenericPage
                     'id'        => 'contains',
                     'name'      => '$LANG.tab_contains',
                     'sort'      => ['-percent', 'name'],
-                    'extraCols' => ['$Listview.extraCols.percent']
+                    'extraCols' => $extraCols
                 );
 
                 if ($hiddenCols)

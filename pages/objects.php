@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ObjectsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_OBJECT;
     protected $tpl           = 'objects';
@@ -20,8 +20,8 @@ class ObjectsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new GameObjectListFilter();
         $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new GameObjectListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -31,6 +31,8 @@ class ObjectsPage extends GenericPage
 
     protected function generateContent()
     {
+        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+
         $conditions = [];
 
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
@@ -40,9 +42,12 @@ class ObjectsPage extends GenericPage
             $conditions[] = ['typeCat', (int)$this->category[0]];
 
         // recreate form selection
-        $this->filter = $this->filterObj->getForm('form');
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['initData'] = ['init' => 'objects'];
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;

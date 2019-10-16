@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class AchievementsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_ACHIEVEMENT;
     protected $tpl           = 'achievements';
@@ -42,8 +42,8 @@ class AchievementsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new AchievementListFilter();
         $this->getCategoryFromUrl($pageParam);
+        $this->filterObj = new AchievementListFilter(false, $this->category);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -63,9 +63,12 @@ class AchievementsPage extends GenericPage
             $conditions[] = ['category', (int)end($this->category)];
 
         // recreate form selection
-        $this->filter = $this->filterObj->getForm('form');
+        $this->filter = $this->filterObj->getForm();
         $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter['initData'] = ['init' => 'achievements'];
+
+        if ($x = $this->filterObj->getSetCriteria())
+            $this->filter['initData']['sc'] = $x;
 
         if ($fiCnd = $this->filterObj->getConditions())
             $conditions[] = $fiCnd;

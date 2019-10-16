@@ -24,8 +24,8 @@ function events(array $ids = [])
             ge.eventEntry,
             holiday,
             0,                                              -- cuFlags
-            UNIX_TIMESTAMP(start_time),
-            UNIX_TIMESTAMP(end_time),
+            IFNULL(UNIX_TIMESTAMP(start_time), 0),
+            IFNULL(UNIX_TIMESTAMP(end_time), 0),
             occurence * 60,
             length * 60,
             IF (gep.eventEntry IS NOT NULL, GROUP_CONCAT(prerequisite_event SEPARATOR " "), NULL),

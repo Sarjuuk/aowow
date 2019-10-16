@@ -31,16 +31,16 @@ if (!CLI)
                    IF (g.typeFlags & 0x1, 2, 1) AS type,
                    i.subclass AS classs,
                    i.requiredLevel AS level,
-                   s1.Id AS glyphSpell,
-                   ic.iconString AS icon,
+                   s1.id AS glyphSpell,
+                   ic.name AS icon,
                    s1.skillLine1 AS skillId,
-                   s2.Id AS glyphEffect,
-                   s2.Id AS ARRAY_KEY
+                   s2.id AS glyphEffect,
+                   s2.id AS ARRAY_KEY
             FROM   ?_items i
-            JOIN   ?_spell s1 ON s1.Id = i.spellid1
-            JOIN   ?_glyphproperties g ON g.Id = s1.effect1MiscValue
-            JOIN   ?_spell s2 ON s2.Id = g.spellId
-            JOIN   ?_icons ic ON ic.Id = s1.iconIdAlt
+            JOIN   ?_spell s1 ON s1.id = i.spellid1
+            JOIN   ?_glyphproperties g ON g.id = s1.effect1MiscValue
+            JOIN   ?_spell s2 ON s2.id = g.spellId
+            JOIN   ?_icons ic ON ic.id = s1.iconIdAlt
             WHERE  i.classBak = 16');
 
         // check directory-structure

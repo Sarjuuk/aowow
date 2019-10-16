@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class RacePage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_RACE;
     protected $typeId        = 0;
@@ -96,7 +96,7 @@ class RacePage extends GenericPage
         );
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
 
@@ -182,6 +182,24 @@ class RacePage extends GenericPage
                 'name'       => '$LANG.tab_mounts',
                 'hiddenCols' => ['slot', 'type']
             )];
+        }
+
+        // Sounds
+        if ($vo = DB::Aowow()->selectCol('SELECT soundId AS ARRAY_KEY, gender FROM ?_races_sounds WHERE raceId = ?d', $this->typeId))
+        {
+            $sounds = new SoundList(array(['id', array_keys($vo)]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $data = $sounds->getListviewData();
+                foreach ($data as $id => &$d)
+                    $d['gender'] = $vo[$id];
+
+                $this->lvTabs[] = ['sound', array(
+                    'data' => array_values($data),
+                    'extraCols' => ['$Listview.templates.title.columns[1]']
+                )];
+            }
         }
     }
 }

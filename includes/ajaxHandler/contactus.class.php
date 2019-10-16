@@ -1,20 +1,20 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 class AjaxContactus extends AjaxHandler
 {
     protected $_post = array(
-        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null],
-        'reason'     => [FILTER_SANITIZE_NUMBER_INT, null],
+        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null                 ],
+        'reason'     => [FILTER_SANITIZE_NUMBER_INT, null                 ],
         'ua'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
         'appname'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'page'       => [FILTER_SANITIZE_URL,        null],
+        'page'       => [FILTER_SANITIZE_URL,        null                 ],
         'desc'       => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'id'         => [FILTER_SANITIZE_NUMBER_INT, null],
-        'relatedurl' => [FILTER_SANITIZE_URL,        null],
-        'email'      => [FILTER_SANITIZE_EMAIL,      null]
+        'id'         => [FILTER_SANITIZE_NUMBER_INT, null                 ],
+        'relatedurl' => [FILTER_SANITIZE_URL,        null                 ],
+        'email'      => [FILTER_SANITIZE_EMAIL,      null                 ]
     );
 
     public function __construct(array $params)
@@ -33,7 +33,7 @@ class AjaxContactus extends AjaxHandler
         7: already reported
         $: prints response
     */
-    protected function handleContactUs()
+    protected function handleContactUs() : string
     {
         $mode = $this->_post['mode'];
         $rsn  = $this->_post['reason'];
@@ -41,6 +41,7 @@ class AjaxContactus extends AjaxHandler
         $app  = $this->_post['appname'];
         $url  = $this->_post['page'];
         $desc = $this->_post['desc'];
+        $subj = $this->_post['id'];
 
         $contexts = array(
             [1, 2, 3, 4, 5, 6, 7, 8],
@@ -53,10 +54,16 @@ class AjaxContactus extends AjaxHandler
         );
 
         if ($mode === null || $rsn === null || $ua === null || $app === null || $url === null)
-            return 'required field missing';
+        {
+            trigger_error('AjaxContactus::handleContactUs - malformed contact request received', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         if (!isset($contexts[$mode]) || !in_array($rsn, $contexts[$mode]))
-            return 'mode invalid';
+        {
+            trigger_error('AjaxContactus::handleContactUs - report has invalid context (mode:'.$mode.' / reason:'.$rsn.')', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         if (!$desc)
             return 3;
@@ -65,36 +72,22 @@ class AjaxContactus extends AjaxHandler
             return 2;
 
         if (!User::$id && !User::$ip)
-            return 'your ip could not be determined';
+        {
+            trigger_error('AjaxContactus::handleContactUs - could not determine IP for anonymous user', E_USER_ERROR);
+            return Lang::main('intError');
+        }
 
         // check already reported
         $field = User::$id ? 'userId' : 'ip';
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $this->_post['id'], $field, User::$id ?: User::$ip))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $mode, $rsn, $subj, $field, User::$id ?: User::$ip))
             return 7;
 
-        $update = array(
-            'userId'      => User::$id,
-            'mode'        => $mode,
-            'reason'      => $rsn,
-            'ip'          => User::$ip,
-            'description' => $desc,
-            'userAgent'   => $ua,
-            'appName'     => $app,
-            'url'         => $url
-        );
-
-        if ($_ = $this->_post['id'])
-            $update['subject'] = $_;
-
-        if ($_ = $this->_post['relatedurl'])
-            $update['relatedurl'] = $_;
-
-        if ($_ = $this->_post['email'])
-            $update['email'] = $_;
-
-        if (DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update)))
+        if (Util::createReport($mode, $rsn, $subj, $desc, $ua, $app, $url, $this->_post['relatedurl'], $this->_post['email']))
             return 0;
 
-        return 'save to db unsuccessful';
+        trigger_error('AjaxContactus::handleContactUs - write to db failed', E_USER_ERROR);
+        return Lang::main('intError');
     }
 }
+
+?>

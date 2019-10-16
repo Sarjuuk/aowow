@@ -6,16 +6,17 @@ if (!defined('AOWOW_REVISION'))
 
 class UserList extends BaseType
 {
-    public static $type      = TYPE_USER;
-    public static $brickFile = 'user';
+    public static   $type      = TYPE_USER;
+    public static   $brickFile = 'user';
+    public static   $dataTable = '';                          // doesn't have community content
 
-    public        $sources   = [];
+    public          $sources   = [];
 
-    protected     $queryBase = 'SELECT *, a.id AS ARRAY_KEY FROM ?_account a';
-    protected     $queryOpts = array(
-                      'a' => [['r']],
-                      'r' => ['j' => ['?_account_reputation r ON r.userId = a.id', true], 's' => ', IFNULL(SUM(r.amount), 0) AS reputation', 'g' => 'a.id']
-    );
+    protected       $queryBase = 'SELECT *, a.id AS ARRAY_KEY FROM ?_account a';
+    protected       $queryOpts = array(
+                        'a' => [['r']],
+                        'r' => ['j' => ['?_account_reputation r ON r.userId = a.id', true], 's' => ', IFNULL(SUM(r.amount), 0) AS reputation', 'g' => 'a.id']
+                    );
 
     public function getListviewData() { }
 

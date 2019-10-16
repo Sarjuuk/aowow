@@ -6,6 +6,14 @@
 
 <body<?=(User::isPremium() ? ' class="premium-logo"' : null); ?>>
 <div id="layers"></div>
+<?php if ($this->headerLogo):  ?>
+<style type="text/css">
+    .header-logo {
+       background: url(<?=$this->headerLogo; ?>) no-repeat center 0 !important;
+       margin-bottom: 1px !important;
+    }
+</style>
+<?php endif; ?>
 <div class="layout nosidebar" id="layout">
     <div class="layout-inner" id="layout-inner">
     <div class="header" id="header">

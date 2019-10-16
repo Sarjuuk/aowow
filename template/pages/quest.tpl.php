@@ -19,6 +19,7 @@
 <?php if ($this->unavailable): ?>
                 <div class="pad"></div>
                 <b style="color: red"><?php echo Lang::quest('unavailable'); ?></b>
+                <div class="pad"></div>
 <?php
 endif;
 
@@ -179,24 +180,30 @@ if ($g = $this->gains):
 
     if (!empty($g['rep'])):
         foreach ($g['rep'] as $r):
-            echo '                        <li><div>'.($r['qty'] < 0 ? '<b class="q10">'.$r['qty'].'</b>' : $r['qty']).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
+            if ($r['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
+                $qty = $r['qty'][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($r['qty'][1] > 0 ? '+' : '').$r['qty'][1]);
+            else
+                $qty = array_sum($r['qty']);
+
+            echo '                        <li><div>'.($r['qty'][0] < 0 ? '<b class="q10">'.$qty.'</b>' : $qty).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
         endforeach;
     endif;
 
     if (!empty($g['title'])):
-        echo '                        <li><div>'.sprintf(Lang::quest('theTitle'), $g['title'])."</div></li>\n";
+        echo '                        <li><div>'.Lang::quest('theTitle', [$g['title']])."</div></li>\n";
     endif;
 
     if (!empty($g['tp'])):
-        echo '                        <li><div>'.$g['tp'].' '.Lang::quest('bonusTalents')."</div></li>\n";
+        echo '                        <li><div>'.Lang::quest('bonusTalents', [$g['tp']])."</div></li>\n";
     endif;
 
     echo "                    </ul>\n";
 endif;
 
-$this->brick('mail');
+$this->brick('mail', ['offset' => ++$offset]);
 
 if (!empty($this->transfer)):
+    echo "    <div style=\"clear: left\"></div>";
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
 

@@ -32,21 +32,21 @@ if (!CLI)
                 baseParryPct
                 ParryCap
                 baseBlockPct
-                directMod1   applies mod directly       only one class having something worth mentioning: DK
-                directMod2   applies mod directly       so what were they originally used for..?
+                classMod1   applies mod directly       only one class having something worth mentioning: DK
+                classMod2   applies mod directly       so what were they originally used for..?
             */
 
             $dataz = array(
-                 1 => [[-20, 2, 0, 3], [-10, 0, 1, 1], null, 0.9560,  3.6640,  88.129021, 5,  47.003525, 5, 0, 0],
-                 2 => [[-20, 2, 0, 3], [-10, 0, 1, 0], null, 0.9560,  3.4943,  88.129021, 5,  47.003525, 5, 0, 0],
-                 3 => [[-20, 1, 1, 2], [-10, 0, 2, 2], null, 0.9880, -4.0873, 145.560408, 5, 145.560408, 0, 0, 0],
-                 4 => [[-20, 1, 1, 2], [-10, 0, 1, 1], null, 0.9880,  2.0957, 145.560408, 5, 145.560408, 0, 0, 0],
-                 5 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  3.4178, 150.375940, 0,   0.0,      0, 0, 0],
-                 6 => [[-20, 2, 0, 3], [-10, 0, 1, 0], null, 0.9560,  3.6640,  88.129021, 5,  47.003525, 0, 0, ['parryrtng' => [0.25, 'percentOf', 'str']]],  // Forcefull Deflection (49410)
-                 7 => [[-20, 1, 1, 2], [-10, 0, 1, 0], null, 0.9880,  2.1080, 145.560408, 0, 145.560408, 5, 0, 0],
-                 8 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  3.6587, 150.375940, 0,   0.0,      0, 0, 0],
-                 9 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  2.4211, 150.375940, 0,   0.0,      0, 0, 0],
-                11 => [[-20, 2, 0, 0], [-10, 0, 1, 0], null, 0.9720,  5.6097, 116.890707, 0,   0.0,      0, 0, 0]
+                 1 => [[-20, 2, 0, 3], [-10, 0, 1, 1], null, 0.9560,  3.6640,  88.129021, 5,  47.003525, 5, [], []],
+                 2 => [[-20, 2, 0, 3], [-10, 0, 1, 0], null, 0.9560,  3.4943,  88.129021, 5,  47.003525, 5, [], []],
+                 3 => [[-20, 1, 1, 2], [-10, 0, 1, 2], null, 0.9880, -4.0873, 145.560408, 5, 145.560408, 0, [], []],
+                 4 => [[-20, 1, 1, 2], [-10, 0, 1, 1], null, 0.9880,  2.0957, 145.560408, 5, 145.560408, 0, [], []],
+                 5 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  3.4178, 150.375940, 0,   0.0,      0, [], []],
+                 6 => [[-20, 2, 0, 3], [-10, 0, 1, 0], null, 0.9560,  3.6640,  88.129021, 5,  47.003525, 0, [], ['parryrtng' => [0.25, 'percentOf', 'str']]],  // Forcefull Deflection (49410)
+                 7 => [[-20, 1, 1, 2], [-10, 0, 1, 0], null, 0.9880,  2.1080, 145.560408, 0, 145.560408, 5, [], []],
+                 8 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  3.6587, 150.375940, 0,   0.0,      0, [], []],
+                 9 => [[-10, 1, 0, 0], [-10, 0, 1, 0], null, 0.9830,  2.4211, 150.375940, 0,   0.0,      0, [], []],
+                11 => [[-20, 2, 0, 0], [-10, 0, 1, 0], null, 0.9720,  5.6097, 116.890707, 0,   0.0,      0, [], []]
             );
 
             foreach ($dataz as $class => &$data)
@@ -57,20 +57,43 @@ if (!CLI)
 
         $race = function()
         {
-            // { str, agi, sta, int, spi, hp, mana, directMod1, directMod2 }
-
-            return array(
-                 1 => [20, 20, 20, 20, 20, 0, ['spi' => [0.05, 'percentOf', 'spi']]],                                                                   // The Human Spirit (20598)
-                 2 => [23, 17, 22, 17, 23, 0, 0],
-                 3 => [22, 16, 23, 19, 19, 0, 0],
-                 4 => [17, 25, 19, 20, 20, 0, 0],
-                 5 => [19, 18, 21, 18, 25, 0, 0],
-                 6 => [25, 15, 22, 15, 22, 0, ['health' => [0.05, 'functionOf', '$function(p) { return g_statistics.combo[p.classs][p.level][5]; }']]], // Endurance (20550) ... if you are looking for something elegant, look away!
-                 7 => [15, 23, 19, 24, 20, 0, ['int' => [0.05, 'percentOf', 'int']]],                                                                   // Expansive Mind (20591)
-                 8 => [21, 22, 21, 16, 21, 0, ['healthrgn' => [0.1, 'percentOf', 'healthrgn']]],                                                        // Regeneration (20555)
-                10 => [17, 22, 18, 24, 19, 0, 0],
-                11 => [21, 17, 19, 21, 22, 0, 0]                                                                                                        // ['mlehitpct' => [1, 'add'], 'splhitpct' => [1, 'add'], 'rgdhitpct' => [1, 'add']]    // Heroic Presence (6562, 28878) (not actually shown..?)
+            // where did i get this data again..?
+            // { str, agi, sta, int, spi, raceMod1, raceMod2 }
+            $raceData = array(
+                 1 => [20, 20, 20, 20, 20, [], []],
+                 2 => [23, 17, 22, 17, 23, [], []],
+                 3 => [22, 16, 23, 19, 19, [], []],
+                 4 => [17, 25, 19, 20, 20, [], []],
+                 5 => [19, 18, 21, 18, 25, [], []],
+                 6 => [25, 15, 22, 15, 22, [], []],
+                 7 => [15, 23, 19, 24, 20, [], []],
+                 8 => [21, 22, 21, 16, 21, [], []],
+                10 => [17, 22, 18, 24, 19, [], []],
+                11 => [21, 17, 19, 21, 22, [], []]
             );
+
+            $racials = new SpellList(array(['typeCat', -4], ['reqClassMask', 0]));
+            $allMods = $racials->getProfilerMods();
+            foreach ($allMods as $spellId => $mods)
+            {
+                if (!$mods)
+                    continue;
+
+                // if there is ever a case where a racial is shared between races i don't want to know about it!
+                $raceId = log($racials->getEntry($spellId)['reqRaceMask'], 2) + 1;
+                if (!isset($raceData[$raceId]))
+                    continue;
+
+                foreach ($mods as $jsonStat => $mod)
+                {
+                    if (empty($raceData[$raceId][5][$jsonStat]))
+                        $raceData[$raceId][5][$jsonStat] = $mod;
+                    else
+                        $raceData[$raceId][6][$jsonStat] = $mod;
+                }
+            }
+
+            return $raceData;
         };
 
         $combo = function()
@@ -143,12 +166,27 @@ if (!CLI)
 
         $skills = function()
         {
-            // profession perks (skinning => +crit, mining => +stam) and maybe some others;      skillId:{rankNo:someJSON, ..}?
-
-            return [];
+            // profession perks ... too lazy to formulate a search algorithm for two occurences
+            return array(
+                186 => array(                               // mining / toughness
+                     75 => ['sta' =>  3],
+                    150 => ['sta' =>  5],
+                    225 => ['sta' =>  7],
+                    300 => ['sta' => 10],
+                    375 => ['sta' => 30],
+                    450 => ['sta' => 60],
+                ),
+                393 => array(                               // skinning / master of anatomy
+                     75 => ['critstrkrtng' =>  3],
+                    150 => ['critstrkrtng' =>  6],
+                    225 => ['critstrkrtng' =>  9],
+                    300 => ['critstrkrtng' => 12],
+                    375 => ['critstrkrtng' => 20],
+                    450 => ['critstrkrtng' => 40],
+                )
+            );
         };
 
-        // todo:                                         x
         $sub     = ['classs', 'race', 'combo', 'level', 'skills'];
         $out     = [];
         $success = true;
@@ -158,7 +196,7 @@ if (!CLI)
             $res = $$s();
             $out[$s] = $res;
             if (!$res)
-                CLISetup::log('statistics - generator $'.$s.'() returned empty', CLISetup::LOG_WARN);
+                CLI::write('statistics - generator $'.$s.'() returned empty', CLI::LOG_WARN);
         }
 
         $toFile = 'g_statistics = '.preg_replace('/"\$([^$"]+)"/', '\1', Util::toJSON($out)).';';

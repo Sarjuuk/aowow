@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 
 class AjaxHandler
@@ -28,7 +28,7 @@ class AjaxHandler
             $v = isset($_GET[$k])  ? filter_input(INPUT_GET,  $k, $v[0], $v[1]) : null;
     }
 
-    public function handle(&$out)
+    public function handle(string &$out) : bool
     {
         if (!$this->handler)
             return false;
@@ -43,30 +43,59 @@ class AjaxHandler
         }
 
         $h   = $this->handler;
-        $out = (string)$this->$h();
+        $out = $this->$h();
+        if ($out === null)
+            $out = '';
 
         return true;
     }
 
-    public function getContentType()
+    public function getContentType() : string
     {
         return $this->contentType;
     }
 
-    protected function checkLocale($val)
+    protected function checkEmptySet(string $val) : bool
+    {
+        return $val === '';                                 // parameter is expected to be empty
+    }
+
+    protected function checkLocale(string $val) : int
     {
         if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
             return intVal($val);
 
-        return null;
+        return -1;
     }
 
-    protected function checkInt($val)
+    protected function checkInt(string $val) : int
     {
         if (preg_match('/^-?\d+$/', $val))
             return intVal($val);
 
-        return null;
+        return 0;
+    }
+
+    protected function checkIdList(string $val) : array
+    {
+        if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
+            return array_map('intVal', explode(',', $val));
+
+        return [];
+    }
+
+    protected function checkIdListUnsigned(string $val) : array
+    {
+        if (preg_match('/\d+(,\d+)*/', $val))
+            return array_map('intVal', explode(',', $val));
+
+        return [];
+    }
+
+    protected function checkFulltext(string $val) : string
+    {
+        // trim non-printable chars
+        return preg_replace('/[\p{C}]/ui', '', $val);
     }
 }
 ?>

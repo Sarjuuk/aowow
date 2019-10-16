@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 
 class SimpleXML extends SimpleXMLElement
@@ -16,30 +16,272 @@ class SimpleXML extends SimpleXMLElement
     }
 }
 
+
+class CLI
+{
+    const CHR_BELL      = 7;
+    const CHR_BACK      = 8;
+    const CHR_TAB       = 9;
+    const CHR_LF        = 10;
+    const CHR_CR        = 13;
+    const CHR_ESC       = 27;
+    const CHR_BACKSPACE = 127;
+
+    const LOG_OK        = 0;
+    const LOG_WARN      = 1;
+    const LOG_ERROR     = 2;
+    const LOG_INFO      = 3;
+
+    private static $logHandle   = null;
+    private static $hasReadline = null;
+
+
+    /***********/
+    /* logging */
+    /***********/
+
+    public static function initLogFile($file = '')
+    {
+        if (!$file)
+            return;
+
+        $file = self::nicePath($file);
+        if (!file_exists($file))
+            self::$logHandle = fopen($file, 'w');
+        else
+        {
+            $logFileParts = pathinfo($file);
+
+            $i = 1;
+            while (file_exists($logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '')))
+                $i++;
+
+            $file = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
+            self::$logHandle = fopen($file, 'w');
+        }
+    }
+
+    public static function red($str)
+    {
+        return OS_WIN ? $str : "\e[31m".$str."\e[0m";
+    }
+
+    public static function green($str)
+    {
+        return OS_WIN ? $str : "\e[32m".$str."\e[0m";
+    }
+
+    public static function yellow($str)
+    {
+        return OS_WIN ? $str : "\e[33m".$str."\e[0m";
+    }
+
+    public static function blue($str)
+    {
+        return OS_WIN ? $str : "\e[36m".$str."\e[0m";
+    }
+
+    public static function bold($str)
+    {
+        return OS_WIN ? $str : "\e[1m".$str."\e[0m";
+    }
+
+    public static function write($txt = '', $lvl = -1)
+    {
+        $msg = "\n";
+        if ($txt)
+        {
+            $msg = str_pad(date('H:i:s'), 10);
+            switch ($lvl)
+            {
+                case self::LOG_ERROR:                       // red      critical error
+                    $msg .= '['.self::red('ERR').']   ';
+                    break;
+                case self::LOG_WARN:                        // yellow   notice
+                    $msg .= '['.self::yellow('WARN').']  ';
+                    break;
+                case self::LOG_OK:                          // green    success
+                    $msg .= '['.self::green('OK').']    ';
+                    break;
+                case self::LOG_INFO:                        // blue     info
+                    $msg .= '['.self::blue('INFO').']  ';
+                    break;
+                default:
+                    $msg .= '        ';
+            }
+
+            $msg .= $txt."\n";
+        }
+
+        echo $msg;
+
+        if (self::$logHandle)                               // remove highlights for logging
+            fwrite(self::$logHandle, preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg));
+
+        flush();
+    }
+
+    public static function nicePath(string $file, string ...$pathParts) : string
+    {
+        $path = '';
+
+        if (!$pathParts)
+            return $file;
+
+        $path = implode(DIRECTORY_SEPARATOR, $pathParts).DIRECTORY_SEPARATOR.$file;
+
+        if (DIRECTORY_SEPARATOR == '/')                     // *nix
+        {
+            $path = str_replace('\\', '/', $path);
+            $path = preg_replace('/\/+/i', '/', $path);
+        }
+        else if (DIRECTORY_SEPARATOR == '\\')               // win
+        {
+            $path = str_replace('/', '\\', $path);
+            $path = preg_replace('/\\\\+/i', '\\', $path);
+        }
+        else
+            CLI::write('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLI::LOG_ERROR);
+
+        $path = trim($path);
+
+        // resolve *nix home shorthand
+        if (!OS_WIN)
+        {
+            if (preg_match('/^~(\w+)\/.*/i', $path, $m))
+                $path = '/home/'.substr($path, 1);
+            else if (substr($path, 0, 2) == '~/')
+                $path = getenv('HOME').substr($path, 1);
+            else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
+                $path = substr($path, 1);
+        }
+
+        // remove quotes (from erronous user input)
+        $path = str_replace(['"', "'"], ['', ''], $path);
+
+        return $path;
+    }
+
+
+    /**************/
+    /* read input */
+    /**************/
+
+    /*
+        since the CLI on WIN ist not interactive, the following things have to be considered
+        you do not receive keystrokes but whole strings upon pressing <Enter> (wich also appends a \r)
+        as such <ESC> and probably other control chars can not be registered
+        this also means, you can't hide input at all, least process it
+    */
+
+    public static function readInput(&$fields, $singleChar = false)
+    {
+        // first time set
+        if (self::$hasReadline === null)
+            self::$hasReadline = function_exists('readline_callback_handler_install');
+
+        // prevent default output if able
+        if (self::$hasReadline)
+            readline_callback_handler_install('', function() { });
+
+        foreach ($fields as $name => $data)
+        {
+            $vars = ['desc', 'isHidden', 'validPattern'];
+            foreach ($vars as $idx => $v)
+                $$v = isset($data[$idx]) ? $data[$idx] : false;
+
+            $charBuff = '';
+
+            if ($desc)
+                echo "\n".$desc.": ";
+
+            while (true) {
+                $r = [STDIN];
+                $w = $e = null;
+                $n = stream_select($r, $w, $e, 200000);
+
+                if ($n && in_array(STDIN, $r)) {
+                    $char  = stream_get_contents(STDIN, 1);
+                    $keyId = ord($char);
+
+                    // ignore this one
+                    if ($keyId == self::CHR_TAB)
+                        continue;
+
+                    // WIN sends \r\n as sequence, ignore one
+                    if ($keyId == self::CHR_CR && OS_WIN)
+                        continue;
+
+                    // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
+                    if ($keyId == self::CHR_ESC)
+                    {
+                        echo chr(self::CHR_BELL);
+                        return false;
+                    }
+                    else if ($keyId == self::CHR_BACKSPACE)
+                    {
+                        if (!$charBuff)
+                            continue;
+
+                        $charBuff = mb_substr($charBuff, 0, -1);
+                        if (!$isHidden && self::$hasReadline)
+                            echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
+                    }
+                    else if ($keyId == self::CHR_LF)
+                    {
+                        $fields[$name] = $charBuff;
+                        break;
+                    }
+                    else if (!$validPattern || preg_match($validPattern, $char))
+                    {
+                        $charBuff .= $char;
+                        if (!$isHidden && self::$hasReadline)
+                            echo $char;
+
+                        if ($singleChar && self::$hasReadline)
+                        {
+                            $fields[$name] = $charBuff;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        echo chr(self::CHR_BELL);
+
+        foreach ($fields as $f)
+            if (strlen($f))
+                return true;
+
+        $fields = null;
+        return true;
+    }
+}
+
+
 class Util
 {
-    const FILE_ACCESS = 0755;
+    const FILE_ACCESS = 0777;
 
-    public static $resistanceFields         = array(
-        null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
-    );
+    const GEM_SCORE_BASE_WOTLK = 16;                        // rare quality wotlk gem score
+    const GEM_SCORE_BASE_BC    = 8;                         // rare quality bc gem score
 
-    public static $rarityColorStings        = array(        // zero-indexed
-        '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
-    );
+    private static $perfectGems             = null;
 
     public static $localeStrings            = array(        // zero-indexed
-        'enus',         null,           'frfr',         'dede',         null,           null,           'eses',         null,           'ruru'
+        'enus',         null,           'frfr',         'dede',         'zhcn',         null,           'eses',         null,           'ruru'
     );
 
     public static $subDomains               = array(
-        'www',          null,           'fr',           'de',           null,           null,           'es',           null,           'ru'
+        'www',          null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
     );
 
     public static $typeClasses              = array(
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
-        'CharRaceList',     'SkillList',        null,               'CurrencyList',
+        'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
+        TYPE_ICON        => 'IconList',
         TYPE_EMOTE       => 'EmoteList',
         TYPE_ENCHANTMENT => 'EnchantmentList'
     );
@@ -47,111 +289,18 @@ class Util
     public static $typeStrings              = array(        // zero-indexed
         null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
         'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
+        null,           'sound',
+        TYPE_ICON        => 'icon',
         TYPE_USER        => 'user',
         TYPE_EMOTE       => 'emote',
         TYPE_ENCHANTMENT => 'enchantment'
     );
 
-    public static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
-        null,           12,             13,             14,             15,             16,             17,             18,             19,
-        20,             21,             22,             23,             24,             25,             26,             27,             28,
-        29,             30,             null,           null,           null,           37,             44
-    );
-
     # todo (high): find a sensible way to write data here on setup
-    public static $gtCombatRatings          = array(
+    private static $gtCombatRatings         = array(
         12 => 1.5,      13 => 13.8,     14 => 13.8,     15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
         21 => 14,       22 => 10,       23 => 10,       24 => 8,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
         30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 28.75,    36 => 10,       37 => 2.5,      44 => 4.268292513760655
-    );
-
-    public static $lvlIndepRating           = array(        // rating doesn't scale with level
-        ITEM_MOD_MANA,                  ITEM_MOD_HEALTH,                ITEM_MOD_ATTACK_POWER,          ITEM_MOD_MANA_REGENERATION,     ITEM_MOD_SPELL_POWER,
-        ITEM_MOD_HEALTH_REGEN,          ITEM_MOD_SPELL_PENETRATION,     ITEM_MOD_BLOCK_VALUE
-    );
-
-    public static $questClasses             = array(        // taken from old aowow: 2 & 3 partially point to pointless mini-areas in front of dungeons
-        -2 =>  [    0],
-         0 =>  [    1,     3,     4,     8,    10,    11,    12,    25,   28,   33,   36,   38,   40,   41,   44,   45,   46,   47,   51,   85,  130,  139,  267,  279, 1497, 1519, 1537, 2257, 3430, 3433, 3487, 4080, 4298],
-         1 =>  [   14,    15,    16,    17,   141,   148,   215,   331,  357,  361,  400,  405,  406,  440,  490,  493,  618, 1216, 1377, 1637, 1638, 1657, 3524, 3525, 3557],
-/*todo*/ 2 =>  [  133,   206,   209,   491,   717,   718,   719,   722,  796,  978, 1196, 1337, 1417, 1581, 1583, 1584, 1941, 2017, 2057, 2100, 2366, 2367, 2437, 2557, 3477, 3562, 3713, 3714, 3715, 3716, 3717, 3789, 3790, 3791, 3792, 3845, 3846, 3847, 3849, 3905, 4095, 4100, 4120, 4196, 4228, 4264, 4272, 4375, 4415, 4494, 4723],
-/*todo*/ 3 =>  [ 1977,  2159,  2562,  2677,  2717,  3428,  3429,  3456, 3606, 3805, 3836, 3840, 3842, 4273, 4500, 4722, 4812],
-         4 =>  [ -372,  -263,  -262,  -261,  -162,  -161,  -141,   -82,  -81,  -61],
-         5 =>  [ -373,  -371,  -324,  -304,  -264,  -201,  -182,  -181, -121, -101,  -24],
-         6 =>  [  -25,  2597,  3277,  3358,  3820,  4384,  4710],
-         7 =>  [-1010,  -368,  -367,  -365,  -344,  -241,    -1],
-         8 =>  [ 3483,  3518,  3519,  3520,  3521,  3522,  3523,  3679, 3703],                                      // Skettis is no parent
-         9 =>  [-1006, -1005, -1003, -1002, -1001,  -376,  -375,  -374, -370, -369, -366, -364, -284,  -41,  -22],  // 22: seasonal, 284: special => not in the actual menu
-        10 =>  [   65,    66,    67,   210,   394,   495,  3537,  3711, 4024, 4197, 4395, 4742]                     // Coldara is no parent
-    );
-
-    /*  why:
-        Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineability  causes more trouble than it has uses.
-        Because this is more or less the only reaonable way to fit all that information into one database field, so..
-        .. the indizes of this array are bits of skillLine2OrMask in ?_spell if skillLineId1 is negative
-    */
-    public static $skillLineMask            = array(        // idx => [familyId, skillLineId]
-        -1 => array(                                        // Pets (Hunter)
-            [ 1, 208],          [ 2, 209],          [ 3, 203],          [ 4, 210],          [ 5, 211],          [ 6, 212],          [ 7, 213],  // Wolf,       Cat,          Spider,       Bear,        Boar,      Crocolisk,    Carrion Bird
-            [ 8, 214],          [ 9, 215],          [11, 217],          [12, 218],          [20, 236],          [21, 251],          [24, 653],  // Crab,       Gorilla,      Raptor,       Tallstrider, Scorpid,   Turtle,       Bat
-            [25, 654],          [26, 655],          [27, 656],          [30, 763],          [31, 767],          [32, 766],          [33, 765],  // Hyena,      Bird of Prey, Wind Serpent, Dragonhawk,  Ravager,   Warp Stalker, Sporebat
-            [34, 764],          [35, 768],          [37, 775],          [38, 780],          [39, 781],          [41, 783],          [42, 784],  // Nether Ray, Serpent,      Moth,         Chimaera,    Devilsaur, Silithid,     Worm
-            [43, 786],          [44, 785],          [45, 787],          [46, 788]                                                               // Rhino,      Wasp,         Core Hound,   Spirit Beast
-        ),
-        -2 => array(                                        // Pets (Warlock)
-            [15, 189],          [16, 204],          [17, 205],          [19, 207],          [23, 188],          [29, 761]                       // Felhunter,  Voidwalker,   Succubus,     Doomguard,   Imp,       Felguard
-        ),
-        -3 => array(                                        // Ranged Weapons
-            [null, 45],         [null, 46],         [null, 226]                                                                                 // Bow,         Gun,         Crossbow
-        )
-    );
-
-    public static $trainerTemplates         = array(        // TYPE => Id => templateList
-        TYPE_CLASS => array(
-              1 => [-200001, -200002],                      // Warrior
-              2 => [-200003, -200004, -200020, -200021],    // Paladin
-              3 => [-200013, -200014],                      // Hunter
-              4 => [-200015, -200016],                      // Rogue
-              5 => [-200011, -200012],                      // Priest
-              6 => [-200019],                               // DK
-              7 => [-200017, -200018],                      // Shaman (HighlevelAlly Id missing..?)
-              8 => [-200007, -200008],                      // Mage
-              9 => [-200009, -200010],                      // Warlock
-             11 => [-200005, -200006]                       // Druid
-        ),
-        TYPE_SKILL => array(
-            171 => [-201001, -201002, -201003],             // Alchemy
-            164 => [-201004, -201005, -201006, -201007, -201008],// Blacksmithing
-            333 => [-201009, -201010, -201011],             // Enchanting
-            202 => [-201012, -201013, -201014, -201015, -201016, -201017], // Engineering
-            182 => [-201018, -201019, -201020],             // Herbalism
-            773 => [-201021, -201022, -201023],             // Inscription
-            755 => [-201024, -201025, -201026],             // Jewelcrafting
-            165 => [-201027, -201028, -201029, -201030, -201031, -201032], // Leatherworking
-            186 => [-201033, -201034, -201035],             // Mining
-            393 => [-201036, -201037, -201038],             // Skinning
-            197 => [-201039, -201040, -201041, -201042],    // Tailoring
-            356 => [-202001, -202002, -202003],             // Fishing
-            185 => [-202004, -202005, -202006],             // Cooking
-            129 => [-202007, -202008, -202009],             // First Aid
-            762 => [-202010, -202011, -202012]              // Riding
-        )
-    );
-
-    public static $sockets                  = array(        // jsStyle Strings
-        'meta',                         'red',                          'yellow',                       'blue'
-    );
-
-    public static $itemMods                 = array(        // zero-indexed; "mastrtng": unused mastery; _[a-z] => taken mods..
-        'dmg',              'mana',             'health',           'agi',              'str',              'int',              'spi',
-        'sta',              'energy',           'rage',             'focus',            'runicpwr',         'defrtng',          'dodgertng',
-        'parryrtng',        'blockrtng',        'mlehitrtng',       'rgdhitrtng',       'splhitrtng',       'mlecritstrkrtng',  'rgdcritstrkrtng',
-        'splcritstrkrtng',  '_mlehitrtng',      '_rgdhitrtng',      '_splhitrtng',      '_mlecritstrkrtng', '_rgdcritstrkrtng', '_splcritstrkrtng',
-        'mlehastertng',     'rgdhastertng',     'splhastertng',     'hitrtng',          'critstrkrtng',     '_hitrtng',         '_critstrkrtng',
-        'resirtng',         'hastertng',        'exprtng',          'atkpwr',           'rgdatkpwr',        'feratkpwr',        'splheal',
-        'spldmg',           'manargn',          'armorpenrtng',     'splpwr',           'healthrgn',        'splpen',           'block',                                          // ITEM_MOD_BLOCK_VALUE
-        'mastrtng',         'armor',            'firres',           'frores',           'holres',           'shares',           'natres',
-        'arcres',           'firsplpwr',        'frosplpwr',        'holsplpwr',        'shasplpwr',        'natsplpwr',        'arcsplpwr'
     );
 
     public static $itemFilter               = array(
@@ -194,8 +343,8 @@ class Util
 
     public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
     public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
+    public static $tryFilteringEntityString = '$$WH.sprintf(LANG.lvnote_entitiesfound, %s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';
     public static $tryNarrowingString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_trynarrowing';
-    public static $setCriteriaString        = "fi_setCriteria(%s, %s, %s);\n";
 
     public static $dfnString                = '<dfn title="%s" class="w">%s</dfn>';
 
@@ -203,500 +352,6 @@ class Util
 
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
-    );
-
-    public static $class2SpellFamily        = array(
-    //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
-        null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
-    );
-
-    // todo: translate and move to Lang
-    public static $spellEffectStrings       = array(
-          0 => 'None',
-          1 => 'Instakill',
-          2 => 'School Damage',
-          3 => 'Dummy',
-          4 => 'Portal Teleport',
-          5 => 'Teleport Units',
-          6 => 'Apply Aura',
-          7 => 'Environmental Damage',
-          8 => 'Power Drain',
-          9 => 'Health Leech',
-         10 => 'Heal',
-         11 => 'Bind',
-         12 => 'Portal',
-         13 => 'Ritual Base',
-         14 => 'Ritual Specialize',
-         15 => 'Ritual Activate Portal',
-         16 => 'Quest Complete',
-         17 => 'Weapon Damage NoSchool',
-         18 => 'Resurrect',
-         19 => 'Add Extra Attacks',
-         20 => 'Dodge',
-         21 => 'Evade',
-         22 => 'Parry',
-         23 => 'Block',
-         24 => 'Create Item',
-         25 => 'Can Use Weapon',
-         26 => 'Defense',
-         27 => 'Persistent Area Aura',
-         28 => 'Summon',
-         29 => 'Leap',
-         30 => 'Energize',
-         31 => 'Weapon Damage Percent',
-         32 => 'Trigger Missile',
-         33 => 'Open Lock',
-         34 => 'Summon Change Item',
-         35 => 'Apply Area Aura Party',
-         36 => 'Learn Spell',
-         37 => 'Spell Defense',
-         38 => 'Dispel',
-         39 => 'Language',
-         40 => 'Dual Wield',
-         41 => 'Jump',
-         42 => 'Jump Dest',
-         43 => 'Teleport Units Face Caster',
-         44 => 'Skill Step',
-         45 => 'Add Honor',
-         46 => 'Spawn',
-         47 => 'Trade Skill',
-         48 => 'Stealth',
-         49 => 'Detect',
-         50 => 'Trans Door',
-         51 => 'Force Critical Hit',
-         52 => 'Guarantee Hit',
-         53 => 'Enchant Item Permanent',
-         54 => 'Enchant Item Temporary',
-         55 => 'Tame Creature',
-         56 => 'Summon Pet',
-         57 => 'Learn Pet Spell',
-         58 => 'Weapon Damage Flat',
-         59 => 'Create Random Item',
-         60 => 'Proficiency',
-         61 => 'Send Event',
-         62 => 'Power Burn',
-         63 => 'Threat',
-         64 => 'Trigger Spell',
-         65 => 'Apply Area Aura Raid',
-         66 => 'Create Mana Gem',
-         67 => 'Heal Max Health',
-         68 => 'Interrupt Cast',
-         69 => 'Distract',
-         70 => 'Pull',
-         71 => 'Pickpocket',
-         72 => 'Add Farsight',
-         73 => 'Untrain Talents',
-         74 => 'Apply Glyph',
-         75 => 'Heal Mechanical',
-         76 => 'Summon Object Wild',
-         77 => 'Script Effect',
-         78 => 'Attack',
-         79 => 'Sanctuary',
-         80 => 'Add Combo Points',
-         81 => 'Create House',
-         82 => 'Bind Sight',
-         83 => 'Duel',
-         84 => 'Stuck',
-         85 => 'Summon Player',
-         86 => 'Activate Object',
-         87 => 'WMO Damage',
-         88 => 'WMO Repair',
-         89 => 'WMO Change',
-         90 => 'Kill Credit',
-         91 => 'Threat All',
-         92 => 'Enchant Held Item',
-         93 => 'Force Deselect',
-         94 => 'Self Resurrect',
-         95 => 'Skinning',
-         96 => 'Charge',
-         97 => 'Cast Button',
-         98 => 'Knock Back',
-         99 => 'Disenchant',
-        100 => 'Inebriate',
-        101 => 'Feed Pet',
-        102 => 'Dismiss Pet',
-        103 => 'Reputation',
-        104 => 'Summon Object Slot1',
-        105 => 'Summon Object Slot2',
-        106 => 'Summon Object Slot3',
-        107 => 'Summon Object Slot4',
-        108 => 'Dispel Mechanic',
-        109 => 'Summon Dead Pet',
-        110 => 'Destroy All Totems',
-        111 => 'Durability Damage',
-        112 => 'Summon Demon',
-        113 => 'Resurrect Flat',
-        114 => 'Attack Me',
-        115 => 'Durability Damage Percent',
-        116 => 'Skin Player Corpse',
-        117 => 'Spirit Heal',
-        118 => 'Skill',
-        119 => 'Apply Area Aura Pet',
-        120 => 'Teleport Graveyard',
-        121 => 'Weapon Damage Normalized',
-        122 => 'Unknown Effect',
-        123 => 'Send Taxi',
-        124 => 'Pull Towards',
-        125 => 'Modify Threat Percent',
-        126 => 'Steal Beneficial Buff',
-        127 => 'Prospecting',
-        128 => 'Apply Area Aura Friend',
-        129 => 'Apply Area Aura Enemy',
-        130 => 'Redirect Threat',
-        131 => 'Unknown Effect',
-        132 => 'Play Music',
-        133 => 'Unlearn Specialization',
-        134 => 'Kill Credit2',
-        135 => 'Call Pet',
-        136 => 'Heal Percent',
-        137 => 'Energize Percent',
-        138 => 'Leap Back',
-        139 => 'Clear Quest',
-        140 => 'Force Cast',
-        141 => 'Force Cast With Value',
-        142 => 'Trigger Spell With Value',
-        143 => 'Apply Area Aura Owner',
-        144 => 'Knock Back Dest',
-        145 => 'Pull Towards Dest',
-        146 => 'Activate Rune',
-        147 => 'Quest Fail',
-        148 => 'Unknown Effect',
-        149 => 'Charge Dest',
-        150 => 'Quest Start',
-        151 => 'Trigger Spell 2',
-        152 => 'Unknown Effect',
-        153 => 'Create Tamed Pet',
-        154 => 'Discover Taxi',
-        155 => 'Dual Wield 2H Weapons',
-        156 => 'Enchant Item Prismatic',
-        157 => 'Create Item 2',
-        158 => 'Milling',
-        159 => 'Allow Rename Pet',
-        160 => 'Unknown Effect',
-        161 => 'Talent Spec Count',
-        162 => 'Talent Spec Select',
-        163 => 'Unknown Effect',
-        164 => 'Remove Aura'
-    );
-
-    public static $spellAuraStrings         = array(
-        0 => 'None',
-        1 => 'Bind Sight',
-        2 => 'Mod Possess',
-        3 => 'Periodic Damage',
-        4 => 'Dummy',
-        5 => 'Mod Confuse',
-        6 => 'Mod Charm',
-        7 => 'Mod Fear',
-        8 => 'Periodic Heal',
-        9 => 'Mod Attack Speed',
-        10 => 'Mod Threat',
-        11 => 'Taunt',
-        12 => 'Stun',
-        13 => 'Mod Damage Done Flat',
-        14 => 'Mod Damage Taken Flat',
-        15 => 'Damage Shield',
-        16 => 'Mod Stealth',
-        17 => 'Mod Stealth Detection',
-        18 => 'Mod Invisibility',
-        19 => 'Mod Invisibility Detection',
-        20 => 'Mod Health Percent',
-        21 => 'Mod Power Percent',
-        22 => 'Mod Resistance Flat',
-        23 => 'Periodic Trigger Spell',
-        24 => 'Periodic Energize',
-        25 => 'Pacify',
-        26 => 'Root',
-        27 => 'Silence',
-        28 => 'Reflect Spells',
-        29 => 'Mod Stat Flat',
-        30 => 'Mod Skill',
-        31 => 'Mod Increase Speed',
-        32 => 'Mod Increase Mounted Speed',
-        33 => 'Mod Decrease Speed',
-        34 => 'Mod Increase Health',
-        35 => 'Mod Increase Power',
-        36 => 'Shapeshift',
-        37 => 'Spell Effect Immunity',
-        38 => 'Spell Aura Immunity',
-        39 => 'School Immunity',
-        40 => 'Damage Immunity',
-        41 => 'Dispel Immunity',
-        42 => 'Proc Trigger Spell',
-        43 => 'Proc Trigger Damage',
-        44 => 'Track Creatures',
-        45 => 'Track Resources',
-        46 => 'Mod Parry Skill',
-        47 => 'Mod Parry Percent',
-        48 => 'Unknown Aura',
-        49 => 'Mod Dodge Percent',
-        50 => 'Mod Critical Healing Amount',
-        51 => 'Mod Block Percent',
-        52 => 'Mod Physical Crit Percent',
-        53 => 'Periodic Health Leech',
-        54 => 'Mod Hit Chance',
-        55 => 'Mod Spell Hit Chance',
-        56 => 'Transform',
-        57 => 'Mod Spell Crit Chance',
-        58 => 'Mod Increase Swim Speed',
-        59 => 'Mod Damage Done Versus Creature',
-        60 => 'Pacify Silence',
-        61 => 'Mod Scale',
-        62 => 'Periodic Health Funnel',
-        63 => 'Periodic Mana Funnel',
-        64 => 'Periodic Mana Leech',
-        65 => 'Mod Casting Speed (not stacking)',
-        66 => 'Feign Death',
-        67 => 'Disarm',
-        68 => 'Stalked',
-        69 => 'School Absorb',
-        70 => 'Extra Attacks',
-        71 => 'Mod Spell Crit Chance School',
-        72 => 'Mod Power Cost School Percent',
-        73 => 'Mod Power Cost School Flat',
-        74 => 'Reflect Spells School',
-        75 => 'Language',
-        76 => 'Far Sight',
-        77 => 'Mechanic Immunity',
-        78 => 'Mounted',
-        79 => 'Mod Damage Done Percent',
-        80 => 'Mod Stat Percent',
-        81 => 'Split Damage Percent',
-        82 => 'Water Breathing',
-        83 => 'Mod Base Resistance Flat',
-        84 => 'Mod Health Regeneration',
-        85 => 'Mod Power Regeneration',
-        86 => 'Channel Death Item',
-        87 => 'Mod Damage Taken Percent',
-        88 => 'Mod Health Regeneration Percent',
-        89 => 'Periodic Damage Percent',
-        90 => 'Mod Resist Chance',
-        91 => 'Mod Detect Range',
-        92 => 'Prevent Fleeing',
-        93 => 'Unattackable',
-        94 => 'Interrupt Regeneration',
-        95 => 'Ghost',
-        96 => 'Spell Magnet',
-        97 => 'Mana Shield',
-        98 => 'Mod Skill Value',
-        99 => 'Mod Attack Power',
-        100 => 'Auras Visible',
-        101 => 'Mod Resistance Percent',
-        102 => 'Mod Melee Attack Power Versus',
-        103 => 'Mod Total Threat',
-        104 => 'Water Walk',
-        105 => 'Feather Fall',
-        106 => 'Hover',
-        107 => 'Add Flat Modifier',
-        108 => 'Add Percent Modifier',
-        109 => 'Add Target Trigger',
-        110 => 'Mod Power Regeneration Percent',
-        111 => 'Add Caster Hit Trigger',
-        112 => 'Override Class Scripts',
-        113 => 'Mod Ranged Damage Taken Flat',
-        114 => 'Mod Ranged Damage Taken Percent',
-        115 => 'Mod Healing',
-        116 => 'Mod Regeneration During Combat',
-        117 => 'Mod Mechanic Resistance',
-        118 => 'Mod Healing Taken Percent',
-        119 => 'Share Pet Tracking',
-        120 => 'Untrackable',
-        121 => 'Empathy',
-        122 => 'Mod Offhand Damage Percent',
-        123 => 'Mod Target Resistance',
-        124 => 'Mod Ranged Attack Power',
-        125 => 'Mod Melee Damage Taken Flat',
-        126 => 'Mod Melee Damage Taken Percent',
-        127 => 'Ranged Attack Power Attacker Bonus',
-        128 => 'Possess Pet',
-        129 => 'Mod Speed Always',
-        130 => 'Mod Mounted Speed Always',
-        131 => 'Mod Ranged Attack Power Versus',
-        132 => 'Mod Increase Energy Percent',
-        133 => 'Mod Increase Health Percent',
-        134 => 'Mod Mana Regeneration Interrupt',
-        135 => 'Mod Healing Done Flat',
-        136 => 'Mod Healing Done Percent',
-        137 => 'Mod Total Stat Percentage',
-        138 => 'Mod Melee Haste',
-        139 => 'Force Reaction',
-        140 => 'Mod Ranged Haste',
-        141 => 'Mod Ranged Ammo Haste',
-        142 => 'Mod Base Resistance Percent',
-        143 => 'Mod Resistance Exclusive',
-        144 => 'Safe Fall',
-        145 => 'Mod Pet Talent Points',
-        146 => 'Allow Tame Pet Type',
-        147 => 'Mechanic Immunity Mask',
-        148 => 'Retain Combo Points',
-        149 => 'Reduce Pushback',
-        150 => 'Mod Shield Blockvalue Percent',
-        151 => 'Track Stealthed',
-        152 => 'Mod Detected Range',
-        153 => 'Split Damage Flat',
-        154 => 'Mod Stealth Level',
-        155 => 'Mod Water Breathing',
-        156 => 'Mod Reputation Gain',
-        157 => 'Pet Damage Multi',
-        158 => 'Mod Shield Blockvalue',
-        159 => 'No PvP Credit',
-        160 => 'Mod AoE Avoidance',
-        161 => 'Mod Health Regeneration In Combat',
-        162 => 'Power Burn Mana',
-        163 => 'Mod Crit Damage Bonus',
-        164 => 'Unknown Aura',
-        165 => 'Melee Attack Power Attacker Bonus',
-        166 => 'Mod Attack Power Percent',
-        167 => 'Mod Ranged Attack Power Percent',
-        168 => 'Mod Damage Done Versus',
-        169 => 'Mod Crit Percent Versus',
-        170 => 'Change Model',
-        171 => 'Mod Speed (not stacking)',
-        172 => 'Mod Mounted Speed (not stacking)',
-        173 => 'Unknown Aura',
-        174 => 'Mod Spell Damage Of Stat Percent',
-        175 => 'Mod Spell Healing Of Stat Percent',
-        176 => 'Spirit Of Redemption',
-        177 => 'AoE Charm',
-        178 => 'Mod Debuff Resistance',
-        179 => 'Mod Attacker Spell Crit Chance',
-        180 => 'Mod Spell Damage Versus',
-        181 => 'Unknown Aura',
-        182 => 'Mod Resistance Of Stat Percent',
-        183 => 'Mod Critical Threat',
-        184 => 'Mod Attacker Melee Hit Chance',
-        185 => 'Mod Attacker Ranged Hit Chance',
-        186 => 'Mod Attacker Spell Hit Chance',
-        187 => 'Mod Attacker Melee Crit Chance',
-        188 => 'Mod Attacker Ranged Crit Chance',
-        189 => 'Mod Rating',
-        190 => 'Mod Faction Reputation Gain',
-        191 => 'Use Normal Movement Speed',
-        192 => 'Mod Melee Ranged Haste',
-        193 => 'Mod Haste',
-        194 => 'Mod Target Absorb School',
-        195 => 'Mod Target Ability Absorb School',
-        196 => 'Mod Cooldown',
-        197 => 'Mod Attacker Spell And Weapon Crit Chance',
-        198 => 'Unknown Aura',
-        199 => 'Mod Increases Spell Percent to Hit',
-        200 => 'Mod XP Percent',
-        201 => 'Fly',
-        202 => 'Ignore Combat Result',
-        203 => 'Mod Attacker Melee Crit Damage',
-        204 => 'Mod Attacker Ranged Crit Damage',
-        205 => 'Mod School Crit Damage Taken',
-        206 => 'Mod Increase Vehicle Flight Speed',
-        207 => 'Mod Increase Mounted Flight Speed',
-        208 => 'Mod Increase Flight Speed',
-        209 => 'Mod Mounted Flight Speed Always',
-        210 => 'Mod Vehicle Speed Always',
-        211 => 'Mod Flight Speed (not stacking)',
-        212 => 'Mod Ranged Attack Power Of Stat Percent',
-        213 => 'Mod Rage from Damage Dealt',
-        214 => 'Tamed Pet Passive',
-        215 => 'Arena Preparation',
-        216 => 'Haste Spells',
-        217 => 'Killing Spree',
-        218 => 'Haste Ranged',
-        219 => 'Mod Mana Regeneration from Stat',
-        220 => 'Mod Rating from Stat',
-        221 => 'Ignore Threat',
-        222 => 'Unknown Aura',
-        223 => 'Raid Proc from Charge',
-        224 => 'Unknown Aura',
-        225 => 'Raid Proc from Charge With Value',
-        226 => 'Periodic Dummy',
-        227 => 'Periodic Trigger Spell With Value',
-        228 => 'Detect Stealth',
-        229 => 'Mod AoE Damage Avoidance',
-        230 => 'Mod Increase Health',
-        231 => 'Proc Trigger Spell With Value',
-        232 => 'Mod Mechanic Duration',
-        233 => 'Mod Display Model',
-        234 => 'Mod Mechanic Duration (not stacking)',
-        235 => 'Mod Dispel Resist',
-        236 => 'Control Vehicle',
-        237 => 'Mod Spell Damage Of Attack Power',
-        238 => 'Mod Spell Healing Of Attack Power',
-        239 => 'Mod Scale 2',
-        240 => 'Mod Expertise',
-        241 => 'Force Move Forward',
-        242 => 'Mod Spell Damage from Healing',
-        243 => 'Mod Faction',
-        244 => 'Comprehend Language',
-        245 => 'Mod Aura Duration By Dispel',
-        246 => 'Mod Aura Duration By Dispel (not stacking)',
-        247 => 'Clone Caster',
-        248 => 'Mod Combat Result Chance',
-        249 => 'Convert Rune',
-        250 => 'Mod Increase Health 2',
-        251 => 'Mod Enemy Dodge',
-        252 => 'Mod Speed Slow All',
-        253 => 'Mod Block Crit Chance',
-        254 => 'Mod Disarm Offhand',
-        255 => 'Mod Mechanic Damage Taken Percent',
-        256 => 'No Reagent Use',
-        257 => 'Mod Target Resist By Spell Class',
-        258 => 'Mod Spell Visual',
-        259 => 'Mod HoT Percent',
-        260 => 'Screen Effect',
-        261 => 'Phase',
-        262 => 'Ability Ignore Aurastate',
-        263 => 'Allow Only Ability',
-        264 => 'Unknown Aura',
-        265 => 'Unknown Aura',
-        266 => 'Unknown Aura',
-        267 => 'Mod Immune Aura Apply School',
-        268 => 'Mod Attack Power Of Stat Percent',
-        269 => 'Mod Ignore Target Resist',
-        270 => 'Mod Ability Ignore Target Resist',
-        271 => 'Mod Damage Taken Percent From Caster',
-        272 => 'Ignore Melee Reset',
-        273 => 'X Ray',
-        274 => 'Ability Consume No Ammo',
-        275 => 'Mod Ignore Shapeshift',
-        276 => 'Mod Mechanic Damage Done Percent',
-        277 => 'Mod Max Affected Targets',
-        278 => 'Mod Disarm Ranged',
-        279 => 'Initialize Images',
-        280 => 'Mod Armor Penetration Percent',
-        281 => 'Mod Honor Gain Percent',
-        282 => 'Mod Base Health Percent',
-        283 => 'Mod Healing Received',
-        284 => 'Linked',
-        285 => 'Mod Attack Power Of Armor',
-        286 => 'Ability Periodic Crit',
-        287 => 'Deflect Spells',
-        288 => 'Ignore Hit Direction',
-        289 => 'Unknown Aura',
-        290 => 'Mod Crit Percent',
-        291 => 'Mod XP Quest Percent',
-        292 => 'Open Stable',
-        293 => 'Override Spells',
-        294 => 'Prevent Power Regeneration',
-        295 => 'Unknown Aura',
-        296 => 'Set Vehicle Id',
-        297 => 'Block Spell Family',
-        298 => 'Strangulate',
-        299 => 'Unknown Aura',
-        300 => 'Share Damage Percent',
-        301 => 'School Heal Absorb',
-        302 => 'Unknown Aura',
-        303 => 'Mod Damage Done Versus Aurastate',
-        304 => 'Mod Fake Inebriate',
-        305 => 'Mod Minimum Speed',
-        306 => 'Unknown Aura',
-        307 => 'Heal Absorb Test',
-        308 => 'Hunter Trap',
-        309 => 'Unknown Aura',
-        310 => 'Mod Creature AoE Damage Avoidance',
-        311 => 'Unknown Aura',
-        312 => 'Unknown Aura',
-        313 => 'Unknown Aura',
-        314 => 'Prevent Ressurection',
-        315 => 'Underwater Walking',
-        316 => 'Periodic Haste'
     );
 
     public static $bgImagePath              = array (
@@ -707,7 +362,7 @@ class Util
     );
 
     public static $configCats               = array(
-        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics'
+        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler'
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
@@ -748,16 +403,6 @@ class Util
         self::$execTime = $newTime;
 
         return self::formatTime($tDiff * 1000, true);
-    }
-
-    public static function getBuyoutForItem($itemId)
-    {
-        if (!$itemId)
-            return 0;
-
-        // try, when having filled char-DB at hand
-        // return DB::Characters()->selectCell('SELECT SUM(a.buyoutprice) / SUM(ii.count) FROM auctionhouse a JOIN item_instance ii ON ii.guid = a.itemguid WHERE ii.itemEntry = ?d', $itemId);
-        return 0;
     }
 
     public static function formatMoney($qty)
@@ -868,67 +513,8 @@ class Util
         }
     }
 
-    public static function itemModByRatingMask($mask)
-    {
-        if (($mask & 0x1C000) == 0x1C000)                   // special case resilience
-            return ITEM_MOD_RESILIENCE_RATING;
-
-        if (($mask & 0x00E0) == 0x00E0)                     // special case hit rating
-            return ITEM_MOD_HIT_RATING;
-
-        for ($j = 0; $j < count(self::$combatRatingToItemMod); $j++)
-        {
-            if (!self::$combatRatingToItemMod[$j])
-                continue;
-
-            if (!($mask & (1 << $j)))
-                continue;
-
-            return self::$combatRatingToItemMod[$j];
-        }
-
-        return 0;
-    }
-
-    public static function sideByRaceMask($race)
-    {
-        // Any
-        if (!$race || ($race & RACE_MASK_ALL) == RACE_MASK_ALL)
-            return SIDE_BOTH;
-
-        // Horde
-        if ($race & RACE_MASK_HORDE && !($race & RACE_MASK_ALLIANCE))
-            return SIDE_HORDE;
-
-        // Alliance
-        if ($race & RACE_MASK_ALLIANCE && !($race & RACE_MASK_HORDE))
-            return SIDE_ALLIANCE;
-
-        return SIDE_BOTH;
-    }
-
-    public static function getReputationLevelForPoints($pts)
-    {
-        if ($pts >= 41999)
-            return REP_EXALTED;
-        else if ($pts >= 20999)
-            return REP_REVERED;
-        else if ($pts >= 8999)
-            return REP_HONORED;
-        else if ($pts >= 2999)
-            return REP_FRIENDLY;
-        else if ($pts >= 0)
-            return REP_NEUTRAL;
-        else if ($pts >= -3000)
-            return REP_UNFRIENDLY;
-        else if ($pts >= -6000)
-            return REP_HOSTILE;
-        else
-            return REP_HATED;
-    }
-
     // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText($text)
+    public static function parseHtmlText($text , $markdown = false)
     {
         if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
@@ -937,7 +523,7 @@ class Util
                 '</HTML>'   => '',
                 '<BODY>'    => '',
                 '</BODY>'   => '',
-                '<BR></BR>' => '<br />'
+                '<BR></BR>' => $markdown ? '[br]' : '<br />'
             );
 
             // html may contain 'Pictures' and FlavorImages and "stuff"
@@ -948,7 +534,7 @@ class Util
             );
         }
         else
-            $text = strtr($text, ["\n" => '<br />', "\r" => '']);
+            $text = strtr($text, ["\n" => $markdown ? '[br]' : '<br />', "\r" => '']);
 
         $from = array(
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
@@ -957,34 +543,45 @@ class Util
             '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
             '/\|\d\-?\d?\((\$\w)\)/ui',                     // and another modifier for something russian       |3-6($r)
             '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
-            '/\$(\d+)w/ui'                                  // worldState(?)-ref found on some pageTexts        $1234w
+            '/\$(\d+)w/ui',                                 // worldState(?)-ref found on some pageTexts        $1234w
+            '/\$c/i',                                       // class-ref
+            '/\$r/i',                                       // race-ref
+            '/\$n/i',                                       // name-ref
+            '/\$b/i',                                       // line break
+            '/\|n/i'                                        // what .. the fuck .. another type of line terminator? (only in spanish though)
         );
 
-        $to = array(
+        $toMD = array(
+            '[icon name=\2]',
+            '[span color=#\1>\2[/span]',
+            '&lt;\1/\2&gt;',
+            '',
+            '\1',
+            '&lt;\1&gt;',
+            '[span class=q0>WorldState #\1[/span]',
+            '&lt;'.Lang::game('class').'&gt;',
+            '&lt;'.Lang::game('race').'&gt;',
+            '&lt;'.Lang::main('name').'&gt;',
+            '[br]',
+            ''
+        );
+
+        $toHTML = array(
             '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/\2.gif)">',
             '<span style="color: #\1">\2</span>',
             '&lt;\1/\2&gt;',
             '',
             '\1',
             '&lt;\1&gt;',
-            '<span class="q0">WorldState #\1</span>'
+            '<span class="q0">WorldState #\1</span>',
+            '&lt;'.Lang::game('class').'&gt;',
+            '&lt;'.Lang::game('race').'&gt;',
+            '&lt;'.Lang::main('name').'&gt;',
+            '<br />',
+            ''
         );
 
-        $text = preg_replace($from, $to, $text);
-
-        $pairs = array(
-            '$c' => '&lt;'.Lang::game('class').'&gt;',
-            '$C' => '&lt;'.Lang::game('class').'&gt;',
-            '$r' => '&lt;'.Lang::game('race').'&gt;',
-            '$R' => '&lt;'.Lang::game('race').'&gt;',
-            '$n' => '&lt;'.Lang::main('name').'&gt;',
-            '$N' => '&lt;'.Lang::main('name').'&gt;',
-            '$b' => '<br />',
-            '$B' => '<br />',
-            '|n' => ''                                      // what .. the fuck .. another type of line terminator? (only in spanish though)
-        );
-
-        return strtr($text, $pairs);
+        return preg_replace($from, $markdown ? $toMD : $toHTML, $text);
     }
 
     public static function asHex($val)
@@ -1014,8 +611,8 @@ class Util
 
             return $data;
         }
-        else
-            return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
+
+        return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
     }
 
     public static function jsEscape($data)
@@ -1027,19 +624,41 @@ class Util
 
             return $data;
         }
-        else
-            return strtr(trim($data), array(
-                '\\' => '\\\\',
-                "'"  => "\\'",
-                '"'  => '\\"',
-                "\r" => '\\r',
-                "\n" => '\\n'
-            ));
+
+        return strtr(trim($data), array(
+            '\\' => '\\\\',
+            "'"  => "\\'",
+            '"'  => '\\"',
+            "\r" => '\\r',
+            "\n" => '\\n'
+        ));
+    }
+
+    public static function defStatic($data)
+    {
+        if (is_array($data))
+        {
+            foreach ($data as &$v)
+                $v = self::defStatic($v);
+
+            return $data;
+        }
+
+        return strtr($data, array(
+            '<script'    => '<scr"+"ipt',
+            'script>'    => 'scr"+"ipt>',
+            'HOST_URL'   => HOST_URL,
+            'STATIC_URL' => STATIC_URL
+        ));
     }
 
     // default back to enUS if localization unavailable
     public static function localizedString($data, $field, $silent = false)
     {
+        // only display placeholder markers for staff
+        if (!User::isInGroup(U_GROUP_EMPLOYEE | U_GROUP_TESTER | U_GROUP_LOCALIZER))
+            $silent = true;
+
         // default case: selected locale available
         if (!empty($data[$field.'_loc'.User::$localeId]))
             return $data[$field.'_loc'.User::$localeId];
@@ -1067,7 +686,7 @@ class Util
         if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING, ITEM_MOD_RESILIENCE_RATING]) && $level < 34)
             $level = 34;
 
-        if (!isset(Util::$gtCombatRatings[$type]))
+        if (!isset(self::$gtCombatRatings[$type]))
             $result = 0;
         else
         {
@@ -1081,7 +700,7 @@ class Util
                 $c = 2 / 52;
 
             // do not use localized number format here!
-            $result = number_format($val / Util::$gtCombatRatings[$type] / $c, 2);
+            $result = number_format($val / self::$gtCombatRatings[$type] / $c, 2);
         }
 
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
@@ -1130,47 +749,48 @@ class Util
     }
 
     // note: valid integer > 32bit are returned as float
-    public static function checkNumeric(&$data)
+    public static function checkNumeric(&$data, $typeCast = NUM_ANY)
     {
         if ($data === null)
             return false;
         else if (!is_array($data))
         {
             $data = trim($data);
+            if (preg_match('/^-?\d*,\d+$/', $data))
+                $data = strtr($data, ',', '.');
 
             if (is_numeric($data))
             {
-                $data += 0;
-                return true;
-            }
-            else if (preg_match('/^\d*,\d+$/', $data))
-            {
-                $data = floatVal(strtr($data, ',', '.'));
+                $data += 0;                                 // becomes float or int
+
+                if ((is_float($data) && $typeCast == NUM_REQ_INT) ||
+                    (is_int($data) && $typeCast == NUM_REQ_FLOAT))
+                    return false;
+
+                if (is_float($data) && $typeCast == NUM_CAST_INT)
+                    $data = intval($data);
+
+                if (is_int($data) && $typeCast == NUM_CAST_FLOAT)
+                    $data = floatval($data);
+
                 return true;
             }
 
             return false;
         }
 
-        array_walk($data, function(&$item, $key) {
-            self::checkNumeric($item);
-        });
+        array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
 
         return false;                                       // always false for passed arrays
     }
 
-    public static function arraySumByKey(&$ref)
+    public static function arraySumByKey(array &$ref, array ...$adds) : void
     {
-        $nArgs = func_num_args();
-        if (!is_array($ref) || $nArgs < 2)
+        if (!$adds)
             return;
 
-        for ($i = 1; $i < $nArgs; $i++)
+        foreach ($adds as $arr)
         {
-            $arr = func_get_arg($i);
-            if (!is_array($arr))
-                continue;
-
             foreach ($arr as $k => $v)
             {
                 if (!isset($ref[$k]))
@@ -1179,82 +799,6 @@ class Util
                 $ref[$k] += $v;
             }
         }
-    }
-
-    public static function getTaughtSpells(&$spell)
-    {
-        $extraIds = [-1];                                    // init with -1 to prevent empty-array errors
-        $lookup   = [-1];
-        switch (gettype($spell))
-        {
-            case 'object':
-                if (get_class($spell) != 'SpellList')
-                    return [];
-
-                $lookup[] = $spell->id;
-                foreach ($spell->canTeachSpell() as $idx)
-                    $extraIds[] = $spell->getField('effect'.$idx.'TriggerSpell');
-
-                break;
-            case 'integer':
-                $lookup[] = $spell;
-                break;
-            case 'array':
-                $lookup = $spell;
-                break;
-            default:
-                return [];
-        }
-
-        // note: omits required spell and chance in skill_discovery_template
-        $data = array_merge(
-            DB::World()->selectCol('SELECT spellId FROM spell_learn_spell WHERE entry IN (?a)', $lookup),
-            DB::World()->selectCol('SELECT spellId FROM skill_discovery_template WHERE reqSpell IN (?a)', $lookup),
-            $extraIds
-        );
-
-        // return list of integers, not strings
-        array_walk($data, function (&$v, $k) {
-            $v = intVal($v);
-        });
-
-        return $data;
-    }
-
-    public static function urlize($str)
-    {
-        $search  = ['<', '>', ' / ', "'", '(', ')'];
-        $replace = ['&lt;', '&gt;', '-', '', '', ''];
-        $str = str_replace($search, $replace, $str);
-
-        $accents = array(
-            "ß" => "ss",
-            "á" => "a", "ä" => "a", "à" => "a", "â" => "a",
-            "è" => "e", "ê" => "e", "é" => "e", "ë" => "e",
-            "í" => "i", "î" => "i", "ì" => "i", "ï" => "i",
-            "ñ" => "n",
-            "ò" => "o", "ó" => "o", "ö" => "o", "ô" => "o",
-            "ú" => "u", "ü" => "u", "û" => "u", "ù" => "u",
-            "œ" => "oe",
-            "Á" => "A", "Ä" => "A", "À" => "A", "Â" => "A",
-            "È" => "E", "Ê" => "E", "É" => "E", "Ë" => "E",
-            "Í" => "I", "Î" => "I", "Ì" => "I", "Ï" => "I",
-            "Ñ" => "N",
-            "Ò" => "O", "Ó" => "O", "Ö" => "O", "Ô" => "O",
-            "Ú" => "U", "Ü" => "U", "Û" => "U", "Ù" => "U",
-            "œ" => "Oe"
-        );
-        $str = strtr($str, $accents);
-        $str = trim($str);
-        $str = preg_replace('/[^a-z0-9]/i', '-', $str);
-
-        $str = str_replace('--', '-', $str);
-        $str = str_replace('--', '-', $str);
-
-        $str = rtrim($str, '-');
-        $str = strtolower($str);
-
-        return $str;
     }
 
     public static function isValidEmail($email)
@@ -1296,18 +840,14 @@ class Util
         return $hash;
     }
 
-    public static function mergeJsGlobals(&$master)
+    public static function mergeJsGlobals(array &$master, array ...$adds) : bool
     {
-        $args = func_get_args();
-        if (count($args) < 2)                               // insufficient args
+        if (!$adds)                                         // insufficient args
             return false;
 
-        if (!is_array($master))
-            $master = [];
-
-        for ($i = 1; $i < count($args); $i++)               // skip first (master) entry
+        foreach ($adds as $arr)
         {
-            foreach ($args[$i] as $type => $data)
+            foreach ($arr as $type => $data)
             {
                 // bad data or empty
                 if (empty(Util::$typeStrings[$type]) || !is_array($data) || !$data)
@@ -1412,23 +952,6 @@ class Util
         return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
     }
 
-    // TYPE => tableName; when handling comments, screenshots or videos
-    public static function getCCTableParent($type)
-    {
-        // only filtrable types; others don't care about being flagged for having CommunityContent
-        switch ($type)
-        {
-            case TYPE_ACHIEVEMENT:  return '?_achievement';
-            case TYPE_SPELL:        return '?_spell';
-            case TYPE_OBJECT:       return '?_objects';
-            case TYPE_ITEM:         return '?_items';
-            case TYPE_ITEMSET:      return '?_itemset';
-            case TYPE_NPC:          return '?_creature';
-            case TYPE_QUEST:        return '?_quests';
-            default:                return null;
-        }
-    }
-
     public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)
     {
         if (!$srcGroup && !$srcEntry)
@@ -1462,12 +985,12 @@ class Util
             switch ($c['ConditionTypeOrReference'])
             {
                 case CND_AURA:                              // 1
-                    $c['ConditionValue2'] = NULL;           // do not use his param
+                    $c['ConditionValue2'] = null;           // do not use his param
                 case CND_SPELL:                             // 25
                     $jsGlobals[TYPE_SPELL][] = $c['ConditionValue1'];
                     break;
                 case CND_ITEM:                              // 2
-                    $c['ConditionValue3'] = NULL;           // do not use his param
+                    $c['ConditionValue3'] = null;           // do not use his param
                 case CND_ITEM_EQUIPPED:                     // 3
                     $jsGlobals[TYPE_ITEM][] = $c['ConditionValue1'];
                     break;
@@ -1597,38 +1120,375 @@ class Util
         return $json;
     }
 
-    public static function checkOrCreateDirectory($path)
+    public static function createSqlBatchInsert(array $data)
     {
-        // remove multiple slashes
-        $path = preg_replace('|/+|', '/', $path);
+        $nRows  = 100;
+        $nItems = count(reset($data));
+        $result = [];
+        $buff   = [];
 
-        if (!is_dir($path) && !@mkdir($path, self::FILE_ACCESS, true))
-            trigger_error('Could not create directory: '.$path, E_USER_ERROR);
-        else if (!is_writable($path) && !@chmod($path, self::FILE_ACCESS))
-            trigger_error('Cannot write into directory: '.$path, E_USER_ERROR);
-        else
-            return true;
+        if (!count($data))
+            return [];
 
-        return false;
-    }
-
-    private static $realms = [];
-    public static function getRealms()
-    {
-        if (DB::isConnectable(DB_AUTH) && !self::$realms)
+        foreach ($data as $d)
         {
-            self::$realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
-            foreach (self::$realms as $rId => $rData)
-            {
-                if (DB::isConnectable(DB_CHARACTERS . $rId))
-                    continue;
+            if (count($d) != $nItems)
+                return [];
 
-                unset(self::$realms[$rId]);
-                trigger_error('Realm #'.$rId.' ('.$rData['name'].') has no connection info set.', E_USER_NOTICE);
+            $d = array_map(function ($x) {
+                if ($x === null)
+                    return 'NULL';
+
+                return DB::Aowow()->escape($x);
+            }, $d);
+
+            $buff[] = implode(',', $d);
+
+            if (count($buff) >= $nRows)
+            {
+                $result[] = '('.implode('),(', $buff).')';
+                $buff = [];
             }
         }
 
-        return self::$realms;
+        if ($buff)
+            $result[] = '('.implode('),(', $buff).')';
+
+        return $result;
+    }
+
+    /*****************/
+    /* file handling */
+    /*****************/
+
+    public static function writeFile($file, $content)
+    {
+        $success = false;
+        if ($handle = @fOpen($file, "w"))
+        {
+            if (fWrite($handle, $content))
+                $success = true;
+            else
+                trigger_error('could not write to file', E_USER_ERROR);
+
+            fClose($handle);
+        }
+        else
+            trigger_error('could not create file', E_USER_ERROR);
+
+        if ($success)
+            @chmod($file, Util::FILE_ACCESS);
+
+        return $success;
+    }
+
+    public static function writeDir($dir)
+    {
+        // remove multiple slashes
+        $dir = preg_replace('|/+|', '/', $dir);
+
+        if (is_dir($dir))
+        {
+            if (!is_writable($dir) && !@chmod($dir, Util::FILE_ACCESS))
+                trigger_error('cannot write into directory', E_USER_ERROR);
+
+            return is_writable($dir);
+        }
+
+        if (@mkdir($dir, Util::FILE_ACCESS, true))
+            return true;
+
+        trigger_error('could not create directory', E_USER_ERROR);
+        return false;
+    }
+
+
+    /**************/
+    /* Good Skill */
+    /**************/
+
+    public static function getEquipmentScore($itemLevel, $quality, $slot, $nSockets = 0)
+    {
+        $score = $itemLevel;
+
+        // quality mod
+        switch ($quality)
+        {
+            case ITEM_QUALITY_POOR:
+                $score = 0;                                 // guessed as crap
+                break;
+            case ITEM_QUALITY_NORMAL:
+                $score = 0;                                 // guessed as crap
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                $score /= 2.0;
+                break;
+            case ITEM_QUALITY_RARE:
+                $score /= 1.8;
+                break;
+            case ITEM_QUALITY_EPIC:
+                $score /= 1.2;
+                break;
+            case ITEM_QUALITY_LEGENDARY:
+                $score /= 1;
+                break;
+            case ITEM_QUALITY_HEIRLOOM:                     // actual calculation in javascript .. still uses this as some sort of factor..?
+                break;
+            case ITEM_QUALITY_ARTIFACT:
+                break;
+        }
+
+        switch ($slot)
+        {
+            case INVTYPE_WEAPON:
+            case INVTYPE_WEAPONMAINHAND:
+            case INVTYPE_WEAPONOFFHAND:
+                $score *= 27/64;
+                break;
+            case INVTYPE_SHIELD:
+            case INVTYPE_HOLDABLE:
+                $score *= 9/16;
+                break;
+            case INVTYPE_HEAD:
+            case INVTYPE_CHEST:
+            case INVTYPE_LEGS:
+            case INVTYPE_2HWEAPON:
+                $score *= 1.0;
+                break;
+            case INVTYPE_SHOULDERS:
+            case INVTYPE_HANDS:
+            case INVTYPE_WAIST:
+            case INVTYPE_FEET:
+                $score *= 3/4;
+                break;
+            case INVTYPE_WRISTS:
+            case INVTYPE_NECK:
+            case INVTYPE_CLOAK:
+            case INVTYPE_FINGER:
+            case INVTYPE_TRINKET:
+                $score *= 9/16;
+                break;
+            case INVTYPE_THROWN:
+            case INVTYPE_RANGED:
+            case INVTYPE_RELIC:
+                $score *= 81/256;
+                break;
+            default:
+                $score *= 0.0;
+        }
+
+        // subtract sockets
+        if ($nSockets)
+        {
+            // items by expansion overlap in this range. luckily highlevel raid items are exclusivly epic or better
+            if ($itemLevel > 164 || ($itemLevel > 134 && $quality < ITEM_QUALITY_EPIC))
+                $score -= $nSockets * self::GEM_SCORE_BASE_WOTLK;
+            else
+                $score -= $nSockets * self::GEM_SCORE_BASE_BC;
+        }
+
+        return round(max(0.0, $score), 4);
+    }
+
+    public static function getGemScore($itemLevel, $quality, $profSpec = false, $itemId = 0)
+    {
+        // prepare score-lookup
+        if (empty(self::$perfectGems))
+            self::$perfectGems = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE requiredSpecialization = ?d', 55534);
+
+        // epic - WotLK - increased stats / profession specific (Dragon's Eyes)
+        if ($profSpec)
+            return 32.0;
+        // epic - WotLK - base stats
+        if ($itemLevel == 80 && $quality == ITEM_QUALITY_EPIC)
+            return 20.0;
+        // rare - WotLK [GEM BASELINE!]
+        if ($itemLevel == 80 && $quality == ITEM_QUALITY_RARE)
+            return 16.0;
+        // uncommon - WotLK - inreased stats
+        if ($itemId > 0 && in_array($itemId, self::$perfectGems))
+            return 14.0;
+        // uncommon - WotLK - base stats
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_UNCOMMON)
+            return 12.0;
+        // epic - BC - vendored (PvP)
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_EPIC)
+            return 10.0;
+        // epic - BC - dropped / crafted
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_EPIC)
+            return 9.0;
+        // rare - BC - crafted
+        if ($itemLevel == 70 && $quality == ITEM_QUALITY_RARE)
+            return 8.0;
+        // rare - BC - vendored (pvp)
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_RARE)
+            return 7.0;
+        // uncommon - BC
+        if ($itemLevel == 60 && $quality == ITEM_QUALITY_UNCOMMON)
+            return 6.0;
+        // common - BC - vendored gems
+        if ($itemLevel == 55 && $quality == ITEM_QUALITY_NORMAL)
+            return 4.0;
+
+        // dafuq..?
+        return 0.0;
+    }
+
+    public static function getEnchantmentScore($itemLevel, $quality, $profSpec = false, $idOverride = 0)
+    {
+        // some hardcoded values, that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
+        if (in_array($idOverride, [3327, 3328, 3872, 3873]))
+            return 20.0;
+
+        if ($profSpec)
+            return 40.0;
+
+        // other than the constraints (0 - 20 points; 40 for profession perks), everything in here is guesswork
+        $score = max(min($itemLevel, 80), 0);
+
+        switch ($quality)
+        {
+            case ITEM_QUALITY_HEIRLOOM:                 // because i say so!
+                $score = 80.0;
+                break;
+            case ITEM_QUALITY_RARE:
+                $score /= 1.2;
+                break;
+            case ITEM_QUALITY_UNCOMMON:
+                $score /= 1.6;
+                break;
+            case ITEM_QUALITY_NORMAL:
+                $score /= 2.5;
+                break;
+        }
+
+        return round(max(0.0, $score / 4), 4);
+    }
+
+    public static function fixWeaponScores($class, $talents, $mainHand, $offHand)
+    {
+        $mh = 1;
+        $oh = 1;
+
+        if ($mainHand) { // Main Hand Equipped
+            if ($offHand) { // Off Hand Equipped
+                if ($mainHand['slotbak'] == 21 || $mainHand['slotbak'] == 13) { // Main Hand, One Hand
+                    if ($offHand['slotbak'] == 22 || $offHand['slotbak'] == 13) { // Off Hand, One Hand
+                        if ($class == 6 || $class == 3 || $class == 4 || // Death Knight, Hunter, Rogue
+                           ($class == 7 && $talents['spent'][1] > 30 && $talents['spec'] == 2) || // Enhancement Shaman Over 39
+                           ($class == 1 && $talents['spent'][1] < 51 && $talents['spec'] == 2)) // Fury Warrior Under 60
+                        {
+                            $mh = 64 / 27;
+                            $oh = 64 / 27;
+                        }
+                    }
+                    else if ($offHand['slotbak'] == 23 || $offHand['slotbak'] == 14) { // Held in Off Hand, Shield
+                        if ($class == 5 || $class == 9 || $class == 8 || // Priest, Warlock, Mage
+                           ($class == 11 && ($talents['spec'] == 1 || $talents['spec'] == 3)) || // Balance Druid, Restoration Druid
+                           ($class == 7 && ($talents['spec'] == 1 || $talents['spec'] == 3)) || // Elemental Shaman, Restoration Shaman
+                           ($class == 2 && ($talents['spec'] == 1 || $talents['spec'] == 2)) || // Holy Paladin, Protection Paladin
+                           ($class == 1 && $talents['spec'] == 3))  // Protection Warrior
+                        {
+                            $mh = 64 / 27;
+                            $oh = 16 / 9;
+                        }
+                    }
+                }
+            }
+            else if ($mainHand['slotbak'] == 17) {  // Two Handed
+                if ($class == 5 || $class == 9 || $class == 8 || // Priest, Warlock, Mage
+                    $class == 11 || $class == 3 || $class == 6 || // Druid, Hunter, Death Knight
+                   ($class == 7 && $talents['spent'][1] < 31 && $talents['spec'] == 2) || // Enhancement Shaman Under 40
+                   ($class == 2 && $talents['spec'] == 3) || // Retribution Paladin
+                   ($class == 1 && $talents['spec'] == 1)) // Arms Warrior
+                {
+                    $mh = 2;
+                    $oh = 0;
+                }
+            }
+        }
+
+        return array(
+            round($mainHand['gearscore'] * $mh),
+            round($offHand['gearscore']  * $oh)
+        );
+    }
+
+    static function createReport($mode, $reason, $subject, $desc, $userAgent = null, $appName = null, $url = null, $relUrl = null, $email = null)
+    {
+        $update = array(
+            'userId'      => User::$id,
+            'createDate'  => time(),
+            'mode'        => $mode,
+            'reason'      => $reason,
+            'subject'     => $subject ?: 0,                 // not set for utility, tools and misc pages
+            'ip'          => User::$ip,
+            'description' => $desc,
+            'userAgent'   => $userAgent ?: $_SERVER['HTTP_USER_AGENT'],
+            'appName'     => $appName ?: (get_browser(null, true)['browser'] ?: '')
+        );
+
+        if ($url)
+            $update['url'] = $url;
+
+        if ($relUrl)
+            $update['relatedurl'] = $relUrl;
+
+        if ($email)
+            $update['email'] = $email;
+
+        return DB::Aowow()->query('INSERT INTO ?_reports (?#) VALUES (?a)', array_keys($update), array_values($update));
+    }
+
+    // orientation is 2*M_PI for a full circle, increasing counterclockwise
+    static function O2Deg($o)
+    {
+        // orientation values can exceed boundaries (for whatever reason)
+        while ($o < 0)
+            $o += 2*M_PI;
+
+        while ($o >= 2*M_PI)
+            $o -= 2*M_PI;
+
+        $deg = 360 * (1 - ($o / (2*M_PI) ) );
+        if ($deg == 360)
+            $deg = 0;
+
+        $dir  = Lang::game('orientation');
+        $desc = '';
+        foreach ($dir as $f => $d)
+        {
+            if (!$f)
+                continue;
+
+            if ( ($deg >= (45 * $f) - 22.5) && ($deg <= (45 * $f) + 22.5) )
+            {
+                $desc = $d;
+                break;
+            }
+        }
+
+        if (!$desc)
+            $desc = $dir[0];
+
+        return [(int)$deg, $desc];
+    }
+
+    static function mask2bits($bitmask, $offset = 0)
+    {
+        $bits = [];
+        $i    = 0;
+        while ($bitmask)
+        {
+            if ($bitmask & (1 << $i))
+            {
+                $bitmask &= ~(1 << $i);
+                $bits[] = ($i + $offset);
+            }
+            $i++;
+        }
+
+        return $bits;
     }
 }
 

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class ClassPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_CLASS;
     protected $typeId        = 0;
@@ -96,7 +96,7 @@ class ClassPage extends GenericPage
         $this->expansion = Util::$expansionString[$this->subject->getField('expansion')];
         $this->headIcons = ['class_'.strtolower($this->subject->getField('fileString'))];
         $this->redButtons = array(
-            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => true,
             BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$this->typeId] * 3], 'pet' => false],
             BUTTON_FORUM   => false                         // todo (low): CFG_BOARD_URL + X
@@ -133,7 +133,7 @@ class ClassPage extends GenericPage
         $genSpells = new SpellList($conditions);
         if (!$genSpells->error)
         {
-            $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF));
+            $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
             $this->lvTabs[] = ['spell', array(
                 'data'            => array_values($genSpells->getListviewData()),

@@ -10,9 +10,9 @@ if (!CLI)
 
 class FileGen
 {
-    const MODE_NORMAL   = 0;
-    const MODE_FIRSTRUN = 1;
-    const MODE_UPDATE   = 2;
+    const MODE_NORMAL   = 1;
+    const MODE_FIRSTRUN = 2;
+    const MODE_UPDATE   = 3;
 
     public  static $tplPath = 'setup/tools/filegen/templates/';
 
@@ -23,6 +23,7 @@ class FileGen
         'icons',   'glyphs',    'pagetexts', 'loadingscreens',              // whole images
         'artwork', 'talentbgs', 'maps',      'spawn-maps',     'area-maps'  // images from image parts
     );
+    private static $mode      = 0;
 
     public static $subScripts = [];
     public static $tplFiles   = array(
@@ -48,7 +49,8 @@ class FileGen
         'enchants'      => [['items', 'spell', 'itemenchantment'], null],
         'gems'          => [['items', 'spell', 'itemenchantment'], null],
         'profiler'      => [['quests', 'quests_startend', 'spell', 'currencies', 'achievement', 'titles'], null],
-        'weightPresets' => [null, null]
+        'weightPresets' => [null, null],
+        'soundfiles'    => [['sounds'], null]
     );
 
     public  static $defaultExecTime = 30;
@@ -60,7 +62,8 @@ class FileGen
         'static/uploads/screenshots/temp',
         'static/uploads/screenshots/thumb',
         'static/uploads/temp/',
-        'static/download/searchplugins/'
+        'static/download/searchplugins/',
+        'static/wowsounds/'
     );
 
     public static $txtConstants = array(
@@ -92,19 +95,21 @@ class FileGen
 
         if (!CLISetup::$localeIds /* todo: && this script has localized text */)
         {
-            CLISetup::log('No valid locale specified. Check your config or --locales parameter, if used', CLISetup::LOG_ERROR);
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
             exit;
         }
 
         // create directory structure
-        CLISetup::log('FileGen::init() - creating required directories');
+        CLI::write('FileGen::init() - creating required directories');
         $pathOk = 0;
         foreach (self::$reqDirs as $rd)
             if (CLISetup::writeDir($rd))
                 $pathOk++;
 
-        CLISetup::log('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
-        CLISetup::log();
+        CLI::write('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
+        CLI::write();
+
+        self::$mode = $mode;
     }
 
     private static function handleCLIOpts(&$doScripts)
@@ -152,10 +157,10 @@ class FileGen
                 self::$cliOpts[$opt] = true;
     }
 
-    public static function hasOpt(/* ...$opt */)
+    public static function hasOpt(string ...$opts) : int
     {
         $result = 0x0;
-        foreach (func_get_args() as $idx => $arg)
+        foreach ($opts as $idx => $arg)
         {
             if (!is_string($arg))
                 continue;
@@ -191,63 +196,51 @@ class FileGen
             require_once 'setup/tools/filegen/'.$key.'.func.php';
         else if (empty(self::$tplFiles[$key]))
         {
-            CLISetup::log(sprintf(ERR_MISSING_INCL, $key, 'setup/tools/filegen/'.$key.'.func.php', CLISetup::LOG_ERROR));
+            CLI::write(sprintf(ERR_MISSING_INCL, $key, 'setup/tools/filegen/'.$key.'.func.php', CLI::LOG_ERROR));
             return false;
         }
 
-        CLISetup::log('FileGen::generate() - gathering data for '.$key);
+        CLI::write('FileGen::generate() - gathering data for '.$key);
 
         if (!empty(self::$tplFiles[$key]))
         {
-            list($file, $destPath, $deps) = self::$tplFiles[$key];
+            [$file, $destPath, $deps] = self::$tplFiles[$key];
 
             if ($content = file_get_contents(FileGen::$tplPath.$file.'.in'))
             {
-                if ($dest = @fOpen($destPath.$file, "w"))
+                // replace constants
+                $content = strtr($content, FileGen::$txtConstants);
+
+                // check for required auxiliary DBC files
+                foreach ($reqDBC as $req)
+                    if (!CLISetup::loadDBC($req))
+                        continue;
+
+                // must generate content
+                // PH format: /*setup:<setupFunc>*/
+                $funcOK = true;
+                if (preg_match_all('/\/\*setup:([\w\-_]+)\*\//i', $content, $m))
                 {
-                    // replace constants
-                    $content = strtr($content, FileGen::$txtConstants);
-
-                    // check for required auxiliary DBC files
-                    foreach ($reqDBC as $req)
-                        if (!CLISetup::loadDBC($req))
-                            continue;
-
-                    // must generate content
-                    // PH format: /*setup:<setupFunc>*/
-                    $funcOK = true;
-                    if (preg_match_all('/\/\*setup:([\w\-_]+)\*\//i', $content, $m))
+                    foreach ($m[1] as $func)
                     {
-                        foreach ($m[1] as $func)
+                        if (function_exists($func))
+                            $content = str_replace('/*setup:'.$func.'*/', $func(), $content);
+                        else
                         {
-                            if (function_exists($func))
-                                $content = str_replace('/*setup:'.$func.'*/', $func(), $content);
-                            else
-                            {
-                                $funcOK = false;
-                                CLISetup::log('No function for was registered for placeholder '.$func.'().', CLISetup::LOG_ERROR);
-                                if (!array_reduce(get_included_files(), function ($inArray, $itr) use ($func) { return $inArray || false !== strpos($itr, $func); }, false))
-                                    CLISetup::log('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
-                            }
+                            $funcOK = false;
+                            CLI::write('No function for was registered for placeholder '.$func.'().', CLI::LOG_ERROR);
+                            if (!array_reduce(get_included_files(), function ($inArray, $itr) use ($func) { return $inArray || false !== strpos($itr, $func); }, false))
+                                CLI::write('Also, expected include setup/tools/filegen/'.$name.'.func.php was not found.');
                         }
                     }
-
-                    if (fWrite($dest, $content))
-                    {
-                        CLISetup::log(sprintf(ERR_NONE, CLISetup::bold($destPath.$file)), CLISetup::LOG_OK);
-                        if ($content && $funcOK)
-                            $success = true;
-                    }
-                    else
-                        CLISetup::log(sprintf(ERR_WRITE_FILE, CLISetup::bold($destPath.$file)), CLISetup::LOG_ERROR);
-
-                    fClose($dest);
                 }
-                else
-                    CLISetup::log(sprintf(ERR_CREATE_FILE, CLISetup::bold($destPath.$file)), CLISetup::LOG_ERROR);
+
+                if ($content && $funcOK)
+                    if (CLISetup::writeFile($destPath.$file, $content))
+                        $success = true;
             }
             else
-                CLISetup::log(sprintf(ERR_READ_FILE, CLISetup::bold(FileGen::$tplPath.$file.'.in')), CLISetup::LOG_ERROR);
+                CLI::write(sprintf(ERR_READ_FILE, CLI::bold(FileGen::$tplPath.$file.'.in')), CLI::LOG_ERROR);
         }
         else if (!empty(self::$datasets[$key]))
         {
@@ -261,7 +254,7 @@ class FileGen
                 $success = $key($updateIds);
             }
             else
-                CLISetup::log(' - subscript \''.$key.'\' not defined in included file', CLISetup::LOG_ERROR);
+                CLI::write(' - subscript \''.$key.'\' not defined in included file', CLI::LOG_ERROR);
         }
 
         set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
@@ -269,6 +262,10 @@ class FileGen
         return $success;
     }
 
+    public static function getMode()
+    {
+        return self::$mode;
+    }
 }
 
 ?>

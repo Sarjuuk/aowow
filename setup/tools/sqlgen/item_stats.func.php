@@ -128,7 +128,7 @@ class ItemStatSetup extends ItemList
                 {
                     if (!$v)
                         continue;
-                    if ($str = Util::$itemMods[$k])
+                    if ($str = Game::$itemMods[$k])
                         $updateFields[$str] = number_format($v, 2, '.', '');
                 }
             }
@@ -142,10 +142,10 @@ function item_stats(array $ids = [])
 {
     $offset = 0;
 
-    CLISetup::log(' - applying stats for enchantments');
+    CLI::write(' - applying stats for enchantments');
     $enchStats = enchantment_stats();
-    CLISetup::log('   '.count($enchStats).' enchantments parsed');
-    CLISetup::log(' - applying stats for items');
+    CLI::write('   '.count($enchStats).' enchantments parsed');
+    CLI::write(' - applying stats for items');
 
     while (true)
     {
@@ -156,12 +156,11 @@ function item_stats(array $ids = [])
         $max = max($items->getFoundIDs());
         $num = count($items->getFoundIDs());
 
-        CLISetup::log(' * sets '.($offset + 1).' - '.($max));
+        CLI::write(' * sets '.($offset + 1).' - '.($max));
 
         $offset = $max;
 
         $items->writeStatsTable();
-
     }
 
     return true;
@@ -170,7 +169,7 @@ function item_stats(array $ids = [])
 function enchantment_stats()
 {
     $statCols   = DB::Aowow()->selectCol('SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` LIKE "%item_stats"');
-    $enchants   = DB::Aowow()->select('SELECT *, Id AS ARRAY_KEY FROM dbc_spellitemenchantment');
+    $enchants   = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_spellitemenchantment');
     $spells     = [];
     $spellStats = [];
 
@@ -211,7 +210,7 @@ function enchantment_stats()
                 case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
                     if (!empty($spellStats[$obj]))
                         foreach ($spellStats[$obj] as $mod => $val)
-                            if ($str = Util::$itemMods[$mod])
+                            if ($str = Game::$itemMods[$mod])
                                 Util::arraySumByKey($result[$eId], [$str => $val]);
 
                     $obj = null;
@@ -256,7 +255,7 @@ function enchantment_stats()
             }
 
             if ($obj !== null)
-                if ($str = Util::$itemMods[$obj])       // check if we use these mods
+                if ($str = Game::$itemMods[$obj])       // check if we use these mods
                     Util::arraySumByKey($result[$eId], [$str => $val]);
         }
 

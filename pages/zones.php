@@ -8,14 +8,14 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ZonesPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type      = TYPE_ZONE;
     protected $tpl       = 'list-page-generic';
     protected $path      = [0, 6];
     protected $tabId     = 0;
     protected $mode      = CACHE_TYPE_PAGE;
-    protected $validCats = [true, true, [0, 1, 2], [0, 1, 2], true, true, true, true, true];
+    protected $validCats = [true, true, [0, 1, 2], [0, 1, 2], false, false, true, false, true, true, true];
     protected $js        = ['ShowOnMap.js'];
 
     public function __construct($pageCall, $pageParam)
@@ -89,7 +89,7 @@ class ZonesPage extends GenericPage
         if ($mapFile)
         {
             $somData = ['flightmaster' => []];
-            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE mapId = ?d ', $spawnMap);
+            $nodes   = DB::Aowow()->select('SELECT id AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE mapId = ?d AND type <> 0 AND typeId <> 0', $spawnMap);
             $paths   = DB::Aowow()->select('
                         SELECT  IF(tn1.reactA = tn1.reactH AND tn2.reactA = tn2.reactH, 1, 0) AS neutral,
                                 tp.startNodeId AS startId,

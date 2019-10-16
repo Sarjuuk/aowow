@@ -170,14 +170,14 @@ function ssm_ColorizeRow(color) {
 }
 
 function ssm_ConfirmMassApprove() {
-    ajaxAnchor(this);                                       // sarjuuk custom - there has to be something in place or we are manually using a script for ajax
+    ajaxAnchor(this);                                       // aowow custom - there has to be something in place or we are manually using a script for ajax
 
     return false;
     // return true;
 }
 
 function ssm_ConfirmMassDelete() {
-    if (confirm('Delete selected screenshot(s)?'))          // sarjuuk custom - see above
+    if (confirm('Delete selected screenshot(s)?'))          // aowow custom - see above
         ajaxAnchor(this);
 
     return false;
@@ -185,7 +185,7 @@ function ssm_ConfirmMassDelete() {
 }
 
 function ssm_ConfirmMassSticky() {
-    if (confirm('Sticky selected screenshot(s)?'))          // sarjuuk custom - see above
+    if (confirm('Sticky selected screenshot(s)?'))          // aowow custom - see above
         ajaxAnchor(this);
 
     return false;
@@ -542,7 +542,7 @@ function ssm_ShowEdit(screenshot, isAlt) {
     iCaption.value = screenshot.caption;
     iCaption.maxLength = 200;
     iCaption.size = 35;
-    iCaption.onclick = function (e) { $WH.sp(e); }          // sarjuuk - custom to inhibit screenshot popup, when clicking into input element
+    iCaption.onclick = function (e) { $WH.sp(e); }          // aowow - custom to inhibit screenshot popup, when clicking into input element
     div.appendChild(iCaption);
 
     var btn = $WH.ce('input');

@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabid   0: Database g_initHeader()
 class EmotePage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_EMOTE;
     protected $typeId        = 0;
@@ -81,6 +81,10 @@ class EmotePage extends GenericPage
 
         $this->extraText = $text;
         $this->infobox   = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->redButtons = array(
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
+            BUTTON_WOWHEAD => false
+        );
 
         /**************/
         /* Extra Tabs */
@@ -96,6 +100,28 @@ class EmotePage extends GenericPage
         $this->lvTabs[] = ['achievement', ['data' => array_values($acv->getListviewData())]];
 
         $this->extendGlobalData($acv->getJsGlobals());
+
+        // tab: sound
+        if ($em = DB::Aowow()->select('SELECT soundId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask, BIT_OR(1 << (gender - 1)) AS gender FROM aowow_emotes_sounds WHERE emoteId = ?d GROUP BY soundId', $this->typeId))
+        {
+            $sounds = new SoundList(array(['id', array_keys($em)]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $data = $sounds->getListviewData();
+                foreach($data as $id => &$d)
+                {
+                    $d['races']  = $em[$id]['raceMask'];
+                    $d['gender'] = $em[$id]['gender'];
+                }
+
+                $this->lvTabs[] = ['sound', array(
+                    'data'      => array_values($data),
+                    //               gender                                  races
+                    'extraCols' => ['$Listview.templates.title.columns[1]', '$Listview.templates.classs.columns[1]']
+                )];
+            }
+        }
     }
 }
 

@@ -20,28 +20,29 @@ if (!CLI)
             jsonequip:{"arcres":3,"avgbuyout":242980,"firres":3,"frores":3,"holres":3,"natres":3,"shares":3},
             colors:14,
             expansion:1
-            gearscore:8  // as if.....
+            gearscore:8  // if only..
         },
     */
 
     function gems()
     {
         // sketchy, but should work
-        // Id < 36'000 || ilevel < 70 ? BC : WOTLK
+        // id < 36'000 || ilevel < 70 ? BC : WOTLK
         $gems   = DB::Aowow()->Select(
            'SELECT    i.id AS itemId,
-                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc6, i.name_loc8,
+                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc4, i.name_loc6, i.name_loc8,
                       IF (i.id < 36000 OR i.itemLevel < 70, 1 , 2) AS expansion,
                       i.quality,
-                      ic.iconString AS icon,
+                      ic.name AS icon,
                       i.gemEnchantmentId AS enchId,
-                      i.gemColorMask AS colors
+                      i.gemColorMask AS colors,
+                      i.requiredSkill,
+                      i.itemLevel
             FROM      ?_items i
-            JOIN      ?_icons ic ON ic.id = -i.displayId
+            JOIN      ?_icons ic ON ic.id = i.iconId
             WHERE     i.gemEnchantmentId <> 0
             ORDER BY  i.id DESC');
         $success = true;
-
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)
@@ -55,8 +56,8 @@ if (!CLI)
         $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
         if ($enchantments->error)
         {
-            CLISetup::log('Required table ?_itemenchantment seems to be empty! Leaving gems()...', CLISetup::LOG_ERROR);
-            CLISetup::log();
+            CLI::write('Required table ?_itemenchantment seems to be empty! Leaving gems()...', CLI::LOG_ERROR);
+            CLI::write();
             return false;
         }
 
@@ -72,7 +73,7 @@ if (!CLI)
             {
                 if (!$enchantments->getEntry($pop['enchId']))
                 {
-                    CLISetup::log(' * could not find enchantment #'.$pop['enchId'].' referenced by item #'.$gem['itemId'], CLISetup::LOG_WARN);
+                    CLI::write(' * could not find enchantment #'.$pop['enchId'].' referenced by item #'.$gem['itemId'], CLI::LOG_WARN);
                     continue;
                 }
 
@@ -83,7 +84,8 @@ if (!CLI)
                     'enchantment' => $enchantments->getField('name', true),
                     'jsonequip'   => $enchantments->getStatGain(),
                     'colors'      => $pop['colors'],
-                    'expansion'   => $pop['expansion']
+                    'expansion'   => $pop['expansion'],
+                    'gearscore'   => Util::getGemScore($pop['itemLevel'], $pop['quality'], $pop['requiredSkill'] == 755, $pop['itemId'])
                 );
             }
 

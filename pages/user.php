@@ -13,6 +13,7 @@ class UserPage extends GenericPage
 
     protected $typeId   = 0;
     protected $pageName = '';
+    protected $user     = [];
 
     public function __construct($pageCall, $pageParam)
     {
@@ -37,6 +38,10 @@ class UserPage extends GenericPage
 
     protected function generateContent()
     {
+        if (!$this->user)                                   // shouldn't happen .. but did
+            return;
+
+
         /***********/
         /* Infobox */
         /***********/
@@ -217,43 +222,37 @@ class UserPage extends GenericPage
 
         // forum -> latest replies [unused]
 
-        // Characters [todo]
-        $this->user['characterData'] = [];
-        /*
-            us_addCharactersTab([
-                {
-                    id:763,
-                    "name":"Lilywhite",
-                    "achievementpoints":"0",
-                    "guild":"whatever",
-                    "guildrank":"0",
-                    "realm":"draenor",
-                    "realmname":"Draenor",
-                    "battlegroup":"cyclone",
-                    "battlegroupname":"Cyclone",
-                    "region":"us",
-                    "level":"10",
-                    "race":"7",
-                    "gender":"0",
-                    "classs":"1",
-                    "faction":"0",
-                    "gearscore":"0",
-                    "talenttree1":"0",
-                    "talenttree2":"0",
-                    "talenttree3":"0",
-                    "talentspec":0,
-                    "published":1,
-                    "pinned":0
-                }
-            ]);
-        */
+        $conditions = array(
+            ['OR', ['cuFlags', PROFILER_CU_PUBLISHED, '&'], ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&']],
+            [['cuFlags', PROFILER_CU_DELETED, '&'], 0],
+            ['OR', ['user', $this->user['id']], ['ap.accountId', $this->user['id']]]
+        );
 
-        // Profiles [todo]
-        $this->user['profileData'] = [];
+        if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            $conditions = array_slice($conditions, 2);
+        else if (User::$id == $this->user['id'])
+            array_shift($conditions);
+
+        $profiles = new LocalProfileList($conditions);
+        if (!$profiles->error)
+        {
+            $this->addJS('?data=weight-presets&t='.$_SESSION['dataKey']);
+
+            // Characters
+            if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
+                $this->user['characterData'] = $chars;
+
+            // Profiles
+            if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE | PROFILEINFO_USER))
+                $this->user['profileData'] = $prof;
+        }
     }
 
     protected function generateTitle()
     {
+        if (!$this->user)                                   // shouldn't happen .. but did
+            return;
+
         array_unshift($this->title, sprintf(Lang::user('profileTitle'), $this->user['displayName']));
     }
 

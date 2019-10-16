@@ -1,17 +1,17 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkLocale']],
-        't'         => [FILTER_SANITIZE_STRING,     0xC],   // FILTER_FLAG_STRIP_LOW | *_HIGH
-        'catg'      => [FILTER_SANITIZE_NUMBER_INT, null],
-        'skill'     => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkSkill']],
-        'class'     => [FILTER_SANITIZE_NUMBER_INT, null],
-        'callback'  => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkCallback']]
+        'locale'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkLocale']     ],
+        't'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
+        'catg'      => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
+        'skill'     => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkSkill']         ],
+        'class'     => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
+        'callback'  => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkCallback']      ]
     );
 
     public function __construct(array $params)
@@ -28,7 +28,7 @@ class AjaxData extends AjaxHandler
     /* responses
         <string>
     */
-    protected function handleData()
+    protected function handleData() : string
     {
         $result = '';
 
@@ -36,9 +36,11 @@ class AjaxData extends AjaxHandler
         foreach ($this->params as $set)
         {
             // requires valid token to hinder automated access
-            if ($set != 'item-scaling')
-                if (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey'])
-                    continue;
+            if ($set != 'item-scaling' && (!$this->_get['t'] || empty($_SESSION['dataKey']) || $this->_get['t'] != $_SESSION['dataKey']))
+            {
+                trigger_error('AjaxData::handleData - session data key empty or expired', E_USER_ERROR);
+                continue;
+            }
 
             switch ($set)
             {
@@ -60,7 +62,7 @@ class AjaxData extends AjaxHandler
                     // &partial: im not doing this right
                     // it expects a full quest dump on first lookup but will query subCats again if clicked..?
                     // for now omiting the detail clicks with empty results and just set catg update
-                    $catg = $this->_get['catg'] ?: 'null';
+                    $catg = isset($this->_get['catg']) ? $this->_get['catg'] : 'null';
                     if ($catg == 'null')
                         $result .= $this->loadProfilerData($set);
                     else if ($this->_get['callback'])
@@ -79,7 +81,7 @@ class AjaxData extends AjaxHandler
 
                     break;
                 // locale independant
-                case 'quick-excludes':                              // generated per character in profiler
+                case 'quick-excludes':
                 case 'zones':
                 case 'weight-presets':
                 case 'item-scaling':
@@ -94,6 +96,7 @@ class AjaxData extends AjaxHandler
                 case 'talents':
                     if ($_ = $this->_get['class'])
                         $set .= "-".$_;
+                case 'achievements':
                 case 'pet-talents':
                 case 'glyphs':
                 case 'gems':
@@ -106,6 +109,7 @@ class AjaxData extends AjaxHandler
                     $result .= "\n\n";
                     break;
                 default:
+                    trigger_error('AjaxData::handleData - invalid file "'.$set.'" in request', E_USER_ERROR);
                     break;
             }
         }
@@ -113,17 +117,17 @@ class AjaxData extends AjaxHandler
         return $result;
     }
 
-    private function checkSkill($val)
+    protected function checkSkill(string $val) : array
     {
         return array_intersect([171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356], explode(',', $val));
     }
 
-    private function checkCallback($val)
+    protected function checkCallback(string $val) : bool
     {
-        return substr($val, 0, 29) == '$WowheadProfiler.loadOnDemand';
+        return substr($val, 0, 29) === '$WowheadProfiler.loadOnDemand';
     }
 
-    private function loadProfilerData($file, $catg = 'null')
+    private function loadProfilerData(string $file, string $catg = 'null') : string
     {
         $result = '';
         if ($this->_get['callback'])

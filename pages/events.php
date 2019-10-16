@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class EventsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_WORLDEVENT;
     protected $tpl           = 'list-page-generic';
@@ -56,7 +56,7 @@ class EventsPage extends GenericPage
 
         $this->lvTabs[] = ['event', ['data' => $data]];
 
-        if ($_ = array_filter($data, function($x) {return $x['id'] > 0;}))
+        if ($_ = array_values(array_filter($data, function($x) {return $x['category'] > 0;})))
         {
             $this->lvTabs[] = ['calendar', array(
                 'data'      => $_,

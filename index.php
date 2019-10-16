@@ -22,8 +22,10 @@ switch ($pageCall)
     case 'account':                                         // account management [nyi]
     case 'achievement':
     case 'achievements':
-    // case 'arena-team':
-    // case 'arena-teams':
+    case 'areatrigger':
+    case 'areatriggers':
+    case 'arena-team':
+    case 'arena-teams':
     case 'class':
     case 'classes':
     case 'currency':
@@ -37,8 +39,10 @@ switch ($pageCall)
     case 'events':
     case 'faction':
     case 'factions':
-    // case 'guild':
-    // case 'guilds':
+    case 'guild':
+    case 'guilds':
+    case 'icon':
+    case 'icons':
     case 'item':
     case 'items':
     case 'itemset':
@@ -64,8 +68,8 @@ switch ($pageCall)
     case 'search':                                          // tool: searches
     case 'skill':
     case 'skills':
-    // case 'sound':                                        // db: sounds for zone, creature, spell, ...
-    // case 'sounds':
+    case 'sound':
+    case 'sounds':
     case 'spell':
     case 'spells':
     case 'talent':                                          // tool: talent calculator
@@ -80,14 +84,16 @@ switch ($pageCall)
     case 'cookie':                                          // lossless cookies and user settings
     case 'contactus':
     case 'comment':
-    // case 'filter':                                       // just a note: this would be accessed from filtrable pages as ?filter=typeStr (with POST-data) and forwards back to page with GET-data .. why? Hell if i know..
+    case 'filter':                                          // pre-evaluate filter POST-data; sanitize and forward as GET-data
     case 'go-to-comment':                                   // find page the comment is on and forward
     case 'locale':                                          // subdomain-workaround, change the language
         $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));
         try                                                 // can it be handled as ajax?
         {
+            $out   = '';
             $class = 'Ajax'.$cleanName;
             $ajax  = new $class(explode('.', $pageParam));
+
             if ($ajax->handle($out))
             {
                 Util::sendNoCacheHeader();
@@ -106,7 +112,12 @@ switch ($pageCall)
         catch (Exception $e)                                // no, apparently not..
         {
             $class = $cleanName.'Page';
-            (new $class($pageCall, $pageParam))->display();
+            if (is_callable([$class, 'display']))
+                (new $class($pageCall, $pageParam))->display();
+            else if (isset($_GET['power']))
+                die('$WowheadPower.register(0, '.User::$localeId.', {})');
+            else                                            // in conjunction with a proper rewriteRule in .htaccess...
+                (new GenericPage($pageCall))->error();
         }
 
         break;
@@ -118,6 +129,10 @@ switch ($pageCall)
     case 'help':
     case 'faq':
     case 'aboutus':
+    case 'reputation':
+    case 'privilege':
+    case 'privileges':
+    case 'top-users':
         (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':

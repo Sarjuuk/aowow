@@ -6,14 +6,15 @@ if (!defined('AOWOW_REVISION'))
 
 class WorldEventList extends BaseType
 {
-    public static $type      = TYPE_WORLDEVENT;
-    public static $brickFile = 'event';
+    public static   $type      = TYPE_WORLDEVENT;
+    public static   $brickFile = 'event';
+    public static   $dataTable = '?_events';
 
-    protected     $queryBase = 'SELECT e.*, h.*, e.description AS nameINT, e.id AS id, e.id AS ARRAY_KEY FROM ?_events e';
-    protected     $queryOpts = array(
-                                   'e' => [['h']],
-                                   'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
-                               );
+    protected       $queryBase = 'SELECT e.*, h.*, e.description AS nameINT, e.id AS id, e.id AS ARRAY_KEY FROM ?_events e';
+    protected       $queryOpts = array(
+                        'e' => [['h']],
+                        'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
+                    );
 
     public function __construct($conditions = [])
     {
@@ -70,6 +71,7 @@ class WorldEventList extends BaseType
                 IFNULL(h.name_loc0, e.description) AS name_loc0,
                 h.name_loc2,
                 h.name_loc3,
+                h.name_loc4,
                 h.name_loc6,
                 h.name_loc8
             FROM

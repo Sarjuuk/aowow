@@ -10,21 +10,41 @@ if (!defined('AOWOW_REVISION'))
 
 class MorePage extends GenericPage
 {
-    protected $tpl           = 'text-page-generic';
-    protected $path          = [2];
-    protected $tabId         = 2;
-    protected $mode          = CACHE_TYPE_NONE;
-    protected $js            = ['swfobject.js'];
+    protected $tpl          = 'list-page-generic';
+    protected $path         = [];
+    protected $tabId        = 0;
+    protected $mode         = CACHE_TYPE_NONE;
+    protected $js           = ['swfobject.js'];
 
-    private   $subPages      = [ -13 => ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']];
-    private   $validPages    = array(                       // [type, typeId, name]
-        'whats-new'     => [ -7,    0, "What's New"],
-        'searchbox'     => [-16,    0, 'Search Box'],
-        'tooltips'      => [-10,    0, 'Tooltips'],
-        'faq'           => [ -3,    0, 'Frequently Asked Questions'],
-        'aboutus'       => [ -1,    0, 'What is AoWoW?'],
-        'searchplugins' => [ -8,    0, 'Search Plugins'],
-        'help'          => [-13, null, '']
+    private   $page         = [];
+    private   $req2priv     = array(
+             1 => CFG_REP_REQ_COMMENT,                      // write comments
+             2 => 0,                                        // NYI post external links
+             4 => 0,                                        // NYI no captcha
+             5 => CFG_REP_REQ_SUPERVOTE,                    // votes count for more
+             9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
+            10 => CFG_REP_REQ_UPVOTE,                       // can upvote
+            11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
+            12 => CFG_REP_REQ_REPLY,                        // can reply
+            13 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            14 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            15 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            16 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
+            17 => CFG_REP_REQ_PREMIUM                       // premium status
+        );
+
+    private   $validPages   = array(                        // [tabId, path[, subPaths]]
+        'whats-new'     => [2, [2,  7]],
+        'searchbox'     => [2, [2, 16]],
+        'tooltips'      => [2, [2, 10]],
+        'faq'           => [2, [2,  3]],
+        'aboutus'       => [2, [2,  0]],
+        'searchplugins' => [2, [2,  8]],
+        'help'          => [2, [2, 13], ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']],
+        'reputation'    => [1, [3, 10]],
+        'privilege'     => [1, [3, 10], [1, 2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 17]],
+        'privileges'    => [1, [3, 10, 0]],
+        'top-users'     => [1, [3, 11]]
     );
 
     public function __construct($pageCall, $subPage)
@@ -34,44 +54,186 @@ class MorePage extends GenericPage
         // chack if page is valid
         if (isset($this->validPages[$pageCall]))
         {
-            $_ = $this->validPages[$pageCall];
+            $pageData = $this->validPages[$pageCall];
 
-            // check if subpage is valid
-            if (!isset($_[1]))
+            $this->tab  = $pageData[0];
+            $this->path = $pageData[1];
+            $this->page = [$pageCall, $subPage];
+
+            if ($subPage && isset($pageData[2]))
             {
-                if (($_[1] = array_search($subPage, $this->subPages[$_[0]])) === false)
+                $exists = array_search($subPage, $pageData[2]);
+                if ($exists === false)
                     $this->error();
 
-                if ($pageCall == 'help')                    // ye.. hack .. class definitions only allow static values
-                    $_[2] = Lang::main('helpTopics', $_[1]);
+                if (is_numeric($subPage))
+                    $this->articleUrl = $pageCall.'='.$subPage;
+                else
+                    $this->articleUrl = $subPage;
+
+                $this->path[] = $subPage;
+                $this->name   = Lang::main('moreTitles', $pageCall, $subPage);
             }
-            $this->type      = $_[0];
-            $this->typeId    = $_[1];
-            $this->name      = $_[2];
-            $this->gPageInfo = array(
-                'type'   => $this->type,
-                'typeId' => $this->typeId,
-                'name'   => $this->name
-            );
+            else
+            {
+                $this->articleUrl = $pageCall;
+                $this->name = Lang::main('moreTitles', $pageCall);
+            }
         }
         else
             $this->error();
+
+        // order by requirement ASC
+        asort($this->req2priv);
     }
 
-    protected function generatePath()
+    protected function generateContent()
     {
-        $this->path[] = abs($this->type);
-
-        if ($this->typeId > -1)
-            $this->path[] = $this->typeId;
+        switch ($this->page[0])
+        {
+            case 'reputation':
+                $this->handleReputationPage();
+                return;
+            case 'privileges':
+                $this->handlePrivilegesPage();
+                return;
+            case 'privilege':
+                $this->tpl = 'privilege';
+                $this->privReqPoints = sprintf(Lang::privileges('reqPoints'), Lang::nf($this->req2priv[$this->page[1]]));
+                return;
+            case 'top-users':
+                $this->handleTopUsersPage();
+                return;
+            default:
+                return;
+        }
     }
+
+    protected function postArticle()
+    {
+        if ($this->page[0] != 'reputation' &&
+            $this->page[0] != 'privileges' &&
+            $this->page[0] != 'privilege')
+            return;
+
+        $txt = &$this->article['text'];
+        $consts = get_defined_constants(true);
+        foreach ($consts['user'] as $k => $v)
+        {
+            if (strstr($k, 'CFG_REP_'))
+                $txt = str_replace($k, Lang::nf($v), $txt);
+            else if ($k == 'CFG_USER_MAX_VOTES' || $k == 'CFG_BOARD_URL')
+                $txt = str_replace($k, $v, $txt);
+        }
+    }
+
+    protected function generatePath() { }
 
     protected function generateTitle()
     {
         array_unshift($this->title, $this->name);
     }
 
-    protected function generateContent() {}                 // its just articles here
+    private function handleReputationPage()
+    {
+        if (!User::$id)
+            return;
+
+        if ($repData = DB::Aowow()->select('SELECT action, amount, date AS \'when\', IF(action IN (3, 4, 5), sourceA, 0) AS param FROM ?_account_reputation WHERE userId = ?d', User::$id))
+        {
+            foreach ($repData as &$r)
+                $r['when'] = date(Util::$dateFormatInternal, $r['when']);
+
+            $this->tabsTitle = Lang::main('yourRepHistory');
+            $this->forceTabs = true;
+            $this->lvTabs[] = ['reputationhistory', array(
+                'id'   => 'reputation-history',
+                'name' => '$LANG.reputationhistory',
+                'data' => $repData
+            )];
+        }
+    }
+
+    private function handlePrivilegesPage()
+    {
+        $this->tpl        = 'privileges';
+        $this->privileges = [];
+
+        foreach ($this->req2priv as $id => $val)
+            if ($val)
+                $this->privileges[$id] = array(
+                    User::getReputation() >= $val,
+                    Lang::privileges('_privileges', $id),
+                    $val
+                );
+    }
+
+    private function handleTopUsersPage()
+    {
+        $tabs = array(
+            [0,              'top-users-alltime', '$LANG.alltime_stc'  ],
+            [time() - MONTH, 'top-users-monthly', '$LANG.lastmonth_stc'],
+            [time() - WEEK,  'top-users-weekly',  '$LANG.lastweek_stc' ]
+        );
+
+        $nullFields = array(
+            'uploads' => 0,
+            'posts'   => 0,
+            'gold'    => 0,
+            'silver'  => 0,
+            'copper'  => 0
+        );
+
+        foreach ($tabs as [$t, $tabId, $tabName])
+        {
+            // stuff received
+            $res = DB::Aowow()->select('
+                SELECT
+                    a.id AS ARRAY_KEY,
+                    a.displayName AS username,
+                    a.userGroups AS groups,
+                    a.joinDate AS creation,
+                    SUM(r.amount) AS reputation,
+                    SUM(IF(r.`action` = 3, 1, 0)) AS comments,
+                    SUM(IF(r.`action` = 6, 1, 0)) AS screenshots,
+                    SUM(IF(r.`action` = 9, 1, 0)) AS reports
+                FROM ?_account_reputation r
+                JOIN ?_account a ON a.id = r.userId
+                {WHERE r.date > ?d}
+                GROUP BY a.id
+                ORDER BY reputation DESC
+                LIMIT ?d
+            ', $t ?: DBSIMPLE_SKIP, CFG_SQL_LIMIT_SEARCH);
+
+            $data = [];
+            if ($res)
+            {
+                // stuff given
+                $votes = DB::Aowow()->selectCol(
+                    'SELECT sourceB AS ARRAY_KEY, SUM(1) FROM ?_account_reputation WHERE action IN (4, 5) AND sourceB IN (?a) {AND date > ?d} GROUP BY sourceB',
+                    array_keys($res),
+                    $t ?: DBSIMPLE_SKIP
+                );
+                foreach ($res as $uId => &$r)
+                {
+                    $r['creation'] = date('c', $r['creation']);
+                    $r['votes']    = empty($votes[$uId]) ? 0 : $votes[$uId];
+                    $r = array_merge($r, $nullFields);
+                }
+
+                $data = array_values($res);
+            }
+
+            $this->lvTabs[] = ['topusers', array(
+                'hiddenCols'  => ['achievements', 'posts', 'uploads'],
+                'visibleCols' => ['created'],
+                'name'        => '$LANG.lastweek_stc',
+                'name'        => $tabName,
+                'id'          => $tabId,
+                'data'        => $data
+            )];
+        }
+    }
 }
 
 ?>

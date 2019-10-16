@@ -13,8 +13,8 @@
             <div id="profilah-generic"></div>
             <script type="text/javascript">//<![CDATA[
                 var profilah = new Profiler();
-                profilah.initialize('profilah-generic', { id: <?php echo $this->profileId; ?> });
-                pr_setRegionRealm($WH.gE($WH.ge('topbar'), 'form')[0], '<?php echo $this->region; ?>', '<?php echo $this->realm; ?>');
+                profilah.initialize('profilah-generic', { id: <?=$this->subjectGUID; ?> });
+                pr_setRegionRealm($WH.gE($WH.ge('topbar'), 'form')[0], '<?=$this->region; ?>', '<?=$this->realm; ?>');
             //]]></script>
 
             <div class="clear"></div>

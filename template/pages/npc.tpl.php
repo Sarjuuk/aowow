@@ -22,15 +22,7 @@
 
 if ($this->accessory):
     echo '                <div>'.Lang::npc('accessoryFor').' ';
-
-    $n = count($this->accessory);
-    foreach ($this->accessory as $i => $ac):
-        if ($n > 1 && $i > 0):
-            echo ($i == $n - 1) ? Lang::main('and') : ', ';
-        endif;
-        echo '<a href="?npc='.$ac[0].'">'.$ac[1].'</a>';
-    endforeach;
-
+    echo Lang::concat($this->accessory, true, function ($v, $k) { return '<a href="?npc='.$v[0].'">'.$v[1].'</a>'; });
     echo ".</div>\n";
 endif;
 
@@ -59,7 +51,7 @@ if ($this->quotes[0]):
 
         $last = end($group);
         foreach ($group as $itr):
-            $_ = ($itr['type'] != 4 ? $this->name.' '.Lang::npc('textTypes', $itr['type']).Lang::main('colon').($itr['lang'] ? '['.$itr['lang'].']' : null) : null).$itr['text'];
+            $_ = ($itr['type'] != 4 ? $this->name.' '.Lang::npc('textTypes', $itr['type']).Lang::main('colon').($itr['lang'] ? '['.$itr['lang'].'] ' : null) : null).$itr['text'];
 
             echo '<div><span class="s'.$itr['type'].'">'.($itr['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $itr['range']), $_) : $_).'</span></div>';
             echo ($itr == $last) ? null : "</li>\n<li>";
@@ -91,8 +83,13 @@ if ($this->reputation):
         echo '<ul>';
 
         foreach ($set[1] as $itr):
-            echo '<li><div'.($itr['qty'] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$itr['qty'].'</span> '.Lang::npc('repWith') .
-                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
+            if ($itr['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
+                $qty = intVal($itr['qty'][0]) . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($itr['qty'][1] > 0 ? '+' : '').intVal($itr['qty'][1]));
+            else
+                $qty = intVal(array_sum($itr['qty']));
+
+            echo '<li><div'.($itr['qty'][0] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$qty.'</span> '.Lang::npc('repWith') .
+                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'][0] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
         endforeach;
 
         echo '</ul>';
@@ -101,6 +98,20 @@ if ($this->reputation):
             echo '</ul>';
         endif;
     endforeach;
+endif;
+
+if (isset($this->smartAI)):
+?>
+    <div id="text-generic" class="left"></div>
+    <script type="text/javascript">//<![CDATA[
+        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
+            allow: Markup.CLASS_ADMIN,
+            dbpage: true
+        });
+    //]]></script>
+
+    <div class="pad2"></div>
+<?php
 endif;
 ?>
                 <h2 class="clear"><?php echo Lang::main('related'); ?></h2>

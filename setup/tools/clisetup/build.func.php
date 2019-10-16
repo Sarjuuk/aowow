@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 if (!CLI)
     die('not in cli mode');
@@ -23,11 +23,11 @@ function build($syncMe = null)
         $allOk = true;
 
         // start file generation
-        CLISetup::log('begin generation of '. implode(', ', FileGen::$subScripts));
-        CLISetup::log();
+        CLI::write('begin generation of '. implode(', ', FileGen::$subScripts));
+        CLI::write();
 
         // files with template
-        foreach (FileGen::$tplFiles as $name => list($file, $destPath, $deps))
+        foreach (FileGen::$tplFiles as $name => [$file, $destPath, $deps])
         {
             $reqDBC = [];
 
@@ -36,7 +36,7 @@ function build($syncMe = null)
 
             if (!file_exists(FileGen::$tplPath.$file.'.in'))
             {
-                CLISetup::log(sprintf(ERR_MISSING_FILE, FileGen::$tplPath.$file.'.in'), CLISetup::LOG_ERROR);
+                CLI::write(sprintf(ERR_MISSING_FILE, FileGen::$tplPath.$file.'.in'), CLI::LOG_ERROR);
                 $allOk = false;
                 continue;
             }
@@ -52,7 +52,7 @@ function build($syncMe = null)
             else
                 $done[] = $name;
 
-            CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
+            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 
@@ -70,19 +70,19 @@ function build($syncMe = null)
             else
                 $done[] = $file;
 
-            CLISetup::log(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
+            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 
         // end
-        CLISetup::log();
+        CLI::write();
         if ($allOk)
-            CLISetup::log('successfully finished file generation', CLISetup::LOG_OK);
+            CLI::write('successfully finished file generation', CLI::LOG_OK);
         else
-            CLISetup::log('finished file generation with errors', CLISetup::LOG_ERROR);
+            CLI::write('finished file generation with errors', CLI::LOG_ERROR);
     }
-    else
-        CLISetup::log('no valid script names supplied', CLISetup::LOG_ERROR);
+    else if ($syncMe)
+        CLI::write('no valid script names supplied', CLI::LOG_ERROR);
 
     return $done;
 }

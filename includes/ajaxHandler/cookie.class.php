@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 class AjaxCookie extends AjaxHandler
 {
@@ -12,7 +12,7 @@ class AjaxCookie extends AjaxHandler
             return;
 
         $this->_get = array(
-            this->params[0] => [FILTER_SANITIZE_STRING, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
+            $params[0] => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
         );
 
         // NOW we know, what to expect and sanitize
@@ -26,12 +26,20 @@ class AjaxCookie extends AjaxHandler
         0: success
         $: silent error
     */
-    protected function handleCookie()
+    protected function handleCookie() : string
     {
         if (User::$id && $this->params && $this->_get[$this->params[0]])
+        {
             if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->_get[$this->params[0]]))
-                return 0;
+                return '0';
+            else
+                trigger_error('AjaxCookie::handleCookie - write to db failed', E_USER_ERROR);
+        }
+        else
+            trigger_error('AjaxCookie::handleCookie - malformed request received', E_USER_ERROR);
 
-        return null;
+        return '';
     }
 }
+
+?>

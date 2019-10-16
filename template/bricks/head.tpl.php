@@ -32,7 +32,7 @@ if ($this->gDataKey):
 endif;
 ?>
     </script>
-    <script src="<?=STATIC_URL.'/js/jquery-1.4.2.min.js'; ?>" type="text/javascript"></script>
+    <script src="<?=STATIC_URL.'/js/jquery-1.12.4.min.js'; ?>" type="text/javascript"></script>
     <script src="<?=STATIC_URL.'/js/basic.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
     <script src="<?=STATIC_URL.'/widgets/power.js?lang='.substr(User::$localeString, 2); ?>" type="text/javascript"></script>
     <script src="<?=STATIC_URL.'/js/locale_'.User::$localeString.'.js?'.AOWOW_REVISION; ?>" type="text/javascript"></script>
@@ -52,7 +52,13 @@ endforeach;
 ?>
     <script type="text/javascript">
         var g_user = <?=Util::toJSON($this->gUser, JSON_UNESCAPED_UNICODE); ?>;
+<?php
+if ($this->gFavorites):
+    echo "        g_favorites = ".Util::toJSON($this->gFavorites).";\n";
+endif;
+?>
     </script>
+
 <?php
 if (CFG_ANALYTICS_USER):
 ?>

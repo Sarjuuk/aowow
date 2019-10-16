@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database   g_initHeader()
 class EventPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_WORLDEVENT;
     protected $typeId        = 0;
@@ -94,7 +94,7 @@ class EventPage extends GenericPage
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => $this->hId > 0,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
         /**************/
@@ -336,7 +336,7 @@ class EventPage extends GenericPage
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
 
         if ($this->subject->getField('iconString') != 'trade_engineering')
-            $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+            $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
 
         $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
         $x .= "});";
@@ -355,7 +355,7 @@ class EventPage extends GenericPage
             $this->saveCache($tt);
         }
 
-        list($start, $end) = $this->postCache();
+        [$start, $end] = $this->postCache();
 
         header('Content-type: application/x-javascript; charset=utf-8');
         die(sprintf($tt, $start, $end));

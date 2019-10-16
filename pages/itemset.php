@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ItemsetPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ITEMSET;
     protected $typeId        = 0;
@@ -163,7 +163,7 @@ class ItemsetPage extends GenericPage
         $this->expansion   = 0;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
-            BUTTON_LINKS   => ['color' => '', 'linkId' => ''],
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['type' => TYPE_ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList],
             BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
         );

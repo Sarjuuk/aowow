@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 class AjaxLocale extends AjaxHandler
 {
@@ -21,7 +21,7 @@ class AjaxLocale extends AjaxHandler
     /* responses
         header()
     */
-    protected function handleLocale()
+    protected function handleLocale() : string
     {
         User::setLocale($this->_get['locale']);
         User::save();

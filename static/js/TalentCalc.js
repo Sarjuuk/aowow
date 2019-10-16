@@ -543,6 +543,10 @@ function TalentCalc() {
         _setPoints(-1, _pointsFromBonus);
     };
 
+    this.getBonusPoints = function (bonusPoints) {
+        return _bonusPoints;
+    };
+
     this.setClass = function (classId) {
         return _setClass(classId);
     };

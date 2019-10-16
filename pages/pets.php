@@ -8,14 +8,14 @@ if (!defined('AOWOW_REVISION'))
 //  tabid 0: Database g_initHeader()
 class PetsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_PET;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 8];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $validCats     = [1, 2, 3];
+    protected $validCats     = [0, 1, 2];
 
     public function __construct($pageCall, $pageParam)
     {
@@ -36,6 +36,7 @@ class PetsPage extends GenericPage
         if ($this->category)
             $conditions[] = ['type', (int)$this->category[0]];
 
+        $data = [];
         $pets = new PetList($conditions);
         if (!$pets->error)
         {
@@ -49,9 +50,8 @@ class PetsPage extends GenericPage
 
             if (!$pets->hasDiffFields(['type']))
                 $data['hiddenCols'] = ['type'];
-
-            $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
         };
+        $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
     }
 
     protected function generateTitle()

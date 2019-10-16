@@ -9,7 +9,7 @@ if (!CLI)
 
 /* deps:
  * creature_template
- * locales_creature
+ * creature_template_locale
  * creature_classlevelstats
  * instance_encounters
 */
@@ -30,14 +30,15 @@ function creature(array $ids = [])
             modelid1, modelid2, modelid3, modelid4,
             "" AS textureString,                            -- textureString
             0 AS modelId,                                   -- modelId
+            0 AS humanoid,                                  -- uses creaturedisplayinfoextra
             "" AS iconString,                               -- iconString
-            ct.name, ctl2.`Name`  AS n2, ctl3.`Name`  AS n3, ctl6.`Name`  AS n6, ctl8.`Name`  AS n8,
-            subname, ctl2.`Title` AS t2, ctl3.`Title` AS t3, ctl6.`Title` AS t6, ctl8.`Title` AS t8,
+            ct.name, IFNULL(ctl2.`Name`, "")  AS n2, IFNULL(ctl3.`Name`, "")  AS n3, IFNULL(ctl4.`Name`, "")  AS n4, IFNULL(ctl6.`Name`, "")  AS n6, IFNULL(ctl8.`Name`, "")  AS n8,
+            subname, IFNULL(ctl2.`Title`, "") AS t2, IFNULL(ctl3.`Title`, "") AS t3, IFNULL(ctl4.`Title`, "") AS t4, IFNULL(ctl6.`Title`, "") AS t6, IFNULL(ctl8.`Title`, "") AS t8,
             minLevel, maxLevel,
             exp,
             faction,
             npcflag,
-            rank,
+            IF(rank > 4, 0, rank),
             dmgSchool,
             DamageModifier,
             BaseAttackTime,
@@ -86,6 +87,8 @@ function creature(array $ids = [])
         LEFT JOIN
             creature_template_locale ctl3 ON ct.entry = ctl3.entry AND ctl3.`locale` = "deDE"
         LEFT JOIN
+            creature_template_locale ctl4 ON ct.entry = ctl4.entry AND ctl4.`locale` = "zhCN"
+        LEFT JOIN
             creature_template_locale ctl6 ON ct.entry = ctl6.entry AND ctl6.`locale` = "esES"
         LEFT JOIN
             creature_template_locale ctl8 ON ct.entry = ctl8.entry AND ctl8.`locale` = "ruRU"
@@ -96,6 +99,8 @@ function creature(array $ids = [])
         {
             AND ct.entry IN (?a)
         }
+        ORDER BY
+            ct.entry ASC
         LIMIT
            ?d';
 
@@ -123,14 +128,15 @@ function creature(array $ids = [])
         SET
             c.textureString = IFNULL(cdie.textureString, cdi.skin1),
             c.modelId = cdi.modelId,
-            c.iconString = cdi.iconString';
+            c.iconString = cdi.iconString,
+            c.humanoid = IF(cdie.id IS NULL, 0, 1)';
 
     $lastMax = 0;
     while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$stepSize))
     {
         $newMax = max(array_column($npcs, 'entry'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 
@@ -146,6 +152,9 @@ function creature(array $ids = [])
 
     // apply cuFlag: excludeFromListview [for trigger-creatures]
     DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE flagsExtra & ?d', CUSTOM_EXCLUDE_FOR_LISTVIEW, 0x80);
+
+    // apply cuFlag: exCludeFromListview [for nameparts indicating internal usage]
+    DB::Aowow()->query('UPDATE ?_creature SET cuFlags = cuFlags | ?d WHERE name_loc0 LIKE "%[%" OR name_loc0 LIKE "%(%" OR name_loc0 LIKE "%visual%" OR name_loc0 LIKE "%trigger%" OR name_loc0 LIKE "%credit%" OR name_loc0 LIKE "%marker%"', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
     return true;
 }

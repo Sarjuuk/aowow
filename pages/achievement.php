@@ -23,7 +23,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database    g_initHeader()
 class AchievementPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ACHIEVEMENT;
     protected $typeId        = 0;
@@ -99,11 +99,18 @@ class AchievementPage extends GenericPage
                 $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
         }
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         // realm first available?
         if ($this->subject->getField('flags') & 0x100 && DB::isConnectable(DB_AUTH))
         {
             $avlb = [];
-            foreach (Util::getRealms() AS $rId => $rData)
+            foreach (Profiler::getRealms() AS $rId => $rData)
                 if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE achievement = ?d LIMIT 1', $this->typeId))
                     $avlb[] = Util::ucWords($rData['name']);
 
@@ -146,8 +153,14 @@ class AchievementPage extends GenericPage
         $this->series      = $series ? [[$series, null]] : null;
         $this->description = $this->subject->getField('description', true);
         $this->redButtons  = array(
-            BUTTON_LINKS   => ['color' => 'ffffff00', 'linkId' => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0'],
-            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE)
+            BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE),
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ffffff00',
+                'linkId'    => Util::$typeStrings[TYPE_ACHIEVEMENT].':'.$this->typeId.':&quot;..UnitGUID(&quot;player&quot;)..&quot;:0:0:0:0:0:0:0:0',
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
         $this->criteria    = array(
             'reqQty' => $this->subject->getField('reqCriteriaCount'),
@@ -250,6 +263,16 @@ class AchievementPage extends GenericPage
 
         $iconId   = 1;
         $rightCol = [];
+        $scripts  = [];
+
+        // serverside extra-Data
+        if ($crtIds = array_column($this->subject->getCriteria(), 'id'))
+        {
+            Util::checkNumeric($crtIds);
+            $crtExtraData = DB::World()->select('SELECT criteria_id AS ARRAY_KEY, type AS ARRAY_KEY2, value1, value2, ScriptName FROM achievement_criteria_data WHERE criteria_id IN (?a)', $crtIds);
+        }
+        else
+            $crtExtraData = [];
 
         foreach ($this->subject->getCriteria() as $i => $crt)
         {
@@ -419,6 +442,72 @@ class AchievementPage extends GenericPage
                     $tmp['extraText'] = $displayMoney ? Util::formatMoney($qty) : $crtName;
                     break;
             }
+
+            if (!empty($crtExtraData[$crt['id']]))
+            {
+                $tmp['extraData'] = [];
+                foreach ($crtExtraData[$crt['id']] as $xType => $xData)
+                {
+                    // just pick stuff, that can actually be linked
+                    switch ($xType)
+                    {
+                        case 1:                             // TYPE_T_CREATURE
+                            $tmp['extraData'][] = ['?npc='.$xData['value1'], CreatureList::getName($xData['value1'])];
+                            break;
+                        case 2:                             // TYPE_T_PLAYER_CLASS_RACE
+                        case 21:                            // TYPE_S_PLAYER_CLASS_RACE
+                            if ($xData['value1'])
+                                $tmp['extraData'][] = ['?class='.$xData['value1'], (new CharClassList(array(['id', $xData['value1']])))->getField('name', true)];
+
+                            if ($xData['value2'])
+                                $tmp['extraData'][] = ['?race='.$xData['value2'], (new CharRaceList(array(['id', $xData['value2']])))->getField('name', true)];
+
+                            break;
+                        // case 3:                          // TYPE_T_PLAYER_LESS_HEALTH
+                        // case 4:                          // TYPE_T_PLAYER_DEAD
+                        case 5:                             // TYPE_S_AURA
+                        case 7:                             // TYPE_T_AURA
+                            $tmp['extraData'][] = ['?spell='.$xData['value1'], SpellList::getName($xData['value1'])];
+                            break;
+                        case 6:                             // TYPE_S_AREA
+                            $tmp['extraData'][] = ['?zone='.$xData['value1'], ZoneList::getName($xData['value1'])];
+                            break;
+                        // case 8:                          // TYPE_VALUE
+                        // case 9:                          // TYPE_T_LEVEL
+                        // case 10:                         // TYPE_T_GENDER
+                        case 11:                            // TYPE_SCRIPT
+                            if ($xData['ScriptName'])
+                                $scripts[] = $xData['ScriptName'];
+
+                            break;
+                        // case 12:                         // TYPE_MAP_DIFFICULTY
+                        // case 13:                         // TYPE_MAP_PLAYER_COUNT
+                        // case 14:                         // TYPE_T_TEAM
+                        // case 15:                         // TYPE_S_DRUNK
+                        case 16:                            // TYPE_HOLIDAY
+                            if ($we = new WorldEventList(array(['holidayId', $xData['value1']])))
+                                $tmp['extraData'][] = ['?event='.$we->id, $we->getField('name', true)];
+
+                            break;
+                        // case 17:                         // TYPE_BG_LOSS_TEAM_SCORE
+                        // case 18:                         // TYPE_INSTANCE_SCRIPT
+                        // case 19:                         // TYPE_S_EQUIPED_ITEM
+                        case 20:                            // TYPE_MAP_ID
+                            if ($z = new ZoneList(array(['mapIdBak', $xData['value1']])))
+                                $tmp['extraData'][] = ['?zone='.$z->id, $z->getField('name', true)];
+
+                            break;
+                        // case 22:                         // TYPE_NTH_BIRTHDAY
+                        case 23:                            // TYPE_S_KNOWN_TITLE
+                            $tmp['extraData'][] = ['?title='.$xData['value1'], trim(str_replace('%s', '', (new TitleList(array(['id', $xData['value1']])))->getField('male', true)))];
+                            break;
+                    }
+
+                    // moar stuffz
+
+                }
+            }
+
             // If the right column
             if ($i % 2)
                 $this->criteria['data'][] = $tmp;
@@ -429,6 +518,13 @@ class AchievementPage extends GenericPage
         // If you found the second column - merge data from it to the end of the main body
         if ($rightCol)
             $this->criteria['data'] = array_merge($this->criteria['data'], $rightCol);
+
+        // criteria have scripts
+        if (User::isInGroup(U_GROUP_EMPLOYEE) && $scripts)
+        {
+            $s = '[li]Script'.Lang::main('colon').'[ul][li]'.implode('[/li][li]', array_unique($scripts)).'[/li][/ul][/li]';
+            $this->infobox = substr_replace($this->infobox, $s, -5, 0);
+        }
     }
 
     protected function generateTooltip($asError = false)
@@ -438,7 +534,7 @@ class AchievementPage extends GenericPage
 
         $x = '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.",{\n";
         $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+        $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
         $x .= "});";
 
@@ -482,20 +578,22 @@ class AchievementPage extends GenericPage
 
             $reqCss = true;
             $mail   = array(
-                'delay'   => null,
-                'sender'  => null,
-                'subject' => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
-                'text'    => Util::parseHtmlText(Util::localizedString($letter, 'text', true))
+                'delay'       => null,
+                'sender'      => null,
+                'attachments' => [],
+                'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject', true)),
+                'text'        => Util::parseHtmlText(Util::localizedString($letter, 'text', true))
             );
         }
         else if ($_ = Util::parseHtmlText($this->subject->getField('text', true, true)))
         {
             $reqCss = true;
             $mail   = array(
-                'delay'   => null,
-                'sender'  => null,
-                'subject' => Util::parseHtmlText($this->subject->getField('subject', true, true)),
-                'text'    => $_
+                'delay'       => null,
+                'sender'      => null,
+                'attachments' => [],
+                'subject'     => Util::parseHtmlText($this->subject->getField('subject', true, true)),
+                'text'        => $_
             );
         }
 

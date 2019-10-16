@@ -8,13 +8,15 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ZonePage extends GenericPage
 {
-    use detailPage;
+    use TrDetailPage;
 
-    protected $path     = [0, 6];
-    protected $tabId    = 0;
-    protected $type     = TYPE_ZONE;
-    protected $tpl      = 'detail-page-generic';
-    protected $js       = ['ShowOnMap.js'];
+    protected $path      = [0, 6];
+    protected $tabId     = 0;
+    protected $type      = TYPE_ZONE;
+    protected $tpl       = 'detail-page-generic';
+    protected $js        = ['ShowOnMap.js'];
+
+    protected $zoneMusic = [];
 
     public function __construct($pageCall, $id)
     {
@@ -169,6 +171,7 @@ class ZonePage extends GenericPage
         // we cannot fetch spawns via lists. lists are grouped by entry
         $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_NPC);
+        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_AREATRIGGER) : [];
 
         $conditions = [CFG_SQL_LIMIT_NONE, ['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
@@ -176,6 +179,7 @@ class ZonePage extends GenericPage
 
         $objectSpawns   = new GameObjectList($conditions);
         $creatureSpawns = new CreatureList($conditions);
+        $atSpawns       = new AreaTriggerList($conditions);
 
         $questsLV = $rewardsLV = [];
 
@@ -247,7 +251,7 @@ class ZonePage extends GenericPage
                             $questsLV[$id] = $data;
                         }
 
-                        $this->extendGlobalData($started->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+                        $this->extendGlobalData($started->getJSGlobals());
 
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
@@ -344,6 +348,8 @@ class ZonePage extends GenericPage
                             $questsLV[$id] = $data;
                         }
 
+                        $this->extendGlobalData($started->getJSGlobals());
+
                         if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
@@ -372,6 +378,24 @@ class ZonePage extends GenericPage
                 }
             }
 
+            foreach ($aSpawns as $spawn)
+            {
+                $tpl = $atSpawns->getEntry($spawn['typeId']);
+                if (!$tpl)
+                    continue;
+
+                $n  = Util::localizedString($tpl, 'name');
+
+                $addToSOM('areatrigger', array(
+                    'coords'        => [[$spawn['posX'], $spawn['posY']]],
+                    'level'         => $spawn['floor'],
+                    'name'          => $tpl['name'] ?: 'Unnamed AT #'.$spawn['typeId'],
+                    'type'          => TYPE_AREATRIGGER,
+                    'id'            => $spawn['typeId'],
+                    'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])
+                ));
+            }
+
             // remove unwanted indizes
             foreach ($som as $what => &$dataz)
             {
@@ -391,6 +415,8 @@ class ZonePage extends GenericPage
                     $dataz = $foo;
                 }
             }
+
+            unset($data);
 
             // append paths between nodes
             if ($flightNodes)
@@ -446,7 +472,7 @@ class ZonePage extends GenericPage
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
     /*
@@ -492,10 +518,18 @@ class ZonePage extends GenericPage
         // tab: Quests [data collected by SOM-routine]
         if ($questsLV)
         {
-            $this->lvTabs[] = ['quest', array(
-                'data' => array_values($questsLV),
-                'note' => '$$WH.sprintf(LANG.lvnote_zonequests, '.$this->subject->getField('mapId').', '.$this->typeId.', \''.Util::jsEscape($this->subject->getField('name', true)).'\', '.$this->typeId.')'
-            )];
+            $tabData = ['quest', ['data' => array_values($questsLV)]];
+
+            foreach (Game::$questClasses as $parent => $children)
+            {
+                if (in_array($this->typeId, $children))
+                {
+                    $tabData[1]['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                    break;
+                }
+            }
+
+            $this->lvTabs[] = $tabData;
         }
 
         // tab: item-quest starter
@@ -684,6 +718,83 @@ class ZonePage extends GenericPage
             )];
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
+        }
+
+        // tab: sound (including subzones; excluding parents)
+        $areaIds = [];
+        if (!$subZones->error)
+            $areaIds = $subZones->getFoundIDs();
+
+        $areaIds[] = $this->typeId;
+
+        $soundIds  = [];
+        $zoneMusic = DB::Aowow()->select('
+            SELECT
+                x.soundId AS ARRAY_KEY, x.soundId, x.worldStateId, x.worldStateValue, x.type
+            FROM (
+                SELECT ambienceDay   AS soundId, worldStateId, worldStateValue, 1 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND ambienceDay   > 0 UNION
+                SELECT ambienceNight AS soundId, worldStateId, worldStateValue, 1 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND ambienceNight > 0 UNION
+                SELECT musicDay      AS soundId, worldStateId, worldStateValue, 2 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND musicDay      > 0 UNION
+                SELECT musicNight    AS soundId, worldStateId, worldStateValue, 2 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND musicNight    > 0 UNION
+                SELECT intro         AS soundId, worldStateId, worldStateValue, 3 AS `type` FROM ?_zones_sounds WHERE id IN (?a) AND intro         > 0
+            ) x
+            GROUP BY
+                x.soundId, x.worldStateId, x.worldStateValue
+       ', $areaIds, $areaIds, $areaIds, $areaIds, $areaIds);
+
+        if ($sSpawns = DB::Aowow()->selectCol('SELECT typeId FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_SOUND))
+            $soundIds = array_merge($soundIds, $sSpawns);
+
+        if ($zoneMusic)
+            $soundIds = array_merge($soundIds, array_column($zoneMusic, 'soundId'));
+
+        if ($soundIds)
+        {
+            $music = new SoundList(array(['id', array_unique($soundIds)]));
+            if (!$music->error)
+            {
+                // tab
+                $data    = $music->getListviewData();
+                $tabData = [];
+
+                if (array_filter(array_column($zoneMusic, 'worldStateId')))
+                {
+                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+
+                    foreach ($soundIds as $sId)
+                        if (!empty($zoneMusic[$sId]['worldStateId']))
+                            $data[$sId]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $zoneMusic[$sId]['worldStateId'], $zoneMusic[$sId]['worldStateValue']]];
+                }
+
+                $tabData['data'] = array_values($data);
+
+                $this->lvTabs[] = ['sound', $tabData];
+
+                $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
+
+                // audio controls
+                // ambience
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 1; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['ambience'][] = $f;
+
+                // music
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 2; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['music'][] = $f;
+
+                // intro
+                if ($sounds = array_filter($zoneMusic, function ($x) { return $x['type'] == 3; } ))
+                    foreach ($sounds as $sId => $_)
+                        if (!empty($data[$sId]['files']))
+                            foreach ($data[$sId]['files'] as $f)
+                                $this->zoneMusic['intro'][] = $f;
+
+            }
         }
     }
 

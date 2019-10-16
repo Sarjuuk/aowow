@@ -5,6 +5,7 @@ Locale class
 var LOCALE_ENUS = 0;
 var LOCALE_FRFR = 2;
 var LOCALE_DEDE = 3;
+var LOCALE_ZHCN = 4;
 var LOCALE_ESES = 6;
 var LOCALE_RURU = 8;
 

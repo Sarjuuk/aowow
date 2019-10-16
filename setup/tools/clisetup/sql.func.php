@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 if (!CLI)
     die('not in cli mode');
@@ -23,8 +23,8 @@ function sql($syncMe = null)
         $allOk = true;
 
         // start file generation
-        CLISetup::log('begin generation of '. implode(', ', SqlGen::$subScripts));
-        CLISetup::log();
+        CLI::write('begin generation of '. implode(', ', SqlGen::$subScripts));
+        CLI::write();
 
         foreach (SqlGen::$subScripts as $tbl)
         {
@@ -36,19 +36,19 @@ function sql($syncMe = null)
             else
                 $done[] = $tbl;
 
-            CLISetup::log(' - subscript \''.$tbl.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLISetup::LOG_OK : CLISetup::LOG_ERROR);
+            CLI::write(' - subscript \''.$tbl.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(SqlGen::$defaultExecTime);      // reset to default for the next script
         }
 
         // end
-        CLISetup::log();
+        CLI::write();
         if ($allOk)
-            CLISetup::log('successfully finished sql generation', CLISetup::LOG_OK);
+            CLI::write('successfully finished sql generation', CLI::LOG_OK);
         else
-            CLISetup::log('finished sql generation with errors', CLISetup::LOG_ERROR);
+            CLI::write('finished sql generation with errors', CLI::LOG_ERROR);
     }
-    else
-        CLISetup::log('no valid script names supplied', CLISetup::LOG_ERROR);
+    else if ($syncMe)
+        CLI::write('no valid script names supplied', CLI::LOG_ERROR);
 
     return $done;
 }

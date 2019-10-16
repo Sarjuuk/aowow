@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class FactionPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_FACTION;
     protected $typeId        = 0;
@@ -88,7 +88,7 @@ class FactionPage extends GenericPage
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
         // Spillover Effects
@@ -134,12 +134,15 @@ class FactionPage extends GenericPage
 
                 switch ($k)
                 {
-                    case 'quest_rate':          $buff .= '[tr][td]'.Lang::game('quests')                                .Lang::main('colon').'[/td]'; break;
-                    case 'quest_daily_rate':    $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('daily').')'  .Lang::main('colon').'[/td]'; break;
-                    case 'quest_weekly_rate':   $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('weekly').')' .Lang::main('colon').'[/td]'; break;
-                    case 'quest_monthly_rate':  $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('monthly').')'.Lang::main('colon').'[/td]'; break;
-                    case 'creature_rate':       $buff .= '[tr][td]'.Lang::game('npcs')                                  .Lang::main('colon').'[/td]'; break;
-                    case 'spell_rate':          $buff .= '[tr][td]'.Lang::game('spells')                                .Lang::main('colon').'[/td]'; break;
+                    case 'quest_rate':            $buff .= '[tr][td]'.Lang::game('quests')                                   .Lang::main('colon').'[/td]'; break;
+                    case 'quest_daily_rate':      $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('daily').')'     .Lang::main('colon').'[/td]'; break;
+                    case 'quest_weekly_rate':     $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('weekly').')'    .Lang::main('colon').'[/td]'; break;
+                    case 'quest_monthly_rate':    $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('monthly').')'   .Lang::main('colon').'[/td]'; break;
+                    case 'quest_repeatable_rate': $buff .= '[tr][td]'.Lang::game('quests').' ('.Lang::quest('repeatable').')'.Lang::main('colon').'[/td]'; break;
+                    case 'creature_rate':         $buff .= '[tr][td]'.Lang::game('npcs')                                     .Lang::main('colon').'[/td]'; break;
+                    case 'spell_rate':            $buff .= '[tr][td]'.Lang::game('spells')                                   .Lang::main('colon').'[/td]'; break;
+                    default:
+                        continue;
                 }
 
                 $buff .= '[td width=35px align=right][span class=q'.($v < 1 ? '10]' : '2]+').intVal(($v - 1) * 100).'%[/span][/td][/tr]';

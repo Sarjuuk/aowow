@@ -32,6 +32,20 @@ else:
 endif;
 
 $this->brick('book');
+
+if (isset($this->smartAI)):
+?>
+    <div id="text-generic" class="left"></div>
+    <script type="text/javascript">//<![CDATA[
+        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
+            allow: Markup.CLASS_ADMIN,
+            dbpage: true
+        });
+    //]]></script>
+
+    <div class="pad2"></div>
+<?php
+endif;
 ?>
 
                 <h2 class="clear"><?php echo Lang::main('related'); ?></h2>

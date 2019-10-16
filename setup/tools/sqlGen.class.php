@@ -21,14 +21,13 @@ if (!CLI)
 
 class SqlGen
 {
-    const MODE_NORMAL   = 0;
-    const MODE_FIRSTRUN = 1;
-    const MODE_UPDATE   = 2;
+    const MODE_NORMAL   = 1;
+    const MODE_FIRSTRUN = 2;
+    const MODE_UPDATE   = 3;
 
     private static $tables = array(                         // [dbcName, saveDbc, AowowDeps, TCDeps]
         'achievementcategory'      => ['achievement_category',          false, null, null],
         'achievementcriteria'      => ['achievement_criteria',          false, null, null],
-        'glyphproperties'          => ['glyphproperties',               true,  null, null],
         'itemenchantmentcondition' => ['spellitemenchantmentcondition', false, null, null],
         'itemextendedcost'         => ['itemextendedcost',              false, null, null],
         'itemlimitcategory'        => ['itemlimitcategory',             false, null, null],
@@ -38,44 +37,49 @@ class SqlGen
         'scalingstatdistribution'  => ['scalingstatdistribution',       true,  null, null],
         'scalingstatvalues'        => ['scalingstatvalues',             true,  null, null],
         'spellfocusobject'         => ['spellfocusobject',              false, null, null],
+        'spelloverride'            => ['overridespelldata',             false, null, null],
         'spellrange'               => ['spellrange',                    false, null, null],
         'spellvariables'           => ['spelldescriptionvariables',     false, null, null],
         'totemcategory'            => ['totemcategory',                 false, null, null],
-        'talents'                  => [null, null,                             null, null],
-        'classes'                  => [null, null,                             null, null],
-        'factions'                 => [null, null,                             null, null],
-        'factiontemplate'          => [null, null,                             null, null],
-        'holidays'                 => [null, null,                             null, null],
-        'icons'                    => [null, null,                             null, null],
-        'itemrandomenchant'        => [null, null,                             null, null],
-        'races'                    => [null, null,                             null, null],
-        'shapeshiftforms'          => [null, null,                             null, null],
-        'skillline'                => [null, null,                             null, null],
-        'emotes'                   => [null, null,                             null, null],
-        'itemenchantment'          => [null, null, null,                      ['spell_enchant_proc_data']],
-        'achievement'              => [null, null, null,                      ['dbc_achievement']],
-        'creature'                 => [null, null, null,                      ['creature_template', 'locales_creature', 'creature_classlevelstats', 'instance_encounters']],
-        'currencies'               => [null, null, null,                      ['item_template', 'locales_item']],
-        'events'                   => [null, null, null,                      ['game_event', 'game_event_prerequisite']],
-        'objects'                  => [null, null, null,                      ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem']],
-        'pet'                      => [null, null, null,                      ['creature_template', 'creature']],
-        'quests'                   => [null, null, null,                      ['quest_template', 'quest_template_addon', 'locales_quest', 'game_event', 'game_event_seasonal_questrelation']],
-        'quests_startend'          => [null, null, null,                      ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template']],
-        'spell'                    => [null, null, null,                      ['skill_discovery_template', 'item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'npc_trainer', 'disables', 'spell_ranks', 'spell_dbc']],
-        'spelldifficulty'          => [null, null, null,                      ['spelldifficulty_dbc']],
-        'taxi' /* nodes + paths */ => [null, null, null,                      ['creature_template', 'creature']],
-        'titles'                   => [null, null, null,                      ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward']],
-        'items'                    => [null, null, null,                      ['item_template', 'locales_item', 'spell_group', 'game_event']],
-        'spawns' /* + waypoints */ => [null, null, null,                      ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data']],
-        'zones'                    => [null, null, null,                      ['access_requirement']],
-        'itemset'                  => [null, null, ['spell'],                 ['item_template', 'game_event']],
-        'item_stats' /* + ench */  => [null, null, ['items', 'spell'],        null],
-        'source'                   => [null, null, ['spell', 'achievement'],  ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'quest_template_addon', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_skills', 'achievement_reward', 'skill_perfect_item_template']]
+        'icons'                    => [null, null, null,                             null],
+        'glyphproperties'          => [null, true, ['icons'],                        null],
+        'talents'                  => [null, null, null,                             null],
+        'classes'                  => [null, null, null,                             null],
+        'factions'                 => [null, null, null,                             null],
+        'factiontemplate'          => [null, null, null,                             null],
+        'holidays'                 => [null, null, null,                             null],
+        'itemrandomenchant'        => [null, null, null,                             null],
+        'races'                    => [null, null, null,                             null],
+        'shapeshiftforms'          => [null, null, null,                             null],
+        'skillline'                => [null, null, ['icons'],                        null],
+        'emotes'                   => [null, null, null,                             null],
+        'sounds'                   => [null, null, null,                             null],
+        'areatrigger'              => [null, null, null,                             ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon']],
+        'itemenchantment'          => [null, null, null,                             ['spell_enchant_proc_data']],
+        'achievement'              => [null, null, ['icons'],                        ['dbc_achievement', 'disables']],
+        'creature'                 => [null, null, null,                             ['creature_template', 'creature_template_locale', 'creature_classlevelstats', 'instance_encounters']],
+        'currencies'               => [null, null, null,                             ['item_template', 'item_template_locale']],
+        'events'                   => [null, null, null,                             ['game_event', 'game_event_prerequisite']],
+        'objects'                  => [null, null, null,                             ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem']],
+        'pet'                      => [null, null, ['icons'],                        ['creature_template', 'creature']],
+        'quests'                   => [null, null, null,                             ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'disables']],
+        'quests_startend'          => [null, null, null,                             ['creature_queststarter', 'creature_questender', 'game_event_creature_quest', 'gameobject_queststarter', 'gameobject_questender', 'game_event_gameobject_quest', 'item_template']],
+        'spell'                    => [null, null, ['icons'],                        ['skill_discovery_template', 'item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'npc_trainer', 'disables', 'spell_ranks', 'spell_dbc']],
+        'spelldifficulty'          => [null, null, null,                             ['spelldifficulty_dbc']],
+        'taxi' /* nodes + paths */ => [null, null, null,                             ['creature_template', 'creature']],
+        'titles'                   => [null, null, null,                             ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward']],
+        'items'                    => [null, null, ['icons'],                        ['item_template', 'item_template_locale', 'spell_group', 'game_event']],
+        'spawns' /* + waypoints */ => [null, null, null,                             ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data']],
+        'zones'                    => [null, null, null,                             ['access_requirement']],
+        'itemset'                  => [null, null, ['spell'],                        ['item_template', 'game_event']],
+        'item_stats' /* + ench */  => [null, null, ['items', 'spell'],               null],
+        'source'                   => [null, null, ['spell', 'achievement'],         ['npc_vendor', 'game_event_npc_vendor', 'creature', 'quest_template', 'quest_template_addon', 'playercreateinfo_item', 'npc_trainer', 'skill_discovery_template', 'playercreateinfo_skills', 'achievement_reward', 'skill_perfect_item_template']]
     );
 
     public  static $cliOpts   = [];
     private static $shortOpts = 'h';
     private static $longOpts  = ['sql::', 'help', 'sync:']; // general
+    private static $mode      = 0;
 
     public static $subScripts = [];
 
@@ -104,9 +108,11 @@ class SqlGen
 
         if (!CLISetup::$localeIds /* && this script has localized text */)
         {
-            CLISetup::log('No valid locale specified. Check your config or --locales parameter, if used', CLISetup::LOG_ERROR);
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
             exit;
         }
+
+        self::$mode = $mode;
     }
 
     private static function handleCLIOpts(&$doTbls)
@@ -153,30 +159,26 @@ class SqlGen
     {
         if (!isset(self::$tables[$tableName]))
         {
-            CLISetup::log('SqlGen::generate - invalid table given', CLISetup::LOG_ERROR);
+            CLI::write('SqlGen::generate - invalid table given', CLI::LOG_ERROR);
             return false;
         }
 
         if (!empty(self::$tables[$tableName][0]))           // straight copy from dbc source
         {
             $tbl = self::$tables[$tableName];               // shorthand
-            CLISetup::log('SqlGen::generate() - copying '.$tbl[0].'.dbc into aowow_'.$tableName);
+            CLI::write('SqlGen::generate() - copying '.$tbl[0].'.dbc into aowow_'.$tableName);
 
-            $dbc = new DBC($tbl[0], CLISetup::$tmpDBC);
+            $dbc = new DBC($tbl[0], ['temporary' => CLISetup::$tmpDBC, 'tableName' => 'aowow_'.$tableName]);
             if ($dbc->error)
                 return false;
 
-            $dbcData = $dbc->readArbitrary($tbl[1]);
-            foreach ($dbcData as $row)
-                DB::Aowow()->query('REPLACE INTO ?_'.$tableName.' (?#) VALUES (?a)', array_keys($row), array_values($row));
-
-            return !!$dbcData;
+            return !!$dbc->readFile();
         }
         else if (file_exists('setup/tools/sqlgen/'.$tableName.'.func.php'))
         {
             $customData = $reqDBC = [];
 
-            CLISetup::log('SqlGen::generate() - filling aowow_'.$tableName.' with data');
+            CLI::write('SqlGen::generate() - filling aowow_'.$tableName.' with data');
 
             require_once 'setup/tools/sqlgen/'.$tableName.'.func.php';
 
@@ -195,13 +197,18 @@ class SqlGen
                         DB::Aowow()->query('UPDATE ?_'.$tableName.' SET ?a WHERE id = ?d', $data, $id);
             }
             else
-                CLISetup::log(' - subscript \''.$tableName.'\' not defined in included file', CLISetup::LOG_ERROR);
+                CLI::write(' - subscript \''.$tableName.'\' not defined in included file', CLI::LOG_ERROR);
 
             return $success;
         }
         else
-            CLISetup::log(sprintf(ERR_MISSING_INCL, $tableName, 'setup/tools/sqlgen/'.$tableName.'.func.php'), CLISetup::LOG_ERROR);
+            CLI::write(sprintf(ERR_MISSING_INCL, $tableName, 'setup/tools/sqlgen/'.$tableName.'.func.php'), CLI::LOG_ERROR);
 
+    }
+
+    public static function getMode()
+    {
+        return self::$mode;
     }
 }
 

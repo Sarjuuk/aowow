@@ -3,28 +3,7 @@
     width, left, background-position values may need adjustment!
 */
 
-.topbar-search input.search-database {
-    background: white url(../images/eses/searchdatabase.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results {
-    background: white url(../images/eses/searchwithinresults.gif) .2em center no-repeat;
-}
-
-.listview-quicksearch input.search-within-results2 {
-    background: white url(../images/eses/searchwithinresults2.gif) .2em center no-repeat;
-}
-
-div.modelviewer-quality div {
-    float: left;
-    width: 70px;
-    height: 22px;
-    margin-right: 10px;
-    background: url(../images/eses/modelviewer-picshures.gif) left center no-repeat;
-}
-
 div.modelviewer-model div {
-    margin-left: 40px;
     margin-right: 5px;
     float: left;
     width: 80px;
@@ -111,4 +90,3 @@ a:hover.screenshotviewer-close span {
     width: 500px !important;
 }
  */
- 

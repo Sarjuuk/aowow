@@ -186,7 +186,7 @@ ShowOnMap.prototype.construct = function() {
                         allianceDailyCoords[pin.level] = [];
                     }
 
-                    if (idx != 'rare' && idx != 'spirithealer' && idx != 'book' && idx != 'forge' && idx != 'anvil' && idx != 'hordequests' && idx != 'alliancequests' && idx != 'hordedailyquests' && idx != 'alliancedailyquests' && idx != 'boss') {
+                    if (idx != 'rare' && idx != 'spirithealer' && idx != 'book' && idx != 'forge' && idx != 'anvil' && idx != 'hordequests' && idx != 'alliancequests' && idx != 'hordedailyquests' && idx != 'alliancedailyquests' && idx != 'boss' && idx != 'areatrigger') { // aowow - areatrigger is custom
                         if (tooltip[1] == 2 || tooltip[1] == 0) {
                             if (tooltip[1] == 2) {
                                 hordeLegend[2] = [LANG.som_legend_horde, null];
@@ -395,7 +395,7 @@ ShowOnMap.prototype.construct = function() {
                 }
             }
         }
-        if (menu && menu[2] && menu[2].constructor && menu[2].call && menu[2].apply) {      // sarjuuk: check if menu[2] is function
+        if (menu && menu[2] && menu[2].constructor && menu[2].call && menu[2].apply) {      // aowow: check if menu[2] is function
             menu[2]();
         }
     }

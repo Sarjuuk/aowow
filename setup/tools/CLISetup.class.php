@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 if (!CLI)
     die('not in cli mode');
@@ -9,24 +9,6 @@ if (!CLI)
 
 class CLISetup
 {
-    const CHR_BELL      = 7;
-    const CHR_BACK      = 8;
-    const CHR_TAB       = 9;
-    const CHR_LF        = 10;
-    const CHR_CR        = 13;
-    const CHR_ESC       = 27;
-    const CHR_BACKSPACE = 127;
-
-    const LOG_OK        = 0;
-    const LOG_WARN      = 1;
-    const LOG_ERROR     = 2;
-    const LOG_INFO      = 3;
-
-    private static $win           = true;
-    private static $hasReadline   = false;
-    private static $logFile       = '';
-    private static $logHandle     = null;
-
     public  static $locales       = [];
     public  static $localeIds     = [];
 
@@ -39,31 +21,29 @@ class CLISetup
         ''     => LOCALE_EN,    'enGB' => LOCALE_EN,    'enUS' => LOCALE_EN,
         'frFR' => LOCALE_FR,
         'deDE' => LOCALE_DE,
+        'zhCN' => LOCALE_CN,    'enCN' => LOCALE_CN,
         'esES' => LOCALE_ES,    'esMX' => LOCALE_ES,
         'ruRU' => LOCALE_RU
     );
 
     public static function init()
     {
-        self::$win         = substr(PHP_OS, 0, 3) == 'WIN';
-        self::$hasReadline = function_exists('readline_callback_handler_install');
-
         if ($_ = getopt('d', ['log::',   'locales::', 'mpqDataDir::', 'delete']))
         {
             // optional logging
             if (!empty($_['log']))
-                self::$logFile = trim($_['log']);
+                CLI::initLogFile(trim($_['log']));
 
             // alternative data source (no quotes, use forward slash)
             if (!empty($_['mpqDataDir']))
-                self::$srcDir = str_replace(['\\', '"', '\''], ['/', '', ''], $_['mpqDataDir']);
+                self::$srcDir = CLI::nicePath($_['mpqDataDir']);
 
             // optional limit handled locales
             if (!empty($_['locales']))
             {
                 // engb and enus are identical for all intents and purposes
-                $from = ['engb', 'esmx'];
-                $to   = ['enus', 'eses'];
+                $from = ['engb', 'esmx', 'encn'];
+                $to   = ['enus', 'eses', 'zhcn'];
                 $_['locales'] = str_ireplace($from, $to, strtolower($_['locales']));
 
                 self::$locales = array_intersect(Util::$localeStrings, explode(',', $_['locales']));
@@ -82,6 +62,7 @@ class CLISetup
                 self::$localeIds[] = $idx;
     }
 
+
     /*******************/
     /* MPQ-file access */
     /*******************/
@@ -94,8 +75,8 @@ class CLISetup
     */
     private static function buildFileList()
     {
-        self::log();
-        self::log('reading MPQdata from '.self::$srcDir.' to list for first time use...');
+        CLI::write();
+        CLI::write('reading MPQdata from '.self::$srcDir.' to list for first time use...');
 
         $setupDirs = glob('setup/*');
         foreach ($setupDirs as $sd)
@@ -124,12 +105,12 @@ class CLISetup
                 self::$mpqFiles[strtolower($_)] = $_;
             }
 
-            self::log('done');
-            self::log();
+            CLI::write('done');
+            CLI::write();
         }
         catch (UnexpectedValueException $e)
         {
-            self::log('- mpqData dir '.self::$srcDir.' does not exist', self::LOG_ERROR);
+            CLI::write('- mpqData dir '.self::$srcDir.' does not exist', CLI::LOG_ERROR);
             return false;
         }
 
@@ -182,87 +163,6 @@ class CLISetup
         return $result;
     }
 
-    /***********/
-    /* logging */
-    /***********/
-
-    public static function red($str)
-    {
-        return self::$win ? $str : "\e[31m".$str."\e[0m";
-    }
-
-    public static function green($str)
-    {
-        return self::$win ? $str : "\e[32m".$str."\e[0m";
-    }
-
-    public static function yellow($str)
-    {
-        return self::$win ? $str : "\e[33m".$str."\e[0m";
-    }
-
-    public static function blue($str)
-    {
-        return self::$win ? $str : "\e[36m".$str."\e[0m";
-    }
-
-    public static function bold($str)
-    {
-        return self::$win ? $str : "\e[1m".$str."\e[0m";
-    }
-
-    public static function log($txt = '', $lvl = -1)
-    {
-        if (self::$logFile && !self::$logHandle)
-        {
-            if (!file_exists(self::$logFile))
-                self::$logHandle = fopen(self::$logFile, 'w');
-            else
-            {
-                $logFileParts = pathinfo(self::$logFile);
-
-                $i = 1;
-                while (file_exists($logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '')))
-                    $i++;
-
-                self::$logFile   = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
-                self::$logHandle = fopen(self::$logFile, 'w');
-            }
-        }
-
-        $msg = "\n";
-        if ($txt)
-        {
-            $msg = str_pad(date('H:i:s'), 10);
-            switch ($lvl)
-            {
-                case self::LOG_ERROR:                       // red      critical error
-                    $msg .= '['.self::red('ERR').']   ';
-                    break;
-                case self::LOG_WARN:                        // yellow   notice
-                    $msg .= '['.self::yellow('WARN').']  ';
-                    break;
-                case self::LOG_OK:                          // green    success
-                    $msg .= '['.self::green('OK').']    ';
-                    break;
-                case self::LOG_INFO:                        // blue     info
-                    $msg .= '['.self::blue('INFO').']  ';
-                    break;
-                default:
-                    $msg .= '        ';
-            }
-
-            $msg .= $txt."\n";
-        }
-
-        echo $msg;
-
-        if (self::$logHandle)                               // remove highlights for logging
-            fwrite(self::$logHandle, preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg));
-
-        flush();
-    }
-
 
     /*****************/
     /* file handling */
@@ -270,42 +170,23 @@ class CLISetup
 
     public static function writeFile($file, $content)
     {
-        $success = false;
-        if ($handle = @fOpen($file, "w"))
+        if (Util::writeFile($file, $content))
         {
-            if (fWrite($handle, $content))
-            {
-                $success = true;
-                self::log(sprintf(ERR_NONE, self::bold($file)), self::LOG_OK);
-            }
-            else
-                self::log(sprintf(ERR_WRITE_FILE, self::bold($file)), self::LOG_ERROR);
-
-            fClose($handle);
+            CLI::write(sprintf(ERR_NONE, CLI::bold($file)), CLI::LOG_OK);
+            return true;
         }
-        else
-            self::log(sprintf(ERR_CREATE_FILE, self::bold($file)), self::LOG_ERROR);
 
-        if ($success)
-            @chmod($file, Util::FILE_ACCESS);
-
-        return $success;
+        $e = error_get_last();
+        CLI::write($e['message'].' '.CLI::bold($file), CLI::LOG_ERROR);
+        return false;
     }
 
     public static function writeDir($dir)
     {
-        if (is_dir($dir))
-        {
-            if (!is_writable($dir) && !@chmod($dir, Util::FILE_ACCESS))
-                self::log('cannot write into output directory '.$dir, self::LOG_ERROR);
-
-            return is_writable($dir);
-        }
-
-        if (@mkdir($dir, Util::FILE_ACCESS, true))
+        if (Util::writeDir($dir))
             return true;
 
-        self::log('could not create output directory '.$dir, self::LOG_ERROR);
+        CLI::write(error_get_last()['message'].' '.CLI::bold($dir), CLI::LOG_ERROR);
         return false;
     }
 
@@ -314,107 +195,19 @@ class CLISetup
         if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'dbc_'.$name) && DB::Aowow()->selectCell('SELECT count(1) FROM ?#', 'dbc_'.$name))
             return true;
 
-        $dbc = new DBC($name, self::$tmpDBC);
+        $dbc = new DBC($name, ['temporary' => self::$tmpDBC]);
         if ($dbc->error)
+        {
+            CLI::write('SqlGen::generate() - required DBC '.$name.'.dbc not found!', CLI::LOG_ERROR);
             return false;
-
-        if ($dbc->readFromFile())
-        {
-            $dbc->writeToDB();
-            return true;
         }
 
-        self::log('SqlGen::generate() - required DBC '.$name.'.dbc found neither in DB nor as file!', self::LOG_ERROR);
-        return false;
-    }
-
-    /**************/
-    /* read input */
-    /**************/
-
-    /*
-        since the CLI on WIN ist not interactive, the following things have to be considered
-        you do not receive keystrokes but whole strings upon pressing <Enter> (wich also appends a \r)
-        as such <ESC> and probably other control chars can not be registered
-        this also means, you can't hide input at all, least process it
-    */
-
-    public static function readInput(&$fields, $singleChar = false)
-    {
-        // prevent default output if able
-        if (self::$hasReadline)
-            readline_callback_handler_install('', function() { });
-
-        foreach ($fields as $name => $data)
+        if (!$dbc->readFile())
         {
-            $vars = ['desc', 'isHidden', 'validPattern'];
-            foreach ($vars as $idx => $v)
-                $$v = isset($data[$idx]) ? $data[$idx] : false;
-
-            $charBuff = '';
-
-            if ($desc)
-                echo "\n".$desc.": ";
-
-            while (true) {
-                $r = [STDIN];
-                $w = $e = null;
-                $n = stream_select($r, $w, $e, 200000);
-
-                if ($n && in_array(STDIN, $r)) {
-                    $char  = stream_get_contents(STDIN, 1);
-                    $keyId = ord($char);
-
-                    // ignore this one
-                    if ($keyId == self::CHR_TAB)
-                        continue;
-
-                    // WIN sends \r\n as sequence, ignore one
-                    if ($keyId == self::CHR_CR && self::$win)
-                        continue;
-
-                    // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
-                    if ($keyId == self::CHR_ESC)
-                    {
-                        echo chr(self::CHR_BELL);
-                        return false;
-                    }
-                    else if ($keyId == self::CHR_BACKSPACE)
-                    {
-                        if (!$charBuff)
-                            continue;
-
-                        $charBuff = mb_substr($charBuff, 0, -1);
-                        echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
-                    }
-                    else if ($keyId == self::CHR_LF)
-                    {
-                        $fields[$name] = $charBuff;
-                        break;
-                    }
-                    else if (!$validPattern || preg_match($validPattern, $char))
-                    {
-                        $charBuff .= $char;
-                        if (!$isHidden && self::$hasReadline)
-                            echo $char;
-
-                        if ($singleChar && self::$hasReadline)
-                        {
-                            $fields[$name] = $charBuff;
-                            break;
-                        }
-                    }
-                }
-            }
+            CLI::write('SqlGen::generate() - DBC '.$name.'.dbc could not be written to DB!', CLI::LOG_ERROR);
+            return false;
         }
 
-        echo chr(self::CHR_BELL);
-
-        foreach ($fields as $f)
-            if (strlen($f))
-                return true;
-
-        $fields = null;
         return true;
     }
 }

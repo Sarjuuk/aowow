@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class SpellsPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_SPELL;
     protected $tpl           = 'spells';
@@ -31,7 +31,7 @@ class SpellsPage extends GenericPage
         ),
         -3  => [782, 270, 653, 210, 655, 211, 213, 209, 780, 787, 214, 212, 781, 763, 215, 654, 775, 764, 217, 767, 786, 236, 768, 783, 203, 788, 765, 218, 251, 766, 785, 656, 208, 784, 761, 189, 188, 205, 204],  // Pet Spells => Skill
         -4  => true,                                        // Racial Traits
-        -5  => true,                                        // Mounts
+        -5  => [1, 2, 3],                                   // Mounts [Ground, Flying, Misc]
         -6  => true,                                        // Companions
         -7  => [409, 410, 411],                             // PetTalents => TalentTabId
         -8  => true,                                        // NPC Abilities
@@ -85,14 +85,16 @@ class SpellsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->filterObj = new SpellListFilter();
         $this->getCategoryFromUrl($pageParam);;
+        $this->filterObj = new SpellListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('spells'));
         $this->subCat = $pageParam !== null ? '='.$pageParam : '';
-        $this->filter = ['classPanel' => false, 'glyphPanel' => false];
+
+        $this->classPanel = false;
+        $this->glyphPanel = false;
     }
 
     protected function generateContent()
@@ -100,6 +102,7 @@ class SpellsPage extends GenericPage
         $conditions   = [];
         $visibleCols  = [];
         $hiddenCols   = [];
+        $extraCols    = [];
         $tabData      = ['data' => []];
 
         // the next lengthy ~250 lines determine $conditions and lvParams
@@ -108,7 +111,7 @@ class SpellsPage extends GenericPage
             switch ($this->category[0])
             {
                 case -2:                                    // Character Talents
-                    $this->filter['classPanel'] = true;
+                    $this->classPanel = true;
 
                     array_push($visibleCols, 'singleclass', 'level', 'schools', 'tier');
 
@@ -131,7 +134,7 @@ class SpellsPage extends GenericPage
                         $xCond = null;
                         for ($i = -2; $i < 0; $i++)
                         {
-                            foreach (Util::$skillLineMask[$i] as $idx => $pair)
+                            foreach (Game::$skillLineMask[$i] as $idx => $pair)
                             {
                                 if ($pair[1] == $this->category[1])
                                 {
@@ -169,6 +172,26 @@ class SpellsPage extends GenericPage
                 case -9:                                    // GM Spells
                     array_push($visibleCols, 'level');
                 case -5:                                    // Mounts
+                    array_push($extraCols, "\$Listview.funcBox.createSimpleCol('speed', 'speed', '90px', 'speed')");
+
+                    if (isset($this->category[1]))
+                    {
+                        switch ($this->category[1])
+                        {
+                            case 1:
+                                $conditions[] = ['OR',
+                                    ['AND', ['effect2AuraId', 32], ['effect3AuraId', 207, '!']],
+                                    ['AND', ['effect3AuraId', 32], ['effect2AuraId', 207, '!']]
+                                ];
+                                break;
+                            case 2:
+                                $conditions[] = ['OR', ['effect2AuraId', 207], ['effect3AuraId', 207]];
+                                break;
+                            case 3:
+                                $conditions[] = ['AND', ['effect2AuraId', 32, '!'], ['effect2AuraId', 207, '!'], ['effect3AuraId', 32, '!'],['effect3AuraId', 207, '!']];
+                                break;
+                        }
+                    }
                 case -6:                                    // Companions
                     $conditions[] = ['s.typeCat', $this->category[0]];
 
@@ -218,8 +241,8 @@ class SpellsPage extends GenericPage
 
                     break;
                 case -13:                                   // Glyphs
-                    $this->filter['classPanel'] = true;
-                    $this->filter['glyphPanel'] = true;
+                    $this->classPanel = true;
+                    $this->glyphPanel = true;
 
                     array_push($visibleCols, 'singleclass', 'glyphtype');
 
@@ -230,7 +253,7 @@ class SpellsPage extends GenericPage
 
                     break;
                 case 7:                                     // Abilities
-                    $this->filter['classPanel'] = true;
+                    $this->classPanel = true;
 
                     array_push($visibleCols, 'level', 'singleclass', 'schools');
 
@@ -363,15 +386,51 @@ class SpellsPage extends GenericPage
         $spells = new SpellList($conditions);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
-        $tabData['data'] = array_values($spells->getListviewData());
+
+        $lvData = $spells->getListviewData();
+
+        // add speed-data for mounts
+        if ($this->category && $this->category[0] == -5)
+        {
+            foreach ($spells->iterate() as $spellId => $__)
+            {
+                $lvData[$spellId]['speed'] = 0;
+
+                if (in_array($spells->getField('effect2AuraId'), [32, 207, 58]))
+                    $lvData[$spellId]['speed'] = $spells->getField('effect2BasePoints') + 1;
+                if (in_array($spells->getField('effect3AuraId'), [32, 207, 58]))
+                    $lvData[$spellId]['speed'] = max($lvData[$spellId]['speed'], $spells->getField('effect3BasePoints') + 1);
+
+                if (!$lvData[$spellId]['speed'] && ($spells->getField('effect2AuraId') == 4 || $spells->getField('effect3AuraId') == 4))
+                    $lvData[$spellId]['speed'] = '?';
+                else
+                    $lvData[$spellId]['speed'] = '+'.$lvData[$spellId]['speed'].'%';
+            }
+        }
+
+        $tabData['data'] = array_values($lvData);
 
         // recreate form selection
-        $this->filter          = array_merge($this->filterObj->getForm('form'), $this->filter);
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : NULL;
-        $this->filter['fi']    =  $this->filterObj->getForm();
+        $this->filter             = $this->filterObj->getForm();
+        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['initData'] = ['init' => 'spells'];
 
-        if (!empty($this->filter['fi']['extraCols']))
+        if ($ec = $this->filterObj->getExtraCols())
+        {
+            $this->filter['initData']['ec'] = $ec;
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
+        }
+        else if ($extraCols)
+            $tabData['extraCols'] = $extraCols;
+
+        if ($sc = $this->filterObj->getSetCriteria())
+        {
+            $this->filter['initData']['sc'] = $sc;
+
+            // add source to cols if explicitly searching for it
+            if (in_array(9, $sc['cr']) && !in_array('source', $visibleCols))
+                $visibleCols[] = 'source';
+        }
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
         if ($spells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
@@ -383,27 +442,23 @@ class SpellsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = 1;
 
-        // add source to cols if explicitly searching for it
-        if ($_ = $this->filterObj->getForm('setCriteria', true))
-            if (in_array(9, $_['cr']) && !in_array('source', $visibleCols))
-                $visibleCols[] = 'source';
 
         $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost', 'reqClassMask']);
         if ($mask & 0x1)
             $visibleCols[] = 'reagents';
         if (!($mask & 0x2) && $this->category && !in_array($this->category[0], [9, 11]))
             $hiddenCols[] = 'skill';
-        if (($mask & 0x4))
+        if ($mask & 0x4)
             $visibleCols[] = 'trainingcost';
         if (($mask & 0x8) && !in_array('singleclass', $visibleCols))
-            $visibleCols[] = 'singleclass';
+            $visibleCols[] = 'classes';
 
 
         if ($visibleCols)
-            $tabData['visibleCols'] = $visibleCols;
+            $tabData['visibleCols'] = array_unique($visibleCols);
 
         if ($hiddenCols)
-            $tabData['hiddenCols'] = $hiddenCols;
+            $tabData['hiddenCols'] = array_unique($hiddenCols);
 
         $this->lvTabs[] = ['spell', $tabData];
 
@@ -444,8 +499,8 @@ class SpellsPage extends GenericPage
         foreach ($this->category as $c)
             $this->path[] = $c;
 
-        $form = $this->filterObj->getForm('form');
-        if (count($this->path) == 4 && $this->category[0] == -13 && isset($form['gl']) && !is_array($form['gl']))
+        $form = $this->filterObj->getForm();
+        if (count($this->path) == 4 && $this->category[0] == -13 && isset($form['gl']) && count($form['gl']) == 1)
             $this->path[] = $form['gl'];
     }
 }

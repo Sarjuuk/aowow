@@ -1,0 +1,114 @@
+/* >>> custom >>> */
+@font-face {
+    font-family: ZYHei;
+    src: url(../ZYHei.ttf) format('truetype');
+}
+
+.wowhead-tooltip td, .wowhead-tooltip th {
+    font-family: ZYHei;
+    font-size: 15px;
+    line-height: 20px;
+}
+
+.listview-mode-default th {
+    line-height: 21px;
+}
+
+/* <<< custom <<< */
+
+div.modelviewer-quality div {
+    float: left;
+    width: 61px;
+    height: 22px;
+    margin-right: 10px;
+    background: url(../images/zhcn/modelviewer-picshures.gif) left center no-repeat;
+}
+
+div.modelviewer-model div {
+    margin-left: 40px;
+    margin-right: 10px;
+    float: left;
+    width: 50px;
+    height: 22px;
+    background: url(../images/zhcn/modelviewer-picshures.gif) -506px center no-repeat;
+}
+
+a.modelviewer-help span {
+    display: block;
+    width: 52px;
+    height: 22px;
+    background: url(../images/zhcn/modelviewer-picshures.gif) -100px center no-repeat;
+}
+
+a:hover.modelviewer-help span {
+    background-position: -200px center;
+}
+
+a.modelviewer-close span {
+    display: block;
+    width: 66px;
+    height: 22px;
+    background: url(../images/zhcn/modelviewer-picshures.gif) -300px center no-repeat;
+}
+
+a:hover.modelviewer-close span {
+    background-position: -400px center;
+}
+
+a.screenshotviewer-prev b {
+    display: block;
+    width: 88px;
+    height: 22px;
+    background: url(../images/zhcn/screenshotviewer-picshures.gif?2) -200px center no-repeat;
+}
+
+a.screenshotviewer-next b {
+    display: block;
+    width: 53px;
+    height: 22px;
+    background: url(../images/zhcn/screenshotviewer-picshures.gif?2) -300px center no-repeat;
+}
+
+a.screenshotviewer-cover span {
+    width: 66px;
+    height: 22px;
+}
+
+a.screenshotviewer-cover b {
+    display: block;
+    width: 66px;
+    height: 22px;
+    background: url(../images/zhcn/screenshotviewer-picshures.gif?2) -100px center no-repeat;
+}
+
+a.screenshotviewer-original span {
+    display: block;
+    width: 93px;
+    height: 22px;
+    background: url(../images/zhcn/screenshotviewer-picshures.gif?2) -400px center no-repeat;
+}
+
+a:hover.screenshotviewer-original span {
+    background-position: -500px center;
+}
+
+a.screenshotviewer-close span {
+    display: block;
+    width: 66px;
+    height: 22px;
+    background: url(../images/zhcn/screenshotviewer-picshures.gif?2) 0 center no-repeat;
+}
+
+a:hover.screenshotviewer-close span {
+    background-position: -100px center;
+}
+
+#su_searchbox {
+    left: -25px !important;
+}
+
+/*
+#su_weights {
+    width: 550px !important;
+}
+ */

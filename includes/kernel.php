@@ -9,23 +9,31 @@ if (file_exists('config/config.php'))
 else
     $AoWoWconf = [];
 
+
 mb_internal_encoding('UTF-8');
+
+
+define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');
+
 
 require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
-require_once 'includes/utilities.php';                      // misc™ data 'n func
+require_once 'includes/utilities.php';                      // helper functions
+require_once 'includes/game.php';                           // game related data & functions
+require_once 'includes/profiler.class.php';
 require_once 'includes/user.class.php';
 require_once 'includes/markup.class.php';                   // manipulate markup text
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/community.class.php';                // handle comments, screenshots and videos
 require_once 'includes/loot.class.php';                     // build lv-tabs containing loot-information
+require_once 'includes/smartAI.class.php';
 require_once 'localization/lang.class.php';
 require_once 'pages/genericPage.class.php';
 
 
 // autoload List-classes, associated filters and pages
 spl_autoload_register(function ($class) {
-    $class = strtolower(str_replace('Filter', '', $class));
+    $class = strtolower(str_replace('ListFilter', 'List', $class));
 
     if (class_exists($class))                               // already registered
         return;
@@ -37,10 +45,18 @@ spl_autoload_register(function ($class) {
     {
         require_once 'includes/basetype.class.php';
 
-        if (file_exists('includes/types/'.strtr($class, ['list' => '']).'.class.php'))
-            require_once 'includes/types/'.strtr($class, ['list' => '']).'.class.php';
+        $cl = strtr($class, ['list' => '']);
+        if ($cl == 'remoteprofile' || $cl == 'localprofile')
+            $cl = 'profile';
+        if ($cl == 'remotearenateam' || $cl == 'localarenateam')
+            $cl = 'arenateam';
+        if ($cl == 'remoteguild' || $cl == 'localguild')
+            $cl = 'guild';
+
+        if (file_exists('includes/types/'.$cl.'.class.php'))
+            require_once 'includes/types/'.$cl.'.class.php';
         else
-            throw new Exception('could not register type class: '.$class);
+            throw new Exception('could not register type class: '.$cl);
 
         return;
     }
@@ -96,7 +112,7 @@ foreach ($sets as $k => $v)
     else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
         $val = (bool)$v['value'];
     else if ($v['flags'] & CON_FLAG_TYPE_STRING)
-        $val = preg_replace('/[^\p{L}0-9~\s_\-\'\/\.:,]/ui', '', $v['value']);
+        $val = preg_replace("/[\p{C}]/ui", '', $v['value']);
     else if ($php)
     {
         trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
@@ -115,9 +131,10 @@ foreach ($sets as $k => $v)
 }
 
 
-// handle occuring errors
-error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? (E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT)) : 0);
-set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
+// handle non-fatal errors and notices
+error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? E_AOWOW : 0);
+set_error_handler(function($errNo, $errStr, $errFile, $errLine)
+{
     $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
     $uGroup  = U_GROUP_EMPLOYEE;
 
@@ -147,8 +164,43 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine) {
         );
 
     return true;
-}, E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+}, E_AOWOW);
 
+// handle exceptions
+set_exception_handler(function ($ex)
+{
+    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$ex->getMessage().' @ '.$ex->getFile(). ':'.$ex->getLine()."\n".$ex->getTraceAsString());
+
+    if (DB::isConnectable(DB_AOWOW))
+        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+            AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $ex->getMessage()
+        );
+
+    if (!CLI)
+        (new GenericPage(null))->error();
+    else
+        echo 'Exception - '.$ex->getMessage()."\n   ".$ex->getFile(). '('.$ex->getLine().")\n".$ex->getTraceAsString()."\n";
+});
+
+// handle fatal errors
+register_shutdown_function(function()
+{
+    if (($e = error_get_last()) && $e['type'] & (E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR))
+    {
+        Util::addNote(U_GROUP_EMPLOYEE, 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']);
+
+        if (DB::isConnectable(DB_AOWOW))
+            DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $e['message']
+            );
+
+        if (CLI)
+            echo 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']."\n";
+
+        // cant generate a page for web view :(
+        die();
+    }
+});
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || (!empty($AoWoWconf['aowow']) && CFG_FORCE_SSL);
 if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts
@@ -164,12 +216,17 @@ if (!CLI)
         die('error: SITE_HOST or STATIC_HOST not configured');
 
     // Setup Session
-    if (CFG_SESSION_CACHE_DIR && Util::checkOrCreateDirectory(CFG_SESSION_CACHE_DIR))
+    if (CFG_SESSION_CACHE_DIR && Util::writeDir(CFG_SESSION_CACHE_DIR))
         session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
 
     session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
     session_cache_limiter('private');
-    session_start();
+    if (!session_start())
+    {
+        trigger_error('failed to start session', E_USER_ERROR);
+        exit;
+    }
+
     if (!empty($AoWoWconf['aowow']) && User::init())
         User::save();                                       // save user-variables in session
 
@@ -184,7 +241,7 @@ if (!CLI)
     }
 
     // parse page-parameters .. sanitize before use!
-    $str = explode('&', $_SERVER['QUERY_STRING'], 2)[0];
+    $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING']), 2)[0];
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
     $pageParam = isset($_[1]) ? $_[1] : null;

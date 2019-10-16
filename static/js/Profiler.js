@@ -51,7 +51,7 @@ function Profiler() {
                     _tdRaidCompletion,
                     _tdRaidGearMeter,
             _divStatistics,
-            _divAuras,
+            // _divAuras,
         _divTalents,
         _divPets,
         _divReputation,
@@ -93,11 +93,27 @@ function Profiler() {
             shasplpwr:       ['shaspldmg']
         },
 
-        _progress = [ /* some example data */
-            { level: 150, instance: 2,            name: LANG.pr_dungeons, icon: 'spell_holy_championsbond', achievs: [477,478,479,480,481,482,483,484,485,486,487,488,3778,4296,4516,4517,4518], kills: [[1232, 29120], [1235, 31134], [1236, 29306], [1233, 29311], [1242, 23980], [1231, 26723], [1240, 26861], [1239, 27656], [1238, 28923], ] }, // some lvl 80 Dungeons normal
-            { level: 187, instance: 2, heroic: 1, name: LANG.pr_dungeons, icon: 'ability_rogue_feigndeath', achievs: [489,490,491,492,493,494,495,496,497,498,499,500,4297,4298,4519,4520,4521], kills: [[1506, 29120], [1509, 31134], [1510, 29306], [1507, 29311], [1504, 23980], [1505, 26723], [1514, 26861], [1513, 27656], [1512, 28923], ] }, // some lvl 80 Dungeons heroic
-            { level: 200, instance: 7,            zone: 3456, icon: 'achievement_zone_firelands', achievs: [574], kills: [[1377, 15991]] }, // 10-man naxxramas
-            { level: 213, instance: 7, heroic: 1, zone: 3456, icon: 'achievement_zone_firelands', achievs: [575], kills: [[1390, 15991]] }  // 25-man naxxramas
+        _progress = [                                       // aowow: don't forget to enable tracking in includes/profiler.class.php
+            { level: 284, instance: 5, heroic: 1, name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'spell_shadow_twilight',                    achievs: [4816], kills: [[4823, 39863]] },  // Ruby Sanctum 25 hc
+            { level: 277, instance: 5, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4637], kills: [[4673, 37970], [4682, 37955], [4664, 37813], [4667, 36626], [4661, 100001], [4656, 36855], [4642, 36612], [4679, 36678], [4670, 36627], [4685, 36853], [4676, 36789], [4688, 36597]] }, // Icecrown Citadel 25 hc
+            { level: 271, instance: 5,            name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'spell_shadow_twilight',                    achievs: [4815], kills: [[4820, 39863]] }, // Ruby Sanctum 25 nh
+            { level: 271, instance: 3, heroic: 1, name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'spell_shadow_twilight',                    achievs: [4818], kills: [[4822, 39863]] }, // Ruby Sanctum 10 hc
+            { level: 264, instance: 5,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4608], kills: [[4672, 37970], [4681, 37955], [4663, 37813], [4666, 36626], [4660, 100001], [4655, 36855], [4641, 36612], [4678, 36678], [4669, 36627], [4683, 36853], [4675, 36789], [4687, 36597]] }, // Icecrown Citadel 25 nh
+            { level: 264, instance: 3, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4636], kills: [[4671, 37970], [4680, 37955], [4662, 37813], [4665, 36626], [4659, 100001], [4654, 36855], [4640, 36612], [4677, 36678], [4668, 36627], [4684, 36853], [4674, 36789], [4686, 36597]] }, // Icecrown Citadel 10 hc
+            { level: 258, instance: 3,            name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'spell_shadow_twilight',                    achievs: [4817], kills: [[4821, 39863]] }, // Ruby Sanctum 10 nh
+            { level: 258, instance: 5, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3812], kills: [[4031, 200001], [4034, 34780], [4038, 200002], [4042, 200003], [4046, 34564]] }, // Trial of the Crusader 25 hc
+            { level: 251, instance: 3,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4532], kills: [[4648, 37970], [4651, 37955], [4645, 37813], [4646, 36626], [4644, 100001], [4643, 36855], [4639, 36612], [4650, 36678], [4647, 36627], [4652, 36853], [4649, 36789], [4653, 36597]] }, // Icecrown Citadel 10 nh
+            { level: 245, instance: 5,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3916], kills: [[4029, 200001], [4035, 34780], [4039, 200002], [4043, 200003], [4047, 34564]] }, // Trial of the Crusader 25 nh
+            { level: 245, instance: 3, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3918], kills: [[4030, 200001], [4033, 34780], [4037, 200002], [4041, 200003], [4045, 34564]] }, // Trial of the Crusader 10 hc
+            { level: 245, instance: 5,            name: g_zones[2159] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_boss_onyxia',                  achievs: [4397], kills: [[1756, 10184]] }, // Onyxia's Lair 25
+            { level: 232, instance: 3,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3917], kills: [[4028, 200001], [4032, 34780], [4036, 200002], [4040, 200003], [4044, 34564]] }, // Trial of the Crusader 10 nh
+            { level: 232, instance: 3,            name: g_zones[2159] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_boss_onyxia',                  achievs: [4396], kills: [[1098, 10184]] }, // Onyxia's Lair 10
+         // { level: 226, instance: 5,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2895], kills: [[2872, 33113], [2873, 33186], [2874, 33118], [2884, 33293], [2875, 32930], [2879, 33432], [2880, 33271], [2882, 33515], [2883, 33288], [3236, 33993], [3257, 64985], [3256, 64899], [3258, 65074], [2881, 65184], [2885, 400001]] }, // 25-man ulduar
+         // { level: 219, instance: 3,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2894], kills: [[2856, 33113], [2857, 33186], [2858, 33118], [2859, 33293], [2861, 32930], [2865, 33432], [2866, 33271], [2868, 33515], [2869, 33288], [2870, 33993], [2863, 64985], [2864, 65074], [2862, 64899], [2867, 65184], [2860, 400001]] }, // 10-man ulduar
+         // { level: 213, instance: 5,            zone: 3456, icon: 'achievement_dungeon_naxxramas_10man',      achievs: [577],  kills: [[1367, 16028], [1368, 15956], [1378, 15932], [1379, 16060], [1380, 15953], [1381, 15931], [1382, 15936], [1383, 300001], [1384, 16061], [1385, 16011], [1386, 15952], [1387, 15954], [1388, 15928], [1389, 15989], [1390, 15990]] }, // 25-man naxxramas
+         // { level: 200, instance: 3,            zone: 3456, icon: 'achievement_dungeon_naxxramas_normal',     achievs: [576],  kills: [1361, 15956], [1362, 15953], [1363, 15952], [1365, 15954], [1366, 16060], [1364, 16028], [1369, 15936], [1370, 16011], [1371, 15931], [1372, 15932], [1373, 15928], [1374, 16061], [1375, 300001], [1376, 15989], [1377, 15990]] }, // 10-man naxxramas
+         // { level: 187, instance: 2, heroic: 1, name: LANG.pr_dungeons, icon: 'ability_rogue_feigndeath',     achievs: [489,490,491,492,493,494,495,496,497,498,499,500,4297,4298,4519,4520,4521], kills: [[1506, 29120], [1509, 31134], [1510, 29306], [1507, 29311], [1504, 23980], [1505, 26723], [1514, 26861], [1513, 27656], [1512, 28923]] }, // some lvl 80 Dungeons heroic
+         // { level: 150, instance: 2,            name: LANG.pr_dungeons, icon: 'spell_holy_championsbond',     achievs: [477,478,479,480,481,482,483,484,485,486,487,488,3778,4296,4516,4517,4518], kills: [[1232, 29120], [1235, 31134], [1236, 29306], [1233, 29311], [1242, 23980], [1231, 26723], [1240, 26861], [1239, 27656], [1238, 28923]] }, // some lvl 80 Dungeons normal
         ];
 
 
@@ -630,23 +646,23 @@ function Profiler() {
 
 /* custom auras */
 
-        var tbl = $WH.ce('table');
+        // var tbl = $WH.ce('table');
 
-        _divAuras = $WH.ce('div');
-        _divAuras.id = 'aura-container';
-        _divAuras.style.cssFloat = 'left';
-        _divAuras.style.marginLeft = '390px';
-        _divAuras.style.width = '325px';
-        _divAuras.style.display = 'none';
+        // _divAuras = $WH.ce('div');
+        // _divAuras.id = 'aura-container';
+        // _divAuras.style.cssFloat = 'left';
+        // _divAuras.style.marginLeft = '390px';
+        // _divAuras.style.width = '325px';
+        // _divAuras.style.display = 'none';
 
-        _ = $WH.ce('h3');
-        $WH.ae(_, $WH.ct('[Auras]'));
-        $WH.ae(_divAuras, _);
+        // _ = $WH.ce('h3');
+        // $WH.ae(_, $WH.ct('[Auras]'));
+        // $WH.ae(_divAuras, _);
 
-        tbl.className = 'iconlist';
+        // tbl.className = 'iconlist';
 
-        $WH.ae(_divAuras, tbl);
-        $WH.aef(_divInventory, _divAuras);
+        // $WH.ae(_divAuras, tbl);
+        // $WH.aef(_divInventory, _divAuras);
 
 /* end custom */
 
@@ -877,7 +893,7 @@ function Profiler() {
             _divMessage.style.backgroundImage = 'none';
         }
         // can't have javascript:; hrefs all over the place with an onbeforeunload on IE
-        if (!$.browser.msie) {
+        if (!$WH.Browser.ie) {
             window.onbeforeunload = (saved ? null : function (e) {
                 return LANG.message_savebeforeexit;
             });
@@ -885,7 +901,9 @@ function Profiler() {
     }
 
     function _updateDefaultIcon() {
-        var icon = $WH.g_getProfileIcon(_profile.race, _profile.classs, _profile.gender, _profile.level, _profile.source, 'large');
+        var icon = $WH.g_getProfileIcon(_profile.race, _profile.classs, _profile.gender, _profile.level, 0, 'large');
+        // aowow - and another bugged icon request
+        // var icon = $WH.g_getProfileIcon(_profile.race, _profile.classs, _profile.gender, _profile.level, _profile.source, 'large');
 
         if (!_profile.icon) {
             _profile.icon = icon;
@@ -1081,6 +1099,7 @@ function Profiler() {
         }
     }
 
+/* Aowow custom
     function _updateAuras() {
         var
             show = false,
@@ -1148,7 +1167,7 @@ function Profiler() {
 
         _divAuras.style.display = show ? 'block' : 'none';
     }
-
+*/
     function _showCharacterMenu(e) {
         if (!_isArmoryProfile()) {
             return;
@@ -1452,6 +1471,8 @@ function Profiler() {
         $WH.ae(div, sp);
         $WH.ae(li, div);
         $WH.ae(_ulQuickFacts, li);
+
+        _updateGearScore();
 
         // Spec
         li = $WH.ce('li');
@@ -1767,7 +1788,8 @@ function Profiler() {
                 statisticId = raid.kills[i][0],
                 nameId = raid.kills[i][1],
                 nKills = (_profile.statistics[statisticId] | 0),
-                name = (raid.zone ? g_npcs[nameId]['name_' + Locale.getName()] : g_zones[nameId]);
+                // name = (raid.zone ? g_npcs[nameId]['name_' + Locale.getName()] : g_zones[nameId]); // aowow - original
+                name = (g_zones[nameId] ? g_zones[nameId] : g_npcs[nameId]['name_' + Locale.getName()]);
 
             if (!name) {
                 continue;
@@ -1830,7 +1852,7 @@ function Profiler() {
         for (var i in g_spells) {
             _fixJson(g_spells[i].modifier || 0);
         }
-        _updateAuras();
+        // _updateAuras();
 
         _statistics.updateModifiers();
 
@@ -2380,7 +2402,7 @@ function ProfilerTalents(_parent) {
         }
 
         if (!_displayed) {
-            // sarjuuk: causes infinite loop and it works fine without this
+            // aowow: causes infinite loop and it works fine without this
             // _talentCalc.setLevelCap(_profile.level);
             if (_mode != 'pets') {
                 _updateBuilds();
@@ -2531,7 +2553,8 @@ function ProfilerStatistics(_parent) {
             },
 
             agi: {
-                tooltipModifiers: ['mleatkpwr', 'mlecritstrkpct', 'armor'],
+                // tooltipModifiers: ['mleatkpwr', 'mlecritstrkpct', 'armor'], - aowow replacement
+                tooltipModifiers: ['mleatkpwr', 'mlecritstrkpct', 'fullarmor'],
                 addModifiers: function () {
                     var
                         raceData  = g_statistics.race[_profile.race],
@@ -2543,7 +2566,8 @@ function ProfilerStatistics(_parent) {
                         rgdatkpwr: [classData[1][2], 'percentOf', ['agi', (classData[1][2] ? (classData[1][0] / (classData[1][1] ? 2 : 1)) : 0)]],
                         mlecritstrkpct: [levelData[7], 'percentOf', ['agi', classData[2][0]]],
                         rgdcritstrkpct: [levelData[7], 'percentOf', ['agi', classData[2][0]]],
-                        armor: [2, 'percentOf', 'agi'],
+                        // armor: [2, 'percentOf', 'agi'], - aowow replacement
+                        fullarmor: [2, 'percentOf', 'agi'],
                         dodgepct: [levelData[9], 'percentOf', ['agi', -levelData[9] * ((raceData ? raceData[1] : 0) + levelData[1])]]
                     };
                 }
@@ -2753,7 +2777,8 @@ function ProfilerStatistics(_parent) {
             manargn: {
                 addModifiers: function () {
                     return {
-                        oocmanargn: [1, 'percentOf', 'manargn']
+                        oocmanargn: [1, 'percentOf', 'manargn'],
+                        icmanargn: [1, 'percentOf', 'manargn']
                     };
                 }
             },
@@ -2768,12 +2793,17 @@ function ProfilerStatistics(_parent) {
 
             oocmanargn: {
                 tooltipCompute: function (total) {
-                    return [total, _statistics.manargn.total];
+                    // return [total, _statistics.manargn.total]; // aowow -- everything with icmanargn is custom. was apparently not handled before
+                    return [total, _statistics.icmanargn.total];
                 }
             },
 
+            icmanargn: {},
+
             // ********* Defenses ********
-            armor: {
+            // armor: { - aowow replacement
+            fullarmor: {
+                label: 'pr_stats_armor', // - aowow added
                 getTooltip: function () {
                     return LANG['pr_statstt_armor' + (_profile.classs == 3 || _profile.classs == 9 ? 2 : '')];
                 },
@@ -2789,7 +2819,16 @@ function ProfilerStatistics(_parent) {
                 },
                 addModifiers: function () {
                     return {
-                        petarmor: [0.35, 'percentOf', 'armor']
+                        // petarmor: [0.35, 'percentOf', 'armor'] - aowow replacement
+                        petarmor: [0.35, 'percentOf', 'fullarmor']
+                    }
+                }
+            },
+
+            armor: { // aowow - added this so we can correctly calc talents that only modify equipped armor values
+                addModifiers: function () {
+                    return {
+                        fullarmor: [1, 'percentOf', 'armor']
                     }
                 }
             },
@@ -3046,7 +3085,8 @@ function ProfilerStatistics(_parent) {
         // Defenses
         [
             {id: 'defenses', type: 'title' },
-            { id: 'armor' },
+            // { id: 'armor' }, // - aowow replacement
+            { id: 'fullarmor' },
             { id: 'def' },
             { id: 'dodgepct' },
             { id: 'parrypct' },
@@ -3368,7 +3408,7 @@ function ProfilerStatistics(_parent) {
                 health:    levelData[5],
                 mleatkpwr: [classData[0][3], 'percentOf', 'level'],
                 rgdatkpwr: [classData[1][3], 'percentOf', 'level'],
-                dodgepct:  classData[4] + levelData[9] * ((raceData ? raceData[1] : 0) + levelData[1]), // may need to add http://www.wowhead.com/spell=13789 here (there are also 2 druid talents but they require bear/cat form so that's not a problem
+                dodgepct:  classData[4] + levelData[9] * ((raceData ? raceData[1] : 0) + levelData[1]),
                 parrypct:  classData[6],
                 blockpct:  classData[8],
                 def:       _profile.level * 5
@@ -3802,6 +3842,8 @@ function ProfilerStatistics(_parent) {
                             $WH.st(boxStat.bar.firstChild.firstChild, _getStatBoxLabel(statId) + ' ' + value);
                             boxStat.bar.style.display = (value > 0 ? '' : 'none');
                         }
+                        else
+                            boxStat.bar.style.display = 'none';
 
                         break;
                     case 'resist':
@@ -4043,22 +4085,22 @@ function ProfilerInventory(_parent) {
             { id: 13, name: 'trinket',  itemslots: [12],                         nomodel: 2 },
             { id: 14, name: 'trinket',  itemslots: [12],                         nomodel: 2 },
             { id: 16, name: 'mainhand', itemslots: [21, 13, 17],     enchant: 1, weapon: 1 },
-            { id: 17, name: 'offhand',  itemslots: [22, 13, 23, 14], enchant: 3, weapon: 2 },
+            { id: 17, name: 'offhand',  itemslots: [22, 13, 23, 14], enchant: 3, weapon: 2, noenchantclasses: [-5] },
             { id: 18, name: 'ranged',   itemslots: [15, 25],         enchant: 3, weapon: 1, classes: [3, 8, 5, 4, 9, 1], nomodel: 1, noenchantclasses: [16, 19] },
             { id: 18, name: 'relic',    itemslots: [28],                         classes: [6, 11, 2, 7], nomodel: 2 } // Special case
         ];
 
         _proficiencies = {
-             1: { 2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13, 15, 16, 18], 4: [6,  1, 2, 3, 4]     },
-             2: { 2: [0, 1, 4, 5, 6, 7, 8],                           4: [6,  7, 1, 2, 3, 4] },
-             3: { 2: [0, 1, 2, 3, 6, 7, 8, 10, 13, 15, 16, 18],       4: [1,  2, 3]           },
-             4: { 2: [2, 3, 4, 7, 13, 15, 16, 18],                    4: [1,  2]              },
-             5: { 2: [4, 10, 15, 19],                                 4: [1]                 },
-             6: { 2: [0, 1, 4, 5, 6, 7, 8],                           4: [10, 1, 2, 3, 4]    },
-             7: { 2: [0, 1, 4, 5, 10, 13, 15],                        4: [6,  9, 1, 2, 3]    },
-             8: { 2: [7, 10, 15, 19],                                 4: [1]                 },
-             9: { 2: [7, 10, 15, 19],                                 4: [1]                 },
-            11: { 2: [4, 5, 6, 10, 13, 15],                           4: [8,  1, 2]          }
+             1: { 2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13, 15, 16, 18], 4: [6, 1, 2, 3, 4]    },
+             2: { 2: [0, 1, 4, 5, 6, 7, 8],                           4: [6, 7, 1, 2, 3, 4] },
+             3: { 2: [0, 1, 2, 3, 6, 7, 8, 10, 13, 15, 16, 18],       4: [1, 2, 3]          },
+             4: { 2: [2, 3, 4, 7, 13, 15, 16, 18],                    4: [1, 2]             },
+             5: { 2: [4, 10, 15, 19],                                 4: [1]                },
+             6: { 2: [0, 1, 4, 5, 6, 7, 8],                           4: [10, 1, 2, 3, 4]   },
+             7: { 2: [0, 1, 4, 5, 10, 13, 15],                        4: [6, 9, 1, 2, 3]    },
+             8: { 2: [7, 10, 15, 19],                                 4: [1]                },
+             9: { 2: [7, 10, 15, 19],                                 4: [1]                },
+            11: { 2: [4, 5, 6, 10, 13, 15],                           4: [8, 1, 2]          }
         },
 
     jsonEquipCopy = {
@@ -4342,7 +4384,8 @@ function ProfilerInventory(_parent) {
             if (item[2] && g_enchants[item[2]]) {
                 gearscore[i].ench += bonus;
             }
-            else {
+            // else {                                       // aowow - adds 20 even if the slot is empty .. what?
+            else if (item[0]) {
                 gearscore[i].item += bonus;
             }
 
@@ -4600,7 +4643,7 @@ function ProfilerInventory(_parent) {
             };
 
             var params = {
-                wmode: 'direct',                            // sarjuuk: was 'opaque'; doesn't draw with this
+                wmode: 'direct',                            // aowow: was 'opaque'; doesn't draw with this
                 quality: 'high',
                 allowscriptaccess: 'always',
                 allowfullscreen: true,
@@ -4617,14 +4660,21 @@ function ProfilerInventory(_parent) {
 
             _mvInited = true;
         }
-        else { /* sarjuuk: the idea of this is to directly access the swf. it just doesn't work with the ZAMviewerfp11.swf */
+        /*
+            aowow: the idea of this is to directly access the swf.
+            though ZAMviewerfp11.swf is unpredictable af
+
+            custom: try/catch; check for empty equipList
+        */
+        else {
             _swfModel = $WH.ge(_swfModel.id);
 
             if (_swfModel.clearSlots) {
                 _swfModel.setAppearance(_profile.hairstyle, _profile.haircolor, _profile.facetype, _profile.skincolor, _profile.features, _profile.haircolor);
 
-                _swfModel.clearSlots(emptySlots);
-                _swfModel.attachList(equipList);
+                try { _swfModel.clearSlots(emptySlots); } catch (x) { }
+                if (equipList.length)
+                    _swfModel.attachList(equipList);
             }
         }
     }
@@ -7388,7 +7438,7 @@ function ProfilerCompletion(_parent) {
             return _timer[wut] = setTimeout(_self.filterData.bind(_self, wut, value), 750);
         }
 
-        if (!_divTotals)                                    // sarjuuk: prevent error on matching available data against empty known data
+        if (!_divTotals)                                    // aowow: prevent error on matching available data against empty known data
             return;
 
         var _ = 0;
@@ -7453,7 +7503,7 @@ function ProfilerCompletion(_parent) {
         }
 
         if (_opt.onDemand && !_loading && !_loaded) {
-            $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + Locale.getId() + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+            $WH.g_ajaxIshRequest(g_host + '/?data=' + _opt.onDemand + (_opt.dataArgs ? _opt.dataArgs(_profile) : '') + '&locale=' + Locale.getId() + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
             _imgLoading.style.display = 'block';
             _divTipQuests.style.display = 'none';
             _loading = this;
@@ -7513,7 +7563,7 @@ function ProfilerCompletion(_parent) {
             }
 
             if ((!_opt.compute || _opt.compute(row, data[i])) && data[i]) {
-                // row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));                     // sarjuuk: idk a way to generate a jScript-TimeObject in php (there probably isn't), but one is expected here
+                // row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));                     // aowow: idk a way to generate a jScript-TimeObject in php (there probably isn't), but one is expected here
                 row.completed = (data[i] > 946681200 ? new Date(data[i] * 1000) : (_opt.showQuantity ? data[i] : 1));   // so we create a dateObject from data[i] if it is a unixtime past the 1.1.2000 - 0:00 (wich probably isn't used as a sensible int anyway)
                 hasData = true;
             }
@@ -8380,7 +8430,7 @@ function ProfilerCompletion(_parent) {
 
                 if (_category !== null) {
                     if (_opt.onDemand && _opt.partial && !_loaded[_category] && !_loading) {
-                        $WH.g_ajaxIshRequest(g_host + '?data=' + _opt.onDemand + '&locale=' + Locale.getId() + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
+                        $WH.g_ajaxIshRequest(g_host + '/?data=' + _opt.onDemand + '&locale=' + Locale.getId() + '&catg=' + _category + '&t=' + g_dataKey + '&callback=$WowheadProfiler.loadOnDemand&' + (new Date().getTime()));
                         _imgLoading.style.display = 'block';
                         _divTipQuests.style.display = 'none';
                         _loading = this;
@@ -9030,6 +9080,7 @@ Listview.templates.itempicker = {
                 }
 
                 return (
+                    -$WH.strcmp(a.gearscore, b.gearscore) ||
                     -$WH.strcmp(a.level, b.level) ||
                     -$WH.strcmp(a.quality, b.quality) ||
                     $WH.strcmp(a.name, b.name)
@@ -9316,6 +9367,7 @@ Listview.templates.gempicker = {
                 }
 
                 return (
+                    -$WH.strcmp(a.gearscore, b.gearscore) ||
                     -$WH.strcmp(a.quality, b.quality) ||
                     $WH.strcmp(a.colors, b.colors) ||
                     $WH.strcmp(a.icon, b.icon) ||
@@ -9485,7 +9537,10 @@ Listview.templates.enchantpicker = {
                     return 1;
                 }
 
-                return $WH.strcmp(a.name, b.name);
+                return (
+                    -$WH.strcmp(a.gearscore, b.gearscore) ||
+                    $WH.strcmp(a.name, b.name)
+                );
             }
         },
         {

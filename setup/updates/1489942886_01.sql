@@ -1,0 +1,7 @@
+ALTER TABLE `aowow_articles`
+    CHANGE COLUMN `type` `type` SMALLINT(5) NULL DEFAULT NULL FIRST,
+    CHANGE COLUMN `typeId` `typeId` MEDIUMINT(9) NULL DEFAULT NULL AFTER `type`,
+    CHANGE COLUMN `locale` `locale` TINYINT(4) UNSIGNED NOT NULL AFTER `typeId`,
+    ADD COLUMN `url` VARCHAR(50) NULL DEFAULT NULL AFTER `locale`,
+    ADD COLUMN `editAccess` SMALLINT UNSIGNED NOT NULL DEFAULT '2' AFTER `url`,
+    ADD UNIQUE INDEX `locale_url` (`locale`, `url`);

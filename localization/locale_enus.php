@@ -4,6 +4,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+
+// comments in CAPS point to items in \Interface\FrameXML\GlobalStrings.lua - lowercase sources are contextual
+
+
+
 $lang = array(
     // page variables
     'timeUnits' => array(
@@ -41,12 +46,14 @@ $lang = array(
         'forum'         => "Forum",
         'n_a'           => "n/a",
         'siteRep'       => "Reputation",
+        'yourRepHistory'=> "Your Reputation History",
         'aboutUs'       => "About us & contact",
         'and'           => " and ",
         'or'            => " or ",
         'back'          => "Back",
         'reputationTip' => "Reputation points",
         'byUserTimeAgo' => 'By <a href="'.HOST_URL.'/?user=%s">%1$s</a> %s ago',
+        'help'          => "Help",
 
         // filter
         'extSearch'     => "Extended search",
@@ -103,22 +110,6 @@ $lang = array(
         'chooseClass'   => "Choose a class",
         'chooseFamily'  => "Choose a pet family",
 
-        // profiler
-        'realm'         => "Realm",
-        'region'        => "Region",
-        'viewCharacter' => "View Character",
-        '_cpHead'       => "Character Profiler",
-        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
-        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
-        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
-
-        // help
-        'help'          => "Help",
-        'helpTopics'    => array(
-            "Commenting and You",                   "Model Viewer",                         "Screenshots: Tips & Tricks",          "Stat Weighting",
-            "Talent Calculator",                    "Item Comparison",                      "Profiler",                            "Markup Guide"
-        ),
-
         // search
         'search'        => "Search",
         'searchButton'  => "Search",
@@ -138,6 +129,58 @@ $lang = array(
         'genericError'  => "An error has occurred; refresh the page and try again. If the error persists email <a href=\"#contact\">feedback</a>", # LANG.genericerror
         'bannedRating'  => "You have been banned from rating comments.", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "You have reached the daily voting cap. Come back tomorrow!", # LANG.tooltip_too_many_votes
+        'alreadyReport' => "You've already reported this.", # LANG.ct_resp_error7
+        'textTooShort'  => "Your message is too short.",
+        'cannotComment' => "You have been banned from writing comments.",
+        'textLength'    => "Your comment has %d characters and must have at least %d and at most %d characters.",
+
+        'moreTitles'    => array(
+            'reputation'    => "Website Reputation",
+            'whats-new'     => "What's New",
+            'searchbox'     => "Search Box",
+            'tooltips'      => "Tooltips",
+            'faq'           => "Frequently Asked Questions",
+            'aboutus'       => "What is AoWoW?",
+            'searchplugins' => "Search Plugins",
+            'privileges'    => "Privileges",
+            'top-users'     => "Top Users",
+            'help'          => array(
+                'commenting-and-you' => "Commenting and You",               'modelviewer'       => "Model Viewer",              'screenshots-tips-tricks' => "Screenshots: Tips & Tricks",
+                'stat-weighting'     => "Stat Weighting",                   'talent-calculator' => "Talent Calculator",         'item-comparison'         => "Item Comparison",
+                'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
+            )
+        )
+    ),
+    'profiler' => array(
+        'realm'         => "Realm",
+        'region'        => "Region",
+        'viewCharacter' => "View Character",
+        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
+        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
+        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
+        'firstUseTitle' => "%s of %s",
+        'complexFilter' => "Complex filter selected! Search results are limited to cached Characters.",
+        'customProfile' => " (Custom Profile)",
+        'resync'        => "Resync",
+        'guildRoster'   => "Guild Roster for &lt;%s&gt;",
+        'arenaRoster'   => "Arena Team Roster for &lt;%s&gt",
+        'atCaptain'     => "Arena Team Captain",
+
+        'profiler'      => "Character Profiler",
+        'arenaTeams'    => "Arena Teams",
+        'guilds'        => "Guilds",
+
+        'notFound'      => array(
+            'guild'     => "This Guild doesn't exist or is not yet in the database.",
+            'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
+            'profile'   => "This character doesn't exist or is not yet in the database."
+        ),
+        'dummyNPCs'     => array(
+            100001 => "Gunship Battle",
+            200001 => "Northrend Beasts", 200002 => "Faction Champions", 200003 => "Val'kyr Twins",
+            300001 => "The Four Horsemen",
+            400001 => "Assembly of Iron"
+        ),
     ),
     'screenshot' => array(
         'submission'    => "Screenshot Submission",
@@ -161,6 +204,8 @@ $lang = array(
     'game' => array(
         'achievement'   => "achievement",
         'achievements'  => "Achievements",
+        'areatrigger'   => "areatrigger",
+        'areatriggers'  => "Areatrigger",
         'class'         => "class",
         'classes'       => "Classes",
         'currency'      => "currency",
@@ -185,6 +230,8 @@ $lang = array(
         'faction'       => "faction",
         'factions'      => "Factions",
         'cooldown'      => "%s cooldown",
+        'icon'          => "icon",
+        'icons'         => "icons",
         'item'          => "item",
         'items'         => "Items",
         'itemset'       => "item Set",
@@ -203,12 +250,13 @@ $lang = array(
         'requires'      => "Requires %s",
         'requires2'     => "Requires",
         'reqLevel'      => "Requires Level %s",
-        'reqLevelHlm'   => "Requires Level %s",
         'reqSkillLevel' => "Required skill level",
         'level'         => "Level",
         'school'        => "School",
         'skill'         => "skill",
         'skills'        => "Skills",
+        'sound'         => "sound",
+        'sounds'        => "Sounds",
         'spell'         => "spell",
         'spells'        => "Spells",
         'type'          => "Type",
@@ -216,14 +264,14 @@ $lang = array(
         'zone'          => "zone",
         'zones'         => "Zones",
 
-        'pvp'           => "PvP",
-        'honorPoints'   => "Honor Points",
-        'arenaPoints'   => "Arena Points",
+        'pvp'           => "PvP",                           // PVP
+        'honorPoints'   => "Honor Points",                  // HONOR_POINTS
+        'arenaPoints'   => "Arena Points",                  // ARENA_POINTS
         'heroClass'     => "Hero class",
         'resource'      => "Resource",
         'resources'     => "Resources",
-        'role'          => "Role",
-        'roles'         => "Roles",
+        'role'          => "Role",                          // ROLE
+        'roles'         => "Roles",                         // LFG_TOOLTIP_ROLES
         'specs'         => "Specs",
         '_roles'        => ["Healer", "Melee DPS", "Ranged DPS", "Tank"],
 
@@ -239,28 +287,28 @@ $lang = array(
             "Milled",                       "Mined",                        "Prospected",                   "Pickpocketed",                 "Salvaged",                     "Skinned",
             "In-Game Store"
         ),
-        'languages'     => array(
+        'languages'     => array(                           // Languages.dbc
              1 => "Orcish",                  2 => "Darnassian",              3 => "Taurahe",                 6 => "Dwarvish",                7 => "Common",                  8 => "Demonic",
              9 => "Titan",                  10 => "Thalassian",             11 => "Draconic",               12 => "Kalimag",                13 => "Gnomish",                14 => "Troll",
             33 => "Gutterspeak",            35 => "Draenei",                36 => "Zombie",                 37 => "Gnomish Binary",         38 => "Goblin Binary"
         ),
-        'gl'            => [null, "Major", "Minor"],
+        'gl'            => [null, "Major", "Minor"],                                                                                                                                // MAJOR_GLYPH, MINOR_GLYPH
         'si'            => [1 => "Alliance", -1 => "Alliance only", 2 => "Horde", -2 => "Horde only", 3 => "Both"],
-        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],
-        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],
-        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],
-        'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],
-        'ra'            => [-2 => "Horde", -1 => "Alliance", "Both", "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],
-        'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],
-        'st'            => array(
+        'resistances'   => [null, 'Holy Resistance', 'Fire Resistance', 'Nature Resistance', 'Frost Resistance', 'Shadow Resistance', 'Arcane Resistance'],                         // RESISTANCE?_NAME
+        'dt'            => [null, "Magic", "Curse", "Disease", "Poison", "Stealth", "Invisibility", null, null, "Enrage"],                                                          // SpellDispalType.dbc
+        'sc'            => ["Physical", "Holy", "Fire", "Nature", "Frost", "Shadow", "Arcane"],                                                                                     // STRING_SCHOOL_*
+        'cl'            => [null, "Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", null, "Druid"],                                   // ChrClasses.dbc
+        'ra'            => [-2 => "Horde", -1 => "Alliance", null, "Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", null, "Blood Elf", "Draenei"],     // ChrRaces.dbc
+        'rep'           => ["Hated", "Hostile", "Unfriendly", "Neutral", "Friendly", "Honored", "Revered", "Exalted"],                                                              // FACTION_STANDING_LABEL*
+        'st'            => array(                           // SpellShapeshiftForm.dbc // with minor deviations on 27, 28
             "Default",                      "Cat Form",                     "Tree of Life",                 "Travel Form",                  "Aquatic Form",                 "Bear From",
-            null,                           null,                           "Dire Bear Form",               null,                           null,                           null,
-            null,                           "Shadowdance",                  null,                           null,                           "Ghostwolf",                    "Battle Stance",
-            "Defensive Stance",             "Berserker Stance",             null,                           null,                           "Metamorphosis",                null,
-            null,                           null,                           null,                           "Swift Flight Form",            "Shadow Form",                  "Flight Form",
+            "Ambient",                      "Ghoul",                        "Dire Bear Form",               "Steve's Ghoul",                "Tharon'ja Skeleton",           "Darkmoon - Test of Strength",
+            "BLB Player",                   "Shadowdance",                  "Creature - Bear",              "Creature - Cat",               "Ghostwolf",                    "Battle Stance",
+            "Defensive Stance",             "Berserker Stance",             "Test",                         "Zombie",                       "Metamorphosis",                null,
+            null,                           "Undead",                       "Frenzy",                       "Swift Flight Form",            "Shadow Form",                  "Flight Form",
             "Stealth",                      "Moonkin Form",                 "Spirit of Redemption"
         ),
-        'me'            => array(
+        'me'            => array(                           // SpellMechanic.dbc .. not quite
             null,                           "Charmed",                      "Disoriented",                  "Disarmed",                     "Distracted",                   "Fleeing",
             "Gripped",                      "Rooted",                       "Pacified",                     "Silenced",                     "Asleep",                       "Ensnared",
             "Stunned",                      "Frozen",                       "Incapacitated",                "Bleeding",                     "Healing",                      "Polymorphed",
@@ -268,12 +316,12 @@ $lang = array(
             "Horrified",                    "Invulnerable",                 "Interrupted",                  "Dazed",                        "Discovery",                    "Invulnerable",
             "Sapped",                       "Enraged"
         ),
-        'ct'            => array(
+        'ct'            => array(                           // CreatureType.dbc
             "Uncategorized",                "Beast",                        "Dragonkin",                    "Demon",                        "Elemental",                    "Giant",
             "Undead",                       "Humanoid",                     "Critter",                      "Mechanical",                   "Not specified",                "Totem",
             "Non-combat Pet",               "Gas Cloud"
         ),
-        'fa'            => array(
+        'fa'            => array(                           // CreatureFamily.dbc
              1 => "Wolf",                    2 => "Cat",                     3 => "Spider",                  4 => "Bear",                    5 => "Boar",                    6 => "Crocolisk",
              7 => "Carrion Bird",            8 => "Crab",                    9 => "Gorilla",                11 => "Raptor",                 12 => "Tallstrider",            20 => "Scorpid",
             21 => "Turtle",                 24 => "Bat",                    25 => "Hyena",                  26 => "Bird of Prey",           27 => "Wind Serpent",           30 => "Dragonhawk",
@@ -281,13 +329,379 @@ $lang = array(
             38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
             45 => "Core Hound",             46 => "Spirit Beast"
         ),
-        'pvpRank'       => array(
+        'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",
             "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
             "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
             "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
             "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
         ),
+        'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
+    ),
+    'unit' => array(
+        'flags'         => array(
+            UNIT_FLAG_SERVER_CONTROLLED     => 'Server controlled',
+            UNIT_FLAG_NON_ATTACKABLE        => 'Not attackable',
+            UNIT_FLAG_REMOVE_CLIENT_CONTROL => 'Remove client control',
+            UNIT_FLAG_PVP_ATTACKABLE        => 'PvP attackable',
+            UNIT_FLAG_RENAME                => 'Rename',
+            UNIT_FLAG_PREPARATION           => 'Arena preparation',
+            UNIT_FLAG_UNK_6                 => 'UNK-6',
+            UNIT_FLAG_NOT_ATTACKABLE_1      => 'Not Attackable',
+            UNIT_FLAG_IMMUNE_TO_PC          => 'Immune to players',
+            UNIT_FLAG_IMMUNE_TO_NPC         => 'Immune to creatures',
+            UNIT_FLAG_LOOTING               => 'Loot animation',
+            UNIT_FLAG_PET_IN_COMBAT         => 'Pet in combat',
+            UNIT_FLAG_PVP                   => 'PvP',
+            UNIT_FLAG_SILENCED              => 'Silenced',
+            UNIT_FLAG_CANNOT_SWIM           => 'Cannot swim',
+            UNIT_FLAG_UNK_15                => 'UNK-15 (can only swim)',
+            UNIT_FLAG_UNK_16                => 'UNK-16 (cannot attack)',
+            UNIT_FLAG_PACIFIED              => 'Pacified',
+            UNIT_FLAG_STUNNED               => 'Stunned',
+            UNIT_FLAG_IN_COMBAT             => 'In combat',
+            UNIT_FLAG_TAXI_FLIGHT           => 'Taxi flight',
+            UNIT_FLAG_DISARMED              => 'Disarmed',
+            UNIT_FLAG_CONFUSED              => 'Confused',
+            UNIT_FLAG_FLEEING               => 'Fleeing',
+            UNIT_FLAG_PLAYER_CONTROLLED     => 'Player controlled',
+            UNIT_FLAG_NOT_SELECTABLE        => 'Not selectable',
+            UNIT_FLAG_SKINNABLE             => 'Skinnable',
+            UNIT_FLAG_MOUNT                 => 'Mounted',
+            UNIT_FLAG_UNK_28                => 'UNK-28',
+            UNIT_FLAG_UNK_29                => 'UNK-29 (Prevent emotes)',
+            UNIT_FLAG_SHEATHE               => 'Sheathe weapon',
+            UNIT_FLAG_UNK_31                => 'UNK-31'
+        ),
+        'flags2'        => array(
+            UNIT_FLAG2_FEIGN_DEATH                => 'Feign Death',
+            UNIT_FLAG2_UNK1                       => 'UNK-1 (hide unit model)',
+            UNIT_FLAG2_IGNORE_REPUTATION          => 'Ignore reputation',
+            UNIT_FLAG2_COMPREHEND_LANG            => 'Comprehend language',
+            UNIT_FLAG2_MIRROR_IMAGE               => 'Mirror Image',
+            UNIT_FLAG2_INSTANTLY_APPEAR_MODEL     => 'Instant spawn',
+            UNIT_FLAG2_FORCE_MOVEMENT             => 'Force movement',
+            UNIT_FLAG2_DISARM_OFFHAND             => 'Disarm offhand weapon',
+            UNIT_FLAG2_DISABLE_PRED_STATS         => 'Disable predicted stats',
+            UNIT_FLAG2_DISARM_RANGED              => 'Disarm ranged weapon',
+            UNIT_FLAG2_REGENERATE_POWER           => 'Regenerate power',
+            UNIT_FLAG2_RESTRICT_PARTY_INTERACTION => 'Restrict party interaction',
+            UNIT_FLAG2_PREVENT_SPELL_CLICK        => 'Prevent spell click',
+            UNIT_FLAG2_ALLOW_ENEMY_INTERACT       => 'Allow enemy interaction',
+            UNIT_FLAG2_DISABLE_TURN               => 'Disable turn',
+            UNIT_FLAG2_UNK2                       => 'UNK-2',
+            UNIT_FLAG2_PLAY_DEATH_ANIM            => 'Play special death animation',
+            UNIT_FLAG2_ALLOW_CHEAT_SPELLS         => 'allow cheat spells'
+        ),
+        'dynFlags'      => array(
+            UNIT_DYNFLAG_LOOTABLE                  => 'Lootable',
+            UNIT_DYNFLAG_TRACK_UNIT                => 'Tracked',
+            UNIT_DYNFLAG_TAPPED                    => 'Tapped',
+            UNIT_DYNFLAG_TAPPED_BY_PLAYER          => 'Tapped by player',
+            UNIT_DYNFLAG_SPECIALINFO               => 'Special info',
+            UNIT_DYNFLAG_DEAD                      => 'Dead',
+            UNIT_DYNFLAG_REFER_A_FRIEND            => 'Refer-a-friend',
+            UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST => 'Tapped by all threat list'
+        ),
+        'bytes1'        => array(
+/*idx:0*/   ['Standing', 'Sitting on ground', 'Sitting on chair', 'Sleeping', 'Sitting on low chair', 'Sitting on medium chair', 'Sitting on high chair', 'Dead', 'Kneeing', 'Submerged'], // STAND_STATE_*
+            null,
+/*idx:2*/   array(
+                UNIT_STAND_FLAGS_UNK1        => 'UNK-1',
+                UNIT_STAND_FLAGS_CREEP       => 'Creep',
+                UNIT_STAND_FLAGS_UNTRACKABLE => 'Untrackable',
+                UNIT_STAND_FLAGS_UNK4        => 'UNK-4',
+                UNIT_STAND_FLAGS_UNK5        => 'UNK-5'
+            ),
+/*idx:3*/   array(
+                UNIT_BYTE1_FLAG_ALWAYS_STAND => 'Always standing',
+                UNIT_BYTE1_FLAG_HOVER        => 'Hovering',
+                UNIT_BYTE1_FLAG_UNK_3        => 'UNK-3'
+            ),
+            'valueUNK' => '[span class=q10]unhandled value [b class=q1]%d[/b] provided for UnitFieldBytes1 on offset [b class=q1]%d[/b][/span]',
+            'idxUNK'   => '[span class=q10]unused offset [b class=q1]%d[/b] provided for UnitFieldBytes1[/span]'
+        )
+    ),
+    'smartAI' => array(
+        'eventUNK'      => '[span class=q10]Unknwon event #[b class=q1]%d[/b] in use.[/span]',
+        'eventTT'       => '[b class=q1]EventType %d[/b][br][table][tr][td]PhaseMask[/td][td=header]0x%04X[/td][/tr][tr][td]Chance[/td][td=header]%d%%%%[/td][/tr][tr][td]Flags[/td][td=header]0x%04X[/td][/tr][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]Param5[/td][td=header]%d[/td][/tr][/table]',
+        'events'        => array(
+            SAI_EVENT_UPDATE_IC             => ['(%7$d)?:When in combat, ;(%6$s)?After %6$s:Instantly;', 'Repeat every %s'],
+            SAI_EVENT_UPDATE_OOC            => ['(%7$d)?:When out of combat, ;(%6$s)?After %6$s:Instantly;', 'Repeat every %s'],
+            SAI_EVENT_HEALT_PCT             => ['At %6$s%% Health', 'Repeat every %s'],
+            SAI_EVENT_MANA_PCT              => ['At %6$s%% Mana', 'Repeat every %s'],
+            SAI_EVENT_AGGRO                 => ['On Aggro', null],
+            SAI_EVENT_KILL                  => ['On killing (%3$d)?player:;(%4$d)?[npc=%4$d]:any creature;', 'Cooldown: %s'],
+            SAI_EVENT_DEATH                 => ['On death', null],
+            SAI_EVENT_EVADE                 => ['When evading', null],
+            SAI_EVENT_SPELLHIT              => ['When hit by (%6$s)?%6$s :;(%1$d)?[spell=%1$d]:Spell;', 'Cooldown: %s'],
+            SAI_EVENT_RANGE                 => ['On target at %6$sm', 'Repeat every %s'],
+/* 10*/     SAI_EVENT_OOC_LOS               => ['While out of combat, (%1$d)?friendly:hostile; (%5$d)?player:unit; enters line of sight within %2$dm', 'Cooldown: %s'],
+            SAI_EVENT_RESPAWN               => ['On respawn', null],
+            SAI_EVENT_TARGET_HEALTH_PCT     => ['On target at %6$s%% health', 'Repeat every %s'],
+            SAI_EVENT_VICTIM_CASTING        => ['Current target is casting (%3$d)?[spell=%3$d]:any spell;', 'Repeat every %s'],
+            SAI_EVENT_FRIENDLY_HEALTH       => ['Friendly NPC within %2$dm is at %1$d health', 'Repeat every %s'],
+            SAI_EVENT_FRIENDLY_IS_CC        => ['Friendly NPC within %1$dm is crowd controlled', 'Repeat every %s'],
+            SAI_EVENT_FRIENDLY_MISSING_BUFF => ['Friendly NPC within %2$dm is missing [spell=%1$d]', 'Repeat every %s'],
+            SAI_EVENT_SUMMONED_UNIT         => ['Just summoned (%1$d)?[npc=%1$d]:any creature;', 'Cooldown: %s'],
+            SAI_EVENT_TARGET_MANA_PCT       => ['On target at %6$s%% mana', 'Repeat every %s'],
+            SAI_EVENT_ACCEPTED_QUEST        => ['Giving (%1$d)?[quest=%1$d]:any quest;', null],
+/* 20*/     SAI_EVENT_REWARD_QUEST          => ['Rewarding (%1$d)?[quest=%1$d]:any quest;', null],
+            SAI_EVENT_REACHED_HOME          => ['Arriving at home coordinates', null],
+            SAI_EVENT_RECEIVE_EMOTE         => ['Being targeted with [emote=%1$d]', 'Cooldown: %s'],
+            SAI_EVENT_HAS_AURA              => ['(%2$d)?Having %2$d stacks of:Missing aura; [spell=%1$d]', 'Repeat every %s'],
+            SAI_EVENT_TARGET_BUFFED         => ['#target# has (%2$d)?%2$d stacks of:aura; [spell=%1$d]', 'Repeat every %s'],
+            SAI_EVENT_RESET                 => ['On reset', null],
+            SAI_EVENT_IC_LOS                => ['While in combat, (%1$d)?friendly:hostile; (%5$d)?player:unit; enters line of sight within %2$dm', 'Cooldown: %s'],
+            SAI_EVENT_PASSENGER_BOARDED     => ['A passenger has boarded', 'Cooldown: %s'],
+            SAI_EVENT_PASSENGER_REMOVED     => ['A passenger got off', 'Cooldown: %s'],
+            SAI_EVENT_CHARMED               => ['(%1$d)?On being charmed:On charm wearing off;', null],
+/* 30*/     SAI_EVENT_CHARMED_TARGET        => ['When charming #target#', null],
+            SAI_EVENT_SPELLHIT_TARGET       => ['When #target# gets hit by (%6$s)?%6$s :;(%1$d)?[spell=%1$d]:Spell;', 'Cooldown: %s'],
+            SAI_EVENT_DAMAGED               => ['After taking %6$s points of damage', 'Repeat every %s'],
+            SAI_EVENT_DAMAGED_TARGET        => ['After #target# took %6$s points of damage', 'Repeat every %s'],
+            SAI_EVENT_MOVEMENTINFORM        => ['Started moving to point #[b]%2$d[/b](%1$d)? using MotionType #[b]%1$d[/b]:;', null],
+            SAI_EVENT_SUMMON_DESPAWNED      => ['Summoned [npc=%1$d] despawned', 'Cooldown: %s'],
+            SAI_EVENT_CORPSE_REMOVED        => ['On corpse despawn', null],
+            SAI_EVENT_AI_INIT               => ['AI initialized', null],
+            SAI_EVENT_DATA_SET              => ['Data field #[b]%1$d[/b] is set to [b]%2$d[/b]', 'Cooldown: %s'],
+            SAI_EVENT_WAYPOINT_START        => ['Start pathing on (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+/* 40*/     SAI_EVENT_WAYPOINT_REACHED      => ['Reaching (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+            null,
+            null,
+            null,
+            null,
+            null,
+            SAI_EVENT_AREATRIGGER_ONTRIGGER => ['On activation', null],
+            null,
+            null,
+            null,
+/* 50*/     null,
+            null,
+            SAI_EVENT_TEXT_OVER             => ['(%2$d)?[npc=%2$d]:any creature; is done talking TextGroup #[b]%1$d[/b]', null],
+            SAI_EVENT_RECEIVE_HEAL          => ['Received %6$s points of healing', 'Cooldown: %s'],
+            SAI_EVENT_JUST_SUMMONED         => ['On being summoned', null],
+            SAI_EVENT_WAYPOINT_PAUSED       => ['Pausing path on (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+            SAI_EVENT_WAYPOINT_RESUMED      => ['Resuming path on (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+            SAI_EVENT_WAYPOINT_STOPPED      => ['Stopping path on (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+            SAI_EVENT_WAYPOINT_ENDED        => ['Ending current path on (%1$d)?waypoint #[b]%1$d[/b]:any waypoint;(%2$d)? on path #[b]%2$d[/b]:;', null],
+            SAI_EVENT_TIMED_EVENT_TRIGGERED => ['Timed event #[b]%1$d[/b] is triggered', null],
+/* 60*/     SAI_EVENT_UPDATE                => ['(%6$s)?After %6$s:Instantly;', 'Repeat every %s'],
+            SAI_EVENT_LINK                  => ['After Event %6$s', null],
+            SAI_EVENT_GOSSIP_SELECT         => ['Selecting Gossip Option:[br](%6$s)?[span class=q1]%6$s[/span]:Menu #[b]%1$d[/b] - Option #[b]%2$d[/b];', null],
+            SAI_EVENT_JUST_CREATED          => ['On being spawned for the first time', null],
+            SAI_EVENT_GOSSIP_HELLO          => ['Opening Gossip', null],
+            SAI_EVENT_FOLLOW_COMPLETED      => ['Finished following', null],
+            SAI_EVENT_EVENT_PHASE_CHANGE    => ['Event Phase changed and matches %6$s', null],
+            SAI_EVENT_IS_BEHIND_TARGET      => ['Facing the backside of #target#', 'Cooldown: %s'],
+            SAI_EVENT_GAME_EVENT_START      => ['[event=%1$d] started', null],
+            SAI_EVENT_GAME_EVENT_END        => ['[event=%1$d] ended', null],
+/* 70*/     SAI_EVENT_GO_STATE_CHANGED      => ['State has changed', null],
+            SAI_EVENT_GO_EVENT_INFORM       => ['Taxi path event #[b]%1$d[/b] trigered', null],
+            SAI_EVENT_ACTION_DONE           => ['Executed action #[b]%1$d[/b] requested by script', null],
+            SAI_EVENT_ON_SPELLCLICK         => ['Spellclick triggered', null],
+            SAI_EVENT_FRIENDLY_HEALTH_PCT   => ['Health of #target# is at %6$s%%', 'Repeat every %s'],
+            SAI_EVENT_DISTANCE_CREATURE     => ['[npc=%6$d](%1$d)? with GUID #%1$d:; enters range at or below %2$dm', 'Repeat every %s'],
+            SAI_EVENT_DISTANCE_GAMEOBJECT   => ['[object=%6$d](%1$d)? with GUID #%1$d:; enters range at or below %2$dm', 'Repeat every %s'],
+            SAI_EVENT_COUNTER_SET           => ['Counter #[b]%1$d[/b] is equal to [b]%2$d[/b]', null],
+        ),
+        'eventFlags'    => array(
+            SAI_EVENT_FLAG_NO_REPEAT     => 'No Repeat',
+            SAI_EVENT_FLAG_DIFFICULTY_0  => 'Normal Dungeon',
+            SAI_EVENT_FLAG_DIFFICULTY_1  => 'Heroic Dungeon',
+            SAI_EVENT_FLAG_DIFFICULTY_2  => 'Normal Raid',
+            SAI_EVENT_FLAG_DIFFICULTY_3  => 'Heroic Raid',
+            SAI_EVENT_FLAG_NO_RESET      => 'No Reset',
+            SAI_EVENT_FLAG_WHILE_CHARMED => 'While Charmed'
+        ),
+        'actionUNK'     => '[span class=q10]Unknown action #[b class=q1]%d[/b] in use.[/span]',
+        'actionTT'      => '[b class=q1]ActionType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]Param5[/td][td=header]%d[/td][/tr][tr][td]Param6[/td][td=header]%d[/td][/tr][/table]',
+        'actions'       => array(                           // [body, footer]
+            null,
+            SAI_ACTION_TALK                               => ['(%3$d)?Say:#target# says; (%7$d)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] to #target#%8$s', 'Duration: %s'],
+            SAI_ACTION_SET_FACTION                        => ['(%1$d)?Set faction of #target# to [faction=%7$d]:Reset faction of #target#;.', null],
+            SAI_ACTION_MORPH_TO_ENTRY_OR_MODEL            => ['(%7$d)?Reset apperance.:Take the appearance of;(%1$d)?[npc=%1$d].:;(%2$d)?[model npc=%2$d border=1 float=right][/model]:;', null],
+            SAI_ACTION_SOUND                              => ['Play sound(%2$d)? to invoking player:;:[div float=right width=270px][sound=%1$d][/div]', 'Played by environment.'],
+            SAI_ACTION_PLAY_EMOTE                         => ['Emote [emote=%1$d] to #target#.', null],
+            SAI_ACTION_FAIL_QUEST                         => ['Fail [quest=%1$d] for #target#.', null],
+            SAI_ACTION_OFFER_QUEST                        => ['(%2$d)?Add [quest=%1$d] to #target#\'s log:Offer [quest=%1$d] to #target#;.', null],
+            SAI_ACTION_SET_REACT_STATE                    => ['#target# becomes %7$s.', null],
+            SAI_ACTION_ACTIVATE_GOBJECT                   => ['#target# becomes activated.', null],
+/* 10*/     SAI_ACTION_RANDOM_EMOTE                       => ['Emote %7$s to #target#.', null],
+            SAI_ACTION_CAST                               => ['Cast [spell=%1$d] at #target#.', null],
+            SAI_ACTION_SUMMON_CREATURE                    => ['Summon [npc=%1$d](%3$d)? for %7$d:;(%4$d)?, attacking invoker:;.', null],
+            SAI_ACTION_THREAT_SINGLE_PCT                  => ['Modify #target#\'s threat by %7$d%%.', null],
+            SAI_ACTION_THREAT_ALL_PCT                     => ['Modify the threat of all targets by %7$d%%.', null],
+            SAI_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    => ['Exploration event of [quest=%1$d] is completed for #target#.', null],
+            SAI_ACTION_SET_EMOTE_STATE                    => ['Continuously emote [emote=%1$d] to #target#.', null],
+            SAI_ACTION_SET_UNIT_FLAG                      => ['Set (%2$d)?UnitFlags2:UnitFlags; %7$s.', null],
+            SAI_ACTION_REMOVE_UNIT_FLAG                   => ['Unset (%2$d)?UnitFlags2:UnitFlags; %7$s.', null],
+/* 20*/     SAI_ACTION_AUTO_ATTACK                        => ['(%1$d)?Start:Stop; auto attacking #target#.', null],
+            SAI_ACTION_ALLOW_COMBAT_MOVEMENT              => ['(%1$d)?Enable:Disable; combat movement.', null],
+            SAI_ACTION_SET_EVENT_PHASE                    => ['Set Event Phase of #target# to [b]%1$d[/b].', null],
+            SAI_ACTION_INC_EVENT_PHASE                    => ['(%1$d)?Increment:Decrement; Event Phase of #target#.', null],
+            SAI_ACTION_EVADE                              => ['#target# enters Evade Mode.', null],
+            SAI_ACTION_FLEE_FOR_ASSIST                    => ['Flee for assistance.', 'Use default flee emote'],
+            SAI_ACTION_CALL_GROUPEVENTHAPPENS             => ['Satisfy objective of [quest=%1$d] for #target#.', null],
+            SAI_ACTION_COMBAT_STOP                        => ['End current combat.', null],
+            SAI_ACTION_REMOVEAURASFROMSPELL               => ['Remove (%1$d)?all auras:auras of [spell=%1$d]; from #target#.', null],
+            SAI_ACTION_FOLLOW                             => ['Follow #target#(%1$d)? at %1$dm distance:;(%3$d)? until reaching [npc=%3$d]:;.', '(%7$d)?Angle: %7$.2f°:;(%8$d)? Some form of Quest Credit is given:;'],
+/* 30*/     SAI_ACTION_RANDOM_PHASE                       => ['Pick random Event Phase from %7$s.', null],
+            SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Pick random Event Phase between %1$d and %2$d.', null],
+            SAI_ACTION_RESET_GOBJECT                      => ['Reset #target#.', null],
+            SAI_ACTION_CALL_KILLEDMONSTER                 => ['A kill of [npc=%1$d] is credited to #target#.', null],
+            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]]%1$d[/b] to [b]%2$d[/b].', null],
+            null,
+            SAI_ACTION_UPDATE_TEMPLATE                    => ['Transform to become [npc=%1$d](%2$d)? with level [b]%2$d[/b]:;.', null],
+            SAI_ACTION_DIE                                => ['Die...&nbsp;&nbsp;&nbsp;painfully.', null],
+            SAI_ACTION_SET_IN_COMBAT_WITH_ZONE            => ['Set in combat with units in zone.', null],
+            SAI_ACTION_CALL_FOR_HELP                      => ['Call for help.', 'Use default help emote'],
+/* 40*/     SAI_ACTION_SET_SHEATH                         => ['Sheath %7$s weapons.', null],
+            SAI_ACTION_FORCE_DESPAWN                      => ['Despawn #target#(%1$d)? after %7$s:;(%2$d)? and then respawn after %8$s:;.', null],
+            SAI_ACTION_SET_INVINCIBILITY_HP_LEVEL         => ['Become invincable below (%2$d)?%2$d%%:%1$d; HP.', null],
+            SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL            => ['(%7$d)?Dismount.:Mount ;(%1$d)?[npc=%1$d].:;(%2$d)?[model npc=%2$d border=1 float=right][/model]:;', null],
+            SAI_ACTION_SET_INGAME_PHASE_MASK              => ['Set visibility of #target# to phase %7$s.', null],
+            SAI_ACTION_SET_DATA                           => ['[b]%2$d[/b] is stored in data field #[b]%1$d[/b] of #target#.', null],
+            null,
+            SAI_ACTION_SET_VISIBILITY                     => ['#target# becomes (%1$d)?visible:invisible;.', null],
+            SAI_ACTION_SET_ACTIVE                         => ['#target# becomes Grid (%1$d)?active:inactive;.', null],
+            SAI_ACTION_ATTACK_START                       => ['Start attacking #target#.', null],
+/* 50*/     SAI_ACTION_SUMMON_GO                          => ['Summon [object=%1$d](%2$d)? for ?%7$d:; at #target#.', 'Despawn linked to summoner'],
+            SAI_ACTION_KILL_UNIT                          => ['#target# dies!', null],
+            SAI_ACTION_ACTIVATE_TAXI                      => ['Fly from [span class=q1]%7$s[/span] to [span class=q1]%8$s[/span]', null],
+            SAI_ACTION_WP_START                           => ['(%1$d)?Walk:Run; on waypoint path #[b]%2$d[/b].(%4$d)? Is linked to [quest=%4$d].:; React %8$s while following the path.(%5$d)? Despawn after %7$s.:;', 'Repeatable'],
+            SAI_ACTION_WP_PAUSE                           => ['Pause waypoint path for %7$d.', null],
+            SAI_ACTION_WP_STOP                            => ['End waypoint path(%1$d)? and despawn after %7$s:;.(%8$d)? [quest=%2$d] fails.:;(%9$d)? [quest=%2$d] is completed.:;', null],
+            SAI_ACTION_ADD_ITEM                           => ['Give %2$d [item=%1$d] to #target#.', null],
+            SAI_ACTION_REMOVE_ITEM                        => ['Remove %2$d [item=%1$d] from #target#.', null],
+            SAI_ACTION_INSTALL_AI_TEMPLATE                => ['Behave as a %7$s.', null],
+            SAI_ACTION_SET_RUN                            => ['(%1$d)?Enable:Disable; run speed.', null],
+/* 60*/     SAI_ACTION_SET_DISABLE_GRAVITY                => ['(%1$d)?Defy:Respect; gravity!', null],
+            SAI_ACTION_SET_SWIM                           => ['(%1$d)?Enable:Disable; swimming.', null],
+            SAI_ACTION_TELEPORT                           => ['#target# is teleported to [zone=%7$d].', null],
+            SAI_ACTION_SET_COUNTER                        => ['(%3$d)?Reset:Increase; Counter #[b]%1$d[/b] of #target#(%3$d)?: by [b]%2$d[/b];.', null],
+            SAI_ACTION_STORE_TARGET_LIST                  => ['Store #target# as target in #[b]%1$d[/b].', null],
+            SAI_ACTION_WP_RESUME                          => ['Continue on waypoint path.', null],
+            SAI_ACTION_SET_ORIENTATION                    => ['Set orientation to (%7$s)?face %7$s:Home Position;.', null],
+            SAI_ACTION_CREATE_TIMED_EVENT                 => ['(%8$d)?%6$d%% chance to:; Trigger timed event #[b]%1$d[/b](%7$s)? after %7$s:;.', 'Repeat every %s'],
+            SAI_ACTION_PLAYMOVIE                          => ['Play Movie #[b]%1$d[/b] to #target#.', null],
+            SAI_ACTION_MOVE_TO_POS                        => ['Move (%4$d)?within %4$dm of:to; Point #[b]%1$d[/b] at #target#(%2$d)? on a transport:;.', 'pathfinding disabled'],
+/* 70*/     SAI_ACTION_ENABLE_TEMP_GOBJ                   => ['#target# is respawned for %7$s.', null],
+            SAI_ACTION_EQUIP                              => ['(%8$d)?Unequip non-standard items:Equip %7$s;(%1$d)? from equipment template #[b]%1$d[/b]:; on #target#.', 'Note: creature items do not nessecarily have an item template'],
+            SAI_ACTION_CLOSE_GOSSIP                       => ['Close Gossip Window.', null],
+            SAI_ACTION_TRIGGER_TIMED_EVENT                => ['Trigger previously defined timed event #[b]%1$d[/b].', null],
+            SAI_ACTION_REMOVE_TIMED_EVENT                 => ['Delete previously defined timed event #[b]%1$d[/b].', null],
+            SAI_ACTION_ADD_AURA                           => ['Apply aura from [spell=%1$d] on #target#.', null],
+            SAI_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        => ['Set #target# as base for further SmartAI-Events.', null],
+            SAI_ACTION_RESET_SCRIPT_BASE_OBJECT           => ['Reset base for SmartAI-Events.', null],
+            SAI_ACTION_CALL_SCRIPT_RESET                  => ['Reset current SmartAI.', null],
+            SAI_ACTION_SET_RANGED_MOVEMENT                => ['Set ranged attack distance to [b]%1$d[/b]m(%2$d)?, at %2$d°:;.', null],
+/* 80*/     SAI_ACTION_CALL_TIMED_ACTIONLIST              => ['Call [html]<a href=#sai-actionlist-%1$d onclick=\\"\$(\\\'#dsf67g4d-sai\\\').find(\\\'[href=\\\\\'#sai-actionlist-%1$d\\\\\']\\\').click()\\">Timed Actionlist #%1$d</a>[/html]. Updates %7$s.', null],
+            SAI_ACTION_SET_NPC_FLAG                       => ['Set #target#\'s npc flags to %7$s.', null],
+            SAI_ACTION_ADD_NPC_FLAG                       => ['Add %7$s npc flags to #target#.', null],
+            SAI_ACTION_REMOVE_NPC_FLAG                    => ['Remove %7$s npc flags from #target#.', null],
+            SAI_ACTION_SIMPLE_TALK                        => ['#target# says (%7$s)?TextGroup:[span class=q10]unknown text[/span]; #[b]%1$d[/b] to #target#%7$s', null],
+            SAI_ACTION_INVOKER_CAST                       => ['Invoker casts [spell=%1$d] at #target#.', null],
+            SAI_ACTION_CROSS_CAST                         => ['%7$s casts [spell=%1$d] at #target#.', null],
+            SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST       => ['Call Timed Actionlist at random: [html]%7$s[/html]', null],
+            SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST => ['Call Timed Actionlist at random from range: [html]%7$s[/html]', null],
+            SAI_ACTION_RANDOM_MOVE                        => ['Move #target# to a random point within %1$dm.', null],
+/* 90*/     SAI_ACTION_SET_UNIT_FIELD_BYTES_1             => ['Set UnitFieldBytes1 %7$s for #target#.', null],
+            SAI_ACTION_REMOVE_UNIT_FIELD_BYTES_1          => ['Unset UnitFieldBytes1 %7$s for #target#.', null],
+            SAI_ACTION_INTERRUPT_SPELL                    => ['Interrupt (%2$d)?cast of [spell=%2$d]:current spell cast;.', '(%1$d)?Instantly:Delayed;'],
+            SAI_ACTION_SEND_GO_CUSTOM_ANIM                => ['Set animation progress to [b]%1$d[/b].', null],
+            SAI_ACTION_SET_DYNAMIC_FLAG                   => ['Set Dynamic Flag to %7$s on #target#.', null],
+            SAI_ACTION_ADD_DYNAMIC_FLAG                   => ['Add Dynamic Flag %7$s to #target#.', null],
+            SAI_ACTION_REMOVE_DYNAMIC_FLAG                => ['Remove Dynamic Flag %7$s from #target#.', null],
+            SAI_ACTION_JUMP_TO_POS                        => ['Jump to fixed position — [b]X: %7$.2f,  Y: %8$.2f,  Z: %9$.2f,  [i]v[/i][sub]xy[/sub]: %1$.2f  [i]v[/i][sub]z[/sub]: %2$.2f[/b]', null],
+            SAI_ACTION_SEND_GOSSIP_MENU                   => ['Display Gossip entry #[b]%1$d[/b] / TextID #[b]%2$d[/b].', null],
+            SAI_ACTION_GO_SET_LOOT_STATE                  => ['Set loot state of #target# to %7$s.', null],
+/*100*/     SAI_ACTION_SEND_TARGET_TO_TARGET              => ['Send targets stored in #[b]%1$d[/b] to #target#.', null],
+            SAI_ACTION_SET_HOME_POS                       => ['Set Home Position to (%10$d)?current position.:fixed position — [b]X: %7$.2f,  Y: %8$.2f,  Z: %9$.2f[/b];', null],
+            SAI_ACTION_SET_HEALTH_REGEN                   => ['(%1$d)?Allow:Prevent; health regeneration for #target#.', null],
+            SAI_ACTION_SET_ROOT                           => ['(%1$d)?Prevent:Allow; movement for #target#.', null],
+            SAI_ACTION_SET_GO_FLAG                        => ['Set GameObject Flag to %7$s on #target#.', null],
+            SAI_ACTION_ADD_GO_FLAG                        => ['Add GameObject Flag %7$s to #target#.', null],
+            SAI_ACTION_REMOVE_GO_FLAG                     => ['Remove GameObject Flag %7$s from #target#.', null],
+            SAI_ACTION_SUMMON_CREATURE_GROUP              => ['Summon Creature Group #[b]%1$d[/b](%2$d)?, attacking invoker:;.[br](%7$s)?[span class=breadcrumb-arrow]&nbsp;[/span]%7$s:[span class=q0]<empty group>[/span];', null],
+            SAI_ACTION_SET_POWER                          => ['%7$s is set to [b]%2$d[/b] for #target#.', null],
+            SAI_ACTION_ADD_POWER                          => ['Add [b]%2$d[/b] %7$s to #target#.', null],
+/*110*/     SAI_ACTION_REMOVE_POWER                       => ['Remove [b]%2$d[/b] %7$s from #target#.', null],
+            SAI_ACTION_GAME_EVENT_STOP                    => ['Stop [event=%1$d].', null],
+            SAI_ACTION_GAME_EVENT_START                   => ['Start [event=%1$d].', null],
+            SAI_ACTION_START_CLOSEST_WAYPOINT             => ['#target# starts moving along a defined waypoint path. Enter path on the closest of these nodes: %7$s.', null],
+            SAI_ACTION_MOVE_OFFSET                        => ['Move to relative position — [b]X: %7$.2f,  Y: %8$.2f,  Z: %9$.2f[/b]', null],
+            SAI_ACTION_RANDOM_SOUND                       => ['Play a random sound(%5$d)? to invoking player:;:[div float=right width=270px]%7$s[/div]', 'Played by environment.'],
+            SAI_ACTION_SET_CORPSE_DELAY                   => ['Set corpse despawn delay for #target# to %7$s.', null],
+            SAI_ACTION_DISABLE_EVADE                      => ['(%1$d)?Prevent:Allow; entering Evade Mode.', null],
+            SAI_ACTION_GO_SET_GO_STATE                    => ['Set gameobject state to %7$s.'. null],
+            SAI_ACTION_SET_CAN_FLY                        => ['(%1$d)?Enable:Disable; flight.', null],
+/*120*/     SAI_ACTION_REMOVE_AURAS_BY_TYPE               => ['Remove all Auras with [b]%7$s[/b] from #target#.', null],
+            SAI_ACTION_SET_SIGHT_DIST                     => ['Set sight range to %1$dm for #target#.', null],
+            SAI_ACTION_FLEE                               => ['#target# flees for assistance for %7$s.', null],
+            SAI_ACTION_ADD_THREAT                         => ['Modify threat level of #target# by %7$d points.', null],
+            SAI_ACTION_LOAD_EQUIPMENT                     => ['(%2$d)?Unequip non-standard items:Equip %7$s; from equipment template #[b]%1$d[/b] on #target#.', 'Note: creature items do not nessecarily have an item template'],
+            SAI_ACTION_TRIGGER_RANDOM_TIMED_EVENT         => ['Trigger previously defined timed event in id range %7$s.', null],
+            SAI_ACTION_REMOVE_ALL_GAMEOBJECTS             => ['Remove all gameobjects owned by #target#.', null],
+            SAI_ACTION_STOP_MOTION                        => ['(%1$d)?Remove motion type #[b]%1$d[/b] from #target#. :;(%2$d)?Stop moving.:;', null],
+        ),
+        'targetUNK'     => '[span class=q10]unknown target #[b class=q1]%d[/b][/span]',
+        'targetTT'      => '[b class=q1]TargetType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]X[/td][td=header]%.2f[/td][/tr][tr][td]Y[/td][td=header]%.2f[/td][/tr][tr][td]Z[/td][td=header]%.2f[/td][/tr][tr][td]O[/td][td=header]%.2f[/td][/tr][/table]',
+        'targets'       => array(
+            null,
+            SAI_TARGET_SELF                   => 'self',
+            SAI_TARGET_VICTIM                 => 'current target',
+            SAI_TARGET_HOSTILE_SECOND_AGGRO   => '2nd in threat list',
+            SAI_TARGET_HOSTILE_LAST_AGGRO     => 'last in threat list',
+            SAI_TARGET_HOSTILE_RANDOM         => 'random target',
+            SAI_TARGET_HOSTILE_RANDOM_NOT_TOP => 'random non-tank target',
+            SAI_TARGET_ACTION_INVOKER         => 'Invoker',
+            SAI_TARGET_POSITION               => 'world coordinates',
+            SAI_TARGET_CREATURE_RANGE         => '(%1$d)?random instance of [npc=%1$d]:arbitrary creature; within %4$sm',
+/*10*/      SAI_TARGET_CREATURE_GUID          => '(%4$d)?[npc=%4$d]:NPC; with GUID #%1$d',
+            SAI_TARGET_CREATURE_DISTANCE      => '(%1$d)?random instance of [npc=%1$d]:arbitrary creature; within %4$sm',
+            SAI_TARGET_STORED                 => 'previously stored targets',
+            SAI_TARGET_GAMEOBJECT_RANGE       => '(%1$d)?random instance of [object=%1$d]:arbitrary object; within %4$sm',
+            SAI_TARGET_GAMEOBJECT_GUID        => '(%4$d)?[object=%4$d]:gameobject; with GUID #%1$d',
+            SAI_TARGET_GAMEOBJECT_DISTANCE    => '(%1$d)?random instance of [object=%1$d]:arbitrary object; within %4$sm',
+            SAI_TARGET_INVOKER_PARTY          => 'Invokers party',
+            SAI_TARGET_PLAYER_RANGE           => 'random player within %4$sm',
+            SAI_TARGET_PLAYER_DISTANCE        => 'random player within %4$sm',
+            SAI_TARGET_CLOSEST_CREATURE       => 'closest (%3$d)?dead:alive; (%1$d)?[npc=%1$d]:arbitrary creature; within %4$sm',
+/*20*/      SAI_TARGET_CLOSEST_GAMEOBJECT     => 'closest (%1$d)?[object=%1$d]:arbitrary gameobject; within %4$sm',
+            SAI_TARGET_CLOSEST_PLAYER         => 'closest player within %1$dm',
+            SAI_TARGET_ACTION_INVOKER_VEHICLE => 'Invokers vehicle',
+            SAI_TARGET_OWNER_OR_SUMMONER      => 'Invokers owner or summoner',
+            SAI_TARGET_THREAT_LIST            => 'all units engaged in combat with self',
+            SAI_TARGET_CLOSEST_ENEMY          => 'closest attackable (%2$d)?player:enemy; within %1$dm',
+            SAI_TARGET_CLOSEST_FRIENDLY       => 'closest friendly (%2$d)?player:creature; within %1$dm',
+            SAI_TARGET_LOOT_RECIPIENTS        => 'all players eligible for loot',
+            SAI_TARGET_FARTHEST               => 'furthest engaged (%2$d)?player:creature; within %1$dm(%3$d)? and line of sight:;',
+            SAI_TARGET_VEHICLE_ACCESSORY      => 'accessory in Invokers vehicle in seat %1$d'
+        ),
+        'castFlags'     => array(
+            SAI_CAST_FLAG_INTERRUPT_PREV => 'Interrupt current cast',
+            SAI_CAST_FLAG_TRIGGERED      => 'Triggered',
+            SAI_CAST_FLAG_AURA_MISSING   => 'Aura missing',
+            SAI_CAST_FLAG_COMBAT_MOVE    => 'Combat movement'
+        ),
+        'GOStates'      => ['active', 'ready', 'active alternative'],
+        'summonTypes'   => [null, 'Despawn timed or when corpse disappears', 'Despawn timed or when dying', 'Despawn timed', 'Despawn timed out of combat', 'Despawn when dying', 'Despawn timed after death', 'Despawn when corpse disappears', 'Despawn manually'],
+        'aiTpl'         => ['basic AI', 'spell caster', 'turret', 'passive creature', 'cage for creature', 'caged creature'],
+        'reactStates'   => ['passive', 'defensive', 'aggressive', 'assisting'],
+        'sheaths'       => ['all', 'melee', 'ranged'],
+        'saiUpdate'     => ['out of combat', 'in combat', 'always'],
+        'lootStates'    => ['Not ready', 'Ready', 'Activated', 'Just Deactivated'],
+
+        'GOStateUNK'    => '[span class=q10]unknown gameobject state #[b class=q1]%d[/b][/span]',
+        'summonTypeUNK' => '[span class=q10]unknown SummonType #[b class=q1]%d[/b][/span]',
+        'aiTplUNK'      => '[span class=q10]unknown AI-Template #[b class=q1]%d[/b][/span]',
+        'reactStateUNK' => '[span class=q10]unknown ReactState #[b class=q1]%d[/b][/span]',
+        'sheathUNK'     => '[span class=q10]unknown sheath #[b class=q1]%d[/b][/span]',
+        'saiUpdateUNK'  => '[span class=q10]unknown update condition #[b class=q1]%d[/b][/span]',
+        'lootStateUNK'  => '[span class=q10]unknown loot state #[b class=q1]%d[/b][/span]',
+
+        'empty'         => '[span class=q0]<empty>[/span]'
     ),
     'account' => array(
         'title'         => "Aowow Account",
@@ -395,6 +809,11 @@ $lang = array(
             5 => "Statistics",              2 => "Weapon Damage",           6 => "DPS",                     4 => "Defense"
         )
     ),
+    'areatrigger' => array(
+        'notFound'      => "This areatrigger doesn't exist.",
+        'foundIn'       => "This areatrigger can be found in",
+        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
+    ),
     'gameObject' => array(
         'notFound'      => "This object doesn't exist.",
         'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
@@ -408,7 +827,17 @@ $lang = array(
         'triggeredBy'   => "Triggered by",
         'capturePoint'  => "Capture Point",
         'foundIn'       => "This object can be found in",
-        'restock'       => "Restocks every %s."
+        'restock'       => "Restocks every %s.",
+        'goFlags'       => array(
+            GO_FLAG_IN_USE         => 'In use',
+            GO_FLAG_LOCKED         => 'Locked',
+            GO_FLAG_INTERACT_COND  => 'Cannot interact',
+            GO_FLAG_TRANSPORT      => 'Transport',
+            GO_FLAG_NOT_SELECTABLE => 'Not selectable',
+            GO_FLAG_TRIGGERED      => 'Triggered',
+            GO_FLAG_DAMAGED        => 'Siege damaged',
+            GO_FLAG_DESTROYED      => 'Siege destroyed'
+        )
     ),
     'npc' => array(
         'notFound'      => "This NPC doesn't exist.",
@@ -446,6 +875,32 @@ $lang = array(
             "Uncategorized",            "Beasts",                   "Dragonkins",               "Demons",                   "Elementals",               "Giants",                   "Undead",                   "Humanoids",
             "Critters",                 "Mechanicals",              "Not specified",            "Totems",                   "Non-combat Pets",          "Gas Clouds"
         ),
+        'npcFlags'      => array(
+            NPC_FLAG_GOSSIP         => 'Gossip',
+            NPC_FLAG_QUEST_GIVER    => 'Quest Giver',
+            NPC_FLAG_TRAINER        => 'Trainer',
+            NPC_FLAG_CLASS_TRAINER  => 'Class Trainer',
+            NPC_PROFESSION_TRAINER  => 'Profession Trainer',
+            NPC_FLAG_VENDOR         => 'Vendor',
+            NPC_FLAG_VENDOR_AMMO    => 'Ammo Vendor',
+            NPC_FLAG_VENDOR_FOOD    => 'Food Vendor',
+            NPC_FLAG_VENDOR_POISON  => 'Poison Vendor',
+            NPC_FLAG_VENDOR_REAGENT => 'Reagent Vendor',
+            NPC_FLAG_REPAIRER       => 'Repair',
+            NPC_FLAG_FLIGHT_MASTER  => 'Flight Master',
+            NPC_FLAG_SPIRIT_HEALER  => 'Spirit Healer',
+            NPC_FLAG_SPIRIT_GUIDE   => 'Spirit Guide',
+            NPC_FLAG_INNKEEPER      => 'Innkeeper',
+            NPC_FLAG_BANKER         => 'Banker',
+            NPC_FLAG_PETITIONER     => 'Petitioner',
+            NPC_FLAG_GUILD_MASTER   => 'Guild Master',
+            NPC_FLAG_BATTLEMASTER   => 'Battle Master',
+            NPC_FLAG_AUCTIONEER     => 'Auctioneer',
+            NPC_FLAG_STABLE_MASTER  => 'Stable Master',
+            NPC_FLAG_GUILD_BANK     => 'Guild Bank',
+            NPC_FLAG_SPELLCLICK     => 'Spellclick',
+            NPC_FLAG_MAILBOX        => 'Mailbox'
+        )
     ),
     'event' => array(
         'notFound'      => "This world event doesn't exist.",
@@ -494,6 +949,20 @@ $lang = array(
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Cosmic Map",
     ),
+    'privileges' => array(
+        'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br><br>So, reputation is a rough measure of how much you contributed to the community.<br><br>As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",
+        'privilege'     => "Privilege",
+        'privileges'    => "Privileges",
+        'requiredRep'   => "Reputation Required",
+        'reqPoints'     => "This privilege requires <b>%s</b> reputation points.",
+        '_privileges'   => array(
+            null,                                   "Post comments",                                "Post external links",                              null,
+            "No CAPTCHAs",                          "Comment votes worth more",                     null,                                               null,
+            null,                                   "More votes per day",                           "Upvote comments",                                  "Downvote comments",
+            "Post comment replies",                 "Border: Uncommon",                             "Border: Rare",                                     "Border: Epic",
+            "Border: Legendary",                    "AoWoW Premium"
+        )
+    ),
     'zone' => array(
         'notFound'      => "This zone doesn't exist.",
         'attunement'    => ["Attunement", "Heroic attunement"],
@@ -507,7 +976,7 @@ $lang = array(
         'city'          => "City",
         'territory'     => "Territory",
         'instanceType'  => "Instance type",
-        'hcAvailable'   => "Heroic mode available &nbsp;(%d)",
+        'hcAvailable'   => "Heroic mode available&nbsp;(%d)",
         'numPlayers'    => "Number of players",
         'noMap'         => "There is no map available for this zone.",
         'instanceTypes' => ["Zone",     "Transit", "Dungeon",   "Raid",      "Battleground", "Dungeon",  "Arena", "Raid", "Raid"],
@@ -522,7 +991,7 @@ $lang = array(
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'questLevel'    => "Level %s",
         'requirements'  => "Requirements",
-        'reqMoney'      => "Required money",
+        'reqMoney'      => "Required money",                // REQUIRED_MONEY
         'money'         => "Money",
         'additionalReq' => "Additional requirements to obtain this quest",
         'reqRepWith'    => 'Your reputation with <a href="?faction=%d">%s</a> must be %s %s',
@@ -558,7 +1027,7 @@ $lang = array(
         'enabledByQ'    => "Enabled by",
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
-        'theTitle'      => 'the title "%s"',
+        'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
         'mailDelivery'  => "You will receive this letter%s%s",
         'mailBy'        => ' by <a href="?npc=%d">%s</a>',
         'mailIn'        => " after %s",
@@ -566,12 +1035,12 @@ $lang = array(
         'experience'    => "experience",
         'expConvert'    => "(or %s if completed at level %d)",
         'expConvert2'   => "%s if completed at level %d",
-        'chooseItems'   => "You will be able to choose one of these rewards",
-        'receiveItems'  => "You will receive",
-        'receiveAlso'   => "You will also receive",
-        'spellCast'     => "The following spell will be cast on you",
-        'spellLearn'    => "You will learn",
-        'bonusTalents'  => "talent points",
+        'chooseItems'   => "You will be able to choose one of these rewards",       // REWARD_CHOICES
+        'receiveItems'  => "You will receive",                                      // REWARD_ITEMS_ONLY
+        'receiveAlso'   => "You will also receive",                                 // REWARD_ITEMS
+        'spellCast'     => "The following spell will be cast on you",               // REWARD_AURA
+        'spellLearn'    => "You will learn",                                        // REWARD_SPELL
+        'bonusTalents'  => "%d talent |4point:points;",                             // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'attachment'    => "Attachment",
         'questInfo'     => array(
@@ -580,74 +1049,80 @@ $lang = array(
         ),
         'cat'           => array(
             0 => array( "Eastern Kingdoms",
-                  36 => "Alterac Mountains",              45 => "Arathi Highlands",                3 => "Badlands",                       25 => "Blackrock Mountain",              4 => "Blasted Lands",
-                  46 => "Burning Steppes",               279 => "Dalaran Crater",                 41 => "Deadwind Pass",                2257 => "Deeprun Tram",                    1 => "Dun Morogh",
-                  10 => "Duskwood",                      139 => "Eastern Plaguelands",            12 => "Elwynn Forest",                3430 => "Eversong Woods",               3433 => "Ghostlands",
-                 267 => "Hillsbrad Foothills",          1537 => "Ironforge",                    4080 => "Isle of Quel'Danas",             38 => "Loch Modan",                     44 => "Redridge Mountains",
-                  51 => "Searing Gorge",                3487 => "Silvermoon City",               130 => "Silverpine Forest",            1519 => "Stormwind City",                 33 => "Stranglethorn Vale",
-                   8 => "Swamp of Sorrows",               47 => "The Hinterlands",              4298 => "The Scarlet Enclave",            85 => "Tirisfal Glades",              1497 => "Undercity",
-                  28 => "Western Plaguelands",            40 => "Westfall",                       11 => "Wetlands"
+                    1 => "Dun Morogh",                       3 => "Badlands",                         4 => "Blasted Lands",                    8 => "Swamp of Sorrows",                 9 => "Northshire Valley",
+                   10 => "Duskwood",                        11 => "Wetlands",                        12 => "Elwynn Forest",                   25 => "Blackrock Mountain",              28 => "Western Plaguelands",
+                   33 => "Stranglethorn Vale",              36 => "Alterac Mountains",               38 => "Loch Modan",                      40 => "Westfall",                        41 => "Deadwind Pass",
+                   44 => "Redridge Mountains",              45 => "Arathi Highlands",                46 => "Burning Steppes",                 47 => "The Hinterlands",                 51 => "Searing Gorge",
+                   85 => "Tirisfal Glades",                130 => "Silverpine Forest",              132 => "Coldridge Valley",               139 => "Eastern Plaguelands",            154 => "Deathknell",
+                  267 => "Hillsbrad Foothills",           1497 => "Undercity",                     1519 => "Stormwind City",                1537 => "Ironforge",                     2257 => "Deeprun Tram",
+                 3430 => "Eversong Woods",                3431 => "Sunstrider Isle",               3433 => "Ghostlands",                    3487 => "Silvermoon City",               4080 => "Isle of Quel'Danas",
+                 4298 => "The Scarlet Enclave"
             ),
             1 => array( "Kalimdor",
-                  331 => "Ashenvale",                     16 => "Azshara",                      3524 => "Azuremyst Isle",               3525 => "Bloodmyst Isle",                148 => "Darkshore",
-                 1657 => "Darnassus",                    405 => "Desolace",                       14 => "Durotar",                        15 => "Dustwallow Marsh",              361 => "Felwood",
-                  357 => "Feralas",                      493 => "Moonglade",                     215 => "Mulgore",                      1637 => "Orgrimmar",                    1377 => "Silithus",
-                  406 => "Stonetalon Mountains",         440 => "Tanaris",                       141 => "Teldrassil",                     17 => "The Barrens",                  3557 => "The Exodar",
-                  457 => "The Veiled Sea",               400 => "Thousand Needles",             1638 => "Thunder Bluff",                 490 => "Un'Goro Crater",                618 => "Winterspring"
+                   14 => "Durotar",                         15 => "Dustwallow Marsh",                16 => "Azshara",                         17 => "The Barrens",                    141 => "Teldrassil",
+                  148 => "Darkshore",                      188 => "Shadowglen",                     215 => "Mulgore",                        220 => "Red Cloud Mesa",                 331 => "Ashenvale",
+                  357 => "Feralas",                        361 => "Felwood",                        363 => "Valley of Trials",               400 => "Thousand Needles",               405 => "Desolace",
+                  406 => "Stonetalon Mountains",           440 => "Tanaris",                        490 => "Un'Goro Crater",                 493 => "Moonglade",                      618 => "Winterspring",
+                 1377 => "Silithus",                      1637 => "Orgrimmar",                     1638 => "Thunder Bluff",                 1657 => "Darnassus",                     1769 => "Timbermaw Hold",
+                 3524 => "Azuremyst Isle",                3525 => "Bloodmyst Isle",                3526 => "Ammen Vale",                    3557 => "The Exodar",
              ),
-            8 => array( "Outland",
-                3522 => "Blade's Edge Mountains",       3483 => "Hellfire Peninsula",           3518 => "Nagrand",                      3523 => "Netherstorm",                  3520 => "Shadowmoon Valley",
-                 703 => "Shattrath City",               3679 => "Skettis",                      3519 => "Terokkar Forest",              3521 => "Zangarmarsh"
-            ),
-           10 => array( "Northrend",
-                3537 => "Borean Tundra",                2817 => "Crystalsong Forest",           4395 => "Dalaran",                        65 => "Dragonblight",                  394 => "Grizzly Hills",
-                 495 => "Howling Fjord",                4742 => "Hrothgar's Landing",            210 => "Icecrown",                     3711 => "Sholazar Basin",                 67 => "The Storm Peaks",
-                4197 => "Wintergrasp",                    66 => "Zul'Drak"
-            ),
             2 => array( "Dungeons",
-                4494 => "Ahn'kahet: The Old Kingdom",   3790 => "Auchenai Crypts",              4277 => "Azjol-Nerub",                   719 => "Blackfathom Deeps",            1584 => "Blackrock Depths",
-                1583 => "Blackrock Spire",              1941 => "Caverns of Time",              3905 => "Coilfang Reservoir",           2557 => "Dire Maul",                    4196 => "Drak'Tharon Keep",
-                 721 => "Gnomeregan",                   4416 => "Gundrak",                      4272 => "Halls of Lightning",           4820 => "Halls of Reflection",          4264 => "Halls of Stone",
-                3562 => "Hellfire Ramparts",            3535 => "Hellfire Citadel",             4131 => "Magisters' Terrace",           3792 => "Mana-Tombs",                   2100 => "Maraudon",
-                2367 => "Old Hillsbrad Foothills",      4813 => "Pit of Saron",                 2437 => "Ragefire Chasm",                722 => "Razorfen Downs",                491 => "Razorfen Kraul",
-                 796 => "Scarlet Monastery",            2057 => "Scholomance",                  3791 => "Sethekk Halls",                3789 => "Shadow Labyrinth",              209 => "Shadowfang Keep",
-                2017 => "Stratholme",                   1477 => "Sunken Temple",                3845 => "Tempest Keep",                 3848 => "The Arcatraz",                 2366 => "The Black Morass",
-                3713 => "The Blood Furnace",            3847 => "The Botanica",                 4100 => "The Culling of Stratholme",    1581 => "The Deadmines",                4809 => "The Forge of Souls",
-                3849 => "The Mechanar",                 4120 => "The Nexus",                    4228 => "The Oculus",                   3714 => "The Shattered Halls",          3717 => "The Slave Pens",
-                3715 => "The Steamvault",                717 => "The Stockade",                 3716 => "The Underbog",                 4415 => "The Violet Hold",              4723 => "Trial of the Champion",
-                1337 => "Uldaman",                       206 => "Utgarde Keep",                 1196 => "Utgarde Pinnacle",              718 => "Wailing Caverns",              1176 => "Zul'Farrak"
+                  206 => "Utgarde Keep",                   209 => "Shadowfang Keep",                491 => "Razorfen Kraul",                 717 => "The Stockade",                   718 => "Wailing Caverns",
+                  719 => "Blackfathom Deeps",              721 => "Gnomeregan",                     722 => "Razorfen Downs",                 796 => "Scarlet Monastery",             1176 => "Zul'Farrak",
+                 1196 => "Utgarde Pinnacle",              1337 => "Uldaman",                       1417 => "Sunken Temple",                 1581 => "The Deadmines",                 1583 => "Blackrock Spire",
+                 1584 => "Blackrock Depths",              1941 => "Caverns of Time",               2017 => "Stratholme",                    2057 => "Scholomance",                   2100 => "Maraudon",
+                 2366 => "The Black Morass",              2367 => "Old Hillsbrad Foothills",       2437 => "Ragefire Chasm",                2557 => "Dire Maul",                     3535 => "Hellfire Citadel",
+                 3562 => "Hellfire Ramparts",             3688 => "Auchindoun",                    3713 => "The Blood Furnace",             3714 => "The Shattered Halls",           3715 => "The Steamvault",
+                 3716 => "The Underbog",                  3717 => "The Slave Pens",                3789 => "Shadow Labyrinth",              3790 => "Auchenai Crypts",               3791 => "Sethekk Halls",
+                 3792 => "Mana-Tombs",                    3842 => "Tempest Keep",                  3847 => "The Botanica",                  3848 => "The Arcatraz",                  3849 => "The Mechanar",
+                 3905 => "Coilfang Reservoir",            4100 => "The Culling of Stratholme",     4131 => "Magisters' Terrace",            4196 => "Drak'Tharon Keep",              4228 => "The Oculus",
+                 4264 => "Halls of Stone",                4265 => "The Nexus",                     4272 => "Halls of Lightning",            4277 => "Azjol-Nerub",                   4415 => "The Violet Hold",
+                 4416 => "Gundrak",                       4494 => "Ahn'kahet: The Old Kingdom",    4522 => "Icecrown Citadel",              4723 => "Trial of the Champion",         4809 => "The Forge of Souls",
+                 4813 => "Pit of Saron",                  4820 => "Halls of Reflection"
             ),
             3 => array( "Raids",
-                3959 => "Black Temple",                 2677 => "Blackwing Lair",               3923 => "Gruul's Lair",                 3606 => "Hyjal Summit",                 4812 => "Icecrown Citadel",
-                3457 => "Karazhan",                     3836 => "Magtheridon's Lair",           2717 => "Molten Core",                  3456 => "Naxxramas",                    2159 => "Onyxia's Lair",
-                3429 => "Ruins of Ahn'Qiraj",           3607 => "Serpentshrine Cavern",         4075 => "Sunwell Plateau",              3428 => "Temple of Ahn'Qiraj",          3842 => "The Eye",
-                4500 => "The Eye of Eternity",          4493 => "The Obsidian Sanctum",         4722 => "Trial of the Crusader",        4273 => "Ulduar",                       4603 => "Vault of Archavon",
-                3805 => "Zul'Aman",                     1977 => "Zul'Gurub"
+                 1977 => "Zul'Gurub",                     2159 => "Onyxia's Lair",                 2677 => "Blackwing Lair",                2717 => "Molten Core",                   3428 => "Temple of Ahn'Qiraj",
+                 3429 => "Ruins of Ahn'Qiraj",            3456 => "Naxxramas",                     3457 => "Karazhan",                      3606 => "Hyjal Summit",                  3607 => "Serpentshrine Cavern",
+                 3805 => "Zul'Aman",                      3836 => "Magtheridon's Lair",            3845 => "Tempest Keep",                  3923 => "Gruul's Lair",                  3959 => "Black Temple",
+                 4075 => "Sunwell Plateau",               4273 => "Ulduar",                        4493 => "The Obsidian Sanctum",          4500 => "The Eye of Eternity",           4603 => "Vault of Archavon",
+                 4722 => "Trial of the Crusader",         4812 => "Icecrown Citadel",              4987 => "The Ruby Sanctum"
             ),
             4 => array( "Classes",
-                -372 => "Death Knight",                 -263 => "Druid",                        -261 => "Hunter",                       -161 => "Mage",                         -141 => "Paladin",
-                -262 => "Priest",                       -162 => "Rogue",                         -82 => "Shaman",                        -61 => "Warlock",                       -81 => "Warrior"
+                  -61 => "Warlock",                        -81 => "Warrior",                        -82 => "Shaman",                        -141 => "Paladin",                       -161 => "Mage",
+                 -162 => "Rogue",                         -261 => "Hunter",                        -262 => "Priest",                        -263 => "Druid",                         -372 => "Death Knight"
                     ),
             5 => array( "Professions",
-                -181 => "Alchemy",                      -121 => "Blacksmithing",                -304 => "Cooking",                      -201 => "Engineering",                  -324 => "First Aid",
-                -101 => "Fishing",                       -24 => "Herbalism",                    -371 => "Inscription",                  -373 => "Jewelcrafting",                -182 => "Leatherworking",
-                -264 => "Tailoring"
+                  -24 => "Herbalism",                     -101 => "Fishing",                       -121 => "Blacksmithing",                 -181 => "Alchemy",                       -182 => "Leatherworking",
+                 -201 => "Engineering",                   -264 => "Tailoring",                     -304 => "Cooking",                       -324 => "First Aid",                     -371 => "Inscription",
+                 -373 => "Jewelcrafting"
             ),
             6 => array( "Battlegrounds",
-                 -25 => "All",                          2597 => "Alterac Valley",               3358 => "Arathi Basin",                 3820 => "Eye of the Storm",             4710 => "Isle of Conquest",
-                4384 => "Strand of the Ancients",       3277 => "Warsong Gulch"
-            ),
-            9 => array( "Seasonal",
-                -370 => "Brewfest",                    -1002 => "Children's Week",              -364 => "Darkmoon Faire",                -41 => "Day of the Dead",             -1003 => "Hallow's End",
-               -1005 => "Harvest Festival",             -376 => "Love is in the Air",           -366 => "Lunar Festival",               -369 => "Midsummer",                   -1006 => "New Year's Eve",
-                -375 => "Pilgrim's Bounty",             -374 => "Noblegarden",                 -1001 => "Winter Veil"
+                 2597 => "Alterac Valley",                3277 => "Warsong Gulch",                 3358 => "Arathi Basin",                  3820 => "Eye of the Storm",              4384 => "Strand of the Ancients",
+                 4710 => "Isle of Conquest",               -25 => "All"
             ),
             7 => array( "Miscellaneous",
-                -365 => "Ahn'Qiraj War Effort",         -241 => "Argent Tournament",           -1010 => "Dungeon Finder",                 -1 => "Epic",                         -344 => "Legendary",
-                -367 => "Reputation",                   -368 => "Scourge Invasion"
+                   -1 => "Epic",                          -241 => "Tournament",                    -344 => "Legendary",                     -365 => "Ahn'Qiraj War",                 -367 => "Reputation",
+                 -368 => "Invasion",                     -1010 => "Dungeon Finder"
+            ),
+            8 => array( "Outland",
+                 3483 => "Hellfire Peninsula",            3518 => "Nagrand",                       3519 => "Terokkar Forest",               3520 => "Shadowmoon Valley",             3521 => "Zangarmarsh",
+                 3522 => "Blade's Edge Mountains",        3523 => "Netherstorm",                   3679 => "Skettis",                       3703 => "Shattrath City"
+            ),
+            9 => array( "Seasonal",
+                  -22 => "Seasonal",                       -41 => "Day of the Dead",               -364 => "Darkmoon Faire",                -366 => "Lunar Festival",                -369 => "Midsummer",
+                 -370 => "Brewfest",                      -374 => "Noblegarden",                   -375 => "Pilgrim's Bounty",              -376 => "Love is in the Air",           -1001 => "Winter Veil",
+                -1002 => "Children's Week",              -1003 => "Hallow's End",                 -1005 => "Harvest Festival"
+            ),
+            10 => array( "Northrend",
+                   65 => "Dragonblight",                    66 => "Zul'Drak",                        67 => "The Storm Peaks",                210 => "Icecrown",                       394 => "Grizzly Hills",
+                  495 => "Howling Fjord",                 3537 => "Borean Tundra",                 3711 => "Sholazar Basin",                4024 => "Coldarra",                      4197 => "Wintergrasp",
+                 4395 => "Dalaran",                       4742 => "Hrothgar's Landing"
             ),
            -2 => "Uncategorized"
         )
+    ),
+    'icon'  => array(
+        'notFound'      => "This icon doesn't exist."
     ),
     'title' => array(
         'notFound'      => "This title doesn't exist.",
@@ -670,10 +1145,25 @@ $lang = array(
             1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
         )
     ),
+    'sound' => array(
+        'notFound'      => "This sound doesn't exist.",
+        'foundIn'       => "This sound can be found in",
+        'goToPlaylist'  => "Go to My Playlist",
+        'music'         => "Music",
+        'intro'         => "Intro Music",
+        'ambience'      => "Ambience",
+        'cat'           => array(
+            null,              "Spells",            "User Interface", "Footsteps",   "Weapons Impacts", null,      "Weapons Misses", null,            null,         "Pick Up/Put Down",
+            "NPC Combat",      null,                "Errors",         "Nature",      "Objects",         null,      "Death",          "NPC Greetings", null,         "Armor",
+            "Footstep Splash", "Water (Character)", "Water",          "Tradeskills", "Misc Ambience",   "Doodads", "Spell Fizzle",   "NPC Loops",     "Zone Music", "Emotes",
+            "Narration Music", "Narration",         50 => "Zone Ambience", 52 => "Emitters", 53 => "Vehicles", 1000 => "My Playlist"
+        )
+    ),
     'pet'      => array(
         'notFound'      => "This pet family doesn't exist.",
         'exotic'        => "Exotic",
-        'cat'           => ["Ferocity", "Tenacity", "Cunning"]
+        'cat'           => ["Ferocity", "Tenacity", "Cunning"],
+        'food'          => ["Meat", "Fish", "Cheese", "Bread", "Fungus", "Fruit", "Raw Meat", "Raw Fish"] // ItemPetFood.dbc
     ),
     'faction' => array(
         'notFound'      => "This faction doesn't exist.",
@@ -737,26 +1227,27 @@ $lang = array(
         '_collapseAll'  => "Collapse All",
         '_expandAll'    => "Expand All",
         '_transfer'     => 'This spell will be converted to <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
+        'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
         'ppm'           => "%s procs per minute",
         'procChance'    => "Proc chance",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost",
-        'remaining'     => "%s remaining",
-        'untilCanceled' => "until canceled",
-        'castIn'        => "%s sec cast",
-        'instantPhys'   => "Instant",
-        'instantMagic'  => "Instant cast",
-        'channeled'     => "Channeled",
-        'range'         => "%s yd range",
-        'meleeRange'    => "Melee Range",
-        'unlimRange'    => "Unlimited Range",
-        'reagents'      => "Reagents",
-        'tools'         => "Tools",
+        'remaining'     => "%s remaining",                  // SPELL_TIME_REMAINING_*
+        'untilCanceled' => "until cancelled",               // SPELL_DURATION_UNTIL_CANCELLED
+        'castIn'        => "%s sec cast",                   // SPELL_CAST_TIME_SEC
+        'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
+        'instantMagic'  => "Instant cast",                  // SPELL_CAST_TIME_INSTANT
+        'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED
+        'range'         => "%s yd range",                   // SPELL_RANGE / SPELL_RANGE_DUAL
+        'meleeRange'    => "Melee Range",                   // MELEE_RANGE
+        'unlimRange'    => "Unlimited Range",               // SPELL_RANGE_UNLIMITED
+        'reagents'      => "Reagents",                      // SPELL_REAGENTS
+        'tools'         => "Tools",                         // SPELL_TOTEMS
         'home'          => "&lt;Inn&gt;",
         'pctCostOf'     => "of base %s",
-        'costPerSec'    => ", plus %s per sec",
-        'costPerLevel'  => ", plus %s per level",
+        'costPerSec'    => ", plus %s per sec",             // see 'powerTypes'
+        'costPerLevel'  => ", plus %s per level",           // not used?
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",
@@ -764,12 +1255,12 @@ $lang = array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
             'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
-        'powerRunes'    => ["Frost", "Unholy", "Blood", "Death"],
+        'powerRunes'    => ["Blood", "Unholy", "Frost", "Death"], // RUNE_COST_* / COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(
-            // conventional
+            // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER / *_COST / *COST_PER_TIME
               -2 => "Health",              0 => "Mana",                1 => "Rage",                2 => "Focus",               3 => "Energy",              4 => "Happiness",
-               5 => "Rune",                6 => "Runic Power",
-            // powerDisplay
+               5 => "Runes",               6 => "Runic Power",
+            // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
               -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
         ),
@@ -779,14 +1270,14 @@ $lang = array(
             'recipes' => '<a href="?items=9.%s">recipe items</a>',
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">crafted items</a>'
         ),
-        'cat'           => array(
-              7 => "Class Skills",      // classList
-            -13 => "Glyphs",            // classList
-            -11 => array("Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"),
+        'cat'           => array(                           // as per menu in locale_enus.js
+              7 => "Class Skills",                          // classList
+            -13 => "Glyphs",                                // classList
+            -11 => ["Proficiencies", 8 => "Armor", 6 => "Weapon", 10 => "Languages"],
              -4 => "Racial Traits",
-             -2 => "Talents",           // classList
+             -2 => "Talents",                               // classList
              -6 => "Companions",
-             -5 => "Mounts",
+             -5 => ["Mounts", 1 => "Ground Mounts", 2 => "Flying Mounts", 3 => "Miscellaneous"],
              -3 => array(
                 "Pet Skills",               782 => "Ghoul",             270 => "Generic",               653 => "Bat",                       210 => "Bear",                  655 => "Bird of Prey",          211 => "Boar",
                 213 => "Carrion Bird",      209 => "Cat",               780 => "Chimaera",              787 => "Core Hound",                214 => "Crab",                  212 => "Crocolisk",             781 => "Devilsaur",
@@ -815,12 +1306,12 @@ $lang = array(
              -9 => "GM Abilities",
               0 => "Uncategorized"
         ),
-        'armorSubClass' => array(
+        'armorSubClass' => array(                           // ItemSubClass.dbc/2
             "Miscellaneous",                        "Cloth Armor",                          "Leather Armor",                        "Mail Armor",                           "Plate Armor",
             null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
             "Sigils"
         ),
-        'weaponSubClass' => array(                          // ordered by content firts, then alphabeticaly
+        'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content firts, then alphabeticaly
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
@@ -831,7 +1322,8 @@ $lang = array(
         ),
         'traitShort'    => array(
             'atkpwr'    => "AP",                    'rgdatkpwr' => "RAP",                   'splpwr'    => "SP",                    'arcsplpwr' => "ArcP",                  'firsplpwr' => "FireP",
-            'frosplpwr' => "FroP",                  'holsplpwr' => "HolP",                  'natsplpwr' => "NatP",                  'shasplpwr' => "ShaP",                  'splheal'   => "Heal"
+            'frosplpwr' => "FroP",                  'holsplpwr' => "HolP",                  'natsplpwr' => "NatP",                  'shasplpwr' => "ShaP",                  'splheal'   => "Heal",
+            'str'       => "Str",                   'agi'       => "Agi",                   'sta'       => "Sta",                   'int'       => "Int",                   'spi'       => "Spi"
         ),
         'spellModOp'    => array(
             "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "Charges",
@@ -849,7 +1341,7 @@ $lang = array(
             "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
             "Mainhand Weapon Skill",                "Offhand Weapon Skill",                 "Ranged Weapon Skill",                  "Expertise",                            "Armor Penetration"
         ),
-        'lockType'      => array(
+        'lockType'      => array(                           // lockType.dbc
             null,                                   "Lockpicking",                          "Herbalism",                            "Mining",                               "Disarm Trap",
             "Open",                                 "Treasure (DND)",                       "Calcified Elven Gems (DND)",           "Close",                                "Arm Trap",
             "Quick Open",                           "Quick Close",                          "Open Tinkering",                       "Open Kneeling",                        "Open Attacking",
@@ -857,36 +1349,127 @@ $lang = array(
             "Inscription",                          "Open From Vehicle"
         ),
         'stealthType'   => ["General", "Trap"],
-        'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"]
+        'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"],
+        'unkEffect'     => 'Unknown Effect',
+        'effects'       => array(
+/*0-5    */ 'None',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
+/*6+     */ 'Apply Aura',               'Environmental Damage',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
+/*12+    */ 'Portal',                   'Ritual Base',              'Ritual Specialize',        'Ritual Activate Portal',   'Complete Quest',           'Weapon Damage - No School',
+/*18+    */ 'Resurrect with % Health',  'Add Extra Attacks',        'Can Dodge',                'Can Evade',                'Can Parry',                'Can Block',
+/*24+    */ 'Create Item',              'Can Use Weapon',           'Know Defense Skill',       'Persistent Area Aura',     'Summon',                   'Leap',
+/*30+    */ 'Give Power',               'Weapon Damage - %',        'Trigger Missile',          'Open Lock',                'Transform Item',           'Apply Area Aura - Party',
+/*36+    */ 'Learn Spell',              'Know Spell Defense',       'Dispel',                   'Learn Language',           'Dual Wield',               'Jump to Target',
+/*42+    */ 'Jump Behind Target',       'Teleport Target to Caster','Learn Skill Step',         'Give Honor',               'Spawn',                    'Trade Skill',
+/*48+    */ 'Stealth',                  'Detect Stealthed',         'Summon Object',            'Force Critical Hit',       'Guarantee Hit',            'Enchant Item Permanent',
+/*54+    */ 'Enchant Item Temporary',   'Tame Creature',            'Summon Pet',               'Learn Spell - Pet',        'Weapon Damage - Flat',     'Open Item & Fast Loot',
+/*60+    */ 'Proficiency',              'Send Script Event',        'Burn Power',               'Modify Threat - Flat',     'Trigger Spell',            'Apply Area Aura - Raid',
+/*66+    */ 'Create Mana Gem',          'Heal to Full',             'Interrupt Cast',           'Distract',                 'Distract Move',            'Pickpocket',
+/*72+    */ 'Far Sight',                'Forget Talents',           'Apply Glyph',              'Heal Mechanical',          'Summon Object - Temporary','Script Effect',
+/*78+    */ 'Attack',                   'Abort All Pending Attacks','Add Combo Points',         'Create House',             'Bind Sight',               'Duel',
+/*84+    */ 'Stuck',                    'Summon Player',            'Activate Object',          'Siege Damage',             'Repair Building',          'Siege Building Action',
+/*90+    */ 'Kill Credit',              'Threat All',               'Enchant Held Item',        'Force Deselect',           'Self Resurrect',           'Skinning',
+/*96+    */ 'Charge',                   'Cast Button',              'Knock Back',               'Disenchant',               'Inebriate',                'Feed Pet',
+/*102+   */ 'Dismiss Pet',              'Give Reputation',          'Summon Object (Trap)',     'Summon Object (Battle S.)','Summon Object (#3)',       'Summon Object (#4)',
+/*108+   */ 'Dispel Mechanic',          'Summon Dead Pet',          'Destroy All Totems',       'Durability Damage - Flat', 'Summon Demon',             'Resurrect with Flat Health',
+/*114+   */ 'Taunt',                    'Durability Damage - %',    'Skin Player Corpse (PvP)', 'AoE Resurrect with % Health','Learn Skill',            'Apply Area Aura - Pet',
+/*120+   */ 'Teleport to Graveyard',    'Normalized Weapon Damage', null,                       'Take Flight Path',         'Pull Towards',             'Modify Threat - %',
+/*126+   */ 'Spell Steal ',             'Prospect',                 'Apply Area Aura - Friend', 'Apply Area Aura - Enemy',  'Redirect Done Threat %',   'Play Sound',
+/*132+   */ 'Play Music',               'Unlearn Specialization',   'Kill Credit2',             'Call Pet',                 'Heal for % of Total Health','Give % of Total Power',
+/*138+   */ 'Leap Back',                'Abandon Quest',            'Force Cast',               'Force Spell Cast with Value','Trigger Spell with Value','Apply Area Aura - Pet Owner',
+/*144+   */ 'Knockback to Dest.',       'Pull Towards Dest.',       'Activate Rune',            'Fail Quest',               null,                       'Charge to Dest',
+/*150+   */ 'Start Quest',              'Trigger Spell 2',          'Summon - Refer-A-Friend',  'Create Tamed Pet',         'Discover Flight Path',     'Dual Wield 2H Weapons',
+/*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
+/*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
+        ),
+        'unkAura'       => 'Unknown Aura',
+        'auras'         => array(
+/*0-   */   'None',                                 'Bind Sight',                           'Possess',                              'Periodic Damage - Flat',               'Dummy',
+/*5+   */   'Confuse',                              'Charm',                                'Fear',                                 'Periodic Heal',                        'Mod Attack Speed',
+            'Mod Threat',                           'Taunt',                                'Stun',                                 'Mod Damage Done - Flat',               'Mod Damage Taken - Flat',
+            'Damage Shield',                        'Stealth',                              'Mod Stealth Detection Level',          'Invisibility',                         'Mod Invisibility Detection Level',
+            'Regenerate Health - %',                'Regenerate Power - %',                 'Mod Resistance - Flat',                'Periodically Trigger Spell',           'Periodically Give Power',
+/*25+  */   'Pacify',                               'Root',                                 'Silence',                              'Reflect Spells',                       'Mod Stat - Flat',
+            'Mod Skill - Temporary',                'Increase Run Speed %',                 'Mod Mounted Speed %',                  'Decrease Run Speed %',                 'Mod Maximum Health - Flat',
+            'Mod Maximum Power - Flat',             'Shapeshift',                           'Spell Effect Immunity',                'Spell Aura Immunity',                  'Spell School Immunity',
+            'Damage Immunity',                      'Dispel Type Immunity',                 'Proc Trigger Spell',                   'Proc Trigger Damage',                  'Track Creatures',
+            'Track Resources',                      'Ignore All Gear',                      'Mod Parry %',                          null,                                   'Mod Dodge %',
+/*50+  */   'Mod Critical Healing Amount %',        'Mod Block %',                          'Mod Physical Crit Chance',             'Periodically Drain Health',            'Mod Physical Hit Chance',
+            'Mod Spell Hit Chance',                 'Transform',                            'Mod Spell Crit Chance',                'Increase Swim Speed %',                'Mod Damage Done Versus Creature',
+            'Pacify & Silence',                     'Mod Size %',                           'Periodically Transfer Health',         'Periodic Transfer Power',              'Periodic Drain Power',
+            'Mod Spell Haste % (not stacking)',     'Feign Death',                          'Disarm',                               'Stalked',                              'Mod Absorb School Damage',
+            'Extra Attacks',                        'Mod Spell School Crit Chance',         'Mod Spell School Power Cost - %',      'Mod Spell School Power Cost - Flat',   'Reflect Spells School From School',
+/*75+  */   'Force Language',                       'Far Sight',                            'Mechanic Immunity',                    'Mounted',                              'Mod Damage Done - %',
+            'Mod Stat - %',                         'Split Damage - %',                     'Underwater Breathing',                 'Mod Base Resistance - Flat',           'Mod Health Regeneration - Flat',
+            'Mod Power Regeneration - Flat',        'Create Item on Death',                 'Mod Damage Taken - %',                 'Mod Health Regeneration - %',          'Periodic Damage - %',
+            'Mod Resist Chance',                    'Mod Aggro Range',                      'Prevent Fleeing',                      'Unattackable',                         'Interrupt Power Decay',
+            'Ghost',                                'Spell Magnet',                         'Absorb Damage - Mana Shield',          'Mod Skill Value',                      'Mod Attack Power - Flat',
+/*100+ */   'Always Show Debuffs',                  'Mod Resistance - %',                   'Mod Melee Attack Power vs Creature',   'Mod Total Threat - Temporary',         'Water Walking',
+            'Feather Fall',                         'Levitate / Hover',                     'Add Modifier - Flat',                  'Add Modifier - %',                     'Proc Spell on Target',
+            'Mod Power Regeneration - %',           'Intercept % of Attacks Against Target','Override Class Script',                'Mod Ranged Damage Taken - Flat',       'Mod Ranged Damage Taken - %',
+            'Mod Healing Taken - Flat',             'Allow % of Health Regen During Combat','Mod Mechanic Resistance',              'Mod Healing Taken - %',                'Share Pet Tracking',
+            'Untrackable',                          'Beast Lore',                           'Mod Offhand Damage Done %',            'Mod Target Resistance - Flat',         'Mod Ranged Attack Power - Flat',
+/*125+ */   'Mod Melee Damage Taken - Flat',        'Mod Melee Damage Taken - %',           'Mod Attacker Ranged Attack Power',     'Possess Pet',                          'Increase Run Speed % - Stacking',
+            'Incerase Mounted Speed % - Stacking',  'Mod Ranged Attack Power vs Creature',  'Mod Maximum Power - %',                'Mod Maximum Health - %',               'Allow % of Mana Regen During Combat',
+            'Mod Healing Done - Flat',              'Mod Healing Done - %',                 'Mod Stat - %',                         'Mod Melee Haste %',                    'Force Reputation',
+            'Mod Ranged Haste %',                   'Mod Ranged Ammo Haste %',              'Mod Base Resistance - %',              'Mod Resistance - Flat (not stacking)', 'Safe Fall',
+            'Increase Pet Talent Points',           'Allow Exotic Pets Taming',             'Mechanic Immunity Mask',               'Retain Combo Points',                  'Reduce Pushback Time %',
+/*150+ */   'Mod Shield Block Value - %',           'Track Stealthed',                      'Mod Player Aggro Range',               'Split Damage - Flat',                  'Mod Stealth Level',
+            'Mod Underwater Breathing %',           'Mod All Reputation Gained by %',       'Done Pet Damage Multiplier',           'Mod Shield Block Value - Flat',        'No PvP Credit',
+            'Mod AoE Avoidance',                    'Mod Health Regen During Combat',       'Mana Burn',                            'Mod Melee Critical Damage %',          null,
+            'Mod Attacker Melee Attack Power',      'Mod Melee Attack Power - %',           'Mod Ranged Attack Power - %',          'Mod Damage Done vs Creature',          'Mod Crit Chance vs Creature',
+            'Change Object Visibility for Player',  'Mod Run Speed (not stacking)',         'Mod Mounted Speed (not stacking)',     null,                                   'Mod Spell Power by % of Stat',
+/*175+ */   'Mod Healing Power by % of Stat',       'Spirit of Redemption',                 'AoE Charm',                            'Mod Debuff Resistance - %',            'Mod Attacker Spell Crit Chance',
+            'Mod Spell Power vs Creature',          null,                                   'Mod Resistance by % of Stat',          'Mod Threat % of Critical Hits',        'Mod Attacker Melee Hit Chance',
+            'Mod Attacker Ranged Hit Chance',       'Mod Attacker Spell Hit Chance',        'Mod Attacker Melee Crit Chance',       'Mod Attacker Ranged Crit Chance',      'Mod Rating',
+            'Mod Reputation Gained %',              'Limit Movement Speed',                 'Mod Attack Speed %',                   'Mod Haste % (gain)',                   'Mod Target School Absorb %',
+            'Mod Target School Absorb for Ability', 'Mod Cooldowns',                        'Mod Attacker Crit Chance',             null,                                   'Mod Spell Hit Chance',
+/*200+ */   'Mod Kill Experience Gained %',         'Can Fly',                              'Ignore Combat Result',                 'Mod Attacker Melee Crit Damage %',     'Mod Attacker Ranged Crit Damage %',
+            'Mod Attacker Spell Crit Damage %',     'Mod Vehicle Flight Speed %',           'Mod Mounted Flight Speed %',           'Mod Flight Speed %',                   'Mod Mounted Flight Speed % (always)',
+            'Mod Vehicle Speed % (always)',         'Mod Flight Speed % (not stacking)',    'Mod Ranged Attack Power by % of Stat', 'Mod Rage Generated from Damage Dealt', 'Tamed Pet Passive',
+            'Arena Preparation',                    'Mod Spell Haste %',                    'Killing Spree',                        'Mod Ranged Haste %',                   'Mod Mana Regeneration by % of Stat',
+            'Mod Combat Rating by % of Stat',       'Ignore Threat',                        null,                                   'Raid Proc from Charge',                null,
+/*225+ */   'Raid Proc from Charge with Value',     'Periodic Dummy',                       'Periodically Trigger Spell with Value','Detect Stealth',                       'Mod AoE Damage Taken %',
+            'Mod Maximum Health - Flat (no stacking)','Proc Trigger Spell with Value',      'Mod Mechanic Duration %',              'Change other Humanoid Display',        'Mod Mechanic Duration % (not stacking)',
+            'Mod Dispel Resistance %',              'Control Vehicle',                      'Mod Spell Power by % of Attack Power', 'Mod Healing Power by % of Attack Power','Mod Size % (not stacking)',
+            'Mod Expertise',                        'Force Move Forward',                   'Mod Spell & Healing Power by % of Int','Faction Override',                     'Comprehend Language',
+            'Mod Aura Duration by Dispel Type',   'Mod Aura Duration by Dispel Type (not stacking)', 'Clone Caster',                'Mod Combat Result Chance',             'Convert Rune',
+/*250+ */   'Mod Maximum Health - Flat (stacking)', 'Mod Enemy Dodge Chance',               'Mod Haste % (loss)',                   'Mod Critical Block Chance',            'Disarm Offhand',
+            'Mod Mechanic Damage Taken %',          'No Reagent Cost',                      'Mod Target Resistance by Spell Class', 'Mod Spell Visual',                     'Mod Periodic Healing Taken %',
+            'Screen Effect',                        'Phase',                                'Ability Ignore Aurastate',             'Allow Only Ability',                   null,
+            null,                                   null,                                   'Cancel Aura Buffer at % of Caster Health','Mod Attack Power by % of Stat',     'Ignore Target Resistance',
+            'Ignore Target Resistance for Ability', 'Mod Damage Taken % from Caster',       'Ignore Swing Timer Reset',             'X-Ray',                                'Ability Consume No Ammo',
+/*275+ */   'Mod Ability Ignore Shapeshift',        'Mod Mechanic Damage Done %',           'Mod Max Affected Targets',             'Disarm Ranged Weapon',                 'Spawn Effect',
+            'Mod Armor Penetration %',              'Mod Honor Gain %',                     'Mod Base Health %',                    'Mod Healing Taken % from Caster',      'Linked Aura',
+            'Mod Attack Power by School Resistance','Allow Periodic Ability to Crit',       'Mod Spell Deflect Chance',             'Ignore Hit Direction',                 null,
+            'Mod Crit Chance',                      'Mod Quest Experience Gained %',        'Open Stable',                          'Override Spells',                      'Prevent Power Regeneration',
+            null,                                   'Set Vehicle Id',                       'Spirit Burst',                         'Strangulate',                          null,
+/*300+ */   'Share Damage %',                       'Mod Absorb School Healing',            null,                                   'Mod Damage Done vs Aurastate - %',     'Fake Inebriate',
+            'Mod Minimum Speed %',                  null,                                   'Heal Absorb Test',                     'Mod Critical Strike Chance for Caster',null,
+            'Mod Pet AoE Damage Avoidance',         null,                                   null,                                   null,                                   'Prevent Ressurection',
+/* -316*/   'Underwater Walking',                   'Periodic Haste'
+        )
     ),
     'item' => array(
         'notFound'      => "This item doesn't exist.",
-        'armor'         => "%s Armor",
-        'block'         => "%s Block",
-        'charges'       => "Charges",
-        'locked'        => "Locked",
+        'armor'         => "%s Armor",                      // ARMOR_TEMPLATE
+        'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE
+        'charges'       => "%d |4Charge:Charges;",          // ITEM_SPELL_CHARGES
+        'locked'        => "Locked",                        // LOCKED
         'ratingString'  => "%s&nbsp;@&nbsp;L%s",
-        'heroic'        => "Heroic",
-        'unique'        => "Unique",
-        'uniqueEquipped'=> "Unique-Equipped",
-        'startQuest'    => "This Item Begins a Quest",
-        'bagSlotString' => "%d Slot %s",
-        'dps'           => "damage per second",
-        'dps2'          => "damage per second",
-        'addsDps'       => "Adds",
+        'heroic'        => "Heroic",                        // ITEM_HEROIC
+        'startQuest'    => "This Item Begins a Quest",      // ITEM_STARTS_QUEST
+        'bagSlotString' => "%d Slot %s",                    // CONTAINER_SLOTS
         'fap'           => "Feral Attack Power",
-        'durability'    => "Durability",
+        'durability'    => "Durability %d / %d",            // DURABILITY_TEMPLATE
         'realTime'      => "real time",
-        'conjured'      => "Conjured Item",
-        'damagePhys'    => "%s Damage",
-        'damageMagic'   => "%s %s Damage",
-        'speed'         => "Speed",
-        'sellPrice'     => "Sell Price",
-        'itemLevel'     => "Item Level",
-        'randEnchant'   => "&lt;Random enchantment&gt",
-        'readClick'     => "&lt;Right Click To Read&gt",
-        'openClick'     => "&lt;Right Click To Open&gt",
-        'set'           => "Set",
+        'conjured'      => "Conjured Item",                 // ITEM_CONJURED
+        'sellPrice'     => "Sell Price",                    // SELL_PRICE
+        'itemLevel'     => "Item Level %d",                 // ITEM_LEVEL
+        'randEnchant'   => "&lt;Random enchantment&gt",     // ITEM_RANDOM_ENCHANT
+        'readClick'     => "&lt;Right Click To Read&gt",    // ITEM_READABLE
+        'openClick'     => "&lt;Right Click To Open&gt",    // ITEM_OPENABLE
+        'setBonus'      => "(%d) Set: %s",                  // ITEM_SET_BONUS_GRAY
+        'setName'       => "%s (%d/%d)",                    // ITEM_SET_NAME
         'partyLoot'     => "Party loot",
         'smartLoot'     => "Smart loot",
         'indestructible'=> "Cannot be destroyed",
@@ -900,61 +1483,73 @@ $lang = array(
         'consumable'    => "Consumable",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
-        'millable'      => "Millable",
+        'millable'      => "Millable",                      // ITEM_MILLABLE
         'noEquipCD'     => "No equip cooldown",
-        'prospectable'  => "Prospectable",
-        'disenchantable'=> "Disenchantable",
-        'cantDisenchant'=> "Cannot be disenchanted",
-        'repairCost'    => "Repair cost",
+        'prospectable'  => "Prospectable",                  // ITEM_PROSPECTABLE
+        'disenchantable'=> "Disenchantable",                // ITEM_DISENCHANT_ANY_SKILL
+        'cantDisenchant'=> "Cannot be disenchanted",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
+        'repairCost'    => "Repair cost",                   // REPAIR_COST
         'tool'          => "Tool",
-        'cost'          => "Cost",
+        'cost'          => "Cost",                          // COSTS_LABEL
         'content'       => "Content",
         '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
         'slot'          => "Slot",
-        '_quality'      => "Quality",
+        '_quality'      => "Quality",                       // QUALITY
         'usableBy'      => "Usable by",
-        'buyout'        => "Buyout price",
+        'buyout'        => "Buyout price",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
+        'reqMinLevel'   => "Requires Level %d",             // ITEM_MIN_LEVEL
+        'reqLevelRange' => "Requires level %d to %d (%s)",  // ITEM_LEVEL_RANGE_CURRENT
+        'unique'        => ["Unique",          "Unique (%d)", "Unique: %s (%d)"         ],   // ITEM_UNIQUE, ITEM_UNIQUE_MULTIPLE, ITEM_LIMIT_CATEGORY
+        'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
+        'speed'         => "Speed",                         // SPEED
+        'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
+        'damage'        => array(                           // *DAMAGE_TEMPLATE*
+                        //  basic,                          basic /w school,                add basic,                  add basic /w school
+            'single'    => ["%d Damage",                    "%d %s Damage",                 "+ %d Damage",              "+%d %s Damage"             ],
+            'range'     => ["%d - %d Damage",               "%d - %d %s Damage",            "+ %d - %d Damage",         "+%d - %d %s Damage"        ],
+            'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
+        ),
         'gems'          => "Gems",
-        'socketBonus'   => "Socket Bonus",
-        'socket'        => array(
+        'socketBonus'   => "Socket Bonus: %s",              // ITEM_SOCKET_BONUS
+        'socket'        => array(                           // EMPTY_SOCKET_*
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"
         ),
-        'gemColors'     => array(
+        'gemColors'     => array(                           // *_GEM
             "meta",                 "red",              "yellow",               "blue"
         ),
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => ["less than %d %s gem", "less than %d %s gems"],
+            2 => "less than %d %s |4gem:gems;",
             3 => "more %s gems than %s gems",
-            5 => ["at least %d %s gem", "at least %d %s gems"]
+            5 => "at least %d %s |4gem:gems;"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requires personal and team arena rating of %d",
-            "Requires personal and team arena rating of %d<br>in 3v3 or 5v5 brackets",
-            "Requires personal and team arena rating of %d<br>in 5v5 brackets"
+            "Requires personal and team arena rating of %d|nin 3v3 or 5v5 brackets",
+            "Requires personal and team arena rating of %d|nin 5v5 brackets"
         ),
-        'quality'       => array(
+        'quality'       => array(                           // ITEM_QUALITY?_DESC
             "Poor",                 "Common",           "Uncommon",             "Rare",
             "Epic",                 "Legendary",        "Artifact",             "Heirloom"
         ),
-        'trigger'       => array(
+        'trigger'       => array(                           // ITEM_SPELL_TRIGGER_*
             "Use: ",                "Equip: ",          "Chance on hit: ",      "",                             "",
             "",                     ""
         ),
-        'bonding'       => array(
+        'bonding'       => array(                           // ITEM_BIND_*
             "Binds to account",                         "Binds when picked up",                                 "Binds when equipped",
             "Binds when used",                          "Quest Item",                                           "Quest Item"
         ),
-        "bagFamily"     => array(
+        "bagFamily"     => array(                           // ItemSubClass.dbc/1
             "Bag",                  "Quiver",           "Ammo Pouch",           "Soul Bag",                     "Leatherworking Bag",
             "Inscription Bag",      "Herb Bag",         "Enchanting Bag",       "Engineering Bag",              null, /*Key*/
             "Gem Bag",              "Mining Bag"
         ),
-        'inventoryType' => array(
+        'inventoryType' => array(                           // INVTYPE_*
             null,                   "Head",             "Neck",                 "Shoulder",                     "Shirt",
             "Chest",                "Waist",            "Legs",                 "Feet",                         "Wrist",
             "Hands",                "Finger",           "Trinket",              "One-Hand",                     "Off Hand", /*Shield*/
@@ -962,23 +1557,23 @@ $lang = array(
             null, /*Robe*/          "Main Hand",        "Off Hand",             "Held In Off-Hand",             "Projectile",
             "Thrown",               null, /*Ranged2*/   "Quiver",               "Relic"
         ),
-        'armorSubClass' => array(
+        'armorSubClass' => array(                           // ItemSubClass.dbc/2
             "Miscellaneous",        "Cloth",            "Leather",              "Mail",                         "Plate",
             null,                   "Shield",           "Libram",               "Idol",                         "Totem",
             "Sigil"
         ),
-        'weaponSubClass'=> array(
+        'weaponSubClass'=> array(                           // ItemSubClass.dbc/4
             "Axe",                  "Axe",              "Bow",                  "Gun",                          "Mace",
             "Mace",                 "Polearm",          "Sword",                "Sword",                        null,
             "Staff",                null,               null,                   "Fist Weapon",                  "Miscellaneous",
             "Dagger",               "Thrown",           null,                   "Crossbow",                     "Wand",
             "Fishing Pole"
         ),
-        'projectileSubClass' => array(
+        'projectileSubClass' => array(                      // ItemSubClass.dbc/6
             null,                   null,               "Arrow",                "Bullet",                        null
         ),
         'elixirType'    => [null, "Battle", "Guardian"],
-        'cat'           => array(                           // ordered by content first, then alphabeticaly
+        'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
              2 => "Weapons",                                // self::$spell['weaponSubClass']
              4 => array("Armor", array(
                  1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
@@ -1022,9 +1617,9 @@ $lang = array(
             12 => "Quest",
             13 => "Keys",
         ),
-        'statType'      => array(
-            "Increases your Mana by %d.",
-            "Increases your Health by %d.",
+        'statType'      => array(                           // ITEM_MOD_*
+            "Mana",
+            "Health",
             null,
             "Agility",
             "Strength",
@@ -1032,7 +1627,7 @@ $lang = array(
             "Spirit",
             "Stamina",
             null, null, null, null,
-            "Improves defense rating by %d.",
+            "Increases defense rating by %d.",
             "Increases your dodge rating by %d.",
             "Increases your parry rating by %d.",
             "Increases your shield block rating by %d.",
@@ -1057,17 +1652,17 @@ $lang = array(
             "Improves critical avoidance rating by %d.",
             "Increases your resilience rating by %d.",
             "Increases your haste rating by %d.",
-            "Improves expertise rating by %d.",
-            "Improves attack power by %d.",
-            "Improves ranged attack power by %d.",
-            "Improves attack power by %d in Cat, Bear, Dire Bear, and Moonkin forms only.",
-            "Improves damage done by magical spells and effects by up to %d.",
-            "Improves healing done by magical spells and effects by up to %d.",
+            "Increases expertise rating by %d.",
+            "Increases attack power by %d.",
+            "Increases ranged attack power by %d.",
+            "Increases attack power by %d in Cat, Bear, Dire Bear, and Moonkin forms only.",
+            "Increases damage done by magical spells and effects by up to %d.",
+            "Increases healing done by magical spells and effects by up to %d.",
             "Restores %d mana per 5 sec.",
             "Increases your armor penetration rating by %d.",
-            "Improves spell power by %d.",
+            "Increases spell power by %d.",
             "Restores %d health per 5 sec.",
-            "Improves spell penetration by %d.",
+            "Increases spell penetration by %d.",
             "Increases the block value of your shield by %d.",
             "Unknown Bonus #%d (%d)",
         )

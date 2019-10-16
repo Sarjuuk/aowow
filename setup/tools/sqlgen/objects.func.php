@@ -31,12 +31,13 @@ function objects(array $ids = [])
             0 AS event,                                                                         -- linked worldevent
             displayId,
             go.name,
-            gtl2.`name` AS name_loc2,
-            gtl3.`name` AS name_loc3,
-            gtl6.`name` AS name_loc6,
-            gtl8.`name` AS name_loc8,
-            faction,
-            flags,
+            IFNULL(gtl2.`name`, "") AS name_loc2,
+            IFNULL(gtl3.`name`, "") AS name_loc3,
+            IFNULL(gtl4.`name`, "") AS name_loc4,
+            IFNULL(gtl6.`name`, "") AS name_loc6,
+            IFNULL(gtl8.`name`, "") AS name_loc8,
+            IFNULL(goa.faction, 0),
+            IFNULL(goa.flags, 0),
             0 AS cuFlags,                                                                       -- custom Flags
             IF(`type` IN (3, 25), Data1, 0),                                                    -- lootId
             IF(`type` IN (2, 3, 6, 10, 13, 24, 26), Data0, IF(`type` IN (0, 1), Data1, 0)),     -- lockId
@@ -66,9 +67,13 @@ function objects(array $ids = [])
         FROM
             gameobject_template go
         LEFT JOIN
+            gameobject_template_addon goa ON go.entry = goa.entry
+        LEFT JOIN
             gameobject_template_locale gtl2 ON go.entry = gtl2.entry AND gtl2.`locale` = "frFR"
         LEFT JOIN
             gameobject_template_locale gtl3 ON go.entry = gtl3.entry AND gtl3.`locale` = "deDE"
+        LEFT JOIN
+            gameobject_template_locale gtl4 ON go.entry = gtl4.entry AND gtl4.`locale` = "zhCN"
         LEFT JOIN
             gameobject_template_locale gtl6 ON go.entry = gtl6.entry AND gtl6.`locale` = "esES"
         LEFT JOIN
@@ -82,6 +87,8 @@ function objects(array $ids = [])
         }
         GROUP BY
             go.entry
+        ORDER BY
+            go.entry ASC
         LIMIT
             ?d';
 
@@ -106,7 +113,7 @@ function objects(array $ids = [])
     {
         $newMax = max(array_column($objects, 'entry'));
 
-        CLISetup::log(' * sets '.($lastMax + 1).' - '.$newMax);
+        CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
 
         $lastMax = $newMax;
 

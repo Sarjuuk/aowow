@@ -9,10 +9,14 @@ if (!CLI)
 
 $customData = array(
 );
-$reqDBC = ['emotes', 'emotestext', 'emotestextdata' /*, 'emotestextsound' */];
+$reqDBC = ['emotes', 'emotestext', 'emotestextdata'];
 
 function emotes(/*array $ids = [] */)
 {
+    /**********/
+    /* Basics */
+    /**********/
+
     $globStrPath  = CLISetup::$srcDir.'%sInterface/FrameXML/GlobalStrings.lua';
     $allOK        = true;
     $locPath      = [];
@@ -37,28 +41,28 @@ function emotes(/*array $ids = [] */)
             }
         }
 
-        CLISetup::log('GlobalStrings.lua not found for selected locale '.CLISetup::bold(Util::$localeStrings[$lId]), CLISetup::LOG_WARN);
+        CLI::write('GlobalStrings.lua not found for selected locale '.CLI::bold(Util::$localeStrings[$lId]), CLI::LOG_WARN);
         $allOK = false;
     }
 
     $_= DB::Aowow()->query('REPLACE INTO ?_emotes SELECT
-            et.Id,
+            et.id,
             LOWER(et.command),
             IF(e.animationId, 1, 0),
             0,                                              -- cuFlags
-            etdT.text_loc0,  etdT.text_loc2,  etdT.text_loc3,  etdT.text_loc6,  etdT.text_loc8,
-            etdNT.text_loc0, etdNT.text_loc2, etdNT.text_loc3, etdNT.text_loc6, etdNT.text_loc8,
-            etdS.text_loc0,  etdS.text_loc2,  etdS.text_loc3,  etdS.text_loc6,  etdS.text_loc8
+            etdT.text_loc0,  etdT.text_loc2,  etdT.text_loc3,  etdT.text_loc4,  etdT.text_loc6,  etdT.text_loc8,
+            etdNT.text_loc0, etdNT.text_loc2, etdNT.text_loc3, etdNT.text_loc4, etdNT.text_loc6, etdNT.text_loc8,
+            etdS.text_loc0,  etdS.text_loc2,  etdS.text_loc3,  etdS.text_loc4,  etdS.text_loc6,  etdS.text_loc8
         FROM
             dbc_emotestext et
         LEFT JOIN
-            dbc_emotes e ON e.Id = et.emoteId
+            dbc_emotes e ON e.id = et.emoteId
         LEFT JOIN
-            dbc_emotestextdata etdT  ON etdT.Id  = et.targetId
+            dbc_emotestextdata etdT  ON etdT.id  = et.targetId
         LEFT JOIN
-            dbc_emotestextdata etdNT ON etdNT.Id = et.noTargetId
+            dbc_emotestextdata etdNT ON etdNT.id = et.noTargetId
         LEFT JOIN
-            dbc_emotestextdata etdS  ON etdS.Id  = et.selfId'
+            dbc_emotestextdata etdS  ON etdS.id  = et.selfId'
     );
 
     if (!$_)

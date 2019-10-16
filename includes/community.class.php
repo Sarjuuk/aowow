@@ -123,6 +123,8 @@ class CommunityContent
                 case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
                 case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
                 case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
+                case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
+                case TYPE_ICON:        $obj = new IconList($cnd);        break;
                 default: continue;
             }
 
@@ -308,14 +310,14 @@ class CommunityContent
 
     public static function getScreenshotPagesForManager($all, &$nFound)
     {
-        // i GUESS .. ss_getALL ? everything : unapproved
+        // i GUESS .. ss_getALL ? everything : pending
         $nFound = 0;
         $pages  = DB::Aowow()->select('
              SELECT   s.`type`, s.`typeId`, count(1) AS "count", MIN(s.`date`) AS "date"
              FROM     ?_screenshots s
             {WHERE    (s.status & ?d) = 0}
              GROUP BY s.`type`, s.`typeId`',
-            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED
+            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED | CC_FLAG_DELETED
         );
 
         if ($pages)
@@ -332,7 +334,7 @@ class CommunityContent
                 if (!$ids)
                     continue;
 
-                $tClass = new Util::$typeClasses[$t](array(['id', $ids]));
+                $tClass = new Util::$typeClasses[$t](array(['id', $ids], CFG_SQL_LIMIT_NONE));
                 foreach ($pages as &$p)
                     if ($p['type'] == $t)
                         if ($tClass->getEntry($p['typeId']))

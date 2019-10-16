@@ -47,6 +47,10 @@ class ScreenshotPage extends GenericPage
             if (empty(Util::$typeClasses[$m[1]]))
                 $this->error();
 
+            // this type cannot receive screenshots
+            if (!(get_class_vars(Util::$typeClasses[$m[1]])['contribute'] & CONTRIBUTE_SS))
+                $this->error();
+
             $t = Util::$typeClasses[$m[1]];
             $c = [['id', intVal($m[2])]];
 
@@ -91,7 +95,7 @@ class ScreenshotPage extends GenericPage
                     header('Location: ?screenshot=thankyou&'.$this->destType.'.'.$this->destTypeId, true, 302);
                 die();
             case 'thankyou':
-                $this->tpl = 'text-page-generic';
+                $this->tpl = 'list-page-generic';
                 $this->handleThankyou();
                 break;
         }
@@ -107,7 +111,7 @@ class ScreenshotPage extends GenericPage
     {
         $this->imgHash = Util::createHash(16);
 
-        if (User::$banStatus & ACC_BAN_SCREENSHOT)
+        if (!User::canUploadScreenshot())
         {
             $_SESSION['error']['ss'] = Lang::screenshot('error', 'notAllowed');
             return false;
@@ -194,7 +198,7 @@ class ScreenshotPage extends GenericPage
         if (count($dims) != 4)
             return 3;
 
-        Util::checkNumeric($dims);
+        Util::checkNumeric($dims, NUM_REQ_INT);
 
         // actually crop the image
         $srcImg = imagecreatefromjpeg($fullPath);

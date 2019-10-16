@@ -37,9 +37,9 @@ function titles()
 
     $questQuery = '
         SELECT
-             qt.RewardTitle AS ARRAY_KEY,
-             qt.AllowableRaces,
-             ge.eventEntry
+            qt.RewardTitle AS ARRAY_KEY,
+            qt.AllowableRaces,
+            IFNULL(ge.eventEntry, 0) AS eventEntry
         FROM
             quest_template qt
         LEFT JOIN
@@ -47,9 +47,9 @@ function titles()
         LEFT JOIN
             game_event ge ON ge.eventEntry = sq.eventEntry
         WHERE
-             qt.RewardTitle <> 0';
+            qt.RewardTitle <> 0';
 
-    DB::Aowow()->query('REPLACE INTO ?_titles SELECT Id, 0, 0, 0, 0, 0, 0, 0, bitIdx, male_loc0, male_loc2, male_loc3, male_loc6, male_loc8, female_loc0, female_loc2, female_loc3, female_loc6, female_loc8 FROM dbc_chartitles');
+    DB::Aowow()->query('REPLACE INTO ?_titles SELECT id, 0, 0, 0, 0, 0, 0, 0, bitIdx, male_loc0, male_loc2, male_loc3, male_loc4, male_loc6, male_loc8, female_loc0, female_loc2, female_loc3, female_loc4, female_loc6, female_loc8 FROM dbc_chartitles');
 
     // hide unused titles
     DB::Aowow()->query('UPDATE ?_titles SET cuFlags = ?d WHERE id BETWEEN 85 AND 123 AND id NOT IN (113, 120, 121, 122)', CUSTOM_EXCLUDE_FOR_LISTVIEW);
@@ -74,13 +74,13 @@ function titles()
 
     // update side
     $questInfo = DB::World()->select($questQuery);
-    $sideUpd   = DB::World()->selectCol('SELECT IF (title_A, title_A, title_H) AS ARRAY_KEY, BIT_OR(IF(title_A, 1, 2)) AS side FROM achievement_reward WHERE (title_A <> 0 AND title_H = 0) OR (title_H <> 0 AND title_A = 0) GROUP BY ARRAY_KEY HAVING side <> 3');
+    $sideUpd   = DB::World()->selectCol('SELECT IF(TitleA, TitleA, TitleH) AS ARRAY_KEY, BIT_OR(IF(TitleA, 1, 2)) AS side FROM achievement_reward WHERE (TitleA <> 0 AND TitleH = 0) OR (TitleH <> 0 AND TitleA = 0) GROUP BY ARRAY_KEY HAVING side <> 3');
     foreach ($questInfo as $tId => $data)
     {
         if ($data['eventEntry'])
             DB::Aowow()->query('UPDATE ?_titles SET eventId = ?d WHERE id = ?d', $data['eventEntry'], $tId);
 
-        $side = Util::sideByRaceMask($data['AllowableRaces']);
+        $side = Game::sideByRaceMask($data['AllowableRaces']);
         if ($side == 3)
             continue;
 
@@ -96,11 +96,6 @@ function titles()
     // update side - sourceless titles (maintain query order)
     DB::Aowow()->query('UPDATE ?_titles SET side = 2 WHERE id <= 28 OR id IN (118, 119, 116, 117, 110, 127)');
     DB::Aowow()->query('UPDATE ?_titles SET side = 1 WHERE id <= 14 OR id IN (111, 115, 112, 114, 126)');
-
-    // ! src12Ext pendant in source-script !
-    $doubles = DB::World()->selectCol('SELECT IF(title_A, title_A, title_H) AS ARRAY_KEY, GROUP_CONCAT(entry SEPARATOR " "), count(1) FROM achievement_reward WHERE title_A <> 0 OR title_H <> 0 GROUP BY ARRAY_KEY HAVING count(1) > 1');
-    foreach ($doubles as $tId => $acvIds)
-        DB::Aowow()->query('UPDATE ?_titles SET src12Ext = ?d WHERE id = ?d', explode(' ', $acvIds)[1], $tId);
 
     return true;
 }

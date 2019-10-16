@@ -16,18 +16,18 @@
 <?php $this->brick('redButtons'); ?>
 
                 <h1><?php echo $this->name; ?></h1>
-
 <?php
-    $this->brick('tooltip');
-
-    $this->brick('article');
-
-if ($this->disabled):
+if ($this->unavailable):
 ?>
 	<div class="pad"></div>
     <b style="color: red"><?php echo Lang::item('_unavailable'); ?></b>
+	<div class="pad"></div>
 <?php
 endif;
+
+    $this->brick('tooltip');
+
+    $this->brick('article');
 
 if (!empty($this->transfer)):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";

@@ -94,7 +94,7 @@ function Summary(opt) {
     }
 
     var GET = $WH.g_getGets();
-    /* sarjuuk: GET.compare => GET.items, when using flat urls */
+    /* aowow: GET.compare => GET.items, when using flat urls */
 
     this.autoSave = 1;
     if (GET.compare) {
@@ -155,7 +155,9 @@ function Summary(opt) {
         }
     }
 
-    this.initialize();
+    // aowow - data=item-scaling load is delayed from basic.js but required for heirlooms
+    // this.initialize();
+    setTimeout(this.initialize.bind(this), 250);
 }
 
 Summary.prototype = {
@@ -1413,7 +1415,7 @@ Summary.prototype = {
         var href ='?compare';
 
         if (groups) {
-            href += '=' + groups;                           // sarjuuk - with fixed urls: href += '?items=' + groups;
+            href += '=' + groups;                           // aowow - with fixed urls: href += '?items=' + groups;
 
             if (level != 80) {
                 href += '&l=' + level;
@@ -3181,7 +3183,7 @@ Summary.prototype = {
         case 13: // Enter
             g_listviews.items.submitSearch(e);
             break;
-/*  sarjuuk todo: internal misconception ... hide() and cycle(dir) are members of Livesearch and cant be reused here without further adaptation
+/*  aowow todo: internal misconception ... hide() and cycle(dir) are members of Livesearch and cant be reused here without further adaptation
         case 27: // Escape
             hide();
             break;

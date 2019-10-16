@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class TitlePage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_TITLE;
     protected $typeId        = 0;
@@ -75,7 +75,7 @@ class TitlePage extends GenericPage
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => ['name' => $this->nameFixed]
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
         // factionchange-equivalent
@@ -114,7 +114,7 @@ class TitlePage extends GenericPage
         }
 
         // tab: achievement source
-        if ($aIds = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE title_A = ?d OR title_H = ?d', $this->typeId, $this->typeId))
+        if ($aIds = DB::World()->selectCol('SELECT ID FROM achievement_reward WHERE TitleA = ?d OR TitleH = ?d', $this->typeId, $this->typeId))
         {
             $acvs = new AchievementList(array(['id', $aIds]));
             if (!$acvs->error)

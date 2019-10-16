@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  0: Database g_initHeader()
 class RacesPage extends GenericPage
 {
-    use ListPage;
+    use TrListPage;
 
     protected $type          = TYPE_RACE;
     protected $tpl           = 'list-page-generic';
@@ -30,9 +30,12 @@ class RacesPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $data  = [];
         $races = new CharRaceList($conditions);
         if (!$races->error)
-            $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
+            $data = array_values($races->getListviewData());
+
+        $this->lvTabs[] = ['race', ['data' => $data]];
     }
 
     protected function generateTitle()

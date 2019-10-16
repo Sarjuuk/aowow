@@ -8,11 +8,12 @@ class SkillList extends BaseType
 {
     public static   $type      = TYPE_SKILL;
     public static   $brickFile = 'skill';
+    public static   $dataTable = '?_skillline';
 
-    protected       $queryBase = 'SELECT *, sl.id AS ARRAY_KEY FROM ?_skillline sl';
+    protected       $queryBase = 'SELECT sl.*, sl.id AS ARRAY_KEY FROM ?_skillline sl';
     protected       $queryOpts = array(
-                        'sl' => [['si']],
-                        'si' => ['j' => '?_icons si ON si.id = sl.iconId', 's' => ', si.iconString'],
+                        'sl' => [['ic']],
+                        'ic' => ['j' => ['?_icons ic ON ic.id = sl.iconId', true], 's' => ', ic.name AS iconString'],
                     );
 
     public function __construct($conditions = [])
@@ -31,12 +32,15 @@ class SkillList extends BaseType
                 while (count($_) < 5)
                     $_[] = 0;
             }
+
+            if (!$_curTpl['iconId'])
+                $_curTpl['iconString'] = 'inv_misc_questionmark';
         }
     }
 
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_skillline WHERE id = ?d', $id);
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_skillline WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 
@@ -53,7 +57,7 @@ class SkillList extends BaseType
                 'name'            => Util::jsEscape($this->getField('name', true)),
                 'profession'      => $this->curTpl['professionMask'],
                 'recipeSubclass'  => $this->curTpl['recipeSubClass'],
-                'specializations' => Util::toJSON($this->curTpl['specializations']),
+                'specializations' => Util::toJSON($this->curTpl['specializations'], JSON_NUMERIC_CHECK),
                 'icon'            => Util::jsEscape($this->curTpl['iconString'])
             );
         }

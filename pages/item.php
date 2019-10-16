@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId 0: Database g_initHeader()
 class ItemPage extends genericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ITEM;
     protected $typeId        = 0;
@@ -54,15 +54,15 @@ class ItemPage extends genericPage
 
             // allow lookup by name for xml
             if (!is_numeric($param))
-                $conditions = [['name_loc'.User::$localeId, utf8_encode(urldecode($param))]];
-
-            if (!is_numeric($param))
-                $this->typeId = $this->subject->id;
+                $conditions = [['name_loc'.User::$localeId, urldecode($param)]];
         }
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
             $this->notFound();
+
+        if (!is_numeric($param))
+            $this->typeId = $this->subject->id;
 
         $this->name = $this->subject->getField('name', true);
 
@@ -144,6 +144,13 @@ class ItemPage extends genericPage
             if ($si != 3)
                 $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($si == 1 ? 'alliance' : 'horde').']'.Lang::game('si', $si).'[/span]';
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         // consumable / not consumable
         if (!$_slot)
         {
@@ -185,45 +192,54 @@ class ItemPage extends genericPage
             $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::item('each').')[/color]' : null;
             $handled  = [];
             $costList = [];
-            foreach ($vendors as $npcId => $data)
+            foreach ($vendors as $npcId => $entries)
             {
-                $tokens   = [];
-                $currency = [];
-
-                if (!is_array($data))
-                    continue;
-
-                foreach ($data as $c => $qty)
+                foreach ($entries as $data)
                 {
-                    if (is_string($c))
-                    {
-                        unset($data[$c]);                   // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
+                    $tokens   = [];
+                    $currency = [];
+
+                    if (!is_array($data))
                         continue;
+
+                    foreach ($data as $c => $qty)
+                    {
+                        if (is_string($c))
+                        {
+                            unset($data[$c]);               // unset miscData to prevent having two vendors /w the same cost being cached, because of different stock or rating-requirements
+                            continue;
+                        }
+
+                        if ($c < 0)                         // currency items (and honor or arena)
+                        {
+                            $currency[] = -$c.','.$qty;
+                            $this->extendGlobalIds(TYPE_CURRENCY, -$c);
+                        }
+                        else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
+                        {
+                            $tokens[$c] = $c.','.$qty;
+                            $this->extendGlobalIds(TYPE_ITEM, $c);
+                        }
                     }
 
-                    if ($c < 0)                             // currency items (and honor or arena)
-                        $currency[] = -$c.','.$qty;
-                    else if ($c > 0)                        // plain items (item1,count1,item2,count2,...)
-                        $tokens[$c] = $c.','.$qty;
+                    // display every cost-combination only once
+                    if (in_array(md5(serialize($data)), $handled))
+                        continue;
+
+                    $handled[] = md5(serialize($data));
+
+                    $cost = isset($data[0]) ? '[money='.$data[0] : '[money';
+
+                    if ($tokens)
+                        $cost .= ' items='.implode(',', $tokens);
+
+                    if ($currency)
+                        $cost .= ' currency='.implode(',', $currency);
+
+                    $cost .= ']';
+
+                    $costList[] = $cost;
                 }
-
-                // display every cost-combination only once
-                if (in_array(md5(serialize($data)), $handled))
-                    continue;
-
-                $handled[] = md5(serialize($data));
-
-                $cost = isset($data[0]) ? '[money='.$data[0] : '[money';
-
-                if ($tokens)
-                    $cost .= ' items='.implode(',', $tokens);
-
-                if ($currency)
-                    $cost .= ' currency='.implode(',', $currency);
-
-                $cost .= ']';
-
-                $costList[] = $cost;
             }
 
             if (count($costList) == 1)
@@ -261,7 +277,7 @@ class ItemPage extends genericPage
 
         // avg auction buyout
         if (in_array($this->subject->getField('bonding'), [0, 2, 3]))
-            if ($_ = Util::getBuyoutForItem($this->typeId))
+            if ($_ = Profiler::getBuyoutForItem($this->typeId))
                 $infobox[] = '[tooltip=tooltip_buyoutprice]'.Lang::item('buyout.').'[/tooltip]'.Lang::main('colon').'[money='.$_.']'.$each;
 
         // avg money contained
@@ -330,25 +346,7 @@ class ItemPage extends genericPage
 
         // pageText
         $pageText = [];
-        if ($next = $this->subject->getField('pageTextId'))
-        {
-            while ($next)
-            {
-                if ($row = DB::World()->selectRow('SELECT *, Text as Text_loc0 FROM page_text pt LEFT JOIN locales_page_text lpt ON pt.ID = lpt.entry WHERE pt.ID = ?d', $next))
-                {
-                    $next = $row['NextPageID'];
-                    $pageText[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
-                }
-                else
-                {
-                    trigger_error('Referenced PageTextId #'.$next.' is not in DB', E_USER_WARNING);
-                    break;
-                }
-            }
-        }
-
-        // add conditional js & css
-        if ($pageText)
+        if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
         {
             $this->addJS('Book.js');
             $this->addCSS(['path' => 'Book.css']);
@@ -356,19 +354,24 @@ class ItemPage extends genericPage
 
         $this->headIcons  = [$this->subject->getField('iconString'), $this->subject->getField('stackable')];
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->pageText   = $pageText;
         $this->tooltip    = $this->subject->renderTooltip(true);
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => ['color' => 'ff'.Util::$rarityColorStings[$this->subject->getField('quality')], 'linkId' => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0'],
             BUTTON_VIEW3D  => in_array($_slot, $_visSlots) && $_model ? ['displayId' => $this->subject->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $this->typeId] : false,
             BUTTON_COMPARE => $_cu,
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
-            BUTTON_UPGRADE => $_cu ? ['class' => $_class, 'slot' => $_slot] : false
+            BUTTON_UPGRADE => ($_cu ? ['class' => $_class, 'slot' => $_slot] : false),
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->getField('quality')],
+                'linkId'    => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0',
+                'linkName'  => $this->name,
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
         );
 
         // availablility
-        $this->disabled = false;    // todo (med): get itemSources (which are not yet in DB :x) or
+        $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
 
         // subItems
         $this->subject->initSubItems();
@@ -454,7 +457,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($lootTabs->jsGlobals);
 
-            foreach ($lootTabs->iterate() as $idx => list($file, $tabData))
+            foreach ($lootTabs->iterate() as $idx => [$file, $tabData])
             {
                 if (!$tabData['data'])
                     continue;
@@ -488,7 +491,7 @@ class ItemPage extends genericPage
                     if (!$lv['quest'])
                         continue;
 
-                    $sf[4] = array_merge($sf[4], ['Listview.extraCols.condition']);
+                    $sf[4] = array_merge($sf[4], ['$Listview.extraCols.condition']);
 
                     $reqQuest[$lv['id']] = 0;
 
@@ -773,7 +776,9 @@ class ItemPage extends genericPage
                 {
                     $currency = [];
                     $tokens   = [];
-                    foreach ($vendors[$k] as $id => $qty)
+
+                    // note: can only display one entry per row, so only use first entry of each vendor
+                    foreach ($vendors[$k][0] as $id => $qty)
                     {
                         if (is_string($id))
                             continue;
@@ -784,16 +789,10 @@ class ItemPage extends genericPage
                             $currency[] = [-$id, $qty];
                     }
 
-                    if ($currency)
-                        $this->extendGlobalIds(TYPE_CURRENCY, array_column($currency, 0));
+                    $row['stock'] = $vendors[$k][0]['stock'];
+                    $row['cost']  = [empty($vendors[$k][0][0]) ? 0 : $vendors[$k][0][0]];
 
-                    if ($tokens)
-                        $this->extendGlobalIds(TYPE_ITEM, array_column($tokens, 0));
-
-                    $row['stock'] = $vendors[$k]['stock'];
-                    $row['cost']  = [empty($vendors[$k][0]) ? 0 : $vendors[$k][0]];
-
-                    if ($e = $vendors[$k]['event'])
+                    if ($e = $vendors[$k][0]['event'])
                     {
                         if (count($extraCols) == 3)
                             $extraCols[] = '$Listview.extraCols.condition';
@@ -869,7 +868,7 @@ class ItemPage extends genericPage
 
                 $this->lvTabs[] = ['item', $tabData];
 
-                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_ANY));
+                $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
         }
 
@@ -892,7 +891,7 @@ class ItemPage extends genericPage
                     foreach ($_ as $idx)
                         $ids[] = $indirectSpells->getField('effect'.$idx.'TriggerSpell');
 
-            $ids = array_merge($ids, Util::getTaughtSpells($indirect));
+            $ids = array_merge($ids, Game::getTaughtSpells($indirect));
         }
 
         if ($ids)
@@ -916,21 +915,40 @@ class ItemPage extends genericPage
         }
 
         // tab: Shared cooldown
-        $cdCats = [];
+        $cdCats    = [];
+        $useSpells = [];
         for ($i = 1; $i < 6; $i++)
+        {
+            // as defined on item
             if ($this->subject->getField('spellId'.$i) > 0 && $this->subject->getField('spellCategory'.$i) > 0)
                 $cdCats[] = $this->subject->getField('spellCategory'.$i);
+
+            // as defined in spell
+            if ($this->subject->getField('spellId'.$i) > 0)
+                $useSpells[] = $this->subject->getField('spellId'.$i);
+        }
+        if ($useSpells)
+            if ($_ = DB::Aowow()->selectCol('SELECT category FROM ?_spell WHERE id IN (?a) AND recoveryCategory > 0', $useSpells))
+                $cdCats += $_;
 
         if ($cdCats)
         {
             $conditions = array(
-                'OR',
-                ['spellCategory1', $cdCats],
-                ['spellCategory2', $cdCats],
-                ['spellCategory3', $cdCats],
-                ['spellCategory4', $cdCats],
-                ['spellCategory5', $cdCats]
+                ['id', $this->typeId, '!'],
+                [
+                    'OR',
+                    ['spellCategory1', $cdCats],
+                    ['spellCategory2', $cdCats],
+                    ['spellCategory3', $cdCats],
+                    ['spellCategory4', $cdCats],
+                    ['spellCategory5', $cdCats],
+                ]
             );
+
+            if ($spellsByCat = DB::Aowow()->selectCol('SELECT id FROM ?_spell WHERE category IN (?a)', $cdCats))
+                for ($i = 1; $i < 6; $i++)
+                    $conditions[1][] = ['spellId'.$i, $spellsByCat];
+
             $cdItems = new ItemList($conditions);
             if (!$cdItems->error)
             {
@@ -943,6 +961,44 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($cdItems->getJSGlobals(GLOBALINFO_SELF));
             }
         }
+
+        // tab: sounds
+        $soundIds = [];
+        if ($_class == ITEM_CLASS_WEAPON)
+        {
+            $scm = (1 << $_subClass);
+            if ($this->subject->getField('soundOverrideSubclass') > 0)
+                $scm = (1 << $this->subject->getField('soundOverrideSubclass'));
+
+            $soundIds = DB::Aowow()->selectCol('SELECT soundId FROM ?_items_sounds WHERE subClassMask & ?d', $scm);
+        }
+
+        $fields = ['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'];
+        foreach ($fields as $f)
+            if ($x = $this->subject->getField($f))
+                $soundIds[] = $x;
+
+        if ($x = $this->subject->getField('spellVisualId'))
+        {
+            if ($spellSounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE id = ?d', $x))
+            {
+                array_shift($spellSounds);                  // bye 'id'-field
+                foreach ($spellSounds as $ss)
+                    if ($ss)
+                        $soundIds[] = $ss;
+            }
+        }
+
+        if ($soundIds)
+        {
+            $sounds = new SoundList(array(['id', $soundIds]));
+            if (!$sounds->error)
+            {
+                $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
+                $this->lvTabs[] = ['sound', ['data' => array_values($sounds->getListviewData())]];
+            }
+        }
+
 
         // // todo - tab: taught by
         // use var $createdBy to find source of this spell
@@ -960,9 +1016,9 @@ class ItemPage extends genericPage
             return '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})';
 
         $x  = '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true, $this->enhancedTT))."',\n";
+        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true, false, $this->enhancedTT))."',\n";
         $x .= "\tquality: ".$this->subject->getField('quality').",\n";
-        $x .= "\ticon: '".urlencode($this->subject->getField('iconString'))."',\n";
+        $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
         $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip(false, 0, $this->enhancedTT))."'\n";
         $x .= "});";
 
@@ -1058,7 +1114,7 @@ class ItemPage extends genericPage
             {
                 $j = '';
                 foreach ($onUse as $idx => $qty)
-                    $j .= ',"'.Util::$itemMods[$idx].'":'.$qty;
+                    $j .= ',"'.Game::$itemMods[$idx].'":'.$qty;
 
                 $xml->addChild('jsonUse')->addCData(substr($j, 1));
             }

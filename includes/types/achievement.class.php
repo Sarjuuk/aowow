@@ -8,17 +8,18 @@ class AchievementList extends BaseType
 {
     use listviewHelper;
 
-    public static $type      = TYPE_ACHIEVEMENT;
-    public static $brickFile = 'achievement';
+    public static   $type      = TYPE_ACHIEVEMENT;
+    public static   $brickFile = 'achievement';
+    public static   $dataTable = '?_achievement';
 
-    public        $criteria  = [];
+    public          $criteria  = [];
 
-    protected     $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
-    protected     $queryOpts = array(
-                          'a' => [['si'], 'o' => 'orderInGroup ASC'],
-                         'si' => ['j' => ['?_icons si ON si.id = a.iconId', true], 's' => ', si.iconString'],
-                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
-                  );
+    protected       $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected       $queryOpts = array(
+                        'a' => [['ic'], 'o' => 'orderInGroup ASC'],
+                        'ic' => ['j' => ['?_icons ic ON ic.id = a.iconId', true], 's' => ', ic.name AS iconString'],
+                        'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
+                    );
 
     /*
         todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation
@@ -33,7 +34,24 @@ class AchievementList extends BaseType
 
         // post processing
         $rewards = DB::World()->select('
-            SELECT ar.entry AS ARRAY_KEY, ar.*, lar.* FROM achievement_reward ar LEFT JOIN locales_achievement_reward lar ON lar.entry = ar.entry WHERE ar.entry IN (?a)',
+            SELECT
+                ar.ID AS ARRAY_KEY, ar.TitleA, ar.TitleH, ar.ItemID, ar.Sender AS sender, ar.MailTemplateID,
+                ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl4.Subject, "") AS subject_loc4, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
+                ar.Text    AS text_loc0,    IFNULL(arl2.Text,    "") AS text_loc2,    IFNULL(arl3.Text,    "") AS text_loc3,    IFNULL(arl4.Text,    "") AS text_loc4,    IFNULL(arl6.Text,    "") AS text_loc6,    IFNULL(arl8.Text,    "") AS text_loc8
+            FROM
+                achievement_reward ar
+            LEFT JOIN
+                achievement_reward_locale arl2 ON arl2.ID = ar.ID AND arl2.Locale = "frFR"
+            LEFT JOIN
+                achievement_reward_locale arl3 ON arl3.ID = ar.ID AND arl3.Locale = "deDE"
+            LEFT JOIN
+                achievement_reward_locale arl4 ON arl4.ID = ar.ID AND arl4.Locale = "zhCN"
+            LEFT JOIN
+                achievement_reward_locale arl6 ON arl6.ID = ar.ID AND arl6.Locale = "esES"
+            LEFT JOIN
+                achievement_reward_locale arl8 ON arl8.ID = ar.ID AND arl8.Locale = "ruRU"
+            WHERE
+                ar.ID IN (?a)',
             $this->getFoundIDs()
         );
 
@@ -45,7 +63,7 @@ class AchievementList extends BaseType
             {
                 $_curTpl = array_merge($rewards[$_id], $_curTpl);
 
-                if ($rewards[$_id]['mailTemplate'])
+                if ($rewards[$_id]['MailTemplateID'])
                 {
                     // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
                     // $mailSrc = new Loot();
@@ -54,22 +72,22 @@ class AchievementList extends BaseType
                         // $_curTpl['rewards'][] = [TYPE_ITEM, $loot['id']];
 
                     // lets just assume for now, that mailRewards for achievements do not contain references
-                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['mailTemplate']);
+                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['MailTemplateID']);
                     foreach ($mailRew AS $mr)
                         $_curTpl['rewards'][] = [TYPE_ITEM, $mr];
                 }
             }
 
             //"rewards":[[11,137],[3,138]]   [type, typeId]
-            if (!empty($_curTpl['item']))
-                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['item']];
+            if (!empty($_curTpl['ItemID']))
+                $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['ItemID']];
             if (!empty($_curTpl['itemExtra']))
                 $_curTpl['rewards'][] = [TYPE_ITEM, $_curTpl['itemExtra']];
-            if (!empty($_curTpl['title_A']))
-                $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_A']];
-            if (!empty($_curTpl['title_H']))
-                if (empty($_curTpl['title_A']) || $_curTpl['title_A'] != $_curTpl['title_H'])
-                    $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['title_H']];
+            if (!empty($_curTpl['TitleA']))
+                $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['TitleA']];
+            if (!empty($_curTpl['TitleH']))
+                if (empty($_curTpl['TitleA']) || $_curTpl['TitleA'] != $_curTpl['TitleH'])
+                    $_curTpl['rewards'][] = [TYPE_TITLE, $_curTpl['TitleH']];
 
             // icon
             $_curTpl['iconString'] = $_curTpl['iconString'] ?: 'trade_engineering';
@@ -280,61 +298,41 @@ class AchievementListFilter extends Filter
               321 => -1,   424 => -1,   301 => -1
         )
     );
+
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_BOOLEAN,   'reward_loc0',    true                      ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',         true                      ], // rewardtext
-         7 => [FILTER_CR_BOOLEAN,   'chainId',                                  ], // partseries
-         9 => [FILTER_CR_NUMERIC,   'id',             null,                 true], // id
-        10 => [FILTER_CR_STRING,    'si.iconString',                            ], // icon
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                                    ], // flags
-        14 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_COMMENT        ], // hascomments
-        15 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        16 => [FILTER_CR_FLAG,      'cuFlags',        CUSTOM_HAS_VIDEO          ], // hasvideos
+         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
+         3 => [FILTER_CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
+         4 => [FILTER_CR_NYI_PH,    null,          1,                               ], // location [enum]
+         5 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_FIRST_SERIES, null], // first in series [yn]
+         6 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_LAST_SERIES,  null], // last in series [yn]
+         7 => [FILTER_CR_BOOLEAN,   'chainId',                                      ], // partseries
+         9 => [FILTER_CR_NUMERIC,   'id',          NUM_CAST_INT,                true], // id
+        10 => [FILTER_CR_STRING,    'ic.name',                                      ], // icon
+        11 => [FILTER_CR_CALLBACK,  'cbRelEvent', null,                         null], // related event [enum]
+        14 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT               ], // hascomments
+        15 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT            ], // hasscreenshots
+        16 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO                 ], // hasvideos
+        18 => [FILTER_CR_STAFFFLAG, 'flags',                                        ]  // flags
+    );
+
+    // fieldId => [checkType, checkValue[, fieldIsArray]]
+    protected $inputFields = array(
+        'cr'    => [FILTER_V_RANGE, [2, 18],                                         true ], // criteria ids
+        'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
+        'crv'   => [FILTER_V_REGEX, '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                             false], // name / description - only printable chars, no delimiter
+        'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // extended name search
+        'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
+        'si'    => [FILTER_V_LIST,  [1, 2, 3, -1, -2],                               false], // side
+        'minpt' => [FILTER_V_RANGE, [1, 99],                                         false], // required level min
+        'maxpt' => [FILTER_V_RANGE, [1, 99],                                         false]  // required level max
     );
 
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-        {
             if ($genCr = $this->genericCriterion($cr))
                 return $genCr;
-
-            unset($cr);
-            $this->error = true;
-            return [1];
-        }
-
-        switch ($cr[0])
-        {
-            case 4:                                         // location [enum]
-/* todo */      return [1];                                 // no plausible locations parsed yet
-            case 5:                                         // first in series [yn]
-                if ($this->int2Bool($cr[1]))
-                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_FIRST_SERIES, '&'], 0]];
-
-                break;
-            case 6:                                         // last in series [yn]
-                if ($this->int2Bool($cr[1]))
-                    return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', ACHIEVEMENT_CU_LAST_SERIES, '&'], 0]];
-
-                break;
-            case 11:                                        // Related Event [enum]
-                $_ = isset($this->enums[$cr[0]][$cr[1]]) ? $this->enums[$cr[0]][$cr[1]] : null;
-                if ($_ !== null)
-                {
-                    if (is_int($_))
-                        return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
-                    else
-                    {
-                        $ids = array_filter($this->enums[$cr[0]], function($x) {
-                            return is_int($x) && $x > 0;
-                        });
-
-                        return ['category', $ids, $_ ? null : '!'];
-                    }
-                }
-                break;
-        }
 
         unset($cr);
         $this->error = true;
@@ -361,44 +359,56 @@ class AchievementListFilter extends Filter
 
         // points min
         if (isset($_v['minpt']))
-        {
-            if ($this->isSaneNumeric($_v['minpt']))
-                $parts[] = ['points', $_v['minpt'],  '>='];
-            else
-                unset($_v['minpt']);
-        }
+            $parts[] = ['points', $_v['minpt'],  '>='];
 
         // points max
         if (isset($_v['maxpt']))
-        {
-            if ($this->isSaneNumeric($_v['maxpt']))
-                $parts[] = ['points', $_v['maxpt'],  '<='];
-            else
-                unset($_v['maxpt']);
-        }
+            $parts[] = ['points', $_v['maxpt'],  '<='];
 
         // faction (side)
         if (isset($_v['si']))
         {
             switch ($_v['si'])
             {
-                case 3:                                     // both
-                    $parts[] = ['faction', 0];
-                    break;
                 case -1:                                    // faction, exclusive both
                 case -2:
                     $parts[] = ['faction', -$_v['si']];
                     break;
                 case 1:                                     // faction, inclusive both
                 case 2:
-                    $parts[] = ['OR', ['faction', 0], ['faction', $_v['si']]];
+                case 3:                                     // both
+                    $parts[] = ['faction', $_v['si'], '&'];
                     break;
-                default:
-                    unset($_v['si']);
             }
         }
 
         return $parts;
+    }
+
+    protected function cbRelEvent($cr, $value)
+    {
+        if (!isset($this->enums[$cr[0]][$cr[1]]))
+            return false;
+
+        $_ = $this->enums[$cr[0]][$cr[1]];
+        if (is_int($_))
+            return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
+        else
+        {
+            $ids = array_filter($this->enums[$cr[0]], function($x) { return is_int($x) && $x > 0; });
+
+            return ['category', $ids, $_ ? null : '!'];
+        }
+
+        return false;
+    }
+
+    protected function cbSeries($cr, $value)
+    {
+        if ($this->int2Bool($cr[1]))
+            return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', $value, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', $value, '&'], 0]];
+
+        return false;
     }
 }
 

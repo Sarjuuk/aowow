@@ -6,15 +6,16 @@ if (!defined('AOWOW_REVISION'))
 
 class FactionList extends BaseType
 {
-    public static $type      = TYPE_FACTION;
-    public static $brickFile = 'faction';
+    public static   $type      = TYPE_FACTION;
+    public static   $brickFile = 'faction';
+    public static   $dataTable = '?_factions';
 
-    protected     $queryBase = 'SELECT f.*, f.parentFactionId AS cat, f.id AS ARRAY_KEY FROM ?_factions f';
-    protected     $queryOpts = array(
-                      'f'  => [['f2']],
-                      'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2'],
-                      'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
-                  );
+    protected       $queryBase = 'SELECT f.*, f.parentFactionId AS cat, f.id AS ARRAY_KEY FROM ?_factions f';
+    protected       $queryOpts = array(
+                        'f'  => [['f2']],
+                        'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2'],
+                        'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
+                    );
 
     public function __construct($conditions = [])
     {
@@ -36,7 +37,7 @@ class FactionList extends BaseType
 
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_factions WHERE id = ?d', $id);
+        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_factions WHERE id = ?d', $id);
         return Util::localizedString($n, 'name');
     }
 

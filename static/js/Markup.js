@@ -27,6 +27,11 @@ MarkupSourceMap[MARKUP_SOURCE_LIVE] = 'live';
 MarkupSourceMap[MARKUP_SOURCE_PTR]  = 'ptr';
 MarkupSourceMap[MARKUP_SOURCE_BETA] = 'beta';
 
+var MarkupDomainRegexMap = {
+    betaPtrLang: /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/,
+    lang: /^(www|fr|de|cn|es|ru)$/                          // Aowowo - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
+};
+
 var Markup = {
     MODE_COMMENT:    MARKUP_MODE_COMMENT,
     MODE_REPLY:         MARKUP_MODE_REPLY,
@@ -70,6 +75,7 @@ var Markup = {
         'mop': 'beta',
         'fr': 'frfr',
         'de': 'dede',
+        'cn': 'zhcn',
         'es': 'eses',
         'ru': 'ruru',
         'pt': 'ptbr'
@@ -190,11 +196,13 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                diff: { req: false, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed:  { req: true,  valid: /^[0-9]+$/ },
+                diff:     { req: false, valid: /^[0-9]+$/ },
+                icon:     { req: false, valid: /^false$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
+                tempname: { req: false }
+
             },
             validate: function(attr)
             {
@@ -209,16 +217,19 @@ var Markup = {
                 var url = domainInfo[0];
                 var nameCol = domainInfo[1];
                 var rel = [];
+                var tempname = null;
 
                 if(attr.diff)
                     rel.push('diff=' + attr.diff);
+                if(attr.tempname)
+                    tempname = attr.tempname;
 
                 if(g_achievements[id] && g_achievements[id][nameCol])
                 {
                     var ach = g_achievements[id];
                     return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + ach.icon.toLowerCase() + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(ach[nameCol]) + '</span></a>';
                 }
-                return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[10][0] + ' #' + id + ')</a>';
+                return '<a href="' + url + '?achievement=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[10][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
@@ -340,10 +351,10 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/i },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                icon:    { req: false, valid: /^false$/i },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -436,11 +447,11 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                amount: { req: false, valid: /^[0-9\:]+$/ },
-                icon: { req: false, valid: /^false$/i },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                amount:  { req: false, valid: /^[0-9\:]+$/ },
+                icon:    { req: false, valid: /^false$/i },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
@@ -532,12 +543,13 @@ var Markup = {
             itrim: true,
             attr:
             {
-                clear: { req: false, valid: /^(left|right|both)$/i },
+                clear:   { req: false, valid: /^(left|right|both)$/i },
                 unnamed: { req: false, valid: /^hidden$/i },
                 'float': { req: false, valid: /^(left|right)$/i },
-                align: { req: false, valid: /^(left|right|center)$/i },
-                margin: { req: false, valid: /^\d+(px|em|\%)$/ },
-                width: { req: false, valid: /^[0-9]+(px|em|\%)$/ }
+                align:   { req: false, valid: /^(left|right|center)$/i },
+                margin:  { req: false, valid: /^\d+(px|em|\%)$/ },
+                style:   { req: false, valid: /^[^"<>]+$/ },
+                width:   { req: false, valid: /^[0-9]+(px|em|\%)$/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             toHtml: function(attr)
@@ -552,21 +564,14 @@ var Markup = {
                     styles.push('display: none');
                 if(attr.width)
                     styles.push('width: ' + attr.width);
-                if(attr['float'])
-                {
-                    styles.push('float: ' + attr['float']);
-                    if(attr.margin === undefined)
-                    {
-                        if(attr['float'] == 'left')
-                            styles.push('margin: 0 10px 10px 0');
-                        else
-                            styles.push('margin: 0 0 10px 10px');
-                    }
-                }
+                if (attr['float'])
+                    classes.push('markup-float-' + attr['float']);
                 if(attr.align)
                     styles.push('text-align: ' + attr.align);
                 if(attr.margin)
                     styles.push('margin: ' + attr.margin);
+                if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
+                    styles.push(attr.style)
                 if(attr.first)
                     classes.push('first');
                 if(attr.last)
@@ -605,9 +610,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -645,9 +650,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -685,9 +690,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^-?[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^-?[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
@@ -727,9 +732,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -809,8 +814,9 @@ var Markup = {
             attr:
             {
                 unnamed: { req: false, valid: /^first$/i },
-                clear: { req: false, valid: /^(true|both|left|right)$/i },
-                toc: { req: false, valid: /^false$/i }
+                clear:   { req: false, valid: /^(true|both|left|right)$/i },
+                style:   { req: false, valid: /^[^"<>]+$/ },
+                toc:     { req: false, valid: /^false$/i }
             },
             toHtml: function(attr)
             {
@@ -824,13 +830,18 @@ var Markup = {
                     classes.push('last');
                 if(classes.length > 0)
                     str += ' class="' + classes.join(' ') + '"';
+                var styles = [];
                 if(attr.clear)
                 {
                     if(attr.clear == 'true' || attr.clear == 'both')
-                        str += ' style="clear: both"';
+                        styles.push('clear: both');
                     else
-                        str += ' style="clear: ' + attr.clear + '"';
+                        styles.push('clear: ' + attr.clear);
                 }
+                if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
+                    styles.push(attr.style);
+                if(styles.length)
+                    str += ' styles="' + styles.join(';') + '"';
                 return [str + '>', '</h2>'];
             },
             fromHtml: function(str)
@@ -848,7 +859,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: false, valid: /^first$/i },
-                toc: { req: false, valid: /^false$/i }
+                style:   { req: false, valid: /^[^"<>]+$/ },
+                toc:     { req: false, valid: /^false$/i }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             toHtml: function(attr)
@@ -863,6 +875,11 @@ var Markup = {
                     classes.push('last');
                 if(classes.length > 0)
                     str += ' class="' + classes.join(' ') + '"';
+                var styles = [];
+                if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
+                    styles.push(attr.style);
+                if(styles.length)
+                    str += ' styles="' + styles.join(';') + '"';
                 return [str + '>', '</h3>'];
             },
             fromHtml: function(str)
@@ -892,7 +909,7 @@ var Markup = {
             },
             fromHtml: function(str)
             {
-                return str.replace(/<(i|em)\b[\s\S]*?>([\s\S]*?)<\/\1>/gi, '[i]$1[/i]');
+                return str.replace(/<(i|em)\b[\s\S]*?>([\s\S]*?)<\/\1>/gi, '[i]$2[/i]');
             }
         },
         icon:
@@ -901,16 +918,17 @@ var Markup = {
             itrim: true,
             attr:
             {
-                align: { req: false, valid: /^right$/i },
+                align:   { req: false, valid: /^right$/i },
                 'float': { req: false, valid: /^(left|right)$/i },
-                name: { req: false, valid: /\S+/ },
-                size: { req: false, valid: /^(tiny|small|medium|large)$/ },
+                name:    { req: false, valid: /\S+/ },
+                size:    { req: false, valid: /^(tiny|small|medium|large)$/ },
                 unnamed: { req: false, valid: /^class$/i },
-                url: { req: false, valid: /\S+/ },
-                preset: { req: false, valid: /\S+/ }
+                url:     { req: false, valid: /\S+/ },
+                preset : { req: false, valid: /\S+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
-            presets: {
+            presets:
+            {
                 boss:   g_staticUrl + '/images/icons/boss.gif',
                 heroic: g_staticUrl + '/images/icons/heroic.gif'
             },
@@ -969,6 +987,80 @@ var Markup = {
                 }
             }
         },
+        icondb:
+        {
+            empty: true,
+            allowInReplies: true,
+            attr:
+            {
+                unnamed:  { req: true,  valid: /^[0-9]+$/ },
+                block:    { req: false, valid: /^(true|false)$/ },
+                size:     { req: false, valid: /^(tiny|small|medium|large)$/ },
+                name:     { req: false, valid: /^true$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
+                diff:     { req: false, valid: /^[0-9]+$/ },
+                tempname: { req: false }
+            },
+            validate: function(attr)
+            {
+                if ((attr.domain || attr.site) && Markup.dbpage)
+                    return false;
+                return true
+            },
+            toHtml: function(attr) {
+                var size = attr.size ? attr.size : 'small';
+                var hasName = attr.name == 'true';
+                var id = attr.unnamed;
+                var domain = Markup._getDatabaseDomainInfo(attr);
+                var url = domain[0];
+                var href = url + '?icon=' + id;
+                var rel = [];
+                var tempname = null;
+
+                if (attr.diff);
+                    rel.push('diff=' + attr.diff);
+                if (attr.tempname)
+                    tempname = attr.tempname;
+
+                if (g_icons[id] && g_icons[id].name)
+                {
+                    // href += '/' + $WH.urlize(g_icons[id].name);         AoWoW  - SEO not used
+                    var icon = g_icons[id];
+                    if (hasName)
+                    {
+                        if (size == 'tiny')
+                            return '<a href="' + href + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + icon.icon.toLowerCase() + '.gif" align="absmiddle"' : '') + Markup._addGlobalAttributes(attr) + '> ' + Markup._safeHtml(icon.name) + '</a>'
+                        else
+                        {
+                            var a = $WH.ce('a', { href: href });
+                            var div = $WH.ce('div', null, a);
+                            $WH.ae(a, Icon.create(icon.name, Icon.sizeIds[size], null, false, null, null, null, null, true));
+                            a.innerHTML += Markup._safeHtml(icon.name);
+
+                            return div.innerHTML;
+                        }
+                    }
+                    else
+                    {
+                        var div = $WH.ce('div');
+                        $WH.ae(div, Icon.create(icon.name, Icon.sizeIds[size], null, href, null, null, null, null, attr.block != 'true'));
+
+                        return div.innerHTML;
+                    }
+                }
+
+                return '<a href="' + href + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[29][0] + ' #' + id + ')')) + '</a>';
+            },
+            toText: function(attr)
+            {
+                var id = attr.unnamed;
+
+                if(g_icons[id] && g_icons[id].name)
+                    return Markup._safeHtml(g_icons[id].name);
+                return LANG.types[29][0] + ' #' + id;
+            }
+        },
         iconlist:
         {
             empty: false,
@@ -977,7 +1069,7 @@ var Markup = {
             rtrim: true,
             attr:
             {
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain: { req: false, valid: MarkupDomainRegexMap.lang }
             },
             taglessSkip: true,
             allowedClass: MARKUP_CLASS_STAFF,
@@ -1022,16 +1114,17 @@ var Markup = {
             empty: true,
             attr:
             {
-                src: { req: false, valid: /\S+/ },
-                icon: { req: false, valid: /\S+/ },
-                id: { req: false, valid: /^[0-9]+$/ },
-                blog: { req: false, valid: /^[0-9]+$/ },
-                size: { req: false, valid: /^(thumb|resized|normal|large|medium|small|tiny)$/i },
-                width: { req: false, valid: /^[0-9]+$/ },
-                height: { req: false, valid: /^[0-9]+$/ },
+                src:     { req: false, valid: /\S+/ },
+                icon:    { req: false, valid: /\S+/ },
+                id:      { req: false, valid: /^[0-9]+$/ },
+                blog:    { req: false, valid: /^[0-9]+$/ },
+                size:    { req: false, valid: /^(thumb|resized|normal|large|medium|small|tiny)$/i },
+                width:   { req: false, valid: /^[0-9]+$/ },
+                height:  { req: false, valid: /^[0-9]+$/ },
                 'float': { req: false, valid: /^(left|right|center)$/i },
-                border: { req: false, valid: /^[0-9]+$/ },
-                margin: { req: false, valid: /^[0-9]+$/ }
+                border:  { req: false, valid: /^[0-9]+$/ },
+                shadow:  { req: false, valid: /^(true|false)$/ },
+                margin:  { req: false, valid: /^[0-9]+$/ }
             },
             blogSize: /^(thumb|normal)$/i,
             idSize: /^(thumb|resized|normal)$/i,
@@ -1052,6 +1145,8 @@ var Markup = {
             toHtml: function(attr)
             {
                 var str = '<img' + Markup._addGlobalAttributes(attr);
+                var classes = [];
+                var styles = [];
                 var post = '';
 
                 if(attr.src)
@@ -1103,21 +1198,39 @@ var Markup = {
                     }
                     else
                     {
-                        str += ' style="float: ' + attr['float'] + ';';
+                        styles.push('float: ' + attr['float']);
                         if(!attr.margin)
                             attr.margin = 10;
                         if(attr['float'] == 'left')
-                            str += ' margin: 0 ' + attr.margin + 'px ' + attr.margin + 'px 0"';
+                            styles.push('margin: 0 ' + attr.margin + 'px ' + attr.margin + 'px 0');
                         else
-                            str += ' margin: 0 0 ' + attr.margin + 'px ' + attr.margin + 'px"';
+                            styles.push('margin: 0 0 ' + attr.margin + 'px ' + attr.margin + 'px');
                     }
                 }
-                if(attr.border != 0)
-                    str += ' class="border"';
+                if(attr.border)
+                {
+                    if (attr.border == 0)
+                        classes.push('no-border');
+                    else
+                    {
+                        classes.push('border');
+                        styles.push('border-width:' + attr.border + 'px');
+                    }
+                }
+                else
+                {
+                    classes.push('content-image');
+                    if (attr.shadow == 'true')
+                        classes.push('content-image-shadowed');
+                }
                 if(attr.title)
                     str += ' alt="' + attr.title + '"';
                 else
                     str += ' alt=""';
+                if (classes.length)
+                    str += ' class="' + classes.join(' ') + '"';
+                if (styles.length)
+                    str += ' style="' + styles.join(';') + '"';
                 str += ' />' + post;
                 return str;
             },
@@ -1153,10 +1266,11 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/i },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed:  { req: true,  valid: /^[0-9]+$/ },
+                icon:     { req: false, valid: /^false$/i },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
+                tempname: { req: false }
             },
             validate: function(attr)
             {
@@ -1170,7 +1284,10 @@ var Markup = {
                 var domainInfo = Markup._getDatabaseDomainInfo(attr);
                 var url = domainInfo[0];
                 var nameCol = domainInfo[1];
+                var tempname = null;
 
+                if(attr.tempname)
+                    tempname = attr.tempname;
                 if(g_items[id] && g_items[id][nameCol])
                 {
                     var item = g_items[id];
@@ -1178,7 +1295,7 @@ var Markup = {
                     str += Markup._safeHtml(item[nameCol]) + '</span></a>';
                     return str;
                 }
-                return '<a href="' + url + '?item=' + id + '"' + Markup._addGlobalAttributes(attr) + '>(' + LANG.types[3][0] + ' #' + id + ')</a>';
+                return '<a href="' + url + '?item=' + id + '"' + Markup._addGlobalAttributes(attr) + '>' + (tempname ? tempname : ('(' + LANG.types[3][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
@@ -1198,8 +1315,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^-?[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1237,6 +1354,11 @@ var Markup = {
             empty: false,
             itrim: true,
             allowedParents: { ul: 1, ol: 1 },
+            attr:
+            {
+                "class": { req: false, valid: /^[a-z0-9 _-]+$/i },
+                style:   { req: false,  valid: /^[^<>]+$/ }
+            },
             helpText: function()
             {
                 var str = '';
@@ -1274,10 +1396,10 @@ var Markup = {
             allowedClass: MARKUP_CLASS_STAFF,
             attr:
             {
-                unnamed: { req: true, valid: /^(map|model|screenshot)$/ },
-                zone: { req: false, valid: /^-?[0-9]+[a-z]?$/i },
-                floor: { req: false, valid: /^[0-9]+$/ },
-                pins: { req: false, valid: /^[0-9]+$/ }
+                unnamed: { req: true,  valid: /^(map|model|screenshot)$/ },
+                zone:    { req: false, valid: /^-?[0-9]+[a-z]?$/i },
+                floor:   { req: false, valid: /^[0-9]+$/ },
+                pins:    { req: false, valid: /^[0-9]+$/ }
             },
             validate: function(attr)
             {
@@ -1322,7 +1444,7 @@ var Markup = {
             empty: false,
             attr:
             {
-                zone: { req: true, valid: /^-?[0-9a-z\-_]+$/i },
+                zone:   { req: true, valid: /^-?[0-9a-z\-_]+$/i },
                 source: { req: false, valid: /\S+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -1355,10 +1477,10 @@ var Markup = {
             empty: false,
             attr:
             {
-                url: { req: false, valid: /\S+/ },
+                url:  { req: false, valid: /\S+/ },
                 type: { req: false, valid: /^[0-9]+$/ },
-                x: { req: true, valid: /^[0-9]{1,2}(\.[0-9])?$/ },
-                y: { req: true, valid: /^[0-9]{1,2}(\.[0-9])?$/ },
+                x:    { req: true, valid: /^[0-9]{1,2}(\.[0-9])?$/ },
+                y:    { req: true, valid: /^[0-9]{1,2}(\.[0-9])?$/ },
                 path: { req: false, valid: /^([0-9]{1,2}(\.[0-9])?[,:]?)+$/ }
             },
             taglessSkip: true,
@@ -1399,7 +1521,7 @@ var Markup = {
             empty: true,
             attr:
             {
-                tag: { req: false, valid: /[a-z0-9]+/i },
+                tag:  { req: false, valid: /[a-z0-9]+/i },
                 help: { req: false, valid: /^(admin|staff|premium|user|pending)$/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -1440,7 +1562,7 @@ var Markup = {
             rtrim: true,
             attr:
             {
-                tab: { req: true, valid: /^[0-9]+$/ },
+                tab:  { req: true, valid: /^[0-9]+$/ },
                 path: { req: true, valid: /\S+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -1474,37 +1596,56 @@ var Markup = {
             empty: false,
             attr:
             {
-                item: { req: false, valid: /^[0-9]+$/ },
-                object: { req: false, valid: /^[0-9]+$/ },
-                npc: { req: false, valid: /^[0-9]+$/ },
-                itemset: { req: false, valid: /^[0-9,]+$/ },
-                slot: { req: false, valid: /^[0-9]+$/ },
+                item:     { req: false, valid: /^[0-9]+$/ },
+                object:   { req: false, valid: /^[0-9]+$/ },
+                npc:      { req: false, valid: /^[0-9]+$/ },
+                itemset:  { req: false, valid: /^[0-9,]+$/ },
+                slot:     { req: false, valid: /^[0-9]+$/ },
                 humanoid: { req: false, valid: /^1$/ },
-                'float': { req: false, valid: /^(left|right)$/i },
-                img: { req: false, valid: /\S+/ },
-                link: { req: false, valid: /\S+/ },
-                label: { req: false, valid: /[\S ]+/ }
+                'float':  { req: false, valid: /^(left|right)$/i },
+                border:   { req: false, valid: /^[0-9]+$/ },
+                shadow:   { req: false, valid: /^(true|false)$/ },
+                img:      { req: false, valid: /\S+/ },
+                link:     { req: false, valid: /\S+/ },
+                label:    { req: false, valid: /[\S ]+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
             skipSlots: { 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 16: 1, 19: 1, 20: 1 },
             toHtml: function(attr)
             {
                 var str = '';
+                var classes = [];
+                var styles = [];
+
+                if(attr['float'])
+                    classes.push('markup-float-' + attr['float']);
+                if(attr.border)
+                {
+                    if(attr.border == 0)
+                        classes.push('no-border');
+                    else
+                    {
+                        classes.push('border');
+                        styles.push('border-width:' + attr.border + 'px');
+                    }
+                }
+                else
+                {
+                    classes.push('content-image');
+                    if(attr.shadow == 'true')
+                        classes.push('content-image-shadowed');
+                }
                 if(attr.npc)
                 {
                     str = '<a' + Markup._addGlobalAttributes(attr) + ' href="#modelviewer:1:' + attr.npc + ':' + (attr.humanoid ? '1' : '0') +
                         '" onclick="ModelViewer.show({ type: 1, displayId: ' + attr.npc + ', slot: ' + attr.slot + ', ' + (attr.humanoid ? 'humanoid: 1, ' : '') +
                         'displayAd: 1, fromTag: 1' + (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/npc/' + attr.npc + '.png" width="150" height="150') + '" class="border" ';
-                    if(attr['float'])
-                    {
-                        str += 'style="float: ' + attr['float'] + '; ';
-                        if(attr['float'] == 'left')
-                            str += 'margin: 0 10px 10px 0" ';
-                        else
-                            str += 'margin: 0 0 10px 10px" ';
-                    }
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/npc/' + attr.npc + '.png" width="150" height="150"') + ' ';
+                    if(classes.length)
+                        str += 'class="' + classes.join(' ') + '"';
+                    if(styles.length)
+                        str += ' style="' + styles.join(';') + '"';
                     str += '/></a>';
                     return [ str ];
                 }
@@ -1513,15 +1654,11 @@ var Markup = {
                     str = '<a' + Markup._addGlobalAttributes(attr) + ' href="#modelviewer:2:' + attr.object + '" onclick="ModelViewer.show({ type: 2, displayId: ' +
                         attr.object + ', displayAd: 1, fromTag: 1' + (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/obj/' + attr.object + '.png" width="150" height="150') + '" class="border" ';
-                    if(attr['float'])
-                    {
-                        str += 'style="float: ' + attr['float'] + '; ';
-                        if(attr['float'] == 'left')
-                            str += 'margin: 0 10px 10px 0" ';
-                        else
-                            str += 'margin: 0 0 10px 10px" ';
-                    }
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/obj/' + attr.object + '.png" width="150" height="150"') + ' ';
+                    if(classes.length)
+                        str += 'class="' + classes.join(' ') + '"';
+                    if(styles.length)
+                        str += ' style="' + styles.join(';') + '"';
                     str += '/></a>';
                     return [ str ];
                 }
@@ -1531,15 +1668,11 @@ var Markup = {
                         '" onclick="ModelViewer.show({ type: 3, displayId: ' + attr.item + ', slot: ' + attr.slot + ', displayAd: 1, fromTag: 1' +
                         (attr.link ? ", link: '" + Markup._safeJsString(attr.link) + "'" : '') + (attr.label ? ", label: '" + Markup._safeJsString(attr.label) + "'" : '') +
                         ' });"><img alt="' + Markup._safeHtml(attr._contents) + '" title="' + Markup._safeHtml(attr._contents) + '" src="' +
-                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/item/' + attr.item + '.png" width="150" height="150') + '" class="border" ';
-                    if(attr['float'])
-                    {
-                        str += 'style="float: ' + attr['float'] + '; ';
-                        if(attr['float'] == 'left')
-                            str += 'margin: 0 10px 10px 0" ';
-                        else
-                            str += 'margin: 0 0 10px 10px" ';
-                    }
+                        (attr.img ? attr.img : g_staticUrl + '/modelviewer/thumbs/item/' + attr.item + '.png" width="150" height="150"') + ' ';
+                    if(classes.length)
+                        str += 'class="' + classes.join(' ') + '"';
+                    if(styles.length)
+                        str += ' style="' + styles.join(';') + '"';
                     str += '/></a>';
                     return [ str ];
                 }
@@ -1558,13 +1691,13 @@ var Markup = {
             empty: true,
             attr:
             {
-                unnamed: { req: false, valid: /^[0-9]+$/ },
-                side: { req: false, valid: /^(alliance|horde|both)$/i },
-                items: { req: false, valid: /^[0-9,]+$/ },
-                currency: { req: false, valid: /^[0-9,]+$/ },
+                unnamed:     { req: false, valid: /^[0-9]+$/ },
+                side:        { req: false, valid: /^(alliance|horde|both)$/i },
+                items:       { req: false, valid: /^[0-9,]+$/ },
+                currency:    { req: false, valid: /^[0-9,]+$/ },
                 achievement: { req: false, valid: /\S+/ },
-                arena: { req: false, valid: /^[0-9]+$/ },
-                honor: { req: false, valid: /^[0-9]+$/ },
+                arena:       { req: false, valid: /^[0-9]+$/ },
+                honor:       { req: false, valid: /^[0-9]+$/ },
             },
             allowedClass: MARKUP_CLASS_STAFF,
             toHtml: function(attr)
@@ -1603,9 +1736,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1645,8 +1778,8 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1767,9 +1900,9 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                icon:    { req: false, valid: /^false$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1828,9 +1961,9 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                icon:    { req: false, valid: /^false$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -1872,13 +2005,15 @@ var Markup = {
             itrim: true,
             attr:
             {
-                unnamed: { req: false, valid: /[\S ]+/ },
-                url: { req: false, valid: /\S+/ },
+                unnamed:  { req: false, valid: /[\S ]+/ },
+                url:      { req: false, valid: /\S+/ },
                 blizzard: { req: false, valid: /^true$/ },
-                pname: { req: false },
-                wowhead: { req: false, valid: /^true$/ },
-                display: { req: false, valid: /^block$/ },
-                align: { req: false, valid: /^(left|right|center)$/i },
+                pname:    { req: false },
+                wowhead:  { req: false, valid: /^true$/ },
+                display:  { req: false, valid: /^block$/ },
+                align:    { req: false, valid: /^(left|right|center)$/i },
+                "float":  { req: false, valid: /^(left|right|none)$/i },
+                clear:    { req: false, valid: /^(left|right|both)$/i },
                 collapse: { req: false, valid: /^true$/ }
             },
             allowedModes: { article: 1, quickfacts: 1, comment: 1 },
@@ -1894,21 +2029,25 @@ var Markup = {
             {
                 var str = '<div' + Markup._addGlobalAttributes(attr);
                 var styles = [];
+                var classes = ['quote'];
 
                 if(attr.display)
                     styles.push('display: ' + attr.display);
-
                 if(attr.align)
                     styles.push('text-align: ' + attr.align);
-
+                if (attr.clear)
+                    styles.push('clear: ' + attr.clear);
                 if(styles.length)
                     str += ' style="' + styles.join('; ') + '" ';
 
-                str += ' class="quote';
                 if(attr.first)
-                    str += ' first';
+                    classes.push('first');
                 if(attr.last)
-                    str += ' last';
+                    classes.push('last');
+                if (attr['float'])
+                    classes.push('markup-float-' + attr['float']);
+                if(classes.length)
+                    str += ' class="' + classes.join(' ');
                 if(attr.blizzard) {
                     if(attr.unnamed && attr.blizzard)
                     {
@@ -1984,11 +2123,11 @@ var Markup = {
             valid: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 22: true, 24: true, 25: true },
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                gender: { req: false, valid: /^(0|1)$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                gender:  { req: false, valid: /^(0|1)$/ },
+                icon:    { req: false, valid: /^false$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2057,14 +2196,15 @@ var Markup = {
             empty: false,
             attr:
             {
-                id: { req: false, valid: /^[0-9]+$/ },
-                url: { req: false, valid: /\S+/ },
-                thumb: { req: false, valid: /\S+/ },
-                size: { req: false, valid: /^(thumb|resized|normal)$/i },
-                width: { req: false, valid: /^[0-9]+$/ },
-                height: { req: false, valid: /^[0-9]+$/ },
+                id:      { req: false, valid: /^[0-9]+$/ },
+                url:     { req: false, valid: /\S+/ },
+                thumb:   { req: false, valid: /\S+/ },
+                size:    { req: false, valid: /^(thumb|resized|normal)$/i },
+                width:   { req: false, valid: /^[0-9]+$/ },
+                height:  { req: false, valid: /^[0-9]+$/ },
                 'float': { req: false, valid: /^(left|right)$/i },
-                border: { req: false, valid: /^[0-9]+$/ }
+                border:  { req: false, valid: /^[0-9]+$/ },
+                shadow:  { req: false, valid: /^(true|false)$/ }
             },
             taglessSkip: true,
             allowedClass: MARKUP_CLASS_STAFF,
@@ -2078,6 +2218,8 @@ var Markup = {
             },
             toHtml: function(attr)
             {
+                var classes = [];
+                var styles = [];
                 var url = '';
                 var thumb = '';
 
@@ -2112,16 +2254,30 @@ var Markup = {
                     str += ' width="' + attr.width + '"';
                 if(attr.size && attr.height)
                     str += ' height="' + attr.height + '"';
-                if(attr.border != 0)
-                    str += 'class="border" ';
-                if(attr['float']) {
-                    str += 'style="float: ' + attr['float'] + '; ';
-                    if(attr['float'] == 'left')
-                        str += 'margin: 0 10px 10px 0';
+                if(attr.border)
+                {
+                    if(attr.border == 0)
+                        classes.push('no-border');
                     else
-                        str += 'margin: 0 0 10px 10px';
-                    str += '" ';
+                    {
+                        classes.push('border');
+                        styles.push('border-width:' + attr.border + 'px');
+                    }
                 }
+                else
+                {
+                    classes.push('content-image');
+                    if(attr.shadow == 'true')
+                        classes.push('content-image-shadowed');
+                }
+                if(attr['float'])
+                    classes.push('markup-float-' + attr['float']);
+
+                if(classes.length)
+                    str += ' class="' + classes.join(' ') + '"';
+                if(styles.length)
+                    str += ' style="' + styles.join(';') + '"';
+
                 str += 'alt="" ';
 
                 var screenshot = {
@@ -2186,10 +2342,10 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                icon:    { req: false, valid: /^false$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2249,13 +2405,148 @@ var Markup = {
                 return str.replace(/<small\b[\s\S]*?>([\s\S]*?)<\/small>/gi, '[small]$1[/small]');
             }
         },
+        sound:
+        {
+            empty: true,
+            attr:
+            {
+                unnamed: { req: false, valid: /^[0-9]+$/ },
+                src:     { req: false, valid: /\S+/ },
+                title:   { req: false, valid: /\S+/ },
+                type:    { req: false, valid: /\S+/ },
+                src2:    { req: false, valid: /\S+/ },
+                type2:   { req: false, valid: /\S+/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang }
+            },
+            validate: function (attr)
+            {
+                if(attr.unnamed)
+                    return true;
+
+                if(!attr.src)
+                    return false;
+
+                return true;
+            },
+            toHtml: function (attr)
+            {
+                var
+                    type,
+                    src,
+                    title,
+                    href,
+                    src2,
+                    type2;
+
+                var domainInfo = Markup._getDatabaseDomainInfo(attr);
+                var url = domainInfo[0];
+                if (attr.unnamed)
+                {
+                    if (!(attr.unnamed in g_sounds))
+                        return '';
+
+                    if (!g_sounds[attr.unnamed].hasOwnProperty("files"))
+                        return '';
+
+                    if (g_sounds[attr.unnamed].files.length == 0)
+                        return '';
+
+                    if (!g_sounds[attr.unnamed].files[0].hasOwnProperty('type'))
+                        return '';
+
+                    type  = g_sounds[attr.unnamed].files[0].type;
+                    src   = g_sounds[attr.unnamed].files[0].url;
+                    title = g_sounds[attr.unnamed].name ? g_sounds[attr.unnamed].name: g_sounds[attr.unnamed].files[0].title;
+                    href  = url + '?sound=' + attr.unnamed;
+                }
+                else
+                {
+                    if (Markup.allow < MARKUP_CLASS_STAFF)
+                        return '';
+
+                    src = attr.src;
+                    title = attr.title ? attr.title : '(Unknown)';
+                    if (attr.hasOwnProperty('type'))
+                        type = attr.type;
+                    else
+                    {
+                        switch (attr.src.toLowerCase().substr(-4))
+                        {
+                            case '.mp3':
+                                type = 'audio/mpeg';
+                                break;
+                            case '.ogg':
+                                type = 'audio/ogg; codecs="vorbis"';
+                                break;
+                        }
+                    }
+
+                    if (attr.src2)
+                    {
+                        src2 = attr.src2;
+                        if (attr.hasOwnProperty('type2'))
+                            type2 = attr.type2;
+                        else
+                        {
+                            switch (attr.src2.toLowerCase().substr(-4))
+                            {
+                                case '.mp3':
+                                    type2 = 'audio/mpeg';
+                                    break;
+                                case '.ogg':
+                                    type2 = 'audio/ogg; codecs="vorbis"';
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                var str = '<audio preload="none" controls="true"' + Markup._addGlobalAttributes(attr);
+                if (attr.unnamed)
+                    str += ' rel="sound=' + attr.unnamed + '"';
+                str += ">";
+
+                if (!(/^(https?:)?\/\//).test(src))
+                    src = g_staticUrl + "/wowsounds" + src;
+
+                str += '<source src="' + src + '"';
+                if (type)
+                    str += ' type="' + type.replace(/"/g, "&quot;") + '"';
+                str += ">";
+
+                if (src2)
+                {
+                    str += '<source src="' + src2 + '"';
+                    if (type2)
+                        str += ' type="' + type2.replace(/"/g, "&quot;") + '"';
+                    str += ">";
+                }
+
+                str += "</audio>";
+
+                if (href)
+                    str = '<div class="audiomarkup">' + str + '<br><a href="' + href + '">' + title + "</a></div>";
+
+                return str;
+            },
+            fromHtml: function (str)
+            {
+                var m = str.match(/<audio [^>]*\brel="sound=(\d+)/);
+                if (m)
+                    return "[sound=" + m[1] + "]";
+
+                return str.replace(/<audio\b[\s\S]*?><source\b[\s\S]*\bsrc="([^"]*?)"[\s\S]*?<\/audio>/gi, '[sound src="$1"]');
+            }
+        },
         span:
         {
             empty: false,
             attr:
             {
-                unnamed: { req: false, valid: /^(hidden|invisible)$/ },
-                tooltip: { req: false, valid: /\S+/ },
+                "class":  { req: false, valid: /^[a-z0-9 _-]+$/i },
+                style:    { req: false, valid: /^[^<>]+$/ },
+                unnamed:  { req: false, valid: /^(hidden|invisible)$/ },
+                tooltip:  { req: false, valid: /\S+/ },
                 tooltip2: { req: false, valid: /\S+/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -2285,12 +2576,13 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                diff: { req: false, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                buff: { req: false, valid: /^true$/ },
+                unnamed:  { req: true, valid: /^[0-9]+$/ },
+                diff:     { req: false, valid: /^[0-9]+$/ },
+                icon:     { req: false, valid: /^false$/ },
+                domain:   { req: false, valid: MarkupDomainRegexMap.lang },
+                site:     { req: false, valid: MarkupDomainRegexMap.lang },
+                buff:     { req: false, valid: /^true$/ },
+                tempname: { req: false }
             },
             validate: function(attr)
             {
@@ -2305,11 +2597,14 @@ var Markup = {
                 var url = domainInfo[0];
                 var nameCol = domainInfo[1];
                 var rel = [];
+                var tempname = null;
 
                 if(attr.buff)
                     rel.push('buff');
                 if(attr.diff)
                     rel.push('diff=' + attr.diff);
+                if(attr.tempname)
+                    tempname = attr.tempname;
 
                 if(g_spells[id] && g_spells[id][nameCol])
                 {
@@ -2317,7 +2612,7 @@ var Markup = {
                     return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + (!attr.icon ? ' class="icontiny"><img src="' + g_staticUrl + '/images/wow/icons/tiny/' + spell.icon.toLowerCase() + '.gif"' : '') + Markup._addGlobalAttributes(attr) + ' align="absmiddle" /> <span class="tinyicontxt">' + Markup._safeHtml(spell[nameCol]) + '</span></a>';
                 }
 
-                return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + '>(' + LANG.types[6][0] + ' #' + id + ')</a>';
+                return '<a href="' + url + '?spell=' + id + '"' + (rel.length ? ' rel="' + rel.join('&') + '"' : '') + '>' + (tempname ? tempname : ('(' + LANG.types[6][0] + ' #' + id + ')')) + '</a>';
             },
             toText: function(attr)
             {
@@ -2347,10 +2642,10 @@ var Markup = {
             empty: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                icon: { req: false, valid: /^false$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                icon:    { req: false, valid: /^false$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -2432,14 +2727,17 @@ var Markup = {
             itrim: true,
             allowedClass: MARKUP_CLASS_STAFF,
             allowedChildren: { tab: 1 },
-            attr: {
-                name: { req: true, valid: /\S+/ },
+            attr:
+            {
+                name:  { req: true, valid: /\S+/ },
                 width: { req: false, valid: /^[0-9]+(px|em|\%)$/ }
             },
             toHtml: function(attr) {
                 attr.id = g_urlize(attr.name);
                 var x = Markup.preview;
-                var str = '<div class="clear"></div><div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
+                // Aowow - clear fucks with text layout near infobox
+                // var str = '<div class="clear"></div><div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
+                var str = '<div id="' + 'dsf67g4d-' + attr.id + (x ? '-preview' : '' ) + '"></div>';
                 str += '<div';
                 if(attr.width)
                     str += ' style="width: ' + attr.width + '"';
@@ -2454,7 +2752,8 @@ var Markup = {
 
                     str += '<div id="tab-' + attr.id + '-' + tab.id + '" style="display: none">';
                     str += tab.content;
-                    str += '<div class="clear"></div>';
+                    // Aowow - clear fucks with text layout near infobox
+                    // str += '<div class="clear"></div>';
                     str += '</div>';
                 }
 
@@ -2474,7 +2773,8 @@ var Markup = {
             itrim: true,
             allowedClass: MARKUP_CLASS_STAFF,
             allowedParents: { tabs: 1 },
-            attr: {
+            attr:
+            {
                 name: { req:true, valid: /[\S ]+/ },
                 icon: { req:false, valid: /\S+/ }
             },
@@ -2497,10 +2797,10 @@ var Markup = {
             allowedChildren: { tr: 1 },
             attr:
             {
-                border: { req: false, valid: /^[0-9]+$/ },
+                border:      { req: false, valid: /^[0-9]+$/ },
                 cellspacing: { req: false, valid: /^[0-9]+$/ },
                 cellpadding: { req: false, valid: /^[0-9]+$/ },
-                width: { req: false, valid: /^[0-9]+(px|em|\%)$/ }
+                width:       { req: false, valid: /^[0-9]+(px|em|\%)$/ }
             },
             toHtml: function(attr)
             {
@@ -2526,11 +2826,11 @@ var Markup = {
                     for(var i = 0; i < m.length; ++i)
                     {
                         var border  = m[i][1].match(/border[:="]+\s*([0-9]+)/i),
-                            width   = m[i][1].match(/width[:="]+\s*([0-9]+)/i),
+                            width   = m[i][1].match(/width[:="]+\s*([0-9]+(%|em|px)?)/i),
                             spacing = m[i][1].match(/cellspacing="([\s\S]+?)"/i),
                             padding = m[i][1].match(/cellpadding="([\s\S]+?)"/i);
 
-                        str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n" + Array(depth + 1).join("\t") + '[table' + (border ? ' border=' + border[1] : '') + (width ? ' width=' + width[1] : '') + (spacing ? ' cellspacing=' + spacing[1] : '') + (padding ? ' cellpadding=' + padding[1] : '') + ']' + Markup.tags.table.fromHtml(m[i][0], depth + 1) + "\n" + Array(depth + 1).join("\t") + '[/table]');
+                        str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n" + Array(depth + 1).join("\t") + '[table' + (border ? ' border=' + border[1] : '') + (width ? ' width=' + width[1] + (width[2] ? '' : 'px') : '') + (spacing ? ' cellspacing=' + spacing[1] : '') + (padding ? ' cellpadding=' + padding[1] : '') + ']' + Markup.tags.table.fromHtml(m[i][0], depth + 1) + "\n" + Array(depth + 1).join("\t") + '[/table]');
                     }
                 }
 
@@ -2571,11 +2871,11 @@ var Markup = {
             attr:
             {
                 unnamed: { req: false, valid: /^header$/ },
-                align: { req: false, valid: /^(right|left|center|justify)$/i },
-                valign: { req: false, valid: /^(top|middle|bottom|baseline)$/i },
+                align:   { req: false, valid: /^(right|left|center|justify)$/i },
+                valign:  { req: false, valid: /^(top|middle|bottom|baseline)$/i },
                 colspan: { req: false, valid: /^[0-9]+$/ },
                 rowspan: { req: false, valid: /^[0-9]+$/ },
-                width: { req: false, valid: /^[0-9]+(px|em|\%)$/ }
+                width:   { req: false, valid: /^[0-9]+(px|em|\%)$/ }
             },
             toHtml: function(attr)
             {
@@ -2604,13 +2904,13 @@ var Markup = {
                     {
                         for(var i = 0; i < m.length; ++i)
                         {
-                            var width   = m[i][1].match(/width[:="]+\s*([0-9]+)/i),
-                                align   = m[i][1].match(/align="([\s\S]+?)"/i),
+                            var width   = m[i][1].match(/width[:="]+\s*([0-9]+(%|em|px)?)/i),
+                                align   = m[i][1].match(/\balign="([\s\S]+?)"/i),
                                 valign  = m[i][1].match(/valign="([\s\S]+?)"/i),
                                 colspan = m[i][1].match(/colspan="([\s\S]+?)"/i),
                                 rowspan = m[i][1].match(/rowspan="([\s\S]+?)"/i);
 
-                            str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n\t\t" + Array(depth + 1).join("\t") + '[td' + (t[j] == 'th' ? '=header' : '') + (width ? ' width=' + width[1] : '') + (align ? ' align=' + align[1] : '') + (valign ? ' valign=' + valign[1] : '') + (colspan ? ' colspan=' + colspan[1] : '') + (rowspan ? ' rowspan=' + rowspan[1] : '') + ']' + Markup.tags.td.fromHtml(m[i][0], depth + 1) + '[/td]');
+                            str = str.replace(m[i][1] + m[i][0] + m[i][2], "\n\t\t" + Array(depth + 1).join("\t") + '[td' + (t[j] == 'th' ? '=header' : '') + (width ? ' width=' + width[1] + (width[2] ? '' : 'px') : '') + (align ? ' align=' + align[1] : '') + (valign ? ' valign=' + valign[1] : '') + (colspan ? ' colspan=' + colspan[1] : '') + (rowspan ? ' rowspan=' + rowspan[1] : '') + ']' + Markup.tags.td.fromHtml(m[i][0], depth + 1) + '[/td]');
                         }
                     }
                 }
@@ -2624,8 +2924,8 @@ var Markup = {
             count: 0,
             attr:
             {
-                until: { req: false, valid: /^\d+$/ },
-                since: { req: false, valid: /^\d+$/ },
+                until:  { req: false, valid: /^\d+$/ },
+                since:  { req: false, valid: /^\d+$/ },
                 server: { req: false, valid: /^true$/ }
             },
             validate: function(attr)
@@ -2757,9 +3057,9 @@ var Markup = {
             attr:
             {
                 unnamed: { req: false, valid: /\S+/ },
-                name: { req: false, valid: /\S+/ },
-                bare: { req: false, valid: /^true$/i },
-                label: { req: false, valid: /[\S ]+/ }
+                name:    { req: false, valid: /\S+/ },
+                bare:    { req: false, valid: /^true$/i },
+                label:   { req: false, valid: /[\S ]+/ }
             },
             taglessSkip: true,
             allowedClass: MARKUP_CLASS_STAFF,
@@ -2840,11 +3140,13 @@ var Markup = {
             helpText: '[url=http://www.google.com]' + LANG.markup_url + '[/url]',
             attr:
             {
-                unnamed: { req: false, valid: /\S+/ },
-                rel: { req: false, valid: /(item|quest|spell|achievement|event|npc|object|itemset|currency)=([0-9]+)/ },
-                onclick: { req: false, valid: /[\S ]+/ },
-                tooltip: { req: false, valid: /\S+/ },
-                tooltip2: { req: false, valid: /\S+/ }
+                unnamed:   { req: false, valid: /\S+/ },
+                rel:       { req: false, valid: /(item|quest|spell|achievement|event|npc|object|itemset|currency)=([0-9]+)/ },
+                onclick:   { req: false, valid: /[\S ]+/ },
+                style:     { req: false, valid: /^[^"<>]+$/ },
+                tooltip:   { req: false, valid: /\S+/ },
+                tooltip2:  { req: false, valid: /\S+/ },
+                newwindow: { req: false, valid: /^true$/ }
             },
             validate: function(attr)
             {
@@ -2875,7 +3177,7 @@ var Markup = {
                     if(Markup._isUrlSafe(target, true))
                     {
                         var pre = '<a' + Markup._addGlobalAttributes(attr) + ' href="' + Markup._fixUrl(target) + '"';
-                        if(Markup._isUrlExternal(target))
+                        if(Markup._isUrlExternal(target) || attr.newwindow)
                             pre += ' target="_blank"';
                         if(attr.rel)
                             pre += ' rel="' + attr.rel + '"';
@@ -2883,6 +3185,8 @@ var Markup = {
                             pre += ' onclick="' + attr.onclick + '"';
                         if(attr.tooltip && Markup.tooltipTags[attr.tooltip])
                             pre += ' onmouseover="$WH.Tooltip.showAtCursor(event, Markup.tooltipTags[\'' + attr.tooltip + '\'], 0, 0, ' + (Markup.tooltipBare[attr.tooltip] ? 'null' : "'q'") + ', ' + (attr.tooltip2 && Markup.tooltipTags[attr.tooltip2] ? "Markup.tooltipTags['" + attr.tooltip2 + "']" : 'null') + ')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
+                        if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
+                            pre += ' style="' + attr.style + '"';
                         pre += '>';
                         return [pre, '</a>'];
                     }
@@ -2923,10 +3227,11 @@ var Markup = {
             empty: true,
             attr:
             {
-                id: { req: true, valid: /^[0-9]+$/ },
+                id:      { req: true,  valid: /^[0-9]+$/ },
                 unnamed: { req: false, valid: /^embed$/i },
                 'float': { req: false, valid: /^(left|right)$/i }, // Thumbnail only
-                border: { req: false, valid: /^[0-9]+$/ } // Thumbnail only
+                shadow:  { req: false, valid: /^(true|false)$/ }, // Thumbnail only
+                border:  { req: false, valid: /^[0-9]+$/ } // Thumbnail only
             },
             ltrim: true,
             rtrim: true,
@@ -2936,6 +3241,8 @@ var Markup = {
                 if(g_videos[attr.id])
                 {
                     var html = '', video = g_videos[attr.id];
+                    var classes = [];
+                    var styles = [];
                     if(attr.unnamed)
                     {
                         if(video.videoType == 1) // YouTube
@@ -2948,16 +3255,29 @@ var Markup = {
 
                         html += '<div style="position: relative; display: -moz-inline-stack; display: inline-block; zoom: 1; *display: inline"><a href="' + $WH.sprintf(vi_siteurls[video.videoType], video.videoId) + '" onclick="if(!g_isLeftClick(event)) return; VideoViewer.show({videos: \'' + Markup.uid + '\', pos: ' + g_videos[Markup.uid].length + '}); return false;"' + Markup._addGlobalAttributes(attr) + '>';
                         html += '<img src="' + $WH.sprintf(vi_thumbnails[video.videoType], video.videoId) + '" ';
-                        if(attr.border != 0)
-                            html += 'class="border" ';
-                        if(attr['float']) {
-                            html += 'style="float: ' + attr['float'] + '; ';
-                            if(attr['float'] == 'left')
-                                html += 'margin: 0 10px 10px 0';
+
+                        if(attr.border)
+                        {
+                            if(attr.border == 0)
+                                classes.push('no-border');
                             else
-                                html += 'margin: 0 0 10px 10px';
-                            html += '" ';
+                            {
+                                classes.push('border');
+                                styles.push('border-width:' + attr.border + 'px');
+                            }
                         }
+                        else
+                        {
+                            classes.push('content-image');
+                            if(attr.shadow == 'true')
+                                classes.push('content-image-shadowed');
+                        }
+                        if(attr['float'])
+                            classes.push('markup-float-' + attr['float']);
+                        if(classes.length)
+                            html += 'class="' + classes.join(' ') + '" ';
+                        if(styles.length)
+                            html += ' style="' + styles.join(';') + '"';
                         if(video.hasCaption)
                             html += 'alt="' + Markup.removeTags(video.caption, { mode: Markup.MODE_SIGNATURE, skipReset: true }) + '" ';
 
@@ -2995,7 +3315,7 @@ var Markup = {
             attr:
             {
                 unnamed: { req: true, valid: /[\S ]+/ },
-                roles: { req: true, valid: /[0-9]+/ }
+                roles:   { req: true, valid: /[0-9]+/ }
             },
             allowedModes: { article: 1, quickfacts: 1, comment: 1 },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -3032,9 +3352,9 @@ var Markup = {
             empty: true,
             attr:
             {
-                unnamed: { req: true, valid: /\S+/ },
-                width: { req: false, valid: /^[0-9]+$/ },
-                height: { req: false, valid: /^[0-9]+$/ },
+                unnamed:  { req: true,  valid: /\S+/ },
+                width:    { req: false, valid: /^[0-9]+$/ },
+                height:   { req: false, valid: /^[0-9]+$/ },
                 autoplay: { req: false, valid: /^true$/ }
             },
             allowedClass: MARKUP_CLASS_STAFF,
@@ -3131,9 +3451,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -3171,9 +3491,9 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true, valid: /^[0-9]+$/ },
-                domain: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ },
-                site: { req: false, valid: /^(beta|mop|ptr|www|de|es|fr|ru|pt)$/ }
+                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                domain:  { req: false, valid: MarkupDomainRegexMap.lang },
+                site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
             validate: function(attr)
             {
@@ -3218,6 +3538,8 @@ var Markup = {
             attribs += ' title="' + Markup._safeQuotes(attr.title) + '"';
         if(attr['class'])
             attribs += ' class="' + attr['class'] + '"';
+        if(attr.style)
+            attribs += ' style="' + attr.style + '"';
         if(attr['data-highlight'])
             attribs += ' data-highlight="' + attr['data-highlight'] + '"';
 
@@ -3379,8 +3701,8 @@ var Markup = {
 
             this.inited = true;
 
-            $('[data-highlight]')
-                .live('mouseenter', function() {
+            $(function () {
+                $(document).delegate('[data-highlight]', 'mouseenter', function() {
                     var _ = $(this).attr('data-highlight').split(':');
 
                     if(_.length != 2)
@@ -3399,6 +3721,7 @@ var Markup = {
                     elem.selectionStart = start;
                     elem.selectionEnd   = start;
                 });
+            });
         }
     },
 

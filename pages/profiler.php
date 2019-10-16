@@ -13,6 +13,14 @@ class ProfilerPage extends GenericPage
     protected $js       = ['profile_all.js', 'profile.js'];
     protected $css      = [['path' => 'Profiler.css']];
 
+    public function __construct($pageCall, $pageParam)
+    {
+        if (!CFG_PROFILER_ENABLE)
+            $this->error();
+
+        parent::__construct($pageCall, $pageParam);
+    }
+
     protected function generateContent()
     {
         $this->addJS('?data=realms&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
@@ -22,7 +30,7 @@ class ProfilerPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, Util::ucFirst(Lang::main('_cpHead')));
+        array_unshift($this->title, Util::ucFirst(Lang::profiler('profiler')));
     }
 }
 

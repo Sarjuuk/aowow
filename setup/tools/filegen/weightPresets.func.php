@@ -20,14 +20,13 @@ if (!CLI)
 
         foreach ($scales as $s)
         {
-            $weights = DB::Aowow()->selectCol('SELECT field AS ARRAY_KEY, val FROM ?_account_weightscale_data WHERE id = ?d', $s['id']);
-            if (!$weights)
+            if ($weights = DB::Aowow()->selectCol('SELECT field AS ARRAY_KEY, val FROM ?_account_weightscale_data WHERE id = ?d', $s['id']))
+                $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
+            else
             {
-                CLISetup::log('WeightScale \''.CLISetup::bold($s['name']).'\' has no data set. Skipping...', CLISetup::LOG_WARN);
-                continue;
+                CLI::write('WeightScale \''.CLI::bold($s['name']).'\' has no data set.', CLI::LOG_WARN);
+                $wtPresets[$s['class']]['pve'][$s['name']] = ['__icon' => $s['icon']];
             }
-
-            $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
         }
 
         $toFile = "var wt_presets = ".Util::toJSON($wtPresets).";";

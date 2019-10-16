@@ -9,15 +9,21 @@ class Lang
     private static $mail;
     private static $game;
     private static $maps;
+    private static $profiler;
     private static $screenshot;
+    private static $privileges;
+    private static $smartAI;
+    private static $unit;
 
     // types
     private static $achievement;
+    private static $areatrigger;
     private static $chrClass;
     private static $currency;
     private static $event;
     private static $faction;
     private static $gameObject;
+    private static $icon;
     private static $item;
     private static $itemset;
     private static $npc;
@@ -25,6 +31,7 @@ class Lang
     private static $quest;
     private static $race;
     private static $skill;
+    private static $sound;
     private static $spell;
     private static $title;
     private static $zone;
@@ -42,9 +49,17 @@ class Lang
         foreach ($lang as $k => $v)
             self::$$k = $v;
 
-        // *cough* .. reuse-hack
+        // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
         self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
+
+        // not localized .. for whatever reason
+        self::$profiler['regions'] = array(
+            'eu' => "Europe",
+            'us' => "US & Oceanic"
+        );
+
+        self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 
     public static function __callStatic($prop, $args)
@@ -55,19 +70,58 @@ class Lang
             return null;
         }
 
+        $vspfArgs = [];
+
         $var = self::$$prop;
-        foreach ($args as $key)
+        foreach ($args as $arg)
         {
-            if (!isset($var[$key]))
+            if (is_array($arg))
             {
-                trigger_error('Lang - undefined key "'.$key.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']', E_USER_WARNING);
+                $vspfArgs = $arg;
+                continue;
+            }
+            else if (!isset($var[$arg]))
+            {
+                trigger_error('Lang - undefined key "'.$arg.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']', E_USER_WARNING);
                 return null;
             }
 
-            $var = $var[$key];
+            $var = $var[$arg];
         }
 
-        return $var;
+        // meh :x
+        if ($var === null && $prop == 'spell' && count($args) == 1)
+        {
+            if ($args[0] == 'effects')
+                $var = self::$$prop['unkEffect'];
+            else if ($args[0] == 'auras')
+                $var = self::$$prop['unkAura'];
+        }
+
+        return self::vspf($var, $vspfArgs);
+    }
+
+    public static function concat($args, $useAnd = true, $callback = null)
+    {
+        $b = '';
+        $i = 0;
+        $n = count($args);
+        foreach ($args as $k => $arg)
+        {
+            if (is_callable($callback))
+                $b .= $callback($arg, $k);
+            else
+                $b .= $arg;
+
+            if ($n > 1 && $i < ($n - 2))
+                $b .= ', ';
+            else if ($n > 1 && $i == $n - 2)
+                $b .= Lang::main($useAnd ? 'and' : 'or');
+
+            $i++;
+        }
+
+        return $b;
     }
 
     public static function sort($prop, $group, $method = SORT_NATURAL)
@@ -170,7 +224,7 @@ class Lang
 
     public static function getReputationLevelForPoints($pts)
     {
-        $_ = Util::getReputationLevelForPoints($pts);
+        $_ = Game::getReputationLevelForPoints($pts);
 
         return self::game('rep', $_);
     }
@@ -201,7 +255,7 @@ class Lang
         }
 
         if ($class == ITEM_CLASS_MISC)                      // yeah hardcoded.. sue me!
-            return self::spell('cat', -5);
+            return self::spell('cat', -5, 0);
 
         $tmp  = [];
         $strs = self::spell($class == ITEM_CLASS_ARMOR ? 'armorSubClass' : 'weaponSubClass');
@@ -209,12 +263,17 @@ class Lang
             if ($mask & (1 << $k) && $str)
                 $tmp[] = $str;
 
-        return implode(', ', $tmp);
+        if (!$tmp && $class == ITEM_CLASS_ARMOR)
+            return self::spell('cat', -11, 8);
+        else if (!$tmp && $class == ITEM_CLASS_WEAPON)
+            return self::spell('cat', -11, 6);
+        else
+            return implode(', ', $tmp);
     }
 
     public static function getStances($stanceMask)
     {
-        $stanceMask &= 0xFC27909F;                          // clamp to available stances/forms..
+        $stanceMask &= 0xFF37F6FF;                          // clamp to available stances/forms..
 
         $tmp = [];
         $i   = 1;
@@ -279,29 +338,20 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$side = 0, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getRaceString($raceMask, &$ids = [], &$n = 0, $asHTML = true)
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
         if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
             return false;
 
+        if (!$raceMask)
+            return false;
+
         $tmp  = [];
         $i    = 1;
         $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
         $br   = $asHTML ? '' : '[br]';
-
-        if (!$raceMask)
-        {
-            $side |= SIDE_BOTH;
-            return self::game('ra', 0);
-        }
-
-        if ($raceMask & RACE_MASK_HORDE)
-            $side |= SIDE_HORDE;
-
-        if ($raceMask & RACE_MASK_ALLIANCE)
-            $side |= SIDE_ALLIANCE;
 
         if ($raceMask == RACE_MASK_HORDE)
             return self::game('ra', -2);
@@ -332,11 +382,108 @@ class Lang
             LOCALE_EN => [',', '.'],
             LOCALE_FR => [' ', ','],
             LOCALE_DE => ['.', ','],
+            LOCALE_CN => [',', '.'],
             LOCALE_ES => ['.', ','],
             LOCALE_RU => [' ', ',']
         );
 
         return number_format($number, $decimals, $seps[User::$localeId][1], $no1k ? '' : $seps[User::$localeId][0]);
+    }
+
+    private static function vspf($var, $args)
+    {
+        if (is_array($var))
+        {
+            foreach ($var as &$v)
+                $v == self::vspf($v, $args);
+
+            return $var;
+        }
+
+        if ($args)
+            $var = vsprintf($var, $args);
+
+        // line break
+        // |n
+        $var = str_replace('|n', '<br />', $var);
+
+        // color
+        // |c<aarrggbb><word>|r
+        $var = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $var);
+
+        // icon
+        // |T<imgPath>:0:0:0:-1|t   -   not used, skip if found
+        $var = preg_replace('/\|T[^\|]+\|t/', '', $var);
+
+        // hyperlink
+        // |H<hyperlinkStruct>|h<name>|h    -   not used, truncate structure if found
+        $var = preg_replace('/\|H[^\|]+\|h([^\|]+)\|h/', '$1', $var);
+
+        // french preposition : de
+        // |2 <word>
+        $var = preg_replace_callback('/\|2\s(\w)/i', function ($m) {
+            if (in_array(strtolower($m[1]), ['a', 'e', 'h', 'i', 'o', 'u']))
+                return "d'".$m[1];
+            else
+                return 'de '.$m[1];
+        }, $var);
+
+        // russian word cunjugation thingy
+        // |3-<number>(<word>)
+        $var = preg_replace_callback('/\|3-(\d)\(([^\)]+)\)/i', function ($m) {
+            switch ($m[0])
+            {
+                case 1:                                     // seen cases
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                default:                                    // passthrough .. unk case
+                    return $m[1];
+            }
+
+        }, $var);
+
+        // numeric switch
+        // <number> |4<singular>:<plural>[:<plural2>];
+        $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^;]*);/i', function ($m) {
+            $plurals = explode(':', $m[4]);
+            $result  = '';
+
+            if (count($plurals) == 2)                       // special case: ruRU
+            {
+                switch (substr($m[1], -1))                  // check last digit of number
+                {
+                    case 1:
+                        // but not 11 (teen number)
+                        if (!in_array($m[1], [11]))
+                        {
+                            $result = $m[3];
+                            break;
+                        }
+                    case 2:
+                    case 3:
+                    case 4:
+                        // but not 12, 13, 14 (teen number) [11 is passthrough]
+                        if (!in_array($m[1], [11, 12, 13, 14]))
+                        {
+                            $result = $plurals[0];
+                            break;
+                        }
+                        break;
+                    default:
+                        $result = $plurals[1];
+                }
+            }
+            else
+                $result = ($m[1] == 1 ? $m[3] : $plurals[0]);
+
+            return $m[1].$m[2].$result;
+        }, $var);
+
+        return $var;
     }
 }
 

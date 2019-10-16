@@ -28,12 +28,12 @@ if (!CLI)
 
     function realms()
     {
-        $realms = Util::getRealms();
+        $realms = Profiler::getRealms();
         if (!$realms)
-            CLISetup::log(' - realms: Auth-DB not set up .. static data g_realms will be empty', CLISetup::LOG_WARN);
-        else
-            foreach ($realms as &$r)
-                $r['battlegroup'] = CFG_BATTLEGROUP;
+            CLI::write(' - realms: Auth-DB not set up .. static data g_realms will be empty', CLI::LOG_WARN);
+        // else
+            // foreach ($realms as &$r)
+                // $r['battlegroup'] = CFG_BATTLEGROUP;
 
         $toFile = "var g_realms = ".Util::toJSON($realms).";";
         $file   = 'datasets/realms';

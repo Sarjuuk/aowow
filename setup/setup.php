@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 if (!CLI)
     die('not in cli mode');
@@ -23,7 +23,7 @@ require_once 'setup/tools/imagecreatefromblp.func.php';
 function finish()
 {
     if (!getopt('d', ['delete']))                           // generated with TEMPORARY keyword. Manual deletion is not needed
-        CLISetup::log('generated dbc_* - tables kept available', CLISetup::LOG_INFO);
+        CLI::write('generated dbc_* - tables kept available', CLI::LOG_INFO);
 
     die("\n");
 }
@@ -37,7 +37,7 @@ if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun
     echo "--account                : create an account with admin privileges\n";
     echo "--sql                    : generate db content from your world tables\n";
     echo "--build                  : create server specific files\n";
-    echo "--sync=<tabelList,>      : regenerate tables/files that depend on given world-table\n";
+    echo "--sync=<tableList,>      : regenerate tables/files that depend on given world-table\n";
     echo "--update                 : apply new sql updates fetched from github\n";
     echo "--firstrun               : goes through the nessecary hoops of the initial setup.\n";
     echo "additional options\n";
@@ -72,7 +72,7 @@ switch ($cmd)                                               // we accept only on
         finish();
     case 'update':
         require_once 'setup/tools/clisetup/update.func.php';
-        list($s, $b) = update();                            // return true if we do not rebuild stuff
+        [$s, $b] = update();                                // return true if we do not rebuild stuff
         if (!$s && !$b)
             return;
     case 'sync':

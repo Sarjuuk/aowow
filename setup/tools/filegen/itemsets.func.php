@@ -69,8 +69,8 @@ if (!CLI)
                     $setOut['classes']  = [];
 
                     for ($i = 0; $i < 12; $i++)
-                        if ($set['classMask'] & (1 << ($i - 1)))
-                            $setOut['classes'][] = $i;
+                        if ($set['classMask'] & (1 << $i))
+                            $setOut['classes'][] = $i + 1;
                 }
 
                 if ($set['contentGroup'])
@@ -107,7 +107,7 @@ if (!CLI)
                     {
                         foreach ($v as $sk => $sv)
                         {
-                            if ($str = Util::$itemMods[$sk])
+                            if ($str = Game::$itemMods[$sk])
                             {
                                 $setOut['setbonus'][$k][$str] = $sv;
                                 unset($setOut['setbonus'][$k][$sk]);

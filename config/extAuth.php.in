@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-    function extAuth($user, $pass, &$userId = 0)
+    function extAuth($user, $pass, &$userId = 0, &$userGroup = -1)
     {
         /*
             insert some auth mechanism here

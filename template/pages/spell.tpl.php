@@ -160,7 +160,7 @@ if (!empty($this->items)):
 ?>
                     <tr>
                         <th><?=Lang::game('requires2');?></th>
-                        <td colspan="3"><?=(User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode(' | ', $this->items[0]), $this->items[1]) : $this->items[1]);?></td>
+                        <td colspan="3"><?=(User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode('<br />', $this->items[0]), $this->items[1]) : $this->items[1]);?></td>
                     </tr>
 <?php
 endif;
@@ -172,30 +172,51 @@ foreach ($this->effects as $i => $e):
                         <th><?=Lang::spell('_effect').' #'.($i + 1);?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
-    echo '                            '.$e['name'].'<small>' .
-        (isset($e['value'])    ? '<br>'.Lang::spell('_value')   .Lang::main('colon').$e['value']    : null) .
-        (isset($e['radius'])   ? '<br>'.Lang::spell('_radius')  .Lang::main('colon').$e['radius'].' '.Lang::spell('_distUnit') : null) .
-        (isset($e['interval']) ? '<br>'.Lang::spell('_interval').Lang::main('colon').$e['interval'] : null) .
-        (isset($e['mechanic']) ? '<br>'.Lang::game('mechanic')  .Lang::main('colon').$e['mechanic'] : null);
+    echo '                            '.$e['name'];
+
+    $smallBuf = '';
+    if (isset($e['value'])):
+        $smallBuf .= '<br>'.Lang::spell('_value').Lang::main('colon').$e['value'];
+    endif;
+
+    if (isset($e['radius'])):
+        $smallBuf .= '<br>'.Lang::spell('_radius').Lang::main('colon').$e['radius'].' '.Lang::spell('_distUnit');
+    endif;
+
+    if (isset($e['interval'])):
+        $smallBuf .= '<br>'.Lang::spell('_interval').Lang::main('colon').$e['interval'];
+    endif;
+
+    if (isset($e['mechanic'])):
+        $smallBuf .= '<br>'.Lang::game('mechanic')  .Lang::main('colon').$e['mechanic'];
+    endif;
 
     if (isset($e['procData'])):
-        echo '<br>';
+        $smallBuf .= '<br>';
 
         if ($e['procData'][0] < 0):
-            echo sprintf(Lang::spell('ppm'), Lang::nf(-$e['procData'][0], 1));
+            $smallBuf .= sprintf(Lang::spell('ppm'), Lang::nf(-$e['procData'][0], 1));
         elseif ($e['procData'][0] < 100.0):
-            echo Lang::spell('procChance').Lang::main('colon').$e['procData'][0].'%';
+            $smallBuf .= Lang::spell('procChance').Lang::main('colon').$e['procData'][0].'%';
         endif;
 
         if ($e['procData'][1]):
             if ($e['procData'][0] < 100.0):
-                echo '<br>';
+                $smallBuf .= '<br>';
             endif;
-            echo sprintf(Lang::game('cooldown'), $e['procData'][1]);
+            $smallBuf .= sprintf(Lang::game('cooldown'), $e['procData'][1]);
         endif;
     endif;
 
-    echo "</small>\n";
+    if ($smallBuf):
+        echo "<small>".$smallBuf."</small>\n";
+    endif;
+
+    if (isset($e['markup'])):
+        echo '<br/><div id="spelleffectmarkup-'.$i.'" style="display: inline-block"></div><script type="text/javascript">//<![CDATA[
+$WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML = Markup.toHtml(\''.$e['markup'].'\');});
+//]]></script>';
+    endif;
 
     if (isset($e['icon'])):
 ?>

@@ -17,13 +17,13 @@ function itemenchantment()
         REPLACE INTO
             ?_itemenchantment
         SELECT
-            Id, charges, 0, 0, 0, type1, type2, type3, amount1, amount2, amount3, object1, object2, object3, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, conditionId, skillLine, skillLevel, requiredLevel
+            Id, charges, 0, 0, 0, type1, type2, type3, amount1, amount2, amount3, object1, object2, object3, name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8, conditionId, skillLine, skillLevel, requiredLevel
         FROM
             dbc_spellitemenchantment';
 
     DB::Aowow()->query($baseQuery);
 
-    $cuProcs = DB::World()->select('SELECT entry AS ARRAY_KEY, customChance AS procChance, PPMChance AS ppmRate FROM spell_enchant_proc_data');
+    $cuProcs = DB::World()->select('SELECT EnchantID AS ARRAY_KEY, Chance AS procChance, ProcsPerMinute AS ppmRate FROM spell_enchant_proc_data');
     foreach ($cuProcs as $id => $vals)
         DB::Aowow()->query('UPDATE ?_itemenchantment SET ?a WHERE id = ?d', $vals, $id);
 

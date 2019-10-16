@@ -14,7 +14,7 @@ $this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f
 ?>
 
             <div id="fi" style="display: <?php echo empty($f['query']) ? 'none' : 'block'; ?>;">
-                <form action="?achievements<?php echo $this->subCat; ?>&filter" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                <form action="?filter=achievements<?php echo $this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <table>
                         <tr>
                             <td><?php echo Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
@@ -63,14 +63,7 @@ endforeach;
                 <div class="pad"></div>
             </div>
 
-            <script type="text/javascript">//<![CDATA[
-                fi_init('achievements');
-<?php
-foreach ($f['fi'] as $str):
-    echo '                '.$str."\n";
-endforeach;
-?>
-            //]]></script>
+<?php $this->brick('filter', ['fi' => $f['initData']]); ?>
 
 <?php $this->brick('lvTabs'); ?>
 

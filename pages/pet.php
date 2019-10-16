@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabid 0: Database g_initHeader()
 class PetPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_PET;
     protected $typeId        = 0;
@@ -58,6 +58,13 @@ class PetPage extends GenericPage
         if ($this->subject->getField('exotic'))
             $infobox[] = '[url=?spell=53270]'.Lang::pet('exotic').'[/url]';
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(TYPE_ICON, $_);
+        }
+
         /****************/
         /* Main Content */
         /****************/
@@ -67,7 +74,7 @@ class PetPage extends GenericPage
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => true,
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_TALENT  => ['href' => '?petcalc#'.Util::$tcEncoding[(int)($this->typeId / 10)] . Util::$tcEncoding[(2 * ($this->typeId % 10) + ($this->subject->getField('exotic') ? 1 : 0))], 'pet' => true]
         );
 
@@ -103,7 +110,7 @@ class PetPage extends GenericPage
         // tab: diet
         $list = [];
         $mask = $this->subject->getField('foodMask');
-        for ($i = 1; $i < 7; $i++)
+        for ($i = 1; $i < 9; $i++)
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
@@ -120,7 +127,7 @@ class PetPage extends GenericPage
 
         // tab: spells
         $mask = 0x0;
-        foreach (Util::$skillLineMask[-1] as $idx => $pair)
+        foreach (Game::$skillLineMask[-1] as $idx => $pair)
         {
             if ($pair[0] == $this->typeId)
             {

@@ -1,7 +1,7 @@
 <?php
 
 if (!defined('AOWOW_REVISION'))
-    die('invalid access');
+    die('illegal access');
 
 
 /*  from TC wiki
@@ -44,7 +44,7 @@ class Loot
     {
         reset($this->results);
 
-        while (list($k, $__) = each($this->results))
+        foreach ($this->results as $k => $__)
             yield $k => $this->results[$k];
     }
 
@@ -134,7 +134,7 @@ class Loot
                 // bandaid.. remove when propperly handling lootmodes
                 if (!in_array($entry['Reference'], $handledRefs))
                 {                                                                                                   // todo (high): find out, why i used this in the first place. (don't do drugs, kids)
-                    list($data, $raw) = self::getByContainerRecursive(LOOT_REFERENCE, $entry['Reference'], $handledRefs, /*$entry['GroupId'],*/ 0, $entry['Chance'] / 100);
+                    [$data, $raw] = self::getByContainerRecursive(LOOT_REFERENCE, $entry['Reference'], $handledRefs, /*$entry['GroupId'],*/ 0, $entry['Chance'] / 100);
 
                     $handledRefs[] = $entry['Reference'];
 
@@ -530,7 +530,7 @@ class Loot
 
                     // achievement part
                     $conditions = array(['itemExtra', $this->entry]);
-                    if ($ar = DB::World()->selectCol('SELECT entry FROM achievement_reward WHERE item = ?d{ OR mailTemplate IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
+                    if ($ar = DB::World()->selectCol('SELECT ID FROM achievement_reward WHERE ItemID = ?d{ OR MailTemplateID IN (?a)}', $this->entry, $ids ?: DBSIMPLE_SKIP))
                         array_push($conditions, ['id', $ar], 'OR');
 
                     $srcObj = new AchievementList($conditions);
@@ -627,7 +627,6 @@ class Loot
 
             $this->results[$tabId] = [$data[0], $tabData];
         }
-
 
         return true;
     }

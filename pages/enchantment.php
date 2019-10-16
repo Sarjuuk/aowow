@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 //  tabId   0: Database    g_initHeader()
 class EnchantmentPage extends GenericPage
 {
-    use DetailPage;
+    use TrDetailPage;
 
     protected $type          = TYPE_ENCHANTMENT;
     protected $typeId        = 0;
@@ -80,6 +80,11 @@ class EnchantmentPage extends GenericPage
 
 
         $this->infobox = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->redButtons = array(
+            BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
+            BUTTON_WOWHEAD => false
+        );
+
         $this->effects = [];
         // 3 effects
         for ($i = 1; $i < 4; $i++)
@@ -108,7 +113,7 @@ class EnchantmentPage extends GenericPage
                     if ($_obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
                         $_obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
 
-                    $this->effects[$i]['tip'] = [$_obj, Util::$itemMods[$_obj]];
+                    $this->effects[$i]['tip'] = [$_obj, Game::$itemMods[$_obj]];
                     // DO NOT BREAK!
                 case 2:
                 case 6:
@@ -146,19 +151,19 @@ class EnchantmentPage extends GenericPage
                         return $foo;
                     };
 
-                    $bLink = $gemCnd['color'.$i]    ? '<a href="?items=3&filter=ty='.$fiColors($gemCnd['color'.$i]).'">'.Lang::item('gemColors', $gemCnd['color'.$i] - 1).'</a>'       : '';
-                    $cLink = $gemCnd['cmpColor'.$i] ? '<a href="?items=3&filter=ty='.$fiColors($gemCnd['cmpColor'.$i]).'">'.Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1).'</a>' : '';
+                    $bLink = $gemCnd['color'.$i]    ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['color'.$i]).'">'.Lang::item('gemColors', $gemCnd['color'.$i] - 1).'</a>'       : '';
+                    $cLink = $gemCnd['cmpColor'.$i] ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['cmpColor'.$i]).'">'.Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1).'</a>' : '';
 
                     switch ($gemCnd['comparator'.$i])
                     {
                         case 2:                             // requires less <color> than (<value> || <comparecolor>) gems
                         case 5:                             // requires at least <color> than (<value> || <comparecolor>) gems
                             $sp = (int)$gemCnd['value'.$i] > 1;
-                            $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', $gemCnd['comparator'.$i], $sp), $gemCnd['value'.$i], $bLink).'</span><br />';
+                            $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.Lang::item('gemConditions', $gemCnd['comparator'.$i], [$gemCnd['value'.$i], $bLink]).'</span><br />';
                             break;
                         case 3:                             // requires more <color> than (<value> || <comparecolor>) gems
                             $link = '<a href="?items=3&filter=ty='.$fiColors($gemCnd['cmpColor'.$i]).'">'.Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1).'</a>';
-                            $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.sprintf(Lang::item('gemConditions', 3), $bLink, $cLink).'</span><br />';
+                            $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.Lang::item('gemConditions', $gemCnd['comparator'.$i], [$bLink, $cLink]).'</span><br />';
                             break;
                     }
                 }
@@ -190,7 +195,7 @@ class EnchantmentPage extends GenericPage
         {
             $this->lvTabs[] = ['item', array(
                 'data' => array_values($socketsList->getListviewData()),
-                'name' => '$LANG.tab_usedby + \' \' + \''.Lang::item('socketBonus').'\'',
+                'name' => '$LANG.tab_socketbonus',
                 'id'   => 'used-by-socketbonus',
             )];
 

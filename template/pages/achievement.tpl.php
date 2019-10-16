@@ -27,40 +27,61 @@ $this->brick('redButtons');
 ?>
 
 
-                <div style="float: left; margin-right: 25px">
-                <table class="iconlist">
 <?php
-foreach ($this->criteria['data'] as $i => $cr):
-    echo '<tr><th'.(isset($cr['icon']) ? ' align="right" id="iconlist-icon'.$cr['icon'].'"' : null).'>';
+    $tbl1  = '<div style="float: left;"><table class="iconlist">%s</table></div>';
+    $tbl2  = '<div style="float: left; margin-right: 25px"><table class="iconlist">%s</table></div>';
+    $rows1 = '';
+    $rows2 = '';
 
-    if (!isset($cr['icon'])):
-        echo '<ul><li><var>&nbsp;</var></li></ul>';
+foreach ($this->criteria['data'] as $i => $cr):
+    if (isset($cr['icon'])):
+        $row = '<tr><th align="right" id="iconlist-icon'.$cr['icon'].'"></th>';
+    else:
+        $row = '<tr><th><ul><li><var>&nbsp;</var></li></ul></th>';
     endif;
 
-    echo '</th><td><span class="tip" title="ID'.Lang::main('colon').$cr['id'].'">';
+    $row .= '<td><span class="tip" title="ID'.Lang::main('colon').$cr['id'].'">';
 
     if (!empty($cr['link'])):
-        echo '<a href="'.$cr['link']['href'].'"'.(isset($cr['link']['quality']) ? ' class="q'.$cr['link']['quality'].'"' : null).'>'.Util::htmlEscape($cr['link']['text']).'</a>';
+        $row .= '<a href="'.$cr['link']['href'].'"'.(isset($cr['link']['quality']) ? ' class="q'.$cr['link']['quality'].'"' : null).'>'.Util::htmlEscape($cr['link']['text']).'</a>';
     endif;
 
     if (!empty($cr['link']['count']) && $cr['link']['count'] > 1):
-        echo '&nbsp;('.$cr['link']['count'].')';
+        $row .= '&nbsp;('.$cr['link']['count'].')';
     endif;
 
     if (isset($cr['extraText'])):
-        echo ' '.$cr['extraText'];
+        $row .= ' '.$cr['extraText'];
     endif;
 
-    echo '</span></td></tr>';
+    $row .= '</span>';
+
+    if (!empty($cr['extraData'])):
+        $buff = [];
+        foreach ($cr['extraData'] as $xd):
+            $buff[] = $xd[0] ? '<a href="'.$xd[0].'">'.$xd[1].'</a>' : '<span>'.$xd[1].'</span>';
+        endforeach;
+
+        $row .= '<br /><sup style="margin-left:8px;">('.implode(', ', $buff).')</sup>';
+    endif;
+
+    $row .= '</td></tr>';
 
     // every odd number of elements
-    if ($i + 1 == round(count($this->criteria['data']) / 2)):
-        echo '</table></div><div style="float: left"><table class="iconlist">';
+    if ($i + 1 > round(count($this->criteria['data']) / 2)):
+        $rows2 .= $row;
+    else:
+        $rows1 .= $row;
     endif;
 endforeach;
+
+if ($rows2):
+    echo sprintf($tbl2, $rows2);
+endif;
+if ($rows1):
+    echo sprintf($tbl1, $rows1);
+endif;
 ?>
-                </table>
-                </div>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
@@ -96,6 +117,7 @@ endif;
 $this->brick('mail');
 
 if (!empty($this->transfer)):
+    echo "    <div style=\"clear: left\"></div>";
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
 

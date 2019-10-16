@@ -115,6 +115,25 @@ $WH.strcmp = function(a, b) {
     return a < b ? -1 : 1;
 }
 
+$WH.stringCompare = function (a, b) {
+    if (a == b)
+        return 0;
+    if (a == null)
+        return -1;
+    if (b == null)
+        return 1;
+
+    var fa = parseFloat(a);
+    var fb = parseFloat(b);
+    if (!isNaN(fa) && !isNaN(fb) && fa != fb)
+        return fa < fb ? -1 : 1;
+
+    if (typeof a == 'string' && typeof b == 'string')
+        return a.localeCompare(b);
+
+    return a < b ? -1 : 1;
+};
+
 $WH.trim = function(str) {
     return str.replace(/(^\s*|\s*$)/g, '');
 }
@@ -890,6 +909,7 @@ $WH.g_getLocaleFromDomain = function(domain) {
 $WH.g_getLocaleFromDomain.L = {
     fr:  2,
     de:  3,
+    cn:  4,
     es:  6,
     ru:  8,
     www: 0
@@ -1045,7 +1065,7 @@ $WH.g_intersectRect = function(a, b) {
 //****************************************************************************//
 //****************************************************************************//
 
-// sarjuuk: this function should be obsolete by now :x
+// aowow: this function should be obsolete by now :x
 $WH.g_setRatingLevel = function(sp, level, rating, value) {
     var newLvl = prompt($WH.sprintf(LANG.prompt_ratinglevel, 1, 80), level);
     if (newLvl != null) {
@@ -1312,7 +1332,7 @@ $WH.g_setJsonItemLevel = function (json, level) {
         json.dmgmin = json[damageType + "dmgmin"] = Math.floor(json.dps * json.speed * (1 - damageRange));
         json.dmgmax = json[damageType + "dmgmax"] = Math.floor(json.dps * json.speed * (1 + damageRange))
 
-        if (json.feratkpwr) {                               // yes thats custom..
+        if (json.feratkpwr) {                               // aowow - yes thats custom..
             json.feratkpwr = Math.max(0, Math.floor((json.dps - 54.8) * 14));
         }
     }
@@ -1320,6 +1340,24 @@ $WH.g_setJsonItemLevel = function (json, level) {
     // Spell Power
     if (splPwrColumn >= 0) {
         json.splpwr = json.bonuses[45] = $WH.g_convertScalingFactor(level, splPwrColumn);
+    }
+
+    // Update the gearscore (profiler usage)
+    if (json.gearscore != null)
+    {
+        if (json._gearscore == null)
+            json._gearscore = json.gearscore;
+
+        var equivLevel = Math.min(80, level + 1);
+
+        if(equivLevel >= 70)
+            n = ((equivLevel - 70) * 9.5) + 105;
+        else if(equivLevel >= 60)
+            n = ((equivLevel - 60) * 4.5) + 60;
+        else
+            n = equivLevel + 5;
+
+        json.gearscore = (json._gearscore * n) / 1.8;
     }
 };
 
@@ -1378,7 +1416,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
                 }
 
                 // Always keep the base armor type
-                return $WH.isset('g_itemset_types') ? prefix + g_itemset_types[_] : _all;   // sarjuuk: LANG is not available if the tooltip is included externaly
+                return $WH.isset('g_itemset_types') ? prefix + g_itemset_types[_] : _all;   // aowow: LANG is not available if the tooltip is included externaly
                 // return prefix + g_itemset_types[_];
             });
 
@@ -1461,7 +1499,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
     // Rating to percent
     nMatch = [];
     tooltip = tooltip.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function(_all, prefix, ratingId, percent) {
-/*  sarjuuk: fix tooltips with multiple occurences of the same rating
+/*  aowow: fix tooltips with multiple occurences of the same rating
         _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)'));
         if (!_) {
             return _all;
@@ -1608,7 +1646,7 @@ $WH.g_enhanceTooltip = function(tooltip, isStatic, useGets, showSlider, buff, kn
 
                 $(chooseSpells)
                     .append('<input type="checkbox" id="known-' + i + '" />')
-                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '">' + g_spells[i]['name_' + Locale.getName()] + (g_spells[i]['rank_' + Locale.getName()] ? ' (' + g_spells[i]['rank_' + Locale.getName()] + ')' : '') + '</a></label>')
+                    .append('<label for="known-' + i + '"><a rel="spell=' + i + '&know=' + i + '&domain=' + Locale.current.domain + '">' + g_spells[i]['name_' + Locale.getName()] + (g_spells[i]['rank_' + Locale.getName()] ? ' (' + g_spells[i]['rank_' + Locale.getName()] + ')' : '') + '</a></label>')
                     .append('<br />');
 
                 $('#known-' + i).change($WH.g_tooltipSpellsChange.bind(this));
@@ -2110,8 +2148,172 @@ $WH.Tooltip = {
         }
 
         $WH.Tooltip.iconVisible = icon ? 1 : 0;
+    },
+
+    simple: function(element, text, className, fixed) {
+        if (fixed)
+            element.onmouseover = function(x) { $WH.Tooltip.show(element, text, false, false, className) };
+        else
+        {
+            element.onmouseover = function(x) { $WH.Tooltip.showAtCursor(x, text, false, false, className) };
+            element.onmousemove = $WH.Tooltip.cursorUpdate;
+        }
+
+        element.onmouseout = $WH.Tooltip.hide;
     }
 };
+
+/* Aowow: totally incompatible with our styles. Only for reference use
+$WH.g_createButton = function(text, href, opts) {
+    var aClass  = 'btn btn-site';
+    var aTarget = '';
+    var aId     = '';
+    var aStyle  = '';
+    var UNUSED  = '';
+    var classes = [];
+    var styles  = [];
+
+    if (!opts)
+        opts = {};
+
+    if (!opts['no-margin'])
+        styles.push('margin-left:5px');
+
+    if (typeof href != 'string' || href === '')
+        href = 'javascript:;';
+
+    if (opts['new-window'])
+        aTarget = ' target="_blank"';
+
+    if (typeof opts.id == 'string')
+        aId = ' id="' + opts.id + '"';
+
+    if (typeof opts.size != 'undefined') {
+        switch (opts.size) {
+            case 'small':
+            case 'large':
+                classes.push('btn-' + opts.size);
+                break
+        }
+    }
+    else
+        classes.push('btn-small');
+
+    if (typeof opts['class'] == 'string')
+        classes.push(opts['class']);
+
+    if (typeof opts.type == 'string') {
+        switch (opts.type) {
+            case 'default':
+            case 'gray':
+                aClass = 'btn';
+                break;
+            default:
+                aClass = 'btn btn-' + opts.type
+        }
+    }
+
+    if (opts.disabled) {
+        classes.push('btn-disabled');
+        href = 'javascript:;';
+    }
+
+    if (classes.length)
+        aClass += ' ' + classes.join(' ');
+
+    if (aClass)
+        aClass = ' class="' + aClass + '"';
+
+    if (!(typeof opts['float'] != 'undefined' && !opts['float']))
+        styles.push('float:right');
+
+    if (typeof opts.style == 'string')
+        styles.push(opts.style);
+
+    if (styles.length)
+        aStyle = ' style="' + styles.join(';') + '"';
+
+    var a = '<a href="' + href + '"' + aTarget + aId + aClass + aStyle + '>' + (text || '') + '</a>';
+    var div = $WH.ce('div');
+    div.innerHTML = a;
+    var btn = div.childNodes[0];
+
+    if (typeof opts.click == 'function' && !opts.disabled)
+        btn.onclick = opts.click;
+
+    if (typeof opts.tooltip != 'undefined') {
+        if (opts.tooltip !== false)
+            btn.setAttribute('data-whattach', 'true');
+
+        if (opts.tooltip === false)
+            btn.rel = 'np';
+        else if (typeof opts.tooltip == 'string')
+            $WH.Tooltip.simple(btn, opts.tooltip, null, true);
+        else if (typeof opts.tooltip == 'object' && opts.tooltip['text'])
+            $WH.Tooltip.simple(btn, opts.tooltip['text'], opts.tooltip['class'], true);
+    }
+
+    return btn;
+};
+*/
+$WH.g_createButton = function(text, href, opts)
+{
+    var classes = [];
+    var styles  = [];
+    var func    = null;
+
+    if (!opts)
+        opts = {};
+
+    if (!opts['no-margin'])
+        styles.push('margin-left:5px');
+
+    if (typeof href != 'string' || href === '')
+        href = 'javascript:;';
+
+    if (typeof opts['class'] == 'string')
+        classes.push(opts['class']);
+
+    if (opts.disabled)
+        href = 'javascript:;';
+
+    if (typeof opts['float'] != 'undefined' && !opts['float'])
+        styles.push('float:right');
+
+    if (typeof opts.style == 'string')
+        styles.push(opts.style);
+
+    if (typeof opts.click == 'function' && !opts.disabled)
+        func = opts.click;
+
+    var btn = RedButton.create(text || '\0', !opts.disabled, func);
+
+    if (styles.length)
+        $(btn).attr('style', styles.join(';'));
+
+    if (classes.length)
+         $(btn).addClass(classes.join(' '));
+
+    btn.href = href;
+
+    if (opts['new-window'])
+        btn.target = '_blank';
+
+    if (typeof opts.id == 'string')
+        btn.id = opts.id;
+
+    if (typeof opts.tooltip != 'undefined') {
+        if (opts.tooltip === false)
+            btn.rel = 'np';
+        else if (typeof opts.tooltip == 'string')
+            $WH.Tooltip.simple(btn, opts.tooltip, null, true);
+        else if (typeof opts.tooltip == 'object' && opts.tooltip['text'])
+            $WH.Tooltip.simple(btn, opts.tooltip['text'], opts.tooltip['class'], true);
+    }
+
+    return btn;
+}
+/* Aowow: end replacement */
 
 if ($WH.isset('$WowheadPower')) {
     $WowheadPower.init();
