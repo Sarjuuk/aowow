@@ -381,7 +381,7 @@ var mn_quests = [
         [4395, "Dalaran"],
         [4742, "Hrothgar's Landing"]
     ]],
-    [,"Othere"],
+    [,"Other"],
     [2, "Dungeons", , [
         [206, "Utgarde Keep"],
         [209, "Shadowfang Keep"],
