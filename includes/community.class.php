@@ -125,7 +125,7 @@ class CommunityContent
                 case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
                 case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
                 case TYPE_ICON:        $obj = new IconList($cnd);        break;
-                default: continue;
+                default: continue 2;
             }
 
             foreach ($obj->iterate() as $id => $__)

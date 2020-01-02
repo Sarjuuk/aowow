@@ -1029,7 +1029,7 @@ class Util
                                 break;
                             }
                             else
-                                continue;
+                                continue 3;
                     }
                 case CND_ZONEID:                            // 4
                 case CND_AREAID:                            // 23
@@ -1084,7 +1084,7 @@ class Util
                     else if ($c['ConditionValue1'] == 67)   // Horde
                         $c['ConditionValue1'] = 2;
                     else
-                        continue;
+                        continue 2;
             }
 
             $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];
