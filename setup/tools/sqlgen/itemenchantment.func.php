@@ -23,7 +23,7 @@ function itemenchantment()
 
     DB::Aowow()->query($baseQuery);
 
-    $cuProcs = DB::World()->select('SELECT EnchantID AS ARRAY_KEY, Chance AS procChance, ProcsPerMinute AS ppmRate FROM spell_enchant_proc_data');
+    $cuProcs = DB::World()->select('SELECT EnchantID AS ARRAY_KEY, Chance AS procChance, ratePerMinute AS ppmRate FROM spell_enchant_proc_data');
     foreach ($cuProcs as $id => $vals)
         DB::Aowow()->query('UPDATE ?_itemenchantment SET ?a WHERE id = ?d', $vals, $id);
 

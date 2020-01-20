@@ -49,6 +49,8 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
 Import `setup/db_structure.sql` into the AoWoW database `mysql -p {your-db-here} < setup/db_structure.sql`  
 
+Import to your AzerothCore database the table `spell_learn_spell`, import it from `www-aowow/setup/spell_learn_spell.sql`.
+
 #### 3. Server created files
 See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
  * `cache/`
@@ -96,33 +98,41 @@ When you've created your admin account you are done.
 
 ## Troubleshooting
 
-Q: The Page appears white, without any styles.  
+**Q: The Page appears white, without any styles.**  
 A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined poperly. Either way this can be fixed via config `php aowow --siteconfig`
+Probably you need to modify [13] and [18].
+For example, if your project is in `/var/www/html/aowow`, hence you visit it with `http://localhost/aowow/`, you should put:
+- [13] localhost/aowow
+- [18] localhost/aowow/static
 
-Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
+**Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>**  
 A: You are using cache optimization modules for php, that are in confict with each other. (Zend OPcache, XCache, ..) Disable all but one.
 
-Q: Some generated images appear distorted or have alpha-channel issues.  
+**Q: Some generated images appear distorted or have alpha-channel issues.**  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
  BUT you can convert the affected blp file into a png file in the same directory, using the provided BLPConverter.
  AoWoW will priorize png files over blp files.
 
-Q: How can i get the modelviewer to work?  
+**Q: How can i get the modelviewer to work?**  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
 
-Q: I'm getting random javascript errors!  
+**Q: I'm getting random javascript errors!**  
 A: Some server configurations or external services (like Cloudflare) come with modules, that automaticly minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
-Q: Some search results within the profiler act rather strange. How does it work?
+**Q: Some search results within the profiler act rather strange. How does it work?**  
 A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run agains the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
+
+**Q: Failed to connect to database.**  
+A: check your file config in `www-aowow/config/config.php`, if everything is correct, check if your password has **"#"** character contained in the password and replace it with the *encoded (URL) character* correspondent **"%23"**, do the same for special characters if you still get this error.  
+If you do not resolve, try to don't use **"#"** in your password.
 
 
 ## Thanks
 
-@mix: for providing the php-script to parse .blp and .dbc into usable images and tables
-@LordJZ: the wrapper-class for DBSimple; the basic idea for the user-class
-@kliver: basic implementation of screenshot uploads
-
+- @mix: for providing the php-script to parse .blp and .dbc into usable images and tables
+- @LordJZ: the wrapper-class for DBSimple; the basic idea for the user-class
+- @kliver: basic implementation of screenshot uploads
+- @Sarjuuk: mantaining this project
 
 ## Special Thanks
 Said website with the red smiling rocket, for providing this beautifull website!
