@@ -287,7 +287,7 @@ class SoundPage extends GenericPage
         $ssActionLists = DB::World()->selectCol('SELECT entryorguid FROM smart_scripts WHERE action_type = 4 AND action_param1 = ?d AND source_type = 9', $this->typeId);
         $smartScripts  = DB::World()->selectCol($ssQuery, $this->typeId, $ssActionLists ?: DBSIMPLE_SKIP, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists);
 
-        $creatureIds = DB::World()->selectCol('SELECT ct.CreatureID FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundId = ?d OR ct.Sound = ?d', $this->typeId, $this->typeId);
+        $creatureIds = DB::World()->selectCol('SELECT ct.CreatureID FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundEntriesID = ?d OR ct.Sound = ?d', $this->typeId, $this->typeId);
         foreach ($smartScripts as $source => $ids)
         {
             switch($source)

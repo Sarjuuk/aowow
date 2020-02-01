@@ -993,10 +993,10 @@ class NpcPage extends GenericPage
             SELECT
                 ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2, ct.`Type`,
                 ct.TextRange AS `range`,
-                IFNULL(bct.`Language`, ct.`Language`) AS lang,
-                IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.MaleText, ""), IFNULL(NULLIF(bctl.FemaleText, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
-                IF(bct.SoundId > 0, bct.SoundId, ct.Sound) AS soundId
+                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
+                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
+               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
+                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
             FROM
                 creature_text ct
            {LEFT JOIN
