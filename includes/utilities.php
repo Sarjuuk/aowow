@@ -1021,8 +1021,9 @@ class Util
                                 $c['ConditionValue1'] = $zone->getField('id');
                                 break;
                             }
-                            else
-                                continue;
+                            else {
+                                break;
+                            }
                     }
                 case CND_ZONEID:                            // 4
                 case CND_AREAID:                            // 23
@@ -1077,7 +1078,7 @@ class Util
                     else if ($c['ConditionValue1'] == 67)   // Horde
                         $c['ConditionValue1'] = 2;
                     else
-                        continue;
+                        break;
             }
 
             $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];
