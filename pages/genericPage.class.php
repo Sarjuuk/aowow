@@ -853,7 +853,7 @@ class GenericPage
                 case TYPE_USER:        $obj = new UserList($cnd);        break;
                 case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
                 case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
-                default: continue;
+                default: break;
             }
 
             $this->extendGlobalData($obj->getJSGlobals(GLOBALINFO_SELF));
