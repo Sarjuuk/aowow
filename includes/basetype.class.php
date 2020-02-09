@@ -666,7 +666,20 @@ trait spawnHelper
             foreach ($areas as $f => &$floor)
                 $floor['count'] = count($floor['coords']) - (!empty($wpSum[$a][$f]) ? $wpSum[$a][$f] : 0);
 
+        uasort($data, array($this, 'sortBySpawnCount'));
         $this->spawnResult[SPAWNINFO_FULL] = $data;
+    }
+
+    private function sortBySpawnCount($a, $b)
+    {
+        $aCount = current($a)['count'];
+        $bCount = current($b)['count'];
+
+        if ($aCount == $bCount) {
+            return 0;
+        }
+
+        return ($aCount < $bCount) ? 1 : -1;
     }
 
     private function createZoneSpawns()                     // [zoneId1, zoneId2, ..]             for locations-column in listview
