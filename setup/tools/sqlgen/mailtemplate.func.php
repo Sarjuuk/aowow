@@ -26,7 +26,7 @@ SqlGen::register(new class extends SetupScript
             SELECT
                 -ar.ID,
                 IFNULL(ar.Subject, "") AS s0, IFNULL(arl2.Subject, "") AS s2, IFNULL(arl3.Subject, "") AS s3, IFNULL(arl4.Subject, "") AS s4, IFNULL(arl6.Subject, "") AS s6, IFNULL(arl8.Subject, "") AS s8,
-                IFNULL(ar.Text, "") AS t0, IFNULL(arl2.Text, "") AS t2, IFNULL(arl3.Text, "") AS t3, IFNULL(arl4.Text, "") AS t4, IFNULL(arl6.Text, "") AS t6, IFNULL(arl8.Text, "") AS t8,
+                IFNULL(ar.Body, "")    AS t0, IFNULL(arl2.Body, "")    AS t2, IFNULL(arl3.Body, "")    AS t3, IFNULL(arl4.Body, "")    AS t4, IFNULL(arl6.Body, "")    AS t6, IFNULL(arl8.Body, "")    AS t8,
                 ItemID
             FROM
                 achievement_reward ar
@@ -41,7 +41,7 @@ SqlGen::register(new class extends SetupScript
             LEFT JOIN
                 achievement_reward_locale arl8 ON ar.ID = arl8.ID AND arl8.Locale = "ruRU"
             WHERE
-                ar.MailTemplateID = 0 AND ar.Text <> ""
+                ar.MailTemplateID = 0 AND ar.Body <> ""
         ');
 
         DB::Aowow()->query('INSERT INTO aowow_mails VALUES (?a)', array_values($acvMail));
