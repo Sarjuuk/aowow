@@ -1240,15 +1240,8 @@ class ItemList extends BaseType
             $this->itemMods[$this->id] = [];
 
             foreach (Game::$itemMods as $mod)
-            {
-                if (isset($this->curTpl[$mod]) && ($_ = floatVal($this->curTpl[$mod])))
-                {
-                    if (!isset($this->itemMods[$this->id][$mod]))
-                        $this->itemMods[$this->id][$mod] = 0;
-
-                    $this->itemMods[$this->id][$mod] += $_;
-                }
-            }
+                if ($_ = floatVal($this->curTpl[$mod]))
+                    Util::arraySumByKey($this->itemMods[$this->id], [$mod => $_]);
 
             // fetch and add socketbonusstats
             if (!empty($this->json[$this->id]['socketbonus']))
@@ -1275,7 +1268,7 @@ class ItemList extends BaseType
                     if ($item > 0)                          // apply socketBonus
                         $this->json[$item]['socketbonusstat'] = array_filter($eStats[$eId]);
                     else /* if ($item < 0) */               // apply gemEnchantment
-                        Util::arraySumByKey($this->json[-$item][$mod], array_filter($eStats[$eId]));
+                        Util::arraySumByKey($this->json[-$item], array_filter($eStats[$eId]));
                 }
             }
         }
