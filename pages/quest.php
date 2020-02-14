@@ -274,7 +274,7 @@ class QuestPage extends GenericPage
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
-                        'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
+                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                     )
                 ));
             }
@@ -294,7 +294,7 @@ class QuestPage extends GenericPage
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
-                        'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n,
+                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                         '_next'   => $_['_next'],
                     )
                 ));
@@ -320,7 +320,7 @@ class QuestPage extends GenericPage
                     'side'    => Game::sideByRaceMask($list->getField('reqRaceMask')),
                     'typeStr' => Util::$typeStrings[TYPE_QUEST],
                     'typeId'  => $id,
-                    'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
+                    'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40))
                 ));
             }
 
