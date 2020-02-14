@@ -25,7 +25,7 @@ class SmartAI
         $this->entry    = $entry;
         $this->miscData = $miscData;
 
-        $raw = DB::World()->select('SELECT id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o FROM smart_scripts WHERE entryorguid = ?d AND source_type = ?d ORDER BY id ASC', $this->entry, $this->srcType);
+        $raw = DB::World()->select('SELECT id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_param4, target_x, target_y, target_z, target_o FROM smart_scripts WHERE entryorguid = ?d AND source_type = ?d ORDER BY id ASC', $this->entry, $this->srcType);
         foreach ($raw as $r)
         {
             $this->rawData[$r['id']] = array(
@@ -44,7 +44,7 @@ class SmartAI
                 ),
                 'target' => array(
                     'type'  => $r['target_type'],
-                    'param' => [$r['target_param1'], $r['target_param2'], $r['target_param3']],
+                    'param' => [$r['target_param1'], $r['target_param2'], $r['target_param3'], $r['target_param4']],
                     'pos'   => [$r['target_x'], $r['target_y'], $r['target_z'], $r['target_o']]
                 )
             );
@@ -429,9 +429,6 @@ class SmartAI
 
         $getDist = function ($min, $max) { return ($min && $max) ? min($min, $max).' &ndash; '.max($min, $max) : max($min, $max); };
         $tooltip = '[tooltip name=t-'.$this->rowKey.']'.Lang::smartAI('targetTT', array_merge([$t['type']], $t['param'], $t['pos'])).'[/tooltip][span class=tip tooltip=t-'.$this->rowKey.']%s[/span]';
-
-        // additional parameters
-        $t['param'][3] = '';
 
         switch ($t['type'])
         {
