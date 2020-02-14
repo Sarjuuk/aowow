@@ -56,7 +56,7 @@ SqlGen::register(new class extends SetupScript
                 type,
                 type_flags,
                 lootid, pickpocketloot, skinloot,
-                spell1, spell2, spell3, spell4, spell5, spell6, spell7, spell8,
+                IFNULL(cts0.Spell, 0), IFNULL(cts1.Spell, 0), IFNULL(cts2.Spell, 0), IFNULL(cts3.Spell, 0), IFNULL(cts4.Spell, 0), IFNULL(cts5.Spell, 0), IFNULL(cts6.Spell, 0), IFNULL(cts7.Spell, 0),
                 PetSpellDataId,
                 VehicleId,
                 mingold, maxgold,
@@ -89,6 +89,22 @@ SqlGen::register(new class extends SetupScript
                 creature_template_locale ctl8 ON ct.entry = ctl8.entry AND ctl8.`locale` = "ruRU"
             LEFT JOIN
                 instance_encounters ie ON ie.creditEntry = ct.entry AND ie.creditType = 0
+            LEFT JOIN
+                creature_template_spell cts0 ON ct.entry = cts0.CreatureID AND cts0.Index = 0
+            LEFT JOIN
+                creature_template_spell cts1 ON ct.entry = cts1.CreatureID AND cts1.Index = 1
+            LEFT JOIN
+                creature_template_spell cts2 ON ct.entry = cts2.CreatureID AND cts2.Index = 2
+            LEFT JOIN
+                creature_template_spell cts3 ON ct.entry = cts3.CreatureID AND cts3.Index = 3
+            LEFT JOIN
+                creature_template_spell cts4 ON ct.entry = cts4.CreatureID AND cts4.Index = 4
+            LEFT JOIN
+                creature_template_spell cts5 ON ct.entry = cts5.CreatureID AND cts5.Index = 5
+            LEFT JOIN
+                creature_template_spell cts6 ON ct.entry = cts6.CreatureID AND cts6.Index = 6
+            LEFT JOIN
+                creature_template_spell cts7 ON ct.entry = cts7.CreatureID AND cts7.Index = 7
             WHERE
                 ct.entry > ?d
             {

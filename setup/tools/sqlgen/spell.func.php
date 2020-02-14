@@ -612,14 +612,7 @@ SqlGen::register(new class extends SetupScript
         // npc spells (-8) (run as last! .. missing from npc_scripts? "enum Spells { \s+(\w\d_)+\s+=\s(\d+) }" and "#define SPELL_(\d\w_)+\s+(\d+)") // RAID_MODE(1, 2[, 3, 4]) - macro still not considered
         $world = DB::World()->selectCol('
             SELECT ss.action_param1 FROM smart_scripts ss WHERE ss.action_type IN (11, 75, 85, 86) UNION
-            SELECT ct.spell1 FROM creature_template ct WHERE ct.spell1 <> 0                        UNION
-            SELECT ct.spell2 FROM creature_template ct WHERE ct.spell2 <> 0                        UNION
-            SELECT ct.spell3 FROM creature_template ct WHERE ct.spell3 <> 0                        UNION
-            SELECT ct.spell4 FROM creature_template ct WHERE ct.spell4 <> 0                        UNION
-            SELECT ct.spell5 FROM creature_template ct WHERE ct.spell5 <> 0                        UNION
-            SELECT ct.spell6 FROM creature_template ct WHERE ct.spell6 <> 0                        UNION
-            SELECT ct.spell7 FROM creature_template ct WHERE ct.spell7 <> 0                        UNION
-            SELECT ct.spell8 FROM creature_template ct WHERE ct.spell8 <> 0'
+            SELECT cts.Spell FROM creature_template_spell cts'
         );
 
         $auras = DB::World()->selectCol('SELECT cta.auras FROM creature_template_addon cta WHERE auras <> ""');
