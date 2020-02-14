@@ -68,7 +68,7 @@ SqlGen::register(new class extends SetupScript
                 EffectSpellClassMaskC1,                 EffectSpellClassMaskC2,                 EffectSpellClassMaskC3,
                 0 AS iconId,                            0 AS iconIdAlt,
                 0 AS rankId,                            0 AS spellVisualId1,
-                CONCAT("Serverside - ",Comment) AS name_loc0,CONCAT("Serverside - ",Comment) AS name_loc2,CONCAT("Serverside - ",Comment) AS name_loc3,CONCAT("Serverside - ",Comment) AS name_loc4,CONCAT("Serverside - ",Comment) AS name_loc6,CONCAT("Serverside - ",Comment) AS name_loc8,
+                CONCAT("Serverside - ",SpellName) AS name_loc0,CONCAT("Serverside - ",SpellName) AS name_loc2,CONCAT("Serverside - ",SpellName) AS name_loc3,CONCAT("Serverside - ",SpellName) AS name_loc4,CONCAT("Serverside - ",SpellName) AS name_loc6,CONCAT("Serverside - ",SpellName) AS name_loc8,
                 "" AS rank_loc0,                        "" AS rank_loc2,                        "" AS rank_loc3,                        "" AS rank_loc4,                        "" AS rank_loc6,                        "" AS rank_loc8,
                 "" AS description_loc0,                 "" AS description_loc2,                 "" AS description_loc3,                 "" AS description_loc4,                 "" AS description_loc6,                 "" AS description_loc8,
                 "" AS buff_loc0,                        "" AS buff_loc2,                        "" AS buff_loc3,                        "" AS buff_loc4,                        "" AS buff_loc6,                        "" AS buff_loc8,
