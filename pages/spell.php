@@ -1629,7 +1629,7 @@ class SpellPage extends GenericPage
                     $foo['icon']['count'] = "'".($effBP + 1).'-'.$foo['icon']['count']."'";
             }
             // .. from spell
-            else if (in_array($i, $spellIdx) || $effId == 133)
+            else if (in_array($i, $spellIdx) || in_array($effId, [133, 140, 141]))
             {
                 if ($effId == 155)
                     $_ = $effMV;
@@ -1656,7 +1656,7 @@ class SpellPage extends GenericPage
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
 
-            if (!in_array($i, $itemIdx) && !in_array($i, $spellIdx) && !in_array($effAura, [225, 227]))
+            if (!in_array($i, $itemIdx))
                 $foo['value'] = ($effDS && $effDS != 1 ? ($effBP + 1).Lang::game('valueDelim') : null).($effBP + $effDS);
 
             if ($effRPPL != 0)
