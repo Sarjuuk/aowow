@@ -102,22 +102,17 @@ class CreatureList extends BaseType
 
     public function getRandomModelId()
     {
+        // dwarf?? [null, 30754, 30753, 30755, 30736]
         // totems use hardcoded models, tauren model is base
-        $totems = array(                                    // tauren => [orc, dwarf(?!), troll, tauren, draenei]
-            4589 => [30758, 30754, 30762, 4589, 19074],     // fire
-            4588 => [30757, 30753, 30761, 4588, 19073],     // earth
-            4587 => [30759, 30755, 30763, 4587, 19075],     // water
-            4590 => [30756, 30736, 30760, 4590, 19071],     // air
-        );
-
-        $data = [];
+        $totems = [null, 4589, 4588, 4587, 4590];           // slot => modelId
+        $data   = [];
 
         for ($i = 1; $i < 5; $i++)
             if ($_ = $this->curTpl['displayId'.$i])
                 $data[] = $_;
 
-        if (count($data) == 1 && in_array($data[0], array_keys($totems)))
-            $data = $totems[$data[0]];
+        if (count($data) == 1 && ($slotId = array_search($data[0], $totems)))
+            $data = DB::World()->selectCol('SELECT DisplayId FROM player_totem_model WHERE TotemSlot = ?d', $slotId);
 
         return !$data ? 0 : $data[array_rand($data)];
     }
