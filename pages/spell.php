@@ -1713,7 +1713,9 @@ class SpellPage extends GenericPage
                         $foo['name'] .= Util::ucFirst(Lang::game('quest')).' #'.$effMV;;
                     break;
                 case 28:                                    // Summon
+                case 56:                                    // Summon Pet
                 case 90:                                    // Kill Credit
+                case 112:                                   // Summon Demon
                 case 134:                                   // Kill Credit2
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
                         $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
