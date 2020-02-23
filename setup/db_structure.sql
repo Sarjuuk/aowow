@@ -1961,6 +1961,7 @@ CREATE TABLE `aowow_quests` (
   `eventId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `prevQuestId` mediumint(8) NOT NULL DEFAULT 0,
   `nextQuestId` mediumint(8) NOT NULL DEFAULT 0,
+  `breadcrumbForQuestId` mediumint(8) NOT NULL DEFAULT 0,
   `exclusiveGroup` mediumint(8) NOT NULL DEFAULT 0,
   `nextQuestIdChain` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `flags` int(10) unsigned NOT NULL DEFAULT 0,
@@ -3119,7 +3120,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1543774779,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1582485391,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

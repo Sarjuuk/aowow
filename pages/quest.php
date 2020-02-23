@@ -332,10 +332,10 @@ class QuestPage extends GenericPage
             ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array(['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId])],
+            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')])],
+            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
             ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],

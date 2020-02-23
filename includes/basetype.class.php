@@ -774,14 +774,6 @@ trait profilerHelper
     }
 }
 
-/*
-    roight!
-        just noticed, that the filters on pages originally pointed to ?filter=<pageName>
-        wich probably checked for correctness of inputs and redirected the correct values as a get-request
-        ..
-        well, as it is now, its working .. and you never change a running system ..
-*/
-
 abstract class Filter
 {
     private static  $wCards      = ['*' => '%', '?' => '_'];
@@ -1143,7 +1135,7 @@ abstract class Filter
                 else if (gettype($valid) == 'double')
                     $val = floatval($val);
                 else /* if (gettype($valid) == 'string') */
-                    $var = strval($val);
+                    $val = strval($val);
 
                 if ($valid == $val)
                     return true;
