@@ -24,11 +24,11 @@ Also, this project is not meant to be used for commercial puposes of any kind!
   + Mysqli
   + mbString
 + MySQL ≥ 5.5.30
-+ [TDB 335.64](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.64) - including world updates up to 09.10.2018
++ [TDB 335.20021](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.20021)
 + Tools require cmake: Please refer to the individual repositories for detailed information
-  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / [BLPConverter](https://github.com/Sarjuuk/BLPConverter) (optional)
+  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
   + WIN users may find it easier to use these alternatives
-     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / [BLPConverter](https://github.com/PatrickCyr/BLPConverter) (optional)
+     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / (optional: [BLPConverter](https://github.com/PatrickCyr/BLPConverter))
 
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
@@ -113,7 +113,7 @@ A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and 
 Q: I'm getting random javascript errors!  
 A: Some server configurations or external services (like Cloudflare) come with modules, that automaticly minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
-Q: Some search results within the profiler act rather strange. How does it work?
+Q: Some search results within the profiler act rather strange. How does it work?  
 A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run agains the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
 
 

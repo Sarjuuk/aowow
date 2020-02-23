@@ -248,7 +248,7 @@ SqlGen::register(new class extends SetupScript
         $offset = 0;
 
         CLI::write(' - applying stats for enchantments');
-        $enchStats = enchantment_stats();
+        $enchStats = $this->enchantment_stats();
         CLI::write('   '.count($enchStats).' enchantments parsed');
         CLI::write(' - applying stats for items');
 

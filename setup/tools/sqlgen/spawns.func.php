@@ -186,7 +186,7 @@ SqlGen::register(new class extends SetupScript
                 }
 
                 // if areaId is set, area was determined by TC .. we're fine .. mostly
-                $final  = $spawn['areaId'] ? $points[0] : $checkCoords($points);
+                $final  = $spawn['areaId'] ? $points[0] : $this->checkCoords($points);
 
                 if ($idx < 5)
                 {
