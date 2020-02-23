@@ -535,9 +535,7 @@ CREATE TABLE `aowow_creature` (
   `dynamicFlags` int(10) unsigned NOT NULL DEFAULT 0,
   `family` tinyint(4) NOT NULL DEFAULT 0,
   `trainerType` tinyint(4) NOT NULL DEFAULT 0,
-  `trainerSpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `trainerClass` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `trainerRace` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `trainerRequirement` smallint(5) unsigned NOT NULL DEFAULT 0,
   `dmgMin` float unsigned NOT NULL DEFAULT 0,
   `dmgMax` float unsigned NOT NULL DEFAULT 0,
   `mleAtkPwrMin` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -3120,7 +3118,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1582485391,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1582486388,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

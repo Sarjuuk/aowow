@@ -213,7 +213,7 @@ class ClassPage extends GenericPage
         $conditions = array(
             ['npcflag', 0x30, '&'],                             // is trainer
             ['trainerType', 0],                                 // trains class spells
-            ['trainerClass', $this->typeId]
+            ['trainerRequirement', $this->typeId]
         );
 
         $trainer = new CreatureList($conditions);

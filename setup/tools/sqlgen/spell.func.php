@@ -12,7 +12,7 @@ SqlGen::register(new class extends SetupScript
     protected $command = 'spell';
 
     protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'npc_trainer', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
+    protected $tblDependancyTC    = ['item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
     protected $dbcSourceFiles     = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon'];
 
     public function generate(array $ids = []) : bool
@@ -346,7 +346,7 @@ SqlGen::register(new class extends SetupScript
         }
 
         // fill learnedAt, trainingCost from trainer
-        if ($trainer = DB::World()->select('SELECT SpellID AS ARRAY_KEY, MIN(ReqSkillRank) AS reqSkill, MIN(MoneyCost) AS cost, COUNT(*) AS count FROM npc_trainer GROUP BY SpellID'))
+        if ($trainer = DB::World()->select('SELECT SpellID AS ARRAY_KEY, MIN(ReqSkillRank) AS reqSkill, MIN(MoneyCost) AS cost, ReqAbility1 AS reqSpellId, COUNT(*) AS count FROM trainer_spell GROUP BY SpellID'))
         {
             $spells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($trainer));
             $links  = [];
@@ -370,7 +370,7 @@ SqlGen::register(new class extends SetupScript
                     $l = &$links[$effects['effect'.$i.'TriggerSpell']];
 
                     if (!isset($l))
-                        $l = [$tData['reqSkill'], $tData['cost']];
+                        $l = [$tData['reqSkill'], $tData['cost'], $tData['reqSpellId']];
 
                     if ($tData['reqSkill'] < $l[0])
                         $l[0] = $tData['reqSkill'];
@@ -384,7 +384,7 @@ SqlGen::register(new class extends SetupScript
                     $l = &$links[$spell];
 
                     if (!isset($l))
-                        $l = [$tData['reqSkill'], $tData['cost']];
+                        $l = [$tData['reqSkill'], $tData['cost'], $tData['reqSpellId']];
 
                     if ($tData['reqSkill'] < $l[0])
                         $l[0] = $tData['reqSkill'];
@@ -483,25 +483,9 @@ SqlGen::register(new class extends SetupScript
             if (isset($itemInfo[$itemId]))
                 DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconIdAlt = ?d, s.cuFlags = s.cuFlags | ?d WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND s.id = ?d', -$itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
 
-        // apply specializations [trainerTemplate => reqSpell]
-        $specs = array(
-            201007 => 9788,
-            201008 => 9787,
-            201015 => 20222,
-            201016 => 20219,
-            201030 => 10660,
-            201031 => 10656,
-            201032 => 10658
-        );
-        foreach ($specs as $tt => $req)
-            if ($spells = DB::World()->selectCol('SELECT SpellID FROM npc_trainer WHERE ID = ?d', $tt))
-                DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE id IN (?a)', $req, $spells);
-
         $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN (?a)', [0, 34090, 34091]); // not riding
         foreach ($itemReqs AS $itemId => $req)
             DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE skillLine1 IN (?a) AND effect1CreateItemId = ?d', $req, [164, 165, 197, 202], $itemId);
-
-        DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = id WHERE id IN (?a)', [9788, 9787, 20222, 20219, 10660, 10656, 10658, 26797, 26798, 26801, 17039, 17040, 17041]);
 
         // setting icons
         DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');

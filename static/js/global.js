@@ -23074,7 +23074,7 @@ var ConditionList = new function() {
             }
         }
 
-        return rows.length > 1 ? '[ul][li]' + rows.join('[/li][li]') + '[/li][/ul]' : rows[0];
+        return rows.length > 1 ? rows.join('[br]') : rows[0];
     }
 
 }

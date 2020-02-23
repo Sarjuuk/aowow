@@ -1036,10 +1036,10 @@ class SpellPage extends GenericPage
             if (count($src) == 1 && $src[0] == 1)           // multiple trainer
             {
                 $list = DB::World()->selectCol('
-                    SELECT    IF(t1.ID > 200000, t2.ID, t1.ID)
-                    FROM      npc_trainer t1
-                    LEFT JOIN npc_trainer t2 ON t2.SpellID = -t1.ID
-                    WHERE     t1.SpellID = ?d',
+                    SELECT  cdt.CreatureId
+                    FROM    creature_default_trainer cdt
+                    JOIN    trainer_spell ts ON ts.TrainerId = cdt.TrainerId
+                    WHERE   ts.SpellId = ?d',
                     $this->typeId
                 );
             }
