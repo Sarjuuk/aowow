@@ -31,6 +31,9 @@ class GameObjectList extends BaseType
         // post processing
         foreach ($this->iterate() as $_id => &$curTpl)
         {
+            if (!$curTpl['name_loc0'])
+                $curTpl['name_loc0'] = 'Unnamed Object #' . $_id;
+
             // unpack miscInfo
             $curTpl['lootStack']    = [];
             $curTpl['spells']       = [];
