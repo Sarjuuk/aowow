@@ -1601,6 +1601,7 @@ CREATE TABLE `aowow_mails` (
   `text_loc4` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `text_loc6` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `text_loc8` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attachment` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
