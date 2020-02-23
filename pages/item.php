@@ -352,7 +352,7 @@ class ItemPage extends genericPage
             $this->addCSS(['path' => 'Book.css']);
         }
 
-        $this->headIcons  = [$this->subject->getField('iconString'), $this->subject->getField('stackable')];
+        $this->headIcons  = [$this->subject->getField('iconString', true, true), $this->subject->getField('stackable')];
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->tooltip    = $this->subject->renderTooltip(true);
         $this->redButtons = array(
@@ -413,7 +413,7 @@ class ItemPage extends genericPage
                     Lang::item('_transfer'),
                     $altItem->id,
                     $altItem->getField('quality'),
-                    $altItem->getField('iconString'),
+                    $altItem->getField('iconString', true, true),
                     $altItem->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
                     $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
@@ -1050,7 +1050,7 @@ class ItemPage extends genericPage
             $x = $this->subject->getField('class') == 2 ? Lang::spell('weaponSubClass') : Lang::item('cat', $this->subject->getField('class'), 1);
             $xml->addChild('subclass')->addCData(is_array($x) ? (is_array($x[$this->subject->getField('subClass')]) ? $x[$this->subject->getField('subClass')][0] : $x[$this->subject->getField('subClass')]) : null)->addAttribute('id', $this->subject->getField('subClass'));
             // icon + displayId
-            $xml->addChild('icon', $this->subject->getField('iconString'))->addAttribute('displayId', $this->subject->getField('displayId'));
+            $xml->addChild('icon', $this->subject->getField('iconString', true, true))->addAttribute('displayId', $this->subject->getField('displayId'));
             // inventorySlot
             $xml->addChild('inventorySlot', Lang::item('inventoryType', $this->subject->getField('slot')))->addAttribute('id', $this->subject->getField('slot'));
             // tooltip
@@ -1142,7 +1142,7 @@ class ItemPage extends genericPage
                         $splNode = $cbNode->addChild('spell');
                         $splNode->addAttribute('id', $sId);
                         $splNode->addAttribute('name', $spellSource->getField('name', true));
-                        $splNode->addAttribute('icon', $this->subject->getField('iconString'));
+                        $splNode->addAttribute('icon', $this->subject->getField('iconString', true, true));
                         $splNode->addAttribute('minCount', $spellSource->getField('effect'.$idx.'BasePoints') + 1);
                         $splNode->addAttribute('maxCount', $spellSource->getField('effect'.$idx.'BasePoints') + $spellSource->getField('effect'.$idx.'DieSides'));
 
