@@ -30,9 +30,7 @@ class MailPage extends GenericPage
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
-        $this->name = Util::ucFirst($this->subject->getField('subject', true));
-        if (!$this->name)
-            $this->name = Lang::mail('untitled');
+        $this->name = Util::ucFirst($this->subject->getField('name', true));
     }
 
     protected function generateContent()

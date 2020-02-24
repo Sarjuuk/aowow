@@ -27,10 +27,6 @@ Listview.templates.mail = {
                 var a = $WH.ce('a');
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = this.getItemLink(mail);
-                if (!mail.subject){
-                    mail.subject = 'Untitled Mail'
-                    a.className = 'q0';
-                }
 
                 $WH.ae(a, $WH.ct(mail.subject));
                 $WH.ae(wrapper, a);

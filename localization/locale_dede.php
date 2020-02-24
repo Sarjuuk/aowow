@@ -1164,7 +1164,7 @@ $lang = array(
         'mailIn'        => " nach %s",
         'delay'         => "Verzögerung",
         'sender'        => "Absender",
-        'untitled'      => "Unbetitelter Brief"
+        'untitled'      => "Unbetitelter Brief #%d"
     ),
     'pet'      => array(
         'notFound'      => "Diese Tierart existiert nicht.",

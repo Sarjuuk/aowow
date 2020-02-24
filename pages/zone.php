@@ -384,12 +384,10 @@ class ZonePage extends GenericPage
                 if (!$tpl)
                     continue;
 
-                $n  = Util::localizedString($tpl, 'name');
-
                 $addToSOM('areatrigger', array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
-                    'name'          => $tpl['name'] ?: 'Unnamed AT #'.$spawn['typeId'],
+                    'name'          => Util::localizedString($tpl, 'name', true, true),
                     'type'          => TYPE_AREATRIGGER,
                     'id'            => $spawn['typeId'],
                     'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])

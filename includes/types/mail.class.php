@@ -21,9 +21,14 @@ class MailList extends BaseType
             return;
 
         // post processing
-        foreach ($this->iterate() as &$_curTpl)
+        foreach ($this->iterate() as $_id => &$_curTpl)
         {
             $_curTpl['name'] = Util::localizedString($_curTpl, 'subject', true);
+            if (!$_curTpl['name'])
+            {
+                $_curTpl['name'] = sprintf(Lang::mail('untitled'), $_id);
+                $_curTpl['subject_loc0'] = $_curTpl['name'];
+            }
         }
     }
 

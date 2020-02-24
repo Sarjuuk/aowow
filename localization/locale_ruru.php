@@ -1164,7 +1164,7 @@ $lang = array(
         'mailIn'        => " через %s",
         'delay'         => "Delay",
         'sender'        => "Sender",
-        'untitled'      => "Untitled Mail"
+        'untitled'      => "Untitled Mail #%d"
     ),
     'pet'      => array(
         'notFound'      => "Такой породы питомцев не существует.",
