@@ -30,7 +30,7 @@ class MailPage extends GenericPage
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
-        $this->name = Util::ucFirst($this->subject->getField('name', true));
+        $this->name = Util::htmlEscape(Util::ucFirst($this->subject->getField('name', true)));
     }
 
     protected function generateContent()
@@ -157,7 +157,7 @@ class MailPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('mail')));
+        array_unshift($this->title, Util::ucFirst($this->subject->getField('name', true)), Util::ucFirst(Lang::game('mail')));
     }
 
     protected function generatePath() { }

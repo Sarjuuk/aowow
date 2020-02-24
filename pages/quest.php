@@ -34,7 +34,7 @@ class QuestPage extends GenericPage
             $this->notFound();
 
         // may contain htmlesque tags
-        $this->name = htmlentities($this->subject->getField('name', true));
+        $this->name = Util::htmlEscape($this->subject->getField('name', true));
     }
 
     protected function generatePath()

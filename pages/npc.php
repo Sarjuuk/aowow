@@ -34,7 +34,7 @@ class NpcPage extends GenericPage
         if ($this->subject->error)
             $this->notFound();
 
-        $this->name    = $this->subject->getField('name', true);
+        $this->name    = Util::htmlEscape($this->subject->getField('name', true));
         $this->subname = $this->subject->getField('subname', true);
     }
 
@@ -48,7 +48,7 @@ class NpcPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('npc')));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('npc')));
     }
 
     protected function generateContent()
@@ -321,14 +321,14 @@ class NpcPage extends GenericPage
         $sai = null;
         if ($this->subject->getField('aiName') == 'SmartAI')
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->name]);
+            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->subject->getField('name', true)]);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
                 $guids = DB::World()->selectCol('SELECT guid FROM creature WHERE id = ?d', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
-                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->subject->getField('name', true), 'title' => ' [small](for GUID: '.$_.')[/small]']);
                     if ($sai->prepare())
                         break;
                 }
@@ -1047,7 +1047,7 @@ class NpcPage extends GenericPage
                     'range' => $t['range'],
                     'type'  => 2,                           // [type: 0, 12] say: yellow-ish
                     'lang'  => !empty($t['lang']) ? Lang::game('languages', $t['lang']) : null,
-                    'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
+                    'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->subject->getField('name', true)),
                 );
 
                 switch ($t['Type'])
