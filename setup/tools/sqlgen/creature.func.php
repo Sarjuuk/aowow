@@ -33,7 +33,7 @@ SqlGen::register(new class extends SetupScript
                 exp,
                 faction,
                 npcflag,
-                IF(rank > 4, 0, rank),
+                IF(`rank` > 4, 0, `rank`),
                 dmgSchool,
                 DamageModifier,
                 BaseAttackTime,
