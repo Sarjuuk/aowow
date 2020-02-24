@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `aowow_mailtemplate`;
 DROP TABLE IF EXISTS `aowow_mails`;
 
 CREATE TABLE `aowow_mails` (
-  `id` smallint(5) unsigned NOT NULL,
+  `id` smallint(5) NOT NULL,
   `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,

@@ -1588,7 +1588,7 @@ DROP TABLE IF EXISTS `aowow_mails`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_mails` (
-  `id` smallint(5) unsigned NOT NULL,
+  `id` smallint(5) NOT NULL,
   `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
