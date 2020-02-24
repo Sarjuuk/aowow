@@ -452,9 +452,9 @@ class NpcPage extends GenericPage
         // tab: summoned by
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', 28], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', 28], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', 28], ['effect3MiscValue', $this->typeId]]
+            ['AND', ['effect1Id', [28, 56, 112]], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', [28, 56, 112]], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', [28, 56, 112]], ['effect3MiscValue', $this->typeId]]
         );
 
         $summoned = new SpellList($conditions);
