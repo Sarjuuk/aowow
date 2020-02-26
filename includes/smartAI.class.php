@@ -889,7 +889,7 @@ class SmartAI
             case SAI_ACTION_SUMMON_CREATURE:                // 12 -> any target
                 $this->jsGlobals[TYPE_NPC][] = $a['param'][0];
                 if ($a['param'][2])
-                    $a['param'][6] = Util::formatTime($a['param'][2]);
+                    $a['param'][6] = Util::formatTime($a['param'][2], true);
 
                 $footer = $this->summonType($a['param'][1]);
                 break;
@@ -971,13 +971,13 @@ class SmartAI
                 if ($a['param'][3])
                     $this->jsGlobals[TYPE_QUEST][] = $a['param'][3];
                 if ($a['param'][4])
-                    $a['param'][6] = Util::formatTime($a['param'][4]);
+                    $a['param'][6] = Util::formatTime($a['param'][4], true);
                 if ($a['param'][2])
                     $footer = true;
 
                 break;
             case SAI_ACTION_WP_PAUSE:                       // 54 -> self
-                $a['param'][6] = Util::formatTime($a['param'][0]);
+                $a['param'][6] = Util::formatTime($a['param'][0], true);
                 break;
             case SAI_ACTION_WP_STOP:                        // 55 -> self
                 if ($a['param'][0])
