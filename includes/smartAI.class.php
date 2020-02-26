@@ -713,11 +713,8 @@ class SmartAI
 
         $tooltip = '[tooltip name=a-'.$this->rowKey.']'.Lang::smartAI('actionTT', array_merge([$a['type']], $a['param'])).'[/tooltip][span tooltip=a-'.$this->rowKey.']%s[/span]';
 
-        // additional parameters
-        $a['param'][6] = '';
-        $a['param'][7] = '';
-        $a['param'][8] = '';
-        $a['param'][9] = '';
+        // init additional parameters
+        $a['param'] = array_pad($a['param'], 10, '');
 
         switch ($a['type'])
         {

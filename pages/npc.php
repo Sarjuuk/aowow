@@ -421,15 +421,8 @@ class NpcPage extends GenericPage
                     if (in_array($id, $smartSpells))
                     {
                         $normal[$id] = $values;
-                        unset($controled[$id]);
-                        continue;
-                    }
-
-                    // not quite right. All seats should be checked for allowed-to-cast-flag-something
-                    if (!$this->subject->getField('vehicleId') && in_array($id, $tplSpells))
-                    {
-                        $normal[$id] = $values;
-                        unset($controled[$id]);
+                        if (!in_array($id, $tplSpells))
+                            unset($controled[$id]);
                     }
                 }
 
