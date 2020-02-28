@@ -372,21 +372,21 @@ class Profiler
         /**************/
 
         $data = array(
-            'realm'             =>  $realmId,
-            'realmGUID'         =>  $charGuid,
-            'name'              =>  $char['name'],
+            'realm'             => $realmId,
+            'realmGUID'         => $charGuid,
+            'name'              => $char['name'],
             'renameItr'         => 0,
-            'race'              =>  $char['race'],
-            'class'             =>  $char['class'],
-            'level'             =>  $char['level'],
-            'gender'            =>  $char['gender'],
-            'skincolor'         =>  $char['playerBytes']        & 0xFF,
-            'facetype'          => ($char['playerBytes'] >>  8) & 0xFF, // maybe features
-            'hairstyle'         => ($char['playerBytes'] >> 16) & 0xFF,
-            'haircolor'         => ($char['playerBytes'] >> 24) & 0xFF,
-            'features'          =>  $char['playerBytes2']       & 0xFF, // maybe facetype
-            'title'             =>  $char['chosenTitle'] ? DB::Aowow()->selectCell('SELECT id FROM ?_titles WHERE bitIdx = ?d', $char['chosenTitle']) : 0,
-            'playedtime'        =>  $char['totaltime'],
+            'race'              => $char['race'],
+            'class'             => $char['class'],
+            'level'             => $char['level'],
+            'gender'            => $char['gender'],
+            'skincolor'         => $char['skin'],
+            'facetype'          => $char['face'],           // maybe features
+            'hairstyle'         => $char['hairStyle'],
+            'haircolor'         => $char['hairColor'],
+            'features'          => $char['facialStyle'],    // maybe facetype
+            'title'             => $char['chosenTitle'] ? DB::Aowow()->selectCell('SELECT id FROM ?_titles WHERE bitIdx = ?d', $char['chosenTitle']) : 0,
+            'playedtime'        => $char['totaltime'],
             'nomodelMask'       => ($char['playerFlags'] & 0x400 ? (1 << SLOT_HEAD) : 0) | ($char['playerFlags'] & 0x800 ? (1 << SLOT_BACK) : 0),
             'talenttree1'       => 0,
             'talenttree2'       => 0,
