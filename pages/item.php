@@ -677,6 +677,9 @@ class ItemPage extends genericPage
             ]
         );
 
+        if ($_ = $this->subject->getField('itemset'))
+            $conditions[1][] = ['AND', ['slot', $_slot], ['itemset', $_]];
+
         $saItems = new ItemList($conditions);
         if (!$saItems->error)
         {

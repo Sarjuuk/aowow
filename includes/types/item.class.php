@@ -979,10 +979,31 @@ class ItemList extends BaseType
         $pieces  = [];
         if ($setId = $this->getField('itemset'))
         {
-            // while Ids can technically be used multiple times the only difference in data are the items used. So it doesn't matter what we get
-            $itemset = new ItemsetList(array(['id', $setId]));
+            $condition = [
+                ['refSetId', $setId],
+             // ['quality',  $this->curTpl['quality']],
+                ['minLevel', $this->curTpl['itemLevel'], '<='],
+                ['maxLevel', $this->curTpl['itemLevel'], '>=']
+            ];
+
+            $itemset = new ItemsetList($condition);
             if (!$itemset->error && $itemset->pieceToSet)
             {
+                // handle special cases where:
+                // > itemset has items of different qualities (handled by not limiting for this in the initial query)
+                // > itemset is virtual and multiple instances have the same itemLevel but not quality (filter below)
+                if ($itemset->getMatches() > 1)
+                {
+                    foreach ($itemset->iterate() as $id => $__)
+                    {
+                        if ($itemset->getField('quality') == $this->curTpl['quality'])
+                        {
+                            $itemset->pieceToSet = array_filter($itemset->pieceToSet, function($x) use ($id) { return $id == $x; });
+                            break;
+                        }
+                    }
+                }
+
                 $pieces = DB::Aowow()->select('
                     SELECT b.id AS ARRAY_KEY, b.name_loc0, b.name_loc2, b.name_loc3, b.name_loc4, b.name_loc6, b.name_loc8, GROUP_CONCAT(a.id SEPARATOR \':\') AS equiv
                     FROM   ?_items a, ?_items b
@@ -996,7 +1017,7 @@ class ItemList extends BaseType
 
                 $xSet = '<br /><span class="q">'.Lang::item('setName', ['<a href="?itemset='.$itemset->id.'" class="q">'.$itemset->getField('name', true).'</a>', 0, count($pieces)]).'</span>';
 
-                if ($skId = $itemset->getField('skillId'))      // bonus requires skill to activate
+                if ($skId = $itemset->getField('skillId'))  // bonus requires skill to activate
                 {
                     $xSet .= '<br />'.sprintf(Lang::game('requires'), '<a href="?skills='.$skId.'" class="q1">'.SkillList::getName($skId).'</a>');
 
