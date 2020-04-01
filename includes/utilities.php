@@ -436,85 +436,86 @@ class Util
         return $money;
     }
 
-    public static function parseTime(int $sec) : array
+    private static function parseTime(int $msec) : array
     {
-        $time = ['d' => 0, 'h' => 0, 'm' => 0, 's' => 0, 'ms' => 0];
+        $time = [0, 0, 0, 0, 0];
+
+        if ($_ = ($msec % 1000))
+            $time[0] = $_;
+
+        $sec = $msec / 1000;
 
         if ($sec >= 3600 * 24)
         {
-            $time['d'] = floor($sec / 3600 / 24);
-            $sec -= $time['d'] * 3600 * 24;
+            $time[4] = floor($sec / 3600 / 24);
+            $sec -= $time[4] * 3600 * 24;
         }
 
         if ($sec >= 3600)
         {
-            $time['h'] = floor($sec / 3600);
-            $sec -= $time['h'] * 3600;
+            $time[3] = floor($sec / 3600);
+            $sec -= $time[3] * 3600;
         }
 
         if ($sec >= 60)
         {
-            $time['m'] = floor($sec / 60);
-            $sec -= $time['m'] * 60;
+            $time[2] = floor($sec / 60);
+            $sec -= $time[2] * 60;
         }
 
         if ($sec > 0)
         {
-            $time['s'] = (int)$sec;
-            $sec -= $time['s'];
+            $time[1] = (int)$sec;
+            $sec -= $time[1];
         }
-
-        if (($sec * 1000) % 1000)
-            $time['ms'] = (int)($sec * 1000);
 
         return $time;
     }
 
     public static function formatTime(int $msec, bool $short = false) : string
     {
-        $s = self::parseTime($msec / 1000);
-        $fmt = [];
+        [$ms, $s, $m, $h, $d] = self::parseTime(abs($msec));
 
         if ($short)
         {
-            if ($_ = round($s['d'] / 364))
+            if ($_ = round($d / 364))
                 return $_." ".Lang::timeUnits('ab', 0);
-            if ($_ = round($s['d'] / 30))
+            if ($_ = round($d / 30))
                 return $_." ".Lang::timeUnits('ab', 1);
-            if ($_ = round($s['d'] / 7))
+            if ($_ = round($d / 7))
                 return $_." ".Lang::timeUnits('ab', 2);
-            if ($_ = round($s['d']))
+            if ($_ = round($d))
                 return $_." ".Lang::timeUnits('ab', 3);
-            if ($_ = round($s['h']))
+            if ($_ = round($h))
                 return $_." ".Lang::timeUnits('ab', 4);
-            if ($_ = round($s['m']))
+            if ($_ = round($m))
                 return $_." ".Lang::timeUnits('ab', 5);
-            if ($_ = round($s['s'] + $s['ms'] / 1000, 2))
+            if ($_ = round($s + $ms / 1000, 2))
                 return $_." ".Lang::timeUnits('ab', 6);
-            if ($s['ms'])
-                return $s['ms']." ".Lang::timeUnits('ab', 7);
+            if ($ms)
+                return $ms." ".Lang::timeUnits('ab', 7);
 
             return '0 '.Lang::timeUnits('ab', 6);
         }
         else
         {
-            $_ = $s['d'] + $s['h'] / 24;
+            $_ = $d + $h / 24;
             if ($_ > 1 && !($_ % 364))                      // whole years
-                return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::timeUnits($s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl', 0);
+                return round(($d + $h / 24) / 364, 2)." ".Lang::timeUnits($d / 364 == 1 && !$h ? 'sg' : 'pl', 0);
             if ($_ > 1 && !($_ % 30))                       // whole month
-                return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::timeUnits($s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl', 1);
+                return round(($d + $h / 24) /  30, 2)." ".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
             if ($_ > 1 && !($_ % 7))                        // whole weeks
-                return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::timeUnits($s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl', 2);
-            if ($s['d'])
-                return round($s['d'] + $s['h']  /   24, 2)." ".Lang::timeUnits($s['d'] == 1 && !$s['h']  ? 'sg' : 'pl', 3);
-            if ($s['h'])
-                return round($s['h'] + $s['m']  /   60, 2)." ".Lang::timeUnits($s['h'] == 1 && !$s['m']  ? 'sg' : 'pl', 4);
-            if ($s['m'])
-                return round($s['m'] + $s['s']  /   60, 2)." ".Lang::timeUnits($s['m'] == 1 && !$s['s']  ? 'sg' : 'pl', 5);
-            if ($s['s'])
-                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::timeUnits($s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl', 6);
-            if ($s['ms'])
-                return $s['ms']." ".Lang::timeUnits($s['ms'] == 1 ? 'sg' : 'pl', 7);
+                return round(($d + $h / 24) /   7, 2)." ".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
+            if ($d)
+                return round($d + $h  /   24, 2)." ".Lang::timeUnits($d == 1 && !$h  ? 'sg' : 'pl', 3);
+            if ($h)
+                return round($h + $m  /   60, 2)." ".Lang::timeUnits($h == 1 && !$m  ? 'sg' : 'pl', 4);
+            if ($m)
+                return round($m + $s  /   60, 2)." ".Lang::timeUnits($m == 1 && !$s  ? 'sg' : 'pl', 5);
+            if ($s)
+                return round($s + $ms / 1000, 2)." ".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
+            if ($ms)
+                return $ms." ".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
 
             return '0 '.Lang::timeUnits('pl', 6);
         }
