@@ -25,6 +25,7 @@ class Loot
 
     private $entry         = 0;                             // depending on the lookup itemId oder templateId
     private $results       = [];
+    private $chanceMods    = [];
     private $lootTemplates = array(
         LOOT_REFERENCE,                                     // internal
         LOOT_ITEM,                                          // item
@@ -40,7 +41,7 @@ class Loot
         LOOT_SPELL                                          // spell
     );
 
-    public function &iterate()
+    public function &iterate() : iterable
     {
         reset($this->results);
 
@@ -48,15 +49,15 @@ class Loot
             yield $k => $this->results[$k];
     }
 
-    public function getResult()
+    public function getResult() : array
     {
         return $this->results;
     }
 
-    private function createStack($l)                        // issue: TC always has an equal distribution between min/max
+    private function createStack(array $l) : string         // issue: TC always has an equal distribution between min/max
     {
         if (empty($l['min']) || empty($l['max']) || $l['max'] <= $l['min'])
-            return null;
+            return '';
 
         $stack = [];
         for ($i = $l['min']; $i <= $l['max']; $i++)
@@ -66,7 +67,7 @@ class Loot
         return json_encode($stack, JSON_NUMERIC_CHECK);     // do not replace with Util::toJSON !
     }
 
-    private function storeJSGlobals($data)
+    private function storeJSGlobals(array $data) :  void
     {
         foreach ($data as $type => $jsData)
         {
@@ -81,7 +82,62 @@ class Loot
         }
     }
 
-    private function getByContainerRecursive($tableName, $lootId, &$handledRefs, $groupId = 0, $baseChance = 1.0)
+    private function calcChance(array $refs, array $parents = []) : array
+    {
+        $retData = [];
+        $retKeys = [];
+
+        foreach ($refs as $rId => $ref)
+        {
+            // check for possible database inconsistencies
+            if (!$ref['chance'] && !$ref['isGrouped'])
+                trigger_error('Loot by Item: Ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!', E_USER_WARNING);
+
+            if ($ref['isGrouped'] && $ref['sumChance'] > 100)
+                trigger_error('Loot by Item: Group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!', E_USER_WARNING);
+
+            if ($ref['isGrouped'] && $ref['sumChance'] >= 100 && !$ref['chance'])
+                trigger_error('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!', E_USER_WARNING);
+
+            $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
+
+            // apply inherited chanceMods
+            if (isset($this->chanceMods[$ref['item']]))
+            {
+                $chance *= $this->chanceMods[$ref['item']][0];
+                $chance  = 1 - pow(1 - $chance, $this->chanceMods[$ref['item']][1]);
+            }
+
+            // save chance for parent-ref
+            $this->chanceMods[$rId] = [$chance, $ref['multiplier']];
+
+            // refTemplate doesn't point to a new ref -> we are done
+            if (!in_array($rId, $parents))
+            {
+                $data = array(
+                    'percent' => $chance,
+                    'stack'   => [$ref['min'], $ref['max']],
+                    'count'   => 1                      // ..and one for the sort script
+                );
+
+                if ($_ = self::createStack($ref))
+                    $data['pctstack'] = $_;
+
+                // sort highest chances first
+                $i = 0;
+                for (; $i < count($retData); $i++)
+                    if ($retData[$i]['percent'] < $data['percent'])
+                        break;
+
+                array_splice($retData, $i, 0, [$data]);
+                array_splice($retKeys, $i, 0, [$rId]);
+            }
+        }
+
+        return array_combine($retKeys, $retData);
+    }
+
+    private function getByContainerRecursive(string $tableName, int $lootId, array &$handledRefs, int $groupId = 0, float $baseChance = 1.0) : ?array
     {
         $loot     = [];
         $rawItems = [];
@@ -101,7 +157,8 @@ class Loot
                 'quest'         => $entry['QuestRequired'],
                 'group'         => $entry['GroupId'],
                 'parentRef'     => $tableName == LOOT_REFERENCE ? $lootId : 0,
-                'realChanceMod' => $baseChance
+                'realChanceMod' => $baseChance,
+                'groupChance'   => 0
             );
 
             // if ($entry['LootMode'] > 1)
@@ -167,11 +224,15 @@ class Loot
             }
             else if ($entry['GroupId'] && $entry['Chance'])
             {
-                if (empty($groupChances[$entry['GroupId']]))
-                    $groupChances[$entry['GroupId']] = 0;
-
-                $groupChances[$entry['GroupId']] += $entry['Chance'];
                 $set['groupChance'] = $entry['Chance'];
+
+                if (!$entry['Reference'])
+                {
+                    if (empty($groupChances[$entry['GroupId']]))
+                        $groupChances[$entry['GroupId']] = 0;
+
+                    $groupChances[$entry['GroupId']] += $entry['Chance'];
+                }
             }
             else                                            // shouldn't have happened
             {
@@ -192,21 +253,19 @@ class Loot
                 trigger_error('Loot entry '.$lootId.' / group '.$k.' has a total chance of '.number_format($sum, 2).'%. Some items cannot drop!', E_USER_WARNING);
                 $sum = 100;
             }
-
-            $cnt = empty($nGroupEquals[$k]) ? 1 : $nGroupEquals[$k];
-
-            $groupChances[$k] = (100 - $sum) / $cnt;        // is applied as backReference to items with 0-chance
+            // is applied as backReference to items with 0-chance
+            $groupChances[$k] = (100 - $sum) / ($nGroupEquals[$k] ?: 1);
         }
 
         return [$loot, array_unique($rawItems)];
     }
 
-    public function getByContainer($table, $entry)
+    public function getByContainer(string $table, int $entry): bool
     {
         $this->entry = intVal($entry);
 
         if (!in_array($table, $this->lootTemplates) || !$this->entry)
-            return null;
+            return false;
 
         /*
             todo (high): implement conditions on loot (and conditions in general)
@@ -321,7 +380,7 @@ class Loot
         return true;
     }
 
-    public function getByItem($entry, $maxResults = CFG_SQL_LIMIT_DEFAULT, $lootTableList = [])
+    public function getByItem(int $entry, int $maxResults = CFG_SQL_LIMIT_DEFAULT, array $lootTableList = []) : bool
     {
         $this->entry = intVal($entry);
 
@@ -350,13 +409,12 @@ class Loot
             ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
         );
         $refResults = [];
-        $chanceMods = [];
         $query      =   'SELECT
                             lt1.entry AS ARRAY_KEY,
                             IF(lt1.reference = 0, lt1.item, lt1.reference) AS item,
                             lt1.chance,
                             SUM(IF(lt2.chance = 0, 1, 0)) AS nZeroItems,
-                            SUM(lt2.chance) AS sumChance,
+                            SUM(IF(lt2.reference = 0, lt2.chance, 0)) AS sumChance,
                             IF(lt1.groupid > 0, 1, 0) AS isGrouped,
                             IF(lt1.reference = 0, lt1.mincount, 1) AS min,
                             IF(lt1.reference = 0, lt1.maxcount, 1) AS max,
@@ -368,61 +426,6 @@ class Loot
                         WHERE
                             %s
                         GROUP BY lt2.entry, lt2.groupid';
-
-        $calcChance = function ($refs, $parents = []) use (&$chanceMods)
-        {
-            $retData = [];
-            $retKeys = [];
-
-            foreach ($refs as $rId => $ref)
-            {
-                // check for possible database inconsistencies
-                if (!$ref['chance'] && !$ref['isGrouped'])
-                    trigger_error('Loot by Item: Ungrouped Item/Ref '.$ref['item'].' has 0% chance assigned!', E_USER_WARNING);
-
-                if ($ref['isGrouped'] && $ref['sumChance'] > 100)
-                    trigger_error('Loot by Item: Group with Item/Ref '.$ref['item'].' has '.number_format($ref['sumChance'], 2).'% total chance! Some items cannot drop!', E_USER_WARNING);
-
-                if ($ref['isGrouped'] && $ref['sumChance'] >= 100 && !$ref['chance'])
-                    trigger_error('Loot by Item: Item/Ref '.$ref['item'].' with adaptive chance cannot drop. Group already at 100%!', E_USER_WARNING);
-
-                $chance = abs($ref['chance'] ?: (100 - $ref['sumChance']) / $ref['nZeroItems']) / 100;
-
-                // apply inherited chanceMods
-                if (isset($chanceMods[$ref['item']]))
-                {
-                    $chance *= $chanceMods[$ref['item']][0];
-                    $chance  = 1 - pow(1 - $chance, $chanceMods[$ref['item']][1]);
-                }
-
-                // save chance for parent-ref
-                $chanceMods[$rId] = [$chance, $ref['multiplier']];
-
-                // refTemplate doesn't point to a new ref -> we are done
-                if (!in_array($rId, $parents))
-                {
-                    $data = array(
-                        'percent' => $chance,
-                        'stack'   => [$ref['min'], $ref['max']],
-                        'count'   => 1                      // ..and one for the sort script
-                    );
-
-                    if ($_ = self::createStack($ref))
-                        $data['pctstack'] = $_;
-
-                    // sort highest chances first
-                    $i = 0;
-                    for (; $i < count($retData); $i++)
-                        if ($retData[$i]['percent'] < $data['percent'])
-                            break;
-
-                    array_splice($retData, $i, 0, [$data]);
-                    array_splice($retKeys, $i, 0, [$rId]);
-                }
-            }
-
-            return array_combine($retKeys, $retData);
-        };
 
         /*
             get references containing the item
@@ -442,7 +445,7 @@ class Loot
                 array_keys($curRefs)
             );
 
-            $refResults += $calcChance($curRefs, array_column($newRefs, 'item'));
+            $refResults += $this->calcChance($curRefs, array_column($newRefs, 'item'));
         }
 
         /*
@@ -453,7 +456,7 @@ class Loot
             if ($lootTableList && !in_array($this->lootTemplates[$i], $lootTableList))
                 continue;
 
-            $result = $calcChance(DB::World()->select(
+            $result = $this->calcChance(DB::World()->select(
                 sprintf($query, '{lt1.reference IN (?a) OR }(lt1.reference = 0 AND lt1.item = ?d)'),
                 $this->lootTemplates[$i], $this->lootTemplates[$i],
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
@@ -494,7 +497,7 @@ class Loot
 
                     $srcData = $srcObj->getListviewData();
 
-                    foreach ($srcObj->iterate() as $__id => $curTpl)
+                    foreach ($srcObj->iterate() as $curTpl)
                     {
                         switch ($curTpl['typeCat'])
                         {

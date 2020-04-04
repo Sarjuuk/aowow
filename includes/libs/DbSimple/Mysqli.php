@@ -159,6 +159,7 @@ class DbSimple_Mysqli extends DbSimple_Database
     {
         $this->_lastQuery = $queryMain;
         $this->_expandPlaceholders($queryMain, false);
+        mysqli_ping($this->link);
         $result = mysqli_query($this->link, $queryMain[0]);
         if ($result === false)
             return $this->_setDbError($queryMain[0]);
