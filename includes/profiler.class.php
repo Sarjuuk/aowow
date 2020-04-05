@@ -559,8 +559,13 @@ class Profiler
         unset($sk);
 
         if ($skills)
+        {
+            // apply auto-learned trade skills
+            DB::Aowow()->query('INSERT INTO ?_profiler_completion SELECT ?d, ?d, spellId, NULL, NULL FROM dbc_skilllineability WHERE id IN (?a)', $profileId, TYPE_SPELL, array_column($skills, 'typeId'));
+
             foreach (Util::createSqlBatchInsert($skills) as $sk)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$sk, array_keys($skills[0]));
+        }
 
         CLI::write(' ..professions');
 
