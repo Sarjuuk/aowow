@@ -296,7 +296,7 @@ class CreatureListFilter extends Filter
          7 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'startsQuests',            0x1        ], // startsquest [enum]
          8 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'endsQuests',              0x2        ], // endsquest [enum]
          9 => [FILTER_CR_BOOLEAN,  'lootId',                                                  ], // lootable
-        10 => [FILTER_CR_BOOLEAN,  'cbRegularSkinLoot', NPC_TYPEFLAG_SPECIALLOOT              ], // skinnable [yn]
+        10 => [FILTER_CR_CALLBACK, 'cbRegularSkinLoot', NPC_TYPEFLAG_SPECIALLOOT              ], // skinnable [yn]
         11 => [FILTER_CR_BOOLEAN,  'pickpocketLootId',                                        ], // pickpocketable
         12 => [FILTER_CR_CALLBACK, 'cbMoneyDrop',       null,                      null       ], // averagemoneydropped [op] [int]
         15 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_HERBLOOT,     null       ], // gatherable [yn]

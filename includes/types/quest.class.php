@@ -457,7 +457,7 @@ class QuestListFilter extends Filter
         34 => [FILTER_CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
         36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
         37 => [FILTER_CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
-        37 => [FILTER_CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
+        38 => [FILTER_CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
         42 => [FILTER_CR_STAFFFLAG, 'flags'                                       ], // flags
         43 => [FILTER_CR_CALLBACK,  'cbCurrencyReward', null,                 null], // currencyrewarded [enum]
         44 => [FILTER_CR_CALLBACK,  'cbLoremaster',     null,                 null], // countsforloremaster_stc [yn]
