@@ -1280,7 +1280,8 @@ class SearchPage extends GenericPage
             [
                 'OR',
                 ['s.typeCat', [0, -9]],
-                ['AND', ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
+                ['s.cuFlags', SPELL_CU_TRIGGERED, '&'],
+                ['s.attributes0', 0x80, '&']
             ],
             $this->createLookup()
         ));
