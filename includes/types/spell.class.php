@@ -2085,13 +2085,13 @@ class SpellList extends BaseType
         $grn = (int)(($ylw + $gry) / 2);
         $org = $this->curTpl['learnedAt'];
 
-        if (($org && $ylw < $org) || $ylw >= $gry)
+        if ($ylw < $org)
             $ylw = 0;
 
-        if (($org && $grn < $org) || $grn >= $gry)
+        if ($grn < $org || $grn < $ylw)
             $grn = 0;
 
-        if (($grn && $org >= $grn) || $org >= $gry)
+        if ($org >= $ylw || $org >= $grn || $org >= $gry)
             $org = 0;
 
         return $gry > 1 ? [$org, $ylw, $grn, $gry] : null;

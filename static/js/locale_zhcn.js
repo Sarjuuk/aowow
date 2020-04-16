@@ -4824,8 +4824,28 @@ var LANG = {
         targetstate:       "目标状态"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "每一个条件必须满足要求。",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement." // enUS
-    /* end custom */
+    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "When Spell is cast",
+    ls_onAuraRemove:      "When Aura is removed",
+    ls_onAuraApply:       "When Spells Aura is applied or removed",
+    ls_onSpellHit:        "When Spell hits the target(s)",
+    ls_onTrigger:         "When Spell is triggered",
+    ls_onImmune:          "When immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };
