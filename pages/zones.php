@@ -103,6 +103,8 @@ class ZonesPage extends GenericPage
                                 ?_taxinodes tn2
                         WHERE   tn1.Id = tp.endNodeId AND
                                 tn2.Id = tp.startNodeId AND
+                                tn1.type <> 0 AND
+                                tn2.type <> 0 AND
                                 (tp.startNodeId IN (?a) OR tp.EndNodeId IN (?a))
                         ', array_keys($nodes), array_keys($nodes));
 

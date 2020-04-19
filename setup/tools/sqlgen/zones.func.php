@@ -26,10 +26,22 @@ SqlGen::register(new class extends SetupScript
         2597 => ['maxPlayer' => 40],                        // is 5 in battlemasterlist ... dafuq?
         4710 => ['maxPlayer' => 40],
         3456 => ['parentAreaId' => 65,   'parentX' => 87.3, 'parentY' => 51.1], // has no coordinates set in map.dbc
+        // individual Tempest Keep ships
         3849 => ['parentAreaId' => 3523, 'parentX' => 70.5, 'parentY' => 69.6],
         3847 => ['parentAreaId' => 3523, 'parentX' => 71.7, 'parentY' => 55.1],
         3848 => ['parentAreaId' => 3523, 'parentX' => 74.3, 'parentY' => 57.8],
-        3845 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7]
+        3845 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7],
+        // individual Icecrown Citadel wings
+        4893 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        4894 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        4895 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        4896 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        4897 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        // uncaught unused zones
+        207  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        208  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        616  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
+        1417 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW]
     );
 
     public function generate(array $ids = []) : bool
@@ -39,16 +51,17 @@ SqlGen::register(new class extends SetupScript
             REPLACE INTO ?_zones
                 SELECT
                     a.id,
-                    IFNULL(wmt.targetMapId, a.mapId),           -- map
-                    a.mapId,                                    -- mapBak
+                    IFNULL(wmt.targetMapId, m.id),              -- map
+                    m.id,                                       -- mapBak
                     a.areaTable,                                -- parentArea
                     IFNULL(wmt.targetMapId,                     -- g_zone_categories
                         IF(m.areaType = 1, 2,
                             IF(m.areaType = 2, 3,
                                 IF(m.areaType = 4, 9,
                                     IF(m.isBG = 1, 6,
-                                        IF(a.mapId = 571, 10,
-                                            IF(a.mapId = 530, 8, a.mapId))))))),
+                                        IF(m.id = 609, 1,
+                                            IF(m.id = 571, 10,
+                                                IF(m.id = 530, 8, m.id)))))))),
                     a.flags,
                     IF(areaTable <> 0 OR                        -- cuFlags
                         (wma.id IS NULL AND pa.areaId IS NULL AND (flags & 0x11000) = 0), ?d, 0),
@@ -95,10 +108,10 @@ SqlGen::register(new class extends SetupScript
                 FROM
                     dbc_areatable a
                 JOIN
-                    dbc_map m ON a.mapId = m.id
+                    dbc_map m ON m.id = IF(a.id = 2159, 249, a.mapId) -- Zone: Onyxias Lair is linked to the wrong map
                 LEFT JOIN (
                     SELECT mapId, BIT_OR(1 << difficulty) AS modeMask, MIN(nPlayer) AS minPl, MAX(nPlayer) AS maxPl FROM dbc_mapdifficulty GROUP BY mapId
-                ) md ON md.mapId = a.mapId
+                ) md ON md.mapId = m.id
                 LEFT JOIN
                     dbc_lfgdungeons lfgOpen ON a.mapId IN (0, 1, 530, 571) AND a.name_loc0 LIKE CONCAT("%", lfgOpen.name_loc0) AND lfgOpen.type = 4
                 LEFT JOIN (
@@ -134,7 +147,7 @@ SqlGen::register(new class extends SetupScript
                         groupId <> 11
                     GROUP BY
                         mapId
-                ) lfgIni ON lfgIni.mapId = a.mapId
+                ) lfgIni ON lfgIni.mapId = m.id
                 LEFT JOIN
                     dbc_battlemasterlist bm ON bm.mapId = a.mapId AND bm.moreMapId < 0
                 LEFT JOIN
@@ -171,12 +184,14 @@ SqlGen::register(new class extends SetupScript
                 mapId
         ');
 
+        $heroics = DB::Aowow()->selectCol('SELECT DISTINCT mapId FROM aowow_zones WHERE type IN (5, 8)');
+
         foreach ($zoneReq as $mapId => $req)
         {
             $update   = ['levelReq' => $req['reqLevel']];
             $aN = $aH = [];
 
-            if ($req['heroicLevel'])
+            if ($req['heroicLevel'] && in_array($mapId, $heroics))
                 $update['levelHeroic'] = $req['heroicLevel'];
 
             if ($req['reqItemLevelN'])
