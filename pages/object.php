@@ -439,6 +439,31 @@ class ObjectPage extends GenericPage
             }
         }
 
+        // tab: Spell Focus for
+        if ($sfId = $this->subject->getField('spellFocusId'))
+        {
+            $focusSpells = new SpellList(array(['spellFocusObject', $sfId]));
+            if (!$focusSpells->error)
+            {
+                $tabData = array(
+                    'data' => array_values($focusSpells->getListviewData()),
+                    'name' => Lang::gameObject('focus'),
+                    'id'   => 'focus-for'
+                );
+
+                $this->extendGlobalData($focusSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+                // create note if search limit was exceeded
+                if ($focusSpells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                {
+                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                    $tabData['_truncated'] = 1;
+                }
+
+                $this->lvTabs[] = ['spell', $tabData];
+            }
+        }
+
         // tab: Same model as .. whats the fucking point..?
         $sameModel = new GameObjectList(array(['displayId', $this->subject->getField('displayId')], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
