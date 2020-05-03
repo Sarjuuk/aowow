@@ -154,18 +154,11 @@ class ProfilePage extends GenericPage
 /*          Anub,  Faerlina, Maexxna, Noth,  Heigan, Loatheb, Razuvious, Gothik, Patchwerk, Grobbulus, Gluth, Thaddius, Sapphiron, Kel'Thuzad */
 /* nax  */  15956, 15953,    15952,   15954, 15936,  16011,   16061,     16060,  16028,     15931,     15932, 15928,    15989,     15990
         );
-        // some events have no singular creature to point to .. create dummy entries
-        $dummyNPCs = [TYPE_NPC => array(
-            100001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 100001)], // Gunship Battle
-            200001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200001)], // Northrend Beasts
-            200002 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200002)], // Faction Champions
-            200003 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 200003)], // Val'kyr Twins
-            300001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 300001)], // The Four Horsemen
-            400001 => ['name_'.User::$localeString => Lang::profiler('dummyNPCs', 400001)]  // Assembly of Iron
-        )];
-
         $this->extendGlobalIds(TYPE_NPC, $bossIds);
-        $this->extendGlobalData($dummyNPCs);
+
+        // dummy title from dungeon encounter
+        foreach (Lang::profiler('encounterNames') as $id => $name)
+            $this->extendGlobalData([TYPE_NPC => [$id => ['name_'.User::$localeString => $name]]]);
     }
 
     protected function generatePath()

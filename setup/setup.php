@@ -29,7 +29,7 @@ function finish()
     die("\n");
 }
 
-$opt = getopt('h', ['help', 'account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update', 'firstrun']);
+$opt = getopt('h', ['help', 'account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update', 'firstrun', 'dbc:']);
 if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun']) || isset($opt['resume']))))
 {
     echo "\nAowow Setup\n";
@@ -95,6 +95,26 @@ switch ($cmd)                                               // we accept only on
         }
 
         finish();
+    case 'dbc':
+        foreach (explode(',', $opt['dbc']) as $n)
+        {
+            if (empty($n))
+                continue;
+
+            $dbc = new DBC(trim($n), ['temporary' => false]);
+            if ($dbc->error)
+            {
+                CLI::write('CLISetup::loadDBC() - required DBC '.$name.'.dbc not found!', CLI::LOG_ERROR);
+                return false;
+            }
+
+            if (!$dbc->readFile())
+            {
+                CLI::write('CLISetup::loadDBC() - DBC '.$name.'.dbc could not be written to DB!', CLI::LOG_ERROR);
+                return false;
+            }
+        }
+        break;
 }
 
 ?>

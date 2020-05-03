@@ -175,11 +175,13 @@ $lang = array(
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
             'profile'   => "[This character doesn't exist or is not yet in the database.]"
         ),
-        'dummyNPCs'     => array(
-            100001 => "Bataille des canonnières",
-            200001 => "Bêtes du Norfendre", 200002 => "Champions de faction", 200003 => "Les jumelles val'kyrs",
-            300001 => "Les Quatre Cavaliers",
-            400001 => "Mande-foudre Brundir"
+        'encounterNames'=> array(
+            243 => "Les Sept",
+            334 => "Grands champions",
+            629 => "Bêtes du Norfendre", 637 => "Champions de faction", 641 => "Les jumelles val'kyrs",
+            692 => "Les quatre cavaliers",
+            748 => "Le conseil de fer",
+            847 => "Bataille des canonnières de la Couronne de glace"
         ),
     ),
     'screenshot' => array(
@@ -552,7 +554,7 @@ $lang = array(
             SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Pick random Event Phase between %1$d and %2$d.', null],
             SAI_ACTION_RESET_GOBJECT                      => ['Reset #target#.', null],
             SAI_ACTION_CALL_KILLEDMONSTER                 => ['A kill of [npc=%1$d] is credited to #target#.', null],
-            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]]%1$d[/b] to [b]%2$d[/b].', null],
+            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]%1$d[/b] to [b]%2$d[/b].', null],
             null,
             SAI_ACTION_UPDATE_TEMPLATE                    => ['Transform to become [npc=%1$d](%2$d)? with level [b]%2$d[/b]:;.', null],
             SAI_ACTION_DIE                                => ['Die...&nbsp;&nbsp;&nbsp;painfully.', null],

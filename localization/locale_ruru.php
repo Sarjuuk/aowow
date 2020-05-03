@@ -175,11 +175,13 @@ $lang = array(
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
             'guild'     => "Такая гильдия не существует, или еще не добавлена в базу данных."
         ),
-        'dummyNPCs'     => array(
-            100001 => "Бой на Кораблях",
-            200001 => "Звери Нордскола", 200002 => "Чемпионы фракций", 200003 => "Валь'киры-близнецы",
-            300001 => "Четыре Всадника",
-            400001 => "Железное Собрание"
+        'encounterNames'=> array(
+            243 => "Семеро",
+            334 => "Абсолютные чемпионы",
+            629 => "Чудовища Нордскола", 637 => "Чемпионы фракций", 641 => "Валь'киры-близнецы",
+            692 => "Четыре всадника",
+            748 => "Железное Собрание",
+            847 => "Боевой корабль Ледяной Короны"
         ),
     ),
     'screenshot' => array(
@@ -552,7 +554,7 @@ $lang = array(
             SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Pick random Event Phase between %1$d and %2$d.', null],
             SAI_ACTION_RESET_GOBJECT                      => ['Reset #target#.', null],
             SAI_ACTION_CALL_KILLEDMONSTER                 => ['A kill of [npc=%1$d] is credited to #target#.', null],
-            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]]%1$d[/b] to [b]%2$d[/b].', null],
+            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]%1$d[/b] to [b]%2$d[/b].', null],
             null,
             SAI_ACTION_UPDATE_TEMPLATE                    => ['Transform to become [npc=%1$d](%2$d)? with level [b]%2$d[/b]:;.', null],
             SAI_ACTION_DIE                                => ['Die...&nbsp;&nbsp;&nbsp;painfully.', null],

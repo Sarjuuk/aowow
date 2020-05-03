@@ -175,11 +175,13 @@ $lang = array(
             'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
             'profile'   => "This character doesn't exist or is not yet in the database."
         ),
-        'dummyNPCs'     => array(
-            100001 => "Gunship Battle",
-            200001 => "Northrend Beasts", 200002 => "Faction Champions", 200003 => "Val'kyr Twins",
-            300001 => "The Four Horsemen",
-            400001 => "Assembly of Iron"
+        'encounterNames'=> array(                           // from dungeonencounter.dbc
+            243 => "The Seven",
+            334 => "Grand Champions",
+            629 => "Northrend Beasts", 637 => "Faction Champions", 641 => "Val'kyr Twins",
+            692 => "The Four Horsemen",
+            748 => "The Iron Council",
+            847 => "Icecrown Gunship Battle"
         ),
     ),
     'screenshot' => array(
@@ -552,7 +554,7 @@ $lang = array(
             SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Pick random Event Phase between %1$d and %2$d.', null],
             SAI_ACTION_RESET_GOBJECT                      => ['Reset #target#.', null],
             SAI_ACTION_CALL_KILLEDMONSTER                 => ['A kill of [npc=%1$d] is credited to #target#.', null],
-            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]]%1$d[/b] to [b]%2$d[/b].', null],
+            SAI_ACTION_SET_INST_DATA                      => ['Set Instance (%3$d)?Boss State:Data Field; #[b]%1$d[/b] to [b]%2$d[/b].', null],
             null,
             SAI_ACTION_UPDATE_TEMPLATE                    => ['Transform to become [npc=%1$d](%2$d)? with level [b]%2$d[/b]:;.', null],
             SAI_ACTION_DIE                                => ['Die...&nbsp;&nbsp;&nbsp;painfully.', null],

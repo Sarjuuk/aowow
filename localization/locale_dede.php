@@ -175,11 +175,13 @@ $lang = array(
             'arenateam' => "Dieses Arena Team existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
             'profile'   => "Dieser Charakter existiert nicht oder wurde noch nicht in die Datenbank übernommen."
         ),
-        'dummyNPCs'     => array(
-            100001 => "Luftschiffkampf",
-            200001 => "Bestien von Nordend", 200002 => "Fraktionschampions", 200003 => "Zwillingsval'kyr",
-            300001 => "Die Vier Reiter",
-            400001 => "Versammlung des Eisens"
+        'encounterNames'=> array(
+            243 => "Die Sieben",
+            334 => "Großchampions",
+            629 => "Bestien von Nordened", 637 => "Fraktionschampions", 641 => "Zwillingsval'kyr",
+            692 => "Die vier Reiter",
+            748 => "Der Eiserne Rat",
+            847 => "Kanonenschiffsschlacht von Eiskrone"
         ),
     ),
     'screenshot' => array(
@@ -552,7 +554,7 @@ $lang = array(
             SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Wähle zufällige Ereignisphase zwischen %1$d und %2$d.', null],
             SAI_ACTION_RESET_GOBJECT                      => ['Setze #target# zurück.', null],
             SAI_ACTION_CALL_KILLEDMONSTER                 => ['Ein Tod von [npc=%1$d] wird #target# zugeschrieben.', null],
-            SAI_ACTION_SET_INST_DATA                      => ['Setze Instanz (%3$d)?Boss State:Datenfeld; #[b]]%1$d[/b] auf [b]%2$d[/b].', null],
+            SAI_ACTION_SET_INST_DATA                      => ['Setze Instanz (%3$d)?Boss State:Datenfeld; #[b]%1$d[/b] auf [b]%2$d[/b].', null],
             null,
             SAI_ACTION_UPDATE_TEMPLATE                    => ['Transformiere zu [npc=%1$d](%2$d)? mit Stufe [b]%2$d[/b]:;.', null],
             SAI_ACTION_DIE                                => ['Stirb!', null],
