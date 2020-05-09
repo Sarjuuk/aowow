@@ -2363,7 +2363,7 @@ class ItemListFilter extends Filter
         {
             // todo: do something sensible..
             // // todo (med): get the avgbuyout into the listview
-            // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING avgbuyout '.$cr[1].' ?f', $c[1]))
+            // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING buyout '.$cr[1].' ?f', $c[1]))
                 // return ['i.id', array_keys($_)];
             // else
                 // return [0];

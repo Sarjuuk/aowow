@@ -413,14 +413,14 @@ class Profiler
         /* talents + glyphs */
         /********************/
 
-        $t = DB::Characters($realmId)->selectCol('SELECT spec AS ARRAY_KEY, spell AS ARRAY_KEY2, spell FROM character_talent WHERE guid = ?d', $char['guid']);
-        $g = DB::Characters($realmId)->select('SELECT spec AS ARRAY_KEY, glyph1 AS g1, glyph2 AS g4, glyph3 AS g5, glyph4 AS g2, glyph5 AS g3, glyph6 AS g6 FROM character_glyphs WHERE guid = ?d', $char['guid']);
+        $t = DB::Characters($realmId)->selectCol('SELECT talentGroup AS ARRAY_KEY, spell AS ARRAY_KEY2, spell FROM character_talent WHERE guid = ?d', $char['guid']);
+        $g = DB::Characters($realmId)->select('SELECT talentGroup AS ARRAY_KEY, glyph1 AS g1, glyph2 AS g4, glyph3 AS g5, glyph4 AS g2, glyph5 AS g3, glyph6 AS g6 FROM character_glyphs WHERE guid = ?d', $char['guid']);
         for ($i = 0; $i < 2; $i++)
         {
             // talents
             for ($j = 0; $j < 3; $j++)
             {
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell in (?a), rank, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), rank, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
                 $data['talentbuild'.($i + 1)] .= implode('', $_);
                 if ($char['activespec'] == $i)
                     $data['talenttree'.($j + 1)] = array_sum($_);
@@ -496,7 +496,7 @@ class Profiler
                 $morePet   = DB::Aowow()->selectRow('SELECT p.`type`, c.family FROM ?_pet p JOIN ?_creature c ON c.family = p.id WHERE c.id = ?d', $petData['entry']);
                 $petSpells = DB::Characters($realmId)->selectCol('SELECT spell FROM pet_spell WHERE guid = ?d', $petGuid);
 
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell in (?a), rank, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), rank, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
                     'owner'     => $profileId,
