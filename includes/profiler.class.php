@@ -561,7 +561,19 @@ class Profiler
         if ($skills)
         {
             // apply auto-learned trade skills
-            DB::Aowow()->query('INSERT INTO ?_profiler_completion SELECT ?d, ?d, spellId, NULL, NULL FROM dbc_skilllineability WHERE id IN (?a)', $profileId, TYPE_SPELL, array_column($skills, 'typeId'));
+            DB::Aowow()->query('
+                INSERT INTO ?_profiler_completion
+                SELECT      ?d, ?d, spellId, NULL, NULL
+                FROM        dbc_skilllineability
+                WHERE       skillLineId IN (?a) AND
+                            acquireMethod = 1 AND
+                            (reqRaceMask  = 0 OR reqRaceMask  & ?d) AND
+                            (reqClassMask = 0 OR reqClassMask & ?d)',
+                $profileId, TYPE_SPELL,
+                array_column($skills, 'typeId'),
+                1 << ($char['race']  - 1),
+                1 << ($char['class'] - 1)
+            );
 
             foreach (Util::createSqlBatchInsert($skills) as $sk)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$sk, array_keys($skills[0]));
