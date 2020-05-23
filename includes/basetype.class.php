@@ -557,6 +557,8 @@ trait spawnHelper
 
     private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
     {
+        $this->spawnResult[SPAWNINFO_SHORT] = new StdClass;
+
         // first get zone/floor with the most spawns
         if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d && typeId = ?d GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
         {
@@ -566,7 +568,8 @@ trait spawnHelper
             foreach ($points as $p)
                 $spawns[] = [$p['posX'], $p['posY']];
 
-            $this->spawnResult[SPAWNINFO_SHORT] = [$res['areaId'], $res['floor'], $spawns];
+            $this->spawnResult[SPAWNINFO_SHORT]->zone   = $res['areaId'];
+            $this->spawnResult[SPAWNINFO_SHORT]->coords = [$res['floor'] => $spawns];
         }
     }
 
@@ -736,7 +739,7 @@ trait spawnHelper
         switch ($mode)
         {
             case SPAWNINFO_SHORT:
-                if (empty($this->spawnResult[SPAWNINFO_SHORT]))
+                if ($this->spawnResult[SPAWNINFO_SHORT] === null)
                     $this->createShortSpawns();
 
                 return $this->spawnResult[SPAWNINFO_SHORT];

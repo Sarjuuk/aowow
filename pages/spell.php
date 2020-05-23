@@ -20,6 +20,7 @@ class SpellPage extends GenericPage
 
     private   $difficulties  = [];
     private   $firstRank     = 0;
+    private   $powerTpl      = '$WowheadPower.registerSpell(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
     {
@@ -33,7 +34,7 @@ class SpellPage extends GenericPage
 
         $this->subject = new SpellList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('spell'), Lang::spell('notFound'));
 
         $jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra);
         $this->extendGlobalData($jsg, $extra);
@@ -158,19 +159,20 @@ class SpellPage extends GenericPage
                 $infobox[] = (in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_);
         }
 
+        $jsg = [];
         // races
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, $n, false))
+        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_RACE, $jsg);
-            $t = $n == 1 ? Lang::game('race') : Lang::game('races');
+            $this->extendGlobalIds(TYPE_RACE, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
         // classes
-        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, $n, false))
+        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $n == 1 ? Lang::game('class') : Lang::game('classes');
+            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
@@ -923,7 +925,7 @@ class SpellPage extends GenericPage
                             if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
-                        $this->extendGlobalIds(TYPE_RACE, $foo);
+                        $this->extendGlobalIds(TYPE_RACE, ...$foo);
                         $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 
@@ -1193,55 +1195,23 @@ class SpellPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            die('$WowheadPower.registerSpell('.$this->typeId.', '.User::$localeId.', {});');
-
-        $x  = '$WowheadPower.registerSpell('.$this->typeId.', '.User::$localeId.", {\n";
-        $pt = [];
-        if ($n = $this->subject->getField('name', true))
-            $pt[] = "\tname_".User::$localeString.": '".Util::jsEscape($n)."'";
-        if ($i = $this->subject->getField('iconString', true, true))
-            $pt[] = "\ticon: '".rawurlencode($i)."'";
-        if ($tt = $this->subject->renderTooltip())
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $pt[] = "\ttooltip_".User::$localeString.": '".Util::jsEscape($tt[0])."'";
-            $pt[] = "\tspells_".User::$localeString.": ".Util::toJSON($tt[1]);
-        }
-        if ($btt = $this->subject->renderBuff())
-        {
-            $pt[] = "\tbuff_".User::$localeString.": '".Util::jsEscape($btt[0])."'";
-            $pt[] = "\tbuffspells_".User::$localeString.": ".Util::toJSON($btt[1]);;
-        }
-        $x .= implode(",\n", $pt)."\n});";
+            [$tooltip, $ttSpells] = $this->subject->renderTooltip();
+            [$buff,    $bfSpells] = $this->subject->renderBuff();
 
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
-        {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}       = $this->subject->getField('name', true);
+            $power->icon                                = rawurlencode($this->subject->getField('iconString', true, true));
+            $power->{'tooltip_'.User::$localeString}    = $tooltip;
+            $power->{'spells_'.User::$localeString}     = $ttSpells;
+            $power->{'buff_'.User::$localeString}       = $buff;
+            $power->{'buffspells_'.User::$localeString} = $bfSpells;
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('spell'), $msg ?: Lang::spell('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function appendReagentItem(&$reagentResult, $_iId, $_qty, $_mult, $_level, $_path, $alreadyUsed)

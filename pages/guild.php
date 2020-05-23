@@ -130,9 +130,9 @@ class GuildPage extends GenericPage
         }
     }
 
-    public function notFound($title = '', $msg = '')
+    public function notFound(string $title = '', string $msg = '') : void
     {
-        return parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'guild'));
+        parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'guild'));
     }
 
     private function handleIncompleteData($teamGuid)

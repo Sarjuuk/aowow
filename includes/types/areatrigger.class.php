@@ -27,7 +27,7 @@ class AreaTriggerList extends BaseType
                 $_curTpl['name'] = 'Unnamed Areatrigger #' . $id;
     }
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -46,7 +46,10 @@ class AreaTriggerList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY) { }
+    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    {
+        return [];
+    }
 
     public function renderTooltip() { }
 }

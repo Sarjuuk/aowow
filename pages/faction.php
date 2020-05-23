@@ -58,7 +58,7 @@ class FactionPage extends GenericPage
         // Quartermaster if any
         if ($ids = $this->subject->getField('qmNpcIds'))
         {
-            $this->extendGlobalIds(TYPE_NPC, $ids);
+            $this->extendGlobalIds(TYPE_NPC, ...$ids);
 
             $qmStr = Lang::faction('quartermaster').Lang::main('colon');
 

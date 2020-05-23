@@ -217,7 +217,7 @@ class AjaxProfile extends AjaxHandler
             return;
         }
 
-        $this->contentType = 'image/'.$matches[2];
+        $this->contentType = $matches[2] == 'png' ? MIME_TYPE_PNG : MIME_TYPE_JPEG;
 
         $id   = $matches[1];
         $dest = imageCreateTruecolor($sizes[$s], $sizes[$s]);

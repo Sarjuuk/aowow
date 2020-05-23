@@ -337,7 +337,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString($classMask, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getClassString(int $classMask, array &$ids = [], bool $asHTML = true) : string
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
@@ -359,13 +359,12 @@ class Lang
             $i++;
         }
 
-        $n   = count($tmp);
         $ids = array_keys($tmp);
 
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getRaceString(int $raceMask, array &$ids = [], bool $asHTML = true) : string
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
@@ -396,7 +395,6 @@ class Lang
             $i++;
         }
 
-        $n   = count($tmp);
         $ids = array_keys($tmp);
 
         return implode(', ', $tmp);

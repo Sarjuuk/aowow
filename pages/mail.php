@@ -55,10 +55,11 @@ class MailPage extends GenericPage
                 if ($mlr['level'])
                     $infobox[] = Lang::game('level').Lang::main('colon').$mlr['level'];
 
-                if ($r = Lang::getRaceString($mlr['raceMask'], $rId, $_, false))
+                $rIds = [];
+                if ($r = Lang::getRaceString($mlr['raceMask'], $rIds, false))
                 {
                     $infobox[] = Lang::game('races').Lang::main('colon').$r;
-                    $this->extendGlobalIds(TYPE_RACE, $rId);
+                    $this->extendGlobalIds(TYPE_RACE, ...$rIds);
                 }
 
                 $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$mlr['senderEntry'].']';

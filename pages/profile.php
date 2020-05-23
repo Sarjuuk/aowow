@@ -27,6 +27,7 @@ class ProfilePage extends GenericPage
     private   $isCustom = false;
     private   $profile  = null;
     private   $rnItr    = 0;
+    private   $powerTpl = '$WowheadPower.registerProfile(%s, %d, %s);';
 
     public function __construct($pageCall, $pageParam)
     {
@@ -50,6 +51,7 @@ class ProfilePage extends GenericPage
             // redundancy much?
             $this->subjectGUID = intval($params[0]);
             $this->profile     = intval($params[0]);
+            $this->isCustom    = true;                      // until proven otherwise
 
             $this->subject = new LocalProfileList(array(['id', intval($params[0])]));
             if ($this->subject->error)
@@ -58,9 +60,7 @@ class ProfilePage extends GenericPage
             if (!$this->subject->isVisibleToUser())
                 $this->notFound();
 
-            if ($this->subject->isCustom())
-                $this->isCustom  = true;
-            else
+            if (!$this->subject->isCustom())
                 header('Location: '.$this->subject->getProfileUrl(), true, 302);
         }
         else if (count($params) == 3)
@@ -154,7 +154,7 @@ class ProfilePage extends GenericPage
 /*          Anub,  Faerlina, Maexxna, Noth,  Heigan, Loatheb, Razuvious, Gothik, Patchwerk, Grobbulus, Gluth, Thaddius, Sapphiron, Kel'Thuzad */
 /* nax  */  15956, 15953,    15952,   15954, 15936,  16011,   16061,     16060,  16028,     15931,     15932, 15928,    15989,     15990
         );
-        $this->extendGlobalIds(TYPE_NPC, $bossIds);
+        $this->extendGlobalIds(TYPE_NPC, ...$bossIds);
 
         // dummy title from dungeon encounter
         foreach (Lang::profiler('encounterNames') as $id => $name)
@@ -171,59 +171,48 @@ class ProfilePage extends GenericPage
         array_unshift($this->title, Util::ucFirst(Lang::game('profile')));
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
         $id = $this->profile;
         if (!$this->isCustom)
             $id = "'".$this->profile[0].'.'.$this->profile[1].'.'.urlencode($this->profile[2])."'";
 
-        $x = '$WowheadPower.registerProfile('.$id.', '.User::$localeId.', {';
-        if ($asError)
-            return $x."});";
+        $power = new StdClass();
+        if ($this->subject && !$this->subject->error && $this->subject->isVisibleToUser())
+        {
+            $n = $this->subject->getField('name');
+            $l = $this->subject->getField('level');
+            $r = $this->subject->getField('race');
+            $c = $this->subject->getField('class');
+            $g = $this->subject->getField('gender');
 
-        $name       = $this->subject->getField('name');
-        $guild      = $this->subject->getField('guild');
-        $guildRank  = $this->subject->getField('guildrank');
-        $lvl        = $this->subject->getField('level');
-        $ra         = $this->subject->getField('race');
-        $cl         = $this->subject->getField('class');
-        $gender     = $this->subject->getField('gender');
-        $title      = '';
-        if ($_ = $this->subject->getField('title'))
-            $title = (new TitleList(array(['id', $_])))->getField($gender ? 'female' : 'male', true);
+            if ($this->isCustom)
+                $n .= Lang::profiler('customProfile');
+            else if ($_ = $this->subject->getField('title'))
+                if ($title = (new TitleList(array(['id', $_])))->getField($g ? 'female' : 'male', true))
+                    $n = sprintf($title, $n);
 
-        if ($this->isCustom)
-            $name .= Lang::profiler('customProfile');
-        else if ($title)
-            $name = sprintf($title, $name);
+            $power->{'name_'.User::$localeString}    = $n;
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->icon                             = '$$WH.g_getProfileIcon('.$r.', '.$c.', '.$g.', '.$l.', \''.$this->subject->getIcon().'\')';
+        }
 
-        $x .= "\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($name)."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."',\n";
-        $x .= "\ticon: \$WH.g_getProfileIcon(".$ra.", ".$cl.", ".$gender.", ".$lvl.", '".$this->subject->getIcon()."'),\n";   // (race, class, gender, level, iconOrId, 'medium')
-        $x .= "});";
-
-        return $x;
+        return sprintf($this->powerTpl, $id, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
-    public function display($override = '')
+    public function display(string $override = ''): void
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
+            parent::display($override);
 
         // do not cache profile tooltips
-        header('Content-type: application/x-javascript; charset=utf-8');
+        header(MIME_TYPE_JSON);
         die($this->generateTooltip());
     }
 
-    public function notFound($title = '', $msg = '')
+    public function notFound(string $title = '', string $msg = '') : void
     {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'profile'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'profile'));
     }
 
     private function handleIncompleteData($params, $guid)

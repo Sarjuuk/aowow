@@ -17142,6 +17142,8 @@ var Menu = new function()
             $menuItems.each(function () { $innerDiv.append(this) });
             $outerDiv.append($innerDiv);
 
+            $outerDiv.contextmenu($WH.rf);                  // aowow custom: prevent browser context menu when right clicking to get our context menu as it placed under the mouse cursor
+
             return $outerDiv;
         }
 

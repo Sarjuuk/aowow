@@ -10,7 +10,7 @@ class AjaxHandler
     protected $params      = [];
     protected $handler;
 
-    protected $contentType = 'application/x-javascript; charset=utf-8';
+    protected $contentType = MIME_TYPE_JSON;
 
     protected $_post       = [];
     protected $_get        = [];

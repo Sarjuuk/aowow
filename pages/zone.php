@@ -97,7 +97,7 @@ class ZonePage extends GenericPage
         {
             foreach ($attmnt as $type => $ids)
             {
-                $this->extendGlobalIds($type, array_map('abs', $ids));
+                $this->extendGlobalIds($type, ...array_map('abs', $ids));
                 foreach ($ids as $id)
                 {
                     if ($type == TYPE_ITEM)
@@ -111,7 +111,7 @@ class ZonePage extends GenericPage
         // Instances
         if ($_ = DB::Aowow()->selectCol('SELECT id FROM ?_zones WHERE parentAreaId = ?d AND (flags & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
-            $this->extendGlobalIds(TYPE_ZONE, $_);
+            $this->extendGlobalIds(TYPE_ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
         }
 
@@ -678,7 +678,7 @@ class ZonePage extends GenericPage
                             if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
-                        $this->extendGlobalIds(TYPE_RACE, $foo);
+                        $this->extendGlobalIds(TYPE_RACE, ...$foo);
                         $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 

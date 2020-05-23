@@ -7,7 +7,15 @@ if (!defined('AOWOW_REVISION'))
  * Page
  */
 
-define('E_AOWOW',                           E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+define('E_AOWOW',          E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
+define('JSON_AOWOW_POWER', JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+define('MIME_TYPE_TEXT',   'Content-Type: text/plain; charset=utf-8');
+define('MIME_TYPE_XML',    'Content-Type: text/xml; charset=utf-8');
+define('MIME_TYPE_JSON',   'Content-Type: application/x-javascript; charset=utf-8');
+define('MIME_TYPE_RSS',    'Content-Type: application/rss+xml; charset=utf-8');
+define('MIME_TYPE_JPEG',   'Content-Type: image/jpeg');
+define('MIME_TYPE_PNG',    'Content-Type: image/png');
 
 // TypeIds
 define('TYPE_NPC',                          1);

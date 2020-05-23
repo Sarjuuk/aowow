@@ -19,6 +19,8 @@ class QuestPage extends GenericPage
     protected $css           = [['path' => 'Book.css']];
     protected $js            = ['ShowOnMap.js'];
 
+    private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -31,7 +33,7 @@ class QuestPage extends GenericPage
 
         $this->subject = new QuestList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('quest'), Lang::quest('notFound'));
 
         // may contain htmlesque tags
         $this->name = Util::htmlEscape($this->subject->getField('name', true));
@@ -138,19 +140,20 @@ class QuestPage extends GenericPage
             case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::game('si', 1).'[/span]'; break;
         }
 
+        $jsg = [];
         // races
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, $n, false))
+        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_RACE, $jsg);
-            $t = $n == 1 ? Lang::game('race') : Lang::game('races');
+            $this->extendGlobalIds(TYPE_RACE, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
         // classes
-        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, $n, false))
+        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $n == 1 ? Lang::game('class') : Lang::game('classes');
+            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
@@ -1015,44 +1018,18 @@ class QuestPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerQuest('.$this->typeId.', '.User::$localeId.', {});';
-
-        $x = '$WowheadPower.registerQuest('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.': \''.$this->subject->renderTooltip()."'";
-        if ($this->subject->isDaily())
-            $x .= ",\n\tdaily: 1";
-        $x .= "\n});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            if ($this->subject->isDaily())
+                $power->daily = 1;
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('quest'), $msg ?: Lang::quest('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function createRewards($side)

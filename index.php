@@ -104,7 +104,7 @@ switch ($pageCall)
                     header('Location: '.$out, true, 302);
                 else
                 {
-                    header('Content-type: '.$ajax->getContentType());
+                    header($ajax->getContentType());
                     die($out);
                 }
             }

@@ -17,6 +17,7 @@ class EventPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
+    private   $powerTpl      = '$WowheadPower.registerHoliday(%d, %d, %s);';
     private   $hId           = 0;
     private   $eId           = 0;
 
@@ -32,7 +33,7 @@ class EventPage extends GenericPage
 
         $this->subject = new WorldEventList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('event'), Lang::event('notFound'));
 
         $this->hId   = $this->subject->getField('holidayId');
         $this->eId   = $this->typeId;
@@ -266,6 +267,22 @@ class EventPage extends GenericPage
         }
     }
 
+    protected function generateTooltip() : string
+    {
+        $power = new StdClass();
+        if (!$this->subject->error)
+        {
+            $power->{'name_'.User::$localeString} = $this->subject->getField('name', true);
+
+            if ($this->subject->getField('iconString') != 'trade_engineering')
+                $power->icon = rawurlencode($this->subject->getField('iconString', true, true));
+
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+        }
+
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+    }
+
     protected function postCache()
     {
         // update dates to now()
@@ -325,50 +342,6 @@ class EventPage extends GenericPage
 
             }
         }
-    }
-
-    protected function generateTooltip($asError = false)
-    {
-        if ($asError)
-            return '$WowheadPower.registerHoliday('.$this->typeId.', '.User::$localeId.', {});';
-
-        $x = '$WowheadPower.registerHoliday('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-
-        if ($this->subject->getField('iconString') != 'trade_engineering')
-            $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
-
-        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
-        $x .= "});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
-        {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
-        }
-
-        [$start, $end] = $this->postCache();
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die(sprintf($tt, $start, $end));
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('event'), $msg ?: Lang::event('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
     }
 }
 

@@ -23,6 +23,8 @@ class ItemPage extends genericPage
         'filters.js'                                        // lolwut?
     );
 
+    private   $powerTpl      = '$WowheadPower.registerItem(%s, %d, %s);';
+
     public function __construct($pageCall, $param)
     {
         parent::__construct($pageCall, $param);
@@ -59,7 +61,7 @@ class ItemPage extends genericPage
 
         $this->subject = new ItemList($conditions);
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('item'), Lang::item('notFound'));
 
         if (!is_numeric($param))
             $this->typeId = $this->subject->id;
@@ -1009,30 +1011,33 @@ class ItemPage extends genericPage
         // name: LANG.tab_taughtby
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
+        $power = new StdClass();
+        if (!$this->subject->error)
+        {
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true, false, $this->enhancedTT);
+            $power->quality                          = $this->subject->getField('quality');
+            $power->icon                             = rawurlencode($this->subject->getField('iconString', true, true));
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip(false, 0, $this->enhancedTT);
+        }
+
         $itemString = $this->typeId;
-        foreach ($this->enhancedTT as $k => $val)
-            $itemString .= $k.(is_array($val) ? implode(',', $val) : $val);
+        if ($this->enhancedTT)
+        {
+            foreach ($this->enhancedTT as $k => $val)
+                $itemString .= $k.(is_array($val) ? implode(',', $val) : $val);
+            $itemString = "'".$itemString."'";
+        }
 
-        if ($asError)
-            return '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.', {})';
-
-        $x  = '$WowheadPower.registerItem(\''.$itemString.'\', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true, false, $this->enhancedTT))."',\n";
-        $x .= "\tquality: ".$this->subject->getField('quality').",\n";
-        $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip(false, 0, $this->enhancedTT))."'\n";
-        $x .= "});";
-
-        return $x;
+        return sprintf($this->powerTpl, $itemString, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
-    protected function generateXML($asError = false)
+    protected function generateXML()
     {
         $root = new SimpleXML('<aowow />');
 
-        if ($asError)
+        if ($this->subject->error)
             $root->addChild('error', 'Item not found!');
         else
         {
@@ -1172,52 +1177,6 @@ class ItemPage extends genericPage
         }
 
         return $root->asXML();
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode == CACHE_TYPE_TOOLTIP)
-        {
-            if (!$this->loadCache($tt))
-            {
-                $tt = $this->generateTooltip();
-                $this->saveCache($tt);
-            }
-
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die($tt);
-        }
-        else if ($this->mode == CACHE_TYPE_XML)
-        {
-            if (!$this->loadCache($xml))
-            {
-                $xml = $this->generateXML();
-                $this->saveCache($xml);
-            }
-
-            header('Content-type: text/xml; charset=utf-8');
-            die($xml);
-        }
-        else
-            return parent::display($override);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode == CACHE_TYPE_TOOLTIP)
-        {
-            header('Content-type: application/x-javascript; charset=utf-8');
-            echo $this->generateTooltip(true);
-            exit();
-        }
-        else if ($this->mode == CACHE_TYPE_XML)
-        {
-            header('Content-type: text/xml; charset=utf-8');
-            echo $this->generateXML(true);
-            exit();
-        }
-        else
-            return parent::notFound($title ?: Lang::game('item'), $msg ?: Lang::item('notFound'));
     }
 }
 

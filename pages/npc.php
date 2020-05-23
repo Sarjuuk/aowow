@@ -19,6 +19,7 @@ class NpcPage extends GenericPage
     protected $js            = ['swfobject.js'];
 
     private   $soundIds      = [];
+    private   $powerTpl      = '$WowheadPower.registerNpc(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
     {
@@ -32,7 +33,7 @@ class NpcPage extends GenericPage
 
         $this->subject = new CreatureList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('npc'), Lang::npc('notFound'));
 
         $this->name    = Util::htmlEscape($this->subject->getField('name', true));
         $this->subname = $this->subject->getField('subname', true);
@@ -335,10 +336,7 @@ class NpcPage extends GenericPage
             }
 
             if ($sai->prepare())
-            {
-                foreach ($sai->getJSGlobals() as $type => $typeIds)
-                    $this->extendGlobalIds($type, $typeIds);
-            }
+                $this->extendGlobalData($sai->getJSGlobals());
             else
                 trigger_error('Creature has SmartAI set in template but no SmartAI defined.');
         }
@@ -841,45 +839,17 @@ class NpcPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerNpc('.$this->typeId.', '.User::$localeId.', {})';
-
-        $s = $this->subject->getSpawns(SPAWNINFO_SHORT);
-
-        $x  = '$WowheadPower.registerNpc('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
-        $x .= "\tmap: ".($s ? "{zone: ".$s[0].", coords: {".$s[1].":".Util::toJSON($s[2])."}}" : '{}')."\n";
-        $x .= "});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('npc'), $msg ?: Lang::npc('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function getRepForId($entries, &$spillover)

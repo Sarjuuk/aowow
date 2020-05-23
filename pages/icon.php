@@ -25,7 +25,7 @@ class IconPage extends GenericPage
 
         $this->subject = new IconList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Util::ucFirst(Lang::game('icon')), Lang::icon('notFound'));
+            $this->notFound(Lang::game('icon'), Lang::icon('notFound'));
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
