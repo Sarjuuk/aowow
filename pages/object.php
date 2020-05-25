@@ -18,7 +18,7 @@ class ObjectPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
-    private $powerTpl        = '$WowheadPower.registerObject(%d, %d, %s);'
+    private   $powerTpl      = '$WowheadPower.registerObject(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
     {
