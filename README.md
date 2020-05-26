@@ -34,7 +34,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 
 #### Highly Recommended
-+ setting the following configuration values on your TrintyCore server will greatly increase the accuracy of spawn points
++ setting the following configuration values on your TrinityCore server will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
   > Calculate.Gameoject.Zone.Area.Data = 1
 

@@ -23,7 +23,7 @@ elseif (!empty($this->map['data'])):
 
         $extra = $this->map['extra'];
         echo Lang::concat($this->map['mapperData'], true, function ($areaData, $areaId) use ($extra) {
-            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$extra[$areaId].'</a>&nbsp;('.reset($areaData)['count'].')';
+            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$extra[$areaId].'</a>&nbsp;('.array_sum(array_column($areaData, 'count')).')';
         });
 
         echo ".</span></div>\n";
@@ -77,6 +77,27 @@ elseif (!empty($this->map['data'])):
     if ($this->type != TYPE_ZONE && $this->type != TYPE_QUEST):
         echo "                \$WH.gE(\$WH.ge('mapper-zone-generic'), 'a')[0].onclick();\n";
     endif;
+
+if (User::isIngroup(U_GROUP_MODERATOR)):
+?>
+
+                function spawnposfix(type, typeguid, area, floor)
+                {
+                    $.ajax({
+                        type: 'GET',
+                        url: '?admin=spawn-override',
+                        data: { type: type, guid: typeguid, area : area, floor: floor, action: 1 },
+                        dataType: 'json',
+                        success: function (rsp) {
+                            if (rsp > 0)
+                                location.reload(true);
+                            else if (rsp /* == x */)
+                                alert('move failed. details tbd');
+                        },
+                    });
+                }
+<?php
+endif;
 ?>
             //]]></script>
 <?php endif; ?>

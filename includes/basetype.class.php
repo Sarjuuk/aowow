@@ -560,10 +560,10 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_SHORT] = new StdClass;
 
         // first get zone/floor with the most spawns
-        if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d && typeId = ?d GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
+        if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d AND typeId = ?d AND posX > 0 AND posY > 0 GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
         {
             // get relevant spawn points
-            $points = DB::Aowow()->select('SELECT posX, posY FROM ?_spawns WHERE type = ?d && typeId = ?d && areaId = ?d && floor = ?d', self::$type, $this->id, $res['areaId'], $res['floor']);
+            $points = DB::Aowow()->select('SELECT posX, posY FROM ?_spawns WHERE type = ?d AND typeId = ?d AND areaId = ?d AND floor = ?d AND posX > 0 AND posY > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
             $spawns = [];
             foreach ($points as $p)
                 $spawns[] = [$p['posX'], $p['posY']];
@@ -575,13 +575,17 @@ trait spawnHelper
 
     private function createFullSpawns()                     // for display on map (objsct/npc detail page)
     {
-        $data   = [];
-        $wpSum  = [];
-        $wpIdx  = 0;
-        $spawns = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE type = ?d AND typeId = ?d", self::$type, $this->id);
+        $data     = [];
+        $wpSum    = [];
+        $wpIdx    = 0;
+        $worldPos = [];
+        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE type = ?d AND typeId = ?d AND posX > 0 AND posY > 0", self::$type, $this->id);
 
         if (!$spawns)
             return;
+
+        if (User::isInGroup(U_GROUP_MODERATOR))
+            $worldPos = Game::getWorldPosForGUID(self::$type, ...array_column($spawns, 'guid'));
 
         foreach ($spawns as $s)
         {
@@ -648,7 +652,49 @@ trait spawnHelper
                     $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
                 }
 
-                // $footer = '<span class="q2">Click to move to different floor</span>';
+                if (User::isInGroup(U_GROUP_MODERATOR))
+                {
+                    if ($points = Game::worldPosToZonePos($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY']))
+                    {
+                        $floors = [];
+                        foreach ($points as $p)
+                        {
+                            if ($p['floor'])
+                                $floors[$p['areaId']][] = $p['floor'];
+
+                            if (isset($menu[$p['areaId']]))
+                                continue;
+                            else if ($p['areaId'] == $s['areaId'])
+                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '', null, ['class' => 'checked q0']];
+                            else
+                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$p['areaId'].', -1)', null, null];
+                        }
+
+                        foreach ($floors as $area => $f)
+                        {
+                            $menu[$area][2] = '';
+                            $menu[$area][3] = [];
+                            if ($menu[$area][4])
+                                $menu[$area][4]['class'] = 'checked';
+
+                            foreach ($f as $n)
+                            {
+                                if ($n == $s['floor'])
+                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n-1).']', '', null, ['class' => 'checked q0']];
+                                else
+                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n-1).']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
+                            }
+                        }
+
+                        $menu = array_values($menu);
+                    }
+
+                    if ($menu)
+                    {
+                        $footer = '<br /><span class="q2">Click to move displayed spawn point</span>';
+                        array_unshift($menu, [null, "Move to..."]);
+                    }
+                }
             }
 
             if ($info)
@@ -698,12 +744,12 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_ZONES] = $res;
     }
 
-    private function createQuestSpawns()                    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]
+    private function createQuestSpawns()                    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
     {
         if (self::$type == TYPE_SOUND)
             return;
 
-        $res    = DB::Aowow()->select('SELECT areaId, floor, typeId, posX, posY FROM ?_spawns WHERE type = ?d && typeId IN (?a)', self::$type, $this->getFoundIDs());
+        $res    = DB::Aowow()->select('SELECT areaId, floor, typeId, posX, posY FROM ?_spawns WHERE type = ?d AND typeId IN (?a) AND posX > 0 AND posY > 0', self::$type, $this->getFoundIDs());
         $spawns = [];
         foreach ($res as $data)
         {

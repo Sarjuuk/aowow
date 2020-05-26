@@ -19,44 +19,32 @@ SqlGen::register(new class extends SetupScript
     private $querys = array(
         1 => ['SELECT c.guid, 1 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, IFNULL(ca.path_id, 0) AS pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
-              ' - assembling creature spawns'],
+              ' - assembling creature spawns', TYPE_NPC],
 
         2 => ['SELECT c.guid, 2 AS "type", c.id AS typeId, ABS(c.spawntimesecs) AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM gameobject c',
-              ' - assembling gameobject spawns'],
+              ' - assembling gameobject spawns', TYPE_OBJECT],
 
         3 => ['SELECT id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_soundemitters',
-              ' - assembling sound emitter spawns'],
+              ' - assembling sound emitter spawns', TYPE_SOUND],
 
         4 => ['SELECT id AS "guid", 503 AS "type", id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_areatrigger',
-              ' - assembling areatrigger spawns'],
+              ' - assembling areatrigger spawns', TYPE_AREATRIGGER],
 
         5 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
               'FROM creature c JOIN script_waypoint w ON c.id = w.entry',
-              ' - assembling waypoints from table script_waypoint'],
+              ' - assembling waypoints from table script_waypoint', TYPE_NPC],
 
         6 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN waypoints w ON c.id = w.entry',
-              ' - assembling waypoints from table waypoints'],
+              ' - assembling waypoints from table waypoints', TYPE_NPC],
 
         7 => ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
-              ' - assembling waypoints from table waypoint_data']
+              ' - assembling waypoints from table waypoint_data', TYPE_NPC]
     );
-
-    private $queryPost =
-        'SELECT dm.id, wma.areaId, IFNULL(dm.floor, 0) AS floor, ' .
-        '100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`, ' .
-        '100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)), 1) AS `posY`, ' .
-        '((abs(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50) / 50) * ' .
-        ' (abs(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50) / 50)) AS quality ' .
-        'FROM dbc_worldmaparea wma ' .
-        'LEFT JOIN dbc_dungeonmap dm ON dm.mapId = IF(?d AND (wma.mapId NOT IN (0, 1, 530, 571) OR wma.areaId = 4395), wma.mapId, -1) ' .
-        'WHERE wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0) ' .
-        'HAVING (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9) ' . // AND (dm.id IS NULL OR ?d) ' .
-        'ORDER BY quality ASC';
 
     private $alphaMapCache = [];
 
@@ -141,6 +129,13 @@ SqlGen::register(new class extends SetupScript
             $t = DB::Aowow()->selectRow('SELECT posX, posY, mapId FROM dbc_taxipathnode tpn WHERE tpn.pathId = ?d AND nodeIdx = 0', $t);
 
 
+        /*********************/
+        /* get override data */
+        /*********************/
+
+        $overrideData = DB::Aowow()->select('SELECT `type` AS ARRAY_KEY, `typeGuid` AS ARRAY_KEY2, areaId, floor FROM ?_spawns_override');
+
+
         /**************/
         /* perform... */
         /**************/
@@ -175,18 +170,34 @@ SqlGen::register(new class extends SetupScript
                     $spawn['map']   = $transports[$spawn['map']]['mapId'];
                 }
 
-                $points = DB::Aowow()->select($this->queryPost, $spawn['posX'], $spawn['posX'], $spawn['posY'], $spawn['posY'], $spawn['posX'], $spawn['posX'], $spawn['posY'], $spawn['posY'], 1, $spawn['map'], $spawn['areaId'], $spawn['areaId'] /*, $spawn['areaId'] ? 1 : 0*/);
-                if (!$points)                               // retry: TC counts pre-instance subareas as instance-maps .. which have no map file
-                    $points = DB::Aowow()->select($this->queryPost, $spawn['posX'], $spawn['posX'], $spawn['posY'], $spawn['posY'], $spawn['posX'], $spawn['posX'], $spawn['posY'], $spawn['posY'], 0, $spawn['map'], 0, 0 /*, 1*/);
-
-                if (!$points)                               // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
+                $area  = $spawn['areaId'];
+                $floor = -1;
+                if (isset($overrideData[$q[2]][$spawn['guid']]))
                 {
-                    CLI::write('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$spawn['areaId'].'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
-                    continue;
+                    $area  = $overrideData[$q[2]][$spawn['guid']]['areaId'];
+                    $floor = $overrideData[$q[2]][$spawn['guid']]['floor'];
+                    CLI::write('GUID '.$spawn['guid'].' was manually moved [A:'.$spawn['areaId'].' => '.$area.'; F: '.$floor.']', CLI::LOG_INFO);
                 }
 
-                // if areaId is set, area was determined by TC .. we're fine .. mostly
-                $final  = $spawn['areaId'] ? $points[0] : $this->checkCoords($points);
+                $points = Game::worldPosToZonePos($spawn['map'], $spawn['posX'], $spawn['posY'], $area, $floor);
+                // cannot be placed, but we know the instanced map and can thus at least assign a zone
+                if (!$points && !in_array($spawn['map'], [0, 1, 530, 571]) && $idx < 5)
+                {
+                    $area = DB::Aowow()->selectCell('SELECT id FROM dbc_areatable WHERE mapId = ?d AND areaTable = 0', $spawn['map']);
+                    if (!$area)
+                    {
+                        CLI::write('tried to default GUID '.$spawn['guid'].' to instanced area by mapId, but returned empty [M:'.$spawn['map'].']', CLI::LOG_WARN);
+                        continue;
+                    }
+                    $final = ['areaId' => $area, 'posX' => 0, 'posY' => 0, 'floor' => 0];
+                }
+                else if (!$points)                               // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
+                {
+                    CLI::write('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$area.'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
+                    continue;
+                }
+                else                                            // if areaId is set, area was determined by TC .. we're fine .. mostly
+                    $final = $area ? $points[0] : $this->checkCoords($points);
 
                 if ($idx < 5)
                 {

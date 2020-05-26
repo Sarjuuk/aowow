@@ -55,6 +55,24 @@ class AjaxHandler
         return $this->contentType;
     }
 
+    protected function reqPOST(string ...$keys) : bool
+    {
+        foreach ($keys as $k)
+            if (!isset($this->_post[$k]) || $this->_post[$k] === null || $this->_post[$k] === '')
+                return false;
+
+        return true;
+    }
+
+    protected function reqGET(string ...$keys) : bool
+    {
+        foreach ($keys as $k)
+            if (!isset($this->_get[$k]) || $this->_get[$k] === null || $this->_get[$k] === '')
+                return false;
+
+        return true;
+    }
+
     protected function checkEmptySet(string $val) : bool
     {
         return $val === '';                                 // parameter is expected to be empty
