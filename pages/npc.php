@@ -116,7 +116,7 @@ class NpcPage extends GenericPage
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_creature gec, creature c WHERE ge.eventEntry = gec.eventEntry AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $this->extendGlobalIds(TYPE_WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';

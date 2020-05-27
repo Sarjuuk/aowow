@@ -60,7 +60,7 @@ class ObjectPage extends GenericPage
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.eventEntry = geg.eventEntry AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $this->extendGlobalIds(TYPE_WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';

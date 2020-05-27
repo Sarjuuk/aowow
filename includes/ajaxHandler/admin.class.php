@@ -414,44 +414,49 @@ class AjaxAdmin extends AjaxHandler
         {
             if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $wPos[$guid]['posX'], $wPos[$guid]['posY'], $area, $floor))
             {
-                $p = array(
+                $updGUIDs = [$guid];
+                $newPos   = array(
                     'posX'   => $point[0]['posX'],
                     'posY'   => $point[0]['posY'],
                     'areaId' => $point[0]['areaId'],
                     'floor'  => $point[0]['floor']
                 );
 
-                DB::Aowow()->query('UPDATE ?_spawns SET ?a WHERE `type` = ?d AND `guid` = ?d', $p, $type, $guid);
-
                 // if creature try for waypoints
-                if ($type != TYPE_NPC)
-                    return '1';
-
-                $jobs = array(
-                    'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_y AS `posX`, w.position_x AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
-                    'SELECT `entry`, `pointId`, `location_y` AS `posX`, `location_x` AS `posY` FROM `script_waypoint` WHERE `entry` = ?d',
-                    'SELECT `entry`, `pointId`, `position_y` AS `posX`, `position_x` AS `posY` FROM `waypoints` WHERE `entry` = ?d'
-                );
-
-                foreach ($jobs as $idx => $job)
+                if ($type == TYPE_NPC)
                 {
-                    if ($swp = DB::World()->select($job, $idx ? $wPos['id'] : $guid))
+                    $jobs = array(
+                        'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_y AS `posX`, w.position_x AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
+                        'SELECT `entry`, `pointId`, `location_y` AS `posX`, `location_x` AS `posY` FROM `script_waypoint` WHERE `entry` = ?d',
+                        'SELECT `entry`, `pointId`, `position_y` AS `posX`, `position_x` AS `posY` FROM `waypoints` WHERE `entry` = ?d'
+                    );
+
+                    foreach ($jobs as $idx => $job)
                     {
-                        foreach ($swp as $w)
+                        if ($swp = DB::World()->select($job, $idx ? $wPos[$guid]['id'] : $guid))
                         {
-                            if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
+                            foreach ($swp as $w)
                             {
-                                $p = array(
-                                    'posX'   => $point[0]['posX'],
-                                    'posY'   => $point[0]['posY'],
-                                    'areaId' => $point[0]['areaId'],
-                                    'floor'  => $point[0]['floor']
-                                );
+                                if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
+                                {
+                                    $p = array(
+                                        'posX'   => $point[0]['posX'],
+                                        'posY'   => $point[0]['posY'],
+                                        'areaId' => $point[0]['areaId'],
+                                        'floor'  => $point[0]['floor']
+                                    );
+                                }
+                                DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
                             }
-                            DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
                         }
                     }
+
+                    // also move linked vehicle accessories (on the very same position)
+                    $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.guid FROM ?_spawns s1 JOIN ?_spawns s2 ON s1.posX = s2.posX AND s1.posY = s2.posY AND
+                        s1.areaId = s2.areaId AND s1.floor = s2.floor AND s2.guid < 0 WHERE s1.guid = ?d', $guid));
                 }
+
+                DB::Aowow()->query('UPDATE ?_spawns SET ?a WHERE `type` = ?d AND `guid` IN (?a)', $newPos, $type, $updGUIDs);
 
                 return '1';
             }

@@ -152,6 +152,7 @@ SqlGen::register(new class extends SetupScript
             else
                 $queryResult = DB::World()->select($q[0]);
 
+            $doneGUID = 0;
             foreach ($queryResult as $spawn)
             {
                 if (!$n)
@@ -176,10 +177,15 @@ SqlGen::register(new class extends SetupScript
                 {
                     $area  = $overrideData[$q[2]][$spawn['guid']]['areaId'];
                     $floor = $overrideData[$q[2]][$spawn['guid']]['floor'];
-                    CLI::write('GUID '.$spawn['guid'].' was manually moved [A:'.$spawn['areaId'].' => '.$area.'; F: '.$floor.']', CLI::LOG_INFO);
+                    if ($doneGUID != $spawn['guid'])
+                    {
+                        CLI::write('GUID '.$spawn['guid'].' was manually moved [A:'.$spawn['areaId'].' => '.$area.'; F: '.$floor.']', CLI::LOG_INFO);
+                        $doneGUID = $spawn['guid'];         // do not spam on waypoints
+                    }
                 }
 
                 $points = Game::worldPosToZonePos($spawn['map'], $spawn['posX'], $spawn['posY'], $area, $floor);
+
                 // cannot be placed, but we know the instanced map and can thus at least assign a zone
                 if (!$points && !in_array($spawn['map'], [0, 1, 530, 571]) && $idx < 5)
                 {
@@ -197,7 +203,12 @@ SqlGen::register(new class extends SetupScript
                     continue;
                 }
                 else                                            // if areaId is set, area was determined by TC .. we're fine .. mostly
+                {
+                    if (in_array($spawn['map'], [564, 580]))    // Black Temple and Sunwell floor offset bullshit
+                        $points[0]['floor']++;
+
                     $final = $area ? $points[0] : $this->checkCoords($points);
+                }
 
                 if ($idx < 5)
                 {
@@ -266,7 +277,7 @@ SqlGen::register(new class extends SetupScript
                         for ($i = 0; $i < $data['nSeats']; $i++)
                             DB::Aowow()->query('
                                 REPLACE INTO ?_spawns (`guid`, `type`, `typeId`, `respawn`, `spawnMask`, `phaseMask`, `areaId`, `floor`, `posX`, `posY`, `pathId`) VALUES
-                                (?d, ?d, ?d, 0, 0, 1, ?d, ?d, ?d, ?d, 0)', --$vGuid, TYPE_NPC, $data['typeId'], $v['areaId'], $v['floor'], $v['posX'], $v['posY']);
+                                (?d, ?d, ?d, 0, 0, 1, ?d, ?d, ?f, ?f, 0)', --$vGuid, TYPE_NPC, $data['typeId'], $v['areaId'], $v['floor'], $v['posX'], $v['posY']);
 
                     unset($accessories[$idx]);
                 }

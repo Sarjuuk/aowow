@@ -652,14 +652,14 @@ trait spawnHelper
                     $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
                 }
 
-                if (User::isInGroup(U_GROUP_MODERATOR))
+                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos)
                 {
                     if ($points = Game::worldPosToZonePos($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY']))
                     {
                         $floors = [];
                         foreach ($points as $p)
                         {
-                            if ($p['floor'])
+                            if (isset(Game::$areaFloors[$p['areaId']]))
                                 $floors[$p['areaId']][] = $p['floor'];
 
                             if (isset($menu[$p['areaId']]))
@@ -679,10 +679,16 @@ trait spawnHelper
 
                             foreach ($f as $n)
                             {
+                                $jsRef = $n;
+                                if ($area != 4273)          // Ulduar is weird maaaan.....
+                                    $jsRef--;
+
+                                // todo: 3959 (BT) and 4075 (Sunwell) start at level 0 or something
+
                                 if ($n == $s['floor'])
-                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n-1).']', '', null, ['class' => 'checked q0']];
+                                    $menu[$area][3][] = [$jsRef, '$g_zone_areas['.$area.']['.$jsRef.']', '', null, ['class' => 'checked q0']];
                                 else
-                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n-1).']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
+                                    $menu[$area][3][] = [$jsRef, '$g_zone_areas['.$area.']['.$jsRef.']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
                             }
                         }
 
