@@ -21538,7 +21538,7 @@ var Announcement = function(opt) {
         return;
     }
 
-    if (g_user.id == 0 && (!g_cookiesEnabled() || g_getWowheadCookie('announcement-' + this.id) == 'closed')) {
+    if (g_user.id > 0 && (!g_cookiesEnabled() || g_getWowheadCookie('announcement-' + this.id) == 'closed')) {
         return;
     }
 

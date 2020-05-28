@@ -1080,6 +1080,7 @@ $lang = array(
         'spellLearn'    => "Вы изучите",
         'bonusTalents'  => "%d |4очко талантов:очка талантов:очков талантов;",
         'spellDisplayed'=> ' (показано: <a href="?spell=%d">%s</a>)',
+        'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
         'questInfo'     => array(
               0 => "Обычный",            1 => "Группа",             21 => "Жизнь",              41 => "PvP",                62 => "Рейд",               81 => "Подземелье",         82 => "Игровое событие",
              83 => "Легенда",           84 => "Сопровождение",      85 => "Героическое",        88 => "Рейд (10)",          89 => "Рейд (25)"

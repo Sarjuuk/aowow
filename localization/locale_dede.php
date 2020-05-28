@@ -1080,6 +1080,7 @@ $lang = array(
         'spellLearn'    => "Ihr erlernt",
         'bonusTalents'  => "%d |4Talentpunkt:Talentpunkte;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
+        'questPoolDesc' => 'Nur %d |4Quest kann:Quests können; aus diesem Tab gleichzeitig aktiv sein',
         'questInfo'     => array(
               0 => "Normal",             1 => "Gruppe",             21 => "Leben",              41 => "PvP",                62 => "Schlachtzug",        81 => "Dungeon",            82 => "Weltereignis",
              83 => "Legendär",          84 => "Eskorte",            85 => "Heroisch",           88 => "Schlachtzug (10)",   89 => "Schlachtzug (25)"

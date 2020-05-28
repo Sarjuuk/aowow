@@ -1080,6 +1080,7 @@ $lang = array(
         'spellLearn'    => "You will learn",                                        // REWARD_SPELL
         'bonusTalents'  => "%d talent |4point:points;",                             // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
+        'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
         'questInfo'     => array(
              0 => "Normal",              1 => "Group",              21 => "Life",               41 => "PvP",                62 => "Raid",               81 => "Dungeon",            82 => "World Event",
             83 => "Legendary",          84 => "Escort",             85 => "Heroic",             88 => "Raid (10)",          89 => "Raid (25)"

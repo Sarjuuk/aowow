@@ -1080,6 +1080,7 @@ $lang = array(
         'spellLearn'    => "Vous apprendrez",
         'bonusTalents'  => "%d |4point:points; de talent",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
+        'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
         'questInfo'     => array(
              0 => "Standard",            1 => "Groupe",             21 => "Vie",                41 => "JcJ",                62 => "Raid",               81 => "Donjon",             82 => "Évènement mondial",
             83 => "Légendaire",         84 => "Escorte",            85 => "Héroïque",           88 => "Raid (10)",          89 => "Raid (25)"

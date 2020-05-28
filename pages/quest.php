@@ -971,6 +971,23 @@ class QuestPage extends GenericPage
             )];
         }
 
+        // tab: spawning pool (for the swarm)
+        if ($qp = DB::World()->selectCol('SELECT qpm2.questId FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.poolId = qpm2.poolId WHERE qpm1.questId = ?d', $this->typeId))
+        {
+            $max = DB::World()->selectCell('SELECT numActive FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.poolId = qpt.poolId WHERE qpm.questId = ?d', $this->typeId);
+            $pooledQuests = new QuestList(array(['id', $qp]));
+            if (!$pooledQuests->error)
+            {
+                $this->extendGlobalData($pooledQuests->getJSGlobals());
+                $this->lvTabs[] = ['quest', array(
+                    'data' => array_values($pooledQuests->getListviewData()),
+                    'name' => 'Quest Pool',
+                    'id'   => 'quest-pool',
+                    'note' => Lang::quest('questPoolDesc', [$max])
+                )];
+            }
+        }
+
         // tab: conditions
         $cnd = [];
         if ($_ = $this->subject->getField('reqMinRepFaction'))
