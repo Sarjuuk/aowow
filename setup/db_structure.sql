@@ -100,8 +100,8 @@ CREATE TABLE `aowow_account_cookies` (
   `userId` int(10) unsigned NOT NULL,
   `name` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL,
   `data` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`userId`),
-  UNIQUE KEY `userId_name` (`userId`,`name`),
+  INDEX `userId` (`userId`) USING BTREE,
+  UNIQUE KEY `userId_name` (`userId`,`name`) USING BTREE,
   CONSTRAINT `FK_acc_cookies` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3138,7 +3138,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1590506555,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1590687330,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
