@@ -15,6 +15,8 @@ class DB
     private static $optionsCache    = [];
     private static $connectionCache = [];
 
+    private static $logs            = [];
+
     private static function createConnectSyntax(&$options)
     {
         return 'mysqli://'.$options['user'].':'.$options['pass'].'@'.$options['host'].'/'.$options['db'];
@@ -56,6 +58,35 @@ class DB
 
         echo CLI ? strip_tags($error) : $error;
         exit;
+    }
+
+    public static function logger($self, $query, $trace)
+    {
+        if ($trace)                                         // actual query
+            self::$logs[] = [substr(str_replace("\n", ' ', $query), 0, 200)];
+        else                                                // the statistics
+        {
+            end(self::$logs);
+            self::$logs[key(self::$logs)][] = substr(explode(';', $query)[0], 5);
+        }
+    }
+
+    public static function getLogs()
+    {
+        $out = '<pre><table style="font-size:12;"><tr><th></th><th>Time</th><th>Query</th></tr>';
+        foreach (self::$logs as $i => [$l, $t])
+        {
+            $c = 'inherit';
+            preg_match('/(\d+)/', $t, $m);
+            if ($m[1] > 100)
+                $c = '#FFA0A0';
+            else if ($m[1] > 20)
+                $c = '#FFFFA0';
+
+            $out .= '<tr><td>'.$i.'.</td><td style="background-color:'.$c.';">'.$t.'</td><td>'.$l.'</td></tr>';
+        }
+
+        return Util::jsEscape($out).'</table></pre>';
     }
 
     public static function getDB($idx)

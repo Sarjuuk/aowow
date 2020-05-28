@@ -32,5 +32,14 @@ endif;
 </noscript>
 
 <script type="text/javascript">DomContentLoaded.now()</script>
+<?php
+if (CFG_DEBUG && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)):
+?>
+<script type="text/javascript">
+    window.open("/", "SqlLog", "width=1800,height=200,top=100,left=100,status=no,location=no,toolbar=no,menubar=no").document.write('<?=DB::getLogs();?>');
+</script>
+<?php
+endif;
+?>
 </body>
 </html>

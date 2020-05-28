@@ -230,6 +230,20 @@ if (!CLI)
     if (!empty($AoWoWconf['aowow']) && User::init())
         User::save();                                       // save user-variables in session
 
+    // set up some logging (~10 queries will execute before we init the user and load the config)
+    if (CFG_DEBUG && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+    {
+        DB::Aowow()->setLogger(['DB', 'logger']);
+        DB::World()->setLogger(['DB', 'logger']);
+        if (DB::isConnected(DB_AUTH))
+            DB::Auth()->setLogger(['DB', 'logger']);
+
+        if (!empty($AoWoWconf['characters']))
+            foreach ($AoWoWconf['characters'] as $idx => $__)
+                if (DB::isConnected(DB_CHARACTERS . $idx))
+                    DB::Characters($idx)->setLogger(['DB', 'logger']);
+    }
+
     // hard-override locale for this call (should this be here..?)
     // all strings attached..
     if (!empty($AoWoWconf['aowow']))
