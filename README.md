@@ -122,7 +122,7 @@ A: Whenever you try to view a new character, AoWoW needs to fetch it first. Sinc
 @mix: for providing the php-script to parse .blp and .dbc into usable images and tables  
 @LordJZ: the wrapper-class for DBSimple; the basic idea for the user-class  
 @kliver: basic implementation of screenshot uploads  
-@Sarjuuk: mantaining this project  
+@Sarjuuk: maintainer of the project  
 
 
 ## Special Thanks
