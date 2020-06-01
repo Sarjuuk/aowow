@@ -83,7 +83,7 @@ function dbconfig()
             {
                 if ($inp['idx'] >= 0 && $inp['idx'] <= (3 + $nCharDBs))
                 {
-                    $curFields = $inp['idx'] ? $dbFields : array_splice($dbFields, 0, 4);
+                    $curFields = $inp['idx'] ? $dbFields : array_slice($dbFields, 0, 4);
 
                     if ($inp['idx'] == 3 + $nCharDBs)       // add new realmDB
                         $curFields['realmId'] = ['Realm Id',  false, '/[1-9][0-9]*/'];
