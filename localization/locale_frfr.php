@@ -725,7 +725,7 @@ $lang = array(
         'forgot'        => "Oublié",
         'forgotUser'    => "Nom d'utilisateur",
         'forgotPass'    => "Mot de passe",
-        'accCreate'     => 'Vous n\'avez pas encore de compte ? <a href="/account=signup">Créez-en un maintenant !</a>',
+        'accCreate'     => 'Vous n\'avez pas encore de compte ? <a href="/?account=signup">Créez-en un maintenant !</a>',
 
         // recovery
         'recoverUser'   => "Demande de nom d'utilisateur",
