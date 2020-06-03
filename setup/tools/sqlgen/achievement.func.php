@@ -23,6 +23,21 @@ SqlGen::register(new class extends SetupScript
 
     public function generate(array $ids = []) : bool
     {
+        /**************/
+        /* categories */
+        /**************/
+
+        CLI::write(' - resolving categories');
+
+        DB::Aowow()->query('REPLACE INTO ?_achievementcategory SELECT ac.id, IFNULL(ac.parentcategory, 0), IFNULL(ac1.parentcategory, 0)
+            FROM dbc_achievement_category ac LEFT JOIN dbc_achievement_category ac1 ON ac1.id = ac.parentCategory');
+
+        /************/
+        /* dbc data */
+        /************/
+
+        CLI::write(' - basic dbc data');
+
         DB::Aowow()->query('
             REPLACE INTO
                 ?_achievement
@@ -57,7 +72,13 @@ SqlGen::register(new class extends SetupScript
             { WHERE a.id IN (?a) }
         ', $ids ?: DBSIMPLE_SKIP);
 
-        // serverside achievements
+
+        /*******************/
+        /* serverside data */
+        /*******************/
+
+        CLI::write(' - serverside achievement data');
+
         $serverAchievements = DB::World()->select('SELECT ID, IF(requiredFaction = -1, 3, IF(requiredFaction = 0, 2, 1)) AS "faction", mapID, points, flags, count, refAchievement FROM achievement_dbc{ WHERE id IN (?a)}',
             $ids ?: DBSIMPLE_SKIP
         );
@@ -67,10 +88,13 @@ SqlGen::register(new class extends SetupScript
                 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID'], 'Serverside - #'.$sa['ID']
             );
 
-        if ($ids)
-            return true;
 
-        // create chain of achievements
+        /********************************/
+        /* create chain of achievements */
+        /********************************/
+
+        CLI::write(' - linking achievements to chain');
+
         $chainIdx = 0;
         $parents  = DB::Aowow()->selectCol('SELECT a.id FROM dbc_achievement a JOIN dbc_achievement b ON b.previous = a.id WHERE a.previous = 0');
         foreach ($parents as $chainId => $next)
@@ -93,7 +117,13 @@ SqlGen::register(new class extends SetupScript
             }
         }
 
-        // apply disables
+
+        /*********************/
+        /* applying disables */
+        /*********************/
+
+        CLI::write(' - disabling disabled achievements from table disables');
+
         if ($criteria = DB::World()->selectCol('SELECT entry FROM disables WHERE sourceType = 4'))
             DB::Aowow()->query('UPDATE aowow_achievement a JOIN aowow_achievementcriteria ac ON a.id = ac.refAchievementId SET a.cuFlags = ?d WHERE ac.id IN (?a)', CUSTOM_DISABLED, $criteria);
 

@@ -270,16 +270,10 @@ DROP TABLE IF EXISTS `aowow_achievementcategory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_achievementcategory` (
-  `id` int(11) unsigned NOT NULL,
-  `parentCategory` mediumint(9) NOT NULL,
-  `name_loc0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc2` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc3` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc4` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc6` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc8` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_achievement` (`parentCategory`)
+  `id` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `parentCat` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `parentCat2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3138,7 +3132,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1590687330,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1591223186,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

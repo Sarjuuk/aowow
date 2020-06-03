@@ -60,7 +60,7 @@ class AchievementPage extends GenericPage
         do
         {
             array_unshift($this->path, $curCat);
-            $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
+            $curCat = DB::Aowow()->SelectCell('SELECT parentCat FROM ?_achievementcategory WHERE id = ?d', $curCat);
         }
         while ($curCat > 0);
 

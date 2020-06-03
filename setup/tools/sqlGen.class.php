@@ -103,7 +103,7 @@ class SqlGen
         self::$mode = $mode;
     }
 
-    public static function register(SetupScript $ssRef) : bool
+    public static function register(SetupScript $ssRef) : void
     {
         // if dependancies haven't been stored yet, put aside for later use
         foreach ($ssRef->getDependancies(true) as $d)
@@ -112,13 +112,13 @@ class SqlGen
                 continue;
 
             self::$tmpStore[] = $ssRef;
-            return false;
+            return;
         }
 
         if (isset(self::$tables[$ssRef->getName()]))
         {
             CLI::write('a SetupScript named '.CLI::bold($ssRef->getName()).' was already registered. Skipping...', CLI::LOG_WARN);
-            return false;
+            return;
         }
 
         self::$tables[$ssRef->getName()] = $ssRef;
@@ -142,8 +142,6 @@ class SqlGen
                 unset(self::$tmpStore[$idx]);
             }
         }
-
-        return true;
     }
 
     private static function handleCLIOpts(&$doTbls) : void
