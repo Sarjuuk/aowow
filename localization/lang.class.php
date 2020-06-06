@@ -66,7 +66,9 @@ class Lang
     {
         if (!isset(self::$$prop))
         {
-            trigger_error('Lang - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
+            $dbt  = debug_backtrace()[0];
+            $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
+            trigger_error('Lang - tried to use undefined property Lang::$'.$prop.', called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
             return null;
         }
 
@@ -82,7 +84,9 @@ class Lang
             }
             else if (!isset($var[$arg]))
             {
-                trigger_error('Lang - undefined key "'.$arg.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']', E_USER_WARNING);
+                $dbt  = debug_backtrace()[0];
+                $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
+                trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
                 return null;
             }
 
