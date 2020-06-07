@@ -934,9 +934,14 @@ class ItemList extends BaseType
                     if ($cd < $this->curTpl['spellCategoryCooldown'.$j])
                         $cd = $this->curTpl['spellCategoryCooldown'.$j];
 
-                    $cd = $cd < 5000 ? null : ' ('.sprintf(Lang::game('cooldown'), Util::formatTime($cd)).')';
+                    $extra = [];
+                    if ($cd >= 5000)
+                        $extra[] = Lang::game('cooldown', [Util::formatTime($cd, true)]);
+                    if ($this->curTpl['spellTrigger'.$j] == 2)
+                        if ($ppm = $this->curTpl['spellppmRate'.$j])
+                            $extra[] = Lang::spell('ppm', [$ppm]);
 
-                    $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $cd];
+                    $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $extra ? ' ('.implode(', ', $extra).')' : ''];
                 }
             }
 
