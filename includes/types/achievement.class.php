@@ -151,7 +151,7 @@ class AchievementList extends BaseType
         if (isset($this->criteria[$this->id]))
             return $this->criteria[$this->id];
 
-        $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievementId` = ?d ORDER BY `order` ASC', $this->id);
+        $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievementId` = ?d ORDER BY `order` ASC', $this->curTpl['refAchievement'] ?: $this->id);
         if (!$result)
             return [];
 
