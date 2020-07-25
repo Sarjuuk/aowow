@@ -1056,14 +1056,15 @@ class QuestPage extends GenericPage
         // moneyReward / maxLevelCompensation
         $comp       = $this->subject->getField('rewardMoneyMaxLevel');
         $questMoney = $this->subject->getField('rewardOrReqMoney');
+        $realComp   = max($comp, $questMoney);
         if ($questMoney > 0)
         {
             $rewards['money'] = Util::formatMoney($questMoney);
-            if ($comp > 0)
-                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+            if ($realComp > $questMoney)
+                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($realComp), MAX_LEVEL);
         }
-        else if ($questMoney <= 0 && $questMoney + $comp > 0)
-            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+        else if ($questMoney <= 0 && $realComp > 0)
+            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($realComp), MAX_LEVEL);
 
         // itemChoices
         if (!empty($this->subject->choices[$this->typeId][TYPE_ITEM]))
