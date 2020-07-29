@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'taxi';                            // path & nodes
 
-    protected $tblDependancyTC = ['creature', 'creature_template'];
+    protected $tblDependencyTC = ['creature', 'creature_template'];
     protected $dbcSourceFiles  = ['taxipath', 'taxinodes', 'worldmaparea', 'worldmaptransforms', 'factiontemplate'];
 
     public function generate(array $ids = []) : bool

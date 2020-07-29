@@ -30,19 +30,6 @@ if (!CLI)
 
     function complexImg()
     {
-        if (isset(FileGen::$cliOpts['help']))
-        {
-            echo "\n";
-            echo "available options for subScript 'complexImg':\n";                                         // modeMask
-            echo "--talentbgs  (backgrounds for talent calculator)\n";                                      // 0x01
-            echo "--maps       (generates worldmaps)\n";                                                    // 0x02
-            echo "--spawn-maps (creates alphaMasks of each zone to check spawns against)\n";                // 0x04
-            echo "--artwork    (optional: imagery from /glues/credits (not used, skipped by default))\n";   // 0x08
-            echo "--area-maps  (optional: renders maps with highlighted subZones for each area)\n";         // 0x10
-
-            return true;
-        }
-
         $mapWidth  = 1002;
         $mapHeight = 668;
         $threshold = 95;                                    // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
@@ -212,8 +199,18 @@ if (!CLI)
         };
 
         // do not change order of params!
-        if ($_ = FileGen::hasOpt('talentbgs', 'maps', 'spawn-maps', 'artwork', 'area-maps'))
-            $modeMask = $_;
+        $o = CLISetup::getOpt('talentbgs', 'maps', 'spawn-maps', 'artwork', 'area-maps');
+        $m = 0x0;
+        $i = 0;
+        foreach ($o as $k => $v)
+        {
+            if ($v)
+                $m |= 1 << $i;
+            $i++;
+        }
+
+        if ($m)
+            $modeMask = $m;
 
         foreach ($paths as $mode => $__)
             if (!($mode & $modeMask))
@@ -318,7 +315,7 @@ if (!CLI)
                             $name = $destDir.'talents/backgrounds/'.strtolower($tt['fileString']).'_'.($tt['tabNumber'] + 1);
                         }
 
-                        if (!isset(FileGen::$cliOpts['force']) && file_exists($name.'.jpg'))
+                        if (!CLISetup::getOpt('force') && file_exists($name.'.jpg'))
                         {
                             CLI::write($done.' - file '.$name.'.jpg was already processed');
                             continue;
@@ -570,7 +567,7 @@ if (!CLI)
                             if ($multiLeveled && !(isset($baseLevelFix[$zoneId]) && $i == $baseLevelFix[$zoneId]))
                                 $outFile[$idx] .= '-'.$floor;
 
-                            if (!isset(FileGen::$cliOpts['force']) && file_exists($outFile[$idx].'.'.$info[1]))
+                            if (!CLISetup::getOpt('force') && file_exists($outFile[$idx].'.'.$info[1]))
                             {
                                 CLI::write($progress.' - file '.$outFile[$idx].'.'.$info[1].' was already processed');
                                 $doSkip |= (1 << $idx);
@@ -619,7 +616,7 @@ if (!CLI)
                             foreach ($mapDirs as $idx => $info)
                             {
                                 $outFile[$idx] = $destDir . sprintf($info[0], strtolower(Util::$localeStrings[$l]).'/') . $row['areaTableId'];
-                                if (!isset(FileGen::$cliOpts['force']) && file_exists($outFile[$idx].'.'.$info[1]))
+                                if (!CLISetup::getOpt('force') && file_exists($outFile[$idx].'.'.$info[1]))
                                 {
                                     CLI::write($progress.' - file '.$outFile[$idx].'.'.$info[1].' was already processed');
                                     $doSkip |= (1 << $idx);
@@ -719,7 +716,7 @@ if (!CLI)
                     $done = ' - '.str_pad($sum.'/'.$total, 8).str_pad('('.number_format($sum * 100 / $total, 2).'%)', 9);
                     $name = $destDir.'Interface/Glues/Credits/'.$file;
 
-                    if (!isset(FileGen::$cliOpts['force']) && file_exists($name.'.png'))
+                    if (!CLISetup::getOpt('force') && file_exists($name.'.png'))
                     {
                         CLI::write($done.' - file '.$name.'.png was already processed');
                         continue;

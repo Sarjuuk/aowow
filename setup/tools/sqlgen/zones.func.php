@@ -13,7 +13,7 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'zones';
 
-    protected $tblDependancyTC = ['access_requirement'];
+    protected $tblDependencyTC = ['access_requirement'];
     protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist'];
 
     private $customData = array(

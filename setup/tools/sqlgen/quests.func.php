@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'quests';
 
-    protected $tblDependancyTC    = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'disables'];
+    protected $tblDependencyTC    = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'disables'];
     protected $dbcSourceFiles     = ['questxp', 'questfactionreward'];
 
     public function generate(array $ids = []) : bool

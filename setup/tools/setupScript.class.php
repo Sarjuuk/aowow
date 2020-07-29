@@ -48,8 +48,8 @@ abstract class SetupScript
     protected $fileTemplatePath = '';
     protected $fileTemplateFile = '';
 
-    protected $tblDependancyAowow = [];
-    protected $tblDependancyTC    = [];
+    protected $tblDependencyAowow = [];
+    protected $tblDependencyTC    = [];
 
     protected $dbcSourceFiles     = [];
 
@@ -62,9 +62,9 @@ abstract class SetupScript
         return $this->dbcSourceFiles;
     }
 
-    public function getDependancies(bool $aowow) : array
+    public function getDependencies(bool $aowow) : array
     {
-        return $aowow ? $this->tblDependancyAowow : $this->tblDependancyTC;
+        return $aowow ? $this->tblDependencyAowow : $this->tblDependencyTC;
     }
 
     public function getName() : string

@@ -13,8 +13,8 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'items';
 
-    protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
+    protected $tblDependencyAowow = ['icons'];
+    protected $tblDependencyTC    = ['item_template', 'item_template_locale', 'spell_group', 'game_event'];
     protected $dbcSourceFiles     = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
 
     private $customData = array(

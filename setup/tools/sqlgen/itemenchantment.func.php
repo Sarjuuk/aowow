@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'itemenchantment';
 
-    protected $tblDependancyTC = ['spell_enchant_proc_data'];
+    protected $tblDependencyTC = ['spell_enchant_proc_data'];
     protected $dbcSourceFiles  = ['spellitemenchantment'];
 
     public function generate(array $ids = []) : bool

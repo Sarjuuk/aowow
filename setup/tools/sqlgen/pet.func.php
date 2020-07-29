@@ -11,8 +11,8 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'pet';
 
-    protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['creature_template', 'creature'];
+    protected $tblDependencyAowow = ['icons'];
+    protected $tblDependencyTC    = ['creature_template', 'creature'];
     protected $dbcSourceFiles     = ['talent', 'spell', 'skilllineability', 'creaturefamily'];
 
     public function generate(array $ids = []) : bool

@@ -22,7 +22,7 @@ function account()
     User::useLocale(LOCALE_EN);
     Lang::load(Util::$localeStrings[LOCALE_EN]);
 
-    if (CLI::readInput($fields))
+    if (CLI::read($fields))
     {
         CLI::write();
 

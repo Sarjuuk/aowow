@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'spelldifficulty';
 
-    protected $tblDependancyTC = ['spelldifficulty_dbc'];
+    protected $tblDependencyTC = ['spelldifficulty_dbc'];
     protected $dbcSourceFiles  = ['spelldifficulty'];
 
     public function generate(array $ids = []) : bool

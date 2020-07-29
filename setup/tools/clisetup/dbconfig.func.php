@@ -79,7 +79,7 @@ function dbconfig()
         while (true)
         {
             $inp = ['idx' => ['', true, '/\d/']];
-            if (CLI::readInput($inp, true) && $inp)
+            if (CLI::read($inp, true) && $inp)
             {
                 if ($inp['idx'] >= 0 && $inp['idx'] <= (3 + $nCharDBs))
                 {
@@ -88,7 +88,7 @@ function dbconfig()
                     if ($inp['idx'] == 3 + $nCharDBs)       // add new realmDB
                         $curFields['realmId'] = ['Realm Id',  false, '/[1-9][0-9]*/'];
 
-                    if (CLI::readInput($curFields))
+                    if (CLI::read($curFields))
                     {
                         if ($inp['idx'] == 0 && $curFields)
                             $curFields['prefix'] = 'aowow_';

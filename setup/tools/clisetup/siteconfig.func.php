@@ -166,7 +166,7 @@ function siteconfig()
         }
 
         $inp = ['idx' => ['', false, '/\d/']];
-        if (CLI::readInput($inp) && $inp && $inp['idx'] !== '')
+        if (CLI::read($inp) && $inp && $inp['idx'] !== '')
         {
             // add new php setting
             if ($inp['idx'] == $sumNum)
@@ -180,7 +180,7 @@ function siteconfig()
                         'key' => ['option name', false, '/[\w_\.\-]/i'],
                         'val' => ['value',                            ]
                     );
-                    if (CLI::readInput($setting) && $setting)
+                    if (CLI::read($setting) && $setting)
                     {
                         CLI::write();
 
@@ -270,7 +270,7 @@ function siteconfig()
                 while (true)
                 {
                     $action = ['idx' => ['', true, '/[edr]/i']];
-                    if (CLI::readInput($action, true) && $action)
+                    if (CLI::read($action, true) && $action)
                     {
                         switch (strtoupper($action['idx']))
                         {
@@ -325,7 +325,7 @@ function siteconfig()
                                 while (true)
                                 {
                                     $use = $value;
-                                    if (CLI::readInput($use, $single))
+                                    if (CLI::read($use, $single))
                                     {
                                         CLI::write();
 
@@ -408,7 +408,7 @@ function siteconfig()
         else
         {
             CLI::write();
-            CLI::write('site configuration aborted', CLI::LOG_INFO);
+            CLI::write('leaving site configuration...', CLI::LOG_INFO);
             break;
         }
 

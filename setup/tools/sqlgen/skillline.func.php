@@ -13,7 +13,7 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'skillline';
 
-    protected $tblDependancyAowow = ['icons'];
+    protected $tblDependencyAowow = ['icons'];
     protected $dbcSourceFiles     = ['skillline', 'spell', 'skilllineability'];
 
     private $customData = array(

@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'areatrigger';
 
-    protected $tblDependancyTC = ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon'];
+    protected $tblDependencyTC = ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon'];
     protected $dbcSourceFiles  = ['areatrigger', 'worldmaparea', 'dungeonmap'];
 
     public function generate(array $ids = []) : bool

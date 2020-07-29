@@ -13,8 +13,8 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'achievement';
 
-    protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['dbc_achievement', 'disables'];
+    protected $tblDependencyAowow = ['icons'];
+    protected $tblDependencyTC    = ['dbc_achievement', 'disables'];
     protected $dbcSourceFiles     = ['achievement_category', 'achievement', 'spellicon'];
 
     private $customData = array(

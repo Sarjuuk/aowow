@@ -13,13 +13,10 @@ class SqlGen
     const MODE_FIRSTRUN = 2;
     const MODE_UPDATE   = 3;
 
+    private static $mode = 0;
+
     private static $tables   = [];
     private static $tmpStore = [];
-
-    public  static $cliOpts   = [];
-    private static $shortOpts = 'h';
-    private static $longOpts  = ['sql::', 'help', 'sync:']; // general
-    private static $mode      = 0;
 
     public static $subScripts = [];
 
@@ -31,6 +28,7 @@ class SqlGen
         self::$defaultExecTime = ini_get('max_execution_time');
         $doScripts = null;
 
+        self::$mode = $mode;
 
         // register subscripts
         foreach (glob('setup/tools/sqlgen/*.func.php') as $file)
@@ -43,7 +41,7 @@ class SqlGen
             foreach (self::$tmpStore as $idx => $ts)
             {
                 $depsOK = true;
-                foreach ($ts->getDependancies(true) as $d)
+                foreach ($ts->getDependencies(true) as $d)
                 {
                     if (isset(self::$tables[$d]))
                         continue;
@@ -68,20 +66,18 @@ class SqlGen
 
             if ($nDepsMissing == count(self::$tmpStore))
             {
-                CLI::write('the flollowing SetupScripts have unresolved dependancies and have not been registered:', CLI::LOG_ERROR);
+                CLI::write('the following SetupScripts have unresolved dependencies and have not been registered:', CLI::LOG_ERROR);
                 foreach (self::$tmpStore as $ts)
-                    CLI::write('  * '.CLI::bold($ts->getName()).' => '.implode(', ', $ts->getDependancies(true)));
+                    CLI::write('  * '.CLI::bold($ts->getName()).' => '.implode(', ', $ts->getDependencies(true)));
 
                 self::$tmpStore = [];
                 break;
             }
         }
 
-
         // handle command prompts
-        if (getopt(self::$shortOpts, self::$longOpts) || $mode == self::MODE_FIRSTRUN)
-            self::handleCLIOpts($doScripts);
-        else if ($mode != self::MODE_UPDATE)
+        self::handleCLIOpts($doScripts);
+        if ($mode == self::MODE_NORMAL && !$doScripts)
         {
             self::printCLIHelp();
             exit;
@@ -99,14 +95,12 @@ class SqlGen
             CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
             exit;
         }
-
-        self::$mode = $mode;
     }
 
     public static function register(SetupScript $ssRef) : void
     {
-        // if dependancies haven't been stored yet, put aside for later use
-        foreach ($ssRef->getDependancies(true) as $d)
+        // if dependencies haven't been stored yet, put aside for later use
+        foreach ($ssRef->getDependencies(true) as $d)
         {
             if (isset(self::$tables[$d]))
                 continue;
@@ -123,11 +117,11 @@ class SqlGen
 
         self::$tables[$ssRef->getName()] = $ssRef;
 
-        // recheck temp stored dependancies
+        // recheck temp stored dependencies
         foreach (self::$tmpStore as $idx => $ts)
         {
             $depsOK = true;
-            foreach ($ts->getDependancies(true) as $d)
+            foreach ($ts->getDependencies(true) as $d)
             {
                 if (isset(self::$tables[$d]))
                     continue;
@@ -147,41 +141,78 @@ class SqlGen
     private static function handleCLIOpts(&$doTbls) : void
     {
         $doTbls = [];
-        $_ = getopt(self::$shortOpts, self::$longOpts);
 
-        if ((isset($_['help']) || isset($_['h'])) && empty($_['sql']))
+        if (CLISetup::getOpt('help') && self::$mode == self::MODE_NORMAL)
         {
             self::printCLIHelp();
             exit;
         }
 
         // required subScripts
-        if (!empty($_['sync']))
+        if ($sync = CLISetup::getOpt('sync'))
         {
-            $sync = explode(',', $_['sync']);
             foreach (self::$tables as $name => &$ssRef)
-                if (array_intersect($sync, $ssRef->getDependancies(false)))
+                if (array_intersect($sync, $ssRef->getDependencies(false)))
                     $doTbls[] = $name;
 
             // recursive dependencies
             foreach (self::$tables as $name => &$ssRef)
-                if (array_intersect($sync, $ssRef->getDependancies(true)))
+                if (array_intersect($sync, $ssRef->getDependencies(true)))
                     $doTbls[] = $name;
 
             $doTbls = $doTbls ? array_unique($doTbls) : null;
         }
-        else if (!empty($_['sql']))
-            $doTbls = explode(',', $_['sql']);
+        else if ($_ = CLISetup::getOpt('sql'))
+            $doTbls = $_;
     }
 
-    public static function printCLIHelp() : void
+    private static function printCLIHelp() : void
     {
-        echo "\nusage: php aowow --sql=<tableList,> [-h --help]\n\n";
-        echo "--sql              : available tables:\n";
-        foreach (self::$tables as $t => &$ssRef)
-            echo " * ".str_pad($t, 24).($ssRef->getDependancies(false) ? ' - TC deps: '.implode(', ', $ssRef->getDependancies(false)) : '').($ssRef->getDependancies(true) ? ' - Aowow deps: '.implode(', ', $ssRef->getDependancies(true)) : '')."\n";
+        CLI::write();
+        CLI::write('  usage: php aowow --sql=<subScriptList,> [--mpqDataDir: --locales:]', -1, false);
+        CLI::write();
+        CLI::write('  Regenerates DB table content for a given subScript. Dependencies are taken into account by the triggered calls of --sync and --update', -1, false);
 
-        echo "-h --help          : shows this info\n";
+        $lines = [['available subScripts', 'TC dependencies', 'AoWoW dependencies']];
+        foreach (self::$tables as $tbl => &$ssRef)
+        {
+            $aoRef = $ssRef->getDependencies(true);
+            $len   = 0;
+            $first = true;
+
+            $row = [" * ".$tbl, '', ''];
+
+            if ($tc = $ssRef->getDependencies(false))
+            {
+                $len = 0;
+                foreach ($tc as $t)
+                {
+                    $n = strlen($t) + 1;
+                    if ($n + $len > 60)
+                    {
+                        // max 2 tables, no multi-row shenanigans required
+                        if ($first && $aoRef)
+                            $row[2] = implode(' ', $aoRef);
+
+                        $lines[] = $row;
+                        $row     = ['', '', ''];
+                        $len     = $n;
+                        $first   = false;
+                    }
+                    else
+                        $len += $n;
+
+                    $row[1] .= $t." ";
+                }
+            }
+
+            if ($first && $aoRef)
+                $row[2] = implode(' ', $aoRef);
+
+            $lines[] = $row;
+        }
+
+        CLI::writeTable($lines);
     }
 
     public static function generate(string $tableName, array $updateIds = []) : bool

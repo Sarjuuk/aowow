@@ -13,8 +13,8 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'currencies';
 
-    protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['item_template', 'item_template_locale'];
+    protected $tblDependencyAowow = ['icons'];
+    protected $tblDependencyTC    = ['item_template', 'item_template_locale'];
     protected $dbcSourceFiles     = ['itemdisplayinfo', 'currencytypes'];
 
     // hide test tokens and move them to unused

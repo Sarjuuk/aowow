@@ -13,7 +13,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'spawns';                          // and waypoints
 
-    protected $tblDependancyTC = ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data'];
+    protected $tblDependencyTC = ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data'];
     protected $dbcSourceFiles  = ['worldmaparea', 'map', 'dungeonmap', 'taxipathnode', 'soundemitters', 'areatrigger', 'areatable'];
 
     private $querys = array(

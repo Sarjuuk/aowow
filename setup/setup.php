@@ -7,96 +7,71 @@ if (!CLI)
     die('not in cli mode');
 
 
-// shared strings
-define('ERR_CREATE_FILE',  'could not create file at destination %s'        );
-define('ERR_WRITE_FILE',   'could not write to file at destination %s'      );
-define('ERR_READ_FILE',    'file %s could not be read'                      );
-define('ERR_MISSING_FILE', 'file %s not found'                              );
-define('ERR_NONE',         'created file %s'                                );
-define('ERR_MISSING_INCL', 'required function %s() could not be found at %s');
-
-
 require_once 'setup/tools/CLISetup.class.php';
 require_once 'setup/tools/setupScript.class.php';
 require_once 'setup/tools/dbc.class.php';
 require_once 'setup/tools/imagecreatefromblp.func.php';
 
-function finish()
+
+function finish(bool $unlock = true) : void
 {
-    if (!getopt('d', ['delete']))                           // generated with TEMPORARY keyword. Manual deletion is not needed
-        CLI::write('generated dbc_* - tables kept available', CLI::LOG_INFO);
+    if (CLISetup::getOpt('delete'))                         // generated with TEMPORARY keyword. Manual deletion is not needed
+        CLI::write('generated dbc_* - tables have been deleted.', CLI::LOG_INFO);
+
+    if ($unlock)
+        lockSite(false);
 
     die("\n");
 }
 
-$opt = getopt('h', ['help', 'account', 'dbconfig', 'siteconfig', 'sql', 'build', 'sync', 'update', 'firstrun', 'dbc:']);
-if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun']) || isset($opt['resume']))))
+function lockSite(bool $enable = true) : void
 {
-    echo "\nAowow Setup\n";
-    echo "--dbconfig               : set up db connection\n";
-    echo "--siteconfig             : set up site variables\n";
-    echo "--account                : create an account with admin privileges\n";
-    echo "--sql                    : generate db content from your world tables\n";
-    echo "--build                  : create server specific files\n";
-    echo "--sync=<tableList,>      : regenerate tables/files that depend on given world-table\n";
-    echo "--update                 : apply new sql updates fetched from github\n";
-    echo "--firstrun               : goes through the nessecary hoops of the initial setup.\n";
-    echo "additional options\n";
-    echo "--log logfile            : write ouput to file\n";
-    echo "--locales=<regionCodes,> : limit setup to enUS, frFR, deDE, esES and/or ruRU (does not override config settings)\n";
-    echo "--mpqDataDir=path/       : manually point to directory with extracted mpq files; is limited to setup/ (default: setup/mpqData/)\n";
-    echo "--delete | -d            : delete generated dbc_* tables when script finishes\n";
-    echo "--help | -h              : contextual help\n";
-    die("\n");
+    DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', $enable ? 1 : 0);
 }
-else
-    CLISetup::init();
 
-$cmd = array_pop(array_keys($opt));
-$s   = [];
-$b   = [];
+CLISetup::init();
+
+if (!CLISetup::getOpt(0x3))
+    die(CLISetup::optHelp(0x7));
+
+$cmd    = CLISetup::getOpt(0x3)[0];                         // get arguments present in argGroup 1 or 2, if set. Pick first.
+$unlock = false;
+$s      = [];
+$b      = [];
 switch ($cmd)                                               // we accept only one main parameter
 {
-    case 'firstrun':
+    case 'setup':
+        lockSite(true);
         require_once 'setup/tools/clisetup/firstrun.func.php';
-        firstrun();
+        $success = firstrun();
 
-        finish();
+        finish($success);
+    case 'sql':
+    case 'build':
+        lockSite(true);
+        $unlock = true;
     case 'account':
     case 'dbconfig':
     case 'siteconfig':
-    case 'sql':
-    case 'build':
         require_once 'setup/tools/clisetup/'.$cmd.'.func.php';
         $cmd();
 
-        finish();
+        finish($unlock);
     case 'update':
+        lockSite(true);
         require_once 'setup/tools/clisetup/update.func.php';
+
         [$s, $b] = update();                                // return true if we do not rebuild stuff
         if (!$s && !$b)
-            return;
+            finish(true);
     case 'sync':
-        require_once 'setup/tools/clisetup/sql.func.php';
-        require_once 'setup/tools/clisetup/build.func.php';
-        $_s = sql($s);
-        $_b = build($b);
+        lockSite(true);
+        require_once 'setup/tools/clisetup/sync.func.php';
 
-        if ($s)
-        {
-            $_ = array_diff($s, $_s);
-            DB::Aowow()->query('UPDATE ?_dbversion SET `sql` = ?', $_ ? implode(' ', $_) : '');
-        }
-
-        if ($b)
-        {
-            $_ = array_diff($b, $_b);
-            DB::Aowow()->query('UPDATE ?_dbversion SET `build` = ?', $_ ? implode(' ', $_) : '');
-        }
-
-        finish();
+        sync($s, $b);
+        finish(true);
     case 'dbc':
-        foreach (explode(',', $opt['dbc']) as $n)
+        foreach (CLISetup::getOpt('dbc') as $n)
         {
             if (empty($n))
                 continue;

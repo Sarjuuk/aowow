@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'events';
 
-    protected $tblDependancyTC = ['game_event', 'game_event_prerequisite'];
+    protected $tblDependencyTC = ['game_event', 'game_event_prerequisite'];
 
     public function generate(array $ids = []) : bool
     {

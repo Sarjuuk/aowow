@@ -132,7 +132,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'item_stats';                      // and enchantment stats
 
-    protected $tblDependancyAowow = ['items', 'spell'];
+    protected $tblDependencyAowow = ['items', 'spell'];
     protected $dbcSourceFiles     = ['spellitemenchantment'];
 
     private function enchantment_stats() : array

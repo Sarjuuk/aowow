@@ -11,9 +11,22 @@ if (!CLI)
 /* automaticly apply sql-updates */
 /*********************************/
 
-function update()
+function update() : array
 {
     [$date, $part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
+
+    if (CLISetup::getOpt('help'))
+    {
+        CLI::write();
+        CLI::write('  usage: php aowow --update', -1, false);
+        CLI::write();
+        CLI::write('  Checks /setup/updates for new *.sql files and applies them. If required by an applied update, the --sql and --build command are triggered afterwards.', -1, false);
+        CLI::write('  Use this after fetching the latest rev. from Github.', -1, false);
+        CLI::write();
+        CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $date).' (Part #'.$part.')', -1, false);
+        CLI::write();
+        exit;
+    }
 
     CLI::write('checking sql updates');
 

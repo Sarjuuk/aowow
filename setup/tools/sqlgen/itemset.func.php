@@ -19,8 +19,8 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'itemset';
 
-    protected $tblDependancyAowow = ['spell'];
-    protected $tblDependancyTC    = ['item_template', 'game_event'];
+    protected $tblDependencyAowow = ['spell'];
+    protected $tblDependencyTC    = ['item_template', 'game_event'];
     protected $dbcSourceFiles     = ['itemset'];
 
     private $customData = array(

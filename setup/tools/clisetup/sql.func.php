@@ -47,7 +47,7 @@ function sql($syncMe = null)
         else
             CLI::write('finished sql generation with errors', CLI::LOG_ERROR);
     }
-    else if ($syncMe)
+    else if (SqlGen::getMode() == SqlGen::MODE_NORMAL)
         CLI::write('no valid script names supplied', CLI::LOG_ERROR);
 
     return $done;

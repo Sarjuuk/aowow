@@ -13,7 +13,7 @@ SqlGen::register(new class extends SetupScript
 
     protected $command = 'titles';
 
-    protected $tblDependancyTC = ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward'];
+    protected $tblDependencyTC = ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward'];
     protected $dbcSourceFiles  = ['chartitles'];
 
     private $customData = array(

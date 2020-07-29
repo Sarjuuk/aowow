@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'glyphproperties';
 
-    protected $tblDependancyAowow = ['icons'];
+    protected $tblDependencyAowow = ['icons'];
     protected $dbcSourceFiles     = ['glyphproperties', 'spellicon'];
 
     public function generate(array $ids = []) : bool

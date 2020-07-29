@@ -27,13 +27,54 @@ class CLI
     const CHR_ESC       = 27;
     const CHR_BACKSPACE = 127;
 
-    const LOG_OK        = 0;
-    const LOG_WARN      = 1;
-    const LOG_ERROR     = 2;
-    const LOG_INFO      = 3;
+    const LOG_BLANK     = 0;
+    const LOG_OK        = 1;
+    const LOG_WARN      = 2;
+    const LOG_ERROR     = 3;
+    const LOG_INFO      = 4;
 
     private static $logHandle   = null;
     private static $hasReadline = null;
+
+
+    /********************/
+    /* formatted output */
+    /********************/
+
+    public static function writeTable(array $out, bool $timestamp = false) : void
+    {
+        if (!$out)
+            return;
+
+        $pads  = [];
+        $nCols = 0;
+
+        foreach ($out as $i => $row)
+        {
+            if (!is_array($out[0]))
+            {
+                unset($out[$i]);
+                continue;
+            }
+
+            if (!$nCols)
+                $nCols = count($row);
+
+            for ($j = 0; $j < $nCols - 1; $j++)             // don't pad last column
+                $pads[$j] = max($pads[$j], mb_strlen($row[$j]));
+        }
+        self::write();
+
+        foreach ($out as $row)
+        {
+            for ($i = 0; $i < $nCols - 1; $i++)             // don't pad last column
+                $row[$i] = str_pad($row[$i], $pads[$i] + 2);
+
+            self::write('  '.implode($row), -1, $timestamp);
+        }
+
+        self::write();
+    }
 
 
     /***********/
@@ -86,12 +127,14 @@ class CLI
         return OS_WIN ? $str : "\e[1m".$str."\e[0m";
     }
 
-    public static function write(string $txt = '', int $lvl = -1) : void
+    public static function write(string $txt = '', int $lvl = self::LOG_BLANK, bool $timestamp = true) : void
     {
-        $msg = "\n";
+        $msg = '';
         if ($txt)
         {
-            $msg = str_pad(date('H:i:s'), 10);
+            if ($timestamp)
+                $msg = str_pad(date('H:i:s'), 10);
+
             switch ($lvl)
             {
                 case self::LOG_ERROR:                       // red      critical error
@@ -106,12 +149,15 @@ class CLI
                 case self::LOG_INFO:                        // blue     info
                     $msg .= '['.self::blue('INFO').']  ';
                     break;
-                default:
+                case self::LOG_BLANK:
                     $msg .= '        ';
+                    break;
             }
 
             $msg .= $txt."\n";
         }
+        else
+            $msg = "\n";
 
         echo $msg;
 
@@ -177,7 +223,7 @@ class CLI
         this also means, you can't hide input at all, least process it
     */
 
-    public static function readInput(array &$fields, bool $singleChar = false) : bool
+    public static function read(array &$fields, bool $singleChar = false) : bool
     {
         // first time set
         if (self::$hasReadline === null)
@@ -368,8 +414,8 @@ class Util
         'large'  => 'style="background-image: url(%s/images/wow/icons/large/%s.jpg)"',
     );
 
-    public static $configCats               = array(
-        'Other', 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler'
+    public static $configCats               = array(        // don't mind the ordering ... please?
+        1 => 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler', 0 => 'Other'
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';

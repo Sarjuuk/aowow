@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'objects';
 
-    protected $tblDependancyTC    = ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem'];
+    protected $tblDependencyTC    = ['gameobject_template', 'gameobject_template_locale', 'gameobject_questitem'];
     protected $dbcSourceFiles     = ['lock'];
 
     public function generate(array $ids = []) : bool

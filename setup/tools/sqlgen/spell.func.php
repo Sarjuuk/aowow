@@ -11,8 +11,8 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'spell';
 
-    protected $tblDependancyAowow = ['icons'];
-    protected $tblDependancyTC    = ['item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
+    protected $tblDependencyAowow = ['icons'];
+    protected $tblDependencyTC    = ['item_template', 'creature_template', 'creature_template_addon', 'smart_scripts', 'trainer_spell', 'disables', 'spell_ranks', 'spell_dbc', 'skill_discovery_template'];
     protected $dbcSourceFiles     = ['spell', 'spellradius', 'spellduration', 'spellrunecost', 'spellcasttimes', 'skillline', 'skilllineability', 'skillraceclassinfo', 'talent', 'talenttab', 'glyphproperties', 'spellicon'];
 
     public function generate(array $ids = []) : bool
