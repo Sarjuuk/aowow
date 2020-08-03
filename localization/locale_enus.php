@@ -840,6 +840,13 @@ $lang = array(
             GO_FLAG_TRIGGERED      => 'Triggered',
             GO_FLAG_DAMAGED        => 'Siege damaged',
             GO_FLAG_DESTROYED      => 'Siege destroyed'
+        ),
+        'actions'       => array(
+            "None",                         "Animate Custom 0",             "Animate Custom 1",             "Animate Custom 2",             "Animate Custom 3",
+            "Disturb / Trigger Trap",       "Unlock",                       "Lock",                         "Open",                         "Unlock & Open",
+            "Close",                        "Toggle Open",                  "Destroy",                      "Rebuild",                      "Creation",
+            "Despawn",                      "Make Inert",                   "Make Active",                  "Close & Lock",                 "Use ArtKit 0",
+            "Use ArtKit 1",                 "Use ArtKit 2",                 "Use ArtKit 3",                 "Set Tap List"
         )
     ),
     'npc' => array(

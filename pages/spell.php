@@ -1736,7 +1736,6 @@ class SpellPage extends GenericPage
                     break;
                 case 50:                                    // Trans Door
                 case 76:                                    // Summon Object (Wild)
-                // case 86:                                 // Activate Object
                 case 104:                                   // Summon Object (slot 1)
                 case 105:                                   // Summon Object (slot 2)
                 case 106:                                   // Summon Object (slot 3)
@@ -1749,6 +1748,15 @@ class SpellPage extends GenericPage
                         $_ = ' (<a href="?object='.$effMV.'">'.$n.'</a>)';
 
                     $foo['name'] .= $_;
+                    break;
+                case 86:                                    // Activate Object
+                    $_ = Lang::gameObject('actions', $effMV);
+                    if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
+                        $_ = sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_);
+                    else if (!$_)
+                        $_ = $effMV;
+
+                    $foo['name'] .= ' ('.$_.')';
                     break;
                 case 74:                                    // Apply Glyph
                     if ($_ = DB::Aowow()->selectCell('SELECT spellId FROM ?_glyphproperties WHERE id = ?d', $effMV))
