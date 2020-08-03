@@ -526,6 +526,17 @@ class AjaxAdmin extends AjaxHandler
                     return Profiler::queueStart($msg);
                 };
                 break;
+            case 'acc_auth_mode':
+                $fn = function($x) use (&$msg) {
+                    if ($x == 1 && !extension_loaded('gmp'))
+                    {
+                        $msg .= 'PHP extension GMP is required to use TrinityCore as auth source, but is not currently enabled.<br />';
+                        return false;
+                    }
+
+                    return true;
+                };
+                break;
             default:                                        // nothing to do, everything is fine
                 return true;
         }

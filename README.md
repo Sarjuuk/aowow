@@ -19,10 +19,12 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 ## Requirements
 
 + Webserver running PHP ≥ 7.1 including extensions:
-  + SimpleXML
-  + GD
-  + Mysqli
-  + mbString
+  + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
+  + [GD](https://www.php.net/manual/en/book.image)
+  + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
+  + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
+  + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
+  + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.5.30
 + [TDB 335.20071](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.20071) including updates up to [TrinityCore/TrinityCore@fb2ab8f](https://github.com/TrinityCore/aowow/commit/fb2ab8f61320a7afda96322cca64e0034f174309)
   + If you are using TrinityCores auth and need time to transition, use the branch *sha1-auth* in the meantime!
