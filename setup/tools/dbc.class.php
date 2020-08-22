@@ -264,7 +264,6 @@ class DBC
 
     public function __construct($file, $opts = [])
     {
-        $file = strtolower($file);
         if (empty($this->_fields[$file]) || empty($this->_formats[$file]))
         {
             CLI::write('no structure known for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
