@@ -264,6 +264,12 @@ class Game
         if (!$points)                                       // retry: TC counts pre-instance subareas as instance-maps .. which have no map file
             $points = DB::Aowow()->select($query, $posX, $posX, $posY, $posY, $posX, $posX, $posY, $posY, 0, $mapId, 0, 0, DBSIMPLE_SKIP);
 
+        if (!is_array($points))
+        {
+            trigger_error('Game::worldPosToZonePos - dbc query failed', E_USER_ERROR);
+            return [];
+        }
+
         return $points;
     }
 }
