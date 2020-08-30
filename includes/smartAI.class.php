@@ -682,7 +682,7 @@ class SmartAI
                     $this->jsGlobals[TYPE_NPC][] = $e['param'][5];
 
                 if ($e['param'][3])
-                    $footer = Util::foramtTime($e['param'][3], true);
+                    $footer = Util::formatTime($e['param'][3], true);
                 break;
             case SAI_EVENT_EVENT_PHASE_CHANGE:              // 66  -  On event phase mask set
                 $e['param'][5] = Lang::concat(Util::mask2bits($a['param'][0]), false);
