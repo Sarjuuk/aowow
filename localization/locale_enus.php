@@ -650,7 +650,7 @@ $lang = array(
             SAI_ACTION_STOP_MOTION                        => ['(%1$d)?Remove motion type #[b]%1$d[/b] from #target#. :;(%2$d)?Stop moving.:;', null],
         ),
         'targetUNK'     => '[span class=q10]unknown target #[b class=q1]%d[/b][/span]',
-        'targetTT'      => '[b class=q1]TargetType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]X[/td][td=header]%.2f[/td][/tr][tr][td]Y[/td][td=header]%.2f[/td][/tr][tr][td]Z[/td][td=header]%.2f[/td][/tr][tr][td]O[/td][td=header]%.2f[/td][/tr][/table]',
+        'targetTT'      => '[b class=q1]TargetType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]X[/td][td=header]%.2f[/td][/tr][tr][td]Y[/td][td=header]%.2f[/td][/tr][tr][td]Z[/td][td=header]%.2f[/td][/tr][tr][td]O[/td][td=header]%.2f[/td][/tr][/table]',
         'targets'       => array(
             null,
             SAI_TARGET_SELF                   => 'self',

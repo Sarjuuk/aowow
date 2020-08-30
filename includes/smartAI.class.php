@@ -502,7 +502,7 @@ class SmartAI
                 break;
             // error
             default:
-                $target = lang::smartAI('targetUNK', [$t['type']]);
+                $target = Lang::smartAI('targetUNK', [$t['type']]);
         }
 
         $target = $target ?: Lang::smartAI('targets', $t['type'], $t['param']);
