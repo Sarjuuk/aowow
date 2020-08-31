@@ -277,6 +277,7 @@ class SpellPage extends GenericPage
         $this->items       = $this->createRequiredItems();
         $this->tools       = $this->createTools();
         $this->effects     = $effects;
+        $this->attributes  = $this->createAttributesList();
         $this->infobox     = $infobox;
         $this->powerCost   = $this->subject->createPowerCostForCurrent();
         $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
@@ -2167,6 +2168,58 @@ class SpellPage extends GenericPage
         unset($foo);                                            // clear reference
 
         return $effects;
+    }
+
+    private function createAttributesList() : array
+    {
+        $cbBandageSpell = function()
+        {
+            return ($this->subject->getField('attributes1') & 0x00004044) && ($this->subject->getField('effect1ImplicitTargetA') == 21);
+        };
+
+        $cbInverseFlag = function($field, $flag)
+        {
+            return !($this->subject->getField($field) & $flag);
+        };
+
+        $cbEquippedWeapon = function ($mask, $useInvType)
+        {
+            $field = $useInvType ? 'equippedItemInventoryTypeMask' : 'equippedItemSubClassMask';
+
+            return ($this->subject->getField('equippedItemClass') == ITEM_CLASS_WEAPON) && ($this->subject->getField($field) & $mask);
+        };
+
+        $cbSpellstealable = function($field, $flag)
+        {
+            return !($this->subject->getField($field) & $flag) && ($this->subject->getField('dispelType') == 1);
+        };
+
+        $list = [];
+        $fi   = new SpellListFilter();
+        foreach (Lang::spell('attributes') as $idx => $_)
+        {
+            if ($cr = $fi->getGenericFilter($idx))
+            {
+                if ($cr[0] == FILTER_CR_CALLBACK)
+                {
+                    if (!isset($cr[1]))
+                        trigger_error('SpellDetailPage::createAttributesList - callback handler '.$cr[1].' not defined for IDX #'.$idx, E_USER_WARNING);
+                    else if (${$cr[1]}($cr[2] ?? null, $cr[3] ?? null))
+                        $list[] = $idx;
+                }
+                else if ($cr[0] == FILTER_CR_FLAG)
+                {
+                    if ($this->subject->getField($cr[1]) & $cr[2])
+                        $list[] = $idx;
+                }
+                else
+                    trigger_error('SpellDetailPage::createAttributesList - unhandled filter case #'.$cr[0].' for IDX #'.$idx, E_USER_WARNING);
+            }
+            else
+                trigger_error('SpellDetailPage::createAttributesList - SpellAttrib IDX #'.$idx.' defined in Lang, but not set as filter', E_USER_WARNING);
+        }
+
+        return $list;
     }
 
     private function ubSmartScript(int $type) : array

@@ -796,7 +796,7 @@ class SpellList extends BaseType
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
-        else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & 0x10)
+        else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY)
             return Lang::spell('instantPhys');
         else                                                // instant cast
             return Lang::spell('instantMagic');
@@ -831,7 +831,7 @@ class SpellList extends BaseType
             else if ($level < $baseLvl)
                 $level = $baseLvl;
 
-            if (!$ref->getField('atributes0') & 0x40)           // SPELL_ATTR0_PASSIVE
+            if (!$ref->getField('atributes0') & SPELL_ATTR0_PASSIVE)
                 $level -= $ref->getField('spellLevel');
 
             $base  += (int)($level * $rppl);
@@ -881,7 +881,7 @@ class SpellList extends BaseType
 
     public function isChanneledSpell()
     {
-        return $this->curTpl['attributes1'] & 0x44;
+        return $this->curTpl['attributes1'] & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2);
     }
 
     public function isHealingSpell()
@@ -1356,7 +1356,7 @@ class SpellList extends BaseType
 
             $formOutStr    = '';
 
-            while ($formCurPos <= strlen($formula))
+            while ($formCurPos < strlen($formula))
             {
                 $char = $formula[$formCurPos];
 
@@ -1650,7 +1650,7 @@ class SpellList extends BaseType
 
             $formOutStr    = '';
 
-            while ($formCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
+            while ($formCurPos < strlen($data))             // only hard-exit condition, we'll hit those breaks eventually^^
             {
                 $char = $data[$formCurPos];
 
@@ -1754,7 +1754,7 @@ class SpellList extends BaseType
             $condParts   = [];
             $isLastElse  = false;
 
-            while ($condCurPos <= strlen($data))            // only hard-exit condition, we'll hit those breaks eventually^^
+            while ($condCurPos < strlen($data))             // only hard-exit condition, we'll hit those breaks eventually^^
             {
                 $char = $data[$condCurPos];
 
@@ -1916,9 +1916,9 @@ class SpellList extends BaseType
 
         $reagents = array_reverse($reagents);
 
-        // get stances (check: SPELL_ATTR2_NOT_NEED_SHAPESHIFT)
+        // get stances
         $stances = '';
-        if ($this->curTpl['stanceMask'] && !($this->curTpl['attributes2'] & 0x80000))
+        if ($this->curTpl['stanceMask'] && !($this->curTpl['attributes2'] & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
             $stances = Lang::game('requires2').' '.Lang::getStances($this->curTpl['stanceMask']);
 
         // get item requirement (skip for professions)
@@ -2296,7 +2296,7 @@ class SpellList extends BaseType
         {
             // mainly for DoTs which are 3500 here otherwise
             $originalCastTime = $this->curTpl['castTime'] * 1000;
-            if ($this->curTpl['attributes0'] & 0x2)         // requires Ammo
+            if ($this->curTpl['attributes0'] & SPELL_ATTR0_REQ_AMMO)
                 $originalCastTime += 500;
 
             if ($originalCastTime > 7000)
@@ -2399,105 +2399,105 @@ class SpellListFilter extends Filter
 
     // cr => [type, field, misc, extraCol]
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         1  => [FILTER_CR_CALLBACK,  'cbCost',                                                  ], // costAbs [op] [int]
-         2  => [FILTER_CR_NUMERIC,   'powerCostPercent', NUM_CAST_INT                           ], // prcntbasemanarequired
-         3  => [FILTER_CR_BOOLEAN,   'spellFocusObject'                                         ], // requiresnearbyobject
-         4  => [FILTER_CR_NUMERIC,   'trainingcost',     NUM_CAST_INT                           ], // trainingcost
-         5  => [FILTER_CR_BOOLEAN,   'reqSpellId'                                               ], // requiresprofspec
-         8  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
-         9  => [FILTER_CR_CALLBACK,  'cbSource',                                                ], // source [enum]
-        10  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_FIRST_RANK                    ], // firstrank
-        11  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT                     ], // hascomments
-        12  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_LAST_RANK                     ], // lastrank
-        13  => [FILTER_CR_NUMERIC,   'rankNo',           NUM_CAST_INT                           ], // rankno
-        14  => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,                true      ], // id
-        15  => [FILTER_CR_STRING,    'ic.name',                                                 ], // icon
-        17  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO                       ], // hasvideos
-        19  => [FILTER_CR_FLAG,      'attributes0',      0x80000                                ], // scaling
-        20  => [FILTER_CR_CALLBACK,  'cbReagents',                                              ], // has Reagents [yn]
-     // 22  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // proficiencytype [proficiencytype]  pointless
-        25  => [FILTER_CR_BOOLEAN,   'skillLevelYellow'                                         ], // rewardsskillups
-        27  => [FILTER_CR_FLAG,      'attributes1',      0x0044,                      true      ], // channeled [yn]
-        28  => [FILTER_CR_NUMERIC,   'castTime',         NUM_CAST_FLOAT                         ], // casttime [num]
-        29  => [FILTER_CR_CALLBACK,  'cbAuraNames',                                             ], // appliesaura [effectauranames]
-     // 31  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // usablewhenshapeshifted [yn]  pointless
-        33  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes0',               0x10000000], // combatcastable [yn]
-        34  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes2',               0x20000000], // chancetocrit [yn]
-        35  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes3',               0x00040000], // chancetomiss [yn]
-        36  => [FILTER_CR_FLAG,      'attributes3',      0x00100000                             ], // persiststhroughdeath [yn]
-        38  => [FILTER_CR_FLAG,      'attributes0',      0x00020000                             ], // requiresstealth [yn]
-        39  => [FILTER_CR_CALLBACK,  'cbSpellstealable', 'attributes4',               0x00000040], // spellstealable [yn]
-        40  => [FILTER_CR_ENUM,      'damageClass'                                              ], // damagetype [damagetype]
-        41  => [FILTER_CR_FLAG,      'stanceMask',       (1 << (22 - 1))                        ], // requiresmetamorphosis [yn]
-        42  => [FILTER_CR_FLAG,      'attributes5',      0x00000008                             ], // usablewhenstunned [yn]
-        44  => [FILTER_CR_CALLBACK,  'cbUsableInArena'                                          ], // usableinarenas [yn]
-        45  => [FILTER_CR_ENUM,      'powerType'                                                ], // resourcetype [resourcetype]
-     // 46  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // disregardimmunity [yn]
-        47  => [FILTER_CR_FLAG,      'attributes1',      0x00010000                             ], // disregardschoolimmunity [yn]
-        48  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x0004000C,                  false     ], // reqrangedweapon [yn]
-        49  => [FILTER_CR_FLAG,      'attributes0',      0x00000004                             ], // onnextswingplayers [yn]
-        50  => [FILTER_CR_FLAG,      'attributes0',      0x00000040                             ], // passivespell [yn]
-        51  => [FILTER_CR_FLAG,      'attributes1',      0x10000000                             ], // hiddenaura [yn]
-        52  => [FILTER_CR_FLAG,      'attributes0',      0x00000400                             ], // onnextswingnpcs [yn]
-        53  => [FILTER_CR_FLAG,      'attributes0',      0x00001000                             ], // daytimeonly [yn]
-        54  => [FILTER_CR_FLAG,      'attributes0',      0x00002000                             ], // nighttimeonly [yn]
-        55  => [FILTER_CR_FLAG,      'attributes0',      0x00004000                             ], // indoorsonly [yn]
-        56  => [FILTER_CR_FLAG,      'attributes0',      0x00008000                             ], // outdoorsonly [yn]
-        57  => [FILTER_CR_FLAG,      'attributes0',      0x80000000                             ], // uncancellableaura [yn]
-        58  => [FILTER_CR_FLAG,      'attributes0',      0x00080000                             ], // damagedependsonlevel [yn]
-        59  => [FILTER_CR_FLAG,      'attributes0',      0x00100000                             ], // stopsautoattack [yn]
-        60  => [FILTER_CR_FLAG,      'attributes0',      0x00200000                             ], // cannotavoid [yn]
-        61  => [FILTER_CR_FLAG,      'attributes0',      0x00800000                             ], // usabledead [yn]
-        62  => [FILTER_CR_FLAG,      'attributes0',      0x01000000                             ], // usablemounted [yn]
-        63  => [FILTER_CR_FLAG,      'attributes0',      0x02000000                             ], // delayedrecoverystarttime [yn]
-        64  => [FILTER_CR_FLAG,      'attributes0',      0x08000000                             ], // usablesitting [yn]
-        65  => [FILTER_CR_FLAG,      'attributes1',      0x00000002                             ], // usesallpower [yn]
-        66  => [FILTER_CR_FLAG,      'attributes1',      0x00000044,                  true      ], // channeled [yn] redundancy much...?
-        67  => [FILTER_CR_FLAG,      'attributes1',      0x00000080                             ], // cannotreflect [yn]
-        68  => [FILTER_CR_FLAG,      'attributes1',      0x00000020                             ], // usablestealthed [yn]
-        69  => [FILTER_CR_FLAG,      'attributes0',      0x04000000                             ], // harmful [yn]
-        70  => [FILTER_CR_FLAG,      'attributes1',      0x00000100                             ], // targetnotincombat [yn]
-        71  => [FILTER_CR_FLAG,      'attributes1',      0x00000400                             ], // nothreat [yn]
-        72  => [FILTER_CR_FLAG,      'attributes1',      0x00001000                             ], // pickpocket [yn]
-        73  => [FILTER_CR_FLAG,      'attributes1',      0x00008000                             ], // dispelauraonimmunity [yn]
-        74  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00100000,                  false     ], // reqfishingpole [yn]
-        75  => [FILTER_CR_FLAG,      'attributes2',      0x00000040                             ], // requntappedtarget [yn]
-     // 76  => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // targetownitem [yn]  // the flag for this has to be somewhere....
-        77  => [FILTER_CR_FLAG,      'attributes2',      0x00080000                             ], // doesntreqshapeshift [yn]
-        78  => [FILTER_CR_FLAG,      'attributes2',      0x80000000                             ], // foodbuff [yn]
-        79  => [FILTER_CR_FLAG,      'attributes3',      0x00000100                             ], // targetonlyplayer [yn]
-        80  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONMAINHAND, true      ], // reqmainhand [yn]
-        81  => [FILTER_CR_FLAG,      'attributes3',      0x00020000                             ], // doesntengagetarget [yn]
-        82  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00080000,                  false     ], // reqwand [yn]
-        83  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONOFFHAND,  true      ], // reqoffhand [yn]
-        84  => [FILTER_CR_FLAG,      'attributes0',      0x00000100                             ], // nolog [yn]
-        85  => [FILTER_CR_FLAG,      'attributes4',      0x00000004                             ], // auratickswhileloggedout [yn]
-        87  => [FILTER_CR_FLAG,      'attributes5',      0x00000200                             ], // startstickingatapplication [yn]
-        88  => [FILTER_CR_FLAG,      'attributes5',      0x00040000                             ], // usableconfused [yn]
-        89  => [FILTER_CR_FLAG,      'attributes5',      0x00020000                             ], // usablefeared [yn]
-        90  => [FILTER_CR_FLAG,      'attributes6',      0x00000002                             ], // onlyarena [yn]
-        91  => [FILTER_CR_FLAG,      'attributes6',      0x00000800                             ], // notinraid [yn]
-        92  => [FILTER_CR_FLAG,      'attributes7',      0x00000004                             ], // paladinaura [yn]
-        93  => [FILTER_CR_FLAG,      'attributes7',      0x00000020                             ], // totemspell [yn]
-        95  => [FILTER_CR_CALLBACK,  'cbBandageSPell'                                           ], // bandagespell [yn] ...don't ask
-        96  => [FILTER_CR_STAFFFLAG, 'attributes0'                                              ], // flags1 [flags]
-        97  => [FILTER_CR_STAFFFLAG, 'attributes1'                                              ], // flags2 [flags]
-        98  => [FILTER_CR_STAFFFLAG, 'attributes2'                                              ], // flags3 [flags]
-        99  => [FILTER_CR_STAFFFLAG, 'attributes3'                                              ], // flags4 [flags]
-        100 => [FILTER_CR_STAFFFLAG, 'attributes4'                                              ], // flags5 [flags]
-        101 => [FILTER_CR_STAFFFLAG, 'attributes5'                                              ], // flags6 [flags]
-        102 => [FILTER_CR_STAFFFLAG, 'attributes6'                                              ], // flags7 [flags]
-        103 => [FILTER_CR_STAFFFLAG, 'attributes7'                                              ], // flags8 [flags]
-        104 => [FILTER_CR_STAFFFLAG, 'targets'                                                  ], // flags9 [flags]
-        105 => [FILTER_CR_STAFFFLAG, 'stanceMaskNot'                                            ], // flags10 [flags]
-        106 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags1'                                        ], // flags11 [flags]
-        107 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags2'                                        ], // flags12 [flags]
-        108 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags3'                                        ], // flags13 [flags]
-        109 => [FILTER_CR_CALLBACK,  'cbEffectNames',                                           ], // effecttype [effecttype]
-     // 110 => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // scalingap [yn]  // unreasonably complex for now
-     // 111 => [FILTER_CR_NYI_PH,    null,               null,                        null      ], // scalingsp [yn]  // unreasonably complex for now
-        114 => [FILTER_CR_CALLBACK,  'cbReqFaction'                                             ], // requiresfaction [side]
-        116 => [FILTER_CR_BOOLEAN,   'startRecoveryTime'                                        ]  // onGlobalCooldown [yn]
+         1  => [FILTER_CR_CALLBACK,  'cbCost',                                                                                   ], // costAbs [op] [int]
+         2  => [FILTER_CR_NUMERIC,   'powerCostPercent', NUM_CAST_INT                                                            ], // prcntbasemanarequired
+         3  => [FILTER_CR_BOOLEAN,   'spellFocusObject'                                                                          ], // requiresnearbyobject
+         4  => [FILTER_CR_NUMERIC,   'trainingcost',     NUM_CAST_INT                                                            ], // trainingcost
+         5  => [FILTER_CR_BOOLEAN,   'reqSpellId'                                                                                ], // requiresprofspec
+         8  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT                                                   ], // hasscreenshots
+         9  => [FILTER_CR_CALLBACK,  'cbSource',                                                                                 ], // source [enum]
+        10  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_FIRST_RANK                                                     ], // firstrank
+        11  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT                                                      ], // hascomments
+        12  => [FILTER_CR_FLAG,      'cuFlags',          SPELL_CU_LAST_RANK                                                      ], // lastrank
+        13  => [FILTER_CR_NUMERIC,   'rankNo',           NUM_CAST_INT                                                            ], // rankno
+        14  => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,                            true                           ], // id
+        15  => [FILTER_CR_STRING,    'ic.name',                                                                                  ], // icon
+        17  => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO                                                        ], // hasvideos
+        19  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION                                    ], // scaling
+        20  => [FILTER_CR_CALLBACK,  'cbReagents',                                                                               ], // has Reagents [yn]
+     // 22  => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // proficiencytype [proficiencytype]  pointless
+        25  => [FILTER_CR_BOOLEAN,   'skillLevelYellow'                                                                          ], // rewardsskillups
+        27  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_CHANNELED_1,                 true                           ], // channeled [yn]
+        28  => [FILTER_CR_NUMERIC,   'castTime',         NUM_CAST_FLOAT                                                          ], // casttime [num]
+        29  => [FILTER_CR_CALLBACK,  'cbAuraNames',                                                                              ], // appliesaura [effectauranames]
+     // 31  => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // usablewhenshapeshifted [yn]  pointless
+        33  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes0',                           SPELL_ATTR0_CANT_USED_IN_COMBAT], // combatcastable [yn]
+        34  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes2',                           SPELL_ATTR2_CANT_CRIT          ], // chancetocrit [yn]
+        35  => [FILTER_CR_CALLBACK,  'cbInverseFlag',    'attributes3',                           SPELL_ATTR3_IGNORE_HIT_RESULT  ], // chancetomiss [yn]
+        36  => [FILTER_CR_FLAG,      'attributes3',      SPELL_ATTR3_DEATH_PERSISTENT                                            ], // persiststhroughdeath [yn]
+        38  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_ONLY_STEALTHED                                              ], // requiresstealth [yn]
+        39  => [FILTER_CR_CALLBACK,  'cbSpellstealable', 'attributes4',                           SPELL_ATTR4_NOT_STEALABLE      ], // spellstealable [yn]
+        40  => [FILTER_CR_ENUM,      'damageClass'                                                                               ], // damagetype [damagetype]
+        41  => [FILTER_CR_FLAG,      'stanceMask',       (1 << (22 - 1))                                                         ], // requiresmetamorphosis [yn]
+        42  => [FILTER_CR_FLAG,      'attributes5',      SPELL_ATTR5_USABLE_WHILE_STUNNED                                        ], // usablewhenstunned [yn]
+        44  => [FILTER_CR_CALLBACK,  'cbUsableInArena'                                                                           ], // usableinarenas [yn]
+        45  => [FILTER_CR_ENUM,      'powerType'                                                                                 ], // resourcetype [resourcetype]
+     // 46  => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // disregardimmunity [yn]
+        47  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE                                 ], // disregardschoolimmunity [yn]
+        48  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x0004000C,                              false                          ], // reqrangedweapon [yn]
+        49  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_ON_NEXT_SWING                                               ], // onnextswingplayers [yn]
+        50  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_PASSIVE                                                     ], // passivespell [yn]
+        51  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR                                    ], // hiddenaura [yn]
+        52  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_ON_NEXT_SWING_2                                             ], // onnextswingnpcs [yn]
+        53  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_DAYTIME_ONLY                                                ], // daytimeonly [yn]
+        54  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_NIGHT_ONLY                                                  ], // nighttimeonly [yn]
+        55  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_INDOORS_ONLY                                                ], // indoorsonly [yn]
+        56  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_OUTDOORS_ONLY                                               ], // outdoorsonly [yn]
+        57  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_CANT_CANCEL                                                 ], // uncancellableaura [yn]
+        58  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION                                    ], // damagedependsonlevel [yn]
+        59  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_STOP_ATTACK_TARGET                                          ], // stopsautoattack [yn]
+        60  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK                                ], // cannotavoid [yn]
+        61  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_CASTABLE_WHILE_DEAD                                         ], // usabledead [yn]
+        62  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_CASTABLE_WHILE_MOUNTED                                      ], // usablemounted [yn]
+        63  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_DISABLED_WHILE_ACTIVE                                       ], // delayedrecoverystarttime [yn]
+        64  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_CASTABLE_WHILE_SITTING                                      ], // usablesitting [yn]
+        65  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_DRAIN_ALL_POWER                                             ], // usesallpower [yn]
+        66  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_CHANNELED_2,                  true                          ], // channeled [yn]
+        67  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_CANT_BE_REFLECTED                                           ], // cannotreflect [yn]
+        68  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_NOT_BREAK_STEALTH                                           ], // usablestealthed [yn]
+        69  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_NEGATIVE_1                                                  ], // harmful [yn]
+        70  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_CANT_TARGET_IN_COMBAT                                       ], // targetnotincombat [yn]
+        71  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_NO_THREAT                                                   ], // nothreat [yn]
+        72  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_IS_PICKPOCKET                                               ], // pickpocket [yn]
+        73  => [FILTER_CR_FLAG,      'attributes1',      SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY                                    ], // dispelauraonimmunity [yn]
+        74  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00100000,                              false                          ], // reqfishingpole [yn]
+        75  => [FILTER_CR_FLAG,      'attributes2',      SPELL_ATTR2_CANT_TARGET_TAPPED                                          ], // requntappedtarget [yn]
+     // 76  => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // targetownitem [yn]  // the flag for this has to be somewhere....
+        77  => [FILTER_CR_FLAG,      'attributes2',      SPELL_ATTR2_NOT_NEED_SHAPESHIFT                                         ], // doesntreqshapeshift [yn]
+        78  => [FILTER_CR_FLAG,      'attributes2',      SPELL_ATTR2_FOOD_BUFF                                                   ], // foodbuff [yn]
+        79  => [FILTER_CR_FLAG,      'attributes3',      SPELL_ATTR3_ONLY_TARGET_PLAYERS                                         ], // targetonlyplayer [yn]
+        80  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONMAINHAND,             true                           ], // reqmainhand [yn]
+        81  => [FILTER_CR_FLAG,      'attributes3',      SPELL_ATTR3_NO_INITIAL_AGGRO                                            ], // doesntengagetarget [yn]
+        82  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 0x00080000,                              false                          ], // reqwand [yn]
+        83  => [FILTER_CR_CALLBACK,  'cbEquippedWeapon', 1 << INVTYPE_WEAPONOFFHAND,              true                           ], // reqoffhand [yn]
+        84  => [FILTER_CR_FLAG,      'attributes0',      SPELL_ATTR0_HIDE_IN_COMBAT_LOG                                          ], // nolog [yn]
+        85  => [FILTER_CR_FLAG,      'attributes4',      SPELL_ATTR4_FADES_WHILE_LOGGED_OUT                                      ], // auratickswhileloggedout [yn]
+        87  => [FILTER_CR_FLAG,      'attributes5',      SPELL_ATTR5_START_PERIODIC_AT_APPLY                                     ], // startstickingatapplication [yn]
+        88  => [FILTER_CR_FLAG,      'attributes5',      SPELL_ATTR5_USABLE_WHILE_CONFUSED                                       ], // usableconfused [yn]
+        89  => [FILTER_CR_FLAG,      'attributes5',      SPELL_ATTR5_USABLE_WHILE_FEARED                                         ], // usablefeared [yn]
+        90  => [FILTER_CR_FLAG,      'attributes6',      SPELL_ATTR6_ONLY_IN_ARENA                                               ], // onlyarena [yn]
+        91  => [FILTER_CR_FLAG,      'attributes6',      SPELL_ATTR6_NOT_IN_RAID_INSTANCE                                        ], // notinraid [yn]
+        92  => [FILTER_CR_FLAG,      'attributes7',      SPELL_ATTR7_REACTIVATE_AT_RESURRECT                                     ], // paladinaura [yn]
+        93  => [FILTER_CR_FLAG,      'attributes7',      SPELL_ATTR7_SUMMON_PLAYER_TOTEM                                         ], // totemspell [yn]
+        95  => [FILTER_CR_CALLBACK,  'cbBandageSpell'                                                                            ], // bandagespell [yn] ...don't ask
+        96  => [FILTER_CR_STAFFFLAG, 'attributes0'                                                                               ], // flags1 [flags]
+        97  => [FILTER_CR_STAFFFLAG, 'attributes1'                                                                               ], // flags2 [flags]
+        98  => [FILTER_CR_STAFFFLAG, 'attributes2'                                                                               ], // flags3 [flags]
+        99  => [FILTER_CR_STAFFFLAG, 'attributes3'                                                                               ], // flags4 [flags]
+        100 => [FILTER_CR_STAFFFLAG, 'attributes4'                                                                               ], // flags5 [flags]
+        101 => [FILTER_CR_STAFFFLAG, 'attributes5'                                                                               ], // flags6 [flags]
+        102 => [FILTER_CR_STAFFFLAG, 'attributes6'                                                                               ], // flags7 [flags]
+        103 => [FILTER_CR_STAFFFLAG, 'attributes7'                                                                               ], // flags8 [flags]
+        104 => [FILTER_CR_STAFFFLAG, 'targets'                                                                                   ], // flags9 [flags]
+        105 => [FILTER_CR_STAFFFLAG, 'stanceMaskNot'                                                                             ], // flags10 [flags]
+        106 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags1'                                                                         ], // flags11 [flags]
+        107 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags2'                                                                         ], // flags12 [flags]
+        108 => [FILTER_CR_STAFFFLAG, 'spellFamilyFlags3'                                                                         ], // flags13 [flags]
+        109 => [FILTER_CR_CALLBACK,  'cbEffectNames',                                                                            ], // effecttype [effecttype]
+     // 110 => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // scalingap [yn]  // unreasonably complex for now
+     // 111 => [FILTER_CR_NYI_PH,    null,               null,                                    null                           ], // scalingsp [yn]  // unreasonably complex for now
+        114 => [FILTER_CR_CALLBACK,  'cbReqFaction'                                                                              ], // requiresfaction [side]
+        116 => [FILTER_CR_BOOLEAN,   'startRecoveryTime'                                                                         ]  // onGlobalCooldown [yn]
     );
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
@@ -2590,6 +2590,11 @@ class SpellListFilter extends Filter
             $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
 
         return $parts;
+    }
+
+    public function getGenericFilter($cr)                   // access required by SpellDetailPage's SpellAttributes list
+    {
+        return $this->genericFilter[$cr] ?? [];
     }
 
     protected function cbClasses(&$val)
@@ -2735,13 +2740,13 @@ class SpellListFilter extends Filter
 
         if ($cr[1])
             return  ['AND',
-                        [['attributes4', 0x00010000, '&'], 0],
-                        ['OR', ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', 0x00020000, '&']]
+                        [['attributes4', SPELL_ATTR4_NOT_USABLE_IN_ARENA, '&'], 0],
+                        ['OR', ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&']]
                     ];
         else
             return  ['OR',
-                        ['attributes4', 0x00010000, '&'],
-                        ['AND', ['recoveryTime', 10 * MINUTE * 1000, '>'], [['attributes4', 0x00020000, '&'], 0]]
+                        ['attributes4', SPELL_ATTR4_NOT_USABLE_IN_ARENA, '&'],
+                        ['AND', ['recoveryTime', 10 * MINUTE * 1000, '>'], [['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&'], 0]]
                     ];
     }
 
@@ -2751,9 +2756,9 @@ class SpellListFilter extends Filter
             return false;
 
         if ($cr[1])                                         // match exact, not as flag
-            return ['AND', ['attributes1', 0x00004044], ['effect1ImplicitTargetA', 21]];
+            return ['AND', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET], ['effect1ImplicitTargetA', 21]];
         else
-            return ['OR', ['attributes1', 0x00004044, '!'], ['effect1ImplicitTargetA', 21, '!']];
+            return ['OR', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET, '!'], ['effect1ImplicitTargetA', 21, '!']];
     }
 }
 
