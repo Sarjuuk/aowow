@@ -943,8 +943,8 @@ class GenericPage
             {
                 try
                 {
-                    // public, protected and an undocumented flag added to properties created on the fly..?
-                    if ((new ReflectionProperty($this, $key))->getModifiers() & 0x1300)
+                    $rp = new ReflectionProperty($this, $key);
+                    if ($rp && ($rp->isPublic() || $rp->isProtected()))
                         if (!in_array($key, $noCache))
                             $cache[$key] = $val;
                 }
