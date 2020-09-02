@@ -420,7 +420,7 @@ class Profiler
             // talents
             for ($j = 0; $j < 3; $j++)
             {
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), rank, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), `rank`, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
                 $data['talentbuild'.($i + 1)] .= implode('', $_);
                 if ($char['activespec'] == $i)
                     $data['talenttree'.($j + 1)] = array_sum($_);
@@ -496,7 +496,7 @@ class Profiler
                 $morePet   = DB::Aowow()->selectRow('SELECT p.`type`, c.family FROM ?_pet p JOIN ?_creature c ON c.family = p.id WHERE c.id = ?d', $petData['entry']);
                 $petSpells = DB::Characters($realmId)->selectCol('SELECT spell FROM pet_spell WHERE guid = ?d', $petGuid);
 
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), rank, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), `rank`, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
                     'owner'     => $profileId,
@@ -765,7 +765,7 @@ class Profiler
 
         // ranks
         DB::Aowow()->query('DELETE FROM ?_profiler_guild_rank WHERE guildId = ?d', $guildId);
-        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS guildId, rid AS rank, rname AS name FROM guild_rank WHERE guildid = ?d', $guildId, $guildGuid))
+        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS guildId, rid AS `rank`, rname AS name FROM guild_rank WHERE guildid = ?d', $guildId, $guildGuid))
             foreach (Util::createSqlBatchInsert($ranks) as $r)
                 DB::Aowow()->query('INSERT INTO ?_profiler_guild_rank (?#) VALUES '.$r, array_keys(reset($ranks)));
 
@@ -804,7 +804,7 @@ class Profiler
 
     public static function getArenaTeamFromRealm($realmId, $teamGuid)
     {
-        $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, rank, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
+        $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, `rank`, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
         if (!$team)
             return false;
 
