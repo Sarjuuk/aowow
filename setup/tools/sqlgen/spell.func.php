@@ -243,7 +243,7 @@ SqlGen::register(new class extends SetupScript
             DB::Aowow()->query('UPDATE ?_spell SET cuFlags = cuFlags | ?d WHERE id IN (?a)', CUSTOM_DISABLED, $disables);
 
         // apply spell ranks (can't use skilllineability.dbc, as it does not contain ranks for non-player/pet spells)
-        $ranks = DB::World()->selectCol('SELECT first_spell_id AS ARRAY_KEY, spell_id AS ARRAY_KEY2, rank FROM spell_ranks');
+        $ranks = DB::World()->selectCol('SELECT first_spell_id AS ARRAY_KEY, spell_id AS ARRAY_KEY2, `rank` FROM spell_ranks');
         foreach ($ranks as $firstSpell => $sets)
         {
             // apply flag: SPELL_CU_FIRST_RANK
@@ -417,7 +417,7 @@ SqlGen::register(new class extends SetupScript
             DB::Aowow()->query('UPDATE ?_spell SET learnedAt = ?d WHERE id = ?d', $reqSkill, $spell);
 
         // calc reqSkill for gethering-passives (herbing, mining, skinning) (on second thought .. it is set in skilllineability >.<)
-        $sets = DB::World()->selectCol('SELECT spell_id AS ARRAY_KEY, rank * 75 AS reqSkill FROM spell_ranks WHERE first_spell_id IN (?a)', [55428, 53120, 53125]);
+        $sets = DB::World()->selectCol('SELECT spell_id AS ARRAY_KEY, `rank` * 75 AS reqSkill FROM spell_ranks WHERE first_spell_id IN (?a)', [55428, 53120, 53125]);
         foreach ($sets as $spell => $reqSkill)
             DB::Aowow()->query('UPDATE ?_spell SET learnedAt = ?d WHERE id = ?d', $reqSkill, $spell);
 
