@@ -14,7 +14,7 @@ SqlGen::register(new class extends SetupScript
     protected $command = 'spawns';                          // and waypoints
 
     protected $tblDependancyTC = ['creature', 'creature_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data'];
-    protected $dbcSourceFiles  = ['worldmaparea', 'map', 'dungeonmap', 'taxipathnode', 'soundemitters', 'areatrigger'];
+    protected $dbcSourceFiles  = ['worldmaparea', 'map', 'dungeonmap', 'taxipathnode', 'soundemitters', 'areatrigger', 'areatable'];
 
     private $querys = array(
         1 => ['SELECT c.guid, 1 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, IFNULL(ca.path_id, 0) AS pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
