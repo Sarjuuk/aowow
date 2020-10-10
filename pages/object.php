@@ -414,7 +414,7 @@ class ObjectPage extends GenericPage
                     'id'        => 'contains',
                     'name'      => '$LANG.tab_contains',
                     'sort'      => ['-percent', 'name'],
-                    'extraCols' => $extraCols
+                    'extraCols' => array_unique($extraCols)
                 );
 
                 if ($hiddenCols)

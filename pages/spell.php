@@ -690,7 +690,7 @@ class SpellPage extends GenericPage
                 'name'       => '$LANG.tab_contains',
                 'id'         => 'contains',
                 'hiddenCols' => ['side', 'slot', 'source', 'reqlevel'],
-                'extraCols'  => $extraCols
+                'extraCols'  => array_unique($extraCols)
             )];
         }
 
