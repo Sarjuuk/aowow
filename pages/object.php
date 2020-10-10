@@ -68,12 +68,19 @@ class ObjectPage extends GenericPage
             $infobox[] = Util::ucFirst(Lang::game('eventShort')).Lang::main('colon').implode(',', $ev);
         }
 
+        // Faction
+        if ($_ = DB::Aowow()->selectCell('SELECT factionId FROM ?_factiontemplate WHERE id = ?d', $this->subject->getField('faction')))
+        {
+            $this->extendGlobalIds(TYPE_FACTION, $_);
+            $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
+        }
+
         // Reaction
         $_ = function ($r)
         {
-            if ($r == 1)  return 2;
-            if ($r == -1) return 10;
-            return;
+            if ($r == 1)  return 2;                         // q2  green
+            if ($r == -1) return 10;                        // q10 red
+            return;                                         // q   yellow
         };
         $infobox[] = Lang::npc('react').Lang::main('colon').'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
 
