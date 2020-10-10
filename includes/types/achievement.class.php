@@ -226,7 +226,7 @@ class AchievementList extends BaseType
                     break;
             }
 
-            $criteria .= '<!--cr'.$crt['id'].':'.$crt['type'].':'.$crt['value1'].'-->- '.Util::jsEscape($crtName);
+            $criteria .= '<!--cr'.$crt['id'].':'.$crt['type'].':'.$crt['value1'].'-->- '.$crtName;
 
             if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
                 $criteria .= '&nbsp;<span class="moneygold">'.Lang::nf($crt['value2' ] / 10000).'</span>';
@@ -238,13 +238,13 @@ class AchievementList extends BaseType
         }
 
         $x  = '<table><tr><td><b class="q">';
-        $x .= Util::jsEscape($name);
+        $x .= $name;
         $x .= '</b></td></tr></table>';
         if ($description || $criteria)
             $x .= '<table><tr><td>';
 
         if ($description)
-            $x .= '<br />'.Util::jsEscape($description).'<br />';
+            $x .= '<br />'.$description.'<br />';
 
         if ($criteria)
         {

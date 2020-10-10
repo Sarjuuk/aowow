@@ -507,6 +507,8 @@ $WH.sc = function(z, y, x, w, v) {
     a.setDate(a.getDate() + y);
     b += "expires=" + a.toUTCString() + "; ";
 
+    b += "SameSite=strict;";
+
     if (w) {
         b += "path=" + w + "; ";
     }

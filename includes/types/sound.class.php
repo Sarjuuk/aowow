@@ -90,7 +90,7 @@ class SoundList extends BaseType
 
         foreach ($this->iterate() as $__)
             $data[self::$type][$this->id] = array(
-                'name'  => Util::jsEscape($this->getField('name', true)),
+                'name'  => $this->getField('name', true),
                 'type'  => $this->getField('cat'),
                 'files' => array_values(array_filter($this->getField('files')))
             );
