@@ -597,8 +597,8 @@ $lang = array(
             SAI_ACTION_TRIGGER_TIMED_EVENT                => ['Trigger previously defined timed event #[b]%1$d[/b].', null],
             SAI_ACTION_REMOVE_TIMED_EVENT                 => ['Delete previously defined timed event #[b]%1$d[/b].', null],
             SAI_ACTION_ADD_AURA                           => ['Apply aura from [spell=%1$d] on #target#.', null],
-            SAI_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        => ['Set #target# as base for further SmartAI-Events.', null],
-            SAI_ACTION_RESET_SCRIPT_BASE_OBJECT           => ['Reset base for SmartAI-Events.', null],
+            SAI_ACTION_OVERRIDE_SCRIPT_BASE_OBJECT        => ['Set #target# as base for further SmartAI events.', null],
+            SAI_ACTION_RESET_SCRIPT_BASE_OBJECT           => ['Reset base for SmartAI events.', null],
             SAI_ACTION_CALL_SCRIPT_RESET                  => ['Reset current SmartAI.', null],
             SAI_ACTION_SET_RANGED_MOVEMENT                => ['Set ranged attack distance to [b]%1$d[/b]m(%2$d)?, at %2$d°:;.', null],
 /* 80*/     SAI_ACTION_CALL_TIMED_ACTIONLIST              => ['Call [html]<a href=#sai-actionlist-%1$d onclick=\\"\$(\\\'#dsf67g4d-sai\\\').find(\\\'[href=\\\\\'#sai-actionlist-%1$d\\\\\']\\\').click()\\">Timed Actionlist #%1$d</a>[/html]. Updates %7$s.', null],
@@ -700,7 +700,7 @@ $lang = array(
 
         'GOStateUNK'    => '[span class=q10]unknown gameobject state #[b class=q1]%d[/b][/span]',
         'summonTypeUNK' => '[span class=q10]unknown SummonType #[b class=q1]%d[/b][/span]',
-        'aiTplUNK'      => '[span class=q10]unknown AI-Template #[b class=q1]%d[/b][/span]',
+        'aiTplUNK'      => '[span class=q10]unknown AI template #[b class=q1]%d[/b][/span]',
         'reactStateUNK' => '[span class=q10]unknown ReactState #[b class=q1]%d[/b][/span]',
         'sheathUNK'     => '[span class=q10]unknown sheath #[b class=q1]%d[/b][/span]',
         'saiUpdateUNK'  => '[span class=q10]unknown update condition #[b class=q1]%d[/b][/span]',
@@ -738,7 +738,7 @@ $lang = array(
         'passConfirm'   => "Confirm password",
 
         // dashboard
-        'ipAddress'     => "IP-Adress",
+        'ipAddress'     => "IP address",
         'lastIP'        => "last used IP",
         'myAccount'     => "My Account",
         'editAccount'   => "Simply use the forms below to update your account information",
@@ -927,7 +927,7 @@ $lang = array(
         'points'        => "Points",
         'series'        => "Series",
         'outOf'         => "out of",
-        'criteriaType'  => "Criterium Type-Id:",
+        'criteriaType'  => "Criterium Type ID:",
         'itemReward'    => "You will receive",
         'titleReward'   => 'You shall be granted the title "<a href="?title=%d">%s</a>"',
         'slain'         => "slain",
