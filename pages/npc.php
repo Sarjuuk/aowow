@@ -961,79 +961,10 @@ class NpcPage extends GenericPage
 
     private function getQuotes()
     {
-        $nQuotes  = 0;
-        $quotes   = [];
-        $quoteSrc = DB::World()->select('
-            SELECT
-                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2, ct.`Type`,
-                ct.TextRange AS `range`,
-                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
-                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
-                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
-            FROM
-                creature_text ct
-           {LEFT JOIN
-                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
-            LEFT JOIN
-                broadcast_text bct ON ct.BroadcastTextId = bct.ID
-           {LEFT JOIN
-                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
-            WHERE
-                ct.CreatureID = ?d',
-            User::$localeId ?: DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            $this->typeId
-        );
+        [$quotes, $nQuotes, $soundIds] = Game::getQuotesForCreature($this->typeId, true, $this->subject->getField('name', true));
 
-        foreach ($quoteSrc as $grp => $text)
-        {
-            $group = [];
-            foreach ($text as $t)
-            {
-                if ($t['soundId'])
-                    $this->soundIds[] = $t['soundId'];
-
-                $msg = Util::localizedString($t, 'text');
-                if (!$msg)
-                    continue;
-
-                // fixup .. either set %s for emotes or dont >.<
-                if (in_array($t['Type'], [2, 16]) && strpos($msg, '%s') === false)
-                    $msg = '%s '.$msg;
-
-                // fixup: bad case-insensivity
-                $msg = str_replace('%S', '%s', $msg);
-
-                $line = array(
-                    'range' => $t['range'],
-                    'type'  => 2,                           // [type: 0, 12] say: yellow-ish
-                    'lang'  => !empty($t['lang']) ? Lang::game('languages', $t['lang']) : null,
-                    'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->subject->getField('name', true)),
-                );
-
-                switch ($t['Type'])
-                {
-                    case  1:                                // yell:
-                    case 14: $line['type'] = 1; break;      // - dark red
-                    case  2:                                // emote:
-                    case 16:                                // "
-                    case  3:                                // boss emote:
-                    case 41: $line['type'] = 4; break;      // - orange
-                    case  4:                                // whisper:
-                    case 15:                                // "
-                    case  5:                                // boss whisper:
-                    case 42: $line['type'] = 3; break;      // - pink-ish
-                }
-
-                $nQuotes++;
-                $group[] = $line;
-            }
-
-            if ($group)
-                $quotes[$grp] = $group;
-        }
+        if ($soundIds)
+            $this->soundIds = array_merge($this->soundIds, $soundIds);
 
         return [$quotes, $nQuotes];
     }

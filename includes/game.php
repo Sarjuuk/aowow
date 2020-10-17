@@ -272,6 +272,105 @@ class Game
 
         return $points;
     }
+
+    public static function getQuotesForCreature(int $creatureId, bool $asHTML = false, string $talkSource = '') : array
+    {
+        $nQuotes  = 0;
+        $quotes   = [];
+        $soundIds = [];
+
+        $quoteSrc = DB::World()->select('
+            SELECT
+                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2,
+                ct.`Type` AS `talkType`,
+                ct.TextRange AS `range`,
+                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
+                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
+               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
+                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
+            FROM
+                creature_text ct
+           {LEFT JOIN
+                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
+            LEFT JOIN
+                broadcast_text bct ON ct.BroadcastTextId = bct.ID
+           {LEFT JOIN
+                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
+            WHERE
+                ct.CreatureID = ?d',
+            User::$localeId ?: DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            $creatureId
+        );
+
+        foreach ($quoteSrc as $grp => $text)
+        {
+            $group = [];
+            foreach ($text as $t)
+            {
+                if ($t['soundId'])
+                    $soundIds[] = $t['soundId'];
+
+                $msg = Util::localizedString($t, 'text');
+                if (!$msg)
+                    continue;
+
+                // fixup .. either set %s for emotes or dont >.<
+                if (in_array($t['talkType'], [2, 16]) && strpos($msg, '%s') === false)
+                    $msg = '%s '.$msg;
+
+                // fixup: bad case-insensivity
+                $msg = Util::parseHtmlText(str_replace('%S', '%s', htmlentities($msg)), !$asHTML);
+
+                if ($talkSource)
+                    $msg = sprintf($msg, $talkSource);
+
+                // make type css compatible
+                switch ($t['talkType'])
+                {
+                    case  1:                                // yell:
+                    case 14: $t['talkType'] = 1; break;     // - dark red
+                    case  2:                                // emote:
+                    case 16:                                // "
+                    case  3:                                // boss emote:
+                    case 41: $t['talkType'] = 4; break;     // - orange
+                    case  4:                                // whisper:
+                    case 15:                                // "
+                    case  5:                                // boss whisper:
+                    case 42: $t['talkType'] = 3; break;     // - pink-ish
+                    default: $t['talkType'] = 2;            // [type: 0, 12] say: yellow-ish
+
+                }
+
+                // prefix
+                $pre = '';
+                if ($t['talkType'] != 4)
+                    $pre = ($talkSource ?: '%s').' '.Lang::npc('textTypes', $t['talkType']).Lang::main('colon').($t['lang'] ? '['.Lang::game('languages', $t['lang']).'] ' : null);
+
+                if ($asHTML)
+                    $msg = '<div><span class="s'.$t['talkType'].'">%s'.($t['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $t['range']), $msg) : $msg).'</span></div>';
+                else
+                    $msg = '[div][span class=s'.$t['talkType'].']%s'.html_entity_decode($msg).'[/span][/div]';
+
+                $line = array(
+                    'range'  => $t['range'],
+                    'text'   => $msg,
+                    'prefix' => $pre
+                );
+
+
+                $nQuotes++;
+                $group[] = $line;
+            }
+
+            if ($group)
+                $quotes[$grp] = $group;
+        }
+
+        return [$quotes, $nQuotes, $soundIds];
+    }
+
 }
 
 ?>
