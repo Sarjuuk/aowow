@@ -1449,7 +1449,7 @@ $lang = array(
             'str'       => "Str",                   'agi'       => "Agi",                   'sta'       => "Sta",                   'int'       => "Int",                   'spi'       => "Spi"
         ),
         'spellModOp'    => array(
-            "Damage",                               "Duration",                             "Thread",                               "Effect 1",                             "Charges",
+            "Damage",                               "Duration",                             "Threat",                               "Effect 1",                             "Charges",
             "Range",                                "Radius",                               "Critical Hit Chance",                  "All Effects",                          "Casting Time loss",
             "Casting Time",                         "Cooldown",                             "Effect 2",                             "Ignore Armor",                         "Cost",
             "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
