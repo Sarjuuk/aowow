@@ -13026,7 +13026,7 @@ Listview.templates = {
                     var a = $WH.ce('a');
                     a.style.whiteSpace = 'nowrap';
                     a.href = '?spell=' + Math.abs(effect);
-                    if (g_pageInfo.typeId == Math.abs(effect)) { // ponts to self
+                    if (g_pageInfo.typeId == Math.abs(effect)) { // points to self
                         a.className = 'q1';
                         $WH.st(a, LANG.ls_self);
                     }
