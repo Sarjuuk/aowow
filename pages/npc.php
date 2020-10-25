@@ -365,7 +365,34 @@ class NpcPage extends GenericPage
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-        $smartSpells = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $this->typeId);
+        $smartScripts = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID = ?d', SAI_SRC_TYPE_CREATURE, array_merge(SAI_ACTION_ALL_SPELLCASTS, SAI_ACTION_ALL_TIMED_ACTION_LISTS), $this->typeId);
+        $smartSpells  = [];
+        $smartTALs    = [];
+        foreach ($smartScripts as $s)
+        {
+            if (in_array($s['action_type'], SAI_ACTION_ALL_SPELLCASTS))
+                $smartSpells[] = $s['action_param1'];
+            else if ($s['action_type'] == SAI_ACTION_CALL_TIMED_ACTIONLIST)
+                $smartTALs[] = $s['action_param1'];
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST)
+            {
+                for ($i = 1; $i < 7; $i++)
+                    if ($s['action_param'.$i])
+                        $smartTALs[] = $s['action_param'.$i];
+            }
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST)
+            {
+                for ($i = $s['action_param1']; $i <= $s['action_param2']; $i++)
+                    $smartTALs[] = $i;
+            }
+            else
+                var_dump($s);
+        }
+
+        if ($smartTALs)
+            if ($_ = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, SAI_ACTION_ALL_SPELLCASTS, $smartTALs))
+                $smartSpells = array_merge($smartSpells, $_);
+
         $tplSpells   = [];
         $conditions  = ['OR'];
 

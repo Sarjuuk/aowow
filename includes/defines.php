@@ -1536,6 +1536,9 @@ define('SAI_ACTION_PLAY_SPELL_VISUAL_KIT',              137); //  spellVisualKit
 define('SAI_ACTION_OVERRIDE_LIGHT',                     138); //  zoneId, areaLightId, overrideLightID, transitionMilliseconds
 define('SAI_ACTION_OVERRIDE_WEATHER',                   139); //  zoneId, weatherId, intensity
 
+define('SAI_ACTION_ALL_SPELLCASTS',         [SAI_ACTION_CAST, SAI_ACTION_ADD_AURA, SAI_ACTION_INVOKER_CAST, SAI_ACTION_SELF_CAST, SAI_ACTION_CROSS_CAST]);
+define('SAI_ACTION_ALL_TIMED_ACTION_LISTS', [SAI_ACTION_CALL_TIMED_ACTIONLIST, SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST, SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST]);
+
 define('SAI_CAST_FLAG_INTERRUPT_PREV', 0x01);
 define('SAI_CAST_FLAG_TRIGGERED',      0x02);
 // define('SAI_CAST_FORCE_CAST',          0x04);            // Forces cast even if creature is out of mana or out of range
@@ -1587,7 +1590,7 @@ define('SAI_TARGET_CLOSEST_ENEMY',          25);            //  Any attackable t
 define('SAI_TARGET_CLOSEST_FRIENDLY',       26);            //  Any friendly unit (creature, player or pet) within maxDist
 define('SAI_TARGET_LOOT_RECIPIENTS',        27);            //  All tagging players
 define('SAI_TARGET_FARTHEST',               28);            //  Farthest unit on the threat list
-define('SAI_TARGET_VEHICLE_ACCESSORY',      29);            //  Vehicle can target unit in given seat
+define('SAI_TARGET_VEHICLE_PASSENGER',      29);            //  Vehicle can target unit in given seat
 define('SAI_TARGET_CLOSEST_UNSPAWNED_GO',   30);            //  entry(0any), maxDist
 
 define('SAI_TEMPLATE_BASIC',          0);                   //
