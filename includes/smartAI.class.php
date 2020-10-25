@@ -25,7 +25,7 @@ class SmartAI
         $this->entry    = $entry;
         $this->miscData = $miscData;
 
-        $raw = DB::World()->select('SELECT id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_param4, target_x, target_y, target_z, target_o FROM smart_scripts WHERE entryorguid = ?d AND source_type = ?d ORDER BY id ASC', $this->entry, $this->srcType);
+        $raw = DB::World()->select('SELECT id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, event_param5, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_param4, target_x, target_y, target_z, target_o FROM smart_scripts WHERE entryorguid = ?d AND source_type = ?d ORDER BY id ASC', $this->entry, $this->srcType);
         foreach ($raw as $r)
         {
             $this->rawData[$r['id']] = array(
@@ -36,7 +36,7 @@ class SmartAI
                     'phases' => Util::mask2bits($r['event_phase_mask'], 1) ?: [0],
                     'chance' => $r['event_chance'],
                     'flags'  => $r['event_flags'],
-                    'param'  => [$r['event_param1'], $r['event_param2'], $r['event_param3'], $r['event_param4'], 0]
+                    'param'  => [$r['event_param1'], $r['event_param2'], $r['event_param3'], $r['event_param4'], $r['event_param5']]
                 ),
                 'action' => array(
                     'type'  => $r['action_type'],
@@ -204,72 +204,15 @@ class SmartAI
         if (isset($this->quotes[$creatureId]))
             return;
 
-        $quoteSrc = DB::World()->select('
-            SELECT
-                ct.CreatureID, ct.GroupID, ct.ID, ct.`Type`,
-                ct.TextRange AS `range`,
-                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
-                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
-                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
-            FROM
-                creature_text ct
-           {LEFT JOIN
-                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
-            LEFT JOIN
-                broadcast_text bct ON ct.BroadcastTextId = bct.ID
-           {LEFT JOIN
-                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
-            WHERE
-                ct.CreatureID = ?d',
-            User::$localeId ?: DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            $creatureId
-        );
+        [$quotes, , ] = Game::getQuotesForCreature($creatureId);
 
-        foreach ($quoteSrc as $text)
-        {
-            $msg = Util::localizedString($text, 'text');
-            if (!$msg)
-                continue;
+        $this->quotes[$creatureId] = $quotes;
 
-            // fixup .. either set %s for emotes or dont >.<
-            if (in_array($text['Type'], [2, 16]) && strpos($msg, '%s') === false)
-                $msg = '%s '.$msg;
-
-            // fixup: bad case-insensivity
-            $msg = str_replace('%S', '%s', $msg);
-
-            $line = array(
-                'range' => $text['range'],
-                'type'  => 2,                           // [type: 0, 12] say: yellow-ish
-                'lang'  => !empty($text['lang']) ? Lang::game('languages', $text['lang']) : null,
-                'text'  => Util::parseHtmlText(htmlentities($msg), true)
-            );
-
-            switch ($text['Type'])
-            {
-                case  1:                                // yell:
-                case 14: $line['type'] = 1; break;      // - dark red
-                case  2:                                // emote:
-                case 16:                                // "
-                case  3:                                // boss emote:
-                case 41: $line['type'] = 4; break;      // - orange
-                case  4:                                // whisper:
-                case 15:                                // "
-                case  5:                                // boss whisper:
-                case 42: $line['type'] = 3; break;      // - pink-ish
-            }
-
-            $this->quotes[$text['CreatureID']][$text['GroupID']][] = $line;
-        }
-
-        if (isset($this->quotes[$text['CreatureID']]))
-            $this->quotes[$text['CreatureID']]['src'] = Util::jsEscape(CreatureList::getName($text['CreatureID']));
+        if (!empty($this->quotes[$creatureId]))
+            $this->quotes[$creatureId]['src'] = Util::jsEscape(CreatureList::getName($creatureId));
     }
 
-    private function getTalkSource() : int
+    private function getTalkSource(bool &$emptySource = false) : int
     {
         if ($this->itr['action']['type'] != SAI_ACTION_TALK &&
             $this->itr['action']['type'] != SAI_ACTION_SIMPLE_TALK)
@@ -286,9 +229,10 @@ class SmartAI
             case SAI_TARGET_CREATURE_DISTANCE:
             case SAI_TARGET_CLOSEST_CREATURE:
                 return $this->itr['target']['param'][0];
+            case SAI_TARGET_CLOSEST_PLAYER:
+                $emptySource = true;
             case SAI_TARGET_SELF:
             case SAI_TARGET_ACTION_INVOKER:
-            case SAI_TARGET_CLOSEST_PLAYER:
             case SAI_TARGET_CLOSEST_FRIENDLY:               // unsure about this
             default:
                 return empty($this->miscData['baseEntry']) ? $this->entry : $this->miscData['baseEntry'];
@@ -405,6 +349,17 @@ class SmartAI
         return Lang::concat($gf ?: [Lang::smartAI('empty')]);
     }
 
+    private function spawnFlags(string $f, int $n) : string
+    {
+        $sf = [];
+        for ($i = 1; $i <= SAI_SPAWN_FLAG_NOSAVE_RESPAWN; $i <<= 1)
+            if ($this->itr[$f]['param'][$n] & $i)
+                if ($x = Lang::smartAI('spawnFlags', $i))
+                    $sf[] = $x;
+
+        return Lang::concat($sf ?: [Lang::smartAI('empty')]);
+    }
+
     private function aiTemplate(int $aiNum) : string
     {
         if ($standState = Lang::smartAI('aiTpl', $aiNum))
@@ -430,6 +385,9 @@ class SmartAI
         $getDist = function ($min, $max) { return ($min && $max) ? min($min, $max).' &ndash; '.max($min, $max) : max($min, $max); };
         $tooltip = '[tooltip name=t-'.$this->rowKey.']'.Lang::smartAI('targetTT', array_merge([$t['type']], $t['param'], $t['pos'])).'[/tooltip][span class=tip tooltip=t-'.$this->rowKey.']%s[/span]';
 
+        // additional parameters
+        $t['param'] = array_pad($t['param'], 15, '');
+
         switch ($t['type'])
         {
             // direct param use
@@ -451,51 +409,55 @@ class SmartAI
             case SAI_TARGET_CLOSEST_FRIENDLY:               // 26
             case SAI_TARGET_LOOT_RECIPIENTS:                // 27
             case SAI_TARGET_FARTHEST:                       // 28
-            case SAI_TARGET_VEHICLE_ACCESSORY:              // 29
+                break;
+            case SAI_TARGET_VEHICLE_PASSENGER:              // 29
+                if ($t['param'][0])
+                    $t['param'][10] = Lang::concat(Util::mask2bits($t['param'][0]));
                 break;
             // distance
             case SAI_TARGET_PLAYER_RANGE:                   // 17
-                $t['param'][3] = $getDist($t['param'][0], $t['param'][1]);
+                $t['param'][10] = $getDist($t['param'][0], $t['param'][1]);
                 break;
             case SAI_TARGET_PLAYER_DISTANCE:                // 18
-                $t['param'][3] = $getDist(0, $t['param'][0]);
+                $t['param'][10] = $getDist(0, $t['param'][0]);
                 break;
             // creature link
             case SAI_TARGET_CREATURE_RANGE:                 // 9
                 if ($t['param'][0])
                     $this->jsGlobals[TYPE_NPC][] = $t['param'][0];
 
-                $t['param'][3] = $getDist($t['param'][1], $t['param'][2]);
+                $t['param'][10] = $getDist($t['param'][1], $t['param'][2]);
                 break;
             case SAI_TARGET_CREATURE_GUID:                  // 10
-                if ($t['param'][3] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $t['param'][0]))
-                    $this->jsGlobals[TYPE_NPC][] = $t['param'][3];
+                if ($t['param'][10] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $t['param'][0]))
+                    $this->jsGlobals[TYPE_NPC][] = $t['param'][10];
                 else
                     trigger_error('SmartAI::resloveTarget - creature with guid '.$t['param'][0].' not in DB');
                 break;
             case SAI_TARGET_CREATURE_DISTANCE:              // 11
             case SAI_TARGET_CLOSEST_CREATURE:               // 19
-                $t['param'][3] = $getDist(0, $t['param'][1]);
+                $t['param'][10] = $getDist(0, $t['param'][1]);
 
                 if ($t['param'][0])
                     $this->jsGlobals[TYPE_NPC][] = $t['param'][0];
                 break;
             // gameobject link
             case SAI_TARGET_GAMEOBJECT_GUID:                // 14
-                if ($t['param'][3] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $t['param'][0]))
-                    $this->jsGlobals[TYPE_OBJECT][] = $t['param'][3];
+                if ($t['param'][10] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $t['param'][0]))
+                    $this->jsGlobals[TYPE_OBJECT][] = $t['param'][10];
                 else
                     trigger_error('SmartAI::resloveTarget - gameobject with guid '.$t['param'][0].' not in DB');
                 break;
             case SAI_TARGET_GAMEOBJECT_RANGE:               // 13
-                $t['param'][3] = $getDist($t['param'][1], $t['param'][2]);
+                $t['param'][10] = $getDist($t['param'][1], $t['param'][2]);
 
                 if ($t['param'][0])
                     $this->jsGlobals[TYPE_OBJECT][] = $t['param'][0];
                 break;
             case SAI_TARGET_GAMEOBJECT_DISTANCE:            // 15
             case SAI_TARGET_CLOSEST_GAMEOBJECT:             // 20
-                $t['param'][3] = $getDist(0, $t['param'][1]);
+            case SAI_TARGET_CLOSEST_UNSPAWNED_GO:           // 30
+                $t['param'][10] = $getDist(0, $t['param'][1]);
 
                 if ($t['param'][0])
                     $this->jsGlobals[TYPE_OBJECT][] = $t['param'][0];
@@ -524,8 +486,7 @@ class SmartAI
         $tooltip = '[tooltip name=e-'.$this->rowKey.']'.Lang::smartAI('eventTT', array_merge([$e['type'], $e['phases'], $e['chance'], $e['flags']], $e['param'])).'[/tooltip][span tooltip=e-'.$this->rowKey.']%s[/span]';
 
         // additional parameters
-        $e['param'][5] = '';
-        $e['param'][6] = '';
+        $e['param'] = array_pad($e['param'], 15, '');
 
         switch ($e['type'])
         {
@@ -551,7 +512,6 @@ class SmartAI
             case SAI_EVENT_WAYPOINT_ENDED:                  // 58  -  On Creature Waypoint Path Ended
             case SAI_EVENT_TIMED_EVENT_TRIGGERED:           // 59  -
             case SAI_EVENT_JUST_CREATED:                    // 63  -
-            case SAI_EVENT_GOSSIP_HELLO:                    // 64  -  On Right-Click Creature/Gameobject that have gossip enabled.
             case SAI_EVENT_FOLLOW_COMPLETED:                // 65  -
             case SAI_EVENT_GO_STATE_CHANGED:                // 70  -
             case SAI_EVENT_GO_EVENT_INFORM:                 // 71  -
@@ -560,7 +520,7 @@ class SmartAI
             case SAI_EVENT_COUNTER_SET:                     // 77  -  If the value of specified counterID is equal to a specified value
                 break;
             // num range [+ time footer]
-            case SAI_EVENT_HEALT_PCT:                       // 2   -  Health Percentage
+            case SAI_EVENT_HEALTH_PCT:                      // 2   -  Health Percentage
             case SAI_EVENT_MANA_PCT:                        // 3   -  Mana Percentage
             case SAI_EVENT_RANGE:                           // 9   -  On Target In Range
             case SAI_EVENT_TARGET_HEALTH_PCT:               // 12  -  On Target Health Percentage
@@ -569,7 +529,7 @@ class SmartAI
             case SAI_EVENT_DAMAGED_TARGET:                  // 33  -  On Target Damaged
             case SAI_EVENT_RECEIVE_HEAL:                    // 53  -  On Creature Received Healing
             case SAI_EVENT_FRIENDLY_HEALTH_PCT:             // 74  -
-                $e['param'][5] = $this->numRange('event', 0);
+                $e['param'][10] = $this->numRange('event', 0);
                 // do not break;
             case SAI_EVENT_OOC_LOS:                         // 10  -  On Target In Distance Out of Combat
             case SAI_EVENT_FRIENDLY_HEALTH:                 // 14  -  On Friendly Health Deficit
@@ -583,12 +543,19 @@ class SmartAI
             case SAI_EVENT_UPDATE_IC:                       // 0   -  In combat.
             case SAI_EVENT_UPDATE_OOC:                      // 1   -  Out of combat.
                 if ($this->srcType == SAI_SRC_TYPE_ACTIONLIST)
-                    $e['param'][6] = 1;
+                    $e['param'][11] = 1;
                 // do not break;
             case SAI_EVENT_UPDATE:                          // 60  -
-                $e['param'][5] = $this->numRange('event', 0, true);
+                $e['param'][10] = $this->numRange('event', 0, true);
                 if ($time = $this->numRange('event', 2, true))
                     $footer = $time;
+                break;
+            case SAI_EVENT_GOSSIP_HELLO:                    // 64  -  On Right-Click Creature/Gameobject that have gossip enabled.
+                if ($this->srcType == SAI_SRC_TYPE_OBJECT)
+                    $footer = array(
+                        $e['param'][0] == 1,
+                        $e['param'][0] == 2,
+                    );
                 break;
             case SAI_EVENT_KILL:                            // 5   -  On Creature Kill
                 if ($time = $this->numRange('event', 0, true))
@@ -605,7 +572,7 @@ class SmartAI
                     $footer = $time;
 
                 if ($e['param'][1])
-                    $e['param'][5] = Lang::getMagicSchools($e['param'][1]);
+                    $e['param'][10] = Lang::getMagicSchools($e['param'][1]);
 
                 if ($e['param'][0])
                     $this->jsGlobals[TYPE_SPELL][] = $e['param'][0];
@@ -621,6 +588,7 @@ class SmartAI
                     $footer = $time;
                 break;
             case SAI_EVENT_SUMMONED_UNIT:                   // 17  -  On Creature/Gameobject Summoned Unit
+            case SAI_EVENT_SUMMONED_UNIT_DIES:              // 82  -  On Summoned Unit Dies
                 if ($e['param'][0])
                     $this->jsGlobals[TYPE_NPC][] = $e['param'][0];
                 // do not break;
@@ -633,6 +601,8 @@ class SmartAI
             case SAI_EVENT_REWARD_QUEST:                    // 20  -  On Target Rewarded Quest
                 if ($e['param'][0])
                     $this->jsGlobals[TYPE_QUEST][] = $e['param'][0];
+                if ($time = $this->numRange('event', 1, true))
+                    $footer = $time;
                 break;
             case SAI_EVENT_RECEIVE_EMOTE:                   // 22  -  On Receive Emote.
                 $this->jsGlobals[TYPE_EMOTE][] = $e['param'][0];
@@ -645,7 +615,7 @@ class SmartAI
                     $this->jsGlobals[TYPE_NPC][] = $e['param'][1];
                 break;
             case SAI_EVENT_LINK:                            // 61  -  Used to link together multiple events as a chain of events.
-                $e['param'][5] = LANG::concat(DB::World()->selectCol('SELECT CONCAT("#[b]", id, "[/b]") FROM smart_scripts WHERE link = ?d AND entryorguid = ?d AND source_type = ?d', $this->itr['id'], $this->entry, $this->srcType), false);
+                $e['param'][10] = LANG::concat(DB::World()->selectCol('SELECT CONCAT("#[b]", id, "[/b]") FROM smart_scripts WHERE link = ?d AND entryorguid = ?d AND source_type = ?d', $this->itr['id'], $this->entry, $this->srcType), false);
                 break;
             case SAI_EVENT_GOSSIP_SELECT:                   // 62  -  On gossip clicked (gossip_menu_option335).
                 $gmo = DB::World()->selectRow('SELECT gmo.OptionText AS text_loc0 {, gmol.OptionText AS text_loc?d}
@@ -658,7 +628,7 @@ class SmartAI
                 );
 
                 if ($gmo)
-                    $e['param'][5] = Util::localizedString($gmo, 'text');
+                    $e['param'][10] = Util::localizedString($gmo, 'text');
                 else
                     trigger_error('SmartAI::event - could not find gossip menu option for event #'.$e['type']);
                 break;
@@ -668,24 +638,24 @@ class SmartAI
                 break;
             case SAI_EVENT_DISTANCE_CREATURE:               // 75  -  On creature guid OR any instance of creature entry is within distance.
                 if ($e['param'][0])
-                    $e['param'][5] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $e['param'][0]);
+                    $e['param'][10] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $e['param'][0]);
                 // do not break;
             case SAI_EVENT_DISTANCE_GAMEOBJECT:             // 76  -  On gameobject guid OR any instance of gameobject entry is within distance.
-                if ($e['param'][0] && !$e['param'][5])
-                    $e['param'][5] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $e['param'][0]);
+                if ($e['param'][0] && !$e['param'][10])
+                    $e['param'][10] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $e['param'][0]);
                 else if ($e['param'][1])
-                    $e['param'][5] = $e['param'][1];
-                else if (!$e['param'][5])
+                    $e['param'][10] = $e['param'][1];
+                else if (!$e['param'][10])
                     trigger_error('SmartAI::event - entity for event #'.$e['type'].' not defined');
 
-                if ($e['param'][5])
-                    $this->jsGlobals[TYPE_NPC][] = $e['param'][5];
+                if ($e['param'][10])
+                    $this->jsGlobals[TYPE_NPC][] = $e['param'][10];
 
                 if ($e['param'][3])
                     $footer = Util::formatTime($e['param'][3], true);
                 break;
             case SAI_EVENT_EVENT_PHASE_CHANGE:              // 66  -  On event phase mask set
-                $e['param'][5] = Lang::concat(Util::mask2bits($a['param'][0]), false);
+                $e['param'][10] = Lang::concat(Util::mask2bits($a['param'][0]), false);
                 break;
             default:
                 $body = '[span class=q10]Unhandled Event[/span] #'.$e['type'];
@@ -714,7 +684,7 @@ class SmartAI
         $tooltip = '[tooltip name=a-'.$this->rowKey.']'.Lang::smartAI('actionTT', array_merge([$a['type']], $a['param'])).'[/tooltip][span tooltip=a-'.$this->rowKey.']%s[/span]';
 
         // init additional parameters
-        $a['param'] = array_pad($a['param'], 10, '');
+        $a['param'] = array_pad($a['param'], 15, '');
 
         switch ($a['type'])
         {
@@ -733,6 +703,7 @@ class SmartAI
             case SAI_ACTION_SET_IN_COMBAT_WITH_ZONE:        // 38 -> self
             case SAI_ACTION_SET_INVINCIBILITY_HP_LEVEL:     // 42 -> self
             case SAI_ACTION_SET_DATA:                       // 45 -> any target
+            case SAI_ACTION_ATTACK_STOP:                    // 46 -> self
             case SAI_ACTION_SET_VISIBILITY:                 // 47 -> any target
             case SAI_ACTION_SET_ACTIVE:                     // 48 -> any target
             case SAI_ACTION_ATTACK_START:                   // 49 -> any target
@@ -761,7 +732,12 @@ class SmartAI
             case SAI_ACTION_SET_CAN_FLY:                    // 119 -> self
             case SAI_ACTION_SET_SIGHT_DIST:                 // 121 -> any target
             case SAI_ACTION_REMOVE_ALL_GAMEOBJECTS:         // 126 -> any target
-            case SAI_ACTION_STOP_MOTION:                    // 127 -> any target [ye, not gonna resolve this nonsense]
+            case SAI_ACTION_PLAY_CINEMATIC:                 // 135 -> player target
+                break;
+            case SAI_ACTION_PAUSE_MOVEMENT:                 // 127 -> any target [ye, not gonna resolve this nonsense]
+                $a['param'][6] = Util::formatTime($a['param'][1], true);
+                if ($a['param'][2])
+                    $footer = true;
                 break;
             // simple type as param[0]
             case SAI_ACTION_PLAY_EMOTE:                     // 5 -> any target
@@ -777,6 +753,8 @@ class SmartAI
                     $this->jsGlobals[TYPE_QUEST][] = $a['param'][0];
                 break;
             case SAI_ACTION_REMOVEAURASFROMSPELL:           // 28 -> any target
+                if ($a['param'][2])
+                $footer = true;
             case SAI_ACTION_ADD_AURA:                       // 75 -> any target
                 if ($a['param'][0])
                     $this->jsGlobals[TYPE_SPELL][] = $a['param'][0];
@@ -826,19 +804,20 @@ class SmartAI
                 break;
             // misc
             case SAI_ACTION_TALK:                           // 1 -> any target
-                if ($src = $this->getTalkSource())
+                $noSrc = false;
+                if ($src = $this->getTalkSource($noSrc))
                 {
                     if ($a['param'][6] = isset($this->quotes[$src][$a['param'][0]]))
                     {
                         $quotes = $this->quotes[$src][$a['param'][0]];
-                        foreach ($quotes as $key => $q)
+                        foreach ($quotes as $quote)
                         {
-                            $_ = ($q['type'] != 4 ? $this->quotes[$src]['src'].' '.Lang::npc('textTypes', $q['type']).Lang::main('colon').($q['lang'] ? '['.$q['lang'].'] ' : null) : null).html_entity_decode($q['text']);
-                            $a['param'][7] .= '[div][span class=s'.$q['type'].']'.sprintf($_, $this->quotes[$src]['src']).'[/span][/div]';
-
+                            $a['param'][7] .= sprintf($quote['text'], $noSrc ? '' : sprintf($quote['prefix'], $this->quotes[$src]['src']), $this->quotes[$src]['src']);
                             if ($a['param'][1])
                                 $footer = [Util::formatTime($a['param'][1], true)];
                         }
+
+                        // todo (low): undestand what action_param2 does
                     }
                 }
                 else
@@ -1084,16 +1063,14 @@ class SmartAI
 
                 break;
             case SAI_ACTION_SIMPLE_TALK:                    // 84 -> any target
-                if ($src = $this->getTalkSource())
+                $noSrc = false;
+                if ($src = $this->getTalkSource($noSrc))
                 {
                     if (isset($this->quotes[$src][$a['param'][0]]))
                     {
                         $quotes = $this->quotes[$src][$a['param'][0]];
-                        foreach ($quotes as $key => $q)
-                        {
-                            $_ = ($q['type'] != 4 ? $this->quotes[$src]['src'].' '.Lang::npc('textTypes', $q['type']).Lang::main('colon').($q['lang'] ? '['.$q['lang'].'] ' : null) : null).html_entity_decode($q['text']);
-                            $a['param'][6] .= '[div][span class=s'.$q['type'].']'.sprintf($_, $this->quotes[$src]['src']).'[/span][/div]';
-                        }
+                        foreach ($quotes as $quote)
+                            $a['param'][6] .= sprintf($quote['text'], $noSrc ? '' : sprintf($quote['prefix'], $this->quotes[$src]['src']), $this->quotes[$src]['src']);
                     }
                 }
                 else
@@ -1103,11 +1080,12 @@ class SmartAI
             case SAI_ACTION_CROSS_CAST:                     // 86 -> entity by TargetingBlock(param3, param4, param5, param6) cross cast spell <param1> at any target
                 $a['param'][6] = $this->target(array(
                     'type'  => $a['param'][2],
-                    'param' => [$a['param'][3], $a['param'][4], $a['param'][5]],
+                    'param' => [$a['param'][3], $a['param'][4], $a['param'][5], 0],
                     'pos'   => [0, 0, 0, 0]
                 ));
                 // do not break;
-            case SAI_ACTION_INVOKER_CAST:                   // 85 -> any target
+            case SAI_ACTION_SELF_CAST:                      // 85 -> self
+            case SAI_ACTION_INVOKER_CAST:                   // 134 -> any target
                 $this->jsGlobals[TYPE_SPELL][] = $a['param'][0];
                 if ($_ = $this->castFlags('action', 1))
                     $footer = $_;
@@ -1270,10 +1248,62 @@ class SmartAI
             case SAI_ACTION_TRIGGER_RANDOM_TIMED_EVENT:     // 125 -> self
                 $a['param'][6] = $this->numRange('action', 0);
                 break;
-            // todo (med): i know these exist, but have no info how they operate
             case SAI_ACTION_SPAWN_SPAWNGROUP:               // 131
             case SAI_ACTION_DESPAWN_SPAWNGROUP:             // 132
+                $a['param'][6] = DB::World()->selectCell('SELECT `GroupName` FROM spawn_group_template WHERE `groupId` = ?d', $a['param'][0]);
+                $entities = DB::World()->select('SELECT `spawnType` AS "0", `spawnId` AS "1" FROM spawn_group WHERE `groupId` = ?d',  $a['param'][0]);
+
+                $n = 5;
+                foreach ($entities as [$spawnType, $guid])
+                {
+                    $type = TYPE_NPC;
+                    if ($spawnType == 1)
+                        $type == TYPE_GAMEOBJECT;
+
+                    $a['param'][7] = $this->spawnFlags('action', 3);
+
+                    if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d',  $type, $guid))
+                    {
+                        $this->jsGlobals[$type][] = $_;
+                        $a['param'][8] .= '[li]['.Util::$typeStrings[$type].'='.$_.'][small class=q0] (GUID: '.$guid.')[/small][/li]';
+                    }
+                    else
+                        $a['param'][8] .= '[li]'.Lang::smartAI('entityUNK').'[small class=q0] (GUID: '.$guid.')[/small][/li]';
+
+                    if (!--$n)
+                        break;
+                }
+
+                if (count($entities) > 5)
+                    $a['param'][8] .= '[li]+'.(count($entities) - 5).'…[/li]';
+
+                $a['param'][8] = '[ul]'.$a['param'][8].'[/ul]';
+
+                if ($time = $this->numRange('action', 1, true))
+                    $footer = [$time];
+                break;
             case SAI_ACTION_RESPAWN_BY_SPAWNID:             // 133
+                $type = TYPE_NPC;
+                if ($a['param'][0] == 1)
+                    $type == TYPE_GAMEOBJECT;
+
+                if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d',  $type, $a['param'][1]))
+                    $a['param'][6] = '['.Util::$typeStrings[$type].'='.$_.']';
+                else
+                    $a['param'][6] = Lang::smartAI('entityUNK');
+                break;
+            case SAI_ACTION_SET_MOVEMENT_SPEED:             // 136
+                $a['param'][6] = $a['param'][1] + $a['param'][2] / pow(10, floor(log10($a['param'][2] ?: 1.0) + 1));  // i know string concatenation is a thing. don't @ me!
+                break;
+            case SAI_ACTION_OVERRIDE_LIGHT:                 // 138
+                $this->jsGlobals[TYPE_ZONE][] = $a['param'][0];
+                $footer = [Util::formatTime($a['param'][2], true)];
+                break;
+            case SAI_ACTION_OVERRIDE_WEATHER:               // 139
+                $this->jsGlobals[TYPE_ZONE][] = $a['param'][0];
+                if (!($a['param'][6] = Lang::smartAI('weatherStates', $a['param'][1])))
+                    $a['param'][6] = Lang::smartAI('weatherStateUNK', [$a['param'][1]]);
+                break;
             default:
                 $body = Lang::smartAI('actionUNK', [$a['type']]);
         }

@@ -4813,12 +4813,12 @@ var LANG = {
     ls_trigger:           "Auslöser",
     ls_self:              "Selbst",
     ls_effects:           "Effekte",
-    ls_onCast:            "Wenn Zauber gewirkt wird",
-    ls_onAuraRemove:      "Wenn Aura endet",
-    ls_onAuraApply:       "Wenn Aura angewandt wird oder endet",
-    ls_onSpellHit:        "Wenn Zauber trifft",
-    ls_onTrigger:         "Wenn Zauber ausgelöst wird",
-    ls_onImmune:          "Wenn Immunität gegen diesen Zauber beginnt oder endet",
+    ls_onCast:            "Zauber wird gewirkt",
+    ls_onAuraRemove:      "Aura endet",
+    ls_onAuraApply:       "Aura wird angewandt oder endet",
+    ls_onSpellHit:        "Zauber trifft",
+    ls_onTrigger:         "Zauber wird ausgelöst",
+    ls_onImmune:          "Immunität gegen diesen Zauber beginnt oder endet",
 
     /* AoWoW: end custom */
 };

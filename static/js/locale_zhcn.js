@@ -4840,12 +4840,12 @@ var LANG = {
     ls_trigger:           "Triggers",
     ls_self:              "This",
     ls_effects:           "Effects",
-    ls_onCast:            "When Spell is cast",
-    ls_onAuraRemove:      "When Aura is removed",
-    ls_onAuraApply:       "When Spells Aura is applied or removed",
-    ls_onSpellHit:        "When Spell hits the target(s)",
-    ls_onTrigger:         "When Spell is triggered",
-    ls_onImmune:          "When immunity against Spell is applied or cleared",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
 
     /* AoWoW: end custom */
 };

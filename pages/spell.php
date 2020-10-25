@@ -632,6 +632,23 @@ class SpellPage extends GenericPage
             $this->extendGlobalData($ubObjects->getJSGlobals());
         }
 
+        // tab: used by - areatrigger
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
+        {
+            if ($_ = $this->ubSmartScript(TYPE_AREATRIGGER))
+            {
+                $ubTriggers = new AreaTriggerList(array(['id', $_]));
+                if (!$ubTriggers->error)
+                {
+                    $this->lvTabs[] = ['areatrigger', array(
+                        'data' => array_values($ubTriggers->getListviewData()),
+                        'id'   => 'used-by-areatrigger',
+                        'name' => '$LANG.tab_usedby'
+                    ), 'areatrigger'];
+                }
+            }
+        }
+
         // tab: criteria of
         $conditions = array(
             ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
@@ -2226,31 +2243,28 @@ class SpellPage extends GenericPage
     {
         $src = -1;
         if ($type == TYPE_OBJECT)
-            $src = 1;
+            $src = SAI_SRC_TYPE_OBJECT;
         else if ($type == TYPE_NPC)
-            $src = 0;
+            $src = SAI_SRC_TYPE_CREATURE;
+        else if ($type == TYPE_AREATRIGGER)
+            $src = SAI_SRC_TYPE_AREATRIGGER;
         else
             return [];
 
-        /*
-            SMART_SCRIPT_TYPE_CREATURE = 0  =>  SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-            SMART_SCRIPT_TYPE_TIMED_ACTIONLIST = 9  =>  SMART_ACTION_CALL_TIMED_ACTIONLIST = 80; SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST = 87; SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST = 88
-        */
-
         $ids = [];
-        if ($smartS = DB::World()->selectCol('SELECT entryOrGUID AS ARRAY_KEY, source_type FROM smart_scripts WHERE entryorguid > 0 AND source_type IN (?d, 9) AND action_type IN (11, 75, 85, 86) AND action_param1 = ?d', $type, $this->typeId))
+        if ($smartS = DB::World()->select('SELECT entryOrGUID, source_type FROM smart_scripts WHERE entryOrGUID > 0 AND source_type IN (?a) AND action_type IN (?a) AND action_param1 = ?d', [$src, SAI_SRC_TYPE_ACTIONLIST], SAI_ACTION_ALL_SPELLCASTS, $this->typeId))
         {
             // filter for timed action list
-            if ($tal = array_filter($smartS, function($x) {return $x == 9;}))
+            if ($tal = array_filter($smartS, function($x) {return $x['source_type'] == SAI_SRC_TYPE_ACTIONLIST;}))
             {
-                if ($talIds = DB::World()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryorguid > 0 AND source_type = ?d AND action_type IN (80, 87, 88) AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a))', $type, array_keys($tal), array_keys($tal), array_keys($tal), array_keys($tal), array_keys($tal), array_keys($tal)))
-                    $conditions[] = ['id', $talIds];
+                $talIds = array_column($tal, 'entryOrGUID');
+                if ($_ = DB::World()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryOrGUID > 0 AND source_type = ?d AND action_type IN (?a) AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a))', $src, SAI_ACTION_ALL_TIMED_ACTION_LISTS, $talIds, $talIds, $talIds, $talIds, $talIds, $talIds))
+                    $ids = $_;
 
                 $smartS = array_diff($smartS, $tal);
             }
-
             if ($smartS);
-                $ids = $smartS;
+                $ids = array_merge($ids, array_column($smartS, 'entryOrGUID'));
         }
 
         return $ids;

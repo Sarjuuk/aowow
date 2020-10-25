@@ -1313,7 +1313,7 @@ define('SAI_EVENT_FLAG_WHILE_CHARMED', 0x0200);
 
 define('SAI_EVENT_UPDATE_IC',               0);             // In combat.
 define('SAI_EVENT_UPDATE_OOC',              1);             // Out of combat.
-define('SAI_EVENT_HEALT_PCT',               2);             // Health Percentage
+define('SAI_EVENT_HEALTH_PCT',              2);             // Health Percentage
 define('SAI_EVENT_MANA_PCT',                3);             // Mana Percentage
 define('SAI_EVENT_AGGRO',                   4);             // On Creature Aggro
 define('SAI_EVENT_KILL',                    5);             // On Creature Kill
@@ -1389,6 +1389,11 @@ define('SAI_EVENT_FRIENDLY_HEALTH_PCT',     74);            //
 define('SAI_EVENT_DISTANCE_CREATURE',       75);            // On creature guid OR any instance of creature entry is within distance.
 define('SAI_EVENT_DISTANCE_GAMEOBJECT',     76);            // On gameobject guid OR any instance of gameobject entry is within distance.
 define('SAI_EVENT_COUNTER_SET',             77);            // If the value of specified counterID is equal to a specified value
+// define('SAI_EVENT_SCENE_START',             78);         // don't use on 3.3.5a
+// define('SAI_EVENT_SCENE_TRIGGER',           79);         // don't use on 3.3.5a
+// define('SAI_EVENT_SCENE_CANCEL',            80);         // don't use on 3.3.5a
+// define('SAI_EVENT_SCENE_COMPLETE',          81);         // don't use on 3.3.5a
+define('SAI_EVENT_SUMMONED_UNIT_DIES',      82);            // CreatureId(0 all), CooldownMin, CooldownMax
 
 define('SAI_ACTION_NONE',                               0);   //  Do nothing
 define('SAI_ACTION_TALK',                               1);   //  Param2 in Milliseconds.
@@ -1436,7 +1441,7 @@ define('SAI_ACTION_SET_INVINCIBILITY_HP_LEVEL',         42);  //  If you use bot
 define('SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL',            43);  //  Mount to Creature Entry (param1) OR Mount to Creature Display (param2) Or both = 0 for Unmount
 define('SAI_ACTION_SET_INGAME_PHASE_MASK',              44);  //
 define('SAI_ACTION_SET_DATA',                           45);  //  Set Data For Target, can be used with SMART_EVENT_DATA_SET
-// define('SAI_ACTION_UNUSED_46',                       46);  //
+define('SAI_ACTION_ATTACK_STOP',                        46);  //
 define('SAI_ACTION_SET_VISIBILITY',                     47);  //  Makes creature Visible = 1  or  Invisible = 0
 define('SAI_ACTION_SET_ACTIVE',                         48);  //
 define('SAI_ACTION_ATTACK_START',                       49);  //  Allows basic melee swings to creature.
@@ -1460,7 +1465,7 @@ define('SAI_ACTION_SET_ORIENTATION',                    66);  //
 define('SAI_ACTION_CREATE_TIMED_EVENT',                 67);  //
 define('SAI_ACTION_PLAYMOVIE',                          68);  //
 define('SAI_ACTION_MOVE_TO_POS',                        69);  //  PointId is called by SMART_EVENT_MOVEMENTINFORM. Continue this action with the TARGET_TYPE column. Use any target_type, and use target_x, target_y, target_z, target_o as the coordinates
-define('SAI_ACTION_ENABLE_TEMP_GOBJ',                   70);  //  Always action_param1>0 For npcs use action_type=133
+define('SAI_ACTION_ENABLE_TEMP_GOBJ',                   70);  //  param1 = duration
 define('SAI_ACTION_EQUIP',                              71);  //  only slots with mask set will be sent to client, bits are 1, 2, 4, leaving mask 0 is defaulted to mask 7 (send all), Slots1-3 are only used if no Param1 is set
 define('SAI_ACTION_CLOSE_GOSSIP',                       72);  //  Closes gossip window.
 define('SAI_ACTION_TRIGGER_TIMED_EVENT',                73);  //
@@ -1475,7 +1480,7 @@ define('SAI_ACTION_SET_NPC_FLAG',                       81);  //
 define('SAI_ACTION_ADD_NPC_FLAG',                       82);  //
 define('SAI_ACTION_REMOVE_NPC_FLAG',                    83);  //
 define('SAI_ACTION_SIMPLE_TALK',                        84);  //  Makes a player say text. SMART_EVENT_TEXT_OVER is not triggered and whispers can not be used.
-define('SAI_ACTION_INVOKER_CAST',                       85);  //  if avaliable, last used invoker will cast spellId with castFlags on targets
+define('SAI_ACTION_SELF_CAST',                          85);  //  spellID, castFlags
 define('SAI_ACTION_CROSS_CAST',                         86);  //  This action is used to make selected caster (in CasterTargetType) to cast spell. Actual target is entered in target_type as normally.
 define('SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST',       87);  //  Will select one entry from the ones provided. 0 is ignored.
 define('SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST', 88);  //  0 is ignored.
@@ -1517,19 +1522,28 @@ define('SAI_ACTION_ADD_THREAT',                         123); //
 define('SAI_ACTION_LOAD_EQUIPMENT',                     124); //
 define('SAI_ACTION_TRIGGER_RANDOM_TIMED_EVENT',         125); //
 define('SAI_ACTION_REMOVE_ALL_GAMEOBJECTS',             126); //
-define('SAI_ACTION_STOP_MOTION',                        127); //
-// define('SAI_ACTION_PLAY_ANIMKIT',                    128); //  // don't use on 3.3.5a
-// define('SAI_ACTION_SCENE_PLAY',                      129); //  // don't use on 3.3.5a
-// define('SAI_ACTION_SCENE_CANCEL',                    130); //  // don't use on 3.3.5a
+define('SAI_ACTION_PAUSE_MOVEMENT',                     127); //  MovementSlot (default = 0, active = 1, controlled = 2), PauseTime (ms), Force
+// define('SAI_ACTION_PLAY_ANIMKIT',                    128); //  don't use on 3.3.5a
+// define('SAI_ACTION_SCENE_PLAY',                      129); //  don't use on 3.3.5a
+// define('SAI_ACTION_SCENE_CANCEL',                    130); //  don't use on 3.3.5a
 define('SAI_ACTION_SPAWN_SPAWNGROUP',                   131); //
 define('SAI_ACTION_DESPAWN_SPAWNGROUP',                 132); //
-define('SAI_ACTION_RESPAWN_BY_SPAWNID',                 133); //  Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)
+define('SAI_ACTION_RESPAWN_BY_SPAWNID',                 133); //  type, typeGuid - Use to respawn npcs and gobs, the target in this case is always=1 and only a single unit could be a target via the spawnId (action_param1, action_param2)
+define('SAI_ACTION_INVOKER_CAST',                       134); //  spellID, castFlags
+define('SAI_ACTION_PLAY_CINEMATIC',                     135); //  cinematic
+define('SAI_ACTION_SET_MOVEMENT_SPEED',                 136); //  movementType, speedInteger, speedFraction
+define('SAI_ACTION_PLAY_SPELL_VISUAL_KIT',              137); //  spellVisualKitId (RESERVED, PENDING CHERRYPICK)
+define('SAI_ACTION_OVERRIDE_LIGHT',                     138); //  zoneId, areaLightId, overrideLightID, transitionMilliseconds
+define('SAI_ACTION_OVERRIDE_WEATHER',                   139); //  zoneId, weatherId, intensity
+
+define('SAI_ACTION_ALL_SPELLCASTS',         [SAI_ACTION_CAST, SAI_ACTION_ADD_AURA, SAI_ACTION_INVOKER_CAST, SAI_ACTION_SELF_CAST, SAI_ACTION_CROSS_CAST]);
+define('SAI_ACTION_ALL_TIMED_ACTION_LISTS', [SAI_ACTION_CALL_TIMED_ACTIONLIST, SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST, SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST]);
 
 define('SAI_CAST_FLAG_INTERRUPT_PREV', 0x01);
 define('SAI_CAST_FLAG_TRIGGERED',      0x02);
-// define('SAI_CAST_FORCE_CAST',          0x04);               // Forces cast even if creature is out of mana or out of range
-// define('SAI_CAST_NO_MELEE_IF_OOM',     0x08);               // Prevents creature from entering melee if out of mana or out of range
-// define('SAI_CAST_FORCE_TARGET_SELF',   0x10);               // the target to cast this spell on itself
+// define('SAI_CAST_FORCE_CAST',          0x04);            // Forces cast even if creature is out of mana or out of range
+// define('SAI_CAST_NO_MELEE_IF_OOM',     0x08);            // Prevents creature from entering melee if out of mana or out of range
+// define('SAI_CAST_FORCE_TARGET_SELF',   0x10);            // the target to cast this spell on itself
 define('SAI_CAST_FLAG_AURA_MISSING',   0x20);
 define('SAI_CAST_FLAG_COMBAT_MOVE',    0x40);
 
@@ -1576,7 +1590,8 @@ define('SAI_TARGET_CLOSEST_ENEMY',          25);            //  Any attackable t
 define('SAI_TARGET_CLOSEST_FRIENDLY',       26);            //  Any friendly unit (creature, player or pet) within maxDist
 define('SAI_TARGET_LOOT_RECIPIENTS',        27);            //  All tagging players
 define('SAI_TARGET_FARTHEST',               28);            //  Farthest unit on the threat list
-define('SAI_TARGET_VEHICLE_ACCESSORY',      29);            //  Vehicle can target unit in given seat
+define('SAI_TARGET_VEHICLE_PASSENGER',      29);            //  Vehicle can target unit in given seat
+define('SAI_TARGET_CLOSEST_UNSPAWNED_GO',   30);            //  entry(0any), maxDist
 
 define('SAI_TEMPLATE_BASIC',          0);                   //
 define('SAI_TEMPLATE_CASTER',         1);                   //  +JOIN: target_param1 as castFlag
@@ -1584,6 +1599,11 @@ define('SAI_TEMPLATE_TURRET',         2);                   //  +JOIN: target_pa
 define('SAI_TEMPLATE_PASSIVE',        3);                   //
 define('SAI_TEMPLATE_CAGED_GO_PART',  4);                   //
 define('SAI_TEMPLATE_CAGED_NPC_PART', 5);                   //
+
+define('SAI_SPAWN_FLAG_NONE',           0x00);
+define('SAI_SPAWN_FLAG_IGNORE_RESPAWN', 0x01);               // onSpawnIn - ignore & reset respawn timer
+define('SAI_SPAWN_FLAG_FORCE_SPAWN',    0x02);               // onSpawnIn - force additional spawn if already in world
+define('SAI_SPAWN_FLAG_NOSAVE_RESPAWN', 0x04);               // onDespawn - remove respawn time
 
 // profiler queue interactions
 define('PR_QUEUE_STATUS_ENDED',   0);
