@@ -211,11 +211,11 @@ class NpcPage extends GenericPage
                 if ($flagsExtra & 0x000040)
                     $buff[] = 'Rewards no experience';
                 if ($flagsExtra & 0x000080)
-                    $buff[] = 'Trigger-Creature';
+                    $buff[] = 'Trigger creature';
                 if ($flagsExtra & 0x000100)
                     $buff[] = 'Immune to Taunt';
                 if ($flagsExtra & 0x008000)
-                    $buff[] = "[tooltip name=guard]- engages PvP-Attacker\n- ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]";
+                    $buff[] = "[tooltip name=guard]- engages PvP attackers\n- ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]";
                 if ($flagsExtra & 0x020000)
                     $buff[] = 'Cannot deal Critical Hits';
                 if ($flagsExtra & 0x040000)
