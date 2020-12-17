@@ -1472,7 +1472,7 @@ $lang = array(
             "Inscription",                          "Open From Vehicle"
         ),
         'stealthType'   => ["General", "Trap"],
-        'invisibilityType' => ["General", 3 => "Trap", 6 => "Drunk"],
+        'invisibilityType' => [null, "General", null, "Trap", null, null, "Drunk", null, null, null, null, null],
         'attributes'    => array(                           // index defined by filters
             69 => "All spell effects are harmful",
             57 => "Aura cannot be cancelled",

@@ -1472,7 +1472,7 @@ $lang = array(
             "Начертание",                           "Открыть на ходу"
         ),
         'stealthType'   => ["GENERAL", "TRAP"],
-        'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"],
+        'invisibilityType' => [null, "General", null, "Trap", null, null, "Drunk", null, null, null, null, null],
         'attributes'    => array(                           // index defined by filters
             69 => "Все пагубные эффекты заклинаний",
             57 => "Эффект не может быть отменен",

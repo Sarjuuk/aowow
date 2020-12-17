@@ -1472,7 +1472,7 @@ $lang = array(
             "Inscripción",                          "Abrir desde vehículo"
         ),
         'stealthType'   => ["GENERAL", "TRAP"],
-        'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"],
+        'invisibilityType' => [null, "General", null, "Trap", null, null, "Drunk", null, null, null, null, null],
         'attributes'    => array(                           // index defined by filters
             69 => "Todos los efectos de Hechizos son perjudiciales",
             57 => "El aura no se puede cancelar",

@@ -1472,7 +1472,7 @@ $lang = array(
             "Calligraphie",                         "Ouverture à partir d'un véhicule",
         ),
         'stealthType'   => ["GENERAL", "TRAP"],
-        'invisibilityType' => ["GENERAL", 3 => "TRAP", 6 => "DRUNK"],
+        'invisibilityType' => [null, "General", null, "Trap", null, null, "Drunk", null, null, null, null, null],
         'attributes'    => array(                           // index defined by filters
             69 => "Tous les effets de sort sont nuisibles",
             57 => "L'aura ne peut être annulée",
