@@ -22,6 +22,8 @@
                 <h1<?=(isset($this->expansion) ? ' class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name); ?></h1>
 
 <?php
+    $this->brick('article');
+
 if (isset($this->extraText)):
 ?>
     <div id="text-generic" class="left"></div>
@@ -35,8 +37,6 @@ if (isset($this->extraText)):
     <div class="pad2"></div>
 <?php
 endif;
-
-    $this->brick('article');
 
     $this->brick('mapper');
 
