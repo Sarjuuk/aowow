@@ -2261,7 +2261,7 @@ class SpellPage extends GenericPage
                 if ($_ = DB::World()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryOrGUID > 0 AND source_type = ?d AND action_type IN (?a) AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a))', $src, SAI_ACTION_ALL_TIMED_ACTION_LISTS, $talIds, $talIds, $talIds, $talIds, $talIds, $talIds))
                     $ids = $_;
 
-                $smartS = array_diff($smartS, $tal);
+                $smartS = array_diff_key($smartS, $tal);
             }
             if ($smartS);
                 $ids = array_merge($ids, array_column($smartS, 'entryOrGUID'));
