@@ -648,7 +648,6 @@ $lang = array(
             SAI_ACTION_LOAD_EQUIPMENT                     => ['(%2$d)?Lege nicht-standart Ausrüstung ab:Rüste %7$s; von Ausrüstungs-Template #[b]%1$d[/b] an #target#(%8$d)?: aus;.', 'Hinweis: Gegenstände für Kreaturen haben nicht zwingend ein Gegenstands-Template'],
             SAI_ACTION_TRIGGER_RANDOM_TIMED_EVENT         => ['Löse definiertes verzögertes Ereignis innerhalb von %7$s aus.', null],
             SAI_ACTION_REMOVE_ALL_GAMEOBJECTS             => ['Entferne alle Gameobjects von #target#.', null],
-            SAI_ACTION_STOP_MOTION                        => ['(%1$d)?Entferne motion type #[b]%1$d[/b] von #target#. :;(%2$d)?Beende Bewegung.:;', null],
             SAI_ACTION_PAUSE_MOVEMENT                     => ['Pausiere Bewegung aus Slot #[b]%1$d[/b] für %7$s.', 'Erzwungen'],
             null,                                           // SAI_ACTION_PLAY_ANIMKIT = 128,    // don't use on 3.3.5a
             null,                                           // SAI_ACTION_SCENE_PLAY = 129,    // don't use on 3.3.5a

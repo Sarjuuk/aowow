@@ -285,11 +285,20 @@ class Profiler
             return false;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
-        $profileId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
-        if (!$profileId)
+        $profile = DB::Aowow()->selectRow('SELECT id, lastupdated FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
+        if (!$profile)
             return false;                                   // well ... it failed
 
-        CLI::write('fetching char #'.$charGuid.' from realm #'.$realmId);
+        $profileId = $profile['id'];
+
+        CLI::write('fetching char '.$char['name'].' (#'.$charGuid.') from realm #'.$realmId);
+
+        if (!$char['online'] && $char['logout_time'] <= $profile['lastupdated'])
+        {
+            CLI::write('char did not log in since last update. skipping...');
+            return true;
+        }
+
         CLI::write('writing...');
 
         $ra = (1 << ($char['race']  - 1));

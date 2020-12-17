@@ -10,7 +10,7 @@ abstract class BaseType
     public    $error     = true;
 
     protected $templates = [];
-    protected $curTpl    = [];                              // lets iterate!
+    protected $curTpl    = [];
     protected $matches   = 0;                               // total matches unaffected by sqlLimit in config
 
     protected $dbNames   = ['Aowow'];                       // multiple DBs in profiler
@@ -59,7 +59,6 @@ abstract class BaseType
         $where     = [];
         $linking   = ' AND ';
         $limit     = CFG_SQL_LIMIT_DEFAULT;
-        $className = get_class($this);
 
         if (!$this->queryBase || $conditions === null)
             return;
@@ -270,7 +269,7 @@ abstract class BaseType
                 foreach ($rows as $id => $row)
                 {
                     if (isset($this->templates[$id]))
-                        trigger_error('guid for List already in use #'.$id, E_USER_WARNING);
+                        trigger_error('GUID for List already in use #'.$id.'. Additional occurrence omitted!', E_USER_ERROR);
                     else
                         $this->templates[$id] = $row;
                 }
@@ -573,7 +572,7 @@ trait spawnHelper
         }
     }
 
-    private function createFullSpawns()                     // for display on map (objsct/npc detail page)
+    private function createFullSpawns()                     // for display on map (object/npc detail page)
     {
         $data     = [];
         $wpSum    = [];

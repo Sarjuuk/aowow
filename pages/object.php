@@ -111,7 +111,7 @@ class ObjectPage extends GenericPage
 
                 // if no propper item is found use a skill
                 if ($locks)
-                    $infobox[] = $l ? $l : array_pop($locks);
+                    $infobox[] = $l ?: array_pop($locks);
             }
         }
 
