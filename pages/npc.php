@@ -174,17 +174,14 @@ class NpcPage extends GenericPage
         if ($this->subject->getField('vehicleId'))
             $infobox[] = Lang::npc('vehicle');
 
-        // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
+            // AI
             if ($_ = $this->subject->getField('scriptName'))
                 $infobox[] = 'Script'.Lang::main('colon').$_;
             else if ($_ = $this->subject->getField('aiName'))
                 $infobox[] = 'AI'.Lang::main('colon').$_;
-        }
 
-        if (User::isInGroup(U_GROUP_STAFF))
-        {
             // Mechanic immune
             if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
             {
@@ -231,6 +228,16 @@ class NpcPage extends GenericPage
 
                 if ($buff)
                     $infobox[] = 'Extra Flags'.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $buff).'[/li][/ul]';
+            }
+
+            // Mode dummy references
+            if ($_altNPCs)
+            {
+                $this->extendGlobalData($_altNPCs->getJSGlobals());
+                $buff = 'Difficulty Versions'.Lang::main('colon').'[ul]';
+                foreach ($_altNPCs->iterate() as $id => $__)
+                    $buff .= '[li][npc='.$id.'][/li]';
+                $infobox[] = $buff.'[/ul]';
             }
         }
 
