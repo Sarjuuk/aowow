@@ -11,7 +11,7 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'creature';
 
-    protected $tblDependancyTC = ['creature_template', 'creature_template_locale', 'creature_classlevelstats', 'instance_encounters'];
+    protected $tblDependancyTC = ['creature_template', 'creature_template_locale', 'creature_template_resistance', 'creature_template_spell', 'creature_classlevelstats', 'instance_encounters'];
     protected $dbcSourceFiles  = ['creaturedisplayinfo', 'creaturedisplayinfoextra'];
 
     public function generate(array $ids = []) : bool
@@ -65,6 +65,7 @@ SqlGen::register(new class extends SetupScript
                 max.basemana  * ct.ManaModifier AS manaMax,
                 min.basearmor * ct.ArmorModifier AS armorMin,
                 max.basearmor * ct.ArmorModifier AS armorMax,
+                IFNULL(ctr1.Resistance, 0), IFNULL(ctr2.Resistance, 0), IFNULL(ctr3.Resistance, 0), IFNULL(ctr4.Resistance, 0), IFNULL(ctr5.Resistance, 0), IFNULL(ctr6.Resistance, 0),
                 RacialLeader,
                 mechanic_immune_mask,
                 flags_extra,
@@ -107,6 +108,18 @@ SqlGen::register(new class extends SetupScript
                 creature_template_spell cts6 ON ct.entry = cts6.CreatureID AND cts6.Index = 6
             LEFT JOIN
                 creature_template_spell cts7 ON ct.entry = cts7.CreatureID AND cts7.Index = 7
+            LEFT JOIN
+                creature_template_resistance ctr1 ON ct.entry = ctr1.CreatureID AND ctr1.School = 1
+            LEFT JOIN
+                creature_template_resistance ctr2 ON ct.entry = ctr2.CreatureID AND ctr2.School = 2
+            LEFT JOIN
+                creature_template_resistance ctr3 ON ct.entry = ctr3.CreatureID AND ctr3.School = 3
+            LEFT JOIN
+                creature_template_resistance ctr4 ON ct.entry = ctr4.CreatureID AND ctr4.School = 4
+            LEFT JOIN
+                creature_template_resistance ctr5 ON ct.entry = ctr5.CreatureID AND ctr5.School = 5
+            LEFT JOIN
+                creature_template_resistance ctr6 ON ct.entry = ctr6.CreatureID AND ctr6.School = 6
             WHERE
                 ct.entry > ?d
             {

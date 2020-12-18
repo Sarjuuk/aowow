@@ -117,7 +117,7 @@ class CreatureList extends BaseType
         return !$data ? 0 : $data[array_rand($data)];
     }
 
-    public function getBaseStats($type)
+    public function getBaseStats(string $type) : array
     {
         // i'm aware of the BaseVariance/RangedVariance fields ... i'm just totaly unsure about the whole damage calculation
         switch ($type)
@@ -142,8 +142,14 @@ class CreatureList extends BaseType
                 $rngMin = ($this->getField('dmgMin')       + ($this->getField('rngAtkPwrMin') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
                 $rngMax = ($this->getField('dmgMax') * 1.5 + ($this->getField('rngAtkPwrMax') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
                 return [$rngMin, $rngMax];
+            case 'resistance':
+                $r = [];
+                for ($i = SPELL_SCHOOL_HOLY; $i < SPELL_SCHOOL_ARCANE+1; $i++)
+                    $r[$i] = $this->getField('resistance'.$i);
+
+                return $r;
             default:
-                return [0, 0];
+                return [];
         }
     }
 

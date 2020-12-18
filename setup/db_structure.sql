@@ -560,6 +560,12 @@ CREATE TABLE `aowow_creature` (
   `manaMax` int(10) unsigned NOT NULL DEFAULT 1,
   `armorMin` mediumint(8) unsigned NOT NULL DEFAULT 1,
   `armorMax` mediumint(8) unsigned NOT NULL DEFAULT 1,
+  `resistance1` smallint(5) NOT NULL DEFAULT 0,
+  `resistance2` smallint(5) NOT NULL DEFAULT 0,
+  `resistance3` smallint(5) NOT NULL DEFAULT 0,
+  `resistance4` smallint(5) NOT NULL DEFAULT 0,
+  `resistance5` smallint(5) NOT NULL DEFAULT 0,
+  `resistance6` smallint(5) NOT NULL DEFAULT 0,
   `racialLeader` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `mechanicImmuneMask` int(10) unsigned NOT NULL DEFAULT 0,
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT 0,
@@ -3132,7 +3138,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1591223186,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1608244865,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

@@ -891,6 +891,7 @@ $lang = array(
         'melee'         => "Nahkampf",
         'ranged'        => "Fernkampf",
         'armor'         => "Rüstung",
+        'resistances'   => "Widerstände",
         'foundIn'       => "Dieser NPC befindet sich in",
         'tameable'      => "Zähmbar (%s)",
         'waypoint'      => "Wegpunkt",

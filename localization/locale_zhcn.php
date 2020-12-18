@@ -892,6 +892,7 @@ $lang = array(
         'melee'         => "近战",
         'ranged'        => "远程",
         'armor'         => "护甲",
+        'resistances'   => "韧性",
         'foundIn'       => "这个NPC能在以下地区找到：",
         'tameable'      => "可驯服的(%s)",
         'waypoint'      => "路径点",

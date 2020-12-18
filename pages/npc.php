@@ -17,6 +17,7 @@ class NpcPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
+    protected $css           = [['path' => 'Profiler.css']];
 
     private   $soundIds      = [];
     private   $powerTpl      = '$WowheadPower.registerNpc(%d, %d, %s);';
@@ -105,6 +106,9 @@ class NpcPage extends GenericPage
             else                                            // 2 versions; may be Heroic (use this), but may also be 10/25-raid
                 $mapType = 1;
         }
+
+
+
 
 
         /***********/
@@ -247,6 +251,23 @@ class NpcPage extends GenericPage
         $armor = $this->subject->getBaseStats('armor');
         $stats['armor'] = Lang::npc('armor').Lang::main('colon').($armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
 
+        // Resistances
+        $resNames = [null, 'hol', 'fir', 'nat', 'fro', 'sha', 'arc'];
+        $tmpRes   = [];
+        $stats['resistance'] = '';
+        foreach ($this->subject->getBaseStats('resistance') as $sc => $amt)
+            if ($amt)
+                $tmpRes[] = '[span class="moneyschool'.$resNames[$sc].'"]'.$amt.'[/span]';
+
+        if ($tmpRes)
+        {
+            $stats['resistance'] = Lang::npc('resistances').Lang::main('colon');
+            if (count($tmpRes > 3))
+                $stats['resistance'] .= implode('&nbsp;', array_slice($tmpRes, 0, 3)).'[br]'.implode('&nbsp;', array_slice($tmpRes, 3));
+            else
+                $stats['resistance'] .= implode('&nbsp;', $tmpRes);
+        }
+
         // Melee Damage
         $melee = $this->subject->getBaseStats('melee');
         if ($_ = $this->subject->getField('dmgSchool'))     // magic damage
@@ -280,6 +301,22 @@ class NpcPage extends GenericPage
                     // Armor
                     $armor = $_altNPCs->getBaseStats('armor');
                     $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
+
+                    // Resistances
+                    $tmpRes = '';
+                    foreach ($_altNPCs->getBaseStats('resistance') as $sc => $amt)
+                        $tmpRes .= '[td]'.$amt.'[/td]';
+
+                    if ($tmpRes)
+                    {
+                        if (!isset($modes['resistance']))   // init table head
+                            $modes['resistance'][] = '[td][/td][td][span class="moneyschoolhol"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolfir"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolnat"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolfro"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolsha"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolarc"][/span][/td]';
+
+                        if (!$stats['resistance'])          // base creature has no resistance. -> display list item.
+                            $stats['resistance'] = Lang::npc('resistances').Lang::main('colon').'…';
+
+                        $modes['resistance'][] = '[td]'.$m.'&nbsp;&nbsp;&nbsp;&nbsp;[/td]'.$tmpRes;
+                    }
 
                     // Melee Damage
                     $melee = $_altNPCs->getBaseStats('melee');

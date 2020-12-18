@@ -892,6 +892,7 @@ $lang = array(
         'melee'         => "de mêlée",
         'ranged'        => "à distance",
         'armor'         => "Armure",
+        'resistances'   => "Résistances",
         'foundIn'       => "Ce PNJ se trouve dans",
         'tameable'      => "Domptable (%s)",
         'waypoint'      => "Point de route",

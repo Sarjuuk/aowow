@@ -892,6 +892,7 @@ $lang = array(
         'melee'         => "Melee",
         'ranged'        => "Ranged",
         'armor'         => "Armor",
+        'resistances'   => "Resistances",
         'foundIn'       => "This NPC can be found in",
         'tameable'      => "Tameable (%s)",
         'waypoint'      => "Waypoint",
