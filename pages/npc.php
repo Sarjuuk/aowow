@@ -37,7 +37,7 @@ class NpcPage extends GenericPage
             $this->notFound(Lang::game('npc'), Lang::npc('notFound'));
 
         $this->name    = Util::htmlEscape($this->subject->getField('name', true));
-        $this->subname = $this->subject->getField('subname', true);
+        $this->subname = Util::htmlEscape($this->subject->getField('subname', true));
     }
 
     protected function generatePath()

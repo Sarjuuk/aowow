@@ -81,10 +81,10 @@ class CreatureList extends BaseType
             $row3[] = '('.$_.')';
 
         $x  = '<table>';
-        $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
+        $x .= '<tr><td><b class="q">'.Util::htmlEscape($this->getField('name', true)).'</b></td></tr>';
 
         if ($sn = $this->getField('subname', true))
-            $x .= '<tr><td>'.$sn.'</td></tr>';
+            $x .= '<tr><td>'.Util::htmlEscape($sn).'</td></tr>';
 
         $x .= '<tr><td>'.implode(' ', $row3).'</td></tr>';
 
