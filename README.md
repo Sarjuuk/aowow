@@ -41,8 +41,8 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 ## Install
 
 #### 1. Acquire the required repositories
-`git clone git@github.com:Sarjuuk/aowow.git aowow`  
-`git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
+`git clone https://github.com/azerothcore/aowow.git aowow`  
+`git clone https://github.com/Sarjuuk/MPQExtractor.git MPQExtractor`  
 
 #### 2. Prepare the database  
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
