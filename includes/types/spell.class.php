@@ -959,7 +959,7 @@ class SpellList extends BaseType
         $cond  = $COND  = function($a, $b, $c) { return $a ? $b : $c; };
         $eq    = $EQ    = function($a, $b)     { return $a == $b;     };
         $gt    = $GT    = function($a, $b)     { return $a > $b;      };
-        $gte   = $GTE   = function($a, $b)     { return $a <= $b;     };
+        $gte   = $GTE   = function($a, $b)     { return $a >= $b;     };
         $floor = $FLOOR = function($a)         { return floor($a);    };
         $max   = $MAX   = function($a, $b)     { return max($a, $b);  };
         $min   = $MIN   = function($a, $b)     { return min($a, $b);  };
@@ -994,7 +994,7 @@ class SpellList extends BaseType
                 $cond  = $COND  = !$this->interactive ? 'COND'  : sprintf(Util::$dfnString, 'COND(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>, <span class=\'q1\'>c</span>)<br /> <span class=\'q1\'>a</span> ? <span class=\'q1\'>b</span> : <span class=\'q1\'>c</span>', 'COND');
                 $eq    = $EQ    = !$this->interactive ? 'EQ'    : sprintf(Util::$dfnString, 'EQ(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> == <span class=\'q1\'>b</span>', 'EQ');
                 $gt    = $GT    = !$this->interactive ? 'GT'    : sprintf(Util::$dfnString, 'GT(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> > <span class=\'q1\'>b</span>', 'GT');
-                $gte   = $GTE   = !$this->interactive ? 'GTE'   : sprintf(Util::$dfnString, 'GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> <= <span class=\'q1\'>b</span>', 'GT');
+                $gte   = $GTE   = !$this->interactive ? 'GTE'   : sprintf(Util::$dfnString, 'GTE(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)<br /> <span class=\'q1\'>a</span> >= <span class=\'q1\'>b</span>', 'GTE');
                 $floor = $FLOOR = !$this->interactive ? 'FLOOR' : sprintf(Util::$dfnString, 'FLOOR(<span class=\'q1\'>a</span>)', 'FLOOR');
                 $min   = $MIN   = !$this->interactive ? 'MIN'   : sprintf(Util::$dfnString, 'MIN(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MIN');
                 $max   = $MAX   = !$this->interactive ? 'MAX'   : sprintf(Util::$dfnString, 'MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');

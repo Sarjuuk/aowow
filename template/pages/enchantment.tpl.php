@@ -47,7 +47,7 @@ foreach ($this->effects as $i => $e):
                         <th><?php echo Lang::spell('_effect').' #'.$i; ?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
-    echo '                            '.$e['name'].(!empty($e['tip']) ? Lang::main('colon').'(<span class="tip" id="efftip-'.$i.'"></span>)' : '').'<small>';
+    echo '                            '.$e['name'].(!empty($e['tip']) ? Lang::main('colon').'(<span '.(User::isInGroup(U_GROUP_EMPLOYEE) ? 'class="tip" ' : '').'id="efftip-'.$i.'"></span>)' : '').'<small>';
 
     if (isset($e['value'])):
         echo '<br>'.Lang::spell('_value').Lang::main('colon').$e['value'];
