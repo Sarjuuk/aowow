@@ -121,6 +121,7 @@ class ItemPage extends genericPage
         $_subClass  = $this->subject->getField('subClass');
         $_bagFamily = $this->subject->getField('bagFamily');
         $_model     = $this->subject->getField('displayId');
+        $_ilvl      = $this->subject->getField('itemLevel');
         $_visSlots  = array(
             INVTYPE_HEAD,           INVTYPE_SHOULDERS,      INVTYPE_BODY,           INVTYPE_CHEST,          INVTYPE_WAIST,          INVTYPE_LEGS,           INVTYPE_FEET,           INVTYPE_WRISTS,
             INVTYPE_HANDS,          INVTYPE_WEAPON,         INVTYPE_SHIELD,         INVTYPE_RANGED,         INVTYPE_CLOAK,          INVTYPE_2HWEAPON,       INVTYPE_TABARD,         INVTYPE_ROBE,
@@ -134,8 +135,8 @@ class ItemPage extends genericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // itemlevel
-        if (in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION]) || $this->subject->getField('gemEnchantmentId'))
-            $infobox[] = Lang::game('level').Lang::main('colon').$this->subject->getField('itemLevel');
+        if ($_ilvl && in_array($_class, [ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON, ITEM_CLASS_AMMUNITION, ITEM_CLASS_GEM]))
+            $infobox[] = Lang::game('level').Lang::main('colon').$_ilvl;
 
         // account-wide
         if ($_flags & ITEM_FLAG_ACCOUNTBOUND)
@@ -294,7 +295,7 @@ class ItemPage extends genericPage
             {
                 $_ = $this->subject->getField('requiredDisenchantSkill');
                 if ($_ < 1)                                 // these are some items, that never went live .. extremely rough emulation here
-                    $_ = intVal($this->subject->getField('itemLevel') / 7.5) * 25;
+                    $_ = intVal($_ilvl / 7.5) * 25;
 
                 $infobox[] = Lang::item('disenchantable').'&nbsp;([tooltip=tooltip_reqenchanting]'.$_.'[/tooltip])';
             }
@@ -671,10 +672,10 @@ class ItemPage extends genericPage
                     ['class',         $_class],
                     ['subClass',      $_subClass],
                     ['slot',          $_slot],
-                    ['itemLevel',     $this->subject->getField('itemLevel') - 15, '>'],
-                    ['itemLevel',     $this->subject->getField('itemLevel') + 15, '<'],
+                    ['itemLevel',     $_ilvl - 15, '>'],
+                    ['itemLevel',     $_ilvl + 15, '<'],
                     ['quality',       $this->subject->getField('quality')],
-                    ['requiredClass', $this->subject->getField('requiredClass')]
+                    ['requiredClass', $this->subject->getField('requiredClass') ?: -1]  // todo: fix db data in setup and not on fetch
                 ]
             ]
         );
