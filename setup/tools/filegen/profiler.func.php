@@ -313,7 +313,7 @@ if (!CLI)
                     if (!$buff)
                     {
                         // this behaviour is intended, do not create an error
-                        CLI::write('profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_WARN);
+                        CLI::write('profiler - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_INFO);
                         continue;
                     }
 

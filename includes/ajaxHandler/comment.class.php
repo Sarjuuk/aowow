@@ -282,7 +282,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleCommentOutOfDate() : string
     {
-        $this->contentType = 'text/plain';
+        $this->contentType = MIME_TYPE_TEXT;
 
         if (!$this->_post['id'])
         {
@@ -320,7 +320,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyAdd() : string
     {
-        $this->contentType = 'text/plain';
+        $this->contentType = MIME_TYPE_TEXT;
 
         if (!User::canComment())
             return Lang::main('cannotComment');
@@ -343,7 +343,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyEdit() : string
     {
-        $this->contentType = 'text/plain';
+        $this->contentType = MIME_TYPE_TEXT;
 
         if (!User::canComment())
             return Lang::main('cannotComment');

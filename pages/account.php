@@ -433,7 +433,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         );
         if (!$ok)
             return Lang::main('intError');
-        else if ($_ = $this->sendMail(Lang::mail('accConfirm', 0), sprintf(Lang::mail('accConfirm', 1), $token), CFG_ACC_CREATE_SAVE_DECAY))
+        else if ($_ = $this->sendMail(Lang::user('accConfirm', 0), sprintf(Lang::user('accConfirm', 1), $token), CFG_ACC_CREATE_SAVE_DECAY))
         {
             if ($id = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ?', $token))
                 Util::gainSiteReputation($id, SITEREP_ACTION_REGISTER);
@@ -454,7 +454,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::mail('resetPass', 0), sprintf(Lang::mail('resetPass', 1), $token), CFG_ACC_RECOVERY_DECAY);
+        return $this->sendMail(Lang::user('resetPass', 0), sprintf(Lang::user('resetPass', 1), $token), CFG_ACC_RECOVERY_DECAY);
     }
 
     private function doResetPass()
@@ -486,7 +486,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::mail('recoverUser', 0), sprintf(Lang::mail('recoverUser', 1), $token), CFG_ACC_RECOVERY_DECAY);
+        return $this->sendMail(Lang::user('recoverUser', 0), sprintf(Lang::user('recoverUser', 1), $token), CFG_ACC_RECOVERY_DECAY);
     }
 
     private function initRecovery($type, $delay, &$token)
@@ -508,7 +508,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     {
         // send recovery mail
         $subj   = CFG_NAME_SHORT.Lang::main('colon') . $subj;
-        $msg   .= "\r\n\r\n".sprintf(Lang::mail('tokenExpires'), Util::formatTime($delay * 1000))."\r\n";
+        $msg   .= "\r\n\r\n".sprintf(Lang::user('tokenExpires'), Util::formatTime($delay * 1000))."\r\n";
         $header = 'From: '.CFG_CONTACT_EMAIL . "\r\n" .
                   'Reply-To: '.CFG_CONTACT_EMAIL . "\r\n" .
                   'X-Mailer: PHP/' . phpversion();

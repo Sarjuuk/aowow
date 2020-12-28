@@ -177,7 +177,7 @@ set_exception_handler(function ($ex)
         );
 
     if (!CLI)
-        (new GenericPage(null))->error();
+        (new GenericPage())->error();
     else
         echo 'Exception - '.$ex->getMessage()."\n   ".$ex->getFile(). '('.$ex->getLine().")\n".$ex->getTraceAsString()."\n";
 });
@@ -230,6 +230,20 @@ if (!CLI)
     if (!empty($AoWoWconf['aowow']) && User::init())
         User::save();                                       // save user-variables in session
 
+    // set up some logging (~10 queries will execute before we init the user and load the config)
+    if (CFG_DEBUG && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+    {
+        DB::Aowow()->setLogger(['DB', 'logger']);
+        DB::World()->setLogger(['DB', 'logger']);
+        if (DB::isConnected(DB_AUTH))
+            DB::Auth()->setLogger(['DB', 'logger']);
+
+        if (!empty($AoWoWconf['characters']))
+            foreach ($AoWoWconf['characters'] as $idx => $__)
+                if (DB::isConnected(DB_CHARACTERS . $idx))
+                    DB::Characters($idx)->setLogger(['DB', 'logger']);
+    }
+
     // hard-override locale for this call (should this be here..?)
     // all strings attached..
     if (!empty($AoWoWconf['aowow']))
@@ -244,7 +258,7 @@ if (!CLI)
     $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING']), 2)[0];
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
-    $pageParam = isset($_[1]) ? $_[1] : null;
+    $pageParam = isset($_[1]) ? $_[1] : '';
 
     Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str;
 }

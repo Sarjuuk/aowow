@@ -381,7 +381,7 @@ var mn_quests = [
         [4395, "Dalaran"],
         [4742, "Hrothgar's Landing"]
     ]],
-    [,"Othere"],
+    [,"Other"],
     [2, "Dungeons", , [
         [206, "Utgarde Keep"],
         [209, "Shadowfang Keep"],
@@ -964,7 +964,8 @@ var mn_database = [
     [, "Other"],
     [31, "Icons", "?icons", mn_icons],
     [19,"Sounds","?sounds",mn_sounds],
-    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}]     // aowow - custom
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Talent Calculator","?talent",mn_talentCalc],
@@ -3405,7 +3406,9 @@ var LANG = {
          19: ["Sound",       "sound",        "Sounds",       "sounds"],
          29: ["Icon",        "icon",         "Icons",        "icons"],
         501: ["Emote",       "emote",        "Emotes",       "emotes"],
-        502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"]
+        502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"],
+        503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
+        504: ["Mail",        "mail",         "Mails",        "mails"]
     },
 
     timeunitssg: ["year", "month", "week", "day", "hour", "minute", "second"],
@@ -4841,8 +4844,28 @@ var LANG = {
         targetstate:       "Target state"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement."
-    /* end custom */
+    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };

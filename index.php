@@ -48,6 +48,8 @@ switch ($pageCall)
     case 'itemset':
     case 'itemsets':
     case 'maps':                                            // tool: map listing
+    case 'mail':
+    case 'mails':
     case 'npc':
     case 'npcs':
     case 'object':
@@ -102,7 +104,7 @@ switch ($pageCall)
                     header('Location: '.$out, true, 302);
                 else
                 {
-                    header('Content-type: '.$ajax->getContentType());
+                    header($ajax->getContentType());
                     die($out);
                 }
             }

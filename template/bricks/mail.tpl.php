@@ -3,7 +3,7 @@ if ($m = $this->mail):
     if (!isset($offset))                                        // in case we have multiple icons on the page (prominently quest-rewards)
         $offset = 0;
 
-    echo '                        <h3>'.sprintf(Lang::quest('mailDelivery'), $m['sender'], $m['delay'])."</h3>\n";
+    echo '                        <h3>'.sprintf(Lang::mail('mailDelivery'), $m['id'], $m['sender'], $m['delay'])."</h3>\n";
 
     if ($m['subject']):
         echo '                        <div class="book"><div class="page">'.$m['subject']."</div></div>\n";

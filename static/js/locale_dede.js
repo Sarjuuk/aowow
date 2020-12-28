@@ -918,7 +918,8 @@ var mn_database = [
     [, "Anderes"],
     [19,"Klänge","?sounds",mn_sounds],
     [31, "Icons", "?icons", mn_icons],
-    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}]     // aowow - custom
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Briefe', '?mails']                               // aowow - custom
 ];
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],
@@ -3357,7 +3358,9 @@ var LANG = {
          19: ["Klang",           "Klang",            "Klänge",           "Klänge"],
          29: ["Icon",            "Icon",             "Icons",            "Icons"],
         501: ["Emote",           "Emote",            "Emotes",           "Emotes"],
-        502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"]
+        502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"],
+        503: ["Areatrigger",     "Areatrigger",      "Areatrigger",      "Areatrigger"],
+        504: ["Brief",           "Brief",            "Briefe",           "Briefe"]
     },
 
     timeunitssg: ["Jahr", "Monat", "Woche", "Tag", "Stunde", "Minute", "Sekunde"],
@@ -4794,8 +4797,28 @@ var LANG = {
         targetstate:       "Zielzustand"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "Jede einzelne, der hier aufgeführte Bedingungen, muss erfüllt sein um die Gesamtbedingung zu erfüllen.",
-    note_condition_group: "Eine beliebige, der hier aufgeführte Gruppen, muss vollständig erfüllt sein um die Gesamtbedingung zu erfüllen."
-    /* end custom */
+    note_condition_group: "Eine beliebige, der hier aufgeführte Gruppen, muss vollständig erfüllt sein um die Gesamtbedingung zu erfüllen.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Verhalten",
+    asr_coexist:          "koexistierend",
+    asr_exclusive:        "ausschließend",
+    asr_same_owner:       "(selber Spieler)",
+    asr_strongest_effect: "(stärkster Effekt)",
+
+    // Linked Spells
+    ls_trigger:           "Auslöser",
+    ls_self:              "Selbst",
+    ls_effects:           "Effekte",
+    ls_onCast:            "Zauber wird gewirkt",
+    ls_onAuraRemove:      "Aura endet",
+    ls_onAuraApply:       "Aura wird angewandt oder endet",
+    ls_onSpellHit:        "Zauber trifft",
+    ls_onTrigger:         "Zauber wird ausgelöst",
+    ls_onImmune:          "Immunität gegen diesen Zauber beginnt oder endet",
+
+    /* AoWoW: end custom */
 };

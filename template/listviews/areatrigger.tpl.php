@@ -27,10 +27,6 @@ Listview.templates.areatrigger = {
                 var a = $WH.ce('a');
                 a.style.fontFamily = 'Verdana, sans-serif';
                 a.href = this.getItemLink(areatrigger);
-                if (!areatrigger.name){
-                    areatrigger.name = 'Unnamed Areatrigger'
-                    a.className = 'q0';
-                }
 
                 $WH.ae(a, $WH.ct(areatrigger.name));
                 $WH.ae(wrapper, a);

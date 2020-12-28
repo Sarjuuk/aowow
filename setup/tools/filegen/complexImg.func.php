@@ -353,7 +353,7 @@ if (!CLI)
             $mapDirs = array(
                 ['maps/%snormal/',   'jpg',  488, 325],
                 ['maps/%soriginal/', 'jpg',    0,   0],     // 1002, 668
-                ['maps/%ssmall/',    'jpg',  224, 163],
+                ['maps/%ssmall/',    'jpg',  224, 149],
                 ['maps/%szoom/',     'jpg',  772, 515]
             );
 

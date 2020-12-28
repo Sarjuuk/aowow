@@ -917,7 +917,9 @@ var mn_database = [
     [6,"Zonas","?zones",mn_zones],
     [, "Otros"],
     [31, "Iconos", "?icons", mn_icons],
-    [19,"Sonidos","?sounds",mn_sounds]
+    [19,"Sonidos","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Calculadora de talentos","?talent",mn_talentCalc],
@@ -2101,14 +2103,14 @@ var g_zone_areas = {
      209: ['El Patio', 'Comedor', 'El Cubil Vacío', 'Observatorio inferior', 'Observatorio superior', 'Cámara de Lord Godfrey', 'El Camino de la Muralla'],
      719: ['La Alberca de Ask\'ar', 'Sagrario Lunar', 'Las Charcas del Olvido'],
      721: ['La Sala de Máquinas', 'Los Dormitorios', 'Aeropuerto', 'Cámara Manitas'],
-796: ['[Cementerio]', '[Biblioteca]', '[Armería]', '[Catedral]'],
+     796: ['[Cementerio]', '[Biblioteca]', '[Armería]', '[Catedral]'],
     1196: ['Pináculo inferior', 'Pináculo superior'],
     1337: ['Sala de los Guardianes', 'Trono de Khaz\'goroth'],
     1581: ['Las Minas de la Muerte', 'Cala del Acorazado'],
     1583: ['Tazz\'Alaor', 'Túneles de Arácnidas', 'Ciudad Hordemar', 'Sala de Puño Negro', 'Sala Dracopico', 'El Grajero', 'Estadio de Roca Negra'],
     1584: ['Bloque de Detención', 'Ciudad Forjatiniebla'],
     2017: ['Plaza de los Cruzados', 'El Guantelete'],
-2057: ['El Relicario', 'Cámara de la Invocación', 'Sala Rectoral', '[Barov Family Vault]'],
+    2057: ['El Relicario', 'Cámara de la Invocación', 'Sala Rectoral', '[Barov Family Vault]'],
     2100: ['Cavernas de Maraudon', 'Tumba de Zaetar'],
     2557: ['Ágora de Gordok', 'Jardines de la Capital', 'Corte de los Altonato', 'Prisión de Immol\'thar', 'Barrio Alabeo', 'Santuario de Eldretharr'],
     2677: ['Cuartel Faucedraco', 'Salas de los Conflictos', 'Laboratorios Carmesí', 'Guarida de Nefarian'],
@@ -3357,7 +3359,9 @@ var LANG = {
          19: ["Sonido",              "sonido",               "Sonidos",              "sonidos"],
          29: ["Icono",               "icono",                "Iconos",               "íconos"],
         501: ["Emoción",             "emoción",              "Emociones",            "emociones"],
-        502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"]
+        502: ["Encantamiento",       "encantamiento",        "Encantamientos",       "encantamientos"],
+        503: ["Areatrigger",         "areatrigger",          "Areatriggers",         "areatriggers"],
+        504: ["Mail",                "mail",                 "Mails",                "mails"]
     },
 
     timeunitssg: ["año", "mes", "semana", "día", "hora", "minuto", "segundo"],
@@ -4090,7 +4094,7 @@ var LANG = {
         combatcastable:             "Utilizable en combate",
         chancetocrit:               "Oportunidad de golpe crítico",
         chancetomiss:               "Oportunidad de fallar",
-        persiststhroughdeath:       "Persiste después de la muerte ",
+        persiststhroughdeath:       "Persiste después de la muerte",
         requiresmetamorphosis:      "Requiere Metamorfosis",
         requiresstealth:            "Requiere Sigilo",
         spellstealable:             "Hechizo puede ser robado",
@@ -4098,7 +4102,7 @@ var LANG = {
         usablewhenstunned:          "Utilizable durante aturdimiento",
         usableinbgs:                "Utilizable solamente en los campos de batalla",
         usableinarenas:             "Se puede usar en arenas",
-        disregardimmunity:          "Ignora la inmunidad ",
+        disregardimmunity:          "Ignora la inmunidad",
         disregardschoolimmunity:    "Ignora la imunidad a una escuela de magia",
         reqrangedweapon:            "Requiere un arma a distancia",
         onnextswingplayers:         "Con el próximo golpe (jugadores)",
@@ -4130,7 +4134,7 @@ var LANG = {
         requntappedtarget:          "Requiere un objetivo no seleccionado",
         targetownitem:              "El objetivo debe ser dueño del objeto",
         doesntreqshapeshift:        "No requiere cambio de forma",
-        foodbuff:                   "Beneficio de la Bebida/Comida ",
+        foodbuff:                   "Beneficio de la Bebida/Comida",
         targetonlyplayer:           "Solo puede hacerle objetivo al jugador",
         reqmainhand:                "Requiere Arma en la Mano Principal",
         doesntengagetarget:         "No ataca al objetivo",
@@ -4796,6 +4800,28 @@ var LANG = {
         targetstate:       "Estado del Objetivo"
     },
 
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "Cada una de estas condiciones se deben cumplir para satisfacer el requerimiento",
-    note_condition_group: "Cualquiera de estos grupos de cumplir en totalidad para satisfacer el requerimiento"
+    note_condition_group: "Cualquiera de estos grupos de cumplir en totalidad para satisfacer el requerimiento",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };

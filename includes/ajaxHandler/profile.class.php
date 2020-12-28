@@ -217,7 +217,7 @@ class AjaxProfile extends AjaxHandler
             return;
         }
 
-        $this->contentType = 'image/'.$matches[2];
+        $this->contentType = $matches[2] == 'png' ? MIME_TYPE_PNG : MIME_TYPE_JPEG;
 
         $id   = $matches[1];
         $dest = imageCreateTruecolor($sizes[$s], $sizes[$s]);
@@ -371,7 +371,7 @@ class AjaxProfile extends AjaxHandler
         }
         else                                                // new
         {
-            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ?_profiler_profiles WHERE user = ?d AND realmGUID IS NULL', User::$id);
+            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ?_profiler_profiles WHERE user = ?d AND (cuFlags & ?d) = 0 AND realmGUID IS NULL', User::$id, PROFILER_CU_DELETED);
             if ($nProfiles < 10 || User::isPremium())
                 if ($newId = DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($cuProfile), array_values($cuProfile)))
                     $charId = $newId;

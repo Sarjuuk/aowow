@@ -285,11 +285,20 @@ class Profiler
             return false;
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
-        $profileId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
-        if (!$profileId)
+        $profile = DB::Aowow()->selectRow('SELECT id, lastupdated FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
+        if (!$profile)
             return false;                                   // well ... it failed
 
-        CLI::write('fetching char #'.$charGuid.' from realm #'.$realmId);
+        $profileId = $profile['id'];
+
+        CLI::write('fetching char '.$char['name'].' (#'.$charGuid.') from realm #'.$realmId);
+
+        if (!$char['online'] && $char['logout_time'] <= $profile['lastupdated'])
+        {
+            CLI::write('char did not log in since last update. skipping...');
+            return true;
+        }
+
         CLI::write('writing...');
 
         $ra = (1 << ($char['race']  - 1));
@@ -372,21 +381,21 @@ class Profiler
         /**************/
 
         $data = array(
-            'realm'             =>  $realmId,
-            'realmGUID'         =>  $charGuid,
-            'name'              =>  $char['name'],
+            'realm'             => $realmId,
+            'realmGUID'         => $charGuid,
+            'name'              => $char['name'],
             'renameItr'         => 0,
-            'race'              =>  $char['race'],
-            'class'             =>  $char['class'],
-            'level'             =>  $char['level'],
-            'gender'            =>  $char['gender'],
-            'skincolor'         =>  $char['playerBytes']        & 0xFF,
-            'facetype'          => ($char['playerBytes'] >>  8) & 0xFF, // maybe features
-            'hairstyle'         => ($char['playerBytes'] >> 16) & 0xFF,
-            'haircolor'         => ($char['playerBytes'] >> 24) & 0xFF,
-            'features'          =>  $char['playerBytes2']       & 0xFF, // maybe facetype
-            'title'             =>  $char['chosenTitle'] ? DB::Aowow()->selectCell('SELECT id FROM ?_titles WHERE bitIdx = ?d', $char['chosenTitle']) : 0,
-            'playedtime'        =>  $char['totaltime'],
+            'race'              => $char['race'],
+            'class'             => $char['class'],
+            'level'             => $char['level'],
+            'gender'            => $char['gender'],
+            'skincolor'         => $char['skin'],
+            'facetype'          => $char['face'],           // maybe features
+            'hairstyle'         => $char['hairStyle'],
+            'haircolor'         => $char['hairColor'],
+            'features'          => $char['facialStyle'],    // maybe facetype
+            'title'             => $char['chosenTitle'] ? DB::Aowow()->selectCell('SELECT id FROM ?_titles WHERE bitIdx = ?d', $char['chosenTitle']) : 0,
+            'playedtime'        => $char['totaltime'],
             'nomodelMask'       => ($char['playerFlags'] & 0x400 ? (1 << SLOT_HEAD) : 0) | ($char['playerFlags'] & 0x800 ? (1 << SLOT_BACK) : 0),
             'talenttree1'       => 0,
             'talenttree2'       => 0,
@@ -413,14 +422,14 @@ class Profiler
         /* talents + glyphs */
         /********************/
 
-        $t = DB::Characters($realmId)->selectCol('SELECT spec AS ARRAY_KEY, spell AS ARRAY_KEY2, spell FROM character_talent WHERE guid = ?d', $char['guid']);
-        $g = DB::Characters($realmId)->select('SELECT spec AS ARRAY_KEY, glyph1 AS g1, glyph2 AS g4, glyph3 AS g5, glyph4 AS g2, glyph5 AS g3, glyph6 AS g6 FROM character_glyphs WHERE guid = ?d', $char['guid']);
+        $t = DB::Characters($realmId)->selectCol('SELECT talentGroup AS ARRAY_KEY, spell AS ARRAY_KEY2, spell FROM character_talent WHERE guid = ?d', $char['guid']);
+        $g = DB::Characters($realmId)->select('SELECT talentGroup AS ARRAY_KEY, glyph1 AS g1, glyph2 AS g4, glyph3 AS g5, glyph4 AS g2, glyph5 AS g3, glyph6 AS g6 FROM character_glyphs WHERE guid = ?d', $char['guid']);
         for ($i = 0; $i < 2; $i++)
         {
             // talents
             for ($j = 0; $j < 3; $j++)
             {
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell in (?a), rank, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), `rank`, 0)) FROM ?_talents WHERE class = ?d AND tab = ?d GROUP BY id ORDER BY row, col ASC', !empty($t[$i]) ? $t[$i] : [0], $char['class'], $j);
                 $data['talentbuild'.($i + 1)] .= implode('', $_);
                 if ($char['activespec'] == $i)
                     $data['talenttree'.($j + 1)] = array_sum($_);
@@ -496,7 +505,7 @@ class Profiler
                 $morePet   = DB::Aowow()->selectRow('SELECT p.`type`, c.family FROM ?_pet p JOIN ?_creature c ON c.family = p.id WHERE c.id = ?d', $petData['entry']);
                 $petSpells = DB::Characters($realmId)->selectCol('SELECT spell FROM pet_spell WHERE guid = ?d', $petGuid);
 
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell in (?a), rank, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
+                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), `rank`, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
                     'owner'     => $profileId,
@@ -559,8 +568,25 @@ class Profiler
         unset($sk);
 
         if ($skills)
+        {
+            // apply auto-learned trade skills
+            DB::Aowow()->query('
+                INSERT INTO ?_profiler_completion
+                SELECT      ?d, ?d, spellId, NULL, NULL
+                FROM        dbc_skilllineability
+                WHERE       skillLineId IN (?a) AND
+                            acquireMethod = 1 AND
+                            (reqRaceMask  = 0 OR reqRaceMask  & ?d) AND
+                            (reqClassMask = 0 OR reqClassMask & ?d)',
+                $profileId, TYPE_SPELL,
+                array_column($skills, 'typeId'),
+                1 << ($char['race']  - 1),
+                1 << ($char['class'] - 1)
+            );
+
             foreach (Util::createSqlBatchInsert($skills) as $sk)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$sk, array_keys($skills[0]));
+        }
 
         CLI::write(' ..professions');
 
@@ -748,7 +774,7 @@ class Profiler
 
         // ranks
         DB::Aowow()->query('DELETE FROM ?_profiler_guild_rank WHERE guildId = ?d', $guildId);
-        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS guildId, rid AS rank, rname AS name FROM guild_rank WHERE guildid = ?d', $guildId, $guildGuid))
+        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS guildId, rid AS `rank`, rname AS name FROM guild_rank WHERE guildid = ?d', $guildId, $guildGuid))
             foreach (Util::createSqlBatchInsert($ranks) as $r)
                 DB::Aowow()->query('INSERT INTO ?_profiler_guild_rank (?#) VALUES '.$r, array_keys(reset($ranks)));
 
@@ -787,7 +813,7 @@ class Profiler
 
     public static function getArenaTeamFromRealm($realmId, $teamGuid)
     {
-        $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, rank, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
+        $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, `rank`, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
         if (!$team)
             return false;
 

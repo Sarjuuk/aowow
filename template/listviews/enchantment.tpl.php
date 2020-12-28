@@ -66,7 +66,7 @@ Listview.templates.enchantment = {
                 if (!enchantment.spells)
                     return null;                            // no spell
 
-                var spellId = $(enchantment.spells).first();
+                var spellId = $(enchantment.spells).first()[0];
                 if (g_spells[spellId])
                     return g_spells[spellId]['name_' + Locale.getName()];
 

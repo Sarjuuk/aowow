@@ -19,6 +19,8 @@ class QuestPage extends GenericPage
     protected $css           = [['path' => 'Book.css']];
     protected $js            = ['ShowOnMap.js'];
 
+    private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -31,10 +33,10 @@ class QuestPage extends GenericPage
 
         $this->subject = new QuestList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('quest'), Lang::quest('notFound'));
 
         // may contain htmlesque tags
-        $this->name = htmlentities($this->subject->getField('name', true));
+        $this->name = Util::htmlEscape($this->subject->getField('name', true));
     }
 
     protected function generatePath()
@@ -138,19 +140,20 @@ class QuestPage extends GenericPage
             case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::game('si', 1).'[/span]'; break;
         }
 
+        $jsg = [];
         // races
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, $n, false))
+        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_RACE, $jsg);
-            $t = $n == 1 ? Lang::game('race') : Lang::game('races');
+            $this->extendGlobalIds(TYPE_RACE, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
         // classes
-        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, $n, false))
+        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, $jsg);
-            $t = $n == 1 ? Lang::game('class') : Lang::game('classes');
+            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
 
@@ -274,7 +277,7 @@ class QuestPage extends GenericPage
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
-                        'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
+                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                     )
                 ));
             }
@@ -294,7 +297,7 @@ class QuestPage extends GenericPage
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
                         'typeStr' => Util::$typeStrings[TYPE_QUEST],
                         'typeId'  => $_['typeId'],
-                        'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n,
+                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                         '_next'   => $_['_next'],
                     )
                 ));
@@ -320,7 +323,7 @@ class QuestPage extends GenericPage
                     'side'    => Game::sideByRaceMask($list->getField('reqRaceMask')),
                     'typeStr' => Util::$typeStrings[TYPE_QUEST],
                     'typeId'  => $id,
-                    'name'    => mb_strlen($n) > 40 ? mb_substr($n, 0, 40).'…' : $n
+                    'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40))
                 ));
             }
 
@@ -332,10 +335,10 @@ class QuestPage extends GenericPage
             ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array(['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId])],
+            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')])],
+            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
 
             // Closes Quests (Quests that become inaccessible after completing this quest)
             ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
@@ -968,6 +971,23 @@ class QuestPage extends GenericPage
             )];
         }
 
+        // tab: spawning pool (for the swarm)
+        if ($qp = DB::World()->selectCol('SELECT qpm2.questId FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.poolId = qpm2.poolId WHERE qpm1.questId = ?d', $this->typeId))
+        {
+            $max = DB::World()->selectCell('SELECT numActive FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.poolId = qpt.poolId WHERE qpm.questId = ?d', $this->typeId);
+            $pooledQuests = new QuestList(array(['id', $qp]));
+            if (!$pooledQuests->error)
+            {
+                $this->extendGlobalData($pooledQuests->getJSGlobals());
+                $this->lvTabs[] = ['quest', array(
+                    'data' => array_values($pooledQuests->getListviewData()),
+                    'name' => 'Quest Pool',
+                    'id'   => 'quest-pool',
+                    'note' => Lang::quest('questPoolDesc', [$max])
+                )];
+            }
+        }
+
         // tab: conditions
         $cnd = [];
         if ($_ = $this->subject->getField('reqMinRepFaction'))
@@ -1015,44 +1035,18 @@ class QuestPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerQuest('.$this->typeId.', '.User::$localeId.', {});';
-
-        $x = '$WowheadPower.registerQuest('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.': \''.$this->subject->renderTooltip()."'";
-        if ($this->subject->isDaily())
-            $x .= ",\n\tdaily: 1";
-        $x .= "\n});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            if ($this->subject->isDaily())
+                $power->daily = 1;
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('quest'), $msg ?: Lang::quest('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function createRewards($side)
@@ -1062,14 +1056,15 @@ class QuestPage extends GenericPage
         // moneyReward / maxLevelCompensation
         $comp       = $this->subject->getField('rewardMoneyMaxLevel');
         $questMoney = $this->subject->getField('rewardOrReqMoney');
+        $realComp   = max($comp, $questMoney);
         if ($questMoney > 0)
         {
             $rewards['money'] = Util::formatMoney($questMoney);
-            if ($comp > 0)
-                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+            if ($realComp > $questMoney)
+                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($realComp), MAX_LEVEL);
         }
-        else if ($questMoney <= 0 && $questMoney + $comp > 0)
-            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($questMoney + $comp), MAX_LEVEL);
+        else if ($questMoney <= 0 && $realComp > 0)
+            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($realComp), MAX_LEVEL);
 
         // itemChoices
         if (!empty($this->subject->choices[$this->typeId][TYPE_ITEM]))
@@ -1226,10 +1221,11 @@ class QuestPage extends GenericPage
         if ($rmtId = $this->subject->getField('rewardMailTemplateId'))
         {
             $delay  = $this->subject->getField('rewardMailDelay');
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $rmtId);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE id = ?d', $rmtId);
 
             $mail = array(
-                'delay'       => $delay  ? sprintf(Lang::quest('mailIn'), Util::formatTime($delay * 1000)) : null,
+                'id'          => $rmtId,
+                'delay'       => $delay  ? sprintf(Lang::mail('mailIn'), Util::formatTime($delay * 1000)) : null,
                 'sender'      => null,
                 'attachments' => [],
                 'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))     : null,
@@ -1245,7 +1241,7 @@ class QuestPage extends GenericPage
                         $senderTypeId = $se['typeId'];
 
             if ($ti = CreatureList::getName($senderTypeId))
-                $mail['sender'] = sprintf(Lang::quest('mailBy'), $senderTypeId, $ti);
+                $mail['sender'] = sprintf(Lang::mail('mailBy'), $senderTypeId, $ti);
 
             // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
             $mailLoot = new Loot();

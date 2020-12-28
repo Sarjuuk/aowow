@@ -126,9 +126,9 @@ class ArenaTeamPage extends GenericPage
         }
     }
 
-    public function notFound($title = '', $msg = '')
+    public function notFound(string $title = '', string $msg = '') : void
     {
-        return parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'arenateam'));
+        parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'arenateam'));
     }
 
     private function handleIncompleteData($teamGuid)

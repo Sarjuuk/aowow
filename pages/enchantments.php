@@ -25,7 +25,7 @@ class EnchantmentsPage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('enchantments'));
-        $this->subCat = $pageParam !== null ? '='.$pageParam : '';
+        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
     }
 
     protected function generateContent()
@@ -100,8 +100,8 @@ class EnchantmentsPage extends GenericPage
     protected function generatePath()
     {
         $form = $this->filterObj->getForm('form');
-        if (isset($form['ty']) && !is_array($form['ty']))
-            $this->path[] = $form['ty'];
+        if (isset($form['ty']) && count($form['ty']) == 1)
+            $this->path[] = $form['ty'][0];
     }
 }
 

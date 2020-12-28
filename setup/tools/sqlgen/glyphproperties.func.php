@@ -6,15 +6,22 @@ if (!defined('AOWOW_REVISION'))
 if (!CLI)
     die('not in cli mode');
 
-$reqDBC = ['glyphproperties', 'spellicon'];
 
-function glyphproperties()
+SqlGen::register(new class extends SetupScript
 {
-    DB::Aowow()->query('REPLACE INTO ?_glyphproperties SELECT id, spellId, typeFlags, 0, iconId FROM dbc_glyphproperties');
+    protected $command = 'glyphproperties';
 
-    DB::Aowow()->query('UPDATE ?_glyphproperties gp, ?_icons ic, dbc_spellicon si SET gp.iconId = ic.id WHERE gp.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
+    protected $tblDependancyAowow = ['icons'];
+    protected $dbcSourceFiles     = ['glyphproperties', 'spellicon'];
 
-    return true;
-}
+    public function generate(array $ids = []) : bool
+    {
+        DB::Aowow()->query('REPLACE INTO ?_glyphproperties SELECT id, spellId, typeFlags, 0, iconId FROM dbc_glyphproperties');
+
+        DB::Aowow()->query('UPDATE ?_glyphproperties gp, ?_icons ic, dbc_spellicon si SET gp.iconId = ic.id WHERE gp.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
+
+        return true;
+    }
+});
 
 ?>

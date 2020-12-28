@@ -32,6 +32,8 @@ class AchievementPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
+    private   $powerTpl      = '$WowheadPower.registerAchievement(%d, %d, %s);';
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -44,7 +46,7 @@ class AchievementPage extends GenericPage
 
         $this->subject = new AchievementList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('achievement'), Lang::achievement('notFound'));
 
         $this->extendGlobalData($this->subject->getJSGlobals(GLOBALINFO_REWARDS));
 
@@ -58,7 +60,7 @@ class AchievementPage extends GenericPage
         do
         {
             array_unshift($this->path, $curCat);
-            $curCat = DB::Aowow()->SelectCell('SELECT parentCategory FROM ?_achievementcategory WHERE id = ?d', $curCat);
+            $curCat = DB::Aowow()->SelectCell('SELECT parentCat FROM ?_achievementcategory WHERE id = ?d', $curCat);
         }
         while ($curCat > 0);
 
@@ -527,43 +529,17 @@ class AchievementPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.', {});';
-
-        $x = '$WowheadPower.registerAchievement('.$this->typeId.', '.User::$localeId.",{\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ticon: '".rawurlencode($this->subject->getField('iconString', true, true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".$this->subject->renderTooltip()."'\n";
-        $x .= "});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->icon                             = rawurlencode($this->subject->getField('iconString', true, true));
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('achievement'), $msg ?: Lang::achievement('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function createMail(&$reqCss = false)
@@ -572,12 +548,13 @@ class AchievementPage extends GenericPage
 
         if ($_ = $this->subject->getField('mailTemplate'))
         {
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mailtemplate WHERE id = ?d', $_);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE id = ?d', $_);
             if (!$letter)
                 return [];
 
             $reqCss = true;
             $mail   = array(
+                'id'          => $_,
                 'delay'       => null,
                 'sender'      => null,
                 'attachments' => [],
@@ -589,6 +566,7 @@ class AchievementPage extends GenericPage
         {
             $reqCss = true;
             $mail   = array(
+                'id'          => -$this->typeId,
                 'delay'       => null,
                 'sender'      => null,
                 'attachments' => [],
@@ -598,7 +576,7 @@ class AchievementPage extends GenericPage
         }
 
         if ($_ = CreatureList::getName($this->subject->getField('sender')))
-            $mail['sender'] = sprintf(Lang::quest('mailBy'), $this->subject->getField('sender'), $_);
+            $mail['sender'] = sprintf(Lang::mail('mailBy'), $this->subject->getField('sender'), $_);
 
         return $mail;
     }

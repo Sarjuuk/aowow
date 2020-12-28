@@ -59,6 +59,17 @@ function siteconfig()
                     return $ok;
                 };
                 break;
+            case 'acc_auth_mode':
+                $fn = function($x) {
+                    if ($x == 1 && !extension_loaded('gmp'))
+                    {
+                        CLI::write('PHP extension GMP is required to use TrinityCore as auth source, but it is currently not enabled.', CLI::LOG_ERROR);
+                        return false;
+                    }
+
+                    return true;
+                };
+                break;
             default:                                        // nothing to do, everything is fine
                 return true;
         }

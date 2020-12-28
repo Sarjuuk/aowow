@@ -917,7 +917,9 @@ var mn_database = [
     [6,"Zones","?zones",mn_zones],
     [, "Autre"],
     [31, "Icônes", ":wowhead.com/icons", mn_icons],
-    [19,"Sons","?sounds", mn_sounds]
+    [19,"Sons","?sounds", mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Calculateur de talents","?talent",mn_talentCalc],
@@ -2100,14 +2102,14 @@ var g_zone_areas = {
      209: ['La cour', 'Salle à manger', 'Antre Vacant', 'Observatoire Inférieur', 'Observatoire Supérieur', 'Chambre du seigneur Godfrey', 'Le chemin de ronde'],
      719: ['Le Bassin d\'Ask\'ar', 'Sanctuaire d’Écrin-de-Lune', 'Les bassins Oubliés'],
      721: ['Le Hall des engrenages', 'Le dortoir', 'Baie de lancement', 'Cour du Bricoleur'],
-796: ['[Cimetière]', '[Bibliothèque]', '[Armurerie]', '[Cathédrale]'],
+     796: ['[Cimetière]', '[Bibliothèque]', '[Armurerie]', '[Cathédrale]'],
     1196: ['Pinnacle inférieur', 'Pinacle Supérieur'],
     1337: ['Hall des Gardiens', 'Siège de Khaz\'goroth'],
     1581: ['Les Mortemines', 'Crique du Cuirassé'],
     1583: ['Tazz\'Alaor', 'Tunnels de Toile-grouillante', 'Cité d\'Hordemar', 'Hall de Main-noire', 'Hall de la Flèche des dragons', 'La colonie', 'Stade Rochenoire'],
     1584: ['Le mitard', 'Ville des Ombreforges'],
     2017: ['Place des Croisés', 'Le Défi'],
-2057: ['Le Reliquaire', 'Chambre d\'invocation', 'Bureau du proviseur', '[Barov Family Vault]'],
+    2057: ['Le Reliquaire', 'Chambre d\'invocation', 'Bureau du proviseur', '[Barov Family Vault]'],
     2100: ['Cavernes de Maraudon', 'Tombe de Zaetar'],
     2557: ['Communs gordok', 'Grands jardins', 'Cours des Bien-nés', 'Prison d\'Immol\'Thar', 'Quartier de Crochebois', 'Le sanctuaire d\'Eldretharr'],
     2677: ['Garnison des Gueules-de-dragon', 'Halls des conflits', 'Laboratoires Cramoisis', 'Antre de Nefarian'],
@@ -3357,7 +3359,9 @@ var LANG = {
          19: ["Son",               "Son",               "Sons",                "Sons"],
          29: ["Icône",             "icône",             "Icônes",              "icônes"],
         501: ["Emote",             "emote",             "Emotes",              "emotes"],
-        502: ["Enchantement",      "enchantement",      "Enchantements",       "enchantements"]
+        502: ["Enchantement",      "enchantement",      "Enchantements",       "enchantements"],
+        503: ["Areatrigger",       "areatrigger",       "Areatriggers",        "areatriggers"],
+        504: ["Mail",              "mail",              "Mails",               "mails"]
     },
 
     timeunitssg: ["année", "mois", "semaine", "jour", "heure", "minute", "seconde"],
@@ -4795,8 +4799,28 @@ var LANG = {
         targetstate:       "État de la cible"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement."
-    /* end custom */
+    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };

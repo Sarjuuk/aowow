@@ -6,7 +6,6 @@ class Lang
     private static $main;
     private static $account;
     private static $user;
-    private static $mail;
     private static $game;
     private static $maps;
     private static $profiler;
@@ -26,6 +25,7 @@ class Lang
     private static $icon;
     private static $item;
     private static $itemset;
+    private static $mail;
     private static $npc;
     private static $pet;
     private static $quest;
@@ -66,7 +66,9 @@ class Lang
     {
         if (!isset(self::$$prop))
         {
-            trigger_error('Lang - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
+            $dbt  = debug_backtrace()[0];
+            $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
+            trigger_error('Lang - tried to use undefined property Lang::$'.$prop.', called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
             return null;
         }
 
@@ -82,7 +84,9 @@ class Lang
             }
             else if (!isset($var[$arg]))
             {
-                trigger_error('Lang - undefined key "'.$arg.'" in property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\']', E_USER_WARNING);
+                $dbt  = debug_backtrace()[0];
+                $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
+                trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
                 return null;
             }
 
@@ -122,6 +126,33 @@ class Lang
         }
 
         return $b;
+    }
+
+    public static function trimTextClean(string $text, int $length = 100) : string
+    {
+        // remove line breaks
+        $text = strtr($text, ["\n" => ' ', "\r" => ' ']);
+
+        // limit whitespaces to one at a time
+        $text = preg_replace('/\s+/', ' ', trim($text));
+
+        // limit previews to 100 chars + whatever it takes to make the last word full
+        if ($length > 0 && mb_strlen($text) > $length)
+        {
+            $n = 0;
+            $b = [];
+            $parts = explode(' ', $text);
+            while ($n < $length && $parts)
+            {
+                $_   = array_shift($parts);
+                $n  += mb_strlen($_);
+                $b[] = $_;
+            }
+
+            $text = implode(' ', $b).'…';
+        }
+
+        return $text;
     }
 
     public static function sort($prop, $group, $method = SORT_NATURAL)
@@ -310,7 +341,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString($classMask, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getClassString(int $classMask, array &$ids = [], bool $asHTML = true) : string
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
@@ -332,13 +363,12 @@ class Lang
             $i++;
         }
 
-        $n   = count($tmp);
         $ids = array_keys($tmp);
 
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString($raceMask, &$ids = [], &$n = 0, $asHTML = true)
+    public static function getRaceString(int $raceMask, array &$ids = [], bool $asHTML = true) : string
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
@@ -369,7 +399,6 @@ class Lang
             $i++;
         }
 
-        $n   = count($tmp);
         $ids = array_keys($tmp);
 
         return implode(', ', $tmp);

@@ -125,7 +125,7 @@ class CommunityContent
                 case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
                 case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
                 case TYPE_ICON:        $obj = new IconList($cnd);        break;
-                default: break;
+                default: continue 2;
             }
 
             foreach ($obj->iterate() as $id => $__)
@@ -172,25 +172,8 @@ class CommunityContent
                 if (empty($params['replies']))
                     unset($c['commentid']);
 
-                // remove line breaks
-                $c['preview'] = strtr($c['preview'], ["\n" => ' ', "\r" => ' ']);
-                // limit whitespaces to one at a time
-                $c['preview'] = preg_replace('/\s+/', ' ', $c['preview']);
-                // limit previews to 100 chars + whatever it takes to make the last word full
-                if (mb_strlen($c['preview']) > 100)
-                {
-                    $n = 0;
-                    $b = [];
-                    $parts = explode(' ', $c['preview']);
-                    while ($n < 100 && $parts)
-                    {
-                        $_   = array_shift($parts);
-                        $n  += mb_strlen($_);
-                        $b[] = $_;
-                    }
-
-                    $c['preview'] = implode(' ', $b).'…';
-                }
+                // format text for listview
+                $c['preview'] = Lang::trimTextClean($c['preview']);
             }
             else
             {

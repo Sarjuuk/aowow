@@ -95,23 +95,23 @@ function Profiler() {
 
         _progress = [                                       // aowow: don't forget to enable tracking in includes/profiler.class.php
             { level: 284, instance: 5, heroic: 1, name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'spell_shadow_twilight',                    achievs: [4816], kills: [[4823, 39863]] },  // Ruby Sanctum 25 hc
-            { level: 277, instance: 5, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4637], kills: [[4673, 37970], [4682, 37955], [4664, 37813], [4667, 36626], [4661, 100001], [4656, 36855], [4642, 36612], [4679, 36678], [4670, 36627], [4685, 36853], [4676, 36789], [4688, 36597]] }, // Icecrown Citadel 25 hc
+            { level: 277, instance: 5, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4637], kills: [[4673, 37970], [4682, 37955], [4664, 37813], [4667, 36626], [4661, 847], [4656, 36855], [4642, 36612], [4679, 36678], [4670, 36627], [4685, 36853], [4676, 36789], [4688, 36597]] }, // Icecrown Citadel 25 hc
             { level: 271, instance: 5,            name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'spell_shadow_twilight',                    achievs: [4815], kills: [[4820, 39863]] }, // Ruby Sanctum 25 nh
             { level: 271, instance: 3, heroic: 1, name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'spell_shadow_twilight',                    achievs: [4818], kills: [[4822, 39863]] }, // Ruby Sanctum 10 hc
-            { level: 264, instance: 5,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4608], kills: [[4672, 37970], [4681, 37955], [4663, 37813], [4666, 36626], [4660, 100001], [4655, 36855], [4641, 36612], [4678, 36678], [4669, 36627], [4683, 36853], [4675, 36789], [4687, 36597]] }, // Icecrown Citadel 25 nh
-            { level: 264, instance: 3, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4636], kills: [[4671, 37970], [4680, 37955], [4662, 37813], [4665, 36626], [4659, 100001], [4654, 36855], [4640, 36612], [4677, 36678], [4668, 36627], [4684, 36853], [4674, 36789], [4686, 36597]] }, // Icecrown Citadel 10 hc
+            { level: 264, instance: 5,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4608], kills: [[4672, 37970], [4681, 37955], [4663, 37813], [4666, 36626], [4660, 847], [4655, 36855], [4641, 36612], [4678, 36678], [4669, 36627], [4683, 36853], [4675, 36789], [4687, 36597]] }, // Icecrown Citadel 25 nh
+            { level: 264, instance: 3, heroic: 1, name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4636], kills: [[4671, 37970], [4680, 37955], [4662, 37813], [4665, 36626], [4659, 847], [4654, 36855], [4640, 36612], [4677, 36678], [4668, 36627], [4684, 36853], [4674, 36789], [4686, 36597]] }, // Icecrown Citadel 10 hc
             { level: 258, instance: 3,            name: g_zones[4987] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'spell_shadow_twilight',                    achievs: [4817], kills: [[4821, 39863]] }, // Ruby Sanctum 10 nh
-            { level: 258, instance: 5, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3812], kills: [[4031, 200001], [4034, 34780], [4038, 200002], [4042, 200003], [4046, 34564]] }, // Trial of the Crusader 25 hc
-            { level: 251, instance: 3,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4532], kills: [[4648, 37970], [4651, 37955], [4645, 37813], [4646, 36626], [4644, 100001], [4643, 36855], [4639, 36612], [4650, 36678], [4647, 36627], [4652, 36853], [4649, 36789], [4653, 36597]] }, // Icecrown Citadel 10 nh
-            { level: 245, instance: 5,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3916], kills: [[4029, 200001], [4035, 34780], [4039, 200002], [4043, 200003], [4047, 34564]] }, // Trial of the Crusader 25 nh
-            { level: 245, instance: 3, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3918], kills: [[4030, 200001], [4033, 34780], [4037, 200002], [4041, 200003], [4045, 34564]] }, // Trial of the Crusader 10 hc
+            { level: 258, instance: 5, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3812], kills: [[4031, 629],   [4034, 34780], [4038, 637],   [4042, 641],   [4046, 34564]] }, // Trial of the Crusader 25 hc
+            { level: 251, instance: 3,            name: g_zones[4812] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_dungeon_icecrown_frostmourne', achievs: [4532], kills: [[4648, 37970], [4651, 37955], [4645, 37813], [4646, 36626], [4644, 847], [4643, 36855], [4639, 36612], [4650, 36678], [4647, 36627], [4652, 36853], [4649, 36789], [4653, 36597]] }, // Icecrown Citadel 10 nh
+            { level: 245, instance: 5,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3916], kills: [[4029, 629],   [4035, 34780], [4039, 637],   [4043, 641],   [4047, 34564]] }, // Trial of the Crusader 25 nh
+            { level: 245, instance: 3, heroic: 1, name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3918], kills: [[4030, 629],   [4033, 34780], [4037, 637],   [4041, 641],   [4045, 34564]] }, // Trial of the Crusader 10 hc
             { level: 245, instance: 5,            name: g_zones[2159] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid25, ''), icon: 'achievement_boss_onyxia',                  achievs: [4397], kills: [[1756, 10184]] }, // Onyxia's Lair 25
-            { level: 232, instance: 3,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3917], kills: [[4028, 200001], [4032, 34780], [4036, 200002], [4040, 200003], [4044, 34564]] }, // Trial of the Crusader 10 nh
+            { level: 232, instance: 3,            name: g_zones[4722] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_reputation_argentchampion',    achievs: [3917], kills: [[4028, 629],   [4032, 34780], [4036, 637],   [4040, 641],   [4044, 34564]] }, // Trial of the Crusader 10 nh
             { level: 232, instance: 3,            name: g_zones[2159] + $WH.sprintf(LANG.lvitem_dd, LANG.lvitem_raid10, ''), icon: 'achievement_boss_onyxia',                  achievs: [4396], kills: [[1098, 10184]] }, // Onyxia's Lair 10
-         // { level: 226, instance: 5,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2895], kills: [[2872, 33113], [2873, 33186], [2874, 33118], [2884, 33293], [2875, 32930], [2879, 33432], [2880, 33271], [2882, 33515], [2883, 33288], [3236, 33993], [3257, 64985], [3256, 64899], [3258, 65074], [2881, 65184], [2885, 400001]] }, // 25-man ulduar
-         // { level: 219, instance: 3,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2894], kills: [[2856, 33113], [2857, 33186], [2858, 33118], [2859, 33293], [2861, 32930], [2865, 33432], [2866, 33271], [2868, 33515], [2869, 33288], [2870, 33993], [2863, 64985], [2864, 65074], [2862, 64899], [2867, 65184], [2860, 400001]] }, // 10-man ulduar
-         // { level: 213, instance: 5,            zone: 3456, icon: 'achievement_dungeon_naxxramas_10man',      achievs: [577],  kills: [[1367, 16028], [1368, 15956], [1378, 15932], [1379, 16060], [1380, 15953], [1381, 15931], [1382, 15936], [1383, 300001], [1384, 16061], [1385, 16011], [1386, 15952], [1387, 15954], [1388, 15928], [1389, 15989], [1390, 15990]] }, // 25-man naxxramas
-         // { level: 200, instance: 3,            zone: 3456, icon: 'achievement_dungeon_naxxramas_normal',     achievs: [576],  kills: [1361, 15956], [1362, 15953], [1363, 15952], [1365, 15954], [1366, 16060], [1364, 16028], [1369, 15936], [1370, 16011], [1371, 15931], [1372, 15932], [1373, 15928], [1374, 16061], [1375, 300001], [1376, 15989], [1377, 15990]] }, // 10-man naxxramas
+         // { level: 226, instance: 5,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2895], kills: [[2872, 33113], [2873, 33186], [2874, 33118], [2884, 33293], [2875, 32930], [2879, 62932], [2880, 33271], [2882, 33515], [2883, 33288], [3236, 33993], [3257, 64985], [3256, 64899], [3258, 65074], [2881, 65184], [2885, 748]] }, // 25-man ulduar
+         // { level: 219, instance: 3,            zone: 4273, icon: 'achievement_dungeon_ulduarraid_misc_01',   achievs: [2894], kills: [[2856, 33113], [2857, 33186], [2858, 33118], [2859, 33293], [2861, 32930], [2865, 62932], [2866, 33271], [2868, 33515], [2869, 33288], [2870, 33993], [2863, 64985], [2864, 65074], [2862, 64899], [2867, 65184], [2860, 748]] }, // 10-man ulduar
+         // { level: 213, instance: 5,            zone: 3456, icon: 'achievement_dungeon_naxxramas_10man',      achievs: [577],  kills: [[1367, 16028], [1368, 15956], [1378, 15932], [1379, 16060], [1380, 15953], [1381, 15931], [1382, 15936], [1383, 692],   [1384, 16061], [1385, 16011], [1386, 15952], [1387, 15954], [1388, 15928], [1389, 15989], [1390, 15990]] }, // 25-man naxxramas
+         // { level: 200, instance: 3,            zone: 3456, icon: 'achievement_dungeon_naxxramas_normal',     achievs: [576],  kills: [[1361, 15956], [1362, 15953], [1363, 15952], [1365, 15954], [1366, 16060], [1364, 16028], [1369, 15936], [1370, 16011], [1371, 15931], [1372, 15932], [1373, 15928], [1374, 16061], [1375, 692],   [1376, 15989], [1377, 15990]] }, // 10-man naxxramas
          // { level: 187, instance: 2, heroic: 1, name: LANG.pr_dungeons, icon: 'ability_rogue_feigndeath',     achievs: [489,490,491,492,493,494,495,496,497,498,499,500,4297,4298,4519,4520,4521], kills: [[1506, 29120], [1509, 31134], [1510, 29306], [1507, 29311], [1504, 23980], [1505, 26723], [1514, 26861], [1513, 27656], [1512, 28923]] }, // some lvl 80 Dungeons heroic
          // { level: 150, instance: 2,            name: LANG.pr_dungeons, icon: 'spell_holy_championsbond',     achievs: [477,478,479,480,481,482,483,484,485,486,487,488,3778,4296,4516,4517,4518], kills: [[1232, 29120], [1235, 31134], [1236, 29306], [1233, 29311], [1242, 23980], [1231, 26723], [1240, 26861], [1239, 27656], [1238, 28923]] }, // some lvl 80 Dungeons normal
         ];
@@ -1089,14 +1089,15 @@ function Profiler() {
         _divLine3.firstChild.innerHTML = $WH.sprintfa(LANG.pr_header_character, _profile.level, g_chr_races[_profile.race], g_chr_classes[_profile.classs], _profile.race, _profile.classs);
 
         // Armory Link
-        if (_isArmoryProfile(_profile.genuine)) {
-            _lnkArmory.href = 'http://' + _profile.region[0] + '.battle.net/wow/' + Locale.getName().substr(0, 2) + '/character/' + _profile.realm[0] + '/' + g_cleanCharacterName(_profile.name) + '/';
-            _lnkArmory.style.display = '';
-            _lnkArmory.target = '_blank';
-        }
-        else {
+        // Aowow custom
+        // if (_isArmoryProfile(_profile.genuine)) {
+            // _lnkArmory.href = 'http://' + _profile.region[0] + '.battle.net/wow/' + Locale.getName().substr(0, 2) + '/character/' + _profile.realm[0] + '/' + g_cleanCharacterName(_profile.name) + '/';
+            // _lnkArmory.style.display = '';
+            // _lnkArmory.target = '_blank';
+        // }
+        // else {
             _lnkArmory.style.display = 'none';
-        }
+        // }
     }
 
 /* Aowow custom
@@ -1720,9 +1721,16 @@ function Profiler() {
                 (avgLevel + 18 < raid.level ? 4 :
                 (avgLevel + 9 < raid.level ? 3 : 2))));
 
+// Aowow custom start
+            let optText = (raid.zone ? g_zones[raid.zone] : raid.name);
+            if (optText.length > 30)
+                optText = optText.substring(0, 25) + '…' + optText.substring(optText.length - 5, optText.length);
+// Aowow custom end
+
             // Raid Activity
             var opt = {
-                text: (raid.zone ? g_zones[raid.zone] : raid.name),
+                // text: (raid.zone ? g_zones[raid.zone] : raid.name),
+                text: optText,
                 hoverText: $WH.sprintf(LANG['pr_qf_activitypct' + (_activity ? 1 : 2)], (activity ? Math.round((nRecent / activity) * 100) : 0)),
                 color: 'ach0',
                 width: (activity ? Math.round((nRecent / activity) * 100) : 0)

@@ -917,7 +917,9 @@ var mn_database = [
     [6,"Местности","?zones",mn_zones],
     [, "Другое"],
     [31, "Иконки", ":wowhead.com/icons", mn_icons],
-    [19,"Звуки","?sounds",mn_sounds]
+    [19,"Звуки","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"Расчёт талантов","?talent",mn_talentCalc],
@@ -2100,14 +2102,14 @@ var g_zone_areas = {
     209:  ['Внутренний двор', 'Обеденный зал', 'Свободная берлога', 'Нижняя обсерватория', 'Верхняя обсерватория', 'Палата лорда Годфри', 'Крепостной вал'],
     719:  ['Пруд Аск\'ара', 'Алтарь святилища Луны', 'Забытый пруд'],
     721:  ['Машинный зал', 'Спальни', 'Пусковая установка', 'Двор Механиков'],
-796: ['[Кладбище]', '[Библиотека]', '[Арсенал]', '[Собор]'],
+    796:  ['[Кладбище]', '[Библиотека]', '[Арсенал]', '[Собор]'],
     1196: ['Подножие', 'Вершина'],
     1337: ['Зал Хранителей', 'Трон Каз\'горота'],
     1581: ['Мертвые копи', 'Потайная бухта'],
     1583: ['Тазз\'Алаор', 'Паучий лабиринт', 'Ордамар', 'Зал Чернорука', 'Зал Драконов', 'Гнездовье', 'Стадион Черной горы'],
     1584: ['Тюремный блок', 'Тенегорн'],
     2017: ['Площадь рыцарей', 'Улица Испытаний'],
-2057: ['Хранилище реликвий', 'Чертог Призыва', 'Кабинет ректора', '[Barov Family Vault]'],
+    2057: ['Хранилище реликвий', 'Чертог Призыва', 'Кабинет ректора', '[Barov Family Vault]'],
     2100: ['Пещеры Мародона', 'Могила Зейтара'],
     2557: ['Палаты Гордока', 'Центральный сад', 'Двор высокорожденных', 'Тюрьма Бессмер\'тера', 'Квартал Криводревов', 'Святилище Элдретарра'],
     2677: ['Гарнизон Драконьей Пасти', 'Залы Раздора', 'Багровые лаборатории', 'Логово Нефариана'],
@@ -3357,7 +3359,9 @@ var LANG = {
          19: ["Звук",           "звук",            "Звуки",           "звуки"],
          29: ["Иконка",         "иконка",          "Иконки",          "иконки"],
         501: ["Эмоция",         "эмоция",          "Эмоции",          "эмоции"],
-        502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"]
+        502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"],
+        503: ["Areatrigger",    "areatrigger",     "Areatriggers",    "areatriggers"],
+        504: ["Mail",           "mail",            "Mails",           "mails"]
     },
 
     timeunitssg: ["год", "месяц", "неделя", "день", "час", "минута", "секунда"],
@@ -4797,8 +4801,28 @@ var LANG = {
         targetstate: "Состояние цели"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement."
-    /* end custom */
+    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };

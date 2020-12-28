@@ -17,6 +17,10 @@ class NpcPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
+    protected $css           = [['path' => 'Profiler.css']];
+
+    private   $soundIds      = [];
+    private   $powerTpl      = '$WowheadPower.registerNpc(%d, %d, %s);';
 
     private   $soundIds      = [];
 
@@ -32,10 +36,10 @@ class NpcPage extends GenericPage
 
         $this->subject = new CreatureList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('npc'), Lang::npc('notFound'));
 
-        $this->name    = $this->subject->getField('name', true);
-        $this->subname = $this->subject->getField('subname', true);
+        $this->name    = Util::htmlEscape($this->subject->getField('name', true));
+        $this->subname = Util::htmlEscape($this->subject->getField('subname', true));
     }
 
     protected function generatePath()
@@ -48,7 +52,7 @@ class NpcPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('npc')));
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('npc')));
     }
 
     protected function generateContent()
@@ -106,6 +110,9 @@ class NpcPage extends GenericPage
         }
 
 
+
+
+
         /***********/
         /* Infobox */
         /***********/
@@ -115,7 +122,7 @@ class NpcPage extends GenericPage
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_creature gec, creature c WHERE ge.eventEntry = gec.eventEntry AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $this->extendGlobalIds(TYPE_WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
@@ -169,17 +176,14 @@ class NpcPage extends GenericPage
         if ($this->subject->getField('vehicleId'))
             $infobox[] = Lang::npc('vehicle');
 
-        // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
+            // AI
             if ($_ = $this->subject->getField('scriptName'))
                 $infobox[] = 'Script'.Lang::main('colon').$_;
             else if ($_ = $this->subject->getField('aiName'))
                 $infobox[] = 'AI'.Lang::main('colon').$_;
-        }
 
-        if (User::isInGroup(U_GROUP_STAFF))
-        {
             // Mechanic immune
             if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
             {
@@ -210,11 +214,11 @@ class NpcPage extends GenericPage
                 if ($flagsExtra & 0x000040)
                     $buff[] = 'Rewards no experience';
                 if ($flagsExtra & 0x000080)
-                    $buff[] = 'Trigger-Creature';
+                    $buff[] = 'Trigger creature';
                 if ($flagsExtra & 0x000100)
                     $buff[] = 'Immune to Taunt';
                 if ($flagsExtra & 0x008000)
-                    $buff[] = "[tooltip name=guard]- engages PvP-Attacker\n- ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]";
+                    $buff[] = "[tooltip name=guard]- engages PvP attackers\n- ignores enemy stealth, invisibility and Feign Death[/tooltip][span class=tip tooltip=guard]Guard[/span]";
                 if ($flagsExtra & 0x020000)
                     $buff[] = 'Cannot deal Critical Hits';
                 if ($flagsExtra & 0x040000)
@@ -226,6 +230,16 @@ class NpcPage extends GenericPage
 
                 if ($buff)
                     $infobox[] = 'Extra Flags'.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $buff).'[/li][/ul]';
+            }
+
+            // Mode dummy references
+            if ($_altNPCs)
+            {
+                $this->extendGlobalData($_altNPCs->getJSGlobals());
+                $buff = 'Difficulty Versions'.Lang::main('colon').'[ul]';
+                foreach ($_altNPCs->iterate() as $id => $__)
+                    $buff .= '[li][npc='.$id.'][/li]';
+                $infobox[] = $buff.'[/ul]';
             }
         }
 
@@ -245,6 +259,23 @@ class NpcPage extends GenericPage
         // Armor
         $armor = $this->subject->getBaseStats('armor');
         $stats['armor'] = Lang::npc('armor').Lang::main('colon').($armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
+
+        // Resistances
+        $resNames = [null, 'hol', 'fir', 'nat', 'fro', 'sha', 'arc'];
+        $tmpRes   = [];
+        $stats['resistance'] = '';
+        foreach ($this->subject->getBaseStats('resistance') as $sc => $amt)
+            if ($amt)
+                $tmpRes[] = '[span class="moneyschool'.$resNames[$sc].'"]'.$amt.'[/span]';
+
+        if ($tmpRes)
+        {
+            $stats['resistance'] = Lang::npc('resistances').Lang::main('colon');
+            if (count($tmpRes > 3))
+                $stats['resistance'] .= implode('&nbsp;', array_slice($tmpRes, 0, 3)).'[br]'.implode('&nbsp;', array_slice($tmpRes, 3));
+            else
+                $stats['resistance'] .= implode('&nbsp;', $tmpRes);
+        }
 
         // Melee Damage
         $melee = $this->subject->getBaseStats('melee');
@@ -279,6 +310,22 @@ class NpcPage extends GenericPage
                     // Armor
                     $armor = $_altNPCs->getBaseStats('armor');
                     $modes['armor'][] = sprintf($modeRow, $m, $armor[0] < $armor[1] ? Lang::nf($armor[0]).' - '.Lang::nf($armor[1]) : Lang::nf($armor[0]));
+
+                    // Resistances
+                    $tmpRes = '';
+                    foreach ($_altNPCs->getBaseStats('resistance') as $sc => $amt)
+                        $tmpRes .= '[td]'.$amt.'[/td]';
+
+                    if ($tmpRes)
+                    {
+                        if (!isset($modes['resistance']))   // init table head
+                            $modes['resistance'][] = '[td][/td][td][span class="moneyschoolhol"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolfir"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolnat"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolfro"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolsha"]&nbsp;&nbsp;&nbsp;&nbsp;[/span][/td][td][span class="moneyschoolarc"][/span][/td]';
+
+                        if (!$stats['resistance'])          // base creature has no resistance. -> display list item.
+                            $stats['resistance'] = Lang::npc('resistances').Lang::main('colon').'…';
+
+                        $modes['resistance'][] = '[td]'.$m.'&nbsp;&nbsp;&nbsp;&nbsp;[/td]'.$tmpRes;
+                    }
 
                     // Melee Damage
                     $melee = $_altNPCs->getBaseStats('melee');
@@ -321,24 +368,21 @@ class NpcPage extends GenericPage
         $sai = null;
         if ($this->subject->getField('aiName') == 'SmartAI')
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->name]);
+            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->subject->getField('name', true)]);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
                 $guids = DB::World()->selectCol('SELECT guid FROM creature WHERE id = ?d', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
-                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->subject->getField('name', true), 'title' => ' [small](for GUID: '.$_.')[/small]']);
                     if ($sai->prepare())
                         break;
                 }
             }
 
             if ($sai->prepare())
-            {
-                foreach ($sai->getJSGlobals() as $type => $typeIds)
-                    $this->extendGlobalIds($type, $typeIds);
-            }
+                $this->extendGlobalData($sai->getJSGlobals());
             else
                 trigger_error('Creature has SmartAI set in template but no SmartAI defined.');
         }
@@ -367,7 +411,34 @@ class NpcPage extends GenericPage
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-        $smartSpells = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = 0 AND action_type IN (11, 75, 85, 86) AND entryOrGUID = ?d', $this->typeId);
+        $smartScripts = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID = ?d', SAI_SRC_TYPE_CREATURE, array_merge(SAI_ACTION_ALL_SPELLCASTS, SAI_ACTION_ALL_TIMED_ACTION_LISTS), $this->typeId);
+        $smartSpells  = [];
+        $smartTALs    = [];
+        foreach ($smartScripts as $s)
+        {
+            if (in_array($s['action_type'], SAI_ACTION_ALL_SPELLCASTS))
+                $smartSpells[] = $s['action_param1'];
+            else if ($s['action_type'] == SAI_ACTION_CALL_TIMED_ACTIONLIST)
+                $smartTALs[] = $s['action_param1'];
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST)
+            {
+                for ($i = 1; $i < 7; $i++)
+                    if ($s['action_param'.$i])
+                        $smartTALs[] = $s['action_param'.$i];
+            }
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST)
+            {
+                for ($i = $s['action_param1']; $i <= $s['action_param2']; $i++)
+                    $smartTALs[] = $i;
+            }
+            else
+                var_dump($s);
+        }
+
+        if ($smartTALs)
+            if ($_ = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, SAI_ACTION_ALL_SPELLCASTS, $smartTALs))
+                $smartSpells = array_merge($smartSpells, $_);
+
         $tplSpells   = [];
         $conditions  = ['OR'];
 
@@ -421,15 +492,8 @@ class NpcPage extends GenericPage
                     if (in_array($id, $smartSpells))
                     {
                         $normal[$id] = $values;
-                        unset($controled[$id]);
-                        continue;
-                    }
-
-                    // not quite right. All seats should be checked for allowed-to-cast-flag-something
-                    if (!$this->subject->getField('vehicleId') && in_array($id, $tplSpells))
-                    {
-                        $normal[$id] = $values;
-                        unset($controled[$id]);
+                        if (!in_array($id, $tplSpells))
+                            unset($controled[$id]);
                     }
                 }
 
@@ -452,9 +516,9 @@ class NpcPage extends GenericPage
         // tab: summoned by
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', 28], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', 28], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', 28], ['effect3MiscValue', $this->typeId]]
+            ['AND', ['effect1Id', [28, 56, 112]], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', [28, 56, 112]], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', [28, 56, 112]], ['effect3MiscValue', $this->typeId]]
         );
 
         $summoned = new SpellList($conditions);
@@ -473,14 +537,10 @@ class NpcPage extends GenericPage
         if ($this->subject->getField('npcflag') & NPC_FLAG_TRAINER)
         {
             $teachQuery = '
-                SELECT    IFNULL(t2.SpellID, t1.SpellID) AS ARRAY_KEY,
-                          IFNULL(t2.MoneyCost, t1.MoneyCost) AS cost,
-                          IFNULL(t2.ReqSkillLine, t1.ReqSkillLine) AS reqSkillId,
-                          IFNULL(t2.ReqSkillRank, t1.ReqSkillRank) AS reqSkillValue,
-                          IFNULL(t2.ReqLevel, t1.ReqLevel) AS reqLevel
-                FROM      npc_trainer t1
-                LEFT JOIN npc_trainer t2 ON t2.ID = IF(t1.SpellID < 0, -t1.SpellID, null)
-                WHERE     t1.ID = ?d
+                SELECT  ts.SpellId AS ARRAY_KEY, ts.MoneyCost AS cost, ts.ReqSkillLine AS reqSkillId, ts.ReqSkillRank AS reqSkillValue, ts.ReqLevel AS reqLevel, ts.ReqAbility1 AS reqSpellId1, ts.reqAbility2 AS reqSpellId2
+                FROM    trainer_spell ts
+                JOIN    creature_default_trainer cdt ON cdt.TrainerId = ts.TrainerId
+                WHERE   cdt.Creatureid = ?d
             ';
 
             if ($tSpells = DB::World()->select($teachQuery, $this->typeId))
@@ -499,11 +559,26 @@ class NpcPage extends GenericPage
 
                         if ($_ = $train['reqSkillId'])
                         {
-                            $this->extendGlobalIds(TYPE_SKILL, $_);
-                            if (!isset($extra[0]))
-                                $extra[0] = '$Listview.extraCols.condition';
+                            if (count($data[$sId]['skill']) == 1 && $_ != $data[$sId]['skill'][0])
+                            {
+                                $this->extendGlobalIds(TYPE_SKILL, $_);
+                                if (!isset($extra[0]))
+                                    $extra[0] = '$Listview.extraCols.condition';
 
-                            $data[$sId]['condition'][0][$this->typeId][] = [[CND_SKILL, $_, $train['reqSkillValue']]];
+                                $data[$sId]['condition'][0][$this->typeId][] = [[CND_SKILL, $_, $train['reqSkillValue']]];
+                            }
+                        }
+
+                        for ($i = 1; $i < 3; $i++)
+                        {
+                            if ($_ = $train['reqSpellId'.$i])
+                            {
+                                $this->extendGlobalIds(TYPE_SPELL, $_);
+                                if (!isset($extra[0]))
+                                    $extra[0] = '$Listview.extraCols.condition';
+
+                                $data[$sId]['condition'][0][$this->typeId][] = [[CND_SPELL, $_]];
+                            }
                         }
 
                         if ($_ = $train['reqLevel'])
@@ -526,7 +601,7 @@ class NpcPage extends GenericPage
                     );
 
                     if ($extra)
-                        $tabData['extraCols'] = $extra;
+                        $tabData['extraCols'] = array_values($extra);
 
                     $this->lvTabs[] = ['spell', $tabData];
                 }
@@ -837,45 +912,17 @@ class NpcPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerNpc('.$this->typeId.', '.User::$localeId.', {})';
-
-        $s = $this->subject->getSpawns(SPAWNINFO_SHORT);
-
-        $x  = '$WowheadPower.registerNpc('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
-        $x .= "\tmap: ".($s ? "{zone: ".$s[0].", coords: {".$s[1].":".Util::toJSON($s[2])."}}" : '{}')."\n";
-        $x .= "});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('npc'), $msg ?: Lang::npc('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function getRepForId($entries, &$spillover)
@@ -987,79 +1034,10 @@ class NpcPage extends GenericPage
 
     private function getQuotes()
     {
-        $nQuotes  = 0;
-        $quotes   = [];
-        $quoteSrc = DB::World()->select('
-            SELECT
-                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2, ct.`Type`,
-                ct.TextRange AS `range`,
-                IFNULL(bct.`Language`, ct.`Language`) AS lang,
-                IFNULL(NULLIF(bct.MaleText, ""), IFNULL(NULLIF(bct.FemaleText, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.MaleText, ""), IFNULL(NULLIF(bctl.FemaleText, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
-                IF(bct.SoundId > 0, bct.SoundId, ct.Sound) AS soundId
-            FROM
-                creature_text ct
-           {LEFT JOIN
-                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
-            LEFT JOIN
-                broadcast_text bct ON ct.BroadcastTextId = bct.ID
-           {LEFT JOIN
-                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
-            WHERE
-                ct.CreatureID = ?d',
-            User::$localeId ?: DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            $this->typeId
-        );
+        [$quotes, $nQuotes, $soundIds] = Game::getQuotesForCreature($this->typeId, true, $this->subject->getField('name', true));
 
-        foreach ($quoteSrc as $grp => $text)
-        {
-            $group = [];
-            foreach ($text as $t)
-            {
-                if ($t['soundId'])
-                    $this->soundIds[] = $t['soundId'];
-
-                $msg = Util::localizedString($t, 'text');
-                if (!$msg)
-                    continue;
-
-                // fixup .. either set %s for emotes or dont >.<
-                if (in_array($t['Type'], [2, 16]) && strpos($msg, '%s') === false)
-                    $msg = '%s '.$msg;
-
-                // fixup: bad case-insensivity
-                $msg = str_replace('%S', '%s', $msg);
-
-                $line = array(
-                    'range' => $t['range'],
-                    'type'  => 2,                           // [type: 0, 12] say: yellow-ish
-                    'lang'  => !empty($t['lang']) ? Lang::game('languages', $t['lang']) : null,
-                    'text'  => sprintf(Util::parseHtmlText(htmlentities($msg)), $this->name),
-                );
-
-                switch ($t['Type'])
-                {
-                    case  1:                                // yell:
-                    case 14: $line['type'] = 1; break;      // - dark red
-                    case  2:                                // emote:
-                    case 16:                                // "
-                    case  3:                                // boss emote:
-                    case 41: $line['type'] = 4; break;      // - orange
-                    case  4:                                // whisper:
-                    case 15:                                // "
-                    case  5:                                // boss whisper:
-                    case 42: $line['type'] = 3; break;      // - pink-ish
-                }
-
-                $nQuotes++;
-                $group[] = $line;
-            }
-
-            if ($group)
-                $quotes[$grp] = $group;
-        }
+        if ($soundIds)
+            $this->soundIds = array_merge($this->soundIds, $soundIds);
 
         return [$quotes, $nQuotes];
     }

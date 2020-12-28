@@ -217,7 +217,7 @@ if (!CLI)
         if (isset(FileGen::$cliOpts['loadingscreens']))
             $groups[] = 11;
 
-        // filter by pasaed options
+        // filter by passed options
         if (!$groups)                                       // by default do not generate loadingscreens
             unset($paths[11]);
         else
@@ -373,8 +373,8 @@ if (!CLI)
                                 /*
                                     ready for some major bullshitery? well, here it comes anyway!
                                     the class-icon tile [idx: 4] isn't 64x64 but 63x64 .. the right side border is 1px short
-                                    so if we don't watch out, the icons start to shift over and show the borderi
-                                    also the icon border is displayced by 1px
+                                    so if we don't watch out, the icons start to shift over and show the border
+                                    also the icon border is displaced by 1px
                                 */
                                 $from = array(
                                     'x' => $borderOffset + 1 + ($tileSize - ($i == 4 ? 1 : 0)) * $x,

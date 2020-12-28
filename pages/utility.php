@@ -44,15 +44,15 @@ class UtilityPage extends GenericPage
         $this->lvTabs = [];
     }
 
-    public function display($override = '')
+    public function display(string $override = '') : void
     {
         if ($this->rss)                                     // this should not be cached
         {
-            header('Content-Type: application/rss+xml; charset=UTF-8');
+            header(MIME_TYPE_RSS);
             die($this->generateRSS());
         }
         else
-            return parent::display($override);
+            parent::display($override);
     }
 
     protected function generateContent()

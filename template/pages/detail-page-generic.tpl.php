@@ -24,8 +24,6 @@
 <?php
     $this->brick('article');
 
-    $this->brick('mapper');
-
 if (isset($this->extraText)):
 ?>
     <div id="text-generic" class="left"></div>
@@ -40,8 +38,24 @@ if (isset($this->extraText)):
 <?php
 endif;
 
+    $this->brick('mapper');
+
 if (!empty($this->transfer)):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+endif;
+
+if (isset($this->smartAI)):
+?>
+    <div id="text-generic" class="left"></div>
+    <script type="text/javascript">//<![CDATA[
+        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
+            allow: Markup.CLASS_ADMIN,
+            dbpage: true
+        });
+    //]]></script>
+
+    <div class="pad2"></div>
+<?php
 endif;
 
 if (!empty($this->zoneMusic)):

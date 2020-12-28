@@ -313,7 +313,7 @@ class QuestList extends BaseType
         if (!$this->curTpl)
             return null;
 
-        $title = Util::jsEscape(htmlentities($this->getField('name', true)));
+        $title = htmlentities($this->getField('name', true));
         $level = $this->curTpl['level'];
         if ($level < 0)
             $level = 0;
@@ -332,7 +332,7 @@ class QuestList extends BaseType
             $x .= '<table><tr><td><b class="q">'.$title.'</b></td></tr></table>';
 
 
-        $x .= '<table><tr><td><br />'.$this->parseText('objectives');
+        $x .= '<table><tr><td><br />'.$this->parseText('objectives', false);
 
 
         $xReq = '';
@@ -350,7 +350,7 @@ class QuestList extends BaseType
             else
                 $name = $rng > 0 ? CreatureList::getName($rng) : GameObjectList::getName(-$rng);
 
-            $xReq .= '<br /> - '.Util::jsEscape($name).($rngQty > 1 ? ' x '.$rngQty : null);
+            $xReq .= '<br /> - '.$name.($rngQty > 1 ? ' x '.$rngQty : null);
         }
 
         for ($i = 1; $i < 7; $i++)
@@ -361,11 +361,11 @@ class QuestList extends BaseType
             if (!$ri || $riQty < 1)
                 continue;
 
-            $xReq .= '<br /> - '.Util::jsEscape(ItemList::getName($ri)).($riQty > 1 ? ' x '.$riQty : null);
+            $xReq .= '<br /> - '.ItemList::getName($ri).($riQty > 1 ? ' x '.$riQty : null);
         }
 
         if ($et = $this->getField('end', true))
-            $xReq .= '<br /> - '.Util::jsEscape($et);
+            $xReq .= '<br /> - '.$et;
 
         if ($_ = $this->getField('rewardOrReqMoney'))
             if ($_ < 0)
@@ -457,7 +457,7 @@ class QuestListFilter extends Filter
         34 => [FILTER_CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
         36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
         37 => [FILTER_CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
-        37 => [FILTER_CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
+        38 => [FILTER_CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
         42 => [FILTER_CR_STAFFFLAG, 'flags'                                       ], // flags
         43 => [FILTER_CR_CALLBACK,  'cbCurrencyReward', null,                 null], // currencyrewarded [enum]
         44 => [FILTER_CR_CALLBACK,  'cbLoremaster',     null,                 null], // countsforloremaster_stc [yn]

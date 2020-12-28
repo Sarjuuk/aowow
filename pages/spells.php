@@ -91,7 +91,7 @@ class SpellsPage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('spells'));
-        $this->subCat = $pageParam !== null ? '='.$pageParam : '';
+        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
 
         $this->classPanel = false;
         $this->glyphPanel = false;

@@ -36,7 +36,7 @@ class TalentPage extends GenericPage
             $this->isPetCalc ? 'petcalc.js'   : 'talent.js',
             $this->isPetCalc ? 'swfobject.js' : null
         ));
-        $this->addCSS($this->isPetCalc ? ['path' => 'petcalc.css'] : null);
+        $this->addCSS($this->isPetCalc ? ['path' => 'petcalc.css'] : []);
 
         $this->tcType  = $this->isPetCalc ? 'pc' : 'tc';
     }

@@ -54,11 +54,11 @@ class SkillList extends BaseType
                 'category'        => $this->curTpl['typeCat'],
                 'categorybak'     => $this->curTpl['categoryId'],
                 'id'              => $this->id,
-                'name'            => Util::jsEscape($this->getField('name', true)),
+                'name'            => $this->getField('name', true),
                 'profession'      => $this->curTpl['professionMask'],
                 'recipeSubclass'  => $this->curTpl['recipeSubClass'],
                 'specializations' => Util::toJSON($this->curTpl['specializations'], JSON_NUMERIC_CHECK),
-                'icon'            => Util::jsEscape($this->curTpl['iconString'])
+                'icon'            => $this->curTpl['iconString']
             );
         }
 
@@ -70,7 +70,7 @@ class SkillList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[self::$type][$this->id] = ['name' => Util::jsEscape($this->getField('name', true)), 'icon' => Util::jsEscape($this->curTpl['iconString'])];
+            $data[self::$type][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
 
         return $data;
     }

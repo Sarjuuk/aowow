@@ -206,7 +206,7 @@ class SearchPage extends GenericPage
         $this->performSearch();
     }
 
-    public function notFound($title = '', $msg = '')
+    public function notFound(string $title = '', string $msg = '') : void
     {
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
@@ -220,80 +220,53 @@ class SearchPage extends GenericPage
             parent::display();                              // errors are handled in the search-template itself
         }
         else if ($this->searchMask & SEARCH_TYPE_OPEN)
-            $result = $this->generateOpenSearch(true);
-        else /* if ($this->searchMask & SEARCH_TYPE_JSON) */
-            $result = $this->generateJsonSearch(true);
+            $result = [$this->search, []];
+        else if ($this->searchMask & SEARCH_TYPE_JSON)
+            $result = [$this->search, [], []];
 
-        header("Content-type: application/x-javascript");
-        exit($result);
+        header(MIME_TYPE_JSON);
+        exit(Util::toJSON($result));
     }
 
-    public function display($override = '')
+    public function display(string $override = '') : void
     {
         if ($override || ($this->searchMask & SEARCH_TYPE_REGULAR))
-            return parent::display($override);
+            parent::display($override);
         else if ($this->searchMask & SEARCH_TYPE_OPEN)
-        {
-            if (!$this->loadCache($open))
-            {
-                $this->performSearch();
-                $open = $this->generateOpenSearch();
-                $this->saveCache($open);
-            }
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die($open);
-        }
-        else /* if ($this->searchMask & SEARCH_TYPE_JSON) */
-        {
-            if (!$this->loadCache($json))
-            {
-                $this->performSearch();
-                $json = $this->generateJsonSearch();
-                $this->saveCache($json);
-            }
-            header('Content-type: application/x-javascript; charset=utf-8');
-            die($json);
-        }
+            $this->displayExtra([$this, 'generateOpenSearch']);
+        else if ($this->searchMask & SEARCH_TYPE_JSON)
+            $this->displayExtra([$this, 'generateJsonSearch']);
     }
 
-    private function generateJsonSearch($asError = false)   // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;
+    // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;
+    protected function generateJsonSearch()
     {
-        $outItems = '';
-        $outSets  = '';
+        $outItems = [];
+        $outSets  = [];
 
-        if (!$asError)
+        $this->performSearch();
+
+        // items
+        if (!empty($this->lvTabs[6][1]['data']))
+            $outItems = array_values($this->lvTabs[6][1]['data']);
+
+        // item sets
+        if (!empty($this->lvTabs[5][1]['data']))
         {
-            // items
-            if (!empty($this->lvTabs[6][1]['data']))
+            foreach ($this->lvTabs[5][1]['data'] as $k => $v)
             {
-                $items = [];
-                foreach ($this->lvTabs[6][1]['data'] as $k => $v)
-                    $items[] = Util::toJSON($v);
+                unset($v['quality']);
+                if (!$v['heroic'])
+                    unset($v['heroic']);
 
-                $outItems = "\t".implode(",\n\t", $items)."\n";
-            }
-
-            // item sets
-            if (!empty($this->lvTabs[5][1]['data']))
-            {
-                $sets = [];
-                foreach ($this->lvTabs[5][1]['data'] as $k => $v)
-                {
-                    unset($v['quality']);
-                    if (!$v['heroic'])
-                        unset($v['heroic']);
-
-                    $sets[] = Util::toJSON($v);
-                }
-
-                $outSets = "\t".implode(",\n\t", $sets)."\n";
+                $outSets[] = $v;
             }
         }
 
-        return '["'.Util::jsEscape($this->search)."\", [\n".$outItems."],[\n".$outSets.']]';
+        return Util::toJSON([$this->search, $outItems, $outSets]);
     }
 
-    private function generateOpenSearch($asError = false)
+    protected function generateOpenSearch()
     {
         // this one is funny: we want 10 results, ideally equally distributed over each type
         $foundTotal = 0;
@@ -303,11 +276,13 @@ class SearchPage extends GenericPage
             [], [], [], [], [], [], []
         );
 
+        $this->performSearch();
+
         foreach ($this->lvTabs as [ , , , $osInfo])
             $foundTotal += $osInfo[2];
 
-        if (!$foundTotal || $asError)
-            return '["'.Util::jsEscape($this->search).'", []]';
+        if (!$foundTotal)
+            return Util::toJSON([$this->search, []]);
 
         foreach ($this->lvTabs as [ , $tabData, , $osInfo])
         {
@@ -1280,7 +1255,8 @@ class SearchPage extends GenericPage
             [
                 'OR',
                 ['s.typeCat', [0, -9]],
-                ['AND', ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
+                ['s.cuFlags', SPELL_CU_TRIGGERED, '&'],
+                ['s.attributes0', 0x80, '&']
             ],
             $this->createLookup()
         ));

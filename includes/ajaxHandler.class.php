@@ -10,7 +10,7 @@ class AjaxHandler
     protected $params      = [];
     protected $handler;
 
-    protected $contentType = 'application/x-javascript; charset=utf-8';
+    protected $contentType = MIME_TYPE_JSON;
 
     protected $_post       = [];
     protected $_get        = [];
@@ -53,6 +53,24 @@ class AjaxHandler
     public function getContentType() : string
     {
         return $this->contentType;
+    }
+
+    protected function reqPOST(string ...$keys) : bool
+    {
+        foreach ($keys as $k)
+            if (!isset($this->_post[$k]) || $this->_post[$k] === null || $this->_post[$k] === '')
+                return false;
+
+        return true;
+    }
+
+    protected function reqGET(string ...$keys) : bool
+    {
+        foreach ($keys as $k)
+            if (!isset($this->_get[$k]) || $this->_get[$k] === null || $this->_get[$k] === '')
+                return false;
+
+        return true;
     }
 
     protected function checkEmptySet(string $val) : bool

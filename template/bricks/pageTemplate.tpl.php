@@ -25,7 +25,7 @@ if (!empty($this->pageTemplate)):
 endif;
 
 if (!empty($fi)):
-    echo "                Menu.modifyUrl(Menu.findItem(mn_database, [".$fi['menuItem']."]), { filter: '+=".$fi['query']."' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [".$fi['menuItem']."])) });\n";
+    echo "                Menu.modifyUrl(Menu.findItem(mn_database, [".$fi['menuItem']."]), { filter: '+=".Util::jsEscape($fi['query'])."' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [".$fi['menuItem']."])) });\n";
         // $(document).ready(function(){ Menu.modifyUrl(Menu.findItem(mn_path, [1,5]), { filter: 'na=Malgayne'}, { onAppendCollision: fi_mergeFilterParams }) });
 endif;
 ?>

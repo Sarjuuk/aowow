@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxAdmin extends AjaxHandler
 {
-    protected $validParams = ['screenshots', 'siteconfig', 'weight-presets'];
+    protected $validParams = ['screenshots', 'siteconfig', 'weight-presets', 'spawn-override'];
     protected $_get        = array(
         'action' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH   ],
         'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned']],
@@ -14,11 +14,14 @@ class AjaxAdmin extends AjaxHandler
         'type'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
         'typeid' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
         'user'   => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkUser']            ],
-        'val'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ]
+        'val'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
+        'guid'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
+        'area'   => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ],
+        'floor'  => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']           ]
     );
     protected $_post       = array(
         'alt'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                 ],
-        'id'     => [FILTER_SANITIZE_NUMBER_INT, null                                  ],
+        'id'     => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkInt']],
         'scale'  => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkScale']],
         '__icon' => [FILTER_CALLBACK,            ['options' => 'AjaxAdmin::checkKey']  ]
     );
@@ -71,6 +74,13 @@ class AjaxAdmin extends AjaxHandler
             if ($this->_get['action'] == 'save')
                 $this->handler = 'wtSave';
         }
+        else if ($this->params[0] == 'spawn-override')
+        {
+            if (!User::isInGroup(U_GROUP_MODERATOR))
+                return;
+
+            $this->handler = 'spawnPosFix';
+        }
     }
 
     // get all => null (optional)
@@ -115,7 +125,7 @@ class AjaxAdmin extends AjaxHandler
     // resp: ''
     protected function ssApprove() : void
     {
-        if (!$this->_get['id'])
+        if (!$this->reqGET('id'))
         {
             trigger_error('AjaxAdmin::ssApprove - screenshotId empty', E_USER_ERROR);
             return;
@@ -190,7 +200,7 @@ class AjaxAdmin extends AjaxHandler
     // resp: ''
     protected function ssSticky() : void
     {
-        if (!$this->_get['id'])
+        if (!$this->reqGET('id'))
         {
             trigger_error('AjaxAdmin::ssSticky - screenshotId empty', E_USER_ERROR);
             return;
@@ -217,7 +227,7 @@ class AjaxAdmin extends AjaxHandler
     // 2 steps: 1) remove from sight, 2) remove from disk
     protected function ssDelete() : void
     {
-        if (!$this->_get['id'])
+        if (!$this->reqGET('id'))
         {
             trigger_error('AjaxAdmin::ssDelete - screenshotId empty', E_USER_ERROR);
             return;
@@ -266,7 +276,7 @@ class AjaxAdmin extends AjaxHandler
     // resp: ''
     protected function ssRelocate() : void
     {
-        if (!$this->_get['id'] || !$this->_get['typeid'])
+        if (!$this->reqGET('id', 'typeid'))
         {
             trigger_error('AjaxAdmin::ssRelocate - screenshotId or typeId empty', E_USER_ERROR);
             return;
@@ -317,7 +327,7 @@ class AjaxAdmin extends AjaxHandler
 
     protected function confRemove() : string
     {
-        if (!$this->_get['key'])
+        if (!$this->reqGET('key'))
             return 'invalid configuration option given';
 
         if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->_get['key'], CON_FLAG_PERSISTENT))
@@ -357,7 +367,7 @@ class AjaxAdmin extends AjaxHandler
 
     protected function wtSave() : string
     {
-        if (!$this->_post['id'] || !$this->_post['__icon'])
+        if (!$this->reqPOST('id', '__icon'))
             return '3';
 
         // save to db
@@ -383,6 +393,78 @@ class AjaxAdmin extends AjaxHandler
 
         // all done
         return '0';
+    }
+
+    protected function spawnPosFix() : string
+    {
+        if (!$this->reqGET('type', 'guid', 'area', 'floor'))
+            return '-4';
+
+        $guid  = $this->_get['guid'];
+        $type  = $this->_get['type'];
+        $area  = $this->_get['area'];
+        $floor = $this->_get['floor'];
+
+        if (!in_array($type, [TYPE_NPC, TYPE_OBJECT, TYPE_SOUND, TYPE_AREATRIGGER]))
+            return '-3';
+
+        DB::Aowow()->query('REPLACE INTO ?_spawns_override VALUES (?d, ?d, ?d, ?d, ?d)', $type, $guid, $area, $floor, AOWOW_REVISION);
+
+        if ($wPos = Game::getWorldPosForGUID($type, $guid))
+        {
+            if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $wPos[$guid]['posX'], $wPos[$guid]['posY'], $area, $floor))
+            {
+                $updGUIDs = [$guid];
+                $newPos   = array(
+                    'posX'   => $point[0]['posX'],
+                    'posY'   => $point[0]['posY'],
+                    'areaId' => $point[0]['areaId'],
+                    'floor'  => $point[0]['floor']
+                );
+
+                // if creature try for waypoints
+                if ($type == TYPE_NPC)
+                {
+                    $jobs = array(
+                        'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_y AS `posX`, w.position_x AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
+                        'SELECT `entry`, `pointId`, `location_y` AS `posX`, `location_x` AS `posY` FROM `script_waypoint` WHERE `entry` = ?d',
+                        'SELECT `entry`, `pointId`, `position_y` AS `posX`, `position_x` AS `posY` FROM `waypoints` WHERE `entry` = ?d'
+                    );
+
+                    foreach ($jobs as $idx => $job)
+                    {
+                        if ($swp = DB::World()->select($job, $idx ? $wPos[$guid]['id'] : $guid))
+                        {
+                            foreach ($swp as $w)
+                            {
+                                if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
+                                {
+                                    $p = array(
+                                        'posX'   => $point[0]['posX'],
+                                        'posY'   => $point[0]['posY'],
+                                        'areaId' => $point[0]['areaId'],
+                                        'floor'  => $point[0]['floor']
+                                    );
+                                }
+                                DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
+                            }
+                        }
+                    }
+
+                    // also move linked vehicle accessories (on the very same position)
+                    $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.guid FROM ?_spawns s1 JOIN ?_spawns s2 ON s1.posX = s2.posX AND s1.posY = s2.posY AND
+                        s1.areaId = s2.areaId AND s1.floor = s2.floor AND s2.guid < 0 WHERE s1.guid = ?d', $guid));
+                }
+
+                DB::Aowow()->query('UPDATE ?_spawns SET ?a WHERE `type` = ?d AND `guid` IN (?a)', $newPos, $type, $updGUIDs);
+
+                return '1';
+            }
+
+            return '-2';
+        }
+
+        return '-1';
     }
 
     protected function checkKey(string $val) : string
@@ -442,6 +524,17 @@ class AjaxAdmin extends AjaxHandler
                         return true;
 
                     return Profiler::queueStart($msg);
+                };
+                break;
+            case 'acc_auth_mode':
+                $fn = function($x) use (&$msg) {
+                    if ($x == 1 && !extension_loaded('gmp'))
+                    {
+                        $msg .= 'PHP extension GMP is required to use TrinityCore as auth source, but is not currently enabled.<br />';
+                        return false;
+                    }
+
+                    return true;
                 };
                 break;
             default:                                        // nothing to do, everything is fine

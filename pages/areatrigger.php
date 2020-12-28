@@ -29,7 +29,7 @@ class AreaTriggerPage extends GenericPage
 
         $this->subject = new AreaTriggerList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Util::ucFirst(Lang::game('areatrigger')), Lang::areatrigger('notFound'));
+            $this->notFound(Lang::game('areatrigger'), Lang::areatrigger('notFound'));
 
         $this->name = $this->subject->getField('name') ?: 'AT #'.$this->typeId;
     }
@@ -99,14 +99,13 @@ class AreaTriggerPage extends GenericPage
         {
             $sai = new SmartAI(SAI_SRC_TYPE_AREATRIGGER, $this->typeId, ['name' => $this->name, 'teleportA' => $this->subject->getField('teleportA')]);
             if ($sai->prepare())
-                foreach ($sai->getJSGlobals() as $type => $typeIds)
-                    $this->extendGlobalIds($type, $typeIds);
+                $this->extendGlobalData($sai->getJSGlobals());
         }
 
 
         $this->map        = $map;
         $this->infobox    = false;
-        $this->extraText  = $sai ? $sai->getMarkdown() : null;
+        $this->smartAI    = $sai ? $sai->getMarkdown() : null;
         $this->redButtons = array(
             BUTTON_LINKS   => false,
             BUTTON_WOWHEAD => false

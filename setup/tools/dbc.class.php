@@ -42,7 +42,7 @@ class DBC
 {
     private $_formats = array(                                  // locales block for copy pasta: sxsssxsxsxxxxxxxx | xxxxxxxxxxxxxxxxx
         'achievement'                   => 'niiisxsssxsxsxxxxxxxxsxsssxsxsxxxxxxxxiiiiisxsssxsxsxxxxxxxxii',
-        'achievement_category'          => 'nisxsssxsxsxxxxxxxxx',
+        'achievement_category'          => 'nixxxxxxxxxxxxxxxxxx',
         'achievement_criteria'          => 'niiiiiiiisxsssxsxsxxxxxxxxiixii',
         'areatable'                     => 'niixixxiiixsxsssxsxsxxxxxxxxixxxxxxx',
         'areatrigger'                   => 'niffxxxxxf',
@@ -61,6 +61,7 @@ class DBC
         'dungeonmap'                    => 'niiffffi',
         'durabilitycosts'               => 'niiiiiiiiixiiiiiiiiiiixiiiixix',
         'durabilityquality'             => 'nf',
+        'dungeonencounter'              => 'niiiisxsssxsxsxxxxxxxxx',
         'emotes'                        => 'nxixxxx',
         'emotestext'                    => 'nsiixxxixixxxxxxxxx',
         'emotestextdata'                => 'nsxsssxsxsxxxxxxxx',
@@ -99,6 +100,7 @@ class DBC
         'overridespelldata'             => 'niiiixixxxxx',
         'powerdisplay'                  => 'nisbbb',
         'questfactionreward'            => 'niiiiiiiiii',
+        'questsort'                     => 'nsxsssxsxsxxxxxxxx',
         'questxp'                       => 'niiiiiiiiii',
         'randproppoints'                => 'niiiiiiiiiiiiiii',
         'scalingstatdistribution'       => 'niiiiiiiiiiiiiiiiiiiii',
@@ -143,7 +145,7 @@ class DBC
 
     private $_fields = array(
         'achievement'                   => 'id,faction,map,previous,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8,description_loc0,description_loc2,description_loc3,description_loc4,description_loc6,description_loc8,category,points,orderInGroup,flags,iconId,reward_loc0,reward_loc2,reward_loc3,reward_loc4,reward_loc6,reward_loc8,reqCriteriaCount,refAchievement',
-        'achievement_category'          => 'id,parentCategory,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8',
+        'achievement_category'          => 'id,parentCategory',
         'achievement_criteria'          => 'id,refAchievementId,type,value1,value2,value3,value4,value5,value6,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8,completionFlags,groupFlags,timeLimit,order',
         'areatable'                     => 'id,mapId,areaTable,flags,soundAmbience,zoneMusic,zoneIntroMusic,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8,factionGroupMask',
         'areatrigger'                   => 'id,mapId,posY,posX,orientation',
@@ -162,6 +164,7 @@ class DBC
         'dungeonmap'                    => 'id,mapId,floor,minY,maxY,minX,maxX,areaId',
         'durabilitycosts'               => 'id,w0,w1,w2,w3,w4,w5,w6,w7,w8,w10,w11,w12,w13,w14,w15,w16,w17,w18,w19,w20,a1,a2,a3,a4,a6',
         'durabilityquality'             => 'id,mod',
+        'dungeonencounter'              => 'id,map,mode,order,bit,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8',
         'emotes'                        => 'id,animationId',
         'emotestext'                    => 'id,command,emoteId,targetId,noTargetId,selfId',
         'emotestextsound'               => 'id,emotesTextId,raceId,gender,soundId',
@@ -200,6 +203,7 @@ class DBC
         'overridespelldata'             => 'id,spellId1,spellId2,spellId3,spellId4,spellId5',
         'powerdisplay'                  => 'id,realType,globalString,r,g,b',
         'questfactionreward'            => 'id,field1,field2,field3,field4,field5,field6,field7,field8,field9,field10',
+        'questsort'                     => 'id,name_loc0,name_loc2,name_loc3,name_loc4,name_loc6,name_loc8',
         'questxp'                       => 'id,field1,field2,field3,field4,field5,field6,field7,field8,field9,field10',
         'randproppoints'                => 'id,epic1,epic2,epic3,epic4,epic5,rare1,rare2,rare3,rare4,rare5,uncommon1,uncommon2,uncommon3,uncommon4,uncommon5',
         'scalingstatdistribution'       => 'id,statMod1,statMod2,statMod3,statMod4,statMod5,statMod6,statMod7,statMod8,statMod9,statMod10,modifier1,modifier2,modifier3,modifier4,modifier5,modifier6,modifier7,modifier8,modifier9,modifier10,maxLevel',

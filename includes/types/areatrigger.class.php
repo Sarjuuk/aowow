@@ -18,19 +18,16 @@ class AreaTriggerList extends BaseType
                         's'      => ['j' => ['?_spawns s ON s.type = 503 AND s.typeId = a.id', true], 's' => ', s.areaId']
                     );
 
-    public function __construct($conditions = [])
+    public function __construct($conditions)
     {
         parent::__construct($conditions);
 
-        // post processing
-        foreach ($this->iterate() as &$curTpl)
-        {
-            // remap for generic access
-            // $curTpl['name'] = $curTpl['cmd'];
-        }
+        foreach ($this->iterate() as $id => &$_curTpl)
+            if (!$_curTpl['name'])
+                $_curTpl['name'] = 'Unnamed Areatrigger #' . $id;
     }
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -51,12 +48,7 @@ class AreaTriggerList extends BaseType
 
     public function getJSGlobals($addMask = GLOBALINFO_ANY)
     {
-        $data = [];
-
-        // foreach ($this->iterate() as $__)
-            // $data[TYPE_EMOTE][$this->id] = ['name' => $this->getField('cmd')];
-
-        return $data;
+        return [];
     }
 
     public function renderTooltip() { }

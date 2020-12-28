@@ -37,7 +37,7 @@ class AchievementList extends BaseType
             SELECT
                 ar.ID AS ARRAY_KEY, ar.TitleA, ar.TitleH, ar.ItemID, ar.Sender AS sender, ar.MailTemplateID,
                 ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl4.Subject, "") AS subject_loc4, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
-                ar.Body    AS text_loc0,    IFNULL(arl2.Text,    "") AS text_loc2,    IFNULL(arl3.Text,    "") AS text_loc3,    IFNULL(arl4.Text,    "") AS text_loc4,    IFNULL(arl6.Text,    "") AS text_loc6,    IFNULL(arl8.Text,    "") AS text_loc8
+                ar.Body    AS text_loc0,    IFNULL(arl2.Body,    "") AS text_loc2,    IFNULL(arl3.Body,    "") AS text_loc3,    IFNULL(arl4.Body,    "") AS text_loc4,    IFNULL(arl6.Body,    "") AS text_loc6,    IFNULL(arl8.Body,    "") AS text_loc8
             FROM
                 achievement_reward ar
             LEFT JOIN
@@ -63,11 +63,13 @@ class AchievementList extends BaseType
             {
                 $_curTpl = array_merge($rewards[$_id], $_curTpl);
 
+                $_curTpl['mailTemplate'] = $rewards[$_id]['MailTemplateID'];
+
                 if ($rewards[$_id]['MailTemplateID'])
                 {
                     // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
                     // $mailSrc = new Loot();
-                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['mailTemplate']);
+                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['MailTemplateID']);
                     // foreach ($mailSrc->iterate() as $loot)
                         // $_curTpl['rewards'][] = [TYPE_ITEM, $loot['id']];
 
@@ -149,7 +151,7 @@ class AchievementList extends BaseType
         if (isset($this->criteria[$this->id]))
             return $this->criteria[$this->id];
 
-        $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievementId` = ?d ORDER BY `order` ASC', $this->id);
+        $result = DB::Aowow()->Select('SELECT * FROM ?_achievementcriteria WHERE `refAchievementId` = ?d ORDER BY `order` ASC', $this->curTpl['refAchievement'] ?: $this->id);
         if (!$result)
             return [];
 
@@ -224,7 +226,7 @@ class AchievementList extends BaseType
                     break;
             }
 
-            $criteria .= '<!--cr'.$crt['id'].':'.$crt['type'].':'.$crt['value1'].'-->- '.Util::jsEscape($crtName);
+            $criteria .= '<!--cr'.$crt['id'].':'.$crt['type'].':'.$crt['value1'].'-->- '.$crtName;
 
             if ($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_MONEY_COUNTER)
                 $criteria .= '&nbsp;<span class="moneygold">'.Lang::nf($crt['value2' ] / 10000).'</span>';
@@ -236,13 +238,13 @@ class AchievementList extends BaseType
         }
 
         $x  = '<table><tr><td><b class="q">';
-        $x .= Util::jsEscape($name);
+        $x .= $name;
         $x .= '</b></td></tr></table>';
         if ($description || $criteria)
             $x .= '<table><tr><td>';
 
         if ($description)
-            $x .= '<br />'.Util::jsEscape($description).'<br />';
+            $x .= '<br />'.$description.'<br />';
 
         if ($criteria)
         {

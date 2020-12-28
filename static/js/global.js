@@ -11818,7 +11818,7 @@ Listview.templates = {
             }));
 
 
-            /* Aowow - we do not use FA
+            /* Aowow - we do not use FontAwesome
             $WH.ae(ovlName, $WH.g_createButton(null, null, {
                 'class': 'fa fa-fw fa-clipboard',
                 'float': false,
@@ -12822,12 +12822,10 @@ Listview.templates = {
                     return Listview.funcBox.assocArrCmp(a.skill, b.skill, g_spell_skills);
                 }
             },
-    /* aowow
-        todo: localize he next three cols
-    */
+    /* AoWoW: custom start */
             {
                 id: 'stackRules',
-                name: 'Behaviour',
+                name: LANG.asr_behaviour,
                 type: 'text',
                 width: '20%',
                 hidden: true,
@@ -12842,15 +12840,15 @@ Listview.templates = {
 
                     switch (spell.stackRule) {
                         case 3:
-                            buff2 = '(strongest effect is applied)';
+                            buff2 = LANG.asr_strongest_effect;
                         case 0:
-                            buff  = 'coexist';              // without condition
+                            buff  = LANG.asr_coexist;       // without condition
                             break;
                         case 2:
                         case 4:
-                            buff2 = spell.stackRule == 2 ? '(from same caster)' : '(strongest effect is applied)';
+                            buff2 = spell.stackRule == 2 ? LANG.asr_same_owner : LANG.asr_strongest_effect;
                         case 1:
-                            buff  = 'exclusive';            // without condition
+                            buff  = LANG.asr_exclusive;     // without condition
                             break;
                     }
 
@@ -12879,14 +12877,14 @@ Listview.templates = {
                     var buff = '';
                     switch (spell.stackRule) {
                         case 3:
-                            buff += '(strongest effect is applied)';
+                            buff += LANG.asr_strongest_effect;
                         case 0:
-                            buff += ' coexist';
+                            buff += ' ' + LANG.asr_coexist;
                             break;
                         case 2:
-                            buff += '(from same caster)';
+                            buff += LANG.asr_same_owner;
                         case 1:
-                            buff += ' exclusive';
+                            buff += ' ' + LANG.asr_exclusive;
                             break;
                     }
 
@@ -12898,7 +12896,7 @@ Listview.templates = {
             },
             {
                 id: 'linkedTrigger',
-                name: 'Triggers',
+                name: LANG.ls_trigger,
                 type: 'text',
                 width: '50%',
                 hidden: true,
@@ -12913,13 +12911,13 @@ Listview.templates = {
 
                     switch (spell.linked[2]) {
                         case 0:
-                            buff = trigger > 0 ? 'When Spell is casted' : 'When Aura is removed';
+                            buff = trigger > 0 ? LANG.ls_onCast : LANG.ls_onAuraRemove;
                             break;
                         case 1:
-                            buff = 'When Spell hits the target(s)';
+                            buff = LANG.ls_onSpellHit;
                             break;
                         case 2:
-                            buff = 'When Aura is applied and removed';
+                            buff = LANG.ls_onAuraApply;
                             break;
                     }
 
@@ -12931,7 +12929,7 @@ Listview.templates = {
                     a.href = '?spell=' + Math.abs(trigger);
                     if (g_pageInfo.typeId == Math.abs(trigger)) { // ponts to self
                         a.className = 'q1';
-                        $WH.st(a, 'This');
+                        $WH.st(a, LANG.ls_self);
                     }
                     else {
                         var item = g_spells[Math.abs(trigger)];
@@ -12958,7 +12956,7 @@ Listview.templates = {
                         buff    = '';
 
                     if (g_pageInfo.typeId == Math.abs(trigger)) {
-                        buff += 'This';
+                        buff += LANG.ls_self;
                     }
                     else {
                         buff += g_spells[Math.abs(trigger)]['name_' + Locale.getName()];
@@ -12966,13 +12964,13 @@ Listview.templates = {
 
                     switch (spell.linked[2]) {
                         case 0:
-                            buff += trigger > 0 ? ' When Spell is casted' : ' When Aura is removed';
+                            buff += trigger > 0 ? ' ' + LANG.ls_onCast : ' ' + LANG.ls_onAuraRemove;
                             break;
                         case 1:
-                            buff += ' When Spell hits the target(s)';
+                            buff += ' ' + LANG.ls_onSpellHit;
                             break;
                         case 2:
-                            buff += ' When Aura is applied and removed';
+                            buff += ' ' + LANG.ls_onAuraApply;
                             break;
                     }
 
@@ -13005,7 +13003,7 @@ Listview.templates = {
             },
             {
                 id: 'linkedEffect',
-                name: 'Effects',
+                name: LANG.ls_effects,
                 type: 'text',
                 width: '50%',
                 hidden: true,
@@ -13021,10 +13019,10 @@ Listview.templates = {
                     switch (spell.linked[2]) {
                         case 0:
                         case 1:
-                            buff = effect > 0 ? 'Spell is triggered' : 'Spells Auras are removed';
+                            buff = effect > 0 ? LANG.ls_onTrigger : LANG.ls_onAuraRemove;
                             break;
                         case 2:
-                            buff = effect > 0 ? 'Spells Auras are applied or removed' : 'Immunity against Spell is applied or cleared ';
+                            buff = effect > 0 ? LANG.ls_onAuraApply : LANG.ls_onImmune;
                             break;
                     }
 
@@ -13034,9 +13032,9 @@ Listview.templates = {
                     var a = $WH.ce('a');
                     a.style.whiteSpace = 'nowrap';
                     a.href = '?spell=' + Math.abs(effect);
-                    if (g_pageInfo.typeId == Math.abs(effect)) { // ponts to self
+                    if (g_pageInfo.typeId == Math.abs(effect)) { // points to self
                         a.className = 'q1';
-                        $WH.st(a, 'This');
+                        $WH.st(a, LANG.ls_self);
                     }
                     else {
                         var item = g_spells[Math.abs(effect)];
@@ -13063,7 +13061,7 @@ Listview.templates = {
                         buff   = '';
 
                     if (g_pageInfo.typeId == Math.abs(effect)) {
-                        buff += 'This';
+                        buff += LANG.ls_self;
                     }
                     else {
                         buff += g_spells[Math.abs(effect)]['name_' + Locale.getName()];
@@ -13072,10 +13070,10 @@ Listview.templates = {
                     switch (spell.linked[2]) {
                         case 0:
                         case 1:
-                            buff += effect > 0 ? ' Spell is triggered' : ' Spells Auras are removed';
+                            buff += effect > 0 ? ' ' + LANG.ls_onTrigger : ' ' + LANG.ls_onAuraRemove;
                             break;
                         case 2:
-                            buff += effect > 0 ? ' Spells Auras are applied or removed' : ' Immunity against Spell is applied or cleared ';
+                            buff += effect > 0 ? ' ' + LANG.ls_onAuraApply : ' ' + LANG.ls_onImmune;
                             break;
                     }
 
@@ -13106,6 +13104,7 @@ Listview.templates = {
                     return 0;
                 }
             }
+    /* AoWoW: custom end */
         ],
 
         getItemLink: function(spell) {
@@ -17148,6 +17147,8 @@ var Menu = new function()
 
             $menuItems.each(function () { $innerDiv.append(this) });
             $outerDiv.append($innerDiv);
+
+            $outerDiv.contextmenu($WH.rf);                  // aowow custom: prevent browser context menu when right clicking to get our context menu as it placed under the mouse cursor
 
             return $outerDiv;
         }
@@ -21543,7 +21544,7 @@ var Announcement = function(opt) {
         return;
     }
 
-    if (g_user.id == 0 && (!g_cookiesEnabled() || g_getWowheadCookie('announcement-' + this.id) == 'closed')) {
+    if (g_user.id > 0 && (!g_cookiesEnabled() || g_getWowheadCookie('announcement-' + this.id) == 'closed')) {
         return;
     }
 
@@ -22647,7 +22648,8 @@ var g_types = {
      29: 'icon',
     501: 'emote',
     502: 'enchantment',
-    503: 'areatrigger'
+    503: 'areatrigger',
+    504: 'mail'
 };
 
 // Items
@@ -23073,7 +23075,7 @@ var ConditionList = new function() {
             }
         }
 
-        return rows.length > 1 ? '[ul][li]' + rows.join('[/li][li]') + '[/li][/ul]' : rows[0];
+        return rows.length > 1 ? rows.join('[br]') : rows[0];
     }
 
 }

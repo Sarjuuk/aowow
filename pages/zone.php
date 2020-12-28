@@ -97,7 +97,7 @@ class ZonePage extends GenericPage
         {
             foreach ($attmnt as $type => $ids)
             {
-                $this->extendGlobalIds($type, array_map('abs', $ids));
+                $this->extendGlobalIds($type, ...array_map('abs', $ids));
                 foreach ($ids as $id)
                 {
                     if ($type == TYPE_ITEM)
@@ -111,7 +111,7 @@ class ZonePage extends GenericPage
         // Instances
         if ($_ = DB::Aowow()->selectCol('SELECT id FROM ?_zones WHERE parentAreaId = ?d AND (flags & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
-            $this->extendGlobalIds(TYPE_ZONE, $_);
+            $this->extendGlobalIds(TYPE_ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
         }
 
@@ -384,12 +384,10 @@ class ZonePage extends GenericPage
                 if (!$tpl)
                     continue;
 
-                $n  = Util::localizedString($tpl, 'name');
-
                 $addToSOM('areatrigger', array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
-                    'name'          => $tpl['name'] ?: 'Unnamed AT #'.$spawn['typeId'],
+                    'name'          => Util::localizedString($tpl, 'name', true, true),
                     'type'          => TYPE_AREATRIGGER,
                     'id'            => $spawn['typeId'],
                     'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])
@@ -680,7 +678,7 @@ class ZonePage extends GenericPage
                             if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
-                        $this->extendGlobalIds(TYPE_RACE, $foo);
+                        $this->extendGlobalIds(TYPE_RACE, ...$foo);
                         $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 

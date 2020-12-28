@@ -100,8 +100,8 @@ CREATE TABLE `aowow_account_cookies` (
   `userId` int(10) unsigned NOT NULL,
   `name` varchar(127) COLLATE utf8mb4_unicode_ci NOT NULL,
   `data` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`userId`),
-  UNIQUE KEY `userId_name` (`userId`,`name`),
+  INDEX `userId` (`userId`) USING BTREE,
+  UNIQUE KEY `userId_name` (`userId`,`name`) USING BTREE,
   CONSTRAINT `FK_acc_cookies` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -270,16 +270,10 @@ DROP TABLE IF EXISTS `aowow_achievementcategory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_achievementcategory` (
-  `id` int(11) unsigned NOT NULL,
-  `parentCategory` mediumint(9) NOT NULL,
-  `name_loc0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc2` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc3` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc4` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc6` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name_loc8` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_achievement` (`parentCategory`)
+  `id` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `parentCat` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `parentCat2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -535,9 +529,7 @@ CREATE TABLE `aowow_creature` (
   `dynamicFlags` int(10) unsigned NOT NULL DEFAULT 0,
   `family` tinyint(4) NOT NULL DEFAULT 0,
   `trainerType` tinyint(4) NOT NULL DEFAULT 0,
-  `trainerSpell` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `trainerClass` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `trainerRace` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `trainerRequirement` smallint(5) unsigned NOT NULL DEFAULT 0,
   `dmgMin` float unsigned NOT NULL DEFAULT 0,
   `dmgMax` float unsigned NOT NULL DEFAULT 0,
   `mleAtkPwrMin` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -568,6 +560,12 @@ CREATE TABLE `aowow_creature` (
   `manaMax` int(10) unsigned NOT NULL DEFAULT 1,
   `armorMin` mediumint(8) unsigned NOT NULL DEFAULT 1,
   `armorMax` mediumint(8) unsigned NOT NULL DEFAULT 1,
+  `resistance1` smallint(5) NOT NULL DEFAULT 0,
+  `resistance2` smallint(5) NOT NULL DEFAULT 0,
+  `resistance3` smallint(5) NOT NULL DEFAULT 0,
+  `resistance4` smallint(5) NOT NULL DEFAULT 0,
+  `resistance5` smallint(5) NOT NULL DEFAULT 0,
+  `resistance6` smallint(5) NOT NULL DEFAULT 0,
   `racialLeader` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `mechanicImmuneMask` int(10) unsigned NOT NULL DEFAULT 0,
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT 0,
@@ -1575,34 +1573,37 @@ DROP TABLE IF EXISTS `aowow_loot_link`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_loot_link` (
-  `npcId` mediumint(8) NOT NULL,
+  `npcId` mediumint(8) NOT NULL COMMENT 'id > 0 normal; id < 0 heroic',
   `objectId` mediumint(8) unsigned NOT NULL,
+  `priority` tinyint(1) unsigned NOT NULL COMMENT '1: use this npc from group encounter (others 0)',
+  `encounterId` mediumint(8) unsigned NOT NULL COMMENT 'as title reference',
   UNIQUE KEY `npcId` (`npcId`),
   KEY `objectId` (`objectId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `aowow_mailtemplate`
+-- Table structure for table `aowow_mails`
 --
 
-DROP TABLE IF EXISTS `aowow_mailtemplate`;
+DROP TABLE IF EXISTS `aowow_mails`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `aowow_mailtemplate` (
-  `id` smallint(5) unsigned NOT NULL,
+CREATE TABLE `aowow_mails` (
+  `id` smallint(5) NOT NULL,
   `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc4` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc6` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc8` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc0` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc2` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc3` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc4` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc6` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `text_loc8` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc0` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc2` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc3` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc4` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc6` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `text_loc8` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attachment` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1961,6 +1962,7 @@ CREATE TABLE `aowow_quests` (
   `eventId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `prevQuestId` mediumint(8) NOT NULL DEFAULT 0,
   `nextQuestId` mediumint(8) NOT NULL DEFAULT 0,
+  `breadcrumbForQuestId` mediumint(8) NOT NULL DEFAULT 0,
   `exclusiveGroup` mediumint(8) NOT NULL DEFAULT 0,
   `nextQuestIdChain` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `flags` int(10) unsigned NOT NULL DEFAULT 0,
@@ -2496,6 +2498,23 @@ CREATE TABLE `aowow_spawns` (
   KEY `type_idx` (`typeId`,`type`),
   KEY `zone_idx` (`areaId`),
   KEY `guid` (`guid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_spawns_override`
+--
+
+DROP TABLE IF EXISTS `aowow_spawns_override`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_spawns_override` (
+  `type` smallint(5) unsigned NOT NULL,
+  `typeGuid` mediumint(9) NOT NULL,
+  `areaId` mediumint(8) unsigned NOT NULL,
+  `floor` mediumint(8) unsigned NOT NULL,
+  `revision` tinyint(3) unsigned NOT NULL COMMENT 'Aowow revision, when this override was applied',
+  PRIMARY KEY (`type`, `typeGuid`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3119,7 +3138,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1543774779,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1608244865,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3159,7 +3178,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_loot_link` WRITE;
 /*!40000 ALTER TABLE `aowow_loot_link` DISABLE KEYS */;
-INSERT INTO `aowow_loot_link` VALUES (17537,185168),(18434,185169),(17536,185168),(18432,185169),(19218,184465),(21525,184849),(19710,184465),(21526,184849),(28234,190586),(-28234,193996),(27656,191349),(31561,193603),(26533,190663),(31217,193597),(16064,181366),(30603,193426),(16065,181366),(30601,193426),(30549,181366),(30600,193426),(16063,181366),(30602,193426),(28859,193905),(31734,193967),(32930,195046),(33909,195047),(32865,194313),(33147,194315),(33350,194957),(-33350,194958),(32845,194200),(32846,194201),(32906,194324),(33360,194325),(32871,194821),(33070,194822),(35119,195374),(35518,195375),(34928,195323),(35517,195324),(34705,195709),(36088,195710),(34702,195709),(36082,195710),(34701,195709),(36083,195710),(34657,195709),(36086,195710),(34703,195709),(36087,195710),(35572,195709),(36089,195710),(35569,195709),(36085,195710),(35571,195709),(36090,195710),(35570,195709),(36091,195710),(35617,195709),(36084,195710),(34441,195631),(34442,195632),(34443,195633),(-34443,195635),(34444,195631),(35740,195632),(35741,195633),(-35741,195635),(34445,195631),(35705,195632),(35706,195633),(-35706,195635),(34447,195631),(35683,195632),(35684,195633),(-35684,195635),(34448,195631),(35724,195632),(35725,195633),(-35725,195635),(34449,195631),(35689,195632),(35690,195633),(-35690,195635),(34450,195631),(35695,195632),(35696,195633),(-35696,195635),(34451,195631),(35671,195632),(35672,195633),(-35672,195635),(34453,195631),(35718,195632),(35719,195633),(-35719,195635),(34454,195631),(35711,195632),(35712,195633),(-35712,195635),(34455,195631),(35680,195632),(35681,195633),(-35681,195635),(34456,195631),(35708,195632),(35709,195633),(-35709,195635),(34458,195631),(35692,195632),(35693,195633),(-35693,195635),(34459,195631),(35686,195632),(35687,195633),(-35687,195635),(34460,195631),(35702,195632),(35703,195633),(-35703,195635),(34461,195631),(35743,195632),(35744,195633),(-35744,195635),(34463,195631),(35734,195632),(35735,195633),(-35735,195635),(34465,195631),(35746,195632),(35747,195633),(-35747,195635),(34466,195631),(35665,195632),(35666,195633),(-35666,195635),(34467,195631),(35662,195632),(35663,195633),(-35663,195635),(34468,195631),(35721,195632),(35722,195633),(-35722,195635),(34469,195631),(35714,195632),(35715,195633),(-35715,195635),(34470,195631),(35728,195632),(35729,195633),(-35729,195635),(34471,195631),(35668,195632),(35669,195633),(-35669,195635),(34472,195631),(35699,195632),(35700,195633),(-35700,195635),(34473,195631),(35674,195632),(35675,195633),(-35675,195635),(34474,195631),(35731,195632),(35732,195633),(-35732,195635),(34475,195631),(35737,195632),(35738,195633),(-35738,195635),(37226,201710),(-37226,202336),(36948,202178),(38157,202180),(38639,202177),(38640,202179),(36939,202178),(38156,202180),(38637,202177),(38638,202179);
+INSERT INTO `aowow_loot_link` VALUES (17537,185168,1,0),(18434,185169,1,0),(17536,185168,0,0),(18432,185169,0,0),(19218,184465,1,0),(21525,184849,1,0),(19710,184465,0,0),(21526,184849,0,0),(28234,190586,0,0),(-28234,193996,0,0),(27656,191349,0,0),(31561,193603,0,0),(26533,190663,0,0),(31217,193597,0,0),(16064,181366,0,692),(30603,193426,0,692),(16065,181366,0,692),(30601,193426,0,692),(30549,181366,1,692),(30600,193426,1,692),(16063,181366,0,692),(30602,193426,0,692),(28859,193905,0,0),(31734,193967,0,0),(32930,195046,0,0),(33909,195047,0,0),(32865,194313,0,0),(33147,194315,0,0),(33350,194957,0,0),(-33350,194958,0,0),(32845,194200,0,0),(32846,194201,0,0),(32906,194324,0,0),(33360,194325,0,0),(32871,194821,0,0),(33070,194822,0,0),(35119,195374,0,0),(35518,195375,0,0),(34928,195323,0,0),(35517,195324,0,0),(34705,195709,0,334),(36088,195710,0,334),(34702,195709,0,334),(36082,195710,0,334),(34701,195709,0,334),(36083,195710,0,334),(34657,195709,0,334),(36086,195710,0,334),(34703,195709,0,334),(36087,195710,0,334),(35572,195709,0,334),(36089,195710,0,334),(35569,195709,1,334),(36085,195710,1,334),(35571,195709,0,334),(36090,195710,0,334),(35570,195709,0,334),(36091,195710,0,334),(35617,195709,0,334),(36084,195710,0,334),(34441,195631,1,637),(34442,195632,1,637),(34443,195633,1,637),(35749,195635,1,637),(34444,195631,0,637),(35740,195632,0,637),(35741,195633,0,637),(-35741,195635,0,637),(34445,195631,0,637),(35705,195632,0,637),(35706,195633,0,637),(-35706,195635,0,637),(34447,195631,0,637),(35683,195632,0,637),(35684,195633,0,637),(-35684,195635,0,637),(34448,195631,0,637),(35724,195632,0,637),(35725,195633,0,637),(-35725,195635,0,637),(34449,195631,0,637),(35689,195632,0,637),(35690,195633,0,637),(-35690,195635,0,637),(34450,195631,0,637),(35695,195632,0,637),(35696,195633,0,637),(-35696,195635,0,637),(34451,195631,0,637),(35671,195632,0,637),(35672,195633,0,637),(-35672,195635,0,637),(34453,195631,0,637),(35718,195632,0,637),(35719,195633,0,637),(-35719,195635,0,637),(34454,195631,0,637),(35711,195632,0,637),(35712,195633,0,637),(-35712,195635,0,637),(34455,195631,0,637),(35680,195632,0,637),(35681,195633,0,637),(-35681,195635,0,637),(34456,195631,0,637),(35708,195632,0,637),(35709,195633,0,637),(-35709,195635,0,637),(34458,195631,0,637),(35692,195632,0,637),(35693,195633,0,637),(-35693,195635,0,637),(34459,195631,0,637),(35686,195632,0,637),(35687,195633,0,637),(-35687,195635,0,637),(34460,195631,0,637),(35702,195632,0,637),(35703,195633,0,637),(-35703,195635,0,637),(34461,195631,0,637),(35743,195632,0,637),(35744,195633,0,637),(-35744,195635,0,637),(34463,195631,0,637),(35734,195632,0,637),(35735,195633,0,637),(-35735,195635,0,637),(34465,195631,0,637),(35746,195632,0,637),(35747,195633,0,637),(-35747,195635,0,637),(34466,195631,0,637),(35665,195632,0,637),(35666,195633,0,637),(-35666,195635,0,637),(34467,195631,0,637),(35662,195632,0,637),(35663,195633,0,637),(-35663,195635,0,637),(34468,195631,0,637),(35721,195632,0,637),(35722,195633,0,637),(-35722,195635,0,637),(34469,195631,0,637),(35714,195632,0,637),(35715,195633,0,637),(-35715,195635,0,637),(34470,195631,0,637),(35728,195632,0,637),(35729,195633,0,637),(-35729,195635,0,637),(34471,195631,0,637),(35668,195632,0,637),(35669,195633,0,637),(-35669,195635,0,637),(34472,195631,0,637),(35699,195632,0,637),(35700,195633,0,637),(-35700,195635,0,637),(34473,195631,0,637),(35674,195632,0,637),(35675,195633,0,637),(-35675,195635,0,637),(34474,195631,0,637),(35731,195632,0,637),(35732,195633,0,637),(-35732,195635,0,637),(34475,195631,0,637),(35737,195632,0,637),(35738,195633,0,637),(-35738,195635,0,637),(37226,201710,0,0),(-37226,202336,0,0),(36948,202178,0,847),(38157,202180,0,847),(38639,202177,0,847),(38640,202179,0,847),(36939,202178,0,847),(38156,202180,0,847),(38637,202177,0,847),(38638,202179,0,847),(9034,169243,0,243),(9035,169243,1,243),(9036,169243,0,243),(9037,169243,0,243),(9038,169243,0,243),(9039,169243,0,243),(9040,169243,0,243),(37813,202238,0,0),(38402,202239,0,0),(38582,202240,0,0),(38583,202241,0,0),(36789,201959,0,0),(-36789,202338,0,0),(38174,202339,0,0),(-38174,202340,0,0);
 /*!40000 ALTER TABLE `aowow_loot_link` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3179,7 +3198,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_profiler_excludes` WRITE;
 /*!40000 ALTER TABLE `aowow_profiler_excludes` DISABLE KEYS */;
-INSERT INTO `aowow_profiler_excludes` VALUES (6,459,1,'Gray Wolf'),(6,468,1,'White Stallion'),(6,471,1,'Palamino'),(6,472,1,'Pinto'),(6,578,1,'Black Wolf'),(6,579,1,'Red Wolf'),(6,581,1,'Winter Wolf'),(6,3363,1,'Nether Drake'),(6,6896,1,'Black Ram'),(6,6897,1,'Blue Ram'),(6,8980,1,'Skeletal Horse'),(6,10681,1,'Summon Cockatoo'),(6,10686,1,'Summon Prairie Chicken'),(6,10687,1,'Summon White Plymouth Rock'),(6,10699,1,'Summon Bronze Whelpling'),(6,10700,1,'Summon Faeling'),(6,10701,1,'Summon Dart Frog'),(6,10702,1,'Summon Island Frog'),(6,10705,1,'Summon Eagle Owl'),(6,10708,1,'Summon Snowy Owl'),(6,10710,1,'Summon Cottontail Rabbit'),(6,10712,1,'Summon Spotted Rabbit'),(6,10715,1,'Summon Blue Racer'),(6,10718,1,'Green Water Snake'),(6,10719,1,'Ribbon Snake'),(6,10720,1,'Scarlet Snake'),(6,10721,1,'Summon Elven Wisp'),(6,10795,1,'Ivory Raptor'),(6,10798,1,'Obsidian Raptor'),(6,15648,1,'Corrupted Kitten'),(6,15779,1,'White Mechanostrider Mod B'),(6,15780,1,'Green Mechanostrider'),(6,15781,1,'Steel Mechanostrider'),(6,16055,1,'Black Nightsaber'),(6,16056,1,'Ancient Frostsaber'),(6,16058,1,'Primal Leopard'),(6,16059,1,'Tawny Sabercat'),(6,16060,1,'Golden Sabercat'),(6,16080,1,'Red Wolf'),(6,16081,1,'Winter Wolf'),(6,16082,1,'Palomino'),(6,16083,1,'White Stallion'),(6,16084,1,'Mottled Red Raptor'),(6,17450,1,'Ivory Raptor'),(6,17455,1,'Purple Mechanostrider'),(6,17456,1,'Red and Blue Mechanostrider'),(6,17458,1,'Fluorescent Green Mechanostrider'),(6,17459,1,'Icy Blue Mechanostrider Mod A'),(6,17460,1,'Frost Ram'),(6,17461,1,'Black Ram'),(6,17468,1,'Pet Fish'),(6,17469,1,'Pet Stone'),(6,18363,1,'Riding Kodo'),(6,18991,1,'Green Kodo'),(6,18992,1,'Teal Kodo'),(6,19363,1,'Summon Mechanical Yeti'),(6,23220,1,'Swift Dawnsaber'),(6,23428,1,'Albino Snapjaw'),(6,23429,1,'Loggerhead Snapjaw'),(6,23430,1,'Olive Snapjaw'),(6,23431,1,'Leatherback Snapjaw'),(6,23432,1,'Hawksbill Snapjaw'),(6,23530,16,'Tiny Red Dragon - wrong region'),(6,23531,16,'Tiny Green Dragon - wrong region'),(6,24985,1,'Summon Baby Murloc (Blue)'),(6,24986,1,'Summon Baby Murloc (Green)'),(6,24987,1,'Summon Baby Murloc (Orange)'),(6,24988,4,'Lurky - CE'),(6,24989,1,'Summon Baby Murloc (Pink)'),(6,24990,1,'Summon Baby Murloc (Purple)'),(6,25849,1,'Baby Shark'),(6,26067,1,'Summon Mechanical Greench'),(6,26391,1,'Tentacle Call'),(6,28828,1,'Nether Drake'),(6,29059,1,'Naxxramas Deathcharger'),(6,30152,1,'White Tiger Cub'),(6,30156,2,'Hippogryph Hatchling - TCG loot'),(6,30174,2,'Riding Turtle - TCG loot'),(6,32298,4,'Netherwhelp - CE'),(6,32345,1,'Peep the Phoenix Mount'),(6,33050,128,'Magical Crawdad'),(6,33057,1,'Summon Mighty Mr. Pinchy'),(6,33630,1,'Blue Mechanostrider'),(6,34407,1,'Great Elite Elekk'),(6,35157,1,'Summon Spotted Rabbit'),(6,37015,1,'Swift Nether Drake'),(6,40319,16,'Lucky - wrong region'),(6,40405,16,'Lucky - wrong region'),(6,43688,1,'Amani War Bear'),(6,43810,1,'Frost Wyrm'),(6,44317,1,'Merciless Nether Drake'),(6,44744,1,'Merciless Nether Drake'),(6,45125,2,'Rocket Chicken - TCG loot'),(6,45174,16,'Golden Pig - wrong region'),(6,45175,16,'Silver Pig - wrong region'),(6,45890,1,'Scorchling'),(6,47037,1,'Swift War Elekk'),(6,48406,16,'Essence of Competition - wrong region'),(6,48408,16,'Essence of Competition - wrong region'),(6,48954,8,'Swift Zhevra - promotion'),(6,49322,8,'Swift Zhevra - promotion'),(6,49378,1,'Brewfest Riding Kodo'),(6,50869,1,'Brewfest Kodo'),(6,50870,1,'Brewfest Ram'),(6,51851,1,'Vampiric Batling'),(6,51960,1,'Frost Wyrm Mount'),(6,52615,4,'Frosty - CE'),(6,53082,8,'Mini Tyrael - promotion'),(6,53768,1,'Haunted'),(6,54187,1,'Clockwork Rocket Bot'),(6,55068,1,'Mr. Chilly'),(6,58983,8,'Big Blizzard Bear - promotion'),(6,59572,1,'Black Polar Bear'),(6,59573,1,'Brown Polar Bear'),(6,59802,1,'Grand Ice Mammoth'),(6,59804,1,'Grand Ice Mammoth'),(6,59976,1,'Black Proto-Drake'),(6,60021,1,'Plagued Proto-Drake'),(6,60136,1,'Grand Caravan Mammoth'),(6,60140,1,'Grand Caravan Mammoth'),(6,61442,1,'Swift Mooncloth Carpet'),(6,61444,1,'Swift Shadoweave Carpet'),(6,61446,1,'Swift Spellfire Carpete'),(6,61855,1,'Baby Blizzard Bear'),(6,62048,1,'Black Dragonhawk Mount'),(6,62514,1,'Alarming Clockbot'),(6,63318,8,'Murkimus the Gladiator'),(6,64351,1,'XS-001 Constructor Bot'),(6,64656,1,'Blue Skeletal Warhorse'),(6,64731,128,'Sea Turtle - fishing only'),(6,65682,1,'Warbot'),(6,65917,2,'Magic Rooster - TCG loot'),(6,66030,8,'Grunty - promotion'),(6,66520,1,'Jade Tiger'),(6,66907,1,'Argent Warhorse'),(6,67527,16,'Onyx Panther - wrong region'),(6,68767,2,'Tuskarr Kite - TCG loot'),(6,68810,2,'Spectral Tiger Cub - TCG loot'),(6,69002,1,'Onyxian Whelpling'),(6,69452,8,'Core Hound Pup - promotion'),(6,69535,4,'Gryphon Hatchling - CE'),(6,69536,4,'Wind Rider Cub - CE'),(6,69539,1,'Zipao Tiger'),(6,69541,4,'Pandaren Monk - CE'),(6,69677,4,'Lil\' K.T. - CE'),(6,74856,2,'Blazing Hippogryph - TCG loot'),(6,74918,2,'Wooly White Rhino - TCG loot'),(6,75613,1,'Celestial Dragon'),(6,75614,1,'Celestial Steed - unavailable'),(6,75906,4,'Lil\' XT - CE'),(6,75936,1,'Murkimus the Gladiator'),(6,75973,8,'X-53 Touring Rocket - promotion'),(6,78381,8,'Mini Thor - promotion'),(8,87,1024,'Bloodsail Buccaneers - max rank is honored'),(8,92,1024,'Gelkis Clan Centaur - max rank is friendly'),(8,93,1024,'Magram Clan Centaur - max rank is friendly'),(6,46197,2,'X-51 Nether-Rocket - TCG loot'),(6,46199,2,'X-51 Nether-Rocket X-TREME - TCG loot'),(6,26656,1,'Black Qiraji Battle Tank - unavailable'),(6,43899,1,'Brewfest Ram - unavailable'),(6,49193,1,'Vengeful Nether Drake - unavailable'),(6,58615,1,'Brutal Nether Drake - unavailable'),(6,64927,1,'Deadly Gladiator\'s Frost Wyrm - unavailable'),(6,65439,1,'Furious Gladiator\'s Frost Wyrm - unavailable'),(6,67336,1,'Relentless Gladiator\'s Frost Wyrm - unavailable'),(6,71810,1,'Wrathful Gladiator\'s Frost Wyrm - unavailable'),(11,122,1,'RealmFirst Kel\'T Title - unavailable'),(11,159,1,'RealmFirst Algalon Title - unavailable'),(11,120,1,'RealmFirst Maly Title - unavailable'),(11,170,1,'RealmFirst TotGC Title - unavailable'),(11,139,1,'RealmFirst Sarth Title - unavailable'),(11,158,1,'RealmFirst Yogg Title - unavailable'),(6,28505,8,'Poley - promotion'),(6,28487,1,'Terky - unavailable'),(8,70,1024,'Syndicate - max rank is neutral');
+INSERT INTO `aowow_profiler_excludes` VALUES (6,459,1,'Gray Wolf'),(6,468,1,'White Stallion'),(6,471,1,'Palamino'),(6,472,1,'Pinto'),(6,578,1,'Black Wolf'),(6,579,1,'Red Wolf'),(6,581,1,'Winter Wolf'),(6,3363,1,'Nether Drake'),(6,6896,1,'Black Ram'),(6,6897,1,'Blue Ram'),(6,8980,1,'Skeletal Horse'),(6,10681,1,'Summon Cockatoo'),(6,10686,1,'Summon Prairie Chicken'),(6,10687,1,'Summon White Plymouth Rock'),(6,10699,1,'Summon Bronze Whelpling'),(6,10700,1,'Summon Faeling'),(6,10701,1,'Summon Dart Frog'),(6,10702,1,'Summon Island Frog'),(6,10705,1,'Summon Eagle Owl'),(6,10708,1,'Summon Snowy Owl'),(6,10710,1,'Summon Cottontail Rabbit'),(6,10712,1,'Summon Spotted Rabbit'),(6,10715,1,'Summon Blue Racer'),(6,10718,1,'Green Water Snake'),(6,10719,1,'Ribbon Snake'),(6,10720,1,'Scarlet Snake'),(6,10721,1,'Summon Elven Wisp'),(6,10795,1,'Ivory Raptor'),(6,10798,1,'Obsidian Raptor'),(6,15648,1,'Corrupted Kitten'),(6,15779,1,'White Mechanostrider Mod B'),(6,15780,1,'Green Mechanostrider'),(6,15781,1,'Steel Mechanostrider'),(6,16055,1,'Black Nightsaber'),(6,16056,1,'Ancient Frostsaber'),(6,16058,1,'Primal Leopard'),(6,16059,1,'Tawny Sabercat'),(6,16060,1,'Golden Sabercat'),(6,16080,1,'Red Wolf'),(6,16081,1,'Winter Wolf'),(6,16082,1,'Palomino'),(6,16083,1,'White Stallion'),(6,16084,1,'Mottled Red Raptor'),(6,17450,1,'Ivory Raptor'),(6,17455,1,'Purple Mechanostrider'),(6,17456,1,'Red and Blue Mechanostrider'),(6,17458,1,'Fluorescent Green Mechanostrider'),(6,17459,1,'Icy Blue Mechanostrider Mod A'),(6,17460,1,'Frost Ram'),(6,17461,1,'Black Ram'),(6,17468,1,'Pet Fish'),(6,17469,1,'Pet Stone'),(6,18363,1,'Riding Kodo'),(6,18991,1,'Green Kodo'),(6,18992,1,'Teal Kodo'),(6,19363,1,'Summon Mechanical Yeti'),(6,23220,1,'Swift Dawnsaber'),(6,23428,1,'Albino Snapjaw'),(6,23429,1,'Loggerhead Snapjaw'),(6,23430,1,'Olive Snapjaw'),(6,23431,1,'Leatherback Snapjaw'),(6,23432,1,'Hawksbill Snapjaw'),(6,23530,16,'Tiny Red Dragon - wrong region'),(6,23531,16,'Tiny Green Dragon - wrong region'),(6,24985,1,'Summon Baby Murloc (Blue)'),(6,24986,1,'Summon Baby Murloc (Green)'),(6,24987,1,'Summon Baby Murloc (Orange)'),(6,24988,4,'Lurky - CE'),(6,24989,1,'Summon Baby Murloc (Pink)'),(6,24990,1,'Summon Baby Murloc (Purple)'),(6,25849,1,'Baby Shark'),(6,26067,1,'Summon Mechanical Greench'),(6,26391,1,'Tentacle Call'),(6,28828,1,'Nether Drake'),(6,29059,1,'Naxxramas Deathcharger'),(6,30152,1,'White Tiger Cub'),(6,30156,2,'Hippogryph Hatchling - TCG loot'),(6,30174,2,'Riding Turtle - TCG loot'),(6,32298,4,'Netherwhelp - CE'),(6,32345,1,'Peep the Phoenix Mount'),(6,33050,128,'Magical Crawdad'),(6,33057,1,'Summon Mighty Mr. Pinchy'),(6,33630,1,'Blue Mechanostrider'),(6,34407,1,'Great Elite Elekk'),(6,35157,1,'Summon Spotted Rabbit'),(6,37015,1,'Swift Nether Drake'),(6,40319,16,'Lucky - wrong region'),(6,40405,16,'Lucky - wrong region'),(6,43688,1,'Amani War Bear'),(6,43810,1,'Frost Wyrm'),(6,44317,1,'Merciless Nether Drake'),(6,44744,1,'Merciless Nether Drake'),(6,45125,2,'Rocket Chicken - TCG loot'),(6,45174,16,'Golden Pig - wrong region'),(6,45175,16,'Silver Pig - wrong region'),(6,45890,1,'Scorchling'),(6,47037,1,'Swift War Elekk'),(6,48406,16,'Essence of Competition - wrong region'),(6,48408,16,'Essence of Competition - wrong region'),(6,48954,8,'Swift Zhevra - promotion'),(6,49322,8,'Swift Zhevra - promotion'),(6,49378,1,'Brewfest Riding Kodo'),(6,50869,1,'Brewfest Kodo'),(6,50870,1,'Brewfest Ram'),(6,51851,1,'Vampiric Batling'),(6,51960,1,'Frost Wyrm Mount'),(6,52615,4,'Frosty - CE'),(6,53082,8,'Mini Tyrael - promotion'),(6,53768,1,'Haunted'),(6,54187,1,'Clockwork Rocket Bot'),(6,55068,1,'Mr. Chilly'),(6,58983,8,'Big Blizzard Bear - promotion'),(6,59572,1,'Black Polar Bear'),(6,59573,1,'Brown Polar Bear'),(6,59802,1,'Grand Ice Mammoth'),(6,59804,1,'Grand Ice Mammoth'),(6,59976,1,'Black Proto-Drake'),(6,60021,1,'Plagued Proto-Drake'),(6,60136,1,'Grand Caravan Mammoth'),(6,60140,1,'Grand Caravan Mammoth'),(6,61442,1,'Swift Mooncloth Carpet'),(6,61444,1,'Swift Shadoweave Carpet'),(6,61446,1,'Swift Spellfire Carpete'),(6,61855,1,'Baby Blizzard Bear'),(6,62048,1,'Black Dragonhawk Mount'),(6,62514,1,'Alarming Clockbot'),(6,63318,8,'Murkimus the Gladiator'),(6,64351,1,'XS-001 Constructor Bot'),(6,64656,1,'Blue Skeletal Warhorse'),(6,64731,128,'Sea Turtle - fishing only'),(6,65682,1,'Warbot'),(6,65917,2,'Magic Rooster - TCG loot'),(6,66030,8,'Grunty - promotion'),(6,66520,1,'Jade Tiger'),(6,66907,1,'Argent Warhorse'),(6,67527,16,'Onyx Panther - wrong region'),(6,68767,2,'Tuskarr Kite - TCG loot'),(6,68810,2,'Spectral Tiger Cub - TCG loot'),(6,69002,1,'Onyxian Whelpling'),(6,69452,8,'Core Hound Pup - promotion'),(6,69535,4,'Gryphon Hatchling - CE'),(6,69536,4,'Wind Rider Cub - CE'),(6,69539,1,'Zipao Tiger'),(6,69541,4,'Pandaren Monk - CE'),(6,69677,4,'Lil\' K.T. - CE'),(6,74856,2,'Blazing Hippogryph - TCG loot'),(6,74918,2,'Wooly White Rhino - TCG loot'),(6,75613,1,'Celestial Dragon'),(6,75614,1,'Celestial Steed - unavailable'),(6,75906,4,'Lil\' XT - CE'),(6,75936,1,'Murkimus the Gladiator'),(6,75973,8,'X-53 Touring Rocket - promotion'),(6,78381,8,'Mini Thor - promotion'),(8,87,1024,'Bloodsail Buccaneers - max rank is honored'),(8,92,1024,'Gelkis Clan Centaur - max rank is friendly'),(8,93,1024,'Magram Clan Centaur - max rank is friendly'),(6,46197,2,'X-51 Nether-Rocket - TCG loot'),(6,46199,2,'X-51 Nether-Rocket X-TREME - TCG loot'),(6,26656,1,'Black Qiraji Battle Tank - unavailable'),(6,43899,1,'Brewfest Ram - unavailable'),(6,49193,1,'Vengeful Nether Drake - unavailable'),(6,58615,1,'Brutal Nether Drake - unavailable'),(6,64927,1,'Deadly Gladiator\'s Frost Wyrm - unavailable'),(6,65439,1,'Furious Gladiator\'s Frost Wyrm - unavailable'),(6,67336,1,'Relentless Gladiator\'s Frost Wyrm - unavailable'),(6,71810,1,'Wrathful Gladiator\'s Frost Wyrm - unavailable'),(11,122,1,'RealmFirst Kel\'T Title - unavailable'),(11,159,1,'RealmFirst Algalon Title - unavailable'),(11,120,1,'RealmFirst Maly Title - unavailable'),(11,170,1,'RealmFirst TotGC Title - unavailable'),(11,139,1,'RealmFirst Sarth Title - unavailable'),(11,158,1,'RealmFirst Yogg Title - unavailable'),(6,28505,8,'Poley - promotion'),(6,28487,1,'Terky - unavailable'),(8,70,1024,'Syndicate - max rank is neutral'),(6,28242,1,'Icebane Breastplate'),(6,28243,1,'Icebane Gauntlets'),(6,28244,1,'Icebane Bracers'),(6,16986,1,'Blood Talon'),(6,16987,1,'Darkspear'),(6,16965,1,'Bleakwood Hew'),(6,8366,1,'Ironforge Chain'),(6,8368,1,'Ironforge Gauntlets'),(6,9942,1,'Mithril Scale Gloves'),(6,2671,1,'Rough Bronze Bracers'),(6,16980,1,'Rune Edge'),(6,16960,1,'Thorium Greatsword'),(6,16967,1,'Inlaid Thorium Hammer'),(6,30342,1,'Red Smoke Flare'),(6,30343,1,'Blue Smoke Flare'),(6,28205,1,'Glacial Gloves'),(6,28207,1,'Glacial Vest'),(6,28208,1,'Glacial Cloak'),(6,28209,1,'Glacial Wrists'),(6,28222,1,'Icy Scale Breastplate'),(6,28223,1,'Icy Scale Gauntlets'),(6,28224,1,'Icy Scale Bracers'),(6,28219,1,'Polar Tunic'),(6,28220,1,'Polar Gloves'),(6,28221,1,'Polar Bracers'),(6,28021,1,'Arcane Dust'),(6,44612,1,'Enchant Gloves - Greater Blasting'),(6,62257,1,'Enchant Weapon - Titanguard'),(6,31461,1,'Heavy Netherweave Net'),(6,56048,1,'Duskweave Boots'),(6,7636,1,'Green Woolen Robe'),(6,8778,1,'Boots of Darkness'),(6,12062,1,'Stormcloth Pants'),(6,12063,1,'Stormcloth Gloves'),(6,12068,1,'Stormcloth Vest'),(6,12083,1,'Stormcloth Headband'),(6,12087,1,'Stormcloth Shoulders'),(6,12090,1,'Stormcloth Boots');
 /*!40000 ALTER TABLE `aowow_profiler_excludes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -81,10 +81,10 @@ class CreatureList extends BaseType
             $row3[] = '('.$_.')';
 
         $x  = '<table>';
-        $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
+        $x .= '<tr><td><b class="q">'.Util::htmlEscape($this->getField('name', true)).'</b></td></tr>';
 
         if ($sn = $this->getField('subname', true))
-            $x .= '<tr><td>'.$sn.'</td></tr>';
+            $x .= '<tr><td>'.Util::htmlEscape($sn).'</td></tr>';
 
         $x .= '<tr><td>'.implode(' ', $row3).'</td></tr>';
 
@@ -102,27 +102,22 @@ class CreatureList extends BaseType
 
     public function getRandomModelId()
     {
+        // dwarf?? [null, 30754, 30753, 30755, 30736]
         // totems use hardcoded models, tauren model is base
-        $totems = array(                                    // tauren => [orc, dwarf(?!), troll, tauren, draenei]
-            4589 => [30758, 30754, 30762, 4589, 19074],     // fire
-            4588 => [30757, 30753, 30761, 4588, 19073],     // earth
-            4587 => [30759, 30755, 30763, 4587, 19075],     // water
-            4590 => [30756, 30736, 30760, 4590, 19071],     // air
-        );
-
-        $data = [];
+        $totems = [null, 4589, 4588, 4587, 4590];           // slot => modelId
+        $data   = [];
 
         for ($i = 1; $i < 5; $i++)
             if ($_ = $this->curTpl['displayId'.$i])
                 $data[] = $_;
 
-        if (count($data) == 1 && in_array($data[0], array_keys($totems)))
-            $data = $totems[$data[0]];
+        if (count($data) == 1 && ($slotId = array_search($data[0], $totems)))
+            $data = DB::World()->selectCol('SELECT DisplayId FROM player_totem_model WHERE TotemSlot = ?d', $slotId);
 
         return !$data ? 0 : $data[array_rand($data)];
     }
 
-    public function getBaseStats($type)
+    public function getBaseStats(string $type) : array
     {
         // i'm aware of the BaseVariance/RangedVariance fields ... i'm just totaly unsure about the whole damage calculation
         switch ($type)
@@ -147,8 +142,14 @@ class CreatureList extends BaseType
                 $rngMin = ($this->getField('dmgMin')       + ($this->getField('rngAtkPwrMin') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
                 $rngMax = ($this->getField('dmgMax') * 1.5 + ($this->getField('rngAtkPwrMax') / 14)) * $this->getField('dmgMultiplier') * $this->getField('rngAtkSpeed');
                 return [$rngMin, $rngMax];
+            case 'resistance':
+                $r = [];
+                for ($i = SPELL_SCHOOL_HOLY; $i < SPELL_SCHOOL_ARCANE+1; $i++)
+                    $r[$i] = $this->getField('resistance'.$i);
+
+                return $r;
             default:
-                return [0, 0];
+                return [];
         }
     }
 
@@ -301,7 +302,7 @@ class CreatureListFilter extends Filter
          7 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'startsQuests',            0x1        ], // startsquest [enum]
          8 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'endsQuests',              0x2        ], // endsquest [enum]
          9 => [FILTER_CR_BOOLEAN,  'lootId',                                                  ], // lootable
-        10 => [FILTER_CR_BOOLEAN,  'cbRegularSkinLoot', NPC_TYPEFLAG_SPECIALLOOT              ], // skinnable [yn]
+        10 => [FILTER_CR_CALLBACK, 'cbRegularSkinLoot', NPC_TYPEFLAG_SPECIALLOOT              ], // skinnable [yn]
         11 => [FILTER_CR_BOOLEAN,  'pickpocketLootId',                                        ], // pickpocketable
         12 => [FILTER_CR_CALLBACK, 'cbMoneyDrop',       null,                      null       ], // averagemoneydropped [op] [int]
         15 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_HERBLOOT,     null       ], // gatherable [yn]

@@ -198,13 +198,13 @@ class CLISetup
         $dbc = new DBC($name, ['temporary' => self::$tmpDBC]);
         if ($dbc->error)
         {
-            CLI::write('SqlGen::generate() - required DBC '.$name.'.dbc not found!', CLI::LOG_ERROR);
+            CLI::write('CLISetup::loadDBC() - required DBC '.$name.'.dbc not found!', CLI::LOG_ERROR);
             return false;
         }
 
         if (!$dbc->readFile())
         {
-            CLI::write('SqlGen::generate() - DBC '.$name.'.dbc could not be written to DB!', CLI::LOG_ERROR);
+            CLI::write('CLISetup::loadDBC() - DBC '.$name.'.dbc could not be written to DB!', CLI::LOG_ERROR);
             return false;
         }
 

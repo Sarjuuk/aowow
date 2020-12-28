@@ -109,7 +109,7 @@ class GuildPage extends GenericPage
         // statistic calculations here
 
         // smuggle the guild ranks into the html
-        if ($ranks = DB::Aowow()->selectCol('SELECT rank AS ARRAY_KEY, name FROM ?_profiler_guild_rank WHERE guildId = ?d', $this->subjectGUID))
+        if ($ranks = DB::Aowow()->selectCol('SELECT `rank` AS ARRAY_KEY, name FROM ?_profiler_guild_rank WHERE guildId = ?d', $this->subjectGUID))
             $this->extraHTML = '<script type="text/javascript">var guild_ranks = '.Util::toJSON($ranks).';</script>';
 
 
@@ -130,9 +130,9 @@ class GuildPage extends GenericPage
         }
     }
 
-    public function notFound($title = '', $msg = '')
+    public function notFound(string $title = '', string $msg = '') : void
     {
-        return parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'guild'));
+        parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'guild'));
     }
 
     private function handleIncompleteData($teamGuid)

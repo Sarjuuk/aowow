@@ -614,9 +614,9 @@ class RemoteProfileList extends ProfileList
         }
 
         foreach ($talentLookup as $realm => $chars)
-            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT guid AS ARRAY_KEY, spell AS ARRAY_KEY2, spec FROM character_talent ct WHERE guid IN (?a)', array_keys($chars));
+            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT guid AS ARRAY_KEY, spell AS ARRAY_KEY2, talentGroup FROM character_talent ct WHERE guid IN (?a)', array_keys($chars));
 
-        $talentSpells = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, rank FROM ?_talents WHERE class IN (?a)', array_unique($talentSpells));
+        $talentSpells = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, `rank` FROM ?_talents WHERE class IN (?a)', array_unique($talentSpells));
 
         if ($distrib !== null)
         {

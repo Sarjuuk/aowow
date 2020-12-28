@@ -6,11 +6,11 @@ if (!defined('AOWOW_REVISION'))
 
 class SimpleXML extends SimpleXMLElement
 {
-    public function addCData($str)
+    public function addCData(string $cData) : SimpleXMLElement
     {
         $node = dom_import_simplexml($this);
         $no   = $node->ownerDocument;
-        $node->appendChild($no->createCDATASection($str));
+        $node->appendChild($no->createCDATASection($cData));
 
         return $this;
     }
@@ -40,7 +40,7 @@ class CLI
     /* logging */
     /***********/
 
-    public static function initLogFile($file = '')
+    public static function initLogFile(string $file = '') : void
     {
         if (!$file)
             return;
@@ -61,32 +61,32 @@ class CLI
         }
     }
 
-    public static function red($str)
+    public static function red(string $str) : string
     {
         return OS_WIN ? $str : "\e[31m".$str."\e[0m";
     }
 
-    public static function green($str)
+    public static function green(string $str) : string
     {
         return OS_WIN ? $str : "\e[32m".$str."\e[0m";
     }
 
-    public static function yellow($str)
+    public static function yellow(string $str) : string
     {
         return OS_WIN ? $str : "\e[33m".$str."\e[0m";
     }
 
-    public static function blue($str)
+    public static function blue(string $str) : string
     {
         return OS_WIN ? $str : "\e[36m".$str."\e[0m";
     }
 
-    public static function bold($str)
+    public static function bold(string $str) : string
     {
         return OS_WIN ? $str : "\e[1m".$str."\e[0m";
     }
 
-    public static function write($txt = '', $lvl = -1)
+    public static function write(string $txt = '', int $lvl = -1) : void
     {
         $msg = "\n";
         if ($txt)
@@ -121,14 +121,22 @@ class CLI
         flush();
     }
 
-    public static function nicePath(string $file, string ...$pathParts) : string
+    public static function nicePath(string $fileOrPath, string ...$pathParts) : string
     {
         $path = '';
 
-        if (!$pathParts)
-            return $file;
+        if ($pathParts)
+        {
+            foreach ($pathParts as &$pp)
+                $pp = trim($pp);
 
-        $path = implode(DIRECTORY_SEPARATOR, $pathParts).DIRECTORY_SEPARATOR.$file;
+            $path .= implode(DIRECTORY_SEPARATOR, $pathParts);
+        }
+
+        $path .= ($path ? DIRECTORY_SEPARATOR : '').trim($fileOrPath);
+
+        // remove quotes (from erronous user input)
+        $path = str_replace(['"', "'"], ['', ''], $path);
 
         if (DIRECTORY_SEPARATOR == '/')                     // *nix
         {
@@ -143,8 +151,6 @@ class CLI
         else
             CLI::write('Dafuq! Your directory separator is "'.DIRECTORY_SEPARATOR.'". Please report this!', CLI::LOG_ERROR);
 
-        $path = trim($path);
-
         // resolve *nix home shorthand
         if (!OS_WIN)
         {
@@ -155,9 +161,6 @@ class CLI
             else if ($path[0] == DIRECTORY_SEPARATOR && substr($path, 0, 6) != '/home/')
                 $path = substr($path, 1);
         }
-
-        // remove quotes (from erronous user input)
-        $path = str_replace(['"', "'"], ['', ''], $path);
 
         return $path;
     }
@@ -174,7 +177,7 @@ class CLI
         this also means, you can't hide input at all, least process it
     */
 
-    public static function readInput(&$fields, $singleChar = false)
+    public static function readInput(array &$fields, bool $singleChar = false) : bool
     {
         // first time set
         if (self::$hasReadline === null)
@@ -283,7 +286,9 @@ class Util
         'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
         TYPE_ICON        => 'IconList',
         TYPE_EMOTE       => 'EmoteList',
-        TYPE_ENCHANTMENT => 'EnchantmentList'
+        TYPE_ENCHANTMENT => 'EnchantmentList',
+        TYPE_AREATRIGGER => 'AreatriggerList',
+        TYPE_MAIL        => 'MailList'
     );
 
     public static $typeStrings              = array(        // zero-indexed
@@ -293,7 +298,9 @@ class Util
         TYPE_ICON        => 'icon',
         TYPE_USER        => 'user',
         TYPE_EMOTE       => 'emote',
-        TYPE_ENCHANTMENT => 'enchantment'
+        TYPE_ENCHANTMENT => 'enchantment',
+        TYPE_AREATRIGGER => 'areatrigger',
+        TYPE_MAIL        => 'mail'
     );
 
     # todo (high): find a sensible way to write data here on setup
@@ -369,12 +376,12 @@ class Util
     public static $wowheadLink              = '';
     private static $notes                   = [];
 
-    public static function addNote($uGroupMask, $str)
+    public static function addNote(int $uGroupMask, string $str) : void
     {
         self::$notes[] = [$uGroupMask, $str];
     }
 
-    public static function getNotes()
+    public static function getNotes() : array
     {
         $notes = [];
 
@@ -387,16 +394,16 @@ class Util
 
     private static $execTime = 0.0;
 
-    public static function execTime($set = false)
+    public static function execTime(bool $set = false) : string
     {
         if ($set)
         {
             self::$execTime = microTime(true);
-            return;
+            return '';
         }
 
         if (!self::$execTime)
-            return;
+            return '';
 
         $newTime        = microTime(true);
         $tDiff          = $newTime - self::$execTime;
@@ -405,7 +412,7 @@ class Util
         return self::formatTime($tDiff * 1000, true);
     }
 
-    public static function formatMoney($qty)
+    public static function formatMoney(int $qty) : string
     {
         $money = '';
 
@@ -429,92 +436,93 @@ class Util
         return $money;
     }
 
-    public static function parseTime($sec)
+    private static function parseTime(int $msec) : array
     {
-        $time = ['d' => 0, 'h' => 0, 'm' => 0, 's' => 0, 'ms' => 0];
+        $time = [0, 0, 0, 0, 0];
+
+        if ($_ = ($msec % 1000))
+            $time[0] = $_;
+
+        $sec = $msec / 1000;
 
         if ($sec >= 3600 * 24)
         {
-            $time['d'] = floor($sec / 3600 / 24);
-            $sec -= $time['d'] * 3600 * 24;
+            $time[4] = floor($sec / 3600 / 24);
+            $sec -= $time[4] * 3600 * 24;
         }
 
         if ($sec >= 3600)
         {
-            $time['h'] = floor($sec / 3600);
-            $sec -= $time['h'] * 3600;
+            $time[3] = floor($sec / 3600);
+            $sec -= $time[3] * 3600;
         }
 
         if ($sec >= 60)
         {
-            $time['m'] = floor($sec / 60);
-            $sec -= $time['m'] * 60;
+            $time[2] = floor($sec / 60);
+            $sec -= $time[2] * 60;
         }
 
         if ($sec > 0)
         {
-            $time['s'] = (int)$sec;
-            $sec -= $time['s'];
+            $time[1] = (int)$sec;
+            $sec -= $time[1];
         }
-
-        if (($sec * 1000) % 1000)
-            $time['ms'] = (int)($sec * 1000);
 
         return $time;
     }
 
-    public static function formatTime($base, $short = false)
+    public static function formatTime(int $msec, bool $short = false) : string
     {
-        $s = self::parseTime($base / 1000);
-        $fmt = [];
+        [$ms, $s, $m, $h, $d] = self::parseTime(abs($msec));
 
         if ($short)
         {
-            if ($_ = round($s['d'] / 364))
+            if ($_ = round($d / 364))
                 return $_." ".Lang::timeUnits('ab', 0);
-            if ($_ = round($s['d'] / 30))
+            if ($_ = round($d / 30))
                 return $_." ".Lang::timeUnits('ab', 1);
-            if ($_ = round($s['d'] / 7))
+            if ($_ = round($d / 7))
                 return $_." ".Lang::timeUnits('ab', 2);
-            if ($_ = round($s['d']))
+            if ($_ = round($d))
                 return $_." ".Lang::timeUnits('ab', 3);
-            if ($_ = round($s['h']))
+            if ($_ = round($h))
                 return $_." ".Lang::timeUnits('ab', 4);
-            if ($_ = round($s['m']))
+            if ($_ = round($m))
                 return $_." ".Lang::timeUnits('ab', 5);
-            if ($_ = round($s['s'] + $s['ms'] / 1000, 2))
+            if ($_ = round($s + $ms / 1000, 2))
                 return $_." ".Lang::timeUnits('ab', 6);
-            if ($s['ms'])
-                return $s['ms']." ".Lang::timeUnits('ab', 7);
+            if ($ms)
+                return $ms." ".Lang::timeUnits('ab', 7);
 
             return '0 '.Lang::timeUnits('ab', 6);
         }
         else
         {
-            $_ = $s['d'] + $s['h'] / 24;
+            $_ = $d + $h / 24;
             if ($_ > 1 && !($_ % 364))                      // whole years
-                return round(($s['d'] + $s['h'] / 24) / 364, 2)." ".Lang::timeUnits($s['d'] / 364 == 1 && !$s['h'] ? 'sg' : 'pl', 0);
+                return round(($d + $h / 24) / 364, 2)." ".Lang::timeUnits($d / 364 == 1 && !$h ? 'sg' : 'pl', 0);
             if ($_ > 1 && !($_ % 30))                       // whole month
-                return round(($s['d'] + $s['h'] / 24) /  30, 2)." ".Lang::timeUnits($s['d'] /  30 == 1 && !$s['h'] ? 'sg' : 'pl', 1);
+                return round(($d + $h / 24) /  30, 2)." ".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
             if ($_ > 1 && !($_ % 7))                        // whole weeks
-                return round(($s['d'] + $s['h'] / 24) /   7, 2)." ".Lang::timeUnits($s['d'] /   7 == 1 && !$s['h'] ? 'sg' : 'pl', 2);
-            if ($s['d'])
-                return round($s['d'] + $s['h']  /   24, 2)." ".Lang::timeUnits($s['d'] == 1 && !$s['h']  ? 'sg' : 'pl', 3);
-            if ($s['h'])
-                return round($s['h'] + $s['m']  /   60, 2)." ".Lang::timeUnits($s['h'] == 1 && !$s['m']  ? 'sg' : 'pl', 4);
-            if ($s['m'])
-                return round($s['m'] + $s['s']  /   60, 2)." ".Lang::timeUnits($s['m'] == 1 && !$s['s']  ? 'sg' : 'pl', 5);
-            if ($s['s'])
-                return round($s['s'] + $s['ms'] / 1000, 2)." ".Lang::timeUnits($s['s'] == 1 && !$s['ms'] ? 'sg' : 'pl', 6);
-            if ($s['ms'])
-                return $s['ms']." ".Lang::timeUnits($s['ms'] == 1 ? 'sg' : 'pl', 7);
+                return round(($d + $h / 24) /   7, 2)." ".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
+            if ($d)
+                return round($d + $h  /   24, 2)." ".Lang::timeUnits($d == 1 && !$h  ? 'sg' : 'pl', 3);
+            if ($h)
+                return round($h + $m  /   60, 2)." ".Lang::timeUnits($h == 1 && !$m  ? 'sg' : 'pl', 4);
+            if ($m)
+                return round($m + $s  /   60, 2)." ".Lang::timeUnits($m == 1 && !$s  ? 'sg' : 'pl', 5);
+            if ($s)
+                return round($s + $ms / 1000, 2)." ".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
+            if ($ms)
+                return $ms." ".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
 
             return '0 '.Lang::timeUnits('pl', 6);
         }
     }
 
     // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText($text , $markdown = false)
+    public static function parseHtmlText(string $text, bool $markdown = false) : string
     {
         if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
@@ -554,14 +562,14 @@ class Util
         $toMD = array(
             '[icon name=\2]',
             '[span color=#\1>\2[/span]',
-            '&lt;\1/\2&gt;',
+            '<\1/\2>',
             '',
             '\1',
-            '&lt;\1&gt;',
+            '<\1>',
             '[span class=q0>WorldState #\1[/span]',
-            '&lt;'.Lang::game('class').'&gt;',
-            '&lt;'.Lang::game('race').'&gt;',
-            '&lt;'.Lang::main('name').'&gt;',
+            '<'.Lang::game('class').'>',
+            '<'.Lang::game('race').'>',
+            '<'.Lang::main('name').'>',
             '[br]',
             ''
         );
@@ -584,7 +592,7 @@ class Util
         return preg_replace($from, $markdown ? $toMD : $toHTML, $text);
     }
 
-    public static function asHex($val)
+    public static function asHex($val) : string
     {
         $_ = decHex($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
@@ -593,7 +601,7 @@ class Util
         return '0x'.strToUpper($_);
     }
 
-    public static function asBin($val)
+    public static function asBin($val) : string
     {
         $_ = decBin($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
@@ -653,7 +661,7 @@ class Util
     }
 
     // default back to enUS if localization unavailable
-    public static function localizedString($data, $field, $silent = false)
+    public static function localizedString(array $data, string $field, bool $silent = false) : string
     {
         // only display placeholder markers for staff
         if (!User::isInGroup(U_GROUP_EMPLOYEE | U_GROUP_TESTER | U_GROUP_LOCALIZER))
@@ -681,7 +689,7 @@ class Util
     }
 
     // for item and spells
-    public static function setRatingLevel($level, $type, $val)
+    public static function setRatingLevel(int $level, int $type, int $val) : string
     {
         if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING, ITEM_MOD_RESILIENCE_RATING]) && $level < 34)
             $level = 34;
@@ -1021,9 +1029,8 @@ class Util
                                 $c['ConditionValue1'] = $zone->getField('id');
                                 break;
                             }
-                            else {
-                                break;
-                            }
+                            else
+                                continue 3;
                     }
                 case CND_ZONEID:                            // 4
                 case CND_AREAID:                            // 23
@@ -1078,7 +1085,7 @@ class Util
                     else if ($c['ConditionValue1'] == 67)   // Horde
                         $c['ConditionValue1'] = 2;
                     else
-                        break;
+                        continue 2;
             }
 
             $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];

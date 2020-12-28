@@ -18,6 +18,8 @@ class ObjectPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['swfobject.js'];
 
+    private   $powerTpl      = '$WowheadPower.registerObject(%d, %d, %s);';
+
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
@@ -30,7 +32,7 @@ class ObjectPage extends GenericPage
 
         $this->subject = new GameObjectList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound();
+            $this->notFound(Lang::game('object'), Lang::gameObject('notFound'));
 
         $this->name = $this->subject->getField('name', true);
     }
@@ -58,7 +60,7 @@ class ObjectPage extends GenericPage
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.eventEntry = geg.eventEntry AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $this->extendGlobalIds(TYPE_WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
@@ -66,12 +68,19 @@ class ObjectPage extends GenericPage
             $infobox[] = Util::ucFirst(Lang::game('eventShort')).Lang::main('colon').implode(',', $ev);
         }
 
+        // Faction
+        if ($_ = DB::Aowow()->selectCell('SELECT factionId FROM ?_factiontemplate WHERE id = ?d', $this->subject->getField('faction')))
+        {
+            $this->extendGlobalIds(TYPE_FACTION, $_);
+            $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
+        }
+
         // Reaction
         $_ = function ($r)
         {
-            if ($r == 1)  return 2;
-            if ($r == -1) return 10;
-            return;
+            if ($r == 1)  return 2;                         // q2  green
+            if ($r == -1) return 10;                        // q10 red
+            return;                                         // q   yellow
         };
         $infobox[] = Lang::npc('react').Lang::main('colon').'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
 
@@ -102,7 +111,7 @@ class ObjectPage extends GenericPage
 
                 // if no propper item is found use a skill
                 if ($locks)
-                    $infobox[] = $l ? $l : array_pop($locks);
+                    $infobox[] = $l ?: array_pop($locks);
             }
         }
 
@@ -217,13 +226,16 @@ class ObjectPage extends GenericPage
 
 
         $relBoss = null;
-        if ($_ = DB::Aowow()->selectCell('SELECT ABS(npcId) FROM ?_loot_link WHERE objectId = ?d', $this->typeId))
+        if ($ll = DB::Aowow()->selectRow('SELECT * FROM ?_loot_link WHERE objectId = ?d ORDER BY priority DESC LIMIT 1', $this->typeId))
         {
+            // group encounter
+            if ($ll['encounterId'])
+                $relBoss = [$ll['npcId'], Lang::profiler('encounterNames', $ll['encounterId'])];
             // difficulty dummy
-            if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', $_, $_, $_))
+            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', abs($ll['npcId']), abs($ll['npcId']), abs($ll['npcId'])))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
             // base creature
-            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $_))
+            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', abs($ll['npcId'])))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
@@ -245,10 +257,7 @@ class ObjectPage extends GenericPage
             }
 
             if ($sai->prepare())
-            {
-                foreach ($sai->getJSGlobals() as $type => $typeIds)
-                    $this->extendGlobalIds($type, $typeIds);
-            }
+                $this->extendGlobalData($sai->getJSGlobals());
             else
                 trigger_error('Gameobject has AIName set in template but no SmartAI defined.');
         }
@@ -405,7 +414,7 @@ class ObjectPage extends GenericPage
                     'id'        => 'contains',
                     'name'      => '$LANG.tab_contains',
                     'sort'      => ['-percent', 'name'],
-                    'extraCols' => $extraCols
+                    'extraCols' => array_unique($extraCols)
                 );
 
                 if ($hiddenCols)
@@ -439,6 +448,31 @@ class ObjectPage extends GenericPage
             }
         }
 
+        // tab: Spell Focus for
+        if ($sfId = $this->subject->getField('spellFocusId'))
+        {
+            $focusSpells = new SpellList(array(['spellFocusObject', $sfId]));
+            if (!$focusSpells->error)
+            {
+                $tabData = array(
+                    'data' => array_values($focusSpells->getListviewData()),
+                    'name' => Lang::gameObject('focus'),
+                    'id'   => 'focus-for'
+                );
+
+                $this->extendGlobalData($focusSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+
+                // create note if search limit was exceeded
+                if ($focusSpells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                {
+                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                    $tabData['_truncated'] = 1;
+                }
+
+                $this->lvTabs[] = ['spell', $tabData];
+            }
+        }
+
         // tab: Same model as .. whats the fucking point..?
         $sameModel = new GameObjectList(array(['displayId', $this->subject->getField('displayId')], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
@@ -453,45 +487,17 @@ class ObjectPage extends GenericPage
         }
     }
 
-    protected function generateTooltip($asError = false)
+    protected function generateTooltip()
     {
-        if ($asError)
-            return '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.', {});';
-
-        $s = $this->subject->getSpawns(SPAWNINFO_SHORT);
-
-        $x  = '$WowheadPower.registerObject('.$this->typeId.', '.User::$localeId.", {\n";
-        $x .= "\tname_".User::$localeString.": '".Util::jsEscape($this->subject->getField('name', true))."',\n";
-        $x .= "\ttooltip_".User::$localeString.": '".Util::jsEscape($this->subject->renderTooltip())."',\n";
-        $x .= "\tmap: ".($s ? "{zone: ".$s[0].", coords: {".$s[1].":".Util::toJSON($s[2])."}}" : '{}')."\n";
-        $x .= "});";
-
-        return $x;
-    }
-
-    public function display($override = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::display($override);
-
-        if (!$this->loadCache($tt))
+        $power = new StdClass();
+        if (!$this->subject->error)
         {
-            $tt = $this->generateTooltip();
-            $this->saveCache($tt);
+            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }
 
-        header('Content-type: application/x-javascript; charset=utf-8');
-        die($tt);
-    }
-
-    public function notFound($title = '', $msg = '')
-    {
-        if ($this->mode != CACHE_TYPE_TOOLTIP)
-            return parent::notFound($title ?: Lang::game('object'), $msg ?: Lang::gameObject('notFound'));
-
-        header('Content-type: application/x-javascript; charset=utf-8');
-        echo $this->generateTooltip(true);
-        exit();
+        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 }
 

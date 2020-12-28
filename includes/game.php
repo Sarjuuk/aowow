@@ -61,38 +61,6 @@ class Game
         )
     );
 
-    public static $trainerTemplates         = array(        // TYPE => Id => templateList
-        TYPE_CLASS => array(
-              1 => [-200001, -200002],                      // Warrior
-              2 => [-200003, -200004, -200020, -200021],    // Paladin
-              3 => [-200013, -200014],                      // Hunter
-              4 => [-200015, -200016],                      // Rogue
-              5 => [-200011, -200012],                      // Priest
-              6 => [-200019],                               // DK
-              7 => [-200017, -200018],                      // Shaman (HighlevelAlly Id missing..?)
-              8 => [-200007, -200008],                      // Mage
-              9 => [-200009, -200010],                      // Warlock
-             11 => [-200005, -200006]                       // Druid
-        ),
-        TYPE_SKILL => array(
-            171 => [-201001, -201002, -201003],             // Alchemy
-            164 => [-201004, -201005, -201006, -201007, -201008],// Blacksmithing
-            333 => [-201009, -201010, -201011],             // Enchanting
-            202 => [-201012, -201013, -201014, -201015, -201016, -201017], // Engineering
-            182 => [-201018, -201019, -201020],             // Herbalism
-            773 => [-201021, -201022, -201023],             // Inscription
-            755 => [-201024, -201025, -201026],             // Jewelcrafting
-            165 => [-201027, -201028, -201029, -201030, -201031, -201032], // Leatherworking
-            186 => [-201033, -201034, -201035],             // Mining
-            393 => [-201036, -201037, -201038],             // Skinning
-            197 => [-201039, -201040, -201041, -201042],    // Tailoring
-            356 => [-202001, -202002, -202003],             // Fishing
-            185 => [-202004, -202005, -202006],             // Cooking
-            129 => [-202007, -202008, -202009],             // First Aid
-            762 => [-202010, -202011, -202012]              // Riding
-        )
-    );
-
     public static $sockets                  = array(        // jsStyle Strings
         'meta',                         'red',                          'yellow',                       'blue'
     );
@@ -113,6 +81,13 @@ class Game
     public static $class2SpellFamily        = array(
     //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
+    );
+
+    public static $areaFloors               = array(
+         206 => 3,  209 => 7,  719 => 3,  721 => 4,  796 => 4, 1196 => 2, 1337 => 2,  1581 => 2, 1583 => 7, 1584 => 2,
+        2017 => 2, 2057 => 4, 2100 => 2, 2557 => 6, 2677 => 4, 3428 => 3, 3457 => 17, 3790 => 2, 3791 => 2, 3959 => 8,
+        3456 => 6, 3715 => 2, 3848 => 3, 3849 => 2, 4075 => 2, 4100 => 2, 4131 => 2,  4196 => 2, 4228 => 4, 4272 => 2,
+        4273 => 6, 4277 => 3, 4395 => 2, 4494 => 2, 4722 => 2, 4812 => 8
     );
 
     public static function itemModByRatingMask($mask)
@@ -233,6 +208,167 @@ class Game
         }
 
         return $pages;
+    }
+
+    public static function getWorldPosForGUID(int $type, int ...$guids) : array
+    {
+        $result = [];
+
+        switch ($type)
+        {
+            case TYPE_NPC:
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM creature WHERE `guid` IN (?a)', $guids);
+                break;
+            case TYPE_OBJECT:
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject WHERE `guid` IN (?a)', $guids);
+                break;
+            case TYPE_SOUND:
+                $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`, `mapId`, `posX`, `posY` FROM dbc_soundemitters WHERE `soundId` IN (?a)', $guids);
+                break;
+            case TYPE_AREATRIGGER:
+                $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM dbc_areatrigger WHERE `id` IN (?a)', $guids);
+                break;
+            default:
+                trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE '.$type, E_USER_WARNING);
+        }
+
+        return $result;
+    }
+
+    public static function worldPosToZonePos(int $mapId, float $posX, float $posY, int $areaId = 0, int $floor = -1) : array
+    {
+        if (!$mapId < 0)
+            return [];
+
+        $query = 'SELECT
+                    dm.id,
+                    wma.areaId,
+                    IFNULL(dm.floor, 0) AS floor,
+                    100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`,
+                    100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)), 1) AS `posY`,
+                    SQRT(POWER(abs(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50), 2) +
+                         POWER(abs(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50), 2)) AS `dist`
+                FROM
+                    dbc_worldmaparea wma
+                LEFT JOIN
+                    dbc_dungeonmap dm ON dm.mapId = IF(?d AND (wma.mapId NOT IN (0, 1, 530, 571) OR wma.areaId = 4395), wma.mapId, -1)
+                WHERE
+                    wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0){ AND IF(dm.floor IS NULL, 1, dm.floor = ?d)}
+                HAVING
+                    (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
+                ORDER BY
+                    `dist` ASC';
+
+        // dist BETWEEN 0 (center) AND 70.7 (corner)
+        $points = DB::Aowow()->select($query, $posX, $posX, $posY, $posY, $posX, $posX, $posY, $posY, 1, $mapId, $areaId, $areaId, $floor < 0 ? DBSIMPLE_SKIP : $floor);
+        if (!$points)                                       // retry: TC counts pre-instance subareas as instance-maps .. which have no map file
+            $points = DB::Aowow()->select($query, $posX, $posX, $posY, $posY, $posX, $posX, $posY, $posY, 0, $mapId, 0, 0, DBSIMPLE_SKIP);
+
+        if (!is_array($points))
+        {
+            trigger_error('Game::worldPosToZonePos - dbc query failed', E_USER_ERROR);
+            return [];
+        }
+
+        return $points;
+    }
+
+    public static function getQuotesForCreature(int $creatureId, bool $asHTML = false, string $talkSource = '') : array
+    {
+        $nQuotes  = 0;
+        $quotes   = [];
+        $soundIds = [];
+
+        $quoteSrc = DB::World()->select('
+            SELECT
+                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2,
+                ct.`Type` AS `talkType`,
+                ct.TextRange AS `range`,
+                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
+                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
+               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
+                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
+            FROM
+                creature_text ct
+           {LEFT JOIN
+                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
+            LEFT JOIN
+                broadcast_text bct ON ct.BroadcastTextId = bct.ID
+           {LEFT JOIN
+                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
+            WHERE
+                ct.CreatureID = ?d',
+            User::$localeId ?: DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+            $creatureId
+        );
+
+        foreach ($quoteSrc as $grp => $text)
+        {
+            $group = [];
+            foreach ($text as $t)
+            {
+                if ($t['soundId'])
+                    $soundIds[] = $t['soundId'];
+
+                $msg = Util::localizedString($t, 'text');
+                if (!$msg)
+                    continue;
+
+                // fixup .. either set %s for emotes or dont >.<
+                if (in_array($t['talkType'], [2, 16]) && strpos($msg, '%s') === false)
+                    $msg = '%s '.$msg;
+
+                // fixup: bad case-insensivity
+                $msg = Util::parseHtmlText(str_replace('%S', '%s', htmlentities($msg)), !$asHTML);
+
+                if ($talkSource)
+                    $msg = sprintf($msg, $talkSource);
+
+                // make type css compatible
+                switch ($t['talkType'])
+                {
+                    case  1:                                // yell:
+                    case 14: $t['talkType'] = 1; break;     // - dark red
+                    case  2:                                // emote:
+                    case 16:                                // "
+                    case  3:                                // boss emote:
+                    case 41: $t['talkType'] = 4; break;     // - orange
+                    case  4:                                // whisper:
+                    case 15:                                // "
+                    case  5:                                // boss whisper:
+                    case 42: $t['talkType'] = 3; break;     // - pink-ish
+                    default: $t['talkType'] = 2;            // [type: 0, 12] say: yellow-ish
+
+                }
+
+                // prefix
+                $pre = '';
+                if ($t['talkType'] != 4)
+                    $pre = ($talkSource ?: '%s').' '.Lang::npc('textTypes', $t['talkType']).Lang::main('colon').($t['lang'] ? '['.Lang::game('languages', $t['lang']).'] ' : null);
+
+                if ($asHTML)
+                    $msg = '<div><span class="s'.$t['talkType'].'">%s'.($t['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $t['range']), $msg) : $msg).'</span></div>';
+                else
+                    $msg = '[div][span class=s'.$t['talkType'].']%s'.html_entity_decode($msg).'[/span][/div]';
+
+                $line = array(
+                    'range'  => $t['range'],
+                    'text'   => $msg,
+                    'prefix' => $pre
+                );
+
+
+                $nQuotes++;
+                $group[] = $line;
+            }
+
+            if ($group)
+                $quotes[$grp] = $group;
+        }
+
+        return [$quotes, $nQuotes, $soundIds];
     }
 
 }

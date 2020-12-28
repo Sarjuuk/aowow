@@ -54,6 +54,7 @@ if (!CLI)
 
                 $setOut = array(
                     'id'       => $set['id'],
+                    'idbak'    => $set['refSetId'],
                     'name'     => (7 - $set['quality']).Util::jsEscape(Util::localizedString($set, 'name')),
                     'pieces'   => [],
                     'heroic'   => !!$set['heroic'],         // should be bool
@@ -75,9 +76,6 @@ if (!CLI)
 
                 if ($set['contentGroup'])
                     $setOut['note'] = $set['contentGroup'];
-
-                if ($set['id'] < 0)
-                    $setOut['idbak'] = $set['refSetId'];
 
                 for ($i = 1; $i < 11; $i++)
                     if ($set['item'.$i])

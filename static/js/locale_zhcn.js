@@ -1,7 +1,7 @@
 var l_reputation_names = [
     '', // 0
-    "注册账户",
     "每日访问",
+    "注册账户",
     "发表评论",
     "评论被顶",
     "评论被踩",
@@ -610,7 +610,6 @@ var mn_spells = [
     ]],
     [,"宠物"],
     [-6,"伙伴"],
-    [-5,""],
     [-5,"坐骑",,[
         [1,"陆地坐骑"],
         [2,"飞行坐骑"],
@@ -964,7 +963,9 @@ var mn_database = [
     [6,"地区","?zones",mn_zones],
     [, "其他"],
     [31,"图标", "?icons", mn_icons],
-    [19,"声音","?sounds",mn_sounds]
+    [19,"声音","?sounds",mn_sounds],
+    [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
+    [103, 'Mails', '?mails']                                // aowow - custom
 ];
 var mn_tools = [
     [0,"天赋模拟器","?talent",mn_talentCalc],
@@ -3405,7 +3406,9 @@ var LANG = {
          19: ["声音",        "音效",         "声音",          "声音"],
          29: ["图标",        "图标",         "图标",          "图标"],
         501: ["表情",        "表情",         "表情",          "表情"],
-        502: ["附魔",        "附魔",         "附魔",          "附魔"]
+        502: ["附魔",        "附魔",         "附魔",          "附魔"],
+        503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
+        504: ["Mail",        "mail",         "Mails",        "mails"]
     },
 
     timeunitssg: ["年", "月", "周", "天", "小时", "分钟", "秒"],
@@ -3421,20 +3424,20 @@ var LANG = {
         assas:     "刺杀",
         balance:   "平衡",
         beast:     "野兽控制",
-        blooddps:  "Blood (DPS)", // enUS
-        bloodtank: "Blood (Tank)", // enUS
+        blooddps:  "鲜血(输出)",
+        bloodtank: "鲜血(坦克)",
         combat:    "狂徒",
         demo:      "恶魔学识",
         destro:    "毁灭",
         disc:      "戒律",
         elem:      "元素",
         enhance:   "增强",
-        feraldps:  "Feral (DPS)", // enUS
-        feraltank: "Feral (Tank)", // enUS
+        feraldps:  "野性战斗(输出)",
+        feraltank: "野性战斗(坦克)",
         fire:      "火焰",
         frost:     "冰霜",
-        frostdps:  "Frost (DPS)", // enUS
-        frosttank: "Frost (Tank)", // enUS
+        frostdps:  "冰霜(输出)",
+        frosttank: "冰霜(坦克)",
         fury:      "狂怒",
         generic:   "通用",
         holy:      "神圣",
@@ -3445,7 +3448,7 @@ var LANG = {
         shadow:    "暗影",
         subtle:    "敏锐",
         surv:      "生存",
-        unholydps: "Unholy (DPS)" // enUS
+        unholydps: "邪恶(输出)"
     },
 
     traits: {
@@ -4217,26 +4220,26 @@ var LANG = {
         flags:          "标记"
     },
 
-    fiprofiles: { // enUS
+    fiprofiles: {
         sepgeneral:           "一般",
-        gearscore:            "Gear score",
+        gearscore:            "装备评分",
         achievementpoints:    "成就点数",
-        wearingitem:          "Wearing item #...",
-        wearingpermenchant:   "Wearing enchantment #...",
-        completedachievement: "Completed achievement #...",
+        wearingitem:          "穿戴的物品#...",
+        wearingpermenchant:   "已附魔物品#...",
+        completedachievement: "完成的成就#...",
 
-        sepprofession:        "Professions",
-        alchemy:              "Alchemy skill",
-        blacksmithing:        "Blacksmithing skill",
-        enchanting:           "Enchanting skill",
-        engineering:          "Engineering skill",
-        herbalism:            "Herbalism skill",
-        inscription:          "Inscription skill",
-        jewelcrafting:        "Jewelcrafting skill",
-        leatherworking:       "Leatherworking skill",
-        mining:               "Mining skill",
-        skinning:             "Skinning skill",
-        tailoring:            "Tailoring skill",
+        sepprofession:        "专业",
+        alchemy:              "炼金技能",
+        blacksmithing:        "锻造技能",
+        enchanting:           "附魔技能",
+        engineering:          "工程技能",
+        herbalism:            "采药技能",
+        inscription:          "铭文技能",
+        jewelcrafting:        "珠宝技能",
+        leatherworking:       "制皮技能",
+        mining:               "挖矿技能",
+        skinning:             "剥皮技能",
+        tailoring:            "裁缝技能",
 
         septalent:            "天赋",
         talenttree1:          "第一个天赋树里点数花费",
@@ -4578,41 +4581,41 @@ var LANG = {
     pr_statstt_nat: "自然",
     pr_statstt_sha: "暗影",
 
-    pr_statstt_agi:            "Increases attack power by $1<br />Increases physical critical hit chance by $2%<br />Increases armor by $3",
-    pr_statstt_armor:          "Reduces physical damage taken by $2%",
-    pr_statstt_armor2:         "Reduces physical damage taken by $2%<br />Increases your pet's armor by $1",
-    pr_statstt_armorpenpct:    '<span class="q2">Armor penetration rating $1 (+$2% armor penetration)</span><br />Reduces enemy armor by $3%',
-    pr_statstt_blockpct:       '<span class="q2">Block rating $1 (+$2% block)</span><br />Increases chance to block by $4%<br />Your block stops $3 damage',
-    pr_statstt_def:            '<span class="q2">Defense rating $1 (+$2 defense)</span><br />Increases chance to dodge, block and parry by $3%<br />Decreases chance to be hit and critically hit by $4%',
-    pr_statstt_dodgepct:       '<span class="q2">Dodge rating $1 (+$2% dodge)</span><br />Increases chance to dodge by $3%<br /><span class="q0">(Before diminishing returns)</span>',
-    pr_statstt_exp:            '<span class="q2">Expertise rating $1 (+$2 expertise)</span><br />Reduces chance to be dodged or parried by $3%',
-    pr_statstt_int:            "Increases mana by $1<br />Increases spell critical hit chance by $2%",
-    pr_statstt_int2:           "Increases mana by $1<br />Increases spell critical hit chance by $2%<br />Increases your pet's intellect by $3",
-    pr_statstt_mleatkpwr:      "Increases damage with melee weapons by $1 per second",
-    pr_statstt_mlecritstrkpct: '<span class="q2">Crit rating $1 (+$2% crit chance)</span><br />Increases melee critical strike chance by $3%',
-    pr_statstt_mlehastepct:    '<span class="q2">Haste rating $1 (+$2% haste)</span><br />Increases melee attack speed by $3%',
-    pr_statstt_mlehitpct:      '<span class="q2">Hit rating $1 (+$2% hit chance)</span><br />Increases melee chance to hit a level $4 target by $3%',
-    pr_statstt_oocmanargn:     "$1 mana regenerated every 5 seconds while not casting<br />$2 mana regenerated every 5 seconds while casting",
-    pr_statstt_parrypct:       '<span class="q2">Parry rating $1 (+$2% parry)</span><br />Increases chance to parry by $3%<br /><span class="q0">(Before diminishing returns)</span>',
-    pr_statstt_resipct:        '<span class="q2">Resilience rating $1 (+$2% resilience)</span><br />Reduces chance to be critically hit by $3%<br />Reduces the effect of mana-drains and the damage of critical strikes by $4%<br />Provides $5% additional damage reduction against all damage done by players and their pets or minions',
-    pr_statstt_resist:         "Increases resistance to $1-based attacks, spells, and abilities.<br />Average resistance against spells cast by level $3: $1%",
-    pr_statstt_rgdatkpwr:      "Increases damage with ranged weapons by $1 per second",
-    pr_statstt_rgdatkpwr2:     "Increases damage with ranged weapons by $1 per second<br />Increases your pet's attack power by $2<br />Increases your pet's spell damage by $3",
-    pr_statstt_rgdcritstrkpct: '<span class="q2">Crit rating $1 (+$2% crit chance)</span><br />Increases ranged critical strike chance by $3%',
-    pr_statstt_rgdhastepct:    '<span class="q2">Haste rating $1 (+$2% haste)</span><br />Increases ranged attack speed by $3%',
-    pr_statstt_rgdhitpct:      '<span class="q2">Hit rating $1 (+$2% hit chance)</span><br />Increases ranged chance to hit a level $4 target by $3%',
-    pr_statstt_spi:            "Increases health regeneration by $1 per 5 seconds while not in combat<br />Increases mana regeneration by $2 per 5 seconds while not casting",
-    pr_statstt_splcritstrkpct: '<span class="q2">Crit rating $2 (+$3% crit chance)</span><br />$1',
-    pr_statstt_spldmg:         "$1",
-    pr_statstt_spldmg2:        "$1<br />Increases your pet's attack power by $3<br />Increases your pet's spell damage by $4",
-    pr_statstt_splhastepct:    '<span class="q2">Haste rating $1 (+$2% haste)</span><br />Increases spell casting speed by $3%',
-    pr_statstt_splheal:        "Increases healing by up to $1",
-    pr_statstt_splhitpct:      '<span class="q2">Hit rating $1 (+$2% hit chance)</span><br />Increases spell chance to hit a level $4 target by $3%',
-    pr_statstt_splpen:         "Reduces enemy resistances by $1",
-    pr_statstt_sta:            "Increases health by $1",
-    pr_statstt_sta2:           "Increases health by $1<br />Increases your pet's stamina by $2",
-    pr_statstt_str:            "Increases attack power by $1",
-    pr_statstt_str2:           "Increases attack power by $1<br />Increases block value by $2",
+    pr_statstt_agi:"增加攻击强度 $1<br />增加物理暴击率 $2%<br />增加护甲 $3",
+    pr_statstt_armor:"减少受到的物理伤害 $2%",
+    pr_statstt_armor2:"减少受到的物理伤害 $2%<br />增加你宠物的护甲 $1",
+    pr_statstt_armorpenpct:'<span class="q2">护甲穿透等级 $1 (+$2% 护甲穿透)</span><br />减少敌人的护甲 $3%',
+    pr_statstt_blockpct:'<span class="q2">格挡等级 $1 (+$2% 格挡)</span><br />增加格挡几率 $4%<br />你的格挡能减少 $3 伤害',
+    pr_statstt_def:'<span class="q2">防御等级 $1 (+$2 防御)</span><br />增加躲闪，格挡和招架的几率 $3%<br />降低被击中和被暴击的几率 $4%',
+    pr_statstt_dodgepct:'<span class="q2">躲闪等级 $1 (+$2% 躲闪)</span><br />增加躲闪几率 $3%<br />',
+    pr_statstt_exp:'<span class="q2">熟练等级 $1 (+$2 熟练)</span><br />降低敌人躲闪和招架几率 $3%',
+    pr_statstt_int:"增加法力值 $1<br />增加法术暴击几率 $2%",
+    pr_statstt_int2:"增加法力值 $1<br />增加法术暴击几率 $2%<br />增加你宠物的智力 $3",
+    pr_statstt_mleatkpwr:"增加近战武器每秒物理伤害 $1",
+    pr_statstt_mlecritstrkpct:'<span class="q2">暴击等级 $1 (+$2% 暴击)</span><br />物理暴击几率 $3%',
+    pr_statstt_mlehastepct:'<span class="q2">加速等级 $1 (+$2% 加速)</span><br />增加物理攻击速度 $3%',
+    pr_statstt_mlehitpct:'<span class="q2">命中等级 $1 (+$2% 命中)</span><br />增加对等级$4目标的物理命中几率 $3%',
+    pr_statstt_oocmanargn:"非施法状态下5秒法力恢复$1<br />施法状态下5秒法力恢复$2",
+    pr_statstt_parrypct:'<span class="q2">招架等级 $1 (+$2% 招架)</span><br />增加招架几率 $3%',
+    pr_statstt_resipct:'<span class="q2">韧性等级 $1 (+$2% 韧性)</span><br />减少被暴击的几率 $3%<br />减少被吸取法力的效果和受到暴击的伤害 $4%<br />针对玩家和其宠物造成的伤害，提供额外 $5% 的伤害减免',
+    pr_statstt_resist:"提高针对$1伤害的抗性。<br />对等级$3的目标 平均法术抵挡: $1%",
+    pr_statstt_rgdatkpwr:"增加远程武器每秒物理伤害 $1",
+    pr_statstt_rgdatkpwr2:"增加远程武器每秒物理伤害 $1<br />增加你宠物的攻击强度 $2<br />增加你宠物的法术伤害 $3",
+    pr_statstt_rgdcritstrkpct:'<span class="q2">暴击等级 $1 (+$2% 暴击)</span><br />远程武器的暴击几率 $3%',
+    pr_statstt_rgdhastepct:'<span class="q2">加速等级 $1 (+$2% 命中)</span><br />增加远程攻击速度 $3%',
+    pr_statstt_rgdhitpct:'<span class="q2">命中等级 $1 (+$2% 命中)</span><br />对等级$4目标增加远程命中几率 $3%',
+    pr_statstt_spi:"战斗外增加 $1 每5秒回血<br />增加非施法状态下5秒法力恢复$2",
+    pr_statstt_splcritstrkpct:'<span class="q2">暴击等级 $2 (+$3% 暴击)</span><br />$1',
+    pr_statstt_spldmg:"$1",
+    pr_statstt_spldmg2:"$1<br />增加你宠物的攻击强度 $3<br />增加你宠物的法术伤害 $4",
+    pr_statstt_splhastepct:'<span class="q2">加速等级 $1 (+$2% 加速)</span><br />增加施法速度 $3%',
+    pr_statstt_splheal:"增加最多 $1 治疗",
+    pr_statstt_splhitpct:'<span class="q2">命中等级 $1 (+$2% 命中)</span><br />对等级$4目标增加法术命中几率 $3%',
+    pr_statstt_splpen:"降低敌人的抗性 $1",
+    pr_statstt_sta:"增加生命值 $1",
+    pr_statstt_sta2:"增加生命值 $1<br />增加你宠物的耐力 $2",
+    pr_statstt_str:"增加攻击强度 $1",
+    pr_statstt_str2:"增加攻击强度 $1<br />增加格挡值 $2",
 
     pr_ach_overall: "总体进度",
 
@@ -4628,11 +4631,11 @@ var LANG = {
 
     pr_note_all:           "全部",
     pr_note_bc:            "TBC",
-    pr_note_subcategories: "Subcategories",
+    pr_note_subcategories: "子分类",
     pr_note_earned:        "赢得",
     pr_note_complete:      "完成",
     pr_note_incomplete:    "未完成",
-    pr_note_excluded:      "Excluded",
+    pr_note_excluded:      "未包含",
     pr_note_items:         "物品",
     pr_note_match:         "匹配",
     pr_note_profs:         "专业",
@@ -4821,8 +4824,28 @@ var LANG = {
         targetstate:       "目标状态"
     },
 
-    /* custom */
+    /* AoWoW: start custom */
+    // Conditions
     note_condition:       "每一个条件必须满足要求。",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement." // enUS
-    /* end custom */
+    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+
+    // Aura Stack Rules
+    asr_behaviour:        "Behaviour",
+    asr_coexist:          "coexist",
+    asr_exclusive:        "exclusive",
+    asr_same_owner:       "(from same caster)",
+    asr_strongest_effect: "(strongest effect is applied)",
+
+    // Linked Spells
+    ls_trigger:           "Triggers",
+    ls_self:              "This",
+    ls_effects:           "Effects",
+    ls_onCast:            "Spell is cast",
+    ls_onAuraRemove:      "Aura is removed",
+    ls_onAuraApply:       "Spells Aura is applied or removed",
+    ls_onSpellHit:        "Spell hits the target(s)",
+    ls_onTrigger:         "Spell is triggered",
+    ls_onImmune:          "Immunity against Spell is applied or cleared",
+
+    /* AoWoW: end custom */
 };

@@ -1,0 +1,16 @@
+REPLACE INTO `aowow_profiler_excludes` VALUES
+    (6, 28242, 1, "Icebane Breastplate"),
+    (6, 28243, 1, "Icebane Gauntlets"),
+    (6, 28244, 1, "Icebane Bracers"),
+    (6, 16986, 1, "Blood Talon"),
+    (6, 16987, 1, "Darkspear"),
+    (6, 16965, 1, "Bleakwood Hew"),
+    (6, 8366, 1, "Ironforge Chain"),
+    (6, 8368, 1, "Ironforge Gauntlets"),
+    (6, 9942, 1, "Mithril Scale Gloves"),
+    (6, 2671, 1, "Rough Bronze Bracers"),
+    (6, 16980, 1, "Rune Edge"),
+    (6, 16960, 1, "Thorium Greatsword"),
+    (6, 16967, 1, "Inlaid Thorium Hammer"),
+    (6, 30342, 1, "Red Smoke Flare"),
+    (6, 30343, 1, "Blue Smoke Flare");
