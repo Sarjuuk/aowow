@@ -24,7 +24,7 @@ function creature(array $ids = [])
     $baseQuery = '
         SELECT
             ct.entry,
-            IF(ie.entry IS NULL, 0, ?d) AS cuFlags,          -- cuFlags
+            IF(`ie`.`entry` IS NULL, 0, ?d) AS `cuFlags`,          -- cuFlags
             difficulty_entry_1, difficulty_entry_2, difficulty_entry_3,
             KillCredit1, KillCredit2,
             modelid1, modelid2, modelid3, modelid4,
@@ -38,13 +38,13 @@ function creature(array $ids = [])
             exp,
             faction,
             npcflag,
-            IF(rank > 4, 0, rank),
+            IF(`rank` > 4, 0, `rank`),
             dmgSchool,
             DamageModifier,
             BaseAttackTime,
             RangeAttackTime,
-            BaseVariance,
-            RangeVariance,
+            1 AS BaseVariance,  -- not in AC
+            1 AS RangeVariance, -- not in AC
             unit_class,
             unit_flags, unit_flags2, dynamicflags,
             family,
