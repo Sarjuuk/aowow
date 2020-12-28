@@ -509,7 +509,7 @@ class ItemList extends BaseType
                     if ($this->enhanceR['enchantId'.$i] <= 0)
                         continue;
 
-                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $this->enhanceR['enchantId'.$i]);
+                    $enchant = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $this->enhanceR['enchantId'.$i]);
                     if ($this->enhanceR['allocationPct'.$i] > 0)
                     {
                         $amount = intVal($this->enhanceR['allocationPct'.$i] * $this->generateEnchSuffixFactor());
@@ -714,7 +714,7 @@ class ItemList extends BaseType
                                 $vspfArgs = [Lang::item('gemColors', $gemCnd['color'.$i] - 1), Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)];
                                 break;
                             default:
-                                continue;
+                                continue 2;
                         }
 
                         $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.Lang::item('gemConditions', $gemCnd['comparator'.$i], $vspfArgs).'</span><br />';
@@ -765,7 +765,7 @@ class ItemList extends BaseType
         // Enchantment
         if (isset($enhance['e']))
         {
-            if ($enchText = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?', $enhance['e']))
+            if ($enchText = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?', $enhance['e']))
                 $x .= '<span class="q2"><!--e-->'.Util::localizedString($enchText, 'name').'</span><br />';
             else
             {
@@ -844,7 +844,7 @@ class ItemList extends BaseType
 
         if ($_ = $this->curTpl['socketBonus'])
         {
-            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE Id = ?d', $_);
+            $sbonus = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $_);
             $x .= '<span class="q'.($hasMatch ? '2' : '0').'">'.Lang::item('socketBonus', ['<a href="?enchantment='.$_.'">'.Util::localizedString($sbonus, 'name').'</a>']).'</span><br />';
         }
 
@@ -1179,7 +1179,7 @@ class ItemList extends BaseType
         // is it available for this item? .. does it even exist?!
         if (empty($this->enhanceR))
             if (DB::World()->selectCell('SELECT 1 FROM item_enchantment_template WHERE entry = ?d AND ench = ?d', abs($this->getField('randomEnchant')), abs($randId)))
-                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE Id = ?d', $randId))
+                if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomenchant WHERE id = ?d', $randId))
                     $this->enhanceR = $_;
 
         return !empty($this->enhanceR);
@@ -1188,7 +1188,7 @@ class ItemList extends BaseType
     // from Trinity
     public function generateEnchSuffixFactor()
     {
-        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE Id = ?', $this->curTpl['itemLevel']);
+        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE id = ?', $this->curTpl['itemLevel']);
         if (!$rpp)
             return 0;
 

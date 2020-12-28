@@ -252,25 +252,8 @@ class ItemPage extends genericPage
 
             if ($_reqRating)
             {
-                $res   = [];
-                $i     = 0;
-                $len   = 0;
-                $parts = explode(' ', str_replace('<br>', ' ', sprintf(Lang::item('reqRating', $_reqRating[1]), $_reqRating[0])));
-                foreach ($parts as $p)
-                {
-                    $res[$i][] = $p;
-                    $len += (mb_strlen($p) + 1);
-
-                    if ($len < 30)
-                        continue;
-
-                    $len = 0;
-                    $i++;
-                }
-                foreach ($res as &$r)
-                    $r = implode(' ', $r);
-
-                $infobox[] = implode('[br]', $res);
+                $text = str_replace('<br />', ' ', Lang::item('reqRating', $_reqRating[1], [$_reqRating[0]]));
+                $infobox[] = Lang::breakTextClean($text, 30, false);
             }
         }
 

@@ -726,6 +726,7 @@ $lang = array(
         'lootStateUNK'    => '[span class=q10]unbekannter Plündern-Status #[b class=q1]%d[/b][/span]',
         'weatherStateUNK' => '[span class=q10]unbekannter Wetter-Zustand #[b class=q1]%d[/b][/span]',
 
+        'entityUNK'     => '[b class=q10]unbekannte Entität[/b]',
 
         'empty'         => '[span class=q0]<leer>[/span]'
     ),
