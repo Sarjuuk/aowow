@@ -12,7 +12,7 @@ SqlGen::register(new class extends SetupScript
     use TrDBCcopy;
 
     protected $command           = 'itemrandomproppoints';
-    protected $dbcSourceFiles    = ['itemrandomproperties'];
+    protected $dbcSourceFiles    = ['randproppoints'];
 });
 
 ?>
