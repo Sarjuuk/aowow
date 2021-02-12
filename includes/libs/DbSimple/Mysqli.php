@@ -157,6 +157,7 @@ class DbSimple_Mysqli extends DbSimple_Database
 
     protected function _performQuery($queryMain)
     {
+        if (ini_get('max_execution_time') < 30) ini_set('max_execution_time', 30);
         $this->_lastQuery = $queryMain;
         $this->_expandPlaceholders($queryMain, false);
         mysqli_ping($this->link);
