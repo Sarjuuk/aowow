@@ -42,7 +42,7 @@ if (!$opt || ((isset($opt['help']) || isset($opt['h'])) && (isset($opt['firstrun
     echo "--update                 : apply new sql updates fetched from github\n";
     echo "--firstrun               : goes through the nessecary hoops of the initial setup.\n";
     echo "additional options\n";
-    echo "--log logfile            : write ouput to file\n";
+    echo "--log=logfile            : write ouput to file\n";
     echo "--locales=<regionCodes,> : limit setup to enUS, frFR, deDE, esES and/or ruRU (does not override config settings)\n";
     echo "--mpqDataDir=path/       : manually point to directory with extracted mpq files; is limited to setup/ (default: setup/mpqData/)\n";
     echo "--delete | -d            : delete generated dbc_* tables when script finishes\n";
