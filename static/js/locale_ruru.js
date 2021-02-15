@@ -916,7 +916,7 @@ var mn_database = [
     [11,"Игровые события","?events",mn_holidays],
     [6,"Местности","?zones",mn_zones],
     [, "Другое"],
-    [31, "Иконки", ":wowhead.com/icons", mn_icons],
+    [31, "Иконки", "?icons", mn_icons],
     [19,"Звуки","?sounds",mn_sounds],
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Mails', '?mails']                                // aowow - custom
