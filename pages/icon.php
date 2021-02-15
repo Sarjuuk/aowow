@@ -29,7 +29,7 @@ class IconPage extends GenericPage
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
-        $this->name = Util::ucFirst($this->subject->getField('name'));
+        $this->name = $this->subject->getField('name');
         $this->icon = $this->subject->getField('name', true, true);
     }
 
