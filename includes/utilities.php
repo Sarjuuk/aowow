@@ -666,7 +666,7 @@ class Util
             return $data;
         }
 
-        return htmlspecialchars(trim($data), ENT_QUOTES, 'utf-8');
+        return htmlspecialchars($data, ENT_QUOTES, 'utf-8');
     }
 
     public static function jsEscape($data)
@@ -679,7 +679,7 @@ class Util
             return $data;
         }
 
-        return strtr(trim($data), array(
+        return strtr($data, array(
             '\\' => '\\\\',
             "'"  => "\\'",
             '"'  => '\\"',
@@ -809,6 +809,8 @@ class Util
             return false;
         else if (!is_array($data))
         {
+            $rawData = $data;                               // do not transform strings
+
             $data = trim($data);
             if (preg_match('/^-?\d*,\d+$/', $data))
                 $data = strtr($data, ',', '.');
@@ -830,6 +832,7 @@ class Util
                 return true;
             }
 
+            $data = $rawData;
             return false;
         }
 
