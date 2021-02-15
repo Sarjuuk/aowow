@@ -25,7 +25,7 @@
     endif;
     if (!User::$id):
 ?>
-            <small>YВы не вошли на сайт. Пожалуйста <a href="?account=signin">войдите</a> или <a href="?account=signup">зарегистрируйтесь</a>, чтобы добавлять комментарии.</small>
+            <small>Вы не вошли на сайт. Пожалуйста <a href="?account=signin">войдите</a> или <a href="?account=signup">зарегистрируйтесь</a>, чтобы добавлять комментарии.</small>
 <?php
     endif;
 ?>
