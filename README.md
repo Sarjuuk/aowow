@@ -91,7 +91,7 @@ WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themse
  * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
 
 #### 6. Run the initial setup from the CLI
-`php aowow --firstrun`.  
+`php aowow --setup`.  
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
 
