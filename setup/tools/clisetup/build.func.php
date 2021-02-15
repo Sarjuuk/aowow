@@ -52,7 +52,7 @@ function build($syncMe = null)
             else
                 $done[] = $name;
 
-            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
+            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'successfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 
@@ -70,7 +70,7 @@ function build($syncMe = null)
             else
                 $done[] = $file;
 
-            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
+            CLI::write(' - subscript \''.$file.'\' returned '.($ok ? 'successfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
         }
 

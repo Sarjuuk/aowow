@@ -36,7 +36,7 @@ function sql($syncMe = null)
             else
                 $done[] = $tbl;
 
-            CLI::write(' - subscript \''.$tbl.'\' returned '.($ok ? 'sucessfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
+            CLI::write(' - subscript \''.$tbl.'\' returned '.($ok ? 'successfully' : 'with errors'), $ok ? CLI::LOG_OK : CLI::LOG_ERROR);
             set_time_limit(SqlGen::$defaultExecTime);      // reset to default for the next script
         }
 
