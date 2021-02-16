@@ -1296,7 +1296,7 @@ $lang = array(
         'maxStanding'   => "Макс Уровень",
         'quartermaster' => "Интендант",
         'customRewRate' => "Индивидуальная ставка вознаграждения",
-        '_transfer'     => 'Репутация у этой фракции будет преобразована в <a href="?faction=%d" class="q1">%s</a> если вы перейдете в <span class="icon-%s">%s</span>.]',
+        '_transfer'     => 'Репутация у этой фракции будет преобразована в <a href="?faction=%d" class="q1">%s</a> если вы перейдете в <span class="icon-%s">%s</span>.',
         'cat'           => array(
             1118 => ["World of Warcraft", 469 => "Альянс", 169 => "Картель Хитрая Шестеренка", 67 => "Орда", 891 => "Силы Альянса", 892 => "Силы Орды"],
             980  => ["The Burning Crusade", 936 => "Город Шаттрат"],
