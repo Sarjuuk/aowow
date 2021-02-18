@@ -85,7 +85,7 @@ endif;
             <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|<a href="https://github.com/Sarjuuk/aowow" target="_blank">Github</a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
         </div>
         <div class="footer-copy">
-            &#12484; 2020 Aowow<br />rev. <?=AOWOW_REVISION; ?>
+            &#12484; 2021 Aowow<br />rev. <?=AOWOW_REVISION; ?>
         </div>
     </div>
 
