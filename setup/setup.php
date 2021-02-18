@@ -26,7 +26,8 @@ function finish(bool $unlock = true) : void
 
 function lockSite(bool $enable = true) : void
 {
-    DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', $enable ? 1 : 0);
+    if (DB::isConnectable(DB_AOWOW))
+        DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', $enable ? 1 : 0);
 }
 
 CLISetup::init();

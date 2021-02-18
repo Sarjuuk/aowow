@@ -16,7 +16,7 @@ function siteconfig()
     $reqKeys    = ['site_host', 'static_host'];
     $updScripts = [];
 
-    if (!DB::isConnected(DB_AOWOW))
+    if (!DB::isConnectable(DB_AOWOW))
     {
         CLI::write();
         CLI::write("database not yet set up!\n        Please use --dbconfig for setup", CLI::LOG_WARN);

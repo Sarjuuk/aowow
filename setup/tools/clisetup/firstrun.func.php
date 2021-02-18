@@ -120,7 +120,7 @@ function firstrun() : bool
         $error   = [];
         $defPort = ini_get('mysqli.default_port');
 
-        foreach (['world', 'aowow', 'auth'] as $what)
+        foreach (['aowow', 'world', 'auth'] as $idx => $what)
         {
             if ($what == 'auth' && (empty($AoWoWconf['auth']) || empty($AoWoWconf['auth']['host'])))
                 continue;
@@ -130,7 +130,12 @@ function firstrun() : bool
                 [$AoWoWconf[$what]['host'], $port] = explode(':', $AoWoWconf[$what]['host']);
 
             if ($link = @mysqli_connect($AoWoWconf[$what]['host'], $AoWoWconf[$what]['user'], $AoWoWconf[$what]['pass'], $AoWoWconf[$what]['db'], $port ?: $defPort))
+            {
                 mysqli_close($link);
+
+                // init proper access for further setup
+                DB::load($idx, $AoWoWconf[$what]);
+            }
             else
                 $error[] = ' * '.$what.': '.'['.mysqli_connect_errno().'] '.mysqli_connect_error();
         }

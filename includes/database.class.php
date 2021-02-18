@@ -31,7 +31,7 @@ class DB
         $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));
 
         if (!$interface || $interface->error)
-            die('Failed to connect to database.');
+            die('Failed to connect to database on index #'.$idx.".\n");
 
         $interface->setErrorHandler(['DB', 'errorHandler']);
         $interface->query('SET NAMES ?', 'utf8mb4');
