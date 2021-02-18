@@ -1291,12 +1291,12 @@ $lang = array(
     ),
     'faction' => array(
         'notFound'      => "Такая фракция не существует.",
-        'spillover'     => "[Reputation Spillover]",
-        'spilloverDesc' => "[Gaining reputation with this faction also yields a proportional gain with the factions listed below.]",
+        'spillover'     => "Распространение репутации",
+        'spilloverDesc' => "Получение репутации у этой фракции также дает пропорциональный выигрыш по отношению к фракциям, перечисленным ниже.",
         'maxStanding'   => "Макс Уровень",
         'quartermaster' => "Интендант",
-        'customRewRate' => "[Custom Reward Rate]",
-        '_transfer'     => '[The reputation with this faction will be converted to <a href="?faction=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.]',
+        'customRewRate' => "Индивидуальная ставка вознаграждения",
+        '_transfer'     => 'Репутация у этой фракции будет преобразована в <a href="?faction=%d" class="q1">%s</a> если вы перейдете в <span class="icon-%s">%s</span>.',
         'cat'           => array(
             1118 => ["World of Warcraft", 469 => "Альянс", 169 => "Картель Хитрая Шестеренка", 67 => "Орда", 891 => "Силы Альянса", 892 => "Силы Орды"],
             980  => ["The Burning Crusade", 936 => "Город Шаттрат"],
