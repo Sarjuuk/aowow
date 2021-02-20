@@ -19,6 +19,302 @@ class SmartAI
     private $quotes     = [];
     private $summons    = null;
 
+    /*********************/
+    /* Lookups by action */
+    /*********************/
+
+    public static function getOwnerOfNPCSummon(int $npcId, int $typeFilter = 0) : array
+    {
+        if ($npcId <= 0)
+            return [];
+
+        $lookup = array(
+            SAI_ACTION_SUMMON_CREATURE         => [1 => $npcId],
+            SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL => [1 => $npcId]
+        );
+
+        if ($npcGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_NPC, $npcId))
+            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 0 AND `spawnId` IN (?a)', $npcGuids))
+                foreach ($groups as $g)
+                    $lookup[SAI_ACTION_SPAWN_SPAWNGROUP][1] = $g;
+
+        $result = self::getActionOwner($lookup, $typeFilter);
+
+        // can skip lookups for SAI_ACTION_SUMMON_CREATURE_GROUP as creature_summon_groups already contains summoner info
+        if ($sgs = DB::World()->select('SELECT `summonerType` AS "0", `summonerId` AS "1" FROM creature_summon_groups WHERE `entry` = ?d', $npcId))
+            foreach ($sgs as [$type, $typeId])
+                $result[$type][] = $typeId;
+
+        return $result;
+    }
+
+    public static function getOwnerOfObjectSummon(int $objectId, int $typeFilter = 0) : array
+    {
+        if ($objectId <= 0)
+            return [];
+
+        $lookup = array(
+            SAI_ACTION_SUMMON_GO => [1 => $objectId]
+        );
+
+        if ($objGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_OBJECT, $objectId))
+            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN (?a)', $objGuids))
+                foreach ($groups as $g)
+                    $lookup[SAI_ACTION_SPAWN_SPAWNGROUP][1] = $g;
+
+        return self::getActionOwner($lookup, $typeFilter);
+    }
+
+    public static function getOwnerOfSpellCast(int $spellId, int $typeFilter = 0) : array
+    {
+        if ($spellId <= 0)
+            return [];
+
+        $lookup = array(
+            SAI_ACTION_CAST         => [1 => $spellId],
+            SAI_ACTION_ADD_AURA     => [1 => $spellId],
+            SAI_ACTION_SELF_CAST    => [1 => $spellId],
+            SAI_ACTION_CROSS_CAST   => [1 => $spellId],
+            SAI_ACTION_INVOKER_CAST => [1 => $spellId]
+        );
+
+        return self::getActionOwner($lookup, $typeFilter);
+    }
+
+    public static function getOwnerOfSoundPlayed(int $soundId, int $typeFilter = 0) : array
+    {
+        if ($soundId <= 0)
+            return [];
+
+        $lookup = array(
+            SAI_ACTION_SOUND => [1 => $soundId]
+        );
+
+        return self::getActionOwner($lookup, $typeFilter);
+    }
+
+    private static function getActionOwner(array $lookup, int $typeFilter = 0) : array
+    {
+        $qParts   = [];
+        $result   = [];
+        $genLimit = $talLimit = [];
+        switch ($typeFilter)
+        {
+            case TYPE_NPC:
+                $genLimit = [SAI_SRC_TYPE_CREATURE, SAI_SRC_TYPE_ACTIONLIST];
+                $talLimit = [SAI_SRC_TYPE_CREATURE];
+                break;
+            case TYPE_OBJECT:
+                $genLimit = [SAI_SRC_TYPE_OBJECT, SAI_SRC_TYPE_ACTIONLIST];
+                $talLimit = [SAI_SRC_TYPE_OBJECT];
+                break;
+            case TYPE_AREATRIGGER:
+                $genLimit = [SAI_SRC_TYPE_AREATRIGGER, SAI_SRC_TYPE_ACTIONLIST];
+                $talLimit = [SAI_SRC_TYPE_AREATRIGGER];
+                break;
+        }
+
+        foreach ($lookup as $action => $params)
+        {
+            $aq = '(`action_type` = '.(int)$action.' AND (';
+            $pq = [];
+            foreach ($params as $idx => $p)
+                $pq[] = '`action_param'.(int)$idx.'` = '.(int)$p;
+
+            if ($pq)
+                $qParts[] = $aq.implode(' OR ', $pq).'))';
+        }
+
+        $smartS = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE (%s){ AND `source_type` IN (?a)} GROUP BY "0", "1"', $qParts ? implode(' OR ', $qParts) : '0'), $genLimit ?: DBSIMPLE_SKIP);
+
+        // filter for TAL shenanigans
+        if ($smartTAL = array_filter($smartS, function ($x) {return $x[0] == SAI_SRC_TYPE_ACTIONLIST;}))
+        {
+            $smartS = array_diff_key($smartS, $smartTAL);
+
+            $q = [];
+            foreach ($smartTAL as [, $eog])
+            {
+                // SAI_ACTION_CALL_TIMED_ACTIONLIST
+                $q[] = '`action_type` = '.SAI_ACTION_CALL_TIMED_ACTIONLIST.' AND `action_param1` = '.$eog;
+
+                // SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST
+                $q[] = '`action_type` = '.SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST.' AND (`action_param1` = '.$eog.' OR `action_param2` = '.$eog.' OR `action_param3` = '.$eog.' OR `action_param4` = '.$eog.' OR `action_param5` = '.$eog.')';
+
+                // SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST
+                $q[] = '`action_type` = '.SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST.' AND `action_param1` <= '.$eog.' AND `action_param2` >= '.$eog;
+            }
+
+            if ($_ = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE ((%s)){ AND `source_type` IN (?a)} GROUP BY "0", "1"', $q ? implode(') OR (', $q) : '0'), $talLimit ?: DBSIMPLE_SKIP))
+                $smartS = array_merge($smartS, $_);
+        }
+
+        // filter guids for entries
+        if ($smartG = array_filter($smartS, function ($x) {return $x[1] < 0;}))
+        {
+            $smartS = array_diff_key($smartS, $smartG);
+
+            $q = [];
+            foreach ($smartG as [$st, $eog])
+            {
+                if ($st == SAI_SRC_TYPE_CREATURE)
+                    $q[] = '`type` = '.TYPE_NPC.' AND `guid` = '.-$eog;
+                else if ($st == SAI_SRC_TYPE_OBJECT)
+                    $q[] = '`type` = '.TYPE_OBJECT.' AND `guid` = '.-$eog;
+            }
+
+            if ($q)
+                $result = DB::Aowow()->selectCol(sprintf('SELECT `type` AS ARRAY_KEY, `typeId` FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
+        }
+
+        foreach ($smartS as [$st, $eog])
+        {
+            if ($st == SAI_SRC_TYPE_CREATURE)
+                $result[TYPE_NPC][] = $eog;
+            else if ($st == SAI_SRC_TYPE_OBJECT)
+                $result[TYPE_OBJECT][] = $eog;
+            else if ($st == SAI_SRC_TYPE_AREATRIGGER)
+                $result[TYPE_AREATRIGGER][] = $eog;
+        }
+
+        return $result;
+    }
+
+
+    /********************/
+    /* Lookups by owner */
+    /********************/
+
+    public static function getNPCSummonsForOwner(int $entry, int $srcType = SAI_SRC_TYPE_CREATURE) : array
+    {
+        // action => paramIdx with npcIds/spawnGoupIds
+        $lookup = array(
+            SAI_ACTION_SUMMON_CREATURE         => [1],
+            SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL => [1],
+            SAI_ACTION_SPAWN_SPAWNGROUP        => [1]
+        );
+
+        $result = self::getOwnerAction($srcType, $entry, $lookup);
+
+        // can skip lookups for SAI_ACTION_SUMMON_CREATURE_GROUP as creature_summon_groups already contains summoner info
+        if ($srcType == SAI_SRC_TYPE_CREATURE || $srcType == SAI_SRC_TYPE_OBJECT)
+        {
+            $st = $srcType == SAI_SRC_TYPE_CREATURE ? 0 : 1;// 0:SUMMONER_TYPE_CREATURE; 1:SUMMONER_TYPE_GAMEOBJECT
+            if ($csg = DB::World()->selectCol('SELECT `entry` FROM creature_summon_groups WHERE `summonerType` = ?d AND `summonerId` = ?d', $st, $entry))
+                $result = array_merge($result, $csg);
+        }
+
+        if (!empty($moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP]))
+        {
+            $grp = $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP];
+            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', 0 /*0:SUMMONER_TYPE_CREATURE*/, $grp))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', TYPE_NPC, $sgs))
+                    $result = array_merge($result, $ids);
+        }
+
+        return $result;
+    }
+
+    public static function getObjectSummonsForOwner(int $entry, int $srcType = SAI_SRC_TYPE_CREATURE) : array
+    {
+        // action => paramIdx with gobIds/spawnGoupIds
+        $lookup = array(
+            SAI_ACTION_SUMMON_GO        => [1],
+            SAI_ACTION_SPAWN_SPAWNGROUP => [1]
+        );
+
+        $result = self::getOwnerAction($srcType, $entry, $lookup, $moreInfo);
+
+        if (!empty($moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP]))
+        {
+            $grp = $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP];
+            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', 1 /*1:SUMMONER_TYPE_GAMEOBJECT*/, $grp))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', TYPE_OBJECT, $sgs))
+                    $result = array_merge($result, $ids);
+        }
+
+        return $result;
+    }
+
+    public static function getSpellCastsForOwner(int $entry, int $srcType = SAI_SRC_TYPE_CREATURE) : array
+    {
+        // action => paramIdx with spellIds
+        $lookup = array(
+            SAI_SRC_TYPE_CREATURE   => [1],
+            SAI_ACTION_CAST         => [1],
+            SAI_ACTION_ADD_AURA     => [1],
+            SAI_ACTION_INVOKER_CAST => [1],
+            SAI_ACTION_CROSS_CAST   => [1]
+        );
+
+        return self::getOwnerAction($srcType, $entry, $lookup);
+    }
+
+    public static function getSoundsPlayedForOwner(int $entry, int $srcType = SAI_SRC_TYPE_CREATURE) : array
+    {
+        // action => paramIdx with soundIds
+        $lookup = [SAI_ACTION_SOUND => [1]];
+
+        return self::getOwnerAction($srcType, $entry, $lookup);
+    }
+
+    private static function getOwnerAction(int $sourceType, int $entry, array $lookup, ?array $moreInfo = []) : array
+    {
+        if ($entry < 0)                                     // please not individual entities :(
+            return [];
+
+        $smartScripts = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID = ?d', $sourceType, array_merge(array_keys($lookup), SAI_ACTION_ALL_TIMED_ACTION_LISTS), $entry);
+        $smartResults = [];
+        $smartTALs    = [];
+        foreach ($smartScripts as $s)
+        {
+            if ($e['action_type'] == SAI_ACTION_SPAWN_SPAWNGROUP)
+                $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $e['action_param'.$i];
+            else if (in_array($s['action_type'], array_keys($lookup)))
+            {
+                foreach ($lookup[$s['action_type']] as $p)
+                    $smartResults[] = $s['action_param'.$p];
+            }
+            else if ($s['action_type'] == SAI_ACTION_CALL_TIMED_ACTIONLIST)
+                $smartTALs[] = $s['action_param1'];
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST)
+            {
+                for ($i = 1; $i < 7; $i++)
+                    if ($s['action_param'.$i])
+                        $smartTALs[] = $s['action_param'.$i];
+            }
+            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST)
+            {
+                for ($i = $s['action_param1']; $i <= $s['action_param2']; $i++)
+                    $smartTALs[] = $i;
+            }
+        }
+
+        if ($smartTALs)
+        {
+            if ($TALActList = DB::World()->selectCol('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, $lookup, $smartTALs))
+            {
+                foreach ($TALActList as $e)
+                {
+                    foreach ($lookup[$e['action_type']] as $i)
+                    {
+                        if ($e['action_type'] == SAI_ACTION_SPAWN_SPAWNGROUP)
+                            $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $e['action_param'.$i];
+                        else
+                            $smartResults[] = $e['action_param'.$i];
+                    }
+                }
+            }
+        }
+
+        return $smartResults;
+    }
+
+
+    /******************************/
+    /* Structured Lisview Display */
+    /******************************/
+
     public function __construct(int $srcType, int $entry, array $miscData = [])
     {
         $this->srcType  = $srcType;
@@ -167,10 +463,11 @@ class SmartAI
         return $this->jsGlobals;
     }
 
-    public function getTabs() :  array
+    public function getTabs() : array
     {
         return $this->tabs;
     }
+
 
     private function &iterate() : iterable
     {

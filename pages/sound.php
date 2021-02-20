@@ -269,39 +269,11 @@ class SoundPage extends GenericPage
             }
         }
 
-        $ssQuery = '
-            SELECT
-                source_type AS ARRAY_KEY,
-                entryorguid AS ARRAY_KEY2,
-                0
-            FROM
-                smart_scripts
-            WHERE
-                (action_type = 4 AND action_param1 = ?d AND source_type <> 9) {
-                OR (action_type = 80 AND (action_param1 IN (?a)))
-                OR (action_type = 87 AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a)))
-                OR (action_type = 88 AND (action_param1 IN (?a) OR action_param2 IN (?a)))
-            }
-        ';
-
-        $ssActionLists = DB::World()->selectCol('SELECT entryorguid FROM smart_scripts WHERE action_type = 4 AND action_param1 = ?d AND source_type = 9', $this->typeId);
-        $smartScripts  = DB::World()->selectCol($ssQuery, $this->typeId, $ssActionLists ?: DBSIMPLE_SKIP, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists, $ssActionLists);
-
         $creatureIds = DB::World()->selectCol('SELECT ct.CreatureID FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundEntriesID = ?d OR ct.Sound = ?d', $this->typeId, $this->typeId);
-        foreach ($smartScripts as $source => $ids)
-        {
-            switch($source)
-            {
-                case 0:                                     // npc
-                    // filter for guids (id < 0)
-                    $creatureIds = array_merge($creatureIds, array_keys(array_filter($ids, function($x) { return $x > 0; })) );
-                    break;
-                case 1:                                     // gameobject
-                default:
-                    break;
-            }
-        }
 
+        // can objects or areatrigger play sound...?
+        if ($goosp = SmartAI::getOwnerOfSoundPlayed($this->typeId, TYPE_NPC))
+            $creatureIds = array_merge($creatureIds, $goosp[TYPE_NPC]);
 
         // tab: NPC (dialogues...?, generic creature sound)
         // skipping (always empty): transforms, footsteps

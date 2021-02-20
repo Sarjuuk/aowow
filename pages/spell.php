@@ -325,6 +325,8 @@ class SpellPage extends GenericPage
 
         $j = [null, 'A', 'B', 'C'];
 
+        $ubSAI = SmartAI::getOwnerOfSpellCast($this->typeId);
+
         // tab: abilities [of shapeshift form]
         for ($i = 1; $i < 4; $i++)
         {
@@ -610,8 +612,8 @@ class SpellPage extends GenericPage
             ['onUseSpell', $this->subject->id], ['onSuccessSpell', $this->subject->id],
             ['auraSpell',  $this->subject->id], ['triggeredSpell', $this->subject->id]
         );
-        if ($_ = $this->ubSmartScript(TYPE_OBJECT))
-            $conditions[] = ['id', $_];
+        if (!empty($ubSAI[TYPE_OBJECT]))
+            $conditions[] = ['id', $ubSAI[TYPE_OBJECT]];
 
         $ubObjects = new GameObjectList($conditions);
         if (!$ubObjects->error)
@@ -628,9 +630,9 @@ class SpellPage extends GenericPage
         // tab: used by - areatrigger
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            if ($_ = $this->ubSmartScript(TYPE_AREATRIGGER))
+            if (!empty($ubSAI[TYPE_AREATRIGGER]))
             {
-                $ubTriggers = new AreaTriggerList(array(['id', $_]));
+                $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[TYPE_AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
                     $this->lvTabs[] = ['areatrigger', array(
@@ -845,8 +847,8 @@ class SpellPage extends GenericPage
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
-        if ($_ = $this->ubSmartScript(TYPE_NPC))
-            $conditions[] = ['id', $_];
+        if (!empty($ubSAI[TYPE_NPC]))
+            $conditions[] = ['id', $ubSAI[TYPE_NPC]];
 
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
@@ -2230,37 +2232,6 @@ class SpellPage extends GenericPage
         }
 
         return $list;
-    }
-
-    private function ubSmartScript(int $type) : array
-    {
-        $src = -1;
-        if ($type == TYPE_OBJECT)
-            $src = SAI_SRC_TYPE_OBJECT;
-        else if ($type == TYPE_NPC)
-            $src = SAI_SRC_TYPE_CREATURE;
-        else if ($type == TYPE_AREATRIGGER)
-            $src = SAI_SRC_TYPE_AREATRIGGER;
-        else
-            return [];
-
-        $ids = [];
-        if ($smartS = DB::World()->select('SELECT entryOrGUID, source_type FROM smart_scripts WHERE entryOrGUID > 0 AND source_type IN (?a) AND action_type IN (?a) AND action_param1 = ?d', [$src, SAI_SRC_TYPE_ACTIONLIST], SAI_ACTION_ALL_SPELLCASTS, $this->typeId))
-        {
-            // filter for timed action list
-            if ($tal = array_filter($smartS, function($x) {return $x['source_type'] == SAI_SRC_TYPE_ACTIONLIST;}))
-            {
-                $talIds = array_column($tal, 'entryOrGUID');
-                if ($_ = DB::World()->selectCol('SELECT entryOrGUID FROM smart_scripts WHERE entryOrGUID > 0 AND source_type = ?d AND action_type IN (?a) AND (action_param1 IN (?a) OR action_param2 IN (?a) OR action_param3 IN (?a) OR action_param4 IN (?a) OR action_param5 IN (?a) OR action_param6 IN (?a))', $src, SAI_ACTION_ALL_TIMED_ACTION_LISTS, $talIds, $talIds, $talIds, $talIds, $talIds, $talIds))
-                    $ids = $_;
-
-                $smartS = array_diff_key($smartS, $tal);
-            }
-            if ($smartS);
-                $ids = array_merge($ids, array_column($smartS, 'entryOrGUID'));
-        }
-
-        return $ids;
     }
 }
 

@@ -408,36 +408,8 @@ class NpcPage extends GenericPage
         /**************/
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
-        // SMART_SCRIPT_TYPE_CREATURE = 0; SMART_ACTION_CAST = 11; SMART_ACTION_ADD_AURA = 75; SMART_ACTION_INVOKER_CAST = 85; SMART_ACTION_CROSS_CAST = 86
-        $smartScripts = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID = ?d', SAI_SRC_TYPE_CREATURE, array_merge(SAI_ACTION_ALL_SPELLCASTS, SAI_ACTION_ALL_TIMED_ACTION_LISTS), $this->typeId);
-        $smartSpells  = [];
-        $smartTALs    = [];
-        foreach ($smartScripts as $s)
-        {
-            if (in_array($s['action_type'], SAI_ACTION_ALL_SPELLCASTS))
-                $smartSpells[] = $s['action_param1'];
-            else if ($s['action_type'] == SAI_ACTION_CALL_TIMED_ACTIONLIST)
-                $smartTALs[] = $s['action_param1'];
-            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_TIMED_ACTIONLIST)
-            {
-                for ($i = 1; $i < 7; $i++)
-                    if ($s['action_param'.$i])
-                        $smartTALs[] = $s['action_param'.$i];
-            }
-            else if ($s['action_type'] == SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST)
-            {
-                for ($i = $s['action_param1']; $i <= $s['action_param2']; $i++)
-                    $smartTALs[] = $i;
-            }
-            else
-                var_dump($s);
-        }
-
-        if ($smartTALs)
-            if ($_ = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, SAI_ACTION_ALL_SPELLCASTS, $smartTALs))
-                $smartSpells = array_merge($smartSpells, $_);
-
         $tplSpells   = [];
+        $smartSpells = [];
         $conditions  = ['OR'];
 
         for ($i = 1; $i < 9; $i++)
@@ -447,7 +419,7 @@ class NpcPage extends GenericPage
         if ($tplSpells)
             $conditions[] = ['id', $tplSpells];
 
-        if ($smartSpells)
+        if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SAI_SRC_TYPE_CREATURE))
             $conditions[] = ['id', $smartSpells];
 
         // Pet-Abilities
@@ -511,7 +483,7 @@ class NpcPage extends GenericPage
             }
         }
 
-        // tab: summoned by
+        // tab: summoned by [spell]
         $conditions = array(
             'OR',
             ['AND', ['effect1Id', [28, 56, 112]], ['effect1MiscValue', $this->typeId]],
@@ -519,16 +491,49 @@ class NpcPage extends GenericPage
             ['AND', ['effect3Id', [28, 56, 112]], ['effect3MiscValue', $this->typeId]]
         );
 
-        $summoned = new SpellList($conditions);
-        if (!$summoned->error)
+        $sbSpell = new SpellList($conditions);
+        if (!$sbSpell->error)
         {
-            $this->extendGlobalData($summoned->getJSGlobals());
+            $this->extendGlobalData($sbSpell->getJSGlobals());
 
             $this->lvTabs[] = ['spell', array(
-                'data' => array_values($summoned->getListviewData()),
+                'data' => array_values($sbSpell->getListviewData()),
                 'name' => '$LANG.tab_summonedby',
-                'id'   => 'summoned-by'
+                'id'   => 'summoned-by-spell'
             )];
+        }
+
+        // tab: summoned by [NPC]
+        $sb = SmartAI::getOwnerOfNPCSummon($this->typeId);
+        if (!empty($sb[TYPE_NPC]))
+        {
+            $sbNPC = new CreatureList(array(['id', $sb[TYPE_NPC]]));
+            if (!$sbNPC->error)
+            {
+                $this->extendGlobalData($sbNPC->getJSGlobals());
+
+                $this->lvTabs[] = ['creature', array(
+                    'data' => array_values($sbNPC->getListviewData()),
+                    'name' => '$LANG.tab_summonedby',
+                    'id'   => 'summoned-by-npc'
+                )];
+            }
+        }
+
+        // tab: summoned by [Object]
+        if (!empty($sb[TYPE_OBJECT]))
+        {
+            $sbGO = new GameObjectList(array(['id', $sb[TYPE_OBJECT]]));
+            if (!$sbGO->error)
+            {
+                $this->extendGlobalData($sbGO->getJSGlobals());
+
+                $this->lvTabs[] = ['object', array(
+                    'data' => array_values($sbGO->getListviewData()),
+                    'name' => '$LANG.tab_summonedby',
+                    'id'   => 'summoned-by-object'
+                )];
+            }
         }
 
         // tab: teaches
@@ -865,27 +870,7 @@ class NpcPage extends GenericPage
             * Dialogue VO => creature_text
             * onClick VO => CreatureDisplayInfo.dbc => NPCSounds.dbc
         */
-        $ssActionLists = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE entryorguid = ?d AND source_type = 0 AND action_type IN (80, 87, 88)', $this->typeId);
-        $actionListIds = [];
-        foreach ($ssActionLists as $sal)
-        {
-            $iMax = 0;
-            switch ($sal['action_type'])
-            {
-                case 80: $iMax = 1; break;
-                case 87: $iMax = 6; break;
-                case 88: $iMax = 2; break;
-                default: continue;
-            }
-
-            for ($i = 1; $i <= $iMax; $i++)
-                if ($sal['action_param'.$i])
-                    $actionListIds[] = $sal['action_param'.$i];
-        }
-
-        // not going for a per guid basis. The infos are nested enough as is.
-        $smartScripts   = DB::World()->selectCol('SELECT action_param1 FROM smart_scripts WHERE action_type = 4 AND ((source_type = 0 AND entryorguid = ?d) { OR (source_type = 9 AND entryorguid IN (?a)) } )',  $this->typeId, $actionListIds ?: DBSIMPLE_SKIP);
-        $this->soundIds = array_merge($this->soundIds, $smartScripts);
+        $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SAI_SRC_TYPE_CREATURE));
 
         // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
         $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE id = ?d', $this->subject->getField('displayId1'));
