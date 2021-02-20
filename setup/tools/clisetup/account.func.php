@@ -11,7 +11,7 @@ if (!CLI)
 /* Account creation */
 /********************/
 
-function account()
+function account() : void
 {
     $fields = array(
         'name'  => ['Username',         false],

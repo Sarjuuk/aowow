@@ -24,6 +24,12 @@ class CLISetup
         'ruRU' => LOCALE_RU
     );
 
+    public  const LOCK_OFF        = 0;
+    public  const LOCK_ON         = 1;
+    public  const LOCK_RESTORE    = 2;
+
+    private static $lock          = 1;
+
     private const ARGV_REQUIRED   = 0x01;
     private const ARGV_OPTIONAL   = 0x02;
     private const ARGV_ARRAY      = 0x10;
@@ -123,6 +129,12 @@ class CLISetup
         foreach (self::$locales as $idx => $str)
             if (!defined('CFG_LOCALES') || CFG_LOCALES & (1 << $idx))
                 self::$localeIds[] = $idx;
+
+        // get site status
+        if (DB::isConnectable(DB_AOWOW))
+            self::$lock = (int)DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = "maintenance"');
+        else
+            self::$lock = self::LOCK_ON;
     }
 
     public static function getOpt(...$args)
@@ -179,6 +191,17 @@ class CLISetup
         }
 
         CLI::writeTable($lines);
+    }
+
+
+    /*******************/
+    /* web page access */
+    /*******************/
+
+    public static function siteLock(int $mode = self::LOCK_RESTORE) : void
+    {
+        if (DB::isConnectable(DB_AOWOW))
+            DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', (int)!!($mode == self::LOCK_RESTORE ? self::$lock : $mode));
     }
 
 

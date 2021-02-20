@@ -49,6 +49,23 @@ class DB
         self::$connectionCache[$idx] = true;
     }
 
+    public static function test(array $options, ?string &$err = '') : bool
+    {
+        $defPort = ini_get('mysqli.default_port');
+        $port = 0;
+        if (strstr($options['host'], ':'))
+            [$options['host'], $port] = explode(':', $options['host']);
+
+        if ($link = @mysqli_connect($options['host'], $options['user'], $options['pass'], $options['db'], $port ?: $defPort))
+        {
+            mysqli_close($link);
+            return true;
+        }
+
+        $err = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
+        return false;
+    }
+
     public static function errorHandler($message, $data)
     {
         if (!error_reporting())

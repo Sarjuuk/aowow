@@ -11,7 +11,7 @@ if (!CLI)
 /* Configure Site variables */
 /****************************/
 
-function siteconfig()
+function siteconfig() : void
 {
     $reqKeys    = ['site_host', 'static_host'];
     $updScripts = [];

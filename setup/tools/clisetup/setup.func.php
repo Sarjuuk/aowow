@@ -11,7 +11,7 @@ if (!CLI)
 /* string setup steps together for first use */
 /*********************************************/
 
-function firstrun() : bool
+function setup() : void
 {
     require_once 'setup/tools/sqlGen.class.php';
     require_once 'setup/tools/fileGen.class.php';
@@ -118,26 +118,16 @@ function firstrun() : bool
         require 'config/config.php';
 
         $error   = [];
-        $defPort = ini_get('mysqli.default_port');
-
-        foreach (['aowow', 'world', 'auth'] as $idx => $what)
+        foreach (['world', 'aowow', 'auth'] as $idx => $what)
         {
             if ($what == 'auth' && (empty($AoWoWconf['auth']) || empty($AoWoWconf['auth']['host'])))
                 continue;
 
-            $port = 0;
-            if (strstr($AoWoWconf[$what]['host'], ':'))
-                [$AoWoWconf[$what]['host'], $port] = explode(':', $AoWoWconf[$what]['host']);
-
-            if ($link = @mysqli_connect($AoWoWconf[$what]['host'], $AoWoWconf[$what]['user'], $AoWoWconf[$what]['pass'], $AoWoWconf[$what]['db'], $port ?: $defPort))
-            {
-                mysqli_close($link);
-
-                // init proper access for further setup
+            // init proper access for further setup
+            if (DB::test($AoWoWconf[$what], $err))
                 DB::load($idx, $AoWoWconf[$what]);
-            }
             else
-                $error[] = ' * '.$what.': '.'['.mysqli_connect_errno().'] '.mysqli_connect_error();
+                $error[] = ' * '.$what.': '.$err;
         }
 
         return empty($error);
@@ -247,7 +237,7 @@ function firstrun() : bool
         }
 
         CLI::write();
-        exit;
+        return;
     }
 
     if ($startStep)
@@ -274,6 +264,8 @@ function firstrun() : bool
     /* run */
     /*******/
 
+    CLISetup::siteLock(CLISetup::LOCK_ON);
+
     foreach ($steps as $idx => $step)
     {
         if ($startStep > $idx)
@@ -288,7 +280,7 @@ function firstrun() : bool
 
             $inp = ['x' => ['Press any key to continue', true]];
             if (!CLI::read($inp, true))                // we don't actually care about the input
-                return false;
+                return;
         }
 
         while (true)
@@ -329,20 +321,21 @@ function firstrun() : bool
                     case 'r':
                         break;
                     case 'a':
-                        return false;
+                        return;
                 }
             }
             else
             {
                 CLI::write();
-                return false;
+                return;
             }
         }
     }
 
     unlink('cache/firstrun');
+    CLISetup::siteLock(CLISetup::LOCK_OFF);
     CLI::write('setup finished', CLI::LOG_OK);
-    return true;
+    return;
 }
 
 ?>

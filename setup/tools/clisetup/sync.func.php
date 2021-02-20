@@ -27,7 +27,7 @@ function sync(array $s = [], array $b = []) : void
         CLI::write('  e.g.: "php aowow --sync=creature_queststarter" causes the table aowow_quests_startend to be recreated.', -1, false);
         CLI::write('  Also quest-related profiler files will be recreated as they depend on aowow_quests_startend and thus indirectly on creature_queststarter.', -1, false);
         CLI::write();
-        exit;
+        return;
     }
 
     $_s = sql($s);
@@ -43,6 +43,9 @@ function sync(array $s = [], array $b = []) : void
         $_ = array_diff($b, $_b);
         DB::Aowow()->query('UPDATE ?_dbversion SET `build` = ?', $_ ? implode(' ', $_) : '');
     }
+
+    if (!$s && !$_s && !$b && !$_b)
+        CLI::write('no valid table names supplied', CLI::LOG_ERROR);
 }
 
 ?>

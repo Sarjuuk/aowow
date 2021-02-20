@@ -11,15 +11,17 @@ if (!CLI)
 /* Create required files */
 /*************************/
 
-function build($syncMe = null)
+function build($syncMe = null) : array
 {
     require_once 'setup/tools/fileGen.class.php';
 
-    FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe ?: []);
+    if(!FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe ?: []))
+        return [];
 
     $done = [];
     if (FileGen::$subScripts)
     {
+        CLISetup::siteLock(CLISetup::LOCK_ON);
         $allOk = true;
 
         // start file generation
@@ -80,6 +82,8 @@ function build($syncMe = null)
             CLI::write('successfully finished file generation', CLI::LOG_OK);
         else
             CLI::write('finished file generation with errors', CLI::LOG_ERROR);
+
+        CLISetup::siteLock(CLISetup::LOCK_RESTORE);
     }
     else if (FileGen::getMode() == FileGen::MODE_NORMAL)
         CLI::write('no valid script names supplied', CLI::LOG_ERROR);

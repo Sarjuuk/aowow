@@ -23,12 +23,16 @@ class SqlGen
     public static $defaultExecTime = 30;
     public static $sqlBatchSize    = 1000;
 
-    public static function init(int $mode = self::MODE_NORMAL, array $updScripts = []) : void
+    public static function init(int $mode = self::MODE_NORMAL, array $updScripts = []) : bool
     {
         self::$defaultExecTime = ini_get('max_execution_time');
-        $doScripts = null;
-
         self::$mode = $mode;
+
+        if (!CLISetup::$localeIds)
+        {
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
+            return false;
+        }
 
         // register subscripts
         foreach (glob('setup/tools/sqlgen/*.func.php') as $file)
@@ -76,25 +80,15 @@ class SqlGen
         }
 
         // handle command prompts
-        self::handleCLIOpts($doScripts);
-        if ($mode == self::MODE_NORMAL && !$doScripts)
-        {
-            self::printCLIHelp();
-            exit;
-        }
+        if (!self::handleCLIOpts($doScripts))
+            return false;
 
         // check passed subscript names; limit to real scriptNames
         self::$subScripts = array_keys(self::$tables);
         if ($doScripts || $updScripts)
             self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
-        else if ($doScripts === null)
-            self::$subScripts = [];
 
-        if (!CLISetup::$localeIds /* && this script has localized text */)
-        {
-            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
-            exit;
-        }
+        return true;
     }
 
     public static function register(SetupScript $ssRef) : void
@@ -138,14 +132,14 @@ class SqlGen
         }
     }
 
-    private static function handleCLIOpts(&$doTbls) : void
+    private static function handleCLIOpts(?array &$doTbls) : bool
     {
         $doTbls = [];
 
         if (CLISetup::getOpt('help') && self::$mode == self::MODE_NORMAL)
         {
             self::printCLIHelp();
-            exit;
+            return false;
         }
 
         // required subScripts
@@ -160,10 +154,19 @@ class SqlGen
                 if (array_intersect($sync, $ssRef->getDependencies(true)))
                     $doTbls[] = $name;
 
-            $doTbls = $doTbls ? array_unique($doTbls) : null;
+            if (!$doTbls)
+                return false;
+
+            $doTbls = array_unique($doTbls);
+            return true;
         }
         else if ($_ = CLISetup::getOpt('sql'))
+        {
             $doTbls = $_;
+            return true;
+        }
+
+        return false;
     }
 
     private static function printCLIHelp() : void

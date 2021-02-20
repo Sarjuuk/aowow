@@ -65,33 +65,25 @@ class FileGen
         'STATIC_URL'     => STATIC_URL
     );
 
-    public static function init($mode = self::MODE_NORMAL, array $updScripts = [])
+    public static function init(int $mode = self::MODE_NORMAL, array $updScripts = []) : bool
     {
         self::$defaultExecTime = ini_get('max_execution_time');
-        $doScripts = null;
-
         self::$mode = $mode;
 
-        // handle command prompts
-        self::handleCLIOpts($doScripts);
-        if ($mode == self::MODE_NORMAL && !$doScripts)
+        if (!CLISetup::$localeIds)
         {
-            self::printCLIHelp();
-            exit;
+            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
+            return false;
         }
+
+        // handle command prompts
+        if (!self::handleCLIOpts($doScripts))
+            return false;
 
         // check passed subscript names; limit to real scriptNames
         self::$subScripts = array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets));
         if ($doScripts || $updScripts)
             self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
-        else if ($doScripts === null)
-            self::$subScripts = [];
-
-        if (!CLISetup::$localeIds /* todo: && this script has localized text */)
-        {
-            CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
-            exit;
-        }
 
         // create directory structure
         CLI::write('FileGen::init() - creating required directories');
@@ -102,9 +94,11 @@ class FileGen
 
         CLI::write('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
         CLI::write();
+
+        return true;
     }
 
-    private static function handleCLIOpts(&$doScripts)
+    private static function handleCLIOpts(?array &$doScripts) : bool
     {
         $doScripts = [];
 
@@ -117,7 +111,7 @@ class FileGen
             else
                 self::printCLIHelp();
 
-            exit;
+            return false;
         }
 
         // required subScripts
@@ -136,10 +130,19 @@ class FileGen
                     $doScripts[] = $name;
             }
 
-            $doScripts = $doScripts ? array_unique($doScripts) : null;
+            if (!$doScripts)
+                return false;
+
+            $doScripts = array_unique($doScripts);
+            return true;
         }
         else if ($_ = CLISetup::getOpt('build'))
+        {
             $doScripts = $_;
+            return true;
+        }
+
+        return false;
     }
 
     private static function printCLIHelp()

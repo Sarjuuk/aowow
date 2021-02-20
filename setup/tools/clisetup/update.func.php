@@ -11,7 +11,7 @@ if (!CLI)
 /* automaticly apply sql-updates */
 /*********************************/
 
-function update() : array
+function update(?array &$sql = [], ?array &$build = []) : void
 {
     [$date, $part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
 
@@ -25,10 +25,11 @@ function update() : array
         CLI::write();
         CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $date).' (Part #'.$part.')', -1, false);
         CLI::write();
-        exit;
+        return;
     }
 
     CLI::write('checking sql updates');
+    CLISetup::siteLock(CLISetup::LOCK_ON);
 
     $nFiles = 0;
     foreach (glob('setup/updates/*.sql') as $file)
@@ -69,6 +70,7 @@ function update() : array
         CLI::write(' -> '.date('d.m.Y', $fDate).' #'.$fPart.': '.$nQuerys.' queries applied', CLI::LOG_OK);
     }
 
+    CLISetup::siteLock(CLISetup::LOCK_RESTORE);
     CLI::write($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date', CLI::LOG_OK);
 
     // fetch sql/build after applying updates, as they may contain sync-prompts
@@ -84,8 +86,6 @@ function update() : array
 
     if ($build)
         CLI::write('The following file(s) require syncing: '.implode(', ', $build));
-
-    return [$sql, $build];
 }
 
 ?>
