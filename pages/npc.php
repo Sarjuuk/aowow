@@ -645,13 +645,13 @@ class NpcPage extends GenericPage
         }
 
         // tabs: this creature contains..
-        $skinTab = ['tab_skinning', 'skinning'];
+        $skinTab = ['tab_skinning', 'skinning', SKILL_SKINNING];
         if ($_typeFlags & NPC_TYPEFLAG_HERBLOOT)
-            $skinTab = ['tab_herbalism', 'herbalism'];
+            $skinTab = ['tab_herbalism', 'herbalism', SKILL_HERBALISM];
         else if ($_typeFlags & NPC_TYPEFLAG_MININGLOOT)
-            $skinTab = ['tab_mining', 'mining'];
+            $skinTab = ['tab_mining', 'mining', SKILL_MINING];
         else if ($_typeFlags & NPC_TYPEFLAG_ENGINEERLOOT)
-            $skinTab = ['tab_engineering', 'engineering'];
+            $skinTab = ['tab_engineering', 'engineering', SKILL_ENGINEERING];
 
     /*
             extraCols: [Listview.extraCols.count, Listview.extraCols.percent, Listview.extraCols.mode],
@@ -726,6 +726,8 @@ class NpcPage extends GenericPage
 
                 if (!empty($sf['note']))
                     $tabData['note'] = $sf['note'];
+                else if ($sf[0] == LOOT_SKINNING)
+                    $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel') * 5), true).'</b>';
 
                 if ($sf[4])
                     $tabData['hiddenCols'] = $sf[4];

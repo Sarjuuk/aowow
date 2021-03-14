@@ -437,6 +437,17 @@ class Lang
         return implode(', ', $tmp);
     }
 
+    public static function formatSkillBreakpoints(array $bp, bool $html = false) : string
+    {
+        $tmp = Lang::game('difficulty').Lang::main('colon');
+
+        for ($i = 0; $i < 4; $i++)
+            if (!empty($bp[$i]))
+                $tmp .= $html ? '<span class="r'.($i + 1).'">'.$bp[$i].'</span> ' : '[color=r'.($i + 1).']'.$bp[$i].'[/color] ';
+
+        return trim($tmp);
+    }
+
     public static function nf($number, $decimals = 0, $no1k = false)
     {
         //               [decimal, thousand]

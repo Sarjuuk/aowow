@@ -323,6 +323,7 @@ define('PROFILER_CU_PROFILE',               0x08);
 define('PROFILER_CU_NEEDS_RESYNC',          0x10);
 
 define('MAX_LEVEL',                         80);
+define('MAX_SKILL',                         450);
 define('WOW_BUILD',                         12340);
 
 // Loot handles
@@ -1116,6 +1117,22 @@ define('SPELL_ATTR7_CONSOLIDATED_RAID_BUFF',           0x10000000); // Consolida
 define('SPELL_ATTR7_UNK29',                            0x20000000); // Unknown attribute 29@Attr7
 define('SPELL_ATTR7_UNK30',                            0x40000000); // Unknown attribute 30@Attr7
 define('SPELL_ATTR7_CLIENT_INDICATOR',                 0x80000000); // Client indicator (client only)
+
+
+// (some) Skill ids
+define('SKILL_BLACKSMITHING',  164);
+define('SKILL_LEATHERWORKING', 165);
+define('SKILL_ALCHEMY',        171);
+define('SKILL_HERBALISM',      182);
+define('SKILL_MINING',         186);
+define('SKILL_TAILORING',      197);
+define('SKILL_ENGINEERING',    202);
+define('SKILL_ENCHANTING',     333);
+define('SKILL_SKINNING',       393);
+define('SKILL_JEWELCRAFTING',  755);
+define('SKILL_INSCRIPTION',    773);
+define('SKILL_LOCKPICKING',    633);
+
 
 // AchievementCriteriaCondition
 define('ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH',                       1);         // reset progress on death

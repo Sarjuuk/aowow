@@ -216,14 +216,7 @@ class SpellPage extends GenericPage
 
             // difficulty
             if ($_ = $this->subject->getColorsForCurrent())
-            {
-                $bar = [];
-                for ($i = 0; $i < 4; $i++)
-                    if ($_[$i])
-                        $bar[] = '[color=r'.($i + 1).']'.$_[$i].'[/color]';
-
-                $infobox[] = Lang::game('difficulty').Lang::main('colon').implode(' ', $bar);
-            }
+                $infobox[] = Lang::formatSkillBreakpoints($_);
         }
 
         // accquisition..   10: starter spell; 7: discovery

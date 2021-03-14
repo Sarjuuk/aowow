@@ -371,6 +371,32 @@ class Game
         return [$quotes, $nQuotes, $soundIds];
     }
 
+    public static function getBreakpointsForSkill(int $skillId, int $reqLevel) : array
+    {
+        switch ($skillId)
+        {
+            case SKILL_HERBALISM:
+            case SKILL_LOCKPICKING:
+            case SKILL_JEWELCRAFTING:
+            case SKILL_INSCRIPTION:
+            case SKILL_SKINNING:
+            case SKILL_MINING:
+                $points = [$reqLevel];                              // red/orange
+
+                if ($reqLevel + 25 <= MAX_SKILL)                    // orange/yellow
+                    $points[] = $reqLevel + 25;
+
+                if ($reqLevel + 50 <= MAX_SKILL)                    // yellow/green
+                    $points[] = $reqLevel + 50;
+
+                if ($reqLevel + 100 <= MAX_SKILL)                   // green/grey
+                    $points[] = $reqLevel + 100;
+
+                return $points;
+            default:
+                return [$reqLevel];
+        }
+    }
 }
 
 ?>

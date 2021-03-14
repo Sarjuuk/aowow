@@ -2078,7 +2078,7 @@ class SpellList extends BaseType
         return $x;
     }
 
-    public function getColorsForCurrent()
+    public function getColorsForCurrent() : array
     {
         $gry = $this->curTpl['skillLevelGrey'];
         $ylw = $this->curTpl['skillLevelYellow'];
@@ -2094,7 +2094,7 @@ class SpellList extends BaseType
         if ($org >= $ylw || $org >= $grn || $org >= $gry)
             $org = 0;
 
-        return $gry > 1 ? [$org, $ylw, $grn, $gry] : null;
+        return $gry > 1 ? [$org, $ylw, $grn, $gry] : [];
     }
 
     public function getListviewData($addInfoMask = 0x0)

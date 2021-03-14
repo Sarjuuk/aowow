@@ -306,7 +306,7 @@ class CreatureListFilter extends Filter
         11 => [FILTER_CR_BOOLEAN,  'pickpocketLootId',                                        ], // pickpocketable
         12 => [FILTER_CR_CALLBACK, 'cbMoneyDrop',       null,                      null       ], // averagemoneydropped [op] [int]
         15 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_HERBLOOT,     null       ], // gatherable [yn]
-        16 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_ENGINEERLOOT, null       ], // minable [yn]
+        16 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_MININGLOOT,   null       ], // minable [yn]
         18 => [FILTER_CR_FLAG,     'npcflag',           NPC_FLAG_AUCTIONEER                   ], // auctioneer
         19 => [FILTER_CR_FLAG,     'npcflag',           NPC_FLAG_BANKER                       ], // banker
         20 => [FILTER_CR_FLAG,     'npcflag',           NPC_FLAG_BATTLEMASTER                 ], // battlemaster
@@ -329,7 +329,7 @@ class CreatureListFilter extends Filter
         41 => [FILTER_CR_NYI_PH,   1,                   null                                  ], // haslocation [yn] [staff]
         42 => [FILTER_CR_CALLBACK, 'cbReputation',      '>',                       null       ], // increasesrepwith [enum]
         43 => [FILTER_CR_CALLBACK, 'cbReputation',      '<',                       null       ], // decreasesrepwith [enum]
-        44 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_MININGLOOT,   null       ]  // salvageable [yn]
+        44 => [FILTER_CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_ENGINEERLOOT, null       ]  // salvageable [yn]
     );
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]

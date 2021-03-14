@@ -250,36 +250,36 @@ class ProfileListFilter extends Filter
     );
 
     protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
-         2 => [FILTER_CR_NUMERIC,  'gearscore',         NUM_CAST_INT     ], // gearscore [num]
-         3 => [FILTER_CR_CALLBACK, 'cbAchievs',         null,        null], // achievementpoints [num]
-         5 => [FILTER_CR_NUMERIC,  'talenttree1',       NUM_CAST_INT     ], // talenttree1 [num]
-         6 => [FILTER_CR_NUMERIC,  'talenttree2',       NUM_CAST_INT     ], // talenttree2 [num]
-         7 => [FILTER_CR_NUMERIC,  'talenttree3',       NUM_CAST_INT     ], // talenttree3 [num]
-         9 => [FILTER_CR_STRING,   'g.name',                             ], // guildname
-        10 => [FILTER_CR_CALLBACK, 'cbHasGuildRank',    null,        null], // guildrank
-        12 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,        null], // teamname2v2
-        15 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,        null], // teamname3v3
-        18 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,        null], // teamname5v5
-        13 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,        null], // teamrtng2v2
-        16 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,        null], // teamrtng3v3
-        19 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,        null], // teamrtng5v5
-        14 => [FILTER_CR_NYI_PH,   0                                     ], // teamcontrib2v2 [num]
-        17 => [FILTER_CR_NYI_PH,   0                                     ], // teamcontrib3v3 [num]
-        20 => [FILTER_CR_NYI_PH,   0                                     ], // teamcontrib5v5 [num]
-        21 => [FILTER_CR_CALLBACK, 'cbWearsItems',      null,        null], // wearingitem [str]
-        23 => [FILTER_CR_CALLBACK, 'cbCompletedAcv',    null,        null], // completedachievement
-        25 => [FILTER_CR_CALLBACK, 'cbProfession',      171,         null], // alchemy [num]
-        26 => [FILTER_CR_CALLBACK, 'cbProfession',      164,         null], // blacksmithing [num]
-        27 => [FILTER_CR_CALLBACK, 'cbProfession',      333,         null], // enchanting [num]
-        28 => [FILTER_CR_CALLBACK, 'cbProfession',      202,         null], // engineering [num]
-        29 => [FILTER_CR_CALLBACK, 'cbProfession',      182,         null], // herbalism [num]
-        30 => [FILTER_CR_CALLBACK, 'cbProfession',      773,         null], // inscription [num]
-        31 => [FILTER_CR_CALLBACK, 'cbProfession',      755,         null], // jewelcrafting [num]
-        32 => [FILTER_CR_CALLBACK, 'cbProfession',      165,         null], // leatherworking [num]
-        33 => [FILTER_CR_CALLBACK, 'cbProfession',      186,         null], // mining [num]
-        34 => [FILTER_CR_CALLBACK, 'cbProfession',      393,         null], // skinning [num]
-        35 => [FILTER_CR_CALLBACK, 'cbProfession',      197,         null], // tailoring [num]
-        36 => [FILTER_CR_CALLBACK, 'cbHasGuild',        null,        null]  // hasguild [yn]
+         2 => [FILTER_CR_NUMERIC,  'gearscore',         NUM_CAST_INT              ], // gearscore [num]
+         3 => [FILTER_CR_CALLBACK, 'cbAchievs',         null,                 null], // achievementpoints [num]
+         5 => [FILTER_CR_NUMERIC,  'talenttree1',       NUM_CAST_INT              ], // talenttree1 [num]
+         6 => [FILTER_CR_NUMERIC,  'talenttree2',       NUM_CAST_INT              ], // talenttree2 [num]
+         7 => [FILTER_CR_NUMERIC,  'talenttree3',       NUM_CAST_INT              ], // talenttree3 [num]
+         9 => [FILTER_CR_STRING,   'g.name',                                      ], // guildname
+        10 => [FILTER_CR_CALLBACK, 'cbHasGuildRank',    null,                 null], // guildrank
+        12 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname2v2
+        15 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname3v3
+        18 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname5v5
+        13 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng2v2
+        16 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng3v3
+        19 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng5v5
+        14 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib2v2 [num]
+        17 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib3v3 [num]
+        20 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib5v5 [num]
+        21 => [FILTER_CR_CALLBACK, 'cbWearsItems',      null,                 null], // wearingitem [str]
+        23 => [FILTER_CR_CALLBACK, 'cbCompletedAcv',    null,                 null], // completedachievement
+        25 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_ALCHEMY,        null], // alchemy [num]
+        26 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_BLACKSMITHING,  null], // blacksmithing [num]
+        27 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_ENCHANTING,     null], // enchanting [num]
+        28 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_ENGINEERING,    null], // engineering [num]
+        29 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_HERBALISM,      null], // herbalism [num]
+        30 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_INSCRIPTION,    null], // inscription [num]
+        31 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_JEWELCRAFTING,  null], // jewelcrafting [num]
+        32 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_LEATHERWORKING, null], // leatherworking [num]
+        33 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_MINING,         null], // mining [num]
+        34 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_SKINNING,       null], // skinning [num]
+        35 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_TAILORING,      null], // tailoring [num]
+        36 => [FILTER_CR_CALLBACK, 'cbHasGuild',        null,                 null]  // hasguild [yn]
     );
 
 
