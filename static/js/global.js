@@ -22860,24 +22860,51 @@ var ConditionList = new function() {
 
         switch (Math.abs(entry[0])) {
             case  1:
-            case 25: param[0] = '[spell=' + entry[1] + ']'; break;
-            case  2: param[1] = entry[2];             // do not break
-            case  3: param[0] = '[item=' + entry[1] + ']'; break;
+            case 25:
+                param[0] = '[spell=' + entry[1] + ']';
+                break;
+            case  2:
+                param[1] = entry[2];
+                // do not break
+            case  3:
+                param[0] = '[item=' + entry[1] + ']';
+                break;
             case  4:
-            case 23: param[0] = '[zone=' + entry[1] + ']'; break;
+            case 23:
+                param[0] = '[zone=' + entry[1] + ']';
+                break;
             case  8:
             case  9:
             case 14:
-            case 28: param[0] = '[quest=' + entry[1] + ']'; break;
-            case 12: param[0] = '[event=' + entry[1] + ']'; break;
-            case 17: param[0] = '[achievement=' + entry[1] + ']'; break;
-            case 18: param[0] = '[title=' + entry[1] + ']'; break;
-            case  6: param[0] = g_sides[entry[1]]; break;
-            case 10: param[0] = g_drunk_states[entry[1]]; break;
-            case 22: param[0] = g_zone_categories[entry[1]]; break;
-            case 15: param[0] = _listing(entry[1], g_chr_classes, '[class=$1]'); break;
-            case 16: param[0] = _listing(entry[1], g_chr_races, '[race=$1]'); break;
-            case  7: param[0] = '[skill=' + entry[1] + ']';
+            case 28:
+                param[0] = '[quest=' + entry[1] + ']';
+                break;
+            case 12:
+                param[0] = '[event=' + entry[1] + ']';
+                break;
+            case 17:
+                param[0] = '[achievement=' + entry[1] + ']';
+                break;
+            case 18:
+                param[0] = '[title=' + entry[1] + ']';
+                break;
+            case  6:
+                param[0] = g_sides[entry[1]];
+                break;
+            case 10:
+                param[0] = g_drunk_states[entry[1]];
+                break;
+            case 22:
+                param[0] = g_zone_categories[entry[1]];
+                break;
+            case 15:
+                param[0] = _listing(entry[1], g_chr_classes, '[class=$1]');
+                break;
+            case 16:
+                param[0] = _listing(entry[1], g_chr_races, '[race=$1]');
+                break;
+            case  7:
+                param[0] = '[skill=' + entry[1] + ']';
                      if (entry[2])
                          param[0] += $WH.sprintf(LANG.qty, entry[2]);
                      break;
@@ -22899,10 +22926,12 @@ var ConditionList = new function() {
                      else
                          param[0] = g_npc_types[10];
                      break;
-            case 29: param[0] = '[npc=' + entry[1] + ']';
+            case 29:
+                param[0] = '[npc=' + entry[1] + ']';
                      param[1] = entry[2];
                      break;
-            case 30: param[0] = '[object=' + entry[1] + ']';
+            case 30:
+                param[0] = '[object=' + entry[1] + ']';
                      param[1] = entry[2];
                      break;
             case 31: if (entry[2] && entry[1] == 3) {
@@ -22915,31 +22944,46 @@ var ConditionList = new function() {
                      }
                      else                           // create mask from id and resolve in case 32
                         entry[1] = (1 << entry[1]);
-            case 32: param[0] = _listing(entry[1], g_world_object_types, '$2'); break;
-            case 36: break;
+            case 32:
+                param[0] = _listing(entry[1], g_world_object_types, '$2');
+                break;
             case 27:
             case 37:
-            case 38: param[0] = entry[1];
-                     param[1] = g_operators[entry[2]];
-                     break;
-            case 35: param[0] = entry[2];
-                     param[1] = g_operators[entry[3]];
-                     break;
-            case 11: param[0] = entry[1];
-                     param[1] = entry[2];
-                     break;
+            case 38:
+                param[0] = entry[1];
+                param[1] = g_operators[entry[2]];
+                break;
+            case 35:
+                param[0] = entry[2];
+                param[1] = g_operators[entry[3]];
+                break;
+            case 11:
+                param[0] = entry[1];
+                param[1] = entry[2];
+                break;
             case 26:
-                    var pIndex = 0;
-                    while (entry[1]) {
-                        if (entry[1] & (1 << pIndex)) {
-                            if (param[0])
-                                param[0] += ', ';
+                var pIndex = 0;
+                while (entry[1]) {
+                    if (entry[1] & (1 << pIndex)) {
+                        if (param[0])
+                            param[0] += ', ';
 
-                            param[0] += pIndex + 1;
-                            entry[1] &= ~(1 << pIndex);
-                        }
-                        pIndex++;
+                        param[0] += pIndex + 1;
+                        entry[1] &= ~(1 << pIndex);
                     }
+                    pIndex++;
+                }
+            case  47:
+                param[0] = '[quest=' + entry[1] + ']';
+                param[1] = '';
+                let _ = Listview.funcBox.assocBinFlags(entry[2], g_quest_states);
+                for (var i = 0, len = _.length; i < len; ++i) {
+                  if (i > 0)
+                      param[1] += ', ';
+
+                  param[1] += g_quest_states[_[i]];
+                }
+                break;
         }
 
         str = g_conditions[strIdx];

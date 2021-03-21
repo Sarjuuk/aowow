@@ -1135,6 +1135,9 @@ class Util
                         $c['ConditionValue1'] = 2;
                     else
                         continue 2;
+                case CND_QUESTSTATE:                        // 47
+                    $jsGlobals[TYPE_QUEST][] = $c['ConditionValue1'];
+                    break;
             }
 
             $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];
