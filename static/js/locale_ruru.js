@@ -2454,7 +2454,7 @@ var LANG = {
 
     date:        "По дате",
     date_colon:  "Дата: ",
-    date_on:     "на",
+    date_on:     "на ",
     date_ago:    "$1 назад",
     date_at:     " в ",
     date_to:     " в ",
