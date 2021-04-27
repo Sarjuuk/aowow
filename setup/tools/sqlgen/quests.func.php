@@ -31,7 +31,7 @@ SqlGen::register(new class extends SetupScript
                 IFNULL(gesqr.eventEntry, 0) AS eventId,
                 IFNULL(qa.PrevQuestId, 0),
                 IFNULL(qa.NextQuestId, 0),
-                IFNULL(qa.BreadcrumbForQuestId, 0),
+                0 AS BreadcrumbForQuestId, -- IFNULL(qa.BreadcrumbForQuestId, 0),
                 IFNULL(qa.ExclusiveGroup, 0),
                 RewardNextQuest,
                 q.Flags,

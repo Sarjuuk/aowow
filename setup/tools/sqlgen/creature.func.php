@@ -33,7 +33,7 @@ SqlGen::register(new class extends SetupScript
                 exp,
                 faction,
                 npcflag,
-                IF(`rank` > 4, 0, `rank`),
+                IF(`rank` > 4, 0, `rank`) AS `rank`,
                 dmgSchool,
                 DamageModifier,
                 BaseAttackTime,
@@ -43,8 +43,8 @@ SqlGen::register(new class extends SetupScript
                 unit_class,
                 unit_flags, unit_flags2, dynamicflags,
                 family,
-                IFNULL(t.Type, 0),
-                IFNULL(t.Requirement, 0),
+                0 AS `t.Type`, -- IFNULL(t.Type, 0),
+                0 AS `t.Requirement`, -- IFNULL(t.Requirement, 0),
                 (CASE ct.exp WHEN 0 THEN min.damage_base WHEN 1 THEN min.damage_exp1 ELSE min.damage_exp2 END) AS dmgMin,
                 (CASE ct.exp WHEN 0 THEN max.damage_base WHEN 1 THEN max.damage_exp1 ELSE max.damage_exp2 END) AS dmgMax,
                 min.attackpower AS mleAtkPwrMin,
@@ -76,10 +76,10 @@ SqlGen::register(new class extends SetupScript
                 creature_classlevelstats min ON ct.unit_class = min.class AND ct.minlevel = min.level
             JOIN
                 creature_classlevelstats max ON ct.unit_class = max.class AND ct.maxlevel = max.level
-            LEFT JOIN
-                creature_default_trainer cdt ON cdt.CreatureId = ct.entry
-            LEFT JOIN
-                trainer t ON t.Id = cdt.TrainerId
+--            LEFT JOIN
+--                creature_default_trainer cdt ON cdt.CreatureId = ct.entry
+--            LEFT JOIN
+--                trainer t ON t.Id = cdt.TrainerId
             LEFT JOIN
                 creature_template_locale ctl2 ON ct.entry = ctl2.entry AND ctl2.`locale` = "frFR"
             LEFT JOIN

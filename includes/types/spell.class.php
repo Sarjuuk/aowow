@@ -1016,7 +1016,14 @@ class SpellList extends BaseType
         $formula = preg_replace('/(\+|-|\*|\/)(\+|-|\*|\/)/i', '\1 \2', $formula);
 
         // there should not be any letters without a leading $
-        return eval('return '.$formula.';');
+        try {
+            $res = eval('return '.$formula.';');
+        } catch (Throwable $t) {
+            echo "- WARNING - problem during parsing the spell formula";
+            $res = 0;
+        }
+
+        return $res;
     }
 
     // description-, buff-parsing component
