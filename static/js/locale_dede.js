@@ -3242,7 +3242,8 @@ var LANG = {
         vein:           "Erzadern",
         spirithealer:   "Geistheiler",
         boss:           "Bosse",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                      // aowow - custom
+        mail:           "Briefkästen"
     },
 
     markup_b:       "Fett",

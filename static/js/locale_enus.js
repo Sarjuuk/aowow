@@ -3290,7 +3290,8 @@ var LANG = {
         vein:           "Mineral Veins",
         spirithealer:   "Spirit Healers",
         boss:           "Bosses",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                      // aowow - custom
+        mail:           "Mailbox"
     },
 
     markup_b:       "Bold",

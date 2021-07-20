@@ -3290,7 +3290,8 @@ var LANG = {
         vein:           "矿点",
         spirithealer:   "灵魂医者",
         boss:           "首领",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                      // aowow - custom
+        mail:           "邮箱"
     },
 
     markup_b:       "勇敢",

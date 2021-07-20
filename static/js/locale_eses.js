@@ -3243,7 +3243,8 @@ var LANG = {
         vein:           "Venas de minerales",
         spirithealer:   "Espíritus sanadores",
         boss:           "Jefes",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                      // aowow - custom
+        mail:           "Buzón"
     },
 
     markup_b:       "Negrita",

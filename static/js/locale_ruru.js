@@ -3243,7 +3243,8 @@ var LANG = {
         vein:           "Полезные ископаемые",
         spirithealer:   "Целители душ",
         boss:           "Боссы",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                      // aowow - custom
+        mail:           "Почтовый ящик"
     },
 
     markup_b:       "Жирный",

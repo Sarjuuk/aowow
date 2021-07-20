@@ -3243,7 +3243,8 @@ var LANG = {
         vein:           "Filons de minerai",
         spirithealer:   "Esprits soigneurs",
         boss:           "Boss",
-        areatrigger:    "Areatrigger"                       // aowow - custom
+        areatrigger:    "Areatrigger",                       // aowow - custom
+        mail:           "Boîte aux lettres"
     },
 
     markup_b:       "Gras",

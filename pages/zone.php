@@ -143,11 +143,11 @@ class ZonePage extends GenericPage
         {
             // entry always contains: type, id, name, level, coords[]
             if (!isset($som[$what][$entry['name']]))        // not found yet
-                $som[$what][$entry['name']][] = $entry;
+                $som[$what][$entry['id']][] = $entry;
             else                                            // found .. something..
             {
                 // check for identical floors
-                foreach ($som[$what][$entry['name']] as &$byFloor)
+                foreach ($som[$what][$entry['id']] as &$byFloor)
                 {
                     if ($byFloor['level'] != $entry['level'])
                         continue;
@@ -158,7 +158,7 @@ class ZonePage extends GenericPage
                 }
 
                 // floor not used yet, create it
-                $som[$what][$entry['name']][] = $entry;
+                $som[$what][$entry['id']][] = $entry;
             }
         };
 
@@ -215,6 +215,10 @@ class ZonePage extends GenericPage
                     case  9:
                         $what = 'book';
                         break;
+                    case 0:
+                        if ($tpl['type'] == 19)
+                            $what = 'mail';
+                        break;
                     case -6:
                         if ($tpl['spellFocusId'] == 1)
                             $what = 'anvil';
@@ -225,13 +229,20 @@ class ZonePage extends GenericPage
                 }
 
                 if ($what)
-                    $addToSOM($what, array(
+                {
+                    $blob = array(
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
                         'name'   => $n,
                         'type'   => TYPE_OBJECT,
                         'id'     => $tpl['id']
-                    ));
+                    );
+
+                    if ($what == 'mail')
+                       $blob['side'] = (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2));
+
+                    $addToSOM($what, $blob);
+                }
 
                 if ($tpl['startsQuests'])
                 {
