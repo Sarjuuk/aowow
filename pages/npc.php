@@ -700,6 +700,8 @@ class NpcPage extends GenericPage
             foreach ($lootGOs as $idx => $lgo)
                 array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")']]);
 
+        $lootGOs = DB::World()->select('select SourceEntry, ConditionValue1, ConditionValue2 from conditions where SourceTypeOrReferenceId = 1 and SourceGroup = ?d and ConditionTypeOrReference = ?d', $this->typeId, CND_SKILL);
+
         $reqQuest = [];
         foreach ($sourceFor as $sf)
         {
@@ -711,21 +713,13 @@ class NpcPage extends GenericPage
 
                 $this->extendGlobalData($creatureLoot->jsGlobals);
 
-                foreach ($creatureLoot->iterate() as &$lv)
-                {
-                    if (!$lv['quest'])
-                        continue;
-
-                    $extraCols[] = '$Listview.extraCols.condition';
-                    $reqQuest[$lv['id']] = 0;
-                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
-                }
+                $this->extendWithConditions($creatureLoot, $lootGOs, $extraCols, $reqQuest);
 
                 $tabData = array(
                     'data'      => array_values($creatureLoot->getResult()),
                     'name'      => $sf[2],
                     'id'        => $sf[3],
-                    'extraCols' => array_unique($extraCols),
+                    'extraCols' => $extraCols,
                     'sort'      => ['-percent', 'name'],
                 );
 
@@ -1025,6 +1019,49 @@ class NpcPage extends GenericPage
             $this->soundIds = array_merge($this->soundIds, $soundIds);
 
         return [$quotes, $nQuotes];
+    }
+
+    private function getConditions($itemId, $data)
+    {
+        foreach ($data as $datum)
+        {
+            if ($datum['SourceEntry'] == $itemId)
+            {
+                return [CND_SKILL, $datum['ConditionValue1'], $datum['ConditionValue2']];
+            }
+        }
+
+        return null;
+    }
+
+    private function extendWithConditions($creatureLoot, $lootConditions, &$extraCols, &$reqQuest)
+    {
+        $hasExtraCol = false;
+        $reqSkill = [];
+
+        foreach ($creatureLoot->iterate() as &$lv)
+        {
+            if ($lv['quest'])
+            {
+                $hasExtraCol = true;
+                $reqQuest[$lv['id']] = 0;
+                $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
+            }
+            elseif ($skill = $this->getConditions($lv['id'], $lootConditions))
+            {
+                $hasExtraCol = true;
+                $lv['condition'][0][$this->typeId][] = [$skill];
+                $reqSkill[] = $skill[1];
+            }
+        }
+
+        if ($hasExtraCol)
+        {
+            $extraCols[] = '$Listview.extraCols.condition';
+        }
+
+        $reqSkills = new SkillList(['OR', ['id', array_unique($reqSkill)]]);
+        $this->extendGlobalData($reqSkills->getJSGlobals());
     }
 }
 
