@@ -453,7 +453,6 @@ var Markup = {
                 domain:  { req: false, valid: MarkupDomainRegexMap.lang },
                 site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
-            allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
             {
                 if((attr.domain || attr.site) && Markup.dbpage)
@@ -694,7 +693,6 @@ var Markup = {
                 domain:  { req: false, valid: MarkupDomainRegexMap.lang },
                 site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
-            allowedClass: MARKUP_CLASS_STAFF,
             validate: function(attr)
             {
                 if((attr.domain || attr.site) && Markup.dbpage)
