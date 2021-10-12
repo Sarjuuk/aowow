@@ -506,7 +506,7 @@ class SmartAI
         $this->quotes[$creatureId] = $quotes;
 
         if (!empty($this->quotes[$creatureId]))
-            $this->quotes[$creatureId]['src'] = Util::jsEscape(CreatureList::getName($creatureId));
+            $this->quotes[$creatureId]['src'] = CreatureList::getName($creatureId);
     }
 
     private function getTalkSource(bool &$emptySource = false) : int
