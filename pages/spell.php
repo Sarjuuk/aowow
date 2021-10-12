@@ -1906,7 +1906,7 @@ class SpellPage extends GenericPage
                             case 212:                       // Mod Ranged Attack Power Of Stat Percent
                             case 219:                       // Mod Mana Regeneration from Stat
                             case 268:                       // Mod Attack Power Of Stat Percent
-                                $mask = $effMV == -1 ? 0x1F : 1 << $effMV;
+                                $mask = $effMV < 0 ? 0x1F : 1 << $effMV;
                                 $_ = [];
                                 for ($j = 0; $j < 5; $j++)
                                     if ($mask & (1 << $j))

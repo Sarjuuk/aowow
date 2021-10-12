@@ -324,6 +324,7 @@ define('PROFILER_CU_NEEDS_RESYNC',          0x10);
 
 define('MAX_LEVEL',                         80);
 define('MAX_SKILL',                         450);
+define('MAX_LOCALES',                       16);            // technical limitation, 6 in use here
 define('WOW_BUILD',                         12340);
 
 // Loot handles

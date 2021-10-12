@@ -1440,7 +1440,7 @@ class SpellList extends BaseType
         // step 3: try to evaluate result
         $evaled = $this->resolveEvaluation($str);
 
-        $return = is_numeric($evaled) ? Lang::nf($evaled, $precision, true) : $evaled;
+        $return = is_numeric($evaled) ? round($evaled, $precision) : $evaled;
 
         return [$return, $fSuffix, $fRating];
     }
