@@ -88,6 +88,8 @@ class ItemList extends BaseType
         if ($this->error)
             return [];
 
+        $idx = $this->id;
+
         if (empty($this->vendors))
         {
             $itemz      = [];
@@ -256,6 +258,9 @@ class ItemList extends BaseType
             if (empty($data))
                 unset($result[$itemId]);
         }
+
+        // restore internal index;
+        $this->getEntry($idx);
 
         return $result;
     }
