@@ -3244,7 +3244,8 @@ var LANG = {
         spirithealer:   "Geistheiler",
         boss:           "Bosse",
         areatrigger:    "Areatrigger",                      // aowow - custom
-        mail:           "Briefkästen"
+        mail:           "Briefkästen",
+        pool:           "Fischschwärme"
     },
 
     markup_b:       "Fett",

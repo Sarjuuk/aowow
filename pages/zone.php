@@ -215,6 +215,9 @@ class ZonePage extends GenericPage
                     case  9:
                         $what = 'book';
                         break;
+                    case 25:
+                        $what = 'pool';
+                        break;
                     case 0:
                         if ($tpl['type'] == 19)
                             $what = 'mail';
@@ -414,7 +417,7 @@ class ZonePage extends GenericPage
                 foreach ($dataz as &$data)
                     $data = array_values($data);
 
-                if (!in_array($what, ['vein', 'herb', 'rare']))
+                if (!in_array($what, ['vein', 'herb', 'rare', 'pool']))
                 {
                     $foo = [];
                     foreach ($dataz as $d)

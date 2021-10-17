@@ -3245,7 +3245,8 @@ var LANG = {
         spirithealer:   "Целители душ",
         boss:           "Боссы",
         areatrigger:    "Areatrigger",                      // aowow - custom
-        mail:           "Почтовый ящик"
+        mail:           "Почтовый ящик",
+        pool:           "Рыболовные лунки",
     },
 
     markup_b:       "Жирный",

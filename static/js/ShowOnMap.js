@@ -86,7 +86,7 @@ ShowOnMap.prototype.construct = function() {
                     if (pin.list.length == 1) {
                         url = (g_types[pin.list[0].type] && pin.list[0].id ? '?' + g_types[pin.list[0].type] + '=' + pin.list[0].id : '');
                     }
-                    if (i == 'rare' || i == 'herb' || i == 'vein') {
+                    if (i == 'rare' || i == 'herb' || i == 'vein' || i == 'pool') {
                         tooltip[1] = submenu.length + 1;
                     }
                     if (coords[pin.level] == undefined) {
@@ -121,7 +121,7 @@ ShowOnMap.prototype.construct = function() {
                             allCoords[l] = coords[l];
                         }
                     }
-                    allLegend[submenu.length] = [p, url];
+                    allLegend[submenu.length] = [group[p][0].name, url];
                 }
             }
             if (submenu.length > 0) {
@@ -482,7 +482,7 @@ ShowOnMap.prototype.checkMenu = function(path) {
 
     var maxLabel = label.length - 1;
     var str = '';
-    var singlePinOptions = { 'rare': true, 'herb': true, 'vein': true };
+    var singlePinOptions = { 'rare': true, 'herb': true, 'vein': true, 'pool': true };
     for (var i = 0; i < label.length; ++i) {
         if (i > 0 && singlePinOptions[label[0][0]]) {
             var span = $('span', this._legendContents);

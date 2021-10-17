@@ -3245,7 +3245,8 @@ var LANG = {
         spirithealer:   "Esprits soigneurs",
         boss:           "Boss",
         areatrigger:    "Areatrigger",                       // aowow - custom
-        mail:           "Boîte aux lettres"
+        mail:           "Boîte aux lettres",
+        pool:           "Bancs de poissons"
     },
 
     markup_b:       "Gras",

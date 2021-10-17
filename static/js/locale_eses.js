@@ -290,7 +290,7 @@ var mn_objects = [
     [9,"Libros"],
     [3,"Contenedores"],
     [-5,"Cofres"],
-    [25,"[Fishing Pools]"],
+    [25,"Bancos de peces"],
     [-3,"Hierbas"],
     [-4,"Venas de minerales"],
     [-2,"Misión"],
@@ -3245,7 +3245,8 @@ var LANG = {
         spirithealer:   "Espíritus sanadores",
         boss:           "Jefes",
         areatrigger:    "Areatrigger",                      // aowow - custom
-        mail:           "Buzón"
+        mail:           "Buzón",
+        pool:           "Bancos de peces"
     },
 
     markup_b:       "Negrita",

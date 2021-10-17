@@ -3292,7 +3292,8 @@ var LANG = {
         spirithealer:   "Spirit Healers",
         boss:           "Bosses",
         areatrigger:    "Areatrigger",                      // aowow - custom
-        mail:           "Mailbox"
+        mail:           "Mailbox",
+        pool:           "Fishing Pools"
     },
 
     markup_b:       "Bold",

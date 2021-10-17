@@ -3292,7 +3292,8 @@ var LANG = {
         spirithealer:   "灵魂医者",
         boss:           "首领",
         areatrigger:    "Areatrigger",                      // aowow - custom
-        mail:           "邮箱"
+        mail:           "邮箱",
+        pool:           "钓鱼池"
     },
 
     markup_b:       "勇敢",
