@@ -2991,6 +2991,7 @@ var LANG = {
     tooltip_reqlockpicking:            "Benötigte Schlossknackenfertigkeit",
     tooltip_smartloot:                 "Nur für Spieler erhältlich, die den<br />zugehörigen Beruf ausüben und das<br />Rezept noch nicht besitzen.",
     tooltip_deprecated:                "Kann nicht benutzt oder angelegt werden",
+    tooltip_noequipcooldown:           "Dieser Gegenstand ist sofort nach dem Anlegen<br />ohne eine normale 30-sekündige Abklingzeit benutzbar.",
     tooltip_realduration:              "Die Dauer dieses Gegenstands läuft, anstelle von Spielzeit,<br />in Realzeit ab. Sie läuft auch dann ab,<br />während Ihr offline seid.",
     tooltip_cannotrollneed:            "Ihr könnt nicht für Bedarf um diesen Gegenstand werfen.",
     tooltip_spellnotfound:             "Zauber nicht gefunden  :(",

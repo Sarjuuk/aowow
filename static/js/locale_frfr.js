@@ -2992,6 +2992,7 @@ var LANG = {
     tooltip_reqlockpicking:            "Niveau de crochetage requis",
     tooltip_smartloot:                 "Seulement disponible aux joueurs qui ont<br />la profession et qui n'ont pas encore<br />la recette.",
     tooltip_deprecated:                "Ne peut être utilisé ou équipé.",
+    tooltip_noequipcooldown:           "L'objet sera disponible immédiatement lorsqu'équipé,<br />sans le temps d'attente normal de 30 secondes.",
     tooltip_realduration:              "La durée de cet objet est en temps réel, pas en temps joué.<br />Elle va diminuer même lorsque déconnecté.",
     tooltip_cannotrollneed:            "Vous ne pouvez pas faire un jet de Besoin.",
     tooltip_spellnotfound:             "Sort non trouvé :(",

@@ -3039,6 +3039,7 @@ var LANG = {
     tooltip_reqlockpicking:            "Required Lockpicking skill",
     tooltip_smartloot:                 "Only available to players who have<br />the profession and don't already<br />have the recipe.",
     tooltip_deprecated:                "Cannot be used or equipped",
+    tooltip_noequipcooldown:           "The item will be ready immediately when equipped,<br />without the normal 30-second cooldown.",
     tooltip_realduration:              "The item's duration is real time, not play time.<br />It will keep ticking while logged off.",
     tooltip_cannotrollneed:            "You cannot roll Need on this item.",
     tooltip_spellnotfound:             "Spell not found :(",

@@ -2992,6 +2992,7 @@ var LANG = {
     tooltip_reqlockpicking:            "Nivel de forzar cerradura requerido",
     tooltip_smartloot:                 "Sólo disponible para jugadores que<br/>tienen la profesión y aun no<br/>tienen la receta.",
     tooltip_deprecated:                "No se puede usar o equipar",
+    tooltip_noequipcooldown:           "El objeto estará disponible inmediatamente al ser equipado,<br />sin el tiempo de reutilización normal de 30 segundos.",
     tooltip_realduration:              "La duración de este objeto es tiempo real, no tiempo jugado.<br />Seguirá reduciéndose aunque estés desconectado.",
     tooltip_cannotrollneed:            "No se puede hacer una tirada de Necesidad en este objeto.",
     tooltip_spellnotfound:             "No se encontró ese hechizo :(",

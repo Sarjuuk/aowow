@@ -3039,6 +3039,7 @@ var LANG = {
     tooltip_reqlockpicking:            "需要撬锁技能",
     tooltip_smartloot:                 "仅限<br />有该专业且还没有<br />改配方的玩家。",
     tooltip_deprecated:                "不可使用或装备",
+    tooltip_noequipcooldown:           "物品装备后可立即使用,<br />无常规30秒冷却时间",
     tooltip_realduration:              "该物品的耐久度以现实时间，而非游戏时间计时。<br />注销后仍在计时。",
     tooltip_cannotrollneed:            "您无法为此物品投掷”需要“。",
     tooltip_spellnotfound:             "未找到法术 :(",
