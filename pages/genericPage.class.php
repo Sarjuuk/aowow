@@ -277,7 +277,7 @@ class GenericPage
 
         // requires authed user
         if ($this->reqAuth && !User::$id)
-            $this->forwardToSignIn($_SERVER['QUERY_STRING']);
+            $this->forwardToSignIn($_SERVER['QUERY_STRING'] ?? '');
 
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
@@ -285,7 +285,7 @@ class GenericPage
             if (User::$id)
                 $this->error();
             else
-                $this->forwardToSignIn($_SERVER['QUERY_STRING']);
+                $this->forwardToSignIn($_SERVER['QUERY_STRING'] ?? '');
         }
 
         if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
