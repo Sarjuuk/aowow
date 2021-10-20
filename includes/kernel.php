@@ -165,7 +165,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 
     if (DB::isConnectable(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $errStr
+            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $errStr
         );
 
     return true;
@@ -178,7 +178,7 @@ set_exception_handler(function ($ex)
 
     if (DB::isConnectable(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $ex->getMessage()
+            AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $ex->getMessage()
         );
 
     if (!CLI)
@@ -196,7 +196,7 @@ register_shutdown_function(function()
 
         if (DB::isConnectable(DB_AOWOW))
             DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : $_SERVER['QUERY_STRING'], User::$groups, $e['message']
+                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e['message']
             );
 
         if (CLI)
@@ -260,7 +260,7 @@ if (!CLI)
     }
 
     // parse page-parameters .. sanitize before use!
-    $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING']), 2)[0];
+    $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING'] ?? ''), 2)[0];
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
     $pageParam = isset($_[1]) ? $_[1] : '';

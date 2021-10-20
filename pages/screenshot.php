@@ -42,7 +42,7 @@ class ScreenshotPage extends GenericPage
 
         // get screenshot destination
         // target delivered as screenshot=<command>&<type>.<typeId>.<hash:16> (hash is optional)
-        if (preg_match('/^screenshot=\w+&(-?\d+)\.(-?\d+)(\.(\w{16}))?$/i', $_SERVER['QUERY_STRING'], $m))
+        if (preg_match('/^screenshot=\w+&(-?\d+)\.(-?\d+)(\.(\w{16}))?$/i', $_SERVER['QUERY_STRING'] ?? '', $m))
         {
             // no such type
             if (empty(Util::$typeClasses[$m[1]]))
