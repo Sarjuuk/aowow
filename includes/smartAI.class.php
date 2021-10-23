@@ -292,7 +292,7 @@ class SmartAI
 
         if ($smartTALs)
         {
-            if ($TALActList = DB::World()->selectCol('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, $lookup, $smartTALs))
+            if ($TALActList = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, array_merge(...array_values($lookup)), $smartTALs))
             {
                 foreach ($TALActList as $e)
                 {
