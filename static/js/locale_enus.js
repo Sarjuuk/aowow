@@ -218,7 +218,7 @@ var mn_items = [
         [1,"Reagents"],
         [5,"Mounts"],
         [-7,"Flying Mounts"],
-        [2,"Small Pets"],
+        [2,"Companions"],
         [4,"Other"]
     ]],
     [10,"Currency"],
