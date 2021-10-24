@@ -1794,7 +1794,7 @@ $lang = array(
             )),
             15 => array("Miscellaneous", array(
                 -2 => "Armor Tokens",                3 => "Holiday",                 0 => "Junk",                    1 => "Reagents",                5 => "Mounts",                 -7 => "Flying Mounts",
-                 2 => "Small Pets",                  4 => "Other (Miscellaneous)"
+                 2 => "Companions",                  4 => "Other (Miscellaneous)"
             )),
             10 => "Currency",
             12 => "Quest",
