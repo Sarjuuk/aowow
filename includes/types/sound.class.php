@@ -60,13 +60,6 @@ class SoundList extends BaseType
         }
     }
 
-    public static function getName($id)
-    {
-        $this->getEntry($id);
-
-        return $this->getField('name');
-    }
-
     public function getListviewData()
     {
         $data = [];
