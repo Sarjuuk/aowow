@@ -152,7 +152,7 @@ class AchievementPage extends GenericPage
         $this->mail        = $this->createMail($reqBook);
         $this->headIcons   = [$this->subject->getField('iconString')];
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->series      = $series ? [[$series, null]] : null;
+        $this->series      = $series ? [[array_values($series), null]] : null;
         $this->description = $this->subject->getField('description', true);
         $this->redButtons  = array(
             BUTTON_WOWHEAD => !($this->subject->getField('cuFlags') & CUSTOM_SERVERSIDE),
