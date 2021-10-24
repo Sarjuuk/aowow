@@ -114,19 +114,10 @@ switch ($pageCall)
         catch (Exception $e)                                // no, apparently not..
         {
             $class = $cleanName.'Page';
-            if (is_callable([$class, 'display']))
-                (new $class($pageCall, $pageParam))->display();
-            else if (method_exists($class, 'display'))
-            {
-                // PHP 8 requires an instance of $class for is_callable to work
-                $classInstance = new $class($pageCall, $pageParam);
-                if (is_callable([$classInstance, 'display']))
-                    $classInstance->display();
-                else if (isset($_GET['power']))
-                    die('$WowheadPower.register(0, '.User::$localeId.', {})');
-                else                                            // in conjunction with a proper rewriteRule in .htaccess...
-                    (new GenericPage($pageCall))->error();
-            }
+            $classInstance = new $class($pageCall, $pageParam);
+
+            if (is_callable([$classInstance, 'display']))
+                $classInstance->display();
             else if (isset($_GET['power']))
                 die('$WowheadPower.register(0, '.User::$localeId.', {})');
             else                                            // in conjunction with a proper rewriteRule in .htaccess...
