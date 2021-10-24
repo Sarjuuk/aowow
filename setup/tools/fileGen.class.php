@@ -136,7 +136,7 @@ class FileGen
             $doScripts = array_unique($doScripts);
             return true;
         }
-        else if ($_ = CLISetup::getOpt('build'))
+        else if (is_array($_ = CLISetup::getOpt('build')))
         {
             $doScripts = $_;
             return true;

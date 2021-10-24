@@ -56,7 +56,7 @@ class SqlGen
 
                 if ($depsOK)
                 {
-                    if (isset(self::$tables[$ssRef->getName()]))
+                    if (isset(self::$tables[$ts->getName()]))
                     {
                         CLI::write('a SetupScript named '.CLI::bold($ts->getName()).' was already registered. Skipping...', CLI::LOG_WARN);
                         unset(self::$tmpStore[$idx]);
