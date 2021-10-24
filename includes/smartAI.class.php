@@ -268,8 +268,8 @@ class SmartAI
         $smartTALs    = [];
         foreach ($smartScripts as $s)
         {
-            if ($e['action_type'] == SAI_ACTION_SPAWN_SPAWNGROUP)
-                $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $e['action_param'.$i];
+            if ($s['action_type'] == SAI_ACTION_SPAWN_SPAWNGROUP)
+                $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $s['action_param'.$i];
             else if (in_array($s['action_type'], array_keys($lookup)))
             {
                 foreach ($lookup[$s['action_type']] as $p)
@@ -292,7 +292,7 @@ class SmartAI
 
         if ($smartTALs)
         {
-            if ($TALActList = DB::World()->selectCol('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, $lookup, $smartTALs))
+            if ($TALActList = DB::World()->select('SELECT action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6 FROM smart_scripts WHERE source_type = ?d AND action_type IN (?a) AND entryOrGUID IN (?a)', SAI_SRC_TYPE_ACTIONLIST, array_keys($lookup), $smartTALs))
             {
                 foreach ($TALActList as $e)
                 {
