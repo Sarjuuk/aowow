@@ -92,7 +92,7 @@ class AjaxComment extends AjaxHandler
 
         // trim to max length
         if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->_post['commentbody']) > (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)))
-            $this->post['commentbody'] = mb_substr($this->_post['commentbody'], 0, (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)));
+            $this->_post['commentbody'] = mb_substr($this->_post['commentbody'], 0, (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)));
 
         if (User::canComment())
         {
@@ -144,7 +144,7 @@ class AjaxComment extends AjaxHandler
 
         // trim to max length
         if (!User::isInGroup(U_GROUP_MODERATOR) && mb_strlen($this->_post['body']) > (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)))
-            $this->post['body'] = mb_substr($this->_post['body'], 0, (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)));
+            $this->_post['body'] = mb_substr($this->_post['body'], 0, (self::COMMENT_LENGTH_MAX * (User::isPremium() ? 3 : 1)));
 
         $update = array(
             'body'       => $this->_post['body'],

@@ -467,7 +467,7 @@ class AjaxAdmin extends AjaxHandler
         return '-1';
     }
 
-    protected function checkKey(string $val) : string
+    protected static function checkKey(string $val) : string
     {
         // expecting string
         if (preg_match('/[^a-z0-9_\.\-]/i', $val))
@@ -476,7 +476,7 @@ class AjaxAdmin extends AjaxHandler
         return strtolower($val);
     }
 
-    protected function checkUser($val) : string
+    protected static function checkUser($val) : string
     {
         $n = Util::lower(trim(urldecode($val)));
 
@@ -486,7 +486,7 @@ class AjaxAdmin extends AjaxHandler
         return '';
     }
 
-    protected function checkScale($val) : string
+    protected static function checkScale($val) : string
     {
         if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
             return $val;
@@ -494,7 +494,7 @@ class AjaxAdmin extends AjaxHandler
         return '';
     }
 
-    private function confOnChange(string $key, string $val, string &$msg) : bool
+    private static function confOnChange(string $key, string $val, string &$msg) : bool
     {
         $fn = $buildList = null;
 

@@ -73,12 +73,12 @@ class AjaxHandler
         return true;
     }
 
-    protected function checkEmptySet(string $val) : bool
+    protected static function checkEmptySet(string $val) : bool
     {
         return $val === '';                                 // parameter is expected to be empty
     }
 
-    protected function checkLocale(string $val) : int
+    protected static function checkLocale(string $val) : int
     {
         if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
             return intVal($val);
@@ -86,7 +86,7 @@ class AjaxHandler
         return -1;
     }
 
-    protected function checkInt(string $val) : int
+    protected static function checkInt(string $val) : int
     {
         if (preg_match('/^-?\d+$/', $val))
             return intVal($val);
@@ -94,7 +94,7 @@ class AjaxHandler
         return 0;
     }
 
-    protected function checkIdList(string $val) : array
+    protected static function checkIdList(string $val) : array
     {
         if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
             return array_map('intVal', explode(',', $val));
@@ -102,7 +102,7 @@ class AjaxHandler
         return [];
     }
 
-    protected function checkIdListUnsigned(string $val) : array
+    protected static function checkIdListUnsigned(string $val) : array
     {
         if (preg_match('/\d+(,\d+)*/', $val))
             return array_map('intVal', explode(',', $val));
@@ -110,10 +110,10 @@ class AjaxHandler
         return [];
     }
 
-    protected function checkFulltext(string $val) : string
+    protected static function checkFulltext(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace('/[\p{C}]/ui', '', $val);
+        return preg_replace('/[\p{Cf} \p{Co} \p{Cs} \p{Cn}]/ui', '', $val);
     }
 }
 ?>

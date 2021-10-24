@@ -165,7 +165,7 @@ class AjaxAccount extends AjaxHandler
             DB::Aowow()->query('DELETE FROM ?_account_favorites WHERE `userId` = ?d AND `type` = ?d AND `typeId` = ?d', User::$id, $type, $typeId);
     }
 
-    protected function checkScale(string $val) : string
+    protected static function checkScale(string $val) : string
     {
         if (preg_match('/^((\w+:\d+)(,\w+:\d+)*)$/', $val))
             return $val;
@@ -173,7 +173,7 @@ class AjaxAccount extends AjaxHandler
         return '';
     }
 
-    protected function checkName(string $val) : string
+    protected static function checkName(string $val) : string
     {
         $var = trim(urldecode($val));
 

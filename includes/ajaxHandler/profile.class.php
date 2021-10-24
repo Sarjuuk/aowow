@@ -746,7 +746,7 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handlePurge() : void { }             // removes completion data (as uploaded by the wowhead client) Just fail silently if someone triggers this manually
 
-    protected function checkItemList($val) : array
+    protected static function checkItemList($val) : array
     {
         // expecting item-list
         if (preg_match('/\d+(:\d+)*/', $val))
@@ -755,7 +755,7 @@ class AjaxProfile extends AjaxHandler
         return [];
     }
 
-    protected function checkUser(string $val) : string
+    protected static function checkUser(string $val) : string
     {
         if (User::isValidName($val))
             return $val;
