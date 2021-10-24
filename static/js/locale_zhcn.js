@@ -2501,7 +2501,7 @@ var LANG = {
 
     date:            "日期",
     date_colon:      "日期：",
-    date_on:         "在",
+    date_on:         "在 ",
     date_ago:        "$1前",
     date_at:         "于",
     date_to:         "至",
