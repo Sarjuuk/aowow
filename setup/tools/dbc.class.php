@@ -349,7 +349,10 @@ class DBC
 
         $this->createTable();
 
-        CLI::write(' - reading '.($this->localized ? 'and merging ' : '').$this->file.'.dbc for locales '.implode(', ', array_keys($this->fileRefs)));
+        if ($this->localized)
+            CLI::write(' - reading and merging '.$this->file.'.dbc for locales '.implode(', ', array_keys($this->fileRefs)));
+        else
+            CLI::write(' - reading '.$this->file.'.dbc');
 
         if (!$this->read())
         {

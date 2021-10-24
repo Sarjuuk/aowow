@@ -118,7 +118,7 @@ function setup() : void
         require 'config/config.php';
 
         $error   = [];
-        foreach (['world', 'aowow', 'auth'] as $idx => $what)
+        foreach (['aowow', 'world', 'auth'] as $idx => $what)
         {
             if ($what == 'auth' && (empty($AoWoWconf['auth']) || empty($AoWoWconf['auth']['host'])))
                 continue;

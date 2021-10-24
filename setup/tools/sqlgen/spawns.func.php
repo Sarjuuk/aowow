@@ -103,7 +103,7 @@ SqlGen::register(new class extends SetupScript
         // spawn does not really match on a map, but we need at least one result
         if (!$result)
         {
-            usort($points, function ($a, $b) { return ($a['quality'] < $b['quality']) ? -1 : 1; });
+            usort($points, function ($a, $b) { return ($a['dist'] < $b['dist']) ? -1 : 1; });
             $result = [1.0, $points[0]];
         }
 

@@ -93,43 +93,48 @@ if (!empty($AoWoWconf['characters']))
 
 
 // load config to constants
-$sets = DB::isConnectable(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
-foreach ($sets as $k => $v)
+function loadConfig(bool $noPHP = false) : void
 {
-    $php = $v['flags'] & CON_FLAG_PHP;
-
-    // this should not have been possible
-    if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
+    $sets = DB::isConnectable(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
+    foreach ($sets as $k => $v)
     {
-        trigger_error('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
-        continue;
-    }
+        $php = $v['flags'] & CON_FLAG_PHP;
+        if ($php && $noPHP)
+            continue;
 
-    if ($v['flags'] & CON_FLAG_TYPE_INT)
-        $val = intVal($v['value']);
-    else if ($v['flags'] & CON_FLAG_TYPE_FLOAT)
-        $val = floatVal($v['value']);
-    else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
-        $val = (bool)$v['value'];
-    else if ($v['flags'] & CON_FLAG_TYPE_STRING)
-        $val = preg_replace("/[\p{C}]/ui", '', $v['value']);
-    else if ($php)
-    {
-        trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
-        continue;
-    }
-    else // if (!$php)
-    {
-        trigger_error('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
-        $val = 0;
-    }
+        // this should not have been possible
+        if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
+        {
+            trigger_error('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
+            continue;
+        }
 
-    if ($php)
-        ini_set(strtolower($k), $val);
-    else
-        define('CFG_'.strtoupper($k), $val);
+        if ($v['flags'] & CON_FLAG_TYPE_INT)
+            $val = intVal($v['value']);
+        else if ($v['flags'] & CON_FLAG_TYPE_FLOAT)
+            $val = floatVal($v['value']);
+        else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
+            $val = (bool)$v['value'];
+        else if ($v['flags'] & CON_FLAG_TYPE_STRING)
+            $val = preg_replace("/[\p{C}]/ui", '', $v['value']);
+        else if ($php)
+        {
+            trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
+            continue;
+        }
+        else // if (!$php)
+        {
+            trigger_error('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
+            $val = 0;
+        }
+
+        if ($php)
+            ini_set(strtolower($k), $val);
+        else
+            define('CFG_'.strtoupper($k), $val);
+    }
 }
-
+loadConfig();
 
 // handle non-fatal errors and notices
 error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? E_AOWOW : 0);

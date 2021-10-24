@@ -104,15 +104,15 @@ class CLISetup
                 self::$opts[$alias[$o] ?? $o] = (self::$optDefs[$alias[$o] ?? $o][2] & self::ARGV_ARRAY) ? ($v ? explode(',', $v) : []) : ($v ?: true);
 
         // optional logging
-        if (self::$opts['log'])
+        if (isset(self::$opts['log']))
             CLI::initLogFile(trim(self::$opts['log']));
 
         // alternative data source (no quotes, use forward slash)
-        if (self::$opts['mpqDataDir'])
+        if (isset(self::$opts['mpqDataDir']))
             self::$srcDir = CLI::nicePath($self::$opts['mpqDataDir']);
 
         // optional limit handled locales
-        if (self::$opts['locales'])
+        if (isset(self::$opts['locales']))
         {
             // engb and enus are identical for all intents and purposes
             $from = ['engb', 'esmx', 'encn'];

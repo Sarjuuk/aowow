@@ -58,11 +58,11 @@ class FileGen
         'static/wowsounds/'
     );
 
-    public static $txtConstants = array(
-        'CFG_NAME'       => CFG_NAME,
-        'CFG_NAME_SHORT' => CFG_NAME_SHORT,
-        'HOST_URL'       => HOST_URL,
-        'STATIC_URL'     => STATIC_URL
+    private static $txtConstants = array(
+        'CFG_NAME'       => '',
+        'CFG_NAME_SHORT' => '',
+        'HOST_URL'       => '',
+        'STATIC_URL'     => ''
     );
 
     public static function init(int $mode = self::MODE_NORMAL, array $updScripts = []) : bool
@@ -76,15 +76,6 @@ class FileGen
             return false;
         }
 
-        // handle command prompts
-        if (!self::handleCLIOpts($doScripts))
-            return false;
-
-        // check passed subscript names; limit to real scriptNames
-        self::$subScripts = array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets));
-        if ($doScripts || $updScripts)
-            self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
-
         // create directory structure
         CLI::write('FileGen::init() - creating required directories');
         $pathOk = 0;
@@ -94,6 +85,15 @@ class FileGen
 
         CLI::write('created '.$pathOk.' extra paths'.($pathOk == count(self::$reqDirs) ? '' : ' with errors'));
         CLI::write();
+
+        // handle command prompts
+        if (!self::handleCLIOpts($doScripts))
+            return false;
+
+        // check passed subscript names; limit to real scriptNames
+        self::$subScripts = array_merge(array_keys(self::$tplFiles), array_keys(self::$datasets));
+        if ($doScripts || $updScripts)
+            self::$subScripts = array_intersect($doScripts ?: $updScripts, self::$subScripts);
 
         return true;
     }
@@ -183,10 +183,14 @@ class FileGen
         {
             [$file, $destPath, $deps] = self::$tplFiles[$key];
 
-            if ($content = file_get_contents(FileGen::$tplPath.$file.'.in'))
+            foreach (self::$txtConstants as $n => &$c)
+                if (!$c && defined($n))
+                    $c = constant($n);
+
+            if ($content = file_get_contents(self::$tplPath.$file.'.in'))
             {
                 // replace constants
-                $content = strtr($content, FileGen::$txtConstants);
+                $content = strtr($content, self::$txtConstants);
 
                 // check for required auxiliary DBC files
                 foreach ($reqDBC as $req)
@@ -217,7 +221,7 @@ class FileGen
                         $success = true;
             }
             else
-                CLI::write(sprintf(ERR_READ_FILE, CLI::bold(FileGen::$tplPath.$file.'.in')), CLI::LOG_ERROR);
+                CLI::write(sprintf(ERR_READ_FILE, CLI::bold(self::$tplPath.$file.'.in')), CLI::LOG_ERROR);
         }
         else if (!empty(self::$datasets[$key]))
         {
@@ -234,7 +238,7 @@ class FileGen
                 CLI::write(' - subscript \''.$key.'\' not defined in included file', CLI::LOG_ERROR);
         }
 
-        set_time_limit(FileGen::$defaultExecTime);      // reset to default for the next script
+        set_time_limit(self::$defaultExecTime);             // reset to default for the next script
 
         return $success;
     }

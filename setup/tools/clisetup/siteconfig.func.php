@@ -431,6 +431,9 @@ function siteconfig() : void
             $updScripts = [];
         }
     }
+
+    // actually load set constants
+    loadConfig(true);
 }
 
 ?>
