@@ -18,7 +18,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 
 ## Requirements
 
-+ Webserver running PHP ≥ 7.1 including extensions:
++ Webserver running PHP ≥ 7.1 — 8.0 including extensions:
   + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
   + [GD](https://www.php.net/manual/en/book.image)
   + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
@@ -26,7 +26,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
   + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.5.30
-+ [TDB 335.21021](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21021)
++ [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101)
 + Tools require cmake: Please refer to the individual repositories for detailed information
   + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
   + WIN users may find it easier to use these alternatives

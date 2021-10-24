@@ -142,7 +142,7 @@ class FactionPage extends GenericPage
                     case 'creature_rate':         $buff .= '[tr][td]'.Lang::game('npcs')                                     .Lang::main('colon').'[/td]'; break;
                     case 'spell_rate':            $buff .= '[tr][td]'.Lang::game('spells')                                   .Lang::main('colon').'[/td]'; break;
                     default:
-                        continue;
+                        continue 2;
                 }
 
                 $buff .= '[td width=35px align=right][span class=q'.($v < 1 ? '10]' : '2]+').intVal(($v - 1) * 100).'%[/span][/td][/tr]';

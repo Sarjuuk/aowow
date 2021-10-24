@@ -253,7 +253,7 @@ class ZonePage extends GenericPage
 
                         $this->extendGlobalData($started->getJSGlobals());
 
-                        if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
@@ -264,7 +264,7 @@ class ZonePage extends GenericPage
                                 'quests' => array_values($_)
                             ));
 
-                        if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
+                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
                             $addToSOM('hordequests', array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
@@ -350,7 +350,7 @@ class ZonePage extends GenericPage
 
                         $this->extendGlobalData($started->getJSGlobals());
 
-                        if (($tpl['A'] != -1) & ($_ = $started->getSOMData(SIDE_ALLIANCE)))
+                        if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
                             $addToSOM('alliancequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
@@ -363,7 +363,7 @@ class ZonePage extends GenericPage
                                 'quests'        => array_values($_)
                             ));
 
-                        if (($tpl['H'] != -1) & ($_ = $started->getSOMData(SIDE_HORDE)))
+                        if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
                             $addToSOM('hordequests', array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
