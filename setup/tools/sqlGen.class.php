@@ -160,7 +160,7 @@ class SqlGen
             $doTbls = array_unique($doTbls);
             return true;
         }
-        else if ($_ = CLISetup::getOpt('sql'))
+        else if (is_array($_ = CLISetup::getOpt('sql')))
         {
             $doTbls = $_;
             return true;
