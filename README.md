@@ -27,6 +27,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.5.30
 + [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101)
++ WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
 + Tools require cmake: Please refer to the individual repositories for detailed information
   + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
   + WIN users may find it easier to use these alternatives
@@ -118,6 +119,8 @@ A: Some server configurations or external services (like Cloudflare) come with m
 Q: Some search results within the profiler act rather strange. How does it work?  
 A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run agains the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
 
+Q: Screenshot upload fails, because the file size is too large and/or the subdirectories are visible from the web!  
+A: That's a web server configuration issue. If you are using Apache you may need to [enable the use of .htaccess](http://httpd.apache.org/docs/2.4/de/mod/core.html#allowoverride). Other servers require individual configuration.  
 
 ## Thanks
 
