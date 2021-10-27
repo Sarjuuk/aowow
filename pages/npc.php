@@ -269,7 +269,7 @@ class NpcPage extends GenericPage
         if ($tmpRes)
         {
             $stats['resistance'] = Lang::npc('resistances').Lang::main('colon');
-            if (count($tmpRes > 3))
+            if (count($tmpRes) > 3)
                 $stats['resistance'] .= implode('&nbsp;', array_slice($tmpRes, 0, 3)).'[br]'.implode('&nbsp;', array_slice($tmpRes, 3));
             else
                 $stats['resistance'] .= implode('&nbsp;', $tmpRes);
