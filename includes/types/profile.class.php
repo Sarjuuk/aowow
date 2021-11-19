@@ -584,6 +584,7 @@ class RemoteProfileList extends ProfileList
             // talent points pre
             $talentLookup[$r][$g] = [];
             $talentSpells[] = $curTpl['class'];
+            $curTpl['activespec'] = $curTpl['activeTalentGroup'];
 
             // equalize distribution
             if ($limit != CFG_SQL_LIMIT_NONE)
