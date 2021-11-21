@@ -628,13 +628,6 @@ define('QUEST_FLAG_SPECIAL_DUNGEON_FINDER', 0x08);
 define('QUEST_FLAG_SPECIAL_MONTHLY',        0x10);
 define('QUEST_FLAG_SPECIAL_SPELLCAST',      0x20);          // not documented in wiki! :[
 
-define('QUEST_STATE_NOT_TAKEN',             0x01);
-define('QUEST_STATE_COMPLETED',             0x02);
-define('QUEST_STATE_IN_PROGRESS',           0x08);
-define('QUEST_STATE_FAILED',                0x10);
-define('QUEST_STATE_REWARDED',              0x20);
-
-
 // GameObject
 define('OBJECT_DOOR',                       0);
 define('OBJECT_BUTTON',                     1);
@@ -1291,57 +1284,44 @@ define('CND_SRC_SMART_EVENT',                 22);
 define('CND_SRC_NPC_VENDOR',                  23);
 define('CND_SRC_SPELL_PROC',                  24);
 
-define('CND_AURA',                     1);                  // aura is applied:         spellId,        UNUSED,         NULL
-define('CND_ITEM',                     2);                  // owns item:               itemId,         count,          UNUSED
-define('CND_ITEM_EQUIPPED',            3);                  // has item equipped:       itemId,         NULL,           NULL
-define('CND_ZONEID',                   4);                  // is in zone:              areaId,         NULL,           NULL
-define('CND_REPUTATION_RANK',          5);                  // reputation status:       factionId,      rankMask,       NULL
-define('CND_TEAM',                     6);                  // is on team:              teamId,         NULL,           NULL
-define('CND_SKILL',                    7);                  // has skill:               skillId,        value,          NULL
-define('CND_QUESTREWARDED',            8);                  // has finished quest:      questId,        NULL,           NULL
-define('CND_QUESTTAKEN',               9);                  // has accepted quest:      questId,        NULL,           NULL
-define('CND_DRUNKENSTATE',             10);                 // has drunken status:      stateId,        NULL,           NULL
-define('CND_WORLD_STATE',              11);
-define('CND_ACTIVE_EVENT',             12);                 // world event is active:   eventId,        NULL,           NULL
-define('CND_INSTANCE_INFO',            13);
-define('CND_QUEST_NONE',               14);                 // never seen quest:        questId,        NULL,           NULL
-define('CND_CLASS',                    15);                 // belongs to classes:      classMask,      NULL,           NULL
-define('CND_RACE',                     16);                 // belongs to races:        raceMask,       NULL,           NULL
-define('CND_ACHIEVEMENT',              17);                 // obtained achievement:    achievementId,  NULL,           NULL
-define('CND_TITLE',                    18);                 // obtained title:          titleId,        NULL,           NULL
-define('CND_SPAWNMASK',                19);
-define('CND_GENDER',                   20);                 // has gender:              genderId,       NULL,           NULL
-define('CND_UNIT_STATE',               21);
-define('CND_MAPID',                    22);                 // is on map:               mapId,          NULL,           NULL
-define('CND_AREAID',                   23);                 // is in area:              areaId,         NULL,           NULL
-define('CND_UNUSED_24',                24);
-define('CND_SPELL',                    25);                 // knows spell:             spellId,        NULL,           NULL
-define('CND_PHASEMASK',                26);                 // is in phase:             phaseMask,      NULL,           NULL
-define('CND_LEVEL',                    27);                 // player level is..:       level,          operator,       NULL
-define('CND_QUEST_COMPLETE',           28);                 // has completed quest:     questId,        NULL,           NULL
-define('CND_NEAR_CREATURE',            29);                 // is near creature:        creatureId,     dist,           NULL
-define('CND_NEAR_GAMEOBJECT',          30);                 // is near gameObject:      gameObjectId,   dist,           NULL
-define('CND_OBJECT_ENTRY',             31);                 // target is ???:           objectType,     id,             NULL
-define('CND_TYPE_MASK',                32);                 // target is type:          typeMask,       NULL,           NULL
-define('CND_RELATION_TO',              33);
-define('CND_REACTION_TO',              34);
-define('CND_DISTANCE_TO',              35);                 // distance to target       targetType,     dist,           operator
-define('CND_ALIVE',                    36);                 // target is alive:         NULL,           NULL,           NULL
-define('CND_HP_VAL',                   37);                 // targets absolute health: amount,         operator,       NULL
-define('CND_HP_PCT',                   38);                 // targets relative health: amount,         operator,       NULL
-define('CND_REALM_ACHIEVEMENT',        39);                 // target has achieved:     achievementId,  NULL,           NULL
-define('CND_IN_WATER',                 40);                 // target is in water:      NULL,           NULL,           NULL        -   NegativeCondition: 0 - land; 1 - water
-// define('CND_TERRAIN_SWAP',          41);                 // not used in 3.3.5
-define('CND_STAND_STATE',              42);                 // target has stateType:    isExact,        0:standing;1:sitting,   NULL
-define('CND_DAILY_QUEST_DONE',         43);                 // target has done Quest:   questId,        NULL,           NULL
-define('CND_CHARMED',                  44);                 // target is charmed:       NULL,           NULL,           NULL
-define('CND_PET_TYPE',                 45);                 // target has pet of type:  petTypeMask     NULL,           NULL
-define('CND_TAXI',                     46);                 // target is using tyxi:    NULL,           NULL,           NULL
-define('CND_QUESTSTATE',               47);                 // target has questState:   questId,        stateMask,      NULL
-define('CND_QUEST_OBJECTIVE_COMPLETE', 48);                 // target has quest status: questId,        objectiveIdx,   counter
-define('CND_DIFFICULTY_ID',            49);                 // difficulty mode of map:  mode,           NULL,           NULL
-define('CND_OBJECT_ENTRY_GUID',        51);                 // target object is of..:   typeId,         orEntry,        orGuid
-define('CND_TYPE_MASK',                52);                 // target object has:       typeMask,       NULL,           NULL
+define('CND_AURA',            1);                           // aura is applied:         spellId,        UNUSED,     NULL
+define('CND_ITEM',            2);                           // owns item:               itemId,         count,      UNUSED
+define('CND_ITEM_EQUIPPED',   3);                           // has item equipped:       itemId,         NULL,       NULL
+define('CND_ZONEID',          4);                           // is in zone:              areaId,         NULL,       NULL
+define('CND_REPUTATION_RANK', 5);                           // reputation status:       factionId,      rankMask,   NULL
+define('CND_TEAM',            6);                           // is on team:              teamId,         NULL,       NULL
+define('CND_SKILL',           7);                           // has skill:               skillId,        value,      NULL
+define('CND_QUESTREWARDED',   8);                           // has finished quest:      questId,        NULL,       NULL
+define('CND_QUESTTAKEN',      9);                           // has accepted quest:      questId,        NULL,       NULL
+define('CND_DRUNKENSTATE',    10);                          // has drunken status:      stateId,        NULL,       NULL
+define('CND_WORLD_STATE',     11);
+define('CND_ACTIVE_EVENT',    12);                          // world event is active:   eventId,        NULL,       NULL
+define('CND_INSTANCE_INFO',   13);
+define('CND_QUEST_NONE',      14);                          // never seen quest:        questId,        NULL,       NULL
+define('CND_CLASS',           15);                          // belongs to classes:      classMask,      NULL,       NULL
+define('CND_RACE',            16);                          // belongs to races:        raceMask,       NULL,       NULL
+define('CND_ACHIEVEMENT',     17);                          // obtained achievement:    achievementId,  NULL,       NULL
+define('CND_TITLE',           18);                          // obtained title:          titleId,        NULL,       NULL
+define('CND_SPAWNMASK',       19);
+define('CND_GENDER',          20);                          // has gender:              genderId,       NULL,       NULL
+define('CND_UNIT_STATE',      21);
+define('CND_MAPID',           22);                          // is on map:               mapId,          NULL,       NULL
+define('CND_AREAID',          23);                          // is in area:              areaId,         NULL,       NULL
+define('CND_UNUSED_24',       24);
+define('CND_SPELL',           25);                          // knows spell:             spellId,        NULL,       NULL
+define('CND_PHASEMASK',       26);                          // is in phase:             phaseMask,      NULL,       NULL
+define('CND_LEVEL',           27);                          // player level is..:       level,          operator,   NULL
+define('CND_QUEST_COMPLETE',  28);                          // has completed quest:     questId,        NULL,       NULL
+define('CND_NEAR_CREATURE',   29);                          // is near creature:        creatureId,     dist,       NULL
+define('CND_NEAR_GAMEOBJECT', 30);                          // is near gameObject:      gameObjectId,   dist,       NULL
+define('CND_OBJECT_ENTRY',    31);                          // target is ???:           objectType,     id,         NULL
+define('CND_TYPE_MASK',       32);                          // target is type:          typeMask,       NULL,       NULL
+define('CND_RELATION_TO',     33);
+define('CND_REACTION_TO',     34);
+define('CND_DISTANCE_TO',     35);                          // distance to target       targetType,     dist,       operator
+define('CND_ALIVE',           36);                          // target is alive:         NULL,           NULL,       NULL
+define('CND_HP_VAL',          37);                          // targets absolute health: amount,         operator,   NULL
+define('CND_HP_PCT',          38);                          // targets relative health: amount,         operator,   NULL
 
 // TrinityCore - SmartAI
 define('SAI_SRC_TYPE_CREATURE',    0);

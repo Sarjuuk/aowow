@@ -2418,16 +2418,6 @@ var g_world_object_types = {
     7: 'Player Corpse'
 };
 
-var g_quest_states = {
-    1: 'not taken',
-    2: 'completed',
-//  3: 'unavailable',
-    4: 'in progress',
-//  5: 'available',
-    6: 'failed',
-    7: 'rewarded'
-};
-
 var g_condition_types = {
      1: ['Looting',        'If the conditions are met, this item can be dropped by [npc=$1].'],                                 // CND_SRC_CREATURE_LOOT_TEMPLATE
      2: ['Disenchanting',  'If the conditions are met, this item can be found when disenchanting [item=$1].'],                  // CND_SRC_DISENCHANT_LOOT_TEMPLATE
@@ -2487,19 +2477,7 @@ var g_conditions = {
     35: 'The target is$: not; $2 $1yd away',
     36: 'The target is$: not; alive',
     37: 'The target\'s health is$: not; $2 $1',
-    38: 'The target\'s health is$: not; $2 $1%',
-    39: 'The player has achieved $1',
-    40: 'The target is$: not; swimming',
-    41: '',                                                                 // not used
-    42: 'The target is $sitting:standing;',                                 // use param1: exact match
-    43: 'The player has finished $1',
-    44: 'The target is charmed',
-    45: 'The target\'s pet is a $1',
-    46: 'The player is using a taxi',
-    47: 'The player is on quest $1 with status $2',
-    48: 'The player completed $3 objective $2 from $1',
-    49: 'The difficulty of this map is $1',
-    51: 'The target object is $1'                                           // also used by 52
+    37: 'The target\'s health is$: not; $2 $1%'
 };
 /* end aowow custom */
 
