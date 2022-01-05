@@ -31,7 +31,8 @@ class Markup
                     $match[1] = 'achievement';
                 else if ($match[1] == 'icondb')
                     $match[1] = 'icon';
-                else if ($match[1] == 'money')
+
+                if ($match[1] == 'money')
                 {
                     if (stripos($match[0], 'items'))
                     {

@@ -2798,7 +2798,7 @@ var Markup = {
                 border:      { req: false, valid: /^[0-9]+$/ },
                 cellspacing: { req: false, valid: /^[0-9]+$/ },
                 cellpadding: { req: false, valid: /^[0-9]+$/ },
-                width:       { req: false, valid: /^[0-9]+(px|em|\%)$/ }
+                width:       { req: false, valid: /^([0-9]+(px|em|\%)|auto)$/ }
             },
             toHtml: function(attr)
             {
