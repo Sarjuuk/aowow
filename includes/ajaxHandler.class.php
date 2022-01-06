@@ -113,7 +113,7 @@ class AjaxHandler
     protected static function checkFulltext(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace('/[\p{Cf} \p{Co} \p{Cs} \p{Cn}]/ui', '', $val);
+        return preg_replace('/[\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
     }
 }
 ?>
