@@ -167,7 +167,15 @@ class RemoteArenaTeamList extends ArenaTeamList
             }
             else
             {
-                trigger_error('arena team "'.$curTpl['name'].'" belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('arena team #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                unset($this->templates[$guid]);
+                continue;
+            }
+
+            // empty name
+            if (!$curTpl['name'])
+            {
+                trigger_error('arena team #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }

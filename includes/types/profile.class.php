@@ -573,7 +573,15 @@ class RemoteProfileList extends ProfileList
             }
             else
             {
-                trigger_error('character "'.$curTpl['name'].'" belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('char #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                unset($this->templates[$guid]);
+                continue;
+            }
+
+            // empty name
+            if (!$curTpl['name'])
+            {
+                trigger_error('char #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
