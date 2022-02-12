@@ -1234,12 +1234,7 @@ class SpellPage extends GenericPage
             return false;
 
         $item = DB::Aowow()->selectRow('
-            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.name AS iconString, quality,
-            IF ( (spellId1 > 0 AND spellCharges1 < 0) OR
-                 (spellId2 > 0 AND spellCharges2 < 0) OR
-                 (spellId3 > 0 AND spellCharges3 < 0) OR
-                 (spellId4 > 0 AND spellCharges4 < 0) OR
-                 (spellId5 > 0 AND spellCharges5 < 0), 1, 0) AS consumed
+            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.name AS iconString, quality
             FROM    ?_items i
             LEFT JOIN ?_icons ic ON ic.id = i.iconId
             WHERE   i.id = ?d',
@@ -1252,9 +1247,6 @@ class SpellPage extends GenericPage
         $this->extendGlobalIds(TYPE_ITEM, $item['id']);
 
         $_level++;
-
-        if ($item['consumed'])
-            $_qty++;
 
         $data = array(
             'type'    => TYPE_ITEM,
@@ -1286,6 +1278,7 @@ class SpellPage extends GenericPage
             SELECT  reagent1,      reagent2,      reagent3,      reagent4,      reagent5,      reagent6,      reagent7,      reagent8,
                     reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8,
                     name_loc0,     name_loc2,     name_loc3,     name_loc6,     name_loc8,
+                    iconIdBak,
                     s.id AS ARRAY_KEY, ic.name AS iconString
             FROM    ?_spell s
             JOIN    ?_icons ic ON s.iconId = ic.id
@@ -1326,6 +1319,11 @@ class SpellPage extends GenericPage
             {
                 if ($row['reagent'.$i] <= 0 || $row['reagentCount'.$i] <= 0)
                     continue;
+
+                // handle edge case elemental crafting material: Mote of X + Crystalized X
+                // on use items, that has require more reagents of itself
+                if ($row['reagentCount'.$i] == 9 && ($row['iconIdBak'] == 140 || $row['iconIdBak'] == 1921))
+                    $row['reagentCount'.$i]++;
 
                 if ($this->appendReagentItem($reagentResult, $row['reagent'.$i], $row['reagentCount'.$i], $data['qty'], $data['level'], $data['path'], $_aU))
                 {

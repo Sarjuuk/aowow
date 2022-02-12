@@ -477,7 +477,7 @@
 }
 
 .iconlist td {
-    padding: 4px 0 6px 0 !important;
+    padding: 4px 0 6px 0;
 }
 
 .iconlist var {
