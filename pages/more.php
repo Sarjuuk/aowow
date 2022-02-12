@@ -191,7 +191,7 @@ class MorePage extends GenericPage
                 SELECT
                     a.id AS ARRAY_KEY,
                     a.displayName AS username,
-                    a.userGroups AS groups,
+                    a.userGroups AS `groups`,
                     a.joinDate AS creation,
                     SUM(r.amount) AS reputation,
                     SUM(IF(r.`action` = 3, 1, 0)) AS comments,

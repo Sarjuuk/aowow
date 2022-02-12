@@ -117,11 +117,10 @@ class CLISetup
             // engb and enus are identical for all intents and purposes
             $from = ['engb', 'esmx', 'encn'];
             $to   = ['enus', 'eses', 'zhcn'];
-            $_['locales'] = str_ireplace($from, $to, strtolower($_['locales']));
+            $opts['locales'] = str_ireplace($from, $to, strtolower($opts['locales']));
 
-            self::$locales = array_intersect(Util::$localeStrings, explode(',', $_['locales']));
+            self::$locales = array_intersect(Util::$localeStrings, explode(',', $opts['locales']));
         }
-
         if (!self::$locales)
             self::$locales = array_filter(Util::$localeStrings);
 

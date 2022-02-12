@@ -386,7 +386,7 @@ if (!CLI)
             // excludes; type => [excludeGroupBit => [typeIds]]
             $excludes = [];
 
-            $exData = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, groups FROM ?_profiler_excludes');
+            $exData = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `groups` FROM ?_profiler_excludes');
             for ($i = 0; (1 << $i) < PR_EXCLUDE_GROUP_ANY; $i++)
                 foreach ($exData as $type => $data)
                     if ($ids = array_keys(array_filter($data, function ($x) use ($i) { return $x & (1 << $i); } )))
