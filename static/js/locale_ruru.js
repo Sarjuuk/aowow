@@ -2430,7 +2430,7 @@ var g_conditions = {
     35: 'The target is$: not; $2 $1yd away',
     36: 'The target is$: not; alive',
     37: 'The target\'s health is$: not; $2 $1',
-    37: 'The target\'s health is$: not; $2 $1%'
+    38: 'The target\'s health is$: not; $2 $1%'
 };
 /* end aowow custom */
 

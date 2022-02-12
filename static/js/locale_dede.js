@@ -2430,7 +2430,7 @@ var g_conditions = {
     35: 'Das Ziel ist$: nicht; $2 $1m entfernt',
     36: 'Das Ziel ist$: nicht; am Leben',
     37: 'Die Gesundheit des Ziels ist$: nicht; $2 $1',
-    37: 'Die Gesundheit des Ziels ist$: nicht; $2 $1%'
+    38: 'Die Gesundheit des Ziels ist$: nicht; $2 $1%'
 };
 /* end aowow custom */
 

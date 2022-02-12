@@ -2431,7 +2431,7 @@ var g_conditions = {
     35: 'El objetivo esta$: no; $2 $1yarda cerca',
     36: 'El objetivo esta$: no; vivo',
     37: 'La salud del objetivo/s esta$: no; $2 $1',
-    37: 'La salud del objetivo/s esta$: no; $2 $1%'
+    38: 'La salud del objetivo/s esta$: no; $2 $1%'
 };
 /* end aowow custom */
 
