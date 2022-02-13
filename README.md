@@ -122,6 +122,9 @@ A: Whenever you try to view a new character, AoWoW needs to fetch it first. Sinc
 Q: Screenshot upload fails, because the file size is too large and/or the subdirectories are visible from the web!  
 A: That's a web server configuration issue. If you are using Apache you may need to [enable the use of .htaccess](http://httpd.apache.org/docs/2.4/de/mod/core.html#allowoverride). Other servers require individual configuration.  
 
+Q: An Item, Quest or NPC i added or edited can't be searched. Why?  
+A: A search is only conducted against the currently used locale. You may have only edited the name field in the base table instead of adding multiple strings into the appropriate \*_locale tables. In this case searches in a non-english locale are run against an empty name field.  
+
 ## Thanks
 
 @mix: for providing the php-script to parse .blp and .dbc into usable images and tables  
