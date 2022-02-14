@@ -54,12 +54,12 @@ if (!CLI)
             if ($row['region'] == 'eu')
             {
                 $set |= 0x1;
-                $subEU[] = [Profiler::urlize($row['name']), $row['name']];
+                $subEU[] = [Profiler::urlize($row['name'], true), $row['name']];
             }
             else if ($row['region'] == 'us')
             {
                 $set |= 0x2;
-                $subUS[] = [Profiler::urlize($row['name']), $row['name']];
+                $subUS[] = [Profiler::urlize($row['name'], true), $row['name']];
             }
         }
 

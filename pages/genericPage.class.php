@@ -119,7 +119,7 @@ trait TrProfiler
         {
             foreach (Profiler::getRealms() as $rId => $r)
             {
-                if (Profiler::urlize($r['name']) == $cat[1])
+                if (Profiler::urlize($r['name'], true) == $cat[1])
                 {
                     $this->realm   = $r['name'];
                     $this->realmId = $rId;
@@ -158,7 +158,7 @@ trait TrProfiler
             $this->path[] = $this->region;
 
             if ($this->realm)
-                $this->path[] = Profiler::urlize($this->realm);
+                $this->path[] = Profiler::urlize($this->realm, true);
             // else
                 // $this->path[] = Profiler::urlize(CFG_BATTLEGROUP);
         }

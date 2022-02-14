@@ -37,7 +37,7 @@ class ProfileList extends BaseType
                 'achievementpoints' => $this->getField('achievementpoints'),
                 'guild'             => '$"'.str_replace ('"', '', $this->curTpl['guildname']).'"',// force this to be a string
                 'guildrank'         => $this->getField('guildrank'),
-                'realm'             => Profiler::urlize($this->getField('realmName')),
+                'realm'             => Profiler::urlize($this->getField('realmName'), true),
                 'realmname'         => $this->getField('realmName'),
              // 'battlegroup'       => Profiler::urlize($this->getField('battlegroup')),        // was renamed to subregion somewhere around cata release
              // 'battlegroupname'   => $this->getField('battlegroup'),

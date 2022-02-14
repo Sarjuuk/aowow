@@ -295,6 +295,7 @@ class Profiler
 
         if (!$char['online'] && $char['logout_time'] <= $profile['lastupdated'])
         {
+            DB::Aowow()->query('UPDATE ?_profiler_profiles SET lastupdated = ?d WHERE id = ?d', time(), $profileId);
             CLI::write('char did not log in since last update. skipping...');
             return true;
         }

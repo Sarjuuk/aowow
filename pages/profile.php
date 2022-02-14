@@ -38,7 +38,7 @@ class ProfilePage extends GenericPage
         if ($params[0])
             $params[0] = Profiler::urlize($params[0]);
         if (isset($params[1]))
-            $params[1] = Profiler::urlize($params[1]);
+            $params[1] = Profiler::urlize($params[1], true);
 
         parent::__construct($pageCall, $pageParam);
 
@@ -175,7 +175,7 @@ class ProfilePage extends GenericPage
     {
         $id = $this->profile;
         if (!$this->isCustom)
-            $id = "'".$this->profile[0].'.'.$this->profile[1].'.'.urlencode($this->profile[2])."'";
+            $id = "'".$this->profile[0].'.'.urlencode($this->profile[1]).'.'.urlencode($this->profile[2])."'";
 
         $power = new StdClass();
         if ($this->subject && !$this->subject->error && $this->subject->isVisibleToUser())

@@ -561,7 +561,7 @@ class AjaxProfile extends AjaxHandler
         {
             $profile['region']      = [$rData['region'], Lang::profiler('regions', $rData['region'])];
             $profile['battlegroup'] = [Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP];
-            $profile['realm']       = [Profiler::urlize($rData['name']), $rData['name']];
+            $profile['realm']       = [Profiler::urlize($rData['name'], true), $rData['name']];
         }
 
         // bookmarks
