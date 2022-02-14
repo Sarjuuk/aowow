@@ -918,8 +918,8 @@ class ItemList extends BaseType
             $x .= sprintf(Lang::game('requires'), '<a class="q1" href="?faction='.$reqFac.'">'.FactionList::getName($reqFac).'</a> - '.Lang::game('rep', $this->curTpl['requiredFactionRank'])).'<br />';
 
         // locked or openable
-        if ($locks = Lang::getLocks($this->curTpl['lockId'], true))
-            $x .= '<span class="q0">'.Lang::item('locked').'<br />'.implode('<br />', $locks).'</span><br />';
+        if ($locks = Lang::getLocks($this->curTpl['lockId'], $arr, true, true))
+            $x .= '<span class="q0">'.Lang::item('locked').'<br />'.implode('<br />', array_map(function($x) { return sprintf(Lang::game('requires'), $x); }, $locks)).'</span><br />';
         else if ($this->curTpl['flags'] & ITEM_FLAG_OPENABLE)
             $x .= '<span class="q2">'.Lang::item('openClick').'</span><br />';
 

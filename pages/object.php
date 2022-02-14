@@ -101,20 +101,22 @@ class ObjectPage extends GenericPage
                 break;
             default:                                            // requires key .. maybe
             {
-                $locks = Lang::getLocks($this->subject->getField('lockId'));
-                $l = '';
-                foreach ($locks as $idx => $_)
-                {
-                    if ($idx < 0)
-                        continue;
+                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true);
+                $l = [];
 
-                    $this->extendGlobalIds(TYPE_ITEM, $idx);
-                    $l = Lang::gameObject('key').Lang::main('colon').'[item='.$idx.']';
+                foreach ($ids as $type => $typeIds)
+                    $this->extendGlobalIds($type, ...$typeIds);
+
+                foreach ($locks as $idx => $str)
+                {
+                    if ($idx > 0)
+                        $l[] = Lang::gameObject('key').Lang::main('colon').$str;
+                    else if ($idx < 0)
+                        $l[] = sprintf(Lang::game('requires'), $str);
                 }
 
-                // if no propper item is found use a skill
-                if ($locks)
-                    $infobox[] = $l ?: array_pop($locks);
+                if ($l)
+                    $infobox[] = implode('[br]', $l);
             }
         }
 

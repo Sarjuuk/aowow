@@ -481,6 +481,10 @@ define('TEAM_ALLIANCE',                     0);
 define('TEAM_HORDE',                        1);
 define('TEAM_NEUTRAL',                      2);
 
+// Lock Types
+define('LOCK_TYPE_ITEM',                    1);
+define('LOCK_TYPE_SKILL',                   2);
+
 // Lock-Properties (also categorizes GOs)
 define('LOCK_PROPERTY_FOOTLOCKER',          1);
 define('LOCK_PROPERTY_HERBALISM',           2);

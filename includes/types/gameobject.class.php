@@ -103,7 +103,7 @@ class GameObjectList extends BaseType
         if (isset($this->curTpl['lockId']))
             if ($locks = Lang::getLocks($this->curTpl['lockId']))
                 foreach ($locks as $l)
-                    $x .= '<tr><td>'.$l.'</td></tr>';
+                    $x .= '<tr><td>'.sprintf(Lang::game('requires'), $l).'</td></tr>';
 
         $x .= '</table>';
 
