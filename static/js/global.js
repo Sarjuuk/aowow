@@ -15730,7 +15730,7 @@ Listview.templates = {
                     if (profile.guild && typeof(profile.guild) != 'number') {
                         var a = $WH.ce('a');
                         a.className = 'q1';
-                        a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild);
+                        a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild, true);
                         $WH.ae(a, $WH.ct(profile.guild));
                         $WH.ae(d, $WH.ct('<'));
                         $WH.ae(d, a);
@@ -16122,7 +16122,7 @@ Listview.templates = {
 
                     var a = $WH.ce('a');
                     a.className = 'q1';
-                    a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild);
+                    a.href = '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.guild, true);
                     $WH.ae(a, $WH.ct(profile.guild));
                     $WH.ae(td, a);
                 },
@@ -16134,10 +16134,10 @@ Listview.templates = {
 
         getItemLink: function(profile) {
             if (profile.size !== undefined) {
-                return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
+                return '?arena-team=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name, true);
             }
             else if (profile.members !== undefined) {
-                return '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name);
+                return '?guild=' + profile.region + '.' + profile.realm + '.' + g_urlize(profile.name, true);
             }
             else {
                 return g_getProfileUrl(profile);

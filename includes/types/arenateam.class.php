@@ -17,7 +17,7 @@ class ArenaTeamList extends BaseType
         {
             $data[$this->id] = array(
                 'name'              => $this->curTpl['name'],
-                'realm'             => Profiler::urlize($this->curTpl['realmName']),
+                'realm'             => Profiler::urlize($this->curTpl['realmName'], true),
                 'realmname'         => $this->curTpl['realmName'],
              // 'battlegroup'       => Profiler::urlize($this->curTpl['battlegroup']),  // was renamed to subregion somewhere around cata release
              // 'battlegroupname'   => $this->curTpl['battlegroup'],

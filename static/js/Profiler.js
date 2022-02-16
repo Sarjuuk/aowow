@@ -1072,7 +1072,7 @@ function Profiler() {
                 $WH.ae(_divLine2, _);
 
                 _ = $WH.ce('a');
-                _.href = '?guild=' + _profile.region[0] + '.' + _profile.realm[0] + '.' + g_urlize(_profile.guild);
+                _.href = '?guild=' + _profile.region[0] + '.' + _profile.realm[0] + '.' + g_urlize(_profile.guild, true);
                 $WH.ae(_, $WH.ct(_profile.guild));
                 $WH.ae(_divLine2, _);
 
@@ -1562,7 +1562,7 @@ function Profiler() {
 
                     $WH.ae(div, $WH.ct($WH.sprintfa(LANG.pr_qf_xvxteam, i)));
                     a = $WH.ce('a');
-                    a.href = '?arena-team=' + _profile.region[0] + '.' + _profile.realm[0] + '.' + g_urlize(_profile.arenateams[i]);
+                    a.href = '?arena-team=' + _profile.region[0] + '.' + _profile.realm[0] + '.' + g_urlize(_profile.arenateams[i], true);
                     $WH.ae(a, $WH.ct(_profile.arenateams[i]));
                     $WH.ae(div, a);
 
