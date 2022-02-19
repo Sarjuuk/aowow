@@ -38,41 +38,34 @@ if (!CLI)
 
     function realmMenu()
     {
-        $subEU = [];
-        $subUS = [];
-        $set   = 0x0;
-        $menu  = [
+        $subs = [];
+        $set  = 0x0;
+        $menu = [
             // skip usage of battlegroup
             // ['us', Lang::profiler('regions', 'us'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]],
             // ['eu', Lang::profiler('regions', 'eu'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]]
-            ['us', Lang::profiler('regions', 'us'), null, &$subUS],
-            ['eu', Lang::profiler('regions', 'eu'), null, &$subEU]
         ];
+
+        foreach (Util::$regions as $idx => $n)
+            $subs[$idx] = [];
 
         foreach (Profiler::getRealms() as $row)
         {
-            if ($row['region'] == 'eu')
+            $idx = array_search($row['region'], Util::$regions);
+            if ($idx !== false)
             {
-                $set |= 0x1;
-                $subEU[] = [Profiler::urlize($row['name'], true), $row['name']];
+                $set |= (1 << $idx);
+                $subs[$idx][] = [Profiler::urlize($row['name'], true), $row['name']];
             }
-            else if ($row['region'] == 'us')
-            {
-                $set |= 0x2;
-                $subUS[] = [Profiler::urlize($row['name'], true), $row['name']];
-            }
+
         }
-
         if (!$set)
-            CLI::write(' - realmMenu: Auth-DB not set up .. menu will be empty', CLI::LOG_WARN);
+            CLI::write(' - realmMenu: Auth-DB not set up .. realm menu will be empty', CLI::LOG_WARN);
 
-        if (!($set & 0x1))
-            array_pop($menu);
-
-        if (!($set & 0x2))
-            array_shift($menu);
+        foreach (Util::$regions as $idx => $n)
+            if ($set & (1 << $idx))
+                $menu[] = [$n, Lang::profiler('regions', $n), null, &$subs[$idx]];
 
         return Util::toJSON($menu);
     }
-
 ?>

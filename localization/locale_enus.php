@@ -112,7 +112,6 @@ $lang = array(
 
         // search
         'search'        => "Search",
-        'searchButton'  => "Search",
         'foundResult'   => "Search Results for",
         'noResult'      => "No Results for",
         'tryAgain'      => "Please try some different keywords or check your spelling.",
@@ -174,6 +173,13 @@ $lang = array(
             'guild'     => "This Guild doesn't exist or is not yet in the database.",
             'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
             'profile'   => "This character doesn't exist or is not yet in the database."
+        ),
+        'regions' => array(
+            'us' => "Americas",
+            'eu' => "Europe",
+            'kr' => "Korea",
+            'tw' => "Taiwan",
+            'cn' => "China"
         ),
         'encounterNames'=> array(                           // from dungeonencounter.dbc
             243 => "The Seven",

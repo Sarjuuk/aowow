@@ -52,13 +52,6 @@ class Lang
         // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
         self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
-
-        // not localized .. for whatever reason
-        self::$profiler['regions'] = array(
-            'eu' => "Europe",
-            'us' => "US & Oceanic"
-        );
-
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 

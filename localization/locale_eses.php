@@ -112,7 +112,6 @@ $lang = array(
 
         // search
         'search'        => "Búsqueda",
-        'searchButton'  => "búsqueda",
         'foundResult'   => "Resultados de busqueda para",
         'noResult'      => "Ningún resultado para",
         'tryAgain'      => "Por favor, introduzca otras palabras claves o verifique el término ingresado.",
@@ -154,7 +153,7 @@ $lang = array(
     'profiler' => array(
         'realm'         => "Reino",
         'region'        => "Región",
-        'viewCharacter' => "View Character",
+        'viewCharacter' => "Ver personaje",
         '_cpHint'       => "l <b>Gestor de perfiles</b> te permite editar tu personaje, encontrar mejoras de equipo, comprobar tu gearscore, ¡y más!",
         '_cpHelp'       => "Para comenzar, sigue los pasos abajo indicados. Si quieres más información, revisa nuestra amplia <a href=\"?help=profiler\">página de ayuda</a>.",
         '_cpFooter'     => "Si quieres una búsqueda más refinada, prueba con nuestras opciones de <a href=\"?profiles\">búsqueda avanzada</a>. También puedes crear un <a href=\"?profile&amp;new\">perfil nuevo personalizado</a>.",
@@ -174,6 +173,13 @@ $lang = array(
             'guild'     => "[This Guild doesn't exist or is not yet in the database.]",
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
             'profile'   => "Este personaje no existe o no está aun en la base de datos.",
+        ),
+        'regions' => array(
+            'us' => "Américas",
+            'eu' => "Europa",
+            'kr' => "Corea",
+            'tw' => "Taiwán",
+            'cn' => "China"
         ),
         'encounterNames'=> array(
             243 => "Los Siete",

@@ -183,7 +183,24 @@ class Profiler
     {
         if (DB::isConnectable(DB_AUTH) && !self::$realms)
         {
-            self::$realms = DB::Auth()->select('SELECT id AS ARRAY_KEY, name, IF(timezone IN (8, 9, 10, 11, 12), "eu", "us") AS region FROM realmlist WHERE allowedSecurityLevel = 0 AND gamebuild = ?d', WOW_BUILD);
+            self::$realms = DB::Auth()->select('SELECT
+                id AS ARRAY_KEY,
+                `name`,
+                CASE
+                    WHEN timezone IN (2, 3, 4) THEN "us"
+                    WHEN timezone IN (8, 9, 10, 11, 12) THEN "eu"
+                    WHEN timezone = 6 THEN "kr"
+                    WHEN timezone = 14 THEN "tw"
+                    WHEN timezone = 16 THEN "cn"
+                END AS region
+                FROM
+                    realmlist
+                WHERE
+                    allowedSecurityLevel = 0 AND
+                    gamebuild = ?d',
+                WOW_BUILD
+            );
+
             foreach (self::$realms as $rId => $rData)
             {
                 if (DB::isConnectable(DB_CHARACTERS . $rId))

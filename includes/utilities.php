@@ -326,6 +326,10 @@ class Util
         'www',          null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
     );
 
+    public static $regions                   = array(
+        'us',           'eu',           'kr',           'tw',           'cn'
+    );
+
     public static $typeClasses              = array(
         null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
         'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',

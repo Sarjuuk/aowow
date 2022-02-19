@@ -108,7 +108,7 @@ trait TrProfiler
 
         $cat = array_map('urldecode', $cat);
 
-        if ($cat[0] !== 'eu' && $cat[0] !== 'us')
+        if (array_search($cat[0], Util::$regions) === false)
             return;
 
         $this->region = $cat[0];

@@ -109,7 +109,7 @@ class CLISetup
 
         // alternative data source (no quotes, use forward slash)
         if (isset(self::$opts['mpqDataDir']))
-            self::$srcDir = CLI::nicePath($self::$opts['mpqDataDir']);
+            self::$srcDir = CLI::nicePath(self::$opts['mpqDataDir']);
 
         // optional limit handled locales
         if (isset(self::$opts['locales']))

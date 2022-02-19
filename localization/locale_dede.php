@@ -112,7 +112,6 @@ $lang = array(
 
         // search
         'search'        => "Suche",
-        'searchButton'  => "Suche",
         'foundResult'   => "Suchergebnisse für",
         'noResult'      => "Keine Ergebnisse für",
         'tryAgain'      => "Bitte versucht es mit anderen Suchbegriffen oder überprüft deren Schreibweise.",
@@ -174,6 +173,13 @@ $lang = array(
             'guild'     => "Diese Gilde existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
             'arenateam' => "Dieses Arena Team existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
             'profile'   => "Dieser Charakter existiert nicht oder wurde noch nicht in die Datenbank übernommen."
+        ),
+        'regions' => array(
+            'us' => "Americas",
+            'eu' => "Europa",
+            'kr' => "Korea",
+            'tw' => "Taiwan",
+            'cn' => "China"
         ),
         'encounterNames'=> array(
             243 => "Die Sieben",

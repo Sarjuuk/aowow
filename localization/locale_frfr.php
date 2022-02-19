@@ -112,7 +112,6 @@ $lang = array(
 
         // search
         'search'        => "Recherche",
-        'searchButton'  => "Rechercher",
         'foundResult'   => "Résultats de recherche pour",
         'noResult'      => "Aucun résultat pour malordawsne",
         'tryAgain'      => "Veuillez essayer d'autres mots ou vérifiez l'orthographe des termes de recherche.",
@@ -174,6 +173,13 @@ $lang = array(
             'guild'     => "[This Guild doesn't exist or is not yet in the database.]",
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
             'profile'   => "[This character doesn't exist or is not yet in the database.]"
+        ),
+        'regions' => array(
+            'us' => "Amériques",
+            'eu' => "L'Europe",
+            'kr' => "Corée",
+            'tw' => "Taïwan",
+            'cn' => "Chine"
         ),
         'encounterNames'=> array(
             243 => "Les Sept",

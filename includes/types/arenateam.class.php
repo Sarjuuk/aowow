@@ -88,7 +88,7 @@ class ArenaTeamListFilter extends Filter
 
     protected function cbRegionCheck(&$v)
     {
-        if ($v == 'eu' || $v == 'us')
+        if (in_array($v, Util::$regions))
         {
             $this->parentCats[0] = $v;                      // directly redirect onto this region
             $v = '';                                        // remove from filter

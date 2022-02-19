@@ -27,8 +27,11 @@
 
                     <div>
                         <h2><?=Lang::profiler('region').Lang::main('colon'); ?></h2>
-                        <input type="radio" name="rg" value="us" id="rg-1" checked="checked" /><label for="rg-1" class="profiler-button profiler-option-left selected"><em><i>US &amp; Oceanic</i></em></label>
-                        <input type="radio" name="rg" value="eu" id="rg-2" /><label for="rg-2" class="profiler-button profiler-option-right"><em><i>Europe</i></em></label>
+<?php
+foreach (Util::$regions as $idx => $n):
+    echo '                        <input type="radio" name="rg" value="'.$n.'" id="rg-'.($idx+1).'" '.(!$idx ? 'checked="checked" ' : '').'/><label for="rg-'.($idx+1).'" class="profiler-button profiler-option-left'.(!$idx ? ' selected' : '').'"><em><i>'.Lang::profiler('regions', $n).'</i></em></label>';
+endforeach;
+ ?>
                     </div>
 
                     <div>
@@ -39,7 +42,7 @@
 
                     <div class="profiler-buttons">
                         <a href="javascript:;" class="profiler-button" id="profiler-lookup"><em><?=Lang::profiler('viewCharacter'); ?></em></a>
-                        <a href="javascript:;" class="profiler-button" id="profiler-search"><em><?=Lang::main('searchButton'); ?></em></a>
+                        <a href="javascript:;" class="profiler-button" id="profiler-search"><em><?=Lang::main('search'); ?></em></a>
                     </div>
                 </div>
 

@@ -102,7 +102,7 @@ class ProfilePage extends GenericPage
                 $char['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
 
                 if ($char['at_login'] & 0x1)
-                    $char['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $realmId, $char['name']);
+                    $char['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $this->realmId, $char['name']);
 
                 if ($char['guildGUID'])
                 {

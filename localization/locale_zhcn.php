@@ -112,7 +112,6 @@ $lang = array(
 
         // search
         'search'        => "搜索",
-        'searchButton'  => "搜索",
         'foundResult'   => "搜索结果关于",
         'noResult'      => "没有搜索结果关于",
         'tryAgain'      => "请尝试不同的关键词或检查你的拼写。",
@@ -174,6 +173,13 @@ $lang = array(
             'guild'     => "This Guild doesn't exist or is not yet in the database.",
             'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
             'profile'   => "This character doesn't exist or is not yet in the database."
+        ),
+        'regions' => array(
+            'us' => "美洲地区",
+            'eu' => "欧洲",
+            'kr' => "韩国",
+            'tw' => "台湾",
+            'cn' => "中国"
         ),
         'encounterNames'=> array(
             243 => "黑铁七贤",
