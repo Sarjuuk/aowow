@@ -112,7 +112,6 @@ class Profiler
         if ($queuePID && $queuePID != $pid)
         {
             trigger_error('pSync - another queue with PID #'.$queuePID.' is already running', E_USER_ERROR);
-            CLI::write('Profiler::queueLock() - another queue with PID #'.$queuePID.' is already runnung', CLI::LOG_ERROR);
             return false;
         }
 

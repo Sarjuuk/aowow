@@ -9,21 +9,11 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'shapeshiftforms';
 
     protected $dbcSourceFiles = ['spellshapeshiftform'];
-
-    private $customData = array(
-         1 => ['displayIdH' => 8571],
-        15 => ['displayIdH' => 8571],
-         5 => ['displayIdH' => 2289],
-         8 => ['displayIdH' => 2289],
-        14 => ['displayIdH' => 2289],
-        27 => ['displayIdH' => 21244],
-        29 => ['displayIdH' => 20872]
-    );
 
     public function generate(array $ids = []) : bool
     {

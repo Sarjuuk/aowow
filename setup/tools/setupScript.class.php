@@ -32,14 +32,27 @@ trait TrDBCcopy
 trait TrCustomData
 {
     // apply post generator custom data
-    public function applyCustomData() : void
+    public function applyCustomData() : bool
     {
-        if (!$this->customData)
-            return;
+        $ok = true;
+        $this->customData = $this->customData ?? [];
+        if ($cd = DB::Aowow()->selectCol('SELECT `entry` AS ARRAY_KEY, `field` AS ARRAY_KEY2, `value` FROM ?_setup_custom_data WHERE `command` = ?', $this->command))
+            $this->customData += $cd;
 
         foreach ($this->customData as $id => $data)
-            if ($data)
+        {
+            try
+            {
                 DB::Aowow()->query('UPDATE ?_'.$this->command.' SET ?a WHERE id = ?d', $data, $id);
+            }
+            catch (Exception $e)
+            {
+                trigger_error('Custom Data for entry #'.$id.': '.$e->getMessage(), E_USER_ERROR);
+                $ok = false;
+            }
+        }
+
+        return $ok;
     }
 }
 

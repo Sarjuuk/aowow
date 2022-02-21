@@ -130,7 +130,7 @@ function loadConfig(bool $noPHP = false) : void
 
         if ($php)
             ini_set(strtolower($k), $val);
-        else
+        else if (!defined('CFG_'.strtoupper($k)))
             define('CFG_'.strtoupper($k), $val);
     }
 }
@@ -162,6 +162,8 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
         $errName = 'E_RECOVERABLE_ERROR';
 
     Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
+    if (CLI)
+        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & 0x40A ? CLI::LOG_WARN : CLI::LOG_ERROR);
 
     if (DB::isConnectable(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',

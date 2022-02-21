@@ -210,6 +210,75 @@ class Game
         return $pages;
     }
 
+
+    /*********************/
+    /* World Pos. Checks */
+    /*********************/
+
+    private static $alphaMapCache = [];
+
+    private static function alphaMapCheck(int $areaId, array &$set) : bool
+    {
+        $file = 'setup/generated/alphaMaps/'.$areaId.'.png';
+        if (!file_exists($file))                            // file does not exist (probably instanced area)
+            return false;
+
+        // invalid and corner cases (literally)
+        if (!is_array($set) || empty($set['posX']) || empty($set['posY']) || $set['posX'] >= 100 || $set['posY'] >= 100)
+        {
+            $set = null;
+            return true;
+        }
+
+        if (empty(self::$alphaMapCache[$areaId]))
+        self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
+
+        // alphaMaps are 1000 x 1000, adapt points [black => valid point]
+        if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
+            $set = null;
+
+        return true;
+    }
+
+    public static function checkCoords(array $points) : array
+    {
+        $result   = [];
+        $capitals = array(                                  // capitals take precedence over their surroundings
+            1497, 1637, 1638, 3487,                         // Undercity,      Ogrimmar,  Thunder Bluff, Silvermoon City
+            1519, 1537, 1657, 3557,                         // Stormwind City, Ironforge, Darnassus,     The Exodar
+            3703, 4395                                      // Shattrath City, Dalaran
+        );
+
+        foreach ($points as $res)
+        {
+            if (self::alphaMapCheck($res['areaId'], $res))
+            {
+                if (!$res)
+                    continue;
+
+                // some rough measure how central the spawn is on the map (the lower the number, the better)
+                // 0: perfect center; 1: touches a border
+                $q = abs( (($res['posX'] - 50) / 50) * (($res['posY'] - 50) / 50) );
+
+                if (empty($result) || $result[0] > $q)
+                    $result = [$q, $res];
+            }
+            else if (in_array($res['areaId'], $capitals))   // capitals (auto-discovered) and no hand-made alphaMap available
+                return $res;
+            else if (empty($result))                        // add with lowest quality if alpha map is missing
+                $result = [1.0, $res];
+        }
+
+        // spawn does not really match on a map, but we need at least one result
+        if (!$result)
+        {
+            usort($points, function ($a, $b) { return ($a['dist'] < $b['dist']) ? -1 : 1; });
+            $result = [1.0, $points[0]];
+        }
+
+        return $result[1];
+    }
+
     public static function getWorldPosForGUID(int $type, int ...$guids) : array
     {
         $result = [];

@@ -9,26 +9,11 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'races';
 
     protected $dbcSourceFiles = ['chrraces', 'charbaseinfo'];
-
-    private $customData = array(
-        null,
-        ['leader' => 29611, 'factionId' => 72,  'startAreaId' =>   12],
-        ['leader' => 4949,  'factionId' => 76,  'startAreaId' =>   14],
-        ['leader' => 2784,  'factionId' => 47,  'startAreaId' =>    1],
-        ['leader' => 7999,  'factionId' => 69,  'startAreaId' =>  141],
-        ['leader' => 10181, 'factionId' => 68,  'startAreaId' =>   85],
-        ['leader' => 3057,  'factionId' => 81,  'startAreaId' =>  215],
-        ['leader' => 7937,  'factionId' => 54,  'startAreaId' =>    1],
-        ['leader' => 10540, 'factionId' => 530, 'startAreaId' =>   14],
-        null,
-        ['leader' => 16802, 'factionId' => 911, 'startAreaId' => 3430],
-        ['leader' => 17468, 'factionId' => 930, 'startAreaId' => 3524]
-    );
 
     public function generate(array $ids = []) : bool
     {

@@ -9,17 +9,12 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'titles';
 
     protected $tblDependencyTC = ['quest_template', 'game_event_seasonal_questrelation', 'game_event', 'achievement_reward'];
     protected $dbcSourceFiles  = ['chartitles'];
-
-    private $customData = array(
-        137 => ['gender' => 2],
-        138 => ['gender' => 1]
-    );
 
     private $titleHoliday = array(
         137 => 201,

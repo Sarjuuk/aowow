@@ -298,6 +298,10 @@ $lang = array(
             "Moulu",                        "Miné",                         "Prospecté",                    "Subtilisé (pickpocket)",       "Ferraillé",                    "Dépecé",
             "Boutique en jeu"
         ),
+        'pvpSources'    => array(
+            null,                           "Saison 1 des combats d'arène", "Saison 2 des combats d'arène", "Saison 3 des combats d'arène", "Saison 4 des combats d'arène",
+            "Saison 5 des combats d'arène", "Saison 6 des combats d'arène", "Saison 7 des combats d'arène", "Saison 8 des combats d'arène", "Tournoi 2009 des combats d'arène"
+        ),
         'languages'     => array(
              1 => "Orc",                     2 => "Darnassien",              3 => "Taurahe",                 6 => "Nain",                    7 => "Commun",                  8 => "Démoniaque",
              9 => "Titan",                  10 => "Thalassien",             11 => "Draconique",             12 => "Kalimag",                13 => "Gnome",                  14 => "Troll",

@@ -269,7 +269,7 @@ class SmartAI
         foreach ($smartScripts as $s)
         {
             if ($s['action_type'] == SAI_ACTION_SPAWN_SPAWNGROUP)
-                $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $s['action_param'.$i];
+                $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP][] = $s['action_param1'];
             else if (in_array($s['action_type'], array_keys($lookup)))
             {
                 foreach ($lookup[$s['action_type']] as $p)
@@ -952,7 +952,7 @@ class SmartAI
                     $footer = Util::formatTime($e['param'][3], true);
                 break;
             case SAI_EVENT_EVENT_PHASE_CHANGE:              // 66  -  On event phase mask set
-                $e['param'][10] = Lang::concat(Util::mask2bits($a['param'][0]), false);
+                $e['param'][10] = Lang::concat(Util::mask2bits($e['param'][0]), false);
                 break;
             default:
                 $body = '[span class=q10]Unhandled Event[/span] #'.$e['type'];
@@ -1532,7 +1532,7 @@ class SmartAI
                             continue;
 
                         $this->jsGlobals[TYPE_ITEM][] = $i;
-                        $buff[] = '[item='.$_.']';
+                        $buff[] = '[item='.$i.']';
                     }
                 }
                 else if (!$a['param'][1])

@@ -239,7 +239,7 @@ class SqlGen
         if ($ssRef->generate($updateIds))
         {
             if (method_exists($ssRef, 'applyCustomData'))
-                $ssRef->applyCustomData();
+                return $ssRef->applyCustomData();
 
             return true;
         }

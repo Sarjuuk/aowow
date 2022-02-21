@@ -298,6 +298,10 @@ $lang = array(
             "取消附魔", "可钓", "已采集", "经研磨", "开采",
             "已加工", "失窃", "废弃", "已剥皮", "游戏商店"
         ),
+        'pvpSources'    => array(
+            null,                           "Arena Season 1",               "Arena Season 2",               "Arena Season 3",               "Arena Season 4",
+            "Arena Season 5",               "Arena Season 6",               "Arena Season 7",               "Arena Season 8",               "2009 Arena Tournament"
+        ),
         'languages'     => array(
              1 => "兽人语",                   2 => "达纳苏斯语",               3 => "牛头人语",                 6 => "矮人语",                  7 => "通用语",                 8 => "恶魔语",
              9 => "泰坦语",                  10 => "萨拉斯语",                11 => "龙语",                    12 => "卡利姆多语",             13 => "侏儒语",                14 => "巨魔语",

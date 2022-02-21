@@ -9,24 +9,13 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'currencies';
 
     protected $tblDependencyAowow = ['icons'];
     protected $tblDependencyTC    = ['item_template', 'item_template_locale'];
     protected $dbcSourceFiles     = ['itemdisplayinfo', 'currencytypes'];
-
-    // hide test tokens and move them to unused
-    private $customData = array(
-          1 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-          2 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-          4 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-         22 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-        141 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3],
-        103 => ['cap' => 10000],                            // Arena Points
-        104 => ['cap' => 75000]                             // Honor Points
-    );
 
     public function generate(array $ids = []) : bool
     {

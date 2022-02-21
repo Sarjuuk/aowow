@@ -15,17 +15,11 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
-
     protected $command = 'itemset';
 
     protected $tblDependencyAowow = ['spell'];
     protected $tblDependencyTC    = ['item_template', 'game_event'];
     protected $dbcSourceFiles     = ['itemset'];
-
-    private $customData = array(
-        221 => ['item1' => 7948, 'item2' => 7949, 'item3' => 7950, 'item4' => 7951, 'item5' => 7952, 'item6' => 7953]
-    );
 
     private $setToHoliday = array (
         761 => 141,                                         // Winterveil

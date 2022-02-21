@@ -59,13 +59,13 @@ switch ($cmd)                                               // we accept only on
             $dbc = new DBC(trim($n), ['temporary' => false]);
             if ($dbc->error)
             {
-                CLI::write('CLISetup::loadDBC() - required DBC '.$name.'.dbc not found!', CLI::LOG_ERROR);
+                CLI::write('CLISetup::loadDBC() - required DBC '.$n.'.dbc not found!', CLI::LOG_ERROR);
                 return false;
             }
 
             if (!$dbc->readFile())
             {
-                CLI::write('CLISetup::loadDBC() - DBC '.$name.'.dbc could not be written to DB!', CLI::LOG_ERROR);
+                CLI::write('CLISetup::loadDBC() - DBC '.$n.'.dbc could not be written to DB!', CLI::LOG_ERROR);
                 return false;
             }
         }

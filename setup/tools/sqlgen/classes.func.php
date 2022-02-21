@@ -9,25 +9,11 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'classes';
 
     protected $dbcSourceFiles = ['spell', 'charbaseinfo', 'skillraceclassinfo', 'skilllineability', 'chrclasses'];
-
-    // roles (1:heal; 2:mleDPS; 4:rngDPS; 8:tank)
-    private $customData = array(
-        1  => ['roles' => 0xA],
-        2  => ['roles' => 0xB],
-        3  => ['roles' => 0x4],
-        4  => ['roles' => 0x2],
-        5  => ['roles' => 0x5],
-        6  => ['roles' => 0xA],
-        7  => ['roles' => 0x7],
-        8  => ['roles' => 0x4],
-        9  => ['roles' => 0x4],
-        11 => ['roles' => 0xF],
-    );
 
     public function generate(array $ids = []) : bool
     {

@@ -9,33 +9,12 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'skillline';
 
     protected $tblDependencyAowow = ['icons'];
     protected $dbcSourceFiles     = ['skillline', 'spell', 'skilllineability'];
-
-    private $customData = array(
-        393 => ['professionMask' => 0x0000],                                                                                            // Skinning
-        171 => ['professionMask' => 0x0001, 'recipeSubClass' => 6, 'specializations' => '28677 28675 28672'],                           // Alchemy
-        164 => ['professionMask' => 0x0002, 'recipeSubClass' => 4, 'specializations' => '9788 9787 17041 17040 17039'],                 // Blacksmithing
-        185 => ['professionMask' => 0x0004, 'recipeSubClass' => 5],                                                                     // Cooking
-        333 => ['professionMask' => 0x0008, 'recipeSubClass' => 8],                                                                     // Enchanting
-        202 => ['professionMask' => 0x0010, 'recipeSubClass' => 3, 'specializations' => '20219 20222'],                                 // Engineering
-        129 => ['professionMask' => 0x0020, 'recipeSubClass' => 7],                                                                     // First Aid
-        755 => ['professionMask' => 0x0040, 'recipeSubClass' => 10],                                                                    // Jewelcrafting
-        165 => ['professionMask' => 0x0080, 'recipeSubClass' => 1, 'specializations' => '10656 10658 10660'],                           // Leatherworking
-        186 => ['professionMask' => 0x0100],                                                                                            // Mining
-        197 => ['professionMask' => 0x0200, 'recipeSubClass' => 2, 'specializations' => '26798 26801 26797'],                           // Tailoring
-        356 => ['professionMask' => 0x0400, 'recipeSubClass' => 9],                                                                     // Fishing
-        182 => ['professionMask' => 0x0800],                                                                                            // Herbalism
-        773 => ['professionMask' => 0x1000, 'recipeSubClass' => 11],                                                                    // Inscription
-        785 => ['name_loc0' => 'Pet - Wasp'],                                                                                           // Pet - Wasp
-        781 => ['name_loc2' => 'Familier - diablosaure exotique'],                                                                      // Pet - Exotic Devilsaur
-        758 => ['name_loc6' => 'Mascota: Evento - Control remoto', 'name_loc3' => 'Tier - Ereignis Ferngesteuert', 'categoryId' => 7],  // Pet - Event - Remote Control
-        788 => ['categoryId' => 7],                                                                                                     // Pet - Exotic Spirit Beast
-    );
 
     public function generate(array $ids = []) : bool
     {

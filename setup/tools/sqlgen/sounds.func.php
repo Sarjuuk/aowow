@@ -9,7 +9,7 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'sounds';
 
@@ -24,10 +24,6 @@ SqlGen::register(new class extends SetupScript
         'soundambience', 'zonemusic', 'zoneintromusictable', 'worldstatezonesounds', 'areatable',
         // items
         'material', 'itemgroupsounds', 'itemdisplayinfo', 'weaponimpactsounds', 'itemsubclass', 'weaponswingsounds2' /*, 'sheathesoundlookups' data is redundant with material..? */
-    );
-
-    private $customData = array(
-        15407 => ['cat' => 10]                              // UR_Algalon_Summon03 (this is not an item pickup)
     );
 
     public function generate(array $ids = []) : bool

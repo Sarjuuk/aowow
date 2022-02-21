@@ -9,68 +9,39 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'zones';
 
     protected $tblDependencyTC = ['access_requirement'];
-    protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist'];
-
-    private $customData = array(
-        2257 => ['cuFlags' => 0, 'category' => 0, 'type' => 1], // deeprun tram => type: transit
-        3698 => ['expansion' => 1],                         // arenas
-        3702 => ['expansion' => 1],
-        3968 => ['expansion' => 1],
-        4378 => ['expansion' => 2],
-        4406 => ['expansion' => 2],
-        2597 => ['maxPlayer' => 40],                        // is 5 in battlemasterlist ... dafuq?
-        4710 => ['maxPlayer' => 40],
-        3456 => ['parentAreaId' => 65,   'parentX' => 87.3, 'parentY' => 51.1], // has no coordinates set in map.dbc
-        // individual Tempest Keep ships
-        3849 => ['parentAreaId' => 3523, 'parentX' => 70.5, 'parentY' => 69.6],
-        3847 => ['parentAreaId' => 3523, 'parentX' => 71.7, 'parentY' => 55.1],
-        3848 => ['parentAreaId' => 3523, 'parentX' => 74.3, 'parentY' => 57.8],
-        3845 => ['parentAreaId' => 3523, 'parentX' => 73.5, 'parentY' => 63.7],
-        // individual Icecrown Citadel wings
-        4893 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        4894 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        4895 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        4896 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        4897 => ['parentAreaId' => 4812, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        // uncaught unused zones
-        207  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        208  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        616  => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-        1417 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW]
-    );
+    protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist', 'dungeonmap'];
 
     public function generate(array $ids = []) : bool
     {
         // base query
-        DB::Aowow()->query('
-            REPLACE INTO ?_zones
-                SELECT
+        $baseData = DB::Aowow()->query('SELECT
                     a.id,
-                    IFNULL(wmt.targetMapId, m.id),              -- map
-                    m.id,                                       -- mapBak
-                    a.areaTable,                                -- parentArea
-                    IFNULL(wmt.targetMapId,                     -- g_zone_categories
+                    IFNULL(wmt.targetMapId, m.id) AS map,
+                    m.id AS mapBak,
+                    a.areaTable AS parentArea,
+                    IFNULL(wmt.targetMapId,
                         IF(m.areaType = 1, 2,
                             IF(m.areaType = 2, 3,
                                 IF(m.areaType = 4, 9,
                                     IF(m.isBG = 1, 6,
-                                        IF(m.id = 609, 1,
-                                            IF(m.id = 571, 10,
-                                                IF(m.id = 530, 8, m.id)))))))),
+                                        IF(m.id = 571, 10,
+                                            IF(m.id = 530, 8, m.id))))))) AS category,
                     a.flags,
-                    IF(areaTable <> 0 OR                        -- cuFlags
-                        (wma.id IS NULL AND pa.areaId IS NULL AND (flags & 0x11000) = 0), ?d, 0),
+                    IF(a.mapId IN (13, 25, 37, 42, 169) OR
+                        (a.mapId IN (0, 1, 530, 571) AND wma.id IS NULL) OR
+                        a.areaTable <> 0 OR
+                        (a.soundAmbience = 0 AND a.mapId IN (0, 1, 530, 571)), ?d, 0) AS cuFlags,
                     IF(a.flags & 0x01000000, 5,                 -- g_zone_territories
                         IF(m.isBG = 1, 4,
                             IF(m.areaType = 4, 4,
                                 IF(a.flags & 0x00000800, 3,
                                     IF(a.factionGroupMask = 6, 2,
-                                        IF(a.factionGroupMask > 0, LOG2(a.factionGroupMask) - 1, 2)))))),
+                                        IF(a.factionGroupMask > 0, LOG2(a.factionGroupMask) - 1, 2)))))) AS faction,
                     m.expansion,
                     IF(m.areaType = 0, 0,                       -- g_zone_instancetypes
                         IF(m.isBG = 1, 4,
@@ -78,27 +49,27 @@ SqlGen::register(new class extends SetupScript
                                 IF(md.modeMask & 0xC, 8,
                                     IF(md.minPl = 10 AND md.maxPL = 25, 7,
                                         IF(m.areaType = 2, 3,
-                                            IF(m.areaType = 1 AND md.modeMask & 0x2, 5, 2))))))),
+                                            IF(m.areaType = 1 AND md.modeMask & 0x2, 5, 2))))))) AS `type`,
                     IF (md.minPl = 10 AND md.maxPl = 25, -2,
-                        IFNULL(bm.maxPlayers, IFNULL(md.maxPl, m.maxPlayers))),
-                    0,                                          -- itemLevelN
-                    0,                                          -- itemLevelH
-                    0,                                          -- levelReq
-                    IFNULL(lfgIni.levelLFG, 0),                 -- levelReqLFG
-                    0,                                          -- levelHeroic
-                    IF(a.flags & 0x8, 1,                        -- levelMin
+                        IFNULL(bm.maxPlayers, IFNULL(md.maxPl, m.maxPlayers))) AS maxPlayer,
+                    0 AS `itemLevelN`,                                          --
+                    0 AS `itemLevelH`,
+                    0 AS `levelReq`,
+                    IFNULL(lfgIni.levelLFG, 0) AS `levelReqLFG`,
+                    0 AS `levelHeroic`,
+                    IF(a.flags & 0x8, 1,
                         IFNULL(bm.minLevel,
                             IFNULL(lfgIni.levelMin,
-                                IFNULL(lfgOpen.levelMin, 0)))),
-                    IF(a.flags & 0x8, ?d,                       -- levelMax
+                                IFNULL(lfgOpen.levelMin, 0)))) AS `levelMin`,
+                    IF(a.flags & 0x8, ?d,
                         IFNULL(bm.maxLevel,
                             IFNULL(lfgIni.levelMax,
-                                IFNULL(lfgOpen.levelMax, 0)))),
-                    "",                                         -- attunements
-                    "",                                         -- heroic attunements
-                    IFNULL(pa.areaId, 0),
-                    IFNULL(pa.posX, 0),
-                    IFNULL(pa.posY, 0),
+                                IFNULL(lfgOpen.levelMax, 0)))) AS `levelMax`,
+                    "" AS `attunementsN`,
+                    "" AS `attunementsH`,
+                    m.parentMapId, -- IFNULL(pa.areaId, 0),
+                    m.parentX, -- IFNULL(pa.posX, 0),
+                    m.parentY, -- IFNULL(pa.posY, 0),
                     IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc0, m.name_loc0),
                     IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc2, m.name_loc2),
                     IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc3, m.name_loc3),
@@ -114,26 +85,6 @@ SqlGen::register(new class extends SetupScript
                 ) md ON md.mapId = m.id
                 LEFT JOIN
                     dbc_lfgdungeons lfgOpen ON a.mapId IN (0, 1, 530, 571) AND a.name_loc0 LIKE CONCAT("%", lfgOpen.name_loc0) AND lfgOpen.type = 4
-                LEFT JOIN (
-                    SELECT
-                        mapId, m.id, `left`, `right`, `top`, `bottom`,
-                        IF((abs(((m.parentY - `right`)  * 100 / (`left` - `right`)) - 50)) > abs(((m.parentX - `bottom`) * 100 / (`top` - `bottom`)) - 50),
-                           (abs(((m.parentY - `right`)  * 100 / (`left` - `right`)) - 50)),
-                           (abs(((m.parentX - `bottom`) * 100 / (`top` - `bottom`)) - 50))) AS diff,
-                        areaId,                                                             -- parentArea
-                        100 - ROUND((m.parentY - `right`)  * 100 / (`left` - `right`), 1) as posX,
-                        100 - ROUND((m.parentX - `bottom`) * 100 / (`top` - `bottom`), 1) as posY
-                    FROM
-                        dbc_worldmaparea wma
-                    JOIN
-                        dbc_map m ON m.parentMapId = wma.mapid
-                    WHERE
-                        m.parentMapId IN (0, 1, 530, 571) AND areaId <> 0 AND
-                        m.parentY BETWEEN `right` AND `left` AND
-                        m.parentX BETWEEN bottom  AND top
-                    ORDER BY
-                        diff ASC
-                ) pa ON pa.id = m.id AND m.parentMapId > -1 AND m.parentX <> 0 AND m.parentY <> 0 AND m.parentMapId = pa.mapId AND m.parentY BETWEEN pa.`right` AND pa.`left` AND m.parentX BETWEEN pa.bottom AND pa.top
                 LEFT JOIN (
                     SELECT
                         mapId,
@@ -160,9 +111,29 @@ SqlGen::register(new class extends SetupScript
                         wma.right  > wmt.minY AND
                         wma.top    < wmt.maxX AND
                         wma.bottom > wmt.minX
-                GROUP BY
-                    a.id
         ', CUSTOM_EXCLUDE_FOR_LISTVIEW, MAX_LEVEL);
+
+        foreach ($baseData as &$bd)
+        {
+            if (!in_array($bd['parentMapId'], [0, 1, 530, 571]))
+                continue;
+
+            if ($gPos = Game::worldPosToZonePos($bd['parentMapId'], $bd['parentY'], $bd['parentX']))
+            {
+                $pos = Game::checkCoords($gPos);
+                $bd['parentMapId'] = $pos['areaId'] ?? $gPos[0]['areaId'];
+                $bd['parentX']     = $pos['posX']   ?? $gPos[0]['posX'];
+                $bd['parentY']     = $pos['posY']   ?? $gPos[0]['posY'];
+            }
+            else
+            {
+                $bd['parentMapId'] = 0;
+                $bd['parentX']     = 0;
+                $bd['parentY']     = 0;
+            }
+        }
+
+        DB::Aowow()->query('REPLACE INTO ?_zones VALUES (?a)', $baseData);
 
         // get requirements from world.access_requirement
         $zoneReq = DB::World()->select('
@@ -205,7 +176,7 @@ SqlGen::register(new class extends SetupScript
                     $aN[TYPE_ITEM][] = $_;
 
             if ($req['reqItemH'] && ($entries = explode(' ', $req['reqItemH'])))
-                if ($entries = array_diff($entries, @(array)$aN[TYPE_ITEM]))
+                if ($entries = array_diff($entries, $aN[TYPE_ITEM] ?? []))
                     foreach ($entries as $_)
                         $aH[TYPE_ITEM][] = $_;
 
@@ -214,7 +185,7 @@ SqlGen::register(new class extends SetupScript
                     $aN[TYPE_QUEST][] = $_;
 
             if ($req['reqQuestH'] && ($entries = explode(' ', $req['reqQuestH'])))
-                if ($entries = array_diff($entries, @(array)$aN[TYPE_QUEST]))
+                if ($entries = array_diff($entries, $aN[TYPE_QUEST] ?? []))
                     foreach ($entries as $_)
                         $aH[TYPE_QUEST][] = $_;
 
@@ -223,7 +194,7 @@ SqlGen::register(new class extends SetupScript
                     $aN[TYPE_ACHIEVEMENT][] = $_;
 
             if ($req['reqAchievementH'] && ($entries = explode(' ', $req['reqAchievementH'])))
-                if ($entries = array_diff($entries, @(array)$aN[TYPE_ACHIEVEMENT]))
+                if ($entries = array_diff($entries, $aN[TYPE_ACHIEVEMENT] ?? []))
                     foreach ($entries as $_)
                         $aH[TYPE_ACHIEVEMENT][] = $_;
 

@@ -115,9 +115,6 @@ class TitleList extends BaseType
         if (!empty($sources[12]))
             $sources[12] = (new AchievementList(array(['id', $sources[12]])))->getSourceData();
 
-        if (!empty($sources[13]))
-            $sources[13] = DB::Aowow()->SELECT('SELECT *, Id AS ARRAY_KEY FROM ?_sourcestrings WHERE Id IN (?a)', $sources[13]);
-
         foreach ($this->sources as $Id => $src)
         {
             $tmp = [];
@@ -148,7 +145,7 @@ class TitleList extends BaseType
 
             // other source (only one item possible, so no iteration needed)
             if (isset($src[13]))
-                $tmp[13] = [Util::localizedString($sources[13][$this->sources[$Id][13][0]], 'source')];
+                $tmp[13] = [Lang::game('pvpSources', $this->sources[$Id][13][0])];
 
             $this->templates[$Id]['source'] = $tmp;
         }

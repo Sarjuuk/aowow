@@ -9,48 +9,11 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    use TrCustomData;
+    use TrCustomData;                                       // import custom data from DB
 
     protected $command = 'factions';
 
     protected $dbcSourceFiles = ['faction', 'factiontemplate'];
-
-    private $customData = array(
-          47 => ['qmNpcIds' => '33310'],
-          68 => ['qmNpcIds' => '33555'],
-          69 => ['qmNpcIds' => '33653'],
-          72 => ['qmNpcIds' => '33307'],
-          76 => ['qmNpcIds' => '33553'],
-          81 => ['qmNpcIds' => '33556'],
-         922 => ['qmNpcIds' => '16528'],
-         930 => ['qmNpcIds' => '33657'],
-         932 => ['qmNpcIds' => '19321'],
-         933 => ['qmNpcIds' => '20242 23007'],
-         935 => ['qmNpcIds' => '21432'],
-         941 => ['qmNpcIds' => '20241'],
-         942 => ['qmNpcIds' => '17904'],
-         946 => ['qmNpcIds' => '17657'],
-         947 => ['qmNpcIds' => '17585'],
-         970 => ['qmNpcIds' => '18382'],
-         978 => ['qmNpcIds' => '20240'],
-         989 => ['qmNpcIds' => '21643'],
-        1011 => ['qmNpcIds' => '21655'],
-        1012 => ['qmNpcIds' => '23159'],
-        1037 => ['qmNpcIds' => '32773 32564'],
-        1038 => ['qmNpcIds' => '23428'],
-        1052 => ['qmNpcIds' => '32774 32565'],
-        1073 => ['qmNpcIds' => '31916 32763'],
-        1090 => ['qmNpcIds' => '32287'],
-        1091 => ['qmNpcIds' => '32533'],
-        1094 => ['qmNpcIds' => '34881'],
-        1105 => ['qmNpcIds' => '31910'],
-        1106 => ['qmNpcIds' => '30431'],
-        1119 => ['qmNpcIds' => '32540'],
-        1124 => ['qmNpcIds' => '34772'],
-        1156 => ['qmNpcIds' => '37687'],
-        1082 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-         952 => ['cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW],
-    );
 
     public function generate(array $ids = []) : bool
     {

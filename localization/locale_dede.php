@@ -298,6 +298,10 @@ $lang = array(
             "Gemahlen",                     "Abgebaut",                     "Sondiert",                     "Aus Taschendiebstahl",         "Geborgen",                     "Gehäutet",
             "In-Game-Store"
         ),
+        'pvpSources'    => array(
+            null,                           "Arenasaison 1",                "Arenasaison 2",                "Arenasaison 3",                "Arenasaison 4",
+            "Arenasaison 5",                "Arenasaison 6",                "Arenasaison 7",                "Arenasaison 8",                "2009 Arena-Turnier"
+        ),
         'languages'     => array(
              1 => "Orcisch",                 2 => "Darnassisch",             3 => "Taurisch",                6 => "Zwergisch",               7 => "Gemeinsprache",           8 => "Dämonisch",
              9 => "Titanisch",              10 => "Thalassisch",            11 => "Drachisch",              12 => "Kalimagisch",            13 => "Gnomisch",               14 => "Trollisch",
