@@ -89,6 +89,100 @@ SqlGen::register(new class extends SetupScript
         30 => ['wrathful']                                  // "Arena Season 8 Set",
     );
 
+    private function getSetType(array $items) : int
+    {
+        $type    = 0;
+        $hasRing = $hasNeck = false;
+
+        foreach ($items as $slot => $item)
+        {
+            if ($type)
+                break;
+
+            // skip cloaks, they mess with armor classes
+            if ($slot == INVTYPE_CLOAK)
+                continue;
+
+            // skip event-sets
+            if ($item['Quality'] == ITEM_QUALITY_NORMAL)
+                continue;
+
+            if ($item['class'] == ITEM_CLASS_WEAPON)
+            {
+                switch ($item['subclass'])
+                {
+                    case  0: $type =  8; break;             // 1H-Axe
+                    case  4: $type =  9; break;             // 1H-Mace
+                    case  7: $type = 10; break;             // 1H-Sword
+                    case 13: $type =  7; break;             // Fist Weapon
+                    case 15: $type =  5; break;             // Dagger
+                }
+            }
+            else if ($item['class'] == ITEM_CLASS_ARMOR)
+            {
+                switch (abs($slot))
+                {
+                    case INVTYPE_NECK:    $hasNeck = true; break;
+                    case INVTYPE_FINGER:  $hasRing = true; break;
+                    case INVTYPE_TRINKET: $type    =   11; break;
+                    default:
+                        if ($item['subclass'] != 0)
+                            $type = $item['subclass'];   // 'armor' set by armor class
+                }
+            }
+        }
+
+        if ($hasNeck && !$type)
+            $type = 12;                                     // Neck
+        else if ($hasRing && !$type)
+            $type = 6;                                      // Ring
+
+        return $type;
+    }
+
+    private function getContentGroup(array $item) : int
+    {
+        // try conventional set
+        foreach ($this->tagsById as $tag => $setIds)
+            if (in_array($item['itemset'], $setIds))
+                return $tag;
+
+        // try arena set
+        if ($item['ItemLevel'] >= 120 && $item['AllowableClass'] && ($item['AllowableClass'] & CLASS_MASK_ALL) != CLASS_MASK_ALL)
+            foreach ($this->tagsByNamePart as $tag => $strings)
+                foreach ($strings as $str)
+                    if (stripos($item['name'], $str) === 0)
+                        return $tag;
+
+        return 0;
+    }
+
+    private function getDataFromSet(array &$data, array $items) : void
+    {
+        $i = 1;
+        foreach ($items as $item)
+            $data['item'.$i++] = $item['entry'];
+
+        $mask = CLASS_MASK_ALL;
+        foreach ($items as $item)
+            $mask &= $item['AllowableClass'];
+
+        if ($mask != CLASS_MASK_ALL)
+            $data['classMask'] = $mask;
+
+        $iLvl = array_column($items, 'ItemLevel');
+        $data['minLevel'] = min($iLvl);
+        $data['maxLevel'] = max($iLvl);
+        $data['npieces']  = count($items);
+
+        $data['reqLevel'] = max(array_column($items, 'RequiredLevel'));
+        $data['quality']  = max(array_column($items, 'Quality'));
+        $data['heroic']   = max(array_column($items, 'heroic'));
+
+        $data['type']         = $this->getSetType($items);
+        $data['contentGroup'] = reset($items)['note'];
+    }
+
     public function generate(array $ids = []) : bool
     {
         // find events associated with holidayIds
@@ -98,175 +192,32 @@ SqlGen::register(new class extends SetupScript
 
         DB::Aowow()->query('TRUNCATE TABLE ?_itemset');
 
-        $vIdx      = 0;
         $virtualId = 0;
         $sets      = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_itemset');
+
         foreach ($sets as $setId => $setData)
         {
-            $spells    = $items  = $mods = $descText = $name   = $gains   = [];
-            $max       = $reqLvl = $min  = $quality  = $heroic = $nPieces = [];
-            $classMask = $type   = 0;
-            $hasRing   = false;
+            $row = array(
+                'id'       => $setId,                       // replace /w --$virtualId if necessary
+                'refSetId' => $setId,
+                'eventId'  => $this->setToHoliday[$setId] ?? 0
+            );
 
-            $holiday  = $this->setToHoliday[$setId] ?? 0;
-            $canReuse = !$holiday;                          // can't reuse holiday-sets
-            $slotList = [];
-            $pieces   = DB::World()->select('SELECT *, IF(InventoryType = 15, 26, IF(InventoryType = 5, 20, InventoryType)) AS slot, entry AS ARRAY_KEY FROM item_template WHERE itemset = ?d AND (class <> 4 OR subclass NOT IN (1, 2, 3, 4) OR armor > 0 OR Quality = 1) ORDER BY itemLevel, subclass, slot ASC', $setId);
+            if ($setData['reqSkillId'])
+                $row['skillId'] = $setData['reqSkillId'];
+            if ($setData['reqSkillLevel'])
+                $row['skillLevel'] = $setData['reqSkillLevel'];
 
-            /****************************************/
-            /* determine type and reuse from pieces */
-            /****************************************/
-
-            // make the first vId always same as setId
-            $firstPiece = reset($pieces);
-            $tmp        = [$firstPiece['Quality'].$firstPiece['ItemLevel'] => $setId];
-
-            // walk through all items associated with the set
-            foreach ($pieces as $itemId => $piece)
-            {
-                $classMask |= ($piece['AllowableClass'] & CLASS_MASK_ALL);
-                $key        = $piece['Quality'].str_pad($piece['ItemLevel'], 3, 0, STR_PAD_LEFT);
-
-                if (!isset($tmp[$key]))
-                    $tmp[$key] = --$vIdx;
-
-                $vId = $tmp[$key];
-
-                // check only actual armor in rare quality or higher (or inherits holiday)
-                if ($piece['class'] != ITEM_CLASS_ARMOR || $piece['subclass'] == 0)
-                    $canReuse = false;
-
-                /* gather relevant stats for use */
-
-                if (!isset($quality[$vId]) || $piece['Quality'] > $quality[$vId])
-                    $quality[$vId] = $piece['Quality'];
-
-                if ($piece['Flags'] & ITEM_FLAG_HEROIC)
-                    $heroic[$vId] = true;
-
-                if (!isset($reqLvl[$vId]) || $piece['RequiredLevel'] > $reqLvl[$vId])
-                    $reqLvl[$vId] = $piece['RequiredLevel'];
-
-                if (!isset($min[$vId]) || $piece['ItemLevel'] < $min[$vId])
-                    $min[$vId] = $piece['ItemLevel'];
-
-                if (!isset($max[$vId]) || $piece['ItemLevel'] > $max[$vId])
-                    $max[$vId] = $piece['ItemLevel'];
-
-                if (!isset($items[$vId][$piece['slot']]) || !$canReuse)
-                {
-                    if (!isset($nPieces[$vId]))
-                        $nPieces[$vId] = 1;
-                    else
-                        $nPieces[$vId]++;
-                }
-
-                if (isset($items[$vId][$piece['slot']]))
-                {
-                    // not reusable -> insert anyway on unique keys
-                    if (!$canReuse)
-                        $items[$vId][$piece['slot'].$itemId] = $itemId;
-                    else
-                    {
-                        CLI::write("set: ".$setId." ilvl: ".$piece['ItemLevel']." - conflict between item: ".$items[$vId][$piece['slot']]." and item: ".$itemId." choosing lower itemId", CLI::LOG_WARN);
-
-                        if ($items[$vId][$piece['slot']] > $itemId)
-                            $items[$vId][$piece['slot']] = $itemId;
-                    }
-                }
-                else
-                    $items[$vId][$piece['slot']] = $itemId;
-
-                /* check for type */
-
-                // skip cloaks, they mess with armor classes
-                if ($piece['slot'] == 16)
-                    continue;
-
-                // skip event-sets
-                if ($piece['Quality'] == 1)
-                    continue;
-
-                if ($piece['class'] == 2 && $piece['subclass'] == 0)
-                    $type = 8;                              // 1H-Axe
-                else if ($piece['class'] == 2 && $piece['subclass'] == 4)
-                    $type = 9;                              // 1H-Mace
-                else if ($piece['class'] == 2 && $piece['subclass'] == 7)
-                    $type = 10;                             // 1H-Sword
-                else if ($piece['class'] == 2 && $piece['subclass'] == 13)
-                    $type = 7;                              // Fist Weapon
-                else if ($piece['class'] == 2 && $piece['subclass'] == 15)
-                    $type = 5;                              // Dagger
-
-                if (!$type)
-                {
-                    if ($piece['class'] == 4 && $piece['slot'] == 12)
-                        $type = 11;                         // trinket
-                    else if ($piece['class'] == 4 && $piece['slot'] == 2)
-                        $type = 12;                         // amulet
-                    else if ($piece['class'] == 4 && $piece['subclass'] != 0)
-                        $type = $piece['subclass'];         // 'armor' set
-
-                    if ($piece['class'] == 4 && $piece['slot'] == 11)
-                        $hasRing = true;                    // contains ring
-                }
-            }
-
-            if ($hasRing && !$type)
-                $type = 6;                                  // pure ring-set
-
-            $isMultiSet  = false;
-            $oldSlotMask = 0x0;
-            foreach ($items as $subset)
-            {
-                $curSlotMask = 0x0;
-                foreach ($subset as $slot => $item)
-                    $curSlotMask |= (1 << $slot);
-
-                if ($oldSlotMask && $oldSlotMask == $curSlotMask)
-                {
-                    $isMultiSet = true;
-                    break;
-                }
-
-                $oldSlotMask = $curSlotMask;
-            }
-
-            if (!$isMultiSet || !$canReuse || $setId == 555)
-            {
-                $temp = [];
-                foreach ($items as $subset)
-                {
-                    foreach ($subset as $slot => $item)
-                    {
-                        if (isset($temp[$slot]) && $temp[$slot] < $item)
-                            CLI::write("set: ".$setId." - conflict between item: ".$item." and item: ".$temp[$slot]." choosing lower itemId", CLI::LOG_WARN);
-                        else if ($slot == 13 || $slot = 11) // special case
-                            $temp[] = $item;
-                        else
-                            $temp[$slot] = $item;
-                    }
-                }
-
-                $items   = [$temp];
-                $heroic  = [reset($heroic)];
-                $nPieces = [count($temp)];
-                $quality = [reset($quality)];
-                $reqLvl  = [reset($reqLvl)];
-                $max     = $max ? [max($max)] : [0];
-                $min     = $min ? [min($min)] : [0];
-            }
-
-            foreach ($items as &$subsets)
-                $subsets = array_pad($subsets, 10, 0);
 
             /********************/
             /* calc statbonuses */
             /********************/
 
+            $gains = $spells = $mods = [];
+
             for ($i = 1; $i < 9; $i++)
                 if ($setData['spellId'.$i] > 0 && $setData['itemCount'.$i] > 0)
-                    $spells[] = [$setData['spellId'.$i], $setData['itemCount'.$i]];
+                    $spells[$i] = [$setData['spellId'.$i], $setData['itemCount'.$i]];
 
             $bonusSpells = new SpellList(array(['s.id', array_column($spells, 0)]));
             $mods = $bonusSpells->getStatGain();
@@ -277,18 +228,28 @@ SqlGen::register(new class extends SetupScript
                 if ($setData['itemCount'.$i] > 0 && !empty($mods[$setData['spellId'.$i]]))
                     $gains[$setData['itemCount'.$i]] = $mods[$setData['spellId'.$i]];
 
+            $row['bonusParsed'] = serialize($gains);
+            foreach (array_column($spells, 0) as $idx => $spellId)
+                $row['spell'.$idx+1] = $spellId;
+            foreach (array_column($spells, 1) as $idx => $nItems)
+                $row['bonus'.$idx+1] = $nItems;
+
+
             /**************************/
             /* get name & description */
             /**************************/
 
-            foreach (array_keys(array_filter(Util::$localeStrings)) as $loc)
+            $descText = [];
+
+            foreach (Util::mask2bits(CFG_LOCALES) as $loc)
             {
                 User::useLocale($loc);
 
-                $name[$loc] = Util::localizedString($setData, 'name');
+                $row['name_loc'.$loc] = Util::localizedString($setData, 'name');
 
                 foreach ($bonusSpells->iterate() as $__)
                 {
+
                     if (!isset($descText[$loc]))
                         $descText[$loc] = '';
 
@@ -296,70 +257,66 @@ SqlGen::register(new class extends SetupScript
                 }
 
                 // strip rating blocks - e.g. <!--rtg19-->14&nbsp;<small>(<!--rtg%19-->0.30%&nbsp;@&nbsp;L<!--lvl-->80)</small>
-                $descText[$loc] = preg_replace('/<!--rtg\d+-->(\d+)&nbsp.*?<\/small>/i', '\1', $descText[$loc]);
+                $row['bonusText_loc'.$loc] = preg_replace('/<!--rtg\d+-->(\d+)&nbsp.*?<\/small>/i', '\1', $descText[$loc]);
             }
 
-            /****************************/
-            /* finalaize data and write */
-            /****************************/
 
-            foreach ($items as $vId => $vSet)
+            /****************************************/
+            /* determine type and reuse from pieces */
+            /****************************************/
+
+            $pieces = DB::World()->select('SELECT entry, name, class, subclass, Quality, AllowableClass, ItemLevel, RequiredLevel, itemset, IF (Flags & ?d, 1, 0) AS heroic, IF(InventoryType = 15, 26, IF(InventoryType = 5, 20, InventoryType)) AS slot, entry AS ARRAY_KEY FROM item_template WHERE itemset = ?d', ITEM_FLAG_HEROIC, $setId);
+
+            /*
+                possible cases:
+                1) unused entry (empty data)
+                2) multiple itemsets from one dbc entry (arena sets + wotlk raid sets). no duplicate items per slot
+                3) one itemset from one dbc entry (basic case). duplicate items per slot possible
+            */
+
+            if (!$pieces)
             {
-                $note = 0;
-                foreach ($this->tagsById as $tag => $sets)
-                {
-                    if (!in_array($setId, $sets))
-                        continue;
+                $row['cuFlags'] = CUSTOM_EXCLUDE_FOR_LISTVIEW;
+                DB::Aowow()->query('REPLACE INTO ?_itemset (?#) VALUES (?a)', array_keys($row), array_values($row));
+                CLI::write(' - item set #'.$setId.' has no associated items', CLI::LOG_INFO);
+                continue;
+            }
 
-                    $note = $tag;
-                }
+            $sorted = [];
+            // sort available items by slot, sort slot by itemID ASC
+            foreach ($pieces as $data)
+            {
+                $data['note'] = $this->getContentGroup($data);
+                if (in_array($data['note'], [23, 25, 27, 29, 17, 19, 20, 22, 24, 26, 28, 30]))
+                    $k = $data['ItemLevel'].'-'.$data['Quality'];
+                else
+                    $k = 0;
 
-                if (!$note && $min > 120 && $classMask && $classMask != CLASS_MASK_ALL)
-                {
-                    foreach ($this->tagsByNamePart as $tag => $strings)
-                    {
-                        foreach ($strings as $str)
-                        {
-                            if (isset($pieces[reset($vSet)]) && stripos($pieces[reset($vSet)]['name'], $str) === 0)
-                            {
-                                $note = $tag;
-                                break 2;
-                            }
-                        }
-                    }
-                }
+                // create new
+                if (!isset($sorted[$k][$data['slot']]))
+                    $sorted[$k][$data['slot']] = $data;
+                // can have multiple
+                else if (in_array($data['slot'], [INVTYPE_WEAPON, INVTYPE_FINGER, INVTYPE_TRINKET]))
+                    $sorted[$k][-$data['slot']] = $data;
+                // use item with lower itemId
+                else if ($sorted[$k][$data['slot']]['entry'] > $data['entry'])
+                    $sorted[$k][$data['slot']] = $data;
+            }
 
-                $row   = [];
+            foreach ($sorted as $i => $set)
+            {
+                ksort($set);
 
-                $row[] = $vId < 0 ? --$virtualId : $setId;
-                $row[] = $setId;                            // refSetId
-                $row[] = 0;                                 // cuFlags
-                $row   = array_merge($row, $name, $vSet);
-                foreach (array_column($spells, 0) as $spellId)
-                    $row[] = $spellId;
-                foreach (array_column($spells, 1) as $nItems)
-                    $row[] = $nItems;
-                $row   = array_merge($row, $descText);
-                $row[] = serialize($gains);
-                $row[] = $nPieces[$vId];
-                $row[] = $min[$vId];
-                $row[] = $max[$vId];
-                $row[] = $reqLvl[$vId];
-                $row[] = $classMask == CLASS_MASK_ALL ? 0 : $classMask;
-                $row[] = !empty($heroic[$vId]) ? 1 : 0;
-                $row[] = $quality[$vId];
-                $row[] = $type;
-                $row[] = $note;                             // contentGroup
-                $row[] = $holiday;
-                $row[] = $setData['reqSkillId'];
-                $row[] = $setData['reqSkillLevel'];
+                $vRow = $row;
+                $this->getDataFromSet($vRow, $set);
 
-                DB::Aowow()->query('REPLACE INTO ?_itemset VALUES (?a)', array_values($row));
+                // is virtual set
+                if ($i)
+                    $vRow['id'] = --$virtualId;
+
+                DB::Aowow()->query('REPLACE INTO ?_itemset (?#) VALUES (?a)', array_keys($vRow), array_values($vRow));
             }
         }
-
-        // hide empty sets
-        DB::Aowow()->query('UPDATE ?_itemset SET cuFlags = cuFlags | ?d WHERE item1 = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
         return true;
     }

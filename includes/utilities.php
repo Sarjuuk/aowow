@@ -184,6 +184,9 @@ class CLI
         // remove quotes (from erronous user input)
         $path = str_replace(['"', "'"], ['', ''], $path);
 
+        if (!$path)                                         // empty strings given. (faulty dbc data?)
+            return '';
+
         if (DIRECTORY_SEPARATOR == '/')                     // *nix
         {
             $path = str_replace('\\', '/', $path);

@@ -80,7 +80,7 @@ class SqlGen
         }
 
         // handle command prompts
-        if (!self::handleCLIOpts($doScripts))
+        if (!self::handleCLIOpts($doScripts) && !$updScripts)
             return false;
 
         // check passed subscript names; limit to real scriptNames
