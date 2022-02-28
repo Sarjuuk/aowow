@@ -1566,7 +1566,7 @@ class SpellPage extends GenericPage
             $effDS   = (int)$this->subject->getField('effect'.$i.'DieSides');
             $effRPPL =      $this->subject->getField('effect'.$i.'RealPointsPerLevel');
             $effAura = (int)$this->subject->getField('effect'.$i.'AuraId');
-            $foo     = &$effects[];
+            $foo     = &$effects[$i];
 
             // Icons:
             // .. from item

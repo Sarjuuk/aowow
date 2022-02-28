@@ -125,7 +125,7 @@ class SmartAI
                 $qParts[] = $aq.implode(' OR ', $pq).'))';
         }
 
-        $smartS = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE (%s){ AND `source_type` IN (?a)} GROUP BY "0", "1"', $qParts ? implode(' OR ', $qParts) : '0'), $genLimit ?: DBSIMPLE_SKIP);
+        $smartS = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE (%s){ AND `source_type` IN (?a)}', $qParts ? implode(' OR ', $qParts) : '0'), $genLimit ?: DBSIMPLE_SKIP);
 
         // filter for TAL shenanigans
         if ($smartTAL = array_filter($smartS, function ($x) {return $x[0] == SAI_SRC_TYPE_ACTIONLIST;}))
@@ -145,7 +145,7 @@ class SmartAI
                 $q[] = '`action_type` = '.SAI_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST.' AND `action_param1` <= '.$eog.' AND `action_param2` >= '.$eog;
             }
 
-            if ($_ = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE ((%s)){ AND `source_type` IN (?a)} GROUP BY "0", "1"', $q ? implode(') OR (', $q) : '0'), $talLimit ?: DBSIMPLE_SKIP))
+            if ($_ = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE ((%s)){ AND `source_type` IN (?a)}', $q ? implode(') OR (', $q) : '0'), $talLimit ?: DBSIMPLE_SKIP))
                 $smartS = array_merge($smartS, $_);
         }
 
