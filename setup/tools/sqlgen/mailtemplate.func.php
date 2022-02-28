@@ -9,9 +9,10 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
-    protected $command           = 'mails';
+    protected $command            = 'mails';
 
-    protected $dbcSourceFiles    = ['mailtemplate'];
+    protected $tblDependencyTC    = ['achievement_reward', 'achievement_reward_locale', 'mail_loot_template'];
+    protected $dbcSourceFiles     = ['mailtemplate'];
 
     public function generate(array $ids = []) : bool
     {
