@@ -315,7 +315,8 @@ if (!CLI)
                 ini_set('max_execution_time', 30);          // max 30sec per image (loading takes the most time)
 
                 $src   = null;
-                $img   = explode('.', array_pop(explode('/', $f)));
+                $na    = explode('/', $f);
+                $img   = explode('.', array_pop($na));
                 array_pop($img);                            // there are a hand full of images with multiple file endings or random dots in the name
                 $img   = implode('.', $img);
 

@@ -93,8 +93,7 @@ if (!CLI)
                     if (!isset($setOut['setbonus'][$set['bonus'.$i]]))
                         $setOut['setbonus'][$set['bonus'.$i]] = $jsonBonus[$set['spell'.$i]];
                     else
-                        foreach ($jsonBonus[$set['spell'.$i]] as $k => $v)
-                            @$setOut['setbonus'][$set['bonus'.$i]][$k] += $v;
+                        Util::arraySumByKey($setOut['setbonus'][$set['bonus'.$i]], $jsonBonus[$set['spell'.$i]]);
                 }
 
                 foreach ($setOut['setbonus'] as $k => $v)

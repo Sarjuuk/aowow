@@ -17,7 +17,7 @@ require_once 'setup/tools/clisetup/build.func.php';
 
 function sync(array $s = [], array $b = []) : void
 {
-    if ((!$s && !$b && !CLISetup::getOpt('sync')) || CLISetup::getOpt('help'))
+    if ((!$s && !$b && !CLISetup::getOpt('sync')  && !CLISetup::getOpt('setup')) || CLISetup::getOpt('help'))
     {
         CLI::write();
         CLI::write('  usage: php aowow --sync=<tableList,> [--locales: --mpqDataDir: --force -f]', -1, false);

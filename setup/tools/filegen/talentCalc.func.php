@@ -118,7 +118,7 @@ if (!CLI)
                         if (!isset($tNums[$talents[$talentIdx]['reqTalent']]))
                             $depLinks[$talents[$talentIdx]['reqTalent']] = $talentIdx;
 
-                        $r = @[$tNums[$talents[$talentIdx]['reqTalent']], $talents[$talentIdx]['reqRank'] + 1];
+                        $r = [$tNums[$talents[$talentIdx]['reqTalent']] ?? 0, $talents[$talentIdx]['reqRank'] + 1];
                     }
 
                     $result[$tabIdx]['t'][$talentIdx] = array(

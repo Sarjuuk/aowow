@@ -24,10 +24,11 @@ function setup() : void
     /* define steps */
     /****************/
 
+    $upd   = [[], []];                                      // ref to pass commands from 'update' to 'sync'
     $steps = array(
         // clisetup, params, test function, introText, errorText
-        ['dbconfig',          null,                      'testDB',    'Please enter your database credentials.', 'could not establish connection to:'],
-        ['siteconfig',        null,                      'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.', 'could not access:'],
+        ['dbconfig',          [null],                     'testDB',    'Please enter your database credentials.', 'could not establish connection to:'],
+        ['siteconfig',        [null],                     'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.', 'could not access:'],
         // sql- and build- stuff here
         ['SqlGen::generate',  'areatrigger',              null, null, null],
         ['SqlGen::generate',  'achievementcriteria',      null, null, null],
@@ -98,8 +99,9 @@ function setup() : void
         ['FileGen::generate', 'profiler',                 null, null, null],
         ['FileGen::generate', 'weightPresets',            null, null, null],
         // apply sql-updates from repository
-        ['update',            null,                       null, null, null],
-        ['account',           null,                       'testAcc',  'Please create your admin account.', 'There is no user with administrator privileges in the DB.']
+        ['update',            &$upd,                      null, null, null],
+        ['sync',              &$upd,                      null, null, null],
+        ['account',           [null],                    'testAcc',  'Please create your admin account.', 'There is no user with administrator privileges in the DB.']
     );
 
 
@@ -244,7 +246,7 @@ function setup() : void
     if ($startStep)
     {
 
-        CLI::write('Found firstrun progression info. (Halted on subscript '.($steps[$startStep][1] ?: $steps[$startStep][0]).')', CLI::LOG_INFO);
+        CLI::write('Found firstrun progression info. (Halted on subscript '.($steps[$startStep][1][0] ? $steps[$startStep][1] : $steps[$startStep][0]).')', CLI::LOG_INFO);
         $inp = ['x' => ['continue setup? (y/n)', true, '/y|n/i']];
         $msg = '';
         if (!CLI::read($inp, true) || !$inp || strtolower($inp['x']) == 'n')
@@ -286,7 +288,10 @@ function setup() : void
 
         while (true)
         {
-            $res = call_user_func($step[0], $step[1]);
+            if (strpos($step[0], '::'))
+                $res = call_user_func($step[0], $step[1]);
+            else
+                $res = $step[0](...$step[1]);
 
             // check script result
             if ($step[2])

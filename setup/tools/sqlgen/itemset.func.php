@@ -230,9 +230,9 @@ SqlGen::register(new class extends SetupScript
 
             $row['bonusParsed'] = serialize($gains);
             foreach (array_column($spells, 0) as $idx => $spellId)
-                $row['spell'.$idx+1] = $spellId;
+                $row['spell'.($idx+1)] = $spellId;
             foreach (array_column($spells, 1) as $idx => $nItems)
-                $row['bonus'.$idx+1] = $nItems;
+                $row['bonus'.($idx+1)] = $nItems;
 
 
             /**************************/

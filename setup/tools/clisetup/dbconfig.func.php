@@ -31,7 +31,7 @@ function dbconfig() : void
             DB::test($dbInfo, $errStr);
 
             $buff .= $errStr ? CLI::red('ERR   ') : CLI::green('OK    ');
-            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].($port ? ':'.$port : null).'/'.$dbInfo['db'];
+            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
             $buff .= ($dbInfo['prefix'] ? '    table prefix: '.$dbInfo['prefix'] : null).'    '.$errStr;
         }
         else
