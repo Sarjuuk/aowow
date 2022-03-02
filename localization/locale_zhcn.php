@@ -52,8 +52,11 @@ $lang = array(
         'or'            => "或",
         'back'          => "返回",
         'reputationTip' => "声望点数",
-        'byUserTimeAgo' => '由<a href="'.HOST_URL.'/?user=%s">%1$s</a>%s之前',
+        'byUser'        => '由<a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a>',
         'help'          => "帮助",
+        'status'        => "状态",
+        'yes'           => "是",
+        'no'            => "无",
 
         // filter
         'extSearch'     => "扩展搜索",
@@ -80,6 +83,10 @@ $lang = array(
         'compare'       => "比较",
         'view3D'        => "3D查看",
         'findUpgrades'  => "查找升级…",
+        'report'        => "报告",
+        'writeGuide'    => "创建新指南",
+        'edit'          => "编辑",
+        'changelog'     => '[Changelog]',
 
         // misc Tools
         'errPageTitle'  => "页面未找到",
@@ -120,7 +127,8 @@ $lang = array(
         // formating
         'colon'         => '：',
         'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i",
+        'dateFmtLong'   => "Y/m/d \a\\t H:i A",
+        'timeAgo'       => '%s之前',
 
         // error
         'intError'      => "发生内部错误。",
@@ -148,6 +156,63 @@ $lang = array(
                 'stat-weighting'     => "Stat Weighting",                   'talent-calculator' => "天赋模拟器",         'item-comparison'         => "物品比较工具",
                 'profiler'           => "Profiler",                         'markup-guide'      => "标记指南"
             )
+        )
+    ),
+    'guide' => array(
+        'guide'     => "指南",
+        'guides'    => "指南",
+        'myGuides'  => "我的指南",
+        'editTitle' => "编辑你的指南",
+        'newTitle'  => "创建新指南",
+        'author'    => "作者",
+        'spec'      => "专精",
+        'sticky'    => "置顶状态",
+        'views'     => "浏览量",
+        'patch'     => "补丁",
+        'added'     => "已添加",
+        'rating'    => "评分",
+        'votes'     => "[span id=guiderating-value]%d[/span]/5 （[span id=guiderating-votes][n5=%d][/span] 投票）[span id=guiderating][/span]",
+        'noVotes'   => "[not enough votes] [span id=guiderating][/span]",
+        'byAuthor'  => "来自 %s",
+        'notFound'  => "[This 指南 doesn't exist.]",
+        'clTitle'     => '[Changelog For] "<a href="?guide=%1$d">%2$s</a>"',
+        'clStatusSet' => '[Status set to] %s',
+        'clCreated'   => '已创建',
+        'clMinorEdit' => '[Minor Edit]',
+        'editor'    => array(
+            'fullTitle'       => '完整标题',
+            'fullTitleTip'    => '[The full guide title will be used on the guide page and may include SEO-oriented phrasing.]',
+            'name'            => '名称',
+            'nameTip'         => '[This should be a simple and clear name of what the guide is, for use in places like menus and guide lists.]',
+            'description'     => '描述',
+            'descriptionTip'  => '描述将用于说明片段&lt;br /&gt;&lt;br /&gt;如果不填，则自动生成。',
+        //  'commentEmail'    => 'Comment Emails',
+        //  'commentEmailTip' => 'Should the author get emailed whenever a user comments on this guide?',
+            'changelog'       => '当前编辑的修改日志',
+            'changelogTip'    => '[Enter your changelog for this update here.]',
+            'save'            => '保存',
+            'submit'          => '提交以供审核',
+            'autoupdate'      => '预览',
+            'showAdjPrev'     => '显示相邻预览',
+            'preview'         => '自动更新',
+            'class-spec'      => '职业 / 专精',
+            'category'        => '分类',
+            'testGuide'       => '自我浏览你的指南',
+            'images'          => '图片',
+            'statusTip'       => array(
+                GUIDE_STATUS_DRAFT    => '你的指南目前是草稿状态，只有你自己可见。试着输入更多的文字，当你觉得可以了的时候就提交送审吧。',
+                GUIDE_STATUS_REVIEW   => '[Your guide is being reviewed.]',
+                GUIDE_STATUS_APPROVED => '[Your guide has been published.]',
+                GUIDE_STATUS_REJECTED => '[Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.]',
+                GUIDE_STATUS_ARCHIVED => '[Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.]',
+            )
+        ),
+        'category'  => array(
+            null,                           "职业",                          "专业",                         "世界事件",                         "新玩家",
+            "地下城与团队副本",                "经济与金钱",                     "成就",                         "华丽收藏",                         "杂项"
+        ),
+        'status'    => array(
+            null,                           "草稿",                          "等待审批",                      "同意",                            "拒绝",                                "已归档"
         )
     ),
     'profiler' => array(
@@ -343,6 +408,20 @@ $lang = array(
             31 => "掠食者", 32 => "迁跃捕猎者", 33 => "孢子蝠", 34 => "虚空鳐", 35 => "蛇", 37 => "蛾子",
             38 => "奇美拉", 39 => "魔暴龙", 41 => "异种虫", 42 => "蠕虫", 43 => "犀牛", 44 => "巨蜂",
             45 => "熔岩犬", 46 => "灵魂兽",
+        ),
+        'classSpecs'    => array(
+            -1 => '没有天赋',
+             0 => '混合',
+             6 => ['鲜血', '冰霜', '邪恶'],
+            11 => ['平衡', '野性战斗', '恢复'],
+             3 => ['野兽控制', '射击', '生存'],
+             8 => ['奥术', '火焰', '冰霜'],
+             2 => ['神圣', '防护', '惩戒'],
+             5 => ['戒律', '神圣', '暗影'],
+             4 => ['刺杀', '战斗', '敏锐'],
+             7 => ['元素', '增强', '恢复'],
+             9 => ['痛苦', '恶魔学识', '毁灭'],
+             1 => ['武器', '狂怒', '防护']
         ),
         'pvpRank'       => array(
             null,                                                           "下士 / 斥候",                                              "下士 / 步兵",

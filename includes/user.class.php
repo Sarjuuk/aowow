@@ -518,6 +518,14 @@ class User
         return true;
     }
 
+    public static function canWriteGuide()
+    {
+        if (!self::$id || self::$banStatus & (ACC_BAN_GUIDE | ACC_BAN_PERM | ACC_BAN_TEMP))
+            return false;
+
+        return true;
+    }
+
     public static function canSuggestVideo()
     {
         if (!self::$id || self::$banStatus & (ACC_BAN_VIDEO | ACC_BAN_PERM | ACC_BAN_TEMP))
@@ -589,6 +597,9 @@ class User
         if ($_ = self::getProfiles())
             $gUser['profiles'] = $_;
 
+        if ($_ = self::getGuides())
+            $gUser['guides'] = $_;
+
         if ($_ = self::getWeightScales())
             $gUser['weightscales'] = $_;
 
@@ -639,6 +650,20 @@ class User
             return [];
 
         return self::$profiles->getJSGlobals(PROFILEINFO_PROFILE);
+    }
+
+    public static function getGuides()
+    {
+        $result = [];
+
+        if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GUIDE_STATUS_ARCHIVED))
+        {
+            // fix url
+            array_walk($guides, fn(&$x) => $x['url'] = '/?guide='.($x['url'] ?? $x['id']));
+            $result = $guides;
+        }
+
+        return $result;
     }
 
     public static function getCookies()

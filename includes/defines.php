@@ -66,7 +66,7 @@ define('ACC_BAN_COMMENT',                   0x08);          // cannot comment an
 define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload avatar / signature files [originally: ban from data upload]
 define('ACC_BAN_SCREENSHOT',                0x20);          // cannot upload screenshots
 define('ACC_BAN_VIDEO',                     0x40);          // cannot suggest videos
-// define('ACC_BAN_FORUM',                  0x80);          // cannot use forums [not used here]
+define('ACC_BAN_GUIDE',                     0x80);          // cannot write a guide
 
 // Site Reputation/Privileges
 define('SITEREP_ACTION_REGISTER',           1);             // Registered account
@@ -164,6 +164,10 @@ define('BUTTON_TALENT',                     6);
 define('BUTTON_EQUIP',                      7);
 define('BUTTON_PLAYLIST',                   8);
 define('BUTTON_RESYNC',                     9);
+define('BUTTON_GUIDE_REPORT',              10);
+define('BUTTON_GUIDE_NEW',                 11);
+define('BUTTON_GUIDE_EDIT',                12);
+define('BUTTON_GUIDE_LOG',                 13);
 
 // generic filter handler
 define('FILTER_CR_BOOLEAN',                 1);
@@ -240,6 +244,16 @@ define('STR_LOCALIZED',                     0x1);
 define('STR_MATCH_EXACT',                   0x2);
 define('STR_ALLOW_SHORT',                   0x4);
 
+define('RATING_COMMENT',                    1);
+define('RATING_GUIDE',                      2);
+
+define('GUIDE_STATUS_NONE',                 0);
+define('GUIDE_STATUS_DRAFT',                1);
+define('GUIDE_STATUS_REVIEW',               2);
+define('GUIDE_STATUS_APPROVED',             3);
+define('GUIDE_STATUS_REJECTED',             4);
+define('GUIDE_STATUS_ARCHIVED',             5);
+
 /*
  * Game
  */
@@ -298,6 +312,9 @@ define('PROFILER_CU_PINNED',                0x02);
 define('PROFILER_CU_DELETED',               0x04);
 define('PROFILER_CU_PROFILE',               0x08);
 define('PROFILER_CU_NEEDS_RESYNC',          0x10);
+
+define('GUIDE_CU_NO_QUICKFACTS',            0x100);         // merge with CC_FLAG_*
+define('GUIDE_CU_NO_RATING',                0x200);
 
 define('MAX_LEVEL',                         80);
 define('MAX_SKILL',                         450);

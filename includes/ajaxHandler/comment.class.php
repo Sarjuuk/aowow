@@ -103,7 +103,7 @@ class AjaxComment extends AjaxHandler
                     Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postIdx]);
 
                     // every comment starts with a rating of +1 and i guess the simplest thing to do is create a db-entry with the system as owner
-                    DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
+                    DB::Aowow()->query('INSERT INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, 0, 1)', RATING_COMMENT, $postIdx);
 
                     // flag target with hasComment
                     if ($tbl = Type::getClassAttrib($this->_get['type'], 'dataTable'))
@@ -122,7 +122,13 @@ class AjaxComment extends AjaxHandler
             $_SESSION['error']['co'] = Lang::main('cannotComment');
 
         $this->doRedirect = true;
-        return '?'.Type::getFileString($this->_get['type']).'='.$this->_get['typeid'].'#comments';
+
+        $idOrUrl = $this->_get['typeid'];
+        if ($this->_get['type'] == Type::GUIDE)
+            if ($_ = DB::Aowow()->selectCell('SELECT `url` FROM ?_guides WHERE `id` = ?d', $this->_get['typeid']))
+                $idOrUrl = $_;
+
+        return '?'.Type::getFileString($this->_get['type']).'='.$idOrUrl.'#comments';
     }
 
     protected function handleCommentEdit() : void
@@ -224,7 +230,7 @@ class AjaxComment extends AjaxHandler
         if (!$this->_get['id'])
             return Util::toJSON(['success' => 0]);
 
-        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(value > 0, value, 0)) AS up, SUM(IF(value < 0, -value, 0)) AS down FROM ?_comments_rates WHERE commentId = ?d and userId <> 0 GROUP BY commentId', $this->_get['id']))
+        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS success, SUM(IF(`value` > 0, `value`, 0)) AS up, SUM(IF(`value` < 0, -`value`, 0)) AS down FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d AND userId <> 0 GROUP BY `entry`', RATING_COMMENT, $this->_get['id']))
             return Util::toJSON($votes);
         else
             return Util::toJSON(['success' => 1, 'up' => 0, 'down' => 0]);
@@ -235,7 +241,7 @@ class AjaxComment extends AjaxHandler
         if (!User::$id || !$this->_get['id'] || !$this->_get['rating'])
             return Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);
 
-        $target = DB::Aowow()->selectRow('SELECT c.userId AS owner, cr.value FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId = ?d WHERE c.id = ?d', User::$id, $this->_get['id']);
+        $target = DB::Aowow()->selectRow('SELECT c.`userId` AS owner, ur.`value` FROM ?_comments c LEFT JOIN ?_user_ratings ur ON ur.`type` = ?d AND ur.`entry` = c.id AND ur.`userId` = ?d WHERE c.id = ?d', RATING_COMMENT, User::$id, $this->_get['id']);
         $val    = User::canSupervote() ? 2 : 1;
         if ($this->_get['rating'] < 0)
             $val *= -1;
@@ -250,9 +256,9 @@ class AjaxComment extends AjaxHandler
         $ok = false;
         // old and new have same sign; undo vote (user may have gained/lost access to superVote in the meantime)
         if ($target['value'] && ($target['value'] < 0) == ($val < 0))
-            $ok = DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d AND userId = ?d', $this->_get['id'], User::$id);
+            $ok = DB::Aowow()->query('DELETE FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d AND `userId` = ?d', RATING_COMMENT, $this->_get['id'], User::$id);
         else                                                // replace, because we may be overwriting an old, opposing vote
-            if ($ok = DB::Aowow()->query('REPLACE INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)', (int)$this->_get['id'], User::$id, $val))
+            if ($ok = DB::Aowow()->query('REPLACE INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)', RATING_COMMENT, (int)$this->_get['id'], User::$id, $val))
                 User::decrementDailyVotes();                // do not refund retracted votes!
 
         if (!$ok)
@@ -385,7 +391,7 @@ class AjaxComment extends AjaxHandler
         }
 
         if (DB::Aowow()->query('DELETE FROM ?_comments WHERE id = ?d{ AND userId = ?d}', $this->_post['id'][0], User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
-            DB::Aowow()->query('DELETE FROM ?_comments_rates WHERE commentId = ?d', $this->_post['id'][0]);
+            DB::Aowow()->query('DELETE FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d', RATING_COMMENT, $this->_post['id'][0]);
         else
             trigger_error('AjaxComment::handleReplyDelete - deleting comment #'.$this->_post['id'][0].' by user #'.User::$id.' from db failed', E_USER_ERROR);
     }
@@ -417,7 +423,8 @@ class AjaxComment extends AjaxHandler
         }
 
         $ok = DB::Aowow()->query(
-            'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
+            'INSERT INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)',
+            RATING_COMMENT,
             $this->_post['id'][0],
             User::$id,
             User::canSupervote() ? 2 : 1
@@ -448,7 +455,8 @@ class AjaxComment extends AjaxHandler
         }
 
         $ok = DB::Aowow()->query(
-            'INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, ?d, ?d)',
+            'INSERT INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)',
+            RATING_COMMENT,
             $this->_post['id'][0],
             User::$id,
             User::canSupervote() ? -2 : -1

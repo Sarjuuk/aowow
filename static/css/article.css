@@ -1,0 +1,18 @@
+.article-header {
+    position: relative;
+    background: repeat-x;
+    margin-bottom: 10px;
+}
+
+.article-header, .article-header a {
+    height: 125px;
+}
+
+.article-header var, .article-header span, .article-header a {
+    background: no-repeat;
+    display: block;
+}
+
+.article-header var, .article-header span {
+    position: absolute;
+}

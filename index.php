@@ -39,6 +39,8 @@ switch ($pageCall)
     case 'events':
     case 'faction':
     case 'factions':
+    case 'guide':
+    case 'guides':
     case 'guild':
     case 'guilds':
     case 'icon':
@@ -50,6 +52,9 @@ switch ($pageCall)
     case 'maps':                                            // tool: map listing
     case 'mail':
     case 'mails':
+    case 'my-guides':
+        if ($pageCall == 'my-guides')
+            $altClass = 'guides';
     case 'npc':
     case 'npcs':
     case 'object':
@@ -86,6 +91,8 @@ switch ($pageCall)
     case 'cookie':                                          // lossless cookies and user settings
     case 'contactus':
     case 'comment':
+    case 'edit':                                            // guide editor: targeted by QQ fileuploader, detail-page article editor
+    case 'get-description':                                 // guide editor: shorten fulltext into description
     case 'filter':                                          // pre-evaluate filter POST-data; sanitize and forward as GET-data
     case 'go-to-comment':                                   // find page the comment is on and forward
     case 'locale':                                          // subdomain-workaround, change the language
@@ -140,7 +147,6 @@ switch ($pageCall)
         (new MorePage($pageCall, $pageParam))->display();
         break;
     case 'latest-additions':
-    case 'latest-articles':
     case 'latest-comments':
     case 'latest-screenshots':
     case 'latest-videos':

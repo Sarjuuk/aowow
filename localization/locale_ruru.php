@@ -52,8 +52,11 @@ $lang = array(
         'or'            => " или ",
         'back'          => "Назад",
         'reputationTip' => "Очки репутации",
-        'byUserTimeAgo' => 'От <a href="'.HOST_URL.'/?user=%s">%1s</a> %s назад',
+        'byUser'        => 'От <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1s</a> ',
         'help'          => "Справка",
+        'status'        => "Статус",
+        'yes'           => "Да",
+        'no'            => "Нет",
 
         // filter
         'extSearch'     => "Расширенный поиск",
@@ -80,6 +83,10 @@ $lang = array(
         'compare'       => "Сравнить",
         'view3D'        => "Посмотреть в 3D",
         'findUpgrades'  => "Найти лучше…",
+        'report'        => "Жалоба",
+        'writeGuide'    => "Написать новое руководство",
+        'edit'          => "Редактировать",
+        'changelog'     => 'История изменений',
 
         // misc Tools
         'errPageTitle'  => "Страница не найдена",
@@ -120,7 +127,8 @@ $lang = array(
         // formating
         'colon'         => ": ",
         'dateFmtShort'  => "Y-m-d",
-        'dateFmtLong'   => "Y-m-d в H:i",
+        'dateFmtLong'   => "Y-m-d в H:i A",
+        'timeAgo'       => '%s назад',
 
         // error
         'intError'      => "[An internal error occured.]",
@@ -148,6 +156,63 @@ $lang = array(
                 'stat-weighting'     => "Значимость характеристик",         'talent-calculator' => "Расчёт талантов",           'item-comparison'         => "Сравнение предметов",
                 'profiler'           => "Профили персонажей",               'markup-guide'      => "Markup Guide"
             )
+        )
+    ),
+    'guide' => array(
+        'guide'     => "Руководство",
+        'guides'    => "Руководство",
+        'myGuides'  => "Мои руководства",
+        'editTitle' => "Редактировать руководство",
+        'newTitle'  => "Написать новое руководство",
+        'author'    => "Автор",
+        'spec'      => "Спек",
+        'sticky'    => "Закрепленный",
+        'views'     => "Просмотры",
+        'patch'     => "Обновление",
+        'added'     => "Добавлено",
+        'rating'    => "Рейтинг",
+        'votes'     => "[span id=guiderating-value]%d[/span]/5 ([span id=guiderating-votes][n5=%d][/span] проголосовало) [span id=guiderating][/span]",
+        'noVotes'   => "недостаточно голосов [span id=guiderating][/span]",
+        'byAuthor'  => "От %s",
+        'notFound'  => "Такого руководство не существует.",
+        'clTitle'     => 'История изменений «<a href="?guide=%1$d">%2$s</a>»',
+        'clStatusSet' => 'Присвоен статус «%s»',
+        'clCreated'   => 'Создано',
+        'clMinorEdit' => 'Небольшое изменение',
+        'editor'    => array(
+            'fullTitle'       => 'Полный заголовок',
+            'fullTitleTip'    => 'Укажите полное название руководства. Оно будет использоваться в качестве заголовка. Допустимо использование ключевых слов.',
+            'name'            => 'Имя',
+            'nameTip'         => 'Укажите краткое и понятное название руководства. Оно будет использоватья в меню и перечнях руководств.',
+            'description'     => 'Описание',
+            'descriptionTip'  => 'Описание для поисковых систем.&lt;br&gt;&lt;br&gt;Если поле будет оставлено пустым, то сайт сгенерирует описание автоматически.',
+        //  'commentEmail'    => 'E-mail уведомления',
+        //  'commentEmailTip' => 'Должен ли автор руководства получать e-mail оповещения, когда к руководству оставляют комментарий?',
+            'changelog'       => 'История изменений, внесенных этой правкой',
+            'changelogTip'    => 'Введите вашу историю изменений для текущего патча здесь.',
+            'save'            => 'Сохранить',
+            'submit'          => 'Отправить на одобрение',
+            'autoupdate'      => 'Автообновление',
+            'showAdjPrev'     => 'Открыть окно предварительного просмотра',
+            'preview'         => 'Предварительный просмотр',
+            'class-spec'      => 'Класс / Спек',
+            'category'        => 'Category',
+            'testGuide'       => 'Посмотрите, как будет выглядеть руководство',
+            'images'          => 'Images',
+            'statusTip'       => array(
+                GUIDE_STATUS_DRAFT    => 'Руководство сохранено как &quot;Черновик&quot; — видеть его можете только вы. Правьте руководство так долго, как сочтете нужным, а когда решите, что оно готово — отправьте на одобрение.',
+                GUIDE_STATUS_REVIEW   => 'Your guide is being reviewed.',
+                GUIDE_STATUS_APPROVED => 'Your guide has been published.',
+                GUIDE_STATUS_REJECTED => 'Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.',
+                GUIDE_STATUS_ARCHIVED => 'Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.',
+            )
+        ),
+        'category'  => array(
+            null,                           "Классы",                       "Профессии",                    "Игровые события",                  "Новые игроки",
+            "Подземелья и рейды",           "Экономика и деньги",           "Достижения",                   "Забавные предметы",                "Разное"
+        ),
+        'status'    => array(
+            null,                           "Черновик",                     "Ожидание проверки",            "Принято",                          "Отклонено",                            "Архивирован"
         )
     ),
     'profiler' => array(
@@ -343,6 +408,20 @@ $lang = array(
             31 => "Опустошитель",           32 => "Прыгуана",               33 => "Спороскат",              34 => "Скат Пустоты",           35 => "Змей",                   37 => "Мотылек",
             38 => "Химера",                 39 => "Дьявозавр",              41 => "Силитид",                42 => "Червь",                  43 => "Люторог",                44 => "Оса",
             45 => "Гончая Недр",            46 => "Дух зверя"
+        ),
+        'classSpecs'    => array(
+            -1 => 'Нет талантов',
+             0 => 'Гибрид',
+             6 => ['Кровь',             'Лед',               'Нечестивость'],
+            11 => ['Баланс',            'Сила зверя',        'Исцеление'   ],
+             3 => ['Повелитель зверей', 'Стрельба',          'Выживание'   ],
+             8 => ['Тайная магия',      'Огонь',             'Лед'         ],
+             2 => ['Свет',              'Защита',            'Воздаяние'   ],
+             5 => ['Послушание',        'Свет',              'Темная магия'],
+             4 => ['Ликвидация',        'Бой',               'Скрытность'  ],
+             7 => ['Стихии',            'Совершенствование', 'Исцеление'   ],
+             9 => ['Колдовство',        'Демонология',       'Разрушение'  ],
+             1 => ['Оружие',            'Неистовство',       'Защита'      ]
         ),
         'pvpRank'       => array(
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",

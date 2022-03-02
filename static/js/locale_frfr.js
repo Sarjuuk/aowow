@@ -20,6 +20,37 @@ var l_reputation_names = [
     "Suspension par un modérateur"
 ];
 
+var l_guide_categories = [
+    '', // 0
+    "Classes", // 1
+    "Métiers", // 2
+    "Évènements mondiaux", // 3
+    "Nouveaux Joueurs & Montée en niveau", // 4
+    "Raids & Combats contre des boss", // 5
+    "Economie et Argent", // 6
+    "Hauts faits", // 7
+    "Objets tape-à-l'oeil, Compagnons et Montures", // 8
+    "Autre" // 9
+];
+
+var l_guide_states = [
+    '',
+    "Brouillon",
+    "Attente d'approbation",
+    "Approuvé",
+    "Rejeter",
+    "Archivé"
+];
+
+var l_guide_states_color = [
+    '',
+    '#71D5FF',
+    '#FFFF00',
+    '#1EFF00',
+    '#FF4040',
+    '#FFD100'
+];
+
 var mn_classes = [
     [6,"Chevalier de la mort",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -921,6 +952,30 @@ var mn_database = [
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Mails', '?mails']                                // aowow - custom
 ];
+
+var mn_guides = [
+    [1, "Classes", '?guides=1'],
+    [6, "Economie et Argent", '?guides=6'],
+    [3, "Évènements mondiaux", '?guides=3', [
+        [,"Aowow Guides"],
+        ["lunar-festival","Fête lunaire","?guide=lunar-festival"],
+        ["love-is-in-the-air","De l'amour dans l'air","?guide=love-is-in-the-air"],
+        ["noblegarden","Jardin des nobles","?guide=noblegarden"],
+        ["childrens-week","Semaine des enfants","?guide=childrens-week"],
+        ["midsummer-fire-festival","Fête du Feu du solstice d'été","?guide=midsummer-fire-festival"],
+        ["brewfest","Voile d'hiver","?guide=brewfest"],
+        ["hallows-end","Sanssaint","?guide=hallows-end"],
+        ["pilgrims-bounty","Bienfaits du pèlerin","?guide=pilgrims-bounty"],
+        ["winter-veil","Voile d'hiver","?guide=winter-veil"]
+    ]],
+    [7, "Hauts faits", '?guides=7'],
+    [4, "Nouveaux Joueurs & Montée en niveau", '?guides=4'],
+    [2, "Métiers", '?guides=2'],
+    [8, "Objets tape-à-l'oeil, Compagnons et Montures", '?guides=8'],
+    [5, "Raids & Combats contre des boss", '?guides=5'],
+    [9, "Autre", '?guides=9']
+];
+
 var mn_tools = [
     [0,"Calculateur de talents","?talent",mn_talentCalc],
     [2,"Calculateur de familiers","?petcalc",mn_petCalc],
@@ -933,22 +988,10 @@ var mn_tools = [
     ]],
     [1,"Cartes","?maps"],
     [,"Autre"],
-    [6,"Guides","",[
-        [,"Évènements mondiaux"],
-        ["lunar-festival","Fête lunaire","?guide=lunar-festival"],
-        ["love-is-in-the-air","De l'amour dans l'air","?guide=love-is-in-the-air"],
-        ["noblegarden","Jardin des nobles","?guide=noblegarden"],
-        ["childrens-week","Semaine des enfants","?guide=childrens-week"],
-        ["midsummer-fire-festival","Fête du Feu du solstice d'été","?guide=midsummer-fire-festival"],
-        ["brewfest","Voile d'hiver","?guide=brewfest"],
-        ["hallows-end","Sanssaint","?guide=hallows-end"],
-        ["pilgrims-bounty","Bienfaits du pèlerin","?guide=pilgrims-bounty"],
-        ["winter-veil","Voile d'hiver","?guide=winter-veil"]
-    ]],
     [8,"Utilitaires",,[
         [,"Base de données"],
-        [0,"Derniers ajouts","?latest-additions"],
-        [1,"Derniers articles","?latest-articles"],
+        // [0,"Derniers ajouts","?latest-additions"],
+        // [1,"Derniers articles","?latest-articles"],
         [2,"Derniers commentaires","?latest-comments"],
         [3,"Dernières captures d'écran","?latest-screenshots"],
         [11,"Derniers vidéos","?latest-videos"],
@@ -1010,11 +1053,13 @@ var mn_more = [
     [8,"Plug-ins de recherche","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];
+
 var mn_path = [
-    [0,"Base de données",,mn_database],
-    [1,"Outils",,mn_tools],
-    [3,"Communauté",,mn_community],
-    [2,"Plus",,mn_more]
+    [0, "Base de données", null,      mn_database ],
+    [1, "Outils",          null,      mn_tools    ],
+    [3, "Communauté",      null,      mn_community],
+    [6, "Guides",          '?guides', mn_guides   ],
+    [2, "Plus",            null,      mn_more     ]
 ];
 
 var g_contact_reasons = {
@@ -2857,6 +2902,7 @@ var LANG = {
     message_cantdeletecomment:    "Ce commentaire a été automatiquement effacé à cause d'une note négative. Il ne peut être supprimé.",
     message_cantdetachcomment:    "Ce commentaire a déjà été détaché.",
     message_codenotentered:       "Vous n'avez pas écrit le CAPTCHA.",
+    message_cantpostlcomment_tip: "Vous ne pouvez pas commenter ce guide, seuls les commentaires rédigés en anglais sont autorisés.",
     message_commentdetached:      "Ce commentaire a été détaché.",
     message_commenttooshort:      "Votre message ne doit pas être vide.",
     message_descriptiontooshort:  "Votre description doit faire au moins 10 caractères de long.\nVeuillez élaborer un peu.",
@@ -3361,6 +3407,7 @@ var LANG = {
          17: ["Monnaies",          "monnaie",           "Monnaies",            "monnaies"],
          19: ["Son",               "Son",               "Sons",                "Sons"],
          29: ["Icône",             "icône",             "Icônes",              "icônes"],
+        300: ["Guide",             "guide",             "Guides",              "guides"],
         501: ["Emote",             "emote",             "Emotes",              "emotes"],
         502: ["Enchantement",      "enchantement",      "Enchantements",       "enchantements"],
         503: ["Areatrigger",       "areatrigger",       "Areatriggers",        "areatriggers"],
@@ -4753,6 +4800,7 @@ var LANG = {
     build:       "Version",
     calculators: "Calculateurs",
     patch:       "Patch",
+    status:      "Statut",
 
     sound_activities: {
         greeting:          "Salutation",
@@ -4803,6 +4851,25 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    // Guide
+    myguides:          'Mes guides',
+    listguides:        '[List of guides]',
+    createnewguide:    'Créer un nouveau Guide',
+    needsvotes_format: '(requiert $1 votes supplémentaires)',
+    needsvote_format:  '(requiert $1 vote supplémentaire)',
+    outofvotes_format: '(sur $1 votes)',
+    outofvote_format:  '(sur $1 vote)',
+    guideAuthor:       'Auteur du guide',
+    autoresizetextbox: 'Redimensionner automatiquement le champ texte',
+
+    descriptionlengthlong_tip:          'Fichtre ! Votre description $1 est trop longue ! Elle sera probablement tronquée.',
+    descriptionlengthoptimal_tip:       'Votre description est de longueur appropriée. Bien joué ! Vous pouvez sans problème ajouter jusqu\'à $1 si besoin.',
+    descriptionlengthshort_tip:         'Votre description est trop courte ! Encore $1...',
+    descriptionlengthslightlylong_tip:  'Votre description devient un peu longue ! Mais elle est toujours acceptable.',
+    descriptionlengthslightlyshort_tip: 'Votre description a l\'air sympa, mais elle pourrait être plus longue. Si cela aide à décrire la page, essayez d\'ajouter $1.',
+    descriptionlengthzero_tip:          'Vous n\'avez pas entré de texte. La description sera générée automatiquement.',
+
     // Conditions
     note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
     note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",

@@ -1,0 +1,63 @@
+@media screen and (max-width: 999px) {
+    .adjacent-preview-controls {
+        display: none !important;
+    }
+}
+@media screen and (min-width: 1000px) {
+    .adjacent-preview-controls {
+        display: none;
+        margin: 10px 0;
+    }
+    .adjacent-preview-controls label {
+        background: #181818;
+        border-radius: 6px;
+        cursor: pointer;
+        float: left;
+        padding: 10px;
+    }
+    .adjacent-preview-controls label:hover {
+        color: #fff;
+    }
+    .adjacent-preview-controls input[type="checkbox"] {
+        position: relative;
+        top: 2px;
+    }
+    .adjacent-preview-controls:after {
+        clear: left;
+        content: " ";
+        display: block;
+    }
+    body[data-adjacent-preview="enabled"] {
+        overflow: hidden;
+    }
+    body[data-adjacent-preview="enabled"] .adjacent-preview {
+        background: #242424;
+        border-top: 2px solid #181818;
+        bottom: 0;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 40px;
+        z-index: 100;
+    }
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-edit,
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-preview {
+        bottom: 0;
+        left: 0;
+        overflow: auto;
+        padding: 10px;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-edit > *:first-child,
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-preview > *:first-child {
+        margin-top: 0;
+    }
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-edit {
+        right: 50%;
+    }
+    body[data-adjacent-preview="enabled"] .adjacent-preview .adjacent-preview-preview {
+        left: 50%;
+    }
+}

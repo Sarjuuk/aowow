@@ -20,6 +20,37 @@ var l_reputation_names = [
     "[Moderator Suspension]"
 ];
 
+var l_guide_categories = [
+    '', // 0
+    "Классы", // 1
+    "Профессии", // 2
+    "Игровые события", // 3
+    "Новые игроки", // 4
+    "Подземелья и рейды", // 5
+    "Экономика и деньги", // 6
+    "Достижения", // 7
+    "Забавные предметы", // 8
+    "Разное" // 9
+]
+
+var l_guide_states = [
+    "",
+    "Черновик",
+    "Ожидание проверки",
+    "Принято",
+    "Отклонено",
+    "Архивирован"
+];
+
+var l_guide_states_color = [
+    "",
+    "#71D5FF",
+    "#FFFF00",
+    "#1EFF00",
+    "#FF4040",
+    "#FFD100"
+];
+
 var mn_classes = [
     [6,"Рыцарь смерти",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Друид",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -921,6 +952,30 @@ var mn_database = [
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Mails', '?mails']                                // aowow - custom
 ];
+
+var mn_guides = [
+    [7, "Достижения", '?guides=7'],
+    [1, "Классы", '?guides=1'],
+    [6, "Экономика и деньги", '?guides=6'],
+    [4, "Новые игроки", '?guides=4'],
+    [2, "Профессии", '?guides=2'],
+    [5, "Подземелья и рейды", '?guides=5'],
+    [8, "Забавные предметы", '?guides=8'],
+    [3, "Игровые события", '?guides=3', [
+        [,"Aowow Гайды"],
+        ["lunar-festival","Лунный фестиваль","?guide=lunar-festival"],
+        ["love-is-in-the-air","Любовная лихорадка","?guide=love-is-in-the-air"],
+        ["noblegarden","Сад чудес","?guide=noblegarden"],
+        ["childrens-week","Детская неделя","?guide=childrens-week"],
+        ["winter-veil","Зимний Покров","?guide=winter-veil"],
+        ["hallows-end","Тыквовин","?guide=hallows-end"],
+        ["midsummer-fire-festival","Огненный солнцеворот","?guide=midsummer-fire-festival"],
+        ["winter-veil","Зимний Покров","?guide=winter-veil"],
+        ["pilgrims-bounty","Пиршество странников","?guide=pilgrims-bounty"]
+    ]],
+    [9, "Разное", '?guides=9']
+];
+
 var mn_tools = [
     [0,"Расчёт талантов","?talent",mn_talentCalc],
     [2,"Расчёт умений питомцев","?petcalc",mn_petCalc],
@@ -933,22 +988,10 @@ var mn_tools = [
     ]],
     [1,"Карты","?maps"],
     [,"Другое"],
-    [6,"Гайды","",[
-        [,"Игровые события"],
-        ["lunar-festival","Лунный фестиваль","?guide=lunar-festival"],
-        ["love-is-in-the-air","Любовная лихорадка","?guide=love-is-in-the-air"],
-        ["noblegarden","Сад чудес","?guide=noblegarden"],
-        ["childrens-week","Детская неделя","?guide=childrens-week"],
-        ["winter-veil","Зимний Покров","?guide=winter-veil"],
-        ["hallows-end","Тыквовин","?guide=hallows-end"],
-        ["midsummer-fire-festival","Огненный солнцеворот","?guide=midsummer-fire-festival"],
-        ["winter-veil","Зимний Покров","?guide=winter-veil"],
-        ["pilgrims-bounty","Пиршество странников","?guide=pilgrims-bounty"]
-    ]],
     [8,"Дополнительно",,[
         [,"База данных"],
-        [0,"Последние добавления","?latest-additions"],
-        [1,"Новые статьи","?latest-articles"],
+        // [0,"Последние добавления","?latest-additions"],
+        // [1,"Новые статьи","?latest-articles"],
         [2,"Последние комментарии","?latest-comments"],
         [3,"Последние изображения","?latest-screenshots"],
         [11,"Последние видео","?latest-videos"],
@@ -1010,11 +1053,13 @@ var mn_more = [
     [16,"Окно поиска","?searchbox"],
     [10,"Всплывающие подсказки","?tooltips"]
 ];
+
 var mn_path = [
-    [0,"База данных",,mn_database],
-    [1,"Инструменты",,mn_tools],
-    [3,"Сообщество",,mn_community],
-    [2,"Дополнительно",,mn_more]
+    [0, "База данных",   null,      mn_database],
+    [1, "Инструменты",   null,      mn_tools],
+    [3, "Сообщество",    null,      mn_community],
+    [6, "Гайды",         '?guides', mn_guides],
+    [2, "Дополнительно", null,      mn_more]
 ];
 
 var g_contact_reasons = {
@@ -2857,6 +2902,7 @@ var LANG = {
     message_cantdeletecomment:    "Этот комментарий был автоматически удален из-за негативного рейтинга.",
     message_cantdetachcomment:    "Этот коментарий уже откреплен.",
     message_codenotentered:       "Вы не ввели CAPTCHA код.",
+    message_cantpostlcomment_tip: "Вы не можете комментировать этот гайд, доступны только английские комментарии.",
     message_commentdetached:      "Комментарий откреплен.",
     message_commenttooshort:      "Ваше сообщение не должно быть пустым.",
     message_descriptiontooshort:  "Ваше описание должен содержать не менее 10 символов.",
@@ -3361,6 +3407,7 @@ var LANG = {
          17: ["Валюта",         "валюта",          "Валюта",          "валюта"],
          19: ["Звук",           "звук",            "Звуки",           "звуки"],
          29: ["Иконка",         "иконка",          "Иконки",          "иконки"],
+        300: ["Гайд",           "гайд",            "Гайды",           "гайды"],
         501: ["Эмоция",         "эмоция",          "Эмоции",          "эмоции"],
         502: ["Улучшение",      "улучшение",       "Улучшения",       "улучшения"],
         503: ["Areatrigger",    "areatrigger",     "Areatriggers",    "areatriggers"],
@@ -4755,6 +4802,7 @@ var LANG = {
     build:       "Версия",
     calculators: "Калькуляторы",
     patch:       "Обновление",
+    status:      "Статус",
 
     sound_activities: {
         greeting: "Привет",
@@ -4805,6 +4853,25 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    // Guide
+    myguides:          'Мои руководства',
+    listguides:        '[List of guides]',
+    createnewguide:    'Написать новое руководство',
+    needsvotes_format: '(нужны еще голоса: $1)',
+    needsvote_format:  '(нужен еще голос: $1)',
+    outofvotes_format: '(голоса: $1)',
+    outofvote_format:  '(голос: $1)',
+    guideAuthor:       'Автор руководства',
+    autoresizetextbox: 'Автоматически изменять размер поля с текстом',
+
+    descriptionlengthlong_tip:          'Не может быть! Ваше описание $1 слишком велико! Вероятнее всего, оно будет сокращено.',
+    descriptionlengthoptimal_tip:       'Ваше описание имеет оптимальную длину. Отлично! Если необходимо, вы можете добавить ещё $1 символов.',
+    descriptionlengthshort_tip:         'Ваше описание слишком короткое! $1 чтобы',
+    descriptionlengthslightlylong_tip:  'Похоже, что описание становится слишком длинным! Но это все еще приемлимо.',
+    descriptionlengthslightlyshort_tip: 'Ваше описание выглядит неплохо, но могло бы быть более объемным. Попробуйте добавить ещё $1, чтобы точнее описать страницу.',
+    descriptionlengthzero_tip:          'Вы не ввели никакой текст. Описание будет создано автоматически.',
+
     // Conditions
     note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
     note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",

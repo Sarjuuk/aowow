@@ -14,6 +14,25 @@ class Game
         '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
     );
 
+    public static $specIconStrings          = array(
+        -1 =>  'inv_misc_questionmark',
+         0 =>  'spell_nature_elementalabsorption',
+         6 => ['spell_deathknight_bloodpresence', 'spell_deathknight_frostpresence', 'spell_deathknight_unholypresence' ],
+        11 => ['spell_nature_starfall',           'ability_racial_bearform',         'spell_nature_healingtouch'        ],
+         3 => ['ability_hunter_beasttaming',      'ability_marksmanship',            'ability_hunter_swiftstrike'       ],
+         8 => ['spell_holy_magicalsentry',        'spell_fire_firebolt02',           'spell_frost_frostbolt02'          ],
+         2 => ['spell_holy_holybolt',             'spell_holy_devotionaura',         'spell_holy_auraoflight'           ],
+         5 => ['spell_holy_wordfortitude',        'spell_holy_holybolt',             'spell_shadow_shadowwordpain'      ],
+         4 => ['ability_rogue_eviscerate',        'ability_backstab',                'ability_stealth'                  ],
+         7 => ['spell_nature_lightning',          'spell_nature_lightningshield',    'spell_nature_magicimmunity'       ],
+         9 => ['spell_shadow_deathcoil',          'spell_shadow_metamorphosis',      'spell_shadow_rainoffire'          ],
+         1 => ['ability_rogue_eviscerate',        'ability_warrior_innerrage',       'ability_warrior_defensivestance'  ]
+    );
+
+    public static $classFileStrings         = array(
+        null,   'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'
+    );
+
     private static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
         null,           12,             13,             14,             15,             16,             17,             18,             19,
         20,             21,             22,             23,             24,             25,             26,             27,             28,

@@ -35,9 +35,19 @@ class Lang
     private static $spell;
     private static $title;
     private static $zone;
+    private static $guide;
 
     private static $emote;
     private static $enchantment;
+
+    private static $locales = array(
+        LOCALE_EN => 'English',
+        LOCALE_FR => 'Français',
+        LOCALE_DE => 'Deutsch',
+        LOCALE_CN => '简体中文',
+        LOCALE_ES => 'Español',
+        LOCALE_RU => 'Русский'
+    );
 
     public static function load($loc)
     {

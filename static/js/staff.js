@@ -1,7 +1,7 @@
 var mn_content = [
 //  [22, 'Achievements',             '?admin=achievements',                   null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_DEV | U_GROUP_BUREAU}],
     [3,  'Announcements',            '?admin=announcements',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-//  [25, 'Guides Awaiting Approval', '?admin=guides',                         null,           {requiredAccess: U_GROUP_STAFF}],
+    [25, 'Guides Awaiting Approval', '?admin=guides',                         null,           {requiredAccess: U_GROUP_STAFF}],
 //  [20, 'Global Images & Headers',  '?admin=headers',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
 //  [21, 'Modelviewer',              '?admin=modelviewer',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
     [23, 'Out of Date Comments',     '?admin=out-of-date',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_MOD}],
@@ -15,8 +15,8 @@ var mn_content = [
 //  [15, 'Skins',                    '?admin=home-skins',                     null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT, breadcrumb: 'Homepage Skins'}],
     [16, 'Titles',                   '?admin=home-titles',                    null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Homepage Titles'}],
 
-//  [,   'Articles'],
-//  [8,  'List',                     '?admin=articles',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_EDITOR | U_GROUP_LOCALIZER, breadcrumb: 'List of Articles'}],
+    [,   'Articles'],
+    [8,  'List',                     '?admin=articles',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_EDITOR | U_GROUP_LOCALIZER, breadcrumb: 'List of Articles'}],
 //  [9,  'Editors\' Lounge',         '?admin=editors-lounge',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_EDITOR | U_GROUP_LOCALIZER}],
 //  [23, 'Related Links',            '?admin=related-links',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
 
@@ -25,7 +25,7 @@ var mn_content = [
 //  [11, 'Content Corner',           '?admin=content-corner',                 null,           {requiredAccess: U_GROUP_EMPLOYEE | U_GROUP_BLOGGER}],
 //  [12, 'Tags',                     '?admin=newstag',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_BLOGGER, breadcrumb: 'News Tags'}],
 //  [24, 'Patch Updates',            '?admin=patch-updates',                  null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU}],
-//  [26, 'Featured Guides',          '?admin=featuredguides',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Featured Guides'}],
+    [26, 'Featured Guides',          '?admin=featuredguides',                 null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU, breadcrumb: 'Featured Guides'}],
 
 //  [,   'Community'],
 //  [4,  'Contests',                 '?admin=contests',                       null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SALESAGENT}],
@@ -170,13 +170,13 @@ $(document).ready(function () {
     if ($WH.isset('g_pageInfo')) {
         if (g_pageInfo.type && g_pageInfo.typeId) {
             mn_staff.push([, 'DB Entry']);
-//          mn_staff.push([1001, 'Edit Article', '?edit=article&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: articleAccess}]);
+            mn_staff.push([1001, 'Edit Article', '?edit=article&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: articleAccess}]);
             mn_staff.push([1000, 'Manage Screenshots', '?admin=screenshots&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT}]);
             mn_staff.push([1000, 'Manage Videos', '?admin=videos&type=' + g_pageInfo.type + '&typeid=' + g_pageInfo.typeId, null, {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO}])
         }
         if (g_pageInfo.articleUrl) {
             mn_staff.push([, 'Article']);
-            mn_staff.push([1002, 'Edit', '?edit=article&' + g_pageInfo.articleUrl, null, {requiredAccess: (g_pageInfo.editAccess ? g_pageInfo.editAccess: articleAccess)}]);
+            mn_staff.push([1002, 'Edit', '?edit=article&' + g_pageInfo.articleUrl, null, {requiredAccess: (g_pageInfo.editAccess ? g_pageInfo.editAccess : articleAccess)}]);
             mn_staff.push([1003, 'Options', '?edit=article-options&url=' + g_pageInfo.articleUrl, null, {requiredAccess: articleAccess}])
         }
     }

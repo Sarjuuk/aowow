@@ -60,7 +60,8 @@ class UserPage extends GenericPage
         // contrib -> [url=http://www.wowhead.com/client]Data uploads: n [small]([tooltip=tooltip_totaldatauploads]xx.y MB[/tooltip])[/small][/url]
 
         $co = DB::Aowow()->selectRow(
-            'SELECT COUNT(DISTINCT c.id) AS sum, SUM(IFNULL(cr.value, 0)) AS nRates FROM ?_comments c LEFT JOIN ?_comments_rates cr ON cr.commentId = c.id AND cr.userId <> 0 WHERE c.replyTo = 0 AND c.userId = ?d',
+            'SELECT COUNT(DISTINCT c.id) AS sum, SUM(IFNULL(ur.value, 0)) AS nRates FROM ?_comments c LEFT JOIN ?_user_ratings ur ON ur.entry = c.id AND ur.type = ?d AND ur.userId <> 0 WHERE c.replyTo = 0 AND c.userId = ?d',
+            RATING_COMMENT,
             $this->user['id']
         );
         if ($co['sum'])

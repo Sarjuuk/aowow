@@ -57,13 +57,21 @@ class AdminPage extends GenericPage
                 array_push($this->path, 2, 16);
                 $this->name = 'Weight Presets';
                 break;
+            case 'guides':
+                $this->reqUGroup = U_GROUP_STAFF;
+                $this->generator = 'handleGuideApprove';
+                $this->tpl       = 'list-page-generic';
+
+                array_push($this->path, 1, 25);
+                $this->name = 'Pending Guides';
+                break;
             default:                                        // error out through unset template
         }
 
         parent::__construct($pageCall, $pageParam);
     }
 
-    protected function generateContent()
+    protected function generateContent() : void
     {
         if (!$this->generator || function_exists($this->generator))
             return;
@@ -71,7 +79,7 @@ class AdminPage extends GenericPage
         $this->{$this->generator}();
     }
 
-    private function handleConfig()
+    private function handleConfig() : void
     {
         $this->addScript(
             [CSS_STRING, '.grid input[type=\'text\'], .grid input[type=\'number\'] { width:250px; text-align:left; }'],
@@ -121,7 +129,7 @@ class AdminPage extends GenericPage
             )];
     }
 
-    private function handlePhpInfo()
+    private function handlePhpInfo() : void
     {
         $this->addScript([
             CSS_STRING, "\npre {margin: 0px; font-family: monospace;}\n" .
@@ -185,7 +193,7 @@ class AdminPage extends GenericPage
         }
     }
 
-    private function handleScreenshots()
+    private function handleScreenshots() : void
     {
         $this->addScript(
             [JS_FILE,    'screenshot.js'],
@@ -223,7 +231,7 @@ class AdminPage extends GenericPage
         $this->ssNFound = $nMatches;                        // ssm_numPagesFound
     }
 
-    private function handleWeightPresets()
+    private function handleWeightPresets() : void
     {
         $this->addScript(
             [JS_FILE,    'filters.js'],
@@ -250,6 +258,26 @@ class AdminPage extends GenericPage
         $this->extraText = '[table class=grid][tr]'.$head.'[/tr][tr]'.$body.'[/tr][/table]';
 
         $this->extraHTML = '<script type="text/javascript">var wt_presets = '.Util::toJSON($weights).";</script>\n\n";
+    }
+
+    private function handleGuideApprove() : void
+    {
+        $pending = new GuideList([['status', GUIDE_STATUS_REVIEW]]);
+        if ($pending->error)
+            $data = [];
+        else
+        {
+            $data   = $pending->getListviewData();
+            $latest = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, MAX(`rev`) FROM ?_articles WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `rev`', Type::GUIDE, $pending->getFoundIDs());
+            foreach ($latest as $id => $rev)
+                $data[$id]['rev'] = $rev;
+        }
+
+        $this->lvTabs[] = ['guide', array(
+            'data'       => array_values($data),
+            'hiddenCols' => ['patch', 'comments', 'views', 'rating'],
+            'extraCols'  => '$_'
+        ), 'guideAdminCol'];
     }
 
     private function configAddRow($r)

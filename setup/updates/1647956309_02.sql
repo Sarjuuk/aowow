@@ -1,0 +1,17 @@
+SET FOREIGN_KEY_CHECKS=0;
+
+-- move comments over to new table
+INSERT INTO `aowow_user_ratings`  SELECT 1, `commentId`, `userId`, `value` FROM `aowow_comments_rates`;
+-- drop aowow_comment_rates at own discretion
+
+-- modify aowow_articles
+ALTER TABLE `aowow_articles` DROP KEY `type`, DROP KEY `locale_url`;
+ALTER TABLE `aowow_articles` ADD `rev` TINYINT UNSIGNED DEFAULT 0 NOT NULL AFTER `url`;
+ALTER TABLE `aowow_articles` MODIFY COLUMN `editAccess` SMALLINT(5) UNSIGNED DEFAULT 2 NOT NULL;
+ALTER TABLE `aowow_articles` ADD UNIQUE KEY `type_id_locale` (`type`,`typeId`,`locale`,`rev`), ADD UNIQUE KEY `url_locale` (`url`,`locale`,`rev`);
+
+REPLACE INTO `aowow_articles` (`locale`,`url`,`article`) VALUES
+    (0,'new','Any user can write a guide and then share it with the community. Before a guide will be available to the public, it will be put in a queue where it can be approved or rejected by the staff. We suggest that you make sure your guide is complete before you put it through this process. A complete guide will generally be thorough, 100% accurate for World of Warcraft''s current build, and include details such as images.\n\n[h3]Tips For Creating Quality Guides[/h3]\n\n[ul][li][b]Use [url=?help=markup-guide]Aowow''s BBCode[/url].[/b][/li]\n[li][b]Choose the correct category.[/b] Guides placed in the wrong category risk being rejected. Don''t see your category? Email [feedback]![/li]\n[li][b]Always submit only complete guides.[/b] You can save in-progress ones indefinitely so you won''t risk losing them.[/li]\n[li][b]Make sure it''s on a unique topic with unique advice.[/b] If someone has already covered your topic, make sure that your guide offers something different and/or better advice or else it may be downvoted by our community.[/li]\n[li][b]Extremely short guides may be better off as a comment.[/b] Though overall there is no predetermined length for a good guide.[/li]\n[li][b]We do not tolerate plagiarism in any form.[/b] Make sure to include credits to other sources and a hyperlink if you use their images or otherwise.[/li][/ul]'),
+    (0,'edit','Any user can write a guide and then share it with the community. Before a guide will be available to the public, it will be put in a queue where it can be approved or rejected by the staff. We suggest that you make sure your guide is complete before you put it through this process. A complete guide will generally be thorough, 100% accurate for World of Warcraft''s current build, and include details such as images.\n\n[h3]Tips For Creating Quality Guides[/h3]\n\n[ul][li][b]Use [url=?help=markup-guide]Aowow''s BBCode[/url].[/b][/li]\n[li][b]Choose the correct category.[/b] Guides placed in the wrong category risk being rejected. Don''t see your category? Email [feedback]![/li]\n[li][b]Always submit only complete guides.[/b] You can save in-progress ones indefinitely so you won''t risk losing them.[/li]\n[li][b]Make sure it''s on a unique topic with unique advice.[/b] If someone has already covered your topic, make sure that your guide offers something different and/or better advice or else it may be downvoted by our community.[/li]\n[li][b]Extremely short guides may be better off as a comment.[/b] Though overall there is no predetermined length for a good guide.[/li]\n[li][b]We do not tolerate plagiarism in any form.[/b] Make sure to include credits to other sources and a hyperlink if you use their images or otherwise.[/li][/ul]');
+
+SET FOREIGN_KEY_CHECKS=1;

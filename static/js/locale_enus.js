@@ -20,6 +20,37 @@ var l_reputation_names = [
     "Moderator Suspension"
 ];
 
+var l_guide_categories = [
+    '', // 0
+    "Classes", // 1
+    "Professions", // 2
+    "World Events", // 3
+    "New Players & Leveling", // 4
+    "Raid & Boss Fights", // 5
+    "Economy & Money", // 6
+    "Achievements", // 7
+    "Vanity Items, Pets & Mounts", // 8
+    "Other" // 9
+];
+
+var l_guide_states = [
+    '',
+    "Draft",
+    "Waiting for Approval",
+    "Approved",
+    "Rejected",
+    "Archived"
+];
+
+var l_guide_states_color = [
+    '',
+    '#71D5FF',
+    '#FFFF00',
+    '#1EFF00',
+    '#FF4040',
+    '#FFD100'
+];
+
 var mn_classes = [
     [6,"Death Knight",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druid",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -967,6 +998,30 @@ var mn_database = [
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Mails', '?mails']                                // aowow - custom
 ];
+
+var mn_guides = [
+    [7, "Achievements", '?guides=7'],
+    [1, "Classes", '?guides=1'],
+    [6, "Economy & Money", '?guides=6'],
+    [4, "New Players & Leveling", '?guides=4'],
+    [2, "Professions", '?guides=2'],
+    [5, "Raid & Boss Fights", '?guides=5'],
+    [8, "Vanity Items, Pets & Mounts", '?guides=8'],
+    [3, "World Events", '?guides=3', [
+        [,"Aowow Guides"],
+        ["lunar-festival","Lunar Festival","?guide=lunar-festival"],
+        ["love-is-in-the-air","Love is in the Air","?guide=love-is-in-the-air"],
+        ["noblegarden","Noblegarden","?guide=noblegarden"],
+        ["childrens-week","Childrens Week","?guide=childrens-week"],
+        ["midsummer-fire-festival","Midsummer Fire Festival","?guide=midsummer-fire-festival"],
+        ["brewfest","Brewfest","?guide=brewfest"],
+        ["hallows-end","Hallow's End","?guide=hallows-end"],
+        ["pilgrims-bounty","Pilgrim's Bounty","?guide=pilgrims-bounty"],
+        ["winter-veil","Feast of Winter Veil","?guide=winter-veil"]
+    ]],
+    [9, "Other", '?guides=9']
+];
+
 var mn_tools = [
     [0,"Talent Calculator","?talent",mn_talentCalc],
     [2,"Hunter Pet Calculator","?petcalc",mn_petCalc],
@@ -979,22 +1034,10 @@ var mn_tools = [
     ]],
     [1,"Maps","?maps"],
     [,"Other"],
-    [6,"Guides","",[
-        [,"World Events"],
-        ["lunar-festival","Lunar Festival","?guide=lunar-festival"],
-        ["love-is-in-the-air","Love is in the Air","?guide=love-is-in-the-air"],
-        ["noblegarden","Noblegarden","?guide=noblegarden"],
-        ["childrens-week","Childrens Week","?guide=childrens-week"],
-        ["midsummer-fire-festival","Midsummer Fire Festival","?guide=midsummer-fire-festival"],
-        ["brewfest","Brewfest","?guide=brewfest"],
-        ["hallows-end","Hallow's End","?guide=hallows-end"],
-        ["pilgrims-bounty","Pilgrim's Bounty","?guide=pilgrims-bounty"],
-        ["winter-veil","Feast of Winter Veil","?guide=winter-veil"]
-    ]],
     [8,"Utilities",,[
         [,"Database"],
-        [0,"Latest Additions","?latest-additions"],
-        [1,"Latest Articles","?latest-articles"],
+        // [0,"Latest Additions","?latest-additions"],
+        // [1,"Latest Articles","?latest-articles"],
         [2,"Latest Comments","?latest-comments"],
         [3,"Latest Screenshots","?latest-screenshots"],
         [11,"Latest Videos","?latest-videos"],
@@ -1056,11 +1099,14 @@ var mn_more = [
     [8,"Search Plugins (FF, IE7, ...)","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];
+
 var mn_path = [
-    [0,"Database",,mn_database],
-    [1,"Tools",,mn_tools],
-    [3,"Community","",mn_community],
-    [2,"More",,mn_more]
+    [0, "Database",  null     , mn_database ],
+    [1, "Tools",     null     , mn_tools    ],
+    [3, "Community", null     , mn_community],
+    [6, "Guides",    '?guides', mn_guides   ],
+    [2, "More",      null     , mn_more     ]
+/* Note: ID 4 is used by the Staff menu - Skip it. It's added by staff.js */
 ];
 
 var g_contact_reasons = {
@@ -2904,6 +2950,7 @@ var LANG = {
     message_cantdeletecomment:    "This comment has been automatically purged due to a negative rating. It cannot be deleted.",
     message_cantdetachcomment:    "This comment has already been detached.",
     message_codenotentered:       "You did not enter the code.",
+    message_cantpostlcomment_tip: "You cannot comment this guide, only English comments are allowed.",
     message_commentdetached:      "This comment is now detached.",
     message_commenttooshort:      "Your comment must be at least 10 characters long.\n\nPlease elaborate a little.",
     message_descriptiontooshort:  "Your description must be at least 10 characters long.\n\nPlease elaborate a little.",
@@ -3408,6 +3455,7 @@ var LANG = {
          17: ["Currency",    "currency",     "Currencies",   "currencies"],
          19: ["Sound",       "sound",        "Sounds",       "sounds"],
          29: ["Icon",        "icon",         "Icons",        "icons"],
+        300: ["Guide",       "guide",        "Guides",       "guides"],
         501: ["Emote",       "emote",        "Emotes",       "emotes"],
         502: ["Enchantment", "enchantment",  "Enchantments", "enchantments"],
         503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
@@ -4798,6 +4846,7 @@ var LANG = {
     build:       "Build",
     calculators: "Calculators",
     patch:       "Patch",
+    status:      "Status",
 
     sound_activities: {
         greeting:          "Greeting",
@@ -4848,27 +4897,46 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    // Guide (wasn't localized at the time of capture)
+    myguides:          'My Guides',
+    listguides:        'List of guides',
+    createnewguide:    'Create New Guide',
+    needsvotes_format: '(needs $1 more votes)',
+    needsvote_format:  '(needs $1 more vote)',
+    outofvotes_format: '(out of $1 votes)',
+    outofvote_format:  '(out of $1 vote)',
+    guideAuthor:       'Guide Author',
+    autoresizetextbox: 'Auto-Resize Text Box',
+
+    descriptionlengthlong_tip:          'Oh no! Your description is $1 too long! It will most likely be truncated.',
+    descriptionlengthoptimal_tip:       'Your description is a good length. Good job! You can safely add up to $1 if needed.',
+    descriptionlengthshort_tip:         'Your description is too short! $1 to go...',
+    descriptionlengthslightlylong_tip:  'Your description is getting a bit too long! But it\'s still acceptable.',
+    descriptionlengthslightlyshort_tip: 'Your description looks okay, but it could be a bit longer. If it would help describe the page try adding $1.',
+    descriptionlengthzero_tip:          'You have not entered any text. The description will be automatically generated for you.',
+
     // Conditions
-    note_condition:       "Every one of these conditions must be met to satisfy the requirement.",
-    note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",
+    note_condition:       'Every one of these conditions must be met to satisfy the requirement.',
+    note_condition_group: 'Any one of these groups must be met in full to satisfy the requirement.',
 
     // Aura Stack Rules
-    asr_behaviour:        "Behaviour",
-    asr_coexist:          "coexist",
-    asr_exclusive:        "exclusive",
-    asr_same_owner:       "(from same caster)",
-    asr_strongest_effect: "(strongest effect is applied)",
+    asr_behaviour:        'Behaviour',
+    asr_coexist:          'coexist',
+    asr_exclusive:        'exclusive',
+    asr_same_owner:       '(from same caster)',
+    asr_strongest_effect: '(strongest effect is applied)',
 
     // Linked Spells
-    ls_trigger:           "Triggers",
-    ls_self:              "This",
-    ls_effects:           "Effects",
-    ls_onCast:            "Spell is cast",
-    ls_onAuraRemove:      "Aura is removed",
-    ls_onAuraApply:       "Spells Aura is applied or removed",
-    ls_onSpellHit:        "Spell hits the target(s)",
-    ls_onTrigger:         "Spell is triggered",
-    ls_onImmune:          "Immunity against Spell is applied or cleared",
+    ls_trigger:           'Triggers',
+    ls_self:              'This',
+    ls_effects:           'Effects',
+    ls_onCast:            'Spell is cast',
+    ls_onAuraRemove:      'Aura is removed',
+    ls_onAuraApply:       'Spells Aura is applied or removed',
+    ls_onSpellHit:        'Spell hits the target(s)',
+    ls_onTrigger:         'Spell is triggered',
+    ls_onImmune:          'Immunity against Spell is applied or cleared',
 
     /* AoWoW: end custom */
 };

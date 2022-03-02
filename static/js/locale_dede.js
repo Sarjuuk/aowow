@@ -20,6 +20,37 @@ var l_reputation_names = [
     "Suspendierung durch Moderator"
 ];
 
+var l_guide_categories = [
+    '', // 0
+    "Klassen", // 1
+    "Berufe", // 2
+    "Weltereignisse", // 3
+    "Neue Spieler & Stufenfortschritt", // 4
+    "Schlachtzüge & Bosskämpfe", // 5
+    "Wirtschaft & Währung", // 6
+    "Erfolge", // 7
+    "Gegenstände, Haus- & Reittiere", // 8
+    "Anderes" // 9
+];
+
+var l_guide_states = [
+    '',
+    "Entwurf",
+    "Zulassung ausstehend",
+    "Zugelassen",
+    "Abgelehnt",
+    "Archiviert"
+];
+
+var l_guide_states_color = [
+    '',
+    '#71D5FF',
+    '#FFFF00',
+    '#1EFF00',
+    '#FF4040',
+    '#FFD100'
+];
+
 var mn_classes = [
     [6,"Todesritter",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"Druide",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -921,6 +952,30 @@ var mn_database = [
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Briefe', '?mails']                               // aowow - custom
 ];
+
+var mn_guides = [
+    [2, "Berufe", '?guides=2'],
+    [7, "Erfolge", '?guides=7'],
+    [8, "Gegenstände, Haus- & Reittiere", '?guides=8'],
+    [1, "Klassen", '?guides=1'],
+    [4, "Neue Spieler & Stufenfortschritt", '?guides=4'],
+    [5, "Schlachtzüge & Bosskämpfe", '?guides=5'],
+    [3, "Weltereignisse", '?guides=3', [
+        [, "Aowow Leitfäden"],
+        ["lunar-festival","Mondfest","?guide=lunar-festival"],
+        ["love-is-in-the-air","Liebe liegt in der Luft","?guide=love-is-in-the-air"],
+        ["noblegarden","Nobelgartenfest","?guide=noblegarden"],
+        ["childrens-week","Kinderwoche","?guide=childrens-week"],
+        ["midsummer-fire-festival","Sonnenwendfest","?guide=midsummer-fire-festival"],
+        ["brewfest","Braufest","?guide=brewfest"],
+        ["hallows-end","Schlotternächte","?guide=hallows-end"],
+        ["pilgrims-bounty","Pilgerfreudenfest","?guide=pilgrims-bounty"],
+        ["winter-veil","Winterhauchfest","?guide=winter-veil"]
+    ]],
+    [6, "Wirtschaft & Währung", '?guides=6'],
+    [9, "Anderes", '?guides=9']
+];
+
 var mn_tools = [
     [0,"Talentrechner","?talent",mn_talentCalc],
     [2,"Begleiterrechner","?petcalc",mn_petCalc],
@@ -933,22 +988,10 @@ var mn_tools = [
     ]],
     [1,"Karten","?maps"],
     [,"Anderes"],
-    [6,"Leitfäden","",[
-        [,"Weltereignisse"],
-        ["lunar-festival","Mondfest","?guide=lunar-festival"],
-        ["love-is-in-the-air","Liebe liegt in der Luft","?guide=love-is-in-the-air"],
-        ["noblegarden","Nobelgartenfest","?guide=noblegarden"],
-        ["childrens-week","Kinderwoche","?guide=childrens-week"],
-        ["midsummer-fire-festival","Sonnenwendfest","?guide=midsummer-fire-festival"],
-        ["brewfest","Braufest","?guide=brewfest"],
-        ["hallows-end","Schlotternächte","?guide=hallows-end"],
-        ["pilgrims-bounty","Pilgerfreudenfest","?guide=pilgrims-bounty"],
-        ["winter-veil","Winterhauchfest","?guide=winter-veil"]
-    ]],
     [8,"Hilfsmittel",,[
         [,"Datenbank"],
-        [0,"Neueste Ergänzungen","?latest-additions"],
-        [1,"Neueste Artikel","?latest-articles"],
+        // [0,"Neueste Ergänzungen","?latest-additions"],
+        // [1,"Neueste Artikel","?latest-articles"],
         [2,"Neueste Kommentare","?latest-comments"],
         [3,"Neueste Screenshots","?latest-screenshots"],
         [11,"Neueste Videos","?latest-videos"],
@@ -1010,11 +1053,13 @@ var mn_more = [
     [8,"Such-Plugins","?searchplugins"],
     [10,"Tooltips","?tooltips"]
 ];
+
 var mn_path = [
-    [0,"Datenbank",,mn_database],
-    [1,"Extras",,mn_tools],
-    [3,"Community","",mn_community],
-    [2,"Weiteres",,mn_more]
+    [0, "Datenbank", null,      mn_database ],
+    [1, "Extras",    null,      mn_tools    ],
+    [3, "Community", null,      mn_community],
+    [6, "Leitfäden", '?guides', mn_guides   ],
+    [2, "Weiteres",  null,      mn_more     ]
 ];
 
 var g_contact_reasons = {
@@ -2856,6 +2901,7 @@ var LANG = {
     message_cantdeletecomment:    "Dieser Kommentar wurde aufgrund seiner negativen Wertung automatisch bereinigt und kann nicht gelöscht werden.",
     message_cantdetachcomment:    "Dieser Kommentar wurde bereits abgetrennt.",
     message_codenotentered:       "Ihr habt den Code nicht eingegeben.",
+    message_cantpostlcomment_tip: "Ihr könnt nicht auf diesen Leitfaden kommentieren, nur englische Kommentare sind erlaubt.",
     message_commentdetached:      "Dieser Kommentar ist ab sofort abgetrennt.",
     message_commenttooshort:      "Euer Kommentar muss mindestens 10 Zeichen umfassen. Bitte führt ihn noch weiter aus.",
     message_descriptiontooshort:  "Eure Beschreibung muss mindestens 10 Zeichen umfassen. Bitte erweitert sie noch ein wenig.",
@@ -3360,6 +3406,7 @@ var LANG = {
          17: ["Währung",         "Währung",          "Währungen",        "Währungen"],
          19: ["Klang",           "Klang",            "Klänge",           "Klänge"],
          29: ["Icon",            "Icon",             "Icons",            "Icons"],
+        300: ["Leitfaden",       "Leitfaden",        "Leitfäden",        "Leitfäden"],
         501: ["Emote",           "Emote",            "Emotes",           "Emotes"],
         502: ["Verzauberung",    "Verzauberung",     "Verzauberungen",   "Verzauberungen"],
         503: ["Areatrigger",     "Areatrigger",      "Areatrigger",      "Areatrigger"],
@@ -4751,6 +4798,7 @@ var LANG = {
     build:       "Version",
     calculators: "Rechner",
     patch:       "Patch",
+    status:      "Status",
 
     sound_activities: {
         greeting:          "Begrüßung",
@@ -4801,6 +4849,25 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    // Guide
+    myguides:          'Meine Leitfäden',
+    listguides:        'Leitfäden auflisten',
+    createnewguide:    'Leitfaden erstellen',
+    needsvotes_format: '(benötigt $1 weitere Stimmen)',
+    needsvote_format:  '(benötigt $1 weitere Stimme)',
+    outofvotes_format: '(aus $1 Stimmen)',
+    outofvote_format:  '(aus $1 Stimme)',
+    guideAuthor:       'Leitfadenautor',
+    autoresizetextbox: 'Textfeld automatisch anpassen',
+
+    descriptionlengthlong_tip:          'Oh nein! Deine Beschreibung ist zu lang bei $1. Es wird wahrscheinlich gekürzt werden.',
+    descriptionlengthoptimal_tip:       'Ihre Beschreibung hat eine gute Länge. Gut gemacht! Sie können sicher bis zu $1 hinzufügen, wenn nötig.',
+    descriptionlengthshort_tip:         'Ihre Beschreibung ist zu kurz! $1 fehlen noch ...',
+    descriptionlengthslightlylong_tip:  'Deine Beschreibung ist ein bißchen lang! Aber es ist immer noch akzeptabel.',
+    descriptionlengthslightlyshort_tip: 'Ihre Beschreibung sieht okay aus, aber es könnte ein bisschen länger sein. Wenn es hilft die Seite zu beschreiben, versuche $1 hinzuzufügen.',
+    descriptionlengthzero_tip:          'Du hast keinen Text eingegeben. Die Beschreibung wird für dich automatisch generiert werden.',
+
     // Conditions
     note_condition:       "Jede einzelne, der hier aufgeführte Bedingungen, muss erfüllt sein um die Gesamtbedingung zu erfüllen.",
     note_condition_group: "Eine beliebige, der hier aufgeführte Gruppen, muss vollständig erfüllt sein um die Gesamtbedingung zu erfüllen.",

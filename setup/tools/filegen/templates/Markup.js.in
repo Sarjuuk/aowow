@@ -345,6 +345,23 @@ var Markup = {
                 return str.replace(/<br\b[\s\S]*?>/gi, "\n");
             }
         },
+        changelog:
+        {
+            empty: false,
+            attr:
+            {
+                open: { req: false, valid: /^true$/ }
+            },
+            allowedClass: MARKUP_CLASS_STAFF,
+            toHtml: function (attr) {
+                var e = '<a id="revealtoggle-changelog" class="revealtoggle changelog" href="javascript:;" onclick="Markup.toggleReveal(\'changelog\');">Show Changelog</a>';
+                var c = "display: none";
+                if (attr.open == "true") {
+                    e = c = "";
+                }
+                return ['<div style="margin: 1em 0" id="guide-changelog"><div id="reveal-changelog" style="' + c + '"><h3 class="heading-size-3">Changelog</h3>', "</div>" + e + "</div>"];
+            }
+        },
         'class':
         {
             empty: true,
@@ -417,7 +434,12 @@ var Markup = {
             },
             allowedClass: MARKUP_CLASS_STAFF,
             /* Syntax: name: class */
-            extraColors: {deathknight: 'c6', dk: 'c6', druid: 'c11', hunter: 'c3', mage: 'c8', paladin: 'c2', priest: 'c5', rogue: 'c4', shaman: 'c7', warlock: 'c9', warrior: 'c1', poor: 'q0', common: 'q1', uncommon: 'q2', rare: 'q3', epic: 'q4', legendary: 'q5', artifact: 'q6', heirloom: 'q7'},
+            extraColors: {
+                deathknight: 'c6', dk: 'c6', druid: 'c11', hunter: 'c3', mage: 'c8', paladin: 'c2', priest: 'c5', rogue: 'c4', shaman: 'c7', warlock: 'c9', warrior: 'c1', poor: 'q0', common: 'q1', uncommon: 'q2', rare: 'q3', epic: 'q4', legendary: 'q5', artifact: 'q6', heirloom: 'q7',
+                'meta-gem': 'gem1', 'red-gem': 'gem2', 'yellow-gem': 'gem4', 'orange-gem': 'gem6', 'blue-gem': 'gem8', 'purple-gem': 'gem10', 'green-gem': 'gem12', 'prismatic-gem': 'gem14',
+                yell: 's1', say: 's2', whsiper: 's3', emote: 's4',
+                hated: 'rep0', hostile: 'rep1', unfriendly: 'rep2', neutral: 'rep3', friendly: 'rep4', honored: 'rep5', revered: 'rep6', exalted: 'rep7'
+            },
             toHtml: function(attr)
             {
                 var valid = /^(aqua|black|blue|fuchsia|gray|green|lime|maroon|navy|olive|purple|red|silver|teal|white|yellow|c\d+|r\d+|q\d*?|#[a-f0-9]{6})$/i;
@@ -839,7 +861,7 @@ var Markup = {
                 if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
                     styles.push(attr.style);
                 if(styles.length)
-                    str += ' styles="' + styles.join(';') + '"';
+                    str += ' style="' + styles.join(';') + '"';
                 return [str + '>', '</h2>'];
             },
             fromHtml: function(str)
@@ -877,7 +899,7 @@ var Markup = {
                 if(attr.style && Markup.allow >= Markup.CLASS_STAFF)
                     styles.push(attr.style);
                 if(styles.length)
-                    str += ' styles="' + styles.join(';') + '"';
+                    str += ' style="' + styles.join(';') + '"';
                 return [str + '>', '</h3>'];
             },
             fromHtml: function(str)
@@ -2973,7 +2995,7 @@ var Markup = {
             trim: true,
             ltrim: true,
             rtrim: true,
-            collect: { h2: 1, h3: 1 },
+            collect: { h2: 1, h3: 1, changelog: 1 },
             exclude: { tabs: { h2: 1, h3: 1 }, minibox: { h2: 1, h3: 1 } },
             allowedClass: MARKUP_CLASS_STAFF,
             attr:
@@ -2999,6 +3021,8 @@ var Markup = {
                     myNodes.push(nodes.h2[node]);
                 for(var node in nodes.h3)
                     myNodes.push(nodes.h3[node]);
+                for(var node in nodes.changelog)
+                    myNodes.push(nodes.changelog[node]);
                 myNodes.sort(function(a, b) {
                   return a.offset - b.offset;
                 });
@@ -3006,7 +3030,17 @@ var Markup = {
                 for(var i in myNodes)
                 {
                     node = myNodes[i];
-                    if(node.name == 'h2' && node.attr.toc != 'false')
+                    if(node.name == 'changelog')
+                    {
+                        if (lastNode == "h3")
+                        {
+                            str += "</ul>";
+                            indent--;
+                        }
+                        str += "<li><b><a href='#guide-changelog' onclick=\"Markup.toggleReveal('changelog');\">Changelog</a></b></li>";
+                        lastNode = "h2";
+                    }
+                    if(node.name == 'h2' && node.attr.toc !== false)
                     {
                         if(lastNode == 'h3')
                         {
@@ -3016,7 +3050,7 @@ var Markup = {
                         str += '<li><b><a href=\'#' + (node.attr.id ? g_urlize(node.attr.id) : g_urlize(node.attr._textContents)) + '\'>' + node.attr._textContents + '</a></b></li>';
                         lastNode = 'h2';
                     }
-                    if(node.name == 'h3' && allowH3 && node.attr.toc != 'false' && (lastNode != '' || nodes.h2.length == 0))
+                    if(node.name == 'h3' && allowH3 && node.attr.toc !== false && (lastNode != '' || nodes.h2.length == 0))
                     {
                         if(lastNode == 'h2')
                         {
@@ -4253,7 +4287,10 @@ var Markup = {
         else
         {
             span.show();
-            toggle.text('(hide)');
+            if (toggle.hasClass('changelog'))
+                toggle.hide();
+            else
+                toggle.text('(hide)');
         }
     },
 

@@ -52,8 +52,11 @@ $lang = array(
         'or'            => " or ",
         'back'          => "Back",
         'reputationTip' => "Reputation points",
-        'byUserTimeAgo' => 'By <a href="'.HOST_URL.'/?user=%s">%1$s</a> %s ago',
+        'byUser'        => 'By <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ', // mind the \s
         'help'          => "Help",
+        'status'        => "Status",
+        'yes'           => "Yes",
+        'no'            => "No",
 
         // filter
         'extSearch'     => "Extended search",
@@ -80,6 +83,10 @@ $lang = array(
         'compare'       => "Compare",
         'view3D'        => "View in 3D",
         'findUpgrades'  => "Find upgrades…",
+        'report'        => "Report",
+        'writeGuide'    => "Write New Guide",
+        'edit'          => "Edit",
+        'changelog'     => 'Changelog',
 
         // misc Tools
         'errPageTitle'  => "Page not found",
@@ -120,7 +127,8 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i",
+        'dateFmtLong'   => "Y/m/d \a\\t H:i A",
+        'timeAgo'       => "%s ago",
 
         // error
         'intError'      => "An internal error has occurred.",
@@ -149,6 +157,63 @@ $lang = array(
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
             )
         )
+    ),
+    'guide' => array(
+        'guide'     => "Guide",
+        'guides'    => "Guides",
+        'myGuides'  => "My Guides",
+        'editTitle' => "Edit your Guide",
+        'newTitle'  => "Create New Guide",
+        'author'    => "Author",
+        'spec'      => "Specialization",
+        'sticky'    => "Sticky Status",
+        'views'     => "Views",
+        'patch'     => "Patch",
+        'added'     => "Added",
+        'rating'    => "Rating",
+        'votes'     => "[span id=guiderating-value]%d[/span]/5 ([span id=guiderating-votes][n5=%d][/span] votes) [span id=guiderating][/span]",
+        'noVotes'   => "not enough votes [span id=guiderating][/span]",
+        'byAuthor'  => "By %s",
+        'notFound'  => "This guide doesn't exist.",
+        'clTitle'     => 'Changelog For "<a href="?guide=%1$d">%2$s</a>"',
+        'clStatusSet' => 'Status set to %s',
+        'clCreated'   => 'Created',
+        'clMinorEdit' => 'Minor Edit',
+        'editor'    => array(
+            'fullTitle'       => 'Full Title',
+            'fullTitleTip'    => 'The full guide title will be used on the guide page and may include SEO-oriented phrasing.',
+            'name'            => 'Name',
+            'nameTip'         => 'This should be a simple and clear name of what the guide is, for use in places like menus and guide lists.',
+            'description'     => 'Description',
+            'descriptionTip'  => 'Description that will be used for search engines.&lt;br&gt;&lt;br&gt;If left empty, it will be generated automatically.',
+        //  'commentEmail'    => 'Comment Emails',
+        //  'commentEmailTip' => 'Should the author get emailed whenever a user comments on this guide?',
+            'changelog'       => 'Changelog For This Edit',
+            'changelogTip'    => 'Enter your changelog for this update here.',
+            'save'            => 'Save',
+            'submit'          => 'Submit for Review',
+            'autoupdate'      => 'Autoupdate',
+            'showAdjPrev'     => 'Show adjacent preview',
+            'preview'         => 'Preview',
+            'class-spec'      => 'Class / Spec',
+            'category'        => 'Category',
+            'testGuide'       => 'See how your guide will look',
+            'images'          => 'Images',
+            'statusTip'       => array(
+                GUIDE_STATUS_DRAFT    => 'Your guide is in &quot;Draft&quot; status and you are the only one able to see it. Keep editing it as long as you like, and when you feel it&apos;s ready submit it for review.',
+                GUIDE_STATUS_REVIEW   => 'Your guide is being reviewed.',
+                GUIDE_STATUS_APPROVED => 'Your guide has been published.',
+                GUIDE_STATUS_REJECTED => 'Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.',
+                GUIDE_STATUS_ARCHIVED => 'Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.',
+            )
+        ),
+        'category'  => array(
+            null,                           "Classes",                      "Professions",                  "World Events",                     "New Players & Leveling",
+            "Raid & Boss Fights",           "Economy & Money",              "Achievements",                 "Vanity Items, Pets & Mounts",      "Other"
+        ),
+        'status'    => array(
+            null,                           "Draft",                        "Waiting for Approval",         "Approved",                         "Rejected",                             "Archived"
+        ),
     ),
     'profiler' => array(
         'realm'         => "Realm",
@@ -343,6 +408,20 @@ $lang = array(
             31 => "Ravager",                32 => "Warp Stalker",           33 => "Sporebat",               34 => "Nether Ray",             35 => "Serpent",                37 => "Moth",
             38 => "Chimaera",               39 => "Devilsaur",              41 => "Silithid",               42 => "Worm",                   43 => "Rhino",                  44 => "Wasp",
             45 => "Core Hound",             46 => "Spirit Beast"
+        ),
+        'classSpecs'    => array(
+            -1 => 'Untalented',
+             0 => 'Hybrid',
+             1 => ['Arms',             'Fury',         'Protection'  ],
+             2 => ['Holy',             'Protection',   'Retribution' ],
+             3 => ['Beast Mastery',    'Marksmanship', 'Survival'    ],
+             4 => ['Assassination',    'Combat',       'Subtlety'    ],
+             5 => ['Discipline',       'Holy',         'Shadow Magic'],
+             6 => ['Blood',            'Frost',        'Unholy'      ],
+             7 => ['Elemental Combat', 'Enhancement',  'Restoration' ],
+             8 => ['Arcane',           'Fire',         'Frost'       ],
+             9 => ['Affliction',       'Demonology',   'Destruction' ],
+            11 => ['Balance',          'Feral Combat', 'Restoration' ]
         ),
         'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",

@@ -266,7 +266,7 @@ if (!CLI)
     $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING'] ?? ''), 2)[0];
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
-    $pageParam = isset($_[1]) ? $_[1] : '';
+    $pageParam = $_[1] ?? '';
 
     Util::$wowheadLink = 'http://'.Util::$subDomains[User::$localeId].'.wowhead.com/'.$str;
 }

@@ -52,8 +52,11 @@ $lang = array(
         'or'            => " ou ",
         'back'          => "Redro",
         'reputationTip' => "Points de réputation",
-        'byUserTimeAgo' => 'Par <a href="'.HOST_URL.'/?user=%s">%1$s</a> il y a %s',
+        'byUser'        => 'Par <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Aide",
+        'status'        => "Statut",
+        'yes'           => "Oui",
+        'no'            => "Non",
 
         // filter
         'extSearch'     => "Recherche avancée",
@@ -80,6 +83,10 @@ $lang = array(
         'compare'       => "Comparer",
         'view3D'        => "Voir en 3D",
         'findUpgrades'  => "Trouver des améliorations…",
+        'report'        => "Signaler",
+        'writeGuide'    => "Créer un nouveau Guide",
+        'edit'          => "Édition",
+        'changelog'     => 'Journal des changements',
 
         // misc Tools
         'errPageTitle'  => "Page non trouvée",
@@ -120,7 +127,8 @@ $lang = array(
         // formating
         'colon'         => ' : ',
         'dateFmtShort'  => "Y-m-d",
-        'dateFmtLong'   => "Y-m-d à H:i",
+        'dateFmtLong'   => "Y-m-d à H:i A",
+        'timeAgo'       => 'il y a %s',
 
         // error
         'intError'      => "[An internal error occured.]",
@@ -148,6 +156,63 @@ $lang = array(
                 'stat-weighting'     => "Échelles de valeurs",              'talent-calculator' => "Calculateur de talents",    'item-comparison'         => "Comparaison d'objets",
                 'profiler'           => "Profiler",                         'markup-guide'      => "Markup Guide"
             )
+        )
+    ),
+    'guide' => array(
+        'guide'     => "Guide",
+        'guides'    => "Guides",
+        'myGuides'  => "Mes guides",
+        'editTitle' => "Editez votre Guide",
+        'newTitle'  => "Créer un nouveau Guide",
+        'author'    => "Auteur",
+        'spec'      => "Spécialisation",
+        'sticky'    => "Statut coller",
+        'views'     => "Vues",
+        'patch'     => "Patch",
+        'added'     => "Ajouté",
+        'rating'    => "Note",
+        'votes'     => "[span id=guiderating-value]%d[/span]/5 ([span id=guiderating-votes][n5=%d][/span] Votes) [span id=guiderating][/span]",
+        'noVotes'   => "pas assez de votes [span id=guiderating][/span]",
+        'byAuthor'  => "Par %s",
+        'notFound'  => "Ce guide n'existe pas.",
+        'clTitle'     => 'Journal des changements pour "<a href="?guide=%1$d">%2$s</a>"',
+        'clStatusSet' => 'Statut défini comme %s',
+        'clCreated'   => 'Créé',
+        'clMinorEdit' => 'Modification mineure',
+        'editor'    => array(
+            'fullTitle'       => 'Titre complet',
+            'fullTitleTip'    => 'Le titre complet du guide sera utilisé sur la page du guide et peut contenir des éléments destinés aux moteurs de recherche.',
+            'name'            => 'Nom',
+            'nameTip'         => 'Ceci devrait être un nom clair et concis de ce en quoi consiste le guide, qui sera affiché dans les menus et listes de guides.',
+            'description'     => 'Description',
+            'descriptionTip'  => 'Description qui sera utilisée par les moteurs de recherche.&lt;br /&gt;&lt;br /&gt;S&apos;il est laissé vide, le résumé sera généré automatiquement.',
+        //  'commentEmail'    => 'Recevoir les commentaires par courriel',
+        //  'commentEmailTip' => 'L&apos;auteur doit-il recevoir un courriel chaque fois qu&apos;un utilisateur commente ce guide ?',
+            'changelog'       => 'Journal des changements pour cette modification',
+            'changelogTip'    => 'Entrez votre journal de modifications pour cette mise à jour ici.',
+            'save'            => 'Sauver',
+            'submit'          => 'Soumettre pour examen',
+            'autoupdate'      => 'Mise à jour automatique',
+            'showAdjPrev'     => 'Show adjacent preview',
+            'preview'         => 'Aperçu',
+            'class-spec'      => 'Classe / Spé',
+            'category'        => 'Catégorie',
+            'testGuide'       => 'Ayez un aperçu de votre guide',
+            'images'          => 'Images',
+            'statusTip'       => array(
+                GUIDE_STATUS_DRAFT    => 'Votre guide est en statut &quot;Brouillon&quot; et vous êtes le seul à pouvoir le lire. Continuez de l&apos;écrire comme vous le voulez, et quand vous sentez qu&apos;il est prêt, soumettez-le pour approbation.',
+                GUIDE_STATUS_REVIEW   => 'Your guide is being reviewed.',
+                GUIDE_STATUS_APPROVED => 'Your guide has been published.',
+                GUIDE_STATUS_REJECTED => 'Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.',
+                GUIDE_STATUS_ARCHIVED => 'Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.',
+            )
+        ),
+        'category'  => array(
+            null,                           "Classes",                      "Métiers",                      "Évènements mondiaux",              "Nouveaux Joueurs & Montée en niveau",
+            "Raids & Combats contre des boss","Economie et Argent",         "Hauts faits",                  "Objets tape-à-l'oeil, Compagnons et Montures","Autre"
+        ),
+        'status'    => array(
+            null,                           "Brouillon",                    "Attente d'approbation",        "Approuvé",                         "Rejeter",                              "Archivé"
         )
     ),
     'profiler' => array(
@@ -343,6 +408,20 @@ $lang = array(
             31 => "Ravageur",               32 => "Traqueur dim.",          33 => "Sporoptère",             34 => "Raie du Néant",          35 => "Serpent",                37 => "Phalène",
             38 => "Chimère",                39 => "Diablosaure",            41 => "Silithide",              42 => "Ver",                    43 => "Rhinocéros",             44 => "Guêpe",
             45 => "Chien du Magma",         46 => "Esprit de bête"
+        ),
+        'classSpecs'    => array(
+            -1 => 'Sans talent',
+             0 => 'Hybride',
+             6 => ['Sang',               'Givre',           'Impie'            ],
+            11 => ['Equilibre',          'Combat farouche', 'Restauration'     ],
+             3 => ['Maîtrise des bêtes', 'Précision',       'Survie'           ],
+             8 => ['Arcanes',            'Feu',             'Givre'            ],
+             2 => ['Sacré',              'Protection',      'Vindicte'         ],
+             5 => ['Discipline',         'Sacré',           'Magie de l\'ombre'],
+             4 => ['Assassinat',         'Combat',          'Finesse'          ],
+             7 => ['Combat élémentaire', 'Amélioration',    'Restauration'     ],
+             9 => ['Affliction',         'Démonologie',     'Destruction'      ],
+             1 => ['Armes',              'Fureur',          'Protection'       ]
         ),
         'pvpRank'       => array(
             null,                                                           "Private / Scout",                                              "Corporal / Grunt",

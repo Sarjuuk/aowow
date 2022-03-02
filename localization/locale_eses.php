@@ -52,8 +52,11 @@ $lang = array(
         'or'            => " o ",
         'back'          => "Atrás",
         'reputationTip' => "Puntos de reputación",
-        'byUserTimeAgo' => 'Por <a href="'.HOST_URL.'/?user=%s">%1$s</a> hace %s',
+        'byUser'        => 'Por <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Ayuda",
+        'status'        => "Estado",
+        'yes'           => "Sí",
+        'no'            => "No",
 
         // filter
         'extSearch'     => "Extender búsqueda",
@@ -80,6 +83,10 @@ $lang = array(
         'compare'       => "Comparar",
         'view3D'        => "Ver en 3D",
         'findUpgrades'  => "Buscar mejoras…",
+        'report'        => "Reportar",
+        'writeGuide'    => "Crear Nueva Guía",
+        'edit'          => "Editar",
+        'changelog'     => 'Changelog',
 
         // misc Tools
         'errPageTitle'  => "Página no encontrada",
@@ -120,7 +127,8 @@ $lang = array(
         // formating
         'colon'         => ': ',
         'dateFmtShort'  => "d/m/Y",
-        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i",
+        'dateFmtLong'   => "d/m/Y \a \l\a\s H:i A",
+        'timeAgo'       => 'hace %s',
 
         // error
         'intError'      => "Un error interno ha ocurrido.",
@@ -148,6 +156,63 @@ $lang = array(
                 'stat-weighting'     => "Medición de atributos",            'talent-calculator' => "Calculadora de talentos",   'item-comparison'         => "Comparación de objetos",
                 'profiler'           => "Perfiles",                         'markup-guide'      => "Margen de Guia"
             )
+        )
+    ),
+    'guide' => array(
+        'guide'     => "Guía",
+        'guides'    => "Guías",
+        'myGuides'  => "Mis Guías",
+        'editTitle' => "Editar tu Guía",
+        'newTitle'  => "Crear Nueva Guía",
+        'author'    => "Autor",
+        'spec'      => "Especialización",
+        'sticky'    => "Estado Fijo",
+        'views'     => "Visto",
+        'patch'     => "Parche",
+        'added'     => "Añadido",
+        'rating'    => "Valoración",
+        'votes'     => "[span id=guiderating-value]%d[/span]/5 ([span id=guiderating-votes][n5=%d][/span] Votos) [span id=guiderating][/span]",
+        'noVotes'   => "necesita votaciones más [span id=guiderating][/span]",
+        'byAuthor'  => "Por %s",
+        'notFound'  => "Este/a guía no existe.",
+        'clTitle'     => 'Historial de cambios para "<a href="?guide=%1$d">%2$s</a>"',
+        'clStatusSet' => 'Estado cambiado a %s',
+        'clCreated'   => 'Creado',
+        'clMinorEdit' => 'Modificación menor',
+        'editor'    => array(
+            'fullTitle'       => 'Full Title',
+            'fullTitleTip'    => 'The full guide title will be used on the guide page and may include SEO-oriented phrasing.',
+            'name'            => 'Nombre',
+            'nameTip'         => 'This should be a simple and clear name of what the guide is, for use in places like menus and guide lists.',
+            'description'     => 'Descripción',
+            'descriptionTip'  => 'Descripción empleada para los motores de búsqueda.&lt;br /&gt;&lt;br /&gt;Si se deja vacío, será generada automáticamente.',
+        //  'commentEmail'    => 'Enviar comentarios por email',
+        //  'commentEmailTip' => '¿El autor debería ser notificado por correo cuando un usuario escriba comentarios en esta guía?',
+            'changelog'       => 'Historial de cambios para esta modifiación',
+            'changelogTip'    => 'Historial de cambios para esta modifiación',
+            'save'            => 'Guardar',
+            'submit'          => 'Enviar para revisión',
+            'autoupdate'      => 'Actualización automática',
+            'showAdjPrev'     => 'Mostrar vista previa adyacente',
+            'preview'         => 'Visualizar',
+            'class-spec'      => 'Clase / Spec',
+            'category'        => 'Categoría',
+            'testGuide'       => 'Mira el aspecto de tu guía.',
+            'images'          => 'Imágenes',
+            'statusTip'       => array(
+                GUIDE_STATUS_DRAFT    => 'Tu guía está en estado &quot;borrador&quot; y solo tú puedes verla. Tienes todo el tiempo del mundo para editarla y, cuando creas que ya está lista, envíala para su revisión.',
+                GUIDE_STATUS_REVIEW   => 'Your guide is being reviewed.',
+                GUIDE_STATUS_APPROVED => 'Your guide has been published.',
+                GUIDE_STATUS_REJECTED => 'Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.',
+                GUIDE_STATUS_ARCHIVED => 'Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.',
+            )
+        ),
+        'category'  => array(
+            null,                           "Clases",                       "Profesiones",                  "Eventos del mundo",                "Nuevos Jugadores y Leveling",
+            "Combates de Bandas y Jefes",   "Economía y Dinero",            "Logros",                       "Objetos de vanidad, Mascotas y Monturas", "Otros"
+        ),
+        'status'    => array(
+            null,                           "Borrador",                     "Esperando aprobación",         "Aprobado",                         "Rechazado",                            "Archivada"
         )
     ),
     'profiler' => array(
@@ -343,6 +408,20 @@ $lang = array(
             31 => "Devastador",             32 => "Acechador deformado",    33 => "Esporiélago",            34 => "Raya abisal",            35 => "Serpiente",              37 => "Palomilla",
             38 => "Quimera",                39 => "Demosaurio",             41 => "Silítido",               42 => "Gusano",                 43 => "Rinoceronte",            44 => "Avispa",
             45 => "Can del Núcleo",         46 => "Bestia espíritu"
+        ),
+        'classSpecs'    => array(
+            -1 => 'Sin talentos',
+             0 => 'Híbrido',
+             6 => ['Sangre',             'Escarcha',      'Profano'      ],
+            11 => ['Equilibrio',         'Combate feral', 'Restauración' ],
+             3 => ['Dominio de bestias', 'Puntería',      'Supervivencia'],
+             8 => ['Arcano',             'Fuego',         'Escarcha'     ],
+             2 => ['Sagrado',            'Protección',    'Reprensión'   ],
+             5 => ['Disciplina',         'Sagrado',       'Magia sombría'],
+             4 => ['Asesinato',          'Combate',       'Sutileza'     ],
+             7 => ['Combate elemental',  'Mejora',        'Restauración' ],
+             9 => ['Aflicción',          'Demonología',   'Destrucción'  ],
+             1 => ['Armas',              'Furia',         'Protección'   ]
         ),
         'pvpRank'       => array(
             null,                                                           "Soldado / Explorador",                                         "Cabo / Bruto",

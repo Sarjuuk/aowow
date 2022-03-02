@@ -20,6 +20,37 @@ var l_reputation_names = [
     "管理员封号"
 ];
 
+var l_guide_categories = [
+    '', // 0
+    "职业", // 1
+    "专业", // 2
+    "世界事件", // 3
+    "新玩家", // 4
+    "地下城与团队副本", // 5
+    "经济与金钱", // 6
+    "成就", // 7
+    "华丽收藏", // 8
+    "杂项" // 9
+];
+
+var l_guide_states = [
+    "",
+    "草稿",
+    "等待审批",
+    "同意",
+    "拒绝",
+    "已归档"
+];
+
+var l_guide_states_color = [
+    "",
+    "#71D5FF",
+    "#FFFF00",
+    "#1EFF00",
+    "#FF4040",
+    "#FFD100"
+];
+
 var mn_classes = [
     [6,"死亡骑士",,,{className:"c6",tinyIcon:"class_deathknight"}],
     [11,"德鲁伊",,,{className:"c11",tinyIcon:"class_druid"}],
@@ -967,6 +998,30 @@ var mn_database = [
     [102, 'Areatrigger', '?areatriggers', mn_areatrigger, {requiredAccess: 1726}],    // aowow - custom
     [103, 'Mails', '?mails']                                // aowow - custom
 ];
+
+var mn_guides = [
+    [7, "成就", '?guides=7'],
+    [1, "职业", '?guides=1'],
+    [6, "经济与金钱", '?guides=6'],
+    [4, "新玩家", '?guides=4'],
+    [2, "专业", '?guides=2'],
+    [5, "地下城与团队副本", '?guides=5'],
+    [8, "华丽收藏", '?guides=8'],
+    [3, "世界事件", '?guides=3', [
+        [,"Aowow 指南"],
+        ["lunar-festival","春节","?guide=lunar-festival"],
+        ["love-is-in-the-air","情人节","?guide=love-is-in-the-air"],
+        ["noblegarden","复活节","?guide=noblegarden"],
+        ["childrens-week","儿童周","?guide=childrens-week"],
+        ["midsummer-fire-festival","仲夏火焰节","?guide=midsummer-fire-festival"],
+        ["brewfest","美酒节","?guide=brewfest"],
+        ["hallows-end","万圣节","?guide=hallows-end"],
+        ["pilgrims-bounty","感恩节","?guide=pilgrims-bounty"],
+        ["winter-veil","冬幕节","?guide=winter-veil"]
+    ]],
+    [9, "杂项", '?guides=9']
+];
+
 var mn_tools = [
     [0,"天赋模拟器","?talent",mn_talentCalc],
     [2,"猎人宠物模拟器","?petcalc",mn_petCalc],
@@ -979,22 +1034,10 @@ var mn_tools = [
     ]],
     [1,"地图","?maps"],
     [,"其他"],
-    [6,"指南","",[
-        [,"世界事件"],
-        ["lunar-festival","春节","?guide=lunar-festival"],
-        ["love-is-in-the-air","情人节","?guide=love-is-in-the-air"],
-        ["noblegarden","复活节","?guide=noblegarden"],
-        ["childrens-week","儿童周","?guide=childrens-week"],
-        ["midsummer-fire-festival","仲夏火焰节","?guide=midsummer-fire-festival"],
-        ["brewfest","美酒节","?guide=brewfest"],
-        ["hallows-end","万圣节","?guide=hallows-end"],
-        ["pilgrims-bounty","感恩节","?guide=pilgrims-bounty"],
-        ["winter-veil","冬幕节","?guide=winter-veil"]
-    ]],
     [8,"Utilities",,[
         [,"数据库"],
-        [0,"最新插件","?latest-additions"],
-        [1,"最新文章","?latest-articles"],
+        // [0,"最新插件","?latest-additions"],
+        // [1,"最新文章","?latest-articles"],
         [2,"最新评论","?latest-comments"],
         [3,"最新截屏","?latest-screenshots"],
         [11,"最新视频","?latest-videos"],
@@ -1056,11 +1099,13 @@ var mn_more = [
     [8,"搜索插件","?searchplugins"],
     [10,"工具提示","?tooltips"]
 ];
+
 var mn_path = [
-    [0,"数据库",,mn_database],
-    [1,"工具",,mn_tools],
-    [3,"社区","",mn_community],
-    [2,"更多",,mn_more]
+    [0, "数据库", null,      mn_database ],
+    [1, "工具",   null,      mn_tools    ],
+    [3, "社区",   null,      mn_community],
+    [6, "指南",   '?guides', mn_guides   ],
+    [2, "更多",   null,      mn_more     ]
 ];
 
 var g_contact_reasons = {
@@ -2904,6 +2949,7 @@ var LANG = {
     message_cantdeletecomment:    "此评论由于负分评价已被自动清除，无法删除。",
     message_cantdetachcomment:    "此评论已分离。",
     message_codenotentered:       "您没有输入验证码。",
+    message_cantpostlcomment_tip: "您无法评论此指南，只允许英文评论。",
     message_commentdetached:      "此评论已被分离。",
     message_commenttooshort:      "消息不可为空。",
     message_descriptiontooshort:  "您的描述至少要10个字符，请多写一些。",
@@ -3408,6 +3454,7 @@ var LANG = {
          17: ["货币",        "货币",         "货币",          "货币"],
          19: ["声音",        "音效",         "声音",          "声音"],
          29: ["图标",        "图标",         "图标",          "图标"],
+        300: ["指南",        "指南",         "指南",          "指南"],
         501: ["表情",        "表情",         "表情",          "表情"],
         502: ["附魔",        "附魔",         "附魔",          "附魔"],
         503: ["Areatrigger", "areatrigger",  "Areatriggers", "areatriggers"],
@@ -4778,6 +4825,7 @@ var LANG = {
     build:       "版本",
     calculators: "模拟器",
     patch:       "补丁",
+    status:      "状态",
 
     sound_activities: {
         greeting:          "问候",
@@ -4828,6 +4876,25 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    // Guide
+    myguides:          '我的指南',
+    listguides:        '[List of guides]',
+    createnewguide:    '创建新指南',
+    needsvotes_format: '（需要 $1 个投票）',
+    needsvote_format:  '（需要 $1 个投票）',
+    outofvotes_format: '[(out of $1 votes)]',
+    outofvote_format:  '[(out of $1 vote)]',
+    guideAuthor:       '[Guide Author]',
+    autoresizetextbox: '自动缩放文字框',
+
+    descriptionlengthlong_tip:          '欧漏，你的描述超出了$1个字！可能会被删减哦。',
+    descriptionlengthoptimal_tip:       '你的注释已经达到了合理的长度。干的漂亮！',
+    descriptionlengthshort_tip:         '你的注释太短了！请再输入$1$个字。',
+    descriptionlengthslightlylong_tip:  '不妙，你的描述超出了$1个字！可能会被删减哦。',
+    descriptionlengthslightlyshort_tip: '你的描述看上去差不多了，但还能再长点。试着再增加 $1 个字。',
+    descriptionlengthzero_tip:          '你没有输入文本，系统将自动生成描述。',
+
     // Conditions
     note_condition:       "每一个条件必须满足要求。",
     note_condition_group: "Any one of these groups must be met in full to satisfy the requirement.",

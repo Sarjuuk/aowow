@@ -80,3 +80,39 @@ if (isset($this->redButtons[BUTTON_RESYNC])):
         echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::profiler('resync').'</i></b><span>'.Lang::profiler('resync').'</span></em></a>';
     endif;
 endif;
+
+// report guide
+if (isset($this->redButtons[BUTTON_GUIDE_REPORT])):
+    if ($this->redButtons[BUTTON_GUIDE_REPORT]):
+        echo '<a href="javascript:;" class="button-red" onclick="a = ContactTool.show.bind(ContactTool, {mode: 6, guide: '.$this->typeId.'}); a();"><em><b><i>'.Lang::main('report').'</i></b><span>'.Lang::main('report').'</span></em></a>';
+    else:
+        echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('report').'</i></b><span>'.Lang::main('report').'</span></em></a>';
+    endif;
+endif;
+
+// show guide changelog
+if (isset($this->redButtons[BUTTON_GUIDE_LOG])):
+    if ($this->redButtons[BUTTON_GUIDE_LOG]):
+        echo '<a href="?guide=changelog&id='.$this->typeId.'" class="button-red"><em><b><i>'.Lang::main('changelog').'</i></b><span>'.Lang::main('changelog').'</span></em></a>';
+    else:
+        echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('changelog').'</i></b><span>'.Lang::main('changelog').'</span></em></a>';
+    endif;
+endif;
+
+// edit existing guide
+if (isset($this->redButtons[BUTTON_GUIDE_EDIT])):
+    if ($this->redButtons[BUTTON_GUIDE_EDIT]):
+        echo '<a href="?guide=edit&id='.$this->typeId.'" class="button-red"><em><b><i>'.Lang::main('edit').'</i></b><span>'.Lang::main('edit').'</span></em></a>';
+    else:
+        echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('edit').'</i></b><span>'.Lang::main('edit').'</span></em></a>';
+    endif;
+endif;
+
+// create new guide
+if (isset($this->redButtons[BUTTON_GUIDE_NEW])):
+    if ($this->redButtons[BUTTON_GUIDE_NEW]):
+        echo '<a href="?guide=new" class="button-red"><em><b><i>'.Lang::main('writeGuide').'</i></b><span>'.Lang::main('writeGuide').'</span></em></a>';
+    else:
+        echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('writeGuide').'</i></b><span>'.Lang::main('writeGuide').'</span></em></a>';
+    endif;
+endif;

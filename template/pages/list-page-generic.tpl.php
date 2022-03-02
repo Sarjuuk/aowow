@@ -21,6 +21,8 @@
 ?>
             <div class="text">
 <?php
+        $this->brick('redButtons');
+
         if (!empty($this->h1Links)):
             echo '                <div class="h1-links">'.$this->h1Links.'</div>';
         endif;

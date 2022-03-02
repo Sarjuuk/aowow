@@ -37,6 +37,7 @@ if (typeof $WowheadPower == "undefined") {
             itemsets     = {},
             currencies   = {},
             profiles     = {},
+            guides       = {},
 
             showLogo = 1,
 
@@ -61,14 +62,18 @@ if (typeof $WowheadPower == "undefined") {
             TYPE_HOLIDAY     = 12,
             TYPE_CURRENCY    = 17,
             TYPE_PROFILE     = 100,
+            TYPE_GUIDE       = 300,
 
             CURSOR_HSPACE = 15,
             CURSOR_VSPACE = 15,
 
             _LANG = {
-                loading: "Loading...",
-                noresponse: "No response from server :(",
-                achievementcomplete: "Achievement earned by $1 on $2/$3/$4"
+                0: { achievementComplete: "Achievement earned by $1 on $2/$3/$4",     loading: "Loading…",    noResponse: "No response from server :(",       notFound: "%s Not Found"       },
+                2: { achievementComplete: "Haut-fait reçu par $1 le $2/$3/$4",        loading: "Chargement…", noResponse: "Pas de réponse du serveur :(",     notFound: "%s non trouvé"      },
+                3: { achievementComplete: "Erfolg wurde von $1 am $3.$2.$4 errungen", loading: "Lädt…",       noResponse: "Keine Antwort vom Server :(",      notFound: "%s nicht gefunden"  },
+                4: { achievementComplete: "$1在$2/$3/$4上获得成就",                     loading: "正在载入…",    noResponse: "服务器没有响应 :(",                   notFound: "%s未找到"            },
+                8: { achievementComplete: "$1 получил(а) это достижение $2/$3/$4",    loading: "Загрузка…",   noResponse: "Нет ответа от сервера :(",         notFound: "%s не найдено"      },
+                6: { achievementComplete: "Logro conseguido por $1 el $2/$3/$4",      loading: "Cargando…",   noResponse: "No hay respuesta del servidor :(", notFound: "%s no encontrado/a" },
             },
             LOOKUPS = {
                   1: [npcs,         "npc",         "NPC"        ],
@@ -80,7 +85,8 @@ if (typeof $WowheadPower == "undefined") {
                  10: [achievements, "achievement", "Achievement"],
                  12: [holidays,     "event",       "Holiday"    ],
                  17: [currencies,   "currency",    "Currency"   ],
-                100: [profiles,     "profile",     "Profile"    ]
+                100: [profiles,     "profile",     "Profile"    ],
+                300: [guides,       "guide",       "Guide"      ]
             },
             SCALES = {
                 3: { url: "?data=item-scaling" },
@@ -285,7 +291,7 @@ if (typeof $WowheadPower == "undefined") {
                     url = t.href.match(/^https?:\/\/(.*)\/?\??(item|quest|spell|achievement|event|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
                         // url = t.href.match(/^http:\/\/(.+?)?\.?wowhead\.com\/\?(profile)=([^&#]+)/)
-                        url = t.href.match(/^https?:\/\/(.*)\/?\??(profile)=([^&#]+)/);
+                        url = t.href.match(/^https?:\/\/(.*)\/?\??(profile|guide)=([^&#]+)/);
                     }
 
                     showLogo = 0;
@@ -293,7 +299,7 @@ if (typeof $WowheadPower == "undefined") {
                 else {
                     url = t.href.match(/()\?(item|quest|spell|achievement|event|npc|object|itemset|currency)=(-?[0-9]+)/);
                     if (url == null) {
-                        url = t.href.match(/()\?(profile)=([^&#]+)/);
+                        url = t.href.match(/()\?(profile|guide)=([^&#]+)/);
                     }
 
                     showLogo = 1;
@@ -310,6 +316,10 @@ if (typeof $WowheadPower == "undefined") {
                 // }
                 showLogo = 1;
             }
+
+            // aowow - skip protected guide names
+            if (url && url[2] == 'guide' && (url[3] == 'new' || url[3] == 'edit' || url[3] == 'changelog'))
+                return;
 
             t.href.replace(/([a-zA-Z]+)=?([a-zA-Z0-9:-]*)/g, p);
             if (rel) {
@@ -520,7 +530,7 @@ if (typeof $WowheadPower == "undefined") {
                 showTooltip(arr[fullId][getTooltipField(locale)], arr[fullId][getIconField()], arr[fullId].map, arr[fullId][getSpellsField(locale)], arr[fullId][getTooltipField(locale, 2)]);
             }
             else if (arr[fullId].status[locale] == STATUS_QUERYING || arr[fullId].status[locale] == STATUS_SCALES) {
-                showTooltip(_LANG.loading);
+                showTooltip(_LANG[locale].loading);
             }
             else {
                 request(type, id, locale, null, params);
@@ -582,54 +592,52 @@ if (typeof $WowheadPower == "undefined") {
             initCSS();
             var notFound = false;
             if (!html) {
-                html = LOOKUPS[currentType][2] + " not found :(";
+                html = $WH.sprintf(_LANG[currentLocale].notFound, LOOKUPS[currentType][2]);
                 icon = "inv_misc_questionmark";
                 notFound = true;
             }
-            else {
-                if (currentParams != null) {
-                    if (currentParams.pcs && currentParams.pcs.length) {
-                        var n = 0;
-                        for (var i = 0, len = currentParams.pcs.length; i < len; ++i) {
-                            var m;
-                            if (m = html.match(new RegExp("<span><!--si([0-9]+:)*" + currentParams.pcs[i] + '(:[0-9]+)*--><a href="\\?item=(\\d+)">(.+?)</a></span>'))) {
-                                html = html.replace(m[0], '<span class="q8"><!--si' + currentParams.pcs[i] + '--><a href="?item=' + m[3] + '">' + (($WH.isset("g_items") && g_items[currentParams.pcs[i]]) ? g_items[currentParams.pcs[i]]["name_" + LOCALES[currentLocale]] : m[4]) + "</a></span>");
-                                ++n;
-                            }
-                        }
-
-                        if (n > 0) {
-                            html = html.replace("(0/", "(" + n + "/");
-                            html = html.replace(new RegExp("<span>\\(([0-" + n + "])\\)", "g"), '<span class="q2">($1)');
+            else if (currentParams != null) {
+                if (currentParams.pcs && currentParams.pcs.length) {
+                    var n = 0;
+                    for (var i = 0, len = currentParams.pcs.length; i < len; ++i) {
+                        var m;
+                        if (m = html.match(new RegExp("<span><!--si([0-9]+:)*" + currentParams.pcs[i] + '(:[0-9]+)*--><a href="\\?item=(\\d+)">(.+?)</a></span>'))) {
+                            html = html.replace(m[0], '<span class="q8"><!--si' + currentParams.pcs[i] + '--><a href="?item=' + m[3] + '">' + (($WH.isset("g_items") && g_items[currentParams.pcs[i]]) ? g_items[currentParams.pcs[i]]["name_" + LOCALES[currentLocale]] : m[4]) + "</a></span>");
+                            ++n;
                         }
                     }
 
-                    if (currentParams.c) {
-                        html = html.replace(/<span class="c([0-9]+?)">(.+?)<\/span><br \/>/g, '<span class="c$1" style="display: none">$2</span>');
-                        html = html.replace(new RegExp('<span class="c(' + currentParams.c + ')" style="display: none">(.+?)</span>', "g"), '<span class="c$1">$2</span><br />');
+                    if (n > 0) {
+                        html = html.replace("(0/", "(" + n + "/");
+                        html = html.replace(new RegExp("<span>\\(([0-" + n + "])\\)", "g"), '<span class="q2">($1)');
                     }
+                }
 
-                    if (currentParams.know && currentParams.know.length) {
-                        html = $WH.g_setTooltipSpells(html, currentParams.know, spellData);
-                    }
+                if (currentParams.c) {
+                    html = html.replace(/<span class="c([0-9]+?)">(.+?)<\/span><br \/>/g, '<span class="c$1" style="display: none">$2</span>');
+                    html = html.replace(new RegExp('<span class="c(' + currentParams.c + ')" style="display: none">(.+?)</span>', "g"), '<span class="c$1">$2</span><br />');
+                }
 
-                    if (currentParams.lvl) {
-                        html = $WH.g_setTooltipLevel(html, currentParams.lvl, currentParams.buff);
-                    }
-                    // custom start
-                    else if ($WH.gc('compare_level') && window.location.href.match(/\?compare/i)) {
-                        html = $WH.g_setTooltipLevel(html, $WH.gc('compare_level'), currentParams.buff);
-                    }
-                    // custom end
+                if (currentParams.know && currentParams.know.length) {
+                    html = $WH.g_setTooltipSpells(html, currentParams.know, spellData);
+                }
 
-                    if (currentParams.who && currentParams.when) {
-                        html = html.replace("<table><tr><td><br />", '<table><tr><td><br /><span class="q2">' + $WH.sprintf(_LANG.achievementcomplete, currentParams.who, currentParams.when.getMonth() + 1, currentParams.when.getDate(), currentParams.when.getFullYear()) + "</span><br /><br />");
-                        html = html.replace(/class="q0"/g, 'class="r3"');
-                    }
-                    if ((currentType == TYPE_ACHIEVEMENT) && currentParams.cri) {
-                        for (var i = 0; i < currentParams.cri.length; i++) {
-                            html = html.replace(new RegExp("<!--cr" + parseInt(currentParams.cri[i]) + ":[^<]+", "g"), '<span class="q2">$&</span>')
-                        }
+                if (currentParams.lvl) {
+                    html = $WH.g_setTooltipLevel(html, currentParams.lvl, currentParams.buff);
+                }
+                // custom start
+                else if ($WH.gc('compare_level') && window.location.href.match(/\?compare/i)) {
+                    html = $WH.g_setTooltipLevel(html, $WH.gc('compare_level'), currentParams.buff);
+                }
+                // custom end
+
+                if (currentParams.who && currentParams.when) {
+                    html = html.replace("<table><tr><td><br />", '<table><tr><td><br /><span class="q2">' + $WH.sprintf(_LANG[currentLocale].achievementComplete, currentParams.who, currentParams.when.getMonth() + 1, currentParams.when.getDate(), currentParams.when.getFullYear()) + "</span><br /><br />");
+                    html = html.replace(/class="q0"/g, 'class="r3"');
+                }
+                if ((currentType == TYPE_ACHIEVEMENT) && currentParams.cri) {
+                    for (var i = 0; i < currentParams.cri.length; i++) {
+                        html = html.replace(new RegExp("<!--cr" + parseInt(currentParams.cri[i]) + ":[^<]+", "g"), '<span class="q2">$&</span>')
                     }
                 }
             }
@@ -654,7 +662,7 @@ if (typeof $WowheadPower == "undefined") {
 
         function showLoading(type, id, locale) {
             if (currentType == type && currentId == id && currentLocale == locale) {
-                showTooltip(_LANG.loading);
+                showTooltip(_LANG[locale].loading);
                 var arr = LOOKUPS[type][0];
 
                 arr[id].timer = setTimeout(function () {
@@ -668,7 +676,7 @@ if (typeof $WowheadPower == "undefined") {
             arr[id].status[locale] = STATUS_ERROR;
 
             if (currentType == type && currentId == id && currentLocale == locale) {
-                showTooltip(_LANG.noresponse);
+                showTooltip(_LANG[locale].noResponse);
             }
         }
 
@@ -772,6 +780,10 @@ if (typeof $WowheadPower == "undefined") {
 
         this.registerProfile = function (id, locale, json) {
             this.register(TYPE_PROFILE, id, locale, json);
+        };
+
+        this.registerGuide = function (id, locale, json) {
+            this.register(TYPE_GUIDE, id, locale, json);
         };
 
         this.displayTooltip = function (type, id, locale, params) {

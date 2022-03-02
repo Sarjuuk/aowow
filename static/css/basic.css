@@ -143,6 +143,19 @@ a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysoc
 .s3 { color: #ffb2eb !important } /* Whisper */
 .s4 { color: #ff8040 !important } /* Emote */
 
+/********************/
+/* REPUTATION RANKS */
+/********************/
+
+.rep0, .rep-hated      { color: #f00 !important }
+.rep1, .rep-hostile    { color: #f44 !important }
+.rep2, .rep-unfirendly { color: #e62 !important }
+.rep3, .rep-neutral    { color: #ff0 !important }
+.rep4, .rep-friendly   { color: #0f0 !important }
+.rep5, .rep-honored    { color: #0f8 !important }
+.rep6, .rep-revered    { color: #0fc !important }
+.rep7, .rep-exalted    { color: #0ff !important }
+
 /*****************/
 /* SOCKETS ICONS */
 /*****************/

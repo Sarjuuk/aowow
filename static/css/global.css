@@ -300,6 +300,11 @@
     text-decoration: underline;
 }
 
+.comment-reply-author-label {
+    color: #fff;
+    font-weight: bold;
+}
+
 .comment-blue b {
     color: White !important;
 }
@@ -800,4 +805,92 @@ div.screenshotviewer-caption {
     font-size: 11px;
     font-weight: bold;
     padding: 5px 0 10px 0;
+}
+
+.enhanced-textarea-expander {
+    display:none;
+}
+
+.enhanced-textarea-wrapper {
+    position:relative;
+}
+
+.enhanced-textarea-wrapper textarea,
+.enhanced-textarea-wrapper .enhanced-textarea-expander {
+    border:1px transparent solid;
+    box-sizing:border-box;
+    font:13px/1.4 "Open Sans",Arial,"Helvetica Neue",Helvetica,sans-serif;
+    overflow-wrap:break-word;
+    padding:5px 7px;
+    white-space:pre-wrap;
+    width:100% !important;
+}
+
+.enhanced-textarea-wrapper textarea,
+.enhanced-textarea-wrapper textarea:hover {
+    transition:150ms;
+}
+
+.enhanced-textarea-wrapper.enhanced-textarea-dynamic-sizing textarea {
+    resize:none;
+}
+
+.enhanced-textarea-wrapper .enhanced-textarea-markup {
+    overflow:hidden;
+}
+
+.enhanced-textarea-wrapper .enhanced-textarea-markup-segment {
+    float:left;
+}
+
+.enhanced-textarea-wrapper .enhanced-textarea-markup-segment.menu-buttons {
+    padding:0;
+}
+
+.enhanced-textarea-text-input[type="text"] {
+    padding:5px 7px;
+}
+
+.enhanced-textarea-wrapper.enhanced-textarea-dark textarea,
+.enhanced-textarea-text-input[type="text"],
+.enhanced-textarea-text-input-dark[type="text"] {
+    min-height:calc(1.4em + 12px);
+}
+
+.enhanced-textarea-wrapper.enhanced-textarea-dark textarea,
+.enhanced-textarea-wrapper.enhanced-textarea-dark textarea:hover,
+.enhanced-textarea-text-input[type="text"],
+.enhanced-textarea-text-input[type="text"]:hover,
+.enhanced-textarea-text-input-dark[type="text"],
+.enhanced-textarea-text-input-dark[type="text"]:hover {
+    background:#1c1c1c;
+    border-color:#3b3b3b;
+    color:#ddd;
+    outline:0;
+}
+
+.enhanced-textarea-wrapper.enhanced-textarea-focus-changes textarea,
+.enhanced-textarea-text-input[type="text"] {
+    background:#1c1c1c;
+    border-color:#3b3b3b;
+    cursor:pointer;
+    min-height:calc(1.4em + 12px);
+}
+
+.enhanced-textarea-wrapper.enhanced-textarea-focus-changes textarea.focus-visible,
+.enhanced-textarea-text-input[type="text"].focus-visible {
+    background:#181818;
+    border-color:#444;
+    box-shadow:0 0 0 1px #444;
+    cursor:auto;
+}
+
+.options-menu-widget {
+    cursor:default;
+    padding-right: 13px;
+    background: url(../images/Menu/arrow-down.gif) right center no-repeat;
+
+}
+.options-menu-widget.open {
+    color:#fff;
 }

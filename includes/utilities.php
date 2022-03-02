@@ -486,6 +486,8 @@ abstract class Util
 
     public static $mapSelectorString        = '<a href="javascript:;" onclick="myMapper.update({zone: %d}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">%s</a>&nbsp;(%d)';
 
+    public static $guideratingString        = "        $(document).ready(function() {\n        $('#guiderating').append(GetStars(%.10F, %s, %u, %u));\n    });";
+
     public static $expansionString          = array(        // 3 & 4 unused .. obviously
         null,           'bc',           'wotlk',            'cata',                'mop'
     );
@@ -1084,8 +1086,8 @@ abstract class Util
                 $x['sourceA'] = $miscData['id'];
                 $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? CFG_REP_REWARD_GOOD_REPORT : CFG_REP_REWARD_BAD_REPORT;
                 break;
-            case SITEREP_ACTION_ARTICLE:                    // NYI
-                if (empty($miscData['id']))                 // reportId
+            case SITEREP_ACTION_ARTICLE:
+                if (empty($miscData['id']))                 // guideId
                     return false;
 
                 $x['sourceA'] = $miscData['id'];

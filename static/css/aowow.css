@@ -4102,27 +4102,30 @@ a.progressbar:hover del {
     width: 16px;
     height: 16px;
     background: url(../images/ui/misc/toolbar.png) no-repeat;
+    margin-top: 2px;
 }
 
-.toolbar img.toolbar-b         { background-position:      0 0 !important; }
-.toolbar img.toolbar-i         { background-position:  -16px 0 !important; }
-.toolbar img.toolbar-u         { background-position:  -32px 0 !important; }
-.toolbar img.toolbar-s         { background-position:  -48px 0 !important; }
-.toolbar img.toolbar-url       { background-position:  -64px 0 !important; }
-.toolbar img.toolbar-small     { background-position:  -80px 0 !important; }
-.toolbar img.toolbar-quote     { background-position:  -96px 0 !important; }
-.toolbar img.toolbar-code      { background-position: -112px 0 !important; }
-.toolbar img.toolbar-ul        { background-position: -128px 0 !important; }
-.toolbar img.toolbar-ol        { background-position: -144px 0 !important; }
-.toolbar img.toolbar-li        { background-position: -160px 0 !important; }
-.toolbar img.toolbar-img       { background-position: -176px 0 !important; }
-.toolbar img.toolbar-thumb     { background-position: -192px 0 !important; }
-.toolbar img.toolbar-title     { background-position: -208px 0 !important; }
-.toolbar img.toolbar-pad       { background-position: -224px 0 !important; }
-.toolbar img.toolbar-winners   { background-position: -240px 0 !important; }
-.toolbar img.toolbar-prizes    { background-position: -256px 0 !important; }
-.toolbar img.toolbar-entryform { background-position: -272px 0 !important; }
-.toolbar img.toolbar-fromhtml  { background-position: -288px 0 !important; }
+.toolbar img.toolbar-b             { background-position:      0 0 !important; }
+.toolbar img.toolbar-i             { background-position:  -16px 0 !important; }
+.toolbar img.toolbar-u             { background-position:  -32px 0 !important; }
+.toolbar img.toolbar-s             { background-position:  -48px 0 !important; }
+.toolbar img.toolbar-url           { background-position:  -64px 0 !important; }
+.toolbar img.toolbar-small         { background-position:  -80px 0 !important; }
+.toolbar img.toolbar-quote         { background-position:  -96px 0 !important; }
+.toolbar img.toolbar-code          { background-position: -112px 0 !important; }
+.toolbar img.toolbar-ul            { background-position: -128px 0 !important; }
+.toolbar img.toolbar-ol            { background-position: -144px 0 !important; }
+.toolbar img.toolbar-li            { background-position: -160px 0 !important; }
+.toolbar img.toolbar-img           { background-position: -176px 0 !important; }
+.toolbar img.toolbar-thumb         { background-position: -192px 0 !important; }
+.toolbar img.toolbar-title         { background-position: -208px 0 !important; }
+.toolbar img.toolbar-pad           { background-position: -224px 0 !important; }
+.toolbar img.toolbar-winners       { background-position: -240px 0 !important; }
+.toolbar img.toolbar-prizes        { background-position: -256px 0 !important; }
+.toolbar img.toolbar-entryform     { background-position: -272px 0 !important; }
+.toolbar img.toolbar-fromhtml      { background-position: -288px 0 !important; }
+.toolbar img.toolbar-minor-heading { background-position: -304px 0 !important; }
+.toolbar img.toolbar-major-heading { background-position: -320px 0 !important; }
 
 /***********/
 /* CAPTCHA */

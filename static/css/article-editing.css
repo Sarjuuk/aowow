@@ -1,0 +1,25 @@
+#editToolbar td {
+    padding-bottom: 5px;
+}
+
+.button {
+    vertical-align: middle;
+    font-family: Verdana, sans-serif;
+    padding: 1px 5px;
+    margin-right: 1px;
+    font-size: 12px;
+    width: auto !important;
+}
+
+#editBox, #qfBox {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 500px;
+    font-size: 13px;
+}
+
+.menu-buttons a {
+    border-color: transparent;
+    _border-color: #000;
+}

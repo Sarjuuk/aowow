@@ -1,0 +1,308 @@
+#guide-form .guide-form-main {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+}
+#guide-form .guide-form-main th,
+#guide-form .guide-form-main td {
+    padding: 0;
+}
+#guide-form .guide-form-main th {
+    line-height: 32px;
+    padding-right: 5px;
+    text-align: left;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 1%;
+}
+#guide-form .guide-form-main td {
+    padding-bottom: 2px;
+}
+#guide-form .guide-form-main input[name="title"],
+#guide-form .guide-form-main input[name="name"] {
+    width: calc(100% - 200px);
+}
+@media screen and (max-width: 799px) {
+    #guide-form .guide-form-main input[name="title"],
+    #guide-form .guide-form-main input[name="name"] {
+        width: 100%;
+    }
+}
+#guide-form .guide-form-main input[name="title"] {
+    max-width: 700px;
+}
+#guide-form .guide-form-main input[name="name"] {
+    max-width: 350px;
+}
+#guide-form .guide-form-main .char-warning {
+    display: inline-block;
+    margin-left: 5px;
+}
+#guide-form #class-guide-specialization-options,
+#guide-form #class-guide-tag-options,
+#guide-form #class-guide-intro,
+#guide-form #class-guide-talents,
+#guide-form #class-guide-pvp-talents,
+#guide-form #class-guide-artifact-weapon,
+#guide-form #class-guide-items,
+#guide-form #class-guide-stats,
+#guide-form #class-guide-gems,
+#guide-form #class-guide-enchants,
+#guide-form #class-guide-consumables {
+    display: none;
+}
+#guide-form[data-spec-category="true"] #class-guide-specialization-options,
+#guide-form[data-spec-category="true"] #class-guide-tag-options {
+    display: table-row;
+}
+#guide-form[data-spec-category="true"] #class-guide-intro,
+#guide-form[data-spec-category="true"] #class-guide-talents,
+#guide-form[data-spec-category="true"] #class-guide-pvp-talents,
+#guide-form[data-spec-category="true"] #class-guide-artifact-weapon,
+#guide-form[data-spec-category="true"] #class-guide-items,
+#guide-form[data-spec-category="true"] #class-guide-stats,
+#guide-form[data-spec-category="true"] #class-guide-gems,
+#guide-form[data-spec-category="true"] #class-guide-enchants,
+#guide-form[data-spec-category="true"] #class-guide-consumables {
+    display: block;
+}
+#guide-tags .tags a span,
+.guide-editing-closer {
+    background: #933
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' height='100%' width='100%'><line x1='30%' y1='30%' x2='70%' y2='70%' style='stroke:rgb(255, 255, 255);stroke-width:7.5%' /><line x1='70%' y1='30%' x2='30%' y2='70%' style='stroke:rgb(255, 255, 255);stroke-width:7.5%' /></svg>")
+        center no-repeat;
+    border-radius: 999px !important;
+    height: 39px;
+    line-height: 0;
+    position: absolute;
+    right: 7.02px;
+    top: 7.02px;
+    width: 39px;
+    z-index: 100;
+}
+#guide-tags .tags a {
+    background: #444 !important;
+    cursor: default;
+    height: 13px;
+    line-height: 13px;
+    margin-right: 16px;
+    position: relative;
+}
+#guide-tags .tags a span {
+    border: 2px solid #242424;
+    cursor: pointer;
+    height: 15px;
+    right: -14px;
+    top: 1px;
+    width: 15px;
+}
+#guide-tags > a {
+    margin-left: 10px;
+}
+.guide-edit-section {
+    margin: 15px 0 30px;
+}
+.guide-edit-section .guide-edit-box,
+.guide-edit-section #editBox,
+.guide-edit-section #qfBox,
+.guide-edit-section #changelog {
+    margin: 0;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc-notes-content .class-guide-calc-notes-note textarea,
+.guide-edit-section#class-guide-items textarea {
+    background: #1c1c1c;
+    border-color: #3b3b3b;
+    box-sizing: border-box;
+    color: #fff;
+    overflow: hidden;
+    padding: 5px 7px;
+    resize: none;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc-notes-content .class-guide-calc-notes-note textarea:focus,
+.guide-edit-section#class-guide-items textarea:focus {
+    background: #181818;
+    border-color: #444;
+}
+.class-guide-calc-wrapper #viewintc-link {
+    display: none;
+}
+.class-guide-calc-wrapper > .guide-editing-closer {
+    display: none;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc .guide-editing-closer {
+    display: none;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] > .guide-editing-closer {
+    display: block;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc-notes-content .class-guide-calc-notes-note .enhanced-textarea-markup {
+    display: inline;
+    overflow: hidden;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc-notes-content .class-guide-calc-notes-note .enhanced-textarea-markup-wrapper {
+    min-height: 26px;
+    padding-bottom: 3px;
+}
+.class-guide-calc-wrapper[data-has-notes="true"] .class-guide-calc-notes-content .class-guide-calc-notes-note .enhanced-textarea-wrapper .enhanced-textarea-markup-segment {
+    display: inline-block;
+    float: none;
+}
+.class-guide-calc-wrapper .class-guide-calc .guide-editing-closer,
+.class-guide-calc-wrapper .class-guide-calc-wrapper#guide-artifact-weapon-shell,
+.class-guide-calc-wrapper#guide-artifact-weapon-shell .guide-editing-closer {
+    right: -19px;
+    top: -19px;
+}
+.talentcalc-controls-actions a.fa-link,
+.pvptalentcalc-controls-actions a.fa-link,
+.artifactcalc-controls a.fa-link {
+    display: none;
+}
+.guide-edit-section#class-guide-items textarea {
+    width: 100%;
+}
+.class-guide-stats-wrapper,
+.class-guide-gems-wrapper,
+.class-guide-enchants-wrapper,
+.class-guide-consumables-wrapper {
+    margin-top: 10px;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable {
+    position: relative;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat .fa,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem .fa,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant .fa,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable .fa {
+    display: none;
+    font-size: 14px;
+    font-weight: normal;
+    left: 0;
+    position: absolute;
+    top: 1.4em;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat .fa-arrow-right,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem .fa-arrow-right,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant .fa-arrow-right,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable .fa-arrow-right {
+    left: 20px;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat .fa-balance-scale,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem .fa-balance-scale,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant .fa-balance-scale,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable .fa-balance-scale {
+    color: #fff;
+    left: 40px;
+}
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant .fa-balance-scale,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable .fa-balance-scale {
+    display: none !important;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat .fa-times,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem .fa-times {
+    left: 60px;
+}
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant .fa-times,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable .fa-times {
+    left: 40px;
+}
+#class-guide-items > ul > li:first-child > div:first-child .fa-arrow-up,
+#class-guide-items > ul > li:last-child > div:first-child .fa-arrow-down,
+.class-guide-stats-stat-wrapper:first-child .fa-arrow-left,
+.class-guide-stats-stat-wrapper:last-child .fa-arrow-right,
+.class-guide-gems-gem-wrapper:first-child .fa-arrow-left,
+.class-guide-gems-gem-wrapper:last-child .fa-arrow-right,
+.class-guide-enchants-enchant-wrapper:first-child .fa-arrow-left,
+.class-guide-enchants-enchant-wrapper:last-child .fa-arrow-right,
+.class-guide-consumables-consumable-wrapper:first-child .fa-arrow-left,
+.class-guide-consumables-consumable-wrapper:last-child .fa-arrow-right {
+    pointer-events: none;
+    visibility: hidden;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat:hover,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem:hover,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant:hover,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable:hover {
+    padding-bottom: 20px;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat:hover .fa,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem:hover .fa,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant:hover .fa,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable:hover .fa {
+    display: block;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat:hover .fa:before,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem:hover .fa:before,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant:hover .fa:before,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable:hover .fa:before {
+    border-radius: 99px;
+    padding: 5px 2px;
+}
+.class-guide-stats-wrapper .class-guide-stats-stat-wrapper .class-guide-stats-stat:hover a.fa:hover:before,
+.class-guide-gems-wrapper .class-guide-gems-gem-wrapper .class-guide-gems-gem:hover a.fa:hover:before,
+.class-guide-enchants-wrapper .class-guide-enchants-enchant-wrapper .class-guide-enchants-enchant:hover a.fa:hover:before,
+.class-guide-consumables-wrapper .class-guide-consumables-consumable-wrapper .class-guide-consumables-consumable:hover a.fa:hover:before {
+    background: #101010;
+}
+.guide-editing-closer {
+    right: 0 !important;
+}
+.guide-submission-options button {
+    margin: 0 20px 5px 0;
+}
+.guide-submission-changelog {
+    display: none;
+}
+.guide-submission[data-type] .guide-submission-changelog {
+    background: #333;
+    border-radius: 6px;
+    display: block;
+    padding: 10px;
+}
+.guide-submission[data-type] .guide-submission-changelog [class^="heading-size-"] {
+    margin-top: 0;
+}
+.guide-submission[data-type] .guide-submission-changelog textarea {
+    margin-bottom: 0 !important;
+}
+.guide-submission[data-type="save"] .guide-submission-options button[data-type="save"],
+.guide-submission[data-type="submit"] .guide-submission-options button[data-type="submit"] {
+    /* background: #333 !important; */
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 15px 0 #333;
+    cursor: default;
+    text-decoration: none;
+    text-shadow: none !important;
+}
+.guide-submission .guide-submission-changelog-save,
+.guide-submission .guide-submission-changelog-submit {
+    display: none;
+}
+.guide-submission[data-type="save"] .guide-submission-changelog-save,
+.guide-submission[data-type="submit"] .guide-submission-changelog-submit {
+    display: block;
+}
+@media screen and (max-width: 812px) {
+    #class-guide-artifact-weapon .guide-editing-closer {
+        top: -39px !important;
+    }
+}
+@media screen and (max-width: 699px) {
+    .artifactcalc-controls {
+        right: 40px !important;
+    }
+}
+@media screen and (max-width: 675px) {
+    #class-guide-talents .guide-editing-closer,
+    #class-guide-pvp-talents .guide-editing-closer {
+        top: -29px !important;
+    }
+}
+@media screen and (max-width: 612px) {
+    .artifactcalc-controls {
+        right: 50px !important;
+    }
+}

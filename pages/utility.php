@@ -13,7 +13,7 @@ class UtilityPage extends GenericPage
     protected $tabId         = 1;
     protected $mode          = CACHE_TYPE_NONE;
     protected $validPages    = array(
-        'latest-additions',       'latest-articles',       'latest-comments',       'latest-screenshots',  'random',
+        null,                     null,                    'latest-comments',       'latest-screenshots',  'random',
         'unrated-comments', 11 => 'latest-videos',   12 => 'most-comments',   13 => 'missing-screenshots'
     );
 
@@ -63,7 +63,7 @@ class UtilityPage extends GenericPage
         /* Main Content */
         /****************/
 
-        if (in_array(array_search($this->page, $this->validPages), [0, 1, 2, 3, 11, 12]))
+        if (in_array(array_search($this->page, $this->validPages), [2, 3, 11, 12]))
             $this->h1Links = '<small><a href="?'.$this->page.($this->category ? '='.$this->category[0] : null).'&rss" class="icon-rss">'.Lang::main('subscribe').'</a></small>';
 
         switch ($this->page)
@@ -152,13 +152,27 @@ class UtilityPage extends GenericPage
                     $this->lvTabs[] = ['video', ['data' => array_values($data)]];
 
                 break;
-            case 'latest-articles':                         // rss
-                $this->lvTabs = [];
-                break;
-            case 'latest-additions':                        // rss
-                $extraText = '';
-                break;
             case 'unrated-comments':
+
+                // EXPLAIN SELECT ac.* FROM aowow_comments ac LEFT JOIN aowow_comments_rates acr ON acr.commentId = ac.id AND acr.userId <> 0 WHERE acr.commentId IS NULL;
+                if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'replies' => false], $nFound))
+                {
+                    $tabData = array(
+                        'data'           => $_,
+                        'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
+                        '_totalCount'    => $nFound
+                    );
+
+                    if ($nFound > CFG_SQL_LIMIT_DEFAULT)
+                    {
+                        $tabData['name'] = '$LANG.tab_latestcomments';
+                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
+                    }
+
+                    $this->lvTabs[] = ['commentpreview', $tabData];
+                }
+
+
                 $this->lvTabs[] = ['commentpreview', ['data' => []]];
                 break;
             case 'missing-screenshots':

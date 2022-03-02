@@ -233,7 +233,8 @@ class GenericPage
         'title'             => ['template' => 'title',             'id' => 'titles',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_titles'        ],
         'topusers'          => ['template' => 'topusers',          'id' => 'topusers',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.topusers'          ],
         'video'             => ['template' => 'video',             'id' => 'videos',          'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_videos'        ],
-        'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ]
+        'zone'              => ['template' => 'zone',              'id' => 'zones',           'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_zones'         ],
+        'guide'             => ['template' => 'guide',             'id' => 'guides',          'parent' => 'lv-generic', 'data' => [],                                     ]
     );
 
     public function __construct(string $pageCall = '', string $pageParam = '')
@@ -363,18 +364,24 @@ class GenericPage
     {
         if (!$this->loadCache())
         {
-            $this->addArticle();
-
             $this->generateContent();
             $this->generatePath();
             $this->generateTitle();
+            $this->addArticle();
 
             $this->applyGlobals();
 
             $this->saveCache();
         }
 
-        if (isset($this->type) && isset($this->typeId))
+        if ($this instanceof GuidePage)
+        {
+            $this->gPageInfo = ['name' => $this->name];
+            if (isset($this->author))
+                $this->gPageInfo['author'] = $this->author;
+
+        }
+        else if (isset($this->type) && isset($this->typeId))
         {
             $this->gPageInfo = array(                       // varies slightly for special pages like maps, user-dashboard or profiler
                 'type'   => $this->type,
@@ -382,7 +389,9 @@ class GenericPage
                 'name'   => $this->name
             );
         }
-        else if (!empty($this->articleUrl))
+
+        // only adds edit links to the staff menu: precursor to guides?
+        if (!empty($this->articleUrl) && !($this instanceof GuidePage && $this->show == GuidePage::SHOW_GUIDE))
         {
             $this->gPageInfo = array(
                 'articleUrl' => $this->fullParams,          // is actually be the url-param
@@ -462,19 +471,19 @@ class GenericPage
     // get article & static infobox (run before processing jsGlobals)
     private function addArticle() :void
     {
+        if (isset($this->article))
+            return;
+
         $article = [];
-        if (!empty($this->type) && isset($this->typeId))
-        {
-            $article = DB::Aowow()->selectRow('SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = ?d UNION ALL SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE type = ?d AND typeId = ?d AND locale = 0  ORDER BY locale DESC LIMIT 1',
-                $this->type, $this->typeId, User::$localeId, $this->type, $this->typeId
-            );
-        }
+        if (isset($this->guideRevision))
+            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
+                Type::GUIDE, $this->typeId, $this->guideRevision);
         else if (!empty($this->articleUrl))
-        {
-            $article = DB::Aowow()->selectRow('SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE url = ? AND locale = ?d UNION ALL SELECT article, quickInfo, locale, editAccess FROM ?_articles WHERE url = ? AND locale = 0  ORDER BY locale DESC LIMIT 1',
-                $this->articleUrl, User::$localeId, $this->articleUrl
-            );
-        }
+            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale`, `rev` DESC LIMIT 1',
+                $this->articleUrl, [User::$localeId, LOCALE_EN]);
+        else if (!empty($this->type) && isset($this->typeId))
+            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale`, `rev` DESC LIMIT 1',
+                $this->type, $this->typeId, [User::$localeId, LOCALE_EN]);
 
         if ($article)
         {
@@ -729,6 +738,9 @@ class GenericPage
     public function writeGlobalVars() : string
     {
         $buff = '';
+
+        if (!empty($this->guideRating))
+            $buff .= sprintf(Util::$guideratingString, ...$this->guideRating);
 
         foreach ($this->jsGlobals as $type => $struct)
         {

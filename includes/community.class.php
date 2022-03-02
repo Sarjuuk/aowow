@@ -28,8 +28,8 @@ class CommunityContent
             a2.displayName AS editUser,
             a3.displayName AS deleteUser,
             a4.displayName AS responseUser,
-            IFNULL(SUM(cr.value), 0) AS rating,
-            SUM(IF(cr.userId > 0 AND cr.userId = ?d, cr.value, 0)) AS userRating,
+            IFNULL(SUM(ur.value), 0) AS rating,
+            SUM(IF(ur.userId > 0 AND ur.userId = ?d, ur.value, 0)) AS userRating,
             SUM(IF( r.userId > 0 AND  r.userId = ?d, 1, 0)) AS userReported
         FROM
             ?_comments c
@@ -42,7 +42,7 @@ class CommunityContent
         LEFT JOIN
             ?_account a4 ON c.responseUserId = a4.id
         LEFT JOIN
-            ?_comments_rates cr ON c.id = cr.commentId
+            ?_user_ratings ur ON c.id = ur.entry AND ur.type = ?d
         LEFT JOIN
             ?_reports r ON r.subject = c.id AND r.mode = 1 AND r.reason = 19
         WHERE
@@ -81,14 +81,14 @@ class CommunityContent
             IF(c.flags & ?d, 1, 0) AS deleted,
             IF(c.type <> 0, c.type, c2.type) AS type,
             IF(c.typeId <> 0, c.typeId, c2.typeId) AS typeId,
-            IFNULL(SUM(cr.value), 0) AS rating,
+            IFNULL(SUM(ur.value), 0) AS rating,
             a.displayName AS user
         FROM
             ?_comments c
         JOIN
             ?_account a ON c.userId = a.id
         LEFT JOIN
-            ?_comments_rates cr ON cr.commentId = c.id AND cr.userId <> 0
+            ?_user_ratings ur ON ur.entry = c.id AND ur.userId <> 0 AND ur.`type` = 1
         LEFT JOIN
             ?_comments c2 ON c.replyTo = c2.id
         WHERE
@@ -179,13 +179,13 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getCommentReplies(int $commentId, int $limit = 0, int &$nFound = 0) : array
+    public static function getCommentReplies(int $commentId, int $limit = 0, ?int &$nFound = 0) : array
     {
         $replies = [];
         $query = $limit > 0 ? self::$coQuery.' LIMIT '.$limit : self::$coQuery;
 
         // get replies
-        $results = DB::Aowow()->selectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results = DB::Aowow()->selectPage($nFound, $query, User::$id, User::$id, RATING_COMMENT, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         foreach ($results as $r)
         {
             (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
@@ -341,7 +341,7 @@ class CommunityContent
     public static function getComments(int $type, int $typeId) : array
     {
 
-        $results  = DB::Aowow()->query(self::$coQuery, User::$id, User::$id, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results  = DB::Aowow()->query(self::$coQuery, User::$id, User::$id, RATING_COMMENT, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         $comments = [];
 
         // additional informations

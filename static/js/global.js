@@ -527,7 +527,8 @@ var PageTemplate = new function()
         menu.push(reputation);
 
         // Guides
-        var guides = ['guides', 'My Guides', '?my-guides'];
+        // var guides = ['guides', 'My Guides', '?my-guides'];
+        var guides = ['guides', LANG.myguides, '?my-guides', null, {onBeforeShow: generateGuidesSubmenu} ];
         menu.push(guides);
 
         addCharactersMenu(menu);
@@ -631,6 +632,30 @@ var PageTemplate = new function()
         });
 
         submenu.push([0, LANG.menu_newprofile, '?profile&new', null, {tinyIcon: 'inv_misc_questionmark'}]);
+
+        menuItem[MENU_IDX_SUB] = submenu;
+    }
+
+    // aowow- custom
+    function generateGuidesSubmenu(menuItem)
+    {
+        var submenu = [];
+
+        // Sort by name
+        g_user.profiles.sort(function(a, b)
+        {
+            return $WH.strcmp(a.title, b.title);
+        });
+
+        $.each(g_user.guides, function(idx, guide)
+        {
+            var menuItem = [guide.id, guide.title, guide.url, [[guide.id, LANG.button_edit, '/?guide=edit&id=' + guide.id]]];
+
+            submenu.push(menuItem);
+        });
+
+        if (g_user.id)
+            submenu.push([0, LANG.createnewguide, '?guide=new']);
 
         menuItem[MENU_IDX_SUB] = submenu;
     }
@@ -878,11 +903,11 @@ var PageTemplate = new function()
                 Menu.addButtons($buttons, Menu.implode(mn_news));
                 break;
 
-            case 6: // Guides
-                var entries = [ [ 1, 'List of guides', '?guides' ], [ 2, 'Write new guide', '?guide=new' ] ];
+            case 6: // Guides // aowow - localization added
+                var entries = [ [ 1, LANG.listguides, '?guides', mn_guides ], [ 2, LANG.createnewguide, '?guide=new' ] ];
 
                 if(g_user.id)
-                    entries.push([ 3, 'My guides', '?my-guides' ]);
+                    entries.push([ 3, LANG.myguides, '?my-guides' ]);
 
                 Menu.addButtons($buttons, entries);
                 break;
@@ -2197,6 +2222,16 @@ function co_addYourComment() {
 
 function co_validateForm(f) {
     var ta = $WH.gE(f, 'textarea')[0];
+
+    // prevent locale comments on guide pages
+    var locale = Locale.getId();
+    // aowow - disabled
+    // if(locale != LOCALE_ENUS && $(f).attr('action') && ($(f).attr('action').replace(/^.*type=([0-9]*).*$/i, '$1')) == 100)
+    if (false)
+    {
+        alert(LANG.message_cantpostlcomment_tip);
+        return false;
+    }
 
     if (g_user.permissions & 1) {
         return true;
@@ -4361,7 +4396,7 @@ var Favorites = new function() {
                 $WH.Tooltip.hide();
             }).bind(null, _type, _typeId, heading.textContent.trim().replace(/(.+)<.*/, '$1')));
 
-            _favIcon.mouseover(function(r) {
+            _favIcon.mouseover(function(event) {
                 var tt = this.className.match(/\bfav-star-0\b/) ? LANG.addtofavorites : LANG.removefromfavorites;
                 $WH.Tooltip.show(this, tt, false, false, 'q2');
             });
@@ -4371,7 +4406,7 @@ var Favorites = new function() {
             _favIcon.addClass('fa-star-0').click(function() {
                 location.href = "?account=signin";
                 $WH.Tooltip.hide();
-            }).mouseover(function(r) {
+            }).mouseover(function(event) {
                 $WH.Tooltip.show(this, LANG.favorites_login + "<div class='q2' style='margin-top:10px'>" + LANG.clicktologin + '</span>');
             });
         }
@@ -10148,6 +10183,251 @@ Listview.templates = {
         }
     },
 
+    guide: {
+        sort: ['rating'],
+        searchable: 1,
+        filterable: 1,
+        columns: [
+            {
+                id: 'title',
+                name: LANG.types[11][0],
+                type: 'text',
+                align: 'left',
+                value: 'title',
+                compute: function(guide, td)
+                {
+                    var wrapper = $('<div>')
+                    var title = $('<a>').text(guide.title).attr('href', guide.url + (typeof guide.rev != 'undefined' ? '&rev=' + guide.rev : ''));
+                    if(guide.description)
+                        title.mouseover(function(event) {$WH.Tooltip.showAtCursor(event, guide.description, 0, 0, 'q');}).mousemove(function(event) {$WH.Tooltip.cursorUpdate(event)}).mouseout(function() {$WH.Tooltip.hide()});
+                    if(guide.sticky)
+                        title.addClass('guide-sticky');
+                    else if(guide.nvotes < 5)
+                        title.addClass('guide-new');
+                    $(wrapper).append(title);
+                    $(td).append(wrapper);
+
+                    if (typeof guide.rev != 'undefined') {
+                        wrapper.css('position', 'relative');
+                        let revText = $('<div>', {
+                            class: 'small',
+                            css: { 'font-style': 'italic', position: 'absolute', right: '3px', bottom: '0px' }
+                        }).text('rev.: ' + guide.rev);
+                        $(wrapper).append(revText);
+                    }
+
+                    return;
+                },
+                getVisibleText: function(guide)
+                {
+                    return guide.title;
+                }
+            },
+            {
+                id: 'status',
+                name: LANG.status,
+                type: 'text',
+                hidden: 1,
+                compute: function(guide, td)
+                {
+                    var text = $('<span>').text(l_guide_states[guide.status]).css('color', l_guide_states_color[guide.status]);
+                    $(td).append(text);
+                },
+                getVisibleText: function(guide)
+                {
+                    return l_guide_states[guide.status];
+                },
+                sortFunc: function(a, b)
+                {
+                    if(a.status == b.status)
+                        return 0;
+
+                    return a.status < b.status ? -1 : 1;
+                }
+            },
+            {
+                id: 'category',
+                name: LANG.category,
+                type: 'text',
+                compute: function(guide, td)
+                {
+                    $(td).append($('<a>').attr('href', '?guides=' + guide.category).text(l_guide_categories[guide.category]).css('color', 'white'));
+                },
+                getVisibleText: function(guide)
+                {
+                    return l_guide_categories[guide.category];
+                },
+                sortFunc: function(a, b)
+                {
+                    if(a.category == b.category)
+                        return 0;
+
+                    return a.category < b.category ? -1 : 1;
+                }
+            },
+            {
+                id: 'author',
+                name: LANG.author,
+                type: 'text',
+                compute: function(guide, td)
+                {
+                    var userLink = $('<a>').attr('href', '?user=' + guide.author).text(guide.author);
+                    var color = g_GetStaffColorFromRoles(guide.authorroles);
+
+                    if(color != '')
+                        userLink.addClass(color);
+                    else
+                        userLink.css('color', 'white');
+
+                    $(td).append(userLink);
+                },
+                getVisibleText: function(guide)
+                {
+                    return guide.author;
+                },
+                sortFunc: function(a, b)
+                {
+                    return $WH.strcmp(a.author, b.author);
+                }
+            },
+            {
+                id: 'rating',
+                name: LANG.rating,
+                type: 'range',
+                width: '200px',
+                compute: function(guide, td)
+                {
+                    $(td).append(GetStars(guide.rating));
+
+                    var voteText = $("<span>").css('font-size', '85%');
+
+                    // aowow - localized
+                    if(guide.rating < 0)
+                        voteText.text($WH.sprintf((5 - guide.nvotes) == 1 ? LANG.needsvote_format : LANG.needsvotes_format, 5 - guide.nvotes));
+                     // voteText.text($WH.sprintf(' (needs $1 more $2)', 5 - guide.nvotes, (5 - guide.nvotes) == 1 ? 'vote' : 'votes'));
+                    else
+                        voteText.text($WH.sprintf(guide.nvotes == 1 ? LANG.outofvote_format : LANG.outofvotes_format, GetN5(guide.nvotes)));
+                     // voteText.text(' (out of ' + GetN5(guide.nvotes) + ' ' + (guide.nvotes == 1 ? 'vote' : 'votes') + ')');
+
+                    $(td).append(voteText);
+                },
+                getMinValue: function(item)
+                {
+                    return guide.rating;
+                },
+                getMaxValue: function(item)
+                {
+                    return guide.rating;
+                },
+                sortFunc: function(a, b, col)
+                {
+                    if(a.sticky && !b.sticky)
+                        return -1;
+                    else if(!a.sticky && b.sticky)
+                        return 1;
+
+                    var isANew = a.rating == -1 && a.author != 'Wowhead';
+                    var isBNew = b.rating == -1 && b.author != 'Wowhead';
+
+                    if(isANew && !isBNew)
+                        return -1;
+                    else if(isBNew && !isANew)
+                        return 1;
+
+                    if(a.rating == b.rating)
+                        return 0;
+
+                    return a.rating < b.rating ? 1 : -1;
+                }
+            },
+            {
+                id: 'views',
+                name: LANG.views,
+                type: 'text',
+                width: '120px',
+                compute: function(guide, td)
+                {
+                    var span = $('<span>');
+                    span.text(GetN5(guide.views));
+
+                    if(guide.views >= 50000)
+                    {
+                        span.css('color', '#FF4040');
+                        span.css('font-weight', 'bold');
+                    }
+                    else if(guide.views >= 25000)
+                    {
+                        span.css('color', '#FF8000');
+                        span.css('font-weight', 'bold');
+                    }
+                    else if(guide.views >= 10000)
+                        span.css('color', '#A335EE');
+                    else if(guide.views >= 5000)
+                        span.css('color', '#0070DD');
+                    else if(guide.views >= 1000)
+                        span.css('color', '#1EFF00');
+
+                    $(td).append(span);
+                },
+                getVisibleText: function(guide)
+                {
+                    return guide.author;
+                },
+                sortFunc: function(a, b)
+                {
+                    if(a.views == b.views)
+                        return 0;
+
+                    return a.views < b.views ? -1 : 1;
+                }
+            },
+            {
+                id: 'comments',
+                name: LANG.comments,
+                type: 'text',
+                width: '120px',
+                compute: function(guide)
+                {
+                    return GetN5(guide.comments);
+                },
+                sortFunc: function(a, b)
+                {
+                    if(a.comments == b.comments)
+                        return 0;
+
+                    return a.comments < b.comments ? -1 : 1;
+                }
+            },
+            {
+                id: 'patch',
+                name: LANG.patch,
+                type: 'text',
+                width: '120px',
+                compute: function(guide, td)
+                {
+                    var span = $("<span>").text($WH.sprintf('$1.$2.$3', Math.floor(guide.patch / 100 / 100), Math.floor(guide.patch / 100) % 100, guide.patch % 100));
+                    var matches = g_getPatchVersion.V[g_getPatchVersion.V.length - 2].match(/([0-9]+)\.([0-9]+)\.([0-9]+)/);
+                    var currentPatch = matches[1] * 100 * 100 + matches[2] * 100;
+
+                    if(parseInt(guide.patch / 100) * 100 >= currentPatch)
+                        span.addClass('q2');
+
+                    $(td).append(span);
+                    return;
+                },
+                sortFunc: function(a, b)
+                {
+                    if(a.patch == b.patch)
+                        return 0;
+
+                    return a.patch < b.patch ? -1 : 1;
+                }
+            }
+        ],
+
+        getItemLink: function(guide) {return guide.url + (typeof guide.rev != 'undefined' ? '&rev=' + guide.rev : '')}
+    },
+
     item: {
         sort: [-2],
         searchable: 1,
@@ -13721,6 +14001,7 @@ Listview.templates = {
             for(var i = 0; i < comment.replies.length; ++i)
             {
                 var reply = comment.replies[i];
+                let owner = g_pageInfo.author === reply.username;
                 var row = $('<tr class="comment-reply-row"><td class="reply-controls"><p class="reply-upvote">upvote</p><p class="reply-rating"></p><p class="reply-downvote">downvote</p></td><td class="reply-text"></td></tr>');
                 var replyBy = $('<p class="comment-reply-author"></p>');
                 var replyByUserLink = $('<a></a>');
@@ -13744,6 +14025,13 @@ Listview.templates = {
                 replyByUserLink.attr('href', '?user=' + reply.username);
                 replyByUserLink.text(reply.username);
                 replyBy.append(replyByUserLink);
+
+                if (owner)
+                {
+                    $WH.ae(replyBy[0], $WH.ct(' '));
+                    $WH.ae(replyBy[0], $WH.ce('span', { className: 'comment-reply-author-label' }, $WH.ct('<' + LANG.guideAuthor + '>')));
+                }
+
                 replyBy.append(' ').append(replyWhen).append(' ').append($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(creationDate)));
 
 
@@ -13833,6 +14121,7 @@ Listview.templates = {
         updateCommentAuthor: function(comment, container)
         {
             var user = g_users[comment.user];
+            let owner = g_pageInfo.author === comment.user;
             var postedOn = new Date(comment.date);
             var elapsed = (g_serverTime - postedOn) / 1000;
 
@@ -13840,6 +14129,11 @@ Listview.templates = {
 
             container.append(LANG.lvcomment_by);
             container.append($WH.sprintf('<a href="?user=$1">$2</a>', comment.user, comment.user));
+            if (owner)
+            {
+                $WH.ae(container[0], $WH.ct(' '));
+                $WH.ae(container[0], $WH.ce('span', { className: 'comment-reply-author-label' }, $WH.ct('<' + LANG.guideAuthor + '>')));
+            }
             container.append(g_getReputationPlusAchievementText(user.gold, user.silver, user.copper, user.reputation));
             container.append($WH.sprintf(' <a class="q0" id="comments:id=$1" href="#comments:id=$2">$3</a>', comment.id, comment.id, g_formatDate(null, elapsed, postedOn)));
             container.append(' ');
@@ -16630,6 +16924,54 @@ Listview.templates = {
         getItemLink: function(race) {
             return '?race=' + race.id;
         }
+    },
+
+    changelog: {
+        nItemsPerPage: 100,
+        sortable: false,
+        columns: [
+            {
+                id: "name",
+                name: "Name",
+                compute: function (changelog, td) {
+                    var c = $(changelog.tooltip).find("b").first().text();
+                    $(td).html(c);
+                    td.className += " listview-cleartext";
+                },
+            },
+            {
+                id: "version",
+                name: "Version (mouseover to see tooltip)",
+                compute: function (changelog, td) {
+                    var tt = changelog.tooltip;
+                    $(td).mouseover(function (event, menu) { $WH.Tooltip.showAtCursor(menu, event, 0, 0); }.bind(td, tt));
+                    $(td).mousemove(function (event) { $WH.Tooltip.cursorUpdate(event); })
+                         .mouseout(function () { $WH.Tooltip.hide(); });
+/* aowow - we dont do patches
+                    var g = typeof g_hearthhead != "undefined" && g_hearthhead ? "hearthstone" : "wow";
+                    if (!g_getPatchVersionObject.hasOwnProperty("parsed") || !g_getPatchVersionObject.parsed[g]) {
+                        g_getPatchVersionObject();
+                    }
+                    var j = (changelog.build > 0 ? "" : "Before ") + "Build " + Math.abs(changelog.build);
+                    if (changelog.version > 0) {
+                        var f = parseInt(changelog.version / 10000) + "." + (parseInt(changelog.version / 100) % 100) + "." + (changelog.version % 100);
+                        j = f + " " + j;
+                        var c = false;
+                        for (var b in g_gameversions[g]) {
+                            if (g_gameversions[g][b].versionnum >= changelog.version && (!c || c.build > g_gameversions[g][b].build)) {
+                                c = g_gameversions[g][b];
+                            }
+                        }
+                        if (c) {
+                            j = j.replace(f, f + " (" + new Date(c.timestamp).toDateString() + ")");
+                        }
+                    }
+*/
+                    let j = changelog.version; // aowow - tmp
+                    $(td).html(j);
+                },
+            },
+        ],
     }
 };
 
@@ -16935,6 +17277,12 @@ var Menu = new function()
         if(pos != -1)
             menu.splice(pos, 1);
     };
+
+    self.setSubmenu = function (menuItem, submenu)
+    {
+        menuItem[MENU_IDX_SUB] = submenu;
+    };
+
 
     /***********/
     /* PRIVATE */
@@ -17778,6 +18126,93 @@ ProgressBar.prototype.getContainer = function()
 {
     return this.elements.container;
 };
+
+
+/* This function is to get the stars for the vote control for the guides. */
+
+function GetStars(stars, ratable, userRating, guideId)
+{
+    var STARS_MAX = 5;
+    var averageRating = stars;
+
+    if(userRating)
+        stars = userRating;
+
+    stars = Math.round(stars*2)/2;
+    var starsRounded = Math.round(stars);
+    var ret = $("<span>").addClass('stars').addClass('max-' + STARS_MAX).addClass('stars-' + starsRounded);
+
+    if(!g_user.id)
+        ratable = false;
+
+    if(ratable)
+        ret.addClass('ratable');
+
+    if(userRating)
+        ret.addClass('rated');
+
+    /* This is kinda lame but oh well */
+    var contents = '<span>';
+
+    // var wbr = $.browser.msie ? '' : '&#8203;';           // aowow - jQuery v1.9 deprecated
+    var wbr = $WH.Browser.ie ? '' : '&#8203;';
+    var tmp = stars;
+    for(var i = 1; i <= STARS_MAX; ++i)
+    {
+        if(tmp < 1 && tmp > 0)
+            contents += '<b class="half">';
+        else
+            contents += '<b>';
+        --tmp;
+
+        contents += '<i class="clickable">' + wbr + '<i></i></i>';
+    }
+
+    for(var i = 1; i <= STARS_MAX; ++i)
+        contents += '</b>';
+
+    contents += '</span>';
+
+    ret.append(contents);
+
+    if(ratable)
+    {
+        var starNumber = 0;
+        ret.find('i.clickable').each(function() { var starId = ++starNumber; $(this).click(function() { VoteGuide(guideId, averageRating, starId); }); })
+    }
+
+    if(userRating)
+    {
+        var clear = $("<span>").addClass('clear').click(function() { VoteGuide(guideId, averageRating, 0); });
+        ret.append(clear);
+    }
+
+    if(stars >= 0)
+        ret.mouseover(function(event) {$WH.Tooltip.showAtCursor(event, 'Rating:&nbsp;' + stars + '&nbsp;/&nbsp;' + STARS_MAX, 0, 0, 'q');}).mousemove(function(event) {$WH.Tooltip.cursorUpdate(event)}).mouseout(function() {$WH.Tooltip.hide()});
+
+    return ret;
+}
+
+function VoteGuide(guideId, oldRating, newRating)
+{
+    // Update stars display
+    $('#guiderating').html(GetStars(oldRating, true, newRating, guideId));
+
+    // Vote
+    $.ajax({cache: false, url: '?guide=vote', type: 'POST',
+        error: function() {
+            $('#guiderating').html(GetStars(oldRating, true, 0, guideId));
+            alert('Voting failed. Try again later.');
+        },
+        success: function(json) {
+            var data = eval('(' + json + ')');
+            $('#guiderating-value').text(data.rating);
+            $('#guiderating-votes').text(GetN5(data.nvotes));
+        },
+        data: { id: guideId, rating: newRating }
+    });
+}
+
 
 var Icon = {
     sizes: ['small', 'medium', 'large'],
@@ -22109,6 +22544,37 @@ $WH.aE(window, 'load', function () {
     }
 });
 
+$(document).ready((function () {
+    $('input').each((function () {
+        var maxLen = $(this).attr('maxlength');
+        var elemId = $(this).attr('data-charwarning');
+        var container = elemId ? $('#' + elemId) : null;
+        if (!maxLen || !container)
+            return;
+
+        var _hide = function () { container.hide() };
+        var _show = function (len) {
+            var chars  = maxLen - len;
+            var usePct = len / maxLen;
+
+            var r = parseInt(usePct >= 0.5 ? 255 :        usePct        * 2 * 255).toString(16);
+            var g = parseInt(usePct <  0.5 ? 255 : 255 - (usePct - 0.5) * 2 * 255).toString(16);
+
+            if (r.length == 1)
+                r = '0' + r;
+            if (g.length == 1)
+                g = '0' + g;
+
+            container.text($WH.sprintf(LANG.compose_remaining, chars));
+            container.show();
+            container.css('color', '#' + r + g + '00')
+        };
+
+        $(this).focus((function () { _show($(this).val().length)}))
+               .blur((function () { _hide() }))
+               .keyup((function () { _show($(this).val().length) }))
+    }))
+}));
 
 function GetN5(num)
 {
@@ -22394,6 +22860,275 @@ function g_modifyUrl(url, params, opt) {
     return url + hash;
 }
 
+function g_enhanceTextarea (ta, opt) {
+    if (!(ta instanceof jQuery)) {
+        ta = $(ta);
+    }
+
+    if (ta.data("wh-enhanced") || ta.prop("tagName") != "TEXTAREA") {
+        return;
+    }
+
+    if (typeof opt != "object") {
+        opt = {};
+    }
+
+    var canResize = (function(el) {
+        if (!el.dynamicResizeOption)
+            return true;
+
+        if ($WH.localStorage.get("dynamic-textarea-resizing") === "true")
+            return true;
+
+        if ($WH.localStorage.get("dynamic-textarea-resizing") === "false")
+            return false;
+
+        return !el.hasOwnProperty("dynamicSizing") || el.dynamicSizing;
+    }).bind(null, opt);
+
+    var height  = ta.height() || 500;
+    var wrapper = $("<div/>", { "class": "enhanced-textarea-wrapper" }).insertBefore(ta).append(ta);
+
+    if (!opt.hasOwnProperty("color"))
+        wrapper.addClass("enhanced-textarea-dark")
+    else if (opt.color)
+        wrapper.addClass("enhanced-textarea-" + opt.color)
+
+    if (!opt.hasOwnProperty("dynamicSizing") || opt.dynamicSizing || opt.dynamicResizeOption) {
+        var expander = $("<div/>", { "class": "enhanced-textarea-expander" }).prependTo(wrapper);
+        var n = function(E, D, F) {
+            if (!F())
+                return;
+
+            // E.css("height", E.siblings(".enhanced-textarea-expander").html($WH.htmlentities(E.val()).replace(/\n/g, "<br>") + "<br>").height() + (D ? 14 : 34) + "px")
+            E.css("height", E.siblings(".enhanced-textarea-expander").html($WH.htmlentities(E.val()) + "<br>").height() + (D ? 14 : 34) + "px")
+        };
+
+        ta.bind("keydown keyup change", n.bind(this, ta, opt.exactLineHeights, canResize));
+        n(ta, opt.exactLineHeights, canResize);
+        var setWidth = function(D) {
+            D.css("width", D.parent().width() + "px")
+        };
+        setWidth(expander);
+        setTimeout(setWidth.bind(null, expander), 1);
+        if (!opt.dynamicResizeOption || (opt.dynamicResizeOption && canResize())) {
+            wrapper.addClass("enhanced-textarea-dynamic-sizing")
+        }
+    }
+    if (!opt.hasOwnProperty("focusChanges") || opt.focusChanges) {
+        wrapper.addClass("enhanced-textarea-focus-changes")
+    }
+    if (opt.markup) {
+        var w = $("<div/>", { "class": "enhanced-textarea-markup-wrapper" }).prependTo(wrapper);
+        var y = $("<div/>", { "class": "enhanced-textarea-markup" }).appendTo(w);
+        var z = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
+        var k = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
+
+        if (opt.markup == "inline")
+            ar_AddInlineToolbar(ta.get(0), z.get(0), k.get(0));
+        else
+            ar_AddToolbar(ta.get(0), z.get(0), k.get(0));
+
+        if (opt.dynamicResizeOption) {
+            var t = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
+            var C = $("<label/>").appendTo(t);
+            var A = $("<input/>", { type: "checkbox", checked: canResize() }).appendTo(C);
+            A.change((function(E, D, H, J, F, G) {
+                var I = this.is(":checked");
+                $WH.localStorage.set("dynamic-textarea-resizing", JSON.stringify(I));
+                if (I) {
+                    D.addClass("enhanced-textarea-dynamic-sizing");
+                    G(H, E.exactLineHeights, J);
+                }
+                else {
+                    D.removeClass("enhanced-textarea-dynamic-sizing");
+                    H.css("height", F + "px");
+                }
+            }).bind(A, opt, wrapper, ta, canResize, height, n));
+
+            $("<span/>", { text: LANG.autoresizetextbox }).appendTo(C);
+        }
+
+        if (opt.scrollingMarkup) {
+            if (g_enhanceTextarea.scrollerCount)
+                g_enhanceTextarea.scrollerCount++;
+            else
+                g_enhanceTextarea.scrollerCount = 1;
+
+            var B = "fixable-markup-controls-" + g_enhanceTextarea.scrollerCount;
+            var o = "fixed-markup-controls-"   + g_enhanceTextarea.scrollerCount;
+            var setBGColor = function(el) {
+                var color = el.css("backgroundColor");
+                if (color == "rgba(0, 0, 0, 0)" || color == "transparent")
+                    return setBGColor(el.parent());
+                else
+                    return color;
+            };
+            var r = setBGColor(y);
+            for (var m, l = 0;
+                (m = window.document.styleSheets[l]) && m.href; l++) {}
+            if (!m) {
+                window.document.head.appendChild(document.createElement("style"));
+                m = window.document.styleSheets[l];
+            }
+            m.insertRule("." + o + " ." + B + " .enhanced-textarea-markup {background:" + r + ";padding-bottom:5px;padding-top:10px;position:fixed;top:0;z-index:3}", m.cssRules.length);
+            m.insertRule(".touch-device ." + o + " ." + B + " .enhanced-textarea-markup {padding-top:50px}", m.cssRules.length);
+            w.addClass(B);
+            var s = function(F, D, cssClass, offset) {
+                var H = this.scrollY || this.pageYOffset || 0;
+                if (H > F.offset().top - 10 - offset && H < D.offset().top + D.height() - 100 - offset)
+                    $("body").addClass(cssClass);
+                else
+                    $("body").removeClass(cssClass);
+            };
+
+            $(window).scroll(s.bind(window, w, wrapper, o, 0));
+            s.call(window, w, wrapper, o, 0);
+            var setSize = (function(D, E) {
+                E.css("width",  D.width()  + "px");
+                D.css("height", E.height() + "px");
+            }).bind(null, w, y);
+            setSize();
+            $(window).on("resize", setSize);
+            $(function() { setTimeout(setSize, 2000) })
+        }
+    }
+
+    ta.data("wh-enhanced", true);
+};
+
+$WH.createOptionsMenuWidget = function (id, txt, opt) {
+    var chevron = $WH.createOptionsMenuWidget.chevron;
+    if (opt.noChevron)
+        chevron = '';
+
+    var container = $WH.ce('span');
+    container.id = 'options-menu-widget-' + id;
+    container.className = 'options-menu-widget ' + container.id;
+    container.innerHTML = txt + chevron;
+
+    if (opt.id)
+        container.id = opt.id;
+
+    if (opt.className)
+        container.className += ' ' + opt.className;
+
+  if (opt.options instanceof Array) {
+        var c = [];
+        for (var itr = 0, d; d = opt.options[itr]; itr++) {
+            var menu = [itr, d[MENU_IDX_NAME]];
+            if ((typeof opt.selected == 'number' || typeof opt.selected == 'string') && opt.selected == d[MENU_IDX_ID]) {
+                container.innerHTML = d[MENU_IDX_NAME] + chevron;
+                if (d[MENU_IDX_SUB]) {
+                    switch (typeof d[MENU_IDX_SUB].className) {
+                        case 'string':
+                            $.data(container, 'options-menu-widget-class', d[MENU_IDX_SUB].className);
+                            container.className += ' ' + d[MENU_IDX_SUB].className;
+                            break;
+                        case 'function':
+                            $.data(container, 'options-menu-widget-class', d[MENU_IDX_SUB].className(d, true));
+                            container.className += ' ' + d[MENU_IDX_SUB].className(d, true);
+                            break
+                    }
+                }
+            }
+            if (d[MENU_IDX_URL]) {
+                menu.push(function (chevron, container, i, opt) {
+                    switch (typeof i[MENU_IDX_URL]) {
+                        case 'string':
+                            window.location = i[MENU_IDX_URL];
+                            break;
+                        case 'function':
+                            if (typeof opt.updateWidgetText == 'undefined' || opt.updateWidgetText) {
+                                container.innerHTML = i[MENU_IDX_NAME] + chevron;
+                                var o = $.data(container, 'options-menu-widget-class');
+                                if (o)
+                                    container.className = container.className.replace(new RegExp(' *\\b' + o + '\\b'), '');
+
+                                if (i[MENU_IDX_SUB]) {
+                                    switch (typeof i[MENU_IDX_SUB].className) {
+                                        case 'string':
+                                            $.data(container, 'options-menu-widget-class', i[MENU_IDX_SUB].className);
+                                            container.className += ' ' + i[MENU_IDX_SUB].className;
+                                            break;
+                                        case 'function':
+                                            $.data(container, 'options-menu-widget-class', i[MENU_IDX_SUB].className(i, true));
+                                            container.className += ' ' + i[MENU_IDX_SUB].className(i, true);
+                                            break;
+                                    }
+                                }
+                            }
+
+                            i[MENU_IDX_URL](container, i);
+                            break;
+                    }
+                }.bind(null, chevron, Menu.add, d, opt))
+            }
+            else if (!d[MENU_IDX_SUB] || !d[MENU_IDX_SUB].menu)
+                menu[0] = null;
+
+            menu[MENU_IDX_OPT] = {};
+            if (d[MENU_IDX_SUB]) {
+                switch (typeof d[MENU_IDX_SUB].className) {
+                    case 'string':
+                        menu[MENU_IDX_OPT].className = d[MENU_IDX_SUB].className;
+                        break;
+                    case 'function':
+                        menu[MENU_IDX_OPT].className = d[MENU_IDX_SUB].className.bind(null, d, false);
+                        break;
+                }
+                switch (typeof d[MENU_IDX_SUB].column) {
+                    case 'number':
+                    case 'string':
+                        menu[MENU_IDX_OPT].column = d[MENU_IDX_SUB].column;
+                        break;
+                    case 'function':
+                        menu[MENU_IDX_OPT].column = d[MENU_IDX_SUB].column.bind(null, d);
+                        break;
+                }
+                switch (typeof d[MENU_IDX_SUB].tinyIcon) {
+                    case 'string':
+                        menu[MENU_IDX_OPT].tinyIcon = d[MENU_IDX_SUB].tinyIcon;
+                        break;
+                    case 'function':
+                        menu[MENU_IDX_OPT].tinyIcon = d[MENU_IDX_SUB].tinyIcon.bind(null, d);
+                        break;
+                }
+                switch (typeof d[MENU_IDX_SUB].fontIcon) {
+                    case 'string':
+                        menu[MENU_IDX_OPT].fontIcon = d[MENU_IDX_SUB].fontIcon;
+                        break;
+                    case 'function':
+                        menu[MENU_IDX_OPT].fontIcon = d[MENU_IDX_SUB].fontIcon.bind(null, d);
+                        break;
+                }
+
+                if (typeof d[MENU_IDX_SUB].isChecked == 'function')
+                    menu[MENU_IDX_OPT].checkedFunc = d[MENU_IDX_SUB].isChecked.bind(null, d);
+
+                if (typeof d[MENU_IDX_SUB].menu == 'object' && d[MENU_IDX_SUB].menu instanceof Array)
+                    Menu.setSubmenu(menu, d[MENU_IDX_SUB].menu); // <-- n.d. !
+
+            }
+            c.push(menu);
+        }
+
+        container.menu = c;
+        if (opt.menuOnClick) {
+            container.onmousedown = $WH.rf;
+            Menu.add(container, c, { showAtElement: true });
+        }
+        else
+            Menu.add(container, c);
+
+  }
+
+  if (opt.target)
+        $(opt.target).append(container);
+  else
+        return container;
+};
+$WH.createOptionsMenuWidget.chevron = ' <i class="fa fa-chevron-down fa-color-gray">~</i>';
 
 /*
 Global WoW data
@@ -22413,16 +23148,31 @@ var g_file_races = {
 };
 
 var g_file_classes = {
-     1: 'warrior',
-     2: 'paladin',
-     3: 'hunter',
-     4: 'rogue',
-     5: 'priest',
-     6: 'deathknight',
-     7: 'shaman',
-     8: 'mage',
-     9: 'warlock',
-    11: 'druid'
+    1: 'warrior',
+    2: 'paladin',
+    3: 'hunter',
+    4: 'rogue',
+    5: 'priest',
+    6: 'deathknight',
+    7: 'shaman',
+    8: 'mage',
+    9: 'warlock',
+   11: 'druid'
+};
+
+var g_file_specs = {
+    "-1":  'inv_misc_questionmark',
+       0:  'spell_nature_elementalabsorption',
+       6: ['spell_deathknight_bloodpresence', 'spell_deathknight_frostpresence', 'spell_deathknight_unholypresence' ],
+      11: ['spell_nature_starfall',           'ability_racial_bearform',         'spell_nature_healingtouch'        ],
+       3: ['ability_hunter_beasttaming',      'ability_marksmanship',            'ability_hunter_swiftstrike'       ],
+       8: ['spell_holy_magicalsentry',        'spell_fire_firebolt02',           'spell_frost_frostbolt02'          ],
+       2: ['spell_holy_holybolt',             'spell_holy_devotionaura',         'spell_holy_auraoflight'           ],
+       5: ['spell_holy_wordfortitude',        'spell_holy_holybolt',             'spell_shadow_shadowwordpain'      ],
+       4: ['ability_rogue_eviscerate',        'ability_backstab',                'ability_stealth'                  ],
+       7: ['spell_nature_lightning',          'spell_nature_lightningshield',    'spell_nature_magicimmunity'       ],
+       9: ['spell_shadow_deathcoil',          'spell_shadow_metamorphosis',      'spell_shadow_rainoffire'          ],
+       1: ['ability_rogue_eviscerate',        'ability_warrior_innerrage',       'ability_warrior_defensivestance'  ]
 };
 
 var g_file_genders = {
