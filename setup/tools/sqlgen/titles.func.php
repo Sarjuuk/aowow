@@ -94,6 +94,8 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('UPDATE ?_titles SET side = 2 WHERE id <= 28 OR id IN (118, 119, 116, 117, 110, 127)');
         DB::Aowow()->query('UPDATE ?_titles SET side = 1 WHERE id <= 14 OR id IN (111, 115, 112, 114, 126)');
 
+        $this->reapplyCCFlags('titles', TYPE_TITLE);
+
         return true;
     }
 });

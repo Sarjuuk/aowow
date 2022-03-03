@@ -243,6 +243,8 @@ SqlGen::register(new class extends SetupScript
             WHERE
                 durability > 0 AND ((classBak = 4 AND subClassBak IN (1, 2, 3, 4, 6)) OR (classBak = 2 AND subClassBak <> 9))');
 
+        $this->reapplyCCFlags('items', TYPE_ITEM);
+
         return true;
     }
 });

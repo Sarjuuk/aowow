@@ -120,6 +120,8 @@ SqlGen::register(new class extends SetupScript
         // apply typeCat and reqSkill depending on locks
         DB::Aowow()->query($updateQuery, $ids ?: DBSIMPLE_SKIP);
 
+        $this->reapplyCCFlags('objects', TYPE_OBJECT);
+
         return true;
     }
 });

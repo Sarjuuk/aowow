@@ -84,6 +84,21 @@ abstract class SetupScript
     {
         return $this->command;
     }
+
+    protected function reapplyCCFlags(string $tbl, int $type) : void
+    {
+        // reaply flags for community content as these are lost when the table is rebuild
+
+        if (preg_match('/[^a-z]/i', $tbl))
+        {
+            trigger_error('SetupScript::reapplyCCFlags() - invalid table name');
+            return;
+        }
+
+        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_comments    y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`flags`  & ?d', CUSTOM_HAS_COMMENT,    $type, CC_FLAG_APPROVED);
+        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_screenshots y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`status` & ?d', CUSTOM_HAS_SCREENSHOT, $type, CC_FLAG_APPROVED);
+        DB::Aowow()->query('UPDATE ?_'.$tbl.' x, ?_videos      y SET x.`cuFlags` = x.`cuFlags` | ?d WHERE x.`id` = y.`typeId` AND y.`type` = ?d AND y.`status` & ?d', CUSTOM_HAS_VIDEO,      $type, CC_FLAG_APPROVED);
+    }
 }
 
 ?>

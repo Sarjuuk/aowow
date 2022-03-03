@@ -58,6 +58,8 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('UPDATE ?_skillline sl, ?_icons ic SET sl.iconId = ic.id WHERE ic.name = ? AND sl.id = ?d', 'inv_misc_pelt_wolf_01', 393);
         DB::Aowow()->query('UPDATE ?_skillline sl, ?_icons ic SET sl.iconId = ic.id WHERE ic.name = ? AND sl.id = ?d', 'inv_misc_key_03', 633);
 
+        $this->reapplyCCFlags('skillline', TYPE_SKILL);
+
         return true;
     }
 });

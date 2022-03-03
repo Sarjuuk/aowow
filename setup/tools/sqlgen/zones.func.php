@@ -217,6 +217,8 @@ SqlGen::register(new class extends SetupScript
             DB::Aowow()->query('UPDATE ?_zones SET ?a WHERE mapId = ?d', $update, $mapId);
         }
 
+        $this->reapplyCCFlags('zones', TYPE_ZONE);
+
         return true;
     }
 });

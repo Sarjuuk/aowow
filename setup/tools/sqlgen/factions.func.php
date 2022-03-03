@@ -96,6 +96,8 @@ SqlGen::register(new class extends SetupScript
         foreach ($pairs as $p)
             DB::Aowow()->query($recursiveUpdateQuery, $p[0], $p[1], $p[0]);
 
+        $this->reapplyCCFlags('factions', TYPE_FACTION);
+
         return true;
     }
 });
