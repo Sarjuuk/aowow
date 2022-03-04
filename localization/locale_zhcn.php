@@ -1167,6 +1167,7 @@ $lang = array(
         'bonusTalents'  => "%d天赋|4点数:点数;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
+        'autoaccept'    => '自动接收',
         'questInfo'     => array(
              0 => "普通",              1 => "组队",              21 => "职业",               41 => "PvP",                62 => "团队",               81 => "地下城",            82 => "世界事件",
             83 => "传说",          84 => "护送",             85 => "英雄",             88 => "团队（10）",          89 => "团队（25）"

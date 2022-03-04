@@ -19,6 +19,19 @@ class QuestPage extends GenericPage
     protected $css           = [['path' => 'Book.css']];
     protected $js            = ['ShowOnMap.js'];
 
+    private   $catExtra      = array(
+                                3526 => 3524,
+                                363  =>   14,
+                                220  =>  215,
+                                188  =>  141,
+                                1769 =>  361,
+                                25   =>   46,
+                                132  =>    1,
+                                3431 => 3430,
+                                154  =>   85,
+                                9    =>   12
+                            );
+
     private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
@@ -44,7 +57,12 @@ class QuestPage extends GenericPage
         // recreate path
         $this->path[] = $this->subject->getField('cat2');
         if ($_ = $this->subject->getField('cat1'))
+        {
+            if (isset($this->catExtra[$_]))
+                $this->path[] = $this->catExtra[$_];
+
             $this->path[] = $_;
+        }
     }
 
     protected function generateTitle()
@@ -203,6 +221,10 @@ class QuestPage extends GenericPage
 
         if ($e)
             $infobox[] = implode('[br]', $e);
+
+        // auto accept
+        if ($_flags & QUEST_FLAG_AUTO_ACCEPT)
+            $infobox[] = Lang::quest('autoaccept');
 
         // Repeatable
         if ($this->subject->isRepeatable())
