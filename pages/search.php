@@ -616,7 +616,7 @@ class SearchPage extends GenericPage
 
     private function _searchAbility($cndBase)               // 7 Abilities (Player + Pet) $searchMask & 0x0000080
     {
-        $cnd       = array_merge($cndBase, array(              // hmm, inclued classMounts..?
+        $cnd       = array_merge($cndBase, array(           // hmm, inclued classMounts..?
             ['s.typeCat', [7, -2, -3, -4]],
             [['s.cuFlags', (SPELL_CU_TRIGGERED | SPELL_CU_TALENT), '&'], 0],
             [['s.attributes0', 0x80, '&'], 0],
@@ -1266,6 +1266,7 @@ class SearchPage extends GenericPage
     private function _searchSpell($cndBase)                 // 24 Spells (Misc + GM + triggered abilities) $searchMask & 0x1000000
     {
         $cnd  = array_merge($cndBase, array(
+            ['s.typeCat', -8, '!'],
             [
                 'OR',
                 ['s.typeCat', [0, -9]],
