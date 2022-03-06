@@ -46,9 +46,16 @@ class ItemList extends BaseType
 
             $this->initJsonStats();
 
-            // readdress itemset .. is wrong for virtual sets
-            if ($miscData && isset($miscData['pcsToSet']) && isset($miscData['pcsToSet'][$this->id]))
-                $this->json[$this->id]['itemset'] = $miscData['pcsToSet'][$this->id];
+            if ($miscData)
+            {
+                // readdress itemset .. is wrong for virtual sets
+                if (isset($miscData['pcsToSet']) && isset($miscData['pcsToSet'][$this->id]))
+                    $this->json[$this->id]['itemset'] = $miscData['pcsToSet'][$this->id];
+
+                // additional rel attribute for listview rows
+                if (isset($miscData['extraOpts']['relEnchant']))
+                    $this->relEnchant = $miscData['extraOpts']['relEnchant'];
+            }
 
             // unify those pesky masks
             $_  = &$_curTpl['requiredClass'];
@@ -297,6 +304,15 @@ class ItemList extends BaseType
             // json vs listview quirk
             $data[$this->id]['name'] = $data[$this->id]['quality'].$data[$this->id]['name'];
             unset($data[$this->id]['quality']);
+
+            if (!empty($this->relEnchant) && $this->curTpl['randomEnchant'])
+            {
+                if (($x = array_search($this->curTpl['randomEnchant'], array_column($this->relEnchant, 'entry'))) !== false)
+                {
+                    $data[$this->id]['rel']   = 'rand='.$this->relEnchant[$x]['ench'];
+                    $data[$this->id]['name'] .= ' '.$this->relEnchant[$x]['name'];
+                }
+            }
 
             if ($addInfoMask & ITEMINFO_JSON)
             {
@@ -2258,11 +2274,24 @@ class ItemListFilter extends Filter
 
     protected function cbHasRandEnchant($cr)
     {
-        $randIds = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, ABS(id) FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', User::$localeId, '%'.$cr[2].'%');
-        $tplIds  = $randIds ? DB::World()->select('SELECT entry, ench FROM item_enchantment_template WHERE ench IN (?a)', $randIds) : [];
-        foreach ($tplIds as $k => &$set)
-            if (array_search($set['ench'], $randIds) < 0)
+        $randIds = DB::Aowow()->select('SELECT id AS ARRAY_KEY, ABS(id) AS `id`, name_loc?d, name_loc0 FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', User::$localeId, User::$localeId, '%'.$cr[2].'%');
+        $tplIds  = $randIds ? DB::World()->select('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN (?a)', array_column($randIds, 'id')) : [];
+        foreach ($tplIds as &$set)
+        {
+            $z = array_column($randIds, 'id');
+            $x = array_search($set['ench'], $z);
+            if (isset($randIds[-$z[$x]]))
+            {
                 $set['entry'] *= -1;
+                $set['ench']  *= -1;
+            }
+
+            $set['name'] = Util::localizedString($randIds[$set['ench']], 'name', true);
+        }
+
+        // only enhance search results if enchantment by name is unique (implies only one enchantment per item is availabel)
+        if (count(array_unique(array_column($randIds, 'name_loc0'))) == 1)
+            $this->extraOpts['relEnchant'] = $tplIds;
 
         if ($tplIds)
             return ['randomEnchant', array_column($tplIds, 'entry')];
@@ -2277,8 +2306,10 @@ class ItemListFilter extends Filter
 
         $this->formData['extraCols'][] = $cr[0];
 
-        $costs = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE reqPersonalrating '.$cr[1].' '.$cr[2]);
-        $items = DB::World()->selectCol($this->extCostQuery, $costs, $costs);
+        $items = [0];
+        if ($costs = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE reqPersonalrating '.$cr[1].' '.$cr[2]))
+            $items = DB::World()->selectCol($this->extCostQuery, $costs, $costs);
+
         return ['id', $items];
     }
 
@@ -2489,7 +2520,7 @@ class ItemListFilter extends Filter
             case 1:                                 // Yes
             case 5:                                 // No
                 $w = 1;
-                return;
+                break;
             case 2:                                 // Alliance
                 $w = 'reqRaceMask & '.RACE_MASK_ALLIANCE.' AND (reqRaceMask & '.RACE_MASK_HORDE.') = 0';
                 break;
