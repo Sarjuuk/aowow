@@ -109,7 +109,7 @@ class ZonePage extends GenericPage
         }
 
         // Instances
-        if ($_ = DB::Aowow()->selectCol('SELECT id FROM ?_zones WHERE parentAreaId = ?d AND (flags & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        if ($_ = DB::Aowow()->selectCol('SELECT `id` FROM ?_zones WHERE `parentAreaId` = ?d AND (`cuFlags` & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
             $this->extendGlobalIds(TYPE_ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
