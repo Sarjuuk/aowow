@@ -6,17 +6,16 @@ if (!defined('AOWOW_REVISION'))
 
 trait TrDetailPage
 {
-    protected $hasComContent = true;
-    protected $category      = null;                        // not used on detail pages
-    protected $lvTabs        = [];                          // most pages have this
+    protected $category   = null;                           // not used on detail pages
+    protected $lvTabs     = [];                             // most pages have this
 
-    protected $ssError       = null;
-    protected $coError       = null;
-    protected $viError       = null;
+    protected $ssError    = null;
+    protected $coError    = null;
+    protected $viError    = null;
 
-    protected $subject       = null;                        // so it will not get cached
+    protected $subject    = null;                           // so it will not get cached
 
-    protected $contribute    = CONTRIBUTE_ANY;
+    protected $contribute = CONTRIBUTE_ANY;
 
     protected function generateCacheKey(bool $withStaff = true) : string
     {
@@ -136,8 +135,8 @@ trait TrProfiler
     {
         $this->prepareContent();
 
-        $this->hasComContent = false;
-        $this->notFound      = array(
+        $this->contribute = CONTRIBUTE_NONE;
+        $this->notFound   = array(
             'title' => sprintf(Lang::profiler('firstUseTitle'), $this->subjectName, $this->realm),
             'msg'   => ''
         );
@@ -172,6 +171,7 @@ class GenericPage
     protected $reqUGroup    = U_GROUP_NONE;
     protected $reqAuth      = false;
     protected $mode         = CACHE_TYPE_NONE;
+ // protected $contribute;                                  // defined in __construct()
 
     protected $jsGlobals    = [];
     protected $lvData       = [];
@@ -237,6 +237,9 @@ class GenericPage
     public function __construct(string $pageCall = '', string $pageParam = '')
     {
         $this->time = microtime(true);
+
+        if (!isset($this->contribute))
+            $this->contribute = CONTRIBUTE_NONE;
 
         $this->fullParams = $pageCall;
         if ($pageParam)
@@ -399,11 +402,19 @@ class GenericPage
             $this->contribute = $x::$contribute;
         }
 
-        if (!empty($this->hasComContent))                   // get comments, screenshots, videos
+        if ($this->contribute & CONTRIBUTE_CO)
+            $this->community['co'] = CommunityContent::getComments($this->type, $this->typeId);
+
+        if ($this->contribute & CONTRIBUTE_SS)
+            $this->community['ss'] = CommunityContent::getScreenshots($this->type, $this->typeId);
+
+        if ($this->contribute & CONTRIBUTE_VI)
+            $this->community['vi'] = CommunityContent::getVideos($this->type, $this->typeId);
+
+        // as comments are not cached, those globals cant be either
+        if ($this->contribute)
         {
-            $jsGlobals = [];
-            $this->community = CommunityContent::getAll($this->type, $this->typeId, $jsGlobals);
-            $this->extendGlobalData($jsGlobals);            // as comments are not cached, those globals cant be either
+            $this->extendGlobalData(CommunityContent::getJSGlobals());
             $this->applyGlobals();
         }
 
@@ -595,8 +606,8 @@ class GenericPage
         {
             array_unshift($this->title, Lang::main('nfPageTitle'));
 
-            $this->hasComContent = false;
-            $this->notFound      = array(
+            $this->contribute = CONTRIBUTE_NONE;
+            $this->notFound   = array(
                 'title' =>          isset($this->typeId) ? Util::ucFirst($title).' #'.$this->typeId    : $title,
                 'msg'   => !$msg && isset($this->typeId) ? sprintf(Lang::main('pageNotFound'), $title) : $msg
             );

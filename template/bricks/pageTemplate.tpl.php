@@ -1,8 +1,13 @@
             <script type="text/javascript">//<![CDATA[
 <?php
-if (!empty($this->hasComContent)):
+if ($this->contribute & CONTRIBUTE_CO):
     echo "                var lv_comments = ".Util::toJSON($this->community['co']).";\n";
+endif;
+if ($this->contribute & CONTRIBUTE_SS):
+
     echo "                var lv_screenshots = ".Util::toJSON($this->community['sc']).";\n";
+endif;
+if ($this->contribute & CONTRIBUTE_VI):
     echo "                var lv_videos = ".Util::toJSON($this->community['vi']).";\n";
 endif;
 

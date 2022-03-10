@@ -26,12 +26,12 @@ class SoundPage extends GenericPage
         // special case
         if (!$id && isset($_GET['playlist']))
         {
-            $this->special       = true;
-            $this->name          = Lang::sound('cat', 1000);
-            $this->cat           = 1000;
-            $this->articleUrl    = 'sound&playlist';
-            $this->hasComContent = false;
-            $this->mode          = CACHE_TYPE_NONE;
+            $this->special    = true;
+            $this->name       = Lang::sound('cat', 1000);
+            $this->cat        = 1000;
+            $this->articleUrl = 'sound&playlist';
+            $this->contribute = CONTRIBUTE_NONE;
+            $this->mode       = CACHE_TYPE_NONE;
         }
         // regular case
         else

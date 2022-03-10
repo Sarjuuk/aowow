@@ -1,8 +1,7 @@
 <?php
-if (!empty($this->infobox) || !empty($this->contributions) || !empty($this->series) || $this->hasComContent):
-?>
-    <table class="infobox">
-<?php
+if (!empty($this->infobox) || !empty($this->contributions) || !empty($this->series) || $this->contribute & (CONTRIBUTE_SS | CONTRIBUTE_VI)):
+echo "    <table class=\"infobox\">\n";
+
     if (!empty($this->infobox)):
 ?>
         <tr><th id="infobox-quick-facts"><?php echo Lang::main('quickFacts'); ?></th></tr>
@@ -35,29 +34,32 @@ if (!empty($this->infobox) || !empty($this->contributions) || !empty($this->seri
         endforeach;
     endif;
 
-    if ($this->hasComContent):
+    if ($this->contribute & CONTRIBUTE_SS):
 ?>
         <tr><th id="infobox-screenshots"><?php echo Lang::main('screenshots'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-ss"></div></td></tr>
 <?php
-        if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi'])):
+    endif;
+
+    if ($this->contribute & CONTRIBUTE_VI && (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
 ?>
         <tr><th id="infobox-videos"><?php echo Lang::main('videos'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
 <?php
-        endif;
+    endif;
+
+    if ($this->contribute & CONTRIBUTE_SS):
 ?>
-    </table>
     <script type="text/javascript">ss_appendSticky()</script>
 <?php
-        if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi'])):
+    endif;
+
+    if ($this->contribute & CONTRIBUTE_VI && (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
 ?>
     <script type="text/javascript">vi_appendSticky()</script>
 <?php
-        endif;
-    else:
-        echo "    </table>\n";
     endif;
-endif;
 
+    echo "    </table>\n";
+endif;
 ?>

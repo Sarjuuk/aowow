@@ -20,7 +20,6 @@ class AreaTriggerPage extends GenericPage
 
     public function __construct($pageCall, $id)
     {
-        $this->hasComContent = false;
         $this->contribute    = CONTRIBUTE_NONE;
 
         parent::__construct($pageCall, $id);

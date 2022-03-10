@@ -18,10 +18,10 @@ if (!defined('AOWOW_REVISION'))
 
 class CommunityContent
 {
-    private static $jsGlobals = [];
-    private static $subjCache = [];
+    private static array $jsGlobals = [];
+    private static array $subjCache = [];
 
-    private static $commentQuery = '
+    private static string $coQuery = '
         SELECT
             c.*,
             a1.displayName AS user,
@@ -54,7 +54,25 @@ class CommunityContent
             rating ASC
     ';
 
-    private static $previewQuery = '
+    private static string $ssQuery = '
+        SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS "sticky", s.type, s.typeId
+        FROM ?_screenshots s
+        LEFT JOIN ?_account a ON s.userIdOwner = a.id
+        WHERE {s.userIdOwner = ?d AND }{s.type = ? AND }{s.typeId = ? AND }s.status & ?d AND (s.status & ?d) = 0
+        {ORDER BY ?# DESC}
+        {LIMIT ?d}
+    ';
+
+    private static string $viQuery = '
+        SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS "sticky", v.type, v.typeId
+        FROM ?_videos v
+        LEFT JOIN ?_account a ON v.userIdOwner = a.id
+        WHERE {v.userIdOwner = ?d AND }{v.type = ? AND }{v.typeId = ? AND }v.status & ?d AND (v.status & ?d) = 0
+        {ORDER BY ?# DESC}
+        {LIMIT ?d}
+    ';
+
+    private static string $previewQuery = '
         SELECT
             c.id,
             c.body AS preview,
@@ -87,13 +105,13 @@ class CommunityContent
             ?d
     ';
 
-    private static function addSubject($type, $typeId)
+    private static function addSubject(int $type, int $typeId) : void
     {
         if (!isset(self::$subjCache[$type][$typeId]))
             self::$subjCache[$type][$typeId] = 0;
     }
 
-    private static function getSubjects()
+    private static function getSubjects() : void
     {
         foreach (self::$subjCache as $type => $ids)
         {
@@ -133,7 +151,7 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews($params = [], &$nFound = 0)
+    public static function getCommentPreviews(array $params = [], int &$nFound = 0) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore
@@ -185,10 +203,10 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getCommentReplies($commentId, $limit = 0, &$nFound = 0)
+    public static function getCommentReplies(int $commentId, int $limit = 0, int &$nFound = 0) : array
     {
         $replies = [];
-        $query = $limit > 0 ? self::$commentQuery.' LIMIT '.$limit : self::$commentQuery;
+        $query = $limit > 0 ? self::$coQuery.' LIMIT '.$limit : self::$coQuery;
 
         // get replies
         $results = DB::Aowow()->selectPage($nFound, $query, User::$id, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
@@ -342,10 +360,10 @@ class CommunityContent
         return $pages;
     }
 
-    private static function getComments($type, $typeId)
+    public static function getComments(int $type, int $typeId) : array
     {
 
-        $results  = DB::Aowow()->query(self::$commentQuery, User::$id, User::$id, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
+        $results  = DB::Aowow()->query(self::$coQuery, User::$id, User::$id, 0, $type, $typeId, CC_FLAG_DELETED, User::$id, (int)User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
         $comments = [];
 
         // additional informations
@@ -400,15 +418,9 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos($typeOrUser = 0, $typeId = 0, &$nFound = 0)
+    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0) : array
     {
-        $videos = DB::Aowow()->selectPage($nFound, "
-            SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS 'sticky', v.type, v.typeId
-            FROM ?_videos v
-            LEFT JOIN ?_account a ON v.userIdOwner = a.id
-            WHERE {v.userIdOwner = ?d AND }{v.type = ? AND }{v.typeId = ? AND }v.status & ?d AND (v.status & ?d) = 0
-            {ORDER BY ?# DESC}
-            {LIMIT ?d}",
+        $videos = DB::Aowow()->selectPage($nFound, self::$viQuery,
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
@@ -451,15 +463,9 @@ class CommunityContent
         return $videos;
     }
 
-    public static function getScreenshots($typeOrUser = 0, $typeId = 0, &$nFound = 0)
+    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0) : array
     {
-        $screenshots = DB::Aowow()->selectPage($nFound, "
-            SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS 'sticky', s.type, s.typeId
-            FROM ?_screenshots s
-            LEFT JOIN ?_account a ON s.userIdOwner = a.id
-            WHERE {s.userIdOwner = ?d AND }{s.type = ? AND }{s.typeId = ? AND }s.status & ?d AND (s.status & ?d) = 0
-            {ORDER BY ?# DESC}
-            {LIMIT ?d}",
+        $screenshots = DB::Aowow()->selectPage($nFound, self::$ssQuery,
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
@@ -501,7 +507,7 @@ class CommunityContent
         return $screenshots;
     }
 
-    public static function getAll($type, $typeId, &$jsg)
+    public static function getAll(int $type, int $typeId, array &$jsg) : array
     {
         $result = array(
             'vi' => self::getVideos($type, $typeId),
@@ -512,6 +518,11 @@ class CommunityContent
         Util::mergeJsGlobals($jsg, self::$jsGlobals);
 
         return $result;
+    }
+
+    public static function getJSGlobals() : array
+    {
+        return self::$jsGlobals;
     }
 }
 ?>
