@@ -1944,11 +1944,11 @@ $WH.Tooltip = {
 
         var
             tooltip = $WH.Tooltip.tooltip,
-            tow     = $WH.Tooltip.tooltipTable.offsetWidth,
-            toh     = $WH.Tooltip.tooltipTable.offsetHeight,
+            tow     = $WH.Tooltip.tooltipTable.offsetWidth + 1,
+            toh     = $WH.Tooltip.tooltipTable.offsetHeight + 1,
             tt2     = $WH.Tooltip.tooltip2,
-            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth : 0,
-            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight : 0,
+            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth + 1 : 0,
+            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight + 1 : 0,
             _;
 
         tooltip.style.width = tow + 'px';
@@ -1981,11 +1981,11 @@ $WH.Tooltip = {
             bakLeft = left,
             bakTop  = top,
             tooltip = $WH.Tooltip.tooltip,
-            tow     = $WH.Tooltip.tooltipTable.offsetWidth,
-            toh     = $WH.Tooltip.tooltipTable.offsetHeight,
+            tow     = $WH.Tooltip.tooltipTable.offsetWidth + 1,
+            toh     = $WH.Tooltip.tooltipTable.offsetHeight + 1,
             tt2     = $WH.Tooltip.tooltip2,
-            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth : 0,
-            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight : 0,
+            tt2w    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetWidth + 1 : 0,
+            tt2h    = $WH.Tooltip.showSecondary ? $WH.Tooltip.tooltipTable2.offsetHeight + 1 : 0,
             winSize = $WH.g_getWindowSize(),
             scroll  = $WH.g_getScroll(),
             bcw     = winSize.w,
