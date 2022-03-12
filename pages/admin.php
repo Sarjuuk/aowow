@@ -73,15 +73,15 @@ class AdminPage extends GenericPage
 
     private function handleConfig()
     {
-        $this->addCSS(array(
-            ['string' => '.grid input[type=\'text\'], .grid input[type=\'number\'] { width:250px; text-align:left; }'],
-            ['string' => '.grid input[type=\'button\'] { width:65px; padding:2px; }'],
-            ['string' => '.grid a.tip { margin:0px 5px; opacity:0.8; }'],
-            ['string' => '.grid a.tip:hover  { opacity:1; }'],
-            ['string' => '.grid tr { height:30px; }'],
-            ['string' => '.grid .disabled { opacity:0.4 !important; }'],
-            ['string' => '.grid .status { position:absolute; right:5px; }'],
-        ));
+        $this->addScript(
+            [CSS_STRING, '.grid input[type=\'text\'], .grid input[type=\'number\'] { width:250px; text-align:left; }'],
+            [CSS_STRING, '.grid input[type=\'button\'] { width:65px; padding:2px; }'],
+            [CSS_STRING, '.grid a.tip { margin:0px 5px; opacity:0.8; }'],
+            [CSS_STRING, '.grid a.tip:hover  { opacity:1; }'],
+            [CSS_STRING, '.grid tr { height:30px; }'],
+            [CSS_STRING, '.grid .disabled { opacity:0.4 !important; }'],
+            [CSS_STRING, '.grid .status { position:absolute; right:5px; }'],
+        );
 
         $head = '<table class="grid"><tr><th><b>Key</b></th><th><b>Value</b></th><th style="width:150px;"><b>Options</b></th></tr>';
         $mainTab = [];
@@ -123,8 +123,8 @@ class AdminPage extends GenericPage
 
     private function handlePhpInfo()
     {
-        $this->addCSS([
-            'string' => "\npre {margin: 0px; font-family: monospace;}\n" .
+        $this->addScript([
+            CSS_STRING, "\npre {margin: 0px; font-family: monospace;}\n" .
                         "td, th { border: 1px solid #000000; vertical-align: baseline;}\n" .
                         ".p {text-align: left;}\n" .
                         ".e {background-color: #ccccff; font-weight: bold; color: #000000;}\n" .
@@ -187,11 +187,11 @@ class AdminPage extends GenericPage
 
     private function handleScreenshots()
     {
-        $this->addJS('screenshot.js');
-        $this->addCSS(array(
-            ['string' => '.layout {margin: 0px 25px; max-width: inherit; min-width: 1200px; }'],
-            ['string' => '#highlightedRow { background-color: #322C1C; }']
-        ));
+        $this->addScript(
+            [JS_FILE,    'screenshot.js'],
+            [CSS_STRING, '.layout {margin: 0px 25px; max-width: inherit; min-width: 1200px; }'],
+            [CSS_STRING, '#highlightedRow { background-color: #322C1C; }'],
+        );
 
         $ssGetAll = $this->_get['all'];
         $ssPages  = [];
@@ -225,8 +225,10 @@ class AdminPage extends GenericPage
 
     private function handleWeightPresets()
     {
-        $this->addCSS(['string' => '.wt-edit {display:inline-block; vertical-align:top; width:350px;}']);
-        $this->addJS('filters.js');
+        $this->addScript(
+            [JS_FILE,    'filters.js'],
+            [CSS_STRING, '.wt-edit {display:inline-block; vertical-align:top; width:350px;}'],
+        );
 
         $head = $body = '';
 

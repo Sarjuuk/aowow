@@ -17,8 +17,8 @@ class GuildPage extends GenericPage
     protected $tabId    = 1;
     protected $path     = [1, 5, 2];
     protected $tpl      = 'roster';
-    protected $js       = ['profile_all.js', 'profile.js'];
-    protected $css      = [['path' => 'Profiler.css']];
+    protected $js       = [[JS_FILE, 'profile_all.js'], [JS_FILE, 'profile.js']];
+    protected $css      = [[CSS_FILE, 'Profiler.css']];
 
     public function __construct($pageCall, $pageParam)
     {
@@ -97,7 +97,7 @@ class GuildPage extends GenericPage
         if ($this->doResync)
             return;
 
-        $this->addJS('?data=realms.weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=realms.weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         $this->redButtons[BUTTON_RESYNC] = [$this->subjectGUID, 'guild'];
 

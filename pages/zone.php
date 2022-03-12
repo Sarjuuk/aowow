@@ -14,7 +14,7 @@ class ZonePage extends GenericPage
     protected $tabId     = 0;
     protected $type      = TYPE_ZONE;
     protected $tpl       = 'detail-page-generic';
-    protected $js        = ['ShowOnMap.js'];
+    protected $js        = [[JS_FILE, 'ShowOnMap.js']];
 
     protected $zoneMusic = [];
 
@@ -33,7 +33,7 @@ class ZonePage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         /***********/
         /* Infobox */

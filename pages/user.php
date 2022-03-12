@@ -7,8 +7,8 @@ if (!defined('AOWOW_REVISION'))
 class UserPage extends GenericPage
 {
     protected $tpl      = 'user';
-    protected $js       = ['user.js', 'profile.js'];
-    protected $css      = [['path' => 'Profiler.css']];
+    protected $js       = [[JS_FILE, 'user.js'], [JS_FILE, 'profile.js']];
+    protected $css      = [[CSS_FILE, 'Profiler.css']];
     protected $mode     = CACHE_TYPE_NONE;
 
     protected $typeId   = 0;
@@ -236,7 +236,7 @@ class UserPage extends GenericPage
         $profiles = new LocalProfileList($conditions);
         if (!$profiles->error)
         {
-            $this->addJS('?data=weight-presets&t='.$_SESSION['dataKey']);
+            $this->addScript([JS_FILE, '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
             // Characters
             if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))

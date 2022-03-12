@@ -64,6 +64,11 @@ define('CACHE_TYPE_XML',                    4);             // only used by item
 define('CACHE_MODE_FILECACHE',              0x1);
 define('CACHE_MODE_MEMCACHED',              0x2);
 
+define ('CSS_FILE',                         1);
+define ('CSS_STRING',                       2);
+define ('JS_FILE',                          3);
+define ('JS_STRING',                        4);
+
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);
 define('SEARCH_TYPE_JSON',                  0x40000000);

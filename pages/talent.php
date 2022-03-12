@@ -12,10 +12,10 @@ class TalentPage extends GenericPage
     protected $path          = [1];
     protected $mode          = CACHE_TYPE_NONE;
     protected $gDataKey      = true;
-    protected $js            = ['TalentCalc.js'];
+    protected $js            = [[JS_FILE, 'TalentCalc.js']];
     protected $css           = array(
-        ['path' => 'talentcalc.css'],
-        ['path' => 'talent.css']
+        [CSS_FILE, 'talentcalc.css'],
+        [CSS_FILE, 'talent.css']
     );
 
     private   $isPetCalc     = false;
@@ -31,12 +31,16 @@ class TalentPage extends GenericPage
     protected function generateContent()
     {
         // add conditional js & css
-        $this->addJS(array(
-           ($this->isPetCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey'],
-            $this->isPetCalc ? 'petcalc.js'   : 'talent.js',
-            $this->isPetCalc ? 'swfobject.js' : null
-        ));
-        $this->addCSS($this->isPetCalc ? ['path' => 'petcalc.css'] : []);
+        $this->addScript(
+            [JS_FILE, ($this->isPetCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey']],
+            [JS_FILE,  $this->isPetCalc ? 'petcalc.js'             : 'talent.js'],
+        );
+
+        if ($this->isPetCalc)
+            $this->addScript(
+                [JS_FILE,  'swfobject.css'],
+                [CSS_FILE, 'petcalc.css']
+            );
 
         $this->tcType  = $this->isPetCalc ? 'pc' : 'tc';
     }

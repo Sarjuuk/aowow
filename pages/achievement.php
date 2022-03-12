@@ -173,7 +173,7 @@ class AchievementPage extends GenericPage
         );
 
         if ($reqBook)
-            $this->addCss(['path' => 'Book.css']);
+            $this->addScript([CSS_FILE, 'Book.css']);
 
         // create rewards
         if ($foo = $this->subject->getField('rewards'))

@@ -16,7 +16,7 @@ class ObjectsPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [-2, -3, -4, -5, -6, 0, 3, 9, 25];
-    protected $js            = ['filters.js'];
+    protected $js            = [[JS_FILE, 'filters.js']];
 
     protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -33,7 +33,7 @@ class ObjectsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         $conditions = [];
 

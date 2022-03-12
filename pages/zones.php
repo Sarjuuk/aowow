@@ -16,7 +16,7 @@ class ZonesPage extends GenericPage
     protected $tabId     = 0;
     protected $mode      = CACHE_TYPE_PAGE;
     protected $validCats = [true, true, [0, 1, 2], [0, 1, 2], false, false, true, false, true, true, true];
-    protected $js        = ['ShowOnMap.js'];
+    protected $js        = [[JS_FILE, 'ShowOnMap.js']];
 
     public function __construct($pageCall, $pageParam)
     {

@@ -78,7 +78,7 @@ class SoundPage extends GenericPage
         /* Main Content */
         /****************/
 
-        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         // get spawns
         $map = null;
@@ -331,7 +331,7 @@ class SoundPage extends GenericPage
             $npcs = new CreatureList($cnds);
             if (!$npcs->error)
             {
-                $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+                $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
                 $this->extendGlobalData($npcs->getJSGlobals(GLOBALINFO_SELF));
                 $this->lvTabs[] = ['creature', ['data' => array_values($npcs->getListviewData())]];

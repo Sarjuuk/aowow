@@ -12,13 +12,13 @@ class ComparePage extends GenericPage
     protected $path          = [1, 3];
     protected $mode          = CACHE_TYPE_NONE;
     protected $js            = array(
-        'profile.js',
-        'Draggable.js',
-        'filters.js',
-        'Summary.js',
-        'swfobject.js',
+        [JS_FILE, 'profile.js'],
+        [JS_FILE, 'Draggable.js'],
+        [JS_FILE, 'filters.js'],
+        [JS_FILE, 'Summary.js'],
+        [JS_FILE, 'swfobject.js'],
     );
-    protected $css           = [['path' => 'Summary.css']];
+    protected $css           = [[CSS_FILE, 'Summary.css']];
 
     protected $summary       = [];
     protected $cmpItems      = [];
@@ -44,7 +44,7 @@ class ComparePage extends GenericPage
     protected function generateContent()
     {
         // add conditional js
-        $this->addJS('?data=weight-presets.gems.enchants.itemsets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=weight-presets.gems.enchants.itemsets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         $this->summary = array(
             'template' => 'compare',

@@ -16,10 +16,7 @@ class ItemsetPage extends GenericPage
     protected $path          = [0, 2];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $js            = array(
-        'swfobject.js',
-        'Summary.js'
-    );
+    protected $js            = [[JS_FILE, 'swfobject.js'], [JS_FILE, 'Summary.js']];
 
     protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
 

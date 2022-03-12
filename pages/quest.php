@@ -16,8 +16,8 @@ class QuestPage extends GenericPage
     protected $path          = [0, 3];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $css           = [['path' => 'Book.css']];
-    protected $js            = ['ShowOnMap.js'];
+    protected $js            = [[JS_FILE, 'ShowOnMap.js']];
+    protected $css           = [[CSS_FILE, 'Book.css']];
 
     protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
 
@@ -570,7 +570,7 @@ class QuestPage extends GenericPage
         /* Mapper */
         /**********/
 
-        $this->addJS('?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         // gather points of interest
         $mapNPCs = $mapGOs = [];                            // [typeId, start|end|objective, startItemId]

@@ -18,9 +18,9 @@ class ItemPage extends genericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $enhancedTT    = [];
     protected $js            = array(
-        'swfobject.js',                                     // view in 3d, ok
-        'profile.js',                                       // item upgrade search, also ok
-        'filters.js'                                        // lolwut?
+        [JS_FILE, 'swfobject.js'],                          // view in 3d, ok
+        [JS_FILE, 'profile.js'],                            // item upgrade search, also ok
+        [JS_FILE, 'filters.js']                             // lolwut?
     );
 
     protected $_get          = array(
@@ -121,7 +121,7 @@ class ItemPage extends genericPage
 
     protected function generateContent()
     {
-        $this->addJS('?data=weight-presets.zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=weight-presets.zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         $_flags     = $this->subject->getField('flags');
         $_slot      = $this->subject->getField('slot');
@@ -349,8 +349,10 @@ class ItemPage extends genericPage
         $pageText = [];
         if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
         {
-            $this->addJS('Book.js');
-            $this->addCSS(['path' => 'Book.css']);
+            $this->addScript(
+                [JS_FILE,  'Book.js'],
+                [CSS_FILE, 'Book.css']
+            );
         }
 
         $this->headIcons  = [$this->subject->getField('iconString', true, true), $this->subject->getField('stackable')];

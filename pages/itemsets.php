@@ -15,7 +15,7 @@ class ItemsetsPage extends GenericPage
     protected $path     = [0, 2];
     protected $tabId    = 0;
     protected $mode     = CACHE_TYPE_PAGE;
-    protected $js       = ['filters.js'];
+    protected $js       = [[JS_FILE, 'filters.js']];
 
     protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -31,7 +31,7 @@ class ItemsetsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addJS('?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']);
+        $this->addScript([JS_FILE, '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
 
         $conditions = [];
 

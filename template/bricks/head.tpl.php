@@ -12,13 +12,11 @@ if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO)):
     echo '    <link rel="stylesheet" type="text/css" href="'.STATIC_URL.'/css/staff.css?'.AOWOW_REVISION."\" />\n";
 endif;
 
-foreach ($this->css as $css):
-    if (!empty($css['string'])):
-        echo '    <style type="text/css">'.$css['string']."</style>\n";
-    elseif (!empty($css['path'])):
-        echo '    '.(!empty($css['ieCond']) ? '<!--[if '.$css['ieCond'].']>' : null) .
-                '<link rel="stylesheet" type="text/css" href="'.STATIC_URL.'/css/'.$css['path'].'?'.AOWOW_REVISION.'" />' .
-                (!empty($css['ieCond']) ? '<![endif]-->' : null)."\n";
+foreach ($this->css as [$type, $css]):
+    if ($type == CSS_FILE):
+        echo '    <link rel="stylesheet" type="text/css" href="'.STATIC_URL.'/css/'.$css.'?'.AOWOW_REVISION."\" />\n";
+    elseif ($type == CSS_STRING):
+        echo '    <style type="text/css">'.$css."</style>\n";
     endif;
 endforeach;
 ?>
@@ -44,9 +42,11 @@ if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO)):
     echo '    <script src="'.STATIC_URL.'/js/staff.js?'.AOWOW_REVISION."\" type=\"text/javascript\"></script>\n";
 endif;
 
-foreach ($this->js as $js):
-    if (!empty($js)):
-        echo '    <script src="'.($js[0] == '?' ? $js.'&' : STATIC_URL.'/js/'.$js.'?').AOWOW_REVISION."\" type=\"text/javascript\"></script>\n";
+foreach ($this->js as [$type, $js]):
+    if ($type == JS_FILE):
+        echo '    <script type="text/javascript" src="'.($js[0] == '?' ? $js.'&' : STATIC_URL.'/js/'.$js.'?').AOWOW_REVISION."\"></script>\n";
+    elseif ($type == JS_STRING):
+        echo '    <script type="text/javascript">'.$js."</script>\n";
     endif;
 endforeach;
 ?>

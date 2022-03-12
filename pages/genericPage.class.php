@@ -426,35 +426,36 @@ class GenericPage
         $this->sumSQLStats();
     }
 
-    public function addJS($name, bool $unshift = false) : void
+    public function addScript(array ...$structs) : void
     {
-        if (is_array($name))
+        foreach ($structs as $s)                            // iType, sContent, bFront, sIeCnd
         {
-            foreach ($name as $n)
-                $this->addJS($n, $unshift);
-        }
-        else if (!in_array($name, $this->js))
-        {
-            if ($unshift)
-                array_unshift($this->js, $name);
-            else
-                $this->js[] = $name;
-        }
-    }
+            if (empty($s[1]))
+            {
+                trigger_error('GenericPage::addScript - content empty', E_USER_WARNING);
+                continue;
+            }
 
-    public function addCSS(array $struct, bool $unshift = false) : void
-    {
-        if (is_array($struct) && empty($struct['path']) && empty($struct['string']))
-        {
-            foreach ($struct as $s)
-                $this->addCSS($s, $unshift);
-        }
-        else if (!in_array($struct, $this->css))
-        {
-            if ($unshift)
-                array_unshift($this->css, $struct);
-            else
-                $this->css[] = $struct;
+            $s = array_pad($s, 4, '');
+            switch ($s[0])
+            {
+                case JS_FILE:
+                case JS_STRING:
+                    if (empty($s[2]))
+                        $this->js[] = $s;
+                    else
+                        array_unshift($this->js, $s);
+                    break;
+                case CSS_FILE:
+                case CSS_STRING:
+                    if (empty($s[2]))
+                        $this->css[] = $s;
+                    else
+                        array_unshift($this->css, $s);
+                    break;
+                default:
+                    trigger_error('GenericPage::addScript - unknown script type #'.$s[0], E_USER_WARNING);
+            }
         }
     }
 

@@ -8,8 +8,8 @@ if (!defined('AOWOW_REVISION'))
 class AccountPage extends GenericPage
 {
     protected $tpl       = 'acc-dashboard';
-    protected $js        = ['user.js', 'profile.js'];
-    protected $css       = [['path' => 'Profiler.css']];
+    protected $js        = [[JS_FILE, 'user.js'], [JS_FILE, 'profile.js']];
+    protected $css       = [[CSS_FILE, 'Profiler.css']];
     protected $mode      = CACHE_TYPE_NONE;
     protected $category  = null;
     protected $validCats = array(

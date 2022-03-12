@@ -16,7 +16,7 @@ class SoundsPage extends GenericPage
     protected $tabId     = 0;
     protected $mode      = CACHE_TYPE_PAGE;
     protected $validCats = [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53];
-    protected $js        = ['filters.js'];
+    protected $js        = [[JS_FILE, 'filters.js']];
 
     protected $_get      = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
