@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxGotocomment extends AjaxHandler
 {
     protected $_get = array(
-        'id' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']]
+        'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt']
     );
 
     public function __construct(array $params)

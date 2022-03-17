@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxLocale extends AjaxHandler
 {
     protected $_get = array(
-        'locale' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkLocale']]
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkLocale']
     );
 
     public function __construct(array $params)

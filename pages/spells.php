@@ -16,6 +16,9 @@ class SpellsPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = ['filters.js'];
+
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     protected $validCats     = array(
         -2  => array(                                       // Talents: Class => Skill
             1  => [ 26, 256, 257],
@@ -412,7 +415,7 @@ class SpellsPage extends GenericPage
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['init' => 'spells'];
 
         if ($ec = $this->filterObj->getExtraCols())

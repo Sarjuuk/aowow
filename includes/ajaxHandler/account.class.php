@@ -7,21 +7,21 @@ class AjaxAccount extends AjaxHandler
 {
     protected $validParams = ['exclude', 'weightscales', 'favorites'];
     protected $_post       = array(
-        'groups'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'save'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'delete'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'id'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdList']],
-        'name'       => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkName']  ],
-        'scale'      => [FILTER_CALLBACK,            ['options' => 'AjaxAccount::checkScale'] ],
-        'reset'      => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'type'       => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'add'        => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-        'remove'     => [FILTER_SANITIZE_NUMBER_INT, null                                     ],
-     // 'sessionKey' => [FILTER_SANITIZE_NUMBER_INT, null                                     ]
+        'groups'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'save'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'delete'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'],
+        'name'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAccount::checkName'  ],
+        'scale'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAccount::checkScale' ],
+        'reset'      => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'type'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'add'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'remove'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+     // 'sessionKey' => ['filter' => FILTER_SANITIZE_NUMBER_INT]
     );
     protected $_get        = array(
-        'locale' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkLocale']]
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkLocale']
     );
 
     public function __construct(array $params)
@@ -177,7 +177,7 @@ class AjaxAccount extends AjaxHandler
     {
         $var = trim(urldecode($val));
 
-        return filter_var($var, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+        return filter_var($var, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_AOWOW);
     }
 }
 

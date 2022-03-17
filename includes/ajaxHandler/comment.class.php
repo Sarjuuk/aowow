@@ -11,23 +11,23 @@ class AjaxComment extends AjaxHandler
     const REPLY_LENGTH_MAX   = 600;
 
     protected $_post = array(
-        'id'          => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned']],
-        'body'        => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
-        'commentbody' => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']      ],
-        'response'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                            ],
-        'reason'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW                            ],
-        'remove'      => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
-        'commentId'   => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
-        'replyId'     => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
-        'sticky'      => [FILTER_SANITIZE_NUMBER_INT, null                                             ],
-     // 'username'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH   ]
+        'id'          => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
+        'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'      ],
+        'commentbody' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'      ],
+        'response'    => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW ],
+        'reason'      => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW ],
+        'remove'      => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'commentId'   => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'replyId'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'sticky'      => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+     // 'username'    => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW ]
     );
 
     protected $_get  = array(
-        'id'     => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
-        'type'   => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
-        'typeid' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkInt']],
-        'rating' => [FILTER_SANITIZE_NUMBER_INT, null]
+        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
+        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
+        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
+        'rating' => ['filter' => FILTER_SANITIZE_NUMBER_INT]
     );
 
     public function __construct(array $params)

@@ -27,13 +27,18 @@ class AccountPage extends GenericPage
     protected $lvTabs    = [];
     protected $banned    = [];
 
-    private   $_post     = array(
-        'username'    => [FILTER_SANITIZE_SPECIAL_CHARS, 0xC], // FILTER_FLAG_STRIP_LOW | *_HIGH
-        'password'    => [FILTER_UNSAFE_RAW, null],
-        'c_password'  => [FILTER_UNSAFE_RAW, null],
-        'token'       => [FILTER_UNSAFE_RAW, null],
-        'remember_me' => [FILTER_CALLBACK, ['options' => 'AccountPage::rememberCallback']],
-        'email'       => [FILTER_SANITIZE_EMAIL, null]
+    protected $_get = array(
+        'token' => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'next'  => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+    );
+
+    protected $_post     = array(
+        'username'    => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'password'    => ['filter' => FILTER_UNSAFE_RAW],
+        'c_password'  => ['filter' => FILTER_UNSAFE_RAW],
+        'token'       => ['filter' => FILTER_UNSAFE_RAW],
+        'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::rememberCallback'],
+        'email'       => ['filter' => FILTER_SANITIZE_EMAIL]
     );
 
     public function __construct($pageCall, $pageParam)
@@ -42,9 +47,6 @@ class AccountPage extends GenericPage
             $this->category = [$pageParam];
 
         parent::__construct($pageCall, $pageParam);
-
-        foreach ($this->_post as $k => &$v)
-            $v = !empty($_POST[$k]) ? filter_input(INPUT_POST, $k, $v[0], $v[1]) : null;
 
         if ($pageParam)
         {
@@ -57,7 +59,7 @@ class AccountPage extends GenericPage
         }
     }
 
-    private function rememberCallback($val)
+    protected function rememberCallback($val)
     {
         return $val == 'yes' ? $val : null;
     }
@@ -128,7 +130,7 @@ class AccountPage extends GenericPage
                         header('Location: '.$this->getNext(true), true, 302);
                     }
                 }
-                else if (!empty($_GET['token']) && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $_GET['token'])))
+                else if ($this->_get['token'] && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $this->_get['token'])))
                     $this->user = $_;
 
                 break;
@@ -156,13 +158,13 @@ class AccountPage extends GenericPage
                         $this->text = sprintf(Lang::account('createAccSent'), $this->_post['email']);
                     }
                 }
-                else if (!empty($_GET['token']) && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $_GET['token'])))
+                else if ($this->_get['token'] && ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE status = ?d AND token = ?', ACC_STATUS_NEW, $this->_get['token'])))
                 {
                     $nStep = 2;
-                    DB::Aowow()->query('UPDATE ?_account SET status = ?d, statusTimer = 0, token = 0, userGroups = ?d WHERE token = ?', ACC_STATUS_OK, U_GROUP_NONE, $_GET['token']);
+                    DB::Aowow()->query('UPDATE ?_account SET status = ?d, statusTimer = 0, token = 0, userGroups = ?d WHERE token = ?', ACC_STATUS_OK, U_GROUP_NONE, $this->_get['token']);
                     DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, ?d + 1, UNIX_TIMESTAMP() + ?d)', User::$ip, CFG_ACC_FAILED_AUTH_COUNT, CFG_ACC_FAILED_AUTH_BLOCK);
 
-                    $this->text = sprintf(Lang::account('accActivated'), $_GET['token']);
+                    $this->text = sprintf(Lang::account('accActivated'), $this->_get['token']);
                 }
                 else
                     $this->next = $this->getNext();
@@ -313,17 +315,17 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                 $this->text = sprintf(Lang::account('recovPassSent'), $this->_post['email']);
             }
         }
-        else if (isset($_GET['token']))                     // step 2
+        else if ($this->_get['token'])                      // step 2
         {
             $step = 2;
             $this->resetPass = true;
-            $this->token     = $_GET['token'];
+            $this->token     = $this->_get['token'];
         }
         else if ($this->_post['token'] && $this->_post['email'] && $this->_post['password'] && $this->_post['c_password'])
         {
             $step = 2;
             $this->resetPass = true;
-            $this->token     = $_GET['token'];              // insecure source .. that sucks; but whats the worst that could happen .. this account cannot be recovered for some minutes
+            $this->token     = $this->_post['token'];       // insecure source .. that sucks; but whats the worst that could happen .. this account cannot be recovered for some minutes
 
             if ($err = $this->doResetPass())
                 $this->error = $err;
@@ -413,7 +415,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         }
 
         // username taken
-        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $this->_post['username'], $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $this->_post['username'], $this->_post['email'], ACC_STATUS_NEW, ACC_STATUS_NEW))
             return $_ == $this->_post['username'] ? Lang::account('nameInUse') : Lang::account('mailInUse');
 
         // create..
@@ -473,10 +475,10 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         if (!$uId)
             return Lang::account('emailNotFound');          // assume they didn't meddle with the token
 
-        if (!User::verifyCrypt($newPass))
+        if (!User::verifyCrypt($this->_post['c_password']))
             return Lang::account('newPassDiff');
 
-        if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashcrypt($newPass), ACC_STATUS_OK, $uId))
+        if (!DB::Aowow()->query('UPDATE ?_account SET passHash = ?, status = ?d WHERE id = ?d', User::hashCrypt($this->_post['c_password']), ACC_STATUS_OK, $uId))
             return Lang::main('intError');
     }
 
@@ -520,8 +522,8 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
     private function getNext($forHeader = false)
     {
         $next = $forHeader ? '.' : '';
-        if (isset($_GET['next']))
-            $next = $_GET['next'];
+        if ($this->_get['next'])
+            $next = $this->_get['next'];
         else if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], '?'))
             $next = explode('?', $_SERVER['HTTP_REFERER'])[1];
 

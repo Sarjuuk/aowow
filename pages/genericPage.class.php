@@ -167,6 +167,8 @@ trait TrProfiler
 
 class GenericPage
 {
+    use TrRequestData;
+
     protected $tpl          = '';
     protected $reqUGroup    = U_GROUP_NONE;
     protected $reqAuth      = false;
@@ -237,6 +239,8 @@ class GenericPage
     public function __construct(string $pageCall = '', string $pageParam = '')
     {
         $this->time = microtime(true);
+
+        $this->initRequestData();
 
         if (!isset($this->contribute))
             $this->contribute = CONTRIBUTE_NONE;

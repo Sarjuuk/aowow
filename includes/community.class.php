@@ -511,7 +511,7 @@ class CommunityContent
     {
         $result = array(
             'vi' => self::getVideos($type, $typeId),
-            'sc' => self::getScreenshots($type, $typeId),
+            'ss' => self::getScreenshots($type, $typeId),
             'co' => self::getComments($type, $typeId)
         );
 

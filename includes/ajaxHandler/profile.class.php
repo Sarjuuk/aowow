@@ -9,36 +9,36 @@ class AjaxProfile extends AjaxHandler
 
     protected $validParams = ['link', 'unlink', 'pin', 'unpin', 'public', 'private', 'avatar', 'resync', 'status', 'save', 'delete', 'purge', 'summary', 'load'];
     protected $_get        = array(
-        'id'         => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkIdList']     ],
-        'items'      => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkItemList']   ],
-        'size'       => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
-        'guild'      => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']   ],
-        'arena-team' => [FILTER_CALLBACK,        ['options' => 'AjaxHandler::checkEmptySet']   ],
-        'user'       => [FILTER_CALLBACK,        ['options' => 'AjaxProfile::checkUser']       ]
+        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'  ],
+        'items'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkItemList'],
+        'size'       => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW     ],
+        'guild'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
+        'arena-team' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
+        'user'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkUser'    ]
     );
 
     protected $_post        = array(
-        'name'         => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']                                       ],
-        'level'        => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'class'        => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'race'         => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'gender'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'nomodel'      => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'talenttree1'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'talenttree2'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'talenttree3'  => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'activespec'   => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'talentbuild1' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
-        'glyphs1'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
-        'talentbuild2' => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
-        'glyphs2'      => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
-        'icon'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH                                    ],
-        'description'  => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkFulltext']                                       ],
-        'source'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'copy'         => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'public'       => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'gearscore'    => [FILTER_SANITIZE_NUMBER_INT, null                                                                              ],
-        'inv'          => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkIdListUnsigned', 'flags' => FILTER_REQUIRE_ARRAY]],
+        'name'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'],
+        'level'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'class'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'race'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'gender'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'nomodel'      => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'talenttree1'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'talenttree2'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'talenttree3'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'activespec'   => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'talentbuild1' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'glyphs1'      => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'talentbuild2' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'glyphs2'      => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'icon'         => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'description'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'],
+        'source'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'copy'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'public'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'gearscore'    => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'inv'          => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned', 'flags' => FILTER_REQUIRE_ARRAY],
     );
 
     public function __construct(array $params)

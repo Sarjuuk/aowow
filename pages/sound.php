@@ -16,15 +16,17 @@ class SoundPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
-    private   $cat           = 0;
     protected $special       = false;
+    protected $_get          = ['playlist' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']];
+
+    private   $cat           = 0;
 
     public function __construct($pageCall, $id)
     {
         parent::__construct($pageCall, $id);
 
         // special case
-        if (!$id && isset($_GET['playlist']))
+        if (!$id && $this->_get['playlist'])
         {
             $this->special    = true;
             $this->name       = Lang::sound('cat', 1000);

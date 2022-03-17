@@ -23,6 +23,14 @@ class ItemPage extends genericPage
         'filters.js'                                        // lolwut?
     );
 
+    protected $_get          = array(
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain'],
+        'rand'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'ench'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'gems'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
+        'sock'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+    );
+
     private   $powerTpl      = '$WowheadPower.registerItem(%s, %d, %s);';
 
     public function __construct($pageCall, $param)
@@ -36,23 +44,23 @@ class ItemPage extends genericPage
         if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
             // temp locale
-            if (isset($_GET['domain']))
-                Util::powerUseLocale($_GET['domain']);
+            if ($this->_get['domain'])
+                Util::powerUseLocale($this->_get['domain']);
 
-            if (isset($_GET['rand']))
-                $this->enhancedTT['r'] = $_GET['rand'];
-            if (isset($_GET['ench']))
-                $this->enhancedTT['e'] = $_GET['ench'];
-            if (isset($_GET['gems']))
-                $this->enhancedTT['g'] = explode(':', $_GET['gems']);
-            if (isset($_GET['sock']))
+            if ($this->_get['rand'])
+                $this->enhancedTT['r'] = $this->_get['rand'];
+            if ($this->_get['ench'])
+                $this->enhancedTT['e'] = $this->_get['ench'];
+            if ($this->_get['gems'])
+                $this->enhancedTT['g'] = $this->_get['gems'];
+            if ($this->_get['sock'])
                 $this->enhancedTT['s'] = '';
         }
         else if ($this->mode == CACHE_TYPE_XML)
         {
             // temp locale
-            if (isset($_GET['domain']))
-                Util::powerUseLocale($_GET['domain']);
+            if ($this->_get['domain'])
+                Util::powerUseLocale($this->_get['domain']);
 
             // allow lookup by name for xml
             if (!is_numeric($param))

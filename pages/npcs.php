@@ -18,6 +18,8 @@ class NpcsPage extends GenericPage
     protected $validCats     = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
     protected $js            = ['filters.js'];
 
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);;
@@ -54,7 +56,7 @@ class NpcsPage extends GenericPage
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] =  ['init' => 'npcs'];
 
         $rCols = $this->filterObj->getReputationCols();

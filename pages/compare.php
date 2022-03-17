@@ -23,17 +23,20 @@ class ComparePage extends GenericPage
     protected $summary       = [];
     protected $cmpItems      = [];
 
+    protected $_get          = ['compare'        => ['filter' => FILTER_CALLBACK, 'options' => 'ComparePage::checkCompareString']];
+    protected $_cookie       = ['compare_groups' => ['filter' => FILTER_CALLBACK, 'options' => 'ComparePage::checkCompareString']];
+
     private   $compareString = '';
 
     public function __construct($pageCall, $__)
     {
         parent::__construct($pageCall, $__);
 
-        // prefer $_GET over $_COOKIE
-        if (!empty($_GET['compare']))
-            $this->compareString = $_GET['compare'];
-        else if (!empty($_COOKIE['compare_groups']))
-            $this->compareString = urldecode($_COOKIE['compare_groups']);
+        // prefer GET over COOKIE
+        if ($this->_get['compare'])
+            $this->compareString = $this->_get['compare'];
+        else if ($this->_cookie['compare_groups'])
+            $this->compareString = $this->_cookie['compare_groups'];
 
         $this->name = Lang::main('compareTool');
     }
@@ -56,14 +59,12 @@ class ComparePage extends GenericPage
         $items = $outSet = [];
         foreach ($sets as $set)
         {
-            $itemSting = explode(':', $set);
-            $outString = [];
-            foreach ($itemSting as $substring)
+            $itemString = explode(':', $set);
+            $outString  = [];
+            foreach ($itemString as $is)
             {
-                $params  = explode('.', $substring);
+                $params  = array_pad(explode('.', $is), 7, 0);
                 $items[] = (int)$params[0];
-                while (sizeof($params) < 7)
-                    $params[] = 0;
 
                 $outString[] = $params;
             }
@@ -100,6 +101,15 @@ class ComparePage extends GenericPage
     }
 
     protected function generatePath() {}
+
+    private function checkCompareString(string $val) : string
+    {
+        $val = urldecode($val);
+        if (preg_match('/[^\d\.:;]/', $val))
+            return '';
+
+        return $val;
+    }
 }
 
 ?>

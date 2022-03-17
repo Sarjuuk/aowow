@@ -17,6 +17,8 @@ class ArenaTeamsPage extends GenericPage
     protected $tpl      = 'arena-teams';
     protected $js       = ['filters.js', 'profile_all.js', 'profile.js'];
 
+    protected $_get     = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         if (!CFG_PROFILER_ENABLE)
@@ -66,7 +68,7 @@ class ArenaTeamsPage extends GenericPage
 
         // recreate form selection
         $this->filter = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['type' => 'arenateams'];
 
         $tabData = array(

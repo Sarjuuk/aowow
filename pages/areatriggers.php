@@ -19,6 +19,8 @@ class AreaTriggersPage extends GenericPage
     protected $js            = ['filters.js'];
     protected $reqUGroup     = U_GROUP_STAFF;
 
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);;
@@ -36,7 +38,7 @@ class AreaTriggersPage extends GenericPage
     {
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['init' => 'areatrigger'];
 
         if ($x = $this->filterObj->getSetCriteria())

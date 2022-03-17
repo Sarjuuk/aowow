@@ -21,6 +21,8 @@ class ItemsetPage extends GenericPage
         'Summary.js'
     );
 
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+
     private   $powerTpl      = '$WowheadPower.registerItemSet(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
@@ -28,8 +30,8 @@ class ItemsetPage extends GenericPage
         parent::__construct($pageCall, $id);
 
         // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
-            Util::powerUseLocale($_GET['domain']);
+        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
+            Util::powerUseLocale($this->_get['domain']);
 
         $this->typeId = intVal($id);
 

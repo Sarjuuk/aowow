@@ -6,12 +6,18 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminPage extends GenericPage
 {
-
     protected $tpl       = null;                            // depends on the subject
     protected $reqUGroup = U_GROUP_NONE;                    // actual group dependant on the subPage
     protected $reqAuth   = true;
     protected $path      = [4];
     protected $tabId     = 4;
+
+    protected $_get      = array(
+        'all'    => ['filter' => FILTER_UNSAFE_RAW],
+        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'urldecode'],
+    );
 
     private   $generator = '';
 
@@ -187,22 +193,21 @@ class AdminPage extends GenericPage
             ['string' => '#highlightedRow { background-color: #322C1C; }']
         ));
 
-        $ssGetAll = isset($_GET['all']) && empty($_GET['all']);
+        $ssGetAll = $this->_get['all'];
         $ssPages  = [];
         $ssData   = [];
         $nMatches = 0;
 
-        if (!empty($_GET['type']) && !empty($_GET['typeid']))
+        if ($this->_get['type'] && $this->_get['typeId'])
         {
-            $ssData   = CommunityContent::getScreenshotsForManager(intVal($_GET['type']), intVal($_GET['typeid']));
+            $ssData   = CommunityContent::getScreenshotsForManager($this->_get['type'], $this->_get['typeid']);
             $nMatches = count($ssData);
         }
-        else if (!empty($_GET['user']))
+        else if ($this->_get['user'])
         {
-            $name = urldecode($_GET['user']);
-            if (mb_strlen($name) >= 3)
+            if (mb_strlen($this->_get['user']) >= 3)
             {
-                if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', ucFirst($name)))
+                if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', ucFirst($this->_get['user'])))
                 {
                     $ssData   = CommunityContent::getScreenshotsForManager(0, 0, $uId);
                     $nMatches = count($ssData);

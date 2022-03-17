@@ -17,6 +17,8 @@ class QuestsPage extends GenericPage
     protected $validCats     = [];
     protected $js            = ['filters.js'];
 
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->validCats = Game::$questClasses;             // not allowed to set this as default
@@ -51,7 +53,7 @@ class QuestsPage extends GenericPage
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['init' => 'quests'];
 
         $rCols = $this->filterObj->getReputationCols();

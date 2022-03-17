@@ -18,6 +18,8 @@ class SoundsPage extends GenericPage
     protected $validCats = [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53];
     protected $js        = ['filters.js'];
 
+    protected $_get      = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);;
@@ -43,7 +45,7 @@ class SoundsPage extends GenericPage
             $conditions[] = $_;
 
         $this->filter          = $this->filterObj->getForm();
-        $this->filter['query'] = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query'] = $this->_get['filter'];
 
         $tabData = [];
         $sounds  = new SoundList($conditions);

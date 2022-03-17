@@ -27,6 +27,11 @@ class ScreenshotPage extends GenericPage
     protected $destTypeId  = 0;
     protected $imgHash     = '';
 
+    protected $_post       = array(
+        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
+        'screenshotalt' => ['filter' => FILTER_UNSAFE_RAW]
+    );
+
     public function __construct($pageCall, $pageParam)
     {
         parent::__construct($pageCall, $pageParam);
@@ -191,10 +196,10 @@ class ScreenshotPage extends GenericPage
             return 1;
 
         // check post data
-        if (empty($_POST) || empty($_POST['coords']))
+        if (!$this->_post['coords'])
             return 2;
 
-        $dims = explode(',', $_POST['coords']);
+        $dims = $this->_post['coords'];
         if (count($dims) != 4)
             return 3;
 
@@ -220,7 +225,7 @@ class ScreenshotPage extends GenericPage
             $this->destType, $this->destTypeId,
             User::$id,
             $w, $h,
-            $_POST['screenshotalt'] ?? ''
+            $this->_post['screenshotalt'] ?? ''
         );
 
         // write to file

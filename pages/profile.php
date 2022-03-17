@@ -24,10 +24,15 @@ class ProfilePage extends GenericPage
         ['path' => 'Profiler.css']
     );
 
-    private   $isCustom = false;
-    private   $profile  = null;
-    private   $rnItr    = 0;
-    private   $powerTpl = '$WowheadPower.registerProfile(%s, %d, %s);';
+    protected $_get      = array(
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain'],
+        'new'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+    );
+
+    private   $isCustom  = false;
+    private   $profile   = null;
+    private   $rnItr     = 0;
+    private   $powerTpl  = '$WowheadPower.registerProfile(%s, %d, %s);';
 
     public function __construct($pageCall, $pageParam)
     {
@@ -43,8 +48,8 @@ class ProfilePage extends GenericPage
         parent::__construct($pageCall, $pageParam);
 
         // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
-            Util::powerUseLocale($_GET['domain']);
+        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
+            Util::powerUseLocale($this->_get['domain']);
 
         if (count($params) == 1 && intval($params[0]))
         {
@@ -125,9 +130,9 @@ class ProfilePage extends GenericPage
             else
                 $this->notFound();
         }
-        else if (($params && $params[0]) || !isset($_GET['new']))
+        else if (($params && $params[0]) || !$this->_get['new'])
             $this->notFound();
-        else if (isset($_GET['new']))
+        else if ($this->_get['new'])
             $this->mode = CACHE_TYPE_NONE;
     }
 

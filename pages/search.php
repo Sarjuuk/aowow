@@ -36,6 +36,15 @@ class SearchPage extends GenericPage
     protected $search        = '';                          // output
     protected $invalid       = [];
 
+    protected $_get          = array(
+        'wt'         => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
+        'wtv'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
+        'slots'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
+        'type'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'json'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet'],
+        'opensearch' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+    );
+
     private   $maxResults    = CFG_SQL_LIMIT_SEARCH;
     private   $searchMask    = 0x0;
     private   $query         = '';                          // lookup
@@ -53,18 +62,20 @@ class SearchPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->search =
-        $this->query  = trim(urlDecode($pageParam));
-
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
             $this->error();
 
+        parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
+
+        $this->search =
+        $this->query  = trim(urlDecode($pageParam));
+
         // sanitize stat weights
-        if (!empty($_GET['wt']) && !empty($_GET['wtv']))
+        if ($this->_get['wt'] && $this->_get['wtv'])
         {
-            $wt   = explode(':', $_GET['wt']);
-            $wtv  = explode(':', $_GET['wtv']);
+            $wt   = $this->_get['wt'];
+            $wtv  = $this->_get['wtv'];
             $nwt  = count($wt);
             $nwtv = count($wtv);
 
@@ -74,25 +85,23 @@ class SearchPage extends GenericPage
                 array_splice($wtv, $nwt);
 
             if ($wt && $wtv)
-                $this->statWeights = [array_map('intVal', $wt), array_map('intVal', $wtv)];
+                $this->statWeights = [$wt, $wtv];
         }
 
         // select search mode
-        if (isset($_GET['json']))
+        if ($this->_get['json'])
         {
             if ($_ = intVal($this->search))                 // allow for search by Id
                 $this->query = $_;
 
-            $type = isset($_GET['type']) ? intVal($_GET['type']) : 0;
-
-            if (!empty($_GET['slots']))
+            if ($this->_get['slots'])
                 $this->searchMask |= SEARCH_TYPE_JSON | 0x40;
-            else if ($type == TYPE_ITEMSET)
+            else if ($this->_get['type'] == TYPE_ITEMSET)
                 $this->searchMask |= SEARCH_TYPE_JSON | 0x60;
-            else if ($type == TYPE_ITEM)
+            else if ($this->_get['type'] == TYPE_ITEM)
                 $this->searchMask |= SEARCH_TYPE_JSON | 0x40;
         }
-        else if (isset($_GET['opensearch']))
+        else if ($this->_get['opensearch'])
         {
             $this->maxResults = CFG_SQL_LIMIT_QUICKSEARCH;
             $this->searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
@@ -103,8 +112,6 @@ class SearchPage extends GenericPage
         // handle maintenance status for js-cases
         if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE) && !($this->searchMask & SEARCH_TYPE_REGULAR))
             $this->notFound();
-
-        parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
 
         // fill include, exclude and ignore
         $this->tokenizeQuery();
@@ -555,8 +562,7 @@ class SearchPage extends GenericPage
             $cnd[] = ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]];
             $cnd[] = $cndAdd;
 
-            $slots = isset($_GET['slots']) ? explode(':', $_GET['slots']) : [];
-            if ($_ = array_filter(array_map('intVal', $slots)))
+            if ($_ = array_filter($this->_get['slots']))
                 $cnd[] = ['slot', $_];
 
             // trick ItemListFilter into evaluating weights

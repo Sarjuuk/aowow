@@ -12,7 +12,7 @@ class AjaxCookie extends AjaxHandler
             return;
 
         $this->_get = array(
-            $params[0] => [FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
+            $params[0] => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
         );
 
         // NOW we know, what to expect and sanitize

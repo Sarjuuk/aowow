@@ -6,14 +6,13 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxHandler
 {
+    use TrRequestData;
+
     protected $validParams = [];
     protected $params      = [];
     protected $handler;
 
     protected $contentType = MIME_TYPE_JSON;
-
-    protected $_post       = [];
-    protected $_get        = [];
 
     public    $doRedirect = false;
 
@@ -21,11 +20,7 @@ class AjaxHandler
     {
         $this->params = $params;
 
-        foreach ($this->_post as $k => &$v)
-            $v = isset($_POST[$k]) ? filter_input(INPUT_POST, $k, $v[0], $v[1]) : null;
-
-        foreach ($this->_get  as $k => &$v)
-            $v = isset($_GET[$k])  ? filter_input(INPUT_GET,  $k, $v[0], $v[1]) : null;
+        $this->initRequestData();
     }
 
     public function handle(string &$out) : bool
@@ -71,49 +66,6 @@ class AjaxHandler
                 return false;
 
         return true;
-    }
-
-    protected static function checkEmptySet(string $val) : bool
-    {
-        return $val === '';                                 // parameter is expected to be empty
-    }
-
-    protected static function checkLocale(string $val) : int
-    {
-        if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
-            return intVal($val);
-
-        return -1;
-    }
-
-    protected static function checkInt(string $val) : int
-    {
-        if (preg_match('/^-?\d+$/', $val))
-            return intVal($val);
-
-        return 0;
-    }
-
-    protected static function checkIdList(string $val) : array
-    {
-        if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return [];
-    }
-
-    protected static function checkIdListUnsigned(string $val) : array
-    {
-        if (preg_match('/\d+(,\d+)*/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return [];
-    }
-
-    protected static function checkFulltext(string $val) : string
-    {
-        // trim non-printable chars
-        return preg_replace('/[\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
     }
 }
 ?>

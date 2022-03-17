@@ -17,6 +17,8 @@ class ItemsetsPage extends GenericPage
     protected $mode     = CACHE_TYPE_PAGE;
     protected $js       = ['filters.js'];
 
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
@@ -44,7 +46,7 @@ class ItemsetsPage extends GenericPage
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : NULL;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['init' => 'itemsets'];
 
         if ($x = $this->filterObj->getSetCriteria())

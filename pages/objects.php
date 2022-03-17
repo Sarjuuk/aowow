@@ -18,6 +18,8 @@ class ObjectsPage extends GenericPage
     protected $validCats     = [-2, -3, -4, -5, -6, 0, 3, 9, 25];
     protected $js            = ['filters.js'];
 
+    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);;
@@ -43,7 +45,7 @@ class ObjectsPage extends GenericPage
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = isset($_GET['filter']) ? $_GET['filter'] : null;
+        $this->filter['query']    = $this->_get['filter'];
         $this->filter['initData'] = ['init' => 'objects'];
 
         if ($x = $this->filterObj->getSetCriteria())

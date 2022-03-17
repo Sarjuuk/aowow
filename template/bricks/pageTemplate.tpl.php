@@ -5,7 +5,7 @@ if ($this->contribute & CONTRIBUTE_CO):
 endif;
 if ($this->contribute & CONTRIBUTE_SS):
 
-    echo "                var lv_screenshots = ".Util::toJSON($this->community['sc']).";\n";
+    echo "                var lv_screenshots = ".Util::toJSON($this->community['ss']).";\n";
 endif;
 if ($this->contribute & CONTRIBUTE_VI):
     echo "                var lv_videos = ".Util::toJSON($this->community['vi']).";\n";

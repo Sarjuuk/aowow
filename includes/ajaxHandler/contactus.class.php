@@ -6,15 +6,15 @@ if (!defined('AOWOW_REVISION'))
 class AjaxContactus extends AjaxHandler
 {
     protected $_post = array(
-        'mode'       => [FILTER_SANITIZE_NUMBER_INT, null                 ],
-        'reason'     => [FILTER_SANITIZE_NUMBER_INT, null                 ],
-        'ua'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'appname'    => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'page'       => [FILTER_SANITIZE_URL,        null                 ],
-        'desc'       => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW],
-        'id'         => [FILTER_SANITIZE_NUMBER_INT, null                 ],
-        'relatedurl' => [FILTER_SANITIZE_URL,        null                 ],
-        'email'      => [FILTER_SANITIZE_EMAIL,      null                 ]
+        'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'reason'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'ua'         => ['filter' => FILTER_UNSAFE_RAW,           'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'appname'    => ['filter' => FILTER_UNSAFE_RAW,           'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'page'       => ['filter' => FILTER_SANITIZE_URL],
+        'desc'       => ['filter' => FILTER_UNSAFE_RAW,           'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'id'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
+        'relatedurl' => ['filter' => FILTER_SANITIZE_URL],
+        'email'      => ['filter' => FILTER_SANITIZE_EMAIL]
     );
 
     public function __construct(array $params)

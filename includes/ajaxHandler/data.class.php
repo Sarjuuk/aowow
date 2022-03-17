@@ -6,12 +6,12 @@ if (!defined('AOWOW_REVISION'))
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => [FILTER_CALLBACK,            ['options' => 'AjaxHandler::checkLocale']     ],
-        't'         => [FILTER_SANITIZE_STRING,     FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
-        'catg'      => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
-        'skill'     => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkSkill']         ],
-        'class'     => [FILTER_SANITIZE_NUMBER_INT, null                                          ],
-        'callback'  => [FILTER_CALLBACK,            ['options' => 'AjaxData::checkCallback']      ]
+        'locale'    => ['filter' => FILTER_CALLBACK,             'options' => 'AjaxHandler::checkLocale'],
+        't'         => ['filter' => FILTER_UNSAFE_RAW,           'flags'   => FILTER_FLAG_STRIP_AOWOW   ],
+        'catg'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
+        'skill'     => ['filter' => FILTER_CALLBACK,             'options' => 'AjaxData::checkSkill'    ],
+        'class'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
+        'callback'  => ['filter' => FILTER_CALLBACK,             'options' => 'AjaxData::checkCallback' ]
     );
 
     public function __construct(array $params)

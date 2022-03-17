@@ -19,6 +19,8 @@ class QuestPage extends GenericPage
     protected $css           = [['path' => 'Book.css']];
     protected $js            = ['ShowOnMap.js'];
 
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+
     private   $catExtra      = array(
                                 3526 => 3524,
                                 363  =>   14,
@@ -39,8 +41,8 @@ class QuestPage extends GenericPage
         parent::__construct($pageCall, $id);
 
         // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && isset($_GET['domain']))
-            Util::powerUseLocale($_GET['domain']);
+        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
+            Util::powerUseLocale($this->_get['domain']);
 
         $this->typeId = intVal($id);
 

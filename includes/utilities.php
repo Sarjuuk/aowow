@@ -16,6 +16,86 @@ class SimpleXML extends SimpleXMLElement
     }
 }
 
+trait TrRequestData
+{
+    private $filtered = false;
+
+    private function initRequestData() : void
+    {
+        if ($this->filtered)
+            return;
+
+        if (isset($this->_post) && gettype($this->_post) == 'array')
+            $this->_post = filter_input_array(INPUT_POST, $this->_post);
+
+        if (isset($this->_get) && gettype($this->_get) == 'array')
+            $this->_get = filter_input_array(INPUT_GET, $this->_get);
+
+        if (isset($this->_cookie) && gettype($this->_cookie) == 'array')
+            $this->_cookie = filter_input_array(INPUT_COOKIE, $this->_cookie);
+
+        $this->filtered = true;
+    }
+
+    protected static function checkEmptySet(string $val) : bool
+    {
+        return $val === '';                                 // parameter is expected to be empty
+    }
+
+    protected static function checkInt(string $val) : int
+    {
+        if (preg_match('/^-?\d+$/', $val))
+            return intVal($val);
+
+        return 0;
+    }
+
+    protected static function checkLocale(string $val) : int
+    {
+        if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
+            return intVal($val);
+
+        return -1;
+    }
+
+    protected static function checkDomain(string $val) : string
+    {
+        if (preg_match('/^'.implode('|', array_filter(Util::$subDomains)).'$/i', $val))
+            return strtolower($val);
+
+        return '';
+    }
+
+    protected static function checkIdList(string $val) : array
+    {
+        if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
+            return array_map('intVal', explode(',', $val));
+
+        return [];
+    }
+
+    protected static function checkIntArray(string $val) : array
+    {
+        if (preg_match('/^-?\d+(:-?\d+)*$/', $val))
+            return array_map('intVal', explode(':', $val));
+
+        return [];
+    }
+
+    protected static function checkIdListUnsigned(string $val) : array
+    {
+        if (preg_match('/\d+(,\d+)*/', $val))
+            return array_map('intVal', explode(',', $val));
+
+        return [];
+    }
+
+    protected static function checkFulltext(string $val) : string
+    {
+        // trim non-printable chars
+        return preg_replace('/[\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
+    }
+}
 
 class CLI
 {

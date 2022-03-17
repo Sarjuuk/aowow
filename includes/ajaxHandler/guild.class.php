@@ -7,8 +7,8 @@ class AjaxGuild extends AjaxHandler
 {
     protected $validParams = ['resync', 'status'];
     protected $_get        = array(
-        'id'      => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkIdList']  ],
-        'profile' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkEmptySet']],
+        'id'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'  ],
+        'profile' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
     );
 
     public function __construct(array $params)
