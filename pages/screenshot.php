@@ -28,8 +28,8 @@ class ScreenshotPage extends GenericPage
     protected $imgHash     = '';
 
     protected $_post       = array(
-        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
-        'screenshotalt' => ['filter' => FILTER_UNSAFE_RAW]
+        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIdListUnsigned'],
+        'screenshotalt' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW]
     );
 
     public function __construct($pageCall, $pageParam)

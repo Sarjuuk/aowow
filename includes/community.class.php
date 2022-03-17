@@ -55,7 +55,7 @@ class CommunityContent
     ';
 
     private static string $ssQuery = '
-        SELECT s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS "sticky", s.type, s.typeId
+        SELECT s.id AS ARRAY_KEY, s.id, a.displayName AS user, s.date, s.width, s.height, s.caption, IF(s.status & ?d, 1, 0) AS "sticky", s.type, s.typeId
         FROM ?_screenshots s
         LEFT JOIN ?_account a ON s.userIdOwner = a.id
         WHERE {s.userIdOwner = ?d AND }{s.type = ? AND }{s.typeId = ? AND }s.status & ?d AND (s.status & ?d) = 0
@@ -64,7 +64,7 @@ class CommunityContent
     ';
 
     private static string $viQuery = '
-        SELECT v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS "sticky", v.type, v.typeId
+        SELECT v.id AS ARRAY_KEY, v.id, a.displayName AS user, v.date, v.videoId, v.caption, IF(v.status & ?d, 1, 0) AS "sticky", v.type, v.typeId
         FROM ?_videos v
         LEFT JOIN ?_account a ON v.userIdOwner = a.id
         WHERE {v.userIdOwner = ?d AND }{v.type = ? AND }{v.typeId = ? AND }v.status & ?d AND (v.status & ?d) = 0
@@ -78,7 +78,6 @@ class CommunityContent
             c.body AS preview,
             c.date,
             c.replyTo AS commentid,
-            UNIX_TIMESTAMP() - c.date AS elapsed,
             IF(c.flags & ?d, 1, 0) AS deleted,
             IF(c.type <> 0, c.type, c2.type) AS type,
             IF(c.typeId <> 0, c.typeId, c2.typeId) AS typeId,
@@ -151,7 +150,7 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews(array $params = [], int &$nFound = 0) : array
+    public static function getCommentPreviews(array $params = [], int &$nFound = 0, bool $dateFmt = true) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore
@@ -184,7 +183,7 @@ class CommunityContent
                 $c['subject'] = self::$subjCache[$c['type']][$c['typeId']];
 
                 // format date
-                $c['date'] = date(Util::$dateFormatInternal, $c['date']);
+                $c['date'] = $dateFmt ? date(Util::$dateFormatInternal, $c['date']) : intVal($c['date']);
 
                 // remove commentid if not looking for replies
                 if (empty($params['replies']))
@@ -418,7 +417,7 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0) : array
+    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0, bool $dateFmt = true) : array
     {
         $videos = DB::Aowow()->selectPage($nFound, self::$viQuery,
             CC_FLAG_STICKY,
@@ -450,7 +449,7 @@ class CommunityContent
                     $v['subject'] = Lang::user('removed');
             }
 
-            $v['date']      = date(Util::$dateFormatInternal, $v['date']);
+            $v['date']      = $dateFmt ? date(Util::$dateFormatInternal, $v['date']) : intVal($v['date']);
             $v['videoType'] = 1;                            // always youtube
 
             if (!$v['sticky'])
@@ -463,7 +462,7 @@ class CommunityContent
         return $videos;
     }
 
-    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0) : array
+    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0, bool $dateFmt = true) : array
     {
         $screenshots = DB::Aowow()->selectPage($nFound, self::$ssQuery,
             CC_FLAG_STICKY,
@@ -495,7 +494,7 @@ class CommunityContent
                     $s['subject'] = Lang::user('removed');
             }
 
-            $s['date'] = date(Util::$dateFormatInternal, $s['date']);
+            $s['date'] = $dateFmt ? date(Util::$dateFormatInternal, $s['date']) : intVal($s['date']);
 
             if (!$s['sticky'])
                 unset($s['sticky']);

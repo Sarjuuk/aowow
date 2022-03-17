@@ -25,24 +25,43 @@ trait TrRequestData
         if ($this->filtered)
             return;
 
+        // php bug? If INPUT_X is empty, filter_input_array returns null/fails
+        // only really relevant for INPUT_POST
+        // manuall set everything null in this case
+
         if (isset($this->_post) && gettype($this->_post) == 'array')
-            $this->_post = filter_input_array(INPUT_POST, $this->_post);
+        {
+            if ($_POST)
+                $this->_post = filter_input_array(INPUT_POST, $this->_post);
+            else
+                $this->_post = array_fill_keys(array_keys($this->_post), null);
+        }
 
         if (isset($this->_get) && gettype($this->_get) == 'array')
-            $this->_get = filter_input_array(INPUT_GET, $this->_get);
+        {
+            if ($_GET)
+                $this->_get = filter_input_array(INPUT_GET, $this->_get);
+            else
+                $this->_get = array_fill_keys(array_keys($this->_get), null);
+        }
 
         if (isset($this->_cookie) && gettype($this->_cookie) == 'array')
-            $this->_cookie = filter_input_array(INPUT_COOKIE, $this->_cookie);
+        {
+            if ($_COOKIE)
+                $this->_cookie = filter_input_array(INPUT_COOKIE, $this->_cookie);
+            else
+                $this->_cookie = array_fill_keys(array_keys($this->_cookie), null);
+        }
 
         $this->filtered = true;
     }
 
-    protected static function checkEmptySet(string $val) : bool
+    private static function checkEmptySet(string $val) : bool
     {
         return $val === '';                                 // parameter is expected to be empty
     }
 
-    protected static function checkInt(string $val) : int
+    public static function checkInt(string $val) : int
     {
         if (preg_match('/^-?\d+$/', $val))
             return intVal($val);
@@ -50,7 +69,7 @@ trait TrRequestData
         return 0;
     }
 
-    protected static function checkLocale(string $val) : int
+    private static function checkLocale(string $val) : int
     {
         if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
             return intVal($val);
@@ -58,7 +77,7 @@ trait TrRequestData
         return -1;
     }
 
-    protected static function checkDomain(string $val) : string
+    private static function checkDomain(string $val) : string
     {
         if (preg_match('/^'.implode('|', array_filter(Util::$subDomains)).'$/i', $val))
             return strtolower($val);
@@ -66,7 +85,7 @@ trait TrRequestData
         return '';
     }
 
-    protected static function checkIdList(string $val) : array
+    private static function checkIdList(string $val) : array
     {
         if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
             return array_map('intVal', explode(',', $val));
@@ -74,7 +93,7 @@ trait TrRequestData
         return [];
     }
 
-    protected static function checkIntArray(string $val) : array
+    private static function checkIntArray(string $val) : array
     {
         if (preg_match('/^-?\d+(:-?\d+)*$/', $val))
             return array_map('intVal', explode(':', $val));
@@ -82,7 +101,7 @@ trait TrRequestData
         return [];
     }
 
-    protected static function checkIdListUnsigned(string $val) : array
+    private static function checkIdListUnsigned(string $val) : array
     {
         if (preg_match('/\d+(,\d+)*/', $val))
             return array_map('intVal', explode(',', $val));
@@ -90,7 +109,7 @@ trait TrRequestData
         return [];
     }
 
-    protected static function checkFulltext(string $val) : string
+    private static function checkFulltext(string $val) : string
     {
         // trim non-printable chars
         return preg_replace('/[\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
@@ -652,6 +671,24 @@ class Util
 
             return '0 '.Lang::timeUnits('pl', 6);
         }
+    }
+
+    public static function formatTimeDiff(int $sec) : string
+    {
+        $delta = time() - $sec;
+
+        [, $s, $m, $h, $d] = self::parseTime($delta * 1000);
+
+        if ($delta > (1 * MONTH))                           // use absolute
+            return date(Lang::main('dateFmtLong'), $sec);
+        else if ($delta > (2 * DAY))                        // days ago
+            return Lang::main('timeAgo', [$d . ' ' . Lang::timeUnits('pl', 3)]);
+        else if ($h)                                        // hours, minutes ago
+            return Lang::main('timeAgo', [$h . ' ' . Lang::timeUnits('ab', 4) . ' ' . $m . ' ' . Lang::timeUnits('ab', 5)]);
+        else if ($m)                                        // minutes, seconds ago
+            return Lang::main('timeAgo', [$m . ' ' . Lang::timeUnits('ab', 5) . ' ' . $m . ' ' . Lang::timeUnits('ab', 6)]);
+        else                                                // seconds ago
+            return Lang::main('timeAgo', [$s . ' ' . Lang::timeUnits($s == 1 ? 'sg' : 'pl', 6)]);
     }
 
     // pageText for Books (Item or GO) and questText

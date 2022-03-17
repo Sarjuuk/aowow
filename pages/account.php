@@ -37,7 +37,7 @@ class AccountPage extends GenericPage
         'password'    => ['filter' => FILTER_UNSAFE_RAW],
         'c_password'  => ['filter' => FILTER_UNSAFE_RAW],
         'token'       => ['filter' => FILTER_UNSAFE_RAW],
-        'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::rememberCallback'],
+        'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'AccountPage::rememberCallback'],
         'email'       => ['filter' => FILTER_SANITIZE_EMAIL]
     );
 
@@ -59,7 +59,7 @@ class AccountPage extends GenericPage
         }
     }
 
-    protected function rememberCallback($val)
+    protected static function rememberCallback($val)
     {
         return $val == 'yes' ? $val : null;
     }
