@@ -594,8 +594,6 @@ class GenericPage
     // unknown entry
     public function notFound(string $title = '', string $msg = '') : void
     {
-        header('HTTP/1.0 404 Not Found', true, 404);
-
         if ($this->mode == CACHE_TYPE_TOOLTIP && method_exists($this, 'generateTooltip'))
         {
             header(MIME_TYPE_JSON);
@@ -608,6 +606,8 @@ class GenericPage
         }
         else
         {
+            header('HTTP/1.0 404 Not Found', true, 404);
+
             array_unshift($this->title, Lang::main('nfPageTitle'));
 
             $this->contribute = CONTRIBUTE_NONE;
