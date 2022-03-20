@@ -102,7 +102,7 @@ class ComparePage extends GenericPage
 
     protected function generatePath() {}
 
-    private function checkCompareString(string $val) : string
+    protected static function checkCompareString(string $val) : string
     {
         $val = urldecode($val);
         if (preg_match('/[^\d\.:;]/', $val))

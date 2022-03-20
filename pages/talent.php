@@ -38,7 +38,7 @@ class TalentPage extends GenericPage
 
         if ($this->isPetCalc)
             $this->addScript(
-                [JS_FILE,  'swfobject.css'],
+                [JS_FILE,  'swfobject.js'],
                 [CSS_FILE, 'petcalc.css']
             );
 

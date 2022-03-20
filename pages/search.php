@@ -562,7 +562,7 @@ class SearchPage extends GenericPage
             $cnd[] = ['i.class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR]];
             $cnd[] = $cndAdd;
 
-            if ($_ = array_filter($this->_get['slots']))
+            if ($_ = array_filter($this->_get['slots'] ?? []))
                 $cnd[] = ['slot', $_];
 
             // trick ItemListFilter into evaluating weights

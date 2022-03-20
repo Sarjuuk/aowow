@@ -150,7 +150,7 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews(array $params = [], int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getCommentPreviews(array $params = [], ?int &$nFound = 0, bool $dateFmt = true) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore

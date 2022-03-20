@@ -87,7 +87,7 @@ class UserPage extends GenericPage
                     $buff[] = '[tooltip=tooltip_pending]'.$ss['nPending'].'[/tooltip]';
             }
 
-            $contrib[] = Lang::user('screenshots').Lang::main('colon').$ss['sum'].($buff ? ' [small]('.implode($buff, ' + ').')[/small]' : null);
+            $contrib[] = Lang::user('screenshots').Lang::main('colon').$ss['sum'].($buff ? ' [small]('.implode(' + ', $buff).')[/small]' : null);
         }
 
         $vi = DB::Aowow()->selectRow('SELECT COUNT(id) AS sum, SUM(IF(status & ?d, 1, 0)) AS nSticky, SUM(IF(status & ?d, 0, 1)) AS nPending FROM ?_videos WHERE userIdOwner = ?d AND (status & ?d) = 0',
@@ -111,7 +111,7 @@ class UserPage extends GenericPage
                     $buff[] = '[tooltip=tooltip_pending]'.$vi['nPending'].'[/tooltip]';
             }
 
-            $contrib[] = Lang::user('videos').Lang::main('colon').$vi['sum'].($buff ? ' [small]('.implode($buff, ' + ').')[/small]' : null);
+            $contrib[] = Lang::user('videos').Lang::main('colon').$vi['sum'].($buff ? ' [small]('.implode(' + ', $buff).')[/small]' : null);
         }
 
         // contrib -> Forum posts: 5769 [small]([tooltip=topics]579[/tooltip] + [tooltip=replies]5190[/tooltip])[/small]
