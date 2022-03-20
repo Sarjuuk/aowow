@@ -512,6 +512,9 @@ class AjaxAdmin extends AjaxHandler
             case 'static_host':
                 $buildList = 'searchplugin,power,searchboxBody,searchboxScript';
                 break;
+            case 'contact_email':
+                $buildList = 'markup';
+                break;
             case 'locales':
                 $buildList = 'locales';
                 $msg .= ' * remember to rebuild all static files for the language you just added.<br />';

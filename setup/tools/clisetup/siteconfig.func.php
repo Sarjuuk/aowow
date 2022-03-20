@@ -41,6 +41,9 @@ function siteconfig() : void
             case 'static_host':
                 array_push($updScripts, 'searchplugin', 'power', 'searchboxBody', 'searchboxScript');
                 break;
+            case 'contact_email':
+                array_push($updScripts, 'markup');
+                break;
             case 'locales':
                 array_push($updScripts, 'locales');
                 CLI::write(' * remember to rebuild all static files for the language you just added.', CLI::LOG_INFO);
@@ -329,7 +332,8 @@ function siteconfig() : void
                                     {
                                         CLI::write();
 
-                                        if (!$validate($use ? $use['idx'] : ''))
+                                        $inp = $use['idx'] ?? '';
+                                        if (!$validate($inp))
                                         {
                                             CLI::write("value not in range", CLI::LOG_ERROR);
                                             sleep(1);
@@ -338,10 +342,10 @@ function siteconfig() : void
                                         else
                                         {
                                             $oldVal = DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = ?', $key);
-                                            DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $use['idx'], $key);
+                                            DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $inp, $key);
 
                                             // postChange returned false => reset value
-                                            if (!$onChange($key, $use['idx']))
+                                            if (!$onChange($key, $inp))
                                             {
                                                 DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldVal, $key);
                                                 sleep(1);

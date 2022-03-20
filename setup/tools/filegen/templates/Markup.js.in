@@ -28,13 +28,13 @@ MarkupSourceMap[MARKUP_SOURCE_PTR]  = 'ptr';
 MarkupSourceMap[MARKUP_SOURCE_BETA] = 'beta';
 
 var MarkupDomainRegexMap = {
-    betaPtrLang: /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/,
-    lang: /^(www|fr|de|cn|es|ru)$/                          // Aowowo - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
+    betaPtrLang: /^(www|fr|de|cn|es|ru)$/,                  // Aowow - /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/
+    lang: /^(www|fr|de|cn|es|ru)$/                          // Aowow - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
 };
 
 var Markup = {
     MODE_COMMENT:    MARKUP_MODE_COMMENT,
-    MODE_REPLY:         MARKUP_MODE_REPLY,
+    MODE_REPLY:      MARKUP_MODE_REPLY,
     MODE_ARTICLE:    MARKUP_MODE_ARTICLE,
     MODE_QUICKFACTS: MARKUP_MODE_QUICKFACTS,
     MODE_SIGNATURE:  MARKUP_MODE_SIGNATURE,
@@ -70,15 +70,15 @@ var Markup = {
     nameCol: 'name_enus',
     domainToLocale: {
         'www': 'enus',
-        'ptr': 'ptr',
-        'beta': 'beta',
-        'mop': 'beta',
+     // 'ptr': 'ptr',
+     // 'beta': 'beta',
+     // 'mop': 'beta',
         'fr': 'frfr',
         'de': 'dede',
         'cn': 'zhcn',
         'es': 'eses',
         'ru': 'ruru',
-        'pt': 'ptbr'
+     // 'pt': 'ptbr'
     },
     maps: [],
     firstTags: {},
@@ -775,7 +775,7 @@ var Markup = {
             },
             toHtml: function(attr)
             {
-                return '<b><span class="icontiny" style="background-image: url(' + g_staticUrl + '/images/icons/email.gif)"><a href="' + (attr.mailto ? 'mailto:feedback@wowhead.com' : 'javascript:;" onclick="ContactTool.show();') + '">feedback@wowhead.com</a></span></b>';
+                return '<b><span class="icontiny" style="background-image: url(' + g_staticUrl + '/images/icons/email.gif)"><a href="' + (attr.mailto ? 'mailto:CFG_CONTACT_EMAIL' : 'javascript:;" onclick="ContactTool.show();') + '">CFG_CONTACT_EMAIL</a></span></b>';
             }
         },
         forumrules:

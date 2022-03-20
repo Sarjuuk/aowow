@@ -12,6 +12,7 @@
 # generated files
 /static/js/profile_all.js
 /static/js/locale.js
+/static/js/Markup.js
 /static/widgets/power.js
 /static/widgets/power/demo.html
 /static/widgets/searchbox.js
