@@ -118,32 +118,9 @@ class CommunityContent
             if (!$_)
                 continue;
 
-            $cnd = [CFG_SQL_LIMIT_NONE, ['id', $_]];
-
-            switch ($type)
-            {
-                case TYPE_NPC:         $obj = new CreatureList($cnd);    break;
-                case TYPE_OBJECT:      $obj = new GameobjectList($cnd);  break;
-                case TYPE_ITEM:        $obj = new ItemList($cnd);        break;
-                case TYPE_ITEMSET:     $obj = new ItemsetList($cnd);     break;
-                case TYPE_QUEST:       $obj = new QuestList($cnd);       break;
-                case TYPE_SPELL:       $obj = new SpellList($cnd);       break;
-                case TYPE_ZONE:        $obj = new ZoneList($cnd);        break;
-                case TYPE_FACTION:     $obj = new FactionList($cnd);     break;
-                case TYPE_PET:         $obj = new PetList($cnd);         break;
-                case TYPE_ACHIEVEMENT: $obj = new AchievementList($cnd); break;
-                case TYPE_TITLE:       $obj = new TitleList($cnd);       break;
-                case TYPE_WORLDEVENT:  $obj = new WorldEventList($cnd);  break;
-                case TYPE_CLASS:       $obj = new CharClassList($cnd);   break;
-                case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
-                case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
-                case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
-                case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
-                case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
-                case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
-                case TYPE_ICON:        $obj = new IconList($cnd);        break;
-                default: continue 2;
-            }
+            $obj = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $_]]);
+            if (!$obj)
+                continue;
 
             foreach ($obj->iterate() as $id => $__)
                 self::$subjCache[$type][$id] = $obj->getField('name', true);
@@ -323,8 +300,7 @@ class CommunityContent
         if ($pages)
         {
             // limit to one actually existing type each
-            $types = array_intersect(array_unique(array_column($pages, 'type')), array_keys(Util::$typeClasses));
-            foreach ($types as $t)
+            foreach (array_unique(array_column($pages, 'type')) as $t)
             {
                 $ids = [];
                 foreach ($pages as $row)
@@ -334,11 +310,14 @@ class CommunityContent
                 if (!$ids)
                     continue;
 
-                $tClass = new Util::$typeClasses[$t](array(['id', $ids], CFG_SQL_LIMIT_NONE));
+                $obj = Type::newList($t, [CFG_SQL_LIMIT_NONE, ['id', $ids]]);
+                if (!$obj || $obj->error)
+                    continue;
+
                 foreach ($pages as &$p)
                     if ($p['type'] == $t)
-                        if ($tClass->getEntry($p['typeId']))
-                            $p['name'] = $tClass->getField('name', true);
+                        if ($obj->getEntry($p['typeId']))
+                            $p['name'] = $obj->getField('name', true);
             }
 
             foreach ($pages as &$p)
@@ -371,7 +350,7 @@ class CommunityContent
         {
             (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
 
-            self::$jsGlobals[TYPE_USER][$r['userId']] = $r['userId'];
+            self::$jsGlobals[Type::USER][$r['userId']] = $r['userId'];
 
             $c = array(
                 'commentv2'  => 1,                          // always 1.. enables some features i guess..?

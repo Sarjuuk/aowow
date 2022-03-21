@@ -417,7 +417,7 @@ class ProfileListFilter extends Filter
         if ($this->useLocalList)
         {
             $this->extraOpts[$k] = array(
-                'j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.TYPE_SKILL.' AND '.$k.'.typeId = '.$skillId.' AND '.$k.'.cur '.$cr[1].' '.$cr[2], true],
+                'j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.Type::SKILL.' AND '.$k.'.typeId = '.$skillId.' AND '.$k.'.cur '.$cr[1].' '.$cr[2], true],
                 's' => [', '.$k.'.cur AS '.$col]
             );
             return [$k.'.typeId', null, '!'];
@@ -444,7 +444,7 @@ class ProfileListFilter extends Filter
 
         if ($this->useLocalList)
         {
-            $this->extraOpts[$k] = ['j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.TYPE_ACHIEVEMENT.' AND '.$k.'.typeId = '.$cr[2], true]];
+            $this->extraOpts[$k] = ['j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.Type::ACHIEVEMENT.' AND '.$k.'.typeId = '.$cr[2], true]];
             return [$k.'.typeId', null, '!'];
         }
         else
@@ -754,7 +754,7 @@ class LocalProfileList extends ProfileList
         $realms = Profiler::getRealms();
 
         // post processing
-        $acvPoints = DB::Aowow()->selectCol('SELECT pc.id AS ARRAY_KEY, SUM(a.points) FROM ?_profiler_completion pc LEFT JOIN ?_achievement a ON a.id = pc.typeId WHERE pc.`type` = ?d AND pc.id IN (?a) GROUP BY pc.id', TYPE_ACHIEVEMENT, $this->getFoundIDs());
+        $acvPoints = DB::Aowow()->selectCol('SELECT pc.id AS ARRAY_KEY, SUM(a.points) FROM ?_profiler_completion pc LEFT JOIN ?_achievement a ON a.id = pc.typeId WHERE pc.`type` = ?d AND pc.id IN (?a) GROUP BY pc.id', Type::ACHIEVEMENT, $this->getFoundIDs());
 
         foreach ($this->iterate() as $id => &$curTpl)
         {

@@ -34,7 +34,7 @@ SqlGen::register(new class extends SetupScript
 
         DB::Aowow()->query($baseQuery);
 
-        $this->reapplyCCFlags('icons', TYPE_ICON);
+        $this->reapplyCCFlags('icons', Type::ICON);
 
         return true;
     }

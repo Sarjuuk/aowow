@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CurrencyList extends BaseType
 {
-    public static   $type      = TYPE_CURRENCY;
+    public static   $type      = Type::CURRENCY;
     public static   $brickFile = 'currency';
     public static   $dataTable = '?_currencies';
 
@@ -57,7 +57,7 @@ class CurrencyList extends BaseType
             else
                 $icon = [$this->curTpl['iconString'], $this->curTpl['iconString']];
 
-            $data[TYPE_CURRENCY][$this->id] = ['name' => $this->getField('name', true), 'icon' => $icon];
+            $data[Type::CURRENCY][$this->id] = ['name' => $this->getField('name', true), 'icon' => $icon];
         }
 
         return $data;

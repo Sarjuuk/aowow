@@ -50,7 +50,7 @@ class AjaxAccount extends AjaxHandler
             $type = $this->_post['type'];
             $ids  = $this->_post['id'];
 
-            if (!isset(Util::$typeStrings[$type]) || empty($ids))
+            if (!Type::exists($type) || empty($ids))
             {
                 trigger_error('AjaxAccount::handleExclude - invalid type #'.$type.(empty($ids) ? ' or id-list empty' : ''), E_USER_ERROR);
                 return;
@@ -146,16 +146,10 @@ class AjaxAccount extends AjaxHandler
 
         if ($type = $this->_post['add'])
         {
-            if (empty(Util::$typeClasses[$type]))
+            $tc = Type::newList($type, [['id', $typeId]]);
+            if (!$tc || $tc->error)
             {
-                trigger_error('AjaxAccount::handleFavorites - invalid type #'.$type, E_USER_ERROR);
-                return;
-            }
-
-            $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
-            if ($tc->error)
-            {
-                trigger_error('AjaxAccount::handleFavorites - invalid typeId #'.$typeId.' for type '.$tc::$brickFile, E_USER_ERROR);
+                trigger_error('AjaxAccount::handleFavorites - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);
                 return;
             }
 

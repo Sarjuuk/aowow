@@ -8,7 +8,7 @@ class CreatureList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type      = TYPE_NPC;
+    public static   $type      = Type::NPC;
     public static   $brickFile = 'creature';
     public static   $dataTable = '?_creature';
 
@@ -252,7 +252,7 @@ class CreatureList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_NPC][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::NPC][$this->id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }
@@ -265,7 +265,7 @@ class CreatureList extends BaseType
         {
             $data[$this->id] = array(
                 'n'  => $this->getField('parentId') ? $this->getField('parent', true) : $this->getField('name', true),
-                't'  => TYPE_NPC,
+                't'  => Type::NPC,
                 'ti' => $this->getField('parentId') ?: $this->id,
              // 'bd' => (int)($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']))
              // 'z'   where am i spawned

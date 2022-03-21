@@ -258,7 +258,7 @@ class AjaxProfile extends AjaxHandler
         if ($chars = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_profiles WHERE id IN (?a)', $this->_get['id']))
         {
             foreach ($chars as $c)
-                Profiler::scheduleResync(TYPE_PROFILE, $c['realm'], $c['realmGUID']);
+                Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
         }
         else
             trigger_error('AjaxProfile::handleResync - profiles '.implode(', ', $this->_get['id']).' not found in db', E_USER_ERROR);
@@ -305,7 +305,7 @@ class AjaxProfile extends AjaxHandler
             return Util::toJSON([1, [PR_QUEUE_STATUS_ERROR, 0, 0, PR_QUEUE_ERROR_CHAR]]);
         }
 
-        $response = Profiler::resyncStatus(TYPE_PROFILE, $ids);
+        $response = Profiler::resyncStatus(Type::PROFILE, $ids);
         return Util::toJSON($response);
     }
 
@@ -603,28 +603,28 @@ class AjaxProfile extends AjaxHandler
         {
             switch ($type)
             {
-                case TYPE_FACTION:                          // factionId => amount
+                case Type::FACTION:                          // factionId => amount
                     $profile['reputation'] = array_combine(array_keys($data), array_column($data, 'cur'));
                     break;
-                case TYPE_TITLE:
+                case Type::TITLE:
                     foreach ($data as &$d)
                         $d = 1;
 
                     $profile['titles'] = $data;
                     break;
-                case TYPE_QUEST:
+                case Type::QUEST:
                     foreach ($data as &$d)
                         $d = 1;
 
                     $profile['quests'] = $data;
                     break;
-                case TYPE_SPELL:
+                case Type::SPELL:
                     foreach ($data as &$d)
                         $d = 1;
 
                     $profile['spells'] = $data;
                     break;
-                case TYPE_ACHIEVEMENT:
+                case Type::ACHIEVEMENT:
                     $achievements = array_filter($data, function ($x) { return $x['max'] === null; });
                     $statistics   = array_filter($data, function ($x) { return $x['max'] !== null; });
 
@@ -642,7 +642,7 @@ class AjaxProfile extends AjaxHandler
                     $profile['statistics'] = array_combine(array_keys($statistics), array_column($statistics, 'max'));
                     $profile['activity']   = $activity;
                     break;
-                case TYPE_SKILL:
+                case Type::SKILL:
                     foreach ($data as &$d)
                         $d = [$d['cur'], $d['max']];
 

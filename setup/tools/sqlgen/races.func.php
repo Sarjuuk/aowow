@@ -37,7 +37,7 @@ SqlGen::register(new class extends SetupScript
         // add cuFlags
         DB::Aowow()->query('UPDATE ?_races SET cuFlags = ?d WHERE flags & ?d', CUSTOM_EXCLUDE_FOR_LISTVIEW, 0x1);
 
-        $this->reapplyCCFlags('races', TYPE_RACE);
+        $this->reapplyCCFlags('races', Type::CHR_RACE);
 
         return true;
     }

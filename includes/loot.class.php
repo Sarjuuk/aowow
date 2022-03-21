@@ -328,7 +328,7 @@ class Loot
                 );
                 $this->results[] = array_merge($base, $data);
 
-                $this->jsGlobals[TYPE_ITEM][$loot['reference']] = $data;
+                $this->jsGlobals[Type::ITEM][$loot['reference']] = $data;
             }
         }
 

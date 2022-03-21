@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class UserList extends BaseType
 {
-    public static   $type      = TYPE_USER;
+    public static   $type      = Type::USER;
     public static   $brickFile = 'user';
     public static   $dataTable = '';                          // doesn't have community content
 
@@ -52,7 +52,7 @@ class UserList extends BaseType
             // border: seen as null|1|3 .. changes the border around the avatar (i suspect its meaning changed and got decupled from premium-status with the introduction of patron-status)
         }
 
-        return [TYPE_USER => $data];
+        return [Type::USER => $data];
     }
 
     public function renderTooltip() { }

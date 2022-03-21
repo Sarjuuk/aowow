@@ -10,7 +10,7 @@ class SkillsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type      = TYPE_SKILL;
+    protected $type      = Type::SKILL;
     protected $tpl       = 'list-page-generic';
     protected $path      = [0, 14];
     protected $tabId     = 0;

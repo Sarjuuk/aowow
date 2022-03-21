@@ -8,7 +8,7 @@ class ItemsetList extends BaseType
 {
     use ListviewHelper;
 
-    public static   $type       = TYPE_ITEMSET;
+    public static   $type       = Type::ITEMSET;
     public static   $brickFile  = 'itemset';
     public static   $dataTable  = '?_itemset';
 
@@ -80,14 +80,14 @@ class ItemsetList extends BaseType
         $data = [];
 
         if ($this->classes && ($addMask & GLOBALINFO_RELATED))
-            $data[TYPE_CLASS] = array_combine($this->classes, $this->classes);
+            $data[Type::CHR_CLASS] = array_combine($this->classes, $this->classes);
 
         if ($this->pieceToSet && ($addMask & GLOBALINFO_SELF))
-            $data[TYPE_ITEM] = array_combine(array_keys($this->pieceToSet), array_keys($this->pieceToSet));
+            $data[Type::ITEM] = array_combine(array_keys($this->pieceToSet), array_keys($this->pieceToSet));
 
         if ($addMask & GLOBALINFO_SELF)
             foreach ($this->iterate() as $id => $__)
-                $data[TYPE_ITEMSET][$id] = ['name' => $this->getField('name', true)];
+                $data[Type::ITEMSET][$id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }

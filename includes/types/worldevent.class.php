@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class WorldEventList extends BaseType
 {
-    public static   $type      = TYPE_WORLDEVENT;
+    public static   $type      = Type::WORLDEVENT;
     public static   $brickFile = 'event';
     public static   $dataTable = '?_events';
 
@@ -162,7 +162,7 @@ class WorldEventList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_WORLDEVENT][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
+            $data[Type::WORLDEVENT][$this->id] = ['name' => $this->getField('name', true), 'icon' => $this->curTpl['iconString']];
 
         return $data;
     }

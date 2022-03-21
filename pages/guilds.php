@@ -10,7 +10,7 @@ class GuildsPage extends GenericPage
 {
     use TrProfiler;
 
-    protected $type     = TYPE_GUILD;
+    protected $type     = Type::GUILD;
 
     protected $tabId    = 1;
     protected $path     = [1, 5, 2];

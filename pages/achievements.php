@@ -10,7 +10,7 @@ class AchievementsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_ACHIEVEMENT;
+    protected $type          = Type::ACHIEVEMENT;
     protected $tpl           = 'achievements';
     protected $path          = [0, 9];
     protected $tabId         = 0;

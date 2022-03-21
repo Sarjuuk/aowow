@@ -19,31 +19,31 @@ SqlGen::register(new class extends SetupScript
     private $querys = array(
         1 => ['SELECT c.guid, 1 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, IFNULL(ca.path_id, 0) AS pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
-              ' - assembling creature spawns', TYPE_NPC],
+              ' - assembling creature spawns', Type::NPC],
 
         2 => ['SELECT c.guid, 2 AS "type", c.id AS typeId, ABS(c.spawntimesecs) AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM gameobject c',
-              ' - assembling gameobject spawns', TYPE_OBJECT],
+              ' - assembling gameobject spawns', Type::OBJECT],
 
         3 => ['SELECT id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_soundemitters',
-              ' - assembling sound emitter spawns', TYPE_SOUND],
+              ' - assembling sound emitter spawns', Type::SOUND],
 
         4 => ['SELECT id AS "guid", 503 AS "type", id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_areatrigger',
-              ' - assembling areatrigger spawns', TYPE_AREATRIGGER],
+              ' - assembling areatrigger spawns', Type::AREATRIGGER],
 
         5 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
               'FROM creature c JOIN script_waypoint w ON c.id = w.entry',
-              ' - assembling waypoints from table script_waypoint', TYPE_NPC],
+              ' - assembling waypoints from table script_waypoint', Type::NPC],
 
         6 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN waypoints w ON c.id = w.entry',
-              ' - assembling waypoints from table waypoints', TYPE_NPC],
+              ' - assembling waypoints from table waypoints', Type::NPC],
 
         7 => ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
-              ' - assembling waypoints from table waypoint_data', TYPE_NPC]
+              ' - assembling waypoints from table waypoint_data', Type::NPC]
     );
 
     public function generate(array $ids = []) : bool
@@ -202,9 +202,9 @@ SqlGen::register(new class extends SetupScript
             {
                 $vehicles = [];
                 if ($data['guid'])                          // vehicle already spawned
-                    $vehicles = DB::Aowow()->select('SELECT s.areaId, s.posX, s.posY, s.floor FROM ?_spawns s WHERE s.guid   = ?d AND s.type = ?d', $data['guid'], TYPE_NPC);
+                    $vehicles = DB::Aowow()->select('SELECT s.areaId, s.posX, s.posY, s.floor FROM ?_spawns s WHERE s.guid   = ?d AND s.type = ?d', $data['guid'], Type::NPC);
                 else if ($data['entry'])                    // vehicle on unspawned vehicle action
-                    $vehicles = DB::Aowow()->select('SELECT s.areaId, s.posX, s.posY, s.floor FROM ?_spawns s WHERE s.typeId = ?d AND s.type = ?d', $data['entry'], TYPE_NPC);
+                    $vehicles = DB::Aowow()->select('SELECT s.areaId, s.posX, s.posY, s.floor FROM ?_spawns s WHERE s.typeId = ?d AND s.type = ?d', $data['entry'], Type::NPC);
 
                 if ($vehicles)
                 {
@@ -213,7 +213,7 @@ SqlGen::register(new class extends SetupScript
                         for ($i = 0; $i < $data['nSeats']; $i++)
                             DB::Aowow()->query('
                                 REPLACE INTO ?_spawns (`guid`, `type`, `typeId`, `respawn`, `spawnMask`, `phaseMask`, `areaId`, `floor`, `posX`, `posY`, `pathId`) VALUES
-                                (?d, ?d, ?d, 0, 0, 1, ?d, ?d, ?f, ?f, 0)', --$vGuid, TYPE_NPC, $data['typeId'], $v['areaId'], $v['floor'], $v['posX'], $v['posY']);
+                                (?d, ?d, ?d, 0, 0, 1, ?d, ?d, ?f, ?f, 0)', --$vGuid, Type::NPC, $data['typeId'], $v['areaId'], $v['floor'], $v['posX'], $v['posY']);
 
                     unset($accessories[$idx]);
                 }

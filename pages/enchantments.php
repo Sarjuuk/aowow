@@ -10,7 +10,7 @@ class EnchantmentsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_ENCHANTMENT;
+    protected $type          = Type::ENCHANTMENT;
     protected $tpl           = 'enchantments';
     protected $path          = [0, 101];
     protected $tabId         = 0;

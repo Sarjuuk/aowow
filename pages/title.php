@@ -10,7 +10,7 @@ class TitlePage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_TITLE;
+    protected $type          = Type::TITLE;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 10];
@@ -63,7 +63,7 @@ class TitlePage extends GenericPage
 
         if ($eId = $this->subject->getField('eventId'))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $eId);
+            $this->extendGlobalIds(Type::WORLDEVENT, $eId);
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$eId.']';
         }
 

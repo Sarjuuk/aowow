@@ -10,7 +10,7 @@ class ItemsetPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_ITEMSET;
+    protected $type          = Type::ITEMSET;
     protected $typeId        = 0;
     protected $tpl           = 'itemset';
     protected $path          = [0, 2];
@@ -77,7 +77,7 @@ class ItemsetPage extends GenericPage
         if ($e = $this->subject->getField('eventId'))
         {
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$e.']';
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
+            $this->extendGlobalIds(Type::WORLDEVENT, $e);
         }
 
         // itemLevel
@@ -96,7 +96,7 @@ class ItemsetPage extends GenericPage
         $jsg = [];
         if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg)== 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$cl;
         }
@@ -166,7 +166,7 @@ class ItemsetPage extends GenericPage
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_VIEW3D  => ['type' => TYPE_ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList],
+            BUTTON_VIEW3D  => ['type' => Type::ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList],
             BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
         );
         $this->summary     = array(

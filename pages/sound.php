@@ -10,7 +10,7 @@ class SoundPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_SOUND;
+    protected $type          = Type::SOUND;
     protected $tpl           = 'sound';
     protected $path          = [0, 19];
     protected $tabId         = 0;
@@ -98,7 +98,7 @@ class SoundPage extends GenericPage
             BUTTON_WOWHEAD  => true,
             BUTTON_PLAYLIST => true,
             BUTTON_LINKS    => array(
-                'type'   => TYPE_SOUND,
+                'type'   => Type::SOUND,
                 'typeId' => $this->typeId,
                 'sound'  => str_replace('\\', '\\\\', $fullpath) // escape for wow client
             )
@@ -274,8 +274,8 @@ class SoundPage extends GenericPage
         $creatureIds = DB::World()->selectCol('SELECT ct.CreatureID FROM creature_text ct LEFT JOIN broadcast_text bct ON bct.ID = ct.BroadCastTextId WHERE bct.SoundEntriesID = ?d OR ct.Sound = ?d', $this->typeId, $this->typeId);
 
         // can objects or areatrigger play sound...?
-        if ($goosp = SmartAI::getOwnerOfSoundPlayed($this->typeId, TYPE_NPC))
-            $creatureIds = array_merge($creatureIds, $goosp[TYPE_NPC]);
+        if ($goosp = SmartAI::getOwnerOfSoundPlayed($this->typeId, Type::NPC))
+            $creatureIds = array_merge($creatureIds, $goosp[Type::NPC]);
 
         // tab: NPC (dialogues...?, generic creature sound)
         // skipping (always empty): transforms, footsteps

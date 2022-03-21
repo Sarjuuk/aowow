@@ -67,7 +67,7 @@ if (!CLI)
                 // get locations
                 // again: caching will save you time and nerves
                 if (!isset($locations[$pet['id']]))
-                    $locations[$pet['id']] = DB::Aowow()->SelectCol('SELECT DISTINCT areaId FROM ?_spawns WHERE type = ?d AND typeId = ?d', TYPE_NPC, $pet['id']);
+                    $locations[$pet['id']] = DB::Aowow()->SelectCol('SELECT DISTINCT areaId FROM ?_spawns WHERE type = ?d AND typeId = ?d', Type::NPC, $pet['id']);
 
                 $petsOut[$pet['id']] = array(
                     'id'             => $pet['id'],

@@ -10,7 +10,7 @@ class PetsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_PET;
+    protected $type          = Type::PET;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 8];
     protected $tabId         = 0;

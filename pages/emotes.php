@@ -10,7 +10,7 @@ class EmotesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_EMOTE;
+    protected $type          = Type::EMOTE;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 100];
     protected $tabId         = 0;

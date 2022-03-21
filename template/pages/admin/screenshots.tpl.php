@@ -23,8 +23,8 @@ $this->brick('pageTemplate');
                         <td>
                             <select id="pagetype">
 <?php
-foreach (Util::$typeStrings as $i => $str):
-    if (Lang::game($str)):
+foreach (Type::getFileStringsFor() as $i => $str):
+    if (Lang::game($str) && Type::checkClassAttrib($i, 'contribute', CONTRIBUTE_SS)):
         echo "                                <option value=\"".$i."\">".Util::ucFirst(Lang::game($str))."</option>\n";
     endif;
 endforeach;

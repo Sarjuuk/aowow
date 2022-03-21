@@ -10,7 +10,7 @@ class IconsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_ICON;
+    protected $type          = Type::ICON;
     protected $tpl           = 'icons';
     protected $path          = [0, 31];
     protected $tabId         = 0;

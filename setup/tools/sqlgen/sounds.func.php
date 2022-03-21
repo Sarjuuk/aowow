@@ -422,7 +422,7 @@ SqlGen::register(new class extends SetupScript
                 subClassMask = subClassMask | (1 << isc.subClass)
         ');
 
-        $this->reapplyCCFlags('sounds', TYPE_SOUND);
+        $this->reapplyCCFlags('sounds', Type::SOUND);
 
         return true;
     }

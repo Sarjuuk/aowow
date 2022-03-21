@@ -318,7 +318,7 @@ SqlGen::register(new class extends SetupScript
             }
         }
 
-        $this->reapplyCCFlags('itemset', TYPE_ITEMSET);
+        $this->reapplyCCFlags('itemset', Type::ITEMSET);
 
         return true;
     }

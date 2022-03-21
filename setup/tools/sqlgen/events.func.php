@@ -42,7 +42,7 @@ SqlGen::register(new class extends SetupScript
         foreach ($events as $e)
             DB::Aowow()->query('REPLACE INTO ?_events VALUES (?a)', array_values($e));
 
-        $this->reapplyCCFlags('events', TYPE_WORLDEVENT);
+        $this->reapplyCCFlags('events', Type::WORLDEVENT);
 
         return true;
     }

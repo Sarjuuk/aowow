@@ -10,7 +10,7 @@ class ObjectsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_OBJECT;
+    protected $type          = Type::OBJECT;
     protected $tpl           = 'objects';
     protected $path          = [0, 5];
     protected $tabId         = 0;

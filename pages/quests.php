@@ -9,7 +9,7 @@ class QuestsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_QUEST;
+    protected $type          = Type::QUEST;
     protected $tpl           = 'quests';
     protected $path          = [0, 3];
     protected $tabId         = 0;

@@ -8,7 +8,7 @@ class AreaTriggerList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type      = TYPE_AREATRIGGER;
+    public static   $type      = Type::AREATRIGGER;
     public static   $brickFile = 'areatrigger';
     public static   $dataTable = '?_areatrigger';
 

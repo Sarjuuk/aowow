@@ -10,7 +10,7 @@ class EventPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_WORLDEVENT;
+    protected $type          = Type::WORLDEVENT;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 11];
@@ -78,7 +78,7 @@ class EventPage extends GenericPage
         // boss
         if ($_ = $this->subject->getField('bossCreature'))
         {
-            $this->extendGlobalIds(TYPE_NPC, $_);
+            $this->extendGlobalIds(Type::NPC, $_);
             $this->infobox[] = Lang::npc('rank', 3).Lang::main('colon').'[npc='.$_.']';
         }
 
@@ -187,10 +187,10 @@ class EventPage extends GenericPage
                 $this->lvTabs[] = ['quest', $tabData];
 
                 $questItems = [];
-                foreach (array_column($quests->rewards, TYPE_ITEM) as $arr)
+                foreach (array_column($quests->rewards, Type::ITEM) as $arr)
                     $questItems = array_merge($questItems, $arr);
 
-                foreach (array_column($quests->requires, TYPE_ITEM) as $arr)
+                foreach (array_column($quests->requires, Type::ITEM) as $arr)
                     $questItems = array_merge($questItems, $arr);
 
                 if ($questItems)
@@ -250,7 +250,7 @@ class EventPage extends GenericPage
                     if ($r <= 0)
                         continue;
 
-                    $this->extendGlobalIds(TYPE_WORLDEVENT, $r);
+                    $this->extendGlobalIds(Type::WORLDEVENT, $r);
 
                     $d = $this->subject->getListviewData();
                     $d[$this->eId]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $r]];

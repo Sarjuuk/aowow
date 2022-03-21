@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class MailList extends BaseType
 {
-    public static   $type      = TYPE_MAIL;
+    public static   $type      = Type::MAIL;
     public static   $brickFile = 'mail';
     public static   $dataTable = '?_mails';
 
@@ -63,7 +63,7 @@ class MailList extends BaseType
 
         foreach ($this->iterate() as $__)
             if ($a = $this->curTpl['attachment'])
-                $data[TYPE_ITEM][$a] = $a;
+                $data[Type::ITEM][$a] = $a;
 
         return $data;
     }

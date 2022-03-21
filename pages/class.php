@@ -10,7 +10,7 @@ class ClassPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_CLASS;
+    protected $type          = Type::CHR_CLASS;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 12];

@@ -80,7 +80,7 @@ SqlGen::register(new class extends SetupScript
         foreach ($addData as $id => $ad)
             DB::Aowow()->query('UPDATE ?_areatrigger SET ?a WHERE id = ?d', $ad, $id);
 
-        $this->reapplyCCFlags('areatrigger', TYPE_AREATRIGGER);
+        $this->reapplyCCFlags('areatrigger', Type::AREATRIGGER);
 
         return true;
     }

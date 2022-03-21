@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class SkillList extends BaseType
 {
-    public static   $type      = TYPE_SKILL;
+    public static   $type      = Type::SKILL;
     public static   $brickFile = 'skill';
     public static   $dataTable = '?_skillline';
 

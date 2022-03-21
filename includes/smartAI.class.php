@@ -33,7 +33,7 @@ class SmartAI
             SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL => [1 => $npcId]
         );
 
-        if ($npcGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_NPC, $npcId))
+        if ($npcGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $npcId))
             if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 0 AND `spawnId` IN (?a)', $npcGuids))
                 foreach ($groups as $g)
                     $lookup[SAI_ACTION_SPAWN_SPAWNGROUP][1] = $g;
@@ -57,7 +57,7 @@ class SmartAI
             SAI_ACTION_SUMMON_GO => [1 => $objectId]
         );
 
-        if ($objGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', TYPE_OBJECT, $objectId))
+        if ($objGuids = DB::Aowow()->selectCol('SELECT guid FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::OBJECT, $objectId))
             if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN (?a)', $objGuids))
                 foreach ($groups as $g)
                     $lookup[SAI_ACTION_SPAWN_SPAWNGROUP][1] = $g;
@@ -100,15 +100,15 @@ class SmartAI
         $genLimit = $talLimit = [];
         switch ($typeFilter)
         {
-            case TYPE_NPC:
+            case Type::NPC:
                 $genLimit = [SAI_SRC_TYPE_CREATURE, SAI_SRC_TYPE_ACTIONLIST];
                 $talLimit = [SAI_SRC_TYPE_CREATURE];
                 break;
-            case TYPE_OBJECT:
+            case Type::OBJECT:
                 $genLimit = [SAI_SRC_TYPE_OBJECT, SAI_SRC_TYPE_ACTIONLIST];
                 $talLimit = [SAI_SRC_TYPE_OBJECT];
                 break;
-            case TYPE_AREATRIGGER:
+            case Type::AREATRIGGER:
                 $genLimit = [SAI_SRC_TYPE_AREATRIGGER, SAI_SRC_TYPE_ACTIONLIST];
                 $talLimit = [SAI_SRC_TYPE_AREATRIGGER];
                 break;
@@ -158,9 +158,9 @@ class SmartAI
             foreach ($smartG as [$st, $eog])
             {
                 if ($st == SAI_SRC_TYPE_CREATURE)
-                    $q[] = '`type` = '.TYPE_NPC.' AND `guid` = '.-$eog;
+                    $q[] = '`type` = '.Type::NPC.' AND `guid` = '.-$eog;
                 else if ($st == SAI_SRC_TYPE_OBJECT)
-                    $q[] = '`type` = '.TYPE_OBJECT.' AND `guid` = '.-$eog;
+                    $q[] = '`type` = '.Type::OBJECT.' AND `guid` = '.-$eog;
             }
 
             if ($q)
@@ -170,11 +170,11 @@ class SmartAI
         foreach ($smartS as [$st, $eog])
         {
             if ($st == SAI_SRC_TYPE_CREATURE)
-                $result[TYPE_NPC][] = $eog;
+                $result[Type::NPC][] = $eog;
             else if ($st == SAI_SRC_TYPE_OBJECT)
-                $result[TYPE_OBJECT][] = $eog;
+                $result[Type::OBJECT][] = $eog;
             else if ($st == SAI_SRC_TYPE_AREATRIGGER)
-                $result[TYPE_AREATRIGGER][] = $eog;
+                $result[Type::AREATRIGGER][] = $eog;
         }
 
         return $result;
@@ -208,7 +208,7 @@ class SmartAI
         {
             $grp = $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP];
             if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', 0 /*0:SUMMONER_TYPE_CREATURE*/, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', TYPE_NPC, $sgs))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', Type::NPC, $sgs))
                     $result = array_merge($result, $ids);
         }
 
@@ -229,7 +229,7 @@ class SmartAI
         {
             $grp = $moreInfo[SAI_ACTION_SPAWN_SPAWNGROUP];
             if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', 1 /*1:SUMMONER_TYPE_GAMEOBJECT*/, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', TYPE_OBJECT, $sgs))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', Type::OBJECT, $sgs))
                     $result = array_merge($result, $ids);
         }
 
@@ -721,13 +721,13 @@ class SmartAI
             // creature link
             case SAI_TARGET_CREATURE_RANGE:                 // 9
                 if ($t['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $t['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $t['param'][0];
 
                 $t['param'][10] = $getDist($t['param'][1], $t['param'][2]);
                 break;
             case SAI_TARGET_CREATURE_GUID:                  // 10
                 if ($t['param'][10] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $t['param'][0]))
-                    $this->jsGlobals[TYPE_NPC][] = $t['param'][10];
+                    $this->jsGlobals[Type::NPC][] = $t['param'][10];
                 else
                     trigger_error('SmartAI::resloveTarget - creature with guid '.$t['param'][0].' not in DB');
                 break;
@@ -736,12 +736,12 @@ class SmartAI
                 $t['param'][10] = $getDist(0, $t['param'][1]);
 
                 if ($t['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $t['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $t['param'][0];
                 break;
             // gameobject link
             case SAI_TARGET_GAMEOBJECT_GUID:                // 14
                 if ($t['param'][10] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $t['param'][0]))
-                    $this->jsGlobals[TYPE_OBJECT][] = $t['param'][10];
+                    $this->jsGlobals[Type::OBJECT][] = $t['param'][10];
                 else
                     trigger_error('SmartAI::resloveTarget - gameobject with guid '.$t['param'][0].' not in DB');
                 break;
@@ -749,7 +749,7 @@ class SmartAI
                 $t['param'][10] = $getDist($t['param'][1], $t['param'][2]);
 
                 if ($t['param'][0])
-                    $this->jsGlobals[TYPE_OBJECT][] = $t['param'][0];
+                    $this->jsGlobals[Type::OBJECT][] = $t['param'][0];
                 break;
             case SAI_TARGET_GAMEOBJECT_DISTANCE:            // 15
             case SAI_TARGET_CLOSEST_GAMEOBJECT:             // 20
@@ -757,7 +757,7 @@ class SmartAI
                 $t['param'][10] = $getDist(0, $t['param'][1]);
 
                 if ($t['param'][0])
-                    $this->jsGlobals[TYPE_OBJECT][] = $t['param'][0];
+                    $this->jsGlobals[Type::OBJECT][] = $t['param'][0];
                 break;
             // error
             default:
@@ -859,7 +859,7 @@ class SmartAI
                     $footer = $time;
 
                 if ($e['param'][3] && !$e['param'][2])
-                    $this->jsGlobals[TYPE_NPC][] = $e['param'][3];
+                    $this->jsGlobals[Type::NPC][] = $e['param'][3];
                 break;
             case SAI_EVENT_SPELLHIT:                        // 8   -  On Creature/Gameobject Spell Hit
             case SAI_EVENT_HAS_AURA:                        // 23  -  On Creature Has Aura
@@ -872,11 +872,11 @@ class SmartAI
                     $e['param'][10] = Lang::getMagicSchools($e['param'][1]);
 
                 if ($e['param'][0])
-                    $this->jsGlobals[TYPE_SPELL][] = $e['param'][0];
+                    $this->jsGlobals[Type::SPELL][] = $e['param'][0];
                 break;
             case SAI_EVENT_VICTIM_CASTING:                  // 13  -  On Target Casting Spell
                 if ($e['param'][2])
-                    $this->jsGlobals[TYPE_SPELL][$e['param'][2]];
+                    $this->jsGlobals[Type::SPELL][$e['param'][2]];
                 // do not break;
             case SAI_EVENT_PASSENGER_BOARDED:               // 27  -
             case SAI_EVENT_PASSENGER_REMOVED:               // 28  -
@@ -887,7 +887,7 @@ class SmartAI
             case SAI_EVENT_SUMMONED_UNIT:                   // 17  -  On Creature/Gameobject Summoned Unit
             case SAI_EVENT_SUMMONED_UNIT_DIES:              // 82  -  On Summoned Unit Dies
                 if ($e['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $e['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $e['param'][0];
                 // do not break;
             case SAI_EVENT_FRIENDLY_IS_CC:                  // 15  -
             case SAI_EVENT_SUMMON_DESPAWNED:                // 35  -  On Summoned Unit Despawned
@@ -897,19 +897,19 @@ class SmartAI
             case SAI_EVENT_ACCEPTED_QUEST:                  // 19  -  On Target Accepted Quest
             case SAI_EVENT_REWARD_QUEST:                    // 20  -  On Target Rewarded Quest
                 if ($e['param'][0])
-                    $this->jsGlobals[TYPE_QUEST][] = $e['param'][0];
+                    $this->jsGlobals[Type::QUEST][] = $e['param'][0];
                 if ($time = $this->numRange('event', 1, true))
                     $footer = $time;
                 break;
             case SAI_EVENT_RECEIVE_EMOTE:                   // 22  -  On Receive Emote.
-                $this->jsGlobals[TYPE_EMOTE][] = $e['param'][0];
+                $this->jsGlobals[Type::EMOTE][] = $e['param'][0];
 
                 if ($time = $this->numRange('event', 1, true))
                     $footer = $time;
                 break;
             case SAI_EVENT_TEXT_OVER:                       // 52  -  On TEXT_OVER Event Triggered After SMART_ACTION_TALK
                 if ($e['param'][1])
-                    $this->jsGlobals[TYPE_NPC][] = $e['param'][1];
+                    $this->jsGlobals[Type::NPC][] = $e['param'][1];
                 break;
             case SAI_EVENT_LINK:                            // 61  -  Used to link together multiple events as a chain of events.
                 $e['param'][10] = LANG::concat(DB::World()->selectCol('SELECT CONCAT("#[b]", id, "[/b]") FROM smart_scripts WHERE link = ?d AND entryorguid = ?d AND source_type = ?d', $this->itr['id'], $this->entry, $this->srcType), false);
@@ -931,7 +931,7 @@ class SmartAI
                 break;
             case SAI_EVENT_GAME_EVENT_START:                // 68  -  On game_event started.
             case SAI_EVENT_GAME_EVENT_END:                  // 69  -  On game_event ended.
-                $this->jsGlobals[TYPE_WORLDEVENT][] = $e['param'][0];
+                $this->jsGlobals[Type::WORLDEVENT][] = $e['param'][0];
                 break;
             case SAI_EVENT_DISTANCE_CREATURE:               // 75  -  On creature guid OR any instance of creature entry is within distance.
                 if ($e['param'][0])
@@ -946,7 +946,7 @@ class SmartAI
                     trigger_error('SmartAI::event - entity for event #'.$e['type'].' not defined');
 
                 if ($e['param'][10])
-                    $this->jsGlobals[TYPE_NPC][] = $e['param'][10];
+                    $this->jsGlobals[Type::NPC][] = $e['param'][10];
 
                 if ($e['param'][3])
                     $footer = Util::formatTime($e['param'][3], true);
@@ -1040,36 +1040,36 @@ class SmartAI
             case SAI_ACTION_PLAY_EMOTE:                     // 5 -> any target
             case SAI_ACTION_SET_EMOTE_STATE:                // 17 -> any target
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_EMOTE][] = $a['param'][0];
+                    $this->jsGlobals[Type::EMOTE][] = $a['param'][0];
                 break;
             case SAI_ACTION_FAIL_QUEST:                     // 6 -> any target
             case SAI_ACTION_OFFER_QUEST:                    // 7 -> invoker
             case SAI_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS:// 15 -> any target
             case SAI_ACTION_CALL_GROUPEVENTHAPPENS:         // 26 -> invoker
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_QUEST][] = $a['param'][0];
+                    $this->jsGlobals[Type::QUEST][] = $a['param'][0];
                 break;
             case SAI_ACTION_REMOVEAURASFROMSPELL:           // 28 -> any target
                 if ($a['param'][2])
                 $footer = true;
             case SAI_ACTION_ADD_AURA:                       // 75 -> any target
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_SPELL][] = $a['param'][0];
+                    $this->jsGlobals[Type::SPELL][] = $a['param'][0];
                 break;
             case SAI_ACTION_CALL_KILLEDMONSTER:             // 33 -> any target
             case SAI_ACTION_UPDATE_TEMPLATE:                // 36 -> self
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $a['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $a['param'][0];
                 break;
             case SAI_ACTION_ADD_ITEM:                       // 56 -> invoker
             case SAI_ACTION_REMOVE_ITEM:                    // 57 -> invoker
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_ITEM][] = $a['param'][0];
+                    $this->jsGlobals[Type::ITEM][] = $a['param'][0];
                 break;
             case SAI_ACTION_GAME_EVENT_STOP:                // 111 -> doesnt matter
             case SAI_ACTION_GAME_EVENT_START:               // 112 -> doesnt matter
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_WORLDEVENT][] = $a['param'][0];
+                    $this->jsGlobals[Type::WORLDEVENT][] = $a['param'][0];
                 break;
             // simple preparse from param[0] to param[6]
             case SAI_ACTION_SET_REACT_STATE:                // 8 -> any target
@@ -1125,18 +1125,18 @@ class SmartAI
                 if ($a['param'][0])
                 {
                     $a['param'][6] = DB::Aowow()->selectCell('SELECT factionId FROM ?_factiontemplate WHERE id = ?d', $a['param'][0]);
-                    $this->jsGlobals[TYPE_FACTION][] = $a['param'][6];
+                    $this->jsGlobals[Type::FACTION][] = $a['param'][6];
                 }
                 break;
             case SAI_ACTION_MORPH_TO_ENTRY_OR_MODEL:        // 3 -> self
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $a['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $a['param'][0];
                 else if (!$a['param'][1])
                     $a['param'][6] = 1;
 
                 break;
             case SAI_ACTION_SOUND:                          // 4 -> self [param3 set in DB but not used in core?]
-                $this->jsGlobals[TYPE_SOUND][] = $a['param'][0];
+                $this->jsGlobals[Type::SOUND][] = $a['param'][0];
                 if ($a['param'][2])
                     $footer = true;
 
@@ -1149,18 +1149,18 @@ class SmartAI
                         continue;
 
                     $buff[] = '[emote='.$a['param'][$i].']';
-                    $this->jsGlobals[TYPE_EMOTE][] = $a['param'][$i];
+                    $this->jsGlobals[Type::EMOTE][] = $a['param'][$i];
                 }
                 $a['param'][6] = Lang::concat($buff, false);
                 break;
             case SAI_ACTION_CAST:                           // 11 -> any target
-                $this->jsGlobals[TYPE_SPELL][] = $a['param'][0];
+                $this->jsGlobals[Type::SPELL][] = $a['param'][0];
                 if ($_ = $this->castFlags('action', 1))
                     $footer = $_;
 
                 break;
             case SAI_ACTION_SUMMON_CREATURE:                // 12 -> any target
-                $this->jsGlobals[TYPE_NPC][] = $a['param'][0];
+                $this->jsGlobals[Type::NPC][] = $a['param'][0];
                 if ($a['param'][2])
                     $a['param'][6] = Util::formatTime($a['param'][2], true);
 
@@ -1181,7 +1181,7 @@ class SmartAI
                     $footer = true;
                 break;
             case SAI_ACTION_FOLLOW:                         // 29 -> any target [what the heck are param 4 & 5]
-                $this->jsGlobals[TYPE_NPC][] = $a['param'][2];
+                $this->jsGlobals[Type::NPC][] = $a['param'][2];
                 if ($a['param'][1])
                     $a['param'][6] = Util::O2Deg($a['param'][1])[0];
                 if ($a['param'][3] || $a['param'][4])
@@ -1212,7 +1212,7 @@ class SmartAI
                 break;
             case SAI_ACTION_MOUNT_TO_ENTRY_OR_MODEL:        // 43 -> self
                 if ($a['param'][0])
-                    $this->jsGlobals[TYPE_NPC][] = $a['param'][0];
+                    $this->jsGlobals[Type::NPC][] = $a['param'][0];
                 else if (!$a['param'][1])
                     $a['param'][6] = 1;
                 break;
@@ -1220,7 +1220,7 @@ class SmartAI
                 $a['param'][6] = $a['param'][0] ? Lang::concat(Util::mask2bits($a['param'][0])) : 0;
                 break;
             case SAI_ACTION_SUMMON_GO:                      // 50 -> self, world coords
-                $this->jsGlobals[TYPE_OBJECT][] = $a['param'][0];
+                $this->jsGlobals[Type::OBJECT][] = $a['param'][0];
                 $a['param'][6] = Util::formatTime($a['param'][1] * 1000, true);
 
                 if (!$a['param'][2])
@@ -1242,7 +1242,7 @@ class SmartAI
             case SAI_ACTION_WP_START:                       // 53 -> any .. why tho?
                 $a['param'][7] = $this->reactState($a['param'][5]);
                 if ($a['param'][3])
-                    $this->jsGlobals[TYPE_QUEST][] = $a['param'][3];
+                    $this->jsGlobals[Type::QUEST][] = $a['param'][3];
                 if ($a['param'][4])
                     $a['param'][6] = Util::formatTime($a['param'][4], true);
                 if ($a['param'][2])
@@ -1258,7 +1258,7 @@ class SmartAI
 
                 if ($a['param'][1])
                 {
-                    $this->jsGlobals[TYPE_QUEST][] = $a['param'][1];
+                    $this->jsGlobals[Type::QUEST][] = $a['param'][1];
                     $a['param'][$a['param'][2] ? 7 : 8] = 1;
                 }
 
@@ -1268,7 +1268,7 @@ class SmartAI
                 break;
             case SAI_ACTION_TELEPORT:                       // 62 -> invoker [resolved coords already stored in areatrigger entry]
                 $a['param'][6] = $this->miscData['teleportA'];
-                $this->jsGlobals[TYPE_ZONE][] = $a['param'][6];
+                $this->jsGlobals[Type::ZONE][] = $a['param'][6];
                 break;
             case SAI_ACTION_SET_ORIENTATION:                // 66 -> any target
                 if ($this->itr['target']['type'] == SAI_TARGET_POSITION)
@@ -1301,7 +1301,7 @@ class SmartAI
 
                     $items = DB::World()->selectRow('SELECT ItemID1, ItemID2, ItemID3 FROM creature_equip_template WHERE CreatureID = ?d AND ID = ?d', $this->miscData['baseEntry'] ?: $this->entry, $a['param'][0]);
                     foreach ($items as $i)
-                        $this->jsGlobals[TYPE_ITEM][] = $i;
+                        $this->jsGlobals[Type::ITEM][] = $i;
 
                     foreach ($slots as $s)
                         if ($_ = $items['ItemID'.$s])
@@ -1311,17 +1311,17 @@ class SmartAI
                 {
                     if ($_ = $a['param'][2])
                     {
-                        $this->jsGlobals[TYPE_ITEM][] = $_;
+                        $this->jsGlobals[Type::ITEM][] = $_;
                         $buff[] = '[item='.$_.']';
                     }
                     if ($_ = $a['param'][3])
                     {
-                        $this->jsGlobals[TYPE_ITEM][] = $_;
+                        $this->jsGlobals[Type::ITEM][] = $_;
                         $buff[] = '[item='.$_.']';
                     }
                     if ($_ = $a['param'][4])
                     {
-                        $this->jsGlobals[TYPE_ITEM][] = $_;
+                        $this->jsGlobals[Type::ITEM][] = $_;
                         $buff[] = '[item='.$_.']';
                     }
                 }
@@ -1383,7 +1383,7 @@ class SmartAI
                 // do not break;
             case SAI_ACTION_SELF_CAST:                      // 85 -> self
             case SAI_ACTION_INVOKER_CAST:                   // 134 -> any target
-                $this->jsGlobals[TYPE_SPELL][] = $a['param'][0];
+                $this->jsGlobals[Type::SPELL][] = $a['param'][0];
                 if ($_ = $this->castFlags('action', 1))
                     $footer = $_;
                 break;
@@ -1435,7 +1435,7 @@ class SmartAI
                 break;
             case SAI_ACTION_INTERRUPT_SPELL:                // 92 -> self
                 if ($_ = $a['param'][1])
-                    $this->jsGlobals[TYPE_SPELL][] = $a['param'][1];
+                    $this->jsGlobals[Type::SPELL][] = $a['param'][1];
 
                 if ($a['param'][0] || $a['param'][2])
                     $footer = [$a['param'][0]];
@@ -1475,7 +1475,7 @@ class SmartAI
                 {
                     foreach ($this->summons[$a['param'][0]] as $id => $n)
                     {
-                        $this->jsGlobals[TYPE_NPC][] = $id;
+                        $this->jsGlobals[Type::NPC][] = $id;
                         $buff[] = $n.'x [npc='.$id.']';
                     }
                 }
@@ -1497,7 +1497,7 @@ class SmartAI
                 {
                     if ($x = $a['param'][$i])
                     {
-                        $this->jsGlobals[TYPE_SOUND][] = $x;
+                        $this->jsGlobals[Type::SOUND][] = $x;
                         $a['param'][6] .= '[sound='.$x.']';
                     }
                 }
@@ -1531,7 +1531,7 @@ class SmartAI
                         if (!$i)
                             continue;
 
-                        $this->jsGlobals[TYPE_ITEM][] = $i;
+                        $this->jsGlobals[Type::ITEM][] = $i;
                         $buff[] = '[item='.$i.']';
                     }
                 }
@@ -1553,16 +1553,16 @@ class SmartAI
                 $n = 5;
                 foreach ($entities as [$spawnType, $guid])
                 {
-                    $type = TYPE_NPC;
+                    $type = Type::NPC;
                     if ($spawnType == 1)
-                        $type == TYPE_GAMEOBJECT;
+                        $type == Type::GAMEOBJECT;
 
                     $a['param'][7] = $this->spawnFlags('action', 3);
 
                     if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d',  $type, $guid))
                     {
                         $this->jsGlobals[$type][] = $_;
-                        $a['param'][8] .= '[li]['.Util::$typeStrings[$type].'='.$_.'][small class=q0] (GUID: '.$guid.')[/small][/li]';
+                        $a['param'][8] .= '[li]['.Type::getFileString($type).'='.$_.'][small class=q0] (GUID: '.$guid.')[/small][/li]';
                     }
                     else
                         $a['param'][8] .= '[li]'.Lang::smartAI('entityUNK').'[small class=q0] (GUID: '.$guid.')[/small][/li]';
@@ -1580,12 +1580,12 @@ class SmartAI
                     $footer = [$time];
                 break;
             case SAI_ACTION_RESPAWN_BY_SPAWNID:             // 133
-                $type = TYPE_NPC;
+                $type = Type::NPC;
                 if ($a['param'][0] == 1)
-                    $type == TYPE_GAMEOBJECT;
+                    $type == Type::GAMEOBJECT;
 
                 if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d',  $type, $a['param'][1]))
-                    $a['param'][6] = '['.Util::$typeStrings[$type].'='.$_.']';
+                    $a['param'][6] = '['.Type::getFileString($type).'='.$_.']';
                 else
                     $a['param'][6] = Lang::smartAI('entityUNK');
                 break;
@@ -1593,11 +1593,11 @@ class SmartAI
                 $a['param'][6] = $a['param'][1] + $a['param'][2] / pow(10, floor(log10($a['param'][2] ?: 1.0) + 1));  // i know string concatenation is a thing. don't @ me!
                 break;
             case SAI_ACTION_OVERRIDE_LIGHT:                 // 138
-                $this->jsGlobals[TYPE_ZONE][] = $a['param'][0];
+                $this->jsGlobals[Type::ZONE][] = $a['param'][0];
                 $footer = [Util::formatTime($a['param'][2], true)];
                 break;
             case SAI_ACTION_OVERRIDE_WEATHER:               // 139
-                $this->jsGlobals[TYPE_ZONE][] = $a['param'][0];
+                $this->jsGlobals[Type::ZONE][] = $a['param'][0];
                 if (!($a['param'][6] = Lang::smartAI('weatherStates', $a['param'][1])))
                     $a['param'][6] = Lang::smartAI('weatherStateUNK', [$a['param'][1]]);
                 break;

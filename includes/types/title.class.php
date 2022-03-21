@@ -8,7 +8,7 @@ class TitleList extends BaseType
 {
     use listviewHelper;
 
-    public static   $type      = TYPE_TITLE;
+    public static   $type      = Type::TITLE;
     public static   $brickFile = 'title';
     public static   $dataTable = '?_titles';
 
@@ -16,7 +16,7 @@ class TitleList extends BaseType
 
     protected       $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
     protected       $queryOpts = array(
-                        't'   => [['src']],                 //    11: TYPE_TITLE
+                        't'   => [['src']],                 //    11: Type::TITLE
                         'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']
                     );
 
@@ -28,9 +28,9 @@ class TitleList extends BaseType
         foreach ($this->iterate() as $id => &$_curTpl)
         {
             // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
-            if ($_curTpl['moreType'] == TYPE_ACHIEVEMENT)
+            if ($_curTpl['moreType'] == Type::ACHIEVEMENT)
                 $this->sources[$this->id][12][] = $_curTpl['moreTypeId'];
-            else if ($_curTpl['moreType'] == TYPE_QUEST)
+            else if ($_curTpl['moreType'] == Type::QUEST)
                 $this->sources[$this->id][4][] = $_curTpl['moreTypeId'];
             else if ($_curTpl['src13'])
                 $this->sources[$this->id][13][] = $_curTpl['src13'];
@@ -81,10 +81,10 @@ class TitleList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            $data[TYPE_TITLE][$this->id]['name'] = $this->getField('male', true);
+            $data[Type::TITLE][$this->id]['name'] = $this->getField('male', true);
 
             if ($_ = $this->getField('female', true))
-                $data[TYPE_TITLE][$this->id]['namefemale'] = $_;
+                $data[Type::TITLE][$this->id]['namefemale'] = $_;
         }
 
         return $data;

@@ -10,7 +10,7 @@ class EnchantmentPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_ENCHANTMENT;
+    protected $type          = Type::ENCHANTMENT;
     protected $typeId        = 0;
     protected $tpl           = 'enchantment';
     protected $path          = [0, 101];
@@ -64,7 +64,7 @@ class EnchantmentPage extends GenericPage
         // reqskill
         if ($_ = $this->subject->getField('skillLine'))
         {
-            $this->extendGlobalIds(TYPE_SKILL, $_);
+            $this->extendGlobalIds(Type::SKILL, $_);
 
             $foo = sprintf(Lang::game('requires'), '&nbsp;[skill='.$_.']');
             if ($_ = $this->subject->getField('skillLevel'))

@@ -10,7 +10,7 @@ class SpellsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_SPELL;
+    protected $type          = Type::SPELL;
     protected $tpl           = 'spells';
     protected $path          = [0, 1];
     protected $tabId         = 0;

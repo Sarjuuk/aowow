@@ -8,7 +8,7 @@ class GameObjectList extends BaseType
 {
     use listviewHelper, spawnHelper;
 
-    public static   $type      = TYPE_OBJECT;
+    public static   $type      = Type::OBJECT;
     public static   $brickFile = 'object';
     public static   $dataTable = '?_objects';
 
@@ -115,7 +115,7 @@ class GameObjectList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_OBJECT][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::OBJECT][$this->id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }
@@ -128,7 +128,7 @@ class GameObjectList extends BaseType
         {
             $data[$this->id] = array(
                 'n'  => $this->getField('name', true),
-                't'  => TYPE_OBJECT,
+                't'  => Type::OBJECT,
                 'ti' => $this->id
              // 'bd' => bossdrop
              // 'dd' => dungeondifficulty

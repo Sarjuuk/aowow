@@ -186,7 +186,7 @@ class AjaxAdmin extends AjaxHandler
                 DB::Aowow()->query('UPDATE ?_screenshots SET status = ?d, userIdApprove = ?d WHERE id = ?d', CC_FLAG_APPROVED, User::$id, $id);
                 Util::gainSiteReputation($ssEntry['userIdOwner'], SITEREP_ACTION_UPLOAD, ['id' => $id, 'what' => 1, 'date' => $ssEntry['date']]);
                 // flag DB entry as having screenshots
-                if (Util::$typeClasses[$ssEntry['type']] && ($tbl = get_class_vars(Util::$typeClasses[$ssEntry['type']])['dataTable']))
+                if ($tbl = Type::getClassAttrib($ssEntry['type'], 'dataTable'))
                     DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $ssEntry['typeId']);
             }
             else
@@ -267,7 +267,7 @@ class AjaxAdmin extends AjaxHandler
         {
             $typeIds  = explode(',', $typeIds);
             $toUnflag = DB::Aowow()->selectCol('SELECT typeId AS ARRAY_KEY, IF(BIT_OR(`status`) & ?d, 1, 0) AS hasMore FROM ?_screenshots WHERE `type` = ?d AND typeId IN (?a) GROUP BY typeId HAVING hasMore = 0', CC_FLAG_APPROVED, $type, $typeIds);
-            if ($toUnflag && Util::$typeClasses[$type] && ($tbl = get_class_vars(Util::$typeClasses[$type])['dataTable']))
+            if ($toUnflag && ($tbl = Type::getClassAttrib($type, 'dataTable')))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id IN (?a)', CUSTOM_HAS_SCREENSHOT, array_keys($toUnflag));
         }
     }
@@ -286,8 +286,8 @@ class AjaxAdmin extends AjaxHandler
         [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT type, typeId FROM ?_screenshots WHERE id = ?d', $id));
         $typeId                 = (int)$this->_get['typeid'];
 
-        $tc = new Util::$typeClasses[$type]([['id', $typeId]]);
-        if (!$tc->error)
+        $tc = Type::newList($type, [['id', $typeId]]);
+        if ($tc && !$tc->error)
         {
             // move screenshot
             DB::Aowow()->query('UPDATE ?_screenshots SET typeId = ?d WHERE id = ?d', $typeId, $id);
@@ -301,7 +301,7 @@ class AjaxAdmin extends AjaxHandler
                 DB::Aowow()->query('UPDATE '.$tc::$dataTable.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_SCREENSHOT, $oldTypeId);
         }
         else
-            trigger_error('AjaxAdmin::ssRelocate - invalid typeId #'.$typeId.' for type '.$tc::$brickFile, E_USER_ERROR);
+            trigger_error('AjaxAdmin::ssRelocate - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);
     }
 
     protected function confAdd() : string
@@ -405,7 +405,7 @@ class AjaxAdmin extends AjaxHandler
         $area  = $this->_get['area'];
         $floor = $this->_get['floor'];
 
-        if (!in_array($type, [TYPE_NPC, TYPE_OBJECT, TYPE_SOUND, TYPE_AREATRIGGER]))
+        if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER]))
             return '-3';
 
         DB::Aowow()->query('REPLACE INTO ?_spawns_override VALUES (?d, ?d, ?d, ?d, ?d)', $type, $guid, $area, $floor, AOWOW_REVISION);
@@ -423,7 +423,7 @@ class AjaxAdmin extends AjaxHandler
                 );
 
                 // if creature try for waypoints
-                if ($type == TYPE_NPC)
+                if ($type == Type::NPC)
                 {
                     $jobs = array(
                         'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_y AS `posX`, w.position_x AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
@@ -466,6 +466,11 @@ class AjaxAdmin extends AjaxHandler
 
         return '-1';
     }
+
+
+    /***************************/
+    /* additional input filter */
+    /***************************/
 
     protected static function checkKey(string $val) : string
     {

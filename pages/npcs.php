@@ -10,7 +10,7 @@ class NpcsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_NPC;
+    protected $type          = Type::NPC;
     protected $tpl           = 'npcs';
     protected $path          = [0, 4];
     protected $tabId         = 0;

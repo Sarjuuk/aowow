@@ -10,7 +10,7 @@ class CurrencyPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_CURRENCY;
+    protected $type          = Type::CURRENCY;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 15];
@@ -68,7 +68,7 @@ class CurrencyPage extends GenericPage
         if ($_ = $this->subject->getField('iconId'))
         {
             $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
-            $this->extendGlobalIds(TYPE_ICON, $_);
+            $this->extendGlobalIds(Type::ICON, $_);
         }
 
         /****************/
@@ -138,7 +138,7 @@ class CurrencyPage extends GenericPage
                             if (count($extraCols) == 3)             // not already pushed
                                 $extraCols[] = '$Listview.extraCols.condition';
 
-                            $this->extendGlobalIds(TYPE_WORLDEVENT, $vendors[$k][0]['event']);
+                            $this->extendGlobalIds(Type::WORLDEVENT, $vendors[$k][0]['event']);
                             $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k][0]['event']]];
                         }
 
@@ -208,7 +208,7 @@ class CurrencyPage extends GenericPage
             if (!$boughtBy->error)
             {
                 $tabData = array(
-                    'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, [TYPE_CURRENCY => $this->typeId])),
+                    'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, [Type::CURRENCY => $this->typeId])),
                     'name'      => '$LANG.tab_currencyfor',
                     'id'        => 'currency-for',
                     'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],

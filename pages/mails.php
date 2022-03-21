@@ -10,7 +10,7 @@ class MailsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_MAIL;
+    protected $type          = Type::MAIL;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 103];
     protected $tabId         = 0;

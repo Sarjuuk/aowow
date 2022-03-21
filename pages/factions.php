@@ -10,7 +10,7 @@ class FactionsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_FACTION;
+    protected $type          = Type::FACTION;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 7];
     protected $tabId         = 0;

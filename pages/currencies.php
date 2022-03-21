@@ -10,7 +10,7 @@ class CurrenciesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_CURRENCY;
+    protected $type          = Type::CURRENCY;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 15];
     protected $tabId         = 0;

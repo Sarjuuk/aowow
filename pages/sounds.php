@@ -10,7 +10,7 @@ class SoundsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type      = TYPE_SOUND;
+    protected $type      = Type::SOUND;
     protected $tpl       = 'sounds';
     protected $path      = [0, 19];
     protected $tabId     = 0;

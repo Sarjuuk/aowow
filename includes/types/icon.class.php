@@ -8,7 +8,7 @@ class IconList extends BaseType
 {
     use listviewHelper;
 
-    public static   $type       = TYPE_ICON;
+    public static   $type       = Type::ICON;
     public static   $brickFile  = 'icon';
     public static   $dataTable  = '?_icons';
     public static   $contribute = CONTRIBUTE_CO;
@@ -24,7 +24,7 @@ class IconList extends BaseType
 
     protected       $queryBase  = 'SELECT ic.*, ic.id AS ARRAY_KEY FROM ?_icons ic';
     /* this works, but takes ~100x more time than i'm comfortable with .. kept as reference
-    protected       $queryOpts  = array(                    // 29 => TYPE_ICON
+    protected       $queryOpts  = array(                    // 29 => Type::ICON
                         'ic'  => [['s', 'i', 'a', 'c', 'p'], 'g' => 'ic.id'],
                         'i'   => ['j' => ['?_items `i`  ON `i`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `i`.`id`) AS nItems'],
                         's'   => ['j' => ['?_spell `s`  ON `s`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `s`.`id`) AS nSpells'],
@@ -90,7 +90,7 @@ class IconList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_ICON][$this->id] = ['name' => $this->getField('name', true, true), 'icon' => $this->getField('name', true, true)];
+            $data[Type::ICON][$this->id] = ['name' => $this->getField('name', true, true), 'icon' => $this->getField('name', true, true)];
 
         return $data;
     }

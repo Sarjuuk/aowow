@@ -77,14 +77,14 @@ class AjaxComment extends AjaxHandler
     // i .. have problems believing, that everything uses nifty ajax while adding comments requires a brutal header(Loacation: <wherever>), yet, thats how it is
     protected function handleCommentAdd() : string
     {
-        if (!$this->_get['typeid'] || !$this->_get['type'] || !isset(Util::$typeClasses[$this->_get['type']]))
+        if (!$this->_get['typeid'] || !$this->_get['type'] || !Type::exists($this->_get['type']))
         {
             trigger_error('AjaxComment::handleCommentAdd - malforemd request received', E_USER_ERROR);
             return '';                                      // whatever, we cant even send him back
         }
 
         // this type cannot be commented on
-        if (!(get_class_vars(Util::$typeClasses[$this->_get['type']])['contribute'] & CONTRIBUTE_CO))
+        if (!Type::checkClassAttrib($this->_get['type'], 'contribute', CONTRIBUTE_CO))
         {
             trigger_error('AjaxComment::handleCommentAdd - tried to comment on unsupported type #'.$this->_get['type'], E_USER_ERROR);
             return '';
@@ -106,7 +106,7 @@ class AjaxComment extends AjaxHandler
                     DB::Aowow()->query('INSERT INTO ?_comments_rates (commentId, userId, value) VALUES (?d, 0, 1)', $postIdx);
 
                     // flag target with hasComment
-                    if ($tbl = get_class_vars(Util::$typeClasses[$this->_get['type']])['dataTable'])
+                    if ($tbl = Type::getClassAttrib($this->_get['type'], 'dataTable'))
                         DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $this->_get['typeid']);
                 }
                 else
@@ -122,7 +122,7 @@ class AjaxComment extends AjaxHandler
             $_SESSION['error']['co'] = Lang::main('cannotComment');
 
         $this->doRedirect = true;
-        return '?'.Util::$typeStrings[$this->_get['type']].'='.$this->_get['typeid'].'#comments';
+        return '?'.Type::getFileString($this->_get['type']).'='.$this->_get['typeid'].'#comments';
     }
 
     protected function handleCommentEdit() : void
@@ -186,7 +186,7 @@ class AjaxComment extends AjaxHandler
                 $this->_post['id']
             );
 
-            if (!$coInfo['hasMore'] && Util::$typeClasses[$coInfo['type']] && ($tbl = get_class_vars(Util::$typeClasses[$coInfo['type']])['dataTable']))
+            if (!$coInfo['hasMore'] && ($tbl = Type::getClassAttrib($coInfo['type'], 'dataTable')))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
         else
@@ -212,7 +212,7 @@ class AjaxComment extends AjaxHandler
         if ($ok)
         {
             $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', $this->_post['id']);
-            if (Util::$typeClasses[$coInfo['type']] && ($tbl = get_class_vars(Util::$typeClasses[$coInfo['type']])['dataTable']))
+            if ($tbl = Type::getClassAttrib($coInfo['type'], 'dataTable'))
                 DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
         }
         else

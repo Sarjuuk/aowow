@@ -8,7 +8,7 @@ class SoundList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type       = TYPE_SOUND;
+    public static   $type       = Type::SOUND;
     public static   $brickFile  = 'sound';
     public static   $dataTable  = '?_sounds';
     public static   $contribute = CONTRIBUTE_CO;

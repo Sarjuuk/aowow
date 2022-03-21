@@ -10,7 +10,7 @@ class AreaTriggersPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_AREATRIGGER;
+    protected $type          = Type::AREATRIGGER;
     protected $tpl           = 'areatriggers';
     protected $path          = [0, 102];
     protected $tabId         = 0;

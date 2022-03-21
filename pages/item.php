@@ -10,7 +10,7 @@ class ItemPage extends genericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_ITEM;
+    protected $type          = Type::ITEM;
     protected $typeId        = 0;
     protected $tpl           = 'item';
     protected $path          = [0, 0];
@@ -159,7 +159,7 @@ class ItemPage extends genericPage
         if ($_ = $this->subject->getField('iconId'))
         {
             $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
-            $this->extendGlobalIds(TYPE_ICON, $_);
+            $this->extendGlobalIds(Type::ICON, $_);
         }
 
         // consumable / not consumable
@@ -187,7 +187,7 @@ class ItemPage extends genericPage
         // related holiday
         if ($eId = $this->subject->getField('eventId'))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $eId);
+            $this->extendGlobalIds(Type::WORLDEVENT, $eId);
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$eId.']';
         }
 
@@ -225,12 +225,12 @@ class ItemPage extends genericPage
                         if ($c < 0)                         // currency items (and honor or arena)
                         {
                             $currency[] = -$c.','.($qty / $stack);
-                            $this->extendGlobalIds(TYPE_CURRENCY, -$c);
+                            $this->extendGlobalIds(Type::CURRENCY, -$c);
                         }
                         else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
                         {
                             $tokens[$c] = $c.','.($qty / $stack);
-                            $this->extendGlobalIds(TYPE_ITEM, $c);
+                            $this->extendGlobalIds(Type::ITEM, $c);
                         }
                     }
 
@@ -360,7 +360,7 @@ class ItemPage extends genericPage
         $this->tooltip    = $this->subject->renderTooltip(true);
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
-            BUTTON_VIEW3D  => in_array($_slot, $_visSlots) && $_model ? ['displayId' => $this->subject->getField('displayId'), 'slot' => $_slot, 'type' => TYPE_ITEM, 'typeId' => $this->typeId] : false,
+            BUTTON_VIEW3D  => in_array($_slot, $_visSlots) && $_model ? ['displayId' => $this->subject->getField('displayId'), 'slot' => $_slot, 'type' => Type::ITEM, 'typeId' => $this->typeId] : false,
             BUTTON_COMPARE => $_cu,
             BUTTON_EQUIP   => in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]),
             BUTTON_UPGRADE => ($_cu ? ['class' => $_class, 'slot' => $_slot] : false),
@@ -441,7 +441,7 @@ class ItemPage extends genericPage
                 {
                     $data['percent'] = $perfItem[$sId]['perfectCreateChance'];
                     $data['condition'][0][$this->typeId] = [[[CND_SPELL, $perfItem[$sId]['requiredSpecialization']]]];
-                    $this->extendGlobalIDs(TYPE_SPELL, $perfItem[$sId]['requiredSpecialization']);
+                    $this->extendGlobalIDs(Type::SPELL, $perfItem[$sId]['requiredSpecialization']);
                 }
 
                 $this->lvTabs[] = ['spell', array(
@@ -535,11 +535,11 @@ class ItemPage extends genericPage
 
             foreach ($reqQuests->iterate() as $qId => $__)
             {
-                if (empty($reqQuests->requires[$qId][TYPE_ITEM]))
+                if (empty($reqQuests->requires[$qId][Type::ITEM]))
                     continue;
 
                 foreach ($reqIds as $rId)
-                    if (in_array($rId, $reqQuests->requires[$qId][TYPE_ITEM]))
+                    if (in_array($rId, $reqQuests->requires[$qId][Type::ITEM]))
                         $reqQuest[$rId] = $reqQuests->id;
             }
         }
@@ -803,7 +803,7 @@ class ItemPage extends genericPage
                         if (count($extraCols) == 3)
                             $extraCols[] = '$Listview.extraCols.condition';
 
-                        $this->extendGlobalIds(TYPE_WORLDEVENT, $e);
+                        $this->extendGlobalIds(Type::WORLDEVENT, $e);
                         $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $e]];
                     }
 
@@ -860,7 +860,7 @@ class ItemPage extends genericPage
             if (!$boughtBy->error)
             {
                 $iCur   = new CurrencyList(array(['itemId', $this->typeId]));
-                $filter = $iCur->error ? [TYPE_ITEM => $this->typeId] : [TYPE_CURRENCY => $iCur->id];
+                $filter = $iCur->error ? [Type::ITEM => $this->typeId] : [Type::CURRENCY => $iCur->id];
 
                 $tabData = array(
                     'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, $filter)),

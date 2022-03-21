@@ -10,7 +10,7 @@ class TitlesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_TITLE;
+    protected $type          = Type::TITLE;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 10];
     protected $tabId         = 0;

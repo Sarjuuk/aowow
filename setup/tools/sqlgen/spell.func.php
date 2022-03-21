@@ -726,7 +726,7 @@ SqlGen::register(new class extends SetupScript
         // hide unused glyphs
         DB::Aowow()->query('UPDATE ?_spell SET skillLine1 = 0, iconIdAlt = 0, cuFlags = cuFlags | ?d WHERE id IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, [60460, 58166, 58239, 58240, 58261, 58262, 54910]);
 
-        $this->reapplyCCFlags('spell', TYPE_SPELL);
+        $this->reapplyCCFlags('spell', Type::SPELL);
 
         return true;
     }

@@ -102,7 +102,7 @@ class ItemStatSetup extends ItemList
         // collect data and write to DB
         foreach ($this->iterate() as $__)
         {
-            $updateFields = ['type' => TYPE_ITEM, 'typeId' => $this->id];
+            $updateFields = ['type' => Type::ITEM, 'typeId' => $this->id];
 
             foreach (@$this->json[$this->id] as $k => $v)
             {
@@ -228,7 +228,7 @@ SqlGen::register(new class extends SetupScript
                         Util::arraySumByKey($result[$eId], [$str => $val]);
             }
 
-            $updateCols = ['type' => TYPE_ENCHANTMENT, 'typeId' => $eId];
+            $updateCols = ['type' => Type::ENCHANTMENT, 'typeId' => $eId];
             foreach ($result[$eId] as $k => $v)
             {
                 if (!in_array($k, $statCols) || !$v || $k == 'id')

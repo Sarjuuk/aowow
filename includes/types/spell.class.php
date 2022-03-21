@@ -12,7 +12,7 @@ class SpellList extends BaseType
     public          $relItems    = null;
     public          $sources     = [];
 
-    public static   $type        = TYPE_SPELL;
+    public static   $type        = Type::SPELL;
     public static   $brickFile   = 'spell';
     public static   $dataTable   = '?_spell';
 
@@ -54,7 +54,7 @@ class SpellList extends BaseType
 
     protected       $queryBase   = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_spell s';
     protected       $queryOpts   = array(
-                        's'   => [['src', 'sr', 'ic', 'ica']],  //  6: TYPE_SPELL
+                        's'   => [['src', 'sr', 'ic', 'ica']],  //  6: Type::SPELL
                         'ic'  => ['j' => ['?_icons ic  ON ic.id  = s.iconId',    true], 's' => ', ic.name AS iconString'],
                         'ica' => ['j' => ['?_icons ica ON ica.id = s.iconIdAlt', true], 's' => ', ica.name AS iconStringAlt'],
                         'sr'  => ['j' => ['?_spellrange sr ON sr.id = s.rangeId'], 's' => ', sr.rangeMinHostile, sr.rangeMinFriend, sr.rangeMaxHostile, sr.rangeMaxFriend, sr.name_loc0 AS rangeText_loc0, sr.name_loc2 AS rangeText_loc2, sr.name_loc3 AS rangeText_loc3, sr.name_loc4 AS rangeText_loc4, sr.name_loc6 AS rangeText_loc6, sr.name_loc8 AS rangeText_loc8'],
@@ -161,7 +161,7 @@ class SpellList extends BaseType
                 // Enchant Item Permanent (53) / Temporary (54)
                 if (in_array($this->curTpl['effect'.$i.'Id'], [53, 54]))
                 {
-                    if ($mv && ($json = DB::Aowow()->selectRow('SELECT * FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', TYPE_ENCHANTMENT, $mv)))
+                    if ($mv && ($json = DB::Aowow()->selectRow('SELECT * FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', Type::ENCHANTMENT, $mv)))
                     {
                         $mods = [];
                         foreach ($json as $str => $val)
@@ -637,18 +637,18 @@ class SpellList extends BaseType
                 // GO Model from MiscVal
                 if (in_array($this->curTpl['effect'.$i.'Id'], [50, 76, 104, 105, 106, 107]))
                 {
-                    if (isset($displays[TYPE_OBJECT][$id]))
-                        $displays[TYPE_OBJECT][$id][0][] = $i;
+                    if (isset($displays[Type::OBJECT][$id]))
+                        $displays[Type::OBJECT][$id][0][] = $i;
                     else
-                        $displays[TYPE_OBJECT][$id] = [[$i], $effMV];
+                        $displays[Type::OBJECT][$id] = [[$i], $effMV];
                 }
                 // NPC Model from MiscVal
                 else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90, 56, 112, 134]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
                 {
-                    if (isset($displays[TYPE_NPC][$id]))
-                        $displays[TYPE_NPC][$id][0][] = $i;
+                    if (isset($displays[Type::NPC][$id]))
+                        $displays[Type::NPC][$id][0][] = $i;
                     else
-                        $displays[TYPE_NPC][$id] = [[$i], $effMV];
+                        $displays[Type::NPC][$id] = [[$i], $effMV];
                 }
                 // Shapeshift
                 else if ($this->curTpl['effect'.$i.'AuraId'] == 36)
@@ -679,12 +679,12 @@ class SpellList extends BaseType
 
         $results = $displays[0];
 
-        if (!empty($displays[TYPE_NPC]))
+        if (!empty($displays[Type::NPC]))
         {
-            $nModels = new CreatureList(array(['id', array_column($displays[TYPE_NPC], 1)]));
+            $nModels = new CreatureList(array(['id', array_column($displays[Type::NPC], 1)]));
             foreach ($nModels->iterate() as $nId => $__)
             {
-                foreach ($displays[TYPE_NPC] as $srcId => [$indizes, $npcId])
+                foreach ($displays[Type::NPC] as $srcId => [$indizes, $npcId])
                 {
                     if ($npcId == $nId)
                     {
@@ -701,12 +701,12 @@ class SpellList extends BaseType
             }
         }
 
-        if (!empty($displays[TYPE_OBJECT]))
+        if (!empty($displays[Type::OBJECT]))
         {
-            $oModels = new GameObjectList(array(['id', array_column($displays[TYPE_OBJECT], 1)]));
+            $oModels = new GameObjectList(array(['id', array_column($displays[Type::OBJECT], 1)]));
             foreach ($oModels->iterate() as $oId => $__)
             {
-                foreach ($displays[TYPE_OBJECT] as $srcId => [$indizes, $objId])
+                foreach ($displays[Type::OBJECT] as $srcId => [$indizes, $objId])
                 {
                     if ($objId == $oId)
                     {
@@ -2205,24 +2205,24 @@ class SpellList extends BaseType
                 if ($mask = $this->curTpl['reqClassMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            $data[TYPE_CLASS][$i + 1] = $i + 1;
+                            $data[Type::CHR_CLASS][$i + 1] = $i + 1;
 
                 if ($mask = $this->curTpl['reqRaceMask'])
                     for ($i = 0; $i < 11; $i++)
                         if ($mask & (1 << $i))
-                            $data[TYPE_RACE][$i + 1] = $i + 1;
+                            $data[Type::CHR_RACE][$i + 1] = $i + 1;
 
                 // play sound effect
                 for ($i = 1; $i < 4; $i++)
                     if ($this->getField('effect'.$i.'Id') == 131 || $this->getField('effect'.$i.'Id') == 132)
-                        $data[TYPE_SOUND][$this->getField('effect'.$i.'MiscValue')] = $this->getField('effect'.$i.'MiscValue');
+                        $data[Type::SOUND][$this->getField('effect'.$i.'MiscValue')] = $this->getField('effect'.$i.'MiscValue');
             }
 
             if ($addMask & GLOBALINFO_SELF)
             {
                 $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
 
-                $data[TYPE_SPELL][$id] = array(
+                $data[Type::SPELL][$id] = array(
                     'icon' => $this->curTpl[$iconString],
                     'name' => $this->getField('name', true),
                 );
@@ -2234,12 +2234,12 @@ class SpellList extends BaseType
                 $tTip = $this->renderTooltip(MAX_LEVEL, true);
 
                 foreach ($tTip[1] as $relId => $_)
-                    if (empty($data[TYPE_SPELL][$relId]))
-                        $data[TYPE_SPELL][$relId] = $relId;
+                    if (empty($data[Type::SPELL][$relId]))
+                        $data[Type::SPELL][$relId] = $relId;
 
                 foreach ($buff[1] as $relId => $_)
-                    if (empty($data[TYPE_SPELL][$relId]))
-                        $data[TYPE_SPELL][$relId] = $relId;
+                    if (empty($data[Type::SPELL][$relId]))
+                        $data[Type::SPELL][$relId] = $relId;
 
                 $extra[$id] = array(
                     'id'         => $id,
@@ -2336,7 +2336,7 @@ class SpellList extends BaseType
         {
             $data[$this->id] = array(
                 'n'    => $this->getField('name', true),
-                't'    => TYPE_SPELL,
+                't'    => Type::SPELL,
                 'ti'   => $this->id,
                 's'    => empty($this->curTpl['skillLines']) ? 0 : $this->curTpl['skillLines'][0],
                 'c'    => $this->curTpl['typeCat'],

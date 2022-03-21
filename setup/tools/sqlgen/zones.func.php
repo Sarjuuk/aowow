@@ -173,30 +173,30 @@ SqlGen::register(new class extends SetupScript
 
             if ($req['reqItemN'] && ($entries = explode(' ', $req['reqItemN'])))
                 foreach ($entries as $_)
-                    $aN[TYPE_ITEM][] = $_;
+                    $aN[Type::ITEM][] = $_;
 
             if ($req['reqItemH'] && ($entries = explode(' ', $req['reqItemH'])))
-                if ($entries = array_diff($entries, $aN[TYPE_ITEM] ?? []))
+                if ($entries = array_diff($entries, $aN[Type::ITEM] ?? []))
                     foreach ($entries as $_)
-                        $aH[TYPE_ITEM][] = $_;
+                        $aH[Type::ITEM][] = $_;
 
             if ($req['reqQuestN'] && ($entries = explode(' ', $req['reqQuestN'])))
                 foreach ($entries as $_)
-                    $aN[TYPE_QUEST][] = $_;
+                    $aN[Type::QUEST][] = $_;
 
             if ($req['reqQuestH'] && ($entries = explode(' ', $req['reqQuestH'])))
-                if ($entries = array_diff($entries, $aN[TYPE_QUEST] ?? []))
+                if ($entries = array_diff($entries, $aN[Type::QUEST] ?? []))
                     foreach ($entries as $_)
-                        $aH[TYPE_QUEST][] = $_;
+                        $aH[Type::QUEST][] = $_;
 
             if ($req['reqAchievementN'] && ($entries = explode(' ', $req['reqAchievementN'])))
                 foreach ($entries as $_)
-                    $aN[TYPE_ACHIEVEMENT][] = $_;
+                    $aN[Type::ACHIEVEMENT][] = $_;
 
             if ($req['reqAchievementH'] && ($entries = explode(' ', $req['reqAchievementH'])))
-                if ($entries = array_diff($entries, $aN[TYPE_ACHIEVEMENT] ?? []))
+                if ($entries = array_diff($entries, $aN[Type::ACHIEVEMENT] ?? []))
                     foreach ($entries as $_)
-                        $aH[TYPE_ACHIEVEMENT][] = $_;
+                        $aH[Type::ACHIEVEMENT][] = $_;
 
             if ($aN)
             {
@@ -217,7 +217,7 @@ SqlGen::register(new class extends SetupScript
             DB::Aowow()->query('UPDATE ?_zones SET ?a WHERE mapId = ?d', $update, $mapId);
         }
 
-        $this->reapplyCCFlags('zones', TYPE_ZONE);
+        $this->reapplyCCFlags('zones', Type::ZONE);
 
         return true;
     }

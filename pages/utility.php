@@ -69,10 +69,10 @@ class UtilityPage extends GenericPage
         switch ($this->page)
         {
             case 'random':
-                $type   = array_rand(array_filter(Util::$typeClasses));
-                $typeId = (new Util::$typeClasses[$type](null))->getRandomId();
+                $type   = array_rand(Type::getClassesFor(Type::FLAG_RANDOM_SEARCHABLE));
+                $typeId = (Type::newList($type, null))?->getRandomId();
 
-                header('Location: ?'.Util::$typeStrings[$type].'='.$typeId, true, 302);
+                header('Location: ?'.Type::getFileString($type).'='.$typeId, true, 302);
                 die();
             case 'latest-comments':                         // rss
                 $data = CommunityContent::getCommentPreviews(dateFmt: false);
@@ -83,7 +83,7 @@ class UtilityPage extends GenericPage
                     {
                         // todo (low): preview should be html-formated
                         $this->feedData[] = array(
-                            'title'       => [true,  [], Util::ucFirst(Lang::game(Util::$typeStrings[$d['type']])).Lang::main('colon').htmlentities($d['subject'])],
+                            'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
                             'link'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']],
                             'description' => [true,  [], htmlentities($d['preview'])."<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true)],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
@@ -103,19 +103,19 @@ class UtilityPage extends GenericPage
                 {
                     foreach ($data as $d)
                     {
-                        $desc = '<a href="'.HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#screenshots:id='.$d['id'].'"><img src="'.STATIC_URL.'/uploads/screenshots/thumb/'.$d['id'].'.jpg" alt="" /></a>';
+                        $desc = '<a href="'.HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id'].'"><img src="'.STATIC_URL.'/uploads/screenshots/thumb/'.$d['id'].'.jpg" alt="" /></a>';
                         if ($d['caption'])
                             $desc .= '<br />'.$d['caption'];
                         $desc .= "<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true);
 
                         // enclosure/length => filesize('static/uploads/screenshots/thumb/'.$d['id'].'.jpg') .. always set to this placeholder value though
                         $this->feedData[] = array(
-                            'title'       => [true,  [], Util::ucFirst(Lang::game(Util::$typeStrings[$d['type']])).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#screenshots:id='.$d['id']],
+                            'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
+                            'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
                             'description' => [true,  [], $desc],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
                             'enclosure'   => [false, ['url' => STATIC_URL.'/uploads/screenshots/thumb/'.$d['id'].'.jpg', 'length' => 12345, 'type' => 'image/jpeg'], null],
-                            'guid'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#screenshots:id='.$d['id']],
+                            'guid'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
                          // 'domain'      => [false, [], live|ptr]
                         );
                     }
@@ -131,19 +131,19 @@ class UtilityPage extends GenericPage
                 {
                     foreach ($data as $d)
                     {
-                        $desc = '<a href="'.HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#videos:id='.$d['id'].'"><img src="//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg" alt="" /></a>';
+                        $desc = '<a href="'.HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id'].'"><img src="//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg" alt="" /></a>';
                         if ($d['caption'])
                             $desc .= '<br />'.$d['caption'];
                             $desc .= "<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true);
 
                         // is enclosure/length .. is this even relevant..?
                         $this->feedData[] = array(
-                            'title'       => [true,  [], Util::ucFirst(Lang::game(Util::$typeStrings[$d['type']])).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#videos:id='.$d['id']],
+                            'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
+                            'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
                             'description' => [true,  [], $desc],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
                             'enclosure'   => [false, ['url' => '//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg', 'length' => 12345, 'type' => 'image/jpeg'], null],
-                            'guid'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$d['type']].'='.$d['typeId'].'#videos:id='.$d['id']],
+                            'guid'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
                          // 'domain'      => [false, [], live|ptr]
                         );
                     }
@@ -167,14 +167,9 @@ class UtilityPage extends GenericPage
                 if (!User::isInGroup(U_GROUP_EMPLOYEE))
                     $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-                foreach (Util::$typeClasses as $type => $classStr)
+
+                foreach (Type::getClassesFor(Type::FLAG_NONE, 'contribute', CONTRIBUTE_SS) as $type => $classStr)
                 {
-                    if (!$classStr)
-                        continue;
-
-                    if (!($classStr::$contribute & CONTRIBUTE_SS))
-                        continue;
-
                     $typeObj = new $classStr($cnd);
                     if (!$typeObj->error)
                     {
@@ -192,11 +187,8 @@ class UtilityPage extends GenericPage
                     'sort'      => ['-ncomments']
                 );
 
-                foreach (Util::$typeClasses as $type => $classStr)
+                foreach (Type::getClassesFor() as $type => $classStr)
                 {
-                    if (!$classStr)
-                        continue;
-
                     $comments = DB::Aowow()->selectCol('
                         SELECT   `typeId` AS ARRAY_KEY, count(1) FROM ?_comments
                         WHERE    `replyTo` = 0 AND (`flags` & ?d) = 0 AND `type`= ?d AND `date` > (UNIX_TIMESTAMP() - ?d)
@@ -219,9 +211,9 @@ class UtilityPage extends GenericPage
                             foreach ($data as $typeId => &$d)
                             {
                                 $this->feedData[] = array(
-                                    'title'       => [true,  [], htmlentities(Util::$typeStrings[$type] == 'item' ? mb_substr($d['name'], 1) : $d['name'])],
-                                    'type'        => [false, [], Util::$typeStrings[$type]],
-                                    'link'        => [false, [], HOST_URL.'/?'.Util::$typeStrings[$type].'='.$d['id']],
+                                    'title'       => [true,  [], htmlentities(Type::getFileString($type) == 'item' ? mb_substr($d['name'], 1) : $d['name'])],
+                                    'type'        => [false, [], Type::getFileString($type)],
+                                    'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($type).'='.$d['id']],
                                     'ncomments'   => [false, [], $comments[$typeId]]
                                 );
                             }

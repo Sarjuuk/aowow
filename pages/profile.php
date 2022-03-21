@@ -13,7 +13,7 @@ class ProfilePage extends GenericPage
     protected $gDataKey  = true;
     protected $mode      = CACHE_TYPE_PAGE;
 
-    protected $type      = TYPE_PROFILE;
+    protected $type      = Type::PROFILE;
 
     protected $tabId     = 1;
     protected $path      = [1, 5, 1];
@@ -166,11 +166,11 @@ class ProfilePage extends GenericPage
 /*          Anub,  Faerlina, Maexxna, Noth,  Heigan, Loatheb, Razuvious, Gothik, Patchwerk, Grobbulus, Gluth, Thaddius, Sapphiron, Kel'Thuzad */
 /* nax  */  15956, 15953,    15952,   15954, 15936,  16011,   16061,     16060,  16028,     15931,     15932, 15928,    15989,     15990
         );
-        $this->extendGlobalIds(TYPE_NPC, ...$bossIds);
+        $this->extendGlobalIds(Type::NPC, ...$bossIds);
 
         // dummy title from dungeon encounter
         foreach (Lang::profiler('encounterNames') as $id => $name)
-            $this->extendGlobalData([TYPE_NPC => [$id => ['name_'.User::$localeString => $name]]]);
+            $this->extendGlobalData([Type::NPC => [$id => ['name_'.User::$localeString => $name]]]);
     }
 
     protected function generatePath()
@@ -242,7 +242,7 @@ class ProfilePage extends GenericPage
             $this->mode = CACHE_TYPE_NONE;
 
             // queue full fetch
-            $newId = Profiler::scheduleResync(TYPE_PROFILE, $this->realmId, $guid);
+            $newId = Profiler::scheduleResync(Type::PROFILE, $this->realmId, $guid);
 
             $this->doResync = ['profile', $newId];
             $this->initialSync();

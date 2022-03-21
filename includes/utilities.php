@@ -116,7 +116,7 @@ trait TrRequestData
     }
 }
 
-class CLI
+abstract class CLI
 {
     const CHR_BELL      = 7;
     const CHR_BACK      = 8;
@@ -411,7 +411,7 @@ class CLI
 }
 
 
-class Util
+abstract class Util
 {
     const FILE_ACCESS = 0777;
 
@@ -430,29 +430,6 @@ class Util
 
     public static $regions                   = array(
         'us',           'eu',           'kr',           'tw',           'cn'
-    );
-
-    public static $typeClasses              = array(
-        null,               'CreatureList',     'GameObjectList',   'ItemList',         'ItemsetList',      'QuestList',        'SpellList',
-        'ZoneList',         'FactionList',      'PetList',          'AchievementList',  'TitleList',        'WorldEventList',   'CharClassList',
-        'CharRaceList',     'SkillList',        null,               'CurrencyList',     null,               'SoundList',
-        TYPE_ICON        => 'IconList',
-        TYPE_EMOTE       => 'EmoteList',
-        TYPE_ENCHANTMENT => 'EnchantmentList',
-        TYPE_AREATRIGGER => 'AreatriggerList',
-        TYPE_MAIL        => 'MailList'
-    );
-
-    public static $typeStrings              = array(        // zero-indexed
-        null,           'npc',          'object',       'item',         'itemset',      'quest',        'spell',        'zone',         'faction',
-        'pet',          'achievement',  'title',        'event',        'class',        'race',         'skill',        null,           'currency',
-        null,           'sound',
-        TYPE_ICON        => 'icon',
-        TYPE_USER        => 'user',
-        TYPE_EMOTE       => 'emote',
-        TYPE_ENCHANTMENT => 'enchantment',
-        TYPE_AREATRIGGER => 'areatrigger',
-        TYPE_MAIL        => 'mail'
     );
 
     # todo (high): find a sensible way to write data here on setup
@@ -1031,7 +1008,7 @@ class Util
             foreach ($arr as $type => $data)
             {
                 // bad data or empty
-                if (empty(Util::$typeStrings[$type]) || !is_array($data) || !$data)
+                if (!Type::exists($type) || !is_array($data) || !$data)
                     continue;
 
                 if (!isset($master[$type]))
@@ -1159,7 +1136,7 @@ class Util
                 case CND_SRC_SPELL_CLICK_EVENT:             // 18
                 case CND_SRC_VEHICLE_SPELL:                 // 21
                 case CND_SRC_NPC_VENDOR:                    // 23
-                    $jsGlobals[TYPE_NPC][] = $c['SourceGroup'];
+                    $jsGlobals[Type::NPC][] = $c['SourceGroup'];
                     break;
             }
 
@@ -1168,12 +1145,12 @@ class Util
                 case CND_AURA:                              // 1
                     $c['ConditionValue2'] = null;           // do not use his param
                 case CND_SPELL:                             // 25
-                    $jsGlobals[TYPE_SPELL][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::SPELL][] = $c['ConditionValue1'];
                     break;
                 case CND_ITEM:                              // 2
                     $c['ConditionValue3'] = null;           // do not use his param
                 case CND_ITEM_EQUIPPED:                     // 3
-                    $jsGlobals[TYPE_ITEM][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::ITEM][] = $c['ConditionValue1'];
                     break;
                 case CND_MAPID:                             // 22 - break down to area or remap for use with g_zone_categories
                     switch ($c['ConditionValue1'])
@@ -1197,7 +1174,7 @@ class Util
                             $zone = new ZoneList($cnd);
                             if (!$zone->error)
                             {
-                                $jsGlobals[TYPE_ZONE][] = $zone->getField('id');
+                                $jsGlobals[Type::ZONE][] = $zone->getField('id');
                                 $c['ConditionTypeOrReference'] = CND_ZONEID;
                                 $c['ConditionValue1'] = $zone->getField('id');
                                 break;
@@ -1207,50 +1184,50 @@ class Util
                     }
                 case CND_ZONEID:                            // 4
                 case CND_AREAID:                            // 23
-                    $jsGlobals[TYPE_ZONE][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::ZONE][] = $c['ConditionValue1'];
                     break;
                 case CND_REPUTATION_RANK:                   // 5
-                    $jsGlobals[TYPE_FACTION][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::FACTION][] = $c['ConditionValue1'];
                     break;
                 case CND_SKILL:                             // 7
-                    $jsGlobals[TYPE_SKILL][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::SKILL][] = $c['ConditionValue1'];
                     break;
                 case CND_QUESTREWARDED:                     // 8
                 case CND_QUESTTAKEN:                        // 9
                 case CND_QUEST_NONE:                        // 14
                 case CND_QUEST_COMPLETE:                    // 28
-                    $jsGlobals[TYPE_QUEST][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::QUEST][] = $c['ConditionValue1'];
                     break;
                 case CND_ACTIVE_EVENT:                      // 12
-                    $jsGlobals[TYPE_WORLDEVENT][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::WORLDEVENT][] = $c['ConditionValue1'];
                     break;
                 case CND_ACHIEVEMENT:                       // 17
-                    $jsGlobals[TYPE_ACHIEVEMENT][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::ACHIEVEMENT][] = $c['ConditionValue1'];
                     break;
                 case CND_TITLE:                             // 18
-                    $jsGlobals[TYPE_TITLE][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::TITLE][] = $c['ConditionValue1'];
                     break;
                 case CND_NEAR_CREATURE:                     // 29
-                    $jsGlobals[TYPE_NPC][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::NPC][] = $c['ConditionValue1'];
                     break;
                 case CND_NEAR_GAMEOBJECT:                   // 30
-                    $jsGlobals[TYPE_OBJECT][] = $c['ConditionValue1'];
+                    $jsGlobals[Type::OBJECT][] = $c['ConditionValue1'];
                     break;
                 case CND_CLASS:                             // 15
                     for ($i = 0; $i < 11; $i++)
                         if ($c['ConditionValue1'] & (1 << $i))
-                            $jsGlobals[TYPE_CLASS][] = $i + 1;
+                            $jsGlobals[Type::CHR_CLASS][] = $i + 1;
                     break;
                 case CND_RACE:                              // 16
                     for ($i = 0; $i < 11; $i++)
                         if ($c['ConditionValue1'] & (1 << $i))
-                            $jsGlobals[TYPE_RACE][] = $i + 1;
+                            $jsGlobals[Type::CHR_RACE][] = $i + 1;
                     break;
                 case CND_OBJECT_ENTRY:                      // 31
                     if ($c['ConditionValue1'] == 3)
-                        $jsGlobals[TYPE_NPC][] = $c['ConditionValue2'];
+                        $jsGlobals[Type::NPC][] = $c['ConditionValue2'];
                     else if ($c['ConditionValue1'] == 5)
-                        $jsGlobals[TYPE_OBJECT][] = $c['ConditionValue2'];
+                        $jsGlobals[Type::OBJECT][] = $c['ConditionValue2'];
                     break;
                 case CND_TEAM:                              // 6
                     if ($c['ConditionValue1'] == 469)       // Alliance
@@ -1670,6 +1647,225 @@ class Util
         }
 
         return $bits;
+    }
+}
+
+abstract class Type
+{
+    public const NPC =                          1;
+    public const OBJECT =                       2;
+    public const ITEM =                         3;
+    public const ITEMSET =                      4;
+    public const QUEST =                        5;
+    public const SPELL =                        6;
+    public const ZONE =                         7;
+    public const FACTION =                      8;
+    public const PET =                          9;
+    public const ACHIEVEMENT =                 10;
+    public const TITLE =                       11;
+    public const WORLDEVENT =                  12;
+    public const CHR_CLASS =                   13;
+    public const CHR_RACE =                    14;
+    public const SKILL =                       15;
+    public const STATISTIC =                   16;
+    public const CURRENCY =                    17;
+    //           PROJECT =                     18;
+    public const SOUND =                       19;
+    //           BUILDING =                    20;
+    //           FOLLOWER =                    21;
+    //           MISSION_ABILITY =             22;
+    //           MISSION =                     23;
+    //           SHIP   =                      25;
+    //           THREAT =                      26;
+    //           RESOURCE =                    27;
+    //           CHAMPION =                    28;
+    public const ICON =                        29;
+    //           ORDER_ADVANCEMENT =           30;
+    //           FOLLOWER_ALLIANCE =           31;
+    //           FOLLOWER_HORDE =              32;
+    //           SHIP_ALLIANCE =               33;
+    //           SHIP_HORDE =                  34;
+    //           CHAMPION_ALLIANCE =           35;
+    //           CHAMPION_HORDE =              36;
+    //           TRANSMOG_ITEM =               37;
+    //           BFA_CHAMPION =                38;
+    //           BFA_CHAMPION_ALLIANCE =       39;
+    //           AFFIX =                       40;
+    //           BFA_CHAMPION_HORDE =          41;
+    //           AZERITE_ESSENCE_POWER =       42;
+    //           AZERITE_ESSENCE =             43;
+    //           STORYLINE =                   44;
+    //           ADVENTURE_COMBATANT_ABILITY = 46;
+    //           ENCOUNTER =                   47;
+    //           COVENANT =                    48;
+    //           SOULBIND =                    49;
+    //           DI_ITEM =                     50;
+    //           GATHERER_SCREENSHOT =         91;
+    //           GATHERER_GUIDE_IMAGE =        98;
+    public const PROFILE =                    100;
+    // our own things
+    public const GUILD =                      101;
+    //           TRANSMOG_SET =               101;          // future conflict inc.
+    public const ARENA_TEAM =                 102;
+    //           OUTFIT =                     110;
+    //           GEAR_SET =                   111;
+    //           GATHERER_LISTVIEW =          158;
+    //           GATHERER_SURVEY_COVENANTS =  161;
+    //           NEWS_POST =                  162;
+    //           BATTLE_PET_ABILITY =         200;
+    public const GUIDE =                      300;          // should have been 100, but conflicts with old version of Profile/List
+    public const USER =                       500;
+    public const EMOTE =                      501;
+    public const ENCHANTMENT =                502;
+    public const AREATRIGGER =                503;
+    public const MAIL =                       504;
+    // Blizzard API things
+    //           MOUNT =                    -1000;
+    //           RECIPE =                   -1001;
+    //           BATTLE_PET =               -1002;
+
+    public const FLAG_NONE              = 0x0;
+    public const FLAG_RANDOM_SEARCHABLE = 0x1;
+ /* public const FLAG_SEARCHABLE        = 0x2 general search? */
+
+    public const IDX_LIST_OBJ = 0;
+    public const IDX_FILE_STR = 1;
+    public const IDX_JSG_TPL  = 2;
+    public const IDX_FLAGS    = 3;
+
+    private static /* array */ $data = array(
+        self::NPC         => ['CreatureList',    'npc',         'g_npcs',              0x1],
+        self::OBJECT      => ['GameObjectList',  'object',      'g_objects',           0x1],
+        self::ITEM        => ['ItemList',        'item',        'g_items',             0x1],
+        self::ITEMSET     => ['ItemsetList',     'itemset',     'g_itemsets',          0x1],
+        self::QUEST       => ['QuestList',       'quest',       'g_quests',            0x1],
+        self::SPELL       => ['SpellList',       'spell',       'g_spells',            0x1],
+        self::ZONE        => ['ZoneList',        'zone',        'g_gatheredzones',     0x1],
+        self::FACTION     => ['FactionList',     'faction',     'g_factions',          0x1],
+        self::PET         => ['PetList',         'pet',         'g_pets',              0x1],
+        self::ACHIEVEMENT => ['AchievementList', 'achievement', 'g_achievements',      0x1],
+        self::TITLE       => ['TitleList',       'title',       'g_titles',            0x1],
+        self::WORLDEVENT  => ['WorldEventList',  'event',       'g_holidays',          0x1],
+        self::CHR_CLASS   => ['CharClassList',   'class',       'g_classes',           0x1],
+        self::CHR_RACE    => ['CharRaceList',    'race',        'g_races',             0x1],
+        self::SKILL       => ['SkillList',       'skill',       'g_skills',            0x1],
+        self::STATISTIC   => ['AchievementList', 'achievement', 'g_achievements',      0x1], // alias for achievements; exists only for Markup
+        self::CURRENCY    => ['CurrencyList',    'currency',    'g_gatheredcurrencies',0x1],
+        self::SOUND       => ['SoundList',       'sound',       'g_sounds',            0x1],
+        self::ICON        => ['IconList',        'icon',        'g_icons',             0x1],
+        self::GUIDE       => ['GuideList',       'guide',       '',                    0x0],
+        self::PROFILE     => ['ProfileList',     '',            '',                    0x0], // x - not known in javascript
+        self::GUILD       => ['GuildList',       '',            '',                    0x0], // x
+        self::ARENA_TEAM  => ['ArenaTeamList',   '',            '',                    0x0], // x
+        self::USER        => ['UserList',        'user',        'g_users',             0x0], // x
+        self::EMOTE       => ['EmoteList',       'emote',       'g_emotes',            0x1],
+        self::ENCHANTMENT => ['EnchantmentList', 'enchantment', 'g_enchantments',      0x1],
+        self::AREATRIGGER => ['AreatriggerList', 'areatrigger', '',                    0x0],
+        self::MAIL        => ['MailList',        'mail',        '',                    0x1]
+    );
+
+
+    /********************/
+    /* Field Operations */
+    /********************/
+
+    public static function newList(int $type, ?array $conditions = []) : ?BaseType
+    {
+        if (!self::exists($type))
+            return null;
+
+        return new (self::$data[$type][self::IDX_LIST_OBJ])($conditions);
+    }
+
+    public static function getFileString(int $type) : string
+    {
+        if (!self::exists($type))
+            return '';
+
+        return self::$data[$type][self::IDX_FILE_STR];
+    }
+
+    public static function getJSGlobalString(int $type) : string
+    {
+        if (!self::exists($type))
+            return '';
+
+        return self::$data[$type][self::IDX_JSG_TPL];
+    }
+
+    public static function getJSGlobalTemplate(int $type) : array
+    {
+        if (!self::exists($type))
+            return [];
+
+            // [key, [data], [extraData]]
+        return [self::$data[$type][self::IDX_JSG_TPL], [], []];
+    }
+
+    public static function checkClassAttrib(int $type, string $attr, ?int $attrVal = null) : bool
+    {
+        if (!self::exists($type))
+            return false;
+
+        return isset((self::$data[$type][self::IDX_LIST_OBJ])::$$attr) && ($attrVal === null || ((self::$data[$type][self::IDX_LIST_OBJ])::$$attr & $attrVal));
+    }
+
+    public static function getClassAttrib(int $type, string $attr) : mixed
+    {
+        if (!self::exists($type))
+            return null;
+
+        return (self::$data[$type][self::IDX_LIST_OBJ])::$$attr ?? null;
+    }
+
+    public static function exists(int $type) : bool
+    {
+        return !empty(self::$data[$type]);
+    }
+
+    public static function getIndexFrom(int $idx, string $match) : int
+    {
+        $i = array_search($match, array_column(self::$data, $idx));
+        if ($i === false)
+            return 0;
+
+        return array_keys(self::$data)[$i];
+    }
+
+
+    /*********************/
+    /* Column Operations */
+    /*********************/
+
+    public static function getClassesFor(int $flags = 0x0, string $attr = '', ?int $attrVal = null) : array
+    {
+        $x = [];
+        foreach (self::$data as $k => [$o, , , $f])
+            if ($o && (!$flags || $flags & $f))
+                if (!$attr || self::checkClassAttrib($attr, $attrVal))
+                    $x[$k] = $o;
+
+        return $x;
+    }
+
+    public static function getFileStringsFor(int $flags = 0x0) : array
+    {
+        $x = [];
+        foreach (self::$data as $k => [, $s, , $f])
+            if ($s && (!$flags || $flags & $f))
+                $x[$k] = $s;
+
+        return $x;
+    }
+
+    public static function getJSGTemplatesFor(int $flags = 0x0) : array
+    {
+        $x = [];
+        foreach (self::$data as $k => [, , $a, $f])
+            if ($a && (!$flags || $flags & $f))
+                $x[$k] = $a;
+
+        return $x;
     }
 }
 

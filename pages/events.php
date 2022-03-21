@@ -10,7 +10,7 @@ class EventsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_WORLDEVENT;
+    protected $type          = Type::WORLDEVENT;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 11];
     protected $tabId         = 0;

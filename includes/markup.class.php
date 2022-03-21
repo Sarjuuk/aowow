@@ -40,7 +40,7 @@ class Markup
                         {
                             $sm = explode(',', $submatch[1]);
                             for ($i = 0; $i < count($sm); $i+=2)
-                                $this->jsGlobals[TYPE_ITEM][$sm[$i]] = $sm[$i];
+                                $this->jsGlobals[Type::ITEM][$sm[$i]] = $sm[$i];
                         }
                     }
 
@@ -50,11 +50,11 @@ class Markup
                         {
                             $sm = explode(',', $submatch[1]);
                             for ($i = 0; $i < count($sm); $i+=2)
-                                $this->jsGlobals[TYPE_CURRENCY][$sm[$i]] = $sm[$i];
+                                $this->jsGlobals[Type::CURRENCY][$sm[$i]] = $sm[$i];
                         }
                     }
                 }
-                else if ($type = array_search($match[1], Util::$typeStrings))
+                else if ($type = Type::getIndexFrom(Type::IDX_FILE_STR, $match[1]))
                     $this->jsGlobals[$type][$match[2]] = $match[2];
             }
         }
@@ -82,8 +82,8 @@ class Markup
                         $sm = explode(',', $submatch[1]);
                         for ($i = 0; $i < count($sm); $i += 2)
                         {
-                            if (!empty($globals[TYPE_ITEM][1][$sm[$i]]))
-                                $moneys[] = $globals[TYPE_ITEM][1][$sm[$i]]['name'];
+                            if (!empty($globals[Type::ITEM][1][$sm[$i]]))
+                                $moneys[] = $globals[Type::ITEM][1][$sm[$i]]['name'];
                             else
                                 $moneys[] = Util::ucFirst(Lang::game('item')).' #'.$sm[$i];
                         }
@@ -97,8 +97,8 @@ class Markup
                         $sm = explode(',', $submatch[1]);
                         for ($i = 0; $i < count($sm); $i += 2)
                         {
-                            if (!empty($globals[TYPE_CURRENCY][1][$sm[$i]]))
-                                $moneys[] = $globals[TYPE_CURRENCY][1][$sm[$i]]['name'];
+                            if (!empty($globals[Type::CURRENCY][1][$sm[$i]]))
+                                $moneys[] = $globals[Type::CURRENCY][1][$sm[$i]]['name'];
                             else
                                 $moneys[] = Util::ucFirst(Lang::game('curency')).' #'.$sm[$i];
                         }
@@ -107,8 +107,7 @@ class Markup
 
                 return Lang::concat($moneys);
             }
-
-            if ($type = array_search($match[1], Util::$typeStrings))
+            if ($type = Type::getIndexFrom(Type::IDX_FILE_STR, $match[1]))
             {
                 if (!empty($globals[$type][1][$match[2]]))
                     return $globals[$type][1][$match[2]]['name'];

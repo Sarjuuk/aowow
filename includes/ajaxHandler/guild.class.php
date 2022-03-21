@@ -39,12 +39,12 @@ class AjaxGuild extends AjaxHandler
     {
         if ($guilds = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_guild WHERE id IN (?a)', $this->_get['id']))
             foreach ($guilds as $g)
-                Profiler::scheduleResync(TYPE_GUILD, $g['realm'], $g['realmGUID']);
+                Profiler::scheduleResync(Type::GUILD, $g['realm'], $g['realmGUID']);
 
         if ($this->_get['profile'])
             if ($chars = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_profiles WHERE guild IN (?a)', $this->_get['id']))
                 foreach ($chars as $c)
-                    Profiler::scheduleResync(TYPE_PROFILE, $c['realm'], $c['realmGUID']);
+                    Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
 
         return '1';
     }
@@ -74,7 +74,7 @@ class AjaxGuild extends AjaxHandler
     */
     protected function handleStatus() : string
     {
-        $response = Profiler::resyncStatus(TYPE_GUILD, $this->_get['id']);
+        $response = Profiler::resyncStatus(Type::GUILD, $this->_get['id']);
         return Util::toJSON($response);
     }
 }

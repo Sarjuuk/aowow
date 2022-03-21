@@ -119,7 +119,7 @@ SqlGen::register(new class extends SetupScript
         foreach ($res as $pId => $row)
             DB::Aowow()->query('UPDATE ?_pet SET ?a WHERE id = ?d', $row, $pId);
 
-        $this->reapplyCCFlags('pet', TYPE_PET);
+        $this->reapplyCCFlags('pet', Type::PET);
 
         return true;
     }

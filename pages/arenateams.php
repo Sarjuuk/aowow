@@ -10,7 +10,7 @@ class ArenaTeamsPage extends GenericPage
 {
     use TrProfiler;
 
-    protected $type     = TYPE_ARENA_TEAM;
+    protected $type     = Type::ARENA_TEAM;
 
     protected $tabId    = 1;
     protected $path     = [1, 5, 3];

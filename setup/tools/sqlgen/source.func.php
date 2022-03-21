@@ -161,9 +161,9 @@ SqlGen::register(new class extends SetupScript
         foreach ($spellItems as $iId => $si)
         {
             if ($_ = $this->taughtSpell($si))
-                $spellBuff[$_] = [TYPE_SPELL, $_, 1, TYPE_SPELL, $itemSpells[$iId]];
+                $spellBuff[$_] = [Type::SPELL, $_, 1, Type::SPELL, $itemSpells[$iId]];
 
-            $itemBuff[$iId] = [TYPE_ITEM, $iId, 1, TYPE_SPELL, $itemSpells[$iId]];
+            $itemBuff[$iId] = [Type::ITEM, $iId, 1, Type::SPELL, $itemSpells[$iId]];
         }
 
         if ($itemBuff)
@@ -205,18 +205,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry'] /*, $lootmode */);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry'] /*, $lootmode */);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry'] /*, $lootmode */);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry'] /*, $lootmode */);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry'] /*, $lootmode */);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry'] /*, $lootmode */);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry'] /*, $lootmode */);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry'] /*, $lootmode */);
         }
 
         $objectOT   = [];
@@ -247,20 +247,20 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
 
                     $objectOT[] = $iId;
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
 
             $objectOT[] = $roi;
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
         }
 
         $itemOT   = [];
@@ -289,20 +289,20 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_ITEM, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::ITEM, $l['entry']);
 
                     $itemOT[] = $iId;
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_ITEM, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::ITEM, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_ITEM, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry']);
 
             $itemOT[] = $roi;
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_ITEM, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry']);
         }
 
         if ($itemBuff)
@@ -340,17 +340,17 @@ SqlGen::register(new class extends SetupScript
         foreach (DB::World()->select($vendorQuery, $xCostA, $xCostA) as $iId => $v)
         {
             if ($_ = $this->taughtSpell($v))
-                $spellBuff[$_] = [TYPE_SPELL, $_, 1];
+                $spellBuff[$_] = [Type::SPELL, $_, 1];
 
-            $itemBuff[$iId] = [TYPE_ITEM, $iId, 1];
+            $itemBuff[$iId] = [Type::ITEM, $iId, 1];
         }
 
         foreach (DB::World()->select($vendorQuery, $xCostH, $xCostH) as $iId => $v)
         {
             if ($_ = $this->taughtSpell($v))
-                $spellBuff[$_] = [TYPE_SPELL, $_, 2];
+                $spellBuff[$_] = [Type::SPELL, $_, 2];
 
-            $itemBuff[$iId] = [TYPE_ITEM, $iId, 2];
+            $itemBuff[$iId] = [Type::ITEM, $iId, 2];
         }
 
         if ($itemBuff)
@@ -386,9 +386,9 @@ SqlGen::register(new class extends SetupScript
         foreach ($quests as $iId => $q)
         {
             if ($_ = $this->taughtSpell($q))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $q['qty'] > 1 ? 0 : TYPE_QUEST, $q['quest'], $q['side']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $q['side']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $q['qty'] > 1 ? 0 : TYPE_QUEST, $q['quest'], $q['side']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $iId, $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $q['side']);
         }
 
         $mailLoot = DB::World()->select('
@@ -419,20 +419,20 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_QUEST, $l['entry'], $l['side']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $l['side']);
 
                     $itemOT[] = $iId;
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_QUEST, $l['entry'], $l['side']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $l['side']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_QUEST, $l['entry'], $l['side']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $l['side']);
 
             $itemOT[] = $roi;
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_QUEST, $l['entry'], $l['side']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $l['side']);
         }
 
         if ($itemBuff)
@@ -464,9 +464,9 @@ SqlGen::register(new class extends SetupScript
         foreach ($vendors as $iId => $v)
         {
             if ($_ = $this->taughtSpell($v))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $v['qty'] > 1 ? 0 : TYPE_NPC, $v['npc']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $v['qty'] > 1 ? 0 : Type::NPC, $v['npc']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $v['qty'] > 1 ? 0 : TYPE_NPC, $v['npc']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $iId, $v['qty'] > 1 ? 0 : Type::NPC, $v['npc']);
         }
 
         if ($itemBuff)
@@ -481,11 +481,11 @@ SqlGen::register(new class extends SetupScript
         ###############
         CLI::write('   * #10 Starter');
 
-        if ($pcii = DB::World()->select('SELECT ?d, itemid, 1 FROM playercreateinfo_item', TYPE_ITEM))
+        if ($pcii = DB::World()->select('SELECT ?d, itemid, 1 FROM playercreateinfo_item', Type::ITEM))
             DB::Aowow()->query($this->queryfy($pcii, $insBasic), 10, 10, 10);
 
         for ($i = 1; $i < 21; $i++)
-            DB::Aowow()->query($insSub, 10, DB::Aowow()->subquery('SELECT ?d, item?d, 1, NULL AS m, NULL AS mt FROM dbc_charstartoutfit WHERE item?d > 0', TYPE_ITEM, $i, $i), 10, 10);
+            DB::Aowow()->query($insSub, 10, DB::Aowow()->subquery('SELECT ?d, item?d, 1, NULL AS m, NULL AS mt FROM dbc_charstartoutfit WHERE item?d > 0', Type::ITEM, $i, $i), 10, 10);
 
 
         ###################
@@ -517,9 +517,9 @@ SqlGen::register(new class extends SetupScript
         foreach ($extraItems as $iId => $l)
         {
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $xItems[$iId]['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $xItems[$iId]['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $xItems[$iId]['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $xItems[$iId]['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $xItems[$iId]['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $xItems[$iId]['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $iId, $xItems[$iId]['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $xItems[$iId]['entry']);
         }
 
         foreach ($rewItems as $iId => $l)
@@ -529,18 +529,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $l['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $l['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $l['qty'] > 1 ? 0 : TYPE_ACHIEVEMENT, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $iId, $l['qty'] > 1 ? 0 : Type::ACHIEVEMENT, $l['entry']);
         }
 
         if ($itemBuff)
@@ -582,18 +582,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi);
         }
 
         if ($itemBuff)
@@ -633,18 +633,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_OBJECT, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry']);
         }
 
         if ($itemBuff)
@@ -677,8 +677,8 @@ SqlGen::register(new class extends SetupScript
                 item_template it ON src.itemOrRef > 0 AND src.itemOrRef = it.entry
             GROUP BY
                 ARRAY_KEY',
-            TYPE_NPC, NPC_TYPEFLAG_HERBLOOT,
-            TYPE_OBJECT, $herbLocks
+            Type::NPC, NPC_TYPEFLAG_HERBLOOT,
+            Type::OBJECT, $herbLocks
         );
 
         foreach ($herbLoot as $roi => $l)
@@ -688,18 +688,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
         }
 
         if ($itemBuff)
@@ -739,18 +739,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi);
         }
 
         if ($itemBuff)
@@ -783,8 +783,8 @@ SqlGen::register(new class extends SetupScript
                 item_template it ON src.itemOrRef > 0 AND src.itemOrRef = it.entry
             GROUP BY
                 ARRAY_KEY',
-            TYPE_NPC, NPC_TYPEFLAG_MININGLOOT,
-            TYPE_OBJECT, $mineLocks
+            Type::NPC, NPC_TYPEFLAG_MININGLOOT,
+            Type::OBJECT, $mineLocks
         );
 
         foreach ($mineLoot as $roi => $l)
@@ -794,18 +794,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : $l['srcType'], $l['entry']);
         }
 
         if ($itemBuff)
@@ -845,18 +845,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi);
         }
 
         if ($itemBuff)
@@ -895,18 +895,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
         }
 
         if ($itemBuff)
@@ -946,18 +946,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
         }
 
         if ($itemBuff)
@@ -997,18 +997,18 @@ SqlGen::register(new class extends SetupScript
                 foreach ($refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                        $this->pushBuffer($spellBuff, Type::SPELL, $_, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-                    $this->pushBuffer($itemBuff, TYPE_ITEM, $iId, $r['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                    $this->pushBuffer($itemBuff, Type::ITEM, $iId, $r['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer($spellBuff, TYPE_SPELL, $_, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+                $this->pushBuffer($spellBuff, Type::SPELL, $_, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
 
-            $this->pushBuffer($itemBuff, TYPE_ITEM, $roi, $l['qty'] > 1 ? 0 : TYPE_NPC, $l['entry']);
+            $this->pushBuffer($itemBuff, Type::ITEM, $roi, $l['qty'] > 1 ? 0 : Type::NPC, $l['entry']);
         }
 
         if ($itemBuff)
@@ -1020,7 +1020,7 @@ SqlGen::register(new class extends SetupScript
 
         // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawnd, quests granting items may be disabled)
         DB::Aowow()->query('UPDATE ?_items SET cuFlags = cuFlags & ?d', ~CUSTOM_UNAVAILABLE);
-        DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.typeId = i.id AND s.type = ?d SET i.cuFlags = i.cuFlags | ?d WHERE s.typeId IS NULL', TYPE_ITEM, CUSTOM_UNAVAILABLE);
+        DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.typeId = i.id AND s.type = ?d SET i.cuFlags = i.cuFlags | ?d WHERE s.typeId IS NULL', Type::ITEM, CUSTOM_UNAVAILABLE);
 
         /*********/
         /* Spell */
@@ -1045,7 +1045,7 @@ SqlGen::register(new class extends SetupScript
             foreach ($qSpells as $sId => $spell)
                 for ($i = 1; $i <= 3; $i++)
                     if ($spell['effect'.$i.'Id'] == 36)         // effect: learnSpell
-                        $this->pushBuffer($buff, TYPE_SPELL, $spell['effect'.$i.'TriggerSpell'], $quests[$sId]['qty'] > 1 ? 0 : TYPE_QUEST, $quests[$sId]['qty'] > 1 ? 0 : $quests[$sId]['id'], $quests[$sId]['side']);
+                        $this->pushBuffer($buff, Type::SPELL, $spell['effect'.$i.'TriggerSpell'], $quests[$sId]['qty'] > 1 ? 0 : Type::QUEST, $quests[$sId]['qty'] > 1 ? 0 : $quests[$sId]['id'], $quests[$sId]['side']);
 
             DB::Aowow()->query($this->queryfy($buff, $insMore), 4, 4, 4);
         }
@@ -1068,9 +1068,9 @@ SqlGen::register(new class extends SetupScript
 
                 for ($i = 1; $i <= 3; $i++)
                     if ($effects['effect'.$i.'Id'] == 36)       // effect: learnSpell
-                        $this->pushBuffer($buff, TYPE_SPELL, $effects['effect'.$i.'TriggerSpell'], $trainerId ? TYPE_NPC : 0, $trainerId);
+                        $this->pushBuffer($buff, Type::SPELL, $effects['effect'.$i.'TriggerSpell'], $trainerId ? Type::NPC : 0, $trainerId);
 
-                $this->pushBuffer($buff, TYPE_SPELL, $spellId, $trainerId ? TYPE_NPC : 0, $trainerId);
+                $this->pushBuffer($buff, Type::SPELL, $spellId, $trainerId ? Type::NPC : 0, $trainerId);
             }
 
             DB::Aowow()->query($this->queryfy($buff, $insMore), 6, 6, 6);
@@ -1079,7 +1079,7 @@ SqlGen::register(new class extends SetupScript
         #  7: Discovery
         CLI::write('   * #7  Discovery');
         // 61756: Northrend Inscription Research (FAST QA VERSION);
-        if ($disco = DB::World()->select('SELECT ?d, spellId, 1 FROM skill_discovery_template WHERE reqSpell <> ?d', TYPE_SPELL, 61756))
+        if ($disco = DB::World()->select('SELECT ?d, spellId, 1 FROM skill_discovery_template WHERE reqSpell <> ?d', Type::SPELL, 61756))
             DB::Aowow()->query($this->queryfy($disco, $insBasic), 7, 7, 7);
 
         #  9: Talent
@@ -1109,7 +1109,7 @@ SqlGen::register(new class extends SetupScript
             }
 
             foreach ($tSpells as $tId => $__)
-                $buff[$tId] = [TYPE_SPELL, $tId, 1];
+                $buff[$tId] = [Type::SPELL, $tId, 1];
 
             if (!$recurse)
                 break;
@@ -1127,7 +1127,7 @@ SqlGen::register(new class extends SetupScript
         */
 
         $pcis = DB::World()->selectCol('SELECT DISTINCT skill FROM playercreateinfo_skills');
-        $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE {(skillLineId IN (?a) AND acquireMethod = 2) OR} (acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129)) GROUP BY spellId', TYPE_SPELL, $pcis ?: DBSIMPLE_SKIP);
+        $subSkills = DB::Aowow()->subquery('SELECT ?d, spellId, 1, NULL AS m, NULL AS mt FROM dbc_skilllineability WHERE {(skillLineId IN (?a) AND acquireMethod = 2) OR} (acquireMethod = 1 AND (reqSkillLevel = 1 OR skillLineId = 129)) GROUP BY spellId', Type::SPELL, $pcis ?: DBSIMPLE_SKIP);
         DB::Aowow()->query($insSub, 10, $subSkills, 10, 10);
 
 
@@ -1139,7 +1139,7 @@ SqlGen::register(new class extends SetupScript
 
         #  4: Quest
         CLI::write('   * #4  Quest');
-        if ($quests = DB::World()->select('SELECT ?d, RewardTitle, 1, ?d, ID FROM quest_template WHERE RewardTitle > 0', TYPE_TITLE, TYPE_QUEST))
+        if ($quests = DB::World()->select('SELECT ?d, RewardTitle, 1, ?d, ID FROM quest_template WHERE RewardTitle > 0', Type::TITLE, Type::QUEST))
             DB::Aowow()->query($this->queryfy($quests, $insMore), 4, 4, 4);
 
         # 12: Achievement
@@ -1153,7 +1153,7 @@ SqlGen::register(new class extends SetupScript
         );
         foreach ($sets as $tId => $set)
         {
-            DB::Aowow()->query($this->queryfy([[TYPE_TITLE, $tId, 1, TYPE_ACHIEVEMENT, $set['srcId']]], $insMore), 12, 12, 12);
+            DB::Aowow()->query($this->queryfy([[Type::TITLE, $tId, 1, Type::ACHIEVEMENT, $set['srcId']]], $insMore), 12, 12, 12);
 
             if ($set['altSrcId'])
                 DB::Aowow()->query('UPDATE ?_titles SET src12Ext = ?d WHERE id = ?d', $set['altSrcId'], $tId);
@@ -1164,7 +1164,7 @@ SqlGen::register(new class extends SetupScript
         $src13 = [null, 42, 52, 71, 80, 157, 163, 167, 169, 177];
         foreach ($src13 as $src => $tId)
             if ($tId)
-                DB::Aowow()->query($this->queryfy([[TYPE_TITLE, $tId, $src]], $insBasic), 13, 13, 13);
+                DB::Aowow()->query($this->queryfy([[Type::TITLE, $tId, $src]], $insBasic), 13, 13, 13);
 
         return true;
     }

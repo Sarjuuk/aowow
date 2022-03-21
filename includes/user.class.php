@@ -663,11 +663,8 @@ class User
         $data = [];
         foreach ($res as $type => $ids)
         {
-            if (empty(Util::$typeClasses[$type]))
-                continue;
-
-            $tc = new Util::$typeClasses[$type]([['id', array_values($ids)]]);
-            if ($tc->error)
+            $tc = Type::newList($type, [['id', array_values($ids)]]);
+            if (!$tc || $tc->error)
                 continue;
 
             $entities = [];

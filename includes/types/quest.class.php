@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class QuestList extends BaseType
 {
-    public static   $type      = TYPE_QUEST;
+    public static   $type      = Type::QUEST;
     public static   $brickFile = 'quest';
     public static   $dataTable = '?_quests';
 
@@ -49,18 +49,18 @@ class QuestList extends BaseType
             for ($i = 1; $i < 7; $i++)
             {
                 if ($_ = $_curTpl['reqItemId'.$i])
-                    $requires[TYPE_ITEM][] = $_;
+                    $requires[Type::ITEM][] = $_;
 
                 if ($i > 4)
                     continue;
 
                 if ($_curTpl['reqNpcOrGo'.$i] > 0)
-                    $requires[TYPE_NPC][] = $_curTpl['reqNpcOrGo'.$i];
+                    $requires[Type::NPC][] = $_curTpl['reqNpcOrGo'.$i];
                 else if ($_curTpl['reqNpcOrGo'.$i] < 0)
-                    $requires[TYPE_OBJECT][] = -$_curTpl['reqNpcOrGo'.$i];
+                    $requires[Type::OBJECT][] = -$_curTpl['reqNpcOrGo'.$i];
 
                 if ($_ = $_curTpl['reqSourceItemId'.$i])
-                    $requires[TYPE_ITEM][] = $_;
+                    $requires[Type::ITEM][] = $_;
             }
             if ($requires)
                 $this->requires[$id] = $requires;
@@ -70,24 +70,24 @@ class QuestList extends BaseType
             $choices = [];
 
             if ($_ = $_curTpl['rewardTitleId'])
-                $rewards[TYPE_TITLE][] = $_;
+                $rewards[Type::TITLE][] = $_;
 
             if ($_ = $_curTpl['rewardHonorPoints'])
-                $rewards[TYPE_CURRENCY][104] = $_;
+                $rewards[Type::CURRENCY][104] = $_;
 
             if ($_ = $_curTpl['rewardArenaPoints'])
-                $rewards[TYPE_CURRENCY][103] = $_;
+                $rewards[Type::CURRENCY][103] = $_;
 
             for ($i = 1; $i < 7; $i++)
             {
                 if ($_ = $_curTpl['rewardChoiceItemId'.$i])
-                    $choices[TYPE_ITEM][$_] = $_curTpl['rewardChoiceItemCount'.$i];
+                    $choices[Type::ITEM][$_] = $_curTpl['rewardChoiceItemCount'.$i];
 
                 if ($i > 5)
                     continue;
 
                 if ($_ = $_curTpl['rewardFactionId'.$i])
-                    $rewards[TYPE_FACTION][$_] = $_curTpl['rewardFactionValue'.$i];
+                    $rewards[Type::FACTION][$_] = $_curTpl['rewardFactionValue'.$i];
 
                 if ($i > 4)
                     continue;
@@ -96,9 +96,9 @@ class QuestList extends BaseType
                 {
                     $qty = $_curTpl['rewardItemCount'.$i];
                     if (in_array($_, $currencies))
-                        $rewards[TYPE_CURRENCY][array_search($_, $currencies)] = $qty;
+                        $rewards[Type::CURRENCY][array_search($_, $currencies)] = $qty;
                     else
-                        $rewards[TYPE_ITEM][$_] = $qty;
+                        $rewards[Type::ITEM][$_] = $qty;
                 }
             }
             if ($rewards)
@@ -156,7 +156,7 @@ class QuestList extends BaseType
         {
             $data[$this->id] = array(
                 "n"  => $this->getField('name', true),
-                "t"  => TYPE_QUEST,
+                "t"  => Type::QUEST,
                 "ti" => $this->id,
                 "c"  => $this->curTpl['cat1'],
                 "c2" => $this->curTpl['cat2']
@@ -214,16 +214,16 @@ class QuestList extends BaseType
                 'xp'        => $this->curTpl['rewardXP']
             );
 
-            if (!empty($this->rewards[$this->id][TYPE_CURRENCY]))
-                foreach ($this->rewards[$this->id][TYPE_CURRENCY] as $iId => $qty)
+            if (!empty($this->rewards[$this->id][Type::CURRENCY]))
+                foreach ($this->rewards[$this->id][Type::CURRENCY] as $iId => $qty)
                     $data[$this->id]['currencyrewards'][] = [$iId, $qty];
 
-            if (!empty($this->rewards[$this->id][TYPE_ITEM]))
-                foreach ($this->rewards[$this->id][TYPE_ITEM] as $iId => $qty)
+            if (!empty($this->rewards[$this->id][Type::ITEM]))
+                foreach ($this->rewards[$this->id][Type::ITEM] as $iId => $qty)
                     $data[$this->id]['itemrewards'][] = [$iId, $qty];
 
-            if (!empty($this->choices[$this->id][TYPE_ITEM]))
-                foreach ($this->choices[$this->id][TYPE_ITEM] as $iId => $qty)
+            if (!empty($this->choices[$this->id][Type::ITEM]))
+                foreach ($this->choices[$this->id][Type::ITEM] as $iId => $qty)
                     $data[$this->id]['itemchoices'][] = [$iId, $qty];
 
             if ($_ = $this->curTpl['rewardTitleId'])
@@ -390,31 +390,31 @@ class QuestList extends BaseType
                 // items
                 for ($i = 1; $i < 5; $i++)
                     if ($this->curTpl['rewardItemId'.$i] > 0)
-                        $data[TYPE_ITEM][$this->curTpl['rewardItemId'.$i]] = $this->curTpl['rewardItemId'.$i];
+                        $data[Type::ITEM][$this->curTpl['rewardItemId'.$i]] = $this->curTpl['rewardItemId'.$i];
 
                 for ($i = 1; $i < 7; $i++)
                     if ($this->curTpl['rewardChoiceItemId'.$i] > 0)
-                        $data[TYPE_ITEM][$this->curTpl['rewardChoiceItemId'.$i]] = $this->curTpl['rewardChoiceItemId'.$i];
+                        $data[Type::ITEM][$this->curTpl['rewardChoiceItemId'.$i]] = $this->curTpl['rewardChoiceItemId'.$i];
 
                 // spells
                 if ($this->curTpl['rewardSpell'] > 0)
-                    $data[TYPE_SPELL][$this->curTpl['rewardSpell']] = $this->curTpl['rewardSpell'];
+                    $data[Type::SPELL][$this->curTpl['rewardSpell']] = $this->curTpl['rewardSpell'];
 
                 if ($this->curTpl['rewardSpellCast'] > 0)
-                    $data[TYPE_SPELL][$this->curTpl['rewardSpellCast']] = $this->curTpl['rewardSpellCast'];
+                    $data[Type::SPELL][$this->curTpl['rewardSpellCast']] = $this->curTpl['rewardSpellCast'];
 
                 // titles
                 if ($this->curTpl['rewardTitleId'] > 0)
-                    $data[TYPE_TITLE][$this->curTpl['rewardTitleId']] = $this->curTpl['rewardTitleId'];
+                    $data[Type::TITLE][$this->curTpl['rewardTitleId']] = $this->curTpl['rewardTitleId'];
 
                 // currencies
-                if (!empty($this->rewards[$this->id][TYPE_CURRENCY]))
-                    foreach ($this->rewards[$this->id][TYPE_CURRENCY] as $id => $__)
-                        $data[TYPE_CURRENCY][$id] = $id;
+                if (!empty($this->rewards[$this->id][Type::CURRENCY]))
+                    foreach ($this->rewards[$this->id][Type::CURRENCY] as $id => $__)
+                        $data[Type::CURRENCY][$id] = $id;
             }
 
             if ($addMask & GLOBALINFO_SELF)
-                $data[TYPE_QUEST][$this->id] = ['name' => $this->getField('name', true)];
+                $data[Type::QUEST][$this->id] = ['name' => $this->getField('name', true)];
         }
 
         return $data;
@@ -581,11 +581,11 @@ class QuestListFilter extends Filter
         switch ($cr[1])
         {
             case 1:                                         // npc
-                return ['AND', ['qse.type', TYPE_NPC],    ['qse.method', $flags, '&']];
+                return ['AND', ['qse.type', Type::NPC],    ['qse.method', $flags, '&']];
             case 2:                                         // object
-                return ['AND', ['qse.type', TYPE_OBJECT], ['qse.method', $flags, '&']];
+                return ['AND', ['qse.type', Type::OBJECT], ['qse.method', $flags, '&']];
             case 3:                                         // item
-                return ['AND', ['qse.type', TYPE_ITEM],   ['qse.method', $flags, '&']];
+                return ['AND', ['qse.type', Type::ITEM],   ['qse.method', $flags, '&']];
         }
 
         return false;

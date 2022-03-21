@@ -10,7 +10,7 @@ class SkillPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_SKILL;
+    protected $type          = Type::SKILL;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 14];
@@ -55,7 +55,7 @@ class SkillPage extends GenericPage
         if ($_ = $this->subject->getField('iconId'))
         {
             $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
-            $this->extendGlobalIds(TYPE_ICON, $_);
+            $this->extendGlobalIds(Type::ICON, $_);
         }
 
         /****************/

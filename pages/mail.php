@@ -10,7 +10,7 @@ class MailPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_MAIL;
+    protected $type          = Type::MAIL;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 103];
@@ -47,7 +47,7 @@ class MailPage extends GenericPage
             if ($npcId = DB::World()->selectCell('SELECT Sender FROM achievement_reward WHERE ID = ?d', -$this->typeId))
             {
                 $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$npcId.']';
-                $this->extendGlobalIds(TYPE_NPC, $npcId);
+                $this->extendGlobalIds(Type::NPC, $npcId);
             }
         }
         else if ($mlr = DB::World()->selectRow('SELECT * FROM mail_level_reward WHERE mailTemplateId = ?d', $this->typeId))  // level rewards
@@ -59,11 +59,11 @@ class MailPage extends GenericPage
                 if ($r = Lang::getRaceString($mlr['raceMask'], $rIds, false))
                 {
                     $infobox[] = Lang::game('races').Lang::main('colon').$r;
-                    $this->extendGlobalIds(TYPE_RACE, ...$rIds);
+                    $this->extendGlobalIds(Type::CHR_RACE, ...$rIds);
                 }
 
                 $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$mlr['senderEntry'].']';
-                $this->extendGlobalIds(TYPE_NPC, $mlr['senderEntry']);
+                $this->extendGlobalIds(Type::NPC, $mlr['senderEntry']);
         }
         else                                                // achievement or quest
         {
@@ -72,12 +72,12 @@ class MailPage extends GenericPage
                 if ($npcId= DB::World()->selectCell('SELECT RewardMailSenderEntry FROM quest_mail_sender WHERE QuestId = ?d', $q['id']))
                 {
                     $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$npcId.']';
-                    $this->extendGlobalIds(TYPE_NPC, $npcId);
+                    $this->extendGlobalIds(Type::NPC, $npcId);
                 }
-                else if ($npcId = DB::Aowow()->selectCell('SELECT typeId FROM ?_quests_startend WHERE questId = ?d AND type = ?d AND method & ?d', $q['id'], TYPE_NPC, 0x2))
+                else if ($npcId = DB::Aowow()->selectCell('SELECT typeId FROM ?_quests_startend WHERE questId = ?d AND type = ?d AND method & ?d', $q['id'], Type::NPC, 0x2))
                 {
                     $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$npcId.']';
-                    $this->extendGlobalIds(TYPE_NPC, $npcId);
+                    $this->extendGlobalIds(Type::NPC, $npcId);
                 }
 
                 if ($q['rewardMailDelay'] > 0)
@@ -86,7 +86,7 @@ class MailPage extends GenericPage
             else if ($npcId = DB::World()->selectCell('SELECT Sender FROM achievement_reward WHERE MailTemplateId = ?d', $this->typeId))
             {
                 $infobox[] = Lang::mail('sender').Lang::main('colon').'[npc='.$npcId.']';
-                $this->extendGlobalIds(TYPE_NPC, $npcId);
+                $this->extendGlobalIds(Type::NPC, $npcId);
             }
         }
 
@@ -139,7 +139,7 @@ class MailPage extends GenericPage
         else if ($npcId = DB::World()->selectCell('SELECT ID FROM achievement_reward WHERE MailTemplateId = ?d', $this->typeId))
             {
                 $infobox[] = '[Sender]: [npc='.$npcId.']';
-                $this->extendGlobalIds(TYPE_NPC, $npcId);
+                $this->extendGlobalIds(Type::NPC, $npcId);
             }
 
         else                                                // used by: quest

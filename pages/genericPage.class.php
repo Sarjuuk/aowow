@@ -739,7 +739,7 @@ class GenericPage
                 foreach ($data as $k => $v)
                 {
                     // localizes expected fields .. except for icons .. icons are special
-                    if (in_array($k, ['name', 'namefemale']) && $struct[0]  != 'g_icons')
+                    if (in_array($k, ['name', 'namefemale']) && $struct[0] != Type::getJSGlobalString(Type::ICON))
                     {
                         $data[$k.'_'.User::$localeString] = $v;
                         unset($data[$k]);
@@ -859,31 +859,8 @@ class GenericPage
         if (isset($jsg[$type]))
             return;
 
-        switch ($type)
-        {                                                // [varName,            [data], [extra]]
-            case TYPE_NPC:         $jsg[TYPE_NPC]         = ['g_npcs',               [], []]; break;
-            case TYPE_OBJECT:      $jsg[TYPE_OBJECT]      = ['g_objects',            [], []]; break;
-            case TYPE_ITEM:        $jsg[TYPE_ITEM]        = ['g_items',              [], []]; break;
-            case TYPE_ITEMSET:     $jsg[TYPE_ITEMSET]     = ['g_itemsets',           [], []]; break;
-            case TYPE_QUEST:       $jsg[TYPE_QUEST]       = ['g_quests',             [], []]; break;
-            case TYPE_SPELL:       $jsg[TYPE_SPELL]       = ['g_spells',             [], []]; break;
-            case TYPE_ZONE:        $jsg[TYPE_ZONE]        = ['g_gatheredzones',      [], []]; break;
-            case TYPE_FACTION:     $jsg[TYPE_FACTION]     = ['g_factions',           [], []]; break;
-            case TYPE_PET:         $jsg[TYPE_PET]         = ['g_pets',               [], []]; break;
-            case TYPE_ACHIEVEMENT: $jsg[TYPE_ACHIEVEMENT] = ['g_achievements',       [], []]; break;
-            case TYPE_TITLE:       $jsg[TYPE_TITLE]       = ['g_titles',             [], []]; break;
-            case TYPE_WORLDEVENT:  $jsg[TYPE_WORLDEVENT]  = ['g_holidays',           [], []]; break;
-            case TYPE_CLASS:       $jsg[TYPE_CLASS]       = ['g_classes',            [], []]; break;
-            case TYPE_RACE:        $jsg[TYPE_RACE]        = ['g_races',              [], []]; break;
-            case TYPE_SKILL:       $jsg[TYPE_SKILL]       = ['g_skills',             [], []]; break;
-            case TYPE_CURRENCY:    $jsg[TYPE_CURRENCY]    = ['g_gatheredcurrencies', [], []]; break;
-            case TYPE_SOUND:       $jsg[TYPE_SOUND]       = ['g_sounds',             [], []]; break;
-            case TYPE_ICON:        $jsg[TYPE_ICON]        = ['g_icons',              [], []]; break;
-            // well, this is awkward
-            case TYPE_USER:        $jsg[TYPE_USER]        = ['g_users',              [], []]; break;
-            case TYPE_EMOTE:       $jsg[TYPE_EMOTE]       = ['g_emotes',             [], []]; break;
-            case TYPE_ENCHANTMENT: $jsg[TYPE_ENCHANTMENT] = ['g_enchantments',       [], []]; break;
-        }
+        if ($tpl = Type::getJSGlobalTemplate($type))
+            $jsg[$type] = $tpl;
     }
 
     // lookup jsGlobals from collected typeIds
@@ -900,34 +877,9 @@ class GenericPage
 
             $this->initJSGlobal($type);
 
-            $cnd = [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]];
-
-            switch ($type)
-            {
-                case TYPE_NPC:         $obj = new CreatureList($cnd);    break;
-                case TYPE_OBJECT:      $obj = new GameobjectList($cnd);  break;
-                case TYPE_ITEM:        $obj = new ItemList($cnd);        break;
-                case TYPE_ITEMSET:     $obj = new ItemsetList($cnd);     break;
-                case TYPE_QUEST:       $obj = new QuestList($cnd);       break;
-                case TYPE_SPELL:       $obj = new SpellList($cnd);       break;
-                case TYPE_ZONE:        $obj = new ZoneList($cnd);        break;
-                case TYPE_FACTION:     $obj = new FactionList($cnd);     break;
-                case TYPE_PET:         $obj = new PetList($cnd);         break;
-                case TYPE_ACHIEVEMENT: $obj = new AchievementList($cnd); break;
-                case TYPE_TITLE:       $obj = new TitleList($cnd);       break;
-                case TYPE_WORLDEVENT:  $obj = new WorldEventList($cnd);  break;
-                case TYPE_CLASS:       $obj = new CharClassList($cnd);   break;
-                case TYPE_RACE:        $obj = new CharRaceList($cnd);    break;
-                case TYPE_SKILL:       $obj = new SkillList($cnd);       break;
-                case TYPE_CURRENCY:    $obj = new CurrencyList($cnd);    break;
-                case TYPE_SOUND:       $obj = new SoundList($cnd);       break;
-                case TYPE_ICON:        $obj = new IconList($cnd);        break;
-                // "um, eh":, he ums and ehs.
-                case TYPE_USER:        $obj = new UserList($cnd);        break;
-                case TYPE_EMOTE:       $obj = new EmoteList($cnd);       break;
-                case TYPE_ENCHANTMENT: $obj = new EnchantmentList($cnd); break;
-                default: continue 2;
-            }
+            $obj = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]]);
+            if (!$obj)
+                continue;
 
             $this->extendGlobalData($obj->getJSGlobals(GLOBALINFO_SELF));
 

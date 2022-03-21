@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class FactionList extends BaseType
 {
-    public static   $type      = TYPE_FACTION;
+    public static   $type      = Type::FACTION;
     public static   $brickFile = 'faction';
     public static   $dataTable = '?_factions';
 
@@ -75,7 +75,7 @@ class FactionList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_FACTION][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::FACTION][$this->id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }

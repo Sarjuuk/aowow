@@ -37,7 +37,7 @@ SqlGen::register(new class extends SetupScript
         foreach ($classes as $cl)
             DB::Aowow()->query('REPLACE INTO ?_classes (?#) VALUES (?a)', array_keys($cl), array_values($cl));
 
-        $this->reapplyCCFlags('classes', TYPE_CLASS);
+        $this->reapplyCCFlags('classes', Type::CHR_CLASS);
 
         return true;
     }

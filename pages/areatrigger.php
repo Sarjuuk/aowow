@@ -10,7 +10,7 @@ class AreaTriggerPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_AREATRIGGER;
+    protected $type          = Type::AREATRIGGER;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 102];

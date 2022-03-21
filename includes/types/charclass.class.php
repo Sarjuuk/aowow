@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CharClassList extends BaseType
 {
-    public static   $type      = TYPE_CLASS;
+    public static   $type      = Type::CHR_CLASS;
     public static   $brickFile = 'class';
     public static   $dataTable = '?_classes';
 

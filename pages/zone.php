@@ -12,7 +12,7 @@ class ZonePage extends GenericPage
 
     protected $path      = [0, 6];
     protected $tabId     = 0;
-    protected $type      = TYPE_ZONE;
+    protected $type      = Type::ZONE;
     protected $tpl       = 'detail-page-generic';
     protected $js        = [[JS_FILE, 'ShowOnMap.js']];
 
@@ -100,10 +100,10 @@ class ZonePage extends GenericPage
                 $this->extendGlobalIds($type, ...array_map('abs', $ids));
                 foreach ($ids as $id)
                 {
-                    if ($type == TYPE_ITEM)
+                    if ($type == Type::ITEM)
                         $infobox[] = Lang::zone('key', (int)($id < 0)).Lang::main('colon').'[item='.abs($id).']';
                     else
-                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).Lang::main('colon').'['.Util::$typeStrings[$type].'='.abs($id).']';
+                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).Lang::main('colon').'['.Type::getFileString($type).'='.abs($id).']';
                 }
             }
         }
@@ -111,7 +111,7 @@ class ZonePage extends GenericPage
         // Instances
         if ($_ = DB::Aowow()->selectCol('SELECT id FROM ?_zones WHERE parentAreaId = ?d AND (flags & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
-            $this->extendGlobalIds(TYPE_ZONE, ...$_);
+            $this->extendGlobalIds(Type::ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
         }
 
@@ -165,13 +165,13 @@ class ZonePage extends GenericPage
         if ($_ = $this->subject->getField('parentArea'))
         {
             $this->extraText = sprintf(Lang::zone('zonePartOf'), $_);
-            $this->extendGlobalIds(TYPE_ZONE, $_);
+            $this->extendGlobalIds(Type::ZONE, $_);
         }
 
         // we cannot fetch spawns via lists. lists are grouped by entry
-        $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_OBJECT);
-        $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_NPC);
-        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_AREATRIGGER) : [];
+        $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::OBJECT);
+        $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::NPC);
+        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::AREATRIGGER) : [];
 
         $conditions = [CFG_SQL_LIMIT_NONE, ['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
@@ -237,7 +237,7 @@ class ZonePage extends GenericPage
                         'coords' => [[$spawn['posX'], $spawn['posY']]],
                         'level'  => $spawn['floor'],
                         'name'   => $n,
-                        'type'   => TYPE_OBJECT,
+                        'type'   => Type::OBJECT,
                         'id'     => $tpl['id']
                     );
 
@@ -249,18 +249,18 @@ class ZonePage extends GenericPage
 
                 if ($tpl['startsQuests'])
                 {
-                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', TYPE_OBJECT], ['qse.typeId', $tpl['id']]));
+                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', Type::OBJECT], ['qse.typeId', $tpl['id']]));
                         if ($started->error)
                             continue;
 
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
-                            if (!empty($started->rewards[$id][TYPE_ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][TYPE_ITEM]));
+                            if (!empty($started->rewards[$id][Type::ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
-                            if (!empty($started->choices[$id][TYPE_ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][TYPE_ITEM]));
+                            if (!empty($started->choices[$id][Type::ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
 
                             $questsLV[$id] = $data;
                         }
@@ -272,7 +272,7 @@ class ZonePage extends GenericPage
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
-                                'type'   => TYPE_OBJECT,
+                                'type'   => Type::OBJECT,
                                 'id'     => $tpl['id'],
                                 'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
                                 'quests' => array_values($_)
@@ -283,7 +283,7 @@ class ZonePage extends GenericPage
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
-                                'type'   => TYPE_OBJECT,
+                                'type'   => Type::OBJECT,
                                 'id'     => $tpl['id'],
                                 'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
                                 'quests' => array_values($_)
@@ -337,7 +337,7 @@ class ZonePage extends GenericPage
                         'coords'        => [[$spawn['posX'], $spawn['posY']]],
                         'level'         => $spawn['floor'],
                         'name'          => $n,
-                        'type'          => TYPE_NPC,
+                        'type'          => Type::NPC,
                         'id'            => $tpl['id'],
                         'reacthorde'    => $tpl['H'] ?: 1,      // no neutral (0) setting
                         'reactalliance' => $tpl['A'] ?: 1,
@@ -346,18 +346,18 @@ class ZonePage extends GenericPage
 
                 if ($tpl['startsQuests'])
                 {
-                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', TYPE_NPC], ['qse.typeId', $tpl['id']]));
+                        $started = new QuestList(array(['qse.method', 1, '&'], ['qse.type', Type::NPC], ['qse.typeId', $tpl['id']]));
                         if ($started->error)
                             continue;
 
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
-                            if (!empty($started->rewards[$id][TYPE_ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][TYPE_ITEM]));
+                            if (!empty($started->rewards[$id][Type::ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
-                            if (!empty($started->choices[$id][TYPE_ITEM]))
-                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][TYPE_ITEM]));
+                            if (!empty($started->choices[$id][Type::ITEM]))
+                                $rewardsLV = array_merge($rewardsLV, array_keys($started->choices[$id][Type::ITEM]));
 
                             $questsLV[$id] = $data;
                         }
@@ -369,7 +369,7 @@ class ZonePage extends GenericPage
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
-                                'type'          => TYPE_NPC,
+                                'type'          => Type::NPC,
                                 'id'            => $tpl['id'],
                                 'reacthorde'    => $tpl['H'],
                                 'reactalliance' => $tpl['A'],
@@ -382,7 +382,7 @@ class ZonePage extends GenericPage
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
-                                'type'          => TYPE_NPC,
+                                'type'          => Type::NPC,
                                 'id'            => $tpl['id'],
                                 'reacthorde'    => $tpl['H'],
                                 'reactalliance' => $tpl['A'],
@@ -402,7 +402,7 @@ class ZonePage extends GenericPage
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
                     'name'          => Util::localizedString($tpl, 'name', true, true),
-                    'type'          => TYPE_AREATRIGGER,
+                    'type'          => Type::AREATRIGGER,
                     'id'            => $spawn['typeId'],
                     'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])
                 ));
@@ -550,9 +550,9 @@ class ZonePage extends GenericPage
             SELECT qse.typeId AS ARRAY_KEY, moreType, moreTypeId, moreZoneId
             FROM   ?_quests_startend qse JOIN ?_source src ON src.type = qse.type AND src.typeId = qse.typeId
             WHERE  src.src2 IS NOT NULL AND qse.type = ?d AND (moreZoneId = ?d OR (moreType = ?d AND moreTypeId IN (?a)) OR (moreType = ?d AND moreTypeId IN (?a)))',
-            TYPE_ITEM,   $this->typeId,
-            TYPE_NPC,    array_unique(array_column($cSpawns, 'typeId')) ?: [0],
-            TYPE_OBJECT, array_unique(array_column($oSpawns, 'typeId')) ?: [0]
+            Type::ITEM,   $this->typeId,
+            Type::NPC,    array_unique(array_column($cSpawns, 'typeId')) ?: [0],
+            Type::OBJECT, array_unique(array_column($oSpawns, 'typeId')) ?: [0]
         );
 
         if ($questStartItem)
@@ -635,13 +635,13 @@ class ZonePage extends GenericPage
                     $condition = [];
                     if ($a['aura_spell'])
                     {
-                        $this->extendGlobalIds(TYPE_SPELL, abs($a['aura_spell']));
+                        $this->extendGlobalIds(Type::SPELL, abs($a['aura_spell']));
                         $condition[0][$this->typeId][] = [[$a['aura_spell'] >  0 ? CND_AURA : -CND_AURA, abs($a['aura_spell'])]];
                     }
 
                     if ($a['quest_start'])                  // status for quests needs work
                     {
-                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_start']);
+                        $this->extendGlobalIds(Type::QUEST, $a['quest_start']);
                         $group = [];
                         for ($i = 0; $i < 7; $i++)
                         {
@@ -664,7 +664,7 @@ class ZonePage extends GenericPage
 
                     if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
                     {
-                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_end']);
+                        $this->extendGlobalIds(Type::QUEST, $a['quest_end']);
                         $group = [];
                         for ($i = 0; $i < 7; $i++)
                         {
@@ -692,7 +692,7 @@ class ZonePage extends GenericPage
                             if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
-                        $this->extendGlobalIds(TYPE_RACE, ...$foo);
+                        $this->extendGlobalIds(Type::CHR_RACE, ...$foo);
                         $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 
@@ -754,7 +754,7 @@ class ZonePage extends GenericPage
                 x.soundId, x.worldStateId, x.worldStateValue
        ', $areaIds, $areaIds, $areaIds, $areaIds, $areaIds);
 
-        if ($sSpawns = DB::Aowow()->selectCol('SELECT typeId FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, TYPE_SOUND))
+        if ($sSpawns = DB::Aowow()->selectCol('SELECT typeId FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::SOUND))
             $soundIds = array_merge($soundIds, $sSpawns);
 
         if ($zoneMusic)

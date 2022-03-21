@@ -10,7 +10,7 @@ class ZonesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type      = TYPE_ZONE;
+    protected $type      = Type::ZONE;
     protected $tpl       = 'list-page-generic';
     protected $path      = [0, 6];
     protected $tabId     = 0;

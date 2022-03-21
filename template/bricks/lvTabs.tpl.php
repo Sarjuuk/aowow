@@ -27,7 +27,7 @@ if (!empty($this->lvTabs) || !empty($this->user['characterData']) || !empty($thi
     endif;
 
     if ($isTabbed):
-        echo "                var ".$tabVar." = new Tabs({parent: \$WH.ge('tabs-generic')".(isset($this->type) ? ", trackable: '".ucfirst(Util::$typeStrings[$this->type]."'") : null)."});\n";
+        echo "                var ".$tabVar." = new Tabs({parent: \$WH.ge('tabs-generic')".(isset($this->type) ? ", trackable: '".ucfirst(Type::getFileString($this->type)."'") : null)."});\n";
     endif;
 
     foreach ($this->lvTabs as $lv):

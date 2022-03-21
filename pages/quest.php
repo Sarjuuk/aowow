@@ -10,7 +10,7 @@ class QuestPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_QUEST;
+    protected $type          = Type::QUEST;
     protected $typeId        = 0;
     protected $tpl           = 'quest';
     protected $path          = [0, 3];
@@ -90,7 +90,7 @@ class QuestPage extends GenericPage
         // event (todo: assign eventData)
         if ($_ = $this->subject->getField('eventId'))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, $_);
+            $this->extendGlobalIds(Type::WORLDEVENT, $_);
             $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$_.']';
         }
 
@@ -164,7 +164,7 @@ class QuestPage extends GenericPage
         // races
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_RACE, ...$jsg);
+            $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
@@ -172,7 +172,7 @@ class QuestPage extends GenericPage
         // classes
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
@@ -180,7 +180,7 @@ class QuestPage extends GenericPage
         // profession / skill
         if ($_ = $this->subject->getField('reqSkillId'))
         {
-            $this->extendGlobalIds(TYPE_SKILL, $_);
+            $this->extendGlobalIds(Type::SKILL, $_);
             $sk =  '[skill='.$_.']';
             if ($_ = $this->subject->getField('reqSkillPoints'))
                 $sk .= ' ('.$_.')';
@@ -202,7 +202,7 @@ class QuestPage extends GenericPage
             if ($se['method'] & 0x1)
             {
                 $this->extendGlobalIds($se['type'], $se['typeId']);
-                $s[] = ($s ? '[span=invisible]'.$start.'[/span] ' : $start.' ') .'['.Util::$typeStrings[$se['type']].'='.$se['typeId'].']';
+                $s[] = ($s ? '[span=invisible]'.$start.'[/span] ' : $start.' ') .'['.Type::getFileString($se['type']).'='.$se['typeId'].']';
             }
         }
 
@@ -217,7 +217,7 @@ class QuestPage extends GenericPage
             if ($se['method'] & 0x2)
             {
                 $this->extendGlobalIds($se['type'], $se['typeId']);
-                $e[] = ($e ? '[span=invisible]'.$end.'[/span] ' : $end.' ') . '['.Util::$typeStrings[$se['type']].'='.$se['typeId'].']';
+                $e[] = ($e ? '[span=invisible]'.$end.'[/span] ' : $end.' ') . '['.Type::getFileString($se['type']).'='.$se['typeId'].']';
             }
         }
 
@@ -276,7 +276,7 @@ class QuestPage extends GenericPage
             array(
                 array(
                     'side'    => $_side,
-                    'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                    'typeStr' => Type::getFileString(Type::QUEST),
                     'typeId'  => $this->typeId,
                     'name'    => $this->name,
                     '_next'   => $this->subject->getField('nextQuestIdChain')
@@ -299,7 +299,7 @@ class QuestPage extends GenericPage
                 array_unshift($chain, array(
                     array(
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
-                        'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                        'typeStr' => Type::getFileString(Type::QUEST),
                         'typeId'  => $_['typeId'],
                         'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                     )
@@ -319,7 +319,7 @@ class QuestPage extends GenericPage
                 array_push($chain, array(
                     array(
                         'side'    => Game::sideByRaceMask($_['reqRaceMask']),
-                        'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                        'typeStr' => Type::getFileString(Type::QUEST),
                         'typeId'  => $_['typeId'],
                         'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
                         '_next'   => $_['_next'],
@@ -345,7 +345,7 @@ class QuestPage extends GenericPage
                 $n = $list->getField('name', true);
                 $chain[] = array(array(
                     'side'    => Game::sideByRaceMask($list->getField('reqRaceMask')),
-                    'typeStr' => Util::$typeStrings[TYPE_QUEST],
+                    'typeStr' => Type::getFileString(Type::QUEST),
                     'typeId'  => $id,
                     'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40))
                 ));
@@ -421,7 +421,7 @@ class QuestPage extends GenericPage
                     $providedRequired = true;
 
                 $this->objectiveList[] = array(
-                    'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                    'typeStr'   => Type::getFileString(Type::ITEM),
                     'id'        => $itemId,
                     'name'      => $olItemData->json[$itemId]['name'],
                     'qty'       => $qty > 1 ? $qty : 0,
@@ -478,7 +478,7 @@ class QuestPage extends GenericPage
                     continue;
 
                 $ol = array(
-                    'typeStr'   => Util::$typeStrings[TYPE_NPC],
+                    'typeStr'   => Type::getFileString(Type::NPC),
                     'id'        => $i,
                     'name'      => $pair[1] ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
                     'qty'       => $pair[0] > 1 ? $pair[0] : 0,
@@ -505,7 +505,7 @@ class QuestPage extends GenericPage
                     continue;
 
                 $this->objectiveList[] = array(
-                    'typeStr'   => Util::$typeStrings[TYPE_OBJECT],
+                    'typeStr'   => Type::getFileString(Type::OBJECT),
                     'id'        => $i,
                     'name'      => $pair[1] ?: Util::localizedString($olGOData->getEntry($i), 'name'),
                     'qty'       => $pair[0] > 1 ? $pair[0] : 0,
@@ -536,7 +536,7 @@ class QuestPage extends GenericPage
                     continue;
 
                 $this->objectiveList[] = array(
-                    'typeStr'   => Util::$typeStrings[TYPE_FACTION],
+                    'typeStr'   => Type::getFileString(Type::FACTION),
                     'id'        => $i,
                     'name'      => Util::localizedString($olFactionsData->getEntry($i), 'name'),
                     'qty'       => sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), Lang::getReputationLevelForPoints($val)),
@@ -548,9 +548,9 @@ class QuestPage extends GenericPage
         // granted spell
         if ($_ = $this->subject->getField('sourceSpellId'))
         {
-            $this->extendGlobalIds(TYPE_SPELL, $_);
+            $this->extendGlobalIds(Type::SPELL, $_);
             $this->objectiveList[] = array(
-                'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                'typeStr'   => Type::getFileString(Type::SPELL),
                 'id'        => $_,
                 'name'      => SpellList::getName($_),
                 'qty'       => 0,
@@ -665,11 +665,11 @@ class QuestPage extends GenericPage
         // POI: start + end
         foreach ($startEnd as $se)
         {
-            if ($se['type'] == TYPE_NPC)
+            if ($se['type'] == Type::NPC)
                 $mapNPCs[] = [$se['typeId'], $se['method'], 0];
-            else if ($se['type'] == TYPE_OBJECT)
+            else if ($se['type'] == Type::OBJECT)
                 $mapGOs[]  = [$se['typeId'], $se['method'], 0];
-            else if ($se['type'] == TYPE_ITEM)
+            else if ($se['type'] == Type::ITEM)
                 $getItemSource($se['typeId'], $se['method']);
         }
 
@@ -698,12 +698,12 @@ class QuestPage extends GenericPage
             // areatrigger
             if ($atir = DB::Aowow()->selectCol('SELECT id FROM ?_areatrigger WHERE type = ?d AND quest = ?d', AT_TYPE_OBJECTIVE, $this->typeId))
             {
-                if ($atSpawns = DB::AoWoW()->select('SELECT typeId AS ARRAY_KEY, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', TYPE_AREATRIGGER, $atir))
+                if ($atSpawns = DB::AoWoW()->select('SELECT typeId AS ARRAY_KEY, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', Type::AREATRIGGER, $atir))
                 {
                     foreach ($atSpawns as $atId => $atsp)
                     {
                         $atSpawn = array (
-                                'type'      => User::isInGroup(U_GROUP_STAFF) ? TYPE_AREATRIGGER : -1,
+                                'type'      => User::isInGroup(U_GROUP_STAFF) ? Type::AREATRIGGER : -1,
                                 'id'        => $atId,
                                 'point'     => 'requirement',
                                 'name'      => $this->subject->parseText('end', false),
@@ -1017,13 +1017,13 @@ class QuestPage extends GenericPage
         if ($_ = $this->subject->getField('reqMinRepFaction'))
         {
             $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))];
-            $this->extendGlobalIds(TYPE_FACTION, $_);
+            $this->extendGlobalIds(Type::FACTION, $_);
         }
 
         if ($_ = $this->subject->getField('reqMaxRepFaction'))
         {
             $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [-CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))];
-            $this->extendGlobalIds(TYPE_FACTION, $_);
+            $this->extendGlobalIds(Type::FACTION, $_);
         }
 
         $_ = Util::getServerConditions([CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK], null, $this->typeId);
@@ -1091,9 +1091,9 @@ class QuestPage extends GenericPage
             $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($realComp), MAX_LEVEL);
 
         // itemChoices
-        if (!empty($this->subject->choices[$this->typeId][TYPE_ITEM]))
+        if (!empty($this->subject->choices[$this->typeId][Type::ITEM]))
         {
-            $c           = $this->subject->choices[$this->typeId][TYPE_ITEM];
+            $c           = $this->subject->choices[$this->typeId][Type::ITEM];
             $choiceItems = new ItemList(array(['id', array_keys($c)]));
             if (!$choiceItems->error)
             {
@@ -1101,21 +1101,21 @@ class QuestPage extends GenericPage
                 foreach ($choiceItems->Iterate() as $id => $__)
                 {
                     $rewards['choice'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                        'typeStr'   => Type::getFileString(Type::ITEM),
                         'id'        => $id,
                         'name'      => $choiceItems->getField('name', true),
                         'quality'   => $choiceItems->getField('quality'),
                         'qty'       => $c[$id],
-                        'globalStr' => 'g_items'
+                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
                     );
                 }
             }
         }
 
         // itemRewards
-        if (!empty($this->subject->rewards[$this->typeId][TYPE_ITEM]))
+        if (!empty($this->subject->rewards[$this->typeId][Type::ITEM]))
         {
-            $ri       = $this->subject->rewards[$this->typeId][TYPE_ITEM];
+            $ri       = $this->subject->rewards[$this->typeId][Type::ITEM];
             $rewItems = new ItemList(array(['id', array_keys($ri)]));
             if (!$rewItems->error)
             {
@@ -1123,20 +1123,20 @@ class QuestPage extends GenericPage
                 foreach ($rewItems->Iterate() as $id => $__)
                 {
                     $rewards['items'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                        'typeStr'   => Type::getFileString(Type::ITEM),
                         'id'        => $id,
                         'name'      => $rewItems->getField('name', true),
                         'quality'   => $rewItems->getField('quality'),
                         'qty'       => $ri[$id],
-                        'globalStr' => 'g_items'
+                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
                     );
                 }
             }
         }
 
-        if (!empty($this->subject->rewards[$this->typeId][TYPE_CURRENCY]))
+        if (!empty($this->subject->rewards[$this->typeId][Type::CURRENCY]))
         {
-            $rc      = $this->subject->rewards[$this->typeId][TYPE_CURRENCY];
+            $rc      = $this->subject->rewards[$this->typeId][Type::CURRENCY];
             $rewCurr = new CurrencyList(array(['id', array_keys($rc)]));
             if (!$rewCurr->error)
             {
@@ -1144,12 +1144,12 @@ class QuestPage extends GenericPage
                 foreach ($rewCurr->Iterate() as $id => $__)
                 {
                     $rewards['items'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_CURRENCY],
+                        'typeStr'   => Type::getFileString(Type::CURRENCY),
                         'id'        => $id,
                         'name'      => $rewCurr->getField('name', true),
                         'quality'   => 1,
                         'qty'       => $rc[$id] * ($side == 2 ? -1 : 1), // toggles the icon
-                        'globalStr' => 'g_gatheredcurrencies'
+                        'globalStr' => Type::getJSGlobalString(Type::CURRENCY)
                     );
                 }
             }
@@ -1179,10 +1179,10 @@ class QuestPage extends GenericPage
                 {
                     $rewards['spells']['extra']  = $extra;
                     $rewards['spells']['cast'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                        'typeStr'   => Type::getFileString(Type::SPELL),
                         'id'        => $cast,
                         'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => 'g_spells'
+                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
                     );
                 }
             }
@@ -1198,20 +1198,20 @@ class QuestPage extends GenericPage
                 {
                     $rewards['spells']['extra'] = null;
                     $rewards['spells'][$teach ? 'learn' : 'cast'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                        'typeStr'   => Type::getFileString(Type::SPELL),
                         'id'        => $displ,
                         'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => 'g_spells'
+                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
                     );
                 }
                 else if (($_ = $rewSpells->getEntry($cast)) && !$teach)
                 {
                     $rewards['spells']['extra']  = null;
                     $rewards['spells']['cast'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                        'typeStr'   => Type::getFileString(Type::SPELL),
                         'id'        => $cast,
                         'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => 'g_spells'
+                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
                     );
                 }
                 else
@@ -1224,10 +1224,10 @@ class QuestPage extends GenericPage
                         foreach ($taught->iterate() as $id => $__)
                         {
                             $rewards['spells']['learn'][] = array(
-                                'typeStr'   => Util::$typeStrings[TYPE_SPELL],
+                                'typeStr'   => Type::getFileString(Type::SPELL),
                                 'id'        => $id,
                                 'name'      => $taught->getField('name', true),
-                                'globalStr' => 'g_spells'
+                                'globalStr' => Type::getJSGlobalString(Type::SPELL)
                             );
                         }
                     }
@@ -1261,7 +1261,7 @@ class QuestPage extends GenericPage
                 $senderTypeId = $_;
             else
                 foreach ($startEnd as $se)
-                    if (($se['method'] & 0x2) && $se['type'] == TYPE_NPC)
+                    if (($se['method'] & 0x2) && $se['type'] == Type::NPC)
                         $senderTypeId = $se['typeId'];
 
             if ($ti = CreatureList::getName($senderTypeId))
@@ -1275,12 +1275,12 @@ class QuestPage extends GenericPage
                 foreach ($mailLoot->getResult() as $loot)
                 {
                     $mail['attachments'][] = array(
-                        'typeStr'   => Util::$typeStrings[TYPE_ITEM],
+                        'typeStr'   => Type::getFileString(Type::ITEM),
                         'id'        => $loot['id'],
                         'name'      => substr($loot['name'], 1),
                         'quality'   => 7 - $loot['name'][0],
                         'qty'       => $loot['stack'][0],
-                        'globalStr' => 'g_items'
+                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
                     );
                 }
             }

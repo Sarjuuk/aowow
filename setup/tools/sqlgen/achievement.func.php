@@ -123,7 +123,7 @@ SqlGen::register(new class extends SetupScript
         if ($criteria = DB::World()->selectCol('SELECT entry FROM disables WHERE sourceType = 4'))
             DB::Aowow()->query('UPDATE aowow_achievement a JOIN aowow_achievementcriteria ac ON a.id = ac.refAchievementId SET a.cuFlags = ?d WHERE ac.id IN (?a)', CUSTOM_DISABLED, $criteria);
 
-        $this->reapplyCCFlags('achievement', TYPE_ACHIEVEMENT);
+        $this->reapplyCCFlags('achievement', Type::ACHIEVEMENT);
 
         return true;
     }

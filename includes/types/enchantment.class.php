@@ -8,7 +8,7 @@ class EnchantmentList extends BaseType
 {
     use listviewHelper;
 
-    public static   $type       = TYPE_ENCHANTMENT;
+    public static   $type       = Type::ENCHANTMENT;
     public static   $brickFile  = 'enchantment';
     public static   $dataTable  = '?_itemenchantment';
 
@@ -17,7 +17,7 @@ class EnchantmentList extends BaseType
     private         $triggerIds = [];
 
     protected       $queryBase  = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
-    protected       $queryOpts  = array(                    // 502 => TYPE_ENCHANTMENT
+    protected       $queryOpts  = array(                    // 502 => Type::ENCHANTMENT
                         'ie'  => [['is']],
                         'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
                     );
@@ -216,7 +216,7 @@ class EnchantmentList extends BaseType
 
         if ($addMask & GLOBALINFO_SELF)
             foreach ($this->iterate() as $__)
-                $data[TYPE_ENCHANTMENT][$this->id] = ['name' => $this->getField('name', true)];
+                $data[Type::ENCHANTMENT][$this->id] = ['name' => $this->getField('name', true)];
 
         if ($addMask & GLOBALINFO_RELATED)
         {
@@ -224,8 +224,8 @@ class EnchantmentList extends BaseType
                 $data = $this->relSpells->getJSGlobals(GLOBALINFO_SELF);
 
             foreach ($this->triggerIds as $tId)
-                if (empty($data[TYPE_SPELL][$tId]))
-                    $data[TYPE_SPELL][$tId] = $tId;
+                if (empty($data[Type::SPELL][$tId]))
+                    $data[Type::SPELL][$tId] = $tId;
         }
 
         return $data;

@@ -12,7 +12,7 @@ class ArenaTeamPage extends GenericPage
 
     protected $lvTabs   = [];
 
-    protected $type     = TYPE_ARENA_TEAM;
+    protected $type     = Type::ARENA_TEAM;
 
     protected $tabId    = 1;
     protected $path     = [1, 5, 3];
@@ -134,7 +134,7 @@ class ArenaTeamPage extends GenericPage
     private function handleIncompleteData($teamGuid)
     {
         //display empty page and queue status
-        $newId = Profiler::scheduleResync(TYPE_ARENA_TEAM, $this->realmId, $teamGuid);
+        $newId = Profiler::scheduleResync(Type::ARENA_TEAM, $this->realmId, $teamGuid);
 
         $this->doResync = ['arena-team', $newId];
         $this->initialSync();

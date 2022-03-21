@@ -26,35 +26,6 @@ define('ERR_MISSING_FILE', 'file %s not found');
 define('ERR_NONE',         'created file %s');
 define('ERR_MISSING_INCL', 'required function %s() could not be found at %s');
 
-// TypeIds
-define('TYPE_NPC',                          1);
-define('TYPE_OBJECT',                       2);
-define('TYPE_ITEM',                         3);
-define('TYPE_ITEMSET',                      4);
-define('TYPE_QUEST',                        5);
-define('TYPE_SPELL',                        6);
-define('TYPE_ZONE',                         7);
-define('TYPE_FACTION',                      8);
-define('TYPE_PET',                          9);
-define('TYPE_ACHIEVEMENT',                  10);
-define('TYPE_TITLE',                        11);
-define('TYPE_WORLDEVENT',                   12);
-define('TYPE_CLASS',                        13);
-define('TYPE_RACE',                         14);
-define('TYPE_SKILL',                        15);
-define('TYPE_CURRENCY',                     17);
-define('TYPE_SOUND',                        19);
-define('TYPE_ICON',                         29);
-define('TYPE_PROFILE',                      100);
-// internal types (not published to js)
-define('TYPE_GUILD',                        101);
-define('TYPE_ARENA_TEAM',                   102);
-define('TYPE_USER',                         500);
-define('TYPE_EMOTE',                        501);
-define('TYPE_ENCHANTMENT',                  502);
-define('TYPE_AREATRIGGER',                  503);
-define('TYPE_MAIL',                         504);
-
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);
 define('CACHE_TYPE_TOOLTIP',                2);
@@ -1674,4 +1645,5 @@ define('AT_TYPE_TELEPORT',  2);
 define('AT_TYPE_OBJECTIVE', 3);
 define('AT_TYPE_SMART',     4);
 define('AT_TYPE_SCRIPT',    5);
+
 ?>

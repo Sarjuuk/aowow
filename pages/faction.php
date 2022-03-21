@@ -10,7 +10,7 @@ class FactionPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_FACTION;
+    protected $type          = Type::FACTION;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 7];
@@ -58,7 +58,7 @@ class FactionPage extends GenericPage
         // Quartermaster if any
         if ($ids = $this->subject->getField('qmNpcIds'))
         {
-            $this->extendGlobalIds(TYPE_NPC, ...$ids);
+            $this->extendGlobalIds(Type::NPC, ...$ids);
 
             $qmStr = Lang::faction('quartermaster').Lang::main('colon');
 

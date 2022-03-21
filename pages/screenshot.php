@@ -49,21 +49,14 @@ class ScreenshotPage extends GenericPage
         // target delivered as screenshot=<command>&<type>.<typeId>.<hash:16> (hash is optional)
         if (preg_match('/^screenshot=\w+&(-?\d+)\.(-?\d+)(\.(\w{16}))?$/i', $_SERVER['QUERY_STRING'] ?? '', $m))
         {
-            // no such type
-            if (empty(Util::$typeClasses[$m[1]]))
+            // no such type or this type cannot receive screenshots
+            if (!Type::checkClassAttrib($m[1], 'contribute', CONTRIBUTE_SS))
                 $this->error();
 
-            // this type cannot receive screenshots
-            if (!(get_class_vars(Util::$typeClasses[$m[1]])['contribute'] & CONTRIBUTE_SS))
-                $this->error();
-
-            $t = Util::$typeClasses[$m[1]];
-            $c = [['id', intVal($m[2])]];
-
-            $this->destination = new $t($c);
+            $this->destination = Type::newList($m[1], [['id', intVal($m[2])]]);
 
             // no such typeId
-            if ($this->destination->error)
+            if (!$this->destination || $this->destination->error)
                 $this->error();
 
             // only accept/expect hash for crop & complete
@@ -89,7 +82,7 @@ class ScreenshotPage extends GenericPage
                 if ($this->handleAdd())
                     header('Location: ?screenshot=crop&'.$this->destType.'.'.$this->destTypeId.'.'.$this->imgHash, true, 302);
                 else
-                    header('Location: ?'.Util::$typeStrings[$this->destType].'='.$this->destTypeId.'#submit-a-screenshot', true, 302);
+                    header('Location: ?'.Type::getFileString($this->destType).'='.$this->destTypeId.'#submit-a-screenshot', true, 302);
                 die();
             case 'crop':
                 $this->handleCrop();
@@ -184,7 +177,7 @@ class ScreenshotPage extends GenericPage
             $this->cropper['minCrop'] = $this->minSize;
 
         // target
-        $this->infobox = sprintf(Lang::screenshot('displayOn'), Util::ucFirst(Lang::game(Util::$typeStrings[$this->destType])), Util::$typeStrings[$this->destType], $this->destTypeId);
+        $this->infobox = sprintf(Lang::screenshot('displayOn'), Lang::typeName($this->destType), Type::getFileString($this->destType), $this->destTypeId);
         $this->extendGlobalIds($this->destType, $this->destTypeId);
     }
 
@@ -240,7 +233,7 @@ class ScreenshotPage extends GenericPage
     private function handleThankyou() : void
     {
         $this->extraHTML  = Lang::screenshot('thanks', 'contrib').'<br><br>';
-        $this->extraHTML .= sprintf(Lang::screenshot('thanks', 'goBack'), Util::$typeStrings[$this->destType], $this->destTypeId)."<br /><br />\n";
+        $this->extraHTML .= sprintf(Lang::screenshot('thanks', 'goBack'), Type::getFileString($this->destType), $this->destTypeId)."<br /><br />\n";
         $this->extraHTML .= '<i>'.Lang::screenshot('thanks', 'note').'</i>';
     }
 

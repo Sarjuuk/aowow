@@ -10,7 +10,7 @@ class EmotePage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_EMOTE;
+    protected $type          = Type::EMOTE;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 100];

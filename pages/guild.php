@@ -12,7 +12,7 @@ class GuildPage extends GenericPage
 
     protected $lvTabs   = [];
 
-    protected $type     = TYPE_GUILD;
+    protected $type     = Type::GUILD;
 
     protected $tabId    = 1;
     protected $path     = [1, 5, 2];
@@ -138,7 +138,7 @@ class GuildPage extends GenericPage
     private function handleIncompleteData($teamGuid)
     {
         //display empty page and queue status
-        $newId = Profiler::scheduleResync(TYPE_GUILD, $this->realmId, $teamGuid);
+        $newId = Profiler::scheduleResync(Type::GUILD, $this->realmId, $teamGuid);
 
         $this->doResync = ['guild', $newId];
         $this->initialSync();

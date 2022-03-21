@@ -75,7 +75,7 @@ SqlGen::register(new class extends SetupScript
                     c.itemId = ?d
             ', $iconId, $itemId);
 
-        $this->reapplyCCFlags('currencies', TYPE_CURRENCY);
+        $this->reapplyCCFlags('currencies', Type::CURRENCY);
 
         return true;
     }

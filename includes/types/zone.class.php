@@ -8,7 +8,7 @@ class ZoneList extends BaseType
 {
     use listviewHelper;
 
-    public static   $type      = TYPE_ZONE;
+    public static   $type      = Type::ZONE;
     public static   $brickFile = 'zone';
     public static   $dataTable = '?_zones';
 
@@ -100,7 +100,7 @@ class ZoneList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_ZONE][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::ZONE][$this->id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }

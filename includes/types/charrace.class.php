@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class CharRaceList extends BaseType
 {
-    public static   $type      = TYPE_RACE;
+    public static   $type      = Type::CHR_RACE;
     public static   $brickFile = 'race';
     public static   $dataTable = '?_races';
 
@@ -40,7 +40,7 @@ class CharRaceList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_RACE][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::CHR_RACE][$this->id] = ['name' => $this->getField('name', true)];
 
         return $data;
     }

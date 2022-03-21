@@ -8,7 +8,7 @@ class PetList extends BaseType
 {
     use ListviewHelper;
 
-    public static   $type      = TYPE_PET;
+    public static   $type      = Type::PET;
     public static   $brickFile = 'pet';
     public static   $dataTable = '?_pet';
 
@@ -59,10 +59,10 @@ class PetList extends BaseType
             if ($addMask & GLOBALINFO_RELATED)
                 for ($i = 1; $i <= 4; $i++)
                     if ($this->curTpl['spellId'.$i] > 0)
-                        $data[TYPE_SPELL][$this->curTpl['spellId'.$i]] = $this->curTpl['spellId'.$i];
+                        $data[Type::SPELL][$this->curTpl['spellId'.$i]] = $this->curTpl['spellId'.$i];
 
             if ($addMask & GLOBALINFO_SELF)
-                $data[TYPE_PET][$this->id] = ['icon' => $this->curTpl['iconString']];
+                $data[Type::PET][$this->id] = ['icon' => $this->curTpl['iconString']];
         }
 
         return $data;

@@ -185,7 +185,7 @@ foreach ($reagents as $k => $itr):
         echo '<div class="iconlist-tree disclosure-off" onclick="iconlist_showhide(this);" style="padding-left: 0; cursor: pointer; width: 15px; float: left" id="spn.reagent-list-generic.'.$itr['path'].'">&nbsp;</div>';
     endif;
 
-    echo '<span class="q'.($itr['type'] == TYPE_ITEM ? $itr['quality'] : null).'"><a href="?'.$itr['typeStr'].'='.$itr['typeId'].'">'.$itr['name'].'</a></span>'.($itr['qty'] > 1 ? '&nbsp;('.$itr['qty'].')' : null)."</td></tr>\n";
+    echo '<span class="q'.($itr['type'] == Type::ITEM ? $itr['quality'] : null).'"><a href="?'.$itr['typeStr'].'='.$itr['typeId'].'">'.$itr['name'].'</a></span>'.($itr['qty'] > 1 ? '&nbsp;('.$itr['qty'].')' : null)."</td></tr>\n";
 endforeach;
 ?>
 </table>

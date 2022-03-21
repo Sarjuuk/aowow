@@ -260,7 +260,7 @@ SqlGen::register(new class extends SetupScript
         // dungeon quests to Misc/Dungeon Finder
         DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE (specialFlags & ?d OR id IN (?a)){ AND id IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
 
-        $this->reapplyCCFlags('quests', TYPE_QUEST);
+        $this->reapplyCCFlags('quests', Type::QUEST);
 
         return true;
     }

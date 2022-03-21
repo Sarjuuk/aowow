@@ -10,7 +10,7 @@ class ObjectPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_OBJECT;
+    protected $type          = Type::OBJECT;
     protected $typeId        = 0;
     protected $tpl           = 'object';
     protected $path          = [0, 5];
@@ -62,7 +62,7 @@ class ObjectPage extends GenericPage
         // Event (ignore events, where the object only gets removed)
         if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.eventEntry = geg.eventEntry AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
         {
-            $this->extendGlobalIds(TYPE_WORLDEVENT, ...$_);
+            $this->extendGlobalIds(Type::WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
@@ -73,7 +73,7 @@ class ObjectPage extends GenericPage
         // Faction
         if ($_ = DB::Aowow()->selectCell('SELECT factionId FROM ?_factiontemplate WHERE id = ?d', $this->subject->getField('faction')))
         {
-            $this->extendGlobalIds(TYPE_FACTION, $_);
+            $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
         }
 
@@ -125,7 +125,7 @@ class ObjectPage extends GenericPage
         // linked trap
         if ($_ = $this->subject->getField('linkedTrap'))
         {
-            $this->extendGlobalIds(TYPE_OBJECT, $_);
+            $this->extendGlobalIds(Type::OBJECT, $_);
             $infobox[] = Lang::gameObject('trap').Lang::main('colon').'[object='.$_.']';
         }
 
@@ -158,7 +158,7 @@ class ObjectPage extends GenericPage
         {
             if ($_ = $this->subject->getField('mStone'))
             {
-                $this->extendGlobalIds(TYPE_ZONE, $_[2]);
+                $this->extendGlobalIds(Type::ZONE, $_[2]);
                 $m = Lang::game('meetingStone').Lang::main('colon').'[zone='.$_[2].']';
 
                 $l = $_[0];
@@ -278,7 +278,7 @@ class ObjectPage extends GenericPage
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
-            BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => TYPE_OBJECT, 'typeId' => $this->typeId]
+            BUTTON_VIEW3D  => ['displayId' => $this->subject->getField('displayId'), 'type' => Type::OBJECT, 'typeId' => $this->typeId]
         );
 
 
@@ -343,7 +343,7 @@ class ObjectPage extends GenericPage
 
         // tab: starts quest
         // tab: ends quest
-        $startEnd = new QuestList(array(['qse.type', TYPE_OBJECT], ['qse.typeId', $this->typeId]));
+        $startEnd = new QuestList(array(['qse.type', Type::OBJECT], ['qse.typeId', $this->typeId]));
         if (!$startEnd->error)
         {
             $this->extendGlobalData($startEnd->getJSGlobals());
@@ -448,11 +448,11 @@ class ObjectPage extends GenericPage
 
             foreach ($reqQuests->iterate() as $qId => $__)
             {
-                if (empty($reqQuests->requires[$qId][TYPE_ITEM]))
+                if (empty($reqQuests->requires[$qId][Type::ITEM]))
                     continue;
 
                 foreach ($reqIds as $rId)
-                    if (in_array($rId, $reqQuests->requires[$qId][TYPE_ITEM]))
+                    if (in_array($rId, $reqQuests->requires[$qId][Type::ITEM]))
                         $reqQuest[$rId] = $reqQuests->id;
             }
         }

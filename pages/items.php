@@ -10,7 +10,7 @@ class ItemsPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_ITEM;
+    protected $type          = Type::ITEM;
     protected $tpl           = 'items';
     protected $path          = [0, 0];
     protected $tabId         = 0;

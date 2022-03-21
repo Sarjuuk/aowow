@@ -285,16 +285,16 @@ class Game
 
         switch ($type)
         {
-            case TYPE_NPC:
+            case Type::NPC:
                 $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM creature WHERE `guid` IN (?a)', $guids);
                 break;
-            case TYPE_OBJECT:
+            case Type::OBJECT:
                 $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject WHERE `guid` IN (?a)', $guids);
                 break;
-            case TYPE_SOUND:
+            case Type::SOUND:
                 $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`, `mapId`, `posX`, `posY` FROM dbc_soundemitters WHERE `soundId` IN (?a)', $guids);
                 break;
-            case TYPE_AREATRIGGER:
+            case Type::AREATRIGGER:
                 $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM dbc_areatrigger WHERE `id` IN (?a)', $guids);
                 break;
             default:

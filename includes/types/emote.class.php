@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 
 class EmoteList extends BaseType
 {
-    public static   $type      = TYPE_EMOTE;
+    public static   $type      = Type::EMOTE;
     public static   $brickFile = 'emote';
     public static   $dataTable = '?_emotes';
 
@@ -47,7 +47,7 @@ class EmoteList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[TYPE_EMOTE][$this->id] = ['name' => $this->getField('cmd')];
+            $data[Type::EMOTE][$this->id] = ['name' => $this->getField('cmd')];
 
         return $data;
     }

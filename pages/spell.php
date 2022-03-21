@@ -10,7 +10,7 @@ class SpellPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_SPELL;
+    protected $type          = Type::SPELL;
     protected $typeId        = 0;
     protected $tpl           = 'spell';
     protected $path          = [0, 1];
@@ -139,7 +139,7 @@ class SpellPage extends GenericPage
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => array(
                 'linkColor' => 'ff71d5ff',
-                'linkId'    => Util::$typeStrings[TYPE_SPELL].':'.$this->typeId,
+                'linkId'    => Type::getFileString(Type::SPELL).':'.$this->typeId,
                 'linkName'  => $this->name,
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
@@ -165,7 +165,7 @@ class SpellPage extends GenericPage
         // races
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_RACE, ...$jsg);
+            $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
@@ -173,7 +173,7 @@ class SpellPage extends GenericPage
         // classes
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, false))
         {
-            $this->extendGlobalIds(TYPE_CLASS, ...$jsg);
+            $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
             $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
         }
@@ -235,7 +235,7 @@ class SpellPage extends GenericPage
         if ($_ = $this->subject->getField('iconId'))
         {
             $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
-            $this->extendGlobalIds(TYPE_ICON, $_);
+            $this->extendGlobalIds(Type::ICON, $_);
         }
 
         // used in mode
@@ -614,8 +614,8 @@ class SpellPage extends GenericPage
             ['onUseSpell', $this->subject->id], ['onSuccessSpell', $this->subject->id],
             ['auraSpell',  $this->subject->id], ['triggeredSpell', $this->subject->id]
         );
-        if (!empty($ubSAI[TYPE_OBJECT]))
-            $conditions[] = ['id', $ubSAI[TYPE_OBJECT]];
+        if (!empty($ubSAI[Type::OBJECT]))
+            $conditions[] = ['id', $ubSAI[Type::OBJECT]];
 
         $ubObjects = new GameObjectList($conditions);
         if (!$ubObjects->error)
@@ -632,9 +632,9 @@ class SpellPage extends GenericPage
         // tab: used by - areatrigger
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            if (!empty($ubSAI[TYPE_AREATRIGGER]))
+            if (!empty($ubSAI[Type::AREATRIGGER]))
             {
-                $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[TYPE_AREATRIGGER]]));
+                $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[Type::AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
                     $this->lvTabs[] = ['areatrigger', array(
@@ -689,7 +689,7 @@ class SpellPage extends GenericPage
                         $lv[$bar] = $foo[$bar];
                         $lv[$bar]['percent'] = $extraItem['additionalCreateChance'];
                         $lv[$bar]['condition'][0][$this->typeId][] = [[CND_SPELL, $extraItem['requiredSpecialization']]];
-                        $this->extendGlobalIds(TYPE_SPELL, $extraItem['requiredSpecialization']);
+                        $this->extendGlobalIds(Type::SPELL, $extraItem['requiredSpecialization']);
                         $extraCols[] = '$Listview.extraCols.condition';
                         if ($max = ($extraItem['additionalMaxNum'] - 1))
                             $lv[$bar]['stack'] = [1, $max];
@@ -849,8 +849,8 @@ class SpellPage extends GenericPage
             ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
             ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
-        if (!empty($ubSAI[TYPE_NPC]))
-            $conditions[] = ['id', $ubSAI[TYPE_NPC]];
+        if (!empty($ubSAI[Type::NPC]))
+            $conditions[] = ['id', $ubSAI[Type::NPC]];
 
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
@@ -884,13 +884,13 @@ class SpellPage extends GenericPage
                     $condition = [];
                     if ($a['aura_spell'])
                     {
-                        $this->extendGlobalIds(TYPE_SPELL, abs($a['aura_spell']));
+                        $this->extendGlobalIds(Type::SPELL, abs($a['aura_spell']));
                         $condition[0][$this->typeId][] = [[$a['aura_spell'] >  0 ? CND_AURA : -CND_AURA, abs($a['aura_spell'])]];
                     }
 
                     if ($a['quest_start'])                  // status for quests needs work
                     {
-                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_start']);
+                        $this->extendGlobalIds(Type::QUEST, $a['quest_start']);
                         $group = [];
                         for ($i = 0; $i < 7; $i++)
                         {
@@ -913,7 +913,7 @@ class SpellPage extends GenericPage
 
                     if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
                     {
-                        $this->extendGlobalIds(TYPE_QUEST, $a['quest_end']);
+                        $this->extendGlobalIds(Type::QUEST, $a['quest_end']);
                         $group = [];
                         for ($i = 0; $i < 7; $i++)
                         {
@@ -941,7 +941,7 @@ class SpellPage extends GenericPage
                             if ($a['racemask'] & (1 << $i))
                                 $foo[] = $i + 1;
 
-                        $this->extendGlobalIds(TYPE_RACE, ...$foo);
+                        $this->extendGlobalIds(Type::CHR_RACE, ...$foo);
                         $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
                     }
 
@@ -1246,19 +1246,19 @@ class SpellPage extends GenericPage
         if (!$item)
             return false;
 
-        $this->extendGlobalIds(TYPE_ITEM, $item['id']);
+        $this->extendGlobalIds(Type::ITEM, $item['id']);
 
         $_level++;
 
         $data = array(
-            'type'    => TYPE_ITEM,
+            'type'    => Type::ITEM,
             'typeId'  => $item['id'],
-            'typeStr' => Util::$typeStrings[TYPE_ITEM],
+            'typeStr' => Type::getFileString(Type::ITEM),
             'quality' => $item['quality'],
             'name'    => Util::localizedString($item, 'name'),
             'icon'    => $item['iconString'],
             'qty'     => $_qty * $_mult,
-            'path'    => $_path.'.'.TYPE_ITEM.'-'.$item['id'],
+            'path'    => $_path.'.'.Type::ITEM.'-'.$item['id'],
             'level'   => $_level
         );
 
@@ -1299,16 +1299,16 @@ class SpellPage extends GenericPage
             if (in_array(-$sId, $alreadyUsed))
                 continue;
 
-            $this->extendGlobalIds(TYPE_SPELL, $sId);
+            $this->extendGlobalIds(Type::SPELL, $sId);
 
             $data = array(
-                'type'    => TYPE_SPELL,
+                'type'    => Type::SPELL,
                 'typeId'  => $sId,
-                'typeStr' => Util::$typeStrings[TYPE_SPELL],
+                'typeStr' => Type::getFileString(Type::SPELL),
                 'name'    => Util::localizedString($row, 'name'),
                 'icon'    => $row['iconString'],
                 'qty'     => $_qty,
-                'path'    => $_path.'.'.TYPE_SPELL.'-'.$sId,
+                'path'    => $_path.'.'.Type::SPELL.'-'.$sId,
                 'level'   => $_level,
             );
 
@@ -1354,14 +1354,14 @@ class SpellPage extends GenericPage
                     continue;
 
                 $data = array(
-                    'type'    => TYPE_ITEM,
+                    'type'    => Type::ITEM,
                     'typeId'  => $iId,
-                    'typeStr' => Util::$typeStrings[TYPE_ITEM],
+                    'typeStr' => Type::getFileString(Type::ITEM),
                     'quality' => $this->subject->relItems->getField('quality'),
                     'name'    => $this->subject->relItems->getField('name', true),
                     'icon'    => $this->subject->relItems->getField('iconString'),
                     'qty'     => $reagents[$iId][1],
-                    'path'    => TYPE_ITEM.'-'.$iId,            // id of the html-element
+                    'path'    => Type::ITEM.'-'.$iId,            // id of the html-element
                     'level'   => 0                              // depths in array, used for indentation
                 );
 
@@ -1702,7 +1702,7 @@ class SpellPage extends GenericPage
                 case 112:                                   // Summon Demon
                 case 134:                                   // Kill Credit2
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
-                        $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $summon['displayId']];
+                        $redButtons[BUTTON_VIEW3D] = ['type' => Type::NPC, 'displayId' => $summon['displayId']];
 
                     $_ = Lang::game('npc').' #'.$effMV;
                     if ($n = CreatureList::getName($effMV))
@@ -1754,7 +1754,7 @@ class SpellPage extends GenericPage
                 case 106:                                   // Summon Object (slot 3)
                 case 107:                                   // Summon Object (slot 4)
                     if ($summon = $this->subject->getModelInfo($this->typeId, $i))
-                        $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_OBJECT, 'displayId' => $summon['displayId']];
+                        $redButtons[BUTTON_VIEW3D] = ['type' => Type::OBJECT, 'displayId' => $summon['displayId']];
 
                     $_ = Util::ucFirst(Lang::game('object')).' #'.$effMV;
                     if ($n = GameobjectList::getName($effMV))
@@ -1920,7 +1920,7 @@ class SpellPage extends GenericPage
                                 if ($st = $this->subject->getModelInfo($this->typeId, $i))
                                 {
                                     $redButtons[BUTTON_VIEW3D] = array(
-                                        'type'      => TYPE_NPC,
+                                        'type'      => Type::NPC,
                                         'displayId' => $st['displayId']
                                     );
 
@@ -2093,7 +2093,7 @@ class SpellPage extends GenericPage
                             case 56:                        // Transform
                                 if ($transform = $this->subject->getModelInfo($this->typeId, $i))
                                 {
-                                    $redButtons[BUTTON_VIEW3D] = ['type' => TYPE_NPC, 'displayId' => $transform['displayId']];
+                                    $redButtons[BUTTON_VIEW3D] = ['type' => Type::NPC, 'displayId' => $transform['displayId']];
                                     $bar = $transform['typeId'] ? ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)' : ' (#0)';
                                 }
                                 else
@@ -2115,7 +2115,7 @@ class SpellPage extends GenericPage
                                     {
                                         if ($x = $so['spellId'.$j])
                                         {
-                                            $this->extendGlobalData([TYPE_SPELL => [$x]]);
+                                            $this->extendGlobalData([Type::SPELL => [$x]]);
                                             $buff[] = '[spell='.$x.']';
                                         }
                                     }

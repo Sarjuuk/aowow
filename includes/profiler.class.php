@@ -234,19 +234,19 @@ class Profiler
 
         switch ($type)
         {
-            case TYPE_PROFILE:
+            case Type::PROFILE:
                 if ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, TYPE_PROFILE, $newId);
+                    self::queueInsert($realmId, $guid, Type::PROFILE, $newId);
 
                 break;
-            case TYPE_GUILD:
+            case Type::GUILD:
                 if ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, TYPE_GUILD, $newId);
+                    self::queueInsert($realmId, $guid, Type::GUILD, $newId);
 
                 break;
-            case TYPE_ARENA_TEAM:
+            case Type::ARENA_TEAM:
                 if ($newId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_arena_team WHERE realm = ?d AND realmGUID = ?d', $realmId, $guid))
-                    self::queueInsert($realmId, $guid, TYPE_ARENA_TEAM, $newId);
+                    self::queueInsert($realmId, $guid, Type::ARENA_TEAM, $newId);
 
                 break;
             default:
@@ -547,7 +547,7 @@ class Profiler
         DB::Aowow()->query('DELETE FROM ?_profiler_completion WHERE id = ?d', $profileId);
 
         // done quests
-        if ($quests = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, quest AS typeId FROM character_queststatus_rewarded WHERE guid = ?d', $profileId, TYPE_QUEST, $char['guid']))
+        if ($quests = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, quest AS typeId FROM character_queststatus_rewarded WHERE guid = ?d', $profileId, Type::QUEST, $char['guid']))
             foreach (Util::createSqlBatchInsert($quests) as $q)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$q, array_keys($quests[0]));
 
@@ -556,7 +556,7 @@ class Profiler
 
         // known skills (professions only)
         $skAllowed = DB::Aowow()->selectCol('SELECT id FROM ?_skillline WHERE typeCat IN (9, 11) AND (cuFlags & ?d) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
-        $skills    = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, skill AS typeId, `value` AS cur, max FROM character_skills WHERE guid = ?d AND skill IN (?a)', $profileId, TYPE_SKILL, $char['guid'], $skAllowed);
+        $skills    = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, skill AS typeId, `value` AS cur, max FROM character_skills WHERE guid = ?d AND skill IN (?a)', $profileId, Type::SKILL, $char['guid'], $skAllowed);
 
         // manually apply racial profession bonuses
         foreach ($skills as &$sk)
@@ -595,7 +595,7 @@ class Profiler
                             acquireMethod = 1 AND
                             (reqRaceMask  = 0 OR reqRaceMask  & ?d) AND
                             (reqClassMask = 0 OR reqClassMask & ?d)',
-                $profileId, TYPE_SPELL,
+                $profileId, Type::SPELL,
                 array_column($skills, 'typeId'),
                 1 << ($char['race']  - 1),
                 1 << ($char['class'] - 1)
@@ -623,7 +623,7 @@ class Profiler
             ((baseRepClassMask4 & ?d) || !baseRepClassMask4)
         ', $ra, $cl, $ra, $cl, $ra, $cl, $ra, $cl);
 
-        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, faction AS typeId, standing AS cur FROM character_reputation WHERE guid = ?d AND (flags & 0x4) = 0', $profileId, TYPE_FACTION, $char['guid']))
+        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, faction AS typeId, standing AS cur FROM character_reputation WHERE guid = ?d AND (flags & 0x4) = 0', $profileId, Type::FACTION, $char['guid']))
         {
             // merge back base values for encountered factions
             foreach ($reputation as &$set)
@@ -640,7 +640,7 @@ class Profiler
         foreach ($baseRep as $id => $val)
             $reputation[] = array(
                 'id'     => $profileId,
-                'type'   => TYPE_FACTION,
+                'type'   => Type::FACTION,
                 'typeId' => $id,
                 'cur'    => $val
             );
@@ -660,13 +660,13 @@ class Profiler
                     $indizes[] = $j + ($i * 32);
 
         if ($indizes)
-            DB::Aowow()->query('INSERT INTO ?_profiler_completion SELECT ?d, ?d, id, NULL, NULL FROM ?_titles WHERE bitIdx IN (?a)', $profileId, TYPE_TITLE, $indizes);
+            DB::Aowow()->query('INSERT INTO ?_profiler_completion SELECT ?d, ?d, id, NULL, NULL FROM ?_titles WHERE bitIdx IN (?a)', $profileId, Type::TITLE, $indizes);
 
         CLI::write(' ..titles');
 
 
         // achievements
-        if ($achievements = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, achievement AS typeId, date AS cur FROM character_achievement WHERE guid = ?d', $profileId, TYPE_ACHIEVEMENT, $char['guid']))
+        if ($achievements = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, achievement AS typeId, date AS cur FROM character_achievement WHERE guid = ?d', $profileId, Type::ACHIEVEMENT, $char['guid']))
         {
             foreach (Util::createSqlBatchInsert($achievements) as $a)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$a, array_keys($achievements[0]));
@@ -678,7 +678,7 @@ class Profiler
 
 
         // raid progression
-        if ($progress = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, criteria AS typeId, date AS cur, counter AS `max` FROM character_achievement_progress WHERE guid = ?d AND criteria IN (?a)', $profileId, TYPE_ACHIEVEMENT, $char['guid'], self::$raidProgression))
+        if ($progress = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, criteria AS typeId, date AS cur, counter AS `max` FROM character_achievement_progress WHERE guid = ?d AND criteria IN (?a)', $profileId, Type::ACHIEVEMENT, $char['guid'], self::$raidProgression))
         {
             array_walk($progress, function (&$val) { $val['typeId'] = array_search($val['typeId'], self::$raidProgression); });
             foreach (Util::createSqlBatchInsert($progress) as $p)
@@ -689,7 +689,7 @@ class Profiler
 
 
         // known spells
-        if ($spells = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, spell AS typeId FROM character_spell WHERE guid = ?d AND disabled = 0', $profileId, TYPE_SPELL, $char['guid']))
+        if ($spells = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, spell AS typeId FROM character_spell WHERE guid = ?d AND disabled = 0', $profileId, Type::SPELL, $char['guid']))
             foreach (Util::createSqlBatchInsert($spells) as $s)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$s, array_keys($spells[0]));
 

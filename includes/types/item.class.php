@@ -8,7 +8,7 @@ class ItemList extends BaseType
 {
     use ListviewHelper;
 
-    public static   $type       = TYPE_ITEM;
+    public static   $type       = Type::ITEM;
     public static   $brickFile  = 'item';
     public static   $dataTable  = '?_items';
 
@@ -25,7 +25,7 @@ class ItemList extends BaseType
     private         $jsGlobals  = [];                       // getExtendedCost creates some and has no access to template
 
     protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
-    protected       $queryOpts  = array(                    // 3 => TYPE_ITEM
+    protected       $queryOpts  = array(                    // 3 => Type::ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
                         'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.name AS iconString'],
                         'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 3 AND `is`.`typeId` = `i`.`id`', true], 's' => ', `is`.*'],
@@ -105,9 +105,9 @@ class ItemList extends BaseType
                 SELECT   nv.item,       nv.entry,             0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
                 SELECT genv.item, c.id AS `entry`, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
-                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
+                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
                 array_keys($this->templates),
-                empty($filter[TYPE_NPC]) || !is_array($filter[TYPE_NPC]) ? DBSIMPLE_SKIP : $filter[TYPE_NPC],
+                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
                 array_keys($this->templates)
             );
 
@@ -147,13 +147,13 @@ class ItemList extends BaseType
                         if (!empty($costs['reqArenaPoints']))
                         {
                             $data[-103] = $costs['reqArenaPoints'];
-                            $this->jsGlobals[TYPE_CURRENCY][103] = 103;
+                            $this->jsGlobals[Type::CURRENCY][103] = 103;
                         }
 
                         if (!empty($costs['reqHonorPoints']))
                         {
                             $data[-104] = $costs['reqHonorPoints'];
-                            $this->jsGlobals[TYPE_CURRENCY][104] = 104;
+                            $this->jsGlobals[Type::CURRENCY][104] = 104;
                         }
 
                         for ($i = 1; $i < 6; $i++)
@@ -212,7 +212,7 @@ class ItemList extends BaseType
                                     }
 
                                     if (!$found)
-                                        $this->jsGlobals[TYPE_ITEM][$k] = $k;
+                                        $this->jsGlobals[Type::ITEM][$k] = $k;
                                 }
                             }
                             $costData[$itr] = $cost;
@@ -229,8 +229,8 @@ class ItemList extends BaseType
         $result = $this->vendors;
 
         // apply filter if given
-        $tok = !empty($filter[TYPE_ITEM])     ? $filter[TYPE_ITEM]     : null;
-        $cur = !empty($filter[TYPE_CURRENCY]) ? $filter[TYPE_CURRENCY] : null;
+        $tok = !empty($filter[Type::ITEM])     ? $filter[Type::ITEM]     : null;
+        $cur = !empty($filter[Type::CURRENCY]) ? $filter[Type::CURRENCY] : null;
 
         foreach ($result as $itemId => &$data)
         {
@@ -366,7 +366,7 @@ class ItemList extends BaseType
 
                         if ($entries['event'])
                         {
-                            $this->jsGlobals[TYPE_WORLDEVENT][$entries['event']] = $entries['event'];
+                            $this->jsGlobals[Type::WORLDEVENT][$entries['event']] = $entries['event'];
                             $costArr['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $entries['event']]];
                         }
 
@@ -464,7 +464,7 @@ class ItemList extends BaseType
         {
             if ($addMask & GLOBALINFO_SELF)
             {
-                $data[TYPE_ITEM][$id] = array(
+                $data[Type::ITEM][$id] = array(
                     'name'    => $this->getField('name', true),
                     'quality' => $this->curTpl['quality'],
                     'icon'    => $this->curTpl['iconString']
@@ -878,8 +878,8 @@ class ItemList extends BaseType
         if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg))
         {
             foreach ($jsg as $js)
-                if (empty($this->jsGlobals[TYPE_CLASS][$js]))
-                    $this->jsGlobals[TYPE_CLASS][$js] = $js;
+                if (empty($this->jsGlobals[Type::CHR_CLASS][$js]))
+                    $this->jsGlobals[Type::CHR_CLASS][$js] = $js;
 
             $x .= Lang::game('classes').Lang::main('colon').$classes.'<br />';
         }
@@ -888,8 +888,8 @@ class ItemList extends BaseType
         if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $jsg))
         {
             foreach ($jsg as $js)
-                if (empty($this->jsGlobals[TYPE_RACE][$js]))
-                    $this->jsGlobals[TYPE_RACE][$js] = $js;
+                if (empty($this->jsGlobals[Type::CHR_RACE][$js]))
+                    $this->jsGlobals[Type::CHR_ACE][$js] = $js;
 
             $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
         }
@@ -1302,7 +1302,7 @@ class ItemList extends BaseType
 
         if ($enchantments)
         {
-            $eStats = DB::Aowow()->select('SELECT *, typeId AS ARRAY_KEY FROM ?_item_stats WHERE `type` = ?d AND typeId IN (?a)', TYPE_ENCHANTMENT, array_keys($enchantments));
+            $eStats = DB::Aowow()->select('SELECT *, typeId AS ARRAY_KEY FROM ?_item_stats WHERE `type` = ?d AND typeId IN (?a)', Type::ENCHANTMENT, array_keys($enchantments));
             Util::checkNumeric($eStats);
 
             // and merge enchantments back
@@ -1362,7 +1362,7 @@ class ItemList extends BaseType
         {
             $data[$this->id] = array(
                 'n'    => $this->getField('name', true),
-                't'    => TYPE_ITEM,
+                't'    => Type::ITEM,
                 'ti'   => $this->id,
                 'q'    => $this->curTpl['quality'],
              // 'p'    => PvP [NYI]
@@ -1424,7 +1424,7 @@ class ItemList extends BaseType
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = (new Util::$typeClasses[$type](array(['id', $ids])))->getSourceData();
+                $this->sourceMore[$type] = (Type::newList($type, [['id', $ids]]))?->getSourceData();
         }
 
         $s = array_keys($this->sources[$this->id]);

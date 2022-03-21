@@ -39,12 +39,12 @@ class AjaxArenaTeam extends AjaxHandler
     {
         if ($teams = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_arena_team WHERE id IN (?a)', $this->_get['id']))
             foreach ($teams as $t)
-                Profiler::scheduleResync(TYPE_ARENA_TEAM, $t['realm'], $t['realmGUID']);
+                Profiler::scheduleResync(Type::ARENA_TEAM, $t['realm'], $t['realmGUID']);
 
         if ($this->_get['profile'])
             if ($chars = DB::Aowow()->select('SELECT realm, realmGUID FROM ?_profiler_profiles p JOIN ?_profiler_arena_team_member atm ON atm.profileId = p.id WHERE atm.arenaTeamId IN (?a)', $this->_get['id']))
                 foreach ($chars as $c)
-                    Profiler::scheduleResync(TYPE_PROFILE, $c['realm'], $c['realmGUID']);
+                    Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
 
         return '1';
     }
@@ -74,7 +74,7 @@ class AjaxArenaTeam extends AjaxHandler
     */
     protected function handleStatus() : string
     {
-        $response = Profiler::resyncStatus(TYPE_ARENA_TEAM, $this->_get['id']);
+        $response = Profiler::resyncStatus(Type::ARENA_TEAM, $this->_get['id']);
         return Util::toJSON($response);
     }
 }

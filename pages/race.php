@@ -10,7 +10,7 @@ class RacePage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $type          = TYPE_RACE;
+    protected $type          = Type::CHR_RACE;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';
     protected $path          = [0, 13];
@@ -72,14 +72,14 @@ class RacePage extends GenericPage
         // leader
         if ($_ = $this->subject->getField('leader'))
         {
-            $this->extendGlobalIds(TYPE_NPC, $_);
+            $this->extendGlobalIds(Type::NPC, $_);
             $infobox[] = Lang::race('racialLeader').Lang::main('colon').'[npc='.$_.']';
         }
 
         // start area
         if ($_ = $this->subject->getField('startAreaId'))
         {
-            $this->extendGlobalIds(TYPE_ZONE, $_);
+            $this->extendGlobalIds(Type::ZONE, $_);
             $infobox[] = Lang::race('startZone').Lang::main('colon').'[zone='.$_.']';
         }
 

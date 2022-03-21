@@ -10,7 +10,7 @@ class ClassesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_CLASS;
+    protected $type          = Type::CHR_CLASS;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 12];
     protected $tabId         = 0;

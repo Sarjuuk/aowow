@@ -10,7 +10,7 @@ class RacesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type          = TYPE_RACE;
+    protected $type          = Type::CHR_RACE;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 13];
     protected $tabId         = 0;
