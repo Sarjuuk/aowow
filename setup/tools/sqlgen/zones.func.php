@@ -115,7 +115,7 @@ SqlGen::register(new class extends SetupScript
 
         foreach ($baseData as &$bd)
         {
-            if (!in_array($bd['parentMapId'], [0, 1, 530, 571]))
+            if (in_array($bd['mapBak'], [0, 1, 530, 571]))
                 continue;
 
             if ($gPos = Game::worldPosToZonePos($bd['parentMapId'], $bd['parentY'], $bd['parentX']))

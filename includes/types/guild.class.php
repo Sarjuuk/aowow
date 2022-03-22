@@ -196,7 +196,15 @@ class RemoteGuildList extends GuildList
             }
             else
             {
-                trigger_error('character "'.$curTpl['name'].'" belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('guild #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                unset($this->templates[$guid]);
+                continue;
+            }
+
+            // empty name
+            if (!$curTpl['name'])
+            {
+                trigger_error('guild #'.$guid.' on realm #'.$r.' has empty name.', E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }

@@ -300,6 +300,12 @@ class Profiler
         if (!$char)
             return false;
 
+        if (!$char['name'])
+        {
+            trigger_error('char #'.$charGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
+            return false;
+        }
+
         // reminder: this query should not fail: a placeholder entry is created as soon as a char listview is created or profile detail page is called
         $profile = DB::Aowow()->selectRow('SELECT id, lastupdated FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $realmId, $char['guid']);
         if (!$profile)
@@ -431,7 +437,7 @@ class Profiler
         // char is flagged for rename
         if ($char['at_login'] & 0x1)
         {
-            $ri = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d AND name = ?', $realmId, $charGuid, $char['name']);
+            $ri = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $realmId, $char['name']);
             $data['renameItr'] = $ri ? ++$ri : 1;
         }
 
@@ -773,6 +779,12 @@ class Profiler
         if (!$guild)
             return false;
 
+        if (!$guild['name'])
+        {
+            trigger_error('guild #'.$guildGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
+            return false;
+        }
+
         // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
         $guildId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $realmId, $guild['guildId']);
 
@@ -833,6 +845,12 @@ class Profiler
         $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, `rank`, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
         if (!$team)
             return false;
+
+        if (!$team['name'])
+        {
+            trigger_error('arena team #'.$teamGuid.' on realm #'.$realmId.' has empty name. skipping...', E_USER_WARNING);
+            return false;
+        }
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
         $teamId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_arena_team WHERE realm = ?d AND realmGUID = ?d', $realmId, $team['arenaTeamId']);
