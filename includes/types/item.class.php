@@ -889,7 +889,7 @@ class ItemList extends BaseType
         {
             foreach ($jsg as $js)
                 if (empty($this->jsGlobals[Type::CHR_RACE][$js]))
-                    $this->jsGlobals[Type::CHR_ACE][$js] = $js;
+                    $this->jsGlobals[Type::CHR_RACE][$js] = $js;
 
             $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
         }

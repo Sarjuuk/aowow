@@ -34,7 +34,7 @@ class GuidesPage extends GenericPage
             $this->myGuides = true;
         }
         else
-            $this->name = Util::ucFirst(Lang::guide('guides'));
+            $this->name = Util::ucFirst(Lang::game('guides'));
     }
 
     protected function generateContent()
@@ -71,7 +71,7 @@ class GuidesPage extends GenericPage
 
         $tabData = array(
             'data'        => $data,
-            'name'        => Util::ucFirst(Lang::guide('guides')),
+            'name'        => Util::ucFirst(Lang::game('guides')),
             'hiddenCols'  => $hCols,
             'visibleCols' => $vCols,
             'extraCols'   => $xCols

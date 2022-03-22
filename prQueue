@@ -28,11 +28,11 @@ $tCycle = microtime(true);
 $error = function ($type, $realmGUID, $realmId)
 {
     $what = '';
-    if ($type == TYPE_PROFILE)
+    if ($type == Type::PROFILE)
         $what = 'char';
-    if ($type == TYPE_GUILD)
+    if ($type == Type::GUILD)
         $what = 'guild';
-    if ($type == TYPE_ARENA_TEAM)
+    if ($type == Type::ARENA_TEAM)
         $what = 'arena team';
 
     DB::Aowow()->query('UPDATE ?_profiler_sync SET status = ?d, errorCode = ?d WHERE realm = ?d AND realmGUID = ?d AND type = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_CHAR, $realmId, $realmGUID, $type);
@@ -73,28 +73,28 @@ while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profil
 
     switch ($row['type'])
     {
-        case TYPE_PROFILE:
+        case Type::PROFILE:
             if (!Profiler::getCharFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(TYPE_PROFILE, $row['realmGUID'], $row['realm']);
+                $error(Type::PROFILE, $row['realmGUID'], $row['realm']);
                 DB::Aowow()->query('DELETE FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }
 
             break;
-        case TYPE_GUILD:
+        case Type::GUILD:
             if (!Profiler::getGuildFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(TYPE_GUILD, $row['realmGUID'], $row['realm']);
+                $error(Type::GUILD, $row['realmGUID'], $row['realm']);
                 DB::Aowow()->query('DELETE FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }
 
             break;
-        case TYPE_ARENA_TEAM:
+        case Type::ARENA_TEAM:
             if (!Profiler::getArenaTeamFromRealm($row['realm'], $row['realmGUID']))
             {
-                $error(TYPE_ARENA_TEAM, $row['realmGUID'], $row['realm']);
+                $error(Type::ARENA_TEAM, $row['realmGUID'], $row['realm']);
                 DB::Aowow()->query('DELETE FROM ?_profiler_arena_team WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }

@@ -106,7 +106,7 @@ class GuidePage extends GenericPage
                     if (User::canWriteGuide())
                     {
                         if (!$this->initEdit())
-                            $this->notFound(Lang::guide('guide'), Lang::guide('notFound'));
+                            $this->notFound(Lang::game('guide'), Lang::guide('notFound'));
 
                         $this->show = self::SHOW_EDITOR;
                     }
@@ -128,7 +128,7 @@ class GuidePage extends GenericPage
 
         $this->subject = new GuideList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::guide('guide'), Lang::guide('notFound'));
+            $this->notFound(Lang::game('guide'), Lang::guide('notFound'));
 
         if (!$this->subject->canBeViewed() && !$this->subject->userCanView())
             header('Location: ?guides='.$this->subject->getField('category'), true, 302);
@@ -188,7 +188,7 @@ class GuidePage extends GenericPage
     {
         // can't check in init as subject is unknown
         if ($this->subject->getField('status') == GUIDE_STATUS_ARCHIVED)
-            $this->notFound(Lang::guide('guide'), Lang::guide('notFound'));
+            $this->notFound(Lang::game('guide'), Lang::guide('notFound'));
 
         $status    = GUIDE_STATUS_NONE;
         $rev       = DB::Aowow()->selectCell('SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC LIMIT 1', Type::GUIDE, $this->typeId);
@@ -537,11 +537,11 @@ class GuidePage extends GenericPage
     protected function generateTitle() : void
     {
         if ($this->show == self::SHOW_EDITOR)
-            array_unshift($this->title, Lang::guide('editTitle').Lang::main('colon').$this->subject->getField('title'), Lang::guide('guides'));
+            array_unshift($this->title, Lang::guide('editTitle').Lang::main('colon').$this->subject->getField('title'), Lang::game('guides'));
         if ($this->show == self::SHOW_NEW)
-            array_unshift($this->title, Lang::guide('newTitle'), Lang::guide('guides'));
+            array_unshift($this->title, Lang::guide('newTitle'), Lang::game('guides'));
         else
-            array_unshift($this->title, $this->subject->getField('title'), Lang::guide('guides'));
+            array_unshift($this->title, $this->subject->getField('title'), Lang::game('guides'));
     }
 
     protected function postCache() : void
