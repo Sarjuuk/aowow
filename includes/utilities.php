@@ -1844,7 +1844,7 @@ abstract class Type
         $x = [];
         foreach (self::$data as $k => [$o, , , $f])
             if ($o && (!$flags || $flags & $f))
-                if (!$attr || self::checkClassAttrib($attr, $attrVal))
+                if (!$attr || self::checkClassAttrib($k, $attr, $attrVal))
                     $x[$k] = $o;
 
         return $x;

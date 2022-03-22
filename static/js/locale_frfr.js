@@ -956,18 +956,7 @@ var mn_database = [
 var mn_guides = [
     [1, "Classes", '?guides=1'],
     [6, "Economie et Argent", '?guides=6'],
-    [3, "Évènements mondiaux", '?guides=3', [
-        [,"Aowow Guides"],
-        ["lunar-festival","Fête lunaire","?guide=lunar-festival"],
-        ["love-is-in-the-air","De l'amour dans l'air","?guide=love-is-in-the-air"],
-        ["noblegarden","Jardin des nobles","?guide=noblegarden"],
-        ["childrens-week","Semaine des enfants","?guide=childrens-week"],
-        ["midsummer-fire-festival","Fête du Feu du solstice d'été","?guide=midsummer-fire-festival"],
-        ["brewfest","Voile d'hiver","?guide=brewfest"],
-        ["hallows-end","Sanssaint","?guide=hallows-end"],
-        ["pilgrims-bounty","Bienfaits du pèlerin","?guide=pilgrims-bounty"],
-        ["winter-veil","Voile d'hiver","?guide=winter-veil"]
-    ]],
+    [3, "Évènements mondiaux", '?guides=3'],
     [7, "Hauts faits", '?guides=7'],
     [4, "Nouveaux Joueurs & Montée en niveau", '?guides=4'],
     [2, "Métiers", '?guides=2'],

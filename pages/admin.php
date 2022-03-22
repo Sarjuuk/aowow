@@ -16,7 +16,7 @@ class AdminPage extends GenericPage
         'all'    => ['filter' => FILTER_UNSAFE_RAW],
         'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
         'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'urldecode'],
+        'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'urldecode']
     );
 
     private   $generator = '';
@@ -88,7 +88,7 @@ class AdminPage extends GenericPage
             [CSS_STRING, '.grid a.tip:hover  { opacity:1; }'],
             [CSS_STRING, '.grid tr { height:30px; }'],
             [CSS_STRING, '.grid .disabled { opacity:0.4 !important; }'],
-            [CSS_STRING, '.grid .status { position:absolute; right:5px; }'],
+            [CSS_STRING, '.grid .status { position:absolute; right:5px; }']
         );
 
         $head = '<table class="grid"><tr><th><b>Key</b></th><th><b>Value</b></th><th style="width:150px;"><b>Options</b></th></tr>';
@@ -198,7 +198,7 @@ class AdminPage extends GenericPage
         $this->addScript(
             [JS_FILE,    'screenshot.js'],
             [CSS_STRING, '.layout {margin: 0px 25px; max-width: inherit; min-width: 1200px; }'],
-            [CSS_STRING, '#highlightedRow { background-color: #322C1C; }'],
+            [CSS_STRING, '#highlightedRow { background-color: #322C1C; }']
         );
 
         $ssGetAll = $this->_get['all'];
@@ -235,7 +235,7 @@ class AdminPage extends GenericPage
     {
         $this->addScript(
             [JS_FILE,    'filters.js'],
-            [CSS_STRING, '.wt-edit {display:inline-block; vertical-align:top; width:350px;}'],
+            [CSS_STRING, '.wt-edit {display:inline-block; vertical-align:top; width:350px;}']
         );
 
         $head = $body = '';

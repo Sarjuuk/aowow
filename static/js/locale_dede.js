@@ -960,18 +960,7 @@ var mn_guides = [
     [1, "Klassen", '?guides=1'],
     [4, "Neue Spieler & Stufenfortschritt", '?guides=4'],
     [5, "Schlachtzüge & Bosskämpfe", '?guides=5'],
-    [3, "Weltereignisse", '?guides=3', [
-        [, "Aowow Leitfäden"],
-        ["lunar-festival","Mondfest","?guide=lunar-festival"],
-        ["love-is-in-the-air","Liebe liegt in der Luft","?guide=love-is-in-the-air"],
-        ["noblegarden","Nobelgartenfest","?guide=noblegarden"],
-        ["childrens-week","Kinderwoche","?guide=childrens-week"],
-        ["midsummer-fire-festival","Sonnenwendfest","?guide=midsummer-fire-festival"],
-        ["brewfest","Braufest","?guide=brewfest"],
-        ["hallows-end","Schlotternächte","?guide=hallows-end"],
-        ["pilgrims-bounty","Pilgerfreudenfest","?guide=pilgrims-bounty"],
-        ["winter-veil","Winterhauchfest","?guide=winter-veil"]
-    ]],
+    [3, "Weltereignisse", '?guides=3'],
     [6, "Wirtschaft & Währung", '?guides=6'],
     [9, "Anderes", '?guides=9']
 ];

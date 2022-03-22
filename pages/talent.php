@@ -33,7 +33,7 @@ class TalentPage extends GenericPage
         // add conditional js & css
         $this->addScript(
             [JS_FILE, ($this->isPetCalc ? '?data=pet-talents.pets' : '?data=glyphs').'&locale='.User::$localeId.'&t='.$_SESSION['dataKey']],
-            [JS_FILE,  $this->isPetCalc ? 'petcalc.js'             : 'talent.js'],
+            [JS_FILE,  $this->isPetCalc ? 'petcalc.js'             : 'talent.js']
         );
 
         if ($this->isPetCalc)

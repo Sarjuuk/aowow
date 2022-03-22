@@ -1007,18 +1007,7 @@ var mn_guides = [
     [2, "Professions", '?guides=2'],
     [5, "Raid & Boss Fights", '?guides=5'],
     [8, "Vanity Items, Pets & Mounts", '?guides=8'],
-    [3, "World Events", '?guides=3', [
-        [,"Aowow Guides"],
-        ["lunar-festival","Lunar Festival","?guide=lunar-festival"],
-        ["love-is-in-the-air","Love is in the Air","?guide=love-is-in-the-air"],
-        ["noblegarden","Noblegarden","?guide=noblegarden"],
-        ["childrens-week","Childrens Week","?guide=childrens-week"],
-        ["midsummer-fire-festival","Midsummer Fire Festival","?guide=midsummer-fire-festival"],
-        ["brewfest","Brewfest","?guide=brewfest"],
-        ["hallows-end","Hallow's End","?guide=hallows-end"],
-        ["pilgrims-bounty","Pilgrim's Bounty","?guide=pilgrims-bounty"],
-        ["winter-veil","Feast of Winter Veil","?guide=winter-veil"]
-    ]],
+    [3, "World Events", '?guides=3'],
     [9, "Other", '?guides=9']
 ];
 

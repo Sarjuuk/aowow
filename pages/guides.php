@@ -10,7 +10,7 @@ class GuidesPage extends GenericPage
 {
     use TrListPage;
 
-    protected $type      = Type::Guide;
+    protected $type      = Type::GUIDE;
     protected $tpl       = 'list-page-generic';
     protected $path      = [6];
     protected $tabId     = 6;

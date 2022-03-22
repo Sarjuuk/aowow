@@ -961,18 +961,7 @@ var mn_guides = [
     [2, "Профессии", '?guides=2'],
     [5, "Подземелья и рейды", '?guides=5'],
     [8, "Забавные предметы", '?guides=8'],
-    [3, "Игровые события", '?guides=3', [
-        [,"Aowow Гайды"],
-        ["lunar-festival","Лунный фестиваль","?guide=lunar-festival"],
-        ["love-is-in-the-air","Любовная лихорадка","?guide=love-is-in-the-air"],
-        ["noblegarden","Сад чудес","?guide=noblegarden"],
-        ["childrens-week","Детская неделя","?guide=childrens-week"],
-        ["winter-veil","Зимний Покров","?guide=winter-veil"],
-        ["hallows-end","Тыквовин","?guide=hallows-end"],
-        ["midsummer-fire-festival","Огненный солнцеворот","?guide=midsummer-fire-festival"],
-        ["winter-veil","Зимний Покров","?guide=winter-veil"],
-        ["pilgrims-bounty","Пиршество странников","?guide=pilgrims-bounty"]
-    ]],
+    [3, "Игровые события", '?guides=3'],
     [9, "Разное", '?guides=9']
 ];
 
