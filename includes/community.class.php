@@ -95,6 +95,7 @@ class CommunityContent
             {c.userId = ?d AND}
             {c.replyTo <> ?d AND}
             {c.replyTo = ?d AND}
+            {ur.entry IS ?n AND}
             ((c.flags & ?d) = 0 OR c.userId = ?d OR ?d)
         GROUP BY
             c.id
@@ -141,6 +142,7 @@ class CommunityContent
              empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
              empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
             !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
+             empty($params['unrated']) ? DBSIMPLE_SKIP : null,
             CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),

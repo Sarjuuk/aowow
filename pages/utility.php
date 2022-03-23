@@ -162,9 +162,7 @@ class UtilityPage extends GenericPage
 
                 break;
             case 'unrated-comments':
-
-                // EXPLAIN SELECT ac.* FROM aowow_comments ac LEFT JOIN aowow_comments_rates acr ON acr.commentId = ac.id AND acr.userId <> 0 WHERE acr.commentId IS NULL;
-                if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'replies' => false], $nFound))
+                if ($_ = CommunityContent::getCommentPreviews(['unrated' => true], $nFound))
                 {
                     $tabData = array(
                         'data'           => $_,
@@ -180,7 +178,6 @@ class UtilityPage extends GenericPage
 
                     $this->lvTabs[] = ['commentpreview', $tabData];
                 }
-
 
                 $this->lvTabs[] = ['commentpreview', ['data' => []]];
                 break;
