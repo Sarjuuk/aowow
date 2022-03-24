@@ -92,7 +92,7 @@ class GuideList extends BaseType
                 'description' => $this->getField('description'),
                 'sticky'      => !!($this->getField('cuFlags') & CC_FLAG_STICKY),
                 'nvotes'      => $this->getField('nvotes'),
-                'url'         => '/?guide=' . ($this->getField('url') ?: $this->id),
+                'url'         => '?guide=' . ($this->getField('url') ?: $this->id),
                 'status'      => $this->getField('status'),
                 'author'      => $this->getField('author'),
                 'authorroles' => $this->getField('roles'),
@@ -103,8 +103,6 @@ class GuideList extends BaseType
                 'date'        => $this->getField('date'),   // ok
                 'when'        => date(Util::$dateFormatInternal, $this->getField('date'))
             );
-
-
         }
 
         return $data;

@@ -162,22 +162,8 @@ class UtilityPage extends GenericPage
 
                 break;
             case 'unrated-comments':
-                if ($_ = CommunityContent::getCommentPreviews(['unrated' => true], $nFound))
-                {
-                    $tabData = array(
-                        'data'           => $_,
-                        'onBeforeCreate' => '$Listview.funcBox.beforeUserComments',
-                        '_totalCount'    => $nFound
-                    );
-
-                    if ($nFound > CFG_SQL_LIMIT_DEFAULT)
-                    {
-                        $tabData['name'] = '$LANG.tab_latestcomments';
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
-                    }
-
-                    $this->lvTabs[] = ['commentpreview', $tabData];
-                }
+                if ($_ = CommunityContent::getCommentPreviews(['unrated' => true]))
+                    $this->lvTabs[] = ['commentpreview', ['data' => $_]];
 
                 $this->lvTabs[] = ['commentpreview', ['data' => []]];
                 break;
