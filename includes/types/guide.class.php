@@ -153,7 +153,7 @@ class GuideList extends BaseType
         }
 
         $tt  = '<table><tr><td><div style="max-width: 320px"><b class="q">'.$this->getField('title').'</b><br>';
-        $tt .= '<table width="100%"><tr><td>'.Lang::guide('guide').'</td><th>'.Lang::guide('byAuthor', [$this->getField('author')]).'</th></tr></table>';
+        $tt .= '<table width="100%"><tr><td>'.Lang::game('guide').'</td><th>'.Lang::guide('byAuthor', [$this->getField('author')]).'</th></tr></table>';
         $tt .= '<table width="100%"><tr><td>'.Lang::guide('category', $this->getField('category')).$specStr.'</td><th>'.Lang::guide('patch').' 3.3.5</th></tr></table>';
         $tt .= '<div class="q" style="margin: 0.25em 0">'.$this->getField('description').'</div>';
         $tt .= '</div></td></tr></table>';

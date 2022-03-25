@@ -1555,7 +1555,7 @@ class SmartAI
                 {
                     $type = Type::NPC;
                     if ($spawnType == 1)
-                        $type == Type::GAMEOBJECT;
+                        $type == Type::OBJECT;
 
                     $a['param'][7] = $this->spawnFlags('action', 3);
 
@@ -1582,7 +1582,7 @@ class SmartAI
             case SAI_ACTION_RESPAWN_BY_SPAWNID:             // 133
                 $type = Type::NPC;
                 if ($a['param'][0] == 1)
-                    $type == Type::GAMEOBJECT;
+                    $type == Type::OBJECT;
 
                 if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d',  $type, $a['param'][1]))
                     $a['param'][6] = '['.Type::getFileString($type).'='.$_.']';
