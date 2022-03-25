@@ -4852,6 +4852,8 @@ var LANG = {
     guideAuthor:       'Auteur du guide',
     autoresizetextbox: 'Redimensionner automatiquement le champ texte',
 
+    restock: '[Restock]',
+
     descriptionlengthlong_tip:          'Fichtre ! Votre description $1 est trop longue ! Elle sera probablement tronquée.',
     descriptionlengthoptimal_tip:       'Votre description est de longueur appropriée. Bien joué ! Vous pouvez sans problème ajouter jusqu\'à $1 si besoin.',
     descriptionlengthshort_tip:         'Votre description est trop courte ! Encore $1...',

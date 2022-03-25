@@ -621,11 +621,18 @@ class NpcPage extends GenericPage
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
             {
+                $colAddIn  = '';
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
-                if ($soldItems->hasSetFields(['condition']))
-                    $extraCols[] = '$Listview.extraCols.condition';
+                    if ($soldItems->hasSetFields(['condition']))
+                        $extraCols[] = '$Listview.extraCols.condition';
 
                 $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [Type::NPC => [$this->typeId]]);
+
+                if (array_filter(array_column($lvData, 'restock')))
+                {
+                    $extraCols[] = '$_';
+                    $colAddIn = 'vendorRestockCol';
+                }
 
                 $sc = Util::getServerConditions(CND_SRC_NPC_VENDOR, $this->typeId);
                 if (!empty($sc[0]))
@@ -645,7 +652,7 @@ class NpcPage extends GenericPage
                     'name'      => '$LANG.tab_sells',
                     'id'        => 'currency-for',
                     'extraCols' => array_unique($extraCols)
-                )];
+                ), $colAddIn];
 
                 $this->extendGlobalData($soldItems->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }

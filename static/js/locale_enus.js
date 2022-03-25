@@ -4898,6 +4898,8 @@ var LANG = {
     guideAuthor:       'Guide Author',
     autoresizetextbox: 'Auto-Resize Text Box',
 
+    restock: 'Restock',
+
     descriptionlengthlong_tip:          'Oh no! Your description is $1 too long! It will most likely be truncated.',
     descriptionlengthoptimal_tip:       'Your description is a good length. Good job! You can safely add up to $1 if needed.',
     descriptionlengthshort_tip:         'Your description is too short! $1 to go...',

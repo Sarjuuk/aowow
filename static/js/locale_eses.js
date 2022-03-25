@@ -4853,6 +4853,8 @@ var LANG = {
     guideAuthor:       '[Guide Author]',
     autoresizetextbox: 'Redimensionar automáticamente el cuadro de texto',
 
+    restock: '[Restock]',
+
     descriptionlengthlong_tip:          '¡Oh, no! Tu descripción es demasido larga por $1. Es muy posible que sea cortada',
     descriptionlengthoptimal_tip:       'Tu descripción es de la longitud óptima. ¡Buen trabajo! Si es necesario, puedes agregar hasta $1.',
     descriptionlengthshort_tip:         '¡Tu descripción es demasiado corta! Te faltan $1...',

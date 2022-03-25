@@ -4850,6 +4850,8 @@ var LANG = {
     guideAuthor:       'Leitfadenautor',
     autoresizetextbox: 'Textfeld automatisch anpassen',
 
+    restock: 'Nachschub',
+
     descriptionlengthlong_tip:          'Oh nein! Deine Beschreibung ist zu lang bei $1. Es wird wahrscheinlich gekürzt werden.',
     descriptionlengthoptimal_tip:       'Ihre Beschreibung hat eine gute Länge. Gut gemacht! Sie können sicher bis zu $1 hinzufügen, wenn nötig.',
     descriptionlengthshort_tip:         'Ihre Beschreibung ist zu kurz! $1 fehlen noch ...',

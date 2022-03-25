@@ -102,9 +102,9 @@ class ItemList extends BaseType
             $itemz      = [];
             $xCostData  = [];
             $rawEntries = DB::World()->select('
-                SELECT   nv.item,       nv.entry,             0  AS eventId,   nv.maxcount,   nv.extendedCost FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
+                SELECT   nv.item,       nv.entry,             0  AS eventId,   nv.maxcount,   nv.extendedCost,   nv.incrtime FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
                 UNION
-                SELECT genv.item, c.id AS `entry`, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+                SELECT genv.item, c.id AS `entry`, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost, genv.incrtime FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
                 empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
                 array_keys($this->templates),
                 empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
@@ -136,9 +136,10 @@ class ItemList extends BaseType
                         if (!empty($xCostData[$vInfo['extendedCost']]))
                             $costs = $xCostData[$vInfo['extendedCost']];
 
-                        $data   = array(
+                        $data = array(
                             'stock'      => $vInfo['maxcount'] ?: -1,
                             'event'      => $vInfo['eventId'],
+                            'restock'    => $vInfo['incrtime'],
                             'reqRating'  => $costs ? $costs['reqPersonalRating'] : 0,
                             'reqBracket' => $costs ? $costs['reqArenaSlot']      : 0
                         );
@@ -360,9 +361,10 @@ class ItemList extends BaseType
                                 $currency[] = [-$k, $qty];
                         }
 
-                        $costArr['stock'] = $entries['stock'];// display as column in lv
-                        $costArr['avail'] = $entries['stock'];// display as number on icon
-                        $costArr['cost']  = [empty($entries[0]) ? 0 : $entries[0]];
+                        $costArr['stock']   = $entries['stock'];// display as column in lv
+                        $costArr['avail']   = $entries['stock'];// display as number on icon
+                        $costArr['cost']    = [empty($entries[0]) ? 0 : $entries[0]];
+                        $costArr['restock'] = $entries['restock'];
 
                         if ($entries['event'])
                         {

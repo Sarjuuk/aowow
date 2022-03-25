@@ -4877,6 +4877,8 @@ var LANG = {
     guideAuthor:       '[Guide Author]',
     autoresizetextbox: '自动缩放文字框',
 
+    restock: '[Restock]',
+
     descriptionlengthlong_tip:          '欧漏，你的描述超出了$1个字！可能会被删减哦。',
     descriptionlengthoptimal_tip:       '你的注释已经达到了合理的长度。干的漂亮！',
     descriptionlengthshort_tip:         '你的注释太短了！请再输入$1$个字。',
