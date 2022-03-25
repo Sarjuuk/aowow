@@ -1623,6 +1623,7 @@ DROP TABLE IF EXISTS `aowow_mails`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_mails` (
   `id` smallint(5) NOT NULL,
+  `cuFlags` int(10) unsigned NOT NULL DEFAULT 0,
   `subject_loc0` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc2` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject_loc3` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -3184,7 +3185,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1647956310,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1648222153,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
