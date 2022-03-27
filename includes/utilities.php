@@ -103,7 +103,7 @@ trait TrRequestData
 
     private static function checkIdListUnsigned(string $val) : array
     {
-        if (preg_match('/\d+(,\d+)*/', $val))
+        if (preg_match('/^\d+(,\d+)*$/', $val))
             return array_map('intVal', explode(',', $val));
 
         return [];

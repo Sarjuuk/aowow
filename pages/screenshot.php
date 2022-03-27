@@ -28,7 +28,7 @@ class ScreenshotPage extends GenericPage
     protected $imgHash     = '';
 
     protected $_post       = array(
-        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIdListUnsigned'],
+        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'ScreenshotPage::checkCoords'],
         'screenshotalt' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW]
     );
 
@@ -196,7 +196,7 @@ class ScreenshotPage extends GenericPage
         if (count($dims) != 4)
             return 3;
 
-        Util::checkNumeric($dims, NUM_REQ_INT);
+        Util::checkNumeric($dims, NUM_CAST_FLOAT);
 
         // actually crop the image
         $srcImg = imagecreatefromjpeg($fullPath);
@@ -331,6 +331,14 @@ class ScreenshotPage extends GenericPage
     private function ssName() : string
     {
         return $this->imgHash ? User::$displayName.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash : '';
+    }
+
+    protected static function checkCoords(string $val) : array
+    {
+        if (preg_match('/^[01]\.[0-9]{3}(,[01]\.[0-9]{3}){3}$/', $val))
+            return explode(',', $val);
+
+        return [];
     }
 
     protected function generatePath() : void { }
