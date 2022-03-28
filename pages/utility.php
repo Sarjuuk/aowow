@@ -95,7 +95,7 @@ class UtilityPage extends GenericPage
                 else
                 {
                     array_walk($data, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
-                    $this->lvTabs[] = ['commentpreview', ['data' => array_values($data)]];
+                    $this->lvTabs[] = ['commentpreview', ['data' => $data]];
                 }
 
                 break;
@@ -126,7 +126,7 @@ class UtilityPage extends GenericPage
                 else
                 {
                     array_walk($data, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
-                    $this->lvTabs[] = ['screenshot', ['data' => array_values($data)]];
+                    $this->lvTabs[] = ['screenshot', ['data' => $data]];
                 }
 
                 break;
@@ -157,7 +157,7 @@ class UtilityPage extends GenericPage
                 else
                 {
                     array_walk($data, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
-                    $this->lvTabs[] = ['video', ['data' => array_values($data)]];
+                    $this->lvTabs[] = ['video', ['data' => $data]];
                 }
 
                 break;

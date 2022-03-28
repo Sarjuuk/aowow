@@ -178,7 +178,7 @@ class CommunityContent
             }
         }
 
-        return $comments;
+        return array_values($comments);
     }
 
     public static function getCommentReplies(int $commentId, int $limit = 0, ?int &$nFound = 0) : array
@@ -440,7 +440,7 @@ class CommunityContent
                 unset($v['user']);
         }
 
-        return $videos;
+        return array_values($videos);
     }
 
     public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0, bool $dateFmt = true) : array
@@ -484,7 +484,7 @@ class CommunityContent
                 unset($s['user']);
         }
 
-        return $screenshots;
+        return array_values($screenshots);
     }
 
     public static function getAll(int $type, int $typeId, array &$jsg) : array
