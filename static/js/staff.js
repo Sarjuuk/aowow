@@ -106,7 +106,7 @@ var mn_staff = [
 //  [3,   'Localization',            null,                                    mn_localization],
 //  [7,   'Statistics',              null,                                    mn_statistics,  {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV}],
 //  [4,   'Users',                   null,                                    mn_users],
-//  [5,   'View Reports',            '?admin=reports',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR | U_GROUP_MOD | U_GROUP_LOCALIZER | U_GROUP_SCREENSHOT | U_GROUP_VIDEO} ],
+    [5,   'View Reports',            '?admin=reports',                        null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR | U_GROUP_MOD | U_GROUP_LOCALIZER | U_GROUP_SCREENSHOT | U_GROUP_VIDEO} ],
 
     [,    'Page'],
     [102, 'Validate',                'http://validator.w3.org/check/referer', null,           {requiredAccess: U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV | U_GROUP_TESTER}]];

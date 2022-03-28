@@ -177,7 +177,7 @@ class AjaxComment extends AjaxHandler
         }
 
         // in theory, there is a username passed alongside...   lets just use the current user (see user.js)
-        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags | ?d, deleteUserId = ?d, deleteDate = UNIX_TIMESTAMP() WHERE id IN (?a){ AND userId = ?d}',
+        $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` | ?d, `deleteUserId` = ?d, `deleteDate` = UNIX_TIMESTAMP() WHERE `id` IN (?a){ AND `userId` = ?d}',
             CC_FLAG_DELETED,
             User::$id,
             $this->_post['id'],
@@ -187,13 +187,14 @@ class AjaxComment extends AjaxHandler
         // deflag hasComment
         if ($ok)
         {
-            $coInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~b.flags) & ?d, 1, 0) as hasMore, b.type, b.typeId FROM ?_comments a JOIN ?_comments b ON a.type = b.type AND a.typeId = b.typeId WHERE a.id = ?d',
+            $coInfo = DB::Aowow()->select('SELECT IF(BIT_OR(~b.`flags`) & ?d, 1, 0) AS hasMore, b.`type`, b.`typeId` FROM ?_comments a JOIN ?_comments b ON a.`type` = b.`type` AND a.`typeId` = b.`typeId` WHERE a.`id` IN (?a) GROUP BY b.`type`, b.`typeId`',
                 CC_FLAG_DELETED,
                 $this->_post['id']
             );
 
-            if (!$coInfo['hasMore'] && ($tbl = Type::getClassAttrib($coInfo['type'], 'dataTable')))
-                DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags & ~?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
+            foreach ($coInfo as $co)
+                if (!$co['hasMore'] && ($tbl = Type::getClassAttrib($co['type'], 'dataTable')))
+                    DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` & ~?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_COMMENT, $co['typeId']);
         }
         else
             trigger_error('AjaxComment::handleCommentDelete - user #'.User::$id.' could not flag comment #'.$this->_post['id'].' as deleted', E_USER_ERROR);
@@ -208,7 +209,7 @@ class AjaxComment extends AjaxHandler
         }
 
         // in theory, there is a username passed alongside...   lets just use the current user (see user.js)
-        $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id IN (?a){ AND userId = deleteUserId AND deleteUserId = ?d}',
+        $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` IN (?a){ AND `userId` = `deleteUserId` AND `deleteUserId` = ?d}',
             CC_FLAG_DELETED,
             $this->_post['id'],
             User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id
@@ -217,9 +218,10 @@ class AjaxComment extends AjaxHandler
         // reflag hasComment
         if ($ok)
         {
-            $coInfo = DB::Aowow()->selectRow('SELECT type, typeId FROM ?_comments WHERE id = ?d', $this->_post['id']);
-            if ($tbl = Type::getClassAttrib($coInfo['type'], 'dataTable'))
-                DB::Aowow()->query('UPDATE '.$tbl.' SET cuFlags = cuFlags | ?d WHERE id = ?d', CUSTOM_HAS_COMMENT, $coInfo['typeId']);
+            $coInfo = DB::Aowow()->select('SELECT `type`, `typeId` FROM ?_comments WHERE `id` IN (?a) GROUP BY `type`, `typeId`', $this->_post['id']);
+            foreach ($coInfo as $co)
+                if ($tbl = Type::getClassAttrib($co['type'], 'dataTable'))
+                    DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_COMMENT, $co['typeId']);
         }
         else
             trigger_error('AjaxComment::handleCommentUndelete - user #'.User::$id.' could not unflag comment #'.$this->_post['id'].' as deleted', E_USER_ERROR);
@@ -300,19 +302,24 @@ class AjaxComment extends AjaxHandler
         if (User::isInGroup(U_GROUP_MODERATOR))             // directly mark as outdated
         {
             if (!$this->_post['remove'])
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  0x4 WHERE id = ?d', $this->_post['id'][0]);
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  ?d WHERE id = ?d', CC_FLAG_OUTDATED, $this->_post['id'][0]);
             else
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~0x4 WHERE id = ?d', $this->_post['id'][0]);
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags & ~?d WHERE id = ?d', CC_FLAG_OUTDATED, $this->_post['id'][0]);
         }
-        else if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND `userId` = ?d', 1, 17, $this->_post['id'][0], User::$id))
-            return Lang::main('alreadyReport');
-        else if (User::$id && !$this->_post['reason'] || mb_strlen($this->_post['reason']) < self::REPLY_LENGTH_MIN)
-            return Lang::main('textTooShort');
-        else if (User::$id)                                 // only report as outdated
-            $ok = Util::createReport(1, 17, $this->_post['id'][0], '[Outdated Comment] '.$this->_post['reason']);
+        else                                                // try to report as outdated
+        {
+            $report = new Report(Report::MODE_COMMENT, Report::CO_OUT_OF_DATE, $this->_post['id'][0]);
+            if ($report->create($this->_post['reason']))
+                $ok = true;                                 // the script expects the actual characters 'ok' not some json string like "ok"
+            else
+                return Lang::main('intError');
 
-        if ($ok)                                            // this one is very special; as in: completely retarded
-            return 'ok';                                    // the script expects the actual characters 'ok' not some string like "ok"
+            if (count($report->getSimilar()) >= 5)          // 5 or more reports on the same comment: trigger flag
+                $ok = DB::Aowow()->query('UPDATE ?_comments SET flags = flags |  ?d WHERE id = ?d', CC_FLAG_OUTDATED, $this->_post['id'][0]);
+        }
+
+        if ($ok)
+            return 'ok';
         else
             trigger_error('AjaxComment::handleCommentOutOfDate - failed to update comment in db', E_USER_ERROR);
 

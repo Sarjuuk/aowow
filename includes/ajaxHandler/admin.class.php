@@ -5,7 +5,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxAdmin extends AjaxHandler
 {
-    protected $validParams = ['screenshots', 'siteconfig', 'weight-presets', 'spawn-override', 'guide'];
+    protected $validParams = ['screenshots', 'siteconfig', 'weight-presets', 'spawn-override', 'guide', 'comment'];
     protected $_get        = array(
         'action' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW           ],
         'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
@@ -88,6 +88,13 @@ class AjaxAdmin extends AjaxHandler
                 return;
 
             $this->handler = 'guideManage';
+        }
+        else if ($this->params[0] == 'comment')
+        {
+            if (!User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_MOD))
+                return;
+
+            $this->handler = 'commentOutOfDate';
         }
     }
 
@@ -524,6 +531,28 @@ class AjaxAdmin extends AjaxHandler
         }
 
         return '-1';
+    }
+
+    protected function commentOutOfDate() : string
+    {
+        $ok = false;
+        switch ($this->_post['status'])
+        {
+            case 0:                                         // up to date
+                if ($ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` = ?d', CC_FLAG_OUTDATED, $this->_post['id']))
+                    if ($rep = new Report(Report::MODE_COMMENT, Report::CO_OUT_OF_DATE, $this->_post['id']))
+                        $rep->close(Report::STATUS_CLOSED_WONTFIX);
+                break;
+            case 1:                                         // outdated, mark as deleted and clear other flags (sticky + outdated)
+                if ($ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = ?d, `deleteUserId` = ?d, `deleteDate` = ?d WHERE `id` = ?d', CC_FLAG_DELETED, User::$id, time(), $this->_post['id']))
+                    if ($rep = new Report(Report::MODE_COMMENT, Report::CO_OUT_OF_DATE, $this->_post['id']))
+                        $rep->close(Report::STATUS_CLOSED_SOLVED);
+        break;
+            default:
+                trigger_error('AjaxHandler::comentOutOfDate - called with invalid status');
+        }
+
+        return $ok ? '1' : '0';
     }
 
 

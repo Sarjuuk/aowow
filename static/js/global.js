@@ -21213,52 +21213,28 @@ var ContactTool = new function() {
             [7, true]  // Other
         ],
         1: [ // comment
-            [15, function(post) {
-                return ((post.roles & U_GROUP_MODERATOR) == 0);
-            }], // Advertising
-            [16, true], // Inaccurate
-            [17, true], // Out of date
-            [18, function(post) {
-                return ((post.roles & U_GROUP_MODERATOR) == 0);
-            }], // Spam
-            [19, function(post) {
-                return ((post.roles & U_GROUP_MODERATOR) == 0);
-            }], // Vulgar/inappropriate
-            [20, function(post) {
-                return ((post.roles & U_GROUP_MODERATOR) == 0);
-            }] // Other
+            [15, function(post) { return ((post.roles & U_GROUP_MODERATOR) == 0); }], // Advertising
+            [16, true],                                                               // Inaccurate
+            [17, true],                                                               // Out of date
+            [18, function(post) { return ((post.roles & U_GROUP_MODERATOR) == 0); }], // Spam
+            [19, function(post) { return ((post.roles & U_GROUP_MODERATOR) == 0); }], // Vulgar/inappropriate
+            [20, function(post) { return ((post.roles & U_GROUP_MODERATOR) == 0); }]  // Other
         ],
         2: [ // forum post
-            [30, function(post) {
-                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
-            }], // Advertising
-            [37, function(post) {
-                return ((post.roles & U_GROUP_MODERATOR) == 0 && g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && g_users[post.user].avatar == 2);
-            }], // Avatar
-            [31, true], // Inaccurate
-            [32, true], // Out of date
-            [33, function(post) {
-                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
-            }], // Spam
-            [34, function(post) {
-                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && post.op && !post.sticky);
-            }], // Sticky request
-            [35, function(post) {
-                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
-            }], // Vulgar/inappropriate
-            [36, function(post) {
-                return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);
-            }]  // Other
+            [30, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0); }],                                                                            // Advertising
+            [37, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && (post.roles & U_GROUP_MODERATOR) == 0 && g_users[post.user].avatar == 2); }], // Avatar
+            [31, true],                                                                                                                                                                                         // Inaccurate
+            [32, true],                                                                                                                                                                                         // Out of date
+            [33, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0); }],                                                                            // Spam
+            [34, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0 && post.op && !post.sticky); }],                                                 // Sticky request
+            [35, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0); }],                                                                            // Vulgar/inappropriate
+            [36, function(post) { return (g_users && g_users[post.user] && (g_users[post.user].roles & U_GROUP_MODERATOR) == 0);}]                                                                              // Other
         ],
         3: [ // screenshot
             [45, true], // Inaccurate,
             [46, true], // Out of date,
-            [47, function(screen) {
-                return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0);
-            }], // Vulgar/inappropriate
-            [48, function(screen) {
-                return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0);
-            }]  // Other
+            [47, function(screen) { return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0); }], // Vulgar/inappropriate
+            [48, function(screen) { return (g_users && g_users[screen.user] && (g_users[screen.user].roles & U_GROUP_MODERATOR) == 0); }]  // Other
         ],
         4: [ // character
             [60, true], // Inaccurate completion data
@@ -21267,14 +21243,10 @@ var ContactTool = new function() {
         5: [ // video
             [45, true], // Inaccurate,
             [46, true], // Out of date,
-            [47, function(video) {
-                return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0);
-            }], // Vulgar/inappropriate
-            [48, function(video) {
-                return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0);
-            }]  // Other
+            [47, function(video) { return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0); }], // Vulgar/inappropriate
+            [48, function(video) { return (g_users && g_users[video.user] && (g_users[video.user].roles & U_GROUP_MODERATOR) == 0); }]  // Other
         ],
-        6: [ // Guide
+        6: [ // guide
             [45, true], // Inaccurate,
             [46, true], // Out of date,
             [48, true]  // Other
@@ -21323,12 +21295,12 @@ var ContactTool = new function() {
 
         var params = [
             'contact=1',
-            'mode=' + $WH.urlencode(data.mode),
-            'reason=' + $WH.urlencode(data.reason),
-            'desc=' + $WH.urlencode(data.description),
-            'ua=' + $WH.urlencode(navigator.userAgent),
+            'mode='    + $WH.urlencode(data.mode),
+            'reason='  + $WH.urlencode(data.reason),
+            'desc='    + $WH.urlencode(data.description),
+            'ua='      + $WH.urlencode(navigator.userAgent),
             'appname=' + $WH.urlencode(navigator.appName),
-            'page=' + $WH.urlencode(data.currenturl)
+            'page='    + $WH.urlencode(data.currenturl)
         ];
 
         if (data.mode == 0) { // contact us
@@ -21366,30 +21338,27 @@ var ContactTool = new function() {
             onSuccess: function(xhr, opt) {
                 var resp = xhr.responseText;
                 if (resp == 0) {
-                    if (g_user.name) {
+                    if (g_user.name)
                         alert($WH.sprintf(LANG.ct_dialog_thanks_user, g_user.name));
-                    }
-                    else {
+                    else
                         alert(LANG.ct_dialog_thanks);
-                    }
+
                     Lightbox.hide();
                 }
                 else {
-                    if (errors[resp]) {
+                    if (errors[resp])
                         alert(errors[resp]);
-                    }
-                    else {
+                    else
                         alert('Error: ' + resp);
-                    }
                 }
             },
             onFailure: function(xhr, opt) {
                 alert('Failure submitting contact request: ' + xhr.statusText);
             },
             onComplete: function(xhr, opt) {
-                for (var i = 0; i < form.elements.length; ++i) {
+                for (var i = 0; i < form.elements.length; ++i)
                     form.elements[i].disabled = false;
-                }
+
                 data.submitting = false;
             }
         });

@@ -65,6 +65,22 @@ class AdminPage extends GenericPage
                 array_push($this->path, 1, 25);
                 $this->name = 'Pending Guides';
                 break;
+            case 'out-of-date':
+                $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_MOD;
+                $this->generator = 'handleOutOfDate';
+                $this->tpl       = 'list-page-generic';
+
+                array_push($this->path, 1, 23);
+                $this->name = 'Out of Date Comments';
+                break;
+            case 'reports':
+                $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_EDITOR | U_GROUP_MOD | U_GROUP_LOCALIZER | U_GROUP_SCREENSHOT | U_GROUP_VIDEO;
+                $this->generator = 'handleReports';
+                $this->tpl       = 'admin/reports';
+
+                array_push($this->path, 5);
+                $this->name = 'Reports';
+                break;
             default:                                        // error out through unset template
         }
 
@@ -278,6 +294,22 @@ class AdminPage extends GenericPage
             'hiddenCols' => ['patch', 'comments', 'views', 'rating'],
             'extraCols'  => '$_'
         ), 'guideAdminCol'];
+    }
+
+    private function handleOutOfDate() : void
+    {
+        $data = CommunityContent::getCommentPreviews(['flags' => CC_FLAG_OUTDATED]);
+
+        $this->lvTabs[] = ['commentpreview', array(
+            'data'      => $data,
+            'extraCols' => '$_'
+        ), 'commentAdminCol'];
+    }
+
+    private function handleReports() : void
+    {
+        // todo: handle reports listing
+        //
     }
 
     private function configAddRow($r)
