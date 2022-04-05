@@ -89,7 +89,7 @@ class EmotePage extends GenericPage
 
         if ($this->subject->getField('cuFlags') & EMOTE_CU_MISSING_CMD)
             $text .= Lang::emote('noCommand').'[br][br]';
-        else if ($aliasses = DB::Aowow()->selectCol('SELECT command FROM ?_emotes_aliasses WHERE id = ?d AND locales & ?d', $this->typeId, 1 << Lang::getLocale()->value))
+        else if ($aliasses = DB::Aowow()->selectCol('SELECT `command` FROM ?_emotes_aliasses WHERE `id` = ?d AND `locales` & ?d', $this->typeId, 1 << Lang::getLocale()->value))
         {
             $text .= '[h3]'.Lang::emote('aliases').'[/h3][ul]';
             foreach ($aliasses as $a)
@@ -161,7 +161,7 @@ class EmotePage extends GenericPage
         }
 
         // tab: sound
-        if ($em = DB::Aowow()->select('SELECT soundId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask, BIT_OR(1 << (gender - 1)) AS gender FROM ?_emotes_sounds WHERE -emoteId = ?d GROUP BY soundId', $this->typeId > 0 ? $this->subject->getField('parentEmote') : $this->typeId))
+        if ($em = DB::Aowow()->select('SELECT `soundId` AS ARRAY_KEY, BIT_OR(1 << (`raceId` - 1)) AS "raceMask", BIT_OR(1 << (`gender` - 1)) AS "gender" FROM ?_emotes_sounds WHERE -`emoteId` = ?d GROUP BY `soundId`', $this->typeId > 0 ? $this->subject->getField('parentEmote') : $this->typeId))
         {
             $sounds = new SoundList(array(['id', array_keys($em)]));
             if (!$sounds->error)

@@ -151,7 +151,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 return $tag;
 
         // try arena set
-        if ($item['AllowableClass'] && ($item['AllowableClass'] & CLASS_MASK_ALL) != CLASS_MASK_ALL)
+        if ($item['AllowableClass'] && ($item['AllowableClass'] & ChrClass::MASK_ALL) != ChrClass::MASK_ALL)
             return $this->tagsByItemlevel[$item['ItemLevel']] ?? 0;
 
         return 0;
@@ -163,11 +163,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         foreach ($items as $item)
             $data['item'.$i++] = $item['entry'];
 
-        $mask = CLASS_MASK_ALL;
+        $mask = ChrClass::MASK_ALL;
         foreach ($items as $item)
             $mask &= $item['AllowableClass'];
 
-        if ($mask != CLASS_MASK_ALL)
+        if ($mask != ChrClass::MASK_ALL)
             $data['classMask'] = $mask;
 
         $iLvl = array_column($items, 'ItemLevel');

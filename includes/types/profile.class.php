@@ -31,7 +31,7 @@ class ProfileList extends BaseType
                 'classs'            => $this->getField('class'),
                 'gender'            => $this->getField('gender'),
                 'level'             => $this->getField('level'),
-                'faction'           => (1 << ($this->getField('race') - 1)) & RACE_MASK_ALLIANCE ? 0 : 1,
+                'faction'           => ChrRace::tryFrom($this->getField('race'))?->isAlliance() ? 0 : 1,
                 'talenttree1'       => $this->getField('talenttree1'),
                 'talenttree2'       => $this->getField('talenttree2'),
                 'talenttree3'       => $this->getField('talenttree3'),

@@ -145,12 +145,12 @@ class SpellList extends BaseType
             }
 
             // set full masks to 0
-            $_curTpl['reqClassMask'] &= CLASS_MASK_ALL;
-            if ($_curTpl['reqClassMask'] == CLASS_MASK_ALL)
+            $_curTpl['reqClassMask'] &= ChrClass::MASK_ALL;
+            if ($_curTpl['reqClassMask'] == ChrClass::MASK_ALL)
                 $_curTpl['reqClassMask'] = 0;
 
-            $_curTpl['reqRaceMask'] &= RACE_MASK_ALL;
-            if ($_curTpl['reqRaceMask'] == RACE_MASK_ALL)
+            $_curTpl['reqRaceMask'] &= ChrRace::MASK_ALL;
+            if ($_curTpl['reqRaceMask'] == ChrRace::MASK_ALL)
                 $_curTpl['reqRaceMask'] = 0;
 
             // unpack skillLines
@@ -2124,15 +2124,11 @@ class SpellList extends BaseType
         {
             if ($addMask & GLOBALINFO_RELATED)
             {
-                if ($mask = $this->curTpl['reqClassMask'])
-                    for ($i = 0; $i < 11; $i++)
-                        if ($mask & (1 << $i))
-                            $data[Type::CHR_CLASS][$i + 1] = $i + 1;
+                foreach (ChrClass::fromMask($this->curTpl['reqClassMask']) as $id)
+                    $data[Type::CHR_CLASS][$id] = $id;
 
-                if ($mask = $this->curTpl['reqRaceMask'])
-                    for ($i = 0; $i < 11; $i++)
-                        if ($mask & (1 << $i))
-                            $data[Type::CHR_RACE][$i + 1] = $i + 1;
+                foreach (ChrRace::fromMask($this->curTpl['reqRaceMask']) as $id)
+                    $data[Type::CHR_RACE][$id] = $id;
 
                 // play sound effect
                 for ($i = 1; $i < 4; $i++)
@@ -2477,7 +2473,7 @@ class SpellListFilter extends Filter
 
         // race
         if (isset($_v['ra']))
-            $parts[] = ['AND', [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
+            $parts[] = ['AND', [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
 
         // class [list]
         if (isset($_v['cl']))
@@ -2618,11 +2614,11 @@ class SpellListFilter extends Filter
             case 1:                                         // yes
                 return ['reqRaceMask', 0, '!'];
             case 2:                                         // alliance
-                return ['AND', [['reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
+                return ['AND', [['reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
             case 3:                                         // horde
-                return ['AND', [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['reqRaceMask', RACE_MASK_HORDE, '&']];
+                return ['AND', [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
             case 4:                                         // both
-                return ['AND', ['reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['reqRaceMask', RACE_MASK_HORDE, '&']];
+                return ['AND', ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
             case 5:                                         // no
                 return ['reqRaceMask', 0];
             default:

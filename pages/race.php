@@ -44,7 +44,7 @@ class RacePage extends GenericPage
     protected function generateContent()
     {
         $infobox      = [];
-        $_mask        = 1 << ($this->typeId - 1);
+        $ra           = ChrRace::from($this->typeId);
         $mountVendors = array(                              // race => [starter, argent tournament]
             null,           [384,   33307], [3362,  33553], [1261,  33310],
             [4730,  33653], [4731,  33555], [3685,  33556], [7955,  33650],
@@ -59,7 +59,7 @@ class RacePage extends GenericPage
 
         // side
         if ($_ = $this->subject->getField('side'))
-            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($_ == 2 ? 'horde' : 'alliance').']'.Lang::game('si', $_).'[/span]';
+            $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-'.($_ == SIDE_HORDE ? 'horde' : 'alliance').']'.Lang::game('si', $_).'[/span]';
 
         // faction
         if ($_ = $this->subject->getField('factionId'))
@@ -90,10 +90,7 @@ class RacePage extends GenericPage
 
         $this->infobox    = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
-        $this->headIcons  = array(
-            'race_'.strtolower($this->subject->getField('fileString')).'_male',
-            'race_'.strtolower($this->subject->getField('fileString')).'_female'
-        );
+        $this->headIcons  = ['race_'.$ra->json().'_male', 'race_'.$ra->json().'_female'];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
@@ -105,7 +102,7 @@ class RacePage extends GenericPage
         /**************/
 
         // Classes
-        $classes = new CharClassList(array(['racemask', $_mask, '&']));
+        $classes = new CharClassList(array(['racemask', $ra->toMask(), '&']));
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
@@ -115,7 +112,7 @@ class RacePage extends GenericPage
         // Tongues
         $conditions = array(
             ['typeCat', -11],                               // proficiencies
-            ['reqRaceMask', $_mask, '&']                    // only languages are race-restricted
+            ['reqRaceMask', $ra->toMask(), '&']             // only languages are race-restricted
         );
 
         $tongues = new SpellList($conditions);
@@ -133,7 +130,7 @@ class RacePage extends GenericPage
         // Racials
         $conditions = array(
             ['typeCat', -4],                               // racial traits
-            ['reqRaceMask', $_mask, '&']
+            ['reqRaceMask', $ra->toMask(), '&']
         );
 
         $racials = new SpellList($conditions);
@@ -150,9 +147,9 @@ class RacePage extends GenericPage
 
         // Quests
         $conditions = array(
-            ['reqRaceMask', $_mask, '&'],
-            [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!'],
-            [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!']
+            ['reqRaceMask', $ra->toMask(), '&'],
+            [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!'],
+            [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!']
         );
 
         $quests = new QuestList($conditions);
@@ -164,7 +161,7 @@ class RacePage extends GenericPage
 
         // Mounts
         // ok, this sucks, but i rather hardcode the trainer, than fetch items by namepart
-        $items = isset($mountVendors[$this->typeId]) ? DB::World()->selectCol('SELECT item FROM npc_vendor WHERE entry IN (?a)', $mountVendors[$this->typeId]) : 0;
+        $items = isset($mountVendors[$this->typeId]) ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` IN (?a)', $mountVendors[$this->typeId]) : 0;
 
         $conditions = array(
             ['i.id', $items],
@@ -185,7 +182,7 @@ class RacePage extends GenericPage
         }
 
         // Sounds
-        if ($vo = DB::Aowow()->selectCol('SELECT soundId AS ARRAY_KEY, gender FROM ?_races_sounds WHERE raceId = ?d', $this->typeId))
+        if ($vo = DB::Aowow()->selectCol('SELECT `soundId` AS ARRAY_KEY, `gender` FROM ?_races_sounds WHERE `raceId` = ?d', $this->typeId))
         {
             $sounds = new SoundList(array(['id', array_keys($vo)]));
             if (!$sounds->error)
@@ -212,6 +209,5 @@ class RacePage extends GenericPage
         }
     }
 }
-
 
 ?>

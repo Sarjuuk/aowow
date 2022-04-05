@@ -485,7 +485,7 @@ class GuidePage extends GenericPage
             // sanitize: spec / class
             if ($this->_post['category'] == 1)              // Classes
             {
-                if ($this->_post['classId'] && !((1 << $this->_post['classId']) & CLASS_MASK_ALL))
+                if ($this->_post['classId'] && !ChrClass::tryFrom($this->_post['classId']))
                     $this->_post['classId'] = 0;
 
                 if (!in_array($this->_post['specId'], [-1, 0, 1, 2]))

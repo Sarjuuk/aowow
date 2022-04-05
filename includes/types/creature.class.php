@@ -447,11 +447,11 @@ class CreatureListFilter extends Filter
             case 1:                                 // any
                 return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!']];
             case 2:                                 // alliance
-                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_HORDE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&']];
+                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
             case 3:                                 // horde
-                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']];
+                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], [['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['qt.reqRaceMask', ChrRace::MASK_HORDE, '&']];
             case 4:                                 // both
-                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', RACE_MASK_ALLIANCE, '&'], ['qt.reqRaceMask', RACE_MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
+                return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!'], ['OR', ['AND', ['qt.reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['qt.reqRaceMask', ChrRace::MASK_HORDE, '&']], ['qt.reqRaceMask', 0]]];
             case 5:                                 // none
                 $this->extraOpts['ct']['h'][] = $field.' = 0';
                 return [1];

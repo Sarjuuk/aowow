@@ -147,7 +147,7 @@ class GuideList extends BaseType
             if ($c = $this->getField('classId'))
             {
                 $n = Lang::game('cl', $c);
-                $specStr .= '&nbsp;&nbsp;–&nbsp;&nbsp;<span class="icontiny c'.$c.'" style="background-image: url('.Cfg::get('STATIC_URL').'/images/wow/icons/tiny/class_'.Game::$classFileStrings[$c].'.gif)">%s</span>';
+                $specStr .= '&nbsp;&nbsp;–&nbsp;&nbsp;<span class="icontiny c'.$c.'" style="background-image: url('.Cfg::get('STATIC_URL').'/images/wow/icons/tiny/class_'.ChrClass::tryFrom($c)->json().'.gif)">%s</span>';
 
                 if (($s = $this->getField('specId')) > -1)
                 {

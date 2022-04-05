@@ -81,7 +81,7 @@ class QuestPage extends GenericPage
         $_minLevel     = $this->subject->getField('minLevel');
         $_flags        = $this->subject->getField('flags');
         $_specialFlags = $this->subject->getField('specialFlags');
-        $_side         = Game::sideByRaceMask($this->subject->getField('reqRaceMask'));
+        $_side         = ChrRace::sideFromMask($this->subject->getField('reqRaceMask'));
 
         /***********/
         /* Infobox */
@@ -300,7 +300,7 @@ class QuestPage extends GenericPage
                 $n = Util::localizedString($_, 'name');
                 array_unshift($chain, array(
                     array(
-                        'side'    => Game::sideByRaceMask($_['reqRaceMask']),
+                        'side'    => ChrRace::sideFromMask($_['reqRaceMask']),
                         'typeStr' => Type::getFileString(Type::QUEST),
                         'typeId'  => $_['typeId'],
                         'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
@@ -320,7 +320,7 @@ class QuestPage extends GenericPage
                 $n = Util::localizedString($_, 'name');
                 array_push($chain, array(
                     array(
-                        'side'    => Game::sideByRaceMask($_['reqRaceMask']),
+                        'side'    => ChrRace::sideFromMask($_['reqRaceMask']),
                         'typeStr' => Type::getFileString(Type::QUEST),
                         'typeId'  => $_['typeId'],
                         'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
@@ -346,7 +346,7 @@ class QuestPage extends GenericPage
             {
                 $n = $list->getField('name', true);
                 $chain[] = array(array(
-                    'side'    => Game::sideByRaceMask($list->getField('reqRaceMask')),
+                    'side'    => ChrRace::sideFromMask($list->getField('reqRaceMask')),
                     'typeStr' => Type::getFileString(Type::QUEST),
                     'typeId'  => $id,
                     'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40))

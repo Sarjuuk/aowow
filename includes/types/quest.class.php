@@ -175,7 +175,7 @@ class QuestList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            if (!(Game::sideByRaceMask($this->curTpl['reqRaceMask']) & $side))
+            if (!(ChrRace::sideFromMask($this->curTpl['reqRaceMask']) & $side))
                 continue;
 
             [$series, $first] = DB::Aowow()->SelectRow(
@@ -212,7 +212,7 @@ class QuestList extends BaseType
                 'level'     => $this->curTpl['level'],
                 'reqlevel'  => $this->curTpl['minLevel'],
                 'name'      => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
-                'side'      => Game::sideByRaceMask($this->curTpl['reqRaceMask']),
+                'side'      => ChrRace::sideFromMask($this->curTpl['reqRaceMask']),
                 'wflags'    => 0x0,
                 'xp'        => $this->curTpl['rewardXP']
             );
@@ -238,8 +238,8 @@ class QuestList extends BaseType
             if ($_ = $this->curTpl['reqClassMask'])
                 $data[$this->id]['reqclass'] = $_;
 
-            if ($_ = ($this->curTpl['reqRaceMask'] & RACE_MASK_ALL))
-                if ((($_ & RACE_MASK_ALLIANCE) != RACE_MASK_ALLIANCE) && (($_ & RACE_MASK_HORDE) != RACE_MASK_HORDE))
+            if ($_ = ($this->curTpl['reqRaceMask'] & ChrRace::MASK_ALL))
+                if ((($_ & ChrRace::MASK_ALLIANCE) != ChrRace::MASK_ALLIANCE) && (($_ & ChrRace::MASK_HORDE) != ChrRace::MASK_HORDE))
                     $data[$this->id]['reqrace'] = $_;
 
             if ($_ = $this->curTpl['rewardOrReqMoney'])
@@ -525,8 +525,8 @@ class QuestListFilter extends Filter
         // side
         if (isset($_v['si']))
         {
-            $ex    = [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'];
-            $notEx = ['OR', ['reqRaceMask', 0], [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL]];
+            $ex    = [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
+            $notEx = ['OR', ['reqRaceMask', 0], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
 
             switch ($_v['si'])
             {
@@ -534,16 +534,16 @@ class QuestListFilter extends Filter
                     $parts[] = $notEx;
                     break;
                 case  SIDE_HORDE:
-                    $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['OR', $notEx, ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
                     break;
                 case -SIDE_HORDE:
-                    $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_HORDE, '&']];
+                    $parts[] = ['AND', $ex,   ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
                     break;
                 case  SIDE_ALLIANCE:
-                    $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['OR', $notEx, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
                     break;
                 case -SIDE_ALLIANCE:
-                    $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
+                    $parts[] = ['AND', $ex,   ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
                     break;
             }
         }
@@ -688,11 +688,11 @@ class QuestListFilter extends Filter
 
         $_ = $this->enums[$cr[0]][$cr[1]];
         if ($_ === true)
-            return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']];
+            return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
         else if ($_ === false)
-            return ['OR', ['reqClassMask', 0], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL]];
+            return ['OR', ['reqClassMask', 0], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL]];
         else if (is_int($_))
-            return ['AND', ['reqClassMask', (1 << ($_ - 1)), '&'], [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']];
+            return ['AND', ['reqClassMask', ChrClass::from($_)->toMask(), '&'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
 
         return false;
     }
@@ -704,11 +704,11 @@ class QuestListFilter extends Filter
 
         $_ = $this->enums[$cr[0]][$cr[1]];
         if ($_ === true)
-            return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'], [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!'], [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!']];
+            return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
         else if ($_ === false)
-            return ['OR', ['reqRaceMask', 0], ['reqRaceMask', RACE_MASK_ALL], ['reqRaceMask', RACE_MASK_ALLIANCE], ['reqRaceMask', RACE_MASK_HORDE]];
+            return ['OR', ['reqRaceMask', 0], ['reqRaceMask', ChrRace::MASK_ALL], ['reqRaceMask', ChrRace::MASK_ALLIANCE], ['reqRaceMask', ChrRace::MASK_HORDE]];
         else if (is_int($_))
-            return ['AND', ['reqRaceMask', (1 << ($_ - 1)), '&'], [['reqRaceMask', RACE_MASK_ALLIANCE, '&'], RACE_MASK_ALLIANCE, '!'], [['reqRaceMask', RACE_MASK_HORDE, '&'], RACE_MASK_HORDE, '!']];
+            return ['AND', ['reqRaceMask', ChrRace::from($_)->toMask(), '&'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
 
         return false;
     }

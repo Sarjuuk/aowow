@@ -312,12 +312,7 @@ class SkillPage extends GenericPage
         }
 
         // tab: related classes (apply classes from [spells])
-        $class = [];
-        for ($i = 0; $i < 11; $i++)
-            if ($reqClass & (1 << $i))
-                $class[] = $i + 1;
-
-        if ($class)
+        if ($class = ChrClass::fromMask($reqClass))
         {
             $classes = new CharClassList(array(['id', $class]));
             if (!$classes->error)
@@ -325,12 +320,7 @@ class SkillPage extends GenericPage
         }
 
         // tab: related races (apply races from [spells])
-        $race = [];
-        for ($i = 0; $i < 12; $i++)
-            if ($reqRace & (1 << $i))
-                $race[] = $i + 1;
-
-        if ($race)
+        if ($race = ChrRace::fromMask($reqRace))
         {
             $races = new CharRaceList(array(['id', $race]));
             if (!$races->error)

@@ -68,11 +68,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($set['classMask'])
                 {
                     $setOut['reqclass'] = $set['classMask'];
-                    $setOut['classes']  = [];
-
-                    for ($i = 0; $i < 12; $i++)
-                        if ($set['classMask'] & (1 << $i))
-                            $setOut['classes'][] = $i + 1;
+                    $setOut['classes']  = ChrClass::fromMask($set['classMask']);
                 }
 
                 if ($set['contentGroup'])

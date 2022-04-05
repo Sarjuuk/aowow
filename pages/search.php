@@ -637,23 +637,11 @@ class SearchPage extends GenericPage
             if ($this->searchMask & SEARCH_TYPE_REGULAR)
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $multiClass = 0;
-            foreach ($data as $d)
-            {
-                $multiClass = 0;
-                for ($i = 1; $i <= 10; $i++)
-                    if (isset($d['reqclass']) && ($d['reqclass'] & (1 << ($i - 1))))
-                        $multiClass++;
-
-                if ($multiClass > 1)
-                    break;
-            }
-
             $vis = ['level', 'schools'];
             if ($abilities->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                 $vis[] = 'reagents';
 
-            $vis[] = $multiClass > 1 ? 'classes' : 'singleclass';
+            $vis[] = count(ChrClass::fromMask($d['reqclass'] ?? 0)) > 1 ? 'classes' : 'singleclass';
 
             $osInfo = [Type::SPELL, ' (Ability)', $abilities->getMatches(), [], []];
             $result = array(

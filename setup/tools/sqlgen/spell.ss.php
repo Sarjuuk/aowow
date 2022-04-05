@@ -453,9 +453,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[spell] - misc fixups & icons');
 
         // FU [FixUps]
-        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', RACE_DRAENEI,  760); // Draenai Racials
-        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', RACE_BLOODELF, 756); // Bloodelf Racials
-        DB::Aowow()->query('UPDATE ?_spell SET `reqClassMask` = ?d WHERE `id`         = ?d', CLASS_MAGE,  30449); // Mage - Spellsteal
+        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::DRAENEI->value,  760); // Draenei Racials
+        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::BLOODELF->value, 756); // Bloodelf Racials
+        DB::Aowow()->query('UPDATE ?_spell SET `reqClassMask` = ?d WHERE `id`         = ?d', ChrClass::MAGE->value,  30449); // Mage - Spellsteal
 
         // triggered by spell
         DB::Aowow()->query(
@@ -580,14 +580,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             (s.attributes0 = 0x20000000 AND s.attributes3 = 0x10000000)                                                                                                                -- Master Demonologist (FamilyId = 0)
         )', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
-        for ($i = 0; (1 << $i) < CLASS_MASK_ALL; $i++)
-            if ((1 << $i) & CLASS_MASK_ALL)
-                DB::Aowow()->query(
-                    'UPDATE ?_spell s, dbc_skillline sl, dbc_skillraceclassinfo srci
-                     SET    s.reqClassMask = srci.classMask
-                     WHERE  s.typeCat IN (-2, 7)  AND (s.attributes0 & 0x80) = 0 AND s.skillLine1 = srci.skillLine AND sl.categoryId = 7 AND
-                            srci.skillline <> 769 AND srci.skillline = sl.id     AND srci.flags & 0x90             AND srci.classMask & ?d',
-                1 << $i);
+        foreach (ChrClass::cases() as $cl)
+            DB::Aowow()->query(
+               'UPDATE ?_spell s, dbc_skillline sl, dbc_skillraceclassinfo srci
+                SET    s.`reqClassMask` = srci.`classMask`
+                WHERE  s.`typeCat` IN (-2, 7)  AND (s.`attributes0` & 0x80) = 0 AND s.`skillLine1` = srci.`skillLine` AND sl.`categoryId` = 7 AND
+                       srci.`skillline` <> 769 AND srci.`skillline` = sl.`id`   AND srci.`flags` & 0x90               AND srci.`classMask` & ?d',
+                $cl->toMask()
+            );
 
         // secondary Skills (9)
         DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = 9 WHERE s.typeCat = 0 AND (s.skillLine1 IN (?a) OR (s.skillLine1 > 0 AND s.skillLine2OrMask IN (?a)))', SKILLS_TRADE_SECONDARY, SKILLS_TRADE_SECONDARY);

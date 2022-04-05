@@ -447,17 +447,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                      SELECT `StartItem`           AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `StartItem`           > 0 GROUP BY `item`) n
             JOIN     item_template it ON it.`entry` = n.`item`
             GROUP BY `item`',
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
         );
         $areaParent = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `parentArea` FROM ?_zones WHERE `id` IN (?a) AND `parentArea` > 0', array_filter(array_column($quests, 'zone')));
 
@@ -480,7 +480,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN item_template it ON it.`entry` = mlt.`Item` AND mlt.`Reference` <= 0
             WHERE     qta.`RewardMailTemplateId` > 0
             GROUP BY  ARRAY_KEY',
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
         );
 
         $areaParent = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `parentArea` FROM ?_zones WHERE `id` IN (?a) AND `parentArea` > 0', array_filter(array_column($mailLoot, 'zone')));
@@ -1012,8 +1012,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             FROM     (SELECT IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) AS `spell`,    `Id`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template                                                    WHERE IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) > 0 GROUP BY `spell` UNION
                       SELECT                                        qta.`SourceSpellId` AS `spell`, qt.`Id`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template qt JOIN quest_template_addon qta ON qta.ID = qt.ID WHERE qta.`SourceSpellId` > 0                                        GROUP BY `spell`) t
             GROUP BY `spell`',
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
         );
 
         if (!$quests)
@@ -1142,7 +1142,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
            'SELECT   `RewardTitle` AS ARRAY_KEY, `ID` AS `id`, SUM(`qty`) AS `qty`, BIT_OR(`side`) AS `side`, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS `zone`
             FROM     (SELECT `RewardTitle`, `ID`, 1 AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template WHERE `RewardTitle` > 0) q
             GROUP BY `RewardTitle`',
-            RACE_MASK_HORDE, RACE_MASK_ALLIANCE, SIDE_HORDE, RACE_MASK_ALLIANCE, RACE_MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
+            ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
         );
 
         if (!$quests)

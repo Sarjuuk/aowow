@@ -425,13 +425,12 @@ class Lang
 
     public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
-        $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
+        $classMask &= ChrClass::MASK_ALL;                   // clamp to available classes..
 
-        if ($classMask == CLASS_MASK_ALL)                   // available to all classes
+        if ($classMask == ChrClass::MASK_ALL)               // available to all classes
             return '';
 
         $tmp  = [];
-        $i    = 1;
 
         switch ($fmt)
         {
@@ -449,15 +448,8 @@ class Lang
                 $br   = '';
         }
 
-        while ($classMask)
-        {
-            if ($classMask & (1 << ($i - 1)))
-            {
-                $tmp[$i]    = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::game('cl', $i));
-                $classMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
+        foreach (ChrClass::fromMask($classMask) as $c)
+            $tmp[$c] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $c, self::game('cl', $c));
 
         $ids = array_keys($tmp);
 
@@ -466,16 +458,15 @@ class Lang
 
     public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
-        $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
+        $raceMask &= ChrRace::MASK_ALL;                     // clamp to available races..
 
-        if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
+        if ($raceMask == ChrRace::MASK_ALL)                 // available to all races (we don't display 'both factions')
             return '';
 
         if (!$raceMask)
             return '';
 
         $tmp  = [];
-        $i    = 1;
 
         switch ($fmt)
         {
@@ -493,21 +484,14 @@ class Lang
                 $br   = '';
         }
 
-        if ($raceMask == RACE_MASK_HORDE)
+        if ($raceMask == ChrRace::MASK_HORDE)
             return self::game('ra', -2);
 
-        if ($raceMask == RACE_MASK_ALLIANCE)
+        if ($raceMask == ChrRace::MASK_ALLIANCE)
             return self::game('ra', -1);
 
-        while ($raceMask)
-        {
-            if ($raceMask & (1 << ($i - 1)))
-            {
-                $tmp[$i]   = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $i, self::game('ra', $i));
-                $raceMask &= ~(1 << ($i - 1));
-            }
-            $i++;
-        }
+        foreach (ChrRace::fromMask($raceMask) as $r)
+            $tmp[$r] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $r, self::game('ra', $r));
 
         $ids = array_keys($tmp);
 

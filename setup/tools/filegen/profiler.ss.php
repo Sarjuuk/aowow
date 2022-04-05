@@ -188,9 +188,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
             {
                 // two cases where the spell is unrestricted but the castitem has class restriction (too lazy to formulate ruleset)
                 if ($id == 66906)                       // Argent Charger
-                    $data['reqclass'] = CLASS_PALADIN;
+                    $data['reqclass'] = ChrClass::PALADIN->toMask();
                 else if ($id == 54729)                  // Winged Steed of the Ebon Blade
-                    $data['reqclass'] = CLASS_DEATHKNIGHT;
+                    $data['reqclass'] = ChrClass::DEATHKNIGHT->toMask();
 
                 rsort($data['skill']);                  // riding (777) expected at pos 0
 
@@ -420,20 +420,20 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function sumTotal(array &$sumArr, int $raceMask = -1, int $classMask= -1) : void
     {
-        for ($i = 0; $i < RACE_MASK_ALL; $i++)
+        foreach (ChrRace::cases() as $ra)
         {
-            if (!((1 << $i) & $raceMask) || !((1 << $i) & RACE_MASK_ALL))
+            if (!$ra->matches($raceMask))
                 continue;
 
-            for ($j = 0; $j < CLASS_MASK_ALL; $j++)
+            foreach (ChrClass::cases() as $cl)
             {
-                if (!((1 << $j) & $classMask) || !((1 << $j) & CLASS_MASK_ALL))
+                if (!$cl->matches($classMask))
                     continue;
 
-                if (!isset($sumArr[$i+1][$j+1]))
-                    $sumArr[$i+1][$j+1] = 1;
+                if (!isset($sumArr[$ra->value][$cl->value]))
+                    $sumArr[$ra->value][$cl->value] = 1;
                 else
-                    $sumArr[$i+1][$j+1]++;
+                    $sumArr[$ra->value][$cl->value]++;
             }
         }
     }

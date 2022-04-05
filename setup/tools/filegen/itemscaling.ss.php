@@ -84,7 +84,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         */
 
         $offsets = array_map(function ($v) {                // LookupEntry((getClass()-1)*GT_MAX_RATING+cr+1)
-            return (CLASS_WARRIOR - 1) * 32 + $v + 1;       // should this be dynamic per pinned character? ITEM_MOD HASTE has a worse scaler for a subset of classes (see table)
+            return (ChrClass::WARRIOR->value - 1) * 32 + $v + 1; // should this be dynamic per pinned character? ITEM_MOD HASTE has a worse scaler for a subset of classes (see table)
         }, $ratings);
         $mods = DB::Aowow()->selectCol('SELECT idx - 1 AS ARRAY_KEY, ratio FROM dbc_gtoctclasscombatratingscalar WHERE idx IN (?a)', $offsets);
 

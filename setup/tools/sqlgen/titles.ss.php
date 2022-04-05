@@ -74,7 +74,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if ($data['eventEntry'])
                 DB::Aowow()->query('UPDATE ?_titles SET `eventId` = ?d WHERE `id` = ?d', $data['eventEntry'], $tId);
 
-            $side = Game::sideByRaceMask($data['AllowableRaces']);
+            $side = ChrRace::sideFromMask($data['AllowableRaces']);
             if ($side == SIDE_BOTH)
                 continue;
 

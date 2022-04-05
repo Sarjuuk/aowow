@@ -46,7 +46,7 @@ class ClassPage extends GenericPage
         $this->addScript([SC_JS_FILE, '?data=zones']);
 
         $infobox   = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
-        $_mask     = 1 << ($this->typeId - 1);
+        $cl        = ChrClass::from($this->typeId);
         $tcClassId = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
 
 
@@ -59,14 +59,14 @@ class ClassPage extends GenericPage
             $infobox[] = '[tooltip=tooltip_heroclass]'.Lang::game('heroClass').'[/tooltip]';
 
         // resource
-        if ($this->typeId == 11)                                // special Druid case
+        if ($cl == ChrClass::DRUID)                         // special Druid case
             $infobox[] = Lang::game('resources').Lang::main('colon').
             '[tooltip name=powertype1]'.Lang::game('st', 0).', '.Lang::game('st', 31).', '.Lang::game('st', 2).'[/tooltip][span class=tip tooltip=powertype1]'.Util::ucFirst(Lang::spell('powerTypes', 0)).'[/span], '.
             '[tooltip name=powertype2]'.Lang::game('st', 5).', '.Lang::game('st', 8).'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::spell('powerTypes', 1)).'[/span], '.
             '[tooltip name=powertype8]'.Lang::game('st', 1).'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::spell('powerTypes', 3)).'[/span]';
-        else if ($this->typeId == 6)                            // special DK case
+        else if ($cl == ChrClass::DEATHKNIGHT)              // special DK case
             $infobox[] = Lang::game('resources').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', 5)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
-        else                                                    // regular case
+        else                                                // regular case
             $infobox[] = Lang::game('resource').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
 
         // roles
@@ -118,11 +118,11 @@ class ClassPage extends GenericPage
             [['s.cuFlags', (SPELL_CU_TRIGGERED | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0],
             [
                 'OR',
-                ['s.reqClassMask', $_mask, '&'],                // Glyphs, Proficiencies
+                ['s.reqClassMask', $cl->toMask(), '&'],     // Glyphs, Proficiencies
                 ['s.skillLine1', $this->subject->getField('skills')],      // Abilities / Talents
                 ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->getField('skills')]]
             ],
-            [                                                   // last rank or unranked
+            [                                               // last rank or unranked
                 'OR',
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
@@ -150,9 +150,9 @@ class ClassPage extends GenericPage
         // Tab: Items (grouped)
         $conditions = array(
             ['requiredClass', 0, '>'],
-            ['requiredClass', $_mask, '&'],
-            [['requiredClass', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!'],
-            ['itemset', 0],                                     // hmm, do or dont..?
+            ['requiredClass', $cl->toMask(), '&'],
+            [['requiredClass', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!'],
+            ['itemset', 0],                                 // hmm, do or dont..?
             Cfg::get('SQL_LIMIT_NONE')
         );
 
@@ -180,8 +180,8 @@ class ClassPage extends GenericPage
 
         // Tab: Quests
         $conditions = array(
-            ['reqClassMask', $_mask, '&'],
-            [['reqClassMask', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!']
+            ['reqClassMask', $cl->toMask(), '&'],
+            [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']
         );
 
         $quests = new QuestList($conditions);
@@ -196,7 +196,7 @@ class ClassPage extends GenericPage
         }
 
         // Tab: Itemsets
-        $sets = new ItemsetList(array(['classMask', $_mask, '&']));
+        $sets = new ItemsetList(array(['classMask', $cl->toMask(), '&']));
         if (!$sets->error)
         {
             $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
@@ -211,8 +211,8 @@ class ClassPage extends GenericPage
 
         // Tab: Trainer
         $conditions = array(
-            ['npcflag', 0x30, '&'],                             // is trainer
-            ['trainerType', 0],                                 // trains class spells
+            ['npcflag', 0x30, '&'],                         // is trainer
+            ['trainerType', 0],                             // trains class spells
             ['trainerRequirement', $this->typeId]
         );
 
@@ -227,7 +227,7 @@ class ClassPage extends GenericPage
         }
 
         // Tab: Races
-        $races = new CharRaceList(array(['classMask', $_mask, '&']));
+        $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
             $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
 

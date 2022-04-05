@@ -375,6 +375,7 @@ define('LOOT_SPELL',                'spell_loot_template');
 define('LOOT_REFERENCE',        'reference_loot_template');
 
 // Sides
+define('SIDE_NONE',                         0);
 define('SIDE_ALLIANCE',                     1);
 define('SIDE_HORDE',                        2);
 define('SIDE_BOTH',                         3);
@@ -384,33 +385,152 @@ define('EXP_CLASSIC',                       0);
 define('EXP_BC',                            1);
 define('EXP_WOTLK',                         2);
 
-// ClassMask
-define('CLASS_WARRIOR',                     0x001);
-define('CLASS_PALADIN',                     0x002);
-define('CLASS_HUNTER',                      0x004);
-define('CLASS_ROGUE',                       0x008);
-define('CLASS_PRIEST',                      0x010);
-define('CLASS_DEATHKNIGHT',                 0x020);
-define('CLASS_SHAMAN',                      0x040);
-define('CLASS_MAGE',                        0x080);
-define('CLASS_WARLOCK',                     0x100);
-define('CLASS_DRUID',                       0x400);
-define('CLASS_MASK_ALL',                    0x5FF);
+enum ChrClass : int
+{
+    case WARRIOR     = 1;
+    case PALADIN     = 2;
+    case HUNTER      = 3;
+    case ROGUE       = 4;
+    case PRIEST      = 5;
+    case DEATHKNIGHT = 6;
+    case SHAMAN      = 7;
+    case MAGE        = 8;
+    case WARLOCK     = 9;
+    case DRUID       = 11;
 
-// RaceMask
-define('RACE_HUMAN',                        0x001);
-define('RACE_ORC',                          0x002);
-define('RACE_DWARF',                        0x004);
-define('RACE_NIGHTELF',                     0x008);
-define('RACE_UNDEAD',                       0x010);
-define('RACE_TAUREN',                       0x020);
-define('RACE_GNOME',                        0x040);
-define('RACE_TROLL',                        0x080);
-define('RACE_BLOODELF',                     0x200);
-define('RACE_DRAENEI',                      0x400);
-define('RACE_MASK_ALLIANCE',                0x44D);
-define('RACE_MASK_HORDE',                   0x2B2);
-define('RACE_MASK_ALL',                     0x6FF);
+    public const MASK_ALL    = 0x5FF;
+
+    public function matches(int $classMask) : bool
+    {
+        return !$classMask || $this->value & $classMask;
+    }
+
+    public function toMask() : int
+    {
+        return 1 << ($this->value - 1);
+    }
+
+    public static function fromMask(int $classMask = self::MASK_ALL) : array
+    {
+        $x = [];
+        foreach (self::cases() as $cl)
+            if ($cl->value & $classMask)
+                $x[] = $cl->value;
+
+        return $x;
+    }
+
+    public function json() : string
+    {
+        return match ($this)
+        {
+            self::WARRIOR     => 'warrior',
+            self::PALADIN     => 'paladin',
+            self::HUNTER      => 'hunter',
+            self::ROGUE       => 'rogue',
+            self::PRIEST      => 'priest',
+            self::DEATHKNIGHT => 'deathknight',
+            self::SHAMAN      => 'shaman',
+            self::MAGE        => 'mage',
+            self::WARLOCK     => 'warlock',
+            self::DRUID       => 'druid'
+        };
+    }
+}
+
+enum ChrRace : int
+{
+    case HUMAN         = 1;
+    case ORC           = 2;
+    case DWARF         = 3;
+    case NIGHTELF      = 4;
+    case UNDEAD        = 5;
+    case TAUREN        = 6;
+    case GNOME         = 7;
+    case TROLL         = 8;
+    case BLOODELF      = 10;
+    case DRAENEI       = 11;
+
+    public const MASK_ALLIANCE = 0x44D;
+    public const MASK_HORDE    = 0x2B2;
+    public const MASK_ALL      = 0x6FF;
+
+    public function matches(int $raceMask) : bool
+    {
+        return !$raceMask || $this->value & $raceMask;
+    }
+
+    public function toMask() : int
+    {
+        return 1 << ($this->value - 1);
+    }
+
+    public function isAlliance() : bool
+    {
+        return $this->toMask() & self::MASK_ALLIANCE;
+    }
+
+    public function isHorde() : bool
+    {
+        return $this->toMask() & self::MASK_HORDE;
+    }
+
+    public function getSide() : int
+    {
+        if ($this->isHorde() && $this->isAlliance())
+            return SIDE_BOTH;
+        else if ($this->isHorde())
+            return SIDE_HORDE;
+        else if ($this->isAlliance())
+            return SIDE_ALLIANCE;
+        else
+            return SIDE_NONE;
+    }
+
+    public function json() : string
+    {
+        return match ($this)
+        {
+            self::HUMAN    => 'human',
+            self::ORC      => 'orc',
+            self::DWARF    => 'dwarf',
+            self::NIGHTELF => 'nightelf',
+            self::UNDEAD   => 'undead',
+            self::TAUREN   => 'tauren',
+            self::GNOME    => 'gnome',
+            self::TROLL    => 'troll',
+            self::BLOODELF => 'bloodelf',
+            self::DRAENEI  => 'draenei'
+        };
+    }
+
+    public static function fromMask(int $raceMask = self::MASK_ALL) : array
+    {
+        $x = [];
+        foreach (self::cases() as $cl)
+            if ($cl->value & $raceMask)
+                $x[] = $cl->value;
+
+        return $x;
+    }
+
+    public static function sideFromMask(int $raceMask) : int
+    {
+        // Any
+        if (!$raceMask || ($raceMask & self::MASK_ALL) == self::MASK_ALL)
+            return SIDE_BOTH;
+
+        // Horde
+        if ($raceMask & self::MASK_HORDE && !($raceMask & self::MASK_ALLIANCE))
+            return SIDE_HORDE;
+
+        // Alliance
+        if ($raceMask & self::MASK_ALLIANCE && !($raceMask & self::MASK_HORDE))
+            return SIDE_ALLIANCE;
+
+        return SIDE_BOTH;
+    }
+}
 
 // SpellFamilyNames
 define('SPELLFAMILY_GENERIC',               0);

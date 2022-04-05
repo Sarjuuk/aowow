@@ -29,17 +29,10 @@ class ItemsetList extends BaseType
         // post processing
         foreach ($this->iterate() as &$_curTpl)
         {
-            $_curTpl['classes'] = [];
-            $_curTpl['pieces']  = [];
-            for ($i = 1; $i < 12; $i++)
-            {
-                if ($_curTpl['classMask'] & (1 << ($i - 1)))
-                {
-                    $this->classes[] = $i;
-                    $_curTpl['classes'][] = $i;
-                }
-            }
+            $_curTpl['classes'] = ChrClass::fromMask($_curTpl['classMask']);
+            $this->classes = array_merge($this->classes, $_curTpl['classes']);
 
+            $_curTpl['pieces']  = [];
             for ($i = 1; $i < 10; $i++)
             {
                 if ($piece = $_curTpl['item'.$i])

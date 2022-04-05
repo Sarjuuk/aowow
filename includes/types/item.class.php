@@ -65,14 +65,14 @@ class ItemList extends BaseType
 
             // unify those pesky masks
             $_  = &$_curTpl['requiredClass'];
-            $_ &= CLASS_MASK_ALL;
-            if ($_ < 0 || $_ == CLASS_MASK_ALL)
+            $_ &= ChrClass::MASK_ALL;
+            if ($_ < 0 || $_ == ChrClass::MASK_ALL)
                 $_ = 0;
             unset($_);
 
             $_ = &$_curTpl['requiredRace'];
-            $_ &= RACE_MASK_ALL;
-            if ($_ < 0 || $_ == RACE_MASK_ALL)
+            $_ &= ChrRace::MASK_ALL;
+            if ($_ < 0 || $_ == ChrRace::MASK_ALL)
                 $_ = 0;
             unset($_);
 
@@ -433,7 +433,7 @@ class ItemList extends BaseType
                 $data[$this->id]['nslots'] = $x;
 
             $_ = $this->curTpl['requiredRace'];
-            if ($_ && $_ & RACE_MASK_ALLIANCE != RACE_MASK_ALLIANCE && $_ & RACE_MASK_HORDE != RACE_MASK_HORDE)
+            if ($_ && $_ & ChrRace::MASK_ALLIANCE != ChrRace::MASK_ALLIANCE && $_ & ChrRace::MASK_HORDE != ChrRace::MASK_HORDE)
                 $data[$this->id]['reqrace'] = $_;
 
             if ($_ = $this->curTpl['requiredClass'])
@@ -1430,7 +1430,7 @@ class ItemList extends BaseType
             return 0.0;
 
         $subClasses = [ITEM_SUBCLASS_MISC_WEAPON];
-        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ?_classes WHERE `id` = ?d', log(CLASS_DRUID, 2) + 1);
+        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ?_classes WHERE `id` = ?d', ChrClass::DRUID->value);
         if ($weaponTypeMask)
             for ($i = 0; $i < 21; $i++)
                 if ($weaponTypeMask & (1 << $i))
@@ -1688,7 +1688,7 @@ class ItemList extends BaseType
             'subclass'    => $subclass,
             'subsubclass' => $this->curTpl['subSubClass'],
             'heroic'      => ($this->curTpl['flags'] & ITEM_FLAG_HEROIC) >> 3,
-            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? SIDE_BOTH - ($this->curTpl['flagsExtra'] & 0x3) : Game::sideByRaceMask($this->curTpl['requiredRace']),
+            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? SIDE_BOTH - ($this->curTpl['flagsExtra'] & 0x3) : ChrRace::sideFromMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
             'level'       => $this->curTpl['itemLevel'],
@@ -1836,162 +1836,162 @@ class ItemListFilter extends Filter
     );
 
     protected $genericFilter = array(
-          2 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1             ], // bindonpickup [yn]
-          3 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2             ], // bindonequip [yn]
-          4 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3             ], // bindonuse [yn]
-          5 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               [4, 5]        ], // questitem [yn]
-          6 => [parent::CR_CALLBACK,  'cbQuestRelation',        null,                    null          ], // startsquest [side]
-          7 => [parent::CR_BOOLEAN,   'description_loc0',       true                                   ], // hasflavortext
-          8 => [parent::CR_BOOLEAN,   'requiredDisenchantSkill'                                        ], // disenchantable
-          9 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED                     ], // conjureditem
-         10 => [parent::CR_BOOLEAN,   'lockId'                                                         ], // locked
-         11 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_OPENABLE                     ], // openable
-         12 => [parent::CR_BOOLEAN,   'itemset'                                                        ], // partofset
-         13 => [parent::CR_BOOLEAN,   'randomEnchant'                                                  ], // randomlyenchanted
-         14 => [parent::CR_BOOLEAN,   'pageTextId'                                                     ], // readable
-         15 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'maxCount',              1             ], // unique [yn]
-         16 => [parent::CR_CALLBACK,  'cbDropsInZone',          null,                    null          ], // dropsin [zone]
-         17 => [parent::CR_ENUM,      'requiredFaction',        true,                    true          ], // requiresrepwith
-         18 => [parent::CR_CALLBACK,  'cbFactionQuestReward',   null,                    null          ], // rewardedbyfactionquest [side]
-         20 => [parent::CR_NUMERIC,   'is.str',                 NUM_CAST_INT,            true          ], // str
-         21 => [parent::CR_NUMERIC,   'is.agi',                 NUM_CAST_INT,            true          ], // agi
-         22 => [parent::CR_NUMERIC,   'is.sta',                 NUM_CAST_INT,            true          ], // sta
-         23 => [parent::CR_NUMERIC,   'is.int',                 NUM_CAST_INT,            true          ], // int
-         24 => [parent::CR_NUMERIC,   'is.spi',                 NUM_CAST_INT,            true          ], // spi
-         25 => [parent::CR_NUMERIC,   'is.arcres',              NUM_CAST_INT,            true          ], // arcres
-         26 => [parent::CR_NUMERIC,   'is.firres',              NUM_CAST_INT,            true          ], // firres
-         27 => [parent::CR_NUMERIC,   'is.natres',              NUM_CAST_INT,            true          ], // natres
-         28 => [parent::CR_NUMERIC,   'is.frores',              NUM_CAST_INT,            true          ], // frores
-         29 => [parent::CR_NUMERIC,   'is.shares',              NUM_CAST_INT,            true          ], // shares
-         30 => [parent::CR_NUMERIC,   'is.holres',              NUM_CAST_INT,            true          ], // holres
-         32 => [parent::CR_NUMERIC,   'is.dps',                 NUM_CAST_FLOAT,          true          ], // dps
-         33 => [parent::CR_NUMERIC,   'is.dmgmin1',             NUM_CAST_INT,            true          ], // dmgmin1
-         34 => [parent::CR_NUMERIC,   'is.dmgmax1',             NUM_CAST_INT,            true          ], // dmgmax1
-         35 => [parent::CR_CALLBACK,  'cbDamageType',           null,                    null          ], // damagetype [enum]
-         36 => [parent::CR_NUMERIC,   'is.speed',               NUM_CAST_FLOAT,          true          ], // speed
-         37 => [parent::CR_NUMERIC,   'is.mleatkpwr',           NUM_CAST_INT,            true          ], // mleatkpwr
-         38 => [parent::CR_NUMERIC,   'is.rgdatkpwr',           NUM_CAST_INT,            true          ], // rgdatkpwr
-         39 => [parent::CR_NUMERIC,   'is.rgdhitrtng',          NUM_CAST_INT,            true          ], // rgdhitrtng
-         40 => [parent::CR_NUMERIC,   'is.rgdcritstrkrtng',     NUM_CAST_INT,            true          ], // rgdcritstrkrtng
-         41 => [parent::CR_NUMERIC,   'is.armor',               NUM_CAST_INT,            true          ], // armor
-         42 => [parent::CR_NUMERIC,   'is.defrtng',             NUM_CAST_INT,            true          ], // defrtng
-         43 => [parent::CR_NUMERIC,   'is.block',               NUM_CAST_INT,            true          ], // block
-         44 => [parent::CR_NUMERIC,   'is.blockrtng',           NUM_CAST_INT,            true          ], // blockrtng
-         45 => [parent::CR_NUMERIC,   'is.dodgertng',           NUM_CAST_INT,            true          ], // dodgertng
-         46 => [parent::CR_NUMERIC,   'is.parryrtng',           NUM_CAST_INT,            true          ], // parryrtng
-         48 => [parent::CR_NUMERIC,   'is.splhitrtng',          NUM_CAST_INT,            true          ], // splhitrtng
-         49 => [parent::CR_NUMERIC,   'is.splcritstrkrtng',     NUM_CAST_INT,            true          ], // splcritstrkrtng
-         50 => [parent::CR_NUMERIC,   'is.splheal',             NUM_CAST_INT,            true          ], // splheal
-         51 => [parent::CR_NUMERIC,   'is.spldmg',              NUM_CAST_INT,            true          ], // spldmg
-         52 => [parent::CR_NUMERIC,   'is.arcsplpwr',           NUM_CAST_INT,            true          ], // arcsplpwr
-         53 => [parent::CR_NUMERIC,   'is.firsplpwr',           NUM_CAST_INT,            true          ], // firsplpwr
-         54 => [parent::CR_NUMERIC,   'is.frosplpwr',           NUM_CAST_INT,            true          ], // frosplpwr
-         55 => [parent::CR_NUMERIC,   'is.holsplpwr',           NUM_CAST_INT,            true          ], // holsplpwr
-         56 => [parent::CR_NUMERIC,   'is.natsplpwr',           NUM_CAST_INT,            true          ], // natsplpwr
-         57 => [parent::CR_NUMERIC,   'is.shasplpwr',           NUM_CAST_INT,            true          ], // shasplpwr
-         59 => [parent::CR_NUMERIC,   'durability',             NUM_CAST_INT,            true          ], // dura
-         60 => [parent::CR_NUMERIC,   'is.healthrgn',           NUM_CAST_INT,            true          ], // healthrgn
-         61 => [parent::CR_NUMERIC,   'is.manargn',             NUM_CAST_INT,            true          ], // manargn
-         62 => [parent::CR_CALLBACK,  'cbCooldown',             null,                    null          ], // cooldown [op] [int]
-         63 => [parent::CR_NUMERIC,   'buyPrice',               NUM_CAST_INT,            true          ], // buyprice
-         64 => [parent::CR_NUMERIC,   'sellPrice',              NUM_CAST_INT,            true          ], // sellprice
-         65 => [parent::CR_CALLBACK,  'cbAvgMoneyContent',      null,                    null          ], // avgmoney [op] [int]
-         66 => [parent::CR_ENUM,      'requiredSpell'                                                  ], // requiresprofspec
-         68 => [parent::CR_CALLBACK,  'cbObtainedBy',           15,                      null          ], // otdisenchanting [yn]
-         69 => [parent::CR_CALLBACK,  'cbObtainedBy',           16,                      null          ], // otfishing [yn]
-         70 => [parent::CR_CALLBACK,  'cbObtainedBy',           17,                      null          ], // otherbgathering [yn]
-         71 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT                    ], // otitemopening [yn]
-         72 => [parent::CR_CALLBACK,  'cbObtainedBy',           2,                       null          ], // otlooting [yn]
-         73 => [parent::CR_CALLBACK,  'cbObtainedBy',           19,                      null          ], // otmining [yn]
-         74 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT                  ], // otobjectopening [yn]
-         75 => [parent::CR_CALLBACK,  'cbObtainedBy',           21,                      null          ], // otpickpocketing [yn]
-         76 => [parent::CR_CALLBACK,  'cbObtainedBy',           23,                      null          ], // otskinning [yn]
-         77 => [parent::CR_NUMERIC,   'is.atkpwr',              NUM_CAST_INT,            true          ], // atkpwr
-         78 => [parent::CR_NUMERIC,   'is.mlehastertng',        NUM_CAST_INT,            true          ], // mlehastertng
-         79 => [parent::CR_NUMERIC,   'is.resirtng',            NUM_CAST_INT,            true          ], // resirtng
-         80 => [parent::CR_CALLBACK,  'cbHasSockets',           null,                    null          ], // has sockets [enum]
-         81 => [parent::CR_CALLBACK,  'cbFitsGemSlot',          null,                    null          ], // fits gem slot [enum]
-         83 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_UNIQUEEQUIPPED               ], // uniqueequipped
-         84 => [parent::CR_NUMERIC,   'is.mlecritstrkrtng',     NUM_CAST_INT,            true          ], // mlecritstrkrtng
-         85 => [parent::CR_CALLBACK,  'cbObjectiveOfQuest',     null,                    null          ], // objectivequest [side]
-         86 => [parent::CR_CALLBACK,  'cbCraftedByProf',        null,                    null          ], // craftedprof [enum]
-         87 => [parent::CR_CALLBACK,  'cbReagentForAbility',    null,                    null          ], // reagentforability [enum]
-         88 => [parent::CR_CALLBACK,  'cbObtainedBy',           20,                      null          ], // otprospecting [yn]
-         89 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                 ], // prospectable
-         90 => [parent::CR_CALLBACK,  'cbAvgBuyout',            null,                    null          ], // avgbuyout [op] [int]
-         91 => [parent::CR_ENUM,      'totemCategory',          false,                   true          ], // tool
-         92 => [parent::CR_CALLBACK,  'cbObtainedBy',           5,                       null          ], // soldbyvendor [yn]
-         93 => [parent::CR_CALLBACK,  'cbObtainedBy',           3,                       null          ], // otpvp [pvp]
-         94 => [parent::CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true          ], // splpen
-         95 => [parent::CR_NUMERIC,   'is.mlehitrtng',          NUM_CAST_INT,            true          ], // mlehitrtng
-         96 => [parent::CR_NUMERIC,   'is.critstrkrtng',        NUM_CAST_INT,            true          ], // critstrkrtng
-         97 => [parent::CR_NUMERIC,   'is.feratkpwr',           NUM_CAST_INT,            true          ], // feratkpwr
-         98 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PARTYLOOT                    ], // partyloot
-         99 => [parent::CR_ENUM,      'requiredSkill'                                                  ], // requiresprof
-        100 => [parent::CR_NUMERIC,   'is.nsockets',            NUM_CAST_INT                           ], // nsockets
-        101 => [parent::CR_NUMERIC,   'is.rgdhastertng',        NUM_CAST_INT,            true          ], // rgdhastertng
-        102 => [parent::CR_NUMERIC,   'is.splhastertng',        NUM_CAST_INT,            true          ], // splhastertng
-        103 => [parent::CR_NUMERIC,   'is.hastertng',           NUM_CAST_INT,            true          ], // hastertng
-        104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                          ], // flavortext
-        105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1             ], // dropsinnormal [heroicdungeon-any]
-        106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2             ], // dropsinheroic [heroicdungeon-any]
-        107 => [parent::CR_NYI_PH,    null,                     1,                                     ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
-        109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null          ], // armorbonus [op] [int]
-        111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true          ], // reqskillrank
-        113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
-        114 => [parent::CR_NUMERIC,   'is.armorpenrtng',        NUM_CAST_INT,            true          ], // armorpenrtng
-        115 => [parent::CR_NUMERIC,   'is.health',              NUM_CAST_INT,            true          ], // health
-        116 => [parent::CR_NUMERIC,   'is.mana',                NUM_CAST_INT,            true          ], // mana
-        117 => [parent::CR_NUMERIC,   'is.exprtng',             NUM_CAST_INT,            true          ], // exprtng
-        118 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithitem [enum]
-        119 => [parent::CR_NUMERIC,   'is.hitrtng',             NUM_CAST_INT,            true          ], // hitrtng
-        123 => [parent::CR_NUMERIC,   'is.splpwr',              NUM_CAST_INT,            true          ], // splpwr
-        124 => [parent::CR_CALLBACK,  'cbHasRandEnchant',       null,                    null          ], // randomenchants [str]
-        125 => [parent::CR_CALLBACK,  'cbReqArenaRating',       null,                    null          ], // reqarenartng [op] [int]  todo (low): 'find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
-        126 => [parent::CR_CALLBACK,  'cbQuestRewardIn',        null,                    null          ], // rewardedbyquestin [zone-any]
-        128 => [parent::CR_CALLBACK,  'cbSource',               null,                    null          ], // source [enum]
-        129 => [parent::CR_CALLBACK,  'cbSoldByNPC',            null,                    null          ], // soldbynpc [str-small]
-        130 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT                     ], // hascomments
-        132 => [parent::CR_CALLBACK,  'cbGlyphType',            null,                    null          ], // glyphtype [enum]
-        133 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_ACCOUNTBOUND                 ], // accountbound
-        134 => [parent::CR_NUMERIC,   'is.mledps',              NUM_CAST_FLOAT,          true          ], // mledps
-        135 => [parent::CR_NUMERIC,   'is.mledmgmin',           NUM_CAST_INT,            true          ], // mledmgmin
-        136 => [parent::CR_NUMERIC,   'is.mledmgmax',           NUM_CAST_INT,            true          ], // mledmgmax
-        137 => [parent::CR_NUMERIC,   'is.mlespeed',            NUM_CAST_FLOAT,          true          ], // mlespeed
-        138 => [parent::CR_NUMERIC,   'is.rgddps',              NUM_CAST_FLOAT,          true          ], // rgddps
-        139 => [parent::CR_NUMERIC,   'is.rgddmgmin',           NUM_CAST_INT,            true          ], // rgddmgmin
-        140 => [parent::CR_NUMERIC,   'is.rgddmgmax',           NUM_CAST_INT,            true          ], // rgddmgmax
-        141 => [parent::CR_NUMERIC,   'is.rgdspeed',            NUM_CAST_FLOAT,          true          ], // rgdspeed
-        142 => [parent::CR_STRING,    'ic.name'                                                        ], // icon
-        143 => [parent::CR_CALLBACK,  'cbObtainedBy',           18,                      null          ], // otmilling [yn]
-        144 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null          ], // purchasablewithhonor [yn]
-        145 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqArenaPoints',        null          ], // purchasablewitharena [yn]
-        146 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC                       ], // heroic
-        147 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      1,            ], // dropsinnormal10 [multimoderaid-any]
-        148 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      2,            ], // dropsinnormal25 [multimoderaid-any]
-        149 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      4,            ], // dropsinheroic10 [heroicraid-any]
-        150 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      8,            ], // dropsinheroic25 [heroicraid-any]
-        151 => [parent::CR_NUMERIC,   'id',                     NUM_CAST_INT,            true          ], // id
-        152 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass',         CLASS_MASK_ALL], // classspecific [enum]
-        153 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace',          RACE_MASK_ALL ], // racespecific [enum]
-        154 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE                   ], // refundable
-        155 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA                 ], // usableinarenas
-        156 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED                ], // usablewhenshapeshifted
-        157 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT                    ], // smartloot
-        158 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithcurrency [enum]
-        159 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE                     ], // millable
-        160 => [parent::CR_NYI_PH,    null,                     1,                                     ], // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
-        161 => [parent::CR_CALLBACK,  'cbAvailable',            null,                    null          ], // availabletoplayers [yn]
-        162 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED                   ], // deprecated
-        163 => [parent::CR_CALLBACK,  'cbDisenchantsInto',      null,                    null          ], // disenchantsinto [disenchanting]
-        165 => [parent::CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true          ], // repaircost
-        167 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                       ], // hasvideos
-        168 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS  ], // teachesspell [yn]
-        169 => [parent::CR_ENUM,      'e.holidayId',            true,                    true          ], // requiresevent
-        171 => [parent::CR_CALLBACK,  'cbObtainedBy',           8,                       null          ], // otredemption [yn]
-        172 => [parent::CR_CALLBACK,  'cbObtainedBy',           12,                      null          ], // rewardedbyachievement [yn]
-        176 => [parent::CR_STAFFFLAG, 'flags'                                                          ], // flags
-        177 => [parent::CR_STAFFFLAG, 'flagsExtra'                                                     ], // flags2
+          2 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1                 ], // bindonpickup [yn]
+          3 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2                 ], // bindonequip [yn]
+          4 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3                 ], // bindonuse [yn]
+          5 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               [4, 5]            ], // questitem [yn]
+          6 => [parent::CR_CALLBACK,  'cbQuestRelation',        null,                    null              ], // startsquest [side]
+          7 => [parent::CR_BOOLEAN,   'description_loc0',       true                                       ], // hasflavortext
+          8 => [parent::CR_BOOLEAN,   'requiredDisenchantSkill'                                            ], // disenchantable
+          9 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED                         ], // conjureditem
+         10 => [parent::CR_BOOLEAN,   'lockId'                                                             ], // locked
+         11 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_OPENABLE                         ], // openable
+         12 => [parent::CR_BOOLEAN,   'itemset'                                                            ], // partofset
+         13 => [parent::CR_BOOLEAN,   'randomEnchant'                                                      ], // randomlyenchanted
+         14 => [parent::CR_BOOLEAN,   'pageTextId'                                                         ], // readable
+         15 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'maxCount',              1                 ], // unique [yn]
+         16 => [parent::CR_CALLBACK,  'cbDropsInZone',          null,                    null              ], // dropsin [zone]
+         17 => [parent::CR_ENUM,      'requiredFaction',        true,                    true              ], // requiresrepwith
+         18 => [parent::CR_CALLBACK,  'cbFactionQuestReward',   null,                    null              ], // rewardedbyfactionquest [side]
+         20 => [parent::CR_NUMERIC,   'is.str',                 NUM_CAST_INT,            true              ], // str
+         21 => [parent::CR_NUMERIC,   'is.agi',                 NUM_CAST_INT,            true              ], // agi
+         22 => [parent::CR_NUMERIC,   'is.sta',                 NUM_CAST_INT,            true              ], // sta
+         23 => [parent::CR_NUMERIC,   'is.int',                 NUM_CAST_INT,            true              ], // int
+         24 => [parent::CR_NUMERIC,   'is.spi',                 NUM_CAST_INT,            true              ], // spi
+         25 => [parent::CR_NUMERIC,   'is.arcres',              NUM_CAST_INT,            true              ], // arcres
+         26 => [parent::CR_NUMERIC,   'is.firres',              NUM_CAST_INT,            true              ], // firres
+         27 => [parent::CR_NUMERIC,   'is.natres',              NUM_CAST_INT,            true              ], // natres
+         28 => [parent::CR_NUMERIC,   'is.frores',              NUM_CAST_INT,            true              ], // frores
+         29 => [parent::CR_NUMERIC,   'is.shares',              NUM_CAST_INT,            true              ], // shares
+         30 => [parent::CR_NUMERIC,   'is.holres',              NUM_CAST_INT,            true              ], // holres
+         32 => [parent::CR_NUMERIC,   'is.dps',                 NUM_CAST_FLOAT,          true              ], // dps
+         33 => [parent::CR_NUMERIC,   'is.dmgmin1',             NUM_CAST_INT,            true              ], // dmgmin1
+         34 => [parent::CR_NUMERIC,   'is.dmgmax1',             NUM_CAST_INT,            true              ], // dmgmax1
+         35 => [parent::CR_CALLBACK,  'cbDamageType',           null,                    null              ], // damagetype [enum]
+         36 => [parent::CR_NUMERIC,   'is.speed',               NUM_CAST_FLOAT,          true              ], // speed
+         37 => [parent::CR_NUMERIC,   'is.mleatkpwr',           NUM_CAST_INT,            true              ], // mleatkpwr
+         38 => [parent::CR_NUMERIC,   'is.rgdatkpwr',           NUM_CAST_INT,            true              ], // rgdatkpwr
+         39 => [parent::CR_NUMERIC,   'is.rgdhitrtng',          NUM_CAST_INT,            true              ], // rgdhitrtng
+         40 => [parent::CR_NUMERIC,   'is.rgdcritstrkrtng',     NUM_CAST_INT,            true              ], // rgdcritstrkrtng
+         41 => [parent::CR_NUMERIC,   'is.armor',               NUM_CAST_INT,            true              ], // armor
+         42 => [parent::CR_NUMERIC,   'is.defrtng',             NUM_CAST_INT,            true              ], // defrtng
+         43 => [parent::CR_NUMERIC,   'is.block',               NUM_CAST_INT,            true              ], // block
+         44 => [parent::CR_NUMERIC,   'is.blockrtng',           NUM_CAST_INT,            true              ], // blockrtng
+         45 => [parent::CR_NUMERIC,   'is.dodgertng',           NUM_CAST_INT,            true              ], // dodgertng
+         46 => [parent::CR_NUMERIC,   'is.parryrtng',           NUM_CAST_INT,            true              ], // parryrtng
+         48 => [parent::CR_NUMERIC,   'is.splhitrtng',          NUM_CAST_INT,            true              ], // splhitrtng
+         49 => [parent::CR_NUMERIC,   'is.splcritstrkrtng',     NUM_CAST_INT,            true              ], // splcritstrkrtng
+         50 => [parent::CR_NUMERIC,   'is.splheal',             NUM_CAST_INT,            true              ], // splheal
+         51 => [parent::CR_NUMERIC,   'is.spldmg',              NUM_CAST_INT,            true              ], // spldmg
+         52 => [parent::CR_NUMERIC,   'is.arcsplpwr',           NUM_CAST_INT,            true              ], // arcsplpwr
+         53 => [parent::CR_NUMERIC,   'is.firsplpwr',           NUM_CAST_INT,            true              ], // firsplpwr
+         54 => [parent::CR_NUMERIC,   'is.frosplpwr',           NUM_CAST_INT,            true              ], // frosplpwr
+         55 => [parent::CR_NUMERIC,   'is.holsplpwr',           NUM_CAST_INT,            true              ], // holsplpwr
+         56 => [parent::CR_NUMERIC,   'is.natsplpwr',           NUM_CAST_INT,            true              ], // natsplpwr
+         57 => [parent::CR_NUMERIC,   'is.shasplpwr',           NUM_CAST_INT,            true              ], // shasplpwr
+         59 => [parent::CR_NUMERIC,   'durability',             NUM_CAST_INT,            true              ], // dura
+         60 => [parent::CR_NUMERIC,   'is.healthrgn',           NUM_CAST_INT,            true              ], // healthrgn
+         61 => [parent::CR_NUMERIC,   'is.manargn',             NUM_CAST_INT,            true              ], // manargn
+         62 => [parent::CR_CALLBACK,  'cbCooldown',             null,                    null              ], // cooldown [op] [int]
+         63 => [parent::CR_NUMERIC,   'buyPrice',               NUM_CAST_INT,            true              ], // buyprice
+         64 => [parent::CR_NUMERIC,   'sellPrice',              NUM_CAST_INT,            true              ], // sellprice
+         65 => [parent::CR_CALLBACK,  'cbAvgMoneyContent',      null,                    null              ], // avgmoney [op] [int]
+         66 => [parent::CR_ENUM,      'requiredSpell'                                                      ], // requiresprofspec
+         68 => [parent::CR_CALLBACK,  'cbObtainedBy',           15,                      null              ], // otdisenchanting [yn]
+         69 => [parent::CR_CALLBACK,  'cbObtainedBy',           16,                      null              ], // otfishing [yn]
+         70 => [parent::CR_CALLBACK,  'cbObtainedBy',           17,                      null              ], // otherbgathering [yn]
+         71 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT                        ], // otitemopening [yn]
+         72 => [parent::CR_CALLBACK,  'cbObtainedBy',           2,                       null              ], // otlooting [yn]
+         73 => [parent::CR_CALLBACK,  'cbObtainedBy',           19,                      null              ], // otmining [yn]
+         74 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT                      ], // otobjectopening [yn]
+         75 => [parent::CR_CALLBACK,  'cbObtainedBy',           21,                      null              ], // otpickpocketing [yn]
+         76 => [parent::CR_CALLBACK,  'cbObtainedBy',           23,                      null              ], // otskinning [yn]
+         77 => [parent::CR_NUMERIC,   'is.atkpwr',              NUM_CAST_INT,            true              ], // atkpwr
+         78 => [parent::CR_NUMERIC,   'is.mlehastertng',        NUM_CAST_INT,            true              ], // mlehastertng
+         79 => [parent::CR_NUMERIC,   'is.resirtng',            NUM_CAST_INT,            true              ], // resirtng
+         80 => [parent::CR_CALLBACK,  'cbHasSockets',           null,                    null              ], // has sockets [enum]
+         81 => [parent::CR_CALLBACK,  'cbFitsGemSlot',          null,                    null              ], // fits gem slot [enum]
+         83 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_UNIQUEEQUIPPED                   ], // uniqueequipped
+         84 => [parent::CR_NUMERIC,   'is.mlecritstrkrtng',     NUM_CAST_INT,            true              ], // mlecritstrkrtng
+         85 => [parent::CR_CALLBACK,  'cbObjectiveOfQuest',     null,                    null              ], // objectivequest [side]
+         86 => [parent::CR_CALLBACK,  'cbCraftedByProf',        null,                    null              ], // craftedprof [enum]
+         87 => [parent::CR_CALLBACK,  'cbReagentForAbility',    null,                    null              ], // reagentforability [enum]
+         88 => [parent::CR_CALLBACK,  'cbObtainedBy',           20,                      null              ], // otprospecting [yn]
+         89 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                     ], // prospectable
+         90 => [parent::CR_CALLBACK,  'cbAvgBuyout',            null,                    null              ], // avgbuyout [op] [int]
+         91 => [parent::CR_ENUM,      'totemCategory',          false,                   true              ], // tool
+         92 => [parent::CR_CALLBACK,  'cbObtainedBy',           5,                       null              ], // soldbyvendor [yn]
+         93 => [parent::CR_CALLBACK,  'cbObtainedBy',           3,                       null              ], // otpvp [pvp]
+         94 => [parent::CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true              ], // splpen
+         95 => [parent::CR_NUMERIC,   'is.mlehitrtng',          NUM_CAST_INT,            true              ], // mlehitrtng
+         96 => [parent::CR_NUMERIC,   'is.critstrkrtng',        NUM_CAST_INT,            true              ], // critstrkrtng
+         97 => [parent::CR_NUMERIC,   'is.feratkpwr',           NUM_CAST_INT,            true              ], // feratkpwr
+         98 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PARTYLOOT                        ], // partyloot
+         99 => [parent::CR_ENUM,      'requiredSkill'                                                      ], // requiresprof
+        100 => [parent::CR_NUMERIC,   'is.nsockets',            NUM_CAST_INT                               ], // nsockets
+        101 => [parent::CR_NUMERIC,   'is.rgdhastertng',        NUM_CAST_INT,            true              ], // rgdhastertng
+        102 => [parent::CR_NUMERIC,   'is.splhastertng',        NUM_CAST_INT,            true              ], // splhastertng
+        103 => [parent::CR_NUMERIC,   'is.hastertng',           NUM_CAST_INT,            true              ], // hastertng
+        104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                              ], // flavortext
+        105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1                 ], // dropsinnormal [heroicdungeon-any]
+        106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2                 ], // dropsinheroic [heroicdungeon-any]
+        107 => [parent::CR_NYI_PH,    null,                     1,                                         ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
+        109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null              ], // armorbonus [op] [int]
+        111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true              ], // reqskillrank
+        113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                      ], // hasscreenshots
+        114 => [parent::CR_NUMERIC,   'is.armorpenrtng',        NUM_CAST_INT,            true              ], // armorpenrtng
+        115 => [parent::CR_NUMERIC,   'is.health',              NUM_CAST_INT,            true              ], // health
+        116 => [parent::CR_NUMERIC,   'is.mana',                NUM_CAST_INT,            true              ], // mana
+        117 => [parent::CR_NUMERIC,   'is.exprtng',             NUM_CAST_INT,            true              ], // exprtng
+        118 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null              ], // purchasablewithitem [enum]
+        119 => [parent::CR_NUMERIC,   'is.hitrtng',             NUM_CAST_INT,            true              ], // hitrtng
+        123 => [parent::CR_NUMERIC,   'is.splpwr',              NUM_CAST_INT,            true              ], // splpwr
+        124 => [parent::CR_CALLBACK,  'cbHasRandEnchant',       null,                    null              ], // randomenchants [str]
+        125 => [parent::CR_CALLBACK,  'cbReqArenaRating',       null,                    null              ], // reqarenartng [op] [int]  todo (low): 'find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
+        126 => [parent::CR_CALLBACK,  'cbQuestRewardIn',        null,                    null              ], // rewardedbyquestin [zone-any]
+        128 => [parent::CR_CALLBACK,  'cbSource',               null,                    null              ], // source [enum]
+        129 => [parent::CR_CALLBACK,  'cbSoldByNPC',            null,                    null              ], // soldbynpc [str-small]
+        130 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT                         ], // hascomments
+        132 => [parent::CR_CALLBACK,  'cbGlyphType',            null,                    null              ], // glyphtype [enum]
+        133 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_ACCOUNTBOUND                     ], // accountbound
+        134 => [parent::CR_NUMERIC,   'is.mledps',              NUM_CAST_FLOAT,          true              ], // mledps
+        135 => [parent::CR_NUMERIC,   'is.mledmgmin',           NUM_CAST_INT,            true              ], // mledmgmin
+        136 => [parent::CR_NUMERIC,   'is.mledmgmax',           NUM_CAST_INT,            true              ], // mledmgmax
+        137 => [parent::CR_NUMERIC,   'is.mlespeed',            NUM_CAST_FLOAT,          true              ], // mlespeed
+        138 => [parent::CR_NUMERIC,   'is.rgddps',              NUM_CAST_FLOAT,          true              ], // rgddps
+        139 => [parent::CR_NUMERIC,   'is.rgddmgmin',           NUM_CAST_INT,            true              ], // rgddmgmin
+        140 => [parent::CR_NUMERIC,   'is.rgddmgmax',           NUM_CAST_INT,            true              ], // rgddmgmax
+        141 => [parent::CR_NUMERIC,   'is.rgdspeed',            NUM_CAST_FLOAT,          true              ], // rgdspeed
+        142 => [parent::CR_STRING,    'ic.name'                                                            ], // icon
+        143 => [parent::CR_CALLBACK,  'cbObtainedBy',           18,                      null              ], // otmilling [yn]
+        144 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null              ], // purchasablewithhonor [yn]
+        145 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqArenaPoints',        null              ], // purchasablewitharena [yn]
+        146 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC                           ], // heroic
+        147 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      1,                ], // dropsinnormal10 [multimoderaid-any]
+        148 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      2,                ], // dropsinnormal25 [multimoderaid-any]
+        149 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      4,                ], // dropsinheroic10 [heroicraid-any]
+        150 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      8,                ], // dropsinheroic25 [heroicraid-any]
+        151 => [parent::CR_NUMERIC,   'id',                     NUM_CAST_INT,            true              ], // id
+        152 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass',         ChrClass::MASK_ALL], // classspecific [enum]
+        153 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace',          ChrRace::MASK_ALL ], // racespecific [enum]
+        154 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE                       ], // refundable
+        155 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA                     ], // usableinarenas
+        156 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED                    ], // usablewhenshapeshifted
+        157 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT                        ], // smartloot
+        158 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null              ], // purchasablewithcurrency [enum]
+        159 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE                         ], // millable
+        160 => [parent::CR_NYI_PH,    null,                     1,                                         ], // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
+        161 => [parent::CR_CALLBACK,  'cbAvailable',            null,                    null              ], // availabletoplayers [yn]
+        162 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED                       ], // deprecated
+        163 => [parent::CR_CALLBACK,  'cbDisenchantsInto',      null,                    null              ], // disenchantsinto [disenchanting]
+        165 => [parent::CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true              ], // repaircost
+        167 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                           ], // hasvideos
+        168 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS      ], // teachesspell [yn]
+        169 => [parent::CR_ENUM,      'e.holidayId',            true,                    true              ], // requiresevent
+        171 => [parent::CR_CALLBACK,  'cbObtainedBy',           8,                       null              ], // otredemption [yn]
+        172 => [parent::CR_CALLBACK,  'cbObtainedBy',           12,                      null              ], // rewardedbyachievement [yn]
+        176 => [parent::CR_STAFFFLAG, 'flags'                                                              ], // flags
+        177 => [parent::CR_STAFFFLAG, 'flagsExtra'                                                         ], // flags2
     );
 
     protected $inputFields   = array(
@@ -2155,25 +2155,25 @@ class ItemListFilter extends Filter
         // side
         if (isset($_v['si']))
         {
-            $ex    = [['requiredRace', RACE_MASK_ALL, '&'], RACE_MASK_ALL, '!'];
-            $notEx = ['OR', ['requiredRace', 0], [['requiredRace', RACE_MASK_ALL, '&'], RACE_MASK_ALL]];
+            $ex    = [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
+            $notEx = ['OR', ['requiredRace', 0], [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
 
             switch ($_v['si'])
             {
                 case  3:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', RACE_MASK_ALL], ['requiredRace', 0]];
+                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', ChrRace::MASK_ALL], ['requiredRace', 0]];
                     break;
                 case  2:
-                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 1]],  ['OR', $notEx, ['requiredRace', RACE_MASK_HORDE, '&']]];
+                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 1]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_HORDE, '&']]];
                     break;
                 case -2:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 1],       ['AND', $ex,   ['requiredRace', RACE_MASK_HORDE, '&']]];
+                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 1],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_HORDE, '&']]];
                     break;
                 case  1:
-                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 2]],  ['OR', $notEx, ['requiredRace', RACE_MASK_ALLIANCE, '&']]];
+                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 2]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
                     break;
                 case -1:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 2],       ['AND', $ex,   ['requiredRace', RACE_MASK_ALLIANCE, '&']]];
+                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 2],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
                     break;
             }
         }
@@ -2545,13 +2545,13 @@ class ItemListFilter extends Filter
                 $w = 1;
                 break;
             case 2:                                 // Alliance
-                $w = '`reqRaceMask` & '.RACE_MASK_ALLIANCE.' AND (`reqRaceMask` & '.RACE_MASK_HORDE.') = 0';
+                $w = '`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND (`reqRaceMask` & '.ChrRace::MASK_HORDE.') = 0';
                 break;
             case 3:                                 // Horde
-                $w = '`reqRaceMask` & '.RACE_MASK_HORDE.' AND (`reqRaceMask` & '.RACE_MASK_ALLIANCE.') = 0';
+                $w = '`reqRaceMask` & '.ChrRace::MASK_HORDE.' AND (`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.') = 0';
                 break;
             case 4:                                 // Both
-                $w = '(`reqRaceMask` & '.RACE_MASK_ALLIANCE.' AND `reqRaceMask` & '.RACE_MASK_HORDE.') OR `reqRaceMask` = 0';
+                $w = '(`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND `reqRaceMask` & '.ChrRace::MASK_HORDE.') OR `reqRaceMask` = 0';
                 break;
             default:
                 return false;

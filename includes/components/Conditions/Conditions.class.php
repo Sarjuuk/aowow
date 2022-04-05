@@ -553,14 +553,14 @@ class Conditions
     {
         if ($cndId == self::CHR_CLASS)
         {
-            $cVal1 &= CLASS_MASK_ALL;
+            $cVal1 &= ChrClass::MASK_ALL;
             foreach (Util::mask2bits($cVal1, 1) as $cId)
                 $this->jsGlobals[Type::CHR_CLASS][$cId] = $cId;
         }
 
         if ($cndId == self::CHR_RACE)
         {
-            $cVal1 &= RACE_MASK_ALL;
+            $cVal1 &= ChrRace::MASK_ALL;
             foreach (Util::mask2bits($cVal1, 1) as $rId)
                 $this->jsGlobals[Type::CHR_RACE][$rId] = $rId;
         }

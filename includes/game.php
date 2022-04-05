@@ -29,10 +29,6 @@ class Game
          1 => ['ability_rogue_eviscerate',        'ability_warrior_innerrage',       'ability_warrior_defensivestance'  ]
     );
 
-    public static $classFileStrings         = array(
-        null,   'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'
-    );
-
     public static $questClasses             = array(
         -2 =>  [    0],
          0 =>  [    1,     3,     4,     8,     9,    10,    11,    12,    25,    28,    33,    36,    38,    40,    41,    44,    45,    46,    47,    51,    85,   130,   132,   139,   154,   267,  1497,  1519,  1537,  2257,  3430,  3431,  3433,  3487,  4080,  4298],
@@ -139,23 +135,6 @@ class Game
     //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
     );
-
-    public static function sideByRaceMask($race)
-    {
-        // Any
-        if (!$race || ($race & RACE_MASK_ALL) == RACE_MASK_ALL)
-            return SIDE_BOTH;
-
-        // Horde
-        if ($race & RACE_MASK_HORDE && !($race & RACE_MASK_ALLIANCE))
-            return SIDE_HORDE;
-
-        // Alliance
-        if ($race & RACE_MASK_ALLIANCE && !($race & RACE_MASK_HORDE))
-            return SIDE_ALLIANCE;
-
-        return SIDE_BOTH;
-    }
 
     public static function getReputationLevelForPoints($pts)
     {

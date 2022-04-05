@@ -59,15 +59,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
             Lang::load($loc);
 
             // TalentCalc
-            for ($i = 1; (1 << ($i - 1)) < CLASS_MASK_ALL; $i++ )
+            foreach (ChrClass::cases() as $class)
             {
-                if (!((1 << ($i - 1)) & CLASS_MASK_ALL))
-                    continue;
-
                 set_time_limit(20);
 
-                $file   = 'datasets/'.$loc->json().'/talents-'.$i;
-                $toFile = '$WowheadTalentCalculator.registerClass('.$i.', '.Util::toJSON($this->buildTree(1 << ($i - 1))).')';
+                $file   = 'datasets/'.$loc->json().'/talents-'.$class->value;
+                $toFile = '$WowheadTalentCalculator.registerClass('.$class->value.', '.Util::toJSON($this->buildTree($class->toMask())).')';
 
                 if (!CLISetup::writeFile($file, $toFile))
                     $this->success = false;

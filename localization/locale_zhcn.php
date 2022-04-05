@@ -1559,7 +1559,7 @@ $lang = array(
             'dotSP'    => "每个周期的法术强度 +%.2f%%",                    'dotAP'    => "每个周期的攻击强度 +%.2f%%"
         ),
         'relItems'      => array(
-            'base'    => "<small>显示与<b>%s</b>相关的 %s<</small>",
+            'base'    => "<small>显示与<b>%s</b>相关的 %s</small>",
             'link'    => "或",
             'recipes' => '<a href="?items=9.%s">制作物品</a>',
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">手工制作物品</a>'
