@@ -1800,6 +1800,13 @@ class SpellList extends BaseType
                 }
             }
 
+            // this should be 0 if all went well
+            if ($condBrktCnt > 0)
+            {
+                trigger_error('SpellList::handleConditions() - string contains unbalanced condition', E_USER_WARNING);
+                $condParts[3] = $condParts[3] ?? '';
+            }
+
             // check if it is know-compatible
             $know = 0;
             if (preg_match('/\(?(\!?)[as](\d+)\)?$/i', $condParts[0], $m))
@@ -1889,7 +1896,7 @@ class SpellList extends BaseType
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        return [$x, $btt[1]];
+        return [$x, Util::parseHtmlText($btt[1])];
     }
 
     public function renderTooltip($level = MAX_LEVEL, $interactive = false)
@@ -2038,7 +2045,7 @@ class SpellList extends BaseType
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
 
-        return [$x, $desc[1]];
+        return [$x, Util::parseHtmlText($desc[1])];
     }
 
     public function getTalentHeadForCurrent()

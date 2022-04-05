@@ -671,8 +671,16 @@ abstract class Util
     }
 
     // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText(string $text, bool $markdown = false) : string
+    public static function parseHtmlText(/*string|array*/ $text, bool $markdown = false) // : /*string|array*/
     {
+        if (is_array($text))
+        {
+            foreach ($text as &$t)
+                $t = self::parseHtmlText($t, $markdown);
+
+            return $text;
+        }
+
         if (stristr($text, '<HTML>'))                       // text is basically a html-document with weird linebreak-syntax
         {
             $pairs = array(
