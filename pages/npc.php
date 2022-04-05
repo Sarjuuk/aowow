@@ -621,7 +621,7 @@ class NpcPage extends GenericPage
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
             {
-                $colAddIn  = '';
+                $colAddIn  = null;
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
                     if ($soldItems->hasSetFields(['condition']))
                         $extraCols[] = '$Listview.extraCols.condition';

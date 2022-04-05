@@ -360,7 +360,7 @@ class AjaxProfile extends AjaxHandler
             $cuProfile['sourceId'] = $_;
         }
 
-        if ($cuProfile['sourceId'])
+        if (!empty($cuProfile['sourceId']))
             $cuProfile['sourceName'] = DB::Aowow()->selectCell('SELECT name FROM ?_profiler_profiles WHERE id = ?d', $cuProfile['sourceId']);
 
         $charId = -1;
@@ -420,7 +420,7 @@ class AjaxProfile extends AjaxHandler
                         $itemData[2] = 0;
 
                     // item sockets are fubar
-                    $nSockets = $items->json[$itemData[1]]['nsockets'];
+                    $nSockets = $items->json[$itemData[1]]['nsockets'] ?? 0;
                     $nSockets += in_array($slot, [SLOT_WAIST, SLOT_WRISTS, SLOT_HANDS]) ? 1 : 0;
                     for ($i = 5; $i < 9; $i++)
                         if ($itemData[$i] > 0 && (!$items->getEntry($itemData[$i]) || $i >= (5 + $nSockets)))

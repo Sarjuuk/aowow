@@ -255,9 +255,12 @@ if (!CLI)
     // all strings attached..
     if (!empty($AoWoWconf['aowow']))
     {
-        if (isset($_GET['locale']) && (int)$_GET['locale'] <= MAX_LOCALES && (int)$_GET['locale'] >= 0)
-            if (CFG_LOCALES & (1 << $_GET['locale']))
-                User::useLocale($_GET['locale']);
+        if (isset($_GET['locale']))
+        {
+            $loc = intVal($_GET['locale']);
+            if ($loc <= MAX_LOCALES && $loc >= 0 && (CFG_LOCALES & (1 << $loc)))
+                User::useLocale($loc);
+        }
 
         Lang::load(User::$localeString);
     }

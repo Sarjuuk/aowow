@@ -1577,8 +1577,8 @@ abstract class Util
         }
 
         return array(
-            round($mainHand['gearscore'] * $mh),
-            round($offHand['gearscore']  * $oh)
+            round(($mainHand['gearscore'] ?? 0) * $mh),
+            round(($offHand['gearscore']  ?? 0) * $oh)
         );
     }
 

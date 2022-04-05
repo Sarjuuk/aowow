@@ -164,7 +164,11 @@ class SmartAI
             }
 
             if ($q)
-                $result = DB::Aowow()->selectCol(sprintf('SELECT `type` AS ARRAY_KEY, `typeId` FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
+            {
+                $owner = DB::Aowow()->select(sprintf('SELECT `type` AS "0", `typeId` AS "1" FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
+                foreach ($owner as [$ty, $id])
+                    $result[$ty][] = $id;
+            }
         }
 
         foreach ($smartS as [$st, $eog])
@@ -258,7 +262,7 @@ class SmartAI
         return self::getOwnerAction($srcType, $entry, $lookup);
     }
 
-    private static function getOwnerAction(int $sourceType, int $entry, array $lookup, ?array $moreInfo = []) : array
+    private static function getOwnerAction(int $sourceType, int $entry, array $lookup, ?array &$moreInfo = []) : array
     {
         if ($entry < 0)                                     // please not individual entities :(
             return [];

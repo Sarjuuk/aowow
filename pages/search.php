@@ -640,7 +640,7 @@ class SearchPage extends GenericPage
             {
                 $multiClass = 0;
                 for ($i = 1; $i <= 10; $i++)
-                    if ($d['reqclass'] & (1 << ($i - 1)))
+                    if (isset($d['reqclass']) && ($d['reqclass'] & (1 << ($i - 1))))
                         $multiClass++;
 
                 if ($multiClass > 1)

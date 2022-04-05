@@ -132,9 +132,8 @@ if ($this->offerReward && ($this->requestItems || $this->objectives)):
 <?php
 endif;
 
+$offset = 0;
 if ($r = $this->rewards):
-    $offset = 0;
-
     echo '                <h3>'.Lang::main('rewards')."</h3>\n";
 
     if (!empty($r['choice'])):

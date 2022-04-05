@@ -81,7 +81,7 @@ class SoundsPage extends GenericPage
     {
         $form = $this->filterObj->getForm();
         if (isset($form['ty']) && count($form['ty']) == 1)
-            $this->path[] = $form['ty'];
+            $this->path[] = $form['ty'][0];
     }
 }
 

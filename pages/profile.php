@@ -38,6 +38,7 @@ class ProfilePage extends GenericPage
 
     private   $isCustom  = false;
     private   $profile   = null;
+    private   $subject   = null;
     private   $rnItr     = 0;
     private   $powerTpl  = '$WowheadPower.registerProfile(%s, %d, %s);';
 
@@ -108,7 +109,7 @@ class ProfilePage extends GenericPage
                     $this->notFound();
             }
             // 2) not yet synced but exists on realm (and not a gm character)
-            else if (!$this->rnItr && ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, g.guildid AS guildGUID, IFNULL(g.name, "") AS guildName, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS)))
+            else if (!$this->rnItr && ($char = DB::Characters($this->realmId)->selectRow('SELECT c.guid AS realmGUID, c.name, c.race, c.class, c.level, c.gender, c.at_login, g.guildid AS guildGUID, IFNULL(g.name, "") AS guildName, IFNULL(gm.rank, 0) AS guildRank FROM characters c LEFT JOIN guild_member gm ON gm.guid = c.guid LEFT JOIN guild g ON g.guildid = gm.guildid WHERE c.name = ? AND level <= ?d AND (extra_flags & ?d) = 0', Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS)))
             {
                 $char['realm']   = $this->realmId;
                 $char['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
