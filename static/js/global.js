@@ -641,8 +641,11 @@ var PageTemplate = new function()
     {
         var submenu = [];
 
+        if (!g_user.guides || !g_user.guides.length)
+            return;
+
         // Sort by name
-        g_user.profiles.sort(function(a, b)
+        g_user.guides.sort(function(a, b)
         {
             return $WH.strcmp(a.title, b.title);
         });
