@@ -19,13 +19,20 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('TRUNCATE aowow_mails');
 
         // copy data over from dbc
-        DB::Aowow()->query('INSERT INTO ?_mails SELECT *, 0 FROM dbc_mailtemplate');
+        DB::Aowow()->query('
+            INSERT INTO ?_mails SELECT 
+                id, 0, 
+                subject_loc0, subject_loc2, subject_loc3, subject_loc4, subject_loc6, subject_loc8,
+                text_loc0, text_loc2, text_loc3, text_loc4, text_loc6, text_loc8,
+                0 
+            FROM dbc_mailtemplate
+        ');
 
         CLI::write('SqlGen::generate() - merging achievement_reward into aowow_mails');
 
         $acvMail = DB::World()->select('
             SELECT
-                -ar.ID,
+                -ar.ID, 0,
                 IFNULL(ar.Subject, "") AS s0, IFNULL(arl2.Subject, "") AS s2, IFNULL(arl3.Subject, "") AS s3, IFNULL(arl4.Subject, "") AS s4, IFNULL(arl6.Subject, "") AS s6, IFNULL(arl8.Subject, "") AS s8,
                 IFNULL(ar.Body, "")    AS t0, IFNULL(arl2.Body, "")    AS t2, IFNULL(arl3.Body, "")    AS t3, IFNULL(arl4.Body, "")    AS t4, IFNULL(arl6.Body, "")    AS t6, IFNULL(arl8.Body, "")    AS t8,
                 ItemID
