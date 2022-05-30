@@ -2306,7 +2306,7 @@ class SpellList extends BaseType
                 $originalCastTime = 1500;
 
             // Portion to Over Time
-            $PtOT = ($overTime / 15000) / (($overTime / 15000) + ($OriginalCastTime / 3500));
+            $PtOT = ($overTime / 15000) / (($overTime / 15000) + ($originalCastTime / 3500));
 
             if ($asDOT)
                 $castingTime = $castingTime * $PtOT;
