@@ -1267,7 +1267,7 @@ class SmartAI
                 $a['param'][6] = $this->aiTemplate($a['param'][0]);
                 break;
             case SAI_ACTION_TELEPORT:                       // 62 -> invoker [resolved coords already stored in areatrigger entry]
-                $a['param'][6] = $this->miscData['teleportA'];
+                $a['param'][6] = $this->miscData['name'];
                 $this->jsGlobals[Type::ZONE][] = $a['param'][6];
                 break;
             case SAI_ACTION_SET_ORIENTATION:                // 66 -> any target
