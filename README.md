@@ -18,7 +18,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
 
 ## Requirements
 
-+ Webserver running PHP ≥ 7.4 — 8.0 including extensions:
++ Webserver running PHP ≥ 7.4 (7.4 works with version [v1.1](https://github.com/Sarjuuk/aowow/releases/tag/v1.1))  — 8.1.x (works with version [v1.2](https://github.com/Sarjuuk/aowow/releases/tag/v1.2)) including extensions:
   + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
   + [GD](https://www.php.net/manual/en/book.image)
   + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
