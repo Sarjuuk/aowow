@@ -230,7 +230,7 @@ class ProfilePage extends GenericPage
 
     private function handleIncompleteData($params, $guid)
     {
-        if ($this->mode == CACHE_TYPE_TOOLTIP)      // enable tooltip display with basic data we just added
+        if ($this->mode == CACHE_TYPE_TOOLTIP)              // enable tooltip display with basic data we just added
         {
             $this->subject = new LocalProfileList(array(['id', $this->subjectGUID]), ['sv' => $params[1]]);
             if ($this->subject->error)
@@ -238,15 +238,18 @@ class ProfilePage extends GenericPage
 
             $this->profile = $params;
         }
-        else                                        // display empty page and queue status
+        else                                                // display empty page and queue status
         {
             $this->mode = CACHE_TYPE_NONE;
 
             // queue full fetch
-            $newId = Profiler::scheduleResync(Type::PROFILE, $this->realmId, $guid);
-
-            $this->doResync = ['profile', $newId];
-            $this->initialSync();
+            if ($newId = Profiler::scheduleResync(Type::PROFILE, $this->realmId, $guid))
+            {
+                $this->doResync = ['profile', $newId];
+                $this->initialSync();
+            }
+            else                                            // todo: base info should have been created in __construct .. why are we here..?
+                header('Location: ?profiles='.$params[0].'.'.$params[1].'&filter=na='.Util::ucFirst($this->subjectName).';ex=on');
         }
     }
 }

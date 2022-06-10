@@ -340,7 +340,7 @@ class ProfileListFilter extends Filter
         // table key differs between remote and local :<
         $k = $this->useLocalList ? 'p' : 'c';
 
-        // name [str] - the table is case sensitive. Since i down't want to destroy indizes, lets alter the search terms
+        // name [str] - the table is case sensitive. Since i don't want to destroy indizes, lets alter the search terms
         if (!empty($_v['na']))
         {
             $lower  = $this->modularizeString([$k.'.name'], Util::lower($_v['na']),   !empty($_v['ex']) && $_v['ex'] == 'on', true);
