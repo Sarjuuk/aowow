@@ -1271,7 +1271,15 @@ class SmartAI
                 $a['param'][6] = $this->aiTemplate($a['param'][0]);
                 break;
             case SAI_ACTION_TELEPORT:                       // 62 -> invoker [resolved coords already stored in areatrigger entry]
-                $a['param'][6] = $this->miscData['teleportA'];
+                if (isset($this->miscData['teleportA']))
+                    $a['param'][6] = $this->miscData['teleportA'];
+                else if ($pos = Game::worldPosToZonePos($a['param'][0], $this->itr['target']['pos'][0], $this->itr['target']['pos'][1]))
+                    $a['param'][6] = $pos['areaId'];
+                else if ($areaId = DB::Aowow()->selectCell('SELECT id FROM ?_zones WHERE mapId = ?d LIMIT 1', $a['param'][0]))
+                    $a['param'][6] = $areaId;
+                else
+                    trigger_error('SmartAI::action - could not resolve teleport target: map:'.$a['param'][0].' x:'.$this->itr['target']['pos'][0].' y:'.$this->itr['target']['pos'][1]);
+
                 $this->jsGlobals[Type::ZONE][] = $a['param'][6];
                 break;
             case SAI_ACTION_SET_ORIENTATION:                // 66 -> any target
