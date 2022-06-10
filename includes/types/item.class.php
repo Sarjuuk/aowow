@@ -970,28 +970,31 @@ class ItemList extends BaseType
 
             if ($itemSpellsAndTrigger)
             {
-                $cooldown = '';
-
                 $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
-                foreach ($itemSpells->iterate() as $__)
-                    if ($parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0])
+                foreach ($itemSpells->iterate() as $sId => $__)
+                {
+                    $parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0];
+                    if (!$parsed && User::isInGroup(U_GROUP_EMPLOYEE))
+                        $parsed = '<span style="opacity:.75">&lt;'.$itemSpells->getField('name', true, true).'&gt;</span>';
+                    else if (!$parsed)
+                        continue;
+
+                    if ($interactive)
                     {
-                        if ($interactive)
-                        {
-                            $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
-                            $parsed = preg_replace_callback('/([^;]*)(&nbsp;<small>.*?<\/small>)([^&]*)/i', function($m) use($link) {
-                                    $m[1] = $m[1] ? sprintf($link, $m[1]) : '';
-                                    $m[3] = $m[3] ? sprintf($link, $m[3]) : '';
-                                    return $m[1].$m[2].$m[3];
-                                }, $parsed, -1, $nMatches
-                            );
+                        $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
+                        $parsed = preg_replace_callback('/([^;]*)(&nbsp;<small>.*?<\/small>)([^&]*)/i', function($m) use($link) {
+                                $m[1] = $m[1] ? sprintf($link, $m[1]) : '';
+                                $m[3] = $m[3] ? sprintf($link, $m[3]) : '';
+                                return $m[1].$m[2].$m[3];
+                            }, $parsed, -1, $nMatches
+                        );
 
-                            if (!$nMatches)
-                                $parsed = sprintf($link, $parsed);
-                        }
-
-                        $green[] = Lang::item('trigger', $itemSpellsAndTrigger[$itemSpells->id][0]).$parsed.$itemSpellsAndTrigger[$itemSpells->id][1];
+                        if (!$nMatches)
+                            $parsed = sprintf($link, $parsed);
                     }
+
+                    $green[] = Lang::item('trigger', $itemSpellsAndTrigger[$itemSpells->id][0]).$parsed.$itemSpellsAndTrigger[$itemSpells->id][1];
+                }
             }
         }
 
