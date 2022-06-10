@@ -607,14 +607,14 @@ trait spawnHelper
                         );
 
                         // connective line
-                        if ($i > 0)
+                        if ($i > 0 && $wPoints[$i - 1]['areaId'] == $p['areaId'])
                             $opts['lines'] = [[$wPoints[$i - 1]['posX'], $wPoints[$i - 1]['posY']]];
 
-                        $data[$s['areaId']][$s['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
-                        if (empty($wpSum[$s['areaId']][$s['floor']]))
-                            $wpSum[$s['areaId']][$s['floor']] = 1;
+                        $data[$p['areaId']][$p['floor']]['coords'][] = [$p['posX'], $p['posY'], $opts];
+                        if (empty($wpSum[$p['areaId']][$p['floor']]))
+                            $wpSum[$p['areaId']][$p['floor']] = 1;
                         else
-                            $wpSum[$s['areaId']][$s['floor']]++;
+                            $wpSum[$p['areaId']][$p['floor']]++;
                     }
                     $wpIdx++;
                 }
