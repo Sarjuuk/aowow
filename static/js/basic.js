@@ -1852,6 +1852,13 @@ $WH.Tooltip = {
                     Slider.setSize(tooltip.slider, m - 6);
                     tooltip.className += ' tooltip-slider';
                 }
+                // btt<typeId> empty, try to find tt<typeId>
+                else if (tt = $WH.ge(tooltip.id.substr(1))) { // aowow - added for spells with buff, but w/o tooltip
+                    if (tt.slider) {
+                        Slider.setSize(tt.slider, tt.offsetWidth - 6);
+                        tooltip.className += ' tooltip-slider';
+                    }
+                }
 
                 if (!noShrink && tooltip.offsetHeight > document.body.clientHeight) {
                     table.className = 'shrink';

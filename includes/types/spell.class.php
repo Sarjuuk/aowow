@@ -51,6 +51,8 @@ class SpellList extends BaseType
     private         $tools       = [];
     private         $interactive = false;
     private         $charLevel   = MAX_LEVEL;
+    private         $scaling     = [];
+    private         $parsedText  = [];
 
     protected       $queryBase   = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_spell s';
     protected       $queryOpts   = array(
@@ -61,12 +63,18 @@ class SpellList extends BaseType
                         'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                     );
 
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], $miscData = [])
     {
         parent::__construct($conditions);
 
         if ($this->error)
             return;
+
+        if (isset($miscData['interactive']))
+            $this->interactive = $miscData['interactive'];
+
+        if (isset($miscData['charLevel']))
+            $this->charLevel = $miscData['charLevel'];
 
         // post processing
         $foo = DB::World()->selectCol('SELECT perfectItemType FROM skill_perfect_item_template WHERE spellId IN (?a)', $this->getFoundIDs());
@@ -129,6 +137,8 @@ class SpellList extends BaseType
 
             if (!$_curTpl['iconString'])
                 $_curTpl['iconString'] = 'inv_misc_questionmark';
+
+            $this->scaling[$this->id] = false;
         }
 
         if ($foo)
@@ -1066,7 +1076,7 @@ class SpellList extends BaseType
 
     // description-, buff-parsing component
     // returns [min, max, minFulltext, maxFulltext, ratingId]
-    private function resolveVariableString($varParts, &$usesScalingRating)
+    private function resolveVariableString($varParts)
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
@@ -1187,7 +1197,7 @@ class SpellList extends BaseType
                 $rType = 0;
                 if ($aura == 189)
                     if ($rType = Game::itemModByRatingMask($mv))
-                        $usesScalingRating = true;
+                        $this->scaling[$this->id] = true;
                 // Aura end
 
                 if ($rType)
@@ -1274,7 +1284,7 @@ class SpellList extends BaseType
                 $rType = 0;
                 if ($aura == 189)
                     if ($rType = Game::itemModByRatingMask($mv))
-                        $usesScalingRating = true;
+                        $this->scaling[$this->id] = true;
                 // Aura end
 
                 if ($rType)
@@ -1342,7 +1352,7 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    private function resolveFormulaString($formula, $precision = 0, &$scaling)
+    private function resolveFormulaString($formula, $precision = 0)
     {
         $fSuffix = '%s';
         $fRating = 0;
@@ -1381,7 +1391,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if we dont increment further..
             }
 
-            [$formOutStr, $fSuffix, $fRating] = $this->resolveFormulaString($formOutStr, $formPrecision, $scaling);
+            [$formOutStr, $fSuffix, $fRating] = $this->resolveFormulaString($formOutStr, $formPrecision);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -1415,7 +1425,7 @@ class SpellList extends BaseType
             $pos += $len;
 
             // we are resolving a formula -> omit ranges
-            $var = $this->resolveVariableString($varParts, $scaling);
+            $var = $this->resolveVariableString($varParts);
 
             // time within formula -> rebase to seconds and omit timeUnit
             if (strtolower($varParts['var']) == 'd')
@@ -1447,7 +1457,7 @@ class SpellList extends BaseType
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
-    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false, &$scaling = false)
+    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false)
     {
         // oooo..kaaayy.. parsing text in 6 or 7 easy steps
         // we don't use the internal iterator here. This func has to be called for the individual template.
@@ -1533,6 +1543,10 @@ class SpellList extends BaseType
         $this->interactive = $interactive;
         $this->charLevel   = $level;
 
+    // step -1: already handled?
+        if (isset($this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive]))
+            return $this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive];
+
     // step 0: get text
         $data = $this->getField($type, true);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
@@ -1582,13 +1596,13 @@ class SpellList extends BaseType
        */
 
         $relSpells = [];
-        $data = $this->handleConditions($data, $scaling, $relSpells, true);
+        $data = $this->handleConditions($data, $relSpells, true);
 
     // step 3: unpack formulas ${ .. }.X
-        $data = $this->handleFormulas($data, $scaling, true);
+        $data = $this->handleFormulas($data, true);
 
     // step 4: find and eliminate regular variables
-        $data = $this->handleVariables($data, $scaling, true);
+        $data = $this->handleVariables($data, true);
 
     // step 5: variable-dependant variable-text
         // special case $lONE:ELSE[:ELSE2]; or $|ONE:ELSE[:ELSE2];
@@ -1636,10 +1650,13 @@ class SpellList extends BaseType
         // line endings
         $data = strtr($data, ["\r" => '', "\n" => '<br />']);
 
+        // cache result
+        $this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive] = [$data, $relSpells];
+
         return [$data, $relSpells];
     }
 
-    private function handleFormulas($data, &$scaling, $topLevel = false)
+    private function handleFormulas($data, $topLevel = false)
     {
         // they are stacked recursively but should be balanced .. hf
         while (($formStartPos = strpos($data, '${')) !== false)
@@ -1678,7 +1695,7 @@ class SpellList extends BaseType
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            [$formOutVal, $formOutStr, $ratingId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10), $scaling);
+            [$formOutVal, $formOutStr, $ratingId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10));
 
             if ($ratingId && Util::checkNumeric($formOutVal) && $this->interactive)
                 $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));
@@ -1693,7 +1710,7 @@ class SpellList extends BaseType
         return $data;
     }
 
-    private function handleVariables($data, &$scaling, $topLevel = false)
+    private function handleVariables($data, $topLevel = false)
     {
         $pos = 0;                                           // continue strpos-search from this offset
         $str = '';
@@ -1716,7 +1733,7 @@ class SpellList extends BaseType
 
             $pos += $len;
 
-            $var = $this->resolveVariableString($varParts, $scaling);
+            $var = $this->resolveVariableString($varParts);
             $resolved = is_numeric($var[0]) ? abs($var[0]) : $var[0];
             if (isset($var[2]))
             {
@@ -1743,7 +1760,7 @@ class SpellList extends BaseType
         return $str;
     }
 
-    private function handleConditions($data, &$scaling, &$relSpells, $topLevel = false)
+    private function handleConditions($data, &$relSpells, $topLevel = false)
     {
         while (($condStartPos = strpos($data, '$?')) !== false)
         {
@@ -1830,17 +1847,17 @@ class SpellList extends BaseType
 
             // recursive conditions
             if (strstr($condParts[$targetPart], '$?'))
-                $condParts[$targetPart] = $this->handleConditions($condParts[$targetPart], $scaling, $relSpells);
+                $condParts[$targetPart] = $this->handleConditions($condParts[$targetPart], $relSpells);
 
             if ($know && $topLevel)
             {
                 foreach ([1, 3] as $pos)
                 {
                     if (strstr($condParts[$pos], '${'))
-                        $condParts[$pos] = $this->handleFormulas($condParts[$pos], $scaling);
+                        $condParts[$pos] = $this->handleFormulas($condParts[$pos]);
 
                     if (strstr($condParts[$pos], '$'))
-                        $condParts[$pos] = $this->handleVariables($condParts[$pos], $scaling);
+                        $condParts[$pos] = $this->handleVariables($condParts[$pos]);
                 }
 
                 // false condition first
@@ -1868,6 +1885,7 @@ class SpellList extends BaseType
             return ['', []];
 
         $this->interactive = $interactive;
+        $this->charLevel   = $level;
 
         $x = '<table><tr>';
 
@@ -1884,7 +1902,7 @@ class SpellList extends BaseType
         $x .= '<table><tr><td>';
 
         // parse Buff-Text
-        $btt = $this->parseText('buff', $level, $this->interactive, $scaling);
+        $btt = $this->parseText('buff');
         $x .= $btt[0].'<br>';
 
         // duration
@@ -1894,7 +1912,7 @@ class SpellList extends BaseType
         $x .= '</td></tr></table>';
 
         // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
+        $x .= '<!--?'.$this->id.':1:'.($this->scaling[$this->id] ? MAX_LEVEL : 1).':'.$this->charLevel.'-->';
 
         return [$x, Util::parseHtmlText($btt[1])];
     }
@@ -1905,11 +1923,12 @@ class SpellList extends BaseType
             return ['', []];
 
         $this->interactive = $interactive;
+        $this->charLevel   = $level;
 
         // fetch needed texts
         $name  = $this->getField('name', true);
         $rank  = $this->getField('rank', true);
-        $desc  = $this->parseText('description', $level, $this->interactive, $scaling);
+        $desc  = $this->parseText('description');
         $tools = $this->getToolsForCurrent();
         $cool  = $this->createCooldownForCurrent();
         $cast  = $this->createCastTimeForCurrent();
@@ -2043,7 +2062,7 @@ class SpellList extends BaseType
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
         // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':1:'.($scaling ? MAX_LEVEL : 1).':'.$level.'-->';
+        $x .= '<!--?'.$this->id.':1:'.($this->scaling[$this->id] ? MAX_LEVEL : 1).':'.$this->charLevel.'-->';
 
         return [$x, Util::parseHtmlText($desc[1])];
     }
