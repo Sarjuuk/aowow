@@ -64,7 +64,11 @@ class SoundsPage extends GenericPage
                 $tabData['_errors'] = 1;
         }
         $this->lvTabs[] = ['sound', $tabData];
+    }
 
+    protected function postCache()
+    {
+        // sort for dropdown-menus
         Lang::sort('sound', 'cat');
     }
 

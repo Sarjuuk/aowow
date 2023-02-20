@@ -464,7 +464,10 @@ class SpellsPage extends GenericPage
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
         $this->lvTabs[] = ['spell', $tabData];
+    }
 
+    protected function postCache()
+    {
         // sort for dropdown-menus
         Lang::sort('game', 'ra');
         Lang::sort('game', 'cl');

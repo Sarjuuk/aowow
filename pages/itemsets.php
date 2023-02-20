@@ -72,7 +72,10 @@ class ItemsetsPage extends GenericPage
             $tabData['_errors'] = 1;
 
         $this->lvTabs[] = ['itemset', $tabData];
+    }
 
+    protected function postCache()
+    {
         // sort for dropdown-menus
         Lang::sort('itemset', 'notes', SORT_NATURAL);
         Lang::sort('game', 'si');

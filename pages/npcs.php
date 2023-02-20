@@ -91,7 +91,10 @@ class NpcsPage extends GenericPage
             $tabData['_errors'] = 1;
 
         $this->lvTabs[] = ['creature', $tabData];
+    }
 
+    protected function postCache()
+    {
         // sort for dropdown-menus
         Lang::sort('game', 'fa');
     }

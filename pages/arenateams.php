@@ -114,7 +114,11 @@ class ArenaTeamsPage extends GenericPage
         }
 
         $this->lvTabs[] = ['profile', $tabData, 'membersCol'];
+    }
 
+    protected function postCache()
+    {
+        // sort for dropdown-menus
         Lang::sort('game', 'cl');
         Lang::sort('game', 'ra');
     }

@@ -181,7 +181,11 @@ class ProfilesPage extends GenericPage
 
 
         $this->lvTabs[] = ['profile', $tabData];
+    }
 
+    protected function postCache()
+    {
+        // sort for dropdown-menus
         Lang::sort('game', 'cl');
         Lang::sort('game', 'ra');
     }

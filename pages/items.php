@@ -431,7 +431,10 @@ class ItemsPage extends GenericPage
             $this->forceTabs = false;
             $this->lvTabs[]  = ['item', ['data' => []]];
         }
+    }
 
+    protected function postCache()
+    {
         // sort for dropdown-menus
         Lang::sort('game', 'ra');
         Lang::sort('game', 'cl');

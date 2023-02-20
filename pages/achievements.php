@@ -116,7 +116,10 @@ class AchievementsPage extends GenericPage
         }
 
         $this->lvTabs[] = ['achievement', $tabData];
+    }
 
+    protected function postCache()
+    {
         // sort for dropdown-menus in filter
         Lang::sort('game', 'si');
     }
