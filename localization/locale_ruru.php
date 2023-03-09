@@ -377,7 +377,7 @@ $lang = array(
         'gl'            => array(null, "Большой", "Малый"),
         'si'            => array(1 => "Альянс", -1 => "Альянс только", 2 => "Орда", -2 => "Орда только", null, 3 => "Обе"),
         'resistances'   => array(null, "Сопротивление светлой магии", "Сопротивление огню", "Сопротивление силам природы", "Сопротивление магии льда", "Сопротивление темной магии", "Сопротивление тайной магии"),
-        'dt'            => array(null, "Магия", "Проклятие", "Болезнь", "Яд", "Незаметность", "Невидимость", null, null, "Исступление"),
+        'dt'            => array(null, "Магия", "Проклятие", "Болезнь", "Яд", "Незаметность", "Невидимость", "Магия, Проклятие, Болезнь, Яд", "Заклинание (НИП)", "Исступление"),
         'sc'            => array("Физический урон", "Свет", "Огонь", "природа", "Лед", "Тьма", "Тайная магия"),
         'cl'            => array(null, "Воин", "Паладин", "Охотник", "Разбойник", "Жрец", "Рыцарь смерти", "Шаман", "Маг", "Чернокнижник", null, "Друид"),
         'ra'            => array(-2 => "Орда", -1 => "Альянс", null, "Человек", "Орк", "Дворф", "Ночной эльф", "Нежить", "Таурен", "Гном", "Тролль", null, "Эльф крови", "Дреней"),
@@ -1625,7 +1625,7 @@ $lang = array(
             89 => "usablefearedМожет быть использовано, пока наложен Страх",
             65 => "Использует ресурс полностью"
         ),
-        'unkEffect'     => 'Unknown Effect',
+        'unkEffect'     => 'Unknown Effect (%1$d)',
         'effects'       => array(
 /*0-5    */ 'None',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
 /*6+     */ 'Apply Aura',               'Environmental Damage',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
@@ -1656,7 +1656,7 @@ $lang = array(
 /*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
 /*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
         ),
-        'unkAura'       => 'Unknown Aura',
+        'unkAura'       => 'Unknown Aura (%1$d)',
         'auras'         => array(
 /*0-   */   'None',                                 'Bind Sight',                           'Possess',                              'Periodic Damage - Flat',               'Dummy',
 /*5+   */   'Confuse',                              'Charm',                                'Fear',                                 'Periodic Heal',                        'Mod Attack Speed',

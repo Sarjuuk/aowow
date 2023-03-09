@@ -1092,10 +1092,10 @@ class SpellList extends BaseType
             $effIdx = 1;
 
         // cache at least some lookups.. should be moved to single spellList :/
-        if ($lookup && !isset($this->refSpells[$lookup]))
+        if ($lookup && $lookup != $this->id && !isset($this->refSpells[$lookup]))
             $this->refSpells[$lookup] = new SpellList(array(['s.id', $lookup]));
 
-        $srcSpell = $lookup ? $this->refSpells[$lookup] : $this;
+        $srcSpell = $lookup && $lookup != $this->id ? $this->refSpells[$lookup] : $this;
         if ($srcSpell->error)
             return $result;
 

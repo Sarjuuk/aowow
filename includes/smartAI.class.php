@@ -165,9 +165,9 @@ class SmartAI
 
             if ($q)
             {
-                $owner = DB::Aowow()->select(sprintf('SELECT `type` AS "0", `typeId` AS "1" FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
-                foreach ($owner as [$ty, $id])
-                    $result[$ty][] = $id;
+                $owner = DB::Aowow()->select(sprintf('SELECT `type`, `typeId` FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
+                foreach ($owner as $o)
+                    $result[$o['type']][] = $o['typeId'];
             }
         }
 

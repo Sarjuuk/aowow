@@ -245,9 +245,6 @@ if (!CLI)
         if (count(array_filter(array_column($paths, 5))) != count($paths))
         {
             CLI::write('one or more required directories are missing:', CLI::LOG_ERROR);
-            foreach ($missing as $m)
-                CLI::write(' - '.$m, CLI::LOG_ERROR);
-
             return;
         }
         else

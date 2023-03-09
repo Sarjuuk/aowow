@@ -376,7 +376,7 @@ $lang = array(
         'gl'            => [null, "大", "小"],
         'si'            => [1 => "联盟", -1 => "仅限联盟", 2 => "部落", -2 => "仅限部落", 3 => "双方"],
         'resistances'   => [null, '神圣抗性', '火焰抗性', '自然抗性', '冰霜抗性', '暗影抗性', '奥术抗性'],
-        'dt'            => [null, "魔法", "诅咒", "疾病", "中毒", "潜行", "隐形", null, null, "激怒"],
+        'dt'            => [null, "魔法", "诅咒", "疾病", "中毒", "潜行", "隐形", "魔法, 诅咒, 疾病, 中毒", "法术 (NPC)", "激怒"],
         'sc'            => ["物理", "神圣", "火焰", "自然", "冰霜", "暗影", "奥术"],
         'cl'            => [null, "战士", "圣骑士", "猎人", "潜行者", "牧师", "死亡骑士", "萨满祭司", "法师", "术士", null, "德鲁伊"],
         'ra'            => [-2 => "部落", -1 => "联盟", null, "人类", "兽人", "矮人", "暗夜精灵", "亡灵", "牛头人", "侏儒", "巨魔", null, "血精灵", "德莱尼"],
@@ -1624,7 +1624,7 @@ $lang = array(
             89 => "恐惧时可用",
             65 => "消耗所有力量"
         ),
-        'unkEffect'     => '未知效果',
+        'unkEffect'     => '未知效果 (%1$d)',
         'effects'       => array(
 /*0-5    */ '无',                     '杀死',                '类型伤害',            'Dummy',                    '传送门',          '传送单位',
 /*6+     */ '应用光环',               '环境伤害',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
@@ -1655,7 +1655,7 @@ $lang = array(
 /*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
 /*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
         ),
-        'unkAura'       => '未知光环',
+        'unkAura'       => '未知光环 (%1$d)',
         'auras'         => array(
 /*0-   */   '无',                                   'Bind Sight',                           'Possess',                              'Periodic Damage - Flat',               'Dummy',
 /*5+   */   'Confuse',                              'Charm',                                'Fear',                                 'Periodic Heal',                        'Mod Attack Speed',

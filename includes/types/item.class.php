@@ -1995,7 +1995,7 @@ class ItemListFilter extends Filter
         'cr'    => [FILTER_V_RANGE,    [1, 177],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [FILTER_V_REGEX,    '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
-        'upg'   => [FILTER_V_RANGE,    [1, 999999],                                     true ], // upgrade item ids
+        'upg'   => [FILTER_V_REGEX,    '/[^\d:]/ui',                                    false], // upgrade item ids
         'gb'    => [FILTER_V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
         'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                             false], // name - only printable chars, no delimiter
         'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
@@ -2103,7 +2103,7 @@ class ItemListFilter extends Filter
         // upgrade for [form only]
         if (isset($_v['upg']))
         {
-            $_ = DB::Aowow()->selectCol('SELECT id as ARRAY_KEY, slot FROM ?_items WHERE class IN (2, 3, 4) AND id IN (?a)', (array)$_v['upg']);
+            $_ = DB::Aowow()->selectCol('SELECT id as ARRAY_KEY, slot FROM ?_items WHERE class IN (2, 3, 4) AND id IN (?a)', explode(':', $_v['upg']));
             if ($_ === null)
             {
                 unset($_v['upg']);

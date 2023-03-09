@@ -1555,6 +1555,14 @@ class SpellPage extends GenericPage
         $itemIdx  = $this->subject->canCreateItem();
         $perfItem = DB::World()->selectRow('SELECT * FROM skill_perfect_item_template WHERE spellId = ?d', $this->typeId);
 
+        $fmtStaffTT = function($text, $tip)
+        {
+            if (User::isInGroup(U_GROUP_EMPLOYEE))
+                return sprintf(Util::$dfnString, $tip, $text);
+            else
+                return $text;
+        };
+
         // Iterate through all effects:
         for ($i = 1; $i < 4; $i++)
         {
@@ -1633,9 +1641,9 @@ class SpellPage extends GenericPage
 
             // Effect Name
             if ($_ = Lang::spell('effects', $effId))
-                $foo['name'] = (User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'EffectId: '.$effId, $_) : Lang::spell('effects', $effId)).Lang::main('colon');
+                $foo['name'] = $fmtStaffTT($_, 'Effect'.Lang::main('colon').$effId).Lang::main('colon');
             else
-                $foo['name'] = 'Unknow Effect (#'.$effId.')';
+                $foo['name'] = Lang::spell('unkEffect', [$effId]);
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
                 $foo['radius'] = $this->subject->getField('effect'.$i.'RadiusMax');
@@ -1669,28 +1677,25 @@ class SpellPage extends GenericPage
                 case 30:                                    // Energize
                 case 62:                                    // Power Burn
                 case 137:                                   // Energize Pct
-                    $_ = Lang::spell('powerTypes', $effMV);
-                    if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_);
-                    else if (!$_)
-                        $_ = $effMV;
+                    if ($_ = Lang::spell('powerTypes', $effMV))
+                        $foo['name'] .= $fmtStaffTT('('.$_.')', 'MiscValue'.Lang::main('colon').$effMV);
+                    else
+                        $foo['name'] .= '('.$effMV.')';
 
                     if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
                         $foo['value'] = ($effDS && $effDS != 1 ? (($effBP + 1) / 10).Lang::game('valueDelim') : null).(($effBP + $effDS) / 10);
 
-                    $foo['name'] .= ' ('.$_.')';
                     break;
                 case 11:                                    // Bind
-                    if (!$effMV && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $foo['name'] .= sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, '(current zone)');
-                    else if (!$effMV)
-                        $foo['name'] .= '('.Lang::spell('currentArea').')';
+                    if ($effMV <= 0)
+                        $foo['name'] .= $fmtStaffTT('('.Lang::spell('currentArea').')', 'MiscValue'.Lang::main('colon').$effMV);
                     else if ($_ = ZoneList::getName($effMV))
                         $foo['name'] .= '(<a href="?zone='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Util::ucFirst(Lang::game('zone')).' #'.$effMV;;
+                        $foo['name'] .= Util::ucFirst(Lang::game('zone')).' #'.$effMV;
                     break;
-                case 16:                                    // QuestComplete
+                case 16:                                    // Complete Quest
+                case 139:                                   // Abandon Quest
                     if ($_ = QuestList::getName($effMV))
                         $foo['name'] .= '(<a href="?quest='.$effMV.'">'.$_.'</a>)';
                     else
@@ -1711,13 +1716,11 @@ class SpellPage extends GenericPage
                     $foo['name'] .= $_;
                     break;
                 case 33:                                    // Open Lock
-                    $_ = $effMV ? Lang::spell('lockType', $effMV) : $effMV;
-                    if ($_ && User::isInGroup(U_GROUP_EMPLOYEE))
-                        $_ = sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_);
-                    else if (!$_)
-                        $_ = $effMV;
+                    if ($effMV && ($_ = Lang::spell('lockType', $effMV)))
+                        $foo['name'] .= ' ('.$fmtStaffTT($_, 'MiscValue'.Lang::main('colon').$effMV).')';
+                    else
+                        $foo['name'] .= ' ('.$effMV.')';
 
-                    $foo['name'] .= ' ('.$_.')';
                     break;
                 case 53:                                    // Enchant Item Perm
                 case 54:                                    // Enchant Item Temp
@@ -1990,6 +1993,7 @@ class SpellPage extends GenericPage
                             case 39:                        // School Immunity
                             case 40:                        // Damage Immunity
                             case 50:                        // Mod Critical Healing Amount
+                            case 52:                        // Mod Physical Crit Chance
                             case 57:                        // Mod Spell Crit Chance
                             case 69:                        // School Absorb
                             case 71:                        // Mod Spell Crit Chance School
@@ -2166,7 +2170,7 @@ class SpellPage extends GenericPage
 
                     }
                     else if ($effAura > 0)
-                        $foo['name'] .= 'Unknown Aura ('.$effAura.')';
+                        $foo['name'] .= Lang::spell('unkAura', [$effAura]);
 
                     break;
                 }

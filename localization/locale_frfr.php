@@ -377,7 +377,7 @@ $lang = array(
         'gl'            => [null, "Majeur", "Mineur"],
         'si'            => [1 => "Alliance", -1 => "Alliance seulement", 2 => "Horde", -2 => "Horde seulement", 3 => "Les deux"],
         'resistances'   => [null, 'Résistance au Sacré', 'Résistance au Feu', 'Résistance à la Nature', 'Résistance au Givre', 'Résistance à l\'Ombre', 'Résistance aux Arcanes'],
-        'dt'            => [null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", null, null, "Enrager"],
+        'dt'            => [null, "Magie", "Malédiction", "Maladie", "Poison", "Camouflage", "Invisibilité", "Magie, Malédiction, Maladie, Poison", "Sort (PNJ)", "Enrager"],
         'sc'            => ["Physique", "Sacré", "Feu", "Nature", "Givre", "Ombre", "Arcane"],
         'cl'            => [null, "Guerrier", "Paladin", "Chasseur", "Voleur", "Prêtre", "DeathChevalier de la mort", "Chaman", "Mage", "Démoniste", null, "Druide"],
         'ra'            => [-2 => "Horde", -1 => "Alliance", null, "Humain", "Orc", "Nain", "Elfe de la nuit", "Mort-vivant", "Tauren", "Gnome", "Troll", null, "Elfe de sang", "Draeneï"],
@@ -1625,7 +1625,7 @@ $lang = array(
             89 => "Utilisable sous l'effet de peur",
             65 => "Utilise toute la puissance"
         ),
-        'unkEffect'     => 'Unknown Effect',
+        'unkEffect'     => 'Unknown Effect (%1$d)',
         'effects'       => array(
 /*0-5    */ 'None',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
 /*6+     */ 'Apply Aura',               'Environmental Damage',     'Drain Power',              'Drain Health',             'Heal',                     'Bind',
@@ -1656,7 +1656,7 @@ $lang = array(
 /*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
 /*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
         ),
-        'unkAura'       => 'Unknown Aura',
+        'unkAura'       => 'Unknown Aura (%1$d)',
         'auras'         => array(
 /*0-   */   'None',                                 'Bind Sight',                           'Possess',                              'Periodic Damage - Flat',               'Dummy',
 /*5+   */   'Confuse',                              'Charm',                                'Fear',                                 'Periodic Heal',                        'Mod Attack Speed',

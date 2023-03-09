@@ -96,15 +96,6 @@ class Lang
             $var = $var[$arg];
         }
 
-        // meh :x
-        if ($var === null && $prop == 'spell' && count($args) == 1)
-        {
-            if ($args[0] == 'effects')
-                $var = self::$$prop['unkEffect'];
-            else if ($args[0] == 'auras')
-                $var = self::$$prop['unkAura'];
-        }
-
         return self::vspf($var, $vspfArgs);
     }
 
