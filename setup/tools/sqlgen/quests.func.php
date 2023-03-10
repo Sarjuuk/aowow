@@ -129,15 +129,14 @@ SqlGen::register(new class extends SetupScript
                 game_event_seasonal_questrelation gesqr ON gesqr.questId = q.ID
             LEFT JOIN
                 disables d ON d.entry = q.ID AND d.sourceType = 1
-            WHERE
-                q.id > ?d
             {
-                AND q.id IN (?a)
+            WHERE
+                q.ID IN (?a)
             }
             ORDER BY
                 q.ID ASC
             LIMIT
-                ?d';
+                ?d, ?d';
 
         $xpQuery = '
             UPDATE
@@ -171,17 +170,13 @@ SqlGen::register(new class extends SetupScript
                 }';
 
 
-        $lastMax = 0;
-        while ($quests = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize))
+        $i = 0;
+        while ($quests = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            $newMax = max(array_column($quests, 'ID'));
+            CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')');
 
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
-
-            $lastMax = $newMax;
-
-            foreach ($quests as $q)
-                DB::Aowow()->query('REPLACE INTO ?_quests VALUES (?a)', array_values($q));
+            foreach ($quests as $quest)
+                DB::Aowow()->query('REPLACE INTO ?_quests VALUES (?a)', array_values($quest));
         }
 
         /*

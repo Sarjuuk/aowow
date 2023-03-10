@@ -120,15 +120,14 @@ SqlGen::register(new class extends SetupScript
                 creature_template_resistance ctr5 ON ct.entry = ctr5.CreatureID AND ctr5.School = 5
             LEFT JOIN
                 creature_template_resistance ctr6 ON ct.entry = ctr6.CreatureID AND ctr6.School = 6
-            WHERE
-                ct.entry > ?d
             {
-                AND ct.entry IN (?a)
+            WHERE
+                ct.entry IN (?a)
             }
             ORDER BY
                 ct.entry ASC
             LIMIT
-               ?d';
+               ?d, ?d';
 
         $dummyQuery = '
             UPDATE
@@ -157,14 +156,10 @@ SqlGen::register(new class extends SetupScript
                 c.iconString = cdi.iconString,
                 c.humanoid = IF(cdie.id IS NULL, 0, 1)';
 
-        $lastMax = 0;
-        while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize))
+        $i = 0;
+        while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            $newMax = max(array_column($npcs, 'entry'));
-
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
-
-            $lastMax = $newMax;
+            CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')');
 
             foreach ($npcs as $npc)
                 DB::Aowow()->query('REPLACE INTO ?_creature VALUES (?a)', array_values($npc));

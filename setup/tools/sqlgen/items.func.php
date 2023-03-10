@@ -131,24 +131,19 @@ SqlGen::register(new class extends SetupScript
                 spell_group sg ON sg.spell_id = it.spellid_1 AND it.class = 0 AND it.subclass = 2 AND sg.id IN (1, 2)
             LEFT JOIN
                 game_event ge ON ge.holiday = it.HolidayId AND it.HolidayId > 0
-            WHERE
-                it.entry > ?d
             {
-                AND it.entry IN (?a)
+            WHERE
+                it.entry IN (?a)
             }
             ORDER BY
                 it.entry ASC
             LIMIT
-               ?d';
+               ?d, ?d';
 
-        $lastMax = 0;
-        while ($items = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize))
+        $i = 0;
+        while ($items = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            $newMax = max(array_column($items, 'entry'));
-
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
-
-            $lastMax = $newMax;
+            CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')');
 
             foreach ($items as $item)
                 DB::Aowow()->query('REPLACE INTO ?_items VALUES (?a)', array_values($item));

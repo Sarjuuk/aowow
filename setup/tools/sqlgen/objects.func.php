@@ -76,17 +76,16 @@ SqlGen::register(new class extends SetupScript
                 gameobject_template_locale gtl8 ON go.entry = gtl8.entry AND gtl8.`locale` = "ruRU"
             LEFT JOIN
                 gameobject_questitem gqi ON gqi.GameObjectEntry = go.entry
-            WHERE
-                go.entry > ?d
             {
-                AND go.entry IN (?a)
+            WHERE
+                go.entry IN (?a)
             }
             GROUP BY
                 go.entry
             ORDER BY
                 go.entry ASC
             LIMIT
-                ?d';
+                ?d, ?d';
 
         $updateQuery = '
             UPDATE
@@ -104,17 +103,13 @@ SqlGen::register(new class extends SetupScript
                 o.id IN (?a)
             }';
 
-        $lastMax = 0;
-        while ($objects = DB::World()->select($baseQuery, $lastMax, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize))
+        $i = 0;
+        while ($objects = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            $newMax = max(array_column($objects, 'entry'));
+            CLI::write(' * batch #' . ++$i . ' (' . count($objects) . ')');
 
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
-
-            $lastMax = $newMax;
-
-            foreach ($objects as $o)
-                DB::Aowow()->query('REPLACE INTO ?_objects VALUES (?a)', array_values($o));
+            foreach ($objects as $object)
+                DB::Aowow()->query('REPLACE INTO ?_objects VALUES (?a)', array_values($object));
         }
 
         // apply typeCat and reqSkill depending on locks
