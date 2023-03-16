@@ -7,25 +7,25 @@ class AjaxAdmin extends AjaxHandler
 {
     protected $validParams = ['screenshots', 'siteconfig', 'weight-presets', 'spawn-override', 'guide', 'comment'];
     protected $_get        = array(
-        'action' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW           ],
+        'action' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'      ],
         'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
         'key'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkKey'             ],
-        'all'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'      ],
+        'all'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'      ],
         'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
         'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
         'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkUser'            ],
-        'val'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'      ],
+        'val'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
         'guid'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
         'area'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
         'floor'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ]
     );
     protected $_post       = array(
-        'alt'    => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
-        'scale'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkScale'],
-        '__icon' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkKey'  ],
-        'status' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
-        'msg'    => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW]
+        'alt'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'],
+        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'     ],
+        'scale'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkScale'     ],
+        '__icon' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkKey'       ],
+        'status' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'     ],
+        'msg'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob']
     );
 
     public function __construct(array $params)

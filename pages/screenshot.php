@@ -29,7 +29,7 @@ class ScreenshotPage extends GenericPage
 
     protected $_post       = array(
         'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'ScreenshotPage::checkCoords'],
-        'screenshotalt' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW]
+        'screenshotalt' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob']
     );
 
     public function __construct($pageCall, $pageParam)

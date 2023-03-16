@@ -109,10 +109,16 @@ trait TrRequestData
         return [];
     }
 
-    private static function checkFulltext(string $val) : string
+    private static function checkTextLine(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace('/[\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
+        return preg_replace('/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
+    }
+
+    private static function checkTextBlob(string $val) : string
+    {
+        // trim non-printable chars
+        return preg_replace('/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
     }
 }
 

@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
 class AjaxContactus extends AjaxHandler
 {
     protected $_post = array(
-        'mode'       => ['filter' => FILTER_CALLBACK,      'options' => 'AjaxHandler::checkInt'],
-        'reason'     => ['filter' => FILTER_CALLBACK,      'options' => 'AjaxHandler::checkInt'],
-        'ua'         => ['filter' => FILTER_UNSAFE_RAW,      'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'appname'    => ['filter' => FILTER_UNSAFE_RAW,      'flags' => FILTER_FLAG_STRIP_AOWOW],
+        'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
+        'reason'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
+        'ua'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
+        'appname'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
         'page'       => ['filter' => FILTER_SANITIZE_URL                                       ],
-        'desc'       => ['filter' => FILTER_UNSAFE_RAW,      'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'id'         => ['filter' => FILTER_CALLBACK,      'options' => 'AjaxHandler::checkInt'],
+        'desc'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'],
+        'id'         => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
         'relatedurl' => ['filter' => FILTER_SANITIZE_URL                                       ],
         'email'      => ['filter' => FILTER_SANITIZE_EMAIL                                     ]
     );

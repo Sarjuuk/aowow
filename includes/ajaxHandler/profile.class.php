@@ -11,14 +11,14 @@ class AjaxProfile extends AjaxHandler
     protected $_get        = array(
         'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'  ],
         'items'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkItemList'],
-        'size'       => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW     ],
+        'size'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
         'guild'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
         'arena-team' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
         'user'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkUser'    ]
     );
 
     protected $_post        = array(
-        'name'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'],
+        'name'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
         'level'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'class'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'race'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
@@ -28,12 +28,12 @@ class AjaxProfile extends AjaxHandler
         'talenttree2'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'talenttree3'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'activespec'   => ['filter' => FILTER_SANITIZE_NUMBER_INT],
-        'talentbuild1' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'glyphs1'      => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'talentbuild2' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'glyphs2'      => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'icon'         => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'description'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkFulltext'],
+        'talentbuild1' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkTalentString'],
+        'glyphs1'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkGlyphString' ],
+        'talentbuild2' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkTalentString'],
+        'glyphs2'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkGlyphString' ],
+        'icon'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'    ],
+        'description'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'    ],
         'source'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'copy'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'public'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
@@ -758,6 +758,22 @@ class AjaxProfile extends AjaxHandler
     protected static function checkUser(string $val) : string
     {
         if (User::isValidName($val))
+            return $val;
+
+        return '';
+    }
+
+    protected static function checkTalentString(string $val) : string
+    {
+        if (preg_match('/^\d+$/', $val))
+            return $val;
+
+        return '';
+    }
+
+    protected static function checkGlyphString(string $val) : string
+    {
+        if (preg_match('/^\d+(:\d+)*$/', $val))
             return $val;
 
         return '';

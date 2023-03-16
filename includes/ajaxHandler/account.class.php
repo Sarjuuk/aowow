@@ -171,7 +171,7 @@ class AjaxAccount extends AjaxHandler
     {
         $var = trim(urldecode($val));
 
-        return filter_var($var, FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_AOWOW);
+        return filter_var($var, FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_LOW);
     }
 }
 

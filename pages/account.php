@@ -34,9 +34,9 @@ class AccountPage extends GenericPage
 
     protected $_post     = array(
         'username'    => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'password'    => ['filter' => FILTER_UNSAFE_RAW],
-        'c_password'  => ['filter' => FILTER_UNSAFE_RAW],
-        'token'       => ['filter' => FILTER_UNSAFE_RAW],
+        'password'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
+        'c_password'  => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
+        'token'       => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
         'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'AccountPage::rememberCallback'],
         'email'       => ['filter' => FILTER_SANITIZE_EMAIL]
     );

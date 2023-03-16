@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxGetdescription extends AjaxHandler
 {
     protected $_post = array(
-        'description' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkFulltext']]
+        'description' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkTextBlob']]
     );
 
     public function __construct(array $params)

@@ -6,8 +6,8 @@ if (!defined('AOWOW_REVISION'))
 class AjaxEdit extends AjaxHandler
 {
     protected $_get = array(
-        'qqfile' => ['filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'guide'  => ['filter' => FILTER_SANITIZE_NUMBER_INT]
+        'qqfile' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
+        'guide'  => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ]
     );
 
     public function __construct(array $params)
