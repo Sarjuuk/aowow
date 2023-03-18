@@ -357,6 +357,13 @@ $lang = array(
         'modes'         => [-1 => "任何", "普通 / 普通 10人", "英雄 / 普通 25人", "英雄 10人", "英雄 25人"],
         'expansions'    => ["经典旧世", "燃烧的远征", "巫妖王之怒"],
         'stats'         => ["力量", "敏捷", "耐力", "智力", "精神"],
+        'timeAbbrev'    => array(
+            '',
+            "%d|4秒:秒;",
+            "%d|4分钟:分钟;",
+            "%d|4小时:小时;",
+            "%d|4天:天;"
+        ),
         'sources'       => array(
             "未知", "已制造", "掉落", "PvP", "任务",
             "商人", "训练师", "发现", "救赎", "天赋",
@@ -1444,12 +1451,10 @@ $lang = array(
         '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
-        'ppm'           => "%s每分钟触发几率",
+        'ppm'           => "(%s每分钟触发几率)",
         'procChance'    => "触发几率",
         'starter'       => "Starter spell",
         'trainingCost'  => "训练成本",
-        'remaining'     => "持续%s",
-        'untilCanceled' => "直到主动取消",
         'castIn'        => "%s秒施法时间",
         'instantPhys'   => "瞬发",
         'instantMagic'  => "瞬发",
@@ -1466,6 +1471,20 @@ $lang = array(
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "缩放比例",
+        'duration'      => array(
+            "直到主动取消",
+            "%.2G秒",
+            "%.2G分钟",
+            "%.2G小时",
+            "%.2G天"
+        ),
+        'timeRemaining' => array(
+            "",
+            "剩余%d秒",
+            "剩余%d分钟",
+            "剩余%d小时",
+            "剩余%d天"
+        ),
         'scaling'       => array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
             'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
@@ -1782,6 +1801,20 @@ $lang = array(
         'uniqueEquipped'=> ["装备唯一", null,     "装备唯一：%s （%d）"],
         'speed'         => "速度",
         'dps'           => "（每秒伤害%.1f）",
+        'duration'      => array(
+            '',
+            "持续时间：%d秒",
+            "持续时间：%d分钟",
+            "持续时间：%d小时",
+            "持续时间：%d天"
+        ),
+        'cooldown'      => array(
+            "（%s冷却）",
+            "(%d秒冷却时间)",
+            "(%d分钟冷却时间)",
+            "(%d小时冷却时间)",
+            "(%d天冷却时间)"
+        ),
         'damage'        => array(
                         //  basic,          basic /w school,    add basic,      add basic /w school
             'single'    => ["%d点伤害",        "%d点%s伤害",          "+ %d伤害",       "+%d %s伤害"          ],

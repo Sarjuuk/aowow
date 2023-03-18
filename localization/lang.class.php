@@ -487,8 +487,39 @@ class Lang
         return Util::ucFirst(self::game(Type::getFileString($type)));
     }
 
+    public static function formatTime(int $msec, string $prop = 'game', string $src = 'timeAbbrev', bool $concat = false) : string
+    {
+        if ($msec < 0)
+            $msec = 0;
 
-    private static function vspf($var, $args)
+        [$ms, $s, $m, $h, $d] = Util::parseTime($msec);
+        $ref    = [];
+        $result = [];
+
+        if (is_array(self::$$prop[$src]))
+            $ref = &self::$$prop[$src];
+        else
+        {
+            trigger_error('Lang::formatTime - tried to access undefined property Lang::$'.$prop, E_USER_WARNING);
+            return '';
+        }
+
+        if ($d >= 1)
+            $result[] = self::vspf($ref[4], [$d + $h / 24]);
+        if ($h >= 1 && ($concat || !$result))
+            $result[] = self::vspf($ref[3], [$h + $m / 60]);
+        if ($m >= 1 && ($concat || !$result))
+            $result[] = self::vspf($ref[2], [$m + $s / 60]);
+        if ($s >= 1 && ($concat || !$result))
+            $result[] = self::vspf($ref[1], [$s]);
+
+        if (!$result)
+            $result[] = self::vspf($ref[0]);
+
+        return implode(', ', $result);
+    }
+
+    private static function vspf($var, array $args = [])
     {
         if (is_array($var))
         {

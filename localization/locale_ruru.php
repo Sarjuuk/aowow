@@ -358,6 +358,13 @@ $lang = array(
         'modes'         => [-1 => "Все", "Обычный / 10-норм.", "Героический / 25-норм.", "10-героич", "25-героич"],
         'expansions'    => array("World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"),
         'stats'         => array("к силе", "к ловкости", "к выносливости", "к интеллекту", "к духу"),
+        'timeAbbrev'    => array(
+            '',
+            "%d с.",
+            "%d мин.",
+            "%d ч.",
+            "%d д."
+        ),
         'sources'       => array(
             "Неизвестно",                   "Ремесло",                      "Добыча",                       "PvP",                          "Задание",                      "Продавец",
             "Тренер",                       "Открытие",                     "Рекламная акция",              "Талант",                       "Начальное заклинание",         "Мероприятие",
@@ -1445,12 +1452,10 @@ $lang = array(
         '_transfer'     => 'Этот предмет превратится в <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Изучается путём освоения местности",
-        'ppm'           => "Срабатывает %s раз в минуту",
+        'ppm'           => "(Срабатывает %s раз в минуту)",
         'procChance'    => "Шанс срабатывания",
         'starter'       => "Начальное заклинание",
         'trainingCost'  => "Цена обучения",
-        'remaining'     => "Осталось: %s",
-        'untilCanceled' => "до отмены",
         'castIn'        => "Применение: %s сек.",
         'instantPhys'   => "Мгновенное действие",
         'instantMagic'  => "Мгновенное действие",
@@ -1467,6 +1472,20 @@ $lang = array(
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
+        'duration'      => array(
+            "до отмены",
+            "%.2G сек",
+            "%.2G мин",
+            "%.2G ч",
+            "%.2G д"
+        ),
+        'timeRemaining' => array(
+            "",
+            "Осталось: %d |4секунда:секунды:секунд;",
+            "Осталось: %d |4минута:минуты:минут;",
+            "Осталось: %d |4час:часа:часов;",
+            "Осталось: %d |4день:дня:дней;"
+        ),
         'scaling'       => array(
             'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
             'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
@@ -1783,6 +1802,21 @@ $lang = array(
         'uniqueEquipped'=> ["Уникальный использующийся",    null,               "Уникальный использующийся предмет: %s (%d)"],
         'speed'         => "Скорость",
         'dps'           => "(%.1f ед. урона в секунду)",
+        'duration'      => array(
+            '',
+            "Срок действия: %d |4секунда:секунды:секунд;",
+            "Срок действия: %d |4минута:минуты:минут;",
+            "Исчезнет через %d ч.",
+            "Исчезнет через %d д."
+        ),
+
+        'cooldown'      => array(
+            "(Восстановление: %s)",
+            "(Восстановление: %d сек.)",
+            "(Восстановление: %d мин.)",
+            "(Восстановление: %d |4час:часа:часов;)",
+            "(Восстановление: %d |4день:дня:дней;)"
+        ),
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                         //  basic,                              basic /w school,                            add basic,                                      add basic /w school
             'single'    => ["Урон: %d",                         "%d ед. |3-6(%s)",                          "+ %d ед. урона",                               "+%d ед. урона (%s)"            ],

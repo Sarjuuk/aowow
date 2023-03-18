@@ -573,7 +573,7 @@ abstract class Util
         return $money;
     }
 
-    private static function parseTime(int $msec) : array
+    public static function parseTime(int $msec) : array
     {
         $time = [0, 0, 0, 0, 0];
 
@@ -671,7 +671,7 @@ abstract class Util
         else if ($h)                                        // hours, minutes ago
             return Lang::main('timeAgo', [$h . ' ' . Lang::timeUnits('ab', 4) . ' ' . $m . ' ' . Lang::timeUnits('ab', 5)]);
         else if ($m)                                        // minutes, seconds ago
-            return Lang::main('timeAgo', [$m . ' ' . Lang::timeUnits('ab', 5) . ' ' . $m . ' ' . Lang::timeUnits('ab', 6)]);
+            return Lang::main('timeAgo', [$m . ' ' . Lang::timeUnits('ab', 5) . ' ' . $s . ' ' . Lang::timeUnits('ab', 6)]);
         else                                                // seconds ago
             return Lang::main('timeAgo', [$s . ' ' . Lang::timeUnits($s == 1 ? 'sg' : 'pl', 6)]);
     }

@@ -358,6 +358,13 @@ $lang = array(
         'modes'         => [-1 => "Tout", "Standard / Normal 10", "Héroïque / Normal 25", "10 héroïque", "25 héroïque"],
         'expansions'    => ["Classique", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Force", "Agilité", "Endurance", "Intelligence", "Esprit"],
+        'timeAbbrev'    => array(
+            '',
+            "%d |4sec:sec;",
+            "%d |4min:min;",
+            "%d |4h:h;",
+            "%d |4jour:jours;"
+        ),
         'sources'       => array(
             "Inconnu",                      "Fabriqué",                     "Butin",                        "JcJ",                          "Quête",                        "Vendeur",
             "Maître",                       "Découverte",                   "Échange d'un code",            "Talent",                       "Débutant",                     "Événement",
@@ -1445,12 +1452,10 @@ $lang = array(
         '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Appris via une découverte",
-        'ppm'           => "%s déclenchements par minute",
+        'ppm'           => "(%s déclenchements par minute)",
         'procChance'    => "Chance",
         'starter'       => "Sortilège initiaux",
         'trainingCost'  => "Coût d'entraînement",
-        'remaining'     => "%s restantes",
-        'untilCanceled' => "jusqu’à annulation",
         'castIn'        => "%s s d'incantation",
         'instantPhys'   => "Incantation immédiate",
         'instantMagic'  => "Instantanée",
@@ -1467,6 +1472,20 @@ $lang = array(
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
+        'duration'      => array(
+            "jusqu’à annulation",
+            "%.2G sec.",
+            "%.2G min",
+            "%.2G h",
+            "%.2G |4jour:jours;"
+        ),
+        'timeRemaining' => array(
+            "",
+            "%d |4seconde restante:secondes restantes;",
+            "%d |4minute restante:minutes restantes;",
+            "%d |4heure restante:heures restantes;",
+            "%d |4jour restant:jours restants;"
+        ),
         'scaling'       => array(
             'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",
             'dotSP'    => "+%.2f%% de la puissance des sorts par tick",       'dotAP'    => "+%.2f%% de la puissance d'attaque par tick"
@@ -1783,6 +1802,20 @@ $lang = array(
         'uniqueEquipped'=> ["Unique - Equipé", null,          "Unique - Equipé: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Vitesse",
         'dps'           => "(%.1f dégâts par seconde)",
+        'duration'      => array(
+            '',
+            "Durée : %d sec",
+            "Durée : %d min",
+            "Durée : %d |4heure:heures;",
+            "Durée : %d |4jour:jours;"
+        ),
+        'cooldown'      => array(
+            "(%s de recharge)",
+            "(%d sec. de recharge)",
+            "(%d min de recharge)",
+            "(%d |4heure:heures; de recharge)",
+            "(%d |4jour:jours; de recharge)"
+        ),
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                             //  basic,                      basic /w school,                                add basic,                              add basic /w school
             'single'    => ["%d Dégâts",                    "%d points de dégâts (%s)",                     "+ %d points de dégâts",                "+ %d points de dégâts (%s)"             ],

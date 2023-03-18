@@ -1123,10 +1123,7 @@ class SpellList extends BaseType
             case 'D':                                       // todo (med): min/max?; /w unit?
                 $base = $srcSpell->getField('duration');
 
-                if ($base <= 0)
-                    $result[2] = Lang::spell('untilCanceled');
-                else
-                    $result[2] = Util::formatTime($base, true);
+                $result[2] = Lang::formatTime($srcSpell->getField('duration'), 'spell', 'duration');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
@@ -1907,7 +1904,7 @@ class SpellList extends BaseType
 
         // duration
         if ($this->curTpl['duration'] > 0)
-            $x .= '<span class="q">'.sprintf(Lang::spell('remaining'), Util::formatTime($this->curTpl['duration'])).'<span>';
+            $x .= '<span class="q">'.Lang::formatTime($this->curTpl['duration'], 'spell', 'timeRemaining').'<span>';
 
         $x .= '</td></tr></table>';
 

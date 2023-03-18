@@ -942,7 +942,7 @@ abstract class Filter
 
     public function getExtraCols()
     {
-        return $this->formData['extraCols'];
+        return array_unique($this->formData['extraCols']);
     }
 
     public function getSetCriteria()

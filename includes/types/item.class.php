@@ -604,16 +604,6 @@ class ItemList extends BaseType
             $x .= '<br />'.sprintf(Lang::item($limit['isGem'] ? 'uniqueEquipped' : 'unique', 2), Util::localizedString($limit, 'name'), $limit['count']);
         }
 
-        // max duration
-        if ($dur = $this->curTpl['duration'])
-        {
-            $rt = '';
-            if ($this->curTpl['flagsCustom'] & 0x1)
-                $rt = $interactive ? ' ('.sprintf(Util::$dfnString, 'LANG.tooltip_realduration', Lang::item('realTime')).')' : ' ('.Lang::item('realTime').')';
-
-            $x .= "<br />".Lang::game('duration').Lang::main('colon').Util::formatTime(abs($dur) * 1000).$rt;
-        }
-
         // required holiday
         if ($eId = $this->curTpl['eventId'])
             if ($hName = DB::Aowow()->selectRow('SELECT h.* FROM ?_holidays h JOIN ?_events e ON e.holidayId = h.id WHERE e.id = ?d', $eId))
@@ -875,6 +865,16 @@ class ItemList extends BaseType
         if ($dur = $this->curTpl['durability'])
             $x .= sprintf(Lang::item('durability'), $dur, $dur).'<br />';
 
+        // max duration
+        if ($dur = $this->curTpl['duration'])
+        {
+            $rt = '';
+            if ($this->curTpl['flagsCustom'] & 0x1)
+                $rt = $interactive ? ' ('.sprintf(Util::$dfnString, 'LANG.tooltip_realduration', Lang::item('realTime')).')' : ' ('.Lang::item('realTime').')';
+
+            $x .= Lang::formatTime(abs($dur) * 1000, 'item', 'duration').$rt."<br />";
+        }
+
         $jsg = [];
         // required classes
         if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg))
@@ -959,12 +959,18 @@ class ItemList extends BaseType
 
                     $extra = [];
                     if ($cd >= 5000)
-                        $extra[] = Lang::game('cooldown', [Util::formatTime($cd, true)]);
+                    {
+                        $pt = Util::parseTime($cd);
+                        if (count(array_filter($pt)) == 1)  // simple time: use simple method
+                            $extra[] = Lang::formatTime($cd, 'item', 'cooldown');
+                        else                                // build block with generic time
+                            $extra[] = Lang::item('cooldown', 0, [Lang::formatTime($cd, 'game', 'timeAbbrev', true)]);
+                    }
                     if ($this->curTpl['spellTrigger'.$j] == 2)
                         if ($ppm = $this->curTpl['spellppmRate'.$j])
                             $extra[] = Lang::spell('ppm', [$ppm]);
 
-                    $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $extra ? ' ('.implode(', ', $extra).')' : ''];
+                    $itemSpellsAndTrigger[$this->curTpl['spellId'.$j]] = [$this->curTpl['spellTrigger'.$j], $extra ? ' '.implode(', ', $extra) : ''];
                 }
             }
 
@@ -2437,7 +2443,7 @@ class ItemListFilter extends Filter
         $cr[2] *= 1000;                                     // field supplied in milliseconds
 
         $this->formData['extraCols'][] = $cr[0];
-        $this->extraOpts['is']['s'][]  = ', IF(spellCooldown1 > 1, spellCooldown1, IF(spellCooldown2 > 1, spellCooldown2, IF(spellCooldown3 > 1, spellCooldown3, IF(spellCooldown4 > 1, spellCooldown4, IF(spellCooldown5 > 1, spellCooldown5,))))) AS cooldown';
+        $this->extraOpts['is']['s'][]  = ', GREATEST(spellCooldown1, spellCooldown2, spellCooldown3, spellCooldown4, spellCooldown5) AS cooldown';
 
         return [
             'OR',

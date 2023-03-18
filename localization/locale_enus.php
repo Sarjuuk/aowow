@@ -358,6 +358,13 @@ $lang = array(
         'modes'         => [-1 => "Any", "Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
+        'timeAbbrev'    => array(                           // <time>S_ABBR
+            '',
+            "%d |4Sec:Sec;",
+            "%d |4Min:Min;",
+            "%d |4Hr:Hr;",
+            "%d |4Day:Days;"
+        ),
         'sources'       => array(
             "Unknown",                      "Crafted",                      "Drop",                         "PvP",                          "Quest",                        "Vendor",
             "Trainer",                      "Discovery",                    "Redemption",                   "Talent",                       "Starter",                      "Event",
@@ -1445,12 +1452,10 @@ $lang = array(
         '_transfer'     => 'This spell will be converted to <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
-        'ppm'           => "%s procs per minute",
+        'ppm'           => "(%s procs per minute)",
         'procChance'    => "Proc chance",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost",
-        'remaining'     => "%s remaining",                  // SPELL_TIME_REMAINING_*
-        'untilCanceled' => "until cancelled",               // SPELL_DURATION_UNTIL_CANCELLED
         'castIn'        => "%s sec cast",                   // SPELL_CAST_TIME_SEC
         'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'instantMagic'  => "Instant cast",                  // SPELL_CAST_TIME_INSTANT
@@ -1467,6 +1472,20 @@ $lang = array(
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",
+        'duration'      => array(                           // SPELL_DURATION_*
+            "until cancelled",
+            "%.2G sec",
+            "%.2G min",
+            "%.2G |4hour:hrs;",
+            "%.2G |4day:days;"
+        ),
+        'timeRemaining' => array(                           // SPELL_TIME_REMAINING_*
+            "",
+            "%d |4second:seconds; remaining",
+            "%d |4minute:minutes; remaining",
+            "%d |4hour:hours; remaining",
+            "%d |4day:days; remaining"
+        ),
         'scaling'       => array(
             'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
             'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
@@ -1783,6 +1802,20 @@ $lang = array(
         'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Speed",                         // SPEED
         'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
+        'duration'      => array(                           // ITEM_DURATION_*
+            '',
+            "Duration: %d sec",
+            "Duration: %d min",
+            "Duration: %d |4hour:hrs;",
+            "Duration: %d |4day:days;"
+        ),
+        'cooldown'      => array(                           // ITEM_COOLDOWN_TOTAL*
+            "(%s Cooldown)",
+            "(%d Sec Cooldown)",
+            "(%d Min Cooldown)",
+            "(%d |4Hour:Hours; Cooldown)",
+            "(%d |4Day:Days; Cooldown)"
+        ),
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                         //  basic,                          basic /w school,                add basic,                  add basic /w school
             'single'    => ["%d Damage",                    "%d %s Damage",                 "+ %d Damage",              "+%d %s Damage"             ],

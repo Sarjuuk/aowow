@@ -358,6 +358,13 @@ $lang = array(
         'modes'         => [-1 => "Beliebig", "Normal / Normal 10", "Heroisch / Normal 25", "Heroisch 10", "Heroisch 25"],
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Stärke", "Beweglichkeit", "Ausdauer", "Intelligenz", "Willenskraft"],
+        'timeAbbrev'    => array(
+            '',
+            "%d |4Sek.:Sek.;",
+            "%d |4Min.:Min.;",
+            "%d |4Std.:Std.;",
+            "%d |4Tag:Tage;"
+        ),
         'sources'       => array(
             "Unbekannt",                    "Hergestellt",                  "Drop",                         "PvP",                          "Quest",                        "Händler",
             "Lehrer",                       "Entdeckung",                   "Einlösung",                    "Talent",                       "Startausrüstung",              "Ereignis",
@@ -1445,12 +1452,10 @@ $lang = array(
         '_transfer'     => 'Dieser Zauber wird mit <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'currentArea'   => '&lt;Momentanes Gebiet&gt;',
         'discovered'    => "Durch Geistesblitz erlernt",
-        'ppm'           => "%s Auslösungen pro Minute",
+        'ppm'           => "(%s Auslösungen pro Minute)",
         'procChance'    => "Procchance",
         'starter'       => "Basiszauber",
         'trainingCost'  => "Trainingskosten",
-        'remaining'     => "Noch %s",
-        'untilCanceled' => "bis Abbruch",
         'castIn'        => "Wirken in %s Sek.",
         'instantPhys'   => "Sofort",
         'instantMagic'  => "Spontanzauber",
@@ -1467,6 +1472,20 @@ $lang = array(
         'stackGroup'    => "Stack Gruppierung",
         'linkedWith'    => "Verknüpft mit",
         '_scaling'      => "Skalierung",
+        'duration'      => array(
+            "bis Abbruch",
+            "%.2G Sek.",
+            "%.2G Min.",
+            "%.2G |4Stunde:Stunden;",
+            "%.2G |4Tag:Tage;"
+        ),
+        'timeRemaining' => array(
+            "",
+            "Noch %d |4Sekunde:Sekunden;",
+            "Noch %d |4Minute:Minuten;",
+            "Noch %d |4Stunde:Stunden;",
+            "Noch %d |4Tag:Tage;"
+        ),
         'scaling'       => array(
             'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",
             'dotSP'    => "+%.2f%% der Zaubermacht pro Tick",                    'dotAP'    => "+%.2f%% der Angriffskraft pro Tick"
@@ -1783,6 +1802,20 @@ $lang = array(
         'uniqueEquipped'=> ["Einzigartig anlegbar", null,             "Einzigartig angelegt: %s (%d)"],
         'speed'         => "Tempo",
         'dps'           => "(%.1f Schaden pro Sekunde)",
+        'duration'      => array(                           // ITEM_DURATION_*
+            '',
+            "Dauer: %d Sek.",
+            "Dauer: %d Min.",
+            "Dauer: %d |4Stunde:Stunden;",
+            "Dauer: %d |4Tag:Tage;"
+        ),
+        'cooldown'      => array(                           // ITEM_COOLDOWN_TOTAL*
+            '(%s Abklingzeit)',
+            "(%d Sek. Abklingzeit)",
+            "(%d Min. Abklingzeit)",
+            "(%d |4Stunde:Stunden; Abklingzeit)",
+            "(%d |4Tag:Tage; Abklingzeit)"
+        ),
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                         //  basic,                                              basic /w school,                                    add basic,                  add basic /w school
             'single'    => ['%d Schaden',                                       '%1$d %2$sschaden',                                 '+ %1$d Schaden',           '+ %1$d %2$sschaden'        ],

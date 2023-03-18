@@ -358,6 +358,13 @@ $lang = array(
         'modes'         => [-1 => "Cualquiera", "Normal / Normal 10", "Heroico / Normal 25", "Heróico 10", "Heróico 25"],
         'expansions'    => ["World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"],
+        'timeAbbrev'    => array(
+            '',
+            "%d |4s:s;",
+            "%d |4min:min;",
+            "%d |4h:h;",
+            "%d |4Día:Días;"
+        ),
         'sources'       => array(
             "Desconocido",                  "Creado",                       "Encontrado",                   "JcJ",                          "Misión",                       "Vendedor",
             "Entrenador",                   "Descubierto",                  "Redención",                    "Talento",                      "Habilidad Inicial",            "Evento",
@@ -1445,12 +1452,10 @@ $lang = array(
         '_transfer'     => 'Este hechizo será convertido a <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Aprendido via descubrimiento",
-        'ppm'           => "%s procs por minuto",
+        'ppm'           => "(%s procs por minuto)",
         'procChance'    => "Probabilidad de que accione",
         'starter'       => "Hechizo inicial",
         'trainingCost'  => "Costo de enseñanza",
-        'remaining'     => "%s restantes",
-        'untilCanceled' => "hasta que se cancela",
         'castIn'        => "Hechizo de %s seg",
         'instantPhys'   => "Instante",
         'instantMagic'  => "Hechizo instantáneo",
@@ -1467,6 +1472,20 @@ $lang = array(
         'stackGroup'    => "Grupo de aplilamiento",
         'linkedWith'    => "Asociado con",
         '_scaling'      => "Escala",
+        'duration'      => array(
+            "hasta cancelación",
+            "%.2G s",
+            "%.2G min",
+            "%.2G |4hora:horas;",
+            "%.2G |4día:días;"
+        ),
+        'timeRemaining' => array(
+            "",
+            "%d |4segundo restante:segundos restantes;",
+            "%d |4minuto restante:minutos restantes;",
+            "%d |4hora restante:horas restantes;",
+            "%d |4día restante:días restantes;"
+        ),
         'scaling'       => array(
             'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
             'dotSP'    => "+%.2f%% del poder de hechizo por tick",                   'dotAP'    => "+%.2f%% del poder de ataque por tick"
@@ -1783,6 +1802,20 @@ $lang = array(
         'uniqueEquipped'=> ["Único-Equipado", null,         "Único-Equipado: %s (%d)"],
         'speed'         => "Veloc.",
         'dps'           => "(%.1f daño por segundo)",
+        'duration'      => array(
+            '',
+            "Duración: %d s",
+            "Duración: %d min",
+            "Duración: %d |4h:h;",
+            "Duración: %d |4día:días;"
+        ),
+        'cooldown'      => array(
+            "(%s tiempo de reutilización)",
+            "(Tiempo de reutilización: %d s)",
+            "(Tiempo de reutilización: %d min)",
+            "(%d |4Hora:Horas; Tiempo de reutilización)",
+            "(%d |4Día:Días; Tiempo de reutilización)"
+        ),
         'damage'        => array(                           // *DAMAGE_TEMPLATE*
                         //  basic,                          basic /w school,                add basic,                  add basic /w school
             "single"    => ["%d Daño",                      "%d %s Daño",                   "+ %d daño",                "+%d %s daños"            ],
