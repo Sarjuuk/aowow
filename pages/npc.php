@@ -410,9 +410,9 @@ class NpcPage extends GenericPage
         /**************/
 
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
-        $tplSpells   = [];
-        $smartSpells = [];
-        $conditions  = ['OR'];
+        $tplSpells  = [];
+        $genSpells  = [];
+        $conditions = ['OR'];
 
         for ($i = 1; $i < 9; $i++)
             if ($_ = $this->subject->getField('spell'.$i))
@@ -422,7 +422,13 @@ class NpcPage extends GenericPage
             $conditions[] = ['id', $tplSpells];
 
         if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SAI_SRC_TYPE_CREATURE))
-            $conditions[] = ['id', $smartSpells];
+            $genSpells = $smartSpells;
+
+        if ($auras = DB::World()->selectCell('SELECT auras FROM creature_template_addon WHERE entry = ?d', $this->typeId))
+            $genSpells = array_merge($genSpells, array_filter(explode(' ', $auras)));
+
+        if ($genSpells)
+            $conditions[] = ['id', $genSpells];
 
         // Pet-Abilities
         if ($_typeFlags & 0x1 && ($_ = $this->subject->getField('family')))
@@ -461,7 +467,7 @@ class NpcPage extends GenericPage
 
                 foreach ($controled as $id => $values)
                 {
-                    if (in_array($id, $smartSpells))
+                    if (in_array($id, $genSpells))
                     {
                         $normal[$id] = $values;
                         if (!in_array($id, $tplSpells))

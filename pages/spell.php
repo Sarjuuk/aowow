@@ -852,6 +852,11 @@ class SpellPage extends GenericPage
         if (!empty($ubSAI[Type::NPC]))
             $conditions[] = ['id', $ubSAI[Type::NPC]];
 
+        if ($auras = DB::World()->selectCol('SELECT `entry` AS ARRAY_KEY, auras FROM creature_template_addon WHERE `auras` LIKE ?', '%'.$this->typeId.'%'))
+            if ($auras = array_filter($auras, function($x) { return preg_match('/\b'.$this->typeId.'\b/', $x); }))
+                $conditions[] = ['id', array_keys($auras)];
+
+
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
         {
