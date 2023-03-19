@@ -607,7 +607,7 @@ class ItemList extends BaseType
         // required holiday
         if ($eId = $this->curTpl['eventId'])
             if ($hName = DB::Aowow()->selectRow('SELECT h.* FROM ?_holidays h JOIN ?_events e ON e.holidayId = h.id WHERE e.id = ?d', $eId))
-                $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="'.$eId.'" class="q1">'.Util::localizedString($hName, 'name').'</a>');
+                $x .= '<br />'.sprintf(Lang::game('requires'), '<a href="?event='.$eId.'" class="q1">'.Util::localizedString($hName, 'name').'</a>');
 
         // item begins a quest
         if ($this->curTpl['startQuest'])
