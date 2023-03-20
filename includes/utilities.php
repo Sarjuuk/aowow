@@ -707,6 +707,9 @@ abstract class Util
         else
             $text = strtr($text, ["\n" => $markdown ? '[br]' : '<br />', "\r" => '']);
 
+        // escape fake html-ish tags the browser skipsh dishplaying ...<hic>!
+        $text = preg_replace('/<([^\s\/]+)>/iu', '&lt;\1&gt;', $text);
+
         $from = array(
             '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
             '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
