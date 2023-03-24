@@ -476,8 +476,26 @@ SqlGen::register(new class extends SetupScript
             LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
             LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
             LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
-            WHERE     effect1CreateItemId > 0 AND effect1Id <> 53 AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
-        ');                                                     // no enchant-spells & no talents!
+            WHERE     effect1CreateItemId > 0 AND (effect1Id in (?a) OR effect1AuraId in (?a)) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+            UNION
+            SELECT    s.id AS ARRAY_KEY, effect2CreateItemId
+            FROM      dbc_spell s
+            LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
+            LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
+            LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
+            WHERE     effect2CreateItemId > 0 AND (effect2Id in (?a) OR effect2AuraId in (?a)) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+            UNION
+            SELECT    s.id AS ARRAY_KEY, effect3CreateItemId
+            FROM      dbc_spell s
+            LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
+            LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
+            LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
+            WHERE     effect3CreateItemId > 0 AND (effect3Id in (?a) OR effect3AuraId in (?a)) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
+        ',
+        SpellList::$effects['itemCreate'], SpellList::$auras['itemCreate'],
+        SpellList::$effects['itemCreate'], SpellList::$auras['itemCreate'],
+        SpellList::$effects['itemCreate'], SpellList::$auras['itemCreate']);
+
         $itemInfo   = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $itemSpells);
         foreach ($itemSpells as $sId => $itemId)
             if (isset($itemInfo[$itemId]))
