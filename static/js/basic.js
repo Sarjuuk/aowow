@@ -1912,7 +1912,7 @@ $WH.Tooltip = {
     set: function(text, text2) {
         var _ = $WH.Tooltip.tooltip;
 
-        _.style.maxWidth = '350px';
+        _.style.maxWidth = '320px';
     //  _.style.width    = '550px';
         _.style.left     = '-2323px';
         _.style.top      = '-2323px';
@@ -1933,7 +1933,7 @@ $WH.Tooltip = {
             $WH.Tooltip.showSecondary = true;
             var _ = $WH.Tooltip.tooltip2;
 
-            _.style.maxWidth = '350px';
+            _.style.maxWidth = '320px';
         //  _.style.width    = '550px';
             _.style.left     = '-2323px';
             _.style.top      = '-2323px';

@@ -68,12 +68,12 @@ if (typeof $WowheadPower == "undefined") {
             CURSOR_VSPACE = 15,
 
             _LANG = {
-                0: { achievementComplete: "Achievement earned by $1 on $2/$3/$4",     loading: "Loading…",    noResponse: "No response from server :(",       notFound: "%s Not Found"       },
-                2: { achievementComplete: "Haut-fait reçu par $1 le $2/$3/$4",        loading: "Chargement…", noResponse: "Pas de réponse du serveur :(",     notFound: "%s non trouvé"      },
-                3: { achievementComplete: "Erfolg wurde von $1 am $3.$2.$4 errungen", loading: "Lädt…",       noResponse: "Keine Antwort vom Server :(",      notFound: "%s nicht gefunden"  },
-                4: { achievementComplete: "$1在$2/$3/$4上获得成就",                     loading: "正在载入…",    noResponse: "服务器没有响应 :(",                   notFound: "%s未找到"            },
-                8: { achievementComplete: "$1 получил(а) это достижение $2/$3/$4",    loading: "Загрузка…",   noResponse: "Нет ответа от сервера :(",         notFound: "%s не найдено"      },
-                6: { achievementComplete: "Logro conseguido por $1 el $2/$3/$4",      loading: "Cargando…",   noResponse: "No hay respuesta del servidor :(", notFound: "%s no encontrado/a" },
+                0: { achievementComplete: "Achievement earned by $1 on $2/$3/$4",     loading: "Loading…",    noResponse: "No response from server :(",       notFound: "$1 Not Found"       },
+                2: { achievementComplete: "Haut-fait reçu par $1 le $2/$3/$4",        loading: "Chargement…", noResponse: "Pas de réponse du serveur :(",     notFound: "$1 non trouvé"      },
+                3: { achievementComplete: "Erfolg wurde von $1 am $3.$2.$4 errungen", loading: "Lädt…",       noResponse: "Keine Antwort vom Server :(",      notFound: "$1 nicht gefunden"  },
+                4: { achievementComplete: "$1在$2/$3/$4上获得成就",                     loading: "正在载入…",    noResponse: "服务器没有响应 :(",                   notFound: "$1未找到"            },
+                8: { achievementComplete: "$1 получил(а) это достижение $2/$3/$4",    loading: "Загрузка…",   noResponse: "Нет ответа от сервера :(",         notFound: "$1 не найдено"      },
+                6: { achievementComplete: "Logro conseguido por $1 el $2/$3/$4",      loading: "Cargando…",   noResponse: "No hay respuesta del servidor :(", notFound: "$1 no encontrado/a" },
             },
             LOOKUPS = {
                   1: [npcs,         "npc",         "NPC"        ],
@@ -878,3 +878,4 @@ if (typeof $WowheadPower == "undefined") {
         init();
     }
 };
+
