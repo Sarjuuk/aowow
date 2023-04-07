@@ -169,7 +169,7 @@ $iconTabIdx = -1;
 foreach ($this->effects as $i => $e):
 ?>
                     <tr>
-                        <th><?=Lang::spell('_effect').' #'.($i + 1);?></th>
+                        <th><?=Lang::spell('_effect').' #'.$i;?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
     echo '                            '.$e['name'];
