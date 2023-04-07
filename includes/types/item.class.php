@@ -1403,8 +1403,14 @@ class ItemList extends BaseType
         if ($this->curTpl['class'] != ITEM_CLASS_WEAPON)
             return 0;
 
-        // must be 2H weapon (2H-Mace, Polearm, Staff, ..Fishing Pole)
-        if (!in_array($this->curTpl['subClass'], [5, 6, 10, 20]))
+        $subClasses = [14];                                 // Misc Weapons
+        $druid = new CharClassList(array(['id', log(CLASS_DRUID, 2) + 1]));
+        if (!$druid->error)
+            for ($i = 0; $i < 21; $i++)
+                if ($druid->getField('weaponTypeMask') & (1 << $i))
+                    $subClasses[] = $i;
+
+        if (!in_array($this->curTpl['subClass'], $subClasses))
             return 0;
 
         // thats fucked up..
