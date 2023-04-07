@@ -18,6 +18,8 @@ class ItemsetPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $js            = [[JS_FILE, 'swfobject.js'], [JS_FILE, 'Summary.js']];
 
+    protected $summary       = [];
+
     protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerItemSet(%d, %d, %s);';
@@ -167,15 +169,16 @@ class ItemsetPage extends GenericPage
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_VIEW3D  => ['type' => Type::ITEMSET, 'typeId' => $this->typeId, 'equipList' => $eqList],
-            BUTTON_COMPARE => ['eqList' => implode(':', $compare), 'qty' => $_cnt]
+            BUTTON_COMPARE => $compare ? ['eqList' => implode(':', $compare), 'qty' => $_cnt] : false
         );
-        $this->summary     = array(
-            'id'       => 'itemset',
-            'template' => 'itemset',
-            'parent'   => 'summary-generic',
-            'groups'   => array_map(function ($v) { return [[$v]]; }, $compare),
-            'level'    => $this->subject->getField('reqLevel'),
-        );
+        if ($compare)
+            $this->summary = array(
+                'id'       => 'itemset',
+                'template' => 'itemset',
+                'parent'   => 'summary-generic',
+                'groups'   => array_map(function ($v) { return [[$v]]; }, $compare),
+                'level'    => $this->subject->getField('reqLevel'),
+            );
 
         /**************/
         /* Extra Tabs */

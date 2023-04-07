@@ -68,6 +68,9 @@ foreach ($this->spells as $i => $s):
 endforeach;
 ?>
                 </ul>
+<?php
+if ($this->summary):
+?>
 
                 <h2 class="clear"><?=Lang::itemset('summary'); ?></h2>
 
@@ -75,6 +78,9 @@ endforeach;
                 <script type="text/javascript">//<![CDATA[
                     new Summary(<?=Util::toJSON($this->summary); ?>);
                 //]]></script>
+<?php
+endif;
+?>
 
                 <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
