@@ -35,10 +35,15 @@ define('CACHE_TYPE_XML',                    4);             // only used by item
 define('CACHE_MODE_FILECACHE',              0x1);
 define('CACHE_MODE_MEMCACHED',              0x2);
 
-define ('CSS_FILE',                         1);
-define ('CSS_STRING',                       2);
-define ('JS_FILE',                          3);
-define ('JS_STRING',                        4);
+define ('SC_CSS_FILE',                      1);
+define ('SC_CSS_STRING',                    2);
+define ('SC_JS_FILE',                       3);
+define ('SC_JS_STRING',                     4);
+define ('SC_FLAG_PREFIX',                   0x01);
+define ('SC_FLAG_NO_TIMESTAMP',             0x02);
+define ('SC_FLAG_APPEND_LOCALE',            0x04);
+define ('SC_FLAG_LOCALIZED',                0x08);
+
 
 define('SEARCH_TYPE_REGULAR',               0x10000000);
 define('SEARCH_TYPE_OPEN',                  0x20000000);

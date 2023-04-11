@@ -30,7 +30,7 @@ class SearchPage extends GenericPage
     protected $tpl           = 'search';
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_SEARCH;
-    protected $js            = [[JS_FILE, 'swfobject.js']];
+    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
     protected $lvTabs        = [];                          // [file, data, extraInclude, osInfo]       // osInfo:[type, appendix, nMatches, param1, param2]
     protected $forceTabs     = true;
     protected $search        = '';                          // output
@@ -208,7 +208,7 @@ class SearchPage extends GenericPage
         if ($this->mode == CACHE_TYPE_NONE)                 // search is invalid
             return;
 
-        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=zones']);
 
         $this->performSearch();
     }

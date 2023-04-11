@@ -11,8 +11,10 @@ class MapsPage extends GenericPage
     protected $tabId         = 1;
     protected $path          = [1, 1];
     protected $mode          = CACHE_TYPE_NONE;
-    protected $js            = [[JS_FILE, 'maps.js']];
-    protected $css           = [[CSS_STRING, 'zone-picker { margin-left: 4px }']];
+    protected $scripts       = array(
+        [SC_JS_FILE, 'js/maps.js'],
+        [SC_CSS_STRING, 'zone-picker { margin-left: 4px }']
+    );
 
     public function __construct($pageCall, $__)
     {
@@ -24,7 +26,7 @@ class MapsPage extends GenericPage
     protected function generateContent()
     {
         // add conditional js
-        $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=zones']);
     }
 
     protected function generateTitle()

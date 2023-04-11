@@ -17,10 +17,10 @@ class ItemPage extends genericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $enhancedTT    = [];
-    protected $js            = array(
-        [JS_FILE, 'swfobject.js'],                          // view in 3d, ok
-        [JS_FILE, 'profile.js'],                            // item upgrade search, also ok
-        [JS_FILE, 'filters.js']                             // lolwut?
+    protected $scripts       = array(
+        [SC_JS_FILE, 'js/swfobject.js'],
+        [SC_JS_FILE, 'js/profile.js'],
+        [SC_JS_FILE, 'js/filters.js']
     );
 
     protected $_get          = array(
@@ -121,7 +121,7 @@ class ItemPage extends genericPage
 
     protected function generateContent()
     {
-        $this->addScript([JS_FILE, '?data=weight-presets.zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=weight-presets.zones']);
 
         $_flags     = $this->subject->getField('flags');
         $_slot      = $this->subject->getField('slot');
@@ -348,12 +348,10 @@ class ItemPage extends genericPage
         // pageText
         $pageText = [];
         if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
-        {
             $this->addScript(
-                [JS_FILE,  'Book.js'],
-                [CSS_FILE, 'Book.css']
+                [SC_JS_FILE,  'js/Book.js'],
+                [SC_CSS_FILE, 'css/Book.css']
             );
-        }
 
         $this->headIcons  = [$this->subject->getField('iconString', true, true), $this->subject->getField('stackable')];
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;

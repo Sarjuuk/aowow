@@ -15,7 +15,11 @@ class ArenaTeamsPage extends GenericPage
     protected $tabId    = 1;
     protected $path     = [1, 5, 3];
     protected $tpl      = 'arena-teams';
-    protected $js       = [[JS_FILE, 'filters.js'], [JS_FILE, 'profile_all.js'], [JS_FILE, 'profile.js']];
+    protected $scripts  = array(
+        [SC_JS_FILE, 'js/filters.js'],
+        [SC_JS_FILE, 'js/profile_all.js'],
+        [SC_JS_FILE, 'js/profile.js']
+    );
 
     protected $_get     = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -57,7 +61,7 @@ class ArenaTeamsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addScript([JS_FILE, '?data=realms&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=realms']);
 
         $conditions = [];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))

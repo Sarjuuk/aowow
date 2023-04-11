@@ -15,7 +15,7 @@ class GuildsPage extends GenericPage
     protected $tabId    = 1;
     protected $path     = [1, 5, 2];
     protected $tpl      = 'guilds';
-    protected $js       = [[JS_FILE, 'filters.js'], [JS_FILE, 'profile_all.js'], [JS_FILE, 'profile.js']];
+    protected $scripts  = [[SC_JS_FILE, 'js/filters.js'], [SC_JS_FILE, 'js/profile_all.js'], [SC_JS_FILE, 'js/profile.js']];
 
     protected $_get     = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -57,7 +57,7 @@ class GuildsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addScript([JS_FILE, '?data=realms&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=realms']);
 
         $conditions = array(
             ['c.deleteInfos_Account', null],

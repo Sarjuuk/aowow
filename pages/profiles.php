@@ -17,8 +17,12 @@ class ProfilesPage extends GenericPage
     protected $tabId    = 1;
     protected $path     = [1, 5, 0];
     protected $tpl      = 'profiles';
-    protected $js       = [[JS_FILE, 'filters.js'], [JS_FILE, 'profile_all.js'], [JS_FILE, 'profile.js']];
-    protected $css      = [[CSS_FILE, 'Profiler.css']];
+    protected $scripts  = array(
+        [SC_JS_FILE,  'js/filters.js'],
+        [SC_JS_FILE,  'js/profile_all.js'],
+        [SC_JS_FILE,  'js/profile.js'],
+        [SC_CSS_FILE, 'css/Profiler.css']
+    );
 
     protected $_get     = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -62,7 +66,7 @@ class ProfilesPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addScript([JS_FILE, '?data=weight-presets.realms&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=weight-presets.realms']);
 
         $conditions = [];
 

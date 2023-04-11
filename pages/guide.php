@@ -85,7 +85,7 @@ class GuidePage extends GenericPage
 
                     // main container should be tagged: <div class="text guide-changelog">
                     // why is this here: is there a mediawiki like diff function for staff?
-                    $this->addScript([CSS_STRING, 'li input[type="radio"] {margin:0}']);
+                    $this->addScript([SC_CSS_STRING, 'li input[type="radio"] {margin:0}']);
 
                     $this->typeId = $this->_get['id'];      // just to display sensible not-found msg
                     if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_guides WHERE `id` = ?d', $this->typeId))
@@ -308,7 +308,7 @@ class GuidePage extends GenericPage
 
             if ($this->subject->getField('status') == GUIDE_STATUS_REVIEW && User::isInGroup(U_GROUP_STAFF) && $this->_get['rev'])
             {
-                $this->addScript([JS_STRING, '
+                $this->addScript([SC_JS_STRING, '
                     DomContentLoaded.addEvent(function() {
                         let send = function (status)
                         {
@@ -364,7 +364,7 @@ class GuidePage extends GenericPage
 
     private function displayChangelog() : void
     {
-        $this->addScript([JS_STRING, '
+        $this->addScript([SC_JS_STRING, '
             $(document).ready(function() {
                 var radios = $("input[type=radio]");
                 function limit(col, val) {
@@ -419,21 +419,21 @@ class GuidePage extends GenericPage
     private function initNew() : void
     {
         $this->addScript(
-            [JS_FILE,  'article-description.js'],
-            [JS_FILE,  'article-editing.js'],
-            [JS_FILE,  'guide-editing.js'],
-            [JS_FILE,  'fileuploader.js'],
-            [JS_FILE,  'toolbar.js'],
-            [JS_FILE,  'AdjacentPreview.js'],
-            [CSS_FILE, 'article-editing.css'],
-            [CSS_FILE, 'fileuploader.css'],
-            [CSS_FILE, 'guide-edit.css'],
-            [CSS_FILE,  'AdjacentPreview.css'],
+            [SC_JS_FILE,    'js/article-description.js'],
+            [SC_JS_FILE,    'js/article-editing.js'],
+            [SC_JS_FILE,    'js/guide-editing.js'],
+            [SC_JS_FILE,    'js/fileuploader.js'],
+            [SC_JS_FILE,    'js/toolbar.js'],
+            [SC_JS_FILE,    'js/AdjacentPreview.js'],
+            [SC_CSS_FILE,   'css/article-editing.css'],
+            [SC_CSS_FILE,   'css/fileuploader.css'],
+            [SC_CSS_FILE,   'css/guide-edit.css'],
+            [SC_CSS_FILE,   'css/AdjacentPreview.css'],
 
-            [CSS_STRING, '#upload-result input[type=text] { padding: 0px 2px; font-size: 12px; }'],
-            [CSS_STRING, '#upload-result > span { display:block; height: 22px; }'],
-            [CSS_STRING, '#upload-result { display: inline-block; text-align:right; }'],
-            [CSS_STRING, '#upload-progress { display: inline-block; margin-right:8px; }']
+            [SC_CSS_STRING, '#upload-result input[type=text] { padding: 0px 2px; font-size: 12px; }'],
+            [SC_CSS_STRING, '#upload-result > span { display:block; height: 22px; }'],
+            [SC_CSS_STRING, '#upload-result { display: inline-block; text-align:right; }'],
+            [SC_CSS_STRING, '#upload-progress { display: inline-block; margin-right:8px; }']
         );
 
         $this->articleUrl = 'new';
@@ -448,21 +448,21 @@ class GuidePage extends GenericPage
     private function initEdit() : bool
     {
         $this->addScript(
-            [JS_FILE,  'article-description.js'],
-            [JS_FILE,  'article-editing.js'],
-            [JS_FILE,  'guide-editing.js'],
-            [JS_FILE,  'fileuploader.js'],
-            [JS_FILE,  'toolbar.js'],
-            [JS_FILE,  'AdjacentPreview.js'],
-            [CSS_FILE, 'article-editing.css'],
-            [CSS_FILE, 'fileuploader.css'],
-            [CSS_FILE, 'guide-edit.css'],
-            [CSS_FILE,  'AdjacentPreview.css'],
+            [SC_JS_FILE,   'js/article-description.js'],
+            [SC_JS_FILE,   'js/article-editing.js'],
+            [SC_JS_FILE,   'js/guide-editing.js'],
+            [SC_JS_FILE,   'js/fileuploader.js'],
+            [SC_JS_FILE,   'js/toolbar.js'],
+            [SC_JS_FILE,   'js/AdjacentPreview.js'],
+            [SC_CSS_FILE,  'css/article-editing.css'],
+            [SC_CSS_FILE,  'css/fileuploader.css'],
+            [SC_CSS_FILE,  'css/guide-edit.css'],
+            [SC_CSS_FILE,  'css/AdjacentPreview.css'],
 
-            [CSS_STRING, '#upload-result input[type=text] { padding: 0px 2px; font-size: 12px; }'],
-            [CSS_STRING, '#upload-result > span { display:block; height: 22px; }'],
-            [CSS_STRING, '#upload-result { display: inline-block; text-align:right; }'],
-            [CSS_STRING, '#upload-progress { display: inline-block; margin-right:8px; }']
+            [SC_CSS_STRING, '#upload-result input[type=text] { padding: 0px 2px; font-size: 12px; }'],
+            [SC_CSS_STRING, '#upload-result > span { display:block; height: 22px; }'],
+            [SC_CSS_STRING, '#upload-result { display: inline-block; text-align:right; }'],
+            [SC_CSS_STRING, '#upload-progress { display: inline-block; margin-right:8px; }']
         );
 
         $this->articleUrl = 'edit';

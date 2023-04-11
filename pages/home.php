@@ -7,8 +7,11 @@ if (!defined('AOWOW_REVISION'))
 class HomePage extends GenericPage
 {
     protected $tpl      = 'home';
-    protected $js       = [[JS_FILE, 'home.js']];
-    protected $css      = [[CSS_FILE, 'home.css']];
+    protected $scripts  = array(
+        [SC_JS_FILE,    'js/home.js'],
+        [SC_CSS_FILE,   'css/home.css'],
+        [SC_CSS_STRING, '.announcement { margin: auto; max-width: 1200px; padding: 0px 15px 15px 15px }']
+    );
 
     protected $featuredBox = [];
     protected $oneliner    = '';
@@ -21,8 +24,6 @@ class HomePage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addScript([CSS_STRING, '.announcement { margin: auto; max-width: 1200px; padding: 0px 15px 15px 15px }']);
-
         // load oneliner
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_home_oneliner WHERE active = 1 LIMIT 1'))
             $this->oneliner = Util::jsEscape(Util::localizedString($_, 'text'));

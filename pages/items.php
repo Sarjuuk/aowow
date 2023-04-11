@@ -15,7 +15,7 @@ class ItemsPage extends GenericPage
     protected $path          = [0, 0];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $js            = [[JS_FILE, 'filters.js'], [JS_FILE, 'swfobject.js']];
+    protected $scripts       = [[SC_JS_FILE, 'js/filters.js'], [SC_JS_FILE, 'js/swfobject.js']];
 
     protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
 
@@ -96,7 +96,7 @@ class ItemsPage extends GenericPage
 
     protected function generateContent()
     {
-        $this->addScript([JS_FILE, '?data=weight-presets&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=weight-presets']);
 
         $conditions = [];
 
@@ -466,10 +466,10 @@ class ItemsPage extends GenericPage
 
         // if slot-dropdown is available && Armor && $path points to Armor-Class
         $form = $this->filterObj->getForm();
-        if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && !is_array($form['sl']))
-            $this->path[] = $form['sl'];
-        else if (!empty($this->category[0]) && $this->category[0] == 0 && isset($form['ty']) && !is_array($form['ty']))
-            $this->path[] = $form['ty'];
+        if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && count($form['sl']) == 1)
+            $this->path[] = $form['sl'][0];
+        else if (isset($this->category[0]) && $this->category[0] == 0 && isset($form['ty']) && count($form['ty']) == 1)
+            $this->path[] = $form['ty'][0];
     }
 
     // fetch best possible gems for chosen weights

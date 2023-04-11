@@ -181,8 +181,19 @@ class GenericPage
     protected $name         = '';                           // for h1-Element
     protected $tabId        = null;
     protected $gDataKey     = false;                        // adds the dataKey to the user vars
-    protected $js           = [];
-    protected $css          = [];
+    protected $scripts      = array(
+        [SC_JS_FILE,  'js/jquery-1.12.4.min.js', SC_FLAG_NO_TIMESTAMP],
+        [SC_JS_FILE,  'js/basic.js'                                  ],
+        [SC_JS_FILE,  'widgets/power.js',        SC_FLAG_NO_TIMESTAMP],
+        [SC_JS_FILE,  'js/locale_%s.js',         SC_FLAG_LOCALIZED   ],
+        [SC_JS_FILE,  'js/global.js'                                 ],
+        [SC_JS_FILE,  'js/locale.js'                                 ],
+        [SC_JS_FILE,  'js/Markup.js'                                 ],
+        [SC_CSS_FILE, 'css/basic.css'                                ],
+        [SC_CSS_FILE, 'css/global.css'                               ],
+        [SC_CSS_FILE, 'css/aowow.css'                                ],
+        [SC_CSS_FILE, 'css/locale_%s.css',       SC_FLAG_LOCALIZED   ]
+    );
 
     // private vars don't get cached
     private   $time         = 0;
@@ -198,6 +209,8 @@ class GenericPage
     private   $memcached    = null;
     private   $mysql        = ['time' => 0, 'count' => 0];
 
+    private   $js           = [];
+    private   $css          = [];
     private   $headerLogo   = '';
     private   $fullParams   = '';
 
@@ -300,6 +313,16 @@ class GenericPage
             $this->maintenance();
         else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
             Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
+
+        // prep js+css includes
+        $parentVars = get_class_vars(__CLASS__);
+        if ($parentVars['scripts'] != $this->scripts)       // additions set in child class
+            $this->scripts = array_merge($parentVars['scripts'], $this->scripts);
+
+        $this->addScript(...$this->scripts);
+
+        if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO))
+            $this->addScript([SC_CSS_FILE, 'css/staff.css'], [SC_JS_FILE,  'js/staff.js']);
 
         // get errors from previous page from session and apply to template
         if (method_exists($this, 'applyCCErrors'))
@@ -437,33 +460,59 @@ class GenericPage
 
     public function addScript(array ...$structs) : void
     {
-        foreach ($structs as $s)                            // iType, sContent, bFront, sIeCnd
+        array_walk($structs, function(&$x) { $x = array_pad($x, 3, 0); });
+
+        foreach ($structs as [$type, $str, $flags])
         {
-            if (empty($s[1]))
+            if (empty($str))
             {
                 trigger_error('GenericPage::addScript - content empty', E_USER_WARNING);
                 continue;
             }
 
-            $s = array_pad($s, 4, '');
-            switch ($s[0])
+            $dynData = strpos($str, '?data=') === 0;
+            $app = [];
+
+            // insert locale string
+            if ($flags & SC_FLAG_LOCALIZED)
+                $str = sprintf($str, User::$localeString);
+
+            if ($dynData)
             {
-                case JS_FILE:
-                case JS_STRING:
-                    if (empty($s[2]))
-                        $this->js[] = $s;
+                $app[] = 'locale='.User::$localeId;
+                $app[] = 't='.$_SESSION['dataKey'];
+            }
+            else if (($flags & SC_FLAG_APPEND_LOCALE) && User::$localeId)
+                $app[] = 'lang='.Util::$subDomains[User::$localeId];
+
+            // append anti-cache timestamp
+            if (!($flags & SC_FLAG_NO_TIMESTAMP) && !$dynData)
+                if ($type == SC_JS_FILE || $type == SC_CSS_FILE)
+                    $app[] = filemtime('static/'.$str) ?: 0;
+
+            if ($app)
+                $str .= ($dynData ? '&' : '?').implode('&', $app);
+
+            switch ($type)
+            {
+                case SC_JS_FILE:
+                    $str = ($dynData ? HOST_URL : STATIC_URL).'/'.$str;
+                case SC_JS_STRING:
+                    if ($flags & SC_FLAG_PREFIX)
+                        array_unshift($this->js, [$type, $str]);
                     else
-                        array_unshift($this->js, $s);
+                        $this->js[] = [$type, $str];
                     break;
-                case CSS_FILE:
-                case CSS_STRING:
-                    if (empty($s[2]))
-                        $this->css[] = $s;
+                case SC_CSS_FILE:
+                    $str = STATIC_URL.'/'.$str;
+                case SC_CSS_STRING:
+                    if ($flags & SC_FLAG_PREFIX)
+                        array_unshift($this->css, [$type, $str]);
                     else
-                        array_unshift($this->css, $s);
+                        $this->css[] = [$type, $str];
                     break;
                 default:
-                    trigger_error('GenericPage::addScript - unknown script type #'.$s[0], E_USER_WARNING);
+                    trigger_error('GenericPage::addScript - unknown script type #'.$type, E_USER_WARNING);
             }
         }
     }

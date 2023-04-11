@@ -16,7 +16,7 @@ class AreaTriggersPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $validCats     = [0, 1, 2, 3, 4, 5];
-    protected $js            = [[JS_FILE, 'filters.js']];
+    protected $scripts       = [[SC_JS_FILE, 'js/filters.js']];
     protected $reqUGroup     = U_GROUP_STAFF;
 
     protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];

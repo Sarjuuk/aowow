@@ -12,8 +12,7 @@ class ScreenshotPage extends GenericPage
     const     MAX_H        = 325;
 
     protected $tpl         = 'screenshot';
-    protected $js          = [[JS_FILE, 'Cropper.js']];
-    protected $css         = [[CSS_FILE, 'Cropper.css']];
+    protected $scripts     = [[SC_JS_FILE, 'js/Cropper.js'], [SC_CSS_FILE, 'css/Cropper.css']];
     protected $reqAuth     = true;
     protected $tabId       = 0;
 

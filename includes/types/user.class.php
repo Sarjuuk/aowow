@@ -6,14 +6,15 @@ if (!defined('AOWOW_REVISION'))
 
 class UserList extends BaseType
 {
-    public static   $type      = Type::USER;
-    public static   $brickFile = 'user';
-    public static   $dataTable = '';                          // doesn't have community content
+    public static   $type       = Type::USER;
+    public static   $brickFile  = 'user';
+    public static   $dataTable  = '';                         // doesn't have community content
+    public static   $contribute = CONTRIBUTE_NONE;
 
-    public          $sources   = [];
+    public          $sources    = [];
 
-    protected       $queryBase = 'SELECT *, a.id AS ARRAY_KEY FROM ?_account a';
-    protected       $queryOpts = array(
+    protected       $queryBase  = 'SELECT *, a.id AS ARRAY_KEY FROM ?_account a';
+    protected       $queryOpts  = array(
                         'a' => [['r']],
                         'r' => ['j' => ['?_account_reputation r ON r.userId = a.id', true], 's' => ', IFNULL(SUM(r.amount), 0) AS reputation', 'g' => 'a.id']
                     );
@@ -49,7 +50,7 @@ class UserList extends BaseType
 
             // more optional data
             // sig: markdown formated string (only used in forum?)
-            // border: seen as null|1|3 .. changes the border around the avatar (i suspect its meaning changed and got decupled from premium-status with the introduction of patron-status)
+            // border: seen as null|1|3 .. changes the border around the avatar (i suspect its meaning changed and got decupled from premium-status with the introduction of patreon-status)
         }
 
         return [Type::USER => $data];

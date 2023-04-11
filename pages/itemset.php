@@ -16,7 +16,7 @@ class ItemsetPage extends GenericPage
     protected $path          = [0, 2];
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
-    protected $js            = [[JS_FILE, 'swfobject.js'], [JS_FILE, 'Summary.js']];
+    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
 
     protected $summary       = [];
 

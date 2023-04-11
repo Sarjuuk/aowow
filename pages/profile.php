@@ -18,17 +18,15 @@ class ProfilePage extends GenericPage
     protected $tabId     = 1;
     protected $path      = [1, 5, 1];
     protected $tpl       = 'profile';
-    protected $js        = array(
-        [JS_FILE, 'filters.js'],
-        [JS_FILE, 'TalentCalc.js'],
-        [JS_FILE, 'swfobject.js'],
-        [JS_FILE, 'profile_all.js'],
-        [JS_FILE, 'profile.js'],
-        [JS_FILE, 'Profiler.js']
-    );
-    protected $css       = array(
-        [CSS_FILE, 'talentcalc.css'],
-        [CSS_FILE, 'Profiler.css']
+    protected $scripts   = array(
+        [SC_JS_FILE,  'js/filters.js'],
+        [SC_JS_FILE,  'js/TalentCalc.js'],
+        [SC_JS_FILE,  'js/swfobject.js'],
+        [SC_JS_FILE,  'js/profile_all.js'],
+        [SC_JS_FILE,  'js/profile.js'],
+        [SC_JS_FILE,  'js/Profiler.js'],
+        [SC_CSS_FILE, 'css/talentcalc.css'],
+        [SC_CSS_FILE, 'css/Profiler.css']
     );
 
     protected $_get      = array(
@@ -150,7 +148,7 @@ class ProfilePage extends GenericPage
             return;
 
         // + .titles ?
-        $this->addScript([JS_FILE, '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets.achievements&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+        $this->addScript([SC_JS_FILE, '?data=enchants.gems.glyphs.itemsets.pets.pet-talents.quick-excludes.realms.statistics.weight-presets.achievements']);
 
         // as demanded by the raid activity tracker
         $bossIds = array(

@@ -264,7 +264,7 @@ class SkillPage extends GenericPage
             $list = $spellIds ? DB::World()->selectCol('SELECT cdt.CreatureId FROM creature_default_trainer cdt JOIN trainer_spell ts ON ts.TrainerId = cdt.TrainerId WHERE ts.SpellID IN (?a)', $spellIds) : [];
             if ($list)
             {
-                $this->addScript([JS_FILE, '?data=zones&locale='.User::$localeId.'&t='.$_SESSION['dataKey']]);
+                $this->addScript([SC_JS_FILE, '?data=zones']);
 
                 $trainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
 
