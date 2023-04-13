@@ -53,7 +53,7 @@ class IconPage extends GenericPage
         $ubSpells = new SpellList(array(['iconId', $this->typeId]));
         if (!$ubSpells->error)
         {
-            $this->extendGlobalData($ubSpells->getJsGlobals());
+            $this->extendGlobalData($ubSpells->getJsGlobals(GLOBALINFO_RELATED | GLOBALINFO_SELF));
             $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data' => array_values($ubSpells->getListviewData()),
                 'id'   => 'used-by-spell'
