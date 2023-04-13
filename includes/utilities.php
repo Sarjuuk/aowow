@@ -786,7 +786,7 @@ abstract class Util
             return $data;
         }
 
-        return htmlspecialchars($data, ENT_QUOTES, 'utf-8');
+        return htmlspecialchars($data, ENT_QUOTES | ENT_DISALLOWED | ENT_HTML5, 'utf-8');
     }
 
     public static function jsEscape($data)

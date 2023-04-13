@@ -313,7 +313,7 @@ class QuestList extends BaseType
         if (!$this->curTpl)
             return null;
 
-        $title = htmlentities($this->getField('name', true));
+        $title = Util::htmlEscape($this->getField('name', true));
         $level = $this->curTpl['level'];
         if ($level < 0)
             $level = 0;

@@ -1,4 +1,4 @@
-    <title><?=htmlentities(implode(' - ', $this->title)); ?></title>
+    <title><?=Util::htmlEscape(implode(' - ', $this->title)); ?></title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="SHORTCUT ICON" href="<?=STATIC_URL; ?>/images/logos/favicon.ico" />
