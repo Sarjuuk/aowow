@@ -182,17 +182,17 @@ class GenericPage
     protected $tabId        = null;
     protected $gDataKey     = false;                        // adds the dataKey to the user vars
     protected $scripts      = array(
-        [SC_JS_FILE,  'js/jquery-1.12.4.min.js', SC_FLAG_NO_TIMESTAMP],
-        [SC_JS_FILE,  'js/basic.js'                                  ],
-        [SC_JS_FILE,  'widgets/power.js',        SC_FLAG_NO_TIMESTAMP],
-        [SC_JS_FILE,  'js/locale_%s.js',         SC_FLAG_LOCALIZED   ],
-        [SC_JS_FILE,  'js/global.js'                                 ],
-        [SC_JS_FILE,  'js/locale.js'                                 ],
-        [SC_JS_FILE,  'js/Markup.js'                                 ],
-        [SC_CSS_FILE, 'css/basic.css'                                ],
-        [SC_CSS_FILE, 'css/global.css'                               ],
-        [SC_CSS_FILE, 'css/aowow.css'                                ],
-        [SC_CSS_FILE, 'css/locale_%s.css',       SC_FLAG_LOCALIZED   ]
+        [SC_JS_FILE,  'js/jquery-1.12.4.min.js', SC_FLAG_NO_TIMESTAMP                        ],
+        [SC_JS_FILE,  'js/basic.js'                                                          ],
+        [SC_JS_FILE,  'widgets/power.js',        SC_FLAG_NO_TIMESTAMP | SC_FLAG_APPEND_LOCALE],
+        [SC_JS_FILE,  'js/locale_%s.js',         SC_FLAG_LOCALIZED                           ],
+        [SC_JS_FILE,  'js/global.js'                                                         ],
+        [SC_JS_FILE,  'js/locale.js'                                                         ],
+        [SC_JS_FILE,  'js/Markup.js'                                                         ],
+        [SC_CSS_FILE, 'css/basic.css'                                                        ],
+        [SC_CSS_FILE, 'css/global.css'                                                       ],
+        [SC_CSS_FILE, 'css/aowow.css'                                                        ],
+        [SC_CSS_FILE, 'css/locale_%s.css',       SC_FLAG_LOCALIZED                           ]
     );
 
     // private vars don't get cached
