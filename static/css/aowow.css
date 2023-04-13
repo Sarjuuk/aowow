@@ -22,7 +22,8 @@ p {
 /******************/
 
 body {
-    background: black;
+    background: black url('https://screens.way-of-elendil.fr/aDdGBLrQ.jpg') fixed no-repeat;
+    background-size: cover;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
@@ -2630,9 +2631,11 @@ a.modelviewer-close {
     border: 0;
     left: 0px;
     top: 20px;
-    width: 160px;
-    height: 68px;
-    background: url(../images/logos/header.png) no-repeat;
+	width: 500px;
+	height: 200px;
+    background: url(https://way-of-elendil.fr/assets/img/logos/footer-way-of-elendil.png) no-repeat;
+    background-size: contain;
+    margin: -110px auto 0px -30px;
 }
 
 /***********/

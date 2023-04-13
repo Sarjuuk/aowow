@@ -19,10 +19,11 @@
 .home-logo {
     display:block;
     cursor:default;
-    width:261px;
-    height:119px;
-    margin:0 auto 20px auto;
-    background:url(../images/logos/home.png) no-repeat;
+	width: 700px;
+	height: 400px;
+	margin: 0px auto -60px auto;
+    background:url(https://way-of-elendil.fr/assets/img/logos/footer-way-of-elendil.png) no-repeat;
+    background-size: contain;
 }
 
 .home-menu {
