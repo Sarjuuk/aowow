@@ -21,6 +21,8 @@ class GuildsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
 
@@ -38,8 +40,6 @@ class GuildsPage extends GenericPage
 
             $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT COUNT(*) FROM guild');
         }
-
-        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Lang::profiler('guilds');
         $this->subCat = $pageParam ? '='.$pageParam : '';

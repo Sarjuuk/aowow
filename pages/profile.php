@@ -42,6 +42,8 @@ class ProfilePage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
 
@@ -50,8 +52,6 @@ class ProfilePage extends GenericPage
             $params[0] = Profiler::urlize($params[0]);
         if (isset($params[1]))
             $params[1] = Profiler::urlize($params[1], true);
-
-        parent::__construct($pageCall, $pageParam);
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])

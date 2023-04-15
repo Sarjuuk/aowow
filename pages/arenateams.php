@@ -25,6 +25,8 @@ class ArenaTeamsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
 
@@ -42,8 +44,6 @@ class ArenaTeamsPage extends GenericPage
 
             $this->sumSubjects += DB::Characters($idx)->selectCell('SELECT count(*) FROM arena_team');
         }
-
-        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Lang::profiler('arenaTeams');
         $this->subCat = $pageParam ? '='.$pageParam : '';

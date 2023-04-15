@@ -25,6 +25,8 @@ class ArenaTeamPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
 
@@ -33,8 +35,6 @@ class ArenaTeamPage extends GenericPage
             $params[0] = Profiler::urlize($params[0]);
         if (isset($params[1]))
             $params[1] = Profiler::urlize($params[1]);
-
-        parent::__construct($pageCall, $pageParam);
 
         if (count($params) == 1 && intval($params[0]))
         {

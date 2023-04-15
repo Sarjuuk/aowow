@@ -62,10 +62,6 @@ class SearchPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        // restricted access
-        if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
-            $this->error();
-
         parent::__construct($pageCall, $pageParam);         // just to set g_user and g_locale
 
         $this->search =

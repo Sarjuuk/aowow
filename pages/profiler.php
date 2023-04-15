@@ -18,10 +18,10 @@ class ProfilerPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
-
-        parent::__construct($pageCall, $pageParam);
     }
 
     protected function generateContent()

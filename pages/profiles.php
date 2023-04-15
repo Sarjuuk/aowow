@@ -28,10 +28,10 @@ class ProfilesPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
+        $this->getSubjectFromUrl($pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
-
-        $this->getSubjectFromUrl($pageParam);
 
         $realms = [];
         foreach (Profiler::getRealms() as $idx => $r)
