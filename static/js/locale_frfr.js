@@ -1024,6 +1024,7 @@ var mn_community = [
 ];
 var mn_more = [
 	[4,"Retourner sur Way of Elendil","https://way-of-elendil.fr"],
+
     [,"Tout sur Woehead"],
     [0,"À propos / contact","?aboutus"],
     [3,"FAQ","?faq"],
