@@ -82,10 +82,9 @@ endif;
 
     <div class="footer">
         <div class="footer-links linklist">
-            <a href="?aboutus"><?=Lang::main('aboutUs'); ?></a>|<a href="https://github.com/Sarjuuk/aowow" target="_blank">Github</a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
+            <a href="https://way-of-elendil.fr" target="_blank">way-of-elendil.fr</a>|<a href="#" id="footer-links-language"><?=Lang::main('language'); ?></a>
         </div>
-        <div class="footer-copy">
-            &#12484; 2024 Aowow<br />rev. <?=AOWOW_REVISION; ?>
+        <div class="footer-copy" style="display: none;">
         </div>
     </div>
 

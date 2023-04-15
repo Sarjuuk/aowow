@@ -17,6 +17,10 @@ p {
     padding: 0;
 }
 
+span.menu-buttons a:nth-child(3), #toptabs dl dt:nth-child(3) {
+
+}
+
 /******************/
 /* DEFAULT STYLES */
 /******************/
