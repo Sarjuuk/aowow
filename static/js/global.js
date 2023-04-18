@@ -10255,10 +10255,28 @@ Listview.templates = {
                 compute: function(guide, td)
                 {
                     $(td).append($('<a>').attr('href', '?guides=' + guide.category).text(l_guide_categories[guide.category]).css('color', 'white'));
+
+                    if (guide.classs && g_chr_specs[guide.classs])
+                    {
+                        $(td).append('&nbsp;' + LANG.dash + '&nbsp;').append($(Icon.create('class_' + g_file_classes[guide.classs], 0, null, '?class=' + guide.classs, null, null, false, null, true)));
+                        let txt = $('<span>').attr('class', 'c' + guide.classs).text(' ' + g_chr_classes[guide.classs]);
+                        if (guide.spec >= 0 && g_chr_specs[guide.classs][guide.spec])
+                        {
+                            $(td).append($(Icon.create(g_file_specs[guide.classs][guide.spec], 0, null, 'javascript:;', null, null, false, null, true)));
+                            txt = $('<span>').attr('class', 'c' + guide.classs).text(' ' + g_chr_specs[guide.classs][guide.spec]);
+                        }
+                        $(td).append(txt);
+                    }
                 },
                 getVisibleText: function(guide)
                 {
-                    return l_guide_categories[guide.category];
+                    let b = l_guide_categories[guide.category];
+                    if (guide.classs)
+                        b += ' ' + g_chr_classes[guide.classs];
+                    if (guide.spec >= 0)
+                        b += ' ' + g_chr_specs[guide.classs][guide.spec];
+
+                    return b;
                 },
                 sortFunc: function(a, b)
                 {
