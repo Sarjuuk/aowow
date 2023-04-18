@@ -491,7 +491,7 @@ class AjaxAdmin extends AjaxHandler
 
             // set display rev to latest
             if ($status == GUIDE_STATUS_APPROVED)
-                DB::Aowow()->query('UPDATE ?_guides SET `rev` = (SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC LIMIT 1) WHERE `id` = ?d', Type::GUIDE, $id, $id);
+                DB::Aowow()->query('UPDATE ?_guides SET `rev` = (SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC LIMIT 1), `approveUserId` = ?d, `approveDate` = ?d WHERE `id` = ?d', Type::GUIDE, $id, User::$id, time(), $id);
 
             DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `status`) VALUES (?d, ?d, ?d, ?d)', $id, time(), User::$id, $status);
             if ($msg)
