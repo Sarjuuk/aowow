@@ -303,7 +303,7 @@ class ItemList extends BaseType
                 $data[$this->id][$k] = $v;
 
             // json vs listview quirk
-            $data[$this->id]['name'] = $data[$this->id]['quality'].$data[$this->id]['name'];
+            $data[$this->id]['name'] = $data[$this->id]['quality'].$this->getField('name', true);
             unset($data[$this->id]['quality']);
 
             if (!empty($this->relEnchant) && $this->curTpl['randomEnchant'])
@@ -436,7 +436,7 @@ class ItemList extends BaseType
                 if ($_ = $this->getField('displayId'))
                     $data[$this->id]['displayid'] = $_;
 
-            if ($this->getSources($s, $sm) && !($addInfoMask & ITEMINFO_MODEL))
+            if ($this->getSources($s, $sm))
             {
                 $data[$this->id]['source'] = $s;
                 if ($sm)
@@ -1441,7 +1441,7 @@ class ItemList extends BaseType
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = (Type::newList($type, [['id', $ids]]))?->getSourceData();
+                $this->sourceMore[$type] = (Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $ids]]))?->getSourceData();
         }
 
         $s = array_keys($this->sources[$this->id]);

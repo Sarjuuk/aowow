@@ -277,6 +277,16 @@ class GenericPage
                 $this->skipCache = CACHE_MODE_FILECACHE | CACHE_MODE_MEMCACHED;
         }
 
+        // prep js+css includes
+        $parentVars = get_class_vars(__CLASS__);
+        if ($parentVars['scripts'] != $this->scripts)       // additions set in child class
+            $this->scripts = array_merge($parentVars['scripts'], $this->scripts);
+
+        $this->addScript(...$this->scripts);
+
+        if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO))
+            $this->addScript([SC_CSS_FILE, 'css/staff.css'], [SC_JS_FILE,  'js/staff.js']);
+
         // display modes
         if (isset($_GET['power']) && method_exists($this, 'generateTooltip'))
             $this->mode = CACHE_TYPE_TOOLTIP;
@@ -313,16 +323,6 @@ class GenericPage
             $this->maintenance();
         else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
             Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
-
-        // prep js+css includes
-        $parentVars = get_class_vars(__CLASS__);
-        if ($parentVars['scripts'] != $this->scripts)       // additions set in child class
-            $this->scripts = array_merge($parentVars['scripts'], $this->scripts);
-
-        $this->addScript(...$this->scripts);
-
-        if (User::isInGroup(U_GROUP_STAFF | U_GROUP_SCREENSHOT | U_GROUP_VIDEO))
-            $this->addScript([SC_CSS_FILE, 'css/staff.css'], [SC_JS_FILE,  'js/staff.js']);
 
         // get errors from previous page from session and apply to template
         if (method_exists($this, 'applyCCErrors'))
