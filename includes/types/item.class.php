@@ -24,7 +24,7 @@ class ItemList extends BaseType
     private         $vendors    = [];
     private         $jsGlobals  = [];                       // getExtendedCost creates some and has no access to template
 
-    protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
+    protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.armor AS tplArmor, i.dmgMin1 AS tplDmgMin1, i.dmgMax1 AS tplDmgMax1, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
     protected       $queryOpts  = array(                    // 3 => Type::ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],
                         'ic'  => ['j' => ['?_icons      `ic`  ON `ic`.`id` = `i`.`iconId`', true], 's' => ', ic.name AS iconString'],
@@ -647,8 +647,8 @@ class ItemList extends BaseType
         $speed  = $this->curTpl['delay'] / 1000;
         $sc1    = $this->curTpl['dmgType1'];
         $sc2    = $this->curTpl['dmgType2'];
-        $dmgmin = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
-        $dmgmax = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
+        $dmgmin = $this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'];
+        $dmgmax = $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2'];
         $dps    = $speed ? ($dmgmin + $dmgmax) / (2 * $speed) : 0;
 
         if ($_class == ITEM_CLASS_AMMUNITION && $dmgmin && $dmgmax)
@@ -660,10 +660,10 @@ class ItemList extends BaseType
         }
         else if ($dps)
         {
-            if ($this->curTpl['dmgMin1'] == $this->curTpl['dmgMax1'])
-                $dmg = sprintf(Lang::item('damage', 'single', $sc1 ? 1 : 0), $this->curTpl['dmgMin1'], $sc1 ? Lang::game('sc', $sc1) : null);
+            if ($this->curTpl['tplDmgMin1'] == $this->curTpl['tplDmgMax1'])
+                $dmg = sprintf(Lang::item('damage', 'single', $sc1 ? 1 : 0), $this->curTpl['tplDmgMin1'], $sc1 ? Lang::game('sc', $sc1) : null);
             else
-                $dmg = sprintf(Lang::item('damage', 'range', $sc1 ? 1 : 0), $this->curTpl['dmgMin1'], $this->curTpl['dmgMax1'], $sc1 ? Lang::game('sc', $sc1) : null);
+                $dmg = sprintf(Lang::item('damage', 'range', $sc1 ? 1 : 0), $this->curTpl['tplDmgMin1'], $this->curTpl['tplDmgMax1'], $sc1 ? Lang::game('sc', $sc1) : null);
 
             if ($_class == ITEM_CLASS_WEAPON)               // do not use localized format here!
                 $x .= '<table width="100%"><tr><td><!--dmg-->'.$dmg.'</td><th>'.Lang::item('speed').' <!--spd-->'.number_format($speed, 2).'</th></tr></table>';
@@ -691,10 +691,10 @@ class ItemList extends BaseType
             if ($interactive)
                 $spanI = 'class="q2 tip" onmouseover="$WH.Tooltip.showAtCursor(event, $WH.sprintf(LANG.tooltip_armorbonus, '.$this->curTpl['armorDamageModifier'].'), 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"';
 
-            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [$this->curTpl['armor']]).'</span></span><br />';
+            $x .= '<span '.$spanI.'><!--addamr'.$this->curTpl['armorDamageModifier'].'--><span>'.Lang::item('armor', [$this->curTpl['tplArmor']]).'</span></span><br />';
         }
-        else if ($this->curTpl['armor'])
-            $x .= '<span><!--amr-->'.Lang::item('armor', [$this->curTpl['armor']]).'</span><br />';
+        else if ($this->curTpl['tplArmor'])
+            $x .= '<span><!--amr-->'.Lang::item('armor', [$this->curTpl['tplArmor']]).'</span><br />';
 
         // Block (note: block value from field block and from field stats or parsed from itemSpells are displayed independently)
         if ($this->curTpl['tplBlock'])
@@ -1418,7 +1418,7 @@ class ItemList extends BaseType
             return 0;
 
         // must have enough damage
-        $dps = ($this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2']) / (2 * $this->curTpl['delay'] / 1000);
+        $dps = ($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']) / (2 * $this->curTpl['delay'] / 1000);
         if ($dps < 54.8)
             return 0;
 
@@ -1540,8 +1540,8 @@ class ItemList extends BaseType
             $range   = isset($this->json[$this->id]['rgddps']) ? 0.3 : 0.2;
             $average = $extraDPS * $this->curTpl['delay'] / 1000;
 
-            $this->templates[$this->id]['dmgMin1'] = floor((1 - $range) * $average);
-            $this->templates[$this->id]['dmgMax1'] = floor((1 + $range) * $average);
+            $this->templates[$this->id]['tplDmgMin1'] = floor((1 - $range) * $average);
+            $this->templates[$this->id]['tplDmgMax1'] = floor((1 + $range) * $average);
         }
 
         // apply Spell Power from ScalingStatValue if set
@@ -1702,7 +1702,7 @@ class ItemList extends BaseType
             'shares'      => $this->curTpl['resShadow'],
             'arcres'      => $this->curTpl['resArcane'],
             'armorbonus'  => max(0, intVal($this->curTpl['armorDamageModifier'])),
-            'armor'       => $this->curTpl['armor'],
+            'armor'       => $this->curTpl['tplArmor'],
             'dura'        => $this->curTpl['durability'],
             'itemset'     => $this->curTpl['itemset'],
             'socket1'     => $this->curTpl['socketColor1'],
@@ -1718,8 +1718,8 @@ class ItemList extends BaseType
         {
 
             $json['dmgtype1'] = $this->curTpl['dmgType1'];
-            $json['dmgmin1']  = $this->curTpl['dmgMin1'] + $this->curTpl['dmgMin2'];
-            $json['dmgmax1']  = $this->curTpl['dmgMax1'] + $this->curTpl['dmgMax2'];
+            $json['dmgmin1']  = $this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'];
+            $json['dmgmax1']  = $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2'];
             $json['speed']    = number_format($this->curTpl['delay'] / 1000, 2);
             $json['dps']      = !floatVal($json['speed']) ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1);
 
