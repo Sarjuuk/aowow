@@ -64,18 +64,19 @@ if (!CLI)
             ['loadingscreens/small/',    '.jpg', 0,  244, 0]
         );
         $paths    = array(                                  // src, [dest, ext, srcSize, destSize, borderOffset], pattern, isIcon, tileSize, resourcePath
-             0 => ['Icons/',                                                $iconDirs,                                        '/.*\.blp$',                         true,   0, null],
-             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]], '/UI-Glyph-Rune-?\d+.blp$',          true,   0, null],
-             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                     '/UI-(Backpack|PaperDoll)-.*\.blp$', true,   0, null],
-             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                        '',                                  true,  64, null],
-             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                        '',                                  true,  64, null],
-             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                        '',                                  true,  64, null],
-          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]], '',                                  true,  32, null],
-             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
-             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
-             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]], '/.*\.blp$',                         false,  0, null],
-            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                    '/.*(start|[ayhs])\.blp$',           true,   0, null],
-            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                  '/lo.*\.blp$',                       false,  0, null]
+             0 => ['Icons/',                                                $iconDirs,                                                    '/.*\.blp$',                           true,   0, null],
+             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]],             '/UI-Glyph-Rune-?\d+.blp$',            true,   0, null],
+             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                                 '/UI-(Backpack|PaperDoll)-.*\.blp$',   true,   0, null],
+             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                                    '',                                    true,  64, null],
+             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                                    '',                                    true,  64, null],
+             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                                    '',                                    true,  64, null],
+          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]],             '',                                    true,  32, null],
+             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
+             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
+             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
+            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                                '/.*(start|[ayhs])\.blp$',             true,   0, null],
+            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                              '/lo.*\.blp$',                         false,  0, null],
+            12 => ['PVPFrame/',                                             array_map(function($x) { $x[4] = 2; return $x; }, $iconDirs), '/PVP-(ArenaPoints|Currency).*\.blp$', true,   0, null]
         );
         // textures are composed of 64x64 icons
         // numeric indexed arrays mimick the position on the texture
@@ -197,7 +198,7 @@ if (!CLI)
         };
 
         if (CLISetup::getOpt('icons'))
-            array_push($groups, 0, 2, 3, 4, 5, 10);
+            array_push($groups, 0, 2, 3, 4, 5, 10, 12);
         if (CLISetup::getOpt('glyphs'))
             $groups[] = 1;
         if (CLISetup::getOpt('pagetexts'))

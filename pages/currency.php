@@ -75,9 +75,13 @@ class CurrencyPage extends GenericPage
         /* Main Content */
         /****************/
 
+        $hi = $this->subject->getJSGlobals()[Type::CURRENCY][$this->typeId]['icon'];
+        if ($hi[0] == $hi[1])
+            unset($hi[1]);
+
         $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->name       = $this->subject->getField('name', true);
-        $this->headIcons  = $this->typeId == 104 ? ['inv_bannerpvp_02', 'inv_bannerpvp_01'] : [$this->subject->getField('iconString')];
+        $this->headIcons  = $hi;
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => true
