@@ -1978,7 +1978,8 @@ $WH.Tooltip = {
 
         tooltip.style.width = 'max-content';
      // tooltip.style.width = tow + 'px';
-        tt2.style.width     = tt2w + 'px';
+        tt2.style.width     = 'max-content';
+     // tt2.style.width     = tt2w + 'px';
 
         var
             rect,
