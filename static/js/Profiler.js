@@ -1427,6 +1427,7 @@ function Profiler() {
                     a  = $WH.ce('a');
 
                 td.style.lineHeight = '1em';
+                td.style.padding = '0px';
 
                 $WH.ae(th, Icon.create((_profile.customs[i].length == 3 && _profile.customs[i][2] ? _profile.customs[i][2] : 'inv_misc_questionmark'), 0, null, '?profile=' + i));
                 $WH.ae(tr, th);
