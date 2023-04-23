@@ -171,12 +171,13 @@ SqlGen::register(new class extends SetupScript
 
 
         $i = 0;
+        DB::Aowow()->query('TRUNCATE ?_quests');
         while ($quests = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')');
 
             foreach ($quests as $quest)
-                DB::Aowow()->query('REPLACE INTO ?_quests VALUES (?a)', array_values($quest));
+                DB::Aowow()->query('INSERT INTO ?_quests VALUES (?a)', array_values($quest));
         }
 
         /*

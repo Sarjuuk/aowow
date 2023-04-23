@@ -141,14 +141,14 @@ SqlGen::register(new class extends SetupScript
                ?d, ?d';
 
         $i = 0;
+        DB::Aowow()->query('TRUNCATE ?_items');
         while ($items = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')');
 
             foreach ($items as $item)
-                DB::Aowow()->query('REPLACE INTO ?_items VALUES (?a)', array_values($item));
+                DB::Aowow()->query('INSERT INTO ?_items VALUES (?a)', array_values($item));
         }
-
 
         // merge with gemProperties
         DB::Aowow()->query('UPDATE ?_items i, dbc_gemproperties gp SET i.gemEnchantmentId = gp.enchantmentId, i.gemColorMask = gp.colorMask WHERE i.gemColorMask = gp.id');
@@ -237,6 +237,26 @@ SqlGen::register(new class extends SetupScript
                 ))
             WHERE
                 durability > 0 AND ((classBak = 4 AND subClassBak IN (1, 2, 3, 4, 6)) OR (classBak = 2 AND subClassBak <> 9))');
+
+        // hide some nonsense
+        DB::Aowow()->query('UPDATE ?_items SET `cuFlags` = `cuFlags` | ?d WHERE
+            `name_loc0` LIKE "Monster - %"  OR  `name_loc0` LIKE "Creature - %" OR
+            `name_loc0` LIKE "%[PH]%"       OR  `name_loc0` LIKE "% PH %"       OR
+            `name_loc0` LIKE "%(new)%"      OR  `name_loc0` LIKE "%(old)%"      OR
+            `name_loc0` LIKE "%deprecated%" OR  `name_loc0` LIKE "%obsolete%"   OR
+            `name_loc0` LIKE "%1H%"         OR  `name_loc0` LIKE "%QA%"         OR
+            `name_loc0` LIKE "%(test)%"     OR  `name_loc0` LIKE "test %"       OR (`name_loc0` LIKE "% test %" AND `class` > 0)',
+            CUSTOM_EXCLUDE_FOR_LISTVIEW
+        );
+
+        // sanity check weapon class and invtype relation
+        $checks = array(
+            [[INVTYPE_WEAPONOFFHAND, INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPON], [0, 4, 7, 13, 14, 15]],
+            [[INVTYPE_2HWEAPON], [1, 5, 6, 8, 10, 14, 20]],
+            [[INVTYPE_RANGED, INVTYPE_RANGEDRIGHT], [2, 3, 16, 18, 14, 19]]
+        );
+        foreach ($checks as [$slots, $subclasses])
+            DB::Aowow()->query('UPDATE ?_items SET `cuFlags` = `cuFlags` | ?d WHERE `class`= ?d AND `slotBak` IN (?a) AND `subClass` NOT IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, ITEM_CLASS_WEAPON, $slots, $subclasses);
 
         $this->reapplyCCFlags('items', Type::ITEM);
 

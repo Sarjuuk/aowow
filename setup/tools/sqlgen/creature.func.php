@@ -19,7 +19,7 @@ SqlGen::register(new class extends SetupScript
         $baseQuery = '
             SELECT
                 ct.entry,
-                IF(ie.entry IS NULL, 0, ?d) AS cuFlags,          -- cuFlags
+                IF(ie.creditEntry IS NULL, 0, ?d) AS cuFlags,   -- cuFlags
                 difficulty_entry_1, difficulty_entry_2, difficulty_entry_3,
                 KillCredit1, KillCredit2,
                 modelid1, modelid2, modelid3, modelid4,
@@ -91,7 +91,7 @@ SqlGen::register(new class extends SetupScript
             LEFT JOIN
                 creature_template_locale ctl8 ON ct.entry = ctl8.entry AND ctl8.`locale` = "ruRU"
             LEFT JOIN
-                instance_encounters ie ON ie.creditEntry = ct.entry AND ie.creditType = 0
+                (SELECT creditEntry FROM instance_encounters WHERE creditType = 0 GROUP BY creditEntry) ie ON ie.creditEntry = ct.entry
             LEFT JOIN
                 creature_template_spell cts0 ON ct.entry = cts0.CreatureID AND cts0.Index = 0
             LEFT JOIN
@@ -157,12 +157,13 @@ SqlGen::register(new class extends SetupScript
                 c.humanoid = IF(cdie.id IS NULL, 0, 1)';
 
         $i = 0;
+        DB::Aowow()->query('TRUNCATE ?_creature');
         while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
             CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')');
 
             foreach ($npcs as $npc)
-                DB::Aowow()->query('REPLACE INTO ?_creature VALUES (?a)', array_values($npc));
+                DB::Aowow()->query('INSERT INTO ?_creature VALUES (?a)', array_values($npc));
         }
 
         // apply "textureString", "modelId" and "iconSring"
