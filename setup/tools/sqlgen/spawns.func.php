@@ -19,31 +19,31 @@ SqlGen::register(new class extends SetupScript
     private $querys = array(
         1 => ['SELECT c.guid, 1 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, IFNULL(ca.path_id, 0) AS pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
-              ' - assembling creature spawns', Type::NPC],
+              'creature spawns', Type::NPC],
 
         2 => ['SELECT c.guid, 2 AS "type", c.id AS typeId, ABS(c.spawntimesecs) AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM gameobject c',
-              ' - assembling gameobject spawns', Type::OBJECT],
+              'gameobject spawns', Type::OBJECT],
 
         3 => ['SELECT id AS "guid", 19 AS "type", soundId AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_soundemitters',
-              ' - assembling sound emitter spawns', Type::SOUND],
+              'sound emitter spawns', Type::SOUND],
 
         4 => ['SELECT id AS "guid", 503 AS "type", id AS typeId, 0 AS respawn, 0 AS phaseMask, 0 AS areaId, mapId AS "map", 0 AS pathId, posX, posY ' .
               'FROM dbc_areatrigger',
-              ' - assembling areatrigger spawns', Type::AREATRIGGER],
+              'areatrigger spawns', Type::AREATRIGGER],
 
         5 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, w.waittime AS "wait", w.location_y AS `posX`, w.location_x AS `posY` ' .
               'FROM creature c JOIN script_waypoint w ON c.id = w.entry',
-              ' - assembling waypoints from table script_waypoint', Type::NPC],
+              'script_waypoint table', Type::NPC],
 
         6 => ['SELECT c.guid, w.entry AS "npcOrPath", w.pointId AS "point", c.zoneId AS areaId, c.map, 0 AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN waypoints w ON c.id = w.entry',
-              ' - assembling waypoints from table waypoints', Type::NPC],
+              'waypoints table', Type::NPC],
 
         7 => ['SELECT c.guid, -w.id AS "npcOrPath", w.point, c.zoneId AS areaId, c.map, w.delay AS "wait", w.position_y AS `posX`, w.position_x AS `posY` ' .
               'FROM creature c JOIN creature_addon ca ON ca.guid = c.guid JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.path_id <> 0',
-              ' - assembling waypoints from table waypoint_data', Type::NPC]
+              'waypoint_data table', Type::NPC]
     );
 
     public function generate(array $ids = []) : bool
@@ -78,24 +78,31 @@ SqlGen::register(new class extends SetupScript
 
         foreach ($this->querys as $idx => $q)
         {
-            CLI::write($q[1]);
-
-            $n   = 0;
-            $sum = 0;
+            $intv = 0.5;
+            $time = microtime(true);
+            $sum  = 0;
 
             if ($idx == 3 || $idx == 4)
                 $queryResult = DB::Aowow()->select($q[0]);
             else
                 $queryResult = DB::World()->select($q[0]);
 
+            $qryProgress = array_combine(array_keys($this->querys), array_column($this->querys, 1));
+            array_walk($qryProgress, function (&$v, $k) use ($idx) { if ($idx == $k) $v = CLI::bold('<'.$v.'>'); });
+            $qryProgress = ' ['.implode(', ', $qryProgress).']';
+
+            $qryTotal = count($queryResult);
+            $qtLen    = strlen($qryTotal);
             $doneGUID = 0;
             foreach ($queryResult as $spawn)
             {
-                if (!$n)
-                    CLI::write(' * sets '.($sum + 1).' - '.($sum += SqlGen::$sqlBatchSize));
-
-                if ($n++ > SqlGen::$sqlBatchSize)
-                    $n = 0;
+                $sum++;
+                $newTime = microtime(true);
+                if ($newTime > $time + $intv)
+                {
+                    CLI::write(sprintf(' * %'.$qtLen.'d / %d (%4.1f%%)', $sum,  $qryTotal, round(100 * $sum / $qryTotal, 1)) . $qryProgress, CLI::LOG_BLANK, true, true);
+                    $time = $newTime;
+                }
 
                 // npc/object is on a transport -> apply offsets to path of transport
                 // note, that the coordinates are mixed up .. again
@@ -116,6 +123,7 @@ SqlGen::register(new class extends SetupScript
                     if ($doneGUID != $spawn['guid'])
                     {
                         CLI::write('GUID '.$spawn['guid'].' was manually moved [A:'.$spawn['areaId'].' => '.$area.'; F: '.$floor.']', CLI::LOG_INFO);
+                        $time = 0;                          // force refresh progress
                         $doneGUID = $spawn['guid'];         // do not spam on waypoints
                     }
                 }
@@ -129,18 +137,21 @@ SqlGen::register(new class extends SetupScript
                     if (!$area)
                     {
                         CLI::write('tried to default GUID '.$spawn['guid'].' to instanced area by mapId, but returned empty [M:'.$spawn['map'].']', CLI::LOG_WARN);
+                        $time = 0;                          // force refresh progress
                         continue;
                     }
                     $final = ['areaId' => $area, 'posX' => 0, 'posY' => 0, 'floor' => 0];
                 }
-                else if (!$points)                               // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
+                else if (!$points)                          // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
                 {
                     CLI::write('GUID '.$spawn['guid'].($idx < 5 ? '' : ' on path/point '.$spawn['npcOrPath'].'/'.$spawn['point']).' could not be matched to displayable area [A:'.$area.'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
+                    $time = 0;                              // force refresh progress
                     continue;
                 }
-                else                                            // if areaId is set, area was determined by TC .. we're fine .. mostly
+                else                                        // if areaId is set, area was determined by TC .. we're fine .. mostly
                 {
-                    if (in_array($spawn['map'], [564, 580]))    // Black Temple and Sunwell floor offset bullshit
+                    // Black Temple and Sunwell floor offset bullshit
+                    if (in_array($spawn['map'], [564, 580]))
                         $points[0]['floor']++;
 
                     $final = $area ? $points[0] : Game::checkCoords($points);
@@ -219,7 +230,7 @@ SqlGen::register(new class extends SetupScript
                 }
             }
             if ($matches)
-                CLI::write(' * assigned '.$matches.' accessories on '.++$n.'. pass on vehicle accessories');
+                CLI::write(' * assigned '.$matches.' accessories on '.++$n.'. pass on vehicle accessories', CLI::LOG_BLANK, true, true);
         }
         if ($accessories)
             CLI::write(count($accessories).' accessories could not be fitted onto a spawned vehicle.', CLI::LOG_WARN);

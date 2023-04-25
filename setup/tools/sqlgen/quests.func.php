@@ -133,8 +133,6 @@ SqlGen::register(new class extends SetupScript
             WHERE
                 q.ID IN (?a)
             }
-            ORDER BY
-                q.ID ASC
             LIMIT
                 ?d, ?d';
 
@@ -174,7 +172,7 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_quests');
         while ($quests = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')');
+            CLI::write(' * batch #' . ++$i . ' (' . count($quests) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($quests as $quest)
                 DB::Aowow()->query('INSERT INTO ?_quests VALUES (?a)', array_values($quest));

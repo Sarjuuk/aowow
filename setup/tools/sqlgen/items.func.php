@@ -135,8 +135,6 @@ SqlGen::register(new class extends SetupScript
             WHERE
                 it.entry IN (?a)
             }
-            ORDER BY
-                it.entry ASC
             LIMIT
                ?d, ?d';
 
@@ -144,7 +142,7 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_items');
         while ($items = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')');
+            CLI::write(' * batch #' . ++$i . ' (' . count($items) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($items as $item)
                 DB::Aowow()->query('INSERT INTO ?_items VALUES (?a)', array_values($item));

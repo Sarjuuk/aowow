@@ -88,7 +88,7 @@ SqlGen::register(new class extends SetupScript
         # also everything from items that teach spells, is src of spell
         # todo: check if items have learn-spells (effect: 36)
 
-        CLI::write('   * resolve ref-loot tree');
+        CLI::write('   * resolve ref-loot tree', CLI::LOG_BLANK, true, true);
         $refLoot = DB::World()->select('
             SELECT
                 rlt.Entry AS ARRAY_KEY,
@@ -135,7 +135,7 @@ SqlGen::register(new class extends SetupScript
         ###############
         #  1: Crafted #
         ###############
-        CLI::write('   * #1  Crafted');
+        CLI::write('   * #1  Crafted', CLI::LOG_BLANK, true, true);
 
         $spellBuff  = [];
         $itemBuff   = [];
@@ -176,7 +176,7 @@ SqlGen::register(new class extends SetupScript
         ############
         #  2: Drop #
         ############
-        CLI::write('   * #2  Drop');
+        CLI::write('   * #2  Drop', CLI::LOG_BLANK, true, true);
 
         $spellBuff    = [];
         $itemBuff     = [];
@@ -318,7 +318,7 @@ SqlGen::register(new class extends SetupScript
         ###########
         #  3: PvP # (Vendors w/ xCost Arena/Honor)
         ###########
-        CLI::write('   * #3  PvP');
+        CLI::write('   * #3  PvP', CLI::LOG_BLANK, true, true);
 
     // var g_sources_pvp = {
         // 1: 'Arena',
@@ -363,7 +363,7 @@ SqlGen::register(new class extends SetupScript
         #############
         #  4: Quest #
         #############
-        CLI::write('   * #4  Quest');
+        CLI::write('   * #4  Quest', CLI::LOG_BLANK, true, true);
 
         $spellBuff  = [];
         $itemBuff   = [];
@@ -445,7 +445,7 @@ SqlGen::register(new class extends SetupScript
         ##############
         #  5: Vendor # (w/o xCost Arena/Honor)
         ##############
-        CLI::write('   * #5  Vendor');
+        CLI::write('   * #5  Vendor', CLI::LOG_BLANK, true, true);
 
         $spellBuff  = [];
         $itemBuff   = [];
@@ -479,7 +479,7 @@ SqlGen::register(new class extends SetupScript
         ###############
         # 10: Starter #
         ###############
-        CLI::write('   * #10 Starter');
+        CLI::write('   * #10 Starter', CLI::LOG_BLANK, true, true);
 
         if ($pcii = DB::World()->select('SELECT ?d, itemid, 1 FROM playercreateinfo_item', Type::ITEM))
             DB::Aowow()->query($this->queryfy($pcii, $insBasic), 10, 10, 10);
@@ -491,7 +491,7 @@ SqlGen::register(new class extends SetupScript
         ###################
         # 12: Achievement #
         ###################
-        CLI::write('   * #12 Achievement');
+        CLI::write('   * #12 Achievement', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -553,7 +553,7 @@ SqlGen::register(new class extends SetupScript
         ####################
         # 15: Disenchanted #
         ####################
-        CLI::write('   * #15 Disenchanted');
+        CLI::write('   * #15 Disenchanted', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -606,7 +606,7 @@ SqlGen::register(new class extends SetupScript
         ##############
         # 16: Fished #
         ##############
-        CLI::write('   * #16 Fished');
+        CLI::write('   * #16 Fished', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -657,7 +657,7 @@ SqlGen::register(new class extends SetupScript
         ################
         # 17: Gathered #
         ################
-        CLI::write('   * #17 Gathered');
+        CLI::write('   * #17 Gathered', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -712,7 +712,7 @@ SqlGen::register(new class extends SetupScript
         ##############
         # 18: Milled #
         ##############
-        CLI::write('   * #18 Milled');
+        CLI::write('   * #18 Milled', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -763,7 +763,7 @@ SqlGen::register(new class extends SetupScript
         #############
         # 19: Mined #
         #############
-        CLI::write('   * #19 Mined');
+        CLI::write('   * #19 Mined', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -818,7 +818,7 @@ SqlGen::register(new class extends SetupScript
         ##################
         # 20: Prospected #
         ##################
-        CLI::write('   * #20 Prospected');
+        CLI::write('   * #20 Prospected', CLI::LOG_BLANK, true, true);
 
         $spellBuff    = [];
         $itemBuff     = [];
@@ -869,7 +869,7 @@ SqlGen::register(new class extends SetupScript
         ##################
         # 21: Pickpocket #
         ##################
-        CLI::write('   * #21 Pickpocket');
+        CLI::write('   * #21 Pickpocket', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -919,7 +919,7 @@ SqlGen::register(new class extends SetupScript
         ################
         # 22: Salvaged #
         ################
-        CLI::write('   * #22 Salvaged');
+        CLI::write('   * #22 Salvaged', CLI::LOG_BLANK, true, true);
 
         $spellBuff   = [];
         $itemBuff    = [];
@@ -970,7 +970,7 @@ SqlGen::register(new class extends SetupScript
         ###############
         # 23: Skinned #
         ###############
-        CLI::write('   * #23 Skinned');
+        CLI::write('   * #23 Skinned', CLI::LOG_BLANK, true, true);
 
         $spellBuff = [];
         $itemBuff  = [];
@@ -1029,7 +1029,7 @@ SqlGen::register(new class extends SetupScript
         CLI::write(' - Spells [original]');
 
         #  4: Quest
-        CLI::write('   * #4  Quest');
+        CLI::write('   * #4  Quest', CLI::LOG_BLANK, true, true);
         $quests = DB::World()->select('
             SELECT spell AS ARRAY_KEY, id, SUM(qty) AS qty, BIT_OR(side) AS side FROM (
                 SELECT IF(RewardSpell = 0, RewardDisplaySpell, RewardSpell) AS spell, ID, COUNT(1) AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side FROM quest_template WHERE IF(RewardSpell = 0, RewardDisplaySpell, RewardSpell) > 0 GROUP BY spell
@@ -1051,7 +1051,7 @@ SqlGen::register(new class extends SetupScript
         }
 
         #  6: Trainer
-        CLI::write('   * #6  Trainer');
+        CLI::write('   * #6  Trainer', CLI::LOG_BLANK, true, true);
         if ($tNpcs = DB::World()->select('SELECT SpellID AS ARRAY_KEY, cdt.CreatureId AS entry, COUNT(1) AS qty FROM `trainer_spell` ts JOIN `creature_default_trainer` cdt ON cdt.TrainerId = ts.TrainerId GROUP BY ARRAY_KEY'))
         {
             $tSpells = DB::Aowow()->select('SELECT id AS ARRAY_KEY, effect1Id, effect2Id, effect3Id, effect1TriggerSpell, effect2TriggerSpell, effect3TriggerSpell FROM dbc_spell WHERE id IN (?a)', array_keys($tNpcs));
@@ -1077,13 +1077,13 @@ SqlGen::register(new class extends SetupScript
         }
 
         #  7: Discovery
-        CLI::write('   * #7  Discovery');
+        CLI::write('   * #7  Discovery', CLI::LOG_BLANK, true, true);
         // 61756: Northrend Inscription Research (FAST QA VERSION);
         if ($disco = DB::World()->select('SELECT ?d, spellId, 1 FROM skill_discovery_template WHERE reqSpell <> ?d', Type::SPELL, 61756))
             DB::Aowow()->query($this->queryfy($disco, $insBasic), 7, 7, 7);
 
         #  9: Talent
-        CLI::write('   * #9  Talent');
+        CLI::write('   * #9  Talent', CLI::LOG_BLANK, true, true);
         $tSpells = DB::Aowow()->select('
             SELECT s.id AS ARRAY_KEY, s.effect1Id, s.effect2Id, s.effect3Id, s.effect1TriggerSpell, s.effect2TriggerSpell, s.effect3TriggerSpell
             FROM   dbc_talent t
@@ -1095,7 +1095,7 @@ SqlGen::register(new class extends SetupScript
         $buff = [];
         while ($tSpells)
         {
-            CLI::write('     - '.++$n.'. pass');
+            CLI::write('     - '.++$n.'. pass', CLI::LOG_BLANK, true, true);
 
             $recurse = [];
             foreach ($tSpells as $tId => $spell)
@@ -1120,7 +1120,7 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query($this->queryfy($buff, $insBasic), 9, 9, 9);
 
         # 10: Starter
-        CLI::write('   * #10 Starter');
+        CLI::write('   * #10 Starter', CLI::LOG_BLANK, true, true);
         /* acquireMethod
             ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,        learnedAt = 1 && source10 = 1
             ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
@@ -1138,12 +1138,12 @@ SqlGen::register(new class extends SetupScript
         CLI::write(' - Titles');
 
         #  4: Quest
-        CLI::write('   * #4  Quest');
+        CLI::write('   * #4  Quest', CLI::LOG_BLANK, true, true);
         if ($quests = DB::World()->select('SELECT ?d, RewardTitle, 1, ?d, ID FROM quest_template WHERE RewardTitle > 0', Type::TITLE, Type::QUEST))
             DB::Aowow()->query($this->queryfy($quests, $insMore), 4, 4, 4);
 
         # 12: Achievement
-        CLI::write('   * #12 Achievement');
+        CLI::write('   * #12 Achievement', CLI::LOG_BLANK, true, true);
         $sets = DB::World()->select('
             SELECT titleId AS ARRAY_KEY, MIN(ID) AS srcId, NULLIF(MAX(ID), MIN(ID)) AS altSrcId FROM (
                 SELECT TitleA AS `titleId`, ID FROM achievement_reward WHERE TitleA <> 0
@@ -1160,7 +1160,7 @@ SqlGen::register(new class extends SetupScript
         }
 
         # 13: Source-String
-        CLI::write('   * #13 cuStrings');
+        CLI::write('   * #13 cuStrings', CLI::LOG_BLANK, true, true);
         $src13 = [null, 42, 52, 71, 80, 157, 163, 167, 169, 177];
         foreach ($src13 as $src => $tId)
             if ($tId)

@@ -313,7 +313,7 @@ class CLISetup
     {
         if (Util::writeFile($file, $content))
         {
-            CLI::write(sprintf(ERR_NONE, CLI::bold($file)), CLI::LOG_OK);
+            CLI::write(sprintf(ERR_NONE, CLI::bold($file)), CLI::LOG_OK, true, true);
             return true;
         }
 

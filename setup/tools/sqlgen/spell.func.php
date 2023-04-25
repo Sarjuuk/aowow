@@ -208,7 +208,7 @@ SqlGen::register(new class extends SetupScript
         {
             $newMax = max(array_column($spells, 'id'));
 
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
+            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax, CLI::LOG_BLANK, true, true);
 
             $lastMax = $newMax;
 
@@ -226,7 +226,7 @@ SqlGen::register(new class extends SetupScript
         {
             $newMax = max(array_column($spells, 'id'));
 
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax);
+            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax, CLI::LOG_BLANK, true, true);
 
             $lastMax = $newMax;
 

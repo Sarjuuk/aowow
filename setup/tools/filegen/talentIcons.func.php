@@ -80,7 +80,7 @@ if (!CLI)
                     }
 
                     if (@imagejpeg($res, $outFile))
-                        CLI::write(sprintf(ERR_NONE, CLI::bold($outFile)), CLI::LOG_OK);
+                        CLI::write(sprintf(ERR_NONE, CLI::bold($outFile)), CLI::LOG_OK, true, true);
                     else
                     {
                         $success = false;

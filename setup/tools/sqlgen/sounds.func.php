@@ -72,11 +72,12 @@ SqlGen::register(new class extends SetupScript
         $lastMax      = 0;
         $soundFileIdx = 0;
         $soundIndex   = [];
+        $j = 0;
         while ($sounds = DB::Aowow()->select($query, $lastMax, SqlGen::$sqlBatchSize))
         {
             $newMax = max(array_column($sounds, 'id'));
 
-            CLI::write('   * sets '.($lastMax + 1).' - '.$newMax);
+            CLI::write('   * batch #' . ++$j . ' (' . count($sounds) . ')', CLI::LOG_BLANK, true, true);
 
             $lastMax = $newMax;
 

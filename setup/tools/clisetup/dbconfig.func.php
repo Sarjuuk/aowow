@@ -49,7 +49,6 @@ function dbconfig() : void
 
     while (true)
     {
-        CLI::write();
         CLI::write("select a numerical index to use the corresponding entry");
 
         $nCharDBs = 0;
@@ -63,6 +62,7 @@ function dbconfig() : void
         }
 
         CLI::write("[".CLI::bold(3 + $nCharDBs)."] add an additional Character DB");
+        CLI::write();
 
         while (true)
         {
@@ -127,8 +127,8 @@ function dbconfig() : void
                     }
                     else
                     {
-                        CLI::write();
                         CLI::write("edit canceled! returning to list...", CLI::LOG_INFO);
+                        CLI::write();
                         sleep(1);
                         continue 2;
                     }
@@ -136,8 +136,8 @@ function dbconfig() : void
             }
             else
             {
-                CLI::write();
                 CLI::write("leaving db setup...", CLI::LOG_INFO);
+                CLI::write();
                 break 2;
             }
         }

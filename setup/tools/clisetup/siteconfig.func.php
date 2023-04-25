@@ -18,8 +18,8 @@ function siteconfig() : void
 
     if (!DB::isConnectable(DB_AOWOW))
     {
-        CLI::write();
         CLI::write("database not yet set up!\n        Please use --dbconfig for setup", CLI::LOG_WARN);
+        CLI::write();
         return;
     }
 
@@ -82,8 +82,8 @@ function siteconfig() : void
 
     while (true)
     {
-        CLI::write();
         CLI::write('select a numerical index to use the corresponding entry');
+        CLI::write();
 
         $sumNum   = 0;
         $cfgList  = [];
@@ -161,11 +161,12 @@ function siteconfig() : void
             CLI::write($b);
 
         CLI::write(str_pad("[".CLI::bold($sumNum)."]", 21)."add another php configuration");
+        CLI::write();
 
         if ($hasEmpty)
         {
+            CLI::write("please configure the required empty settings", CLI::LOG_WARN);
             CLI::write();
-            CLI::write("please configure the required empty setings", CLI::LOG_WARN);
         }
 
         $inp = ['idx' => ['', false, '/\d/']];
@@ -174,8 +175,8 @@ function siteconfig() : void
             // add new php setting
             if ($inp['idx'] == $sumNum)
             {
-                CLI::write();
                 CLI::write("Adding additional php configuration.");
+                CLI::write();
 
                 while (true)
                 {
@@ -185,8 +186,6 @@ function siteconfig() : void
                     );
                     if (CLI::read($setting) && $setting)
                     {
-                        CLI::write();
-
                         $key = strtolower($setting['key']);
                         if (ini_get($key) === false || ini_set($key, $setting['val']) === false)
                         {
@@ -205,12 +204,13 @@ function siteconfig() : void
                             sleep(1);
                         }
 
+                        CLI::write();
                         break;
                     }
                     else
                     {
-                        CLI::write();
                         CLI::write("edit canceled! returning to list...", CLI::LOG_INFO);
+                        CLI::write();
                         sleep(1);
                         break;
                     }
@@ -224,7 +224,6 @@ function siteconfig() : void
                 $key  = strtolower($conf['key']);
                 $buff = '';
 
-                CLI::write();
                 $buff .= $conf['flags'] & CON_FLAG_PHP ? "  PHP: " : "AOWOW: ";
                 $buff .= $conf['flags'] & CON_FLAG_PHP ? $key : strtoupper('cfg_'.$conf['key']);
 
@@ -232,6 +231,7 @@ function siteconfig() : void
                     $buff .= " - ".$info[1];
 
                 CLI::write($buff);
+                CLI::write();
 
                 $buff = "VALUE: ";
 
@@ -270,6 +270,8 @@ function siteconfig() : void
                 if (strstr($info[0], 'default:'))
                     CLI::write("[".CLI::bold('R')."]estore Default - ".trim(explode('default:', $info[0])[1]));
 
+                CLI::write();
+
                 while (true)
                 {
                     $action = ['idx' => ['', true, '/[edr]/i']];
@@ -306,7 +308,7 @@ function siteconfig() : void
                                         CLI::write('['.CLI::bold(1 << $opt[0]).']'.str_pad('', 4-strlen(1 << $opt[0])).$opt[1]);
                                     }
                                     $pattern  = '/\d+/';
-                                    $validate = function ($v) use($_valid) { $v = $v & $_valid; return $v; };
+                                    $validate = function ($v) use($_valid) { $v = ($v ?: 0) & $_valid; return $v; };
                                 }
                                 else if ($conf['flags'] & CON_FLAG_TYPE_BOOL)
                                 {
@@ -395,8 +397,8 @@ function siteconfig() : void
                     }
                     else
                     {
-                        CLI::write();
                         CLI::write('edit canceled! returning to list...', CLI::LOG_INFO);
+                        CLI::write();
                         sleep(1);
                         break;
                     }
@@ -404,15 +406,15 @@ function siteconfig() : void
             }
             else
             {
-                CLI::write();
                 CLI::write('invalid selection', CLI::LOG_ERROR);
+                CLI::write();
                 sleep(1);
             }
         }
         else
         {
-            CLI::write();
             CLI::write('leaving site configuration...', CLI::LOG_INFO);
+            CLI::write();
             break;
         }
 

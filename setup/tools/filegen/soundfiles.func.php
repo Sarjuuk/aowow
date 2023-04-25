@@ -13,16 +13,21 @@ if (!CLI)
         // ALL files
         $files  = DB::Aowow()->selectCol('SELECT ABS(id) AS ARRAY_KEY, CONCAT(path, "/", `file`) FROM ?_sounds_files');
         $nFiles = count($files);
-        $itr    = $i = 0;
-        $step   = 1000;
+        $qtLen  = strlen($nFiles);
+        $sum    = 0;
+
+        $intv = 0.5;
+        $time = microtime(true);
+        $sum  = 0;
+
         foreach ($files as $fileId => $filePath)
         {
-            $i++;
-            $itr++;
-            if ($i == $step)
+            $sum++;
+            $newTime = microtime(true);
+            if ($newTime > $time + $intv)
             {
-                $i = 0;
-                CLI::write(' - '.$itr.'/'.$nFiles.' ('.(intVal(100 * $itr / $nFiles).'%) done'));
+                CLI::write(sprintf(' * %'.$qtLen.'d / %d (%4.1f%%)', $sum,  $nFiles, round(100 * $sum / $nFiles, 1)), CLI::LOG_BLANK, true, true);
+                $time = $newTime;
                 DB::Aowow()->selectCell('SELECT 1');        // keep mysql busy or it may go away
             }
 
@@ -42,6 +47,7 @@ if (!CLI)
                     {
                         $ok = false;
                         CLI::write(' - could not copy '.CLI::bold($p).' into '.CLI::bold('static/wowsounds/'.$fileId), CLI::LOG_ERROR);
+                        $time = 0;
                         break 2;
                     }
 
@@ -50,6 +56,7 @@ if (!CLI)
             }
 
             CLI::write(' - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '['.implode(',', CLISetup::$locales).']')), CLI::LOG_WARN);
+            $time = 0;
             // flag as unusable in DB
             DB::Aowow()->query('UPDATE ?_sounds_files SET id = ?d WHERE ABS(id) = ?d', -$fileId, $fileId);
         }

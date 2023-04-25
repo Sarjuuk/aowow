@@ -56,16 +56,15 @@ class DB
         if (strstr($options['host'], ':'))
             [$options['host'], $port] = explode(':', $options['host']);
 
-        try {
-            $link = @mysqli_connect($options['host'], $options['user'], $options['pass'], $options['db'], $port ?: $defPort);
+        if ($link = @mysqli_connect($options['host'], $options['user'], $options['pass'], $options['db'], $port ?: $defPort))
             mysqli_close($link);
-        }
-        catch (Exception $e)
+        else
         {
             $err = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
             return false;
         }
-            return true;
+
+        return true;
     }
 
     public static function errorHandler($message, $data)

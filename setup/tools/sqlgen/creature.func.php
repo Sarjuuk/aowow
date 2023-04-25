@@ -124,8 +124,6 @@ SqlGen::register(new class extends SetupScript
             WHERE
                 ct.entry IN (?a)
             }
-            ORDER BY
-                ct.entry ASC
             LIMIT
                ?d, ?d';
 
@@ -160,7 +158,7 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_creature');
         while ($npcs = DB::World()->select($baseQuery, NPC_CU_INSTANCE_BOSS, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')');
+            CLI::write(' * batch #' . ++$i . ' (' . count($npcs) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($npcs as $npc)
                 DB::Aowow()->query('INSERT INTO ?_creature VALUES (?a)', array_values($npc));

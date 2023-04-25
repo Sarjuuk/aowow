@@ -171,7 +171,7 @@ if (!CLI)
             if ($ok)
             {
                 chmod($name.$ext, Util::FILE_ACCESS);
-                CLI::write($done.' - image '.$name.$ext.' written', CLI::LOG_OK);
+                CLI::write($done.' - image '.$name.$ext.' written', CLI::LOG_OK, true, true);
             }
             else
                 CLI::write($done.' - could not create image '.$name.$ext, CLI::LOG_ERROR);
@@ -347,7 +347,7 @@ if (!CLI)
 
                                 if (!CLISetup::getOpt('force') && file_exists($destDir.$dest.$img.$ext))
                                 {
-                                    CLI::write($done.' - file '.$dest.$img.$ext.' was already processed');
+                                    CLI::write($done.' - file '.$dest.$img.$ext.' was already processed', CLI::LOG_BLANK, true, true);
                                     continue;
                                 }
 
@@ -416,7 +416,7 @@ if (!CLI)
 
                         if (!CLISetup::getOpt('force') && file_exists($destDir.$dest.$img.$ext))
                         {
-                            CLI::write($done.' - file '.$dest.$img.$ext.' was already processed');
+                            CLI::write($done.' - file '.$dest.$img.$ext.' was already processed', CLI::LOG_BLANK, true, true);
                             continue;
                         }
 

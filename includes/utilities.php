@@ -141,6 +141,7 @@ abstract class CLI
     private static $logHandle   = null;
     private static $hasReadline = null;
 
+    private static $overwriteLast = false;
 
     /********************/
     /* formatted output */
@@ -232,7 +233,7 @@ abstract class CLI
         return OS_WIN ? $str : "\e[1m".$str."\e[0m";
     }
 
-    public static function write(string $txt = '', int $lvl = self::LOG_BLANK, bool $timestamp = true) : void
+    public static function write(string $txt = '', int $lvl = self::LOG_BLANK, bool $timestamp = true, bool $tmpRow = false) : void
     {
         $msg = '';
         if ($txt)
@@ -259,15 +260,16 @@ abstract class CLI
                     break;
             }
 
-            $msg .= $txt."\n";
+            $msg .= $txt;
         }
-        else
-            $msg = "\n";
+
+        $msg = (self::$overwriteLast && !OS_WIN ? "\e[1G\e[0K" : "\n") . $msg;
+        self::$overwriteLast = $tmpRow;
 
         echo $msg;
 
-        if (self::$logHandle)                               // remove highlights for logging
-            fwrite(self::$logHandle, preg_replace(["/\e\[\d+m/", "/\e\[0m/"], '', $msg));
+        if (self::$logHandle)                               // remove control sequences from log
+            fwrite(self::$logHandle, preg_replace(["/\e\[\d+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg));
 
         flush();
     }

@@ -82,8 +82,6 @@ SqlGen::register(new class extends SetupScript
             }
             GROUP BY
                 go.entry
-            ORDER BY
-                go.entry ASC
             LIMIT
                 ?d, ?d';
 
@@ -107,7 +105,7 @@ SqlGen::register(new class extends SetupScript
         DB::Aowow()->query('TRUNCATE ?_objects');
         while ($objects = DB::World()->select($baseQuery, $ids ?: DBSIMPLE_SKIP, SqlGen::$sqlBatchSize * $i, SqlGen::$sqlBatchSize))
         {
-            CLI::write(' * batch #' . ++$i . ' (' . count($objects) . ')');
+            CLI::write(' * batch #' . ++$i . ' (' . count($objects) . ')', CLI::LOG_BLANK, true, true);
 
             foreach ($objects as $object)
                 DB::Aowow()->query('INSERT INTO ?_objects VALUES (?a)', array_values($object));

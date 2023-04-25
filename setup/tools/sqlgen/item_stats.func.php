@@ -252,18 +252,16 @@ SqlGen::register(new class extends SetupScript
         CLI::write('   '.count($enchStats).' enchantments parsed');
         CLI::write(' - applying stats for items');
 
+        $i = 0;
         while (true)
         {
             $items = new ItemStatSetup($offset, SqlGen::$sqlBatchSize, $ids, $enchStats);
             if ($items->error)
                 break;
 
-            $max = max($items->getFoundIDs());
-            $num = count($items->getFoundIDs());
+            CLI::write(' * batch #' . ++$i . ' (' . count($items->getFoundIDs()) . ')', CLI::LOG_BLANK, true, true);
 
-            CLI::write(' * sets '.($offset + 1).' - '.($max));
-
-            $offset = $max;
+            $offset = max($items->getFoundIDs());
 
             $items->writeStatsTable();
         }

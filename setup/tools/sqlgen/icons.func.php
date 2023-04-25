@@ -28,9 +28,7 @@ SqlGen::register(new class extends SetupScript
                 (SELECT LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS x FROM dbc_creaturefamily WHERE iconString LIKE "%icons%")
             ) y
             GROUP BY
-                x
-            ORDER BY
-                x ASC';
+                x';
 
         DB::Aowow()->query($baseQuery);
 
