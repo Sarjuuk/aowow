@@ -1370,13 +1370,24 @@ Variations:
     background: url(../images/icons/instance.gif) no-repeat;
 }
 
-.icon-instance1 { background-position: left center;   } /* Transit (white) */
-.icon-instance2 { background-position: -152px center; } /* Dungeon (blue) */
+span.icon-instance1,
+span.icon-instance2,
+span.icon-instance3,
+span.icon-instance4,
+span.icon-instance5,
+span.icon-instance7,
+span.icon-instance8 {
+    line-height: 17px;
+    display: inline-block;
+}
+
+.icon-instance1 { background-position: left     0px; } /* Transit (white) */
+.icon-instance2 { background-position: left   -32px; } /* Dungeon (blue) */
 .icon-instance3,
 .icon-instance7,
-.icon-instance8 { background-position: -357px center; } /* Raid (green) */
-.icon-instance4 { background-position: -564px center; } /* Battleground (red) */
-.icon-instance5 { background-position: -734px center; } /* Heroic dungeon (purple) */
+.icon-instance8 { background-position: left   -64px; } /* Raid (green) */
+.icon-instance4 { background-position: left   -96px; } /* Battleground (red) */
+.icon-instance5 { background-position: left  -128px; } /* Heroic dungeon (purple) */
 
 .icon-link {
     padding-left: 19px;
