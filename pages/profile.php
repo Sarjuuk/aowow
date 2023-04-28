@@ -125,6 +125,7 @@ class ProfilePage extends GenericPage
 
                 unset($char['guildGUID']);
                 unset($char['guildName']);
+                unset($char['at_login']);
 
                 // create entry from realm with enough basic info to disply tooltips
                 DB::Aowow()->query('REPLACE INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($char), array_values($char));
