@@ -96,7 +96,7 @@ class ItemsetPage extends GenericPage
 
         // class
         $jsg = [];
-        if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, false))
+        if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
             $t = count($jsg)== 1 ? Lang::game('class') : Lang::game('classes');

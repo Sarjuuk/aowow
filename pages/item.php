@@ -262,7 +262,7 @@ class ItemPage extends genericPage
             if ($_reqRating)
             {
                 $text = str_replace('<br />', ' ', Lang::item('reqRating', $_reqRating[1], [$_reqRating[0]]));
-                $infobox[] = Lang::breakTextClean($text, 30, false);
+                $infobox[] = Lang::breakTextClean($text);
             }
         }
 

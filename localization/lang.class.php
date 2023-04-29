@@ -49,7 +49,11 @@ class Lang
         LOCALE_RU => 'Русский'
     );
 
-    public static function load($loc)
+    public const FMT_RAW    = 0;
+    public const FMT_HTML   = 1;
+    public const FMT_MARKUP = 2;
+
+    public static function load(string $loc) : void
     {
         if (!file_exists('localization/locale_'.$loc.'.php'))
             die('File for localization '.strToUpper($loc).' not found.');
@@ -65,7 +69,7 @@ class Lang
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 
-    public static function __callStatic($prop, $args)
+    public static function __callStatic(string $prop, array $args) : ?string
     {
         if (!isset(self::$$prop))
         {
@@ -99,7 +103,7 @@ class Lang
         return self::vspf($var, $vspfArgs);
     }
 
-    public static function concat($args, $useAnd = true, $callback = null)
+    public static function concat(array $args, bool $useAnd = true, ?callable $callback = null) : string
     {
         $b = '';
         $i = 0;
@@ -114,7 +118,7 @@ class Lang
             if ($n > 1 && $i < ($n - 2))
                 $b .= ', ';
             else if ($n > 1 && $i == $n - 2)
-                $b .= Lang::main($useAnd ? 'and' : 'or');
+                $b .= self::main($useAnd ? 'and' : 'or');
 
             $i++;
         }
@@ -131,26 +135,24 @@ class Lang
         // limit whitespaces to one at a time
         $text = preg_replace('/\s+/', ' ', trim($text));
 
-        if ($len > 0 && mb_strlen($text) > $len)
-        {
-            $n = 0;
-            $b = [];
-            $parts = explode(' ', $text);
-            while ($n < $len && $parts)
-            {
-                $_   = array_shift($parts);
-                $n  += mb_strlen($_);
-                $b[] = $_;
-            }
+        if ($len <= 0 || mb_strlen($text) <= $len)
+            return $text;
 
-            $text = implode(' ', $b).'…';
+        $n = 0;
+        $b = [];
+        $parts = explode(' ', $text);
+        while ($n < $len && $parts)
+        {
+            $_   = array_shift($parts);
+            $n  += mb_strlen($_);
+            $b[] = $_;
         }
 
-        return $text;
+        return implode(' ', $b).'…';
     }
 
     // add line breaks to string after X chars. If X is inside a word break behind it.
-    public static function breakTextClean(string $text, int $len = 30, bool $asHTML = true) : string
+    public static function breakTextClean(string $text, int $len = 30, int $fmt = self::FMT_HTML) : string
     {
         // remove line breaks
         $text = strtr($text, ["\n" => ' ', "\r" => ' ']);
@@ -158,51 +160,58 @@ class Lang
         // limit whitespaces to one at a time
         $text = preg_replace('/\s+/', ' ', trim($text));
 
+        if ($len <= 0 || mb_strlen($text) <= $len)
+            return $text;
+
         $row = [];
-        if ($len > 0 && mb_strlen($text) > $len)
+        $i   = 0;
+        $n   = 0;
+        foreach (explode(' ', $text) as $p)
         {
-            $i = 0;
+            $row[$i][] = $p;
+            $n += (mb_strlen($p) + 1);
+
+            if ($n < $len)
+                continue;
+
             $n = 0;
-            $parts = explode(' ', $text);
-            foreach ($parts as $p)
-            {
-                $row[$i][] = $p;
-                $n += (mb_strlen($p) + 1);
+            $i++;
+        }
+        foreach ($row as &$r)
+            $r = implode(' ', $r);
 
-                if ($n < $len)
-                    continue;
-
-                $n = 0;
-                $i++;
-            }
-            foreach ($row as &$r)
-                $r = implode(' ', $r);
+        switch ($fmt)
+        {
+            case self::FMT_HTML:   $separator = '<br />'; break;
+            case self::FMT_MARKUP: $separator = '[br]';   break;
+            case self::FMT_RAW:
+            default:               $separator = "\n";     break;
         }
 
-        return implode($asHTML ? '<br />' : '[br]', $row);
+        return implode($separator, $row);
     }
 
-    public static function sort($prop, $group, $method = SORT_NATURAL)
+    public static function sort(string $prop, string $group, int $method = SORT_NATURAL) : void
     {
 
         if (!isset(self::$$prop))
         {
             trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop, E_USER_WARNING);
-            return null;
+            return;
         }
 
         $var = &self::$$prop;
         if (!isset($var[$group]))
         {
             trigger_error('Lang::sort - tried to use undefined property Lang::$'.$prop.'[\''.$group.'\']', E_USER_WARNING);
-            return null;
+            return;
         }
 
         asort($var[$group], $method);
     }
 
     // todo: expand
-    public static function getInfoBoxForFlags($flags)
+    public static function getInfoBoxForFlags(int $flags) : array
     {
         $tmp = [];
 
@@ -221,7 +230,7 @@ class Lang
         return $tmp;
     }
 
-    public static function getLocks(int $lockId, ?array &$ids = [], bool $interactive = false, bool $asHTML = false) : array
+    public static function getLocks(int $lockId, ?array &$ids = [], bool $interactive = false, int $fmt = self::FMT_HTML) : array
     {
         $locks = [];
         $ids   = [];
@@ -241,13 +250,16 @@ class Lang
                 if (!$name)
                     continue;
 
-                if ($interactive && $asHTML)
-                    $name = '<a class="q1" href="?item='.$prop.'">'.$name.'</a>';
-                else if ($interactive && !$asHTML)
+                if ($fmt == self::FMT_HTML)
+                    $name = $interactive ? '<a class="q1" href="?item='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                else if ($interactive && $fmt == self::FMT_MARKUP)
                 {
                     $name = '[item='.$prop.']';
                     $ids[Type::ITEM][] = $prop;
                 }
+                else
+                    $name = $prop;
+
             }
             else if ($lock['type'.$i] == LOCK_TYPE_SKILL)
             {
@@ -263,15 +275,17 @@ class Lang
                         2 => SKILL_HERBALISM,
                         3 => SKILL_MINING,
                        20 => SKILL_INSCRIPTION
-                   );
+                    );
 
-                    if ($interactive && $asHTML)
-                        $name = '<a href="?skill='.$skills[$prop].'">'.$name.'</a>';
-                    else if ($interactive && !$asHTML)
+                    if ($fmt == self::FMT_HTML)
+                        $name = $interactive ? '<a href="?skill='.$skills[$prop].'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                    else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
                         $name = '[skill='.$skills[$prop].']';
                         $ids[Type::SKILL][] = $skills[$prop];
                     }
+                    else
+                        $name = $skills[$prop];
 
                     if ($rank > 0)
                         $name .= ' ('.$rank.')';
@@ -279,13 +293,14 @@ class Lang
                 // Lockpicking
                 else if ($prop == 4)
                 {
-                    if ($interactive && $asHTML)
-                        $name = '<a href="?spell=1842">'.$name.'</a>';
-                    else if ($interactive && !$asHTML)
+                    if ($fmt == self::FMT_HTML)
+                        $name = $interactive ? '<a href="?spell=1842">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                    else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
                         $name = '[spell=1842]';
                         $ids[Type::SPELL][] = 1842;
                     }
+                    // else $name = $name
                 }
                 // exclude unusual stuff
                 else if (User::isInGroup(U_GROUP_STAFF))
@@ -305,14 +320,12 @@ class Lang
         return $locks;
     }
 
-    public static function getReputationLevelForPoints($pts)
+    public static function getReputationLevelForPoints(int $pts) : string
     {
-        $_ = Game::getReputationLevelForPoints($pts);
-
-        return self::game('rep', $_);
+        return self::game('rep', Game::getReputationLevelForPoints($pts));
     }
 
-    public static function getRequiredItems($class, $mask, $short = true)
+    public static function getRequiredItems(int $class, int $mask, bool $short = true) : string
     {
         if (!in_array($class, [ITEM_CLASS_MISC, ITEM_CLASS_ARMOR, ITEM_CLASS_WEAPON]))
             return '';
@@ -354,7 +367,7 @@ class Lang
             return implode(', ', $tmp);
     }
 
-    public static function getStances($stanceMask)
+    public static function getStances(int $stanceMask) : string
     {
         $stanceMask &= 0xFF37F6FF;                          // clamp to available stances/forms..
 
@@ -374,7 +387,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getMagicSchools($schoolMask)
+    public static function getMagicSchools(int $schoolMask) : string
     {
         $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
         $tmp = [];
@@ -393,17 +406,31 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString(int $classMask, array &$ids = [], bool $asHTML = true) : string
+    public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $classMask &= CLASS_MASK_ALL;                       // clamp to available classes..
 
         if ($classMask == CLASS_MASK_ALL)                   // available to all classes
-            return false;
+            return '';
 
         $tmp  = [];
         $i    = 1;
-        $base = $asHTML ? '<a href="?class=%d" class="c%1$d">%2$s</a>' : '[class=%d]';
-        $br   = $asHTML ? '' : '[br]';
+
+        switch ($fmt)
+        {
+            case self::FMT_HTML:
+                $base = '<a href="?class=%1$d" class="c%1$d">%2$s</a>';
+                $br   = '';
+                break;
+            case self::FMT_MARKUP:
+                $base = '[class=%1$d]';
+                $br   = '[br]';
+                break;
+            case self::FMT_RAW:
+            default:
+                $base = '%2$s';
+                $br   = '';
+        }
 
         while ($classMask)
         {
@@ -420,20 +447,34 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString(int $raceMask, array &$ids = [], bool $asHTML = true) : string
+    public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $raceMask &= RACE_MASK_ALL;                         // clamp to available races..
 
         if ($raceMask == RACE_MASK_ALL)                     // available to all races (we don't display 'both factions')
-            return false;
+            return '';
 
         if (!$raceMask)
-            return false;
+            return '';
 
         $tmp  = [];
         $i    = 1;
-        $base = $asHTML ? '<a href="?race=%d" class="q1">%s</a>' : '[race=%d]';
-        $br   = $asHTML ? '' : '[br]';
+
+        switch ($fmt)
+        {
+            case self::FMT_HTML:
+                $base = '<a href="?race=%1$d" class="c%1$d">%2$s</a>';
+                $br   = '';
+                break;
+            case self::FMT_MARKUP:
+                $base = '[race=%1$d]';
+                $br   = '[br]';
+                break;
+            case self::FMT_RAW:
+            default:
+                $base = '%2$s';
+                $br   = '';
+        }
 
         if ($raceMask == RACE_MASK_HORDE)
             return self::game('ra', -2);
@@ -456,30 +497,28 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function formatSkillBreakpoints(array $bp, bool $html = false) : string
+    public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
     {
-        $tmp = Lang::game('difficulty').Lang::main('colon');
+        $tmp = self::game('difficulty').self::main('colon');
+
+        switch ($fmt)
+        {
+            case self::FMT_HTML:   $base = '<span class="r%1$d">%2$s</span> '; break;
+            case self::FMT_MARKUP: $base = '[color=r%1$d]%2$s[/color] '; break;
+            case self::FMT_RAW:
+            default:               $base = '%2$s '; break;
+        }
 
         for ($i = 0; $i < 4; $i++)
             if (!empty($bp[$i]))
-                $tmp .= $html ? '<span class="r'.($i + 1).'">'.$bp[$i].'</span> ' : '[color=r'.($i + 1).']'.$bp[$i].'[/color] ';
+                $tmp .= sprintf($base, $i + 1, $bp[$i]);
 
         return trim($tmp);
     }
 
-    public static function nf($number, $decimals = 0, $no1k = false)
+    public static function nf(float $number, int $decimals = 0, bool $no1k = false) : string
     {
-        //               [decimal, thousand]
-        $seps = array(
-            LOCALE_EN => [',', '.'],
-            LOCALE_FR => [' ', ','],
-            LOCALE_DE => ['.', ','],
-            LOCALE_CN => [',', '.'],
-            LOCALE_ES => ['.', ','],
-            LOCALE_RU => [' ', ',']
-        );
-
-        return number_format($number, $decimals, $seps[User::$localeId][1], $no1k ? '' : $seps[User::$localeId][0]);
+        return number_format($number, $decimals, self::main('nfSeparators', 1), $no1k ? '' : self::main('nfSeparators', 0));
     }
 
     public static function typeName(int $type) : string
@@ -519,7 +558,7 @@ class Lang
         return implode(', ', $result);
     }
 
-    private static function vspf($var, array $args = [])
+    private static function vspf(/* array|string */ $var, array $args = []) // : array|string
     {
         if (is_array($var))
         {

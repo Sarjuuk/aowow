@@ -103,7 +103,7 @@ class ObjectPage extends GenericPage
                 break;
             default:                                            // requires key .. maybe
             {
-                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true);
+                $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true, Lang::FMT_MARKUP);
                 $l = [];
 
                 foreach ($ids as $type => $typeIds)

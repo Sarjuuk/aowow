@@ -129,6 +129,7 @@ $lang = array(
         'dateFmtShort'  => "d/m/Y",
         'dateFmtLong'   => "d/m/Y \a \l\a\s H:i A",
         'timeAgo'       => 'hace %s',
+        'nfSeparators'  => ['.', ','],
 
         // error
         'intError'      => "Un error interno ha ocurrido.",
