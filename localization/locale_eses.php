@@ -1457,9 +1457,6 @@ $lang = array(
         'procChance'    => "Probabilidad de que accione",
         'starter'       => "Hechizo inicial",
         'trainingCost'  => "Costo de enseñanza",
-        'castIn'        => "Hechizo de %s seg",
-        'instantPhys'   => "Instante",
-        'instantMagic'  => "Hechizo instantáneo",
         'channeled'     => "Canalizado",
         'range'         => "Alcance de %s m",
         'meleeRange'    => "Alcance de ataques cuerpo a cuerpo",
@@ -1473,6 +1470,19 @@ $lang = array(
         'stackGroup'    => "Grupo de aplilamiento",
         'linkedWith'    => "Asociado con",
         '_scaling'      => "Escala",
+        'instantPhys'   => "Instantáneo",
+        'castTime' => array(
+            "Hechizo instantáneo",
+            "%.3g s para lanzar",
+            "Hechizo de %.3g min"
+        ),
+        'cooldown' => array(
+            "Reutilización instantánea",
+            "Reutilización: %.3g s",
+            "Reutilización: %.3g min",
+         // "Reutilización: %.3g h",
+         // "Reutilización: %.3g días"
+        ),
         'duration'      => array(
             "hasta cancelación",
             "%.2G s",
@@ -1487,10 +1497,16 @@ $lang = array(
             "%d |4hora restante:horas restantes;",
             "%d |4día restante:días restantes;"
         ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
-            'dotSP'    => "+%.2f%% del poder de hechizo por tick",                   'dotAP'    => "+%.2f%% del poder de ataque por tick"
+        'powerCost'     => array(
+            -2 => ["Salud %d",         "%d p. de salud, más %d p. por segundo"],
+             0 => ["%d p. de maná",    "%d p. de maná, más %d por s"],
+             1 => ["%d p. de ira",     "%d Ira, más %d por s"],
+             2 => ["%d p. de enfoque", "%d enfoque, más %d por s"],
+             3 => ["%d p. de energía", "%d energía, más %d por s"],
+             6 => ["%d Poder rúnico",  "%d poder rúnico, más %d por segundo"]
         ),
+        'powerDisplayCost' => ["%d %s", "%d %s, más %d por seg."],
+        'powerCostRunes'=> ["%d sangre", "%d Profano", "%d Escarcha"],
         'powerRunes'    => ["Sangre", "Profano", "Escarcha", "Muerte"],
         'powerTypes'    => array(
             // conventional
@@ -1499,6 +1515,10 @@ $lang = array(
             // powerDisplay
               -1 => "Munición",          -41 => "Pirita",            -61 => "Presión de vapor", -101 => "Calor",            -121 => "Moco",             -141 => "Poder de sangre",
             -142 => "Cólera"
+        ),
+        'scaling'       => array(
+            'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
+            'dotSP'    => "+%.2f%% del poder de hechizo por tick",                     'dotAP'    => "+%.2f%% del poder de ataque por tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",

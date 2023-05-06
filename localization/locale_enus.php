@@ -1457,9 +1457,6 @@ $lang = array(
         'procChance'    => "Proc chance",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost",
-        'castIn'        => "%s sec cast",                   // SPELL_CAST_TIME_SEC
-        'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
-        'instantMagic'  => "Instant cast",                  // SPELL_CAST_TIME_INSTANT
         'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED
         'range'         => "%s yd range",                   // SPELL_RANGE / SPELL_RANGE_DUAL
         'meleeRange'    => "Melee Range",                   // MELEE_RANGE
@@ -1473,6 +1470,19 @@ $lang = array(
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",
+        'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
+        'castTime' => array(
+            "Instant cast",                                 // SPELL_CAST_TIME_INSTANT
+            "Wirken in %.3g Sek.",                          // SPELL_CAST_TIME_SEC
+            "Wirken in %.3g Min."                           // SPELL_CAST_TIME_MIN
+        ),
+        'cooldown' => array(
+            "Instant cooldown",                             // SPELL_RECAST_TIME_INSTANT not used?
+            "%.3g sec cooldown",                            // SPELL_RECAST_TIME_SEC
+            "%.3g min cooldown",                            // SPELL_RECAST_TIME_MIN
+         // "%.3g hour cooldown",                           // SPELL_RECAST_TIME_HOURS not in 3.3.5
+         // "%.3g day cooldown"                             // SPELL_RECAST_TIME_DAYS not in 3.3.5
+        ),
         'duration'      => array(                           // SPELL_DURATION_*
             "until cancelled",
             "%.2G sec",
@@ -1487,11 +1497,17 @@ $lang = array(
             "%d |4hour:hours; remaining",
             "%d |4day:days; remaining"
         ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
-            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
+        'powerCost'     => array(
+            -2 => ["%d Health",      "%d Health, plus %d per sec"     ],    // HEALTH_COST        HEALTH_COST_PER_TIME
+             0 => ["%d Mana",        "%d Mana, plus %d per sec"       ],    // MANA_COST          MANA_COST_PER_TIME
+             1 => ["%d Rage",        "%d Rage, plus %d per sec"       ],    // RAGE_COST          RAGE_COST_PER_TIME
+             2 => ["%d Focus",       "%d Focus, plus %d per sec"      ],    // FOCUS_COST         FOCUS_COST_PER_TIME
+             3 => ["%d Energy",      "%d Energy, plus %d per sec"     ],    // ENERGY_COST        ENERGY_COST_PER_TIME
+             6 => ["%d Runic Power", "%d Runic Power, plus %d per sec"],    // RUNIC_POWER_COST   RUNIC_POWER_COST_PER_TIME
         ),
-        'powerRunes'    => ["Blood", "Unholy", "Frost", "Death"], // RUNE_COST_* / COMBAT_TEXT_RUNE_*
+        'powerDisplayCost' => ["%d %s", "%d %s, plus %d per sec"],          // POWER_DISPLAY_COST POWER_DISPLAY_COST_PER_TIME
+        'powerCostRunes'=> ["%d Blood", "%d Unholy", "%d Frost"],   // RUNE_COST_*
+        'powerRunes'    => ["Blood", "Unholy", "Frost", "Death"],   // COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(
             // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER / *_COST / *COST_PER_TIME
               -2 => "Health",              0 => "Mana",                1 => "Rage",                2 => "Focus",               3 => "Energy",              4 => "Happiness",
@@ -1499,6 +1515,10 @@ $lang = array(
             // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
               -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
+        ),
+        'scaling'       => array(
+            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
+            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",

@@ -765,59 +765,66 @@ class SpellList extends BaseType
     {
         $str = '';
 
-        // check for custom PowerDisplay
-        $pt = $this->curTpl['powerType'];
+        $pt   = $this->curTpl['powerType'];
+        $pc   = $this->curTpl['powerCost'];
+        $pcp  = $this->curTpl['powerCostPercent'];
+        $pps  = $this->curTpl['powerPerSecond'];
+        $pcpl = $this->curTpl['powerCostPerLevel'];
+
+        if ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER)
+            $pc /= 10;
 
         if ($pt == POWER_RUNE && ($rCost = ($this->curTpl['powerCostRunes'] & 0x333)))
-        {   // Frost 2|1 - Unholy 2|1 - Blood 2|1
+        {   // Blood 2|1 - Unholy 2|1 - Frost 2|1
             $runes = [];
-            if ($_ = (($rCost & 0x300) >> 8))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 2);
-            if ($_ = (($rCost & 0x030) >> 4))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 1);
-            if ($_ =  ($rCost & 0x003))
-                $runes[] = $_.' '.Lang::spell('powerRunes', 0);
 
-            $str .= implode(', ', $runes);
+            for ($i = 0; $i < 3; $i++)
+            {
+                if ($rCost & 0x3)
+                    $runes[] = Lang::spell('powerCostRunes', $i, [$rCost & 0x3]);
+
+                $rCost >>= 4;
+            }
+
+            $str .= implode(' ', $runes);
         }
-        else if ($this->curTpl['powerCostPercent'] > 0)     // power cost: pct over static
-            $str .= $this->curTpl['powerCostPercent']."% ".sprintf(Lang::spell('pctCostOf'), mb_strtolower(Lang::spell('powerTypes', $pt)));
-        else if ($this->curTpl['powerCost'] > 0 || $this->curTpl['powerPerSecond'] > 0 || $this->curTpl['powerCostPerLevel'] > 0)
-            $str .= ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER ? $this->curTpl['powerCost'] / 10 : $this->curTpl['powerCost']).' '.Util::ucFirst(Lang::spell('powerTypes', $pt));
-
-        // append periodic cost
-        if ($this->curTpl['powerPerSecond'] > 0)
-            $str .= sprintf(Lang::spell('costPerSec'), $this->curTpl['powerPerSecond']);
+        else if ($pcp > 0)                                  // power cost: pct over static
+            $str .= $pcp."% ".sprintf(Lang::spell('pctCostOf'), mb_strtolower(Lang::spell('powerTypes', $pt)));
+        else if ($pc > 0 || $pps > 0 || $pcpl > 0)
+        {
+            if (Lang::exist('spell', 'powerCost', $pt))
+                $str .= Lang::spell('powerCost', $pt,   intVal($pps > 0), [$pc, $pps]);
+            else
+                $str .= Lang::spell('powerDisplayCost', intVal($pps > 0), [$pc, Lang::spell('powerTypes', $pt), $pps]);
+        }
 
         // append level cost (todo (low): work in as scaling cost)
-        if ($this->curTpl['powerCostPerLevel'] > 0)
-            $str .= sprintf(Lang::spell('costPerLevel'), $this->curTpl['powerCostPerLevel']);
+        if ($pcpl > 0)
+            $str .= sprintf(Lang::spell('costPerLevel'), $pcpl);
 
         return $str;
     }
 
     public function createCastTimeForCurrent($short = true, $noInstant = true)
     {
-        if ($this->isChanneledSpell())
+        if (!$this->curTpl['castTime'] && $this->isChanneledSpell())
             return Lang::spell('channeled');
-        else if ($this->curTpl['castTime'] > 0)
-            return $short ? sprintf(Lang::spell('castIn'), $this->curTpl['castTime']) : Util::formatTime($this->curTpl['castTime'] * 1000);
+        // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
+        else if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
+            return Lang::spell('instantPhys');
         // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
-        // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
-        else if ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY)
-            return Lang::spell('instantPhys');
-        else                                                // instant cast
-            return Lang::spell('instantMagic');
+        else
+            return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : Util::formatTime($this->curTpl['castTime'] * 1000);
     }
 
     private function createCooldownForCurrent()
     {
         if ($this->curTpl['recoveryTime'])
-            return sprintf(Lang::game('cooldown'), Util::formatTime($this->curTpl['recoveryTime'], true));
+            return Lang::formatTime($this->curTpl['recoveryTime'], 'spell', 'cooldown');
         else if ($this->curTpl['recoveryCategory'])
-            return sprintf(Lang::game('cooldown'), Util::formatTime($this->curTpl['recoveryCategory'], true));
+            return Lang::formatTime($this->curTpl['recoveryCategory'], 'spell', 'cooldown');
         else
             return '';
     }

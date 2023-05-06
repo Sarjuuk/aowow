@@ -1456,9 +1456,6 @@ $lang = array(
         'procChance'    => "触发几率",
         'starter'       => "Starter spell",
         'trainingCost'  => "训练成本",
-        'castIn'        => "%s秒施法时间",
-        'instantPhys'   => "瞬发",
-        'instantMagic'  => "瞬发",
         'channeled'     => "需引导",
         'range'         => "%s码范围",
         'meleeRange'    => "近战范围",
@@ -1472,6 +1469,19 @@ $lang = array(
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "缩放比例",
+        'instantPhys'   => "瞬发",
+        'castTime' => array(
+            "瞬发法术",
+            "%.3g秒施法时间",
+            "%.3g分钟施法时间"
+        ),
+        'cooldown' => array(
+            "即时冷却",
+            "%.3g秒冷却时间",
+            "%.3g分钟冷却时间",
+         // "%.3g小时冷却时间",
+         // "%.3g天冷却时间"
+        ),
         'duration'      => array(
             "直到主动取消",
             "%.2G秒",
@@ -1486,10 +1496,16 @@ $lang = array(
             "剩余%d小时",
             "剩余%d天"
         ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
-            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
+        'powerCost'     => array(
+            -2 => ["%d生命值",   "%d生命值，每秒增加%d"     ],
+             0 => ["%d法力值",   "%d点法力值，外加每秒%d点" ],
+             1 => ["%d怒气",     "%d怒气，外加每秒%d"       ],
+             2 => ["%d集中",     "%d集中，外加每秒%d"       ],
+             3 => ["%d能量",     "%d能量，外加每秒%d"       ],
+             6 => ["%d符文能量", "%d点符文能量，外加每秒%d点"],
         ),
+        'powerDisplayCost' => ["%d %s", "%d %s，再加上每秒%d"],
+        'powerCostRunes'=> ["%d鲜血", "%d邪恶", "%d冰霜"],
         'powerRunes'    => ["鲜血", "邪恶", "冰霜", "死亡"],
         'powerTypes'    => array(
             // conventional
@@ -1498,6 +1514,10 @@ $lang = array(
             // powerDisplay
               -1 => "Ammo",              -41 => "蓝铁",            -61 => "蒸汽动力",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
+        ),
+        'scaling'       => array(
+            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
+            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",

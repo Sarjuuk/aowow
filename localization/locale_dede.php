@@ -1457,9 +1457,6 @@ $lang = array(
         'procChance'    => "Procchance",
         'starter'       => "Basiszauber",
         'trainingCost'  => "Trainingskosten",
-        'castIn'        => "Wirken in %s Sek.",
-        'instantPhys'   => "Sofort",
-        'instantMagic'  => "Spontanzauber",
         'channeled'     => "Kanalisiert",
         'range'         => "%s Meter Reichweite",
         'meleeRange'    => "Nahkampfreichweite",
@@ -1473,6 +1470,19 @@ $lang = array(
         'stackGroup'    => "Stack Gruppierung",
         'linkedWith'    => "Verknüpft mit",
         '_scaling'      => "Skalierung",
+        'instantPhys'   => "Sofort",
+        'castTime' => array(
+            "Spontanzauber",
+            "Wirken in %.3g Sek.",
+            "Wirken in %.3g Min."
+        ),
+        'cooldown' => array(
+            "Keine Abklingzeit",
+            "%.3g Sek. Abklingzeit",
+            "%.3g Min. Abklingzeit",
+         // "%.3g |4Stunde:Stunden; Abklingzeit",
+         // "%.3g |4Tag:Tage; Abklingzeit"
+        ),
         'duration'      => array(
             "bis Abbruch",
             "%.2G Sek.",
@@ -1487,10 +1497,16 @@ $lang = array(
             "Noch %d |4Stunde:Stunden;",
             "Noch %d |4Tag:Tage;"
         ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",
-            'dotSP'    => "+%.2f%% der Zaubermacht pro Tick",                    'dotAP'    => "+%.2f%% der Angriffskraft pro Tick"
+        'powerCost'     => array(
+           -2 => ["%d Gesundheit", '%1$d Gesundheit und %2$d pro Sek.'],
+            0 => ["%d Mana",       '%1$d Mana und %2$d pro Sek.'      ],
+            1 => ["%d Wut",        '%1$d Wut und %2$d pro Sek.'       ],
+            2 => ["%d Fokus",      "%d Fokus und %d pro Sek."         ],
+            3 => ["%d Energie",    "%d Energie und %d pro Sek."       ],
+            6 => ["%d Runenmacht", "%d Runenmacht, plus %d pro Sek."  ],
         ),
+        'powerDisplayCost' => ["%d %s", "%d %s, plus %d pro Sek"],
+        'powerCostRunes'=> ["%d Blut", "%d Unheilig", "%d Frost"],
         'powerRunes'    => ["Blut", "Unheilig", "Frost", "Tod"],
         'powerTypes'    => array(
             // conventional
@@ -1499,6 +1515,10 @@ $lang = array(
             // powerDisplay
               -1 => "Munition",          -41 => "Pyrit",             -61 => "Dampfdruck",       -101 => "Hitze",            -121 => "Schlamm",          -141 => "Blutmacht",
             -142 => "Wrath"
+        ),
+        'scaling'       => array(
+            'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",
+            'dotSP'    => "+%.2f%% der Zaubermacht pro Tick",                    'dotAP'    => "+%.2f%% der Angriffskraft pro Tick"
         ),
         'relItems'      => array(
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",

@@ -1457,9 +1457,6 @@ $lang = array(
         'procChance'    => "Шанс срабатывания",
         'starter'       => "Начальное заклинание",
         'trainingCost'  => "Цена обучения",
-        'castIn'        => "Применение: %s сек.",
-        'instantPhys'   => "Мгновенное действие",
-        'instantMagic'  => "Мгновенное действие",
         'channeled'     => "Направляемое",
         'range'         => "Радиус действия: %s м",
         'meleeRange'    => "Дистанция ближнего боя",
@@ -1473,6 +1470,19 @@ $lang = array(
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
+        'instantPhys'   => "Мгновенное действие",
+        'castTime' => array(
+            "Мгновенное действие",
+            "Применение: %.3g сек.",
+            "применение заклинания: %.3g мин."
+        ),
+        'cooldown'      => array(
+            "Мгновенное восстановление",
+            "Восстановление: %.3g сек.",
+            "Восстановление: %.3g мин.",
+         // "Восстановление: %.3g ч.",
+         // "Восстановление: %.3g д."
+        ),
         'duration'      => array(
             "до отмены",
             "%.2G сек",
@@ -1487,10 +1497,16 @@ $lang = array(
             "Осталось: %d |4час:часа:часов;",
             "Осталось: %d |4день:дня:дней;"
         ),
-        'scaling'       => array(
-            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
-            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
-        ),
+        'powerCost'     => array(
+            -2 => ["Здоровье: %d",                                    "Здоровье: %d плюс %d/сек."],
+             0 => ["Мана: %d",                                        "Мана: %d плюс %d/сек"     ],
+             1 => ["Ярость: %d",                                      "Ярость: %d плюс %d/сек"   ],
+             2 => ["Тонус: %d",                                       "Тонус: %d плюс %d/сек."   ],
+             3 => ["Энергия: %d",                                     "Энергия: %d плюс %d/сек." ],
+             6 => ["Требуется %d |4единица:единицы:единиц; силы рун", "Cила рун: %d плюс %d/сек" ],
+         ),
+        'powerDisplayCost' => ['%2$s: %1$d', "%d %s и %d в сек. дополнительно"],
+        'powerCostRunes'=> ["%d |4руна:руны:рун; крови", "%d |4руна:руны:рун; нечестивости", "%d |4руна:руны:рун; льда"],
         'powerRunes'    => ["Руна крови", "Руна льда", "Лед", "Смерти"],
         'powerTypes'    => array(
             // conventional
@@ -1499,6 +1515,10 @@ $lang = array(
             // powerDisplay
               -1 => "Боеприпасы",        -41 => "Колчедан",          -61 => "Давление пара",    -101 => "Жар",              -121 => "Слизнюк",          -141 => "Сила крови",
             -142 => "Гнев"
+        ),
+        'scaling'       => array(
+            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
+            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
         ),
         'relItems'      => array(
             'base'    => "<small>Показать %s, относящиеся к профессии <b>%s</b></small>",

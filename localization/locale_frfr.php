@@ -1457,9 +1457,6 @@ $lang = array(
         'procChance'    => "Chance",
         'starter'       => "Sortilège initiaux",
         'trainingCost'  => "Coût d'entraînement",
-        'castIn'        => "%s s d'incantation",
-        'instantPhys'   => "Incantation immédiate",
-        'instantMagic'  => "Instantanée",
         'channeled'     => "Canalisée",
         'range'         => "%s m de portée",
         'meleeRange'    => "Allonge",
@@ -1473,6 +1470,19 @@ $lang = array(
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",
+        'instantPhys'   => "Instantané",
+        'castTime' => array(
+            "Incantation immédiate",
+            "%.3g sec. d'incantation",
+            "%.3g min d'incantation"
+        ),
+        'cooldown' => array(
+            "Recharge instantanée",
+            "%.3g sec. de recharge",                        // "Recharge en cours : %d |4seconde:secondes;";
+            "%.3g min de recharge",                         // "Recharge en cours : %d |4minute:minutes;";
+         // "Recharge en cours : %d |4heure:heures;",
+         // "Recharge en cours : %d |4jour:jours;"
+        ),
         'duration'      => array(
             "jusqu’à annulation",
             "%.2G sec.",
@@ -1487,10 +1497,16 @@ $lang = array(
             "%d |4heure restante:heures restantes;",
             "%d |4jour restant:jours restants;"
         ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",
-            'dotSP'    => "+%.2f%% de la puissance des sorts par tick",       'dotAP'    => "+%.2f%% de la puissance d'attaque par tick"
+        'powerCost'     => array(
+            -2 => ["%d points de vie",     "Points de vie %d, plus %d par sec."     ],
+             0 => ["Mana : %d",            "%d mana, plus %d par sec."              ],
+             1 => ["Rage : %d",            "Rage %d, plus %d par sec."              ],
+             2 => ["Focalisation : %d",    "Focalisation %d, plus %d par sec."      ],
+             3 => ["Énergie : %d",         "Énergie %d, plus %d par sec."           ],
+             6 => ["%d puissance runique", "%d puissance runique, plus %d par sec." ],
         ),
+        'powerDisplayCost' => ["%d %s", "%d %s, plus %d par seconde"],
+        'powerCostRunes'=> ["%d sang", "%d impie", "%d givre"],
         'powerRunes'    => ["Sang", "Impie", "Givre", "Mort"],
         'powerTypes'    => array(
             // conventional
@@ -1499,6 +1515,10 @@ $lang = array(
             // powerDisplay
               -1 => "Munitions",         -41 => "Pyrite",            -61 => "Pression vapeur",  -101 => "Chaleur",          -121 => "Limon",            -141 => "Puissance de sang",
             -142 => "Courroux"
+        ),
+        'scaling'       => array(
+            'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",
+            'dotSP'    => "+%.2f%% de la puissance des sorts par tick",       'dotAP'    => "+%.2f%% de la puissance d'attaque par tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Montre %s reliés à <b>%s</b></small>",

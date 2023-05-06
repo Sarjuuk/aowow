@@ -69,38 +69,41 @@ class Lang
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
     }
 
-    public static function __callStatic(string $prop, array $args) : ?string
+    public static function __callStatic(string $prop, array $args) // : ?string|array
+    {
+        $vspfArgs = [];
+        foreach ($args as $i => $arg)
+        {
+            if (!is_array($arg))
+                continue;
+
+            $vspfArgs = $arg;
+            unset($args[$i]);
+        }
+
+        if ($x = self::exist($prop, ...$args))
+            return self::vspf($x, $vspfArgs);
+
+        $dbt  = debug_backtrace()[0];
+        $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
+        trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
+    }
+
+    public static function exist(string $prop, ...$args)
     {
         if (!isset(self::$$prop))
-        {
-            $dbt  = debug_backtrace()[0];
-            $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
-            trigger_error('Lang - tried to use undefined property Lang::$'.$prop.', called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
             return null;
-        }
 
-        $vspfArgs = [];
-
-        $var = self::$$prop;
-        foreach ($args as $arg)
+        $ref = self::$$prop;
+        foreach ($args as $a)
         {
-            if (is_array($arg))
-            {
-                $vspfArgs = $arg;
-                continue;
-            }
-            else if (!isset($var[$arg]))
-            {
-                $dbt  = debug_backtrace()[0];
-                $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
-                trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
+            if (!isset($ref[$a]))
                 return null;
-            }
 
-            $var = $var[$arg];
+            $ref = $ref[$a];
         }
 
-        return self::vspf($var, $vspfArgs);
+        return $ref;
     }
 
     public static function concat(array $args, bool $useAnd = true, ?callable $callback = null) : string
@@ -531,7 +534,9 @@ class Lang
         if ($msec < 0)
             $msec = 0;
 
-        [$ms, $s, $m, $h, $d] = Util::parseTime($msec);
+        $time   = Util::parseTime($msec);                   // [$ms, $s, $m, $h, $d]
+        $mult   = [0, 1000, 60, 60, 24];
+        $total  = 0;
         $ref    = [];
         $result = [];
 
@@ -543,19 +548,36 @@ class Lang
             return '';
         }
 
-        if ($d >= 1)
-            $result[] = self::vspf($ref[4], [$d + $h / 24]);
-        if ($h >= 1 && ($concat || !$result))
-            $result[] = self::vspf($ref[3], [$h + $m / 60]);
-        if ($m >= 1 && ($concat || !$result))
-            $result[] = self::vspf($ref[2], [$m + $s / 60]);
-        if ($s >= 1 && ($concat || !$result))
-            $result[] = self::vspf($ref[1], [$s]);
+        if (!$msec)
+            return self::vspf($ref[0], [0]);
 
-        if (!$result)
-            $result[] = self::vspf($ref[0]);
+        if ($concat)
+        {
+            for ($i = 4; $i > 0; $i--)
+            {
+                $total += $time[$i];
+                if (isset($ref[$i]) && ($total || ($i == 1 && !$result)))
+                {
+                    $result[] = self::vspf($ref[$i], [$total]);
+                    $total = 0;
+                }
+                else
+                    $total *= $mult[$i];
+            }
 
-        return implode(', ', $result);
+            return implode(', ', $result);
+        }
+
+        for ($i = 4; $i > 0; $i--)
+        {
+            $total += $time[$i];
+            if (isset($ref[$i]) && ($total || $i == 1))
+                return self::vspf($ref[$i], [$total + ($time[$i-1] ?? 0) / $mult[$i]]);
+            else
+                $total *= $mult[$i];
+        }
+
+        return '';
     }
 
     private static function vspf(/* array|string */ $var, array $args = []) // : array|string
