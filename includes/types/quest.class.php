@@ -451,7 +451,7 @@ class QuestListFilter extends Filter
         25 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
         27 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_DAILY          ], // daily
         28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
-        29 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_REPEATABLE     ], // repeatable
+        29 => [FILTER_CR_CALLBACK,  'cbRepeatable',     null                      ], // repeatable
         30 => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,         true], // id
         33 => [FILTER_CR_ENUM,      'e.holidayId'                                 ], // relatedevent
         34 => [FILTER_CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
@@ -612,6 +612,17 @@ class QuestListFilter extends Filter
             return [['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0];
         else
             return ['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'];
+    }
+
+    protected function cbRepeatable($cr)
+    {
+        if (!$this->int2Bool($cr[1]))
+            return false;
+
+        if ($cr[1])
+            return ['OR', ['flags', QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&']];
+        else
+            return ['AND', [['flags', QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&'], 0]];
     }
 
     protected function cbItemChoices($cr)
