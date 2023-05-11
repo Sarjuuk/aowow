@@ -16081,7 +16081,7 @@ Listview.templates = {
 
                     // aowow custom
                     if (profile.renameItr) {
-                        $WH.ae(s, $WH.ct(LANG.pr_note_pendingrename));
+                        $WH.ae(d, $WH.ce('span', { className: 'q0'}, $WH.ct(LANG.pr_note_pendingrename)));
                     }
                     // end aowow custom
 
