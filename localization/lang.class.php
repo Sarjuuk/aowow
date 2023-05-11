@@ -3,6 +3,7 @@
 class Lang
 {
     private static $timeUnits;
+    private static $lang;
     private static $main;
     private static $account;
     private static $user;

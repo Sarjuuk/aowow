@@ -16,6 +16,7 @@ $lang = array(
         'pl'            => ["年", "月", "周", "天", "小时", "分钟", "秒", "毫秒"],
         'ab'            => ["年",    "月",     "周",    "天",  "小时",    "分钟",     "秒",     "毫秒"]
     ),
+    'lang' => ['英语', null, '法语', '德语', '中文', null, '西班牙语', null, '俄语'],
     'main' => array(
         'name'          => "名字",
         'link'          => "链接",
@@ -99,7 +100,7 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "该页面仅以<b>英语</b>提供。",
+        'langOnly'   => "该页面仅以<b>%s</b>提供。",
 
         // calculators
         'preset'        => "预设",

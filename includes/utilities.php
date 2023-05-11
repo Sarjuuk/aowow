@@ -18,6 +18,10 @@ class SimpleXML extends SimpleXMLElement
 
 trait TrRequestData
 {
+    // const in trait supported in php8.2+
+    public static $PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
+    public static $PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
+
     private $filtered = false;
 
     private function initRequestData() : void
@@ -61,7 +65,7 @@ trait TrRequestData
         return $val === '';                                 // parameter is expected to be empty
     }
 
-    public static function checkInt(string $val) : int
+    private static function checkInt(string $val) : int
     {
         if (preg_match('/^-?\d+$/', $val))
             return intVal($val);
@@ -112,13 +116,13 @@ trait TrRequestData
     private static function checkTextLine(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace('/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
+        return preg_replace(self::$PATTERN_TEXT_LINE, '', $val);
     }
 
     private static function checkTextBlob(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace('/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui', '', $val);
+        return preg_replace(self::$PATTERN_TEXT_BLOB, '', $val);
     }
 }
 

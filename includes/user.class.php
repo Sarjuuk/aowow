@@ -677,7 +677,7 @@ class User
         if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GUIDE_STATUS_ARCHIVED))
         {
             // fix url
-            array_walk($guides, fn(&$x) => $x['url'] = '/?guide='.($x['url'] ?? $x['id']));
+            array_walk($guides, fn(&$x) => $x['url'] = '?guide='.($x['url'] ?? $x['id']));
             $result = $guides;
         }
 

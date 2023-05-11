@@ -44,7 +44,7 @@ class GuidePage extends GenericPage
         'submit'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet'],
         'title'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
         'name'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
-        'description' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob'],
+        'description' => ['filter' => FILTER_CALLBACK, 'options' => 'GuidePage::checkDescription'],
         'changelog'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob'],
         'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob'],
         'locale'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
@@ -521,7 +521,7 @@ class GuidePage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->name;
+            $power->{'name_'.User::$localeString}    = strip_tags($this->name);
             $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
         }
 
@@ -549,6 +549,16 @@ class GuidePage extends GenericPage
         // increment views of published guide; ignore caching
         if ($this->subject?->getField('status') == GUIDE_STATUS_APPROVED)
             DB::Aowow()->query('UPDATE ?_guides SET `views` = `views` + 1 WHERE `id` = ?d', $this->typeId);
+    }
+
+    protected static function checkDescription(string $str) : string
+    {
+        // run checkTextBlob and also replace \n => \s and \s+ => \s
+        $str = preg_replace(parent::$PATTERN_TEXT_BLOB, '', $str);
+
+        $str = strtr($str, ["\n" => ' ', "\r" => ' ']);
+
+        return preg_replace('/\s+/', ' ', trim($str));
     }
 }
 

@@ -652,7 +652,7 @@ var PageTemplate = new function()
 
         $.each(g_user.guides, function(idx, guide)
         {
-            var menuItem = [guide.id, guide.title, guide.url, [[guide.id, LANG.button_edit, '/?guide=edit&id=' + guide.id]]];
+            var menuItem = [guide.id, guide.title, guide.url, [[guide.id, LANG.button_edit, '?guide=edit&id=' + guide.id]]];
 
             submenu.push(menuItem);
         });

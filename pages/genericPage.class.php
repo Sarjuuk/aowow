@@ -567,7 +567,7 @@ class GenericPage
                 $this->infobox = $article['quickInfo'];
 
             if ($article['locale'] != User::$localeId)
-                $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('englishOnly').'</span></div>';
+                $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('langOnly', [Lang::lang($article['locale'])]).'</span></div>';
 
             if (method_exists($this, 'postArticle'))        // e.g. update variables in article
                 $this->postArticle();

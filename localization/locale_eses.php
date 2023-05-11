@@ -16,6 +16,7 @@ $lang = array(
         'pl'            => ["años", "meses", "semanas", "dias", "horas", "minutos", "segundos", "milisegundos"],
         'ab'            => ["año",  "mes",   "sem",     "",     "h",     "min",     "seg",      "ms"]
     ),
+    'lang' => ['inglés', null, 'francés', 'alemán', 'chino', null, 'español', null, 'ruso'],
     'main' => array(
         'name'          => "nombre",
         'link'          => "Enlace",
@@ -99,7 +100,7 @@ $lang = array(
         ),
 
         // article & infobox
-        'englishOnly'   => "Esta página sólo está disponible en <b>inglés</b>.",
+        'langOnly'   => "Esta página sólo está disponible en <b>%s</b>.",
 
         // calculators
         'preset'        => "Predet.",
