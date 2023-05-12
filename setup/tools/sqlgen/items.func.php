@@ -185,7 +185,7 @@ SqlGen::register(new class extends SetupScript
         // filter misc(class:15) junk(subclass:0) to appropriate categories
 
         // assign pets and mounts to category
-        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET subClass = IF(effect1AuraId <> 78, 2, IF(effect2AuraId = 207 OR effect3AuraId = 207 OR (s.id <> 65917 AND effect2AuraId = 4 AND effect3Id = 77), -7, 5)) WHERE s.id = spellId2 AND class = 15 AND spellId1 IN (483, 55884)');
+        DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET subClass = IF(effect1AuraId <> 78, 2, IF(effect2AuraId = 207 OR effect3AuraId = 207 OR (s.id <> 65917 AND effect2AuraId = 4 AND effect3Id = 77), -7, 5)) WHERE s.id = spellId2 AND class = 15 AND spellId1 IN (?a)', LEARN_SPELLS);
 
         // more corner cases (mounts that are not actualy learned)
         DB::Aowow()->query('UPDATE ?_items i, dbc_spell s SET i.subClass = -7 WHERE (effect1Id = 64 OR (effect1AuraId = 78 AND effect2AuraId = 4 AND effect3Id = 77) OR effect1AuraId = 207 OR effect2AuraId = 207 OR effect3AuraId = 207) AND s.id = i.spellId1 AND i.class = 15 AND i.subClass = 5');

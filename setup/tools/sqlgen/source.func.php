@@ -50,18 +50,17 @@ SqlGen::register(new class extends SetupScript
     private function taughtSpell(array $item) : int
     {
         # spelltrigger_X (0: onUse; 6: onLearnSpell)
-        # spell: 483 & 55884 are learn spells
 
         // should not be able to teach spells (recipe || mount || vanityPet)
         if ($item['class'] != ITEM_CLASS_RECIPE && ($item['class'] != ITEM_CLASS_MISC || ($item['subclass'] != 2 && $item['subclass'] != 5)))
             return 0;
 
         // wotlk system
-        if (($item['spellid_1'] == 483 || $item['spellid_1'] == 55884) && $item['spelltrigger_1'] == 0 && $item['spellid_2'] > 0 && $item['spelltrigger_2'] == 6)
+        if (in_array($item['spellid_1'], LEARN_SPELLS) && $item['spelltrigger_1'] == 0 && $item['spellid_2'] > 0 && $item['spelltrigger_2'] == 6)
             return $item['spellid_2'];
 
         // deprecated system
-        if ($item['spellid_1'] != 483 && $item['spellid_1'] != 55884 && $item['spellid_1'] > 0 && $item['spelltrigger_1'] == 0)
+        if (!in_array($item['spellid_1'], LEARN_SPELLS) && $item['spellid_1'] > 0 && $item['spelltrigger_1'] == 0)
             return $item['spellid_1'];
 
         return 0;

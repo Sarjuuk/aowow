@@ -1386,8 +1386,7 @@ class ItemList extends BaseType
 
     private function canTeachSpell()
     {
-        // 483: learn recipe; 55884: learn mount/pet
-        if (!in_array($this->curTpl['spellId1'], [483, 55884]))
+        if (!in_array($this->curTpl['spellId1'], LEARN_SPELLS))
             return false;
 
         // needs learnable spell
@@ -1990,7 +1989,7 @@ class ItemListFilter extends Filter
         163 => [FILTER_CR_CALLBACK,  'cbDisenchantsInto',      null,                    null          ], // disenchantsinto [disenchanting]
         165 => [FILTER_CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true          ], // repaircost
         167 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                       ], // hasvideos
-        168 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              [483, 55884]  ], // teachesspell [yn] - 483: learn recipe; 55884: learn mount/pet
+        168 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS  ], // teachesspell [yn]
         169 => [FILTER_CR_ENUM,      'e.holidayId'                                                    ], // requiresevent
         171 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otredemption [yn]
         172 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // rewardedbyachievement [yn]

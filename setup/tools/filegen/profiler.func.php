@@ -52,6 +52,8 @@ if (!CLI)
         };
 
 
+        $spellFactions = DB::World()->selectCol('SELECT `alliance_id` AS ARRAY_KEY, 1 FROM player_factionchange_spells UNION SELECT `horde_id` AS ARRAY_KEY, 2 FROM player_factionchange_spells');
+
         /**********/
         /* Quests */
         /**********/
@@ -187,7 +189,7 @@ if (!CLI)
         /**********/
         /* Mounts */
         /**********/
-        $scripts[] = function() use ($exAdd)
+        $scripts[] = function() use ($exAdd, $spellFactions)
         {
             $success   = true;
             $condition = array(
@@ -198,8 +200,6 @@ if (!CLI)
             );
             $mountz = new SpellList($condition);
 
-            // we COULD go into aowow_sources to get the faction of the source and apply it to the spell. .. Or we could keep our sanity and assume TC did nothing wrong. haHA! no!
-            $factionSet   = DB::World()->selectCol('SELECT alliance_id AS ARRAY_KEY, horde_id FROM player_factionchange_spells WHERE alliance_id IN (?a) OR horde_id IN (?a)', $mountz->getFoundIDs(), $mountz->getFoundIDs());
             $conditionSet = DB::World()->selectCol('SELECT SourceEntry AS ARRAY_KEY, ConditionValue1 FROM conditions WHERE SourceTypeOrReferenceId = ?d AND ConditionTypeOrReference = ?d AND SourceEntry IN (?a)', CND_SRC_SPELL, CND_SKILL, $mountz->getFoundIDs());
 
             // get mounts for exclusion
@@ -227,15 +227,9 @@ if (!CLI)
                     else if ($id == 54729)                  // Winged Steed of the Ebon Blade
                         $data['reqclass'] = CLASS_DEATHKNIGHT;
 
-                    if (isset($factionSet[$id]))            // alliance owned
-                        $data['side'] = SIDE_ALLIANCE;
-                    else if (in_array($id, $factionSet))    // horde owned
-                        $data['side'] = SIDE_HORDE;
-                    else
-                        $data['side'] = SIDE_BOTH;
-
                     rsort($data['skill']);                  // riding (777) expected at pos 0
 
+                    $data['side']    = $spellFactions[$id] ?? SIDE_BOTH;
                     $data['quality'] = $data['name'][0];
                     $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
@@ -251,7 +245,7 @@ if (!CLI)
         /**************/
         /* Companions */
         /**************/
-        $scripts[] = function() use ($exAdd)
+        $scripts[] = function() use ($exAdd, $spellFactions)
         {
             $success   = true;
             $condition = array(
@@ -260,6 +254,7 @@ if (!CLI)
                 ['typeCat', -6]
             );
             $companionz = new SpellList($condition);
+            $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ?_items WHERE `class` = ?d AND `subClass` = ?d AND `spellId1` IN (?a) AND `spellId2` IN (?a)', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
 
             foreach (CLISetup::$localeIds as $l)
             {
@@ -271,6 +266,10 @@ if (!CLI)
                 $buff = "var _ = g_spells;\n";
                 foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
                 {
+                    if (!in_array($id, $legit))
+                        continue;
+
+                    $data['side']    = $spellFactions[$id] ?? SIDE_BOTH;
                     $data['quality'] = $data['name'][0];
                     $data['name']    = mb_substr($data['name'], 1);
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
@@ -318,7 +317,7 @@ if (!CLI)
         /***********/
         /* Recipes */
         /***********/
-        $scripts[] = function() use ($exAdd)
+        $scripts[] = function() use ($exAdd, $spellFactions)
         {
             // special case: secondary skills are always requested, so put them in one single file (185, 129, 356); it also contains g_skill_order
             $skills  = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, [185, 129, 356]];
@@ -355,7 +354,10 @@ if (!CLI)
 
                     $buff = '';
                     foreach ($recipez->getListviewData() as $id => $data)
+                    {
+                        $data['side'] = $spellFactions[$id] ?? SIDE_BOTH;
                         $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                    }
 
                     if (!$buff)
                     {

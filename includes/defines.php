@@ -832,6 +832,9 @@ define('ITEM_MOD_SHADOW_POWER',             60);
 define('ITEM_MOD_NATURE_POWER',             61);
 define('ITEM_MOD_ARCANE_POWER',             62);
 
+// learn trigger spells on items - 483: learn recipe; 55884: learn mount/pet
+define('LEARN_SPELLS', [483, 55884]);
+
 // Spell Attributes definitions
 define('SPELL_ATTR0_CU_ENCHANT_PROC',                  0x00000001); //
 define('SPELL_ATTR0_CU_CONE_BACK',                     0x00000002); //

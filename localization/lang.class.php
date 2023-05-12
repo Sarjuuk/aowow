@@ -467,7 +467,7 @@ class Lang
         switch ($fmt)
         {
             case self::FMT_HTML:
-                $base = '<a href="?race=%1$d" class="c%1$d">%2$s</a>';
+                $base = '<a href="?race=%1$d" class="q1">%2$s</a>';
                 $br   = '';
                 break;
             case self::FMT_MARKUP:
