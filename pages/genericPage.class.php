@@ -550,13 +550,13 @@ class GenericPage
                 $this->article['params']['dbpage'] = true;
 
             // convert U_GROUP_* to MARKUP.CLASS_* (as seen in js-object Markup)
-            if($article['editAccess'] & (U_GROUP_ADMIN | U_GROUP_VIP | U_GROUP_DEV))
+            if ($article['editAccess'] & (U_GROUP_ADMIN | U_GROUP_VIP | U_GROUP_DEV))
                 $this->article['params']['allow'] = '$Markup.CLASS_ADMIN';
-            else if($article['editAccess'] & U_GROUP_STAFF)
+            else if ($article['editAccess'] & U_GROUP_STAFF)
                 $this->article['params']['allow'] = '$Markup.CLASS_STAFF';
-            else if($article['editAccess'] & U_GROUP_PREMIUM)
+            else if ($article['editAccess'] & U_GROUP_PREMIUM)
                 $this->article['params']['allow'] = '$Markup.CLASS_PREMIUM';
-            else if($article['editAccess'] & U_GROUP_PENDING)
+            else if ($article['editAccess'] & U_GROUP_PENDING)
                 $this->article['params']['allow'] = '$Markup.CLASS_PENDING';
             else
                 $this->article['params']['allow'] = '$Markup.CLASS_USER';

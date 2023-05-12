@@ -202,7 +202,7 @@ class GuidePage extends GenericPage
 
             // insert Article
             DB::Aowow()->query('INSERT INTO ?_articles (`type`, `typeId`, `locale`, `rev`, `editAccess`, `article`) VALUES (?d, ?d, ?d, ?d, ?d, ?)',
-                Type::GUIDE, $this->typeId, $this->_post['locale'], $rev, User::$groups, $this->_post['body']);
+                Type::GUIDE, $this->typeId, $this->_post['locale'], $rev, User::$groups & U_GROUP_STAFF ? User::$groups : User::$groups | U_GROUP_BLOGGER, $this->_post['body']);
 
             // link to Guide
             $guideData = array(
