@@ -57,20 +57,10 @@ if (!CLI)
 
         $race = function()
         {
-            // where did i get this data again..?
             // { str, agi, sta, int, spi, raceMod1, raceMod2 }
-            $raceData = array(
-                 1 => [20, 20, 20, 20, 20, [], []],
-                 2 => [23, 17, 22, 17, 23, [], []],
-                 3 => [22, 16, 23, 19, 19, [], []],
-                 4 => [17, 25, 19, 20, 20, [], []],
-                 5 => [19, 18, 21, 18, 25, [], []],
-                 6 => [25, 15, 22, 15, 22, [], []],
-                 7 => [15, 23, 19, 24, 20, [], []],
-                 8 => [21, 22, 21, 16, 21, [], []],
-                10 => [17, 22, 18, 24, 19, [], []],
-                11 => [21, 17, 19, 21, 22, [], []]
-            );
+            $raceData = DB::World()->select('SELECT `race` AS ARRAY_KEY, MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 GROUP BY `race` ORDER BY `race` ASC');
+            foreach ($raceData as &$rd)
+                $rd = array_values($rd + [[], []]);
 
             $racials = new SpellList(array(['typeCat', -4], ['reqClassMask', 0]));
             $allMods = $racials->getProfilerMods();
@@ -107,16 +97,17 @@ if (!CLI)
 
             // TrinityCore claims, DodgePerAgi per level and class can be constituted from critPerAgi (and level (and class))
             // who am i to argue
-            // rebase stats to a specific race. chosen human as all stats are 20
+            // rebase stats to a specific race. chosen human as all stats are 20 and tauren for hunter, shaman and druid
+            // the stat gain per level is only dependant on the class. The race only determines the initial stats at level 0
             // level:{ str, agi, sta, int, spi, hp, mana, mleCrt%Agi, splCrt%Int, dodge%Agi, HealthRegenModToBaseStat, HealthRegenModToBonusStat }
 
             foreach ($critToDodge as $class => $mod)
             {
                 // humans can't be hunter, shaman, druids (use tauren here)
                 if (in_array($class, [3, 7, 11]))
-                    $offset = [25, 15, 22, 15, 22];
+                    $offset = array_values(DB::World()->selectRow('SELECT MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 AND `race` = 6'));
                 else
-                    $offset = [20, 20, 20, 20, 20];
+                    $offset = array_values(DB::World()->selectRow('SELECT MIN(`str`), MIN(`agi`), MIN(`sta`), MIN(`inte`), MIN(`spi`) FROM player_levelstats WHERE `level` = 1 AND `race` = 1'));
 
                 $gtData = DB::Aowow()->select('
                     SELECT mlecrt.idx - ?d AS ARRAY_KEY, mlecrt.chance * 100, splcrt.chance * 100, mlecrt.chance * 100 * ?f, baseHP5.ratio * 1, extraHP5.ratio * 1

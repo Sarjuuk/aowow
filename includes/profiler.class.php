@@ -561,31 +561,20 @@ class Profiler
 
 
         // known skills (professions only)
-        $skAllowed = DB::Aowow()->selectCol('SELECT id FROM ?_skillline WHERE typeCat IN (9, 11) AND (cuFlags & ?d) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
-        $skills    = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, skill AS typeId, `value` AS cur, max FROM character_skills WHERE guid = ?d AND skill IN (?a)', $profileId, Type::SKILL, $char['guid'], $skAllowed);
-
-        // manually apply racial profession bonuses
+        $skAllowed = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` IN (9, 11) AND (`cuFlags` & ?d) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        $skills    = DB::Characters($realmId)->select('SELECT ?d AS `id`, ?d AS `type`, `skill` AS typeId, `value` AS cur, `max` FROM character_skills WHERE guid = ?d AND `skill` IN (?a)', $profileId, Type::SKILL, $char['guid'], $skAllowed);
+        $racials   = DB::Aowow()->select('SELECT `effect1MiscValue` AS ARRAY_KEY, `effect1DieSides` + `effect1BasePoints` AS qty, `reqRaceMask`, `reqClassMask` FROM ?_spell WHERE `typeCat` = -4 AND `effect1Id` = 6 AND `effect1AuraId` = 98');
+        // apply racial profession bonuses
         foreach ($skills as &$sk)
         {
-            // Blood Elves - Arcane Affinity
-            if ($sk['typeId'] == 333 && $char['race'] == 10)
+            if (!isset($racials[$sk['typeId']]))
+                continue;
+
+            $r = $racials[$sk['typeId']];
+            if ((!$r['reqRaceMask'] || $r['reqRaceMask'] & (1 << ($char['race'] - 1))) && (!$r['reqClassMask'] || $r['reqClassMask'] & (1 << ($char['class'] - 1))))
             {
-                $sk['cur'] += 10;
-                $sk['max'] += 10;
-            }
-            // Draenei - Gemcutting
-            if ($sk['typeId'] == 755 && $char['race'] == 11)
-            {
-                $sk['cur'] += 5;
-                $sk['max'] += 5;
-            }
-            // Tauren - Cultivation
-            // Gnomes - Engineering Specialization
-            if (($sk['typeId'] == 182 && $char['race'] == 6) ||
-                ($sk['typeId'] == 202 && $char['race'] == 7))
-            {
-                $sk['cur'] += 15;
-                $sk['max'] += 15;
+                $sk['cur'] += $r['qty'];
+                $sk['max'] += $r['qty'];
             }
         }
         unset($sk);
