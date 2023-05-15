@@ -175,8 +175,8 @@ class ItemsPage extends GenericPage
             $upgItems = new ItemList(array(['id', array_keys($this->filter['upg'])]), ['extraOpts' => $this->filterObj->extraOpts]);
             if (!$upgItems->error)
             {
-                $this->extendGlobalData($upgItems->getJSGlobals());
                 $upgItemData = $upgItems->getListviewData($infoMask);
+                $this->extendGlobalData($upgItems->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
         }
 
@@ -316,11 +316,11 @@ class ItemsPage extends GenericPage
             if ($items->error)
                 continue;
 
-            $this->extendGlobalData($items->getJSGlobals());
             $tabData = array_merge(
                 ['data' => $items->getListviewData($infoMask)],
                 $this->sharedLV
             );
+            $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
             $upg = [];
             if ($upgItemData)

@@ -734,7 +734,7 @@ class NpcPage extends GenericPage
                     'name'      => $sf[2],
                     'id'        => $sf[3],
                     'extraCols' => $extraCols,
-                    'sort'      => ['-percent', 'name'],
+                    'sort'      => ['-percent', 'name']
                 );
 
                 if (!empty($sf['note']))
