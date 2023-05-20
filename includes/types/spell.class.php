@@ -6,11 +6,10 @@ if (!defined('AOWOW_REVISION'))
 
 class SpellList extends BaseType
 {
-    use listviewHelper;
+    use listviewHelper, sourceHelper;
 
     public          $ranks       = [];
     public          $relItems    = null;
-    public          $sources     = [];
 
     public static   $type        = Type::SPELL;
     public static   $brickFile   = 'spell';
@@ -60,7 +59,7 @@ class SpellList extends BaseType
                         'ic'  => ['j' => ['?_icons ic  ON ic.id  = s.iconId',    true], 's' => ', ic.name AS iconString'],
                         'ica' => ['j' => ['?_icons ica ON ica.id = s.iconIdAlt', true], 's' => ', ica.name AS iconStringAlt'],
                         'sr'  => ['j' => ['?_spellrange sr ON sr.id = s.rangeId'], 's' => ', sr.rangeMinHostile, sr.rangeMinFriend, sr.rangeMaxHostile, sr.rangeMaxFriend, sr.name_loc0 AS rangeText_loc0, sr.name_loc2 AS rangeText_loc2, sr.name_loc3 AS rangeText_loc3, sr.name_loc4 AS rangeText_loc4, sr.name_loc6 AS rangeText_loc6, sr.name_loc8 AS rangeText_loc8'],
-                        'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
+                        'src' => ['j' => ['?_source src ON type = 6 AND typeId = s.id', true], 's' => ', moreType, moreTypeId, moreZoneId, moreMask, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                     );
 
     public function __construct($conditions = [], $miscData = [])
@@ -2150,15 +2149,15 @@ class SpellList extends BaseType
                 'skill'        => count($this->curTpl['skillLines']) > 4 ? array_merge(array_splice($this->curTpl['skillLines'], 0, 4), [-1]): $this->curTpl['skillLines'], // display max 4 skillLines (fills max three lines in listview)
                 'reagents'     => array_values($this->getReagentsForCurrent()),
                 'source'       => []
-                // 'talentspec'   => $this->curTpl['skillLines'][0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
+             // 'talentspec'   => $this->curTpl['skillLines'][0]      not used: g_chr_specs has the wrong structure for it; also setting .cat and .type does the same
             );
 
             // Sources
-            if (!empty($this->sources[$this->id]))
+            if ($this->getSources($s, $sm))
             {
-                $data[$this->id]['source'] = array_keys($this->sources[$this->id]);
-                if (!empty($this->sources[$this->id][3]))
-                    $data[$this->id]['sourcemore'] = [['p' => $this->sources[$this->id][3][0]]];
+                $data[$this->id]['source'] = $s;
+                if ($sm)
+                    $data[$this->id]['sourcemore'] = $sm;
             }
 
             // Proficiencies

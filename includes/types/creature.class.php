@@ -266,10 +266,7 @@ class CreatureList extends BaseType
             $data[$this->id] = array(
                 'n'  => $this->getField('parentId') ? $this->getField('parent', true) : $this->getField('name', true),
                 't'  => Type::NPC,
-                'ti' => $this->getField('parentId') ?: $this->id,
-             // 'bd' => (int)($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']))
-             // 'z'   where am i spawned
-             // 'dd'   DungeonDifficulty requires 'z'
+                'ti' => $this->getField('parentId') ?: $this->id
             );
         }
 

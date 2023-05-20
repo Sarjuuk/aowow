@@ -842,6 +842,59 @@ trait profilerHelper
     }
 }
 
+trait sourceHelper
+{
+    protected $sources    = [];
+    protected $sourceMore = null;
+
+    public function getSources(?array &$s, ?array &$sm) : bool
+    {
+        $s = $sm = null;
+        if (empty($this->sources[$this->id]))
+            return false;
+
+        if ($this->sourceMore === null)
+        {
+            $buff = [];
+            $this->sourceMore = [];
+
+            foreach ($this->iterate() as $_curTpl)
+                if ($_curTpl['moreType'] && $_curTpl['moreTypeId'])
+                    $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
+
+            foreach ($buff as $type => $ids)
+                $this->sourceMore[$type] = (Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $ids]]))->getSourceData();
+        }
+
+        $s = array_keys($this->sources[$this->id]);
+        if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
+            $sm = $this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']];
+        else if (!empty($this->sources[$this->id][SRC_PVP]))
+            $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
+
+        if ($z = $this->curTpl['moreZoneId'])
+            $sm['z'] = $z;
+
+        if ($this->curTpl['moreMask'] & SRC_FLAG_BOSSDROP)
+            $sm['bd'] = 1;
+
+        if (isset($this->sources[$this->id][SRC_DROP][0]))
+        {
+            $dd = $this->sources[$this->id][SRC_DROP][0];
+            if ($this->curTpl['moreMask'] & SRC_FLAG_RAID_DROP)
+                $sm['dd'] = (1 << ($dd - 1));
+            else if ($this->curTpl['moreMask'] & SRC_FLAG_DUNGEON_DROP)
+                $sm['dd'] = (1 << ($dd - 1)) * -1;
+        }
+
+        if ($sm)
+            $sm = [$sm];
+
+        return true;
+    }
+}
+
+
 abstract class Filter
 {
     private static  $wCards      = ['*' => '%', '?' => '_'];

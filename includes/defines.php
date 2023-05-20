@@ -1127,18 +1127,22 @@ define('SPELL_ATTR7_CLIENT_INDICATOR',                 0x80000000); // Client in
 
 
 // (some) Skill ids
+define('SKILL_FIRST_AID',      129);
 define('SKILL_BLACKSMITHING',  164);
 define('SKILL_LEATHERWORKING', 165);
 define('SKILL_ALCHEMY',        171);
 define('SKILL_HERBALISM',      182);
+define('SKILL_COOKING',        185);
 define('SKILL_MINING',         186);
 define('SKILL_TAILORING',      197);
 define('SKILL_ENGINEERING',    202);
 define('SKILL_ENCHANTING',     333);
+define('SKILL_FISHING',        356);
 define('SKILL_SKINNING',       393);
-define('SKILL_JEWELCRAFTING',  755);
-define('SKILL_INSCRIPTION',    773);
 define('SKILL_LOCKPICKING',    633);
+define('SKILL_JEWELCRAFTING',  755);
+define('SKILL_RIDING',         762);
+define('SKILL_INSCRIPTION',    773);
 
 
 // AchievementCriteriaCondition
@@ -1670,5 +1674,40 @@ define('AT_TYPE_TELEPORT',  2);
 define('AT_TYPE_OBJECTIVE', 3);
 define('AT_TYPE_SMART',     4);
 define('AT_TYPE_SCRIPT',    5);
+
+// Drop Sources
+define('SRC_CRAFTED',         1);
+define('SRC_DROP',            2);
+define('SRC_PVP',             3);
+define('SRC_QUEST',           4);
+define('SRC_VENDOR',          5);
+define('SRC_TRAINER',         6);
+define('SRC_DISCOVERY',       7);
+define('SRC_REDEMPTION',      8);                           // unused
+define('SRC_TALENT',          9);
+define('SRC_STARTER',        10);
+define('SRC_EVENT',          11);                           // unused
+define('SRC_ACHIEVEMENT',    12);
+define('SRC_CUSTOM_STRING',  13);
+// define('SRC_BLACK_MARKET',   14);                        // not in 3.3.5
+define('SRC_DISENCHANTMENT', 15);
+define('SRC_FISHING',        16);
+define('SRC_GATHERING',      17);
+define('SRC_MILLING',        18);
+define('SRC_MINING',         19);
+define('SRC_PROSPECTING',    20);
+define('SRC_PICKPOCKETING',  21);
+define('SRC_SALVAGING',      22);
+define('SRC_SKINNING',       23);
+// define('SRC_INGAME_STORE',   24);                        // not in 3.3.5
+
+define('SRC_SUB_PVP_ARENA', 1);
+define('SRC_SUB_PVP_BG',    2);
+define('SRC_SUB_PVP_WORLD', 4);
+
+define('SRC_FLAG_BOSSDROP',     0x01);
+define('SRC_FLAG_COMMON',       0x02);
+define('SRC_FLAG_DUNGEON_DROP', 0x10);
+define('SRC_FLAG_RAID_DROP',    0x20);
 
 ?>

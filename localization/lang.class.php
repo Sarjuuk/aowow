@@ -82,7 +82,7 @@ class Lang
             unset($args[$i]);
         }
 
-        if ($x = self::exist($prop, ...$args))
+        if (($x = self::exist($prop, ...$args)) !== null)
             return self::vspf($x, $vspfArgs);
 
         $dbt  = debug_backtrace()[0];

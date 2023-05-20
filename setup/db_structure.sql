@@ -2477,6 +2477,7 @@ CREATE TABLE `aowow_source` (
   `moreType` tinyint(4) unsigned DEFAULT NULL,
   `moreTypeId` mediumint(9) unsigned DEFAULT NULL,
   `moreZoneId` mediumint(9) unsigned DEFAULT NULL,
+  `moreMask` mediumint(9) unsigned DEFAULT NULL,
   `src1` tinyint(1) unsigned DEFAULT NULL COMMENT 'Crafted',
   `src2` tinyint(3) unsigned DEFAULT NULL COMMENT 'Drop (npc / object / item) (modeMask)',
   `src3` tinyint(3) unsigned DEFAULT NULL COMMENT 'PvP (g_sources_pvp)',
@@ -3185,7 +3186,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1682012751,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1684620410,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

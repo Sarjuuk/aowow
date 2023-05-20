@@ -29,15 +29,15 @@ class TitleList extends BaseType
         {
             // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
             if ($_curTpl['moreType'] == Type::ACHIEVEMENT)
-                $this->sources[$this->id][12][] = $_curTpl['moreTypeId'];
+                $this->sources[$this->id][SRC_ACHIEVEMENT][] = $_curTpl['moreTypeId'];
             else if ($_curTpl['moreType'] == Type::QUEST)
-                $this->sources[$this->id][4][] = $_curTpl['moreTypeId'];
+                $this->sources[$this->id][SRC_QUEST][] = $_curTpl['moreTypeId'];
             else if ($_curTpl['src13'])
-                $this->sources[$this->id][13][] = $_curTpl['src13'];
+                $this->sources[$this->id][SRC_CUSTOM_STRING][] = $_curTpl['src13'];
 
             // titles display up to two achievements at once
             if ($_curTpl['src12Ext'])
-                $this->sources[$this->id][12][] = $_curTpl['src12Ext'];
+                $this->sources[$this->id][SRC_ACHIEVEMENT][] = $_curTpl['src12Ext'];
 
             unset($_curTpl['src12Ext']);
             unset($_curTpl['moreType']);
@@ -93,9 +93,9 @@ class TitleList extends BaseType
     private function createSource()
     {
         $sources = array(
-            4  => [],                                       // Quest
-            12 => [],                                       // Achievements
-            13 => []                                        // simple text
+            SRC_QUEST         => [],
+            SRC_ACHIEVEMENT   => [],
+            SRC_CUSTOM_STRING => []
         );
 
         foreach ($this->iterate() as $__)
@@ -109,43 +109,43 @@ class TitleList extends BaseType
         }
 
         // fill in the details
-        if (!empty($sources[4]))
-            $sources[4] = (new QuestList(array(['id', $sources[4]])))->getSourceData();
+        if (!empty($sources[SRC_QUEST]))
+            $sources[SRC_QUEST] = (new QuestList(array(['id', $sources[SRC_QUEST]])))->getSourceData();
 
-        if (!empty($sources[12]))
-            $sources[12] = (new AchievementList(array(['id', $sources[12]])))->getSourceData();
+        if (!empty($sources[SRC_ACHIEVEMENT]))
+            $sources[SRC_ACHIEVEMENT] = (new AchievementList(array(['id', $sources[SRC_ACHIEVEMENT]])))->getSourceData();
 
         foreach ($this->sources as $Id => $src)
         {
             $tmp = [];
 
             // Quest-source
-            if (isset($src[4]))
+            if (isset($src[SRC_QUEST]))
             {
-                foreach ($src[4] as $s)
+                foreach ($src[SRC_QUEST] as $s)
                 {
-                    if (isset($sources[4][$s]['s']))
-                        $this->faction2Side($sources[4][$s]['s']);
+                    if (isset($sources[SRC_QUEST][$s]['s']))
+                        $this->faction2Side($sources[SRC_QUEST][$s]['s']);
 
-                    $tmp[4][] = $sources[4][$s];
+                    $tmp[SRC_QUEST][] = $sources[SRC_QUEST][$s];
                 }
             }
 
             // Achievement-source
-            if (isset($src[12]))
+            if (isset($src[SRC_ACHIEVEMENT]))
             {
-                foreach ($src[12] as $s)
+                foreach ($src[SRC_ACHIEVEMENT] as $s)
                 {
-                    if (isset($sources[12][$s]['s']))
-                        $this->faction2Side($sources[12][$s]['s']);
+                    if (isset($sources[SRC_ACHIEVEMENT][$s]['s']))
+                        $this->faction2Side($sources[SRC_ACHIEVEMENT][$s]['s']);
 
-                    $tmp[12][] = $sources[12][$s];
+                    $tmp[SRC_ACHIEVEMENT][] = $sources[SRC_ACHIEVEMENT][$s];
                 }
             }
 
             // other source (only one item possible, so no iteration needed)
-            if (isset($src[13]))
-                $tmp[13] = [Lang::game('pvpSources', $this->sources[$Id][13][0])];
+            if (isset($src[SRC_CUSTOM_STRING]))
+                $tmp[SRC_CUSTOM_STRING] = [Lang::game('pvpSources', $Id)];
 
             $this->templates[$Id]['source'] = $tmp;
         }

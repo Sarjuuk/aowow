@@ -374,8 +374,8 @@ $lang = array(
             "已加工", "失窃", "废弃", "已剥皮", "游戏商店"
         ),
         'pvpSources'    => array(
-            null,                           "Arena Season 1",               "Arena Season 2",               "Arena Season 3",               "Arena Season 4",
-            "Arena Season 5",               "Arena Season 6",               "Arena Season 7",               "Arena Season 8",               "2009 Arena Tournament"
+            42 => "Arena Season 1",         52 => "Arena Season 2",         71 => "Arena Season 3",         80 => "Arena Season 4",        157 => "Arena Season 5",
+           163 => "Arena Season 6",        167 => "Arena Season 7",        169 => "Arena Season 8",        177 => "2009 Arena Tournament"
         ),
         'languages'     => array(
              1 => "兽人语",                   2 => "达纳苏斯语",               3 => "牛头人语",                 6 => "矮人语",                  7 => "通用语",                 8 => "恶魔语",

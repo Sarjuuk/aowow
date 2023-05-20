@@ -130,8 +130,6 @@ class GameObjectList extends BaseType
                 'n'  => $this->getField('name', true),
                 't'  => Type::OBJECT,
                 'ti' => $this->id
-             // 'bd' => bossdrop
-             // 'dd' => dungeondifficulty
             );
         }
 

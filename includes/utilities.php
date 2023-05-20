@@ -423,6 +423,37 @@ abstract class CLI
 }
 
 
+class Timer
+{
+    private $t_cur = 0;
+    private $t_new = 0;
+    private $intv  = 0;
+
+    public function __construct(int $intervall)
+    {
+        $this->intv  = $intervall / 1000;                   // in msec
+        $this->t_cur = microtime(true);
+    }
+
+    public function update() : bool
+    {
+        $this->t_new = microtime(true);
+        if ($this->t_new > $this->t_cur + $this->intv)
+        {
+            $this->t_cur = $this->t_cur + $this->intv;
+            return true;
+        }
+
+        return false;
+    }
+
+    public function reset() : void
+    {
+        $this->t_cur = 0;
+    }
+}
+
+
 abstract class Util
 {
     const FILE_ACCESS = 0777;
