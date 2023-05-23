@@ -2473,7 +2473,7 @@ DROP TABLE IF EXISTS `aowow_source`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_source` (
   `type` tinyint(4) unsigned NOT NULL,
-  `typeId` mediumint(9) unsigned NOT NULL,
+  `typeId` mediumint(9) NOT NULL,
   `moreType` tinyint(4) unsigned DEFAULT NULL,
   `moreTypeId` mediumint(9) unsigned DEFAULT NULL,
   `moreZoneId` mediumint(9) unsigned DEFAULT NULL,
@@ -3186,7 +3186,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1684793470,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1684849476,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

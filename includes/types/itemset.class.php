@@ -18,7 +18,8 @@ class ItemsetList extends BaseType
     protected       $queryBase  = 'SELECT `set`.*, `set`.id AS ARRAY_KEY FROM ?_itemset `set`';
     protected       $queryOpts  = array(
                         'set' => ['o' => 'maxlevel DESC'],
-                        'e'   => ['j' => ['?_events e ON e.id = `set`.eventId', true], 's' => ', e.holidayId']
+                        'e'   => ['j' => ['?_events e ON `e`.`id` = `set`.`eventId`', true], 's' => ', e.holidayId'],
+                        'src' => ['j' => ['?_source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                     );
 
     public function __construct($conditions = [])
@@ -176,15 +177,15 @@ class ItemsetListFilter extends Filter
     );
 
     protected $genericFilter = array(
-         2 => [FILTER_CR_NUMERIC, 'id',          NUM_CAST_INT,         true], // id
-         3 => [FILTER_CR_NUMERIC, 'npieces',     NUM_CAST_INT              ], // pieces
-         4 => [FILTER_CR_STRING,  'bonusText',   STR_LOCALIZED             ], // bonustext
-         5 => [FILTER_CR_BOOLEAN, 'heroic'                                 ], // heroic
-         6 => [FILTER_CR_ENUM,    'e.holidayId', true,                 true], // relatedevent
-         8 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
-         9 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        10 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
-        12 => [FILTER_CR_NYI_PH,  null,          1                         ]  // available to players [yn] - ugh .. scan loot, quest and vendor templates and write to ?_itemset
+         2 => [FILTER_CR_NUMERIC,  'id',          NUM_CAST_INT,         true], // id
+         3 => [FILTER_CR_NUMERIC,  'npieces',     NUM_CAST_INT              ], // pieces
+         4 => [FILTER_CR_STRING,   'bonusText',   STR_LOCALIZED             ], // bonustext
+         5 => [FILTER_CR_BOOLEAN,  'heroic'                                 ], // heroic
+         6 => [FILTER_CR_ENUM,     'e.holidayId', true,                 true], // relatedevent
+         8 => [FILTER_CR_FLAG,     'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
+         9 => [FILTER_CR_FLAG,     'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        10 => [FILTER_CR_FLAG,     'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
+        12 => [FILTER_CR_CALLBACK, 'cbAvaliable',                           ]  // available to players [yn]
     );
 
     protected $inputFields = array(
@@ -257,6 +258,19 @@ class ItemsetListFilter extends Filter
             $parts[] = ['contentGroup', intVal($_v['ta'])];
 
         return $parts;
+    }
+
+    protected function cbAvaliable($cr)
+    {
+        switch ($cr[1])
+        {
+            case 1:                                         // Yes
+                return ['src.typeId', null, '!'];
+            case 2:                                         // No
+                return ['src.typeId', null];
+        }
+
+        return false;
     }
 }
 

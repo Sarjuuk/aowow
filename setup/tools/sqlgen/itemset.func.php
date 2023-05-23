@@ -274,7 +274,7 @@ SqlGen::register(new class extends SetupScript
                 3) one itemset from one dbc entry (basic case). duplicate items per slot possible
             */
 
-            if (!$pieces)
+            if (count($pieces) < 2)
             {
                 $row['cuFlags'] = CUSTOM_EXCLUDE_FOR_LISTVIEW;
                 DB::Aowow()->query('REPLACE INTO ?_itemset (?#) VALUES (?a)', array_keys($row), array_values($row));
@@ -295,11 +295,11 @@ SqlGen::register(new class extends SetupScript
                 // create new
                 if (!isset($sorted[$k][$data['slot']]))
                     $sorted[$k][$data['slot']] = $data;
-                // can have multiple
+                // can have two
                 else if (in_array($data['slot'], [INVTYPE_WEAPON, INVTYPE_FINGER, INVTYPE_TRINKET]))
                     $sorted[$k][-$data['slot']] = $data;
-                // use item with lower itemId
-                else if ($sorted[$k][$data['slot']]['entry'] > $data['entry'])
+                // slot confict. If item is being sold, replace old item (imperfect solution :/)
+                else if (DB::World()->selectCell('SELECT SUM(n) FROM (SELECT COUNT(1) AS n FROM npc_vendor WHERE item = ?d UNION SELECT COUNT(1) AS n FROM game_event_npc_vendor WHERE item = ?d) x', $data['entry'], $data['entry']))
                     $sorted[$k][$data['slot']] = $data;
             }
 

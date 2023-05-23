@@ -11,8 +11,8 @@ SqlGen::register(new class extends SetupScript
 {
     protected $command = 'source';
 
-    protected $tblDependancyAowow = ['spell', 'achievement', 'items', 'spawns', 'creature', 'zones', 'titles'];
-    protected $tblDependancyTC    = ['playercreateinfo_skills', 'playercreateinfo_item', 'skill_discovery_template', 'achievement_reward', 'skill_perfect_item_template', 'item_template', 'gameobject_template', 'quest_template', 'quest_template_addon', 'creature_template', 'creature', 'creature_default_trainer', 'npc_vendor', 'game_event_npc_vendor', 'reference_loot_template', 'item_loot_template', 'creature_loot_template', 'gameobject_loot_template', 'mail_loot_template', 'disenchant_loot_template', 'fishing_loot_template', 'skinning_loot_template', 'milling_loot_template', 'prospecting_loot_template', 'pickpocketing_loot_template'];
+    protected $tblDependancyAowow = ['spell', 'achievement', 'items', 'itemset', 'spawns', 'creature', 'zones', 'titles'];
+    protected $tblDependancyTC    = ['playercreateinfo_skills', 'playercreateinfo_item', 'skill_discovery_template', 'achievement_reward', 'skill_perfect_item_template', 'item_template', 'gameobject_template', 'quest_template', 'quest_template_addon', 'creature_template', 'creature', 'npc_trainer', 'npc_vendor', 'game_event_npc_vendor', 'reference_loot_template', 'item_loot_template', 'creature_loot_template', 'gameobject_loot_template', 'mail_loot_template', 'disenchant_loot_template', 'fishing_loot_template', 'skinning_loot_template', 'milling_loot_template', 'prospecting_loot_template', 'pickpocketing_loot_template'];
     protected $dbcSourceFiles     = ['charstartoutfit', 'talent', 'spell', 'skilllineability', 'itemextendedcost', 'lock'];
 
     private $srcBuffer = [];
@@ -118,6 +118,14 @@ SqlGen::register(new class extends SetupScript
         $this->titleAchievement();                          # 12: Achievement   #
         $this->titleCustomString();                         # 13: Source-String #
 
+        /************/
+        /* Itemsets */
+        /************/
+
+        CLI::write(' - Itemsets');
+
+        $this->itemset();                                   # Meta category .. inherit from items #
+
 
         $t = new Timer(500);
         foreach ($this->srcBuffer as $type => $data)
@@ -184,7 +192,7 @@ SqlGen::register(new class extends SetupScript
         $str = '';
         foreach ($rows as &$r)
         {
-            array_walk($r, function(&$x) {$x = (int)$x < 1 ? 'NULL' : $x; });
+            array_walk($r, function(&$x) {$x = (int)$x === 0 ? 'NULL' : $x; });
             $str .= '(' . implode(', ', $r) . '),';
         }
 
@@ -1155,6 +1163,43 @@ SqlGen::register(new class extends SetupScript
 
         foreach (Lang::game('pvpSources') as $src => $__)
             $this->pushBuffer(Type::TITLE, $src, SRC_CUSTOM_STRING, $src);
+    }
+
+    private function itemset() : void
+    {
+        // every item in ?_itemset needs a source. if so merge fields. if not it's not available.
+
+        $sets = DB::Aowow()->select('SELECT id AS ARRAY_KEY, contentGroup, item1, item2, item3, item4, item5, item6, item7, item8, item9, item10 FROM ?_itemset');
+
+        $metaSrc = [];
+        foreach ($sets as $id => $set)
+        {
+            $available = true;
+            for ($i = 1; $i < 11; $i++)
+            {
+                if (!$set['item'.$i])
+                    continue;
+
+                if (!isset($this->srcBuffer[Type::ITEM][$set['item'.$i]]))
+                {
+                    // Todo: remove HACK - neck in Zul'Gurub set ist created by spell from onUse item trigger
+                    if ($set['contentGroup'] == 11)
+                        continue;
+
+                    $available = false;
+                    break;
+                }
+
+                $metaSrc[$id] = ($metaSrc[$id] ?? []) + $this->srcBuffer[Type::ITEM][$set['item'.$i]][6];
+            }
+
+            if (!$available)
+                unset($metaSrc[$id]);
+        }
+
+        foreach($metaSrc as $id => $bits)
+            foreach ($bits as $src => $bit)
+                $this->pushBuffer(Type::ITEMSET, $id, $src, $bit);
     }
 });
 
