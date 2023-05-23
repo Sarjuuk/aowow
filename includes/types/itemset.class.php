@@ -171,25 +171,27 @@ class ItemsetList extends BaseType
 // missing filter: "Available to Players"
 class ItemsetListFilter extends Filter
 {
-    // cr => [type, field, misc, extraCol]
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $enums         = array(
+         6 => parent::ENUM_EVENT
+    );
+
+    protected $genericFilter = array(
          2 => [FILTER_CR_NUMERIC, 'id',          NUM_CAST_INT,         true], // id
          3 => [FILTER_CR_NUMERIC, 'npieces',     NUM_CAST_INT              ], // pieces
          4 => [FILTER_CR_STRING,  'bonusText',   STR_LOCALIZED             ], // bonustext
-         5 => [FILTER_CR_BOOLEAN, 'heroic',                                ], // heroic
-         6 => [FILTER_CR_ENUM,    'e.holidayId',                           ], // relatedevent
+         5 => [FILTER_CR_BOOLEAN, 'heroic'                                 ], // heroic
+         6 => [FILTER_CR_ENUM,    'e.holidayId', true,                 true], // relatedevent
          8 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_COMMENT        ], // hascomments
          9 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         10 => [FILTER_CR_FLAG,    'cuFlags',     CUSTOM_HAS_VIDEO          ], // hasvideos
         12 => [FILTER_CR_NYI_PH,  null,          1                         ]  // available to players [yn] - ugh .. scan loot, quest and vendor templates and write to ?_itemset
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE, [2, 12],                                       true ], // criteria ids
         'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 424]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, '/[\p{C};:%\\\\]/ui',                          true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                           false], // name / description - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX, parent::PATTERN_CRV,                           true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, parent::PATTERN_NAME,                          false], // name / description - only printable chars, no delimiter
         'ma'    => [FILTER_V_EQUAL, 1,                                             false], // match any / all filter
         'qu'    => [FILTER_V_RANGE, [0, 7],                                        true ], // quality
         'ty'    => [FILTER_V_RANGE, [1, 12],                                       true ], // set type

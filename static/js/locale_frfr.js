@@ -3647,7 +3647,7 @@ var LANG = {
         event:          [
                             [285, "Appel aux armes : bassin d'Arathi"],                                     [284, "Appel aux armes : goulet des Chanteguerres"],                            [400, "Appel aux armes : rivage des Anciens"],
                             [283, "Appel aux armes : vallée d'Alterac"],                                    [420, "Appel aux armes : île des Conquérants"],                                 [353, "Appel aux armes : Œil du cyclone"],
-                            [301, "Concours de pêche de Strangleronce"],                                    [335, "De l'amour dans l'air"],         [374, "Foire de Sombrelune"],           [372, "Fête des Brasseurs"],
+                            [301, "Concours de pêche de Strangleronce"],                                    [423, "De l'amour dans l'air"],         [374, "Foire de Sombrelune"],           [372, "Fête des Brasseurs"],
                             [321, "Fête des moissons"],             [341, "Fête du Feu du solstice d'été"], [327, "Fête lunaire"],                  [409, "Jour des morts"],                [398, "Jour des pirates"],
                             [181, "Le Jardin des nobles"],          [404, "Les Bienfaits du pèlerin"],      [324, "Sanssaint"],                     [201, "Semaine des enfants"],           [424, "Tournoi de pêche kalu'ak"],
                             [141, "Voile d'hiver"]

@@ -238,13 +238,10 @@ class EnchantmentList extends BaseType
 class EnchantmentListFilter extends Filter
 {
     protected $enums         = array(
-        3 => array(                                         // requiresprof
-            null,                 SKILL_ALCHEMY, SKILL_BLACKSMITHING, SKILL_COOKING, SKILL_ENCHANTING, SKILL_ENGINEERING, SKILL_FIRST_AID, SKILL_JEWELCRAFTING,
-            SKILL_LEATHERWORKING, SKILL_MINING,  SKILL_TAILORING,     true,          false,            SKILL_FISHING,     SKILL_HERBALISM, SKILL_INSCRIPTION
-        )
+        3 => parent::ENUM_PROFESSION                        // requiresprof
     );
 
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $genericFilter = array(
           2 => [FILTER_CR_NUMERIC, 'id',                 NUM_CAST_INT,         true], // id
           3 => [FILTER_CR_ENUM,    'skillLine'                                     ], // requiresprof
           4 => [FILTER_CR_NUMERIC, 'skillLevel',         NUM_CAST_INT              ], // reqskillrank
@@ -306,14 +303,13 @@ class EnchantmentListFilter extends Filter
         123 => [FILTER_CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true]  // splpwr
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'    => [FILTER_V_RANGE,    [2, 123],            true ], // criteria ids
-        'crs'   => [FILTER_V_RANGE,    [1, 15],             true ], // criteria operators
-        'crv'   => [FILTER_V_RANGE,    [0, 99999],          true ], // criteria values - only numerals
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui', false], // name - only printable chars, no delimiter
-        'ma'    => [FILTER_V_EQUAL,    1,                   false], // match any / all filter
-        'ty'    => [FILTER_V_RANGE,    [1, 8],              true ]  // types
+        'cr'  => [FILTER_V_RANGE, [2, 123],             true ], // criteria ids
+        'crs' => [FILTER_V_RANGE, [1, 15],              true ], // criteria operators
+        'crv' => [FILTER_V_REGEX, parent::PATTERN_INT,  true ], // criteria values - only numerals
+        'na'  => [FILTER_V_REGEX, parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'ma'  => [FILTER_V_EQUAL, 1,                    false], // match any / all filter
+        'ty'  => [FILTER_V_RANGE, [1, 8],               true ]  // types
     );
 
     protected function createSQLForCriterium(&$cr)

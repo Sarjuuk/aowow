@@ -1735,69 +1735,63 @@ class ItemListFilter extends Filter
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
     private   $extCostQuery  = 'SELECT item FROM npc_vendor            WHERE extendedCost IN (?a) UNION
                                 SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)';
-    private   $otFields      = [18 => 4, 68 => 15, 69 => 16, 70 => 17, 72 => 2, 73 => 19, 75 => 21, 76 => 23, 88 => 20, 92 => 5, 93 => 3, 143 => 18, 171 => 8, 172 => 12];
 
     public    $extraOpts     = [];                          // score for statWeights
     public    $wtCnd         = [];
     protected $enums         = array(
-        16 => array(                                        // drops in zone
-            4494,   36, 2597, 3358,   45,  331, 3790, 4277,   16, 3524,    3, 3959,  719, 1584,   25, 1583, 2677, 3702, 3522,    4, 3525, 3537,   46, 1941,
-            2918, 3905, 4024, 2817, 4395, 4378,  148,  393, 1657,   41, 2257,  405, 2557,   65, 4196,    1,   14,   10,   15,  139,   12, 3430, 3820,  361,
-             357, 3433,  721,  394, 3923, 4416, 2917, 4272, 4820, 4264, 3483, 3562,  267,  495, 4742, 3606,  210, 4812, 1537, 4710, 4080, 3457,   38, 4131,
-            3836, 3792, 2100, 2717,  493,  215, 3518, 3698, 3456, 3523, 2367, 2159, 1637, 4813, 4298, 2437,  722,  491,   44, 3429, 3968,  796, 2057,   51,
-            3607, 3791, 3789,  209, 3520, 3703, 3711, 1377, 3487,  130, 3679,  406, 1519, 4384,   33, 2017, 1477, 4075,    8,  440,  141, 3428, 3519, 3848,
-              17, 2366, 3840, 3713, 3847, 3775, 4100, 1581, 3557, 3845, 4500, 4809,   47, 3849, 4265, 4493, 4228, 3698, 4406, 3714, 3717, 3715,  717,   67,
-            3716,  457, 4415,  400, 1638, 1216,   85, 4723, 4722, 1337, 4273,  490, 1497,  206, 1196, 4603, 718, 3277,    28,   40,   11, 4197,  618, 3521,
-            3805,   66, 1176, 1977
+         16 => parent::ENUM_ZONE,                           // drops in zone
+         17 => parent::ENUM_FACTION,                        // requiresrepwith
+         99 => parent::ENUM_PROFESSION,                     // requiresprof
+         86 => parent::ENUM_PROFESSION,                     // craftedprof
+         87 => parent::ENUM_PROFESSION,                     // reagentforability
+        105 => parent::ENUM_HEROICDUNGEON,                  // drops in nh dungeon
+        106 => parent::ENUM_HEROICDUNGEON,                  // drops in hc dungeon
+        126 => parent::ENUM_ZONE,                           // rewardedbyquestin
+        147 => parent::ENUM_MULTIMODERAID,                  // drops in nh raid 10
+        148 => parent::ENUM_MULTIMODERAID,                  // drops in nh raid 25
+        149 => parent::ENUM_HEROICRAID,                     // drops in hc raid 10
+        150 => parent::ENUM_HEROICRAID,                     // drops in hc raid 25
+        152 => parent::ENUM_CLASSS,                         // class-specific
+        153 => parent::ENUM_RACE,                           // race-specific
+        160 => parent::ENUM_EVENT,                          // relatedevent
+        169 => parent::ENUM_EVENT,                          // requiresevent
+        158 => parent::ENUM_CURRENCY,                       // purchasablewithcurrency
+        118 => array(                                       // itemcurrency
+            34853, 34854, 34855, 34856, 34857, 34858, 34848, 34851, 34852, 40625, 40626, 40627, 45632, 45633, 45634, 34169, 34186, 29754, 29753, 29755,
+            31089, 31091, 31090, 40610, 40611, 40612, 30236, 30237, 30238, 45635, 45636, 45637, 34245, 34332, 34339, 34345, 40631, 40632, 40633, 45638,
+            45639, 45640, 34244, 34208, 34180, 34229, 34350, 40628, 40629, 40630, 45641, 45642, 45643, 29757, 29758, 29756, 31092, 31094, 31093, 40613,
+            40614, 40615, 30239, 30240, 30241, 45644, 45645, 45646, 34342, 34211, 34243, 29760, 29761, 29759, 31097, 31095, 31096, 40616, 40617, 40618,
+            30242, 30243, 30244, 45647, 45648, 45649, 34216, 29766, 29767, 29765, 31098, 31100, 31099, 40619, 40620, 40621, 30245, 30246, 30247, 45650,
+            45651, 45652, 34167, 40634, 40635, 40636, 45653, 45654, 45655, 40637, 40638, 40639, 45656, 45657, 45658, 34170, 34192, 29763, 29764, 29762,
+            31101, 31103, 31102, 30248, 30249, 30250, 47557, 47558, 47559, 34233, 34234, 34202, 34195, 34209, 40622, 40623, 40624, 34193, 45659, 45660,
+            45661, 34212, 34351, 34215
         ),
-        66 => array(                                        // profession specialization
-             1 => -1,
-             2 => [ 9788,  9787, 17041, 17040, 17039                                                        ],
-             3 => -1,
-             4 => -1,
-             5 => [20219, 20222                                                                             ],
-             6 => -1,
-             7 => -1,
-             8 => [10656, 10658, 10660                                                                      ],
-             9 => -1,
-            10 => [26798, 26801, 26797                                                                      ],
-            11 => [ 9788,  9787, 17041, 17040, 17039, 20219, 20222, 10656, 10658, 10660, 26798, 26801, 26797],  // i know, i know .. lazy as fuck
-            12 => false,
-            13 => -1,
-            14 => -1,
-            15 => -1
+        163 => array(                                       // enchantment mats
+            34057, 22445, 11176, 34052, 11082, 34055, 16203, 10939, 11135, 11175, 22446, 16204, 34054, 14344, 11084, 11139, 22449, 11178, 10998, 34056,
+            16202, 10938, 11134, 11174, 22447, 20725, 14343, 34053, 10978, 11138, 22448, 11177, 11083, 10940, 11137, 22450
         ),
-        99 => array(                                        // profession | recycled for 86, 87
-            null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, true, false, 356, 182, 773
+         91 => array(                                       // tool
+                3,    14,   162,   168,   141,     2,     4,   169,   161,    15,   167,    81,    21,   165,    12,    62,    10,   101,   189,     6,
+               63,    41,     8,     7,   190,     9,   166,   121,     5
         ),
-        105 => array(                                       // drops in nh dungeon
-            4494, 3790, 4277, 4196, 4416, 4272, 4820, 4264, 3562, 4131, 3792, 2367, 4813, 3791, 3789, 3848, 2366, 3713, 3847, 4100,
-            4809, 3849, 4265, 4228, 3714, 3717, 3715, 3716, 4415, 4723, 206,  1196
-        ),
-        106 => array(                                       // drops in hc dungeon
-            4494, 3790, 4277, 4196, 4416, 4272, 4820, 4264, 3562, 4131, 3792, 2367, 4813, 3791, 3789, 3848, 2366, 3713, 3847, 4100,
-            4809, 3849, 4265, 4228, 3714, 3717, 3715, 3716, 4415, 4723, 206,  1196
-        ),
-        118 => array(                                       // tokens
-            34853, 34854, 34855, 34856, 34857, 34858, 34848, 34851, 34852, 40625, 40626, 40627, 45632, 45633, 45634, 34169, 34186, 29754, 29753, 29755, 31089, 31091, 31090,
-            40610, 40611, 40612, 30236, 30237, 30238, 45635, 45636, 45637, 34245, 34332, 34339, 34345, 40631, 40632, 40633, 45638, 45639, 45640, 34244, 34208, 34180, 34229,
-            34350, 40628, 40629, 40630, 45641, 45642, 45643, 29757, 29758, 29756, 31092, 31094, 31093, 40613, 40614, 40615, 30239, 30240, 30241, 45644, 45645, 45646, 34342,
-            34211, 34243, 29760, 29761, 29759, 31097, 31095, 31096, 40616, 40617, 40618, 30242, 30243, 30244, 45647, 45648, 45649, 34216, 29766, 29767, 29765, 31098, 31100,
-            31099, 40619, 40620, 40621, 30245, 30246, 30247, 45650, 45651, 45652, 34167, 40634, 40635, 40636, 45653, 45654, 45655, 40637, 40638, 40639, 45656, 45657, 45658,
-            34170, 34192, 29763, 29764, 29762, 31101, 31103, 31102, 30248, 30249, 30250, 47557, 47558, 47559, 34233, 34234, 34202, 34195, 34209, 40622, 40623, 40624, 34193,
-            45659, 45660, 45661, 34212, 34351, 34215
-        ),
-        126 => array(                                       // Zones
-            4494,   36, 2597, 3358,   45,  331, 3790, 4277,   16, 3524,    3, 3959,  719, 1584,   25, 1583, 2677, 3702, 3522,    4, 3525, 3537,   46, 1941,
-            2918, 3905, 4024, 2817, 4395, 4378,  148,  393, 1657,   41, 2257,  405, 2557,   65, 4196,    1,   14,   10,   15,  139,   12, 3430, 3820,  361,
-             357, 3433,  721,  394, 3923, 4416, 2917, 4272, 4820, 4264, 3483, 3562,  267,  495, 4742, 3606,  210, 4812, 1537, 4710, 4080, 3457,   38, 4131,
-            3836, 3792, 2100, 2717,  493,  215, 3518, 3698, 3456, 3523, 2367, 2159, 1637, 4813, 4298, 2437,  722,  491,   44, 3429, 3968,  796, 2057,   51,
-            3607, 3791, 3789,  209, 3520, 3703, 3711, 1377, 3487,  130, 3679,  406, 1519, 4384,   33, 2017, 1477, 4075,    8,  440,  141, 3428, 3519, 3848,
-              17, 2366, 3840, 3713, 3847, 3775, 4100, 1581, 3557, 3845, 4500, 4809,   47, 3849, 4265, 4493, 4228, 3698, 4406, 3714, 3717, 3715,  717,   67,
-            3716,  457, 4415,  400, 1638, 1216,   85, 4723, 4722, 1337, 4273,  490, 1497,  206, 1196, 4603, 718, 3277,    28,   40,   11, 4197,  618, 3521,
-            3805,   66, 1176, 1977
-        ),
-        128 => array(                                       // source
+         66 => array(                                       // profession specialization
+            1 => -1,
+            2 => [ 9788,  9787, 17041, 17040, 17039                                                        ],
+            3 => -1,
+            4 => -1,
+            5 => [20219, 20222                                                                             ],
+            6 => -1,
+            7 => -1,
+            8 => [10656, 10658, 10660                                                                      ],
+            9 => -1,
+           10 => [26798, 26801, 26797                                                                      ],
+           11 => [ 9788,  9787, 17041, 17040, 17039, 20219, 20222, 10656, 10658, 10660, 26798, 26801, 26797],  // i know, i know .. lazy as fuck
+           12 => false,
+           13 => -1,
+           14 => -1,
+           15 => -1
+       ),
+       128 => array(                                       // source
              1 => true,                                     // Any
              2 => false,                                    // None
              3 => 1,                                        // Crafted
@@ -1808,37 +1802,10 @@ class ItemListFilter extends Filter
              9 => 10,                                       // Starter
             10 => 11,                                       // Event
             11 => 12                                        // Achievement
-        ),
-        147 => array(                                       // drops in nh raid 10
-            4812, 3456, 2159, 4500, 4493, 4722, 4273, 4603, 4987
-        ),
-        148 => array(                                       // drops in nh raid 25
-            4812, 3456, 2159, 4500, 4493, 4722, 4273, 4603, 4987
-        ),
-        149 => array(                                       // drops in hc raid 10
-            4987, 4812, 4722
-        ),
-        150 => array(                                       // drops in hc raid 25
-            4987, 4812, 4722
-        ),
-        152 => array(                                       // class-specific
-            null, 1, 2, 3, 4, 5, 6, 7, 8, 9, null, 11, true, false
-        ),
-        153 => array(                                       // race-specific
-            null, 1, 2, 3, 4, 5, 6, 7, 8, null, 10, 11, true, false
-        ),
-        158 => array(                                       // currency
-            32572, 32569, 29736, 44128, 20560, 20559, 29434, 37829, 23247, 44990, 24368, 52027, 52030, 43016, 41596, 34052, 45624, 49426, 40752, 47241, 40753, 29024,
-            24245, 26045, 26044, 38425, 29735, 24579, 24581, 32897, 22484, 52026, 52029,  4291, 28558, 43228, 34664, 47242, 52025, 52028, 37836, 20558, 34597, 43589
-        ),
-        163 => array(                                       // enchantment mats
-            34057, 22445, 11176, 34052, 11082, 34055, 16203, 10939, 11135, 11175, 22446, 16204, 34054, 14344, 11084, 11139, 22449, 11178,
-            10998, 34056, 16202, 10938, 11134, 11174, 22447, 20725, 14343, 34053, 10978, 11138, 22448, 11177, 11083, 10940, 11137, 22450
         )
     );
 
-    // cr => [type, field, misc, extraCol]
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $genericFilter = array(
           2 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1             ], // bindonpickup [yn]
           3 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2             ], // bindonequip [yn]
           4 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3             ], // bindonuse [yn]
@@ -1854,7 +1821,7 @@ class ItemListFilter extends Filter
          14 => [FILTER_CR_BOOLEAN,   'pageTextId'                                                     ], // readable
          15 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'maxCount',              1             ], // unique [yn]
          16 => [FILTER_CR_CALLBACK,  'cbDropsInZone',          null,                    null          ], // dropsin [zone]
-         17 => [FILTER_CR_ENUM,      'requiredFaction'                                                ], // requiresrepwith
+         17 => [FILTER_CR_ENUM,      'requiredFaction',        true,                    true          ], // requiresrepwith
          18 => [FILTER_CR_CALLBACK,  'cbFactionQuestReward',   null,                    null          ], // rewardedbyfactionquest [side]
          20 => [FILTER_CR_NUMERIC,   'is.str',                 NUM_CAST_INT,            true          ], // str
          21 => [FILTER_CR_NUMERIC,   'is.agi',                 NUM_CAST_INT,            true          ], // agi
@@ -1900,15 +1867,15 @@ class ItemListFilter extends Filter
          64 => [FILTER_CR_NUMERIC,   'sellPrice',              NUM_CAST_INT,            true          ], // sellprice
          65 => [FILTER_CR_CALLBACK,  'cbAvgMoneyContent',      null,                    null          ], // avgmoney [op] [int]
          66 => [FILTER_CR_ENUM,      'requiredSpell'                                                  ], // requiresprofspec
-         68 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otdisenchanting [yn]
-         69 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otfishing [yn]
-         70 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otherbgathering [yn]
+         68 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           15,                      null          ], // otdisenchanting [yn]
+         69 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           16,                      null          ], // otfishing [yn]
+         70 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           17,                      null          ], // otherbgathering [yn]
          71 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT                    ], // otitemopening [yn]
-         72 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otlooting [yn]
-         73 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otmining [yn]
+         72 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           2,                       null          ], // otlooting [yn]
+         73 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           19,                      null          ], // otmining [yn]
          74 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT                  ], // otobjectopening [yn]
-         75 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otpickpocketing [yn]
-         76 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otskinning [yn]
+         75 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           21,                      null          ], // otpickpocketing [yn]
+         76 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           23,                      null          ], // otskinning [yn]
          77 => [FILTER_CR_NUMERIC,   'is.atkpwr',              NUM_CAST_INT,            true          ], // atkpwr
          78 => [FILTER_CR_NUMERIC,   'is.mlehastertng',        NUM_CAST_INT,            true          ], // mlehastertng
          79 => [FILTER_CR_NUMERIC,   'is.resirtng',            NUM_CAST_INT,            true          ], // resirtng
@@ -1919,12 +1886,12 @@ class ItemListFilter extends Filter
          85 => [FILTER_CR_CALLBACK,  'cbObjectiveOfQuest',     null,                    null          ], // objectivequest [side]
          86 => [FILTER_CR_CALLBACK,  'cbCraftedByProf',        null,                    null          ], // craftedprof [enum]
          87 => [FILTER_CR_CALLBACK,  'cbReagentForAbility',    null,                    null          ], // reagentforability [enum]
-         88 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otprospecting [yn]
+         88 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           20,                      null          ], // otprospecting [yn]
          89 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                 ], // prospectable
          90 => [FILTER_CR_CALLBACK,  'cbAvgBuyout',            null,                    null          ], // avgbuyout [op] [int]
          91 => [FILTER_CR_ENUM,      'totemCategory'                                                  ], // tool
-         92 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // soldbyvendor [yn]
-         93 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otpvp [pvp]
+         92 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           5,                       null          ], // soldbyvendor [yn]
+         93 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           3,                       null          ], // otpvp [pvp]
          94 => [FILTER_CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true          ], // splpen
          95 => [FILTER_CR_NUMERIC,   'is.mlehitrtng',          NUM_CAST_INT,            true          ], // mlehitrtng
          96 => [FILTER_CR_NUMERIC,   'is.critstrkrtng',        NUM_CAST_INT,            true          ], // critstrkrtng
@@ -1966,9 +1933,9 @@ class ItemListFilter extends Filter
         140 => [FILTER_CR_NUMERIC,   'is.rgddmgmax',           NUM_CAST_INT,            true          ], // rgddmgmax
         141 => [FILTER_CR_NUMERIC,   'is.rgdspeed',            NUM_CAST_FLOAT,          true          ], // rgdspeed
         142 => [FILTER_CR_STRING,    'ic.name'                                                        ], // icon
-        143 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otmilling [yn]
+        143 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           18,                      null          ], // otmilling [yn]
         144 => [FILTER_CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null          ], // purchasablewithhonor [yn]
-        145 => [FILTER_CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null          ], // purchasablewitharena [yn]
+        145 => [FILTER_CR_CALLBACK,  'cbPvpPurchasable',       'reqArenaPoints',        null          ], // purchasablewitharena [yn]
         146 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC                       ], // heroic
         147 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      1,            ], // dropsinnormal10 [multimoderaid-any]
         148 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      2,            ], // dropsinnormal25 [multimoderaid-any]
@@ -1990,14 +1957,13 @@ class ItemListFilter extends Filter
         165 => [FILTER_CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true          ], // repaircost
         167 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                       ], // hasvideos
         168 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS  ], // teachesspell [yn]
-        169 => [FILTER_CR_ENUM,      'e.holidayId'                                                    ], // requiresevent
-        171 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // otredemption [yn]
-        172 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           null,                    null          ], // rewardedbyachievement [yn]
+        169 => [FILTER_CR_ENUM,      'e.holidayId',            true,                    true          ], // requiresevent
+        171 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           8,                       null          ], // otredemption [yn]
+        172 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           12,                      null          ], // rewardedbyachievement [yn]
         176 => [FILTER_CR_STAFFFLAG, 'flags'                                                          ], // flags
         177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                                     ], // flags2
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'wt'    => [FILTER_V_CALLBACK, 'cbWeightKeyCheck',                              true ], // weight keys
         'wtv'   => [FILTER_V_RANGE,    [1, 999],                                        true ], // weight values
@@ -2005,10 +1971,10 @@ class ItemListFilter extends Filter
         'gm'    => [FILTER_V_LIST,     [2, 3, 4],                                       false], // gem rarity for weight calculation
         'cr'    => [FILTER_V_RANGE,    [1, 177],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
+        'crv'   => [FILTER_V_REGEX,    parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
         'upg'   => [FILTER_V_REGEX,    '/[^\d:]/ui',                                    false], // upgrade item ids
         'gb'    => [FILTER_V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                             false], // name - only printable chars, no delimiter
+        'na'    => [FILTER_V_REGEX,    parent::PATTERN_NAME,                            false], // name - only printable chars, no delimiter
         'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
         'ub'    => [FILTER_V_LIST,     [[1, 9], 11],                                    false], // usable by classId
         'qu'    => [FILTER_V_RANGE,    [0, 7],                                          true ], // quality ids
@@ -2211,22 +2177,18 @@ class ItemListFilter extends Filter
 
     protected function cbFactionQuestReward($cr)
     {
-        if (!isset($this->otFields[$cr[0]]))
-            return false;
-
-        $field = 'src.src'.$this->otFields[$cr[0]];
         switch ($cr[1])
         {
             case 1:                                         // Yes
-                return [$field, null, '!'];
+                return ['src.src4', null, '!'];
             case 2:                                         // Alliance
-                return [$field, 1];
+                return ['src.src4', 1];
             case 3:                                         // Horde
-                return [$field, 2];
+                return ['src.src4', 2];
             case 4:                                         // Both
-                return [$field, 3];
+                return ['src.src4', 3];
             case 5:                                         // No
-                return [$field, null];
+                return ['src.src4', null];
         }
 
         return false;
@@ -2362,10 +2324,10 @@ class ItemListFilter extends Filter
 
     protected function cbCraftedByProf($cr)
     {
-        if (!isset($this->enums[99][$cr[1]]))
+        if (!isset($this->enums[$cr[0]][$cr[1]]))
             return false;
 
-        $_ = $this->enums[99][$cr[1]];
+        $_ = $this->enums[$cr[0]][$cr[1]];
         if (is_bool($_))
             return ['src.src1', null, $_ ? '!' : null];
         else if (is_int($_))
@@ -2510,7 +2472,7 @@ class ItemListFilter extends Filter
     protected function cbObtainedBy($cr, $field)
     {
         if ($this->int2Bool($cr[1]))
-            return ['src.src'.$this->otFields[$cr[0]], null, $cr[1] ? '!' : null];
+            return ['src.src'.$field, null, $cr[1] ? '!' : null];
 
         return false;
     }
@@ -2585,10 +2547,10 @@ class ItemListFilter extends Filter
 
     protected function cbReagentForAbility($cr)
     {
-        if (!isset($this->enums[99][$cr[1]]))
+        if (!isset($this->enums[$cr[0]][$cr[1]]))
             return false;
 
-        $_ =  $this->enums[99][$cr[1]];
+        $_ =  $this->enums[$cr[0]][$cr[1]];
         if ($_ === null)
             return false;
 

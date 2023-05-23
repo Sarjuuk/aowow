@@ -88,14 +88,13 @@ class GuildListFilter extends Filter
     public    $extraOpts     = [];
     protected $genericFilter = [];
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'na'     => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
-        'ma'     => [FILTER_V_EQUAL,    1,                                              false], // match any / all filter
-        'ex'     => [FILTER_V_EQUAL,    'on',                                           false], // only match exact
-        'si'     => [FILTER_V_LIST,     [1, 2],                                         false], // side
-        'rg'     => [FILTER_V_CALLBACK, 'cbRegionCheck',                                false], // region
-        'sv'     => [FILTER_V_CALLBACK, 'cbServerCheck',                                false], // server
+        'na' => [FILTER_V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'ma' => [FILTER_V_EQUAL,    1,                    false], // match any / all filter
+        'ex' => [FILTER_V_EQUAL,    'on',                 false], // only match exact
+        'si' => [FILTER_V_LIST,     [1, 2],               false], // side
+        'rg' => [FILTER_V_CALLBACK, 'cbRegionCheck',      false], // region
+        'sv' => [FILTER_V_CALLBACK, 'cbServerCheck',      false], // server
     );
 
     protected function createSQLForCriterium(&$cr) { }

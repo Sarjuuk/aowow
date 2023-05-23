@@ -142,36 +142,35 @@ class GameObjectListFilter extends Filter
 {
     public    $extraOpts     = [];
     protected $enums         = array(
+         1 => parent::ENUM_ZONE,
+        16 => parent::ENUM_EVENT,
         50 => array(
             null, 1, 2, 3, 4,
             663 => 663,
-            883 => 883,
-            FILTER_ENUM_ANY => true,
-            FILTER_ENUM_NONE => false
+            883 => 883
         )
     );
 
     protected $genericFilter = array(
-         1 => [FILTER_CR_ENUM,     's.areaId',        null                      ], // foundin
+         1 => [FILTER_CR_ENUM,     's.areaId'                                   ], // foundin
          2 => [FILTER_CR_CALLBACK, 'cbQuestRelation', 'startsQuests',       0x1 ], // startsquest [side]
          3 => [FILTER_CR_CALLBACK, 'cbQuestRelation', 'endsQuests',         0x2 ], // endsquest [side]
          4 => [FILTER_CR_CALLBACK, 'cbOpenable',      null,                 null], // openable [yn]
-         5 => [FILTER_CR_NYI_PH,   null,              null                      ], // averagemoneycontained [op] [int] - GOs don't contain money, match against 0
+         5 => [FILTER_CR_NYI_PH,   null,              0                         ], // averagemoneycontained [op] [int] - GOs don't contain money, match against 0
          7 => [FILTER_CR_NUMERIC,  'reqSkill',        NUM_CAST_INT              ], // requiredskilllevel
         11 => [FILTER_CR_FLAG,     'cuFlags',         CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         13 => [FILTER_CR_FLAG,     'cuFlags',         CUSTOM_HAS_COMMENT        ], // hascomments
         15 => [FILTER_CR_NUMERIC,  'id',              NUM_CAST_INT              ], // id
         16 => [FILTER_CR_CALLBACK, 'cbRelEvent',      null,                 null], // relatedevent (ignore removed by event)
         18 => [FILTER_CR_FLAG,     'cuFlags',         CUSTOM_HAS_VIDEO          ], // hasvideos
-        50 => [FILTER_CR_ENUM,     'spellFocusId',    null,                     ], // SpellFocus
+        50 => [FILTER_CR_ENUM,     'spellFocusId',    true,                 true], // spellfocus
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'cr'  => [FILTER_V_LIST,  [[1, 5], 7, 11, 13, 15, 16, 18, 50],            true ], // criteria ids
         'crs' => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 5000]], true ], // criteria operators
-        'crv' => [FILTER_V_RANGE, [0, 99999],                                     true ], // criteria values - only numeric input values expected
-        'na'  => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
+        'crv' => [FILTER_V_REGEX, parent::PATTERN_INT,                            true ], // criteria values - only numeric input values expected
+        'na'  => [FILTER_V_REGEX, parent::PATTERN_NAME,                           false], // name - only printable chars, no delimiter
         'ma'  => [FILTER_V_EQUAL, 1,                                              false]  // match any / all filter
     );
 
@@ -229,9 +228,6 @@ class GameObjectListFilter extends Filter
 
     protected function cbRelEvent($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
-            return false;;
-
         if ($cr[1] == FILTER_ENUM_ANY)
         {
             $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId <> 0');
@@ -244,11 +240,13 @@ class GameObjectListFilter extends Filter
             $goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds);
             return ['s.guid', $goGuids, '!'];
         }
-        else if ($cr[1])
+        else if (in_array($cr[1], $this->enums[$cr[0]]))
         {
-            $eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId = ?d', $cr[1]);
-            $goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds);
-            return ['s.guid', $goGuids];
+            if ($eventIds = DB::Aowow()->selectCol('SELECT id FROM ?_events WHERE holidayId = ?d', $cr[1]))
+                if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT guid FROM game_event_gameobject WHERE eventEntry IN (?a)', $eventIds))
+                    return ['s.guid', $goGuids];
+
+            return [0];
         }
 
         return false;

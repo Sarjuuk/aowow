@@ -3696,7 +3696,7 @@ var LANG = {
                             [372, "Brewfest"],                      [283, "Call to Arms: Alterac Valley"],  [285, "Call to Arms: Arathi Basin"],    [353, "Call to Arms: Eye of the Storm"],[420, "Call to Arms: Isle of Conquest"],
                             [400, "Call to Arms: Strand of the Ancients"],                                  [284, "Call to Arms: Warsong Gulch"],   [201, "Children's Week"],               [374, "Darkmoon Faire"],
                             [409, "Day of the Dead"],               [141, "Feast of Winter Veil"],          [324, "Hallow's End"],                  [321, "Harvest Festival"],              [424, "Kalu'ak Fishing Derby"],
-                            [335, "Love is in the Air"],            [327, "Lunar Festival"],                [341, "Midsummer Fire Festival"],       [181, "Noblegarden"],                   [404, "Pilgrim's Bounty"],
+                            [423, "Love is in the Air"],            [327, "Lunar Festival"],                [341, "Midsummer Fire Festival"],       [181, "Noblegarden"],                   [404, "Pilgrim's Bounty"],
                             [398, "Pirates' Day"],                  [301, "Stranglethorn Fishing Extravaganza"]
                         ],
         pvp:            [   [1, "Yes"],                             [3, "Arena"],                           [4, "Battleground"],                    [5, "World"],                           [2, "No"]                           ],

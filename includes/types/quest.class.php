@@ -425,10 +425,16 @@ class QuestList extends BaseType
 class QuestListFilter extends Filter
 {
     public    $extraOpts     = [];
-    protected $enums         = array(                       // massive enums could be put here, if you want to restrict inputs further to be valid IDs instead of just integers
-        37 => [null, 1, 2, 3, 4, 5, 6, 7, 8,    9, null, 11, true, false],
-        38 => [null, 1, 2, 3, 4, 5, 6, 7, 8, null,   10, 11, true, false],
+    protected $enums         = array(
+        37 => parent::ENUM_CLASSS,                          // classspecific
+        38 => parent::ENUM_RACE,                            // racespecific
+         9 => parent::ENUM_FACTION,                         // objectiveearnrepwith
+        33 => parent::ENUM_EVENT,                           // relatedevent
+        43 => parent::ENUM_CURRENCY,                        // currencyrewarded
+         1 => parent::ENUM_FACTION,                         // increasesrepwith
+        10 => parent::ENUM_FACTION                          // decreasesrepwith
     );
+
     protected $genericFilter = array(
          1 => [FILTER_CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
          2 => [FILTER_CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
@@ -453,7 +459,7 @@ class QuestListFilter extends Filter
         28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
         29 => [FILTER_CR_CALLBACK,  'cbRepeatable',     null                      ], // repeatable
         30 => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,         true], // id
-        33 => [FILTER_CR_ENUM,      'e.holidayId'                                 ], // relatedevent
+        33 => [FILTER_CR_ENUM,      'e.holidayId',      true,                 true], // relatedevent
         34 => [FILTER_CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
         36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
         37 => [FILTER_CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
@@ -464,12 +470,11 @@ class QuestListFilter extends Filter
         45 => [FILTER_CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE, [1, 45],                                         true ], // criteria ids
         'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, '/\D/',                                          true ], // criteria values - only numerals
-        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                             false], // name / text - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX, parent::PATTERN_INT,                             true ], // criteria values - only numerals
+        'na'    => [FILTER_V_REGEX, parent::PATTERN_NAME,                            false], // name / text - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // also match subname
         'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
         'minle' => [FILTER_V_RANGE, [1, 99],                                         false], // min quest level
@@ -560,7 +565,10 @@ class QuestListFilter extends Filter
 
     protected function cbReputation($cr, $sign)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT) || $cr[1] <= 0)
+        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+            return false;
+
+        if (!in_array($cr[1], $this->enums[$cr[0]]))
             return false;
 
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
@@ -593,7 +601,10 @@ class QuestListFilter extends Filter
 
     protected function cbCurrencyReward($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT) || $cr[1] <= 0)
+        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+            return false;
+
+        if (!in_array($cr[1], $this->enums[$cr[0]]))
             return false;
 
         return [
@@ -672,12 +683,12 @@ class QuestListFilter extends Filter
         if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
             return false;
 
-        if ($cr[1] > 0)
-            return ['OR', ['reqFactionId1', $cr[1]], ['reqFactionId2', $cr[1]]];
-        else if ($cr[1] == FILTER_ENUM_ANY)         // any
+        if ($cr[1] == FILTER_ENUM_ANY)              // any
             return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
         else if ($cr[1] == FILTER_ENUM_NONE)        // none
             return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
+        else if (in_array($cr[1], $this->enums[$cr[0]]))
+            return ['OR', ['reqFactionId1', $cr[1]], ['reqFactionId2', $cr[1]]];
 
         return false;
     }

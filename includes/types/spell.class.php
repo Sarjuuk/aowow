@@ -2426,8 +2426,7 @@ class SpellListFilter extends Filter
         )
     );
 
-    // cr => [type, field, misc, extraCol]
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $genericFilter = array(
          1  => [FILTER_CR_CALLBACK,  'cbCost',                                                                                   ], // costAbs [op] [int]
          2  => [FILTER_CR_NUMERIC,   'powerCostPercent', NUM_CAST_INT                                                            ], // prcntbasemanarequired
          3  => [FILTER_CR_BOOLEAN,   'spellFocusObject'                                                                          ], // requiresnearbyobject
@@ -2529,12 +2528,11 @@ class SpellListFilter extends Filter
         116 => [FILTER_CR_BOOLEAN,   'startRecoveryTime'                                                                         ]  // onGlobalCooldown [yn]
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE,    [1, 116],                                        true ], // criteria ids
         'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                             false], // name / text - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX,    parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX,    parent::PATTERN_NAME,                            false], // name / text - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL,    'on',                                            false], // extended name search
         'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
         'minle' => [FILTER_V_RANGE,    [1, 99],                                         false], // spell level min
@@ -2694,7 +2692,7 @@ class SpellListFilter extends Filter
 
     protected function cbAuraNames($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT) || $cr[1] <= 0 || $cr[1] > self::MAX_SPELL_AURA)
+        if (!$this->checkInput(FILTER_V_RANGE, [1, self::MAX_SPELL_AURA], $cr[1]))
             return false;
 
         return ['OR', ['effect1AuraId', $cr[1]], ['effect2AuraId', $cr[1]], ['effect3AuraId', $cr[1]]];
@@ -2702,7 +2700,7 @@ class SpellListFilter extends Filter
 
     protected function cbEffectNames($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT) || $cr[1] <= 0 || $cr[1] > self::MAX_SPELL_EFFECT)
+        if (!$this->checkInput(FILTER_V_RANGE, [1, self::MAX_SPELL_EFFECT], $cr[1]))
             return false;
 
         return ['OR', ['effect1Id', $cr[1]], ['effect2Id', $cr[1]], ['effect3Id', $cr[1]]];

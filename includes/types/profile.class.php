@@ -240,32 +240,23 @@ class ProfileListFilter extends Filter
 
     private   $realms       = [];
 
-    protected $enums        = array(
-        -1 => array(                                        // arena team sizes
-        //  by name     by rating   by contrib
-            12 => 2,    13 => 2,    14 => 2,
-            15 => 3,    16 => 3,    17 => 3,
-            18 => 5,    19 => 5,    20 => 5
-        )
-    );
-
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $genericFilter = array(
          2 => [FILTER_CR_NUMERIC,  'gearscore',         NUM_CAST_INT              ], // gearscore [num]
          3 => [FILTER_CR_CALLBACK, 'cbAchievs',         null,                 null], // achievementpoints [num]
          5 => [FILTER_CR_NUMERIC,  'talenttree1',       NUM_CAST_INT              ], // talenttree1 [num]
          6 => [FILTER_CR_NUMERIC,  'talenttree2',       NUM_CAST_INT              ], // talenttree2 [num]
          7 => [FILTER_CR_NUMERIC,  'talenttree3',       NUM_CAST_INT              ], // talenttree3 [num]
-         9 => [FILTER_CR_STRING,   'g.name',                                      ], // guildname
+         9 => [FILTER_CR_STRING,   'g.name'                                       ], // guildname
         10 => [FILTER_CR_CALLBACK, 'cbHasGuildRank',    null,                 null], // guildrank
-        12 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname2v2
-        15 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname3v3
-        18 => [FILTER_CR_CALLBACK, 'cbTeamName',        null,                 null], // teamname5v5
-        13 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng2v2
-        16 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng3v3
-        19 => [FILTER_CR_CALLBACK, 'cbTeamRating',      null,                 null], // teamrtng5v5
-        14 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib2v2 [num]
-        17 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib3v3 [num]
-        20 => [FILTER_CR_NYI_PH,   0                                              ], // teamcontrib5v5 [num]
+        12 => [FILTER_CR_CALLBACK, 'cbTeamName',        2,                    null], // teamname2v2
+        15 => [FILTER_CR_CALLBACK, 'cbTeamName',        3,                    null], // teamname3v3
+        18 => [FILTER_CR_CALLBACK, 'cbTeamName',        5,                    null], // teamname5v5
+        13 => [FILTER_CR_CALLBACK, 'cbTeamRating',      2,                    null], // teamrtng2v2
+        16 => [FILTER_CR_CALLBACK, 'cbTeamRating',      3,                    null], // teamrtng3v3
+        19 => [FILTER_CR_CALLBACK, 'cbTeamRating',      5,                    null], // teamrtng5v5
+        14 => [FILTER_CR_NYI_PH,   null,                0 /* 2 */                 ], // teamcontrib2v2 [num]
+        17 => [FILTER_CR_NYI_PH,   null,                0 /* 3 */                 ], // teamcontrib3v3 [num]
+        20 => [FILTER_CR_NYI_PH,   null,                0 /* 5 */                 ], // teamcontrib5v5 [num]
         21 => [FILTER_CR_CALLBACK, 'cbWearsItems',      null,                 null], // wearingitem [str]
         23 => [FILTER_CR_CALLBACK, 'cbCompletedAcv',    null,                 null], // completedachievement
         25 => [FILTER_CR_CALLBACK, 'cbProfession',      SKILL_ALCHEMY,        null], // alchemy [num]
@@ -282,22 +273,20 @@ class ProfileListFilter extends Filter
         36 => [FILTER_CR_CALLBACK, 'cbHasGuild',        null,                 null]  // hasguild [yn]
     );
 
-
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'     => [FILTER_V_RANGE,    [1, 36],                                        true ], // criteria ids
-        'crs'    => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 5000]], true ], // criteria operators
-        'crv'    => [FILTER_V_REGEX,    '/[\p{C}:;%\\\\]/ui',                           true ], // criteria values
-        'na'     => [FILTER_V_REGEX,    '/[\p{C};%\\\\]/ui',                            false], // name - only printable chars, no delimiter
-        'ma'     => [FILTER_V_EQUAL,    1,                                              false], // match any / all filter
-        'ex'     => [FILTER_V_EQUAL,    'on',                                           false], // only match exact
-        'si'     => [FILTER_V_LIST,     [1, 2],                                         false], // side
-        'ra'     => [FILTER_V_LIST,     [[1, 8], 10, 11],                               true ], // race
-        'cl'     => [FILTER_V_LIST,     [[1, 9], 11],                                   true ], // class
-        'minle'  => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                 false], // min level
-        'maxle'  => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                 false], // max level
-        'rg'     => [FILTER_V_CALLBACK, 'cbRegionCheck',                                false], // region
-        'sv'     => [FILTER_V_CALLBACK, 'cbServerCheck',                                false], // server
+        'cr'    => [FILTER_V_RANGE,    [1, 36],                                        true ], // criteria ids
+        'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 5000]], true ], // criteria operators
+        'crv'   => [FILTER_V_REGEX,    parent::PATTERN_CRV,                            true ], // criteria values
+        'na'    => [FILTER_V_REGEX,    parent::PATTERN_NAME,                           false], // name - only printable chars, no delimiter
+        'ma'    => [FILTER_V_EQUAL,    1,                                              false], // match any / all filter
+        'ex'    => [FILTER_V_EQUAL,    'on',                                           false], // only match exact
+        'si'    => [FILTER_V_LIST,     [1, 2],                                         false], // side
+        'ra'    => [FILTER_V_LIST,     [[1, 8], 10, 11],                               true ], // race
+        'cl'    => [FILTER_V_LIST,     [[1, 9], 11],                                   true ], // class
+        'minle' => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                 false], // min level
+        'maxle' => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                 false], // max level
+        'rg'    => [FILTER_V_CALLBACK, 'cbRegionCheck',                                false], // region
+        'sv'    => [FILTER_V_CALLBACK, 'cbServerCheck',                                false], // server
     );
 
     /*  heads up!
@@ -490,20 +479,20 @@ class ProfileListFilter extends Filter
             return ['gm.rank', $cr[2], $cr[1]];
     }
 
-    protected function cbTeamName($cr)
+    protected function cbTeamName($cr, $size)
     {
         if ($_ = $this->modularizeString(['at.name'], $cr[2]))
-            return ['AND', ['at.type', $this->enums[-1][$cr[0]]], $_];
+            return ['AND', ['at.type', $size], $_];
 
         return false;
     }
 
-    protected function cbTeamRating($cr)
+    protected function cbTeamRating($cr, $size)
     {
         if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
             return false;
 
-        return ['AND', ['at.type', $this->enums[-1][$cr[0]]], ['at.rating', $cr[2], $cr[1]]];
+        return ['AND', ['at.type', $size], ['at.rating', $cr[2], $cr[1]]];
     }
 
     protected function cbAchievs($cr)

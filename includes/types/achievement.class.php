@@ -280,9 +280,10 @@ class AchievementListFilter extends Filter
 {
 
     protected $enums         = array(
+         4 => parent::ENUM_ZONE,                            // location
         11 => array(
               327 => 160,                                   // Lunar Festival
-              335 => 187,                                   // Love is in the Air
+              423 => 187,                                   // Love is in the Air
               181 => 159,                                   // Noblegarden
               201 => 163,                                   // Children's Week
               341 => 161,                                   // Midsummer Fire Festival
@@ -301,7 +302,7 @@ class AchievementListFilter extends Filter
         )
     );
 
-    protected $genericFilter = array(                       // misc (bool): _NUMERIC => useFloat; _STRING => localized; _FLAG => match Value; _BOOLEAN => stringSet
+    protected $genericFilter = array(
          2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
          3 => [FILTER_CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
          4 => [FILTER_CR_NYI_PH,    null,          1,                               ], // location [enum]
@@ -317,12 +318,11 @@ class AchievementListFilter extends Filter
         18 => [FILTER_CR_STAFFFLAG, 'flags',                                        ]  // flags
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
         'cr'    => [FILTER_V_RANGE, [2, 18],                                         true ], // criteria ids
         'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, '/[\p{C};:%\\\\]/ui',                            true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',                             false], // name / description - only printable chars, no delimiter
+        'crv'   => [FILTER_V_REGEX, parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
+        'na'    => [FILTER_V_REGEX, parent::PATTERN_NAME,                            false], // name / description - only printable chars, no delimiter
         'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // extended name search
         'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
         'si'    => [FILTER_V_LIST,  [1, 2, 3, -1, -2],                               false], // side
@@ -333,7 +333,7 @@ class AchievementListFilter extends Filter
     protected function createSQLForCriterium(&$cr)
     {
         if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
+            if (($genCr = $this->genericCriterion($cr)) !== null)
                 return $genCr;
 
         unset($cr);

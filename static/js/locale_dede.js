@@ -3645,7 +3645,7 @@ var LANG = {
                         ],
         event:          [
                             [424, "Angelwettstreit der Kalu'ak"],   [301, "Anglerwettbewerb im Schlingendorntal"],                                  [372, "Braufest"],                      [374, "Dunkelmond-Jahrmarkt"],
-                            [321, "Erntedankfest"],                 [201, "Kinderwoche"],                   [335, "Liebe liegt in der Luft"],       [327, "Mondfest"],                      [181, "Nobelgartenfest"],
+                            [321, "Erntedankfest"],                 [201, "Kinderwoche"],                   [423, "Liebe liegt in der Luft"],       [327, "Mondfest"],                      [181, "Nobelgartenfest"],
                             [404, "Pilgerfreudenfest"],             [398, "Piratentag"],                    [324, "Schlotternächte"],               [341, "Sonnenwendfest"],                [409, "Tag der Toten"],
                             [141, "Winterhauchfest"],               [283, "Zu den Waffen: Alteractal"],     [285, "Zu den Waffen: Arathibecken"],   [353, "Zu den Waffen: Auge des Sturms"],[420, "Zu den Waffen: Insel der Eroberung"],
                             [284, "Zu den Waffen: Kriegshymnenschlucht"],                                   [400, "Zu den Waffen: Strand der Uralten"]

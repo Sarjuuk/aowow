@@ -103,7 +103,6 @@ class IconListFilter extends Filter
 {
     public $extraOpts = null;
 
-    // cr => [type, field, misc, extraCol]
     private $criterion2field = array(
           1 => '?_items',                                   // items [num]
           2 => '?_spell',                                   // spells [num]
@@ -121,22 +120,21 @@ class IconListFilter extends Filter
     private $totalUses       = [];
 
     protected $genericFilter = array(
-         1 => [FILTER_CR_CALLBACK, 'cbUseAny'     ],        // items [num]
-         2 => [FILTER_CR_CALLBACK, 'cbUseAny'     ],        // spells [num]
-         3 => [FILTER_CR_CALLBACK, 'cbUseAny'     ],        // achievements [num]
-         6 => [FILTER_CR_CALLBACK, 'cbUseAny'     ],        // currencies [num]
-         9 => [FILTER_CR_CALLBACK, 'cbUseAny'     ],        // hunterpets [num]
-        11 => [FILTER_CR_NYI_PH,   null,      null],        // classes [num]
-        13 => [FILTER_CR_CALLBACK, 'cbUseAll'     ]         // used [num]
+         1 => [FILTER_CR_CALLBACK, 'cbUseAny'  ],           // items [num]
+         2 => [FILTER_CR_CALLBACK, 'cbUseAny'  ],           // spells [num]
+         3 => [FILTER_CR_CALLBACK, 'cbUseAny'  ],           // achievements [num]
+         6 => [FILTER_CR_CALLBACK, 'cbUseAny'  ],           // currencies [num]
+         9 => [FILTER_CR_CALLBACK, 'cbUseAny'  ],           // hunterpets [num]
+        11 => [FILTER_CR_NYI_PH,   null,      0],           // classes [num]
+        13 => [FILTER_CR_CALLBACK, 'cbUseAll'  ]            // used [num]
     );
 
-    // fieldId => [checkType, checkValue[, fieldIsArray]]
     protected $inputFields = array(
-        'cr'    => [FILTER_V_LIST,  [1, 2, 3, 6, 9, 11, 13], true ], // criteria ids
-        'crs'   => [FILTER_V_RANGE, [1, 6],                  true ], // criteria operators
-        'crv'   => [FILTER_V_RANGE, [0, 99999],              true ], // criteria values - all criteria are numeric here
-        'na'    => [FILTER_V_REGEX, '/[\p{C};%\\\\]/ui',     false], // name - only printable chars, no delimiter
-        'ma'    => [FILTER_V_EQUAL, 1,                       false]  // match any / all filter
+        'cr'  => [FILTER_V_LIST,  [1, 2, 3, 6, 9, 11, 13], true ], // criteria ids
+        'crs' => [FILTER_V_RANGE, [1, 6],                  true ], // criteria operators
+        'crv' => [FILTER_V_REGEX, parent::PATTERN_INT,     true ], // criteria values - all criteria are numeric here
+        'na'  => [FILTER_V_REGEX, parent::PATTERN_NAME,    false], // name - only printable chars, no delimiter
+        'ma'  => [FILTER_V_EQUAL, 1,                       false]  // match any / all filter
     );
 
     private function _getCnd($op, $val, $tbl)

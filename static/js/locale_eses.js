@@ -3645,7 +3645,7 @@ var LANG = {
                             [4603, "La Cámara de Archavon"],        [3456, "Naxxramas"],                    [4722, "Prueba del Cruzado"],           [4273, "Ulduar"]
                         ],
         event:          [
-                            [335, "Amor en el aire"],               [424, "Competición de pesca Kalu'ak"],  [398, "Día de los Piratas"],            [141, "El festín del Festival de Invierno"],
+                            [423, "Amor en el aire"],               [424, "Competición de pesca Kalu'ak"],  [398, "Día de los Piratas"],            [141, "El festín del Festival de Invierno"],
                             [374, "Feria de la Luna Negra"],        [327, "Festival Lunar"],                [341, "Festival de Fuego del Solsticio de Verano"],                             [321, "Festival de la Cosecha"],
                             [409, "Festividad de los Muertos"],     [372, "Fiesta de la cerveza"],          [404, "Generosidad del Peregrino"],     [301, "Gran espectáculo de pesca de Tuercespina"],
                             [324, "Halloween"],                     [181, "Jardín Noble"],                  [285, "Llamamiento a las armas: Cuenca de Arathi"],                             [284, "Llamamiento a las armas: Garganta Grito de Guerra"],
