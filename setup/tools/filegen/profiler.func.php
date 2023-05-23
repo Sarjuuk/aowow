@@ -211,6 +211,10 @@ if (!CLI)
                     $exAdd(Type::SPELL, $mount, PR_EXCLUDE_GROUP_REQ_TAILORING);
             }
 
+            foreach ($mountz->iterate() as $id => $_)
+                if (!$mountz->getSources($__, $___))
+                    $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
+
             foreach (CLISetup::$localeIds as $l)
             {
                 set_time_limit(5);
@@ -255,6 +259,10 @@ if (!CLI)
             );
             $companionz = new SpellList($condition);
             $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ?_items WHERE `class` = ?d AND `subClass` = ?d AND `spellId1` IN (?a) AND `spellId2` IN (?a)', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
+
+            foreach ($companionz->iterate() as $id => $_)
+                if (!$companionz->getSources($__, $___))
+                    $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
             foreach (CLISetup::$localeIds as $l)
             {
@@ -336,8 +344,11 @@ if (!CLI)
                 $cnd     = array_merge($baseCnd, [['skillLine1', $s]]);
                 $recipez = new SpellList($cnd);
                 $created = '';
-                foreach ($recipez->iterate() as $__)
+                foreach ($recipez->iterate() as $id => $__)
                 {
+                    if (!$recipez->getSources($__, $___))
+                        $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
+
                     foreach ($recipez->canCreateItem() as $idx)
                     {
                         $id = $recipez->getField('effect'.$idx.'CreateItemId');
