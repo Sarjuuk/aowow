@@ -1157,11 +1157,13 @@ define('ACHIEVEMENT_CRITERIA_CONDITION_NOT_IN_GROUP',                   10);    
 define('ACHIEVEMENT_FLAG_COUNTER',                                      0x0001);    // Just count statistic (never stop and complete)
 define('ACHIEVEMENT_FLAG_HIDDEN',                                       0x0002);    // Not sent to client - internal use only
 define('ACHIEVEMENT_FLAG_STORE_MAX_VALUE',                              0x0004);    // Store only max value? used only in "Reach level xx"
-define('ACHIEVEMENT_FLAG_SUMM',                                         0x0008);    // Use summ criteria value from all reqirements (and calculate max value)
+define('ACHIEVEMENT_FLAG_SUM',                                          0x0008);    // Use sum criteria value from all reqirements (and calculate max value)
 define('ACHIEVEMENT_FLAG_MAX_USED',                                     0x0010);    // Show max criteria (and calculate max value ??)
 define('ACHIEVEMENT_FLAG_REQ_COUNT',                                    0x0020);    // Use not zero req count (and calculate max value)
 define('ACHIEVEMENT_FLAG_AVERAGE',                                      0x0040);    // Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
-define('ACHIEVEMENT_FLAG_BAR',                                          0x0080);    // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
+define('ACHIEVEMENT_FLAG_PROGRESS_BAR',                                 0x0080);    // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
+define('ACHIEVEMENT_FLAG_REALM_FIRST',                                  0x0100);    // first max race/class/profession
+define('ACHIEVEMENT_FLAG_REALM_FIRST_KILL',                             0x0200);    // first boss kill
 
 // AchievementCriteriaFlags
 define('ACHIEVEMENT_CRITERIA_FLAG_SHOW_PROGRESS_BAR',                   0x0001);    // Show progress as bar

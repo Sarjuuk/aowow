@@ -666,7 +666,7 @@ class Profiler
             foreach (Util::createSqlBatchInsert($achievements) as $a)
                 DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$a, array_keys($achievements[0]));
 
-            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(points) FROM ?_achievement WHERE id IN (?a)', array_column($achievements, 'typeId'));
+            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(points) FROM ?_achievement WHERE id IN (?a) AND (flags & ?d) = 0', array_column($achievements, 'typeId'), ACHIEVEMENT_FLAG_COUNTER);
         }
 
         CLI::write(' ..achievements');

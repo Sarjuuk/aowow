@@ -750,9 +750,6 @@ class LocalProfileList extends ProfileList
 
         $realms = Profiler::getRealms();
 
-        // post processing
-        $acvPoints = DB::Aowow()->selectCol('SELECT pc.id AS ARRAY_KEY, SUM(a.points) FROM ?_profiler_completion pc LEFT JOIN ?_achievement a ON a.id = pc.typeId WHERE pc.`type` = ?d AND pc.id IN (?a) GROUP BY pc.id', Type::ACHIEVEMENT, $this->getFoundIDs());
-
         foreach ($this->iterate() as $id => &$curTpl)
         {
             if ($curTpl['realm'] && !isset($realms[$curTpl['realm']]))
@@ -766,8 +763,6 @@ class LocalProfileList extends ProfileList
 
             // battlegroup
             $curTpl['battlegroup'] = CFG_BATTLEGROUP;
-
-            $curTpl['achievementpoints'] = isset($acvPoints[$id]) ? $acvPoints[$id] : 0;
         }
     }
 
