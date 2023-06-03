@@ -1359,7 +1359,7 @@ abstract class Filter
         foreach ($fields as $n => $f)
         {
             $sub   = [];
-            $parts = array_filter(explode(' ', $string));
+            $parts = $exact ? [$string] : array_filter(explode(' ', $string));
             foreach ($parts as $p)
             {
                 if ($p[0] == '-' && (mb_strlen($p) > 3 || $shortStr))
