@@ -106,10 +106,10 @@ $lang = array(
         'addWeight'     => "添加另一个权重",
         'createWS'      => "创建一个权重比例",
         'jcGemsOnly'    => "包含<span%s>JC-only</span>宝石",
-        'cappedHint'    => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
+        'cappedHint'    => '提示: <a href="javascript:;" onclick="fi_presetDetails();">移除</a> 命中等级等上限属性的权重。',
         'groupBy'       => "按组",
         'gb'            => array(
-            ["无", "none"],         ["Slot", "slot"],       ["等级", "level"],     ["来源", "source"]
+            ["无", "none"],         ["插槽", "slot"],       ["等级", "level"],     ["来源", "source"]
         ),
         'compareTool'   => "物品比较工具",
         'talentCalc'    => "天赋模拟器",
@@ -137,9 +137,9 @@ $lang = array(
         'bannedRating'  => "你评级评论的权力已被冻结。", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "你已经达到每日投票上限。请明天再来！", # LANG.tooltip_too_many_votes
         'alreadyReport' => "您已报告。", # LANG.ct_resp_error7
-        'textTooShort'  => "[Your message is too short.]",
-        'cannotComment' => "[You have been banned from writing comments.]",
-        'textLength'    => "[Your comment has %d characters and must have at least %d and at most %d characters.]",
+        'textTooShort'  => "你的留言太短了。",
+        'cannotComment' => "你已被禁止发表评论。",
+        'textLength'    => "你的评论有 %d 个字符，必须至少有 %d 个字符，最多 %d 个字符。",
 
         'moreTitles'    => array(
             'reputation'    => "网站声望",
@@ -147,14 +147,14 @@ $lang = array(
             'searchbox'     => "搜索框",
             'tooltips'      => "工具提示",
             'faq'           => "常见问答",
-            'aboutus'       => "什么是AoWoW？",
+            'aboutus'       => "什么是数据库？",
             'searchplugins' => "搜索插件",
             'privileges'    => "特权",
             'top-users'     => "高级用户",
             'help'          => array(
                 'commenting-and-you' => "评论和你",               'modelviewer'       => "模型查看器",              'screenshots-tips-tricks' => "截图：提示和技巧",
-                'stat-weighting'     => "Stat Weighting",                   'talent-calculator' => "天赋模拟器",         'item-comparison'         => "物品比较工具",
-                'profiler'           => "Profiler",                         'markup-guide'      => "标记指南"
+                'stat-weighting'     => "属性权重",                   'talent-calculator' => "天赋模拟器",         'item-comparison'         => "物品比较工具",
+                'profiler'           => "角色概况",                         'markup-guide'      => "标记指南"
             )
         )
     ),
@@ -170,24 +170,24 @@ $lang = array(
         'added'     => "已添加",
         'rating'    => "评分",
         'votes'     => "[span id=guiderating-value]%d[/span]/5 （[span id=guiderating-votes][n5=%d][/span] 投票）[span id=guiderating][/span]",
-        'noVotes'   => "[not enough votes] [span id=guiderating][/span]",
+        'noVotes'   => "[投票数量不足] [span id=guiderating][/span]",
         'byAuthor'  => "来自 %s",
-        'notFound'  => "[This 指南 doesn't exist.]",
-        'clTitle'     => '[Changelog For] "<a href="?guide=%1$d">%2$s</a>"',
-        'clStatusSet' => '[Status set to] %s',
+        'notFound'  => "[该指南不存在。]",
+        'clTitle'     => '[修改日志] "<a href="?guide=%1$d">%2$s</a>"',
+        'clStatusSet' => '[状态已设置为] %s',
         'clCreated'   => '已创建',
-        'clMinorEdit' => '[Minor Edit]',
+        'clMinorEdit' => '[小修改]',
         'editor'    => array(
             'fullTitle'       => '完整标题',
-            'fullTitleTip'    => '[The full guide title will be used on the guide page and may include SEO-oriented phrasing.]',
+            'fullTitleTip'    => '[完整的指南标题将用于指南页面，并可能包含面向搜索引擎优化的词语]',
             'name'            => '名称',
-            'nameTip'         => '[This should be a simple and clear name of what the guide is, for use in places like menus and guide lists.]',
+            'nameTip'         => '[这应该是一个简单明了的指南名称，用于菜单和指南列表]',
             'description'     => '描述',
             'descriptionTip'  => '描述将用于说明片段&lt;br /&gt;&lt;br /&gt;如果不填，则自动生成。',
-        //  'commentEmail'    => 'Comment Emails',
-        //  'commentEmailTip' => 'Should the author get emailed whenever a user comments on this guide?',
+        //  'commentEmail'    => '评论电子邮件',
+        //  'commentEmailTip' => '当用户对此指南发表评论时，作者是否收到电子邮件通知？',
             'changelog'       => '当前编辑的修改日志',
-            'changelogTip'    => '[Enter your changelog for this update here.]',
+            'changelogTip'    => '[在此处输入此次更新的修改日志]',
             'save'            => '保存',
             'submit'          => '提交以供审核',
             'autoupdate'      => '预览',
@@ -199,10 +199,10 @@ $lang = array(
             'images'          => '图片',
             'statusTip'       => array(
                 GUIDE_STATUS_DRAFT    => '你的指南目前是草稿状态，只有你自己可见。试着输入更多的文字，当你觉得可以了的时候就提交送审吧。',
-                GUIDE_STATUS_REVIEW   => '[Your guide is being reviewed.]',
-                GUIDE_STATUS_APPROVED => '[Your guide has been published.]',
-                GUIDE_STATUS_REJECTED => '[Your guide has been rejected. After it\'s shortcomings have been remedied you may resubmit it for review.]',
-                GUIDE_STATUS_ARCHIVED => '[Your guide is outdated and has been archived. Is will no longer be listed and can\'t be edited.]',
+                GUIDE_STATUS_REVIEW   => '[你的指南正在审核中]',
+                GUIDE_STATUS_APPROVED => '[你的指南已发布]',
+                GUIDE_STATUS_REJECTED => '[你的指南已被拒绝。在修正问题后，你可以重新提交审核。]',
+                GUIDE_STATUS_ARCHIVED => '[你的指南已过时，并已归档。它将不再列出，也无法编辑。]',
             )
         ),
         'category'  => array(
@@ -217,25 +217,25 @@ $lang = array(
         'realm'         => "服务器",
         'region'        => "区域",
         'viewCharacter' => "查看角色",
-        '_cpHint'       => "The <b>Character Profiler</b> lets you edit your character, find gear upgrades, check your gearscore and more!",
-        '_cpHelp'       => "To get started, just follow the steps below. If you'd like more information, check out our extensive <a href=\"?help=profiler\">help page</a>.",
-        '_cpFooter'     => "If you want a more refined search try out our <a href=\"?profiles\">advanced search</a> options. You can also create a <a href=\"?profile&amp;new\">new custom profile</a>.",
-        'firstUseTitle' => "%s of %s",
-        'complexFilter' => "Complex filter selected! Search results are limited to cached Characters.",
-        'customProfile' => " (Custom Profile)",
-        'resync'        => "Resync",
-        'guildRoster'   => "Guild Roster for &lt;%s&gt;",
-        'arenaRoster'   => "Arena Team Roster for &lt;%s&gt",
-        'atCaptain'     => "Arena Team Captain",
+        '_cpHint'       => " <b>角色概况 <b>可以让你编辑你的角色、查找装备升级、检查装备评分等等！",
+        '_cpHelp'       => "要开始使用，请按照以下步骤操作。如果需要更多信息，请查阅我们详尽的<a href=\"?help=profiler\">帮助页面</a>。",
+        '_cpFooter'     => "如果你想进行更精细的搜索，请尝试我们的<a href=\"?profiles\">高级搜索</a>选项。你还可以创建一个<a href=\"?profile&amp;new\">新的自定义概况</a>。",
+        'firstUseTitle' => "%s 的 %s",
+        'complexFilter' => "选择了复杂过滤器！搜索结果仅限于缓存的角色。",
+        'customProfile' => "（自定义概况）",
+        'resync'        => "重新同步",
+        'guildRoster'   => "公会成员名单 &lt;%s&gt;",
+        'arenaRoster'   => "竞技场战队名单 &lt;%s&gt",
+        'atCaptain'     => "竞技场战队队长",
 
-        'profiler'      => "Character Profiler",
-        'arenaTeams'    => "Arena Teams",
-        'guilds'        => "Guilds",
+        'profiler'      => "角色概况",
+        'arenaTeams'    => "竞技场战队",
+        'guilds'        => "公会",
 
         'notFound'      => array(
-            'guild'     => "This Guild doesn't exist or is not yet in the database.",
-            'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
-            'profile'   => "This character doesn't exist or is not yet in the database."
+            'guild'     => "该公会不存在或尚未被收录到数据库中。",
+            'arenateam' => "该竞技场战队不存在或尚未被收录到数据库中。",
+            'profile'   => "该角色不存在或尚未被收录到数据库中。"
         ),
         'regions' => array(
             'us' => "美洲地区",
@@ -317,10 +317,10 @@ $lang = array(
         'emotes'        => "表情",
         'enchantment'   => "附魔",
         'enchantments'  => "附魔",
-        'areatrigger'   => "areatrigger",
-        'areatriggers'  => "Areatrigger",
-        'mail'          => "mail",
-        'mails'         => "Mails",
+        'areatrigger'   => "区域触发器",
+        'areatriggers'  => "区域触发器",
+        'mail'          => "邮件",
+        'mails'         => "邮件",
 
         'cooldown'      => "%s冷却时间",
         'difficulty'    => "难度",
@@ -372,8 +372,8 @@ $lang = array(
             "已加工", "失窃", "废弃", "已剥皮", "游戏商店"
         ),
         'pvpSources'    => array(
-            null,                           "Arena Season 1",               "Arena Season 2",               "Arena Season 3",               "Arena Season 4",
-            "Arena Season 5",               "Arena Season 6",               "Arena Season 7",               "Arena Season 8",               "2009 Arena Tournament"
+            null,                           "竞技场赛季 1",               "竞技场赛季 2",               "竞技场赛季 3",               "竞技场赛季 4",
+            "竞技场赛季 5",               "竞技场赛季 6",               "竞技场赛季 7",               "竞技场赛季 8",               "2009竞技场锦标赛"
         ),
         'languages'     => array(
              1 => "兽人语",                   2 => "达纳苏斯语",               3 => "牛头人语",                 6 => "矮人语",                  7 => "通用语",                 8 => "恶魔语",
@@ -828,7 +828,7 @@ $lang = array(
         'empty'         => '[span class=q0]<empty>[/span]'
     ),
     'account' => array(
-        'title'         => "Aowow账号",
+        'title'         => "数据库账号",
         'email'         => "电子邮箱地址",
         'continue'      => "继续",
         'groups'        => array(
@@ -837,7 +837,7 @@ $lang = array(
             "截屏管理器", "视频管理员", "API伙伴", "等待中"
         ),
         // signIn
-        'doSignIn'      => "登录你的AoWoW账号",
+        'doSignIn'      => "登录你的数据库账号",
         'signIn'        => "登录",
         'user'          => "用户名",
         'pass'          => "密码",
@@ -873,14 +873,14 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "该电子邮件地址无效。", // message_emailnotvalid
-        'emailNotFound' => "你输入的电子邮件地址与任何帐户不关联。<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'emailNotFound' => "你输入的电子邮件地址与任何帐户不关联。<br><br>如果您忘记了使用哪个电子邮件注册了您的帐户，请发送电子邮件至".CFG_CONTACT_EMAIL."寻求帮助。",
         'createAccSent' => "电子邮件发送到<b>%s</b>。只需按照说明创建你的帐户。",
         'recovUserSent' => "电子邮件发送到<b>%s</b>。只需按照说明恢复你的用户名。",
         'recovPassSent' => "电子邮件发送到<b>%s</b>。只需按照说明重置你的密码。",
         'accActivated'  => '你的帐户已被激活。<br>继续<a href="?account=signin&token=%s">登录</a>',
         'userNotFound'  => "输入的用户名不存在。",
         'wrongPass'     => "密码无效。",
-        // 'accInactive'   => "That account has not yet been confirmed active.",
+        // 'accInactive'   => "该帐户尚未确认激活。",
         'loginExceeded' => "这个IP最大登录次数已超过。请在%s后再次尝试。",
         'signupExceeded'=> "这个IP最大注册次数已超过。请在%s后再次尝试。",
         'errNameLength' => "你的用户名必须至少4个字符长度。", // message_usernamemin
@@ -899,20 +899,20 @@ $lang = array(
         'joinDate'      => "加入",
         'lastLogin'     => "上次访问",
         'userGroups'    => "角色",
-        'consecVisits'  => "Consecutive visits",
+        'consecVisits'  => "连续访问",
         'publicDesc'    => "公共描述",
         'profileTitle'  => "%s的简介",
-        'contributions' => "Contributions",
-        'uploads'       => "Data uploads",
+        'contributions' => "贡献",
+        'uploads'       => "数据上传",
         'comments'      => "评论",
         'screenshots'   => "截图",
         'videos'        => "视频",
-        'posts'         => "Forum posts",
+        'posts'         => "论坛帖子",
         // user mail
         'tokenExpires'  => "此令牌将在%s过期。",
-        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+        'accConfirm'    => ["账户确认", "欢迎来到".CFG_NAME_SHORT."!\r\n\r\n点击下方链接以激活您的账户。\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
+        'recoverUser'   => ["用户恢复",        "点击此链接登录\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
+        'resetPass'     => ["重置密码",       "点击此链接以重置您的密码。\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"]
     ),
     'emote' => array(
         'notFound'      => "这个表情不存在。",
@@ -933,31 +933,31 @@ $lang = array(
         )
     ),
     'areatrigger' => array(
-        'notFound'      => "This areatrigger doesn't exist.",
-        'foundIn'       => "This areatrigger can be found in",
-        'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
+        'notFound'      => "这个区域触发器不存在。",
+        'foundIn'       => "这个区域触发器可以在以下地区找到：",
+        'types'         => ['未使用', '酒馆', '传送门', '任务目标', 'Smart Trigger', '脚本']
     ),
     'gameObject' => array(
         'notFound'      => "这个对象不存在。",
-        'cat'           => [0 => "Other", 9 => "Books", 3 => "Containers", -5 => "Chests", 25 => "Fishing Pools", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
-        'type'          => [              9 => "Book",  3 => "Container",  -5 => "Chest",  25 => "",              -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],
+        'cat'           => [0 => "其他", 9 => "书籍", 3 => "容器", -5 => "宝箱", 25 => "钓鱼点", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => "工具"],
+        'type'          => [              9 => "书籍",  3 => "容器",  -5 => "宝箱",  25 => "",              -3 => "草药",  -4 => "矿脉",  -2 => "任务", -6 => ""],
         'unkPosition'   => "这个对象的位置未知。",
         'npcLootPH'     => '这个<b>%s</b>包含战利品，与<a href="?npc=%d">%s</a>的作战后，在他/她/它死亡后刷新。',
-        'key'           => "Key",
+        'key'           => "钥匙",
         'focus'         => "Spell Focus",
         'focusDesc'     => "Spells requiring this Focus can be cast near this Object",
-        'trap'          => "Trap",
+        'trap'          => "陷阱",
         'triggeredBy'   => "触发由",
-        'capturePoint'  => "Capture Point",
-        'foundIn'       => "这个对象能在以下地区找到：",
-        'restock'       => "Restocks every %s.",
+        'capturePoint'  => "占领点",
+        'foundIn'       => "这个游戏对象可以在以下地区找到：",
+        'restock'       => "每%s重新补给一次。",
         'goFlags'       => array(
-            GO_FLAG_IN_USE         => 'In use',
-            GO_FLAG_LOCKED         => 'Locked',
-            GO_FLAG_INTERACT_COND  => 'Cannot interact',
-            GO_FLAG_TRANSPORT      => 'Transport',
-            GO_FLAG_NOT_SELECTABLE => 'Not selectable',
-            GO_FLAG_TRIGGERED      => 'Triggered',
+            GO_FLAG_IN_USE         => '正在使用',
+            GO_FLAG_LOCKED         => '已锁定',
+            GO_FLAG_INTERACT_COND  => '无法交互',
+            GO_FLAG_TRANSPORT      => '传送',
+            GO_FLAG_NOT_SELECTABLE => '不可选择',
+            GO_FLAG_TRIGGERED      => '已触发',
             GO_FLAG_DAMAGED        => 'Siege damaged',
             GO_FLAG_DESTROYED      => 'Siege destroyed'
         ),
@@ -1007,30 +1007,30 @@ $lang = array(
             '人型生物', '小动物', '机械', '未指定', '图腾', '非战斗宠物', '气体云雾'
         ),
         'npcFlags'      => array(
-            NPC_FLAG_GOSSIP         => 'Gossip',
-            NPC_FLAG_QUEST_GIVER    => 'Quest Giver',
-            NPC_FLAG_TRAINER        => 'Trainer',
-            NPC_FLAG_CLASS_TRAINER  => 'Class Trainer',
-            NPC_PROFESSION_TRAINER  => 'Profession Trainer',
-            NPC_FLAG_VENDOR         => 'Vendor',
-            NPC_FLAG_VENDOR_AMMO    => 'Ammo Vendor',
-            NPC_FLAG_VENDOR_FOOD    => 'Food Vendor',
-            NPC_FLAG_VENDOR_POISON  => 'Poison Vendor',
-            NPC_FLAG_VENDOR_REAGENT => 'Reagent Vendor',
-            NPC_FLAG_REPAIRER       => 'Repair',
-            NPC_FLAG_FLIGHT_MASTER  => 'Flight Master',
-            NPC_FLAG_SPIRIT_HEALER  => 'Spirit Healer',
-            NPC_FLAG_SPIRIT_GUIDE   => 'Spirit Guide',
-            NPC_FLAG_INNKEEPER      => 'Innkeeper',
-            NPC_FLAG_BANKER         => 'Banker',
-            NPC_FLAG_PETITIONER     => 'Petitioner',
-            NPC_FLAG_GUILD_MASTER   => 'Guild Master',
-            NPC_FLAG_BATTLEMASTER   => 'Battle Master',
-            NPC_FLAG_AUCTIONEER     => 'Auctioneer',
-            NPC_FLAG_STABLE_MASTER  => 'Stable Master',
-            NPC_FLAG_GUILD_BANK     => 'Guild Bank',
+            NPC_FLAG_GOSSIP         => '对话',
+            NPC_FLAG_QUEST_GIVER    => '任务发布者',
+            NPC_FLAG_TRAINER        => '训练师',
+            NPC_FLAG_CLASS_TRAINER  => '职业训练师',
+            NPC_PROFESSION_TRAINER  => '专业训练师',
+            NPC_FLAG_VENDOR         => '商人',
+            NPC_FLAG_VENDOR_AMMO    => '弹药商',
+            NPC_FLAG_VENDOR_FOOD    => '食物商',
+            NPC_FLAG_VENDOR_POISON  => '毒药商',
+            NPC_FLAG_VENDOR_REAGENT => '材料商',
+            NPC_FLAG_REPAIRER       => '修理',
+            NPC_FLAG_FLIGHT_MASTER  => '飞行管理员',
+            NPC_FLAG_SPIRIT_HEALER  => '灵魂医者',
+            NPC_FLAG_SPIRIT_GUIDE   => '灵魂向导',
+            NPC_FLAG_INNKEEPER      => '旅店老板',
+            NPC_FLAG_BANKER         => '银行职员',
+            NPC_FLAG_PETITIONER     => '请愿者',
+            NPC_FLAG_GUILD_MASTER   => '公会官员',
+            NPC_FLAG_BATTLEMASTER   => '战斗大师',
+            NPC_FLAG_AUCTIONEER     => '拍卖师',
+            NPC_FLAG_STABLE_MASTER  => '兽栏管理员',
+            NPC_FLAG_GUILD_BANK     => '公会银行',
             NPC_FLAG_SPELLCLICK     => 'Spellclick',
-            NPC_FLAG_MAILBOX        => 'Mailbox'
+            NPC_FLAG_MAILBOX        => '邮箱'
         )
     ),
     'event' => array(
@@ -1047,12 +1047,12 @@ $lang = array(
         'points'        => "点数",
         'series'        => "系列",
         'outOf'         => "/",
-        'criteriaType'  => "Criterium Type ID:",
+        'criteriaType'  => "条件类型ID：",
         'itemReward'    => "你将得到",
         'titleReward'   => '你将被授予头衔"<a href="?title=%d">%s</a>"',
         'slain'         => "杀死",
         'reqNumCrt'     => "要求",
-        'rfAvailable'   => "Available on realm: ",
+        'rfAvailable'   => "在服务器上可用：",
         '_transfer'     => '这个成就将被转换到<a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
                 1 => "属性",                                                           21 => "PvP",
@@ -1126,22 +1126,22 @@ $lang = array(
         'CosmicMap'     => "宇宙地图"
     ),
     'privileges' => array(
-        'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br><br>So, reputation is a rough measure of how much you contributed to the community.<br><br>As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",
-        'privilege'     => "Privilege",
-        'privileges'    => "Privileges",
-        'requiredRep'   => "Reputation Required",
-        'reqPoints'     => "This privilege requires <b>%s</b> reputation points.",
+        'main'          => "在我们的网站上，你可以通过 <a href=\"?reputation\">声望</a>. 来获取特权。获取声望的主要途径是获得评论的赞同。<br><br>因此，声望是衡量你对社区的贡献程度的一个大致指标。<br><br>随着声望的积累，你将获得社区的信任，并被赋予额外的特权。以下是完整的特权列表。",
+        'privilege'     => "特权",
+        'privileges'    => "特权",
+        'requiredRep'   => "需要声望",
+        'reqPoints'     => "这个特权需要 <b>%s</b> 声望点数。",
         '_privileges'   => array(
-            null,                                   "Post comments",                                "Post external links",                              null,
-            "No CAPTCHAs",                          "Comment votes worth more",                     null,                                               null,
-            null,                                   "More votes per day",                           "Upvote comments",                                  "Downvote comments",
-            "Post comment replies",                 "Border: Uncommon",                             "Border: Rare",                                     "Border: Epic",
-            "Border: Legendary",                    "AoWoW Premium"
+            null,                                   "发表评论",                                "发布外部链接",                              null,
+            "无验证码",                          "评论投票价值更高",                     null,                                               null,
+            null,                                   "每日投票次数更多",                           "点赞评论",                                  "反对评论",
+            "发表评论回复",                 "Border: 罕见",                             "Border: 稀有",                                     "Border: 史诗",
+            "Border: 传说",                    "数据库高级会员"
         )
     ),
     'zone' => array(
         'notFound'      => "这个区域不存在。",
-        'attunement'    => ["Attunement", "Heroic attunement"],
+        'attunement'    => ["调整", "英雄调整"],
         'key'           => ["钥匙", "英雄钥匙"],
         'location'      => "位置",
         'raidFaction'   => "团队副本阵营",
@@ -1166,7 +1166,7 @@ $lang = array(
              209 => ["庭院", "饭厅", "空巢", "下层瞭望台", "上层瞭望台", "高弗雷勋爵的大厅", "城墙走道"],
              719 => ["阿斯卡之池", "月神圣地密室", "遗忘之池"],
              721 => ["齿轮大厅", "宿舍", "发射台", "工匠议会"],
-             796 => ["Graveyard", "Library", "Armory", "Cathedral"],
+             796 => ["墓地", "图书馆", "军械库", "大教堂"],
             1196 => ["尖塔下层", "尖塔上层"],
             1337 => ["守护者大厅", "卡兹格罗斯之座"],
             1581 => ["死亡矿井", "铁甲湾"],
@@ -1218,7 +1218,7 @@ $lang = array(
         'description'   => "描述",
         'playerSlain'   => "玩家被杀",
         'profession'    => "专业",
-        'timer'         => "Timer",
+        'timer'         => "计时器",
         'loremaster'    => "博学者",
         'suggestedPl'   => "建议玩家数",
         'keepsPvpFlag'  => "保持你的PvP标记",
@@ -1252,8 +1252,8 @@ $lang = array(
         'spellCast'     => "该法术将被施放在你身上",
         'spellLearn'    => "你将学会",
         'bonusTalents'  => "%d天赋|4点数:点数;",
-        'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
-        'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
+        'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> 已显示)',
+        'questPoolDesc' => '每次只能同时提供 %d 个任务',
         'autoaccept'    => '自动接收',
         'questInfo'     => array(
              0 => "普通",              1 => "组队",              21 => "职业",               41 => "PvP",                62 => "团队",               81 => "地下城",            82 => "世界事件",
@@ -1372,14 +1372,14 @@ $lang = array(
         )
     ),
     'mail' => array(
-        'notFound'      => "This mail doesn't exist.",
+        'notFound'      => "该邮件不存在。",
         'attachment'    => "附件",
-        'mailDelivery'  => 'You will receive <a href="?mail=%d">this letter</a>%s%s', // "你会收到这封信%s%s",
-        'mailBy'        => '由<a href="?npc=%d">%s</a>所写',
-        'mailIn'        => " after %s",
-        'delay'         => "Delay",
-        'sender'        => "Sender",
-        'untitled'      => "Untitled Mail #%d"
+        'mailDelivery'  => '你将收到 <a href="?mail=%d">这封信</a>%s%s', // "你会收到这封信%s%s",
+        'mailBy'        => '发件人：<a href="?npc=%d">%s</a>',
+        'mailIn'        => "在 %s 后",
+        'delay'         => "延迟",
+        'sender'        => "寄件人",
+        'untitled'      => "无标题邮件 #%d"
     ),
     'pet'      => array(
         'notFound'      => "这个宠物家族不存在。",
@@ -1435,7 +1435,7 @@ $lang = array(
         '_castTime'     => "施法时间",
         '_cooldown'     => "冷却时间",
         '_distUnit'     => "码",
-        '_forms'        => "Forms",
+        '_forms'        => "形态",
         '_aura'         => "光环",
         '_effect'       => "效果",
         '_none'         => "无",
@@ -1444,16 +1444,16 @@ $lang = array(
         '_gcdCategory'  => "GCD类别",
         '_value'        => "值",
         '_radius'       => "半径",
-        '_interval'     => "Interval", //Interval
-        '_inSlot'       => "in slot",
+        '_interval'     => "间隔", //Interval
+        '_inSlot'       => "在插槽中",
         '_collapseAll'  => "折叠全部",
         '_expandAll'    => "展开全部",
         '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
-        'currentArea'   => '&lt;current area&gt;',
-        'discovered'    => "Learned via discovery",
-        'ppm'           => "(%s每分钟触发几率)",
+        'currentArea'   => '&lt;当前区域&gt;',
+        'discovered'    => "通过发现学习",
+        'ppm'           => "%s每分钟触发几率",
         'procChance'    => "触发几率",
-        'starter'       => "Starter spell",
+        'starter'       => "初始法术",
         'trainingCost'  => "训练成本",
         'castIn'        => "%s秒施法时间",
         'instantPhys'   => "瞬发",
@@ -1486,8 +1486,8 @@ $lang = array(
             "剩余%d天"
         ),
         'scaling'       => array(
-            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
-            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
+            'directSP' => "直接效果的攻击强度 +%.2f%%",         'directAP' => "直接效果的攻击强度 +%.2f%%",
+            'dotSP'    => "每个周期的法术强度 +%.2f%%",                    'dotAP'    => "每个周期的攻击强度 +%.2f%%"
         ),
         'powerRunes'    => ["鲜血", "邪恶", "冰霜", "死亡"],
         'powerTypes'    => array(
@@ -1495,11 +1495,11 @@ $lang = array(
               -2 => "生命值",              0 => "法力值",                1 => "怒气",                2 => "集中",               3 => "能量",              4 => "快乐",
                5 => "符文",               6 => "符文能量",
             // powerDisplay
-              -1 => "Ammo",              -41 => "蓝铁",            -61 => "蒸汽动力",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
-            -142 => "Wrath"
+              -1 => "弹药",              -41 => "蓝铁",            -61 => "蒸汽动力",   -101 => "能量",             -121 => "软泥",             -141 => "鲜血之力",
+            -142 => "愤怒"
         ),
         'relItems'      => array(
-            'base'    => "<small>Show %s related to <b>%s</b></small>",
+            'base'    => "<small>显示与<b>%s</b>相关的 %s<</small>",
             'link'    => "或",
             'recipes' => '<a href="?items=9.%s">制作物品</a>',
             'crafted' => '<a href="?items&filter=cr=86;crs=%s;crv=0">手工制作物品</a>'
@@ -1555,35 +1555,35 @@ $lang = array(
             0x02A5F3 => "近战武器",             0x0060 => "盾牌",                     0x04000C => "远程武器",            0xA091 => "单手近战武器"
         ),
         'traitShort'    => array(
-            'atkpwr'    => "AP",                    'rgdatkpwr' => "RAP",                   'splpwr'    => "SP",                    'arcsplpwr' => "ArcP",                  'firsplpwr' => "FireP",
-            'frosplpwr' => "FroP",                  'holsplpwr' => "HolP",                  'natsplpwr' => "NatP",                  'shasplpwr' => "ShaP",                  'splheal'   => "Heal",
-            'str'       => "Str",                   'agi'       => "Agi",                   'sta'       => "Sta",                   'int'       => "Int",                   'spi'       => "Spi"
+            'atkpwr'    => "攻强",                    'rgdatkpwr' => "远程攻强",                   'splpwr'    => "法强",                    'arcsplpwr' => "奥术强度",                  'firsplpwr' => "火焰强度",
+            'frosplpwr' => "冰霜强度",                  'holsplpwr' => "神圣强度",                  'natsplpwr' => "自然强度",                  'shasplpwr' => "暗影强度",                  'splheal'   => "治疗强度",
+            'str'       => "力量",                   'agi'       => "敏捷",                   'sta'       => "耐力",                   'int'       => "智力",                   'spi'       => "精神"
         ),
         'spellModOp'    => array(
-            "伤害",                               "持续时间",                             "Threat",                               "效果1",                             "可使用次数",
-            "范围",                                "半径",                               "Critical Hit Chance",                  "所有效果",                          "Casting Time loss",
-            "Casting Time",                         "冷却时间",                             "效果2",                             "无视护甲",                         "花费",
-            "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
-            "Multiplier (Damage)",                  "公共冷却时间",                      "Damage over Time",                     "效果3",                             "Multiplier (Bonus)",
-            null,                                   "Procs per Minute",                     "Multiplier (Value)",                   "Chance to Resist Dispel",              "Critical Damage Bonus2",
-            "Refund Cost on Fail"
+            "伤害",                               "持续时间",                             "威胁值",                               "效果1",                             "可使用次数",
+            "范围",                                "半径",                               "暴击几率",                  "所有效果",                          "施法时间缩短",
+            "施法时间",                         "冷却时间",                             "效果2",                             "无视护甲",                         "花费",
+            "暴击伤害加成",                "失败几率",                       "跳跃目标数",                         "触发几率",                          "间隔",
+            "倍数（伤害）",                  "公共冷却时间",                      "持续伤害",                     "效果3",                             "倍数（加成）",
+            null,                                   "每分钟触发几率",                     "倍数（数值）",                   "抵抗驱散几率",              "击伤害加成2",
+            "失败返还成本"
         ),
         'combatRating'  => array(
-            "Weapon Skill",                         "Defense Skill",                        "Dodge",                                "Parry",                                "Block",
-            "武器技能",                         "防御",                        "躲闪",                                "招架",                                "格挡",
-            "Critical Spell Hit Chance",            "Taken Melee Hit Chance",               "Taken Ranged Hit Chance",              "Taken Spell Hit Chance",               "Taken Critical Melee Hit Chance",
-            "Taken Critical Ranged Hit Chance",     "Taken Critical Spell Hit Chance",      "Melee Haste",                          "Ranged Haste",                         "Spell Haste",
-            "Mainhand Weapon Skill",                "Offhand Weapon Skill",                 "Ranged Weapon Skill",                  "Expertise",                            "Armor Penetration"
+            "武器技能",                         "防御技能",                        	"躲闪",                             "招架",                           "格挡",
+            "近战命中几率",                     "远程命中几率",               		"法术命中几率",                     "近战暴击几率",                   "远程暴击几率",
+            "法术暴击几率",           			"受到近战命中几率",               	"受到远程命中几率",              	"受到法术命中几率",               "受到近战暴击几率",
+            "受到远程暴击几率",     			"受到法术暴击几率",      			"急速（近战）",                     "急速（远程）",                   "急速（法术）",
+            "主手武器技能",                		"副手武器技能",                 	"远程武器技能",                  	"精准",                           "护甲穿透"
         ),
         'lockType'      => array(
             null,                                   "锁上的物品",                          "药草",                            "矿点",                               "陷阱",
-            "未锁上的物品",                                 "宝物",                       "Calcified Elven Gems",           "未锁上的物品",                                "陷阱",
+            "未锁上的物品",                                 "宝物",                       "钙化精灵宝石",           "未锁上的物品",                                "陷阱",
             "未锁上的物品",                           "未锁上的物品",                          "未锁上的物品",                       "未锁上的物品",                        "未锁上的物品",
             "加兹瑞迪安",                    "锁上的物品",                             "未锁上的物品",                             "未锁上的物品",                            "钓鱼",
             "书典",                          "未锁上的物品"
         ),
-        'stealthType'   => ["General", "Trap"],
-        'invisibilityType' => [null, "General", null, "Trap", null, null, "Drunk", null, null, null, null, null],
+        'stealthType'   => ["一般", "陷阱"],
+        'invisibilityType' => [null, "一般", null, "陷阱", null, null, "醉酒", null, null, null, null, null],
         'attributes'    => array(                           // index defined by filters
             69 => "所有法术效果都是有害的",
             57 => "无法取消光环",
@@ -1754,7 +1754,7 @@ $lang = array(
         'bagSlotString' => "%d格%s",
         'fap'           => "在猎豹、熊、巨熊和枭兽形态下的攻击强度",
         'durability'    => "耐久度 %d / %d",
-        'realTime'      => "real time",
+        'realTime'      => "实时",
         'conjured'      => "魔法制造的物品",
         'sellPrice'     => "卖价",
         'itemLevel'     => "物品等级%d",
@@ -1763,35 +1763,35 @@ $lang = array(
         'openClick'     => "&lt;右键点击打开&gt",
         'setBonus'      => "(%d) 套装：%s",
         'setName'       => "%s（%d/%d）",
-        'partyLoot'     => "Party loot",
-        'smartLoot'     => "Smart loot",
+        'partyLoot'     => "团队拾取",
+        'smartLoot'     => "智能拾取",
         'indestructible'=> "不能被摧毁",
         'deprecated'    => "过时的",
         'useInShape'    => "可在变形形态下使用", //shapeshifted=变形
         'useInArena'    => "可在竞技场状态下使用",
         'refundable'    => "可退还的",
-        'noNeedRoll'    => "Cannot roll Need",
+        'noNeedRoll'    => "无法需求掷骰",
         'atKeyring'     => "可以放在钥匙链",
-        'worth'         => "Worth",
+        'worth'         => "价值",
         'consumable'    => "消耗品",
         'nonConsumable' => "非消耗品",
-        'accountWide'   => "Account-wide",
+        'accountWide'   => "账号共享",
         'millable'      => "可研磨",
-        'noEquipCD'     => "没有装备的冷却时间",
+        'noEquipCD'     => "没有装备冷却时间",
         'prospectable'  => "可选矿",
         'disenchantable'=> "可分解",
         'cantDisenchant'=> "无法分解",
-        'repairCost'    => "修理花费",
-        'tool'          => "Tool",
+        'repairCost'    => "修理费用",
+        'tool'          => "工具",
         'cost'          => "花费",
         'content'       => "内容",
         '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         '_unavailable'  => "这个物品对玩家不可用。",
         '_rndEnchants'  => "随机附魔",
         '_chance'       => "（%s%%几率）",
-        'slot'          => "Slot",
-        '_quality'      => "质量",
-        'usableBy'      => "Usable by",
+        'slot'          => "装备部位",
+        '_quality'      => "品质",
+        'usableBy'      => "可用职业",
         'buyout'        => "一口价",
         'each'          => "每个",
         'tabOther'      => "其他",
@@ -1971,7 +1971,7 @@ $lang = array(
             "每5秒恢复%d点生命值。",
             "法术穿透提高%d。",
             "使你的盾牌格挡值提高%d。",
-            "Unknown Bonus #%d (%d)",
+            "未知加成 #%d (%d)",
         )
     )
 );
