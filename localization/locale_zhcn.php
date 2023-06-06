@@ -137,9 +137,9 @@ $lang = array(
         'bannedRating'  => "你评级评论的权力已被冻结。", # LANG.tooltip_banned_rating
         'tooManyVotes'  => "你已经达到每日投票上限。请明天再来！", # LANG.tooltip_too_many_votes
         'alreadyReport' => "您已报告。", # LANG.ct_resp_error7
-        'textTooShort'  => "[你的留言太短了。]",
-        'cannotComment' => "[你已被禁止发表评论。]",
-        'textLength'    => "[你的评论有 %d 个字符，必须至少有 %d 个字符，最多 %d 个字符。]",
+        'textTooShort'  => "你的留言太短了。",
+        'cannotComment' => "你已被禁止发表评论。",
+        'textLength'    => "你的评论有 %d 个字符，必须至少有 %d 个字符，最多 %d 个字符。",
 
         'moreTitles'    => array(
             'reputation'    => "网站声望",
@@ -1975,3 +1975,5 @@ $lang = array(
         )
     )
 );
+
+?>
