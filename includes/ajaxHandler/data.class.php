@@ -59,14 +59,13 @@ class AjaxData extends AjaxHandler
                     $result .= $this->loadProfilerData($set, '777');
                     break;
                 case 'quests':
-                    // &partial: im not doing this right
-                    // it expects a full quest dump on first lookup but will query subCats again if clicked..?
-                    // for now omiting the detail clicks with empty results and just set catg update
                     $catg = isset($this->_get['catg']) ? $this->_get['catg'] : 'null';
                     if ($catg == 'null')
-                        $result .= $this->loadProfilerData($set);
-                    else if ($this->_get['callback'])
-                        $result .= "\n\$WowheadProfiler.loadOnDemand('quests', ".$catg.");\n";
+                        Util::loadStaticFile('p-'.$set, $result, false);
+                    else
+                        Util::loadStaticFile('p-'.$set.'-'.$catg, $result, true);
+
+                    $result .= "\n\$WowheadProfiler.loadOnDemand('".$set."', ".$catg.");\n";
 
                     break;
                 case 'recipes':

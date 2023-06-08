@@ -7728,6 +7728,18 @@ function ProfilerCompletion(_parent) {
             }
         }
 
+        // aowow: added for &partial init
+        if (subtotal == null && window[_opt.order] && window[_opt.cattotal]) {
+            let sumtotal = 0;
+
+            for (var i = 0, len = window[_opt.order].length; i < len; ++i) {
+                let cat = window[_opt.order][i];
+                result.all[cat] = window[_opt.cattotal][cat][_profile.race][_profile.classs];
+                sumtotal += window[_opt.cattotal][cat][_profile.race][_profile.classs];
+            }
+            result.all[overall] = sumtotal;
+        }
+
         if (_opt.noempty) {
             for (var catg in result.complete) {
                 if (catg == overall) {

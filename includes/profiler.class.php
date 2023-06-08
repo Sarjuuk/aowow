@@ -727,6 +727,8 @@ class Profiler
             $data['guildRank'] = $guild['rank'];
         }
 
+        CLI::write(' ..basic guild data');
+
 
         // arena teams
         $teams = DB::Characters($realmId)->select('SELECT at.arenaTeamId AS ARRAY_KEY, at.name, at.type, IF(at.captainGuid = atm.guid, 1, 0) AS captain, atm.* FROM arena_team at JOIN arena_team_member atm ON atm.arenaTeamId = at.arenaTeamId WHERE atm.guid = ?d', $char['guid']);

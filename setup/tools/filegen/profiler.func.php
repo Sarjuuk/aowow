@@ -31,66 +31,113 @@ if (!CLI)
         };
 
 
+        $sumTotal = function(array &$sumArr, int $raceMask = -1, int $classMask= -1)
+        {
+            for ($i = 0; $i < RACE_MASK_ALL; $i++)
+            {
+                if (!((1 << $i) & $raceMask) || !((1 << $i) & RACE_MASK_ALL))
+                    continue;
+
+                for ($j = 0; $j < CLASS_MASK_ALL; $j++)
+                {
+                    if (!((1 << $j) & $classMask) || !((1 << $j) & CLASS_MASK_ALL))
+                        continue;
+
+                    if (!isset($sumArr[$i+1][$j+1]))
+                        $sumArr[$i+1][$j+1] = 1;
+                    else
+                        $sumArr[$i+1][$j+1]++;
+                }
+            }
+        };
+
+
         /**********/
         /* Quests */
         /**********/
-        $scripts[] = function() use ($exAdd)
+        $scripts[] = function() use ($exAdd, $sumTotal)
         {
-            $success   = true;
-            $condition = [
+            $success    = true;
+            $questorder = [];
+            $questtotal = [];
+            $condition  = [
                 CFG_SQL_LIMIT_NONE,
                 'AND',
-                [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW], 0],
+                [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
                 [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE | QUEST_FLAG_AUTO_REWARDED, '&'], 0],
                 [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_DUNGEON_FINDER | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]
             ];
-            $questz = new QuestList($condition);
 
-            // get quests for exclusion
-            foreach ($questz->iterate() as $id => $__)
+            foreach (Game::$questClasses as $cat2 => $cat)
             {
-                switch ($questz->getField('reqSkillId'))
+                if ($cat2 < 0)
+                    continue;
+
+                $cond = array_merge($condition, [['zoneOrSort', $cat]]);
+                $questz = new QuestList($cond);
+                if ($questz->error)
+                    continue;
+
+                $questorder[] = $cat2;
+                $questtotal[$cat2] = [];
+
+                // get quests for exclusion
+                foreach ($questz->iterate() as $id => $__)
                 {
-                    case 356:
-                        $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_FISHING);
-                        break;
-                    case 202:
-                        $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_ENGINEERING);
-                        break;
-                    case 197:
-                        $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_TAILORING);
-                        break;
+                    $sumTotal($questtotal[$cat2], $questz->getField('reqRaceMask') ?: -1, $questz->getField('reqClassMask') ?: -1);
+
+                    switch ($questz->getField('reqSkillId'))
+                    {
+                        case 356:
+                            $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_FISHING);
+                            break;
+                        case 202:
+                            $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_ENGINEERING);
+                            break;
+                        case 197:
+                            $exAdd(Type::QUEST, $id, PR_EXCLUDE_GROUP_REQ_TAILORING);
+                            break;
+                    }
+                }
+
+                $_ = [];
+                $currencies = array_column($questz->rewards, Type::CURRENCY);
+                foreach ($currencies as $curr)
+                    foreach ($curr as $cId => $qty)
+                        $_[] = $cId;
+
+                $relCurr = new CurrencyList(array(['id', $_]));
+
+                foreach (CLISetup::$localeIds as $l)
+                {
+                    set_time_limit(20);
+
+                    User::useLocale($l);
+                    Lang::load(Util::$localeStrings[$l]);
+
+                    if (!$relCurr->error)
+                    {
+                        $buff = "var _ = g_gatheredcurrencies;\n";
+                        foreach ($relCurr->getListviewData() as $id => $data)
+                            $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+                    }
+
+                    $buff .= "var _ = g_quests;\n";
+                    foreach ($questz->getListviewData() as $id => $data)
+                        $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
+
+                    if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-quests-'.$cat2, $buff))
+                        $success = false;
                 }
             }
 
-            $_ = [];
-            $currencies = array_column($questz->rewards, Type::CURRENCY);
-            foreach ($currencies as $curr)
-                foreach ($curr as $cId => $qty)
-                    $_[] = $cId;
+            $buff  = "g_quest_catorder = ".Util::toJSON($questorder).";\n";
+            $buff .= "g_quest_catorder_total = {};\n";
+            foreach ($questtotal as $cat => $totals)
+                $buff .= "g_quest_catorder_total[".$cat."] = ".Util::toJSON($totals).";\n";
 
-            $relCurr = new CurrencyList(array(['id', $_]));
-
-            foreach (CLISetup::$localeIds as $l)
-            {
-                set_time_limit(20);
-
-                User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
-
-                $buff = "var _ = g_gatheredcurrencies;\n";
-                foreach ($relCurr->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
-
-                $buff .= "\n\nvar _ = g_quests;\n";
-                foreach ($questz->getListviewData() as $id => $data)
-                    $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
-
-                $buff .= "\ng_quest_catorder = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n";
-
-                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-quests', $buff))
-                    $success = false;
-            }
+            if (!CLISetup::writeFile('datasets/p-quests', $buff))
+                $success = false;
 
             return $success;
         };

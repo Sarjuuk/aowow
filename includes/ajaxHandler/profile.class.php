@@ -613,10 +613,12 @@ class AjaxProfile extends AjaxHandler
                     $profile['titles'] = $data;
                     break;
                 case Type::QUEST:
-                    foreach ($data as &$d)
-                        $d = 1;
+                    $qList   = new QuestList(array(['id', array_keys($data)], CFG_SQL_LIMIT_NONE));
+                    $qResult = [];
+                    foreach ($qList->iterate() as $id => $__)
+                        $qResult[$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
 
-                    $profile['quests'] = $data;
+                    $profile['quests'] = $qResult;
                     break;
                 case Type::SPELL:
                     foreach ($data as &$d)
@@ -651,7 +653,7 @@ class AjaxProfile extends AjaxHandler
             }
         }
 
-        $buff = '';
+        $gItems = [];
 
         $usedSlots = [];
         if ($this->_get['items'])
@@ -668,7 +670,12 @@ class AjaxProfile extends AjaxHandler
                         if (in_array($sl, $invTypes) && !in_array($slot, $usedSlots))
                         {
                             // get and apply inventory
-                            $buff .= 'g_items.add('.$iId.', {name_'.User::$localeString.":'".Util::jsEscape($phItems->getField('name', true))."', quality:".$phItems->getField('quality').", icon:'".$phItems->getField('iconString')."', jsonequip:".Util::toJSON($data[$iId])."});\n";
+                            $gItems[$iId] = array(
+                                'name_'.User::$localeString => $phItems->getField('name', true),
+                                'quality'                   => $phItems->getField('quality'),
+                                'icon'                      => $phItems->getField('iconString'),
+                                'jsonequip'                 => $data[$iId]
+                            );
                             $profile['inventory'][$slot] = [$iId, 0, 0, 0, 0, 0, 0, 0];
 
                             $usedSlots[] = $slot;
@@ -684,22 +691,28 @@ class AjaxProfile extends AjaxHandler
             $itemz = new ItemList(array(['id', array_column($items, 'item')], CFG_SQL_LIMIT_NONE));
             if (!$itemz->error)
             {
-                $data  = $itemz->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
+                $data = $itemz->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
 
                 foreach ($items as $i)
                 {
                     if ($itemz->getEntry($i['item']) && !in_array($i['slot'], $usedSlots))
                     {
                         // get and apply inventory
-                        $buff .= 'g_items.add('.$i['item'].', {name_'.User::$localeString.":'".Util::jsEscape($itemz->getField('name', true))."', quality:".$itemz->getField('quality').", icon:'".$itemz->getField('iconString')."', jsonequip:".Util::toJSON($data[$i['item']])."});\n";
+                        $gItems[$i['item']] = array(
+                            'name_'.User::$localeString => $itemz->getField('name', true),
+                            'quality'                   => $itemz->getField('quality'),
+                            'icon'                      => $itemz->getField('iconString'),
+                            'jsonequip'                 => $data[$i['item']]
+                        );
                         $profile['inventory'][$i['slot']] = [$i['item'], $i['subItem'], $i['permEnchant'], $i['tempEnchant'], $i['gem1'], $i['gem2'], $i['gem3'], $i['gem4']];
                     }
                 }
             }
         }
 
-        if ($buff)
-            $buff .= "\n";
+        $buff = '';
+        foreach ($gItems as $id => $item)
+            $buff .= 'g_items.add('.$id.', '.Util::toJSON($item, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).");\n";
 
 
         // if ($au = $char->getField('auras'))

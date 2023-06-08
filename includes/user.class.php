@@ -652,6 +652,24 @@ class User
         return self::$profiles->getJSGlobals(PROFILEINFO_PROFILE);
     }
 
+    public static function getPinnedCharacter() : array
+    {
+        if (!self::$profiles)
+            return [];
+
+        $realms = Profiler::getRealms();
+
+        foreach (self::$profiles->iterate() as $id => $_)
+            if (self::$profiles->getField('cuFlags') & PROFILER_CU_PINNED)
+                return [
+                    $id,
+                    self::$profiles->getField('name'),
+                    self::$profiles->getField('region') . '.' . Profiler::urlize($realms[self::$profiles->getField('realm')]['name'], true) . '.' . Profiler::urlize(self::$profiles->getField('name'), true, true)
+                ];
+
+        return [];
+    }
+
     public static function getGuides()
     {
         $result = [];
