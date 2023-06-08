@@ -20,19 +20,6 @@ class QuestPage extends GenericPage
 
     protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
 
-    private   $catExtra      = array(
-                                3526 => 3524,
-                                363  =>   14,
-                                220  =>  215,
-                                188  =>  141,
-                                1769 =>  361,
-                                25   =>   46,
-                                132  =>    1,
-                                3431 => 3430,
-                                154  =>   85,
-                                9    =>   12
-                            );
-
     private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
 
     public function __construct($pageCall, $id)
@@ -57,12 +44,13 @@ class QuestPage extends GenericPage
     {
         // recreate path
         $this->path[] = $this->subject->getField('cat2');
-        if ($_ = $this->subject->getField('cat1'))
+        if ($cat = $this->subject->getField('cat1'))
         {
-            if (isset($this->catExtra[$_]))
-                $this->path[] = $this->catExtra[$_];
+            foreach (Game::$questSubCats as $parent => $children)
+                if (in_array($cat, $children))
+                    $this->path[] = $parent;
 
-            $this->path[] = $_;
+            $this->path[] = $cat;
         }
     }
 

@@ -59,6 +59,28 @@ class Game
         10 =>  [   65,    66,    67,   210,   394,   495,  2817,  3537,  3711,  4024,  4197,  4395,  4742]
     );
 
+    public static $questSubCats             = array(
+        1    => [132],              // Dun Morogh: Coldridge Valley
+        12   => [9],                // Elwynn Forest: Northshire Valley
+        141  => [188],              // Teldrassil: Shadowglen
+        3524 => [3526],             // Azuremyst Isle: Ammen Vale
+
+        14   => [363],              // Durotar: Valley of Trials
+        85   => [154],              // Tirisfal Glades: Deathknell
+        215  => [220],              // Mulgore: Red Cloud Mesa
+        3430 => [3431],             // Eversong Woods: Sunstrider Isle
+
+        46   => [25],               // Burning Steppes: Blackrock Mountain
+        361  => [1769],             // Felwood: Timbermaw Hold
+        3519 => [3679],             // Terokkar: Skettis
+        3535 => [3562, 3713, 3714], // Hellfire Citadel
+        3905 => [3715, 3716, 3717], // Coilfang Reservoir
+        3688 => [3789, 3790, 3792], // Auchindoun
+        1941 => [2366, 2367, 4100], // Caverns of Time
+        3842 => [3847, 3848, 3849], // Tempest Keep
+        4522 => [4809, 4813, 4820]  // Icecrown Citadel
+    );
+
     /*  why:
         Because petSkills (and ranged weapon skills) are the only ones with more than two skillLines attached. Because Left Joining ?_spell with ?_skillLineability  causes more trouble than it has uses.
         Because this is more or less the only reaonable way to fit all that information into one database field, so..

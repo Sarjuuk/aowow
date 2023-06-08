@@ -183,6 +183,15 @@ class ZonePage extends GenericPage
 
         $questsLV = $rewardsLV = [];
 
+        $relQuestZOS = [$this->typeId];
+        foreach (Game::$questSubCats as $parent => $children)
+        {
+            if (in_array($this->typeId, $children))
+                $relQuestZOS[] = $parent;
+            else if ($this->typeId == $parent)
+                $relQuestZOS = array_merge($relQuestZOS, $children);
+        }
+
         // see if we can actually display a map
         $hasMap = file_exists('static/images/wow/maps/'.Util::$localeStrings[User::$localeId].'/normal/'.$this->typeId.'.jpg');
         if (!$hasMap)                                       // try multilayered
@@ -256,6 +265,9 @@ class ZonePage extends GenericPage
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
+                            if ($started->getField('zoneOrSort') > 0 && !in_array($started->getField('zoneOrSort'), $relQuestZOS))
+                                continue;
+
                             if (!empty($started->rewards[$id][Type::ITEM]))
                                 $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
@@ -353,6 +365,9 @@ class ZonePage extends GenericPage
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
+                            if ($started->getField('zoneOrSort') > 0 && !in_array($started->getField('zoneOrSort'), $relQuestZOS))
+                                continue;
+
                             if (!empty($started->rewards[$id][Type::ITEM]))
                                 $rewardsLV = array_merge($rewardsLV, array_keys($started->rewards[$id][Type::ITEM]));
 
@@ -527,18 +542,34 @@ class ZonePage extends GenericPage
             $this->lvTabs[] = ['object', $tabData];
         }
 
-        // tab: Quests [data collected by SOM-routine]
+        $quests = new QuestList(array(['zoneOrSort', $this->typeId]));
+        if (!$quests->error)
+        {
+            $this->extendGlobalData($quests->getJSGlobals());
+            foreach ($quests->getListviewData() as $id => $data)
+            {
+                if (!empty($quests->rewards[$id][Type::ITEM]))
+                    $rewardsLV = array_merge($rewardsLV, array_keys($quests->rewards[$id][Type::ITEM]));
+
+                if (!empty($quests->choices[$id][Type::ITEM]))
+                    $rewardsLV = array_merge($rewardsLV, array_keys($quests->choices[$id][Type::ITEM]));
+
+                $questsLV[$id] = $data;
+            }
+        }
+
+        // tab: Quests [including data collected by SOM-routine]
         if ($questsLV)
         {
             $tabData = ['quest', ['data' => array_values($questsLV)]];
 
             foreach (Game::$questClasses as $parent => $children)
             {
-                if (in_array($this->typeId, $children))
-                {
-                    $tabData[1]['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
-                    break;
-                }
+                if (!in_array($this->typeId, $children))
+                    continue;
+
+                $tabData[1]['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                break;
             }
 
             $this->lvTabs[] = $tabData;
