@@ -168,7 +168,7 @@ class ItemPage extends genericPage
             $hasUse = false;
             for ($i = 1; $i < 6; $i++)
             {
-                if ($this->subject->getField('spellId'.$i) <= 0 || in_array($this->subject->getField('spellTrigger'.$i), [1, 2]))
+                if ($this->subject->getField('spellId'.$i) <= 0 || in_array($this->subject->getField('spellTrigger'.$i), [SPELL_TRIGGER_EQUIP, SPELL_TRIGGER_HIT]))
                     continue;
 
                 $hasUse = true;
@@ -880,9 +880,9 @@ class ItemPage extends genericPage
         $ids = $indirect = [];
         for ($i = 1; $i < 6; $i++)
         {
-            if ($this->subject->getField('spellTrigger'.$i) == 6)
+            if ($this->subject->getField('spellTrigger'.$i) == SPELL_TRIGGER_LEARN)
                 $ids[] = $this->subject->getField('spellId'.$i);
-            else if ($this->subject->getField('spellTrigger'.$i) == 0 && $this->subject->getField('spellId'.$i) > 0)
+            else if ($this->subject->getField('spellTrigger'.$i) == SPELL_TRIGGER_USE && $this->subject->getField('spellId'.$i) > 0)
                 $indirect[] = $this->subject->getField('spellId'.$i);
         }
 

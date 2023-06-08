@@ -832,6 +832,14 @@ define('ITEM_MOD_SHADOW_POWER',             60);
 define('ITEM_MOD_NATURE_POWER',             61);
 define('ITEM_MOD_ARCANE_POWER',             62);
 
+// item trigger and recipe handling
+define('SPELL_TRIGGER_USE',         0);
+define('SPELL_TRIGGER_EQUIP',       1);
+define('SPELL_TRIGGER_HIT',         2);
+define('SPELL_TRIGGER_SOULSTONE',   4);
+define('SPELL_TRIGGER_USE_NODELAY', 5);
+define('SPELL_TRIGGER_LEARN',       6);
+
 // learn trigger spells on items - 483: learn recipe; 55884: learn mount/pet
 define('LEARN_SPELLS', [483, 55884]);
 

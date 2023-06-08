@@ -218,12 +218,12 @@ class EnchantmentPage extends GenericPage
 
             $spellIds = $spellList->getFoundIDs();
             $conditions = array(
-                'OR',                  // [use, useUndelayed]
-                ['AND', ['spellTrigger1', [0, 5]], ['spellId1', $spellIds]],
-                ['AND', ['spellTrigger2', [0, 5]], ['spellId2', $spellIds]],
-                ['AND', ['spellTrigger3', [0, 5]], ['spellId3', $spellIds]],
-                ['AND', ['spellTrigger4', [0, 5]], ['spellId4', $spellIds]],
-                ['AND', ['spellTrigger5', [0, 5]], ['spellId5', $spellIds]]
+                'OR',
+                ['AND', ['spellTrigger1', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId1', $spellIds]],
+                ['AND', ['spellTrigger2', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId2', $spellIds]],
+                ['AND', ['spellTrigger3', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId3', $spellIds]],
+                ['AND', ['spellTrigger4', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId4', $spellIds]],
+                ['AND', ['spellTrigger5', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId5', $spellIds]]
             );
 
             $ubItems = new ItemList($conditions);

@@ -588,12 +588,12 @@ class SpellPage extends GenericPage
 
         // tab: used by - item
         $conditions = array(
-            'OR',                  // 6: learn spell
-            ['AND', ['spellTrigger1', 6, '!'], ['spellId1', $this->subject->id]],
-            ['AND', ['spellTrigger2', 6, '!'], ['spellId2', $this->subject->id]],
-            ['AND', ['spellTrigger3', 6, '!'], ['spellId3', $this->subject->id]],
-            ['AND', ['spellTrigger4', 6, '!'], ['spellId4', $this->subject->id]],
-            ['AND', ['spellTrigger5', 6, '!'], ['spellId5', $this->subject->id]]
+            'OR',
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->subject->id]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN, '!'], ['spellId2', $this->subject->id]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN, '!'], ['spellId3', $this->subject->id]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN, '!'], ['spellId4', $this->subject->id]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->subject->id]]
         );
 
         $ubItems = new ItemList($conditions);
@@ -1132,11 +1132,11 @@ class SpellPage extends GenericPage
         // tab: taught by item (i'd like to precheck $this->subject->sources, but there is no source:item only complicated crap like "drop" and "vendor")
         $conditions = array(
             'OR',
-            ['AND', ['spellTrigger1', 6], ['spellId1', $this->subject->id]],
-            ['AND', ['spellTrigger2', 6], ['spellId2', $this->subject->id]],
-            ['AND', ['spellTrigger3', 6], ['spellId3', $this->subject->id]],
-            ['AND', ['spellTrigger4', 6], ['spellId4', $this->subject->id]],
-            ['AND', ['spellTrigger5', 6], ['spellId5', $this->subject->id]],
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->subject->id]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN], ['spellId2', $this->subject->id]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN], ['spellId3', $this->subject->id]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN], ['spellId4', $this->subject->id]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->subject->id]],
         );
 
         $tbItem = new ItemList($conditions);

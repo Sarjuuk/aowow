@@ -62,8 +62,8 @@ class ItemStatSetup extends ItemList
                     continue;
 
                 // armor & weapons only onEquip && consumables only onUse
-                if (!(in_array($this->curTpl['class'],  [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $this->curTpl['spellTrigger'.$h] == 1) &&
-                    !(         $this->curTpl['class'] == ITEM_CLASS_CONSUMABLE                 && $this->curTpl['spellTrigger'.$h] == 0))
+                if (!(in_array($this->curTpl['class'],  [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $this->curTpl['spellTrigger'.$h] == SPELL_TRIGGER_EQUIP) &&
+                    !(         $this->curTpl['class'] == ITEM_CLASS_CONSUMABLE                 && $this->curTpl['spellTrigger'.$h] == SPELL_TRIGGER_USE))
                     continue;
 
                 $equipSpells[] = $this->curTpl['spellId'.$h];

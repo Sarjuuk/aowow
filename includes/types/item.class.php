@@ -964,7 +964,7 @@ class ItemList extends BaseType
                         else                                // build block with generic time
                             $extra[] = Lang::item('cooldown', 0, [Lang::formatTime($cd, 'game', 'timeAbbrev', true)]);
                     }
-                    if ($this->curTpl['spellTrigger'.$j] == 2)
+                    if ($this->curTpl['spellTrigger'.$j] == SPELL_TRIGGER_HIT)
                         if ($ppm = $this->curTpl['spellppmRate'.$j])
                             $extra[] = Lang::spell('ppm', [$ppm]);
 
@@ -2434,11 +2434,11 @@ class ItemListFilter extends Filter
 
         return [
             'OR',
-            ['AND', ['spellTrigger1', 0], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger2', 0], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger3', 0], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger4', 0], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger5', 0], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_USE], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_USE], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_USE], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_USE], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_USE], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $cr[2], $cr[1]]],
         ];
     }
 
