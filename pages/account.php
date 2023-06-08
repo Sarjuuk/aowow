@@ -251,7 +251,7 @@ class AccountPage extends GenericPage
         }
 
         // comments
-        if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'replies' => false]))
+        if ($_ = CommunityContent::getCommentPreviews(['user' => User::$id, 'comments' => true]))
         {
             // needs foundCount for params
             // _totalCount: 377,

@@ -151,7 +151,7 @@ class UserPage extends GenericPage
         }
 
         // Comments
-        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'replies' => false], $nFound))
+        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'comments' => true], $nFound))
         {
             $tabData = array(
                 'data'           => $_,

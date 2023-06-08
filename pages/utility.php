@@ -75,11 +75,25 @@ class UtilityPage extends GenericPage
                 header('Location: ?'.Type::getFileString($type).'='.$typeId, true, 302);
                 die();
             case 'latest-comments':                         // rss
-                $data = CommunityContent::getCommentPreviews(dateFmt: false);
+                $comments = CommunityContent::getCommentPreviews(['comments' => true, 'replies' => false], $i, false);
+                $replies  = CommunityContent::getCommentPreviews(['comments' => false, 'replies' => true], $i, false);
 
                 if ($this->rss)
                 {
-                    foreach ($data as $d)
+                    foreach ($comments as $d)
+                    {
+                        // todo (low): preview should be html-formated
+                        $this->feedData[] = array(
+                            'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
+                            'link'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']],
+                            'description' => [true,  [], htmlentities($d['preview'])."<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true)],
+                            'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
+                            'guid'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']]
+                         // 'domain'      => [false, [], null]
+                        );
+                    }
+
+                    foreach ($replies as $d)
                     {
                         // todo (low): preview should be html-formated
                         $this->feedData[] = array(
@@ -94,8 +108,11 @@ class UtilityPage extends GenericPage
                 }
                 else
                 {
-                    array_walk($data, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
-                    $this->lvTabs[] = ['commentpreview', ['data' => $data]];
+                    array_walk($comments, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
+                    $this->lvTabs[] = ['commentpreview', ['data' => $comments]];
+
+                    array_walk($replies, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
+                    $this->lvTabs[] = ['commentpreview', ['data' => $replies]];
                 }
 
                 break;
@@ -162,10 +179,10 @@ class UtilityPage extends GenericPage
 
                 break;
             case 'unrated-comments':
-                if ($_ = CommunityContent::getCommentPreviews(['unrated' => true]))
-                    $this->lvTabs[] = ['commentpreview', ['data' => $_]];
+                $this->lvTabs[] = ['commentpreview', [
+                    'data' => CommunityContent::getCommentPreviews(['unrated' => true, 'comments' => true])
+                ]];
 
-                $this->lvTabs[] = ['commentpreview', ['data' => []]];
                 break;
             case 'missing-screenshots':
                 // limit to 200 entries each (it generates faster, consumes less memory and should be enough options)

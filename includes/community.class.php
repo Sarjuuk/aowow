@@ -51,7 +51,7 @@ class CommunityContent
         GROUP BY
             c.id
         ORDER BY
-            rating ASC
+            `date` ASC
     ';
 
     private static string $ssQuery = '
@@ -92,11 +92,7 @@ class CommunityContent
         LEFT JOIN
             ?_comments c2 ON c.replyTo = c2.id
         WHERE
-            {c.userId = ?d AND}
-            {c.replyTo <> ?d AND}
-            {c.replyTo = ?d AND}
-            {ur.entry IS ?n AND}
-            {(c.flags & ?d) AND}
+            %s
             ((c.flags & ?d) = 0 OR c.userId = ?d OR ?d)
         GROUP BY
             c.id
@@ -129,22 +125,32 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews(array $params = [], ?int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore
             domain:'live'       <- irrelevant for our case
         */
 
+        // add default values
+        $opt += ['user' => 0, 'unrated' => 0, 'comments' => 0, 'replies' => 0];
+
+        $w = [];
+        if ($opt['user'])
+            $w[] = sprintf('c.userId = %d AND', $opt['user']);
+        if ($opt['unrated'])
+            $w[] = 'ur.entry IS NULL AND';
+        if ($opt['comments'] && !$opt['replies'])
+            $w[] = 'c.replyTo = 0 AND';
+        else if (!$opt['comments'] && $opt['replies'])
+            $w[] = 'c.replyTo <> 0 AND';
+     // else
+     //     pick both and no extra constraint needed for that
+
         $comments  = DB::Aowow()->selectPage(
             $nFound,
-            self::$previewQuery,
+            sprintf(self::$previewQuery, implode(' ', $w)),
             CC_FLAG_DELETED,
-             empty($params['user'])    ? DBSIMPLE_SKIP : $params['user'],
-             empty($params['replies']) ? DBSIMPLE_SKIP : 0, // i dont know, how to switch the sign around
-            !empty($params['replies']) ? DBSIMPLE_SKIP : 0,
-             empty($params['unrated']) ? DBSIMPLE_SKIP : null,
-             empty($params['flags'])   ? DBSIMPLE_SKIP : $params['flags'],
             CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
