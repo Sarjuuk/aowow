@@ -239,7 +239,8 @@ class EnchantmentListFilter extends Filter
 {
     protected $enums         = array(
         3 => array(                                         // requiresprof
-            null, 171, 164, 185, 333, 202, 129, 755, 165, 186, 197, true, false, 356, 182, 773
+            null,                 SKILL_ALCHEMY, SKILL_BLACKSMITHING, SKILL_COOKING, SKILL_ENCHANTING, SKILL_ENGINEERING, SKILL_FIRST_AID, SKILL_JEWELCRAFTING,
+            SKILL_LEATHERWORKING, SKILL_MINING,  SKILL_TAILORING,     true,          false,            SKILL_FISHING,     SKILL_HERBALISM, SKILL_INSCRIPTION
         )
     );
 

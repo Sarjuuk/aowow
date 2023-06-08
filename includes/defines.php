@@ -1144,6 +1144,9 @@ define('SKILL_JEWELCRAFTING',  755);
 define('SKILL_RIDING',         762);
 define('SKILL_INSCRIPTION',    773);
 
+define('SKILLS_TRADE_PRIMARY',   [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_ALCHEMY, SKILL_HERBALISM, SKILL_MINING, SKILL_TAILORING, SKILL_ENGINEERING, SKILL_ENCHANTING, SKILL_SKINNING, SKILL_JEWELCRAFTING, SKILL_INSCRIPTION]);
+define('SKILLS_TRADE_SECONDARY', [SKILL_FIRST_AID, SKILL_COOKING, SKILL_FISHING, SKILL_RIDING]);
+
 
 // AchievementCriteriaCondition
 define('ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH',                       1);         // reset progress on death
@@ -1709,5 +1712,16 @@ define('SRC_FLAG_BOSSDROP',     0x01);
 define('SRC_FLAG_COMMON',       0x02);
 define('SRC_FLAG_DUNGEON_DROP', 0x10);
 define('SRC_FLAG_RAID_DROP',    0x20);
+
+// Map Types
+define('MAP_TYPE_ZONE',          0);
+define('MAP_TYPE_TRANSIT',       1);
+define('MAP_TYPE_DUNGEON',       2);
+define('MAP_TYPE_RAID',          3);
+define('MAP_TYPE_BATTLEGROUND',  4);
+define('MAP_TYPE_DUNGEON_HC',    5);
+define('MAP_TYPE_ARENA',         6);
+define('MAP_TYPE_MMODE_RAID',    7);
+define('MAP_TYPE_MMODE_RAID_HC', 8);
 
 ?>

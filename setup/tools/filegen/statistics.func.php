@@ -159,7 +159,7 @@ if (!CLI)
         {
             // profession perks ... too lazy to formulate a search algorithm for two occurences
             return array(
-                186 => array(                               // mining / toughness
+                SKILL_MINING => array(                      // mining / toughness
                      75 => ['sta' =>  3],
                     150 => ['sta' =>  5],
                     225 => ['sta' =>  7],
@@ -167,7 +167,7 @@ if (!CLI)
                     375 => ['sta' => 30],
                     450 => ['sta' => 60],
                 ),
-                393 => array(                               // skinning / master of anatomy
+                SKILL_SKINNING => array(                    // skinning / master of anatomy
                      75 => ['critstrkrtng' =>  3],
                     150 => ['critstrkrtng' =>  6],
                     225 => ['critstrkrtng' =>  9],

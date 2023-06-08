@@ -9,6 +9,8 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
+    use TrCustomData;
+
     protected $command = 'spell';
 
     protected $tblDependencyAowow = ['icons'];
@@ -451,9 +453,9 @@ SqlGen::register(new class extends SetupScript
         CLI::write(' - misc fixups & icons');
 
         // FU [FixUps]
-        DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', 1 << 10, 760);      // Draenai Racials
-        DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', 1 <<  9, 756);      // Bloodelf Racials
-        DB::Aowow()->query('UPDATE ?_spell SET reqClassMask = ?d WHERE id         = ?d', 1 <<  7, 30449);    // Mage - Spellsteal
+        DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', RACE_DRAENEI,  760); // Draenai Racials
+        DB::Aowow()->query('UPDATE ?_spell SET reqRaceMask  = ?d WHERE skillLine1 = ?d', RACE_BLOODELF, 756); // Bloodelf Racials
+        DB::Aowow()->query('UPDATE ?_spell SET reqClassMask = ?d WHERE id         = ?d', CLASS_MAGE,  30449); // Mage - Spellsteal
 
         // triggered by spell
         DB::Aowow()->query('
@@ -503,7 +505,7 @@ SqlGen::register(new class extends SetupScript
 
         $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN (?a)', [0, 34090, 34091]); // not riding
         foreach ($itemReqs AS $itemId => $req)
-            DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE skillLine1 IN (?a) AND effect1CreateItemId = ?d', $req, [164, 165, 197, 202], $itemId);
+            DB::Aowow()->query('UPDATE ?_spell SET reqSpellId = ?d WHERE skillLine1 IN (?a) AND effect1CreateItemId = ?d', $req, [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_TAILORING, SKILL_ENGINEERING], $itemId);
 
         // setting icons
         DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconId = ic.id WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1))');
@@ -580,9 +582,7 @@ SqlGen::register(new class extends SetupScript
             (s.SpellFamilyId = 6  AND s.SpellFamilyFlags1 & 0x8000000 AND s.rank_loc0 <> "") OR                                                                                        -- Priest: Bling Bling
             (s.SpellFamilyId = 8  AND s.attributes0 = 0x50 AND s.attributes1 & 0x400) OR                                                                                               -- Rogue: Intuition (dropped Talent..? looks nice though)
             (s.SpellfamilyId = 11 AND s.SpellFamilyFlags1 & 3 AND s.attributes1 = 1024) OR                                                                                             -- Shaman: Lightning Overload procs
-            (s.attributes0 = 0x20000000 AND s.attributes3 = 0x10000000) OR                                                                                                             -- Master Demonologist (FamilyId = 0)
-            s.id IN (47633, 22845, 29442, 31643, 44450, 32841, 20154, 34919, 27813, 27817, 27818, 30708, 30874, 379, 21169, 19483, 29886, 58889, 23885, 29841, 29842, 64380, 58427) OR -- Misc
-            s.id IN (48954, 17567, 66175, 66122, 66123, 66124, 52374, 49575, 56816, 50536)                                                                                             -- Misc cont.
+            (s.attributes0 = 0x20000000 AND s.attributes3 = 0x10000000)                                                                                                                -- Master Demonologist (FamilyId = 0)
         )', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
         foreach ([1, 2, 3, 4, 5, 6, 7, 8, 9, 11] as $classId)
@@ -606,10 +606,10 @@ SqlGen::register(new class extends SetupScript
             );
 
         // secondary Skills (9)
-        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = 9 WHERE s.typeCat = 0 AND (s.skillLine1 IN (129, 185, 356, 762) OR (s.skillLine1 > 0 AND s.skillLine2OrMask IN (129, 185, 356, 762)))');
+        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = 9 WHERE s.typeCat = 0 AND (s.skillLine1 IN (?a) OR (s.skillLine1 > 0 AND s.skillLine2OrMask IN (?a)))', SKILLS_TRADE_SECONDARY, SKILLS_TRADE_SECONDARY);
 
         // primary Skills (11)
-        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = 11 WHERE s.typeCat = 0 AND s.skillLine1 IN (164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773)');
+        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = 11 WHERE s.typeCat = 0 AND s.skillLine1 IN (?a)', SKILLS_TRADE_PRIMARY);
 
         // npc spells (-8) (run as last! .. missing from npc_scripts? "enum Spells { \s+(\w\d_)+\s+=\s(\d+) }" and "#define SPELL_(\d\w_)+\s+(\d+)") // RAID_MODE(1, 2[, 3, 4]) - macro still not considered
         $world = DB::World()->selectCol('
@@ -740,9 +740,6 @@ SqlGen::register(new class extends SetupScript
             else
                 CLI::write('could not match '.$glyphEffect['name_loc0'].' ('.$glyphEffect['id'].') with affected spells', CLI::LOG_WARN);
         }
-
-        // hide unused glyphs
-        DB::Aowow()->query('UPDATE ?_spell SET skillLine1 = 0, iconIdAlt = 0, cuFlags = cuFlags | ?d WHERE id IN (?a)', CUSTOM_EXCLUDE_FOR_LISTVIEW, [60460, 58166, 58239, 58240, 58261, 58262, 54910]);
 
         $this->reapplyCCFlags('spell', Type::SPELL);
 

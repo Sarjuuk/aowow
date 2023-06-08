@@ -18,9 +18,9 @@ class SpellList extends BaseType
     public static   $skillLines  = array(
          6 => [ 43,  44,  45,  46,  54,  55,  95, 118, 136, 160, 162, 172, 173, 176, 226, 228, 229, 473], // Weapons
          8 => [293, 413, 414, 415, 433],                                                                  // Armor
-         9 => [129, 185, 356, 762],                                                                       // sec. Professions
+         9 => SKILLS_TRADE_SECONDARY,                                                                     // sec. Professions
         10 => [ 98, 109, 111, 113, 115, 137, 138, 139, 140, 141, 313, 315, 673, 759],                     // Languages
-        11 => [164, 165, 171, 182, 186, 197, 202, 333, 393, 755, 773]                                     // prim. Professions
+        11 => SKILLS_TRADE_PRIMARY                                                                        // prim. Professions
     );
 
     public static   $spellTypes  = array(

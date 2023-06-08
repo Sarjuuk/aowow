@@ -18,11 +18,11 @@ SqlGen::register(new class extends SetupScript
     protected $dbcSourceFiles     = ['gemproperties', 'itemdisplayinfo', 'spell', 'glyphproperties', 'durabilityquality', 'durabilitycosts'];
 
     private $skill2cat = array(
-        773 => 11,                                          // inscription
-        356 =>  9,                                          // fishing
-        186 => 12,                                          // mining
-        185 =>  5,                                          // cooking
-        171 =>  6                                           // alchemy
+        SKILL_INSCRIPTION => 11,
+        SKILL_FISHING     =>  9,
+        SKILL_MINING      => 12,
+        SKILL_COOKING     =>  5,
+        SKILL_ALCHEMY     =>  6
     );
 
     public function generate(array $ids = []) : bool

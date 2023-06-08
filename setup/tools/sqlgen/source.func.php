@@ -274,10 +274,10 @@ SqlGen::register(new class extends SetupScript
             {
                 switch ($spawns[$entry]['type'])
                 {
-                    case 5: // heroic dungeon
+                    case MAP_TYPE_DUNGEON_HC:
                         $mMask |= SRC_FLAG_DUNGEON_DROP; break;
-                    case 7: // multi mode raid
-                    case 8: // heroic multi mode raid
+                    case MAP_TYPE_MMODE_RAID:
+                    case MAP_TYPE_MMODE_RAID_HC:
                         $mMask |= SRC_FLAG_RAID_DROP; break;
                 }
 

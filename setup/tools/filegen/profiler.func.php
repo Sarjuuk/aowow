@@ -320,7 +320,7 @@ if (!CLI)
         $scripts[] = function() use ($exAdd, $spellFactions)
         {
             // special case: secondary skills are always requested, so put them in one single file (185, 129, 356); it also contains g_skill_order
-            $skills  = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, [185, 129, 356]];
+            $skills  = array_merge(SKILLS_TRADE_PRIMARY, [[185, 129, 356]]);
             $success = true;
             $baseCnd = array(
                 CFG_SQL_LIMIT_NONE,

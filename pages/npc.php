@@ -92,11 +92,13 @@ class NpcPage extends GenericPage
             {
                 switch (DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE id = ?d', $maps[0]))
                 {
-                    case 2:
-                    case 5: $mapType = 1; break;
-                    case 3:
-                    case 7:
-                    case 8: $mapType = 2; break;
+                 // case MAP_TYPE_DUNGEON:
+                    case MAP_TYPE_DUNGEON_HC:
+                        $mapType = 1; break;
+                 // case MAP_TYPE_RAID:
+                    case MAP_TYPE_MMODE_RAID:
+                    case MAP_TYPE_MMODE_RAID_HC:
+                        $mapType = 2; break;
                 }
             }
         }
