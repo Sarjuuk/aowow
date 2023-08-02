@@ -908,7 +908,7 @@ abstract class Filter
         [FILTER_CR_FLAG,      <string:colName>, <int:testBit>,   <bool:matchAny>]       # default param2: matchExact
         [FILTER_CR_NUMERIC,   <string:colName>, <int:NUM_FLAGS>, <bool:addExtraCol>]
         [FILTER_CR_STRING,    <string:colName>, <int:STR_FLAGS>, null]
-        [FILTER_CR_ENUM,      <string:colName>, <bool:useANY>,   <bool:useNONE>]
+        [FILTER_CR_ENUM,      <string:colName>, <bool:ANYNONE>,  <bool:isEnumVal>]      # param3 ? cr[2] is val in enum : key in enum
         [FILTER_CR_STAFFFLAG, <string:colName>, null,            null]
         [FILTER_CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
         [FILTER_CR_NYI_PH,    null,             <int:returnVal>, param2]                # mostly 1: to ignore this criterium; 0: to fail the whole query
@@ -1072,7 +1072,8 @@ abstract class Filter
 
             // criteria
             foreach ($this->criteriaIterator() as &$_cr)
-                $this->cndSet[] = $this->createSQLForCriterium($_cr);
+                if ($cnd = $this->createSQLForCriterium($_cr))
+                    $this->cndSet[] = $cnd;
 
             if ($this->cndSet)
                 array_unshift($this->cndSet, empty($this->fiData['v']['ma']) ? 'AND' : 'OR');
@@ -1514,9 +1515,11 @@ abstract class Filter
                 $result = $this->genericString($gen[1], $cr[2], $gen[2]);
                 break;
             case FILTER_CR_ENUM:
-                if (isset($this->enums[$cr[0]][$cr[1]]))
+                if (!$gen[3] && isset($this->enums[$cr[0]][$cr[1]]))
                     $result = $this->genericEnum($gen[1], $this->enums[$cr[0]][$cr[1]]);
-                else if (($gen[2] && $cr[1] == FILTER_ENUM_ANY) || ($gen[3] && $cr[1] == FILTER_ENUM_NONE))
+                if ($gen[3] && in_array($cr[1], $this->enums[$cr[0]]))
+                    $result = $this->genericEnum($gen[1], $cr[1]);
+                else if ($gen[2] && ($cr[1] == FILTER_ENUM_ANY || $cr[1] == FILTER_ENUM_NONE))
                     $result = $this->genericEnum($gen[1], $cr[1]);
                 break;
             case FILTER_CR_CALLBACK:
@@ -1550,7 +1553,23 @@ abstract class Filter
     /* non-generic values and criteria */
     /***********************************/
 
-    abstract protected function createSQLForCriterium(&$cr);
+    protected function createSQLForCriterium(array &$cr) : array
+    {
+        if (!$this->genericFilter)                          // criteria not in use - no error
+            return [];
+
+        if (in_array($cr[0], array_keys($this->genericFilter)))
+            if ($genCr = $this->genericCriterion($cr))
+                return $genCr;
+
+        $this->error = true;
+        trigger_error('Filter::createSQLForCriterium - received unhandled criterium: ["'.$cr[0].'", "'.$cr[1].'", "'.$cr[2].'"]', E_USER_WARNING);
+
+        unset($cr);
+
+        return [];
+    }
+
     abstract protected function createSQLForValues();
 }
 

@@ -485,17 +485,6 @@ class QuestListFilter extends Filter
         'ty'    => [FILTER_V_LIST,  [0, 1, 21, 41, 62, [81, 85], 88, 89],            true ]  // type
     );
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

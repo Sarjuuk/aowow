@@ -144,15 +144,11 @@ class GameObjectListFilter extends Filter
     protected $enums         = array(
          1 => parent::ENUM_ZONE,
         16 => parent::ENUM_EVENT,
-        50 => array(
-            null, 1, 2, 3, 4,
-            663 => 663,
-            883 => 883
-        )
+        50 => [1, 2, 3, 4, 663, 883]
     );
 
     protected $genericFilter = array(
-         1 => [FILTER_CR_ENUM,     's.areaId'                                   ], // foundin
+         1 => [FILTER_CR_ENUM,     's.areaId',        false,                true], // foundin
          2 => [FILTER_CR_CALLBACK, 'cbQuestRelation', 'startsQuests',       0x1 ], // startsquest [side]
          3 => [FILTER_CR_CALLBACK, 'cbQuestRelation', 'endsQuests',         0x2 ], // endsquest [side]
          4 => [FILTER_CR_CALLBACK, 'cbOpenable',      null,                 null], // openable [yn]
@@ -173,17 +169,6 @@ class GameObjectListFilter extends Filter
         'na'  => [FILTER_V_REGEX, parent::PATTERN_NAME,                           false], // name - only printable chars, no delimiter
         'ma'  => [FILTER_V_EQUAL, 1,                                              false]  // match any / all filter
     );
-
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
 
     protected function createSQLForValues()
     {

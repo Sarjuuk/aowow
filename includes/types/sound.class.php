@@ -101,14 +101,6 @@ class SoundListFilter extends Filter
         'ty' => [FILTER_V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
     );
 
-    // we have no criteria for this one...
-    protected function createSQLForCriterium(&$cr)
-    {
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

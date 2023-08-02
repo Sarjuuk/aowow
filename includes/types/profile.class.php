@@ -308,17 +308,6 @@ class ProfileListFilter extends Filter
                 $this->useLocalList = true;
     }
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

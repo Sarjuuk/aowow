@@ -204,17 +204,6 @@ class ItemsetListFilter extends Filter
         'ta'    => [FILTER_V_RANGE, [1, 30],                                       false]  // tag / content group
     );
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCR = $this->genericCriterion($cr))
-                return $genCR;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

@@ -295,7 +295,7 @@ class CreatureListFilter extends Filter
          2 => [FILTER_CR_CALLBACK, 'cbHealthMana',      'manaMin',                 'manaMax'  ], // mana [num]
          3 => [FILTER_CR_CALLBACK, 'cbFaction',         null,                      null       ], // faction [enum]
          5 => [FILTER_CR_FLAG,     'npcflag',           NPC_FLAG_REPAIRER                     ], // canrepair
-         6 => [FILTER_CR_ENUM,     's.areaId',                                                ], // foundin
+         6 => [FILTER_CR_ENUM,     's.areaId',          false,                     true       ], // foundin
          7 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'startsQuests',            0x1        ], // startsquest [enum]
          8 => [FILTER_CR_CALLBACK, 'cbQuestRelation',   'endsQuests',              0x2        ], // endsquest [enum]
          9 => [FILTER_CR_BOOLEAN,  'lootId',                                                  ], // lootable
@@ -343,17 +343,6 @@ class CreatureListFilter extends Filter
         'ra'    => [FILTER_V_LIST,     [-1, 0, 1],                                                               false], // react alliance [int]
         'rh'    => [FILTER_V_LIST,     [-1, 0, 1],                                                               false]  // react horde [int]
     );
-
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
 
     protected function createSQLForValues()
     {

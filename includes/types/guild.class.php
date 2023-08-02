@@ -97,8 +97,6 @@ class GuildListFilter extends Filter
         'sv' => [FILTER_V_CALLBACK, 'cbServerCheck',      false], // server
     );
 
-    protected function createSQLForCriterium(&$cr) { }
-
     protected function createSQLForValues()
     {
         $parts = [];

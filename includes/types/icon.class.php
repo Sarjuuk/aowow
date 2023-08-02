@@ -164,17 +164,6 @@ class IconListFilter extends Filter
         return $ids ? ['id', array_keys($ids), '!'] : [1];
     }
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

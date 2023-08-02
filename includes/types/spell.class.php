@@ -2547,17 +2547,6 @@ class SpellListFilter extends Filter
         'me'    => [FILTER_V_RANGE,    [1, 31],                                         false]  // mechanics
     );
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];

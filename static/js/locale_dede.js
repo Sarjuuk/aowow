@@ -3612,8 +3612,8 @@ var LANG = {
                             [1, "Heilig"],                          [0, "Physisch"]
                         ],
         gem:            [
-                            [7, "Ja"],                              [1, "Meta"],                            [2, "Rot"],                             [3, "Gelb"],                            [4, "Blau"],
-                            [8, "Nein"]
+                            [5, "Ja"],                              [1, "Meta"],                            [2, "Rot"],                             [3, "Gelb"],                            [4, "Blau"],
+                            [6, "Nein"]
                         ],
         profession:     [
                             [11, "Ja"],                             [1, "Alchemie"],                        [13, "Angeln"],                         [9, "Bergbau"],                         [6, "Erste Hilfe"],

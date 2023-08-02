@@ -1889,7 +1889,7 @@ class ItemListFilter extends Filter
          88 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           20,                      null          ], // otprospecting [yn]
          89 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                 ], // prospectable
          90 => [FILTER_CR_CALLBACK,  'cbAvgBuyout',            null,                    null          ], // avgbuyout [op] [int]
-         91 => [FILTER_CR_ENUM,      'totemCategory'                                                  ], // tool
+         91 => [FILTER_CR_ENUM,      'totemCategory',          false,                   true          ], // tool
          92 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           5,                       null          ], // soldbyvendor [yn]
          93 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           3,                       null          ], // otpvp [pvp]
          94 => [FILTER_CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true          ], // splpen
@@ -2047,17 +2047,6 @@ class ItemListFilter extends Filter
             $this->extraOpts['is']['s'][] = ', 0 AS score'; // prevent errors
 
         return $this->wtCnd;
-    }
-
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
     }
 
     protected function createSQLForValues()

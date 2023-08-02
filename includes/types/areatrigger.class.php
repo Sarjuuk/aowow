@@ -70,17 +70,6 @@ class AreaTriggerListFilter extends Filter
         'ty'  => [FILTER_V_RANGE, [0, 5],               true ]  // types
     );
 
-    protected function createSQLForCriterium(&$cr)
-    {
-        if (in_array($cr[0], array_keys($this->genericFilter)))
-            if ($genCr = $this->genericCriterion($cr))
-                return $genCr;
-
-        unset($cr);
-        $this->error = true;
-        return [1];
-    }
-
     protected function createSQLForValues()
     {
         $parts = [];
