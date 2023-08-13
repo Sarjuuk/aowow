@@ -652,7 +652,7 @@ trait spawnHelper
                 }
 
                 // guid < 0 are vehicle accessories. those are moved by moving the vehicle
-                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && $s['guid'] > 0)
+                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && $s['guid'] > 0 && isset($worldPos[$s['guid']]))
                 {
                     if ($points = Game::worldPosToZonePos($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY']))
                     {

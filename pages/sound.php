@@ -258,7 +258,7 @@ class SoundPage extends GenericPage
 
 
         // tab: Emotes (EmotesTextSound (containing emote audio))
-        if ($em = DB::Aowow()->selectCol('SELECT emoteId FROM ?_emotes_sounds WHERE soundId = ?d GROUP BY emoteId', $this->typeId))
+        if ($em = DB::Aowow()->selectCol('SELECT emoteId FROM ?_emotes_sounds WHERE soundId = ?d GROUP BY emoteId UNION SELECT id FROM ?_emotes WHERE soundId = ?d', $this->typeId, $this->typeId))
         {
             $races = new EmoteList(array(['id', $em]));
             if (!$races->error)

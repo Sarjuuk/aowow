@@ -905,7 +905,7 @@ class SmartAI
                 if ($time = $this->numRange('event', 1, true))
                     $footer = $time;
                 break;
-            case SAI_EVENT_RECEIVE_EMOTE:                   // 22  -  On Receive Emote.
+            case SAI_EVENT_RECEIVE_EMOTE:                   // 22  -  On Receive Player Emote.
                 $this->jsGlobals[Type::EMOTE][] = $e['param'][0];
 
                 if ($time = $this->numRange('event', 1, true))
@@ -1044,7 +1044,10 @@ class SmartAI
             case SAI_ACTION_PLAY_EMOTE:                     // 5 -> any target
             case SAI_ACTION_SET_EMOTE_STATE:                // 17 -> any target
                 if ($a['param'][0])
+                {
+                    $a['param'][0] *= -1;                   // handle creature emote
                     $this->jsGlobals[Type::EMOTE][] = $a['param'][0];
+                }
                 break;
             case SAI_ACTION_FAIL_QUEST:                     // 6 -> any target
             case SAI_ACTION_OFFER_QUEST:                    // 7 -> invoker
@@ -1152,6 +1155,7 @@ class SmartAI
                     if (empty($a['param'][$i]))
                         continue;
 
+                    $a['param'][$i] *= -1;                  // handle creature emote
                     $buff[] = '[emote='.$a['param'][$i].']';
                     $this->jsGlobals[Type::EMOTE][] = $a['param'][$i];
                 }

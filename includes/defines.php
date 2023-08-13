@@ -303,6 +303,8 @@ define('NPC_CU_DIFFICULTY_DUMMY',           0x02);
 define('ITEM_CU_OT_ITEMLOOT',               0x01);          // there are no sourceTypes for these two cases
 define('ITEM_CU_OT_OBJECTLOOT',             0x02);
 
+define('EMOTE_CU_MISSING_CMD',              0x01);          // no alias in Globalstrings.lua and thus unusable
+
 // as seen in wFlags
 define('QUEST_CU_REPEATABLE',               0x01);
 define('QUEST_CU_DAILY',                    0x02);
@@ -1734,4 +1736,20 @@ define('MAP_TYPE_ARENA',         6);
 define('MAP_TYPE_MMODE_RAID',    7);
 define('MAP_TYPE_MMODE_RAID_HC', 8);
 
+define('EMOTE_FLAG_ONLY_STANDING',       0x0001);           // Only while standig
+define('EMOTE_FLAG_USE_MOUNT',           0x0002);           // Emote applies to mount
+define('EMOTE_FLAG_NOT_CHANNELING',      0x0004);           // Not while channeling
+define('EMOTE_FLAG_ANIM_TALK',           0x0008);           // Talk anim - talk
+define('EMOTE_FLAG_ANIM_QUESTION',       0x0010);           // Talk anim - question
+define('EMOTE_FLAG_ANIM_EXCLAIM',        0x0020);           // Talk anim - exclamation
+define('EMOTE_FLAG_ANIM_SHOUT',          0x0040);           // Talk anim - shout
+define('EMOTE_FLAG_NOT_SWIMMING',        0x0080);           // Not while swimming
+define('EMOTE_FLAG_ANIM_LAUGH',          0x0100);           // Talk anim - laugh
+define('EMOTE_FLAG_CAN_LIE_ON_GROUND',   0x0200);           // Ok while sleeping or dead
+define('EMOTE_FLAG_NOT_FROM_CLIENT',     0x0400);           // Disallow from client
+define('EMOTE_FLAG_NOT_CASTING',         0x0800);           // Not while casting
+define('EMOTE_FLAG_END_MOVEMENT',        0x1000);           // Movement ends
+define('EMOTE_FLAG_INTERRUPT_ON_ATTACK', 0x2000);           // Interrupt on attack
+define('EMOTE_FLAG_ONLY_STILL',          0x4000);           // Only while still
+define('EMOTE_FLAG_NOT_FLYING',          0x8000);           // Not while flying
 ?>

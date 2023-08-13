@@ -675,28 +675,45 @@ DROP TABLE IF EXISTS `aowow_emotes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_emotes` (
-  `id` smallint(5) unsigned NOT NULL,
-  `cmd` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `isAnimated` tinyint(1) unsigned NOT NULL,
-  `cuFlags` int(10) unsigned NOT NULL,
-  `target_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `target_loc2` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `target_loc3` varchar(95) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `target_loc4` varchar(95) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `target_loc6` varchar(90) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `target_loc8` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc2` varchar(110) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc3` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc4` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc6` varchar(75) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `noTarget_loc8` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc0` varchar(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc2` varchar(115) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc3` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc4` varchar(85) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc6` varchar(75) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `self_loc8` varchar(70) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id` SMALLINT(5) SIGNED NOT NULL,
+  `cmd` VARCHAR(35) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isAnimated` TINYINT(1) UNSIGNED NOT NULL,
+  `flags` SMALLINT(5) UNSIGNED NOT NULL,
+  `parentEmote` SMALLINT(5) UNSIGNED NOT NULL,
+  `soundId` SMALLINT(5) SIGNED NOT NULL,
+  `state` TINYINT(1) UNSIGNED NOT NULL,
+  `stateParam` TINYINT(1) UNSIGNED NOT NULL,
+  `cuFlags` INT(10) UNSIGNED NOT NULL,
+  `extToExt_loc0` VARCHAR(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToExt_loc2` VARCHAR(113) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToExt_loc3` VARCHAR(91) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToExt_loc4` VARCHAR(71) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToExt_loc6` VARCHAR(89) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToExt_loc8` VARCHAR(123) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc0` VARCHAR(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc2` VARCHAR(113) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc3` VARCHAR(91) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc4` VARCHAR(71) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc6` VARCHAR(89) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToMe_loc8` VARCHAR(123) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc0` VARCHAR(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc2` VARCHAR(113) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc3` VARCHAR(91) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc4` VARCHAR(71) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc6` VARCHAR(89) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToExt_loc8` VARCHAR(123) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc0` VARCHAR(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc2` VARCHAR(113) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc3` VARCHAR(91) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc4` VARCHAR(71) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc6` VARCHAR(89) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `extToNone_loc8` VARCHAR(123) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc0` VARCHAR(65) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc2` VARCHAR(113) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc3` VARCHAR(91) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc4` VARCHAR(71) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc6` VARCHAR(89) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `meToNone_loc8` VARCHAR(123) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3186,7 +3203,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1684849476,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1691940878,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

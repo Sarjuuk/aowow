@@ -33,7 +33,7 @@ class EmoteList extends BaseType
             $data[$this->id] = array(
                 'id'      => $this->curTpl['id'],
                 'name'    => $this->curTpl['cmd'],
-                'preview' => $this->getField('self', true) ?: ($this->getField('noTarget', true) ?: $this->getField('target', true))
+                'preview' => Util::parseHtmlText($this->getField('meToExt', true) ?: $this->getField('meToNone', true) ?: $this->getField('extToMe', true) ?: $this->getField('extToExt', true) ?: $this->getField('extToNone', true), true)
             );
 
             // [nyi] sounds

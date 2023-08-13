@@ -1315,7 +1315,7 @@ class SearchPage extends GenericPage
 
     private function _searchEmote($cndBase)                 // 25 Emotes $searchMask & 0x2000000
     {
-        $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'self_loc'.User::$localeId, 'target_loc'.User::$localeId, 'noTarget_loc'.User::$localeId])]);
+        $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'meToExt_loc'.User::$localeId, 'meToNone_loc'.User::$localeId, 'extToMe_loc'.User::$localeId, 'extToExt_loc'.User::$localeId, 'extToNone_loc'.User::$localeId])]);
         $emote = new EmoteList($cnd);
 
         if ($data = $emote->getListviewData())

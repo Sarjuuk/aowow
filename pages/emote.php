@@ -19,6 +19,11 @@ class EmotePage extends GenericPage
 
     public function __construct($pageCall, $id)
     {
+        /*
+         * id > 0: player text emote
+         * id < 0: creature emote
+        */
+
         parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);
@@ -46,15 +51,45 @@ class EmotePage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // has Animation
-        if ($this->subject->getField('isAnimated'))
+        if ($this->subject->getField('isAnimated') && !$this->subject->getField('stateParam'))
+        {
             $infobox[] = Lang::emote('isAnimated');
+
+            // anim state
+            $state = Lang::emote('state', $this->subject->getField('state'));
+            if ($this->subject->getField('state') == 1)
+                $state .= Lang::main('colon').Lang::unit('bytes1', 0, $this->subject->getField('stateParam'));
+            $infobox[] = $state;
+        }
+
+        if (User::isInGroup(U_GROUP_STAFF | U_GROUP_TESTER))
+        {
+            // player emote: point to internal data
+            if ($_ = $this->subject->getField('parentEmote'))
+            {
+                $this->extendGlobalIds(Type::EMOTE, $_);
+                $infobox[] = '[emote='.$_.']';
+            }
+
+            if ($flags = $this->subject->getField('flags'))
+            {
+                $box = Lang::game('flags').Lang::main('colon').'[ul]';
+                foreach (Lang::emote('flags') as $bit => $str)
+                    if ($bit & $flags)
+                        $box .= '[li][tooltip name=hint-'.$bit.']'.Util::asHex($bit).'[/tooltip][span class=tip tooltip=hint-'.$bit.']'.$str.'[/span][/li]';
+                $infobox[] = $box.'[/ul]';
+            }
+        }
 
         /****************/
         /* Main Content */
         /****************/
 
         $text = '';
-        if ($aliasses = DB::Aowow()->selectCol('SELECT command FROM ?_emotes_aliasses WHERE id = ?d AND locales & ?d', $this->typeId, 1 << User::$localeId))
+
+        if ($this->subject->getField('cuFlags') & EMOTE_CU_MISSING_CMD)
+            $text .= Lang::emote('noCommand').'[br][br]';
+        else if ($aliasses = DB::Aowow()->selectCol('SELECT command FROM ?_emotes_aliasses WHERE id = ?d AND locales & ?d', $this->typeId, 1 << User::$localeId))
         {
             $text .= '[h3]'.Lang::emote('aliases').'[/h3][ul]';
             foreach ($aliasses as $a)
@@ -63,21 +98,43 @@ class EmotePage extends GenericPage
             $text .= '[/ul][br][br]';
         }
 
-        $texts = [];
-        if ($_ = $this->subject->getField('self', true))
-            $texts[Lang::emote('self')] = $_;
+        $target = $noTarget = [];
+        if ($_ = $this->subject->getField('extToExt', true))
+            $target[] = $this->prepare($_);
+        if ($_ = $this->subject->getField('extToMe', true))
+            $target[] = $this->prepare($_);
+        if ($_ = $this->subject->getField('meToExt', true))
+            $target[] = $this->prepare($_);
+        if ($_ = $this->subject->getField('extToNone', true))
+            $noTarget[] = $this->prepare($_);
+        if ($_ = $this->subject->getField('meToNone', true))
+            $noTarget[] =$this->prepare($_);
 
-        if ($_ = $this->subject->getField('target', true))
-            $texts[Lang::emote('target')] = $_;
-
-        if ($_ = $this->subject->getField('noTarget', true))
-            $texts[Lang::emote('noTarget')] = $_;
-
-        if (!$texts)
+        if (!$target && !$noTarget)
             $text .= '[div][i class=q0]'.Lang::emote('noText').'[/i][/div]';
-        else
-            foreach ($texts as $h => $t)
-                $text .= '[pad][b]'.$h.'[/b][ul][li][span class=s4]'.preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $t).'[/span][/li][/ul]';
+
+        if ($target)
+        {
+            $text .= '[pad][b]'.Lang::emote('targeted').'[/b][ul]';
+            foreach ($target as $t)
+                $text .= '[li][span class=s4]'.$t.'[/span][/li]';
+            $text .= '[/ul]';
+        }
+
+        if ($noTarget)
+        {
+            $text .= '[pad][b]'.Lang::emote('untargeted').'[/b][ul]';
+            foreach ($noTarget as $t)
+                $text .= '[li][span class=s4]'.$t.'[/span][/li]';
+            $text .= '[/ul]';
+        }
+
+        // event sound
+        if ($_ = $this->subject->getField('soundId'))
+        {
+            $this->extendGlobalIds(Type::SOUND, $_);
+            $text .= '[h3]'.Lang::emote('eventSound').'[/h3][sound='.$_.']';
+        }
 
         $this->extraText = $text;
         $this->infobox   = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
@@ -102,7 +159,7 @@ class EmotePage extends GenericPage
         $this->extendGlobalData($acv->getJsGlobals());
 
         // tab: sound
-        if ($em = DB::Aowow()->select('SELECT soundId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask, BIT_OR(1 << (gender - 1)) AS gender FROM aowow_emotes_sounds WHERE emoteId = ?d GROUP BY soundId', $this->typeId))
+        if ($em = DB::Aowow()->select('SELECT soundId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask, BIT_OR(1 << (gender - 1)) AS gender FROM ?_emotes_sounds WHERE -emoteId = ?d GROUP BY soundId', $this->typeId > 0 ? $this->subject->getField('parentEmote') : $this->typeId))
         {
             $sounds = new SoundList(array(['id', array_keys($em)]));
             if (!$sounds->error)
@@ -122,6 +179,12 @@ class EmotePage extends GenericPage
                 )];
             }
         }
+    }
+
+    private function prepare(string $emote) : string
+    {
+        $emote = Util::parseHtmlText($emote, true);
+        return preg_replace('/%\d?\$?s/', '<'.Util::ucFirst(Lang::main('name')).'>', $emote);
     }
 }
 

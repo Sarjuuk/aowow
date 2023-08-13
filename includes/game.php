@@ -339,8 +339,11 @@ class Game
                 $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM dbc_areatrigger WHERE `id` IN (?a)', $guids);
                 break;
             default:
-                trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE '.$type, E_USER_WARNING);
+                trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE #'.$type, E_USER_WARNING);
         }
+
+        if ($diff = array_diff($guids, array_keys($result)))
+            trigger_error('Game::getWorldPosForGUID - no spawn points for TYPE #'.$type.' GUIDS: '.implode(', ', $diff), E_USER_WARNING);
 
         return $result;
     }
