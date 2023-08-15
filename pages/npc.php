@@ -742,7 +742,7 @@ class NpcPage extends GenericPage
                 if (!empty($sf['note']))
                     $tabData['note'] = $sf['note'];
                 else if ($sf[0] == LOOT_SKINNING)
-                    $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel') * 5), Lang::FMT_HTML).'</b>';
+                    $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel')), Lang::FMT_HTML).'</b>';
 
                 if ($sf[4])
                     $tabData['hiddenCols'] = $sf[4];

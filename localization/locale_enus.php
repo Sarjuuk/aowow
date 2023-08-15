@@ -1181,6 +1181,7 @@ $lang = array(
         'hcAvailable'   => "Heroic mode available&nbsp;(%d)",
         'numPlayers'    => "Number of players",
         'noMap'         => "There is no map available for this zone.",
+        'fishingSkill'  => "25 &ndash; 100% chance to catch a listed fish.",
         'instanceTypes' => ["Zone",     "Transit", "Dungeon",   "Raid",      "Battleground", "Dungeon",  "Arena", "Raid", "Raid"],
         'territories'   => ["Alliance", "Horde",   "Contested", "Sanctuary", "PvP",          "World PvP"],
         'cat'           => array(

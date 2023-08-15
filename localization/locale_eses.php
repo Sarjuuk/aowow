@@ -1181,6 +1181,7 @@ $lang = array(
         'hcAvailable'   => "Modo heroico disponible&nbsp;(%di)",
         'numPlayers'    => "Número de jugadores",
         'noMap'         => "No hay mapa disponible para esta zona.",
+        'fishingSkill'  => "[25 &ndash; 100% chance to catch a listed fish.]",
         'instanceTypes' => ["Zona",    "Tránsito", "Mazmorra",   "Banda",     "Campo de batalla", "Mazmorra",   "Arena", "Banda", "Banda"],
         'territories'   => ["Alianza", "Horda",    "En disputa", "Santuario", "JcJ",              "JcJ abierto"],
         'cat'           => array(

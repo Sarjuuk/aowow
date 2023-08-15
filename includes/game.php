@@ -486,13 +486,27 @@ class Game
 
     public static function getBreakpointsForSkill(int $skillId, int $reqLevel) : array
     {
+        if ($skillId == SKILL_FISHING)
+            return array(
+                round(sqrt(.25) * $reqLevel),               //  25% valid catches
+                round(sqrt(.50) * $reqLevel),               //  50% valid catches
+                round(sqrt(.75) * $reqLevel),               //  75% valid catches
+                $reqLevel                                   // 100% valid catches
+            );
+
         switch ($skillId)
         {
+            case SKILL_SKINNING:
+                if ($reqLevel < 10)
+                    $reqLevel = 0;
+                else if ($reqLevel < 20)
+                    $reqLevel = ($reqLevel - 10) * 10;
+                else
+                    $reqLevel *= 5;
             case SKILL_HERBALISM:
             case SKILL_LOCKPICKING:
             case SKILL_JEWELCRAFTING:
             case SKILL_INSCRIPTION:
-            case SKILL_SKINNING:
             case SKILL_MINING:
                 $points = [$reqLevel];                              // red/orange
 

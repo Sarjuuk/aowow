@@ -639,12 +639,17 @@ class ZonePage extends GenericPage
                 $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
             }
 
+            $note = '';
+            if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $this->typeId))
+               $note = '<b class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.Lang::zone('fishingSkill').'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML).'</b>';
+
             $this->lvTabs[] = ['item', array(
                 'data'       => array_values($fish->getResult()),
                 'name'       => '$LANG.tab_fishing',
                 'id'         => 'fishing',
                 'extraCols'  => array_unique($xCols),
-                'hiddenCols' => ['side']
+                'hiddenCols' => ['side'],
+                'note'       => $note
             )];
         }
 

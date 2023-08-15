@@ -1181,6 +1181,7 @@ $lang = array(
         'hcAvailable'   => "Heroischer Modus verfügbar&nbsp;(%d)",
         'numPlayers'    => "Anzahl an Spielern",
         'noMap'         => "Für dieses Gebiet steht keine Karte zur Verfügung.",
+        'fishingSkill'  => "25 &ndash; 100% Chance einen gelisteten Fisch zu fangen.",
         'instanceTypes' => ["Zone",    "Durchgang", "Dungeon",  "Schlachtzug",     "Battleground", "Dungeon", "Arena", "Schlachtzug", "Schlachtzug"],
         'territories'   => ["Allianz", "Horde",     "Umkämpft", "Sicheres Gebiet", "PvP",          "Welt-PvP"],
         'cat'           => array(

@@ -1181,6 +1181,7 @@ $lang = array(
         'hcAvailable'   => "Mode héroïque disponible&nbsp;(%d)",
         'numPlayers'    => "Nombre de joueurs",
         'noMap'         => "Il n'y a aucune carte disponible pour cette zone.",
+        'fishingSkill'  => "[25 &ndash; 100% chance to catch a listed fish.]",
         'instanceTypes' => ["Zone",     "Transit", "Donjon",   "Raid",       "Champ de bataille", "Donjon",    "Arène", "Raid", "Raid"],
         'territories'   => ["Alliance", "Horde",   "Contesté", "Sanctuaire", "JcJ",               "JcJ Global"],
         'cat'           => array(

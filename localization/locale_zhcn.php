@@ -1180,6 +1180,7 @@ $lang = array(
         'hcAvailable'   => "英雄模式可用&nbsp;(%d)",
         'numPlayers'    => "玩家人数",
         'noMap'         => "这个区域没有可用地图。",
+        'fishingSkill'  => "[25 &ndash; 100% chance to catch a listed fish.]",
         'instanceTypes' => ["区域", "运送", "地下城", "团队副本", "战场", "地下城", "竞技场", "团队副本", "团队副本"],
         'territories'   => ["联盟", "部落",   "争夺中", "安全区域", "PvP",          "世界PvP"],
         'cat'           => array(
