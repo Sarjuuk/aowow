@@ -1877,7 +1877,7 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "Особый",               "Красный",          "Желтый",               "Синий"
         ),
-        'gemConditions' => array(                           // ENCHANT_CONDITION_*      so whats that pipe-code..?
+        'gemConditions' => array(                           // ENCHANT_CONDITION_*
             2 => "меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета",
             3 => "больше |3-7(%s), чем |3-7(%s) камней",
             5 => "хотя бы %d |4камень:камня:камней; |3-1(%s) цвета"

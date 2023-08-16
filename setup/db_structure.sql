@@ -668,6 +668,35 @@ CREATE TABLE `aowow_dbversion` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_declinedword`
+--
+
+DROP TABLE IF EXISTS `aowow_declinedword`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_declinedword` (
+  `id` SMALLINT(5) UNSIGNED NOT NULL,
+  `word` VARCHAR(127) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_declinedwordcases`
+--
+
+DROP TABLE IF EXISTS `aowow_declinedwordcases`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_declinedwordcases` (
+ `wordId` SMALLINT(5) UNSIGNED NOT NULL,
+ `caseIdx` TINYINT(1) UNSIGNED NOT NULL,
+ `word` VARCHAR(131) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+ PRIMARY KEY (`wordId`, `caseIdx`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_emotes`
 --
 
@@ -3203,7 +3232,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1691940878,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1692289952,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

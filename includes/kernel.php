@@ -262,7 +262,7 @@ if (!CLI)
                 User::useLocale($loc);
         }
 
-        Lang::load(User::$localeString);
+        Lang::load(User::$localeId);
     }
 
     // parse page-parameters .. sanitize before use!
@@ -274,7 +274,7 @@ if (!CLI)
     Util::$wowheadLink = 'https://www.wowhead.com/wotlk/'.(User::$localeId ? Util::$subDomains[User::$localeId].'/' : '').$str;
 }
 else if (!empty($AoWoWconf['aowow']))
-    Lang::load('enus');
+    Lang::load(LOCALE_EN);
 
 $AoWoWconf = null;                                          // empty auths
 

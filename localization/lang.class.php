@@ -41,6 +41,7 @@ class Lang
     private static $emote;
     private static $enchantment;
 
+    private static $locId;
     private static $locales = array(
         LOCALE_EN => 'English',
         LOCALE_FR => 'Français',
@@ -54,12 +55,14 @@ class Lang
     public const FMT_HTML   = 1;
     public const FMT_MARKUP = 2;
 
-    public static function load(string $loc) : void
+    public static function load(int $locale) : void
     {
-        if (!file_exists('localization/locale_'.$loc.'.php'))
-            die('File for localization '.strToUpper($loc).' not found.');
+        if (!isset(Util::$localeStrings[$locale]))
+            die($locale.' is not a known locale!');
+        if (!file_exists('localization/locale_'.Util::$localeStrings[$locale].'.php'))
+            die('File for locale '.$locale.' not found.');
         else
-            require 'localization/locale_'.$loc.'.php';
+            require 'localization/locale_'.Util::$localeStrings[$locale].'.php';
 
         foreach ($lang as $k => $v)
             self::$$k = $v;
@@ -68,6 +71,8 @@ class Lang
         self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
+
+        self::$locId = $locale;
     }
 
     public static function __callStatic(string $prop, array $args) // : ?string|array
@@ -591,88 +596,221 @@ class Lang
             return $var;
         }
 
+        if (!$var)                                          // may be null or empty. Handled differently depending on context
+            return $var;
+
         if ($args)
             $var = vsprintf($var, $args);
 
-        // line break
-        // |n
-        $var = str_replace('|n', '<br />', $var);
+        return self::unescapeUISequences($var);
+    }
 
-        // color
-        // |c<aarrggbb><word>|r
-        $var = preg_replace('/\|cff([a-f0-9]{6})(.+?)\|r/i', '<span style="color: #$1;">$2</span>', $var);
+    /* Quoted from WoWWiki - UI Escape Sequences (https://wowwiki-archive.fandom.com/wiki/UI_escape_sequences)
+     * number |1singular;plural;
+           Will choose a word depending on whether the digit preceding it is 0/1 or not (i.e. 1,11,21 return the first string, as will 0,10,40). Note that unlike |4 singular and plural forms are separated by semi-colon.
 
-        // icon
-        // |T<imgPath>:0:0:0:-1|t   -   not used, skip if found
-        $var = preg_replace('/\|T[^\|]+\|t/', '', $var);
+     * |2text
+           Before vowels outputs d' (with apostrophe) and removes any leading spaces from text, otherwise outputs de (with trailing space)
 
-        // hyperlink
-        // |H<hyperlinkStruct>|h<name>|h    -   not used, truncate structure if found
-        $var = preg_replace('/\|H[^\|]+\|h([^\|]+)\|h/', '$1', $var);
+     * |3-formid(text)
+           Displays text declined to the specified form (index ranges from 1 to GetNumDeclensionSets()).
 
-        // french preposition : de
-        // |2 <word>
-        $var = preg_replace_callback('/\|2\s(\w)/i', function ($m) {
-            if (in_array(strtolower($m[1]), ['a', 'e', 'h', 'i', 'o', 'u']))
-                return "d'".$m[1];
-            else
-                return 'de '.$m[1];
-        }, $var);
+     * number |4singular:plural; -or- number |4singular:plural1:plural2;
+           Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
+    **/
 
-        // russian word cunjugation thingy
-        // |3-<number>(<word>)
-        $var = preg_replace_callback('/\|3-(\d)\(([^\)]+)\)/i', function ($m) {
-            switch ($m[0])
+    public static function unescapeUISequences(string $var, int $fmt = -1) : string
+    {
+        // line break                   |n
+        $var = preg_replace_callback('/\|n/i', function ($m) use ($fmt)
             {
-                case 1:                                     // seen cases
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                default:                                    // passthrough .. unk case
-                    return $m[1];
-            }
-
-        }, $var);
-
-        // numeric switch
-        // <number> |4<singular>:<plural>[:<plural2>];
-        $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^;]*);/i', function ($m) {
-            $plurals = explode(':', $m[4]);
-            $result  = '';
-
-            if (count($plurals) == 2)                       // special case: ruRU
-            {
-                switch (substr($m[1], -1))                  // check last digit of number
+                switch ($fmt)
                 {
-                    case 1:
-                        // but not 11 (teen number)
-                        if (!in_array($m[1], [11]))
-                        {
-                            $result = $m[3];
-                            break;
-                        }
-                    case 2:
-                    case 3:
-                    case 4:
-                        // but not 12, 13, 14 (teen number) [11 is passthrough]
-                        if (!in_array($m[1], [11, 12, 13, 14]))
-                        {
-                            $result = $plurals[0];
-                            break;
-                        }
-                        break;
+                    case -1:                                // default Lang::vspf case
+                    case self::FMT_HTML:
+                        return '<br />';
+                    case self::FMT_MARKUP:
+                        return '[br]';
+                    case self::FMT_RAW:
                     default:
-                        $result = $plurals[1];
+                        return '';
                 }
-            }
-            else
-                $result = ($m[1] == 1 ? $m[3] : $plurals[0]);
+            } , $var);
 
-            return $m[1].$m[2].$result;
-        }, $var);
+        // color                        |c<aarrggbb><word>|r
+        $var = preg_replace_callback('/\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/i', function ($m) use ($fmt)
+            {
+                [$_, $a, $rgb, $text] = $m;
+
+                switch ($fmt)
+                {
+                    case -1:                                // default Lang::vspf case
+                    case self::FMT_HTML:
+                        return sprintf('<span style="color: #%1s%2s;">%3s</span>', $rgb, $a, $text);
+                    case self::FMT_MARKUP:
+                        return sprintf('[span color=#%1s]%3s[/span]', $rgb, $text); // doesn't support alpha
+                    case self::FMT_RAW:
+                    default:
+                        return $text;
+                }
+            }, $var);
+
+        // icon                         |T<imgPath+File.blp>:0:0:0:-1|t
+        $var = preg_replace_callback('/\|T([\w]+\\\)*([^\.]+)\.[bB][lL][pP]:([^\|]+)\|t/', function ($m) use ($fmt)
+            {
+                /* iconParam - size1, size2, xoffset, yoffset
+                    size1 == 0; size2 omitted: Width = Height = TextHeight (always square!)
+                    size1 > 0;  size2 omitted: Width = Height = size1 (always square!)
+                    size1 == 0; size2 == 0   : Width = Height = TextHeight (always square!)
+                    size1 > 0;  size2 == 0   : Width = TextHeight; Height = size1 (size1 is height!!!)
+                    size1 == 0; size2 > 0    : Width = size2 * TextHeight; Height = TextHeight (size2 is an aspect ratio and defines width!!!)
+                    size1 > 0;  size2 > 0    : Width = size1; Height = size2
+                */
+
+                [$_, $iconPath, $iconName, $iconParam] = $m;
+
+                switch ($fmt)
+                {
+                    case self::FMT_HTML:
+                        return '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/'.Util::lower($iconName).'.gif)">';
+                    case self::FMT_MARKUP:
+                        return '[icon name='.Util::lower($iconName).']';
+                    case self::FMT_RAW:
+                    default:
+                        return '';
+                }
+            }, $var);
+
+        // hyperlink                    |H<hyperlinkStruct>|h<name>|h
+        $var = preg_replace_callback('/\|H([^:]+):([^\|]+)\|h([^\|]+)\|h/', function ($m) use ($fmt)
+            {
+                /*  type            Params
+                    |Hchannel       channelName, channelname == CHANNEL ? channelNr : null
+                    |Hachievement   AchievementID, PlayerGUID, isComplete, Month, Day, Year, criteriaMask1, criteriaMask2, criteriaMask3, criteriaMask4 - 32bit masks of Achievement_criteria.dbc/UIOrder only for achievements that display a todo list
+                    |Hquest         QuestID, QuestLevel
+                    |Hitem          itemId enchantId gemId1 gemId2 gemId3 gemId4 suffixId uniqueId linkLevel
+                    |Henchant       SpellID (from craftwindow)
+                    |Htalent        TalentID, TalentRank
+                    |Hspell         SpellID, PlayerLevel?
+                    |Htrade         SpellID, curSkill, maxSkill, PlayerGUID, base64_encode(known recipes bitmask)
+                    |Hplayer        Name
+                    |Hunit          GUID    ?               -  combatlog
+                    |Hicon          ?   "source"|"dest"     -  combatlog
+                    |Haction        ?                       -  combatlog
+                */
+
+                [$_, $linkType, $linkVars, $text] = $m;
+
+                $linkVars = explode(':', $linkVars);
+
+                $spfVars = ['', $linkVars[0], $text];
+
+                switch ($linkType)
+                {
+                    case 'trade':
+                    case 'enchant':
+                        $linkType = 'spell';
+                    case 'achievement':                             // markdown COULD implement completed status
+                    case 'quest':
+                    case 'item':                                    // markdown COULD implement enchantments/gems
+                    case 'spell':
+                        $spfVars[0] = $linkType;
+                        break;
+                    case 'talent':
+                        if ($spell = DB::Aowow()->selectCell('SELECT `spell` FROM ?_talents WHERE `id` = ?d AND `rank` = ?d', $linkVars[0], $linkVars[1]))
+                        {
+                            $spfVars[0] = 'spell';
+                            $spfVars[1] = $spell;
+                            break;
+                        }
+                    default:
+                        return '';
+                }
+
+                switch ($fmt)
+                {
+                    case self::FMT_HTML:
+                        return sprintf('<a href="?%s=%d">%s</a>', $spfVars);
+                    case self::FMT_MARKUP:
+                        return sprintf('[%s=%d]', $spfVars);
+                    case self::FMT_RAW:
+                    default:
+                        return sprintf('(%s #%d) %s', $spfVars);
+                }
+            }, $var);
+
+        // |1 - digit singular/plural  <number> |1<singular;<plural>;
+        $var = preg_replace_callback('/(\d+)\s*\|1([^;]+);([^;]+);/i', function ($m)
+            {
+                [$_, $num, $singular, $plural] = $m;
+
+                switch ($num[-1])
+                {
+                    case 0:
+                    case 1:
+                        return $num . ' ' . $singular;
+                    default:
+                        return $num . ' ' . $plural;
+                }
+            }, $var);
+
+        // |2 - frFR preposition: de    |2 <word>
+        $var = preg_replace_callback('/\|2\s?(\w)/i', function ($m)
+            {
+                [$_, $word] = $m;
+
+                switch (strtolower($word[1]))
+                {
+                    case 'h':
+                        if (self::$locId != LOCALE_FR)
+                            return 'de ' . $word;
+                    case 'a':
+                    case 'e':
+                    case 'i':
+                    case 'o':
+                    case 'u':
+                        return "d'" . $word;
+                    default:
+                        return 'de ' . $word;
+                }
+            }, $var);
+
+        // |3 - ruRU declinations       |3-<caseIdx>(<word>)
+        $var = preg_replace_callback('/\|3-(\d)\(([^\)]+)\)/iu', function ($m)
+            {
+                [$_, $caseIdx, $word] = $m;
+
+                if ($caseIdx > 11 || $caseIdx < 1)          // max caseIdx seen in DeclinedWordCases.dbc
+                    return $word;
+
+                if (preg_match('/\P{Cyrillic}/iu', $word))  // not in cyrillic script
+                    return $word;
+
+                if ($declWord = DB::Aowow()->selectCell('SELECT dwc.word FROM ?_declinedwordcases dwc JOIN ?_declinedword dc ON dwc.wordId = dc.id WHERE dwc.caseIdx = ?d AND dc.word = ?', $caseIdx, $word))
+                    return $declWord;
+
+                return $word;
+            }, $var);
+
+        // |4 - numeric switch          <number>           |4<singular>:<plural>[:<plural2>];
+        $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^:;]+)(?::([^;]+))?;/i', function ($m)
+            {
+                [$_, $num, $pad, $singular, $plural1, $plural2] = $m;
+
+                if (self::$locId != LOCALE_RU || !$plural2)
+                    return $num . $pad . ($num == 1 ? $singular : $plural1);
+
+                // singular - ends in 1, but not teen number
+                if ($num[-1] == 1 && $num != 11)
+                    return $num . $pad . $singular;
+
+                // genitive singular - ends in 2, 3, 4, but not teen number
+                if (($num[-1] == 2 && $num != 12) || ($num[-1] == 3 && $num != 13) || ($num[-1] == 4 && $num != 14))
+                    return $num . $pad . $plural1;
+
+                // genitive plural - everything else
+                return $num . $pad . $plural2;
+            }, $var);
 
         return $var;
     }

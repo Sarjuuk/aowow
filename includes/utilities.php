@@ -713,8 +713,8 @@ abstract class Util
             return Lang::main('timeAgo', [$s . ' ' . Lang::timeUnits($s == 1 ? 'sg' : 'pl', 6)]);
     }
 
-    // pageText for Books (Item or GO) and questText
-    public static function parseHtmlText(/*string|array*/ $text, bool $markdown = false) // : /*string|array*/
+    // pageTexts, questTexts and mails
+    public static function parseHtmlText(string|array $text, bool $markdown = false) : string|array
     {
         if (is_array($text))
         {
@@ -748,51 +748,41 @@ abstract class Util
         $text = preg_replace('/<([^\s\/]+)>/iu', '&lt;\1&gt;', $text);
 
         $from = array(
-            '/\|T([\w]+\\\)*([^\.]+)\.blp:\d+\|t/ui',       // images (force size to tiny)                      |T<fullPath>:<size>|t
-            '/\|c(\w{6})\w{2}([^\|]+)\|r/ui',               // color                                            |c<RRGGBBAA><text>|r
             '/\$g\s*([^:;]*)\s*:\s*([^:;]*)\s*(:?[^:;]*);/ui',// directed gender-reference                      $g<male>:<female>:<refVariable>
             '/\$t([^;]+);/ui',                              // nonsense, that the client apparently ignores
-            '/\|\d\-?\d?\(([\$\%]\w)\)/ui',                 // and another modifier for something russian       |3-6($r)
             '/<([^\"=\/>]+\s[^\"=\/>]+)>/ui',               // emotes (workaround: at least one whitespace and never " or = between brackets)
             '/\$(\d+)w/ui',                                 // worldState(?)-ref found on some pageTexts        $1234w
             '/\$c/i',                                       // class-ref
             '/\$r/i',                                       // race-ref
             '/\$n/i',                                       // name-ref
-            '/\$b/i',                                       // line break
-            '/\|n/i'                                        // what .. the fuck .. another type of line terminator? (only in spanish though)
+            '/\$b/i'                                        // line break
         );
 
         $toMD = array(
-            '[icon name=\2]',
-            '[span color=#\1>\2[/span]',
             '<\1/\2>',
             '',
-            '\1',
             '<\1>',
             '[span class=q0>WorldState #\1[/span]',
             '<'.Lang::game('class').'>',
             '<'.Lang::game('race').'>',
             '<'.Lang::main('name').'>',
-            '[br]',
-            ''
+            '[br]'
         );
 
         $toHTML = array(
-            '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/\2.gif)">',
-            '<span style="color: #\1">\2</span>',
             '&lt;\1/\2&gt;',
             '',
-            '\1',
             '&lt;\1&gt;',
             '<span class="q0">WorldState #\1</span>',
             '&lt;'.Lang::game('class').'&gt;',
             '&lt;'.Lang::game('race').'&gt;',
             '&lt;'.Lang::main('name').'&gt;',
-            '<br />',
-            ''
+            '<br />'
         );
 
-        return preg_replace($from, $markdown ? $toMD : $toHTML, $text);
+        $text = preg_replace($from, $markdown ? $toMD : $toHTML, $text);
+
+        return Lang::unescapeUISequences($text, $markdown ? Lang::FMT_MARKUP : Lang::FMT_HTML);
     }
 
     public static function asHex($val) : string
@@ -927,7 +917,7 @@ abstract class Util
             if (strstr($v, $domain))
             {
                 User::useLocale($k);
-                Lang::load(User::$localeString);
+                Lang::load($k);
                 return;
             }
         }
@@ -935,7 +925,7 @@ abstract class Util
         if ($domain == 'www')
         {
             User::useLocale(LOCALE_EN);
-            Lang::load(User::$localeString);
+            Lang::load(LOCALE_EN);
         }
     }
 
