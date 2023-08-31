@@ -1170,11 +1170,17 @@ class SpellPage extends GenericPage
         }
 
         // tab: sounds
+        $data     = [];
+        $seSounds = [];
+        for ($i = 1; $i < 4; $i++)                          // sounds from screen effect
+            if ($this->subject->getField('effect'.$i.'AuraId') == 260)
+               $seSounds = DB::Aowow()->selectRow('SELECT `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight` FROM ?_screeneffect_sounds WHERE `id` = ?d', $this->subject->getField('effect'.$i.'MiscValue'));
+
         $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE id = ?d', $this->subject->getField('spellVisualId'));
         array_shift($activitySounds);                       // remove id-column
-        if ($activitySounds)
+        if ($soundIDs = $activitySounds + $seSounds)
         {
-            $sounds = new SoundList(array(['id', $activitySounds]));
+            $sounds = new SoundList(array(['id', $soundIDs]));
             if (!$sounds->error)
             {
                 $data = $sounds->getListviewData();
@@ -2165,6 +2171,10 @@ class SpellPage extends GenericPage
                                 $bar = ' ('.Lang::game('npc').' #'.$effMV.')';
                                 if ($n = CreatureList::getName($effMV))
                                     $bar = ' (<a href="?npc='.$effMV.'">'.$n.'</a>)';
+                                break;
+                            case 260:                       // Screen Effect
+                                if ($_ = DB::Aowow()->selectCell('SELECT `name` FROM ?_screeneffect_sounds WHERE `id` = ?d', $effMV))
+                                    $bar = User::isInGroup(U_GROUP_EMPLOYEE | U_GROUP_TESTER) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
                         }
                         $foo['name'] .= strstr($bar, 'href') || strstr($bar, '#') ? $bar : ($bar ? ' ('.$bar.')' : null);
 

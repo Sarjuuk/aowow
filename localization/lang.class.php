@@ -795,7 +795,7 @@ class Lang
         // |4 - numeric switch          <number>           |4<singular>:<plural>[:<plural2>];
         $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^:;]+)(?::([^;]+))?;/i', function ($m)
             {
-                [$_, $num, $pad, $singular, $plural1, $plural2] = $m;
+                [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 
                 if (self::$locId != LOCALE_RU || !$plural2)
                     return $num . $pad . ($num == 1 ? $singular : $plural1);

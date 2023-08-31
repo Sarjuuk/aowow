@@ -2364,6 +2364,24 @@ CREATE TABLE `aowow_scalingstatvalues` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_screeneffect_sounds`
+--
+
+DROP TABLE IF EXISTS `aowow_screeneffect_sounds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_screeneffect_sounds` (
+  `id` smallint(5) unsigned NOT NULL,
+  `name` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ambienceDay` smallint(5) unsigned NOT NULL,
+  `ambienceNight` smallint(5) unsigned NOT NULL,
+  `musicDay` smallint(5) unsigned NOT NULL,
+  `musicNight` smallint(5) unsigned NOT NULL,
+  KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_screenshots`
 --
 
@@ -3232,7 +3250,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1692289952,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1693485225,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

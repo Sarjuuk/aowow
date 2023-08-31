@@ -19,7 +19,7 @@ SqlGen::register(new class extends SetupScript
         // creatures
         'npcsounds', 'creaturesounddata', 'creaturedisplayinfo', 'creaturemodeldata',
         // spells
-        'spell', 'spellvisual', 'spellvisualkit',
+        'spell', 'spellvisual', 'spellvisualkit', 'screeneffect',
         // zones
         'soundambience', 'zonemusic', 'zoneintromusictable', 'worldstatezonesounds', 'areatable',
         // items
@@ -421,6 +421,27 @@ SqlGen::register(new class extends SetupScript
                 isc.class = 2
             ON DUPLICATE KEY UPDATE
                 subClassMask = subClassMask | (1 << isc.subClass)
+        ');
+
+
+        /************************/
+        /* Screen Effect Sounds */
+        /************************/
+
+        CLI::write(' - linking to screen effects');
+
+        DB::Aowow()->query('TRUNCATE ?_screeneffect_sounds');
+        DB::Aowow()->query('
+            INSERT INTO
+                ?_screeneffect_sounds
+            SELECT
+                se.id, se.name, IFNULL(sa.soundIdDay, 0), IFNULL(sa.soundIdNight, 0), IFNULL(zm.soundIdDay, 0), IFNULL(zm.soundIdNight, 0)
+            FROM
+                dbc_screeneffect se
+            LEFT JOIN
+                dbc_soundambience sa ON se.soundAmbienceId = sa.id
+            LEFT JOIN
+                dbc_zonemusic zm ON se.zoneMusicId = zm.id
         ');
 
         $this->reapplyCCFlags('sounds', Type::SOUND);

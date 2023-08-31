@@ -131,6 +131,14 @@ class SoundPage extends GenericPage
                 impactarea = ?d
         ', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId);
 
+        $seMiscValues = DB::Aowow()->selectCol('
+            SELECT `id` FROM ?_screeneffect_sounds WHERE
+                `ambienceDay` = ?d OR
+                `ambienceNight` = ?d OR
+                `musicDay` = ?d OR
+                `musicNight` = ?d
+        ', $this->typeId, $this->typeId, $this->typeId, $this->typeId);
+
         $cnd = array(
             'OR',
             ['AND', ['effect1Id', 132], ['effect1MiscValue', $this->typeId]],
@@ -140,6 +148,14 @@ class SoundPage extends GenericPage
 
         if ($displayIds)
             $cnd[] = ['spellVisualId', $displayIds];
+
+        if ($seMiscValues)
+            $cnd[] = array(
+                'OR',
+                ['AND', ['effect1AuraId', 260], ['effect1MiscValue', $seMiscValues]],
+                ['AND', ['effect2AuraId', 260], ['effect2MiscValue', $seMiscValues]],
+                ['AND', ['effect3AuraId', 260], ['effect3MiscValue', $seMiscValues]]
+            );
 
         $spells = new SpellList($cnd);
         if (!$spells->error)
