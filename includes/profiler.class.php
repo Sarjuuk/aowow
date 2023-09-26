@@ -521,20 +521,29 @@ class Profiler
 
         if ($cl == CLASS_HUNTER)
         {
-            DB::Aowow()->query('DELETE FROM ?_profiler_pets WHERE owner = ?d', $profileId);
-            $pets = DB::Characters($realmId)->select('SELECT id AS ARRAY_KEY, id, entry, modelId, name FROM character_pet WHERE owner = ?d', $charGuid);
+            DB::Aowow()->query('DELETE FROM ?_profiler_pets WHERE `owner` = ?d', $profileId);
+            $pets = DB::Characters($realmId)->select('SELECT `id` AS ARRAY_KEY, `entry`, `modelId`, `name` FROM character_pet WHERE `owner` = ?d', $charGuid);
             foreach ($pets as $petGuid => $petData)
             {
-                $morePet   = DB::Aowow()->selectRow('SELECT p.`type`, c.family FROM ?_pet p JOIN ?_creature c ON c.family = p.id WHERE c.id = ?d', $petData['entry']);
-                $petSpells = DB::Characters($realmId)->selectCol('SELECT spell FROM pet_spell WHERE guid = ?d', $petGuid);
+                $petSpells = DB::Characters($realmId)->selectCol('SELECT `spell` FROM pet_spell WHERE `guid` = ?d', $petGuid);
+                $morePet   = DB::Aowow()->selectRow(
+                   'SELECT    IFNULL(c3.`id`, IFNULL(c2.`id`, IFNULL(c1.`id`, c.`id`))) AS "entry", p.`type`, c.`family`
+                    FROM      ?_pet p
+                    JOIN      ?_creature c ON c.`family` = p.`id`
+                    LEFT JOIN ?_creature c1 ON c1.`difficultyEntry1` = c.id
+                    LEFT JOIN ?_creature c2 ON c2.`difficultyEntry2` = c.id
+                    LEFT JOIN ?_creature c3 ON c3.`difficultyEntry3` = c.id
+                    WHERE     c.`id` = ?d',
+                    $petData['entry']
+                );
 
-                $_ = DB::Aowow()->selectCol('SELECT spell AS ARRAY_KEY, MAX(IF(spell IN (?a), `rank`, 0)) FROM ?_talents WHERE class = 0 AND petTypeMask = ?d GROUP BY id ORDER BY row, col ASC', $petSpells ?: [0], 1 << $morePet['type']);
+                $_ = DB::Aowow()->selectCol('SELECT `spell` AS ARRAY_KEY, MAX(IF(`spell` IN (?a), `rank`, 0)) FROM ?_talents WHERE `class` = 0 AND `petTypeMask` = ?d GROUP BY `id` ORDER BY `row`, `col` ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
                     'owner'     => $profileId,
                     'name'      => $petData['name'],
                     'family'    => $morePet['family'],
-                    'npc'       => $petData['entry'],
+                    'npc'       => $morePet['entry'],
                     'displayId' => $petData['modelId'],
                     'talents'   => implode('', $_)
                 );

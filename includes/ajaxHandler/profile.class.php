@@ -573,7 +573,7 @@ class AjaxProfile extends AjaxHandler
             $profile['arenateams'] = $at;
 
         // pets if hunter fields: [name:name, family:petFamily, npc:npcId, displayId:modelId, talents:talentString]
-        if ($pets = DB::Aowow()->select('SELECT name, family, npc, displayId, talents FROM ?_profiler_pets WHERE owner = ?d', $pBase['id']))
+        if ($pets = DB::Aowow()->select('SELECT `name`, `family`, `npc`, `displayId`, CONCAT("$\"", `talents`, "\"") AS "talents" FROM ?_profiler_pets WHERE `owner` = ?d', $pBase['id']))
             $profile['pets'] = $pets;
 
         // source for custom profiles; profileId => [name, ownerId, iconString(optional)]
