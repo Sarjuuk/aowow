@@ -662,7 +662,7 @@ class QuestListFilter extends Filter
             return false;
 
         if ($cr[1])
-            return ['OR', ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::$effects['teach']], ['rsc.effect2Id', SpellList::$effects['teach']], ['rsc.effect3Id', SpellList::$effects['teach']]];
+            return ['OR', ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::EFFECTS_TEACH], ['rsc.effect2Id', SpellList::EFFECTS_TEACH], ['rsc.effect3Id', SpellList::EFFECTS_TEACH]];
         else
             return ['AND', ['sourceSpellId', 0], ['rewardSpell', 0], ['rewardSpellCast', 0]];
     }

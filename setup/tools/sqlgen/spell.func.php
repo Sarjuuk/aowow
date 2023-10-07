@@ -364,7 +364,7 @@ SqlGen::register(new class extends SetupScript
 
                 for ($i = 1; $i <= 3; $i++)
                 {
-                    if ($effects['effect'.$i.'Id'] != 36)   // effect: learnSpell
+                    if ($effects['effect'.$i.'Id'] != SPELL_EFFECT_LEARN_SPELL)
                         continue;
 
                     $triggered = true;

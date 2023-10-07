@@ -1129,9 +1129,9 @@ class ItemPage extends genericPage
             // reagents
             $cnd = array(
                 'OR',
-                ['AND', ['effect1CreateItemId', $this->typeId], ['OR', ['effect1Id', SpellList::$effects['itemCreate']], ['effect1AuraId', SpellList::$auras['itemCreate']]]],
-                ['AND', ['effect2CreateItemId', $this->typeId], ['OR', ['effect2Id', SpellList::$effects['itemCreate']], ['effect2AuraId', SpellList::$auras['itemCreate']]]],
-                ['AND', ['effect3CreateItemId', $this->typeId], ['OR', ['effect3Id', SpellList::$effects['itemCreate']], ['effect3AuraId', SpellList::$auras['itemCreate']]]],
+                ['AND', ['effect1CreateItemId', $this->typeId], ['OR', ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
+                ['AND', ['effect2CreateItemId', $this->typeId], ['OR', ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
+                ['AND', ['effect3CreateItemId', $this->typeId], ['OR', ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]],
             );
 
             $spellSource = new SpellList($cnd);

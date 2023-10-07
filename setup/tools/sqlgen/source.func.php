@@ -1010,7 +1010,7 @@ SqlGen::register(new class extends SetupScript
 
         foreach ($qSpells as $sId => $spell)
             for ($i = 1; $i <= 3; $i++)
-                if ($spell['effect'.$i.'Id'] == 36)         // effect: learnSpell
+                if ($spell['effect'.$i.'Id'] == SPELL_EFFECT_LEARN_SPELL)
                     $this->pushBuffer(Type::SPELL, $spell['effect'.$i.'TriggerSpell'], SRC_QUEST, $quests[$sId]['side'], $quests[$sId]['qty'] > 1 ? 0 : Type::QUEST, $quests[$sId]['id'], $areaParent[$quests[$sId]['zone']] ?? $quests[$sId]['zone']);
     }
 
@@ -1042,7 +1042,7 @@ SqlGen::register(new class extends SetupScript
             $triggered = false;
             for ($i = 1; $i <= 3; $i++)
             {
-                if ($effects['effect'.$i.'Id'] != 36)       // effect: learnSpell
+                if ($effects['effect'.$i.'Id'] != SPELL_EFFECT_LEARN_SPELL)
                     continue;
 
                 $triggered = true;
@@ -1084,7 +1084,7 @@ SqlGen::register(new class extends SetupScript
             foreach ($tSpells as $tId => $spell)
             {
                 for ($i = 1; $i <= 3; $i++)
-                    if ($spell['effect'.$i.'Id'] == 36)            // effect: learnSpell
+                    if ($spell['effect'.$i.'Id'] == SPELL_EFFECT_LEARN_SPELL)
                         $recurse[$spell['effect'.$i.'TriggerSpell']] = $tId;
 
                 if (array_search($tId, $recurse))

@@ -826,9 +826,9 @@ class SpellPage extends GenericPage
         // tab: triggered by
         $conditions = array(
             'OR',
-            ['AND', ['OR', ['effect1Id', SpellList::$effects['trigger']], ['effect1AuraId', SpellList::$auras['trigger']]], ['effect1TriggerSpell', $this->subject->id]],
-            ['AND', ['OR', ['effect2Id', SpellList::$effects['trigger']], ['effect2AuraId', SpellList::$auras['trigger']]], ['effect2TriggerSpell', $this->subject->id]],
-            ['AND', ['OR', ['effect3Id', SpellList::$effects['trigger']], ['effect3AuraId', SpellList::$auras['trigger']]], ['effect3TriggerSpell', $this->subject->id]],
+            ['AND', ['OR', ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->subject->id]],
+            ['AND', ['OR', ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->subject->id]],
+            ['AND', ['OR', ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->subject->id]],
         );
 
         $trigger = new SpellList($conditions);
@@ -1087,9 +1087,9 @@ class SpellPage extends GenericPage
         // tab: taught by spell
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', SpellList::$effects['teach']], ['effect1TriggerSpell', $this->subject->id]],
-            ['AND', ['effect2Id', SpellList::$effects['teach']], ['effect2TriggerSpell', $this->subject->id]],
-            ['AND', ['effect3Id', SpellList::$effects['teach']], ['effect3TriggerSpell', $this->subject->id]],
+            ['AND', ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->subject->id]],
+            ['AND', ['effect2Id', SpellList::EFFECTS_TEACH], ['effect2TriggerSpell', $this->subject->id]],
+            ['AND', ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->subject->id]],
         );
 
         $tbSpell = new SpellList($conditions);

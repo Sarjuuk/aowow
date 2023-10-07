@@ -29,20 +29,56 @@ class SpellList extends BaseType
         10 => 4
     );
 
-    public static   $effects     = array(
-        'heal'       => [ 0,/*3,*/10,  67,  75, 136                         ],  // <no effect>, /*Dummy*/, Heal, Heal Max Health, Heal Mechanical, Heal Percent
-        'damage'     => [ 0,  2,   3,   9,  62                              ],  // <no effect>, Dummy, School Damage, Health Leech, Power Burn
-        'itemCreate' => [24, 34,  59,  66, 157                              ],  // createItem, changeItem, randomItem, createManaGem, createItem2
-        'trigger'    => [ 3, 32,  64, 101, 142, 148, 151, 152, 155, 160, 164],  // dummy, trigger missile, trigger spell, feed pet, force cast, force cast with value, unk, trigger spell 2, unk, dualwield 2H, unk, remove aura
-        'teach'      => [36, 57, /*133*/                                    ]   // learn spell, learn pet spell, /*unlearn specialization*/
+    public const EFFECTS_HEAL             = array(
+        SPELL_EFFECT_NONE,                  /*SPELL_EFFECT_DUMMY*/                          SPELL_EFFECT_HEAL,                              SPELL_EFFECT_HEAL_MAX_HEALTH,                   SPELL_EFFECT_HEAL_MECHANICAL,
+        SPELL_EFFECT_HEAL_PCT
+    );
+    public const EFFECTS_DAMAGE           = array(
+        SPELL_EFFECT_NONE,                  SPELL_EFFECT_DUMMY,                             SPELL_EFFECT_SCHOOL_DAMAGE,                     SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN
+    );
+    public const EFFECTS_ITEM_CREATE      = array(
+        SPELL_EFFECT_CREATE_ITEM,           SPELL_EFFECT_SUMMON_CHANGE_ITEM,                SPELL_EFFECT_CREATE_RANDOM_ITEM,                SPELL_EFFECT_CREATE_MANA_GEM,                   SPELL_EFFECT_CREATE_ITEM_2
+    );
+    public const EFFECTS_TRIGGER          = array(
+        SPELL_EFFECT_DUMMY,                 SPELL_EFFECT_TRIGGER_MISSILE,                   SPELL_EFFECT_TRIGGER_SPELL,                     SPELL_EFFECT_FEED_PET,                          SPELL_EFFECT_FORCE_CAST,
+        SPELL_EFFECT_FORCE_CAST_WITH_VALUE, SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE,          SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE,  SPELL_EFFECT_TRIGGER_SPELL_2,                   SPELL_EFFECT_SUMMON_RAF_FRIEND,
+        SPELL_EFFECT_TITAN_GRIP,            SPELL_EFFECT_FORCE_CAST_2,                      SPELL_EFFECT_REMOVE_AURA
+    );
+    public const EFFECTS_TEACH            = array(
+        SPELL_EFFECT_LEARN_SPELL,           SPELL_EFFECT_LEARN_PET_SPELL                    /*SPELL_EFFECT_UNLEARN_SPECIALIZATION*/
+    );
+    public const EFFECTS_MODEL_OBJECT     = array(
+        SPELL_EFFECT_TRANS_DOOR,            SPELL_EFFECT_SUMMON_OBJECT_WILD,                SPELL_EFFECT_SUMMON_OBJECT_SLOT1,               SPELL_EFFECT_SUMMON_OBJECT_SLOT2,               SPELL_EFFECT_SUMMON_OBJECT_SLOT3,
+        SPELL_EFFECT_SUMMON_OBJECT_SLOT4
+    );
+    public const EFFECTS_MODEL_NPC        = array(
+        SPELL_EFFECT_SUMMON,                SPELL_EFFECT_SUMMON_PET,                        SPELL_EFFECT_SUMMON_DEMON,                      SPELL_EFFECT_KILL_CREDIT,                       SPELL_EFFECT_KILL_CREDIT2
+    );
+    public const EFFECTS_DIRECT_SCALING   = array(
+        SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_ENVIRONMENTAL_DAMAGE,              SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN,
+        SPELL_EFFECT_HEAL_MAX_HEALTH
     );
 
-    public static   $auras       = array(
-        'heal'       => [ 4,  8, 62, 69,  97, 226                           ],  // Dummy, Periodic Heal, Periodic Health Funnel, School Absorb, Mana Shield, Periodic Dummy
-        'damage'     => [ 3,  4, 15, 53,  89, 162, 226                      ],  // Periodic Damage, Dummy, Damage Shield, Periodic Health Leech, Periodic Damage Percent, Power Burn Mana, Periodic Dummy
-        'itemCreate' => [86                                                 ],  // Channel Death Item
-        'trigger'    => [ 4, 23, 42, 48, 109, 226, 227, 231, 236, 284       ],  // dummy; 23/227: periodic trigger spell (with value); 42/231: proc trigger spell (with value); 48: unk; 109: add target trigger; 226: periodic dummy; 236: control vehicle; 284: linked
-        'teach'      => [                                                   ]
+    public const AURAS_HEAL               = array(
+        SPELL_AURA_DUMMY,                   SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_HEALTH_FUNNEL,              SPELL_AURA_SCHOOL_ABSORB,                       SPELL_AURA_MANA_SHIELD,
+        SPELL_AURA_PERIODIC_DUMMY
+    );
+    public const AURAS_DAMAGE             = array(
+        SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_DUMMY,                               SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_PERIODIC_DAMAGE_PERCENT,
+        SPELL_AURA_POWER_BURN,              SPELL_AURA_PERIODIC_DUMMY
+    );
+    public const AURAS_ITEM_CREATE        = array(
+        SPELL_AURA_CHANNEL_DEATH_ITEM
+    );
+    public const AURAS_TRIGGER            = array(
+        SPELL_AURA_DUMMY,                   SPELL_AURA_PERIODIC_TRIGGER_SPELL,              SPELL_AURA_PROC_TRIGGER_SPELL,                  SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT,  SPELL_AURA_ADD_TARGET_TRIGGER,
+        SPELL_AURA_PERIODIC_DUMMY,          SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE,   SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE,       SPELL_AURA_CONTROL_VEHICLE,                     SPELL_AURA_LINKED
+    );
+    public const AURAS_MODEL_NPC          = array(
+        SPELL_AURA_TRANSFORM,               SPELL_AURA_MOUNTED
+    );
+    public const AURAS_PERIODIC_SCALING   = array(
+        SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_LEECH
     );
 
     private         $spellVars   = [];
@@ -167,8 +203,7 @@ class SpellList extends BaseType
                 $mv  = $this->curTpl['effect'.$i.'MiscValue'];
                 $au  = $this->curTpl['effect'.$i.'AuraId'];
 
-                // Enchant Item Permanent (53) / Temporary (54)
-                if (in_array($this->curTpl['effect'.$i.'Id'], [53, 54]))
+                if (in_array($this->curTpl['effect'.$i.'Id'], [SPELL_EFFECT_ENCHANT_ITEM, SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY]))
                 {
                     if ($mv && ($json = DB::Aowow()->selectRow('SELECT * FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', Type::ENCHANTMENT, $mv)))
                     {
@@ -186,7 +221,7 @@ class SpellList extends BaseType
 
                 switch ($au)
                 {
-                    case 29:                                // ModStat MiscVal:type
+                    case SPELL_AURA_MOD_STAT:
                         if ($mv < 0)                        // all stats
                         {
                             for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
@@ -206,12 +241,12 @@ class SpellList extends BaseType
                             trigger_error('AuraId 29 of spell #'.$this->id.' has wrong statId #'.$mv, E_USER_WARNING);
 
                         break;
-                    case 34:                                // Increase Health
-                    case 230:
-                    case 250:
+                    case SPELL_AURA_MOD_INCREASE_HEALTH:
+                    case SPELL_AURA_MOD_INCREASE_HEALTH_NONSTACK:
+                    case SPELL_AURA_MOD_INCREASE_HEALTH_2:
                         Util::arraySumByKey($stats, [ITEM_MOD_HEALTH => $pts]);
                         break;
-                    case 13:                                // damage splpwr + physical (dmg & any)
+                    case SPELL_AURA_MOD_DAMAGE_DONE:
                         // + weapon damage
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                         {
@@ -253,10 +288,10 @@ class SpellList extends BaseType
                         }
 
                         break;
-                    case 135:                               // healing splpwr (healing & any) .. not as a mask..
+                    case SPELL_AURA_MOD_HEALING_DONE:       // not as a mask..
                         Util::arraySumByKey($stats, [ITEM_MOD_SPELL_HEALING_DONE => $pts]);
                         break;
-                    case 35:                                // ModPower - MiscVal:type see defined Powers only energy/mana in use
+                    case SPELL_AURA_MOD_INCREASE_ENERGY:    // MiscVal:type see defined Powers only energy/mana in use
                         if ($mv == POWER_HEALTH)
                             Util::arraySumByKey($stats, [ITEM_MOD_HEALTH      => $pts]);
                         else if ($mv == POWER_ENERGY)
@@ -269,21 +304,23 @@ class SpellList extends BaseType
                             Util::arraySumByKey($stats, [ITEM_MOD_RUNIC_POWER => $pts]);
 
                         break;
-                    case 189:                               // CombatRating MiscVal:ratingMask
-                    case 220:
+                    case SPELL_AURA_MOD_RATING:
+                    case SPELL_AURA_MOD_RATING_FROM_STAT:
                         if ($mod = Game::itemModByRatingMask($mv))
                             Util::arraySumByKey($stats, [$mod => $pts]);
                         break;
-                    case 143:                               // Resistance MiscVal:school
-                    case 83:
-                    case 22:
-                        if ($mv == 1)                       // Armor only if explicitly specified
+                    case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE:
+                    case SPELL_AURA_MOD_RESISTANCE:
+                        // Armor only if explicitly specified
+                        if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                         {
                             Util::arraySumByKey($stats, [ITEM_MOD_ARMOR => $pts]);
                             break;
                         }
 
-                        if ($mv == 2)                       // holy-resistance ONLY if explicitly specified (shouldn't even exist...)
+                        // Holy resistance only if explicitly specified (shouldn't even exist...?)
+                        if ($mv == (1 << SPELL_SCHOOL_HOLY))
                         {
                             Util::arraySumByKey($stats, [ITEM_MOD_HOLY_RESISTANCE => $pts]);
                             break;
@@ -296,45 +333,45 @@ class SpellList extends BaseType
 
                             switch ($j)
                             {
-                                case 2:
+                                case SPELL_SCHOOL_FIRE:
                                     Util::arraySumByKey($stats, [ITEM_MOD_FIRE_RESISTANCE   => $pts]);
                                     break;
-                                case 3:
+                                case SPELL_SCHOOL_NATURE:
                                     Util::arraySumByKey($stats, [ITEM_MOD_NATURE_RESISTANCE => $pts]);
                                     break;
-                                case 4:
+                                case SPELL_SCHOOL_FROST:
                                     Util::arraySumByKey($stats, [ITEM_MOD_FROST_RESISTANCE  => $pts]);
                                     break;
-                                case 5:
+                                case SPELL_SCHOOL_SHADOW:
                                     Util::arraySumByKey($stats, [ITEM_MOD_SHADOW_RESISTANCE => $pts]);
                                     break;
-                                case 6:
+                                case SPELL_SCHOOL_ARCANE:
                                     Util::arraySumByKey($stats, [ITEM_MOD_ARCANE_RESISTANCE => $pts]);
                                     break;
                             }
                         }
                         break;
-                    case 8:                                 // hp5
-                    case 84:
-                    case 161:
+                    case SPELL_AURA_PERIODIC_HEAL:          // hp5
+                    case SPELL_AURA_MOD_REGEN:
+                    case SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT:
                         Util::arraySumByKey($stats, [ITEM_MOD_HEALTH_REGEN        => $pts]);
                         break;
-                    case 85:                                // mp5
+                    case SPELL_AURA_MOD_POWER_REGEN:        // mp5
                         Util::arraySumByKey($stats, [ITEM_MOD_MANA_REGENERATION   => $pts]);
                         break;
-                    case 99:                                // atkpwr
+                    case SPELL_AURA_MOD_ATTACK_POWER:
                         Util::arraySumByKey($stats, [ITEM_MOD_ATTACK_POWER        => $pts]);
                         break;                              // ?carries over to rngatkpwr?
-                    case 124:                               // rngatkpwr
+                    case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
                         Util::arraySumByKey($stats, [ITEM_MOD_RANGED_ATTACK_POWER => $pts]);
                         break;
-                    case 158:                               // blockvalue
+                    case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
                         Util::arraySumByKey($stats, [ITEM_MOD_BLOCK_VALUE         => $pts]);
                         break;
-                    case 240:                               // ModExpertise
+                    case SPELL_AURA_MOD_EXPERTISE:
                         Util::arraySumByKey($stats, [ITEM_MOD_EXPERTISE_RATING    => $pts]);
                         break;
-                    case 123:                               // Mod Target Resistance
+                    case SPELL_AURA_MOD_TARGET_RESISTANCE:
                         if ($mv == 0x7C && $pts < 0)
                             Util::arraySumByKey($stats, [ITEM_MOD_SPELL_PENETRATION => -$pts]);
                         break;
@@ -466,57 +503,59 @@ class SpellList extends BaseType
 
                 switch ($au)
                 {
-                    case 101:                               // Mod Resistance Percent
-                    case 142:                               // Mod Base Resistance Percent
-                        if ($mv == 1)                       // Armor only if explicitly specified only affects armor from equippment
+                    case SPELL_AURA_MOD_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
+                        // Armor only if explicitly specified only affects armor from equippment
+                        if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                             $data[$id]['armor'] = [$pts / 100, 'percentOf', ['armor', 0]];
                         else if ($mv)
                             $modXBySchool($data[$id], 'res', $pts);
                         break;
-                    case 182:                               // Mod Resistance Of Stat Percent
-                        if ($mv == 1)                       // Armor only if explicitly specified
+                    case SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT:
+                        // Armor only if explicitly specified
+                        if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                             $data[$id]['armor'] = [$pts / 100, 'percentOf', $jsonStat($mvB)];
                         else if ($mv)
                             $modXBySchool($data[$id], 'res', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
                         break;
-                    case 137:                               // mod stat percent
+                    case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         if ($mv > -1)                       // one stat
                             $modXByStat($data[$id], null, $pts);
                         else if ($mv < 0)                   // all stats
                             for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
                                 $data[$id][Game::$itemMods[$iMod]] = [$pts / 100, 'percentOf', Game::$itemMods[$iMod]];
                         break;
-                    case 174:                               // Mod Spell Damage Of Stat Percent
+                    case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
                         $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
                         break;
-                    case 212:                               // Mod Ranged Attack Power Of Stat Percent
+                    case SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT:
                         $modXByStat($data[$id], 'rgdatkpwr', $pts);
                         break;
-                    case 268:                               // Mod Attack Power Of Stat Percent
+                    case SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT:
                         $modXByStat($data[$id], 'mleatkpwr', $pts);
                         break;
-                    case 175:                               // Mod Spell Healing Of Stat Percent
+                    case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
                         $modXByStat($data[$id], 'splheal', $pts);
                         break;
-                    case 219:                               // Mod Mana Regeneration from Stat
+                    case SPELL_AURA_MOD_MANA_REGEN_FROM_STAT:
                         $modXByStat($data[$id], 'manargn', $pts);
                         break;
-                    case 134:                               // Mod Mana Regeneration Interrupt
+                    case SPELL_AURA_MOD_MANA_REGEN_INTERRUPT:
                         $data[$id]['icmanargn'] = [$pts / 100, 'percentOf', 'oocmanargn'];
                         break;
-                    case 57:                                // Mod Spell Crit Chance
-                    case 71:                                // Mod Spell Crit Chance School
+                    case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
+                    case SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
                         $modXBySchool($data[$id], 'splcritstrkpct', [$pts, 'add']);
                         if (($mv & SPELL_MAGIC_SCHOOLS) == SPELL_MAGIC_SCHOOLS)
                             $data[$id]['splcritstrkpct'] = [$pts, 'add'];
                         break;
-                    case 285:                               // Mod Attack Power Of Armor
+                    case SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR:
                         $data[$id]['mleatkpwr'] = [1 / $pts, 'percentOf', 'fullarmor'];
                         $data[$id]['rgdatkpwr'] = [1 / $pts, 'percentOf', 'fullarmor'];
                         break;
-                    case 52:                                // Mod Physical Crit Percent
+                    case SPELL_AURA_MOD_WEAPON_CRIT_PERCENT:
                         if ($class < 1 || ($class == ITEM_CLASS_WEAPON && ($subClass & 0x5000C)))
                             $data[$id]['rgdcritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 18, $class, $subClass, $pts)];
                             // $data[$id]['rgdcritstrkpct'] = [$pts, 'add'];
@@ -524,16 +563,16 @@ class SpellList extends BaseType
                             $data[$id]['mlecritstrkpct'] = [1, 'functionOf', sprintf($whCheck, 16, $class, $subClass, $pts)];
                             // $data[$id]['mlecritstrkpct'] = [$pts, 'add'];
                         break;
-                    case 47:                                // Mod Parry Percent
+                    case SPELL_AURA_MOD_PARRY_PERCENT:
                         $data[$id]['parrypct'] = [$pts, 'add'];
                         break;
-                    case 49:                                // Mod Dodge Percent
+                    case SPELL_AURA_MOD_DODGE_PERCENT:
                         $data[$id]['dodgepct'] = [$pts, 'add'];
                         break;
-                    case 51:                                // Mod Block Percent
+                    case SPELL_AURA_MOD_BLOCK_PERCENT:
                         $data[$id]['blockpct'] = [$pts, 'add'];
                         break;
-                    case 132:                               // Mod Increase Energy Percent
+                    case SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT:
                         if ($mv == POWER_HEALTH)
                             $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
                         else if ($mv == POWER_ENERGY)
@@ -545,28 +584,28 @@ class SpellList extends BaseType
                         else if ($mv == POWER_RUNIC_POWER)
                             $data[$id]['runic'] = [$pts / 100, 'percentOf', 'runic'];
                         break;
-                    case 133:                               // Mod Increase Health Percent
+                    case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
                         $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
                         break;
-                    case 150:                               // Mod Shield Blockvalue Percent
+                    case SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT:
                         $data[$id]['block'] = [$pts / 100, 'percentOf', 'block'];
                         break;
-                    case 290:                               // Mod Crit Percent
+                    case SPELL_AURA_MOD_CRIT_PCT:
                         $data[$id]['mlecritstrkpct'] = [$pts, 'add'];
                         $data[$id]['rgdcritstrkpct'] = [$pts, 'add'];
                         $data[$id]['splcritstrkpct'] = [$pts, 'add'];
                         break;
-                    case 237:                               // Mod Spell Damage Of Attack Power
+                    case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
                         $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', 'mleatkpwr']);
                         break;
-                    case 238:                               // Mod Spell Healing Of Attack Power
+                    case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
                         $data[$id]['splheal'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
                         break;
-                    case 166:                               // Mod Attack Power Percent [ingmae only melee..?]
+                    case SPELL_AURA_MOD_ATTACK_POWER_PCT:   // ingmae only melee..?
                         $data[$id]['mleatkpwr'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
                         break;
-                    case 88:                                // Mod Health Regeneration Percent
+                    case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:
                         $data[$id]['healthrgn'] = [$pts / 100, 'percentOf', 'healthrgn'];
                         break;
                 }
@@ -644,7 +683,7 @@ class SpellList extends BaseType
                     continue;
 
                 // GO Model from MiscVal
-                if (in_array($this->curTpl['effect'.$i.'Id'], [50, 76, 104, 105, 106, 107]))
+                if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_MODEL_OBJECT))
                 {
                     if (isset($displays[Type::OBJECT][$id]))
                         $displays[Type::OBJECT][$id][0][] = $i;
@@ -652,7 +691,7 @@ class SpellList extends BaseType
                         $displays[Type::OBJECT][$id] = [[$i], $effMV];
                 }
                 // NPC Model from MiscVal
-                else if (in_array($this->curTpl['effect'.$i.'Id'], [28, 90, 56, 112, 134]) || in_array($this->curTpl['effect'.$i.'AuraId'], [56, 78]))
+                else if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_MODEL_NPC) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_MODEL_NPC))
                 {
                     if (isset($displays[Type::NPC][$id]))
                         $displays[Type::NPC][$id][0][] = $i;
@@ -660,7 +699,7 @@ class SpellList extends BaseType
                         $displays[Type::NPC][$id] = [[$i], $effMV];
                 }
                 // Shapeshift
-                else if ($this->curTpl['effect'.$i.'AuraId'] == 36)
+                else if ($this->curTpl['effect'.$i.'AuraId'] == SPELL_AURA_MOD_SHAPESHIFT)
                 {
                     $subForms = array(
                         892  => [892,  29407, 29406, 29408, 29405],         // Cat - NE
@@ -866,7 +905,7 @@ class SpellList extends BaseType
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['itemCreate']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['itemCreate']))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_ITEM_CREATE) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_ITEM_CREATE))
                 if ($this->curTpl['effect'.$i.'CreateItemId'] > 0)
                     $idx[] = $i;
 
@@ -877,8 +916,8 @@ class SpellList extends BaseType
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['trigger']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['trigger']))
-                if ($this->curTpl['effect'.$i.'AuraId'] == 4 || $this->curTpl['effect'.$i.'TriggerSpell'] > 0 || ($this->curTpl['effect'.$i.'Id'] == 155 && $this->curTpl['effect'.$i.'MiscValue'] > 0))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_TRIGGER) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_TRIGGER))
+                if ($this->curTpl['effect'.$i.'AuraId'] == SPELL_AURA_DUMMY || $this->curTpl['effect'.$i.'TriggerSpell'] > 0 || ($this->curTpl['effect'.$i.'Id'] == SPELL_EFFECT_TITAN_GRIP && $this->curTpl['effect'.$i.'MiscValue'] > 0))
                     $idx[] = $i;
 
         return $idx;
@@ -888,7 +927,7 @@ class SpellList extends BaseType
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
-            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['teach']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['teach']))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_TEACH))
                 if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0)
                     $idx[] = $i;
 
@@ -903,7 +942,7 @@ class SpellList extends BaseType
     public function isHealingSpell()
     {
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['heal']) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['heal']))
+            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_HEAL) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_HEAL))
                 return false;
 
         return true;
@@ -912,7 +951,7 @@ class SpellList extends BaseType
     public function isDamagingSpell()
     {
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['damage']) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['damage']))
+            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_DAMAGE) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_DAMAGE))
                 return false;
 
         return true;
@@ -1198,7 +1237,7 @@ class SpellList extends BaseType
 
                 // Aura giving combat ratings
                 $rType = 0;
-                if ($aura == 189)
+                if ($aura == SPELL_AURA_MOD_RATING)
                     if ($rType = Game::itemModByRatingMask($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
@@ -1230,7 +1269,7 @@ class SpellList extends BaseType
                 {
                     // Mod Power Regeneration & Mod Health Regeneration have an implicit periode of 5sec
                     $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
-                    if ($aura == 84 || $aura == 85)
+                    if ($aura == SPELL_AURA_MOD_REGEN || $aura == SPELL_AURA_MOD_POWER_REGEN)
                         $periode = 5000;
                     else
                         $periode = 3000;
@@ -1285,7 +1324,7 @@ class SpellList extends BaseType
                 }
                 // Aura giving combat ratings
                 $rType = 0;
-                if ($aura == 189)
+                if ($aura == SPELL_AURA_MOD_RATING)
                     if ($rType = Game::itemModByRatingMask($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
@@ -1295,7 +1334,7 @@ class SpellList extends BaseType
                     $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
                     $result[4] = $rType;
                 }
-                else if ($aura == 189 && $this->interactive)
+                else if ($aura == SPELL_AURA_MOD_RATING && $this->interactive)
                 {
                     $result[2] = $modStrMin.'%s';
                     $result[3] = $modStrMax.'%s';
@@ -1965,7 +2004,8 @@ class SpellList extends BaseType
         {
             foreach ($this->canCreateItem() as $idx)
             {
-                if ($this->curTpl['effect'.$idx.'Id'] == 53)// Enchantment (has createItem Scroll of Enchantment)
+                // has createItem Scroll of Enchantment
+                if ($this->curTpl['effect'.$idx.'Id'] == SPELL_EFFECT_ENCHANT_ITEM)
                     continue;
 
                 foreach ($this->relItems->iterate() as $cId => $__)
@@ -2243,7 +2283,7 @@ class SpellList extends BaseType
 
                 // play sound effect
                 for ($i = 1; $i < 4; $i++)
-                    if ($this->getField('effect'.$i.'Id') == 131 || $this->getField('effect'.$i.'Id') == 132)
+                    if ($this->getField('effect'.$i.'Id') == SPELL_EFFECT_PLAY_SOUND || $this->getField('effect'.$i.'Id') == SPELL_EFFECT_PLAY_MUSIC)
                         $data[Type::SOUND][$this->getField('effect'.$i.'MiscValue')] = $this->getField('effect'.$i.'MiscValue');
             }
 
@@ -2308,9 +2348,9 @@ class SpellList extends BaseType
 
         for ($i = 1; $i <= 3; $i++)
         {
-            if (in_array($this->curTpl['effect'.$i.'Id'], [2, 7, 8, 9, 62, 67]))
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellLIst::EFFECTS_DIRECT_SCALING))
                 $isDirect = true;
-            else if (in_array($this->curTpl['effect'.$i.'AuraId'], [3, 8, 53]))
+            else if (in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_PERIODIC_SCALING))
                 if ($_ = $this->curTpl['duration'])
                     $overTime = $_;
             else if ($this->curTpl['effect'.$i.'AuraId'])
