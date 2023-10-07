@@ -11,12 +11,13 @@ define('E_AOWOW',                 E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E
 define('JSON_AOWOW_POWER',        JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 define('FILTER_FLAG_STRIP_AOWOW', FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
 
-define('MIME_TYPE_TEXT',   'Content-Type: text/plain; charset=utf-8');
-define('MIME_TYPE_XML',    'Content-Type: text/xml; charset=utf-8');
-define('MIME_TYPE_JSON',   'Content-Type: application/x-javascript; charset=utf-8');
-define('MIME_TYPE_RSS',    'Content-Type: application/rss+xml; charset=utf-8');
-define('MIME_TYPE_JPEG',   'Content-Type: image/jpeg');
-define('MIME_TYPE_PNG',    'Content-Type: image/png');
+define('MIME_TYPE_TEXT',       'Content-Type: text/plain; charset=utf-8');
+define('MIME_TYPE_XML',        'Content-Type: text/xml; charset=utf-8');
+define('MIME_TYPE_JSON',       'Content-Type: application/x-javascript; charset=utf-8');
+define('MIME_TYPE_OPENSEARCH', 'Content-Type: application/x-suggestions+json; charset=utf-8');
+define('MIME_TYPE_RSS',        'Content-Type: application/rss+xml; charset=utf-8');
+define('MIME_TYPE_JPEG',       'Content-Type: image/jpeg');
+define('MIME_TYPE_PNG',        'Content-Type: image/png');
 
 // shared setup strings
 define('ERR_CREATE_FILE',  'could not create file at destination %s');

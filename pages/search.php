@@ -223,12 +223,15 @@ class SearchPage extends GenericPage
             parent::display();                              // errors are handled in the search-template itself
         }
         else if ($this->searchMask & SEARCH_TYPE_OPEN)
-            $result = [$this->search, []];
+        {
+            header(MIME_TYPE_OPENSEARCH);
+            exit(Util::toJSON([$this->search, []]));
+        }
         else if ($this->searchMask & SEARCH_TYPE_JSON)
-            $result = [$this->search, [], []];
-
-        header(MIME_TYPE_JSON);
-        exit(Util::toJSON($result));
+        {
+            header(MIME_TYPE_JSON);
+            exit(Util::toJSON([$this->search, [], []]));
+        }
     }
 
     public function display(string $override = '') : void
@@ -236,7 +239,7 @@ class SearchPage extends GenericPage
         if ($override || ($this->searchMask & SEARCH_TYPE_REGULAR))
             parent::display($override);
         else if ($this->searchMask & SEARCH_TYPE_OPEN)
-            $this->displayExtra([$this, 'generateOpenSearch']);
+            $this->displayExtra([$this, 'generateOpenSearch'], MIME_TYPE_OPENSEARCH);
         else if ($this->searchMask & SEARCH_TYPE_JSON)
             $this->displayExtra([$this, 'generateJsonSearch']);
     }
