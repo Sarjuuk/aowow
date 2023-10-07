@@ -878,7 +878,7 @@ class SpellList extends BaseType
         $idx = [];
         for ($i = 1; $i < 4; $i++)
             if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::$effects['trigger']) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::$auras['trigger']))
-                if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0 || ($this->curTpl['effect'.$i.'Id'] == 155 && $this->curTpl['effect'.$i.'MiscValue'] > 0))
+                if ($this->curTpl['effect'.$i.'AuraId'] == 4 || $this->curTpl['effect'.$i.'TriggerSpell'] > 0 || ($this->curTpl['effect'.$i.'Id'] == 155 && $this->curTpl['effect'.$i.'MiscValue'] > 0))
                     $idx[] = $i;
 
         return $idx;

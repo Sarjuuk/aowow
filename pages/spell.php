@@ -1557,9 +1557,15 @@ class SpellPage extends GenericPage
     private function createEffects(&$infobox, &$redButtons)
     {
         // proc data .. maybe use more information..?
-        $procData = DB::World()->selectRow('SELECT IF(ProcsPerMinute  > 0, -ProcsPerMinute, Chance) AS chance, Cooldown AS cooldown FROM spell_proc WHERE ABS(SpellId) = ?d', $this->firstRank);
-        if (!isset($procData['cooldown']))
-            $procData['cooldown'] = 0;
+        $procData = array(
+            'chance'   => $this->subject->getField('procChance'),
+            'cooldown' => 0
+        );
+
+        if ($procCustom = DB::World()->selectRow('SELECT IF(ProcsPerMinute > 0, -ProcsPerMinute, Chance) AS chance, Cooldown AS cooldown FROM spell_proc WHERE ABS(SpellId) = ?d', $this->firstRank))
+            foreach ($procCustom as $k => $v)
+                if ($v)
+                    $procData[$k] = $v;
 
         $effects  = [];
         $spellIdx = array_unique(array_merge($this->subject->canTriggerSpell(), $this->subject->canTeachSpell()));
@@ -1635,19 +1641,22 @@ class SpellPage extends GenericPage
             else if (in_array($i, $spellIdx) || in_array($effId, [133, 140, 141]))
             {
                 if ($effId == 155)
-                    $_ = $effMV;
+                    $triggeredSpell = $effMV;
                 else
-                    $_ = $this->subject->getField('effect'.$i.'TriggerSpell');
+                    $triggeredSpell = $this->subject->getField('effect'.$i.'TriggerSpell');
 
-                $trig = new SpellList(array(['s.id', (int)$_]));
+                if ($triggeredSpell > 0)                    // Dummy Auras are probably scripted
+                {
+                    $trig = new SpellList(array(['s.id', (int)$triggeredSpell]));
 
-                $foo['icon'] = array(
-                    'id'    => $_,
-                    'name'  => $trig->error ? Util::ucFirst(Lang::game('spell')).' #'.$_ : $trig->getField('name', true),
-                    'count' => 0
-                );
+                    $foo['icon'] = array(
+                        'id'    => $triggeredSpell,
+                        'name'  => $trig->error ? Util::ucFirst(Lang::game('spell')).' #'.$triggeredSpell : $trig->getField('name', true),
+                        'count' => 0
+                    );
 
-                $this->extendGlobalData($trig->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                    $this->extendGlobalData($trig->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                }
             }
 
             // Effect Name
@@ -1670,14 +1679,9 @@ class SpellPage extends GenericPage
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $foo['mechanic'] = Lang::game('me', $_);
 
-            if (in_array($i, $this->subject->canTriggerSpell()) && !empty($procData['chance']))
+            if (in_array($i, $this->subject->canTriggerSpell()) && $procData['chance'])
                 $foo['procData'] = array(
                     $procData['chance'],
-                    $procData['cooldown'] ? Util::formatTime($procData['cooldown'], true) : null
-                );
-            else if (in_array($i, $this->subject->canTriggerSpell()) && $this->subject->getField('procChance'))
-                $foo['procData'] = array(
-                    $this->subject->getField('procChance'),
                     $procData['cooldown'] ? Util::formatTime($procData['cooldown'], true) : null
                 );
 
