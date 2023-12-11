@@ -318,8 +318,8 @@ class CreatureListFilter extends Filter
         31 => [FILTER_CR_FLAG,     'cuFlags',           CUSTOM_HAS_SCREENSHOT                 ], // hasscreenshots
         32 => [FILTER_CR_FLAG,     'cuFlags',           NPC_CU_INSTANCE_BOSS                  ], // instanceboss
         33 => [FILTER_CR_FLAG,     'cuFlags',           CUSTOM_HAS_COMMENT                    ], // hascomments
-        34 => [FILTER_CR_NYI_PH,   1,                   null                                  ], // usemodel [str] - displayId -> id:creatureDisplayInfo.dbc/model -> id:cratureModelData.dbc/modelPath
-        35 => [FILTER_CR_STRING,   'textureString'                                            ], // useskin
+        34 => [FILTER_CR_STRING,   'modelId',           STR_MATCH_EXACT | STR_ALLOW_SHORT     ], // usemodel [str] (wants int in string fmt <_<)
+        35 => [FILTER_CR_STRING,   'textureString'                                            ], // useskin [str]
         37 => [FILTER_CR_NUMERIC,  'id',                NUM_CAST_INT,              true       ], // id
         38 => [FILTER_CR_CALLBACK, 'cbRelEvent',        null,                      null       ], // relatedevent [enum]
         40 => [FILTER_CR_FLAG,     'cuFlags',           CUSTOM_HAS_VIDEO                      ], // hasvideos
