@@ -389,24 +389,24 @@ class Loot
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(
-            ['item',        [], '$LANG.tab_containedin',      'contained-in-item',       [], [], []],
-            ['item',        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',       [], [], []],
-            ['item',        [], '$LANG.tab_prospectedfrom',   'prospected-from',         [], [], []],
-            ['item',        [], '$LANG.tab_milledfrom',       'milled-from',             [], [], []],
-            ['creature',    [], '$LANG.tab_droppedby',        'dropped-by',              [], [], []],
-            ['creature',    [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',       [], [], []],
-            ['creature',    [], '$LANG.tab_skinnedfrom',      'skinned-from',            [], [], []],
-            ['creature',    [], '$LANG.tab_minedfromnpc',     'mined-from-npc',          [], [], []],
-            ['creature',    [], '$LANG.tab_salvagedfrom',     'salvaged-from',           [], [], []],
-            ['creature',    [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',       [], [], []],
-            ['quest',       [], '$LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],
-            ['zone',        [], '$LANG.tab_fishedin',         'fished-in-zone',          [], [], []],
-            ['object',      [], '$LANG.tab_containedin',      'contained-in-object',     [], [], []],
-            ['object',      [], '$LANG.tab_minedfrom',        'mined-from-object',       [], [], []],
-            ['object',      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',    [], [], []],
-            ['object',      [], '$LANG.tab_fishedin',         'fished-in-object',        [], [], []],
-            ['spell',       [], '$LANG.tab_createdby',        'created-by',              [], [], []],
-            ['achievement', [], '$LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
+            [Type::ITEM,        [], '$LANG.tab_containedin',      'contained-in-item',       [], [], []],
+            [Type::ITEM,        [], '$LANG.tab_disenchantedfrom', 'disenchanted-from',       [], [], []],
+            [Type::ITEM,        [], '$LANG.tab_prospectedfrom',   'prospected-from',         [], [], []],
+            [Type::ITEM,        [], '$LANG.tab_milledfrom',       'milled-from',             [], [], []],
+            [Type::NPC,         [], '$LANG.tab_droppedby',        'dropped-by',              [], [], []],
+            [Type::NPC,         [], '$LANG.tab_pickpocketedfrom', 'pickpocketed-from',       [], [], []],
+            [Type::NPC,         [], '$LANG.tab_skinnedfrom',      'skinned-from',            [], [], []],
+            [Type::NPC,         [], '$LANG.tab_minedfromnpc',     'mined-from-npc',          [], [], []],
+            [Type::NPC,         [], '$LANG.tab_salvagedfrom',     'salvaged-from',           [], [], []],
+            [Type::NPC,         [], '$LANG.tab_gatheredfromnpc',  'gathered-from-npc',       [], [], []],
+            [Type::QUEST,       [], '$LANG.tab_rewardfrom',       'reward-from-quest',       [], [], []],
+            [Type::ZONE,        [], '$LANG.tab_fishedin',         'fished-in-zone',          [], [], []],
+            [Type::OBJECT,      [], '$LANG.tab_containedin',      'contained-in-object',     [], [], []],
+            [Type::OBJECT,      [], '$LANG.tab_minedfrom',        'mined-from-object',       [], [], []],
+            [Type::OBJECT,      [], '$LANG.tab_gatheredfrom',     'gathered-from-object',    [], [], []],
+            [Type::OBJECT,      [], '$LANG.tab_fishedin',         'fished-in-object',        [], [], []],
+            [Type::SPELL,       [], '$LANG.tab_createdby',        'created-by',              [], [], []],
+            [Type::ACHIEVEMENT, [], '$LANG.tab_rewardfrom',       'reward-from-achievement', [], [], []]
         );
         $refResults = [];
         $query      =   'SELECT
@@ -580,13 +580,28 @@ class Loot
             if (!$ids)
                 continue;
 
+            $parentData = [];
             switch ($tabsFinal[abs($tabId)][0])
             {
-                case 'creature':                            // new CreatureList
-                case 'item':                                // new ItemList
-                case 'zone':                                // new ZoneList
-                    $oName  = ucFirst($tabsFinal[abs($tabId)][0]).'List';
-                    $srcObj = new $oName(array([$field, $ids]));
+                case TYPE::NPC:                             // new CreatureList
+                    if ($baseIds = DB::Aowow()->selectCol(
+                       'SELECT `difficultyEntry1` AS ARRAY_KEY, `id` FROM ?_creature WHERE difficultyEntry1 IN (?a) UNION
+                        SELECT `difficultyEntry2` AS ARRAY_KEY, `id` FROM ?_creature WHERE difficultyEntry2 IN (?a) UNION
+                        SELECT `difficultyEntry3` AS ARRAY_KEY, `id` FROM ?_creature WHERE difficultyEntry3 IN (?a)',
+                        $ids, $ids, $ids))
+                        {
+                            $parentObj = new CreatureList(array(['id', $baseIds]));
+                            if (!$parentObj->error)
+                            {
+                                self::storeJSGlobals($parentObj->getJSGlobals());
+                                $parentData = $parentObj->getListviewData();
+                                $ids = array_diff($ids, $baseIds);
+                            }
+                        }
+
+                case Type::ITEM:                            // new ItemList
+                case Type::ZONE:                            // new ZoneList
+                    $srcObj = Type::newList($tabsFinal[abs($tabId)][0], array([$field, $ids]));
                     if (!$srcObj->error)
                     {
                         $srcData = $srcObj->getListviewData();
@@ -603,7 +618,11 @@ class Loot
                             else if ($tabId < 0)
                                 $tabId = abs($tabId);       // general case (skinning)
 
-                            $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
+                            if (($p = $srcObj->getField('parentId')) && ($d = $parentData[$p] ?? null))
+                                $tabsFinal[$tabId][1][] = array_merge($d,                    $result[$srcObj->getField($field)]);
+                            else
+                                $tabsFinal[$tabId][1][] = array_merge($srcData[$srcObj->id], $result[$srcObj->getField($field)]);
+
                             $tabsFinal[$tabId][4][] = '$Listview.extraCols.percent';
                         }
                     }
@@ -620,15 +639,15 @@ class Loot
             );
 
             if ($data[4])
-                $tabData['extraCols']   = array_unique($data[4]);
+                $tabData['extraCols'] = array_unique($data[4]);
 
             if ($data[5])
-                $tabData['hiddenCols']  = array_unique($data[5]);
+                $tabData['hiddenCols'] = array_unique($data[5]);
 
             if ($data[6])
                 $tabData['visibleCols'] = array_unique($data[6]);
 
-            $this->results[$tabId] = [$data[0], $tabData];
+            $this->results[$tabId] = [Type::getFileString($data[0]), $tabData];
         }
 
         return true;

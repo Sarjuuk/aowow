@@ -466,6 +466,21 @@ class ItemPage extends genericPage
                 if ($idx == 16)
                     $createdBy = array_column($tabData['data'], 'id');
 
+                $s = $sm = null;
+                if ($idx == 4 && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
+                {
+                    switch ($sm[0]['dd'])
+                    {
+                        case -1: $tabData['note'] = '$LANG.lvnote_itemdropsinnormalonly';   break;
+                        case -2: $tabData['note'] = '$LANG.lvnote_itemdropsinheroiconly';   break;
+                        case -3: $tabData['note'] = '$LANG.lvnote_itemdropsinnormalheroic'; break;
+                        case  1: $tabData['note'] = '$LANG.lvnote_itemdropsinnormal10only'; break;
+                        case  2: $tabData['note'] = '$LANG.lvnote_itemdropsinnormal25only'; break;
+                        case  3: $tabData['note'] = '$LANG.lvnote_itemdropsinheroic10only'; break;
+                        case  4: $tabData['note'] = '$LANG.lvnote_itemdropsinheroic25only'; break;
+                    }
+                }
+
                 $this->lvTabs[] = [$file, $tabData];
             }
         }

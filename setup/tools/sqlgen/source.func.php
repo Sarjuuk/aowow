@@ -29,9 +29,9 @@ SqlGen::register(new class extends SetupScript
         /*********************************/
 
         $this->dummyNPCs = DB::Aowow()->select(
-            'SELECT difficultyEntry1 AS ARRAY_KEY, 2 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry1 > 0 UNION
-             SELECT difficultyEntry2 AS ARRAY_KEY, 4 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry2 > 0 UNION
-             SELECT difficultyEntry3 AS ARRAY_KEY, 8 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry3 > 0'
+           'SELECT difficultyEntry1 AS ARRAY_KEY, 2 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry1 > 0 UNION
+            SELECT difficultyEntry2 AS ARRAY_KEY, 4 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry2 > 0 UNION
+            SELECT difficultyEntry3 AS ARRAY_KEY, 8 AS "0", `id` AS "1" FROM ?_creature WHERE difficultyEntry3 > 0'
         );
         // todo: do the same for GOs
 

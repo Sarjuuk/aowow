@@ -220,7 +220,7 @@ class GenericPage
         'calendar'          => ['template' => 'holidaycal',        'id' => 'calendar',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_calendar'      ],
         'class'             => ['template' => 'classs',            'id' => 'classes',         'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_classes'       ],
         'commentpreview'    => ['template' => 'commentpreview',    'id' => 'comments',        'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_comments'      ],
-        'creature'          => ['template' => 'npc',               'id' => 'npcs',            'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_npcs'          ],
+        'npc'               => ['template' => 'npc',               'id' => 'npcs',            'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_npcs'          ],
         'currency'          => ['template' => 'currency',          'id' => 'currencies',      'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_currencies'    ],
         'emote'             => ['template' => 'emote',             'id' => 'emotes',          'parent' => 'lv-generic', 'data' => []                                      ],
         'enchantment'       => ['template' => 'enchantment',       'id' => 'enchantments',    'parent' => 'lv-generic', 'data' => []                                      ],

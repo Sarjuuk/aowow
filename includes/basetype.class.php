@@ -880,11 +880,21 @@ trait sourceHelper
 
         if (isset($this->sources[$this->id][SRC_DROP][0]))
         {
-            $dd = $this->sources[$this->id][SRC_DROP][0];
-            if ($this->curTpl['moreMask'] & SRC_FLAG_RAID_DROP)
-                $sm['dd'] = (1 << ($dd - 1));
-            else if ($this->curTpl['moreMask'] & SRC_FLAG_DUNGEON_DROP)
-                $sm['dd'] = (1 << ($dd - 1)) * -1;
+            /*
+                mode        srcFlag     log2    dd Flag
+                10N/D-NH    0b0001      0       0b001
+                25N/D-HC    0b0010      1       0b010
+                10H         0b0100      2       0b011
+                25H         0b1000      3       0b100
+            */
+            if ($this->curTpl['moreMask'] & SRC_FLAG_DUNGEON_DROP)
+                $sm['dd'] = $this->sources[$this->id][SRC_DROP][0] * -1;
+            else if ($this->curTpl['moreMask'] & SRC_FLAG_RAID_DROP)
+            {
+                $dd = log($this->sources[$this->id][SRC_DROP][0], 2);
+                if ($dd == intVal($dd))                             // only one bit set
+                    $sm['dd'] = $dd + 1;
+            }
         }
 
         if ($sm)
