@@ -1610,7 +1610,7 @@ $lang = array(
             "Damage",                               "Duration",                             "Threat",                               "Effect 1",                             "Charges",
             "Range",                                "Radius",                               "Critical Hit Chance",                  "All Effects",                          "Casting Time loss",
             "Casting Time",                         "Cooldown",                             "Effect 2",                             "Ignore Armor",                         "Cost",
-            "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
+            "Critical Damage Bonus",                "Chance to Hit",                        "Jump Targets",                         "Proc Chance",                          "Intervall",
             "Multiplier (Damage)",                  "Global Cooldown",                      "Damage over Time",                     "Effect 3",                             "Multiplier (Bonus)",
             null,                                   "Procs per Minute",                     "Multiplier (Value)",                   "Chance to Resist Dispel",              "Critical Damage Bonus2",
             "Refund Cost on Fail"

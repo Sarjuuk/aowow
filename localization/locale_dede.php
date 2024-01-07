@@ -1610,7 +1610,7 @@ $lang = array(
             "Schaden",                              "Dauer",                                "Bedrohung",                            "Effekt 1",                             "Aufladungen",
             "Reichweite",                           "Radius",                               "kritische Trefferchance",              "Alle Effekte",                         "Zauberzeitverlust",
             "Zauberzeit",                           "Abklingzeit",                          "Effekt 2",                             "Ignoriere Rüstung",                    "Kosten",
-            "Kritischer Bonusschaden",              "Chance auf Fehlschlag",                "Sprung-Ziele",                         "Chance auf Auslösung",                 "Intervall",
+            "Kritischer Bonusschaden",              "Trefferchance",                        "Sprung-Ziele",                         "Chance auf Auslösung",                 "Intervall",
             "Multiplikator (Schaden)",              "Globale Abklingzeit",                  "Schaden über Zeit",                    "Effekt 3",                             "Multiplikator (Bonus)",
             null,                                   "Auslösungen pro Minute",               "Multiplikator (Betrag)",               "Widerstand gegen Bannung",             "kritischer Bonusschaden2",
             "Kostenrückerstattung bei Fehlschlag"

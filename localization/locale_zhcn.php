@@ -1609,7 +1609,7 @@ $lang = array(
             "伤害",                               "持续时间",                             "Threat",                               "效果1",                             "可使用次数",
             "范围",                                "半径",                               "Critical Hit Chance",                  "所有效果",                          "Casting Time loss",
             "Casting Time",                         "冷却时间",                             "效果2",                             "无视护甲",                         "花费",
-            "Critical Damage Bonus",                "Chance to Fail",                       "Jump Targets",                         "Proc Chance",                          "Intervall",
+            "Critical Damage Bonus",                "Chance to Hit",                        "Jump Targets",                         "Proc Chance",                          "Intervall",
             "Multiplier (Damage)",                  "公共冷却时间",                      "Damage over Time",                     "效果3",                             "Multiplier (Bonus)",
             null,                                   "Procs per Minute",                     "Multiplier (Value)",                   "Chance to Resist Dispel",              "Critical Damage Bonus2",
             "Refund Cost on Fail"

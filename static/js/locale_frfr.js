@@ -2136,7 +2136,7 @@ var g_zone_areas = {
      209: ['La cour', 'Salle à manger', 'Antre Vacant', 'Observatoire Inférieur', 'Observatoire Supérieur', 'Chambre du seigneur Godfrey', 'Le chemin de ronde'],
      719: ['Le Bassin d\'Ask\'ar', 'Sanctuaire d’Écrin-de-Lune', 'Les bassins Oubliés'],
      721: ['Le Hall des engrenages', 'Le dortoir', 'Baie de lancement', 'Cour du Bricoleur'],
-     796: ['[Cimetière]', '[Bibliothèque]', '[Armurerie]', '[Cathédrale]'],
+     796: ['Cimetière', 'La Bibliothèque', 'Armurerie', 'Cathédrale'],
     1196: ['Pinnacle inférieur', 'Pinacle Supérieur'],
     1337: ['Hall des Gardiens', 'Siège de Khaz\'goroth'],
     1581: ['Les Mortemines', 'Crique du Cuirassé'],

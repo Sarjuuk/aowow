@@ -2131,13 +2131,12 @@ var g_zones = {
     4987: 'El Sagrario Rubí'
 };
 
-/* todo (high): add translation */
 var g_zone_areas = {
      206: ['Preparación Norndir', 'Ascenso de los Desuelladragones', 'Bancal de Tyr'],
      209: ['El Patio', 'Comedor', 'El Cubil Vacío', 'Observatorio inferior', 'Observatorio superior', 'Cámara de Lord Godfrey', 'El Camino de la Muralla'],
      719: ['La Alberca de Ask\'ar', 'Sagrario Lunar', 'Las Charcas del Olvido'],
      721: ['La Sala de Máquinas', 'Los Dormitorios', 'Aeropuerto', 'Cámara Manitas'],
-     796: ['[Cementerio]', '[Biblioteca]', '[Armería]', '[Catedral]'],
+     796: ['Cementerio', 'Biblioteca', 'Arsenal', 'Catedral'],
     1196: ['Pináculo inferior', 'Pináculo superior'],
     1337: ['Sala de los Guardianes', 'Trono de Khaz\'goroth'],
     1581: ['Las Minas de la Muerte', 'Cala del Acorazado'],
@@ -2190,8 +2189,8 @@ var g_zone_instancetypes = {
     4: 'Campo de batalla',
     5: 'Mazmorra',          // Heroic
     6: 'Arena',
-    7: 'Banda 10-25',             // 10-25
-    8: 'Banda 10-25 Heroico'              // 10-25 Heroic
+    7: 'Banda 10-25',       // 10-25
+    8: 'Banda 10-25 Heroico'// 10-25 Heroic
 };
 
 var g_zone_territories = {
