@@ -287,12 +287,28 @@ class RemoteArenaTeamList extends ArenaTeamList
 
             $memberData = [];
             foreach ($teams as $teamId => $team)
+            {
+                $clearMembers = [];
                 foreach ($team as $memberId => $member)
-                    $memberData[] = array(
+                {
+                    $clearMembers[] = $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'];
+                    $memberData[]   = array(
                         'arenaTeamId' => $localIds[$realmId.':'.$teamId],
                         'profileId'   => $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'],
                         'captain'     => $member[2]
                     );
+                }
+
+                // Delete members from other teams of the same type
+                DB::Aowow()->query(
+                   'DELETE atm
+                    FROM   ?_profiler_arena_team_member atm
+                    JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
+                    WHERE  atm.`profileId` IN (?a)',
+                    $data[$realmId.':'.$teamId]['type'] ?? 0,
+                    $clearMembers
+                );
+            }
 
             foreach (Util::createSqlBatchInsert($memberData) as $ins)
                 DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team_member (?#) VALUES '.$ins, array_keys(reset($memberData)));

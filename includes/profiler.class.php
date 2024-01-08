@@ -758,6 +758,16 @@ class Profiler
                 'personalRating' => $t['personalRating']
             );
 
+            // Delete members from other teams of the same type
+            DB::Aowow()->query(
+               'DELETE atm
+                FROM   ?_profiler_arena_team_member atm
+                JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
+                WHERE  atm.`profileId` = ?d',
+                $t['type'],
+                $profileId
+            );
+
             DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES (?a) ON DUPLICATE KEY UPDATE ?a', array_keys($member), array_values($member), array_slice($member, 2));
         }
 
@@ -915,11 +925,21 @@ class Profiler
                 $members[$mGuid]['profileId']   = $mProfiles->getField('id');
             }
 
+            // Delete members from other teams of the same type...
+            DB::Aowow()->query(
+               'DELETE atm
+                FROM   ?_profiler_arena_team_member atm
+                JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
+                WHERE  atm.`profileId` IN (?a)',
+                $team['type'],
+                array_column($members, 'profileId')
+            );
+
+            // ...and purge this teams member
             DB::Aowow()->query('DELETE FROM ?_profiler_arena_team_member WHERE arenaTeamId = ?d', $teamId);
 
             foreach (Util::createSqlBatchInsert($members) as $m)
                 DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$m, array_keys(reset($members)));
-
         }
         else
             return false;
