@@ -55,7 +55,7 @@ if (!CLI)
             set_time_limit(30);
 
             User::useLocale($lId);
-            Lang::load(Util::$localeStrings[$lId]);
+            Lang::load($lId);
 
             $glyphsOut = [];
             foreach ($glyphSpells->iterate() as $__)

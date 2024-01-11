@@ -20,7 +20,7 @@ function account() : void
     );
 
     User::useLocale(LOCALE_EN);
-    Lang::load(Util::$localeStrings[LOCALE_EN]);
+    Lang::load(LOCALE_EN);
 
     if (CLI::read($fields))
     {

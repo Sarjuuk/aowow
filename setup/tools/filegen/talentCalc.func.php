@@ -176,7 +176,7 @@ if (!CLI)
         foreach (CLISetup::$localeIds as $lId)
         {
             User::useLocale($lId);
-            Lang::load(Util::$localeStrings[$lId]);
+            Lang::load($lId);
 
             // TalentCalc
             foreach ($classes as $cMask)

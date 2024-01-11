@@ -115,7 +115,7 @@ if (!CLI)
                     set_time_limit(20);
 
                     User::useLocale($l);
-                    Lang::load(Util::$localeStrings[$l]);
+                    Lang::load($l);
 
                     if (!$relCurr->error)
                     {
@@ -166,7 +166,7 @@ if (!CLI)
                 set_time_limit(5);
 
                 User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
+                Lang::load($l);
 
                 foreach ([0, 1] as $g)                      // gender
                 {
@@ -220,7 +220,7 @@ if (!CLI)
                 set_time_limit(5);
 
                 User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
+                Lang::load($l);
 
                 $buff = "var _ = g_spells;\n";
                 foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
@@ -269,7 +269,7 @@ if (!CLI)
                 set_time_limit(5);
 
                 User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
+                Lang::load($l);
 
                 $buff = "var _ = g_spells;\n";
                 foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
@@ -307,7 +307,7 @@ if (!CLI)
                 set_time_limit(5);
 
                 User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
+                Lang::load($l);
 
                 $buff = "var _ = g_factions;\n";
                 foreach ($factionz->getListviewData() as $id => $data)
@@ -361,7 +361,7 @@ if (!CLI)
                     set_time_limit(10);
 
                     User::useLocale($l);
-                    Lang::load(Util::$localeStrings[$l]);
+                    Lang::load($l);
 
                     $buff = '';
                     foreach ($recipez->getListviewData() as $id => $data)
@@ -408,7 +408,7 @@ if (!CLI)
                 set_time_limit(5);
 
                 User::useLocale($l);
-                Lang::load(Util::$localeStrings[$l]);
+                Lang::load($l);
 
                 $sumPoints = 0;
                 $buff      = "var _ = g_achievements;\n";

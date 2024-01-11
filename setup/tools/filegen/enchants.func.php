@@ -13,13 +13,13 @@ if (!CLI)
 
     /* Examples
         15: {
-            name:'Leichtes Rüstungsset',
+            name:'Leichtes RÃ¼stungsset',
             quality:1,
             icon:'INV_Misc_ArmorKit_17',
             source:-2304,
             skill:-1,
             slots:525008,
-            enchantment:'Verstärkt (+8 Rüstung)',
+            enchantment:'VerstÃ¤rkt (+8 RÃ¼stung)',
             jsonequip:{"armor":8,"reqlevel":1},
             temp:0,
             classes:0,
@@ -96,7 +96,7 @@ if (!CLI)
         foreach (CLISetup::$localeIds as $lId)
         {
             User::useLocale($lId);
-            Lang::load(Util::$localeStrings[$lId]);
+            Lang::load($lId);
 
             $enchantsOut = [];
             foreach ($enchantSpells as $esId => $es)

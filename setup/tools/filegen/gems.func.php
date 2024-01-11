@@ -66,7 +66,7 @@ if (!CLI)
             set_time_limit(5);
 
             User::useLocale($lId);
-            Lang::load(Util::$localeStrings[$lId]);
+            Lang::load($lId);
 
             $gemsOut = [];
             foreach ($gems as $pop)
