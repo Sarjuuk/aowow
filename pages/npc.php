@@ -426,7 +426,10 @@ class NpcPage extends GenericPage
             $genSpells = $smartSpells;
 
         if ($auras = DB::World()->selectCell('SELECT auras FROM creature_template_addon WHERE entry = ?d', $this->typeId))
+        {
+            $auras = preg_replace('/[^\d ]/', ' ', $auras);  // remove erronous chars from string
             $genSpells = array_merge($genSpells, array_filter(explode(' ', $auras)));
+        }
 
         if ($genSpells)
             $conditions[] = ['id', $genSpells];

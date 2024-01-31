@@ -617,12 +617,18 @@ SqlGen::register(new class extends SetupScript
             SELECT cts.Spell FROM creature_template_spell cts'
         );
 
-        $auras = DB::World()->selectCol('SELECT cta.auras FROM creature_template_addon cta WHERE auras <> ""');
-        foreach ($auras as $a)
-            foreach (explode(' ', $a ) as $spell)
-                $world[] = $spell;
+        $auras = DB::World()->selectCol('SELECT `entry` AS ARRAY_KEY, cta.auras FROM creature_template_addon cta WHERE auras <> ""');
+        foreach ($auras as $e => $aur)
+        {
+            // people keep trying to seperate auras with commas
+            $a = preg_replace('/[^\d ]/', ' ', $aur, -1, $nErrors);
+            if ($nErrors > 0)
+                CLI::write('creature_template_addon entry #' . CLI::bold($e) . ' has invalid chars in auras string "'. CLI::bold($aur).'"', CLI::LOG_WARN);
 
-        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -8 WHERE s.typeCat = 0 AND s.id In (?a)', $world);
+            $world = array_merge($world, array_filter(explode(' ', $a)));
+        }
+
+        DB::Aowow()->query('UPDATE ?_spell s SET s.typeCat = -8 WHERE s.typeCat = 0 AND s.id IN (?a)', $world);
 
 
         /**********/
