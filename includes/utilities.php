@@ -449,7 +449,7 @@ class Timer
 
     public function reset() : void
     {
-        $this->t_cur = 0;
+        $this->t_cur = microtime(true) - $this->intv;
     }
 }
 
