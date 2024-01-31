@@ -445,7 +445,7 @@ abstract class BaseType
         'c2':   subCat [Quests]
       'icon':   iconString
     */
-    public function getSourceData() {}
+    public function getSourceData(int $id = 0) : array { return []; }
 
     // should return data required to display a listview of any kind
     // this is a rudimentary example, that will not suffice for most Types
@@ -863,12 +863,12 @@ trait sourceHelper
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = (Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $ids]]))->getSourceData();
+                $this->sourceMore[$type] = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $ids]]);
         }
 
         $s = array_keys($this->sources[$this->id]);
-        if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && !empty($this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']]))
-            $sm = $this->sourceMore[$this->curTpl['moreType']][$this->curTpl['moreTypeId']];
+        if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && ($srcData = $this->sourceMore[$this->curTpl['moreType']]->getSourceData($this->curTpl['moreTypeId'])))
+            $sm = $srcData;
         else if (!empty($this->sources[$this->id][SRC_PVP]))
             $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
 

@@ -257,12 +257,15 @@ class AchievementList extends BaseType
         return $x;
     }
 
-    public function getSourceData()
+    public function getSourceData(int $id = 0) : array
     {
         $data = [];
 
         foreach ($this->iterate() as $__)
         {
+            if ($id && $id != $this->id)
+                continue;
+
             $data[$this->id] = array(
                 "n"  => $this->getField('name', true),
                 "s"  => $this->curTpl['faction'],

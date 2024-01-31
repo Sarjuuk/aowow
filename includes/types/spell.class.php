@@ -1586,8 +1586,8 @@ class SpellList extends BaseType
         $this->charLevel   = $level;
 
     // step -1: already handled?
-        if (isset($this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive]))
-            return $this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive];
+        if (isset($this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive]))
+            return $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive];
 
     // step 0: get text
         $data = $this->getField($type, true);
@@ -1693,7 +1693,7 @@ class SpellList extends BaseType
         $data = strtr($data, ["\r" => '', "\n" => '<br />']);
 
         // cache result
-        $this->parsedText[$this->id][$type][$this->charLevel][(int)$this->interactive] = [$data, $relSpells];
+        $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive] = [$data, $relSpells];
 
         return [$data, $relSpells];
     }
@@ -2397,12 +2397,15 @@ class SpellList extends BaseType
         return $castingTime;
     }
 
-    public function getSourceData()
+    public function getSourceData(int $id = 0) : array
     {
         $data = [];
 
         foreach ($this->iterate() as $__)
         {
+            if ($id && $id != $this->id)
+                continue;
+
             $data[$this->id] = array(
                 'n'    => $this->getField('name', true),
                 't'    => Type::SPELL,
