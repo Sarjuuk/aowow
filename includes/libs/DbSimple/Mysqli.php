@@ -163,6 +163,17 @@ class DbSimple_Mysqli extends DbSimple_Database
         $result = mysqli_query($this->link, $queryMain[0]);
         if ($result === false)
             return $this->_setDbError($queryMain[0]);
+
+        if ($this->link->warning_count) {
+            if ($warn = $this->link->query("SHOW WARNINGS")) {
+                while ($warnRow = $warn->fetch_row())
+                    if ($warnRow[0] !== 'Note')
+                        $this->_setLastError(-$warnRow[1], $warnRow[2], $queryMain[0]);
+
+                $warn->close();
+            }
+        }
+
         if (!is_object($result)) {
             if (preg_match('/^\s* INSERT \s+/six', $queryMain[0]))
             {

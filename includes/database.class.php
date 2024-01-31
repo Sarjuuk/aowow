@@ -19,7 +19,7 @@ class DB
 
     private static function createConnectSyntax(&$options)
     {
-        return 'mysqli://'.$options['user'].':'.$options['pass'].'@'.$options['host'].'/'.$options['db'];
+        return 'mysqli://'.urlencode($options['user']).':'.urlencode($options['pass']).'@'.$options['host'].'/'.$options['db'];
     }
 
     public static function connect($idx)
@@ -72,10 +72,18 @@ class DB
         if (!error_reporting())
             return;
 
+        // continue on warning, end on error
+        $isError = $data['code'] > 0;
+
+        // make number sensible again
+        $data['code'] = abs($data['code']);
+
         $error = "DB ERROR:<br /><br />\n\n<pre>".print_r($data, true)."</pre>";
 
         echo CLI ? strip_tags($error) : $error;
-        exit;
+
+        if ($isError)
+            exit;
     }
 
     public static function logger($self, $query, $trace)
