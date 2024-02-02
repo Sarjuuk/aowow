@@ -956,7 +956,7 @@ class ItemList extends BaseType
                         $cd = $this->curTpl['spellCategoryCooldown'.$j];
 
                     $extra = [];
-                    if ($cd >= 5000)
+                    if ($cd >= 5000 && $this->curTpl['spellTrigger'.$j] != SPELL_TRIGGER_EQUIP)
                     {
                         $pt = Util::parseTime($cd);
                         if (count(array_filter($pt)) == 1)  // simple time: use simple method
