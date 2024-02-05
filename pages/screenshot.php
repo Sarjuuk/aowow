@@ -84,7 +84,8 @@ class ScreenshotPage extends GenericPage
                     header('Location: ?'.Type::getFileString($this->destType).'='.$this->destTypeId.'#submit-a-screenshot', true, 302);
                 die();
             case 'crop':
-                $this->handleCrop();
+                if (!$this->handleCrop())
+                    header('Location: ?'.Type::getFileString($this->destType).'='.$this->destTypeId.'#submit-a-screenshot', true, 302);
                 break;
             case 'complete':
                 if ($_ = $this->handleComplete())
@@ -107,6 +108,13 @@ class ScreenshotPage extends GenericPage
     private function handleAdd() : bool
     {
         $this->imgHash = Util::createHash(16);
+
+        if (!is_writable($this->tmpPath))
+        {
+            trigger_error('ScreenshotPage::handleAdd - temp upload directory not writable', E_USER_ERROR);
+            $_SESSION['error']['ss'] = Lang::main('intError');
+            return false;
+        }
 
         if (!User::canUploadScreenshot())
         {
@@ -136,17 +144,37 @@ class ScreenshotPage extends GenericPage
         else if ($rel < 1.5 && $oSize[1] > self::MAX_H)
             $rSize = [self::MAX_H * $rel, self::MAX_H];
 
-        // use this image for work
-        $this->writeImage($im, $oSize[0], $oSize[1], $this->ssName().'_original');
-        // use this image to display
-        $this->writeImage($im, $rSize[0], $rSize[1], $this->ssName());
+        $success = true;
 
-        return true;
+        // use this image for work
+        if (!$this->writeImage($im, $oSize[0], $oSize[1], $this->ssName().'_original'))
+            $success = false;
+
+        // use this image to display
+        if (!$this->writeImage($im, $rSize[0], $rSize[1], $this->ssName()))
+            $success = false;
+
+        return $success;
     }
 
-    private function handleCrop() : void
+    private function handleCrop() : bool
     {
-        $im = imagecreatefromjpeg($this->tmpPath.$this->ssName().'_original.jpg');
+        $tmpFile = $this->tmpPath.$this->ssName().'_original.jpg';
+
+        if (!file_exists($tmpFile))
+        {
+            trigger_error('ScreenshotPage::handleCrop - temp image ('.$tmpFile.') not found', E_USER_ERROR);
+            $_SESSION['error']['ss'] = Lang::main('intError');
+            return false;
+        }
+
+        $im = imagecreatefromjpeg($tmpFile);
+        if (!$im)
+        {
+            trigger_error('ScreenshotPage::handleCrop - imagecreate failed ('.$tmpFile.')', E_USER_ERROR);
+            $_SESSION['error']['ss'] = Lang::main('intError');
+            return false;
+        }
 
         $oSize = $rSize = [imagesx($im), imagesy($im)];
         $rel   = $oSize[0] / $oSize[1];
@@ -178,6 +206,8 @@ class ScreenshotPage extends GenericPage
         // target
         $this->infobox = sprintf(Lang::screenshot('displayOn'), Lang::typeName($this->destType), Type::getFileString($this->destType), $this->destTypeId);
         $this->extendGlobalIds($this->destType, $this->destTypeId);
+
+        return true;
     }
 
     private function handleComplete() : int
@@ -262,9 +292,19 @@ class ScreenshotPage extends GenericPage
     private function writeImage(/*resource/gd*/ $im, int $w, int $h, string $file) : bool
     {
         if ($res = imagecreatetruecolor($w, $h))
+        {
             if (imagecopyresampled($res, $im, 0, 0, 0, 0, $w, $h, imagesx($im), imagesy($im)))
+            {
                 if (imagejpeg($res, $this->tmpPath.$file.'.jpg', 100))
                     return true;
+                else
+                    trigger_error('ScreenshotPage::writeImage -  write failed', E_USER_ERROR);
+            }
+            else
+                trigger_error('ScreenshotPage::writeImage - imagecopy failed', E_USER_ERROR);
+        }
+        else
+            trigger_error('ScreenshotPage::writeImage - imagecreate failed', E_USER_ERROR);
 
         return false;
     }
