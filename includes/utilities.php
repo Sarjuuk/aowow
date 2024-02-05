@@ -468,7 +468,7 @@ abstract class Util
     );
 
     public static $subDomains               = array(
-        'www',          null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
+        'en',           null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
     );
 
     public static $regions                   = array(
@@ -547,7 +547,6 @@ abstract class Util
     );
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
-    public static $wowheadLink              = '';
     private static $notes                   = [];
 
     public static function addNote(int $uGroupMask, string $str) : void

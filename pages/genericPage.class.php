@@ -175,6 +175,8 @@ class GenericPage
     protected $mode         = CACHE_TYPE_NONE;
  // protected $contribute;                                  // defined in __construct()
 
+    protected $wowheadLink  = 'https://wowhead.com/';
+
     protected $jsGlobals    = [];
     protected $lvData       = [];
     protected $title        = [CFG_NAME];                   // for title-Element
@@ -301,6 +303,8 @@ class GenericPage
             $this->gUser      = User::getUserGlobals();
             $this->gFavorites = User::getFavorites();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
+
+            $this->wowheadLink = sprintf(WOWHEAD_LINK, Util::$subDomains[User::$localeId], $pageCall, $pageParam);
 
             if (!$this->isValidPage())
                 $this->error();

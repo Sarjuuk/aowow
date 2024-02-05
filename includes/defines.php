@@ -11,6 +11,10 @@ define('E_AOWOW',                 E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E
 define('JSON_AOWOW_POWER',        JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 define('FILTER_FLAG_STRIP_AOWOW', FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
 
+// as of 01.01.2024     https://www.wowhead.com/wotlk/de/spell=40120/{seo}
+//                      https://www.wowhead.com/wotlk/es/search=vuelo
+define('WOWHEAD_LINK', 'https://www.wowhead.com/wotlk/%s/%s=%s');
+
 define('MIME_TYPE_TEXT',       'Content-Type: text/plain; charset=utf-8');
 define('MIME_TYPE_XML',        'Content-Type: text/xml; charset=utf-8');
 define('MIME_TYPE_JSON',       'Content-Type: application/x-javascript; charset=utf-8');

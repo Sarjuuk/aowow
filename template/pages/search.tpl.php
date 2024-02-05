@@ -11,7 +11,7 @@ $this->brick('pageTemplate');
 ?>
 
             <div class="text">
-                <a href="<?php echo Util::$wowheadLink; ?>" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
+                <a href="<?=$this->wowheadLink; ?>" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
 <?php
 if ($this->lvTabs):
     echo '                <h1>'.Lang::main('foundResult').' <i>'.Util::htmlEscape($this->search).'</i>';

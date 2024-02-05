@@ -270,8 +270,6 @@ if (!CLI)
     $_   = explode('=', $str, 2);
     $pageCall  = $_[0];
     $pageParam = $_[1] ?? '';
-
-    Util::$wowheadLink = 'https://www.wowhead.com/wotlk/'.(User::$localeId ? Util::$subDomains[User::$localeId].'/' : '').$str;
 }
 else if (!empty($AoWoWconf['aowow']))
     Lang::load(LOCALE_EN);

@@ -2,7 +2,7 @@
 // link to wowhead
 if (isset($this->redButtons[BUTTON_WOWHEAD])):
     if ($this->redButtons[BUTTON_WOWHEAD]):
-        echo '<a href="'.Util::$wowheadLink.'" rel="np" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>';
+        echo '<a href="'.$this->wowheadLink.'" rel="np" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>';
     else:
         echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>';
     endif;
