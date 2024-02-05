@@ -352,7 +352,7 @@ class SpellPage extends GenericPage
                 if (!$abilities->hasSetFields(['skillLines']))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
 
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -399,7 +399,7 @@ class SpellPage extends GenericPage
                 if (!$modSpells->hasSetFields(['skillLines']))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
 
                 $this->extendGlobalData($modSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -448,7 +448,7 @@ class SpellPage extends GenericPage
                 if (!$modsSpell->hasSetFields(['skillLines']))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
 
                 $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -513,7 +513,7 @@ class SpellPage extends GenericPage
             if (isset($saE))
                 $tabData['extraCols'] = $saE;
 
-            $this->lvTabs[] = ['spell', $tabData];
+            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
 
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -534,7 +534,7 @@ class SpellPage extends GenericPage
             $cdSpells = new SpellList($conditions);
             if (!$cdSpells->error)
             {
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data' => array_values($cdSpells->getListviewData()),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
@@ -556,7 +556,7 @@ class SpellPage extends GenericPage
             $ubSpells = new SpellList($conditions);
             if (!$ubSpells->error)
             {
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data' => array_values($ubSpells->getListviewData()),
                     'id'   => 'used-by-spell',
                     'name' => '$LANG.tab_usedby'
@@ -577,7 +577,7 @@ class SpellPage extends GenericPage
         $ubSets = new ItemsetList($conditions);
         if (!$ubSets->error)
         {
-            $this->lvTabs[] = ['itemset', array(
+            $this->lvTabs[] = [ItemsetList::$brickFile, array(
                 'data' => array_values($ubSets->getListviewData()),
                 'id'   => 'used-by-itemset',
                 'name' => '$LANG.tab_usedby'
@@ -599,7 +599,7 @@ class SpellPage extends GenericPage
         $ubItems = new ItemList($conditions);
         if (!$ubItems->error)
         {
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data' => array_values($ubItems->getListviewData()),
                 'id'   => 'used-by-item',
                 'name' => '$LANG.tab_usedby'
@@ -620,7 +620,7 @@ class SpellPage extends GenericPage
         $ubObjects = new GameObjectList($conditions);
         if (!$ubObjects->error)
         {
-            $this->lvTabs[] = ['object', array(
+            $this->lvTabs[] = [GameObjectList::$brickFile, array(
                 'data' => array_values($ubObjects->getListviewData()),
                 'id'   => 'used-by-object',
                 'name' => '$LANG.tab_usedby'
@@ -637,7 +637,7 @@ class SpellPage extends GenericPage
                 $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[Type::AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
-                    $this->lvTabs[] = ['areatrigger', array(
+                    $this->lvTabs[] = [AreaTriggerList::$brickFile, array(
                         'data' => array_values($ubTriggers->getListviewData()),
                         'id'   => 'used-by-areatrigger',
                         'name' => '$LANG.tab_usedby'
@@ -656,7 +656,7 @@ class SpellPage extends GenericPage
         $coAchievemnts = new AchievementList($conditions);
         if (!$coAchievemnts->error)
         {
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data' => array_values($coAchievemnts->getListviewData()),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
@@ -699,7 +699,7 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data'       => array_values($lv),
                 'name'       => '$LANG.tab_contains',
                 'id'         => 'contains',
@@ -767,7 +767,7 @@ class SpellPage extends GenericPage
                         if (isset($sH))
                             $tabData['hiddenCols'] = $sH;
 
-                        $this->lvTabs[] = ['spell', $tabData];
+                        $this->lvTabs[] = [SpellList::$brickFile, $tabData];
 
                         $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
                     }
@@ -811,7 +811,7 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data'        => array_values($data),
                 'id'          => 'spell-link',
                 'name'        => Lang::spell('linkedWith'),
@@ -834,7 +834,7 @@ class SpellPage extends GenericPage
         $trigger = new SpellList($conditions);
         if (!$trigger->error)
         {
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data' => array_values($trigger->getListviewData()),
                 'id'   => 'triggered-by',
                 'name' => '$LANG.tab_triggeredby'
@@ -858,7 +858,7 @@ class SpellPage extends GenericPage
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
         {
-            $this->lvTabs[] = ['creature', array(
+            $this->lvTabs[] = [CreatureList::$brickFile, array(
                 'data' => array_values($ubCreature->getListviewData()),
                 'id'   => 'used-by-npc',
                 'name' => '$LANG.tab_usedby'
@@ -1013,7 +1013,7 @@ class SpellPage extends GenericPage
                     $tabData['hiddenCols'] = ['instancetype'];
                 }
 
-                $this->lvTabs[] = ['zone', $tabData];
+                $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
             }
         }
 
@@ -1045,7 +1045,7 @@ class SpellPage extends GenericPage
                 if (!$teaches->hasSetFields(['skillLines']))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
             }
         }
 
@@ -1073,7 +1073,7 @@ class SpellPage extends GenericPage
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
-                    $this->lvTabs[] = ['creature', array(
+                    $this->lvTabs[] = [CreatureList::$brickFile, array(
                         'data' => array_values($tbTrainer->getListviewData()),
                         'id'   => 'taught-by-npc',
                         'name' => '$LANG.tab_taughtby',
@@ -1095,7 +1095,7 @@ class SpellPage extends GenericPage
         if (!$tbSpell->error)
         {
             $tbsData = $tbSpell->getListviewData();
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data' => array_values($tbsData),
                 'id'   => 'taught-by-spell',
                 'name' => '$LANG.tab_taughtby'
@@ -1118,7 +1118,7 @@ class SpellPage extends GenericPage
         $tbQuest = new QuestList($conditions);
         if (!$tbQuest->error)
         {
-            $this->lvTabs[] = ['quest', array(
+            $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($tbQuest->getListviewData()),
                 'id'   => 'reward-from-quest',
                 'name' => '$LANG.tab_rewardfrom'
@@ -1140,7 +1140,7 @@ class SpellPage extends GenericPage
         $tbItem = new ItemList($conditions);
         if (!$tbItem->error)
         {
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data' => array_values($tbItem->getListviewData()),
                 'id'   => 'taught-by-item',
                 'name' => '$LANG.tab_taughtby'
@@ -1159,7 +1159,7 @@ class SpellPage extends GenericPage
         $enchList = new EnchantmentList($conditions);
         if (!$enchList->error)
         {
-            $this->lvTabs[] = ['enchantment', array(
+            $this->lvTabs[] = [EnchantmentList::$brickFile, array(
                 'data' => array_values($enchList->getListviewData()),
                 'name' => Util::ucFirst(Lang::game('enchantments'))
             ), 'enchantment'];
@@ -1191,7 +1191,7 @@ class SpellPage extends GenericPage
                     $tabData['visibleCols'] = ['activity'];
 
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['sound', $tabData];
+                $this->lvTabs[] = [SoundList::$brickFile, $tabData];
             }
         }
 

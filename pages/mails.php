@@ -32,7 +32,7 @@ class MailsPage extends GenericPage
 
         $this->extendGlobalData($mails->getJsGlobals());
 
-        $this->lvTabs[] = ['mail', $tabData, 'mail'];
+        $this->lvTabs[] = [MailList::$brickFile, $tabData, 'mail'];
     }
 
     protected function generateTitle()

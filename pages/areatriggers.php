@@ -66,7 +66,7 @@ class AreaTriggersPage extends GenericPage
 
         }
 
-        $this->lvTabs[] = ['areatrigger', $tabData, 'areatrigger'];
+        $this->lvTabs[] = [AreaTriggerList::$brickFile, $tabData, 'areatrigger'];
     }
 
     protected function generateTitle()

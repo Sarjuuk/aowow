@@ -154,7 +154,7 @@ class EmotePage extends GenericPage
         );
         $acv = new AchievementList($condition);
 
-        $this->lvTabs[] = ['achievement', ['data' => array_values($acv->getListviewData())]];
+        $this->lvTabs[] = [AchievementList::$brickFile, ['data' => array_values($acv->getListviewData())]];
 
         $this->extendGlobalData($acv->getJsGlobals());
 
@@ -172,7 +172,7 @@ class EmotePage extends GenericPage
                     $d['gender'] = $em[$id]['gender'];
                 }
 
-                $this->lvTabs[] = ['sound', array(
+                $this->lvTabs[] = [SoundList::$brickFile, array(
                     'data'      => array_values($data),
                     //               gender                                  races
                     'extraCols' => ['$Listview.templates.title.columns[1]', '$Listview.templates.classs.columns[1]']

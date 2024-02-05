@@ -87,7 +87,7 @@ class EnchantmentsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = '$1';
 
-        $this->lvTabs[] = ['enchantment', $tabData, 'enchantment'];
+        $this->lvTabs[] = [EnchantmentList::$brickFile, $tabData, 'enchantment'];
     }
 
     protected function generateTitle()

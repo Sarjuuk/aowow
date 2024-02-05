@@ -63,7 +63,7 @@ class SoundsPage extends GenericPage
             if ($this->filterObj->error)
                 $tabData['_errors'] = 1;
         }
-        $this->lvTabs[] = ['sound', $tabData];
+        $this->lvTabs[] = [SoundList::$brickFile, $tabData];
     }
 
     protected function postCache()

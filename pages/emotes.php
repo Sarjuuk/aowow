@@ -34,7 +34,7 @@ class EmotesPage extends GenericPage
             'name' => Util::ucFirst(Lang::game('emotes'))
         );
 
-        $this->lvTabs[] = ['emote', $tabData, 'emote'];
+        $this->lvTabs[] = [EmoteList::$brickFile, $tabData, 'emote'];
     }
 
     protected function generateTitle()

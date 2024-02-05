@@ -12,12 +12,12 @@ if (!empty($this->lvTabs) || !empty($this->user['characterData']) || !empty($thi
             <div id="tabs-generic"></div>
 <?php endif; ?>
             <div id="lv-generic" class="listview"><?php
-    foreach ($this->lvTabs as $lv):
-        if ($lv[0]):
+    foreach ($this->lvTabs as [$tplName, $tabData]):
+        if ($tplName):
             continue;
         endif;
 
-        echo '<div class="text tabbed-contents" id="tab-'.$lv[1]['id'].'" style="display:none;">'.$lv[1]['data'].'</div>';
+        echo '<div class="text tabbed-contents" id="tab-'.$tabData['id'].'" style="display:none;">'.$tabData['data'].'</div>';
     endforeach;
             ?></div>
             <script type="text/javascript">//<![CDATA[
@@ -30,28 +30,30 @@ if (!empty($this->lvTabs) || !empty($this->user['characterData']) || !empty($thi
         echo "                var ".$tabVar." = new Tabs({parent: \$WH.ge('tabs-generic')".(isset($this->type) ? ", trackable: '".ucfirst(Type::getFileString($this->type)."'") : null)."});\n";
     endif;
 
-    foreach ($this->lvTabs as $lv):
-        if (!empty($lv[1]['data']) || (count($this->lvTabs) == 1 && !$relTabs)):
-            if ($isTabbed):
-                $lv[1]['tabs'] = '$'.$tabVar;
+    foreach ($this->lvTabs as [$tplName, $tabData, $include]):
+        if (empty($tabData['data']) && $relTabs && count($this->lvTabs) != 1):
+            continue;
+        endif;
+
+        if ($isTabbed):
+            $tabData['tabs'] = '$'.$tabVar;
+        endif;
+
+        if ($tplName):
+            // extra functions on top of lv
+            if (isset($include)):
+                $this->lvBrick($include);
             endif;
 
-            if ($lv[0]):
-                // extra functions on top of lv
-                if (isset($lv[2])):
-                    $this->lvBrick($lv[2]);
-                endif;
-
-                if (isset($this->lvTemplates[$lv[0]])):
-                    echo "new Listview(".Util::toJSON(array_merge($this->lvTemplates[$lv[0]], $lv[1])).");\n";
-                else:
-                    // does not appear as announcement, those have already been handled at this point
-                    trigger_error('requested undefined listview: '.$lv[0], E_USER_ERROR);
-                endif;
-            elseif ($isTabbed):
-                $n = $lv[1]['name'][0] == '$' ? substr($lv[1]['name'], 1) : "'".$lv[1]['name']."'";
-                echo $tabVar.".add(".$n.", { id: '".$lv[1]['id']."' });\n";
+            if (isset($this->lvTemplates[$tplName])):
+                echo "new Listview(".Util::toJSON(array_merge($this->lvTemplates[$tplName], $tabData)).");\n";
+            else:
+                // does not appear as announcement, those have already been handled at this point
+                trigger_error('requested undefined listview: '.$tplName, E_USER_ERROR);
             endif;
+        elseif ($isTabbed):
+            $n = $tabData['name'][0] == '$' ? substr($tabData['name'], 1) : "'".$tabData['name']."'";
+            echo $tabVar.".add(".$n.", { id: '".$tabData['id']."' });\n";
         endif;
     endforeach;
 

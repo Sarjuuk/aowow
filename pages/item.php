@@ -442,7 +442,7 @@ class ItemPage extends genericPage
                     $this->extendGlobalIDs(Type::SPELL, $perfItem[$sId]['requiredSpecialization']);
                 }
 
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data'      => array_values($lvData),
                     'name'      => '$LANG.tab_createdby',
                     'id'        => 'created-by',            // should by exclusive with created-by from spell_loot
@@ -529,7 +529,7 @@ class ItemPage extends genericPage
                 if ($sf[6])
                     $tabData['visibleCols'] = array_unique($sf[6]);
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
         }
 
@@ -569,7 +569,7 @@ class ItemPage extends genericPage
                 if (!$contains->hasSetFields(['slot']))
                     $hCols[] = 'slot';
 
-                $this->lvTabs[] = ['item', array(
+                $this->lvTabs[] = [ItemList::$brickFile, array(
                     'data'       => array_values($contains->getListviewData()),
                     'name'       => '$LANG.tab_cancontain',
                     'id'         => 'can-contain',
@@ -586,7 +586,7 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = ['item', array(
+                $this->lvTabs[] = [ItemList::$brickFile, array(
                     'data'       => array_values($contains->getListviewData()),
                     'name'       => '$LANG.tab_canbeplacedin',
                     'id'         => 'can-be-placed-in',
@@ -616,7 +616,7 @@ class ItemPage extends genericPage
             if (!$criteriaOf->hasSetFields(['reward_loc0']))
                 $tabData['hiddenCols'] = ['rewards'];
 
-            $this->lvTabs[] = ['achievement', $tabData];
+            $this->lvTabs[] = [AchievementList::$brickFile, $tabData];
         }
 
         // tab: reagent for
@@ -631,7 +631,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($reagent->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data'        => array_values($reagent->getListviewData()),
                 'name'        => '$LANG.tab_reagentfor',
                 'id'          => 'reagent-for',
@@ -653,7 +653,7 @@ class ItemPage extends genericPage
             $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
             if (!$lockedObj->error)
             {
-                $this->lvTabs[] = ['object', array(
+                $this->lvTabs[] = [GameObjectList::$brickFile, array(
                     'data' => array_values($lockedObj->getListviewData()),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-object'
@@ -666,7 +666,7 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = ['item', array(
+                $this->lvTabs[] = [ItemList::$brickFile, array(
                     'data' => array_values($lockedItm->getListviewData()),
                     'name' => '$LANG.tab_unlocks',
                     'id'   => 'unlocks-item'
@@ -701,7 +701,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($saItems->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data' => array_values($saItems->getListviewData()),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
@@ -716,7 +716,7 @@ class ItemPage extends genericPage
             {
                 $this->extendGlobalData($starts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($starts->getListviewData()),
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts-quest'
@@ -735,7 +735,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($objective->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($objective->getListviewData()),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of-quest'
@@ -753,7 +753,7 @@ class ItemPage extends genericPage
         {
             $this->extendGlobalData($provided->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($provided->getListviewData()),
                 'name' => '$LANG.tab_providedfor',
                 'id'   => 'provided-for-quest'
@@ -837,7 +837,7 @@ class ItemPage extends genericPage
                 }
 
 
-                $this->lvTabs[] = ['creature', array(
+                $this->lvTabs[] = [CreatureList::$brickFile, array(
                     'data'       => array_values($sbData),
                     'name'       => '$LANG.tab_soldby',
                     'id'         => 'sold-by-npc',
@@ -885,7 +885,7 @@ class ItemPage extends genericPage
                 if ($boughtBy->getMatches() > CFG_SQL_LIMIT_DEFAULT && $n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -924,7 +924,7 @@ class ItemPage extends genericPage
                 if ($taughtSpells->hasSetFields(['reagent1']))
                     $visCols[] = 'reagents';
 
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data'        => array_values($taughtSpells->getListviewData()),
                     'name'        => '$LANG.tab_teaches',
                     'id'          => 'teaches',
@@ -971,7 +971,7 @@ class ItemPage extends genericPage
             $cdItems = new ItemList($conditions);
             if (!$cdItems->error)
             {
-                $this->lvTabs[] = ['item', array(
+                $this->lvTabs[] = [ItemList::$brickFile, array(
                     'data' => array_values($cdItems->getListviewData()),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
@@ -1014,7 +1014,7 @@ class ItemPage extends genericPage
             if (!$sounds->error)
             {
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['sound', ['data' => array_values($sounds->getListviewData())]];
+                $this->lvTabs[] = [SoundList::$brickFile, ['data' => array_values($sounds->getListviewData())]];
             }
         }
 

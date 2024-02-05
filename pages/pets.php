@@ -51,7 +51,7 @@ class PetsPage extends GenericPage
             if (!$pets->hasDiffFields(['type']))
                 $data['hiddenCols'] = ['type'];
         };
-        $this->lvTabs[] = ['pet', $data, 'petFoodCol'];
+        $this->lvTabs[] = [PetList::$brickFile, $data, 'petFoodCol'];
     }
 
     protected function generateTitle()

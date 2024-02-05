@@ -236,7 +236,7 @@ class AchievementPage extends GenericPage
             ['id', $this->typeId, '!']
         );
         $saList = new AchievementList($conditions);
-        $this->lvTabs[] = ['achievement', array(
+        $this->lvTabs[] = [AchievementList::$brickFile, array(
             'data'        => array_values($saList->getListviewData()),
             'id'          => 'see-also',
             'name'        => '$LANG.tab_seealso',
@@ -252,7 +252,7 @@ class AchievementPage extends GenericPage
         if (!empty($refs))
         {
             $coList = new AchievementList(array(['id', $refs]));
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data'        => array_values($coList->getListviewData()),
                 'id'          => 'criteria-of',
                 'name'        => '$LANG.tab_criteriaof',

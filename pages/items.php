@@ -418,7 +418,7 @@ class ItemsPage extends GenericPage
 
             $tabData['data'] = array_values($tabData['data']);
 
-            $this->lvTabs[] = ['item', $tabData];
+            $this->lvTabs[] = [ItemList::$brickFile, $tabData];
         }
 
         // reformat for use in template
@@ -429,7 +429,7 @@ class ItemsPage extends GenericPage
         if (empty($this->lvTabs))
         {
             $this->forceTabs = false;
-            $this->lvTabs[]  = ['item', ['data' => []]];
+            $this->lvTabs[]  = [ItemList::$brickFile, ['data' => []]];
         }
     }
 

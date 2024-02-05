@@ -463,7 +463,7 @@ class SpellsPage extends GenericPage
         if ($hiddenCols)
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
-        $this->lvTabs[] = ['spell', $tabData];
+        $this->lvTabs[] = [SpellList::$brickFile, $tabData];
     }
 
     protected function postCache()

@@ -227,7 +227,7 @@ class ItemsetPage extends GenericPage
                 if (!$relSets->hasDiffFields(['classMask']))
                     $tabData['hiddenCols'] = ['classes'];
 
-                $this->lvTabs[] = ['itemset', $tabData];
+                $this->lvTabs[] = [ItemsetList::$brickFile, $tabData];
 
                 $this->extendGlobalData($relSets->getJSGlobals());
             }

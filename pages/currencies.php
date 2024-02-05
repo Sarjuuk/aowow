@@ -37,7 +37,7 @@ class CurrenciesPage extends GenericPage
             $conditions[] = ['category', (int)$this->category[0]];
 
         $money = new CurrencyList($conditions);
-        $this->lvTabs[] = ['currency', ['data' => array_values($money->getListviewData())]];
+        $this->lvTabs[] = [CurrencyList::$brickFile, ['data' => array_values($money->getListviewData())]];
     }
 
     protected function generateTitle()

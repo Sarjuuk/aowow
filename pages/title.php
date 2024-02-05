@@ -104,7 +104,7 @@ class TitlePage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_REWARDS));
 
-            $this->lvTabs[] = ['quest', array(
+            $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data'        => array_values($quests->getListviewData()),
                 'id'          => 'reward-from-quest',
                 'name'        => '$LANG.tab_rewardfrom',
@@ -121,7 +121,7 @@ class TitlePage extends GenericPage
             {
                 $this->extendGlobalData($acvs->getJSGlobals());
 
-                $this->lvTabs[] = ['achievement', array(
+                $this->lvTabs[] = [AchievementList::$brickFile, array(
                     'data'        => array_values($acvs->getListviewData()),
                     'id'          => 'reward-from-achievement',
                     'name'        => '$LANG.tab_rewardfrom',

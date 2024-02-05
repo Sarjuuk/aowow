@@ -761,6 +761,9 @@ class GenericPage
 
                 $this->addAnnouncements();
 
+                if (isset($this->lvTabs))
+                    array_walk($this->lvTabs, function (&$x) { $x = array_pad($x, 3, null); });
+
                 include('template/pages/'.$this->tpl.'.tpl.php');
                 die();
             }

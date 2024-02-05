@@ -35,7 +35,7 @@ class RacesPage extends GenericPage
         if (!$races->error)
             $data = array_values($races->getListviewData());
 
-        $this->lvTabs[] = ['race', ['data' => $data]];
+        $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => $data]];
     }
 
     protected function generateTitle()

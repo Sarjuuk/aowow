@@ -120,7 +120,7 @@ class ArenaTeamPage extends GenericPage
         $member = new LocalProfileList(array(['atm.arenaTeamId', $this->subjectGUID]));
         if (!$member->error)
         {
-            $this->lvTabs[] = ['profile', array(
+            $this->lvTabs[] = [ProfileList::$brickFile, array(
                 'data'        => array_values($member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_ARENA)),
                 'sort'        => [-15],
                 'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'rating', 'wins', 'losses'],

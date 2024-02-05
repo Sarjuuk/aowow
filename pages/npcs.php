@@ -90,7 +90,7 @@ class NpcsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = ['creature', $tabData];
+        $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
     }
 
     protected function postCache()

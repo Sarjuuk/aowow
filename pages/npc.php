@@ -480,14 +480,14 @@ class NpcPage extends GenericPage
                 }
 
                 if ($normal)
-                    $this->lvTabs[] = ['spell', array(
+                    $this->lvTabs[] = [SpellList::$brickFile, array(
                         'data' => array_values($normal),
                         'name' => '$LANG.tab_abilities',
                         'id'   => 'abilities'
                     )];
 
                 if ($controled)
-                    $this->lvTabs[] = ['spell', array(
+                    $this->lvTabs[] = [SpellList::$brickFile, array(
                         'data' => array_values($controled),
                         'name' => '$LANG.tab_controlledabilities',
                         'id'   => 'controlled-abilities'
@@ -508,7 +508,7 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($sbSpell->getJSGlobals());
 
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data' => array_values($sbSpell->getListviewData()),
                 'name' => '$LANG.tab_summonedby',
                 'id'   => 'summoned-by-spell'
@@ -524,7 +524,7 @@ class NpcPage extends GenericPage
             {
                 $this->extendGlobalData($sbNPC->getJSGlobals());
 
-                $this->lvTabs[] = ['creature', array(
+                $this->lvTabs[] = [CreatureList::$brickFile, array(
                     'data' => array_values($sbNPC->getListviewData()),
                     'name' => '$LANG.tab_summonedby',
                     'id'   => 'summoned-by-npc'
@@ -540,7 +540,7 @@ class NpcPage extends GenericPage
             {
                 $this->extendGlobalData($sbGO->getJSGlobals());
 
-                $this->lvTabs[] = ['object', array(
+                $this->lvTabs[] = [GameObjectList::$brickFile, array(
                     'data' => array_values($sbGO->getListviewData()),
                     'name' => '$LANG.tab_summonedby',
                     'id'   => 'summoned-by-object'
@@ -618,7 +618,7 @@ class NpcPage extends GenericPage
                     if ($extra)
                         $tabData['extraCols'] = array_values($extra);
 
-                    $this->lvTabs[] = ['spell', $tabData];
+                    $this->lvTabs[] = [SpellList::$brickFile, $tabData];
                 }
             }
             else
@@ -657,7 +657,7 @@ class NpcPage extends GenericPage
                             $row['condition'][0][$id.':'.$this->typeId] = $cndData[$id.':'.$this->typeId];
                 }
 
-                $this->lvTabs[] = ['item', array(
+                $this->lvTabs[] = [ItemList::$brickFile, array(
                     'data'      => array_values($lvData),
                     'name'      => '$LANG.tab_sells',
                     'id'        => 'currency-for',
@@ -750,7 +750,7 @@ class NpcPage extends GenericPage
                 if ($sf[4])
                     $tabData['hiddenCols'] = $sf[4];
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
         }
 
@@ -797,14 +797,14 @@ class NpcPage extends GenericPage
             }
 
             if ($_[0])
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($_[0]),
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
                 )];
 
             if ($_[1])
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($_[1]),
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
@@ -825,7 +825,7 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($objectiveOf->getJSGlobals());
 
-            $this->lvTabs[] = ['quest', array(
+            $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($objectiveOf->getListviewData()),
                 'name' => '$LANG.tab_objectiveof',
                 'id'   => 'objective-of'
@@ -843,7 +843,7 @@ class NpcPage extends GenericPage
         {
             $this->extendGlobalData($crtOf->getJSGlobals());
 
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data' => array_values($crtOf->getListviewData()),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
@@ -873,7 +873,7 @@ class NpcPage extends GenericPage
                 if (User::isInGroup(U_GROUP_STAFF))
                     $tabData['extraCols'] = ["\$Listview.funcBox.createSimpleCol('seat', '".Lang::npc('seat')."', '10%', 'seat')"];
 
-                $this->lvTabs[] = ['creature', $tabData];
+                $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
             }
         }
 
@@ -905,7 +905,7 @@ class NpcPage extends GenericPage
                     $tabData['visibleCols'] = ['activity'];
 
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['sound', $tabData];
+                $this->lvTabs[] = [SoundList::$brickFile, $tabData];
             }
         }
     }

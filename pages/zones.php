@@ -83,7 +83,7 @@ class ZonesPage extends GenericPage
             $tabData['hiddenCols'] = $hiddenCols;
 
         $this->map      = null;
-        $this->lvTabs[] = ['zone', $tabData];
+        $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
 
         // create flight map
         if ($mapFile)

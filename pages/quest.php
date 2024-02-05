@@ -963,7 +963,7 @@ class QuestPage extends GenericPage
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
-            $this->lvTabs[] = ['quest', array(
+            $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($seeAlso->getListviewData()),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
@@ -975,7 +975,7 @@ class QuestPage extends GenericPage
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals());
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data' => array_values($criteriaOf->getListviewData()),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
@@ -990,7 +990,7 @@ class QuestPage extends GenericPage
             if (!$pooledQuests->error)
             {
                 $this->extendGlobalData($pooledQuests->getJSGlobals());
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($pooledQuests->getListviewData()),
                     'name' => 'Quest Pool',
                     'id'   => 'quest-pool',

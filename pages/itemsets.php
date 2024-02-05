@@ -71,7 +71,7 @@ class ItemsetsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = ['itemset', $tabData];
+        $this->lvTabs[] = [ItemsetList::$brickFile, $tabData];
     }
 
     protected function postCache()

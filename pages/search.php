@@ -177,7 +177,7 @@ class SearchPage extends GenericPage
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
             $foundTotal = 0;
-            foreach ($this->lvTabs as [$file, $tabData, , $osInfo])
+            foreach ($this->lvTabs as [, $tabData])
                 $foundTotal += count($tabData['data']);
 
             if ($foundTotal == 1)                           // only one match -> redirect to find
@@ -284,13 +284,13 @@ class SearchPage extends GenericPage
 
         $this->performSearch();
 
-        foreach ($this->lvTabs as [ , , , $osInfo])
+        foreach ($this->lvTabs as [, , , $osInfo])
             $foundTotal += $osInfo[2];
 
         if (!$foundTotal)
             return Util::toJSON([$this->search, []]);
 
-        foreach ($this->lvTabs as [ , $tabData, , $osInfo])
+        foreach ($this->lvTabs as [, $tabData, , $osInfo])
         {
             $max = max(1, intVal($limit * $osInfo[2] / $foundTotal));
             $limit -= $max;
@@ -392,7 +392,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['class', $result, null, $osInfo];
+            return [CharClassList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -418,7 +418,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['race', $result, null, $osInfo];
+            return [CharRaceList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -444,7 +444,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['title', $result, null, $osInfo];
+            return [TitleList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -477,7 +477,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['event', $result, null, $osInfo];
+            return [WorldEventList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -503,7 +503,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['currency', $result, null, $osInfo];
+            return [CurrencyList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -539,7 +539,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?itemsets&filter=na='.urlencode($this->search).'\')';
 
-            return ['itemset', $result, null, $osInfo];
+            return [ItemsetList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -613,7 +613,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?items&filter=na='.urlencode($this->search).'\')';
 
-            return ['item', $result, null, $osInfo];
+            return [ItemList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -680,7 +680,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=7&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -731,7 +731,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-2&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -773,7 +773,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-13&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -815,7 +815,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-11&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -857,7 +857,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=11&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -899,7 +899,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-6&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -940,7 +940,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-5&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -975,7 +975,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?npcs&filter=na='.urlencode($this->search).'\')';
 
-            return ['creature', $result, null, $osInfo];
+            return [CreatureList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1008,7 +1008,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?quests&filter=na='.urlencode($this->search).'\')';
 
-            return ['quest', $result, null, $osInfo];
+            return [QuestList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1048,7 +1048,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements&filter=na='.urlencode($this->search).'\')';
 
-            return ['achievement', $result, null, $osInfo];
+            return [AchievementList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1087,7 +1087,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?achievements=1&filter=na='.urlencode($this->search).'\')';
 
-            return ['achievement', $result, null, $osInfo];
+            return [AchievementList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1112,7 +1112,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['zone', $result, null, $osInfo];
+            return [ZoneList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1142,7 +1142,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?objects&filter=na='.urlencode($this->search).'\')';
 
-            return ['object', $result, null, $osInfo];
+            return [GameObjectList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1164,7 +1164,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['faction', $result, null, $osInfo];
+            return [FactionList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1190,7 +1190,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['skill', $result, null, $osInfo];
+            return [SkillList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1219,7 +1219,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['pet', $result, 'petFoodCol', $osInfo];
+            return [PetList::$brickFile, $result, 'petFoodCol', $osInfo];
         }
 
         return false;
@@ -1262,7 +1262,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=-8&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1310,7 +1310,7 @@ class SearchPage extends GenericPage
             else
                 $result['note'] = '$$WH.sprintf(LANG.lvnote_filterresults, \'?spells=0&filter=na='.urlencode($this->search).'\')';
 
-            return ['spell', $result, null, $osInfo];
+            return [SpellList::$brickFile, $result, null, $osInfo];
         }
 
         return false;
@@ -1329,7 +1329,7 @@ class SearchPage extends GenericPage
                 'name' => Util::ucFirst(Lang::game('emotes'))
             );
 
-            return ['emote', $result, 'emote', $osInfo];
+            return [EmoteList::$brickFile, $result, 'emote', $osInfo];
         }
 
         return false;
@@ -1362,7 +1362,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['enchantment', $result, 'enchantment', $osInfo];
+            return [EnchantmentList::$brickFile, $result, 'enchantment', $osInfo];
         }
 
         return false;
@@ -1387,7 +1387,7 @@ class SearchPage extends GenericPage
                 $result['_truncated'] = 1;
             }
 
-            return ['sound', $result, null, $osInfo];
+            return [SoundList::$brickFile, $result, null, $osInfo];
         }
 
         return false;

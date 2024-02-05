@@ -9,7 +9,7 @@ class CreatureList extends BaseType
     use spawnHelper;
 
     public static   $type      = Type::NPC;
-    public static   $brickFile = 'creature';
+    public static   $brickFile = 'npc';
     public static   $dataTable = '?_creature';
 
     protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';

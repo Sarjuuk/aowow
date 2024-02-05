@@ -155,7 +155,7 @@ class CurrencyPage extends GenericPage
                         );
                     }
 
-                    $this->lvTabs[] = ['creature', array(
+                    $this->lvTabs[] = [CreatureList::$brickFile, array(
                         'data'       => array_values($sbData),
                         'name'       => '$LANG.tab_soldby',
                         'id'         => 'sold-by-npc',
@@ -183,7 +183,7 @@ class CurrencyPage extends GenericPage
                 if ($createdBy->hasSetFields(['reagent1']))
                     $tabData['visibleCols'] = ['reagents'];
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
             }
         }
 
@@ -221,7 +221,7 @@ class CurrencyPage extends GenericPage
                 if ($boughtBy->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
 
                 $this->extendGlobalData($boughtBy->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }

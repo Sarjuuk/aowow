@@ -289,7 +289,7 @@ class AdminPage extends GenericPage
                 $data[$id]['rev'] = $rev;
         }
 
-        $this->lvTabs[] = ['guide', array(
+        $this->lvTabs[] = [GuideList::$brickFile, array(
             'data'       => array_values($data),
             'hiddenCols' => ['patch', 'comments', 'views', 'rating'],
             'extraCols'  => '$_'

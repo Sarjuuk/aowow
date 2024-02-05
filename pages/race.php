@@ -109,7 +109,7 @@ class RacePage extends GenericPage
         if (!$classes->error)
         {
             $this->extendGlobalData($classes->getJSGlobals());
-            $this->lvTabs[] = ['class', ['data' => array_values($classes->getListviewData())]];
+            $this->lvTabs[] = [CharClassList::$brickFile, ['data' => array_values($classes->getListviewData())]];
         }
 
         // Tongues
@@ -122,7 +122,7 @@ class RacePage extends GenericPage
         if (!$tongues->error)
         {
             $this->extendGlobalData($tongues->getJSGlobals());
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data'       => array_values($tongues->getListviewData()),
                 'id'         => 'languages',
                 'name'       => '$LANG.tab_languages',
@@ -140,7 +140,7 @@ class RacePage extends GenericPage
         if (!$racials->error)
         {
             $this->extendGlobalData($racials->getJSGlobals());
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data'       => array_values($racials->getListviewData()),
                 'id'         => 'racial-traits',
                 'name'       => '$LANG.tab_racialtraits',
@@ -159,7 +159,7 @@ class RacePage extends GenericPage
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals());
-            $this->lvTabs[] = ['quest', ['data' => array_values($quests->getListviewData())]];
+            $this->lvTabs[] = [QuestList::$brickFile, ['data' => array_values($quests->getListviewData())]];
         }
 
         // Mounts
@@ -176,7 +176,7 @@ class RacePage extends GenericPage
         if (!$mounts->error)
         {
             $this->extendGlobalData($mounts->getJSGlobals());
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data'       => array_values($mounts->getListviewData()),
                 'id'         => 'mounts',
                 'name'       => '$LANG.tab_mounts',
@@ -195,7 +195,7 @@ class RacePage extends GenericPage
                 foreach ($data as $id => &$d)
                     $d['gender'] = $vo[$id];
 
-                $this->lvTabs[] = ['sound', array(
+                $this->lvTabs[] = [SoundList::$brickFile, array(
                     'data' => array_values($data),
                     'extraCols' => ['$Listview.templates.title.columns[1]']
                 )];

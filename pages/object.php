@@ -297,7 +297,7 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($summons->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data' => array_values($summons->getListviewData()),
                 'id'   => 'summoned-by',
                 'name' => '$LANG.tab_summonedby'
@@ -316,7 +316,7 @@ class ObjectPage extends GenericPage
                 foreach ($data as $relId => $d)
                     $data[$relId]['trigger'] = array_search($relId, $_);
 
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data'       => array_values($data),
                     'id'         => 'spells',
                     'name'       => '$LANG.tab_spells',
@@ -332,7 +332,7 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data' => array_values($acvs->getListviewData()),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
@@ -358,14 +358,14 @@ class ObjectPage extends GenericPage
             }
 
             if ($_[0])
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($_[0]),
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
                 )];
 
             if ($_[1])
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($_[1]),
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
@@ -380,7 +380,7 @@ class ObjectPage extends GenericPage
             {
                 $this->extendGlobalData($relQuest->getJSGlobals());
 
-                $this->lvTabs[] = ['quest', array(
+                $this->lvTabs[] = [QuestList::$brickFile, array(
                     'data' => array_values($relQuest->getListviewData()),
                     'name' => '$LANG.tab_quests',
                     'id'   => 'quests'
@@ -427,7 +427,7 @@ class ObjectPage extends GenericPage
                 if ($hiddenCols)
                     $tabData['hiddenCols'] = $hiddenCols;
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
         }
 
@@ -476,7 +476,7 @@ class ObjectPage extends GenericPage
                     $tabData['_truncated'] = 1;
                 }
 
-                $this->lvTabs[] = ['spell', $tabData];
+                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
             }
         }
 
@@ -486,7 +486,7 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($sameModel->getJSGlobals());
 
-            $this->lvTabs[] = ['object', array(
+            $this->lvTabs[] = [GameObjectList::$brickFile, array(
                 'data' => array_values($sameModel->getListviewData()),
                 'name' => '$LANG.tab_samemodelas',
                 'id'   => 'same-model-as'

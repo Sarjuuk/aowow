@@ -73,7 +73,7 @@ class ObjectsPage extends GenericPage
                 $tabData['_errors'] = 1;
         }
 
-        $this->lvTabs[] = ['object', $tabData];
+        $this->lvTabs[] = [GameObjectList::$brickFile, $tabData];
     }
 
     protected function generateTitle()

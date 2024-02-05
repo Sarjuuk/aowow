@@ -135,7 +135,7 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = ['spell', array(
+            $this->lvTabs[] = [SpellList::$brickFile, array(
                 'data'            => array_values($genSpells->getListviewData()),
                 'id'              => 'spells',
                 'name'            => '$LANG.tab_spells',
@@ -165,7 +165,7 @@ class ClassPage extends GenericPage
             if ($items->hasDiffFields(['requiredRace']))
                 $hiddenCols = ['side'];
 
-            $this->lvTabs[] = ['item', array(
+            $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data'            => array_values($items->getListviewData()),
                 'id'              => 'items',
                 'name'            => '$LANG.tab_items',
@@ -189,7 +189,7 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals());
 
-            $this->lvTabs[] = ['quest', array(
+            $this->lvTabs[] = [QuestList::$brickFile, array(
                 'data' => array_values($quests->getListviewData()),
                 'sort' => ['reqlevel', 'name']
             )];
@@ -201,7 +201,7 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = ['itemset', array(
+            $this->lvTabs[] = [ItemsetList::$brickFile, array(
                 'data'       => array_values($sets->getListviewData()),
                 'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
                 'hiddenCols' => ['classes'],
@@ -219,7 +219,7 @@ class ClassPage extends GenericPage
         $trainer = new CreatureList($conditions);
         if (!$trainer->error)
         {
-            $this->lvTabs[] = ['creature', array(
+            $this->lvTabs[] = [CreatureList::$brickFile, array(
                 'data' => array_values($trainer->getListviewData()),
                 'id'   => 'trainers',
                 'name' => '$LANG.tab_trainers'
@@ -229,7 +229,7 @@ class ClassPage extends GenericPage
         // Tab: Races
         $races = new CharRaceList(array(['classMask', $_mask, '&']));
         if (!$races->error)
-            $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
+            $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
     }
 }
 

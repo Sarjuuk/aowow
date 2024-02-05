@@ -121,7 +121,7 @@ class EventPage extends GenericPage
                 if ($hasFilter)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=38;crs='.$this->hId.';crv=0');
 
-                $this->lvTabs[] = ['creature', $tabData];
+                $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
             }
         }
 
@@ -140,7 +140,7 @@ class EventPage extends GenericPage
                 if ($hasFilter)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?objects&filter=cr=16;crs='.$this->hId.';crv=0');
 
-                $this->lvTabs[] = ['object', $tabData];
+                $this->lvTabs[] = [GameObjectList::$brickFile, $tabData];
             }
         }
 
@@ -161,7 +161,7 @@ class EventPage extends GenericPage
                 if ($hasFilter)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$this->hId.';crv=0');
 
-                $this->lvTabs[] = ['achievement', $tabData];
+                $this->lvTabs[] = [AchievementList::$brickFile, $tabData];
             }
         }
 
@@ -184,7 +184,7 @@ class EventPage extends GenericPage
                 if ($hasFilter)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$this->hId.';crv=0');
 
-                $this->lvTabs[] = ['quest', $tabData];
+                $this->lvTabs[] = [QuestList::$brickFile, $tabData];
 
                 $questItems = [];
                 foreach (array_column($quests->rewards, Type::ITEM) as $arr)
@@ -221,7 +221,7 @@ class EventPage extends GenericPage
                 if ($hasFilter)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=160;crs='.$this->hId.';crv=0');
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
         }
 
@@ -258,7 +258,7 @@ class EventPage extends GenericPage
                     $relData = array_merge($relData, $d);
                 }
 
-                $this->lvTabs[] = ['event', array(
+                $this->lvTabs[] = [WorldEventList::$brickFile, array(
                     'data'       => array_values($relData),
                     'id'         => 'see-also',
                     'name'       => '$LANG.tab_seealso',

@@ -66,7 +66,7 @@ class IconsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = ['icongallery', $tabData];
+        $this->lvTabs[] = [IconList::$brickFile, $tabData];
     }
 
     protected function generateTitle()

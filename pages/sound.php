@@ -160,12 +160,8 @@ class SoundPage extends GenericPage
         $spells = new SpellList($cnd);
         if (!$spells->error)
         {
-            $data = $spells->getListviewData();
             $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
-
-            $this->lvTabs[] = ['spell', array(
-                'data' => array_values($data),
-            )];
+            $this->lvTabs[] = [SpellList::$brickFile, ['data' => array_values($spells->getListviewData())]];
         }
 
 
@@ -198,7 +194,7 @@ class SoundPage extends GenericPage
             if (!$items->error)
             {
                 $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['item', ['data' => array_values($items->getListviewData())]];
+                $this->lvTabs[] = [ItemList::$brickFile, ['data' => array_values($items->getListviewData())]];
             }
         }
 
@@ -256,7 +252,7 @@ class SoundPage extends GenericPage
                 $tabData['data'] = array_values($zoneData);
                 $tabData['hiddenCols'] = ['territory'];
 
-                $this->lvTabs[] = ['zone', $tabData];
+                $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
             }
         }
 
@@ -268,7 +264,7 @@ class SoundPage extends GenericPage
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
+                $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
             }
         }
 
@@ -280,7 +276,7 @@ class SoundPage extends GenericPage
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['emote', array(
+                $this->lvTabs[] = [EmoteList::$brickFile, array(
                     'data' => array_values($races->getListviewData()),
                     'name' => Util::ucFirst(Lang::game('emotes'))
                 ), 'emote'];
@@ -350,7 +346,7 @@ class SoundPage extends GenericPage
                 $this->addScript([SC_JS_FILE, '?data=zones']);
 
                 $this->extendGlobalData($npcs->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = ['creature', ['data' => array_values($npcs->getListviewData())]];
+                $this->lvTabs[] = [CreatureList::$brickFile, ['data' => array_values($npcs->getListviewData())]];
             }
         }
     }

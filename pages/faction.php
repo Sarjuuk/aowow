@@ -187,7 +187,7 @@ class FactionPage extends GenericPage
             if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                 $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs[] = ['item', $tabData, 'itemStandingCol'];
+            $this->lvTabs[] = [ItemList::$brickFile, $tabData, 'itemStandingCol'];
         }
 
         // tab: creatures with onKill reputation
@@ -220,7 +220,7 @@ class FactionPage extends GenericPage
                     if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                         $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
-                    $this->lvTabs[] = ['creature', $tabData, 'npcRepCol'];
+                    $this->lvTabs[] = [CreatureList::$brickFile, $tabData, 'npcRepCol'];
                 }
             }
         }
@@ -240,7 +240,7 @@ class FactionPage extends GenericPage
                 if ($members->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
-                $this->lvTabs[] = ['creature', $tabData];
+                $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
             }
         }
 
@@ -249,7 +249,7 @@ class FactionPage extends GenericPage
         {
             $objects = new GameObjectList(array(['faction', $_]));
             if (!$objects->error)
-                $this->lvTabs[] = ['object', ['data' => array_values($objects->getListviewData())]];
+                $this->lvTabs[] = [GameObjectList::$brickFile, ['data' => array_values($objects->getListviewData())]];
         }
 
         // tab: quests
@@ -274,7 +274,7 @@ class FactionPage extends GenericPage
             if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
                 $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            $this->lvTabs[] = ['quest', $tabData, 'questRepCol'];
+            $this->lvTabs[] = [QuestList::$brickFile, $tabData, 'questRepCol'];
         }
 
         // tab: achievements
@@ -287,7 +287,7 @@ class FactionPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_ANY));
 
-            $this->lvTabs[] = ['achievement', array(
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
                 'data'        => array_values($acvs->getListviewData()),
                 'id'          => 'criteria-of',
                 'name'        => '$LANG.tab_criteriaof',

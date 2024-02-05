@@ -90,7 +90,7 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($recipes->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-                $this->lvTabs[] = ['spell', array(
+                $this->lvTabs[] = [SpellList::$brickFile, array(
                     'data'        => array_values($recipes->getListviewData()),
                     'id'          => 'recipes',
                     'name'        => '$LANG.tab_recipes',
@@ -121,7 +121,7 @@ class SkillPage extends GenericPage
                 if ($_ = array_search($this->typeId, $filterRecipe))
                     $tabData['note'] = sprintf(Util::$filterResultString, "?items=9.".$_);
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
 
             // tab: crafted items [items]
@@ -148,7 +148,7 @@ class SkillPage extends GenericPage
                     if ($_ = array_search($this->typeId, $filterItem))
                         $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=cr=86;crs=".$_.";crv=0");
 
-                    $this->lvTabs[] = ['item', $tabData];
+                    $this->lvTabs[] = [ItemList::$brickFile, $tabData];
                 }
             }
 
@@ -173,7 +173,7 @@ class SkillPage extends GenericPage
                 if ($_ = array_search($this->typeId, $filterItem))
                     $tabData['note'] = sprintf(Util::$filterResultString, "?items&filter=99:168;crs=".$_.":2;crv=0:0");
 
-                $this->lvTabs[] = ['item', $tabData];
+                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
             }
 
             // tab: required by [itemset]
@@ -187,7 +187,7 @@ class SkillPage extends GenericPage
             {
                 $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
 
-                $this->lvTabs[] = ['itemset', array(
+                $this->lvTabs[] = [ItemsetList::$brickFile, array(
                     'data' => array_values($reqBy->getListviewData()),
                     'id'   => 'required-by-set',
                     'name' => '$LANG.tab_requiredby'
@@ -243,7 +243,7 @@ class SkillPage extends GenericPage
                     break;
             }
 
-            $this->lvTabs[] = ['spell', $tabData];
+            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
         }
 
         // tab: trainers [npcs]
@@ -272,7 +272,7 @@ class SkillPage extends GenericPage
                 {
                     $this->extendGlobalData($trainer->getJSGlobals());
 
-                    $this->lvTabs[] = ['creature', array(
+                    $this->lvTabs[] = [CreatureList::$brickFile, array(
                         'data' => array_values($trainer->getListviewData()),
                         'id'   => 'trainer',
                         'name' => '$LANG.tab_trainers',
@@ -287,17 +287,17 @@ class SkillPage extends GenericPage
             $sort = 0;
             switch ($this->typeId)
             {
-                case 182: $sort =  24; break;               // Herbalism
-                case 356: $sort = 101; break;               // Fishing
-                case 164: $sort = 121; break;               // Blacksmithing
-                case 171: $sort = 181; break;               // Alchemy
-                case 165: $sort = 182; break;               // Leatherworking
-                case 202: $sort = 201; break;               // Engineering
-                case 197: $sort = 264; break;               // Tailoring
-                case 185: $sort = 304; break;               // Cooking
-                case 129: $sort = 324; break;               // First Aid
-                case 773: $sort = 371; break;               // Inscription
-                case 755: $sort = 373; break;               // Jewelcrafting
+                case SKILL_HERBALISM:      $sort =  24; break;
+                case SKILL_FISHING:        $sort = 101; break;
+                case SKILL_BLACKSMITHING:  $sort = 121; break;
+                case SKILL_ALCHEMY:        $sort = 181; break;
+                case SKILL_LEATHERWORKING: $sort = 182; break;
+                case SKILL_ENGINEERING:    $sort = 201; break;
+                case SKILL_TAILORING:      $sort = 264; break;
+                case SKILL_COOKING:        $sort = 304; break;
+                case SKILL_FIRST_AID:      $sort = 324; break;
+                case SKILL_INSCRIPTION:    $sort = 371; break;
+                case SKILL_JEWELCRAFTING:  $sort = 373; break;
             }
 
             if ($sort)
@@ -306,7 +306,7 @@ class SkillPage extends GenericPage
                 if (!$quests->error)
                 {
                     $this->extendGlobalData($quests->getJSGlobals());
-                    $this->lvTabs[] = ['quest', ['data' => array_values($quests->getListviewData())]];
+                    $this->lvTabs[] = [QuestList::$brickFile, ['data' => array_values($quests->getListviewData())]];
                 }
             }
         }
@@ -321,7 +321,7 @@ class SkillPage extends GenericPage
         {
             $classes = new CharClassList(array(['id', $class]));
             if (!$classes->error)
-                $this->lvTabs[] = ['class', ['data' => array_values($classes->getListviewData())]];
+                $this->lvTabs[] = [CharClassList::$brickFile, ['data' => array_values($classes->getListviewData())]];
         }
 
         // tab: related races (apply races from [spells])
@@ -334,7 +334,7 @@ class SkillPage extends GenericPage
         {
             $races = new CharRaceList(array(['id', $race]));
             if (!$races->error)
-                $this->lvTabs[] = ['race', ['data' => array_values($races->getListviewData())]];
+                $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
         }
     }
 }

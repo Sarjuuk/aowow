@@ -113,7 +113,7 @@ class GuildsPage extends GenericPage
                 $tabData['_errors'] = 1;
         }
 
-        $this->lvTabs[] = ['profile', $tabData, 'membersCol'];
+        $this->lvTabs[] = [GuildList::$brickFile, $tabData, 'membersCol'];
     }
 
     protected function postCache()

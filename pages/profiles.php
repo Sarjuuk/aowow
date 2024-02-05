@@ -184,7 +184,7 @@ class ProfilesPage extends GenericPage
             $this->roster = 0;
 
 
-        $this->lvTabs[] = ['profile', $tabData];
+        $this->lvTabs[] = [ProfileList::$brickFile, $tabData];
     }
 
     protected function postCache()

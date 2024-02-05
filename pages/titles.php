@@ -49,7 +49,7 @@ class TitlesPage extends GenericPage
                 $tabData['hiddenCols'] = ['source'];
         }
 
-        $this->lvTabs[] = ['title', $tabData];
+        $this->lvTabs[] = [TitleList::$brickFile, $tabData];
     }
 
     protected function generateTitle()

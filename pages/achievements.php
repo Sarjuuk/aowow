@@ -115,7 +115,7 @@ class AchievementsPage extends GenericPage
                 $tabData['_errors'] = 1;
         }
 
-        $this->lvTabs[] = ['achievement', $tabData];
+        $this->lvTabs[] = [AchievementList::$brickFile, $tabData];
     }
 
     protected function postCache()

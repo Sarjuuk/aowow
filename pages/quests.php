@@ -86,7 +86,7 @@ class QuestsPage extends GenericPage
         if ($this->filterObj->error)
             $tabData['_errors'] = 1;
 
-        $this->lvTabs[] = ['quest', $tabData];
+        $this->lvTabs[] = [QuestList::$brickFile, $tabData];
     }
 
     protected function generateTitle()

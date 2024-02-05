@@ -9,7 +9,7 @@ class IconList extends BaseType
     use listviewHelper;
 
     public static   $type       = Type::ICON;
-    public static   $brickFile  = 'icon';
+    public static   $brickFile  = 'icongallery';
     public static   $dataTable  = '?_icons';
     public static   $contribute = CONTRIBUTE_CO;
 

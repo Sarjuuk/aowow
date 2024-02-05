@@ -54,7 +54,7 @@ class EventsPage extends GenericPage
 
         $data = array_values($events->getListviewData());
 
-        $this->lvTabs[] = ['event', ['data' => $data]];
+        $this->lvTabs[] = [WorldEventList::$brickFile, ['data' => $data]];
 
         if ($_ = array_values(array_filter($data, function($x) {return $x['category'] > 0;})))
         {

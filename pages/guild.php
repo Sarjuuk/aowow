@@ -124,7 +124,7 @@ class GuildPage extends GenericPage
         $member = new LocalProfileList(array(['p.guild', $this->subjectGUID], CFG_SQL_LIMIT_NONE));
         if (!$member->error)
         {
-            $this->lvTabs[] = ['profile', array(
+            $this->lvTabs[] = [ProfileList::$brickFile, array(
                 'data'        => array_values($member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_ARENA)),
                 'sort'        => [-15],
                 'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'achievementpoints', 'guildrank'],

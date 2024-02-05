@@ -121,7 +121,7 @@ class AreaTriggerPage extends GenericPage
             if (!$relQuest->error)
             {
                 $this->extendGlobalData($relQuest->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
-                $this->lvTabs[] = ['quest', ['data' => array_values($relQuest->getListviewData())]];
+                $this->lvTabs[] = [QuestList::$brickFile, ['data' => array_values($relQuest->getListviewData())]];
             }
         }
         else if ($_type == AT_TYPE_TELEPORT)
@@ -129,7 +129,7 @@ class AreaTriggerPage extends GenericPage
             $relZone = new ZoneList(array(['id', $this->subject->getField('teleportA')]));
             if (!$relZone->error)
             {
-                $this->lvTabs[] = ['zone', ['data' => array_values($relZone->getListviewData())]];
+                $this->lvTabs[] = [ZoneList::$brickFile, ['data' => array_values($relZone->getListviewData())]];
             }
         }
         else if ($_type == AT_TYPE_SCRIPT)
@@ -137,7 +137,7 @@ class AreaTriggerPage extends GenericPage
             $relTrigger = new AreaTriggerList(array(['id', $this->typeId, '!'], ['name', $this->subject->getField('name')]));
             if (!$relTrigger->error)
             {
-                $this->lvTabs[] = ['areatrigger', ['data' => array_values($relTrigger->getListviewData()), 'name' => Util::ucFirst(Lang::game('areatrigger'))], 'areatrigger'];
+                $this->lvTabs[] = [AreaTriggerList::$brickFile, ['data' => array_values($relTrigger->getListviewData()), 'name' => Util::ucFirst(Lang::game('areatrigger'))], 'areatrigger'];
             }
         }
     }
