@@ -21988,7 +21988,7 @@ var Links = new function() {
         }
 
         var data = {
-            'wowheadurl': g_host +'?' + type + '=' + opt.typeId,
+            'wowheadurl': g_host +'/?' + type + '=' + opt.typeId,
             'armoryurl': 'http://us.battle.net/wow/en/' + type + '/' + opt.typeId,
             'ingamelink': link,
             'markuptag': '[' + (extraTypes[opt.type] || type) + '=' + opt.typeId + ']'
