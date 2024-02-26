@@ -75,7 +75,8 @@ class SpellList extends BaseType
         SPELL_AURA_PERIODIC_DUMMY,          SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE,   SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE,       SPELL_AURA_CONTROL_VEHICLE,                     SPELL_AURA_LINKED
     );
     public const AURAS_MODEL_NPC          = array(
-        SPELL_AURA_TRANSFORM,               SPELL_AURA_MOUNTED
+        SPELL_AURA_TRANSFORM,               SPELL_AURA_MOUNTED,                             SPELL_AURA_CHANGE_MODEL_FOR_ALL_HUMANOIDS,      SPELL_AURA_X_RAY,
+        SPELL_AURA_MOD_FAKE_INEBRIATE
     );
     public const AURAS_PERIODIC_SCALING   = array(
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_LEECH
@@ -738,11 +739,16 @@ class SpellList extends BaseType
                     {
                         foreach ($indizes as $idx)
                         {
-                            $results[$srcId][$idx] = array(
+                            $res = array(
                                 'typeId'      => $nId,
                                 'displayId'   => $nModels->getRandomModelId(),
                                 'displayName' => $nModels->getField('name', true)
                             );
+
+                            if ($nModels->getField('humanoid'))
+                                $res['humanoid'] = 1;
+
+                            $results[$srcId][$idx] = $res;
                         }
                     }
                 }
