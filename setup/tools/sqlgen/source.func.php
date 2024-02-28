@@ -1120,7 +1120,7 @@ SqlGen::register(new class extends SetupScript
         CLI::write('   * #4  Quest', CLI::LOG_BLANK, true, true);
 
         $quests = DB::World()->select(
-           'SELECT   RewardTitle AS ARRAY_KEY, id, SUM(qty) AS qty, BIT_OR(side) AS side, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS "zone"
+           'SELECT   RewardTitle AS ARRAY_KEY, id AS id, SUM(qty) AS qty, BIT_OR(side) AS side, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS "zone"
             FROM     (SELECT RewardTitle, ID, 1 AS qty, IF(AllowableRaces & 0x2B2 AND !(AllowableRaces & 0x44D), 2, IF(AllowableRaces & 0x44D AND !(AllowableRaces & 0x2B2), 1, 3)) AS side, GREATEST(QuestSortID, 0) AS "zone" FROM quest_template WHERE RewardTitle > 0) q
             GROUP BY RewardTitle'
         );
