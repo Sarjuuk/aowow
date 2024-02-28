@@ -170,7 +170,6 @@ if (!CLI)
 
             if ($ok)
             {
-                chmod($name.$ext, Util::FILE_ACCESS);
                 CLI::write($done.' - image '.$name.$ext.' written', CLI::LOG_OK, true, true);
             }
             else
