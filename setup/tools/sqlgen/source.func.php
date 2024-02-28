@@ -92,10 +92,6 @@ SqlGen::register(new class extends SetupScript
         $this->itemSalvaging();                             # 22: Salvaged     #
         $this->itemSkinning();                              # 23: Skinned      #
 
-        // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawnd, quests granting items may be disabled)
-        DB::Aowow()->query('UPDATE ?_items SET cuFlags = cuFlags & ?d', ~CUSTOM_UNAVAILABLE);
-        DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.typeId = i.id AND s.type = ?d SET i.cuFlags = i.cuFlags | ?d WHERE s.typeId IS NULL', Type::ITEM, CUSTOM_UNAVAILABLE);
-
         /*********/
         /* Spell */
         /*********/
@@ -155,6 +151,10 @@ SqlGen::register(new class extends SetupScript
 
         CLI::write(' - Inserting... (done)');
 
+        // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawnd, quests granting items may be disabled)
+        DB::Aowow()->query('UPDATE ?_items SET cuFlags = cuFlags & ?d', ~CUSTOM_UNAVAILABLE);
+        DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.typeId = i.id AND s.type = ?d SET i.cuFlags = i.cuFlags | ?d WHERE s.typeId IS NULL', Type::ITEM, CUSTOM_UNAVAILABLE);
+
         return true;
     }
 
@@ -174,10 +174,10 @@ SqlGen::register(new class extends SetupScript
         if ($mType != $b[2] || $mTypeId != $b[3])
             $b[2] = $b[3] = null;
 
-        if ($mZoneId && !$b[4])
+        if ($mZoneId && $b[4] === null)
             $b[4] = $mZoneId;
         else if ($mZoneId && $b[4] && $mZoneId != $b[4])
-            $b[4] = -1;
+            $b[4] = 0;
 
         $b[5] = ($b[5] ?? 0) & $mMask;                      // only bossdrop for now .. remove flag if regular source is available
         $b[6][$srcId] = ($b[6][$srcId] ?? 0) | $srcBit;     // SIDE_X for quests, modeMask for drops, subSrc for pvp, else: 1
@@ -639,7 +639,7 @@ SqlGen::register(new class extends SetupScript
             $l['zone'] = $areaParent[$l['zone']] ?? $l['zone'];
             $zoneId    = $goSpawns[$l['entry']]  ?? 0;
             if ($l['zone'] != $zoneId)
-                $zoneId = -1;
+                $zoneId = 0;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {
