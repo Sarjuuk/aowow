@@ -457,6 +457,7 @@ class Timer
 abstract class Util
 {
     const FILE_ACCESS = 0755;
+    const DIR_ACCESS  = 0777;
 
     const GEM_SCORE_BASE_WOTLK = 16;                        // rare quality wotlk gem score
     const GEM_SCORE_BASE_BC    = 8;                         // rare quality bc gem score
@@ -1392,13 +1393,13 @@ abstract class Util
 
         if (is_dir($dir))
         {
-            if (!is_writable($dir) && !@chmod($dir, Util::FILE_ACCESS))
+            if (!is_writable($dir) && !@chmod($dir, Util::DIR_ACCESS))
                 trigger_error('cannot write into directory', E_USER_ERROR);
 
             return is_writable($dir);
         }
 
-        if (@mkdir($dir, Util::FILE_ACCESS, true))
+        if (@mkdir($dir, Util::DIR_ACCESS, true))
             return true;
 
         trigger_error('could not create directory', E_USER_ERROR);

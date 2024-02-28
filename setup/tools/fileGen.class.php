@@ -49,12 +49,13 @@ class FileGen
     public  static $defaultExecTime = 30;
 
     private static $reqDirs   = array(
-        'static/uploads/screenshots/normal',
-        'static/uploads/screenshots/pending',
-        'static/uploads/screenshots/resized',
-        'static/uploads/screenshots/temp',
-        'static/uploads/screenshots/thumb',
+        'static/uploads/screenshots/normal/',
+        'static/uploads/screenshots/pending/',
+        'static/uploads/screenshots/resized/',
+        'static/uploads/screenshots/temp/',
+        'static/uploads/screenshots/thumb/',
         'static/uploads/temp/',
+        'static/uploads/guide/images/',
         'static/download/searchplugins/',
         'static/wowsounds/'
     );
