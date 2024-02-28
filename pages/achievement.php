@@ -236,13 +236,17 @@ class AchievementPage extends GenericPage
             ['id', $this->typeId, '!']
         );
         $saList = new AchievementList($conditions);
-        $this->lvTabs[] = [AchievementList::$brickFile, array(
-            'data'        => array_values($saList->getListviewData()),
-            'id'          => 'see-also',
-            'name'        => '$LANG.tab_seealso',
-            'visibleCols' => ['category']
-        )];
-        $this->extendGlobalData($saList->getJSGlobals());
+        if (!$saList->error)
+        {
+            $this->extendGlobalData($saList->getJSGlobals());
+
+            $this->lvTabs[] = [AchievementList::$brickFile, array(
+                'data'        => array_values($saList->getListviewData()),
+                'id'          => 'see-also',
+                'name'        => '$LANG.tab_seealso',
+                'visibleCols' => ['category']
+            )];
+        }
 
         // tab: criteria of
         $refs = DB::Aowow()->SelectCol('SELECT refAchievementId FROM ?_achievementcriteria WHERE Type = ?d AND value1 = ?d',

@@ -37,7 +37,7 @@ class QuestPage extends GenericPage
             $this->notFound(Lang::game('quest'), Lang::quest('notFound'));
 
         // may contain htmlesque tags
-        $this->name = Util::htmlEscape($this->subject->getField('name', true));
+        $this->name = Lang::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
     }
 
     protected function generatePath()
@@ -57,7 +57,7 @@ class QuestPage extends GenericPage
     protected function generateTitle()
     {
         // page title already escaped
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('quest')));
+        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
     }
 
     protected function generateContent()
@@ -265,7 +265,7 @@ class QuestPage extends GenericPage
                     'side'    => $_side,
                     'typeStr' => Type::getFileString(Type::QUEST),
                     'typeId'  => $this->typeId,
-                    'name'    => $this->name,
+                    'name'    => Util::htmlEscape($this->subject->getField('name', true)),
                     '_next'   => $this->subject->getField('nextQuestIdChain')
                 )
             )
@@ -410,7 +410,7 @@ class QuestPage extends GenericPage
                 $this->objectiveList[] = array(
                     'typeStr'   => Type::getFileString(Type::ITEM),
                     'id'        => $itemId,
-                    'name'      => $olItemData->json[$itemId]['name'],
+                    'name'      => Lang::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
                     'qty'       => $qty > 1 ? $qty : 0,
                     'quality'   => 7 - $olItemData->json[$itemId]['quality'],
                     'extraText' => $provided ? '&nbsp;('.Lang::quest('provided').')' : ''
@@ -422,7 +422,7 @@ class QuestPage extends GenericPage
             {
                 $this->providedItem = array(
                     'id'        => $olItems[0][0],
-                    'name'      => $olItemData->json[$olItems[0][0]]['name'],
+                    'name'      => Lang::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
                     'qty'       => $olItems[0][1] > 1 ? $olItems[0][1] : 0,
                     'quality'   => 7 - $olItemData->json[$olItems[0][0]]['quality']
                 );
@@ -494,7 +494,7 @@ class QuestPage extends GenericPage
                 $this->objectiveList[] = array(
                     'typeStr'   => Type::getFileString(Type::OBJECT),
                     'id'        => $i,
-                    'name'      => $pair[1] ?: Util::localizedString($olGOData->getEntry($i), 'name'),
+                    'name'      => $pair[1] ?: Lang::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
                     'qty'       => $pair[0] > 1 ? $pair[0] : 0,
                     'extraText' => ''
                 );
@@ -932,7 +932,7 @@ class QuestPage extends GenericPage
             BUTTON_LINKS   => array(
                 'linkColor' => 'ffffff00',
                 'linkId'    => 'quest:'.$this->typeId.':'.$_level,
-                'linkName'  => $this->name,
+                'linkName'  => Util::htmlEscape($this->subject->getField('name', true)),
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
             )
@@ -959,7 +959,7 @@ class QuestPage extends GenericPage
         /**************/
 
         // tab: see also
-        $seeAlso = new QuestList(array(['name_loc'.User::$localeId, '%'.$this->name.'%'], ['id', $this->typeId, '!']));
+        $seeAlso = new QuestList(array(['name_loc'.User::$localeId, '%'.Util::htmlEscape($this->subject->getField('name', true)).'%'], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
@@ -1051,7 +1051,7 @@ class QuestPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
             $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
             if ($this->subject->isDaily())
                 $power->daily = 1;
@@ -1112,7 +1112,7 @@ class QuestPage extends GenericPage
                     $rewards['items'][] = array(
                         'typeStr'   => Type::getFileString(Type::ITEM),
                         'id'        => $id,
-                        'name'      => $rewItems->getField('name', true),
+                        'name'      => Lang::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
                         'quality'   => $rewItems->getField('quality'),
                         'qty'       => $ri[$id],
                         'globalStr' => Type::getJSGlobalString(Type::ITEM)

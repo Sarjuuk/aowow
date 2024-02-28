@@ -211,7 +211,7 @@ class QuestList extends BaseType
                 'id'        => $this->id,
                 'level'     => $this->curTpl['level'],
                 'reqlevel'  => $this->curTpl['minLevel'],
-                'name'      => $this->getField('name', true),
+                'name'      => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                 'side'      => Game::sideByRaceMask($this->curTpl['reqRaceMask']),
                 'wflags'    => 0x0,
                 'xp'        => $this->curTpl['rewardXP']
@@ -316,7 +316,7 @@ class QuestList extends BaseType
         if (!$this->curTpl)
             return null;
 
-        $title = Util::htmlEscape($this->getField('name', true));
+        $title = Lang::unescapeUISequences(Util::htmlEscape($this->getField('name', true)), Lang::FMT_HTML);
         $level = $this->curTpl['level'];
         if ($level < 0)
             $level = 0;
@@ -351,7 +351,7 @@ class QuestList extends BaseType
             if ($ot)
                 $name = $ot;
             else
-                $name = $rng > 0 ? CreatureList::getName($rng) : GameObjectList::getName(-$rng);
+                $name = $rng > 0 ? CreatureList::getName($rng) : Lang::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
 
             $xReq .= '<br /> - '.$name.($rngQty > 1 ? ' x '.$rngQty : null);
         }
@@ -364,7 +364,7 @@ class QuestList extends BaseType
             if (!$ri || $riQty < 1)
                 continue;
 
-            $xReq .= '<br /> - '.ItemList::getName($ri).($riQty > 1 ? ' x '.$riQty : null);
+            $xReq .= '<br /> - '.Lang::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML).($riQty > 1 ? ' x '.$riQty : null);
         }
 
         if ($et = $this->getField('end', true))

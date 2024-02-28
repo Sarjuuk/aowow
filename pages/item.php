@@ -74,7 +74,7 @@ class ItemPage extends genericPage
         if (!is_numeric($param))
             $this->typeId = $this->subject->id;
 
-        $this->name = $this->subject->getField('name', true);
+        $this->name = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
 
         if ($this->mode == CACHE_TYPE_PAGE)
         {
@@ -116,7 +116,7 @@ class ItemPage extends genericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('item')));
+        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('item')));
     }
 
     protected function generateContent()
@@ -365,7 +365,7 @@ class ItemPage extends genericPage
             BUTTON_LINKS   => array(
                 'linkColor' => 'ff'.Game::$rarityColorStings[$this->subject->getField('quality')],
                 'linkId'    => 'item:'.$this->typeId.':0:0:0:0:0:0:0:0',
-                'linkName'  => $this->name,
+                'linkName'  => Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW),
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
             )
@@ -1030,7 +1030,7 @@ class ItemPage extends genericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true, false, $this->enhancedTT);
+            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW);
             $power->quality                          = $this->subject->getField('quality');
             $power->icon                             = rawurlencode($this->subject->getField('iconString', true, true));
             $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip(false, 0, $this->enhancedTT);

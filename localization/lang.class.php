@@ -638,7 +638,7 @@ class Lang
             } , $var);
 
         // color                        |c<aarrggbb><word>|r
-        $var = preg_replace_callback('/\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/i', function ($m) use ($fmt)
+        $var = preg_replace_callback('/\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/is', function ($m) use ($fmt)
             {
                 [$_, $a, $rgb, $text] = $m;
 
@@ -656,7 +656,7 @@ class Lang
             }, $var);
 
         // icon                         |T<imgPath+File.blp>:0:0:0:-1|t
-        $var = preg_replace_callback('/\|T([\w]+\\\)*([^\.]+)\.[bB][lL][pP]:([^\|]+)\|t/', function ($m) use ($fmt)
+        $var = preg_replace_callback('/\|T([\w]+\\\)*([^\.:]+)(?:\.[bB][lL][pP])?:([^\|]+)\|t/', function ($m) use ($fmt)
             {
                 /* iconParam - size1, size2, xoffset, yoffset
                     size1 == 0; size2 omitted: Width = Height = TextHeight (always square!)
@@ -682,7 +682,7 @@ class Lang
             }, $var);
 
         // hyperlink                    |H<hyperlinkStruct>|h<name>|h
-        $var = preg_replace_callback('/\|H([^:]+):([^\|]+)\|h([^\|]+)\|h/', function ($m) use ($fmt)
+        $var = preg_replace_callback('/\|H([^:]+):([^\|]+)\|h([^\|]+)\|h/i', function ($m) use ($fmt)
             {
                 /*  type            Params
                     |Hchannel       channelName, channelname == CHANNEL ? channelNr : null
@@ -740,7 +740,7 @@ class Lang
             }, $var);
 
         // |1 - digit singular/plural  <number> |1<singular;<plural>;
-        $var = preg_replace_callback('/(\d+)\s*\|1([^;]+);([^;]+);/i', function ($m)
+        $var = preg_replace_callback('/(\d+)\s*\|1([^;]+);([^;]+);/is', function ($m)
             {
                 [$_, $num, $singular, $plural] = $m;
 
@@ -793,7 +793,7 @@ class Lang
             }, $var);
 
         // |4 - numeric switch          <number>           |4<singular>:<plural>[:<plural2>];
-        $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^:;]+)(?::([^;]+))?;/i', function ($m)
+        $var = preg_replace_callback('/([\d\.\,]+)([^\d]*)\|4([^:]*):([^:;]+)(?::([^;]+))?;/is', function ($m)
             {
                 [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 

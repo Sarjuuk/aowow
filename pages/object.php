@@ -36,7 +36,7 @@ class ObjectPage extends GenericPage
         if ($this->subject->error)
             $this->notFound(Lang::game('object'), Lang::gameObject('notFound'));
 
-        $this->name = $this->subject->getField('name', true);
+        $this->name = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
     }
 
     protected function generatePath()
@@ -46,7 +46,7 @@ class ObjectPage extends GenericPage
 
     protected function generateTitle()
     {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('object')));
+        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
     }
 
     protected function generateContent()
@@ -250,14 +250,14 @@ class ObjectPage extends GenericPage
         $sai = null;
         if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, $this->typeId, ['name' => $this->name]);
+            $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, $this->typeId, ['name' => $this->subject->getField('name', true)]);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
                 $guids = DB::World()->selectCol('SELECT guid FROM gameobject WHERE id = ?d LIMIT 1', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
-                    $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, -$_, ['name' => $this->name, 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, -$_, ['name' => $this->subject->getField('name', true), 'title' => ' [small](for GUID: '.$_.')[/small]']);
                     if ($sai->prepare())
                         break;
                 }
@@ -499,7 +499,7 @@ class ObjectPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
+            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
             $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
             $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }

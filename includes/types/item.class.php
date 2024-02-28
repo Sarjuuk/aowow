@@ -301,7 +301,7 @@ class ItemList extends BaseType
                 $data[$this->id][$k] = $v;
 
             // json vs listview quirk
-            $data[$this->id]['name'] = $data[$this->id]['quality'].$this->getField('name', true);
+            $data[$this->id]['name'] = $data[$this->id]['quality'].Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW);
             unset($data[$this->id]['quality']);
 
             if (!empty($this->relEnchant) && $this->curTpl['randomEnchant'])
@@ -465,7 +465,7 @@ class ItemList extends BaseType
             if ($addMask & GLOBALINFO_SELF)
             {
                 $data[Type::ITEM][$id] = array(
-                    'name'    => $this->getField('name', true),
+                    'name'    => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                     'quality' => $this->curTpl['quality'],
                     'icon'    => $this->curTpl['iconString']
                 );
@@ -509,7 +509,7 @@ class ItemList extends BaseType
         if ($this->error)
             return;
 
-        $_name         = $this->getField('name', true);
+        $_name         = Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML);
         $_reqLvl       = $this->curTpl['requiredLevel'];
         $_quality      = $this->curTpl['quality'];
         $_flags        = $this->curTpl['flags'];
@@ -1155,7 +1155,7 @@ class ItemList extends BaseType
 
         // funny, yellow text at the bottom, omit if we have a recipe
         if ($this->curTpl['description_loc0'] && !$this->canTeachSpell())
-            $xMisc[] = '<span class="q">"'.$this->getField('description', true).'"</span>';
+            $xMisc[] = '<span class="q">"'.Util::parseHtmlText($this->getField('description', true), false).'"</span>';
 
         // readable
         if ($this->curTpl['pageTextId'])

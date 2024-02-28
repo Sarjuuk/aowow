@@ -73,7 +73,7 @@ class GameObjectList extends BaseType
         {
             $data[$this->id] = array(
                 'id'       => $this->id,
-                'name'     => $this->getField('name', true),
+                'name'     => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
                 'type'     => $this->curTpl['typeCat'],
                 'location' => $this->getSpawns(SPAWNINFO_ZONES)
             );
@@ -95,7 +95,7 @@ class GameObjectList extends BaseType
             return array();
 
         $x  = '<table>';
-        $x .= '<tr><td><b class="q">'.$this->getField('name', true).'</b></td></tr>';
+        $x .= '<tr><td><b class="q">'.Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_HTML).'</b></td></tr>';
         if ($this->curTpl['typeCat'])
             if ($_ = Lang::gameObject('type', $this->curTpl['typeCat']))
                 $x .= '<tr><td>'.$_.'</td></tr>';
@@ -115,7 +115,7 @@ class GameObjectList extends BaseType
         $data = [];
 
         foreach ($this->iterate() as $__)
-            $data[Type::OBJECT][$this->id] = ['name' => $this->getField('name', true)];
+            $data[Type::OBJECT][$this->id] = ['name' => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW)];
 
         return $data;
     }
