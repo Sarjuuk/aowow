@@ -1380,8 +1380,6 @@ abstract class Util
         else
             trigger_error('could not create file', E_USER_ERROR);
 
-        if ($success)
-            @chmod($file, Util::FILE_ACCESS);
 
         return $success;
     }
