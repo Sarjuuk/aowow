@@ -456,7 +456,7 @@ class Timer
 
 abstract class Util
 {
-    const FILE_ACCESS = 0777;
+    const FILE_ACCESS = 0755;
 
     const GEM_SCORE_BASE_WOTLK = 16;                        // rare quality wotlk gem score
     const GEM_SCORE_BASE_BC    = 8;                         // rare quality bc gem score

@@ -99,6 +99,7 @@ function setup() : void
         ['FileGen::generate', 'gems',                     null, null, null],
         ['FileGen::generate', 'profiler',                 null, null, null],
         ['FileGen::generate', 'weightPresets',            null, null, null],
+        ['FileGen::generate', 'markup',                   null, null, null],
         // apply sql-updates from repository
         ['update',            &$upd,                      null, null, null],
         ['sync',              &$upd,                      null, null, null],

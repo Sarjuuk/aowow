@@ -116,7 +116,7 @@ function dbconfig() : void
                         {
                             if ($db != 'characters')
                                 $buff .= '$AoWoWconf[\''.$db.'\'] = '.var_export($AoWoWconf[$db], true).";\n\n";
-                            else
+                            else if (isset($AoWoWconf[$db]))
                                 foreach ($AoWoWconf[$db] as $idx => $charInfo)
                                     $buff .= '$AoWoWconf[\''.$db.'\'][\''.$idx.'\'] = '.var_export($AoWoWconf[$db][$idx], true).";\n\n";
                         }
