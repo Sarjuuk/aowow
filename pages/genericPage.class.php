@@ -579,7 +579,7 @@ class GenericPage
     }
 
     // get announcements and notes for user
-    private function addAnnouncements() : void
+    private function addAnnouncements(bool $pagespecific = true) : void
     {
         if (!isset($this->announcements))
             $this->announcements = [];
@@ -603,7 +603,7 @@ class GenericPage
         // fetch announcements
         if ($this->pageTemplate['pageName'])
         {
-            $ann = DB::Aowow()->Select('SELECT ABS(id) AS ARRAY_KEY, a.* FROM ?_announcements a WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $this->pageTemplate['pageName'], User::$groups);
+            $ann = DB::Aowow()->Select('SELECT ABS(id) AS ARRAY_KEY, a.* FROM ?_announcements a WHERE status = 1 AND (page = ? OR page = "*") AND (groupMask = 0 OR groupMask & ?d)', $pagespecific ? $this->pageTemplate['pageName'] : '', User::$groups);
             foreach ($ann as $k => $v)
             {
                 if ($t = Util::localizedString($v, 'text'))
@@ -744,7 +744,7 @@ class GenericPage
 
             if ($override)
             {
-                $this->addAnnouncements();
+                $this->addAnnouncements(false);
 
                 include('template/pages/'.$override.'.tpl.php');
                 die();

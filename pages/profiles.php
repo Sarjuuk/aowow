@@ -30,6 +30,8 @@ class ProfilesPage extends GenericPage
     {
         $this->getSubjectFromUrl($pageParam);
 
+        parent::__construct($pageCall, $pageParam);
+
         if (!CFG_PROFILER_ENABLE)
             $this->error();
 
@@ -47,8 +49,6 @@ class ProfilesPage extends GenericPage
         }
 
         $this->filterObj = new ProfileListFilter(false, ['realms' => $realms]);
-
-        parent::__construct($pageCall, $pageParam);
 
         $this->name   = Util::ucFirst(Lang::game('profiles'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
