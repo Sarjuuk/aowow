@@ -178,32 +178,27 @@ class AchievementPage extends GenericPage
         // create rewards
         if ($foo = $this->subject->getField('rewards'))
         {
-            array_walk($foo, function(&$item) {
-                $item = $item[0] != Type::ITEM ? null : $item[1];
-            });
-
-            $bar = new ItemList(array(['i.id', $foo]));
-            foreach ($bar->iterate() as $id => $__)
+            if ($itemRewards = array_filter($foo, function($x) { return $x[0] == Type::ITEM; }))
             {
-                $this->rewards['item'][] = array(
-                    'name'      => $bar->getField('name', true),
-                    'quality'   => $bar->getField('quality'),
-                    'typeStr'   => Type::getFileString(Type::ITEM),
-                    'id'        => $id,
-                    'globalStr' => Type::getJSGlobalString(Type::ITEM)
-                );
+                $bar = new ItemList(array(['i.id', array_column($itemRewards, 1)]));
+                foreach ($bar->iterate() as $id => $__)
+                {
+                    $this->rewards['item'][] = array(
+                        'name'      => $bar->getField('name', true),
+                        'quality'   => $bar->getField('quality'),
+                        'typeStr'   => Type::getFileString(Type::ITEM),
+                        'id'        => $id,
+                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
+                    );
+                }
             }
-        }
 
-        if ($foo = $this->subject->getField('rewards'))
-        {
-            array_walk($foo, function(&$item) {
-                $item = $item[0] != Type::TITLE ? null : $item[1];
-            });
-
-            $bar = new TitleList(array(['id', $foo]));
-            foreach ($bar->iterate() as $__)
-                $this->rewards['title'][] = sprintf(Lang::achievement('titleReward'), $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
+            if ($titleRewards = array_filter($foo, function($x) { return $x[0] == Type::TITLE; }))
+            {
+                $bar = new TitleList(array(['id', array_column($titleRewards, 1)]));
+                foreach ($bar->iterate() as $__)
+                    $this->rewards['title'][] = sprintf(Lang::achievement('titleReward'), $bar->id, trim(str_replace('%s', '', $bar->getField('male', true))));
+            }
         }
 
         $this->rewards['text'] = $this->subject->getField('reward', true);
