@@ -115,7 +115,8 @@ SqlGen::register(new class extends SetupScript
 
         foreach ($baseData as &$bd)
         {
-            if (in_array($bd['mapBak'], [0, 1, 530, 571]))
+            // usually parent = -1 means no parent but some maps have this touple set to 0
+            if (!$bd['parentMapId'] && !$bd['parentX'] && !$bd['parentY'])
                 continue;
 
             if ($gPos = Game::worldPosToZonePos($bd['parentMapId'], $bd['parentY'], $bd['parentX']))
@@ -124,13 +125,10 @@ SqlGen::register(new class extends SetupScript
                 $bd['parentMapId'] = $pos['areaId'] ?? $gPos[0]['areaId'];
                 $bd['parentX']     = $pos['posX']   ?? $gPos[0]['posX'];
                 $bd['parentY']     = $pos['posY']   ?? $gPos[0]['posY'];
+                continue;
             }
-            else
-            {
-                $bd['parentMapId'] = 0;
-                $bd['parentX']     = 0;
-                $bd['parentY']     = 0;
-            }
+
+            $bd['parentMapId'] = 0;
         }
 
         DB::Aowow()->query('REPLACE INTO ?_zones VALUES (?a)', $baseData);

@@ -153,10 +153,12 @@ class EmotePage extends GenericPage
             ['ac.value1', $this->typeId],
         );
         $acv = new AchievementList($condition);
+        if (!$acv->error)
+        {
+            $this->lvTabs[] = [AchievementList::$brickFile, ['data' => array_values($acv->getListviewData())]];
 
-        $this->lvTabs[] = [AchievementList::$brickFile, ['data' => array_values($acv->getListviewData())]];
-
-        $this->extendGlobalData($acv->getJsGlobals());
+            $this->extendGlobalData($acv->getJsGlobals());
+        }
 
         // tab: sound
         if ($em = DB::Aowow()->select('SELECT soundId AS ARRAY_KEY, BIT_OR(1 << (raceId - 1)) AS raceMask, BIT_OR(1 << (gender - 1)) AS gender FROM ?_emotes_sounds WHERE -emoteId = ?d GROUP BY soundId', $this->typeId > 0 ? $this->subject->getField('parentEmote') : $this->typeId))
