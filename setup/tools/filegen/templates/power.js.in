@@ -356,6 +356,9 @@ if (typeof $WowheadPower == "undefined") {
                     // domain = url[i0];
                     domain = url[i0].split(".")[0];
                 }
+                else if (typeof window.Locale == 'object') {// aowow - Locale is known, just out of scope...?
+                    domain = window.Locale.current.domain;
+                }
 
                 if (REDIRECTS[domain]) {
                     domain = REDIRECTS[domain];
@@ -878,4 +881,3 @@ if (typeof $WowheadPower == "undefined") {
         init();
     }
 };
-
