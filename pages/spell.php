@@ -1255,11 +1255,11 @@ class SpellPage extends GenericPage
         $pctStack = [];
         for ($i = 1; $i <= $maxStack; $i++)
         {
-            $pctStack[$i] = (($baseChance ** $i) * 100) / $baseChance ;
+            $pctStack[$i] = (($baseChance ** $i) * 100) / $baseChance;
 
             // remove chance from previous stacks
-            for ($j = 1; $j < $i; $j++)
-                $pctStack[$j] -= ($pctStack[$i] / ($i - 1));
+            if ($i > 1)
+                $pctStack[$i-1] -= $pctStack[$i];
         }
 
         // cleanup tiny fractions
