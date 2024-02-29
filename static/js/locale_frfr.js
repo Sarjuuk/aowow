@@ -3178,6 +3178,7 @@ var LANG = {
     tab_weaponskills:        "Compétences d'armes",
     tab_world:               "Monde",
     tab_zones:               "Zones",
+    tab_bonusloot:           "Butin bonus",                 // aowow - custom from BONUS_LOOT_LABEL
 
     numberofupvotesreceived_tip: "Nombre de votes positifs reçus",
     deletethisreply_stc:         "Effacer cette réponse",

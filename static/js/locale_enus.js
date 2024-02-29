@@ -3225,6 +3225,7 @@ var LANG = {
     tab_weaponskills:        "Weapon Skills",
     tab_world:               "World",
     tab_zones:               "Zones",
+    tab_bonusloot:           "Bonus Loot",                  // aowow - custom from BONUS_LOOT_LABEL
 
     numberofupvotesreceived_tip: "Number of upvotes received",
     deletethisreply_stc:         "Delete this reply",

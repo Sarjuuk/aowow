@@ -682,6 +682,7 @@ class SpellPage extends GenericPage
             $lv = $spellLoot->getResult();
             $extraCols   = $spellLoot->extraCols;
             $extraCols[] = '$Listview.extraCols.percent';
+            $lvName      = '$LANG.tab_contains';
 
             if ($extraItem && $this->subject->canCreateItem())
             {
@@ -691,8 +692,10 @@ class SpellPage extends GenericPage
                 {
                     if (($bar = $this->subject->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
                     {
+                        $lvName = '$LANG.tab_bonusloot';
                         $lv[$bar] = $foo[$bar];
-                        $lv[$bar]['percent'] = $extraItem['additionalCreateChance'];
+                        $lv[$bar]['percent']  = $extraItem['additionalCreateChance'];
+                        $lv[$bar]['pctstack'] = $this->buildPctStack($extraItem['additionalCreateChance'] / 100, $extraItem['additionalMaxNum']);
                         $lv[$bar]['condition'][0][$this->typeId][] = [[CND_SPELL, $extraItem['requiredSpecialization']]];
                         $this->extendGlobalIds(Type::SPELL, $extraItem['requiredSpecialization']);
                         $extraCols[] = '$Listview.extraCols.condition';
@@ -706,7 +709,7 @@ class SpellPage extends GenericPage
 
             $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data'       => array_values($lv),
-                'name'       => '$LANG.tab_contains',
+                'name'       => $lvName,
                 'id'         => 'contains',
                 'hiddenCols' => ['side', 'slot', 'source', 'reqlevel'],
                 'extraCols'  => array_unique($extraCols)
@@ -1242,6 +1245,27 @@ class SpellPage extends GenericPage
         }
 
         return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+    }
+
+    private function buildPctStack(float $baseChance, int $maxStack) : string
+    {
+        // note: pctStack does not contain absolute values but chances relative to the overall drop chance
+        // e.g.: dropChance is 17% then [1 => 50, 2 => 25, 3 => 25] displays > Stack of 1: 8%; Stack of 2: 4%; Stack of 3: 4%
+        $maxStack = $maxStack ?: 1;
+        $pctStack = [];
+        for ($i = 1; $i <= $maxStack; $i++)
+        {
+            $pctStack[$i] = (($baseChance ** $i) * 100) / $baseChance ;
+
+            // remove chance from previous stacks
+            for ($j = 1; $j < $i; $j++)
+                $pctStack[$j] -= ($pctStack[$i] / ($i - 1));
+        }
+
+        // cleanup tiny fractions
+        $pctStack = array_filter($pctStack, function($x) use ($baseChance) { return $x * $baseChance >= 0.01; });
+
+        return json_encode($pctStack, JSON_NUMERIC_CHECK);
     }
 
     private function appendReagentItem(&$reagentResult, $_iId, $_qty, $_mult, $_level, $_path, $alreadyUsed)

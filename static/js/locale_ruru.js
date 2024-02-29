@@ -3177,6 +3177,7 @@ var LANG = {
     tab_weaponskills:        "Оружейные навыки",
     tab_world:               "Игровой мир",
     tab_zones:               "Местности",
+    tab_bonusloot:           "Доп. добыча",                 // aowow - custom from BONUS_LOOT_LABEL
 
     numberofupvotesreceived_tip: "Голосов получено",
     deletethisreply_stc:         "Удалить этот ответ",

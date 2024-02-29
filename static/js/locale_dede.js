@@ -3176,6 +3176,7 @@ var LANG = {
     tab_weaponskills:        "Waffenfertigkeit",
     tab_world:               "Welt",
     tab_zones:               "Gebiete",
+    tab_bonusloot:           "Bonusbeute",                  // aowow - custom from BONUS_LOOT_LABEL
 
     numberofupvotesreceived_tip: "Anzahl von positiven Bewertungen erhalten",
     deletethisreply_stc:         "Antwort löschen",
