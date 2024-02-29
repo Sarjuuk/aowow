@@ -3224,6 +3224,7 @@ var LANG = {
     tab_weaponskills:         "武器技能",
     tab_world:                "世界",
     tab_zones:                "地区",
+    tab_bonusloot:            "奖励战利品",                      // aowow - custom from BONUS_LOOT_LABEL
 
     numberofupvotesreceived_tip: "收到顶票数量",
     deletethisreply_stc:         "删除本评论",
