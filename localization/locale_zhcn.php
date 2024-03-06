@@ -1629,7 +1629,7 @@ $lang = array(
             "书典",                          "未锁上的物品"
         ),
         'stealthType'   => ["一般", "陷阱"],
-        'invisibilityType' => [null, "一般", null, "陷阱", null, null, "醉酒", null, null, null, null, null],
+        'invisibilityType' => ["一般", "UNK-1", "UNK-2", "陷阱", "UNK-4", "UNK-5", "醉酒", "UNK-7", "UNK-8", "UNK-9", "UNK-10", "UNK-11"],
         'attributes'    => array(                           // index defined by filters
             69 => "所有法术效果都是有害的",
             57 => "无法取消光环",

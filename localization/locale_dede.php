@@ -1630,7 +1630,7 @@ $lang = array(
             "Inschriftenkunde",                     "Vom Fahrzeug öffnen"
         ),
         'stealthType'   => ["Allgemein", "Falle"],
-        'invisibilityType' => [null, "Allgemein", null, "Falle", null, null, "Trunkenheit", null, null, null, null, null],
+        'invisibilityType' => ["Allgemein", "UNK-1", "UNK-2", "Falle", "UNK-4", "UNK-5", "Trunkenheit", "UNK-7", "UNK-8", "UNK-9", "UNK-10", "UNK-11"],
         'attributes'    => array(                           // index defined by filters
             69 => "Alle Zaubereffekte sind schädlich",
             57 => "Aura kann nicht entfernt werden",
