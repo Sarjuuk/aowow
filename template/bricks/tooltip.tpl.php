@@ -9,7 +9,7 @@ $hasBuff = !empty($this->jsGlobals[Type::SPELL][2][$this->typeId]['buff']); // n
 
 if ($hasBuff):
 ?>
-    <h3><?php echo Lang::spell('_aura'); ?></h3>
+    <h3><?=Lang::spell('_aura'); ?></h3>
     <div id="btt<?=$this->typeId; ?>" class="wowhead-tooltip"></div>
 <?php
 endif;
@@ -23,7 +23,7 @@ endif;
 ?>
 
 <script type="text/javascript">//<![CDATA[
-    $WH.ge('ic<?=$this->typeId; ?>').appendChild(Icon.create('<?php echo $this->headIcons[0]; ?>', 2, null, 0, <?php echo $this->headIcons[1]; ?>));
+    $WH.ge('ic<?=$this->typeId; ?>').appendChild(Icon.create('<?=$this->headIcons[0]; ?>', 2, null, 0, <?=$this->headIcons[1]; ?>));
     var
         tt  = $WH.ge('tt<?=$this->typeId; ?>'),
 <?php if ($hasBuff): ?>

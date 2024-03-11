@@ -10,6 +10,9 @@ class ObjectPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $pageText      = [];
+    protected $relBoss       = null;
+
     protected $type          = Type::OBJECT;
     protected $typeId        = 0;
     protected $tpl           = 'object';
@@ -213,7 +216,7 @@ class ObjectPage extends GenericPage
         /****************/
 
         // pageText
-        if ($this->pageText = Game::getPageText($next = $this->subject->getField('pageTextId')))
+        if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']

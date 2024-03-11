@@ -13,6 +13,7 @@ class ZonePage extends GenericPage
     protected $path      = [0, 6];
     protected $tabId     = 0;
     protected $type      = Type::ZONE;
+    protected $typeId    = 0;
     protected $tpl       = 'detail-page-generic';
     protected $scripts   = [[SC_JS_FILE, 'js/ShowOnMap.js']];
 

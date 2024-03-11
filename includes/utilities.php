@@ -1033,7 +1033,7 @@ abstract class Util
         return $success;
     }
 
-    public static function createHash($length = 40)         // just some random numbers for unsafe identifictaion purpose
+    public static function createHash($length = 40)         // just some random numbers for unsafe identification purpose
     {
         static $seed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $hash = '';
@@ -2010,21 +2010,21 @@ class Report
     {
         if ($mode < 0 || $reason <= 0 || !$subject)
         {
-            trigger_error('AjaxContactus::handleContactUs - malformed contact request received', E_USER_ERROR);
+            trigger_error('Report - malformed contact request received', E_USER_ERROR);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!isset($this->context[$mode][$reason]))
         {
-            trigger_error('AjaxContactus::handleContactUs - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_ERROR);
+            trigger_error('Report - report has invalid context (mode:'.$mode.' / reason:'.$reason.')', E_USER_ERROR);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }
 
         if (!User::$id && !User::$ip)
         {
-            trigger_error('AjaxContactus::handleContactUs - could not determine IP for anonymous user', E_USER_ERROR);
+            trigger_error('Report - could not determine IP for anonymous user', E_USER_ERROR);
             $this->errorCode = self::ERR_MISCELLANEOUS;
             return;
         }

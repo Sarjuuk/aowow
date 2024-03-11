@@ -11,6 +11,10 @@ class ScreenshotPage extends GenericPage
     const     MAX_W        = 488;
     const     MAX_H        = 325;
 
+    protected $infobox     = [];
+    protected $cropper     = [];
+    protected $extraHTML   = null;
+
     protected $tpl         = 'screenshot';
     protected $scripts     = [[SC_JS_FILE, 'js/Cropper.js'], [SC_CSS_FILE, 'css/Cropper.css']];
     protected $reqAuth     = true;
@@ -20,6 +24,7 @@ class ScreenshotPage extends GenericPage
     private   $pendingPath = 'static/uploads/screenshots/pending/';
     private   $destination = null;
     private   $minSize     = CFG_SCREENSHOT_MIN_SIZE;
+    private   $command     = '';
 
     protected $validCats   = ['add', 'crop', 'complete', 'thankyou'];
     protected $destType    = 0;
@@ -243,7 +248,7 @@ class ScreenshotPage extends GenericPage
 
         // write to db
         $newId = DB::Aowow()->query(
-            'INSERT INTO ?_screenshots (type, typeId, userIdOwner, date, width, height, caption) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?)',
+            'INSERT INTO ?_screenshots (`type`, `typeId`, `userIdOwner`, `date`, `width`, `height`, `caption`, `status`) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?, 0)',
             $this->destType, $this->destTypeId,
             User::$id,
             $w, $h,

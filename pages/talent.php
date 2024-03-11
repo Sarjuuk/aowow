@@ -18,6 +18,7 @@ class TalentPage extends GenericPage
         [SC_CSS_FILE, 'css/talent.css']
     );
 
+    protected $tcType        = 'tc';                        // tc: TalentCalculator; pc: PetCalculator
     private   $isPetCalc     = false;
 
     public function __construct($pageCall, $__)

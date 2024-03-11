@@ -10,6 +10,11 @@ class ItemPage extends genericPage
 {
     use TrDetailPage;
 
+    protected $pageText      = [];
+    protected $tooltip       = null;
+    protected $unavailable   = false;
+    protected $subItems      = [];
+
     protected $type          = Type::ITEM;
     protected $typeId        = 0;
     protected $tpl           = 'item';
@@ -372,7 +377,7 @@ class ItemPage extends genericPage
         );
 
         // availablility
-        $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
+        $this->unavailable = !!($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE);
 
         // subItems
         $this->subject->initSubItems();

@@ -122,6 +122,7 @@ class RemoteArenaTeamList extends ArenaTeamList
                 );
 
     private     $members   = [];
+    private     $rankOrder = [];
 
     public function __construct($conditions = [], $miscData = null)
     {

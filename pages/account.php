@@ -7,6 +7,13 @@ if (!defined('AOWOW_REVISION'))
 // exclude & weightscales are handled as Ajax
 class AccountPage extends GenericPage
 {
+    protected $text      = '';
+    protected $head      = '';
+    protected $token     = '';
+    protected $infobox   = [];
+    protected $resetPass = false;
+    protected $forceTabs = false;
+
     protected $tpl       = 'acc-dashboard';
     protected $scripts   = array(
         [SC_JS_FILE,  'js/user.js'],

@@ -10,14 +10,18 @@ class GuildPage extends GenericPage
 {
     use TrProfiler;
 
-    protected $lvTabs   = [];
+    protected $lvTabs     = [];
 
-    protected $type     = Type::GUILD;
+    protected $type       = Type::GUILD;
 
-    protected $tabId    = 1;
-    protected $path     = [1, 5, 2];
-    protected $tpl      = 'roster';
-    protected $scripts  = array(
+    protected $subject    = null;
+    protected $redButtons = [];
+    protected $extraHTML  = null;
+
+    protected $tabId      = 1;
+    protected $path       = [1, 5, 2];
+    protected $tpl        = 'roster';
+    protected $scripts    = array(
         [SC_JS_FILE,  'js/profile_all.js'],
         [SC_JS_FILE,  'js/profile.js'],
         [SC_CSS_FILE, 'css/Profiler.css']
@@ -65,7 +69,6 @@ class GuildPage extends GenericPage
                 if ($this->subject->error)
                     $this->notFound();
 
-                $this->profile = $params;
                 $this->name = sprintf(Lang::profiler('guildRoster'), $this->subject->getField('name'));
             }
             // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)

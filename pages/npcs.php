@@ -10,6 +10,8 @@ class NpcsPage extends GenericPage
 {
     use TrListPage;
 
+    protected $petFamPanel   = false;
+
     protected $type          = Type::NPC;
     protected $tpl           = 'npcs';
     protected $path          = [0, 4];
@@ -45,8 +47,6 @@ class NpcsPage extends GenericPage
             $conditions[] = ['type', $this->category[0]];
             $this->petFamPanel = $this->category[0] == 1;
         }
-        else
-            $this->petFamPanel = false;
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;

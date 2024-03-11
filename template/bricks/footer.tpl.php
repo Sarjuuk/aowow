@@ -28,7 +28,7 @@ endif;
 
 <noscript>
     <div id="noscript-bg"></div>
-    <div id="noscript-text"><?php echo Lang::main('noJScript'); ?></div>
+    <div id="noscript-text"><?=Lang::main('noJScript'); ?></div>
 </noscript>
 
 <script type="text/javascript">DomContentLoaded.now()</script>

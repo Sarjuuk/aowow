@@ -6,6 +6,14 @@ if (!defined('AOWOW_REVISION'))
 
 class AdminPage extends GenericPage
 {
+    protected $getAll    = null;
+    protected $ssPages   = [];
+    protected $ssData    = [];
+    protected $ssNFound  = int;
+    protected $lvTabs    = [];
+    protected $extraText = '';
+    protected $extraHTML = '';
+
     protected $tpl       = null;                            // depends on the subject
     protected $reqUGroup = U_GROUP_NONE;                    // actual group dependant on the subPage
     protected $reqAuth   = true;

@@ -11,9 +11,9 @@
             <div class="pad3"></div>
 <?php if (!empty($this->text)): ?>
             <div class="inputbox">
-                <h1><?php echo $this->head; ?></h1>
+                <h1><?=$this->head; ?></h1>
                 <div id="inputbox-error"></div>
-                <div style="text-align: center; font-size: 110%"><?php echo $this->text; ?></div>
+                <div style="text-align: center; font-size: 110%"><?=$this->text; ?></div>
             </div>
 <?php elseif ($this->resetPass): ?>
             <script type="text/javascript">
@@ -60,29 +60,29 @@
                 }
             </script>
 
-            <form action="?account=signup&amp;next=<?php echo $this->next . '&amp;token=' . $this->token; ?>" method="post" onsubmit="return inputBoxValidate(this)">
+            <form action="?account=signup&amp;next=<?=$this->next . '&amp;token=' . $this->token; ?>" method="post" onsubmit="return inputBoxValidate(this)">
                 <div class="inputbox" style="position: relative">
-                    <h1><?php echo $this->head; ?></h1>
-                    <div id="inputbox-error"><?php echo $this->error; ?></div>
+                    <h1><?=$this->head; ?></h1>
+                    <div id="inputbox-error"><?=$this->error; ?></div>
 
                     <table align="center">
                         <tr>
-                            <td align="right"><?php echo Lang::account('email').Lang::main('colon'); ?></td>
+                            <td align="right"><?=Lang::account('email').Lang::main('colon'); ?></td>
                             <td><input type="text" name="email" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::account('newPass').Lang::main('colon'); ?></td>
+                            <td align="right"><?=Lang::account('newPass').Lang::main('colon'); ?></td>
                             <td><input type="password" name="password" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::account('passConfirm').Lang::main('colon'); ?></td>
+                            <td align="right"><?=Lang::account('passConfirm').Lang::main('colon'); ?></td>
                             <td><input type="password" name="c_password" style="width: 10em" /></td>
                         </tr>
                         <tr>
                             <td align="right" valign="top"></td>
-                            <td><input type="submit" name="signup" value="<?php echo Lang::account('continue'); ?>" /></td>
+                            <td><input type="submit" name="signup" value="<?=Lang::account('continue'); ?>" /></td>
                         </tr>
-                        <input type="hidden" name="token" value="<?php echo $this->token; ?>" />
+                        <input type="hidden" name="token" value="<?=$this->token; ?>" />
                     </table>
 
                 </div>
@@ -111,16 +111,16 @@
                 //]]>
             </script>
 
-            <form action="?account=<?php echo $this->category[0]; ?>" method="post" onsubmit="return inputBoxValidate(this)">
+            <form action="?account=<?=$this->category[0]; ?>" method="post" onsubmit="return inputBoxValidate(this)">
                 <div class="inputbox">
-                    <h1><?php echo $this->head; ?></h1>
-                    <div id="inputbox-error"><?php echo $this->error; ?></div>
+                    <h1><?=$this->head; ?></h1>
+                    <div id="inputbox-error"><?=$this->error; ?></div>
 
                     <div style="text-align: center">
-                        <?php echo Lang::account('email').Lang::main('colon'); ?><input type="text" name="email" value="" id="email-generic" style="width: 12em" />
+                        <?=Lang::account('email').Lang::main('colon'); ?><input type="text" name="email" value="" id="email-generic" style="width: 12em" />
                         <div class="pad2"></div>
 
-                        <input type="submit" value="<?php echo Lang::account('continue'); ?>" />
+                        <input type="submit" value="<?=Lang::account('continue'); ?>" />
                     </div>
 
                 </div>

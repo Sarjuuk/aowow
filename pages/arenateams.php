@@ -10,6 +10,12 @@ class ArenaTeamsPage extends GenericPage
 {
     use TrProfiler;
 
+    private $filterObj  = null;
+
+    protected $subCat   = '';
+    protected $filter   = [];
+    protected $lvTabs   = [];
+
     protected $type     = Type::ARENA_TEAM;
 
     protected $tabId    = 1;

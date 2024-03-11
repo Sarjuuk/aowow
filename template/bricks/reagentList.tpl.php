@@ -1,4 +1,4 @@
-<h3><?php echo Lang::spell('reagents'); ?></h3>
+<h3><?=Lang::spell('reagents'); ?></h3>
 
 <?php
 if ($enhanced):
@@ -168,8 +168,8 @@ if ($enhanced):
     <tr>
         <th></th>
         <th align="left">
-            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',true);" value="<?php echo Lang::spell('_expandAll'); ?>">
-            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',false);" value="<?php echo Lang::spell('_collapseAll'); ?>">
+            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',true);" value="<?=Lang::spell('_expandAll'); ?>">
+            <input type="button" style="font-size: 11px; margin-right: 0.5em" onclick="iconlist_expandall('reagent-list-generic',false);" value="<?=Lang::spell('_collapseAll'); ?>">
         </th>
     </tr>
 <?php

@@ -30,32 +30,32 @@
                 }
             </script>
 
-            <form action="?account=signin&amp;next=<?php echo $this->next; ?>" method="post" onsubmit="return inputBoxValidate(this)">
+            <form action="?account=signin&amp;next=<?=$this->next; ?>" method="post" onsubmit="return inputBoxValidate(this)">
                 <div class="inputbox" style="position: relative">
-                    <h1><?php echo Lang::account('doSignIn'); ?></h1>
-                    <div id="inputbox-error"><?php echo $this->error; ?></div>
+                    <h1><?=Lang::account('doSignIn'); ?></h1>
+                    <div id="inputbox-error"><?=$this->error; ?></div>
 
                     <table align="center">
                         <tr>
-                            <td align="right"><?php echo Lang::account('user').Lang::main('colon'); ?></td>
-                            <td><input type="text" name="username" value="<?php echo $this->user; ?>" maxlength="16" id="username-generic" style="width: 10em" /></td>
+                            <td align="right"><?=Lang::account('user').Lang::main('colon'); ?></td>
+                            <td><input type="text" name="username" value="<?=$this->user; ?>" maxlength="16" id="username-generic" style="width: 10em" /></td>
                         </tr>
                         <tr>
-                            <td align="right"><?php echo Lang::account('pass').Lang::main('colon'); ?></td>
+                            <td align="right"><?=Lang::account('pass').Lang::main('colon'); ?></td>
                             <td><input type="password" name="password" style="width: 10em" /></td>
                         </tr>
                         <tr>
                             <td align="right" valign="top"><input type="checkbox" name="remember_me" id="remember_me" value="yes" checked="checked" /></td>
                             <td>
-                                <label for="remember_me"><?php echo Lang::account('rememberMe'); ?></label>
+                                <label for="remember_me"><?=Lang::account('rememberMe'); ?></label>
                                 <div class="pad2"></div>
-                                <input type="submit" value="<?php echo Lang::account('signIn'); ?>" />
+                                <input type="submit" value="<?=Lang::account('signIn'); ?>" />
                             </td>
                         </tr>
                     </table>
 
                     <br>
-                    <div style="position: absolute; right: 5px; bottom: 5px;"><?php echo Lang::account('forgot').Lang::main('colon'); ?><a href="?account=forgotusername"><?php echo Lang::account('forgotUser'); ?></a> | <a href="?account=forgotpassword"><?php echo Lang::account('forgotPass'); ?></a></div>
+                    <div style="position: absolute; right: 5px; bottom: 5px;"><?=Lang::account('forgot').Lang::main('colon'); ?><a href="?account=forgotusername"><?=Lang::account('forgotUser'); ?></a> | <a href="?account=forgotpassword"><?=Lang::account('forgotPass'); ?></a></div>
                 </div>
             </form>
 

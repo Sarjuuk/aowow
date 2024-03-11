@@ -128,7 +128,7 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
                     })();
 
                 //]]></script>
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
 
             </div>
 

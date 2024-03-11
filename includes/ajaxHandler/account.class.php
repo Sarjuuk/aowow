@@ -64,7 +64,7 @@ class AjaxAccount extends AjaxHandler
 
             foreach ($ids as $typeId)
                 DB::Aowow()->query('INSERT INTO ?_account_excludes (`userId`, `type`, `typeId`, `mode`) VALUES (?a) ON DUPLICATE KEY UPDATE mode = (mode ^ 0x3)', array(
-                    User::$id, $type, $typeId, in_array($includes, $typeId) ? 2 : 1
+                    User::$id, $type, $typeId, in_array($typeId, $includes) ? 2 : 1
                 ));
 
             return;

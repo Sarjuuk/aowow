@@ -509,6 +509,8 @@ class RemoteProfileList extends ProfileList
                     'at'  => [['atm'], 'j' => 'arena_team at ON atm.arenaTeamId = at.arenaTeamId', 's' => ', at.name AS arenateam, IF(at.captainGuid = c.guid, 1, 0) AS captain']
                 );
 
+    private     $rnItr     = [];                            // rename iterator [name => nCharsWithThisName]
+
     public function __construct($conditions = [], $miscData = null)
     {
         // select DB by realm

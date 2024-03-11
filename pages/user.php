@@ -6,6 +6,11 @@ if (!defined('AOWOW_REVISION'))
 
 class UserPage extends GenericPage
 {
+    protected $lvTabs        = [];
+    protected $forceTabs     = true;
+    protected $infobox       = [];
+    protected $contributions = '';
+
     protected $tpl      = 'user';
     protected $scripts  = array(
         [SC_JS_FILE,  'js/user.js'],
@@ -14,7 +19,6 @@ class UserPage extends GenericPage
     );
     protected $mode     = CACHE_TYPE_NONE;
 
-    protected $typeId   = 0;
     protected $pageName = '';
     protected $user     = [];
 
@@ -135,9 +139,6 @@ class UserPage extends GenericPage
         /**************/
         /* Extra Tabs */
         /**************/
-
-        $this->lvTabs = [];
-        $this->forceTabs = true;
 
         // [unused] Site Achievements
 

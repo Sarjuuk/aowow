@@ -10,14 +10,14 @@
     $this->brick('pageTemplate');
 ?>
 
-        <div id="<?php echo $this->tcType; ?>-classes">
-                <div id="<?php echo $this->tcType; ?>-classes-outer">
-                    <div id="<?php echo $this->tcType; ?>-classes-inner"><p><?php echo ($this->tcType == 'tc' ? Lang::main('chooseClass') : Lang::main('chooseFamily')) . Lang::main('colon'); ?></p></div>
+        <div id="<?=$this->tcType; ?>-classes">
+                <div id="<?=$this->tcType; ?>-classes-outer">
+                    <div id="<?=$this->tcType; ?>-classes-inner"><p><?=($this->tcType == 'tc' ? Lang::main('chooseClass') : Lang::main('chooseFamily')) . Lang::main('colon'); ?></p></div>
                 </div>
             </div>
-            <div id="<?php echo $this->tcType; ?>-itself"></div>
+            <div id="<?=$this->tcType; ?>-itself"></div>
             <script type="text/javascript">
-                <?php echo $this->tcType; ?>_init();
+                <?=$this->tcType; ?>_init();
             </script>
 
             <div class="clear"></div>

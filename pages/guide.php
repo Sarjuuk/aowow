@@ -17,6 +17,9 @@ class GuidePage extends GenericPage
 
     const VALID_URL      = '/^[a-z0-9=_&\.\/\-]{2,64}$/i';
 
+    protected /* array */  $guideRating  = [];
+    protected /* ?string */$extraHTML    = null;
+
     protected /* int */    $type          = Type::GUIDE;
     protected /* int */    $typeId        = 0;
     protected /* int */    $guideRevision = -1;
@@ -33,6 +36,7 @@ class GuidePage extends GenericPage
     private   /* string */ $extra         = '';
     private   /* string */ $powerTpl      = '$WowheadPower.registerGuide(%s, %d, %s);';
     private   /* array */  $editorFields  = [];
+    private   /* bool */   $save          = false;
 
     protected /* array */ $_get = array(
         'id'  => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
@@ -296,7 +300,7 @@ class GuidePage extends GenericPage
                         if ($this->subject->getField('nvotes') < 5)
                             $qf[] = Lang::guide('rating').Lang::main('colon').Lang::guide('noVotes');
                         else
-                            $qf[] = Lang::guide('rating').Lang::main('colon').Lang::guide('votes', [round($this->rating['avg'], 1), $this->rating['n']]);
+                            $qf[] = Lang::guide('rating').Lang::main('colon').Lang::guide('votes', [round($this->subject->getField('rating'), 1), $this->subject->getField('nvotes')]);
                     }
                     break;
                 case GUIDE_STATUS_ARCHIVED:

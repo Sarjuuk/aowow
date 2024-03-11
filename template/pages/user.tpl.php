@@ -12,23 +12,23 @@
     $this->brick('infobox');
 ?>
 
-            <script type="text/javascript">var g_pageInfo = { username: '<?php echo Util::jsEscape($this->user['displayName']); ?>' }</script>
+            <script type="text/javascript">var g_pageInfo = { username: '<?=Util::jsEscape($this->user['displayName']); ?>' }</script>
 
             <div class="text">
                 <div id="h1-icon-generic" class="h1-icon"></div>
                 <script type="text/javascript">
-                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?php echo (is_numeric($this->user['avatar']) ? 2 : 1).', \''.($this->user['avatar'] ?: 'inv_misc_questionmark').'\''?>, 1, null, <?php echo User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?php echo $this->user['sumRep']; ?>)));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=(is_numeric($this->user['avatar']) ? 2 : 1).', \''.($this->user['avatar'] ?: 'inv_misc_questionmark').'\''?>, 1, null, <?=User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?=$this->user['sumRep']; ?>)));
                 </script>
-                <h1 class="h1-icon"><?php echo $this->name; ?></h1>
+                <h1 class="h1-icon"><?=$this->name; ?></h1>
             </div>
 
-            <h3 class="first"><?php echo Lang::user('publicDesc'); ?></h3>
+            <h3 class="first"><?=Lang::user('publicDesc'); ?></h3>
             <div id="description" class="left"><?php #  must follow directly, no whitespaces allowed
 if (!empty($this->user['description'])):
 ?>
                 <div id="description-generic"></div>
                 <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml('<?php echo $this->user['description']; ?>', "description-generic", { allow: Markup.CLASS_USER, roles: "<?php echo $this->user['userGroups']; ?>" });
+                    Markup.printHtml('<?=$this->user['description']; ?>', "description-generic", { allow: Markup.CLASS_USER, roles: "<?=$this->user['userGroups']; ?>" });
                 //]]></script>
 <?php
 endif;
