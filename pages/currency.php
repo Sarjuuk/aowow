@@ -188,6 +188,7 @@ class CurrencyPage extends GenericPage
         }
 
         // tab: currency for
+        $n = $w = null;
         if ($this->typeId == 103)
         {
             $n = '?items&filter=cr=145;crs=1;crv=0';
@@ -199,10 +200,10 @@ class CurrencyPage extends GenericPage
             $w = 'reqHonorPoints > 0';
         }
         else
-        {
-            $n = in_array($this->typeId, [42, 61, 81, 241, 121, 122, 123, 125, 126, 161, 201, 101, 102, 221, 301, 341]) ? '?items&filter=cr=158;crs='.$_itemId.';crv=0' : null;
             $w = 'reqItemId1 = '.$_itemId.' OR reqItemId2 = '.$_itemId.' OR reqItemId3 = '.$_itemId.' OR reqItemId4 = '.$_itemId.' OR reqItemId5 = '.$_itemId;
-        }
+
+        if (!$n && (new ItemListFilter())->isCurrencyFor($_itemId))
+            $n = '?items&filter=cr=158;crs='.$_itemId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE '.$w);
         $boughtBy = $xCosts ? DB::World()->selectCol('SELECT item FROM npc_vendor WHERE extendedCost IN (?a) UNION SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)', $xCosts, $xCosts) : [];
@@ -215,10 +216,10 @@ class CurrencyPage extends GenericPage
                     'data'      => array_values($boughtBy->getListviewData(ITEMINFO_VENDOR, [Type::CURRENCY => $this->typeId])),
                     'name'      => '$LANG.tab_currencyfor',
                     'id'        => 'currency-for',
-                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'],
+                    'extraCols' => ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost']
                 );
 
-                if ($boughtBy->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                if ($n)
                     $tabData['note'] = sprintf(Util::$filterResultString, $n);
 
                 $this->lvTabs[] = [ItemList::$brickFile, $tabData];

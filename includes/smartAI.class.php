@@ -1196,7 +1196,7 @@ class SmartAI
                     $a['param'][7] = 1;
 
                 if ($a['param'][6] || $a['param'][7])
-                    $footer = true;
+                    $footer = $a['param'];
 
                 break;
             case SAI_ACTION_RANDOM_PHASE:                   // 30 -> self

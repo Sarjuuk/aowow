@@ -2052,6 +2052,11 @@ class ItemListFilter extends Filter
         return $this->wtCnd;
     }
 
+    public function isCurrencyFor(int $itemId) : bool
+    {
+        return in_array($itemId, self::ENUM_CURRENCY);
+    }
+
     protected function createSQLForValues()
     {
         $parts = [];

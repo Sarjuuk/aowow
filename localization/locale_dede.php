@@ -650,7 +650,7 @@ $lang = array(
             SAI_ACTION_CALL_GROUPEVENTHAPPENS             => ['Erfülle Ziel von [quest=%1$d] für #target#.', null],
             SAI_ACTION_COMBAT_STOP                        => ['Beende aktuellen Kampf.', null],
             SAI_ACTION_REMOVEAURASFROMSPELL               => ['Entferne (%1$d)?alle Auren:Aura [spell=%1$d]; von #target#.', 'Nur eigene Auren'],
-            SAI_ACTION_FOLLOW                             => ['Folge #target#(%1$d)? mit %1$dm Abstand:;(%3$d)? bis zum Erreichen von [npc=%3$d]:;.', '(%7$d)?Winkel: %7$.2f°:;(%8$d)? Eine Form von Questziel wird erfüllt:;'],
+            SAI_ACTION_FOLLOW                             => ['Folge #target#(%1$d)? mit %1$dm Abstand:;(%3$d)? bis zum Erreichen von [npc=%3$d]:;.', '(%7$d)?Winkel\u003A %7$.2f°:;(%8$d)? Eine Form von Questziel wird erfüllt:;'],
 /* 30*/     SAI_ACTION_RANDOM_PHASE                       => ['Wähle zufällige Ereignisphase aus %7$s.', null],
             SAI_ACTION_RANDOM_PHASE_RANGE                 => ['Wähle zufällige Ereignisphase zwischen %1$d und %2$d.', null],
             SAI_ACTION_RESET_GOBJECT                      => ['Setze #target# zurück.', null],
@@ -1630,7 +1630,7 @@ $lang = array(
             "Inschriftenkunde",                     "Vom Fahrzeug öffnen"
         ),
         'stealthType'   => ["Allgemein", "Falle"],
-        'invisibilityType' => [null, "Allgemein", null, "Falle", null, null, "Trunkenheit", null, null, null, null, null],
+        'invisibilityType' => ["Allgemein", "UNK-1", "UNK-2", "Falle", "UNK-4", "UNK-5", "Trunkenheit", "UNK-7", "UNK-8", "UNK-9", "UNK-10", "UNK-11"],
         'attributes'    => array(                           // index defined by filters
             69 => "Alle Zaubereffekte sind schädlich",
             57 => "Aura kann nicht entfernt werden",
