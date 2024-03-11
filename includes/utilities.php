@@ -171,7 +171,7 @@ abstract class CLI
                 $nCols = count($row);
 
             for ($j = 0; $j < $nCols - 1; $j++)             // don't pad last column
-                $pads[$j] = max($pads[$j], mb_strlen($row[$j]));
+                $pads[$j] = max($pads[$j] ?? 0, mb_strlen($row[$j]));
         }
         self::write();
 
@@ -214,27 +214,27 @@ abstract class CLI
 
     public static function red(string $str) : string
     {
-        return OS_WIN ? $str : "\e[31m".$str."\e[0m";
+        return CLI_HAS_E ? "\e[31m".$str."\e[0m" : $str;
     }
 
     public static function green(string $str) : string
     {
-        return OS_WIN ? $str : "\e[32m".$str."\e[0m";
+        return CLI_HAS_E ? "\e[32m".$str."\e[0m" : $str;
     }
 
     public static function yellow(string $str) : string
     {
-        return OS_WIN ? $str : "\e[33m".$str."\e[0m";
+        return CLI_HAS_E ? "\e[33m".$str."\e[0m" : $str;
     }
 
     public static function blue(string $str) : string
     {
-        return OS_WIN ? $str : "\e[36m".$str."\e[0m";
+        return CLI_HAS_E ? "\e[36m".$str."\e[0m" : $str;
     }
 
     public static function bold(string $str) : string
     {
-        return OS_WIN ? $str : "\e[1m".$str."\e[0m";
+        return CLI_HAS_E ? "\e[1m".$str."\e[0m" : $str;
     }
 
     public static function write(string $txt = '', int $lvl = self::LOG_BLANK, bool $timestamp = true, bool $tmpRow = false) : void
@@ -267,7 +267,7 @@ abstract class CLI
             $msg .= $txt;
         }
 
-        $msg = (self::$overwriteLast && !OS_WIN ? "\e[1G\e[0K" : "\n") . $msg;
+        $msg = (self::$overwriteLast && CLI_HAS_E ? "\e[1G\e[0K" : "\n") . $msg;
         self::$overwriteLast = $tmpRow;
 
         echo $msg;

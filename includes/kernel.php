@@ -12,8 +12,11 @@ else
 
 mb_internal_encoding('UTF-8');
 
-
+// OS_WIN as per compile info of php
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');
+
+// WIN10 and later support ANSI escape sequences
+define('CLI_HAS_E', !OS_WIN || version_compare(php_uname('r'), '10.0') >= 0);
 
 
 require_once 'includes/defines.php';
