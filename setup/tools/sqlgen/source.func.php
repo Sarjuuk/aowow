@@ -263,7 +263,7 @@ SqlGen::register(new class extends SetupScript
         );
 
         $spawns = DB::Aowow()->select('SELECT typeId AS ARRAY_KEY, IF(COUNT(DISTINCT s.areaId) > 1, 0, s.areaId) AS areaId, z.type FROM ?_spawns s JOIN ?_zones z ON z.id = s.areaId WHERE s.`type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC, array_filter(array_column($creatureLoot, 'entry')));
-        $bosses = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(cuFlags & ?d, 1, IF(typeFlags & 0x4 AND rank > 0, 1, 0)) FROM ?_creature WHERE id IN (?a)', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
+        $bosses = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, IF(cuFlags & ?d, 1, IF(typeFlags & 0x4 AND `rank` > 0, 1, 0)) FROM ?_creature WHERE id IN (?a)', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
 
         foreach ($creatureLoot as $l)
         {
