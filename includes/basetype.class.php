@@ -625,7 +625,7 @@ trait spawnHelper
             $footer = '';
 
             if ($s['respawn'])
-                $info[1] = '<span class="q0">'.Lang::npc('respawnIn').Lang::main('colon').Util::formatTime($s['respawn'] * 1000, false).'</span>';
+                $info[1] = '<span class="q0">'.Lang::npc('respawnIn').Lang::main('colon').Lang::formatTime($s['respawn'] * 1000, 'game', 'timeAbbrev', true).'</span>';
 
             if (User::isInGroup(U_GROUP_STAFF))
             {
