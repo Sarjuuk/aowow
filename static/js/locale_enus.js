@@ -325,7 +325,8 @@ var mn_objects = [
     [-3,"Herbs"],
     [-4,"Mineral Veins"],
     [-2,"Quest"],
-    [-6,"Tools"]
+    [-6,"Tools"],
+    [6,"Traps"]
 ];
 var mn_quests = [
     [,"Continents"],
@@ -1496,6 +1497,7 @@ var g_object_types = {
        0: 'Other',
        9: 'Book',
        3: 'Container',
+       6: 'Trap',
     "-5": 'Chest',
       25: 'Fishing Pool',
     "-3": 'Herb',

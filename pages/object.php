@@ -132,13 +132,7 @@ class ObjectPage extends GenericPage
             $infobox[] = Lang::gameObject('trap').Lang::main('colon').'[object='.$_.']';
         }
 
-        // trap for
-        $trigger = new GameObjectList(array(['linkedTrap', $this->typeId]));
-        if (!$trigger->error)
-        {
-            $this->extendGlobalData($trigger->getJSGlobals());
-            $infobox[] = Lang::gameObject('triggeredBy').Lang::main('colon').'[object='.$trigger->id.']';
-        }
+        // trap for X (note: moved to lv-tabs)
 
         // SpellFocus
         if ($_ = $this->subject->getField('spellFocusId'))
@@ -481,6 +475,20 @@ class ObjectPage extends GenericPage
 
                 $this->lvTabs[] = [SpellList::$brickFile, $tabData];
             }
+        }
+
+        // tab: trap for X
+        $trigger = new GameObjectList(array(['linkedTrap', $this->typeId]));
+        if (!$trigger->error)
+        {
+            $this->extendGlobalData($trigger->getJSGlobals());
+
+            $this->lvTabs[] = [GameObjectList::$brickFile, array(
+                'data' => array_values($trigger->getListviewData()),
+                'name' => Lang::gameObject('triggeredBy'),
+                'id'   => 'triggerd-by',
+                'note' => sprintf(Util::$filterResultString, '?objects=6')
+            )];
         }
 
         // tab: Same model as .. whats the fucking point..?

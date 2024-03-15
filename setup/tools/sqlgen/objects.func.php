@@ -23,7 +23,7 @@ SqlGen::register(new class extends SetupScript
                 IF(`type` = 2, -2,                                                                  -- quests 1
                     IF(`type` = 8 AND Data0 IN (1, 2, 3, 4, 1552), -6,                              -- tools
                     IF(`type` = 3 AND IFNULL(gqi.ItemId, 0) <> 0, -2,                               -- quests 2
-                    IF(`type` IN (3, 9, 25), `type`, 0)))),                                         -- regular chests, books, pools
+                    IF(`type` IN (3, 6, 9, 25), `type`, 0)))),                                      -- regular chests, traps, books, fishing pools
                 0 AS event,                                                                         -- linked worldevent
                 displayId,
                 go.name,

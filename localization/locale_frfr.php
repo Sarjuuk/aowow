@@ -965,8 +965,8 @@ $lang = array(
     ),
     'gameObject' => array(
         'notFound'      => "Cette entité n'existe pas.",
-        'cat'           => [0 => "Autre", 9 => "Livres", 3 => "Conteneurs", -5 => "Coffres", 25 => "Bancs de poissons", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
-        'type'          => [              9 => "Livre",  3 => "Conteneur",  -5 => "Coffre",  25 => "",                  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],
+        'cat'           => [0 => "Autre", 3 => "Conteneurs", 6 => "Pièges", 9 => "Livres", 25 => "Bancs de poissons", -5 => "Coffres", -3 => "Herbes", -4 => "Filons de minerai", -2 => "Quêtes", -6 => "Outils"],
+        'type'          => [              3 => "Conteneur",  6 => "",       9 => "Livre",  25 => "",                  -5 => "Coffre",  -3 => "Herbe",  -4 => "Filon de minerai",  -2 => "Quête",  -6 => ""],
         'unkPosition'   => "L'emplacement de cette entité est inconnu.",
         'npcLootPH'     => 'Le <b>%s</b> contient les récompenses du combat contre <a href="?npc=%d">%s</a>. Il apparaît après sa mort.',
         'key'           => "Clé",
