@@ -11,7 +11,7 @@
 
     if (User::canComment()):
 ?>
-            <form name="addcomment" action="?comment=add&amp;type=<?php echo $this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">
+            <form name="addcomment" action="?comment=add&amp;type=<?=$this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">
                 <div id="funcbox-generic"></div>
                 <script type="text/javascript">Listview.funcBox.coEditAppend($('#funcbox-generic'), {body: ''}, 1)</script>
                 <div class="pad"></div>
@@ -43,7 +43,7 @@
 
     if (User::canUploadScreenshot()):
 ?>
-            <form action="?screenshot=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
+            <form action="?screenshot=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
             <input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
             <input type="submit" value="Отправить" />
@@ -70,7 +70,7 @@
     if (User::canSuggestVideo()):
 ?>
             <div class="pad2"></div>
-            <form action="?video=add&<?php echo $this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
+            <form action="?video=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
             <input type="text" name="videourl" style="width: 35%" /> <small>Поддерживается: только YouTube</small>
             <div class="pad2"></div>
             <input type="submit" value="Отправить" />

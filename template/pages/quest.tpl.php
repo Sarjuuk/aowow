@@ -15,10 +15,10 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?php echo $this->name; ?></h1>
+                <h1><?=$this->name; ?></h1>
 <?php if ($this->unavailable): ?>
                 <div class="pad"></div>
-                <b style="color: red"><?php echo Lang::quest('unavailable'); ?></b>
+                <b style="color: red"><?=Lang::quest('unavailable'); ?></b>
                 <div class="pad"></div>
 <?php
 endif;
@@ -120,15 +120,15 @@ endif;
 
 if ($this->requestItems && $this->objectives):
 ?>
-                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-progress'), this)"><?php echo Lang::quest('progress'); ?></a></h3>
-                <div id="disclosure-progress" style="display: none"><?php echo $this->requestItems; ?></div>
+                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-progress'), this)"><?=Lang::quest('progress'); ?></a></h3>
+                <div id="disclosure-progress" style="display: none"><?=$this->requestItems; ?></div>
 <?php
 endif;
 
 if ($this->offerReward && ($this->requestItems || $this->objectives)):
 ?>
-                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-completion'), this)"><?php echo Lang::quest('completion'); ?></a></h3>
-                <div id="disclosure-completion" style="display: none"><?php echo $this->offerReward; ?></div>
+                <h3><a href="javascript:;" class="disclosure-off" onclick="return g_disclose($WH.ge('disclosure-completion'), this)"><?=Lang::quest('completion'); ?></a></h3>
+                <div id="disclosure-completion" style="display: none"><?=$this->offerReward; ?></div>
 <?php
 endif;
 
@@ -207,7 +207,7 @@ if (!empty($this->transfer)):
 endif;
 
 ?>
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

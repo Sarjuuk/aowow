@@ -22,6 +22,9 @@ class ItemList extends BaseType
     private         $vendors    = [];
     private         $jsGlobals  = [];                       // getExtendedCost creates some and has no access to template
 
+    private         $enhanceR   = [];
+    private         $relEnchant = [];
+
     protected       $queryBase  = 'SELECT i.*, i.block AS tplBlock, i.armor AS tplArmor, i.dmgMin1 AS tplDmgMin1, i.dmgMax1 AS tplDmgMax1, i.id AS ARRAY_KEY, i.id AS id FROM ?_items i';
     protected       $queryOpts  = array(                    // 3 => Type::ITEM
                         'i'   => [['is', 'src', 'ic'], 'o' => 'i.quality DESC, i.itemLevel DESC'],

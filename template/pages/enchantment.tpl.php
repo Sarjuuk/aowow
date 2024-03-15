@@ -16,14 +16,14 @@
 
 <?php $this->brick('redButtons'); ?>
 
-                <h1 class="h1-icon"><?php echo $this->name; ?></h1>
+                <h1 class="h1-icon"><?=$this->name; ?></h1>
 
                 <div class="clear"></div>
 
 <?php $this->brick('article'); ?>
 
 
-                <h3><?php echo Lang::enchantment('details'); ?></h3>
+                <h3><?=Lang::enchantment('details'); ?></h3>
 
                 <table class="grid" id="spelldetails">
                     <colgroup>
@@ -32,11 +32,11 @@
                         <col width="50%" />
                     </colgroup>
 <?php
-if (!empty($this->activateCondition)):
+if (!empty($this->activation)):
 ?>
                     <tr>
-                        <th><?php echo Lang::enchantment('activation'); ?></th>
-                        <td colspan="2"><?php echo $this->activateCondition; ?></td>
+                        <th><?=Lang::enchantment('activation'); ?></th>
+                        <td colspan="2"><?=$this->activation; ?></td>
                     </tr>
 <?php
 endif;
@@ -44,7 +44,7 @@ endif;
 foreach ($this->effects as $i => $e):
 ?>
                     <tr>
-                        <th><?php echo Lang::spell('_effect').' #'.$i; ?></th>
+                        <th><?=Lang::spell('_effect').' #'.$i; ?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
     echo '                            '.$e['name'].(!empty($e['tip']) ? Lang::main('colon').'(<span '.(User::isInGroup(U_GROUP_EMPLOYEE) ? 'class="tip" ' : '').'id="efftip-'.$i.'"></span>)' : '').'<small>';
@@ -83,7 +83,7 @@ foreach ($this->effects as $i => $e):
 ?>
                             <table class="icontab">
                                 <tr>
-                                    <th id="icontab-icon<?php echo $i; ?>"></th>
+                                    <th id="icontab-icon<?=$i; ?>"></th>
 <?php
         echo '                                    <td>'.(strpos($e['icon']['name'], '#') ? $e['icon']['name'] : sprintf('<a href="?spell=%d">%s</a>', $e['icon']['id'], $e['icon']['name']))."</td>\n";
 ?>
@@ -91,7 +91,7 @@ foreach ($this->effects as $i => $e):
                                 </tr>
                             </table>
                             <script type="text/javascript">
-                                <?php echo '$WH.ge(\'icontab-icon'.$i.'\').appendChild(g_spells.createIcon('.$e['icon']['id'].', 1, '.$e['icon']['count']."));\n"; ?>
+                                <?='$WH.ge(\'icontab-icon'.$i.'\').appendChild(g_spells.createIcon('.$e['icon']['id'].', 1, '.$e['icon']['count']."));\n"; ?>
                             </script>
 <?php
     endif;
@@ -103,7 +103,7 @@ endforeach;
 ?>
                 </table>
 
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

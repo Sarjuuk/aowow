@@ -10,6 +10,26 @@ class SpellPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $reagents      = [];
+    protected $scaling       = [];
+    protected $items         = [];
+    protected $tools         = [];
+    protected $effects       = [];
+    protected $attributes    = [];
+    protected $powerCost     = [];
+    protected $castTime      = [];
+    protected $level         = [];
+    protected $rangeName     = [];
+    protected $range         = [];
+    protected $gcd           = [];
+    protected $gcdCat        = null;                        // todo (low): nyi; find out how this works [n/a; normal; ..]
+    protected $school        = [];
+    protected $dispel        = [];
+    protected $mechanic      = [];
+    protected $stances       = [];
+    protected $cooldown      = [];
+    protected $duration      = [];
+
     protected $type          = Type::SPELL;
     protected $typeId        = 0;
     protected $tpl           = 'spell';
@@ -278,20 +298,19 @@ class SpellPage extends GenericPage
         $this->tools       = $this->createTools();
         $this->effects     = $effects;
         $this->attributes  = $this->createAttributesList();
-        $this->infobox     = $infobox;
         $this->powerCost   = $this->subject->createPowerCostForCurrent();
         $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
-        $this->name        = $this->subject->getField('name', true);
-        $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : '')];
         $this->level       = $this->subject->getField('spellLevel');
         $this->rangeName   = $this->subject->getField('rangeText', true);
         $this->range       = $this->subject->getField('rangeMaxHostile');
         $this->gcd         = Util::formatTime($this->subject->getField('startRecoveryTime'));
-        $this->gcdCat      = null;                          // todo (low): nyi; find out how this works [n/a; normal; ..]
         $this->school      = [Util::asHex($this->subject->getField('schoolMask')), Lang::getMagicSchools($this->subject->getField('schoolMask'))];
         $this->dispel      = $this->subject->getField('dispelType') ? Lang::game('dt', $this->subject->getField('dispelType')) : null;
         $this->mechanic    = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
+        $this->name        = $this->subject->getField('name', true);
+        $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : '')];
         $this->redButtons  = $redButtons;
+        $this->infobox     = $infobox;
 
         // minRange exists..  prepend
         if ($_ = $this->subject->getField('rangeMinHostile'))

@@ -1,4 +1,4 @@
-                    <h2><img src="<?php echo STATIC_URL; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">提醒</h2>
+                    <h2><img src="<?=STATIC_URL; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">提醒</h2>
                     你的截图将<b class="q10">不会</b> 通过审查假设不符合下列准则。
 
                     <ul>

@@ -10,6 +10,8 @@ class EventPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $dates         = [];
+
     protected $type          = Type::WORLDEVENT;
     protected $typeId        = 0;
     protected $tpl           = 'detail-page-generic';

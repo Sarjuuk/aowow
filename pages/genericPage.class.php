@@ -15,6 +15,18 @@ trait TrDetailPage
 
     protected $subject    = null;                           // so it will not get cached
 
+    // template vars
+    protected $extraText  = '';
+    protected $infobox    = [];
+    protected $transfer   = [];                             // faction transfer equivalent data
+    protected $redButtons = [];                             // see template/redButtons.tpl.php
+    protected $smartAI    = null;
+    protected $map        = null;
+    protected $article    = [];
+    protected $headIcons  = [];
+    protected $expansion  = EXP_CLASSIC;
+
+
     protected $contribute = CONTRIBUTE_ANY;
 
     protected function generateCacheKey(bool $withStaff = true) : string
@@ -49,9 +61,11 @@ trait TrDetailPage
 
 trait TrListPage
 {
-    protected $category  = null;
-    protected $filter    = [];
-    protected $lvTabs    = [];                              // most pages have this
+    protected $category   = null;
+    protected $subCat     = '';
+    protected $filter     = [];
+    protected $lvTabs     = [];                             // most pages have this
+    protected $redButtons = [];                             // see template/redButtons.tpl.php
 
     private   $filterObj = null;
 
@@ -574,7 +588,7 @@ class GenericPage
                 $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('langOnly', [Lang::lang($article['locale'])]).'</span></div>';
 
             if (method_exists($this, 'postArticle'))        // e.g. update variables in article
-                $this->postArticle();
+                $this->postArticle($this->article['text']);
         }
     }
 

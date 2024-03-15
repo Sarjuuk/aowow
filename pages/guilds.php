@@ -10,6 +10,12 @@ class GuildsPage extends GenericPage
 {
     use TrProfiler;
 
+    private $filterObj  = null;
+
+    protected $subCat   = '';
+    protected $filter   = [];
+    protected $lvTabs   = [];
+
     protected $type     = Type::GUILD;
 
     protected $tabId    = 1;

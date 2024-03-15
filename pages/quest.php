@@ -10,6 +10,21 @@ class QuestPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $objectiveList = [];
+    protected $providedItem  = [];
+    protected $series        = [];
+    protected $gains         = [];
+    protected $mail          = [];
+    protected $rewards       = [];
+    protected $objectives    = '';
+    protected $details       = '';
+    protected $offerReward   = '';
+    protected $requestItems  = '';
+    protected $completed     = '';
+    protected $end           = '';
+    protected $suggestedPl   = 1;
+    protected $unavailable   = false;
+
     protected $type          = Type::QUEST;
     protected $typeId        = 0;
     protected $tpl           = 'quest';
@@ -368,9 +383,6 @@ class QuestPage extends GenericPage
         /*******************/
         /* Objectives List */
         /*******************/
-
-        $this->objectiveList = [];
-        $this->providedItem  = [];
 
         // gather ids for lookup
         $olItems    = $olNPCs    = $olGOs    = $olFactions = [];

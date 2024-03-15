@@ -19,6 +19,7 @@ abstract class BaseType
 
     private   $itrStack  = [];
 
+    public static $dataTable  = '';
     public static $contribute = CONTRIBUTE_ANY;
 
     /*
@@ -924,6 +925,8 @@ abstract class Filter
         [FILTER_CR_NYI_PH,    null,             <int:returnVal>, param2]                # mostly 1: to ignore this criterium; 0: to fail the whole query
     */
     protected       $genericFilter = [];
+
+    protected       $enums         = [];                    // criteriumID => [validOptionList]
 
     /*
         fieldId => [checkType, checkValue[, fieldIsArray]]

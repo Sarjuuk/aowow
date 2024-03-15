@@ -15,7 +15,7 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?php echo $this->name; ?></h1>
+                <h1><?=$this->name; ?></h1>
 
 <?php
 $this->brick('article');
@@ -48,7 +48,7 @@ if (isset($this->smartAI)):
 endif;
 ?>
 
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

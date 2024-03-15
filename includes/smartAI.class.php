@@ -15,6 +15,8 @@ class SmartAI
     private $srcType    = 0;
     private $entry      = 0;
 
+    private $rowKey     = '';
+
     private $miscData   = [];
     private $quotes     = [];
     private $summons    = null;

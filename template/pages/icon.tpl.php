@@ -26,7 +26,7 @@
     $this->brick('article');
 ?>
                 <div class="clear"></div>
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

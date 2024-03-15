@@ -10,6 +10,9 @@ class EnchantmentPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $effects       = [];
+    protected $activation    = [];
+
     protected $type          = Type::ENCHANTMENT;
     protected $typeId        = 0;
     protected $tpl           = 'enchantment';
@@ -169,7 +172,7 @@ class EnchantmentPage extends GenericPage
                 }
             }
 
-            $this->activateCondition = $x;
+            $this->activation = $x;
         }
 
         /**************/

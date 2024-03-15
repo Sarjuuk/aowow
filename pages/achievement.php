@@ -25,6 +25,12 @@ class AchievementPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $mail          = [];
+    protected $series        = null;
+    protected $description   = '';
+    protected $criteria      = [];
+    protected $rewards       = [];
+
     protected $type          = Type::ACHIEVEMENT;
     protected $typeId        = 0;
     protected $tpl           = 'achievement';
@@ -151,9 +157,9 @@ class AchievementPage extends GenericPage
         /* Main Content */
         /****************/
 
-        $this->mail        = $this->createMail($reqBook);
         $this->headIcons   = [$this->subject->getField('iconString')];
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        $this->mail        = $this->createMail($reqBook);
         $this->series      = $series ? [[array_values($series), null]] : null;
         $this->description = $this->subject->getField('description', true);
         $this->redButtons  = array(

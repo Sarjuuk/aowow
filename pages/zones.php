@@ -10,6 +10,8 @@ class ZonesPage extends GenericPage
 {
     use TrListPage;
 
+    protected $map       = null;
+
     protected $type      = Type::ZONE;
     protected $tpl       = 'list-page-generic';
     protected $path      = [0, 6];
@@ -82,7 +84,6 @@ class ZonesPage extends GenericPage
         if ($hiddenCols)
             $tabData['hiddenCols'] = $hiddenCols;
 
-        $this->map      = null;
         $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
 
         // create flight map

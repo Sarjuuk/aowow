@@ -10,6 +10,12 @@ class NpcPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $placeholder  = null;
+    protected $accessory    = [];
+    protected $quotes       = [];
+    protected $reputation   = [];
+    protected $subname      = '';
+
     protected $type          = Type::NPC;
     protected $typeId        = 0;
     protected $tpl           = 'npc';

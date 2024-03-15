@@ -10,6 +10,8 @@ class EventsPage extends GenericPage
 {
     use TrListPage;
 
+    private   $dependency    = [];
+
     protected $type          = Type::WORLDEVENT;
     protected $tpl           = 'list-page-generic';
     protected $path          = [0, 11];
@@ -47,10 +49,9 @@ class EventsPage extends GenericPage
         $events = new WorldEventList($condition);
         $this->extendGlobalData($events->getJSGlobals());
 
-        $this->deps = [];
         foreach ($events->iterate() as $__)
             if ($d = $events->getField('requires'))
-                $this->deps[$events->id] = $d;
+                $this->dependency[$events->id] = $d;
 
         $data = array_values($events->getListviewData());
 
@@ -86,7 +87,7 @@ class EventsPage extends GenericPage
             foreach ($views[1]['data'] as &$data)
             {
                 // is a followUp-event
-                if (!empty($this->deps[$data['id']]))
+                if (!empty($this->dependency[$data['id']]))
                 {
                     $data['startDate'] = $data['endDate'] = false;
                     unset($data['_date']);

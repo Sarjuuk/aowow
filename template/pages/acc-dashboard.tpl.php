@@ -12,24 +12,24 @@
     $this->brick('infobox');
 ?>
 
-            <script type="text/javascript">var g_pageInfo = { username: '<?php echo Util::jsEscape($this->gUser['name']); ?>' }</script>
+            <script type="text/javascript">var g_pageInfo = { username: '<?=Util::jsEscape($this->gUser['name']); ?>' }</script>
 
             <div class="text">
                 <div id="h1-icon-generic" class="h1-icon"></div>
                 <script type="text/javascript">
-                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?php echo (is_numeric(User::$avatar) ? 2 : 1).' , \''.User::$avatar.'\''?>, 1, null, <?php echo User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?php echo User::getReputation(); ?>)));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=(is_numeric(User::$avatar) ? 2 : 1).' , \''.User::$avatar.'\''?>, 1, null, <?=User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?=User::getReputation(); ?>)));
                 </script>
-                <h1 class="h1-icon"><?php echo Lang::account('myAccount'); ?></h1>
+                <h1 class="h1-icon"><?=Lang::account('myAccount'); ?></h1>
 <?php
 // Banned-Minibox
 if ($b = $this->banned):
 ?>
                 <div style="max-width:300px;" class="minibox">
-                    <h1 class="q10"><?php echo Lang::account('accBanned'); ?></h1>
+                    <h1 class="q10"><?=Lang::account('accBanned'); ?></h1>
                     <ul style="text-align:left">
-                        <li><div><?php echo '<b>'.Lang::account('bannedBy').'</b>'.Lang::main('colon').'<a href="?user='.$b['by'][0].'">'.$b['by'][1].'</a>'; ?></div></li>
-                        <li><div><?php echo '<b>'.Lang::account('ends').'</b>'.Lang::main('colon').($b['end'] ? date(Lang::main('dateFmtLong'), $b['end']) : Lang::account('permanent')); ?></div></li>
-                        <li><div><?php echo '<b>'.Lang::account('reason').'</b>'.Lang::main('colon').'<span class="msg-failure">'.($b['reason'] ?: Lang::account('noReason')).'</span>'; ?></div></li>
+                        <li><div><?='<b>'.Lang::account('bannedBy').'</b>'.Lang::main('colon').'<a href="?user='.$b['by'][0].'">'.$b['by'][1].'</a>'; ?></div></li>
+                        <li><div><?='<b>'.Lang::account('ends').'</b>'.Lang::main('colon').($b['end'] ? date(Lang::main('dateFmtLong'), $b['end']) : Lang::account('permanent')); ?></div></li>
+                        <li><div><?='<b>'.Lang::account('reason').'</b>'.Lang::main('colon').'<span class="msg-failure">'.($b['reason'] ?: Lang::account('noReason')).'</span>'; ?></div></li>
                     </ul>
                 </div>
 <?php

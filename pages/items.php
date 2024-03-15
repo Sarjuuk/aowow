@@ -10,6 +10,9 @@ class ItemsPage extends GenericPage
 {
     use TrListPage;
 
+    protected $forceTabs     = false;
+    protected $gemScores     = [];
+
     protected $type          = Type::ITEM;
     protected $tpl           = 'items';
     protected $path          = [0, 0];
@@ -76,6 +79,7 @@ class ItemsPage extends GenericPage
         13 => true
     );
 
+    private $filterOpts      = [];
     private $sharedLV        = array(                       // common listview components across all tabs
         'hiddenCols'  => [],
         'visibleCols' => [],
@@ -485,7 +489,7 @@ class ItemsPage extends GenericPage
             $this->sharedLV['computeDataFunc'] = '$fi_scoreSockets';
 
             $q    = intVal($this->filter['gm']);
-            $mask = 14;
+            $mask = 0xE;
             $cnd  = [10, ['class', ITEM_CLASS_GEM], ['gemColorMask', &$mask, '&'], ['quality', &$q]];
             if (!isset($this->filter['jc']))
                 $cnd[] = ['itemLimitCategory', 0];          // Jeweler's Gems
@@ -503,7 +507,7 @@ class ItemsPage extends GenericPage
             for ($i = 0; $i < 4; $i++)
             {
                 $mask = 1 << $i;
-                $q    = !$i ? 3 : intVal($this->filter['gm']);    // meta gems are always included.. ($q is backReferenced)
+                $q    = !$i ? ITEM_QUALITY_RARE : intVal($this->filter['gm']);    // meta gems are always included.. ($q is backReferenced)
                 $byColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
                 if (!$byColor->error)
                 {

@@ -8,6 +8,10 @@ if (!defined('AOWOW_REVISION'))
 //  tabId  1: Tools     g_initHeader()
 class UtilityPage extends GenericPage
 {
+    protected $lvTabs   = [];
+    protected $category = [];
+    protected $h1Links  = '';
+
     protected $tpl           = 'list-page-generic';
     protected $path          = [1, 8];
     protected $tabId         = 1;
@@ -42,8 +46,6 @@ class UtilityPage extends GenericPage
             else
                 $this->name .= Lang::main('colon') . Lang::main('mostComments', 0);
         }
-
-        $this->lvTabs = [];
     }
 
     public function display(string $override = '') : void

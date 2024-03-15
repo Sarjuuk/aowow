@@ -411,7 +411,8 @@ class AjaxComment extends AjaxHandler
             return;
         }
 
-        Util::createReport(1, 19, $this->_post['id'][0], '[General Reply Report]');
+        $report = new Report(Report::MODE_COMMENT, Report::CO_INAPPROPRIATE, $this->_post['id'][0]);
+        $report->create('Report Reply Button Click');
     }
 
     protected function handleReplyUpvote() : void

@@ -15,7 +15,7 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?php echo $this->name.($this->subname ? ' &lt;'.$this->subname.'&gt;' : null); ?></h1>
+                <h1><?=$this->name.($this->subname ? ' &lt;'.$this->subname.'&gt;' : null); ?></h1>
 
 <?php
     $this->brick('article');
@@ -39,7 +39,7 @@ endif;
 
 if ($this->quotes[0]):
 ?>
-                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?php echo Lang::npc('quotes').'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
+                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?=Lang::npc('quotes').'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
                 <div id="quotes-generic" style="display: none"><ul>
 <?php
     foreach ($this->quotes[0] as $group):
@@ -69,7 +69,7 @@ endif;
 
 if ($this->reputation):
 ?>
-                <h3><?php echo Lang::main('gains'); ?></h3>
+                <h3><?=Lang::main('gains'); ?></h3>
 <?php
     echo Lang::npc('gainsDesc').Lang::main('colon');
 
@@ -112,7 +112,7 @@ if (isset($this->smartAI)):
 <?php
 endif;
 ?>
-                <h2 class="clear"><?php echo Lang::main('related'); ?></h2>
+                <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php

@@ -352,6 +352,11 @@ define('SIDE_ALLIANCE',                     1);
 define('SIDE_HORDE',                        2);
 define('SIDE_BOTH',                         3);
 
+// Expansion
+define('EXP_CLASSIC',                       0);
+define('EXP_BC',                            1);
+define('EXP_WOTLK',                         2);
+
 // ClassMask
 define('CLASS_WARRIOR',                     0x001);
 define('CLASS_PALADIN',                     0x002);

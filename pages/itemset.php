@@ -10,6 +10,13 @@ class ItemsetPage extends GenericPage
 {
     use TrDetailPage;
 
+    protected $summary       = [];
+    protected $bonusExt      = '';
+    protected $description   = '';
+    protected $unavailable   = false;
+    protected $pieces        = [];
+    protected $spells        = [];
+
     protected $type          = Type::ITEMSET;
     protected $typeId        = 0;
     protected $tpl           = 'itemset';
@@ -17,8 +24,6 @@ class ItemsetPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
-
-    protected $summary       = [];
 
     protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
 
@@ -160,11 +165,11 @@ class ItemsetPage extends GenericPage
 
         $this->bonusExt    = $skill;
         $this->description = $_ta ? sprintf(Lang::itemset('_desc'), $this->name, Lang::itemset('notes', $_ta), $_cnt) : sprintf(Lang::itemset('_descTagless'), $this->name, $_cnt);
-        $this->unavailable = $this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE;
+        $this->unavailable = !!($this->subject->getField('cuFlags') & CUSTOM_UNAVAILABLE);
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->pieces      = $pieces;
         $this->spells      = $this->subject->getBonuses();
-        $this->expansion   = 0;
+    //  $this->expansion   = $this->subject->getField('expansion'); NYI - todo: add col to table
         $this->redButtons  = array(
             BUTTON_WOWHEAD => $this->typeId > 0,            // bool only
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],

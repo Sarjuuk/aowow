@@ -10,14 +10,21 @@ if (!defined('AOWOW_REVISION'))
 
 class MorePage extends GenericPage
 {
-    protected $tpl          = 'list-page-generic';
-    protected $path         = [];
-    protected $tabId        = 0;
-    protected $mode         = CACHE_TYPE_NONE;
-    protected $scripts      = [[SC_JS_FILE, 'js/swfobject.js']];
+    protected $articleUrl    = '';
+    protected $tabsTitle     = '';
+    protected $privReqPoints = '';
+    protected $forceTabs     = true;
+    protected $lvTabs        = [];
+    protected $privileges    = [];
 
-    private   $page         = [];
-    private   $req2priv     = array(
+    protected $tpl           = 'list-page-generic';
+    protected $path          = [];
+    protected $tabId         = 0;
+    protected $mode          = CACHE_TYPE_NONE;
+    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
+
+    private   $page          = [];
+    private   $req2priv      = array(
              1 => CFG_REP_REQ_COMMENT,                      // write comments
              2 => 0,                                        // NYI post external links
              4 => 0,                                        // NYI no captcha
@@ -56,9 +63,9 @@ class MorePage extends GenericPage
         {
             $pageData = $this->validPages[$pageCall];
 
-            $this->tab  = $pageData[0];
-            $this->path = $pageData[1];
-            $this->page = [$pageCall, $subPage];
+            $this->tabId = $pageData[0];
+            $this->path  = $pageData[1];
+            $this->page  = [$pageCall, $subPage];
 
             if ($subPage && isset($pageData[2]))
             {
@@ -109,14 +116,13 @@ class MorePage extends GenericPage
         }
     }
 
-    protected function postArticle()
+    protected function postArticle(string &$txt) : void
     {
         if ($this->page[0] != 'reputation' &&
             $this->page[0] != 'privileges' &&
             $this->page[0] != 'privilege')
             return;
 
-        $txt = &$this->article['text'];
         $consts = get_defined_constants(true);
         foreach ($consts['user'] as $k => $v)
         {
@@ -145,7 +151,6 @@ class MorePage extends GenericPage
                 $r['when'] = date(Util::$dateFormatInternal, $r['when']);
 
             $this->tabsTitle = Lang::main('yourRepHistory');
-            $this->forceTabs = true;
             $this->lvTabs[] = ['reputationhistory', array(
                 'id'   => 'reputation-history',
                 'name' => '$LANG.reputationhistory',

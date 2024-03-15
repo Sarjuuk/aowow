@@ -93,6 +93,8 @@ require_once __DIR__ . '/CacherImpl.php';
  */
 abstract class DbSimple_Database extends DbSimple_LastError
 {
+    private $attributes;
+
     /**
      * Public methods.
      */
