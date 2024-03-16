@@ -21,7 +21,7 @@ class EnchantmentsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->getCategoryFromUrl($pageParam);
         $this->filterObj = new EnchantmentListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);

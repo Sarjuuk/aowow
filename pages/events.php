@@ -21,7 +21,7 @@ class EventsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->getCategoryFromUrl($pageParam);
 
         parent::__construct($pageCall, $pageParam);
 

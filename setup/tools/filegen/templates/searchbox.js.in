@@ -1,6 +1,6 @@
 (function () {
     function create(w, h) {
-        var body = 'STATIC_URL/widgets/searchbox/searchbox.html';;
+        var body = 'STATIC_URL/widgets/searchbox/searchbox.html';
         var buff = '<iframe src="' + body + '" width="' + w + '" height="' + h + '" frameborder="0" class="aowow-searchbox"';
         buff += "></iframe>";
 

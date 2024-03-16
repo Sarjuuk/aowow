@@ -1126,7 +1126,7 @@ class GenericPage
             return true;
         }
 
-        return false;;
+        return false;
     }
 
     private function memcached() : Memcached

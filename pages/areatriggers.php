@@ -23,7 +23,7 @@ class AreaTriggersPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->getCategoryFromUrl($pageParam);
         if (isset($this->category[0]))
             header('Location: ?areatriggers&filter=ty='.$this->category[0], true, 302);
 
