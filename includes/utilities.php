@@ -22,6 +22,10 @@ trait TrRequestData
     public static $PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
     public static $PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
 
+    protected $_get    = [];                                // fill with variables you that are going to be used; eg:
+    protected $_post   = [];                                // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList']
+    protected $_cookie = [];
+
     private $filtered = false;
 
     private function initRequestData() : void
@@ -33,7 +37,7 @@ trait TrRequestData
         // only really relevant for INPUT_POST
         // manuall set everything null in this case
 
-        if (isset($this->_post) && gettype($this->_post) == 'array')
+        if ($this->_post)
         {
             if ($_POST)
                 $this->_post = filter_input_array(INPUT_POST, $this->_post);
@@ -41,7 +45,7 @@ trait TrRequestData
                 $this->_post = array_fill_keys(array_keys($this->_post), null);
         }
 
-        if (isset($this->_get) && gettype($this->_get) == 'array')
+        if ($this->_get)
         {
             if ($_GET)
                 $this->_get = filter_input_array(INPUT_GET, $this->_get);
@@ -49,7 +53,7 @@ trait TrRequestData
                 $this->_get = array_fill_keys(array_keys($this->_get), null);
         }
 
-        if (isset($this->_cookie) && gettype($this->_cookie) == 'array')
+        if ($this->_cookie)
         {
             if ($_COOKIE)
                 $this->_cookie = filter_input_array(INPUT_COOKIE, $this->_cookie);

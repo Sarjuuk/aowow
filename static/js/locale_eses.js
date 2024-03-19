@@ -325,7 +325,8 @@ var mn_objects = [
     [-3,"Hierbas"],
     [-4,"Venas de minerales"],
     [-2,"Misión"],
-    [-6,"Herramientas"]
+    [-6,"Herramientas"],
+    [6,"Trampas"]
 ];
 var mn_quests = [
     [,"Continentes"],
@@ -1449,6 +1450,7 @@ var g_object_types = {
        0: 'Otros',
        9: 'Libro',
        3: 'Contenedore',
+       6: 'Trampa',
     "-5": 'Cofre',
       25: '[Fishing Pool]',
     "-3": 'Hierba',

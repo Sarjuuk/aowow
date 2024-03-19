@@ -621,6 +621,9 @@ class Lang
 
     public static function unescapeUISequences(string $var, int $fmt = -1) : string
     {
+        if (strpos($var, '|') === false)
+            return $var;
+
         // line break                   |n
         $var = preg_replace_callback('/\|n/i', function ($m) use ($fmt)
             {
