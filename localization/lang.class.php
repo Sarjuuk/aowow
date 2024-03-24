@@ -591,7 +591,7 @@ class Lang
         if (is_array($var))
         {
             foreach ($var as &$v)
-                $v == self::vspf($v, $args);
+                $v = self::vspf($v, $args);
 
             return $var;
         }
