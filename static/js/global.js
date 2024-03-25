@@ -23672,7 +23672,7 @@ var ConditionList = new function() {
             else if (i > 0)
                 buff += ', ';
 
-            buff += $WH.sprintf(tpl, arr[i], src[arr[i]]);;
+            buff += $WH.sprintf(tpl, arr[i], src[arr[i]]);
         }
 
         return buff;
@@ -23688,7 +23688,7 @@ var ConditionList = new function() {
         if (strIdx == 22 || strIdx == 23)
             strIdx = 4;
         else if (strIdx == 16 || strIdx == 30 || strIdx == 32)
-            strIdx--;;
+            strIdx--;
 
         if (!g_conditions[strIdx])
             return 'unknown condition index ' + strIdx;

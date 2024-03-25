@@ -24,7 +24,7 @@ class NpcsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->getCategoryFromUrl($pageParam);
         $this->filterObj = new CreatureListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);

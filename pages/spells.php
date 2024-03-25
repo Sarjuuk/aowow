@@ -91,7 +91,7 @@ class SpellsPage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->getCategoryFromUrl($pageParam);;
+        $this->getCategoryFromUrl($pageParam);
         $this->filterObj = new SpellListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);

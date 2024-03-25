@@ -1761,7 +1761,7 @@ class SpellPage extends GenericPage
                     if ($_ = QuestList::getName($effMV))
                         $foo['name'] .= '(<a href="?quest='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Util::ucFirst(Lang::game('quest')).' #'.$effMV;;
+                        $foo['name'] .= Util::ucFirst(Lang::game('quest')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_SUMMON:
                 case SPELL_EFFECT_SUMMON_PET:
@@ -1845,7 +1845,7 @@ class SpellPage extends GenericPage
                             $foo['name'] .= Util::ucFirst(Lang::game('spell')).' #'.$effMV;
                     }
                     else
-                        $foo['name'] .= ' #'.$effMV;;
+                        $foo['name'] .= ' #'.$effMV;
                     break;
                 case SPELL_EFFECT_SKINNING:
                     switch ($effMV)
@@ -1877,7 +1877,7 @@ class SpellPage extends GenericPage
                     if ($_ = SkillList::getName($effMV))
                         $foo['name'] .= '(<a href="?skill='.$effMV.'">'.$_.'</a>)';
                     else
-                        $foo['name'] .= Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
+                        $foo['name'] .= Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_ACTIVATE_RUNE:
                     $_ = Lang::spell('powerRunes', $effMV);
@@ -2105,7 +2105,7 @@ class SpellPage extends GenericPage
                                 if ($n = SkillList::getName($effMV))
                                     $bar = ' (<a href="?skill='.$effMV.'">'.$n.'</a>)';
                                 else
-                                    $bar = Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;;
+                                    $bar = Lang::main('colon').Util::ucFirst(Lang::game('skill')).' #'.$effMV;
 
                                 break;
                             case SPELL_AURA_ADD_FLAT_MODIFIER:
@@ -2164,7 +2164,7 @@ class SpellPage extends GenericPage
                                     $bar = $transform['typeId'] ? ' (<a href="?npc='.$transform['typeId'].'">'.$transform['displayName'].'</a>)' : ' (#0)';
                                 }
                                 else
-                                    $bar = Lang::main('colon').Lang::game('npc').' #'.$effMV;;
+                                    $bar = Lang::main('colon').Lang::game('npc').' #'.$effMV;
 
                                 break;
                             case SPELL_AURA_FORCE_REACTION:

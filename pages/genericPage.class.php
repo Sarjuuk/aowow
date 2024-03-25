@@ -22,7 +22,7 @@ trait TrDetailPage
     protected $redButtons = [];                             // see template/redButtons.tpl.php
     protected $smartAI    = null;
     protected $map        = null;
-    protected $article    = [];
+    protected $article    = null;
     protected $headIcons  = [];
     protected $expansion  = EXP_CLASSIC;
 
@@ -546,10 +546,10 @@ class GenericPage
             $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
                 Type::GUIDE, $this->typeId, $this->guideRevision);
         else if (!empty($this->articleUrl))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale`, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->articleUrl, [User::$localeId, LOCALE_EN]);
         else if (!empty($this->type) && isset($this->typeId))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale`, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->type, $this->typeId, [User::$localeId, LOCALE_EN]);
 
         if ($article)
@@ -1126,7 +1126,7 @@ class GenericPage
             return true;
         }
 
-        return false;;
+        return false;
     }
 
     private function memcached() : Memcached
