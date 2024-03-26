@@ -16,7 +16,7 @@ mb_internal_encoding('UTF-8');
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');
 
 // WIN10 and later usually support ANSI escape sequences
-define('CLI_HAS_E', !OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT)));
+define('CLI_HAS_E', CLI && (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
 
 
 require_once 'includes/defines.php';
