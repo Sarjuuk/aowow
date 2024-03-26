@@ -9,7 +9,7 @@ class AdminPage extends GenericPage
     protected $getAll    = null;
     protected $ssPages   = [];
     protected $ssData    = [];
-    protected $ssNFound  = int;
+    protected $ssNFound  = 0;
     protected $lvTabs    = [];
     protected $extraText = '';
     protected $extraHTML = '';
