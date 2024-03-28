@@ -130,7 +130,7 @@ $lang = array(
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d в H:i A",
         'timeAgo'       => '%s назад',
-        'nfSeparators'  => [' ', ','],
+        'nfSeparators'  => [' ', ','],
 
         // error
         'intError'      => "[An internal error occured.]",
