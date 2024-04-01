@@ -1494,6 +1494,14 @@ span.icon-instance8 {
     margin-top: 4px;
 }
 
+.icontab.show-all tr {
+    display: table-row !important;
+}
+
+.icontab.show-all tr.icontab-revealer {
+    display: none !important;
+}
+
 .icontab tr {
     background: none !important;
 }
@@ -1530,6 +1538,19 @@ span.icon-instance8 {
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+}
+
+.icontab-revealer a {
+    color: inherit;
+    display: block;
+    font-size: 14px;
+    height: 44px;
+    line-height: 44px;
+    text-align: center
+}
+
+.icontab-revealer a:hover {
+    color: #fff;
 }
 
 .lightbox-outer {

@@ -44,10 +44,11 @@ class SpellPage extends GenericPage
     private   $firstRank     = 0;
     private   $powerTpl      = '$WowheadPower.registerSpell(%d, %d, %s);';
 
-    private static $modAuras = [SPELL_AURA_ADD_FLAT_MODIFIER,     SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
-                                SPELL_AURA_ABILITY_PERIODIC_CRIT, SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
-                                SPELL_AURA_ALLOW_ONLY_ABILITY,    SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
-                                SPELL_AURA_MOD_IGNORE_SHAPESHIFT, SPELL_AURA_PERIODIC_HASTE                 /* SPELL_AURA_DUMMY ? */];
+    private static $modAuras = [SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
+                                SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
+                                SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
+                                SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
+                                SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,            /* SPELL_AURA_DUMMY ? */];
 
     public function __construct($pageCall, $id)
     {
@@ -296,7 +297,7 @@ class SpellPage extends GenericPage
         $this->scaling     = $this->createScalingData();
         $this->items       = $this->createRequiredItems();
         $this->tools       = $this->createTools();
-        $this->effects     = $effects;
+        $this->effects     = &$effects;
         $this->attributes  = $this->createAttributesList();
         $this->powerCost   = $this->subject->createPowerCostForCurrent();
         $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
@@ -383,12 +384,14 @@ class SpellPage extends GenericPage
         }
 
         // tab: [$this] modifies
-        $sub = ['OR'];
+        $sub = [];
         $conditions = [
             ['s.typeCat', [-9], '!'],                       // GM (-9); also include uncategorized (0), NPC-Spell (-8)?; NPC includes totems, lightwell and others :/
             ['s.spellFamilyId', $this->subject->getField('spellFamilyId')],
             &$sub
         ];
+        $modifiesData = [];
+        $hideSkillCol = true;
 
         for ($i = 1; $i < 4; $i++)
         {
@@ -402,30 +405,58 @@ class SpellPage extends GenericPage
             if (!$m1 && !$m2 && !$m3)
                 continue;
 
-            $sub[] = ['s.spellFamilyFlags1', $m1, '&'];
-            $sub[] = ['s.spellFamilyFlags2', $m2, '&'];
-            $sub[] = ['s.spellFamilyFlags3', $m3, '&'];
-        }
+            $classSpells = $miscSpells = [];
+            $this->effects[$i]['modifies'] = [&$classSpells, &$miscSpells];
 
-        if (count($sub) > 1)
-        {
+            $sub = ['OR', ['s.spellFamilyFlags1', $m1, '&'], ['s.spellFamilyFlags2', $m2, '&'], ['s.spellFamilyFlags3', $m3, '&']];
+
             $modSpells = new SpellList($conditions);
             if (!$modSpells->error)
             {
-                $tabData = array(
-                    'data'        => array_values($modSpells->getListviewData()),
-                    'id'          => 'modifies',
-                    'name'        => '$LANG.tab_modifies',
-                    'visibleCols' => ['level'],
-                );
+                foreach ($modSpells->iterate() as $id => $__)
+                {
+                    if (in_array($modSpells->getField('typeCat'), [-2, 7]))
+                        $classSpells[$id] = [$id, $modSpells->getField('name', true), 0, 0];
+                    else
+                        $miscSpells[$id]  = [$id, $modSpells->getField('name', true), 0, 0];
+                }
 
-                if (!$modSpells->hasSetFields(['skillLines']))
-                    $tabData['hiddenCols'] = ['skill'];
+                if ($classSpells)
+                    foreach (DB::World()->select('SELECT spell_id AS ARRAY_KEY, first_spell_id AS "0", `rank` AS "1" FROM spell_ranks WHERE spell_id IN (?a)', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
+                    {
+                        $classSpells[$firstSpellId][2] = min($classSpells[$firstSpellId][2] ?: $rank, $rank);
+                        $classSpells[$firstSpellId][3] = max($classSpells[$firstSpellId][3], $rank);
 
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                        if ($spellId != $firstSpellId)
+                            unset($classSpells[$spellId]);
+                    }
+
+                $modifiesData += $modSpells->getListviewData();
+                if ($modSpells->hasSetFields(['skillLines']))
+                    $hideSkillCol = false;
 
                 $this->extendGlobalData($modSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
+
+            $classSpells = array_values($classSpells);
+            $miscSpells  = array_values($miscSpells);
+
+            unset($classSpells, $miscSpells);
+        }
+
+        if ($modifiesData)
+        {
+            $tabData = array(
+                'data'        => array_values($modifiesData),
+                'id'          => 'modifies',
+                'name'        => '$LANG.tab_modifies',
+                'visibleCols' => ['level'],
+            );
+
+            if ($hideSkillCol)
+                $tabData['hiddenCols'] = ['skill'];
+
+            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
         }
 
         // tab: [$this is] modified by
