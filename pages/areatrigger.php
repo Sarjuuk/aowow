@@ -115,6 +115,15 @@ class AreaTriggerPage extends GenericPage
         /* Extra Tabs */
         /**************/
 
+        // tab: conditions
+        $cnd = new Conditions();
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_AREATRIGGER_CLIENT);
+        if ($tab = $cnd->toListviewTab());
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $tab;
+        }
+
         if ($_type == AT_TYPE_OBJECTIVE)
         {
             $relQuest = new QuestList(array(['id', $this->subject->getField('quest')]));

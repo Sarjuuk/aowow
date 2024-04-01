@@ -118,9 +118,7 @@ class CurrencyPage extends GenericPage
                 if (!$soldBy->error)
                 {
                     $sbData    = $soldBy->getListviewData();
-                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
-                    $holidays  = [];
-
+                    $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost', '$Listview.extraCols.condition'];
                     foreach ($sbData as $k => &$row)
                     {
                         $items  = [];
@@ -137,14 +135,9 @@ class CurrencyPage extends GenericPage
                                 $items[] = [-$id, $qty];
                         }
 
-                        if ($vendors[$k][0]['event'])
-                        {
-                            if (count($extraCols) == 3)             // not already pushed
-                                $extraCols[] = '$Listview.extraCols.condition';
-
-                            $this->extendGlobalIds(Type::WORLDEVENT, $vendors[$k][0]['event']);
-                            $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $vendors[$k][0]['event']]];
-                        }
+                        if ($e = $vendors[$k][0]['event'])
+                            if (Conditions::extendListviewRow($row, Conditions::SRC_NONE, $k, [Conditions::ACTIVE_EVENT, $e]))
+                                $this->extendGlobalIds(Type::WORLDEVENT, $e);
 
                         $row['stock'] = $vendors[$k][0]['stock'];
                         $row['stack'] = $itemObj->getField('buyCount');
@@ -154,6 +147,10 @@ class CurrencyPage extends GenericPage
                             $tokens ? $tokens : null
                         );
                     }
+
+                    // no conditions > remove conditions column
+                    if (!array_column($sbData, 'condition'))
+                        array_pop($extraCols);
 
                     $this->lvTabs[] = [CreatureList::$brickFile, array(
                         'data'       => array_values($sbData),

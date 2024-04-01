@@ -249,7 +249,7 @@ class SoundPage extends GenericPage
 
                     foreach ($zoneIds as $zData)
                         if ($zData['worldStateId'])
-                            $zoneData[$zData['id']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]];
+                            Conditions::extendListviewRow($zoneData[$zData['id']], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]);
                 }
 
                 $tabData['data'] = array_values($zoneData);

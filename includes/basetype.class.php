@@ -859,9 +859,9 @@ trait sourceHelper
     protected $sources    = [];
     protected $sourceMore = null;
 
-    public function getSources(?array &$s, ?array &$sm) : bool
+    public function getSources(?array &$s = [], ?array &$sm = []) : bool
     {
-        $s = $sm = null;
+        $s = $sm = [];
         if (empty($this->sources[$this->id]))
             return false;
 

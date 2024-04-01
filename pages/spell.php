@@ -746,11 +746,14 @@ class SpellPage extends GenericPage
                         $lv[$bar] = $foo[$bar];
                         $lv[$bar]['percent']  = $extraItem['additionalCreateChance'];
                         $lv[$bar]['pctstack'] = $this->buildPctStack($extraItem['additionalCreateChance'] / 100, $extraItem['additionalMaxNum']);
-                        $lv[$bar]['condition'][0][$this->typeId][] = [[CND_SPELL, $extraItem['requiredSpecialization']]];
-                        $this->extendGlobalIds(Type::SPELL, $extraItem['requiredSpecialization']);
-                        $extraCols[] = '$Listview.extraCols.condition';
                         if ($max = ($extraItem['additionalMaxNum'] - 1))
                             $lv[$bar]['stack'] = [1, $max];
+
+                        if (Conditions::extendListviewRow($lv[$bar], Conditions::SRC_NONE, $this->typeId, [Conditions::SPELL, $extraItem['requiredSpecialization']]))
+                        {
+                            $this->extendGlobalIds(Type::SPELL, $extraItem['requiredSpecialization']);
+                            $extraCols[] = '$Listview.extraCols.condition';
+                        }
 
                         break;                              // skill_extra_item_template can only contain 1 item
                     }
@@ -926,119 +929,46 @@ class SpellPage extends GenericPage
         }
 
         // tab: zone
-        if ($areas = DB::World()->select('SELECT * FROM spell_area WHERE spell = ?d', $this->typeId))
+        if ($areaSpells = DB::World()->select('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE spell = ?d', $this->typeId))
         {
-            $zones = new ZoneList(array(['id', array_column($areas, 'area')]));
+            $zones = new ZoneList(array(['id', array_keys($areaSpells)]));
             if (!$zones->error)
             {
                 $lvZones = $zones->getListviewData();
                 $this->extendGlobalData($zones->getJSGlobals());
 
-                $lv      = [];
-                $parents = [];
-                $extra   = false;
-                foreach ($areas as $a)
+                $resultLv = [];
+                $parents  = [];
+                foreach ($areaSpells as $areaId => $condition)
                 {
-                    if (empty($lvZones[$a['area']]))
+                    if (empty($lvZones[$areaId]))
                         continue;
 
-                    $condition = [];
-                    if ($a['aura_spell'])
-                    {
-                        $this->extendGlobalIds(Type::SPELL, abs($a['aura_spell']));
-                        $condition[0][$this->typeId][] = [[$a['aura_spell'] >  0 ? CND_AURA : -CND_AURA, abs($a['aura_spell'])]];
-                    }
+                    $row = $lvZones[$areaId];
 
-                    if ($a['quest_start'])                  // status for quests needs work
-                    {
-                        $this->extendGlobalIds(Type::QUEST, $a['quest_start']);
-                        $group = [];
-                        for ($i = 0; $i < 7; $i++)
-                        {
-                            if (!($a['quest_start_status'] & (1 << $i)))
-                                continue;
+                    // attach to lv row and evaluate after merging
+                    $row['__condition'] = $condition;
 
-                            if ($i == 0)
-                                $group[] = [CND_QUEST_NONE, $a['quest_start']];
-                            else if ($i == 1)
-                                $group[] = [CND_QUEST_COMPLETE, $a['quest_start']];
-                            else if ($i == 3)
-                                $group[] = [CND_QUESTTAKEN, $a['quest_start']];
-                            else if ($i == 6)
-                                $group[] = [CND_QUESTREWARDED, $a['quest_start']];
-                        }
-
-                        if ($group)
-                            $condition[0][$this->typeId][] = $group;
-                    }
-
-                    if ($a['quest_end'] && $a['quest_end'] != $a['quest_start'])
-                    {
-                        $this->extendGlobalIds(Type::QUEST, $a['quest_end']);
-                        $group = [];
-                        for ($i = 0; $i < 7; $i++)
-                        {
-                            if (!($a['quest_end_status'] & (1 << $i)))
-                                continue;
-
-                            if ($i == 0)
-                                $group[] = [-CND_QUEST_NONE, $a['quest_end']];
-                            else if ($i == 1)
-                                $group[] = [-CND_QUEST_COMPLETE, $a['quest_end']];
-                            else if ($i == 3)
-                                $group[] = [-CND_QUESTTAKEN, $a['quest_end']];
-                            else if ($i == 6)
-                                $group[] = [-CND_QUESTREWARDED, $a['quest_end']];
-                        }
-
-                        if ($group)
-                            $condition[0][$this->typeId][] = $group;
-                    }
-
-                    if ($a['racemask'])
-                    {
-                        $foo = [];
-                        for ($i = 0; $i < 11; $i++)
-                            if ($a['racemask'] & (1 << $i))
-                                $foo[] = $i + 1;
-
-                        $this->extendGlobalIds(Type::CHR_RACE, ...$foo);
-                        $condition[0][$this->typeId][] = [[CND_RACE, $a['racemask']]];
-                    }
-
-                    if ($a['gender'] != 2)                  // 2: both
-                        $condition[0][$this->typeId][] = [[CND_GENDER, $a['gender'] + 1]];
-
-                    $row = $lvZones[$a['area']];
-                    if ($condition)
-                    {
-                        $extra = true;
-                        $row   = array_merge($row, ['condition' => $condition]);
-                    }
-
-                    // merge subzones, into one row, if: conditions match && parentZone is shared
-                    if ($p = $zones->getEntry($a['area'])['parentArea'])
+                    // merge subzones, into one row, if: spell_area data is identical && parentZone is shared
+                    if ($p = $zones->getEntry($areaId)['parentArea'])
                     {
                         $parents[] = $p;
-                        $row['parentArea'] = $p;
-                        $row['subzones']   = [$a['area']];
+                        $row['__parent'] = $p;
+                        $row['subzones'] = [$areaId];
                     }
                     else
-                        $row['parentArea'] = 0;
+                        $row['__parent'] = 0;
 
                     $set = false;
-                    foreach ($lv as &$v)
+                    foreach ($resultLv as &$v)
                     {
-                        if ($v['parentArea'] != $row['parentArea'] && $v['id'] != $row['parentArea'])
+                        if ($v['__parent'] != $row['__parent'] && $v['id'] != $row['__parent'])
                             continue;
 
-                        if (empty($v['condition']) xor empty($row['condition']))
+                        if ($v['__condition'] != $row['__condition'])
                             continue;
 
-                        if (!empty($row['condition']) && !empty($v['condition']) && $v['condition'] != $row['condition'])
-                            continue;
-
-                        if (!$row['parentArea'] && $v['id'] != $row['parentArea'])
+                        if (!$row['__parent'] && $v['id'] != $row['__parent'])
                             continue;
 
                         $set = true;
@@ -1050,7 +980,7 @@ class SpellPage extends GenericPage
                     if (!$set)
                     {
                         $row['subzones'] = [$row['id']];
-                        $lv[] = $row;
+                        $resultLv[] = $row;
                     }
                 }
 
@@ -1058,16 +988,44 @@ class SpellPage extends GenericPage
                 if ($parents)
                 {
                     $parents = (new ZoneList(array(['id', $parents])))->getListviewData();
-                    foreach ($lv as &$_)
-                        if (isset($parents[$_['parentArea']]))
-                            $_ = array_merge($_, $parents[$_['parentArea']]);
+                    foreach ($resultLv as &$_)
+                        if (isset($parents[$_['__parent']]))
+                            $_ = array_merge($_, $parents[$_['__parent']]);
                 }
 
-                $tabData = ['data' => array_values($lv)];
-
-                if ($extra)
+                $cnd = new Conditions();
+                foreach ($resultLv as $idx => $lv)
                 {
-                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+                    [$auraSpell, $questStart, $questEnd, $questStartState, $questEndState, $raceMask, $gender] = $lv['__condition'];
+
+                    if ($auraSpell)
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [$auraSpell > 0 ? Conditions::AURA : -Conditions::AURA, abs($auraSpell)]);
+
+                    if ($questStart)
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questStart, $questStartState]);
+
+                    if ($questEnd && $questEnd != $questStart)
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::QUESTSTATE, $questEnd, $questEndState]);
+
+                    if ($raceMask)
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::CHR_RACE, $raceMask]);
+
+                    if ($gender != 2)                       // 2: both
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::GENDER, $gender + 1]);
+
+                    // remove temp storage from result
+                    unset($resultLv[$idx]['__condition']);
+                    unset($resultLv[$idx]['__parent']);
+                }
+
+                if ($cnd->toListviewColumn($resultLv, $extraCols))
+                    $this->extendGlobalData($cnd->getJsGlobals());
+
+                $tabData = ['data' => array_values($resultLv)];
+
+                if ($extraCols)
+                {
+                    $tabData['extraCols']  = $extraCols;
                     $tabData['hiddenCols'] = ['instancetype'];
                 }
 
@@ -1107,35 +1065,55 @@ class SpellPage extends GenericPage
             }
         }
 
-        // tab: taught by npc (source:6 => trainer)
-        if (!empty($this->subject->sources[$this->typeId][6]))
+        // tab: taught by npc
+        if ($this->subject->getSources($s) && in_array(SRC_TRAINER, $s))
         {
-            $src  = $this->subject->sources[$this->typeId][6];
-            $list = [];
-            if (count($src) == 1 && $src[0] == 1)           // multiple trainer
-            {
-                $list = DB::World()->selectCol('
-                    SELECT  cdt.CreatureId
-                    FROM    creature_default_trainer cdt
-                    JOIN    trainer_spell ts ON ts.TrainerId = cdt.TrainerId
-                    WHERE   ts.SpellId = ?d',
-                    $this->typeId
-                );
-            }
-            else if ($src)
-                $list = array_values($src);
+            $trainers = DB::World()->select('
+                SELECT  cdt.CreatureId AS ARRAY_KEY, ts.ReqSkillLine AS reqSkillId, ts.ReqSkillRank AS reqSkillValue, ts.ReqLevel AS reqLevel, ts.ReqAbility1 AS reqSpellId1, ts.reqAbility2 AS reqSpellId2
+                FROM    creature_default_trainer cdt
+                JOIN    trainer_spell ts ON ts.TrainerId = cdt.TrainerId
+                WHERE   ts.SpellId = ?d',
+                $this->typeId
+            );
 
-            if ($list)
+            if ($trainers)
             {
-                $tbTrainer = new CreatureList(array(Cfg::get('SQL_LIMIT_NONE'), ['ct.id', $list], ['s.guid', null, '!'], ['ct.npcflag', 0x10, '&']));
+                $tbTrainer = new CreatureList(array(Cfg::get('SQL_LIMIT_NONE'), ['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
-                    $this->lvTabs[] = [CreatureList::$brickFile, array(
-                        'data' => array_values($tbTrainer->getListviewData()),
+
+                    $cnd   = new Conditions();
+                    $skill = $this->subject->getField('skill');
+
+                    foreach ($trainers as $tId => $train)
+                    {
+                        if ($_ = $train['reqLevel'])
+                            $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::LEVEL, $_, Conditions::OP_GT_E]);
+
+                        if ($_ = $train['reqSkillId'])
+                            if (count($skill) == 1 && $_ != $skill[0])
+                                $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SKILL, $_, $train['reqSkillValue']]);
+
+                        for ($i = 1; $i < 3; $i++)
+                            if ($_ = $train['reqSpellId'.$i])
+                                $cnd->addExternalCondition(Conditions::SRC_NONE, $tId, [Conditions::SPELL, $_]);
+                    }
+
+                    $lvData = $tbTrainer->getListviewData();
+                    if ($cnd->toListviewColumn($lvData, $extraCols))
+                        $this->extendGlobalData($cnd->getJsGlobals());
+
+                    $lvTab = array(
+                        'data' => array_values($lvData),
                         'id'   => 'taught-by-npc',
                         'name' => '$LANG.tab_taughtby',
-                    )];
+                    );
+
+                    if ($extraCols)
+                        $lvTab['extraCols'] = $extraCols;
+
+                    $this->lvTabs[] = [CreatureList::$brickFile, $lvTab];
                 }
             }
         }
@@ -1261,20 +1239,19 @@ class SpellPage extends GenericPage
         // taughtbyitem
 
         // tab: conditions
-        $sc = Util::getServerConditions([CND_SRC_SPELL_LOOT_TEMPLATE, CND_SRC_SPELL_IMPLICIT_TARGET, CND_SRC_SPELL, CND_SRC_SPELL_CLICK_EVENT, CND_SRC_VEHICLE_SPELL, CND_SRC_SPELL_PROC], null, $this->typeId);
-        if (!empty($sc[0]))
+        $cnd = new Conditions();
+        if ($cnd->getBySourceEntry($this->typeId, Conditions::SRC_SPELL_LOOT_TEMPLATE, Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC))
         {
-            $this->extendGlobalData($sc[1]);
-            $tab = "<script type=\"text/javascript\">\n" .
-                   "var markup = ConditionList.createTab(".Util::toJSON($sc[0]).");\n" .
-                   "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
-                   "</script>";
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab();
+        }
 
-            $this->lvTabs[] = [null, array(
-                'data'   => $tab,
-                'id'   => 'conditions',
-                'name' => '$LANG.requires'
-            )];
+        // tab: condition for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::SPELL, $this->typeId))
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
         }
     }
 

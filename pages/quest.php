@@ -1012,49 +1012,19 @@ class QuestPage extends GenericPage
         }
 
         // tab: conditions
-        $cnd = [];
+        $cnd = new Conditions();
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_QUEST_AVAILABLE, Conditions::SRC_QUEST_SHOW_MARK);
+
         if ($_ = $this->subject->getField('reqMinRepFaction'))
-        {
-            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))];
-            $this->extendGlobalIds(Type::FACTION, $_);
-        }
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, $this->typeId, [Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))]);
 
         if ($_ = $this->subject->getField('reqMaxRepFaction'))
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, $this->typeId, [-Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))]);
+
+        if ($tab = $cnd->toListviewTab())
         {
-            $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0][] = [-CND_REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))];
-            $this->extendGlobalIds(Type::FACTION, $_);
-        }
-
-        $_ = Util::getServerConditions([CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK], null, $this->typeId);
-        if (!empty($_[0]))
-        {
-            // awkward merger
-            if (isset($_[0][CND_SRC_QUEST_ACCEPT][$this->typeId][0]))
-            {
-                if (isset($cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0]))
-                    $cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0] = array_merge($cnd[CND_SRC_QUEST_ACCEPT][$this->typeId][0], $_[0][CND_SRC_QUEST_ACCEPT][$this->typeId][0]);
-                else
-                    $cnd[CND_SRC_QUEST_ACCEPT] = $_[0][CND_SRC_QUEST_ACCEPT];
-            }
-
-            if (isset($_[0][CND_SRC_QUEST_SHOW_MARK]))
-                $cnd[CND_SRC_QUEST_SHOW_MARK] = $_[0][CND_SRC_QUEST_SHOW_MARK];
-
-            $this->extendGlobalData($_[1]);
-        }
-
-        if ($cnd)
-        {
-            $tab = "<script type=\"text/javascript\">\n" .
-                   "var markup = ConditionList.createTab(".Util::toJSON($cnd).");\n" .
-                   "Markup.printHtml(markup, 'tab-conditions', { allow: Markup.CLASS_STAFF })" .
-                   "</script>";
-
-            $this->lvTabs[] = [null, array(
-                'data'   => $tab,
-                'id'   => 'conditions',
-                'name' => '$LANG.requires'
-            )];
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $tab;
         }
     }
 

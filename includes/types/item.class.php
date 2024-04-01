@@ -371,10 +371,8 @@ class ItemList extends BaseType
                         $costArr['restock'] = $entries['restock'];
 
                         if ($entries['event'])
-                        {
-                            $this->jsGlobals[Type::WORLDEVENT][$entries['event']] = $entries['event'];
-                            $costArr['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $entries['event']]];
-                        }
+                            if (Conditions::extendListviewRow($costArr, Conditions::SRC_NONE, $this->id, [Conditions::ACTIVE_EVENT, $entries['event']]))
+                                $this->jsGlobals[Type::WORLDEVENT][$entries['event']] = $entries['event'];
 
                         if ($currency || $tokens)           // fill idx:3 if required
                             $costArr['cost'][] = $currency;

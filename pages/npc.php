@@ -572,40 +572,25 @@ class NpcPage extends GenericPage
                     $this->extendGlobalData($teaches->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
                     $data = $teaches->getListviewData();
 
-                    $extra = [];
+                    $extraCols = [];
+                    $cnd = new Conditions();
                     foreach ($tSpells as $sId => $train)
                     {
                         if (empty($data[$sId]))
                             continue;
 
                         if ($_ = $train['reqSkillId'])
-                        {
                             if (count($data[$sId]['skill']) == 1 && $_ != $data[$sId]['skill'][0])
-                            {
-                                $this->extendGlobalIds(Type::SKILL, $_);
-                                if (!isset($extra[0]))
-                                    $extra[0] = '$Listview.extraCols.condition';
-
-                                $data[$sId]['condition'][0][$this->typeId][] = [[CND_SKILL, $_, $train['reqSkillValue']]];
-                            }
-                        }
+                                $cnd->addExternalCondition(Conditions::SRC_NONE, $sId, [Conditions::SKILL, $_, $train['reqSkillValue']]);
 
                         for ($i = 1; $i < 3; $i++)
-                        {
                             if ($_ = $train['reqSpellId'.$i])
-                            {
-                                $this->extendGlobalIds(Type::SPELL, $_);
-                                if (!isset($extra[0]))
-                                    $extra[0] = '$Listview.extraCols.condition';
-
-                                $data[$sId]['condition'][0][$this->typeId][] = [[CND_SPELL, $_]];
-                            }
-                        }
+                                $cnd->addExternalCondition(Conditions::SRC_NONE, $sId, [Conditions::SPELL, $_]);
 
                         if ($_ = $train['reqLevel'])
                         {
-                            if (!isset($extra[1]))
-                                $extra[1] = "\$Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
+                            if (!isset($extraCols[1]))
+                                $extraCols[1] = "\$Listview.funcBox.createSimpleCol('reqLevel', LANG.tooltip_reqlevel, '7%', 'reqLevel')";
 
                             $data[$sId]['reqLevel'] = $_;
                         }
@@ -614,6 +599,9 @@ class NpcPage extends GenericPage
                             $data[$sId]['trainingcost'] = $_;
                     }
 
+                    if ($cnd->toListviewColumn($data, $extraCols))
+                        $this->extendGlobalData($cnd->getJsGlobals());
+
                     $tabData = array(
                         'data'        => array_values($data),
                         'name'        => '$LANG.tab_teaches',
@@ -621,8 +609,8 @@ class NpcPage extends GenericPage
                         'visibleCols' => ['trainingcost']
                     );
 
-                    if ($extra)
-                        $tabData['extraCols'] = array_values($extra);
+                    if ($extraCols)
+                        $tabData['extraCols'] = array_values($extraCols);
 
                     $this->lvTabs[] = [SpellList::$brickFile, $tabData];
                 }
@@ -639,10 +627,11 @@ class NpcPage extends GenericPage
             {
                 $colAddIn  = null;
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
-                    if ($soldItems->hasSetFields('condition'))
-                        $extraCols[] = '$Listview.extraCols.condition';
 
                 $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [Type::NPC => [$this->typeId]]);
+
+                if (array_column($lvData, 'condition'))
+                    $extraCols[] = '$Listview.extraCols.condition';
 
                 if (array_filter(array_column($lvData, 'restock')))
                 {
@@ -650,17 +639,11 @@ class NpcPage extends GenericPage
                     $colAddIn = 'vendorRestockCol';
                 }
 
-                $sc = Util::getServerConditions(CND_SRC_NPC_VENDOR, $this->typeId);
-                if (!empty($sc[0]))
+                $cnd = new Conditions();
+                if ($cnd->getBySourceGroup($this->typeId, Conditions::SRC_NPC_VENDOR))
                 {
-                    $this->extendGlobalData($sc[1]);
-
-                    $extraCols[] = '$Listview.extraCols.condition';
-
-                    foreach ($lvData as $id => &$row)
-                        foreach ($sc[0] as $srcType => $cndData)
-                        if (!empty($cndData[$id.':'.$this->typeId]))
-                            $row['condition'][0][$id.':'.$this->typeId] = $cndData[$id.':'.$this->typeId];
+                    $this->extendGlobalData($cnd->getJsGlobals());
+                    $cnd->toListviewColumn($lvData, $extraCols);
                 }
 
                 $this->lvTabs[] = [ItemList::$brickFile, array(
@@ -725,62 +708,33 @@ class NpcPage extends GenericPage
             foreach ($lootGOs as $idx => $lgo)
                 array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")']]);
 
-        $lootGOs = DB::World()->select('select SourceEntry, ConditionValue1, ConditionValue2 from conditions where SourceTypeOrReferenceId = 1 and SourceGroup = ?d and ConditionTypeOrReference = ?d', $this->typeId, CND_SKILL);
-
-        $reqQuest = [];
-        foreach ($sourceFor as $sf)
+        foreach ($sourceFor as [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols])
         {
             $creatureLoot = new Loot();
-            if ($creatureLoot->getByContainer($sf[0], $sf[1]))
+            if ($creatureLoot->getByContainer($lootTpl, $lootId))
             {
                 $extraCols   = $creatureLoot->extraCols;
                 $extraCols[] = '$Listview.extraCols.percent';
 
                 $this->extendGlobalData($creatureLoot->jsGlobals);
 
-                $this->extendWithConditions($creatureLoot, $lootGOs, $extraCols, $reqQuest);
-
                 $tabData = array(
                     'data'      => array_values($creatureLoot->getResult()),
-                    'name'      => $sf[2],
-                    'id'        => $sf[3],
-                    'extraCols' => $extraCols,
+                    'name'      => $tabName,
+                    'id'        => $tabId,
+                    'extraCols' => array_values(array_unique($extraCols)),
                     'sort'      => ['-percent', 'name']
                 );
 
                 if (!empty($sf['note']))
                     $tabData['note'] = $sf['note'];
-                else if ($sf[0] == LOOT_SKINNING)
+                else if ($lootTpl == LOOT_SKINNING)
                     $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel')), Lang::FMT_HTML).'</b>';
 
-                if ($sf[4])
-                    $tabData['hiddenCols'] = $sf[4];
+                if ($hiddenCols)
+                    $tabData['hiddenCols'] = $hiddenCols;
 
                 $this->lvTabs[] = [ItemList::$brickFile, $tabData];
-            }
-        }
-
-        if ($reqIds = array_keys($reqQuest))                // apply quest-conditions as back-reference
-        {
-            $conditions = array(
-                'OR',
-                ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
-                ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
-                ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
-                ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
-            );
-
-            $reqQuests = new QuestList($conditions);
-            $this->extendGlobalData($reqQuests->getJSGlobals());
-
-            foreach ($reqQuests->iterate() as $qId => $__)
-            {
-                if (empty($reqQuests->requires[$qId][Type::ITEM]))
-                    continue;
-
-                foreach ($reqIds as $rId)
-                    if (in_array($rId, $reqQuests->requires[$qId][Type::ITEM]))
-                        $reqQuest[$rId] = $reqQuests->id;
             }
         }
 
@@ -914,6 +868,14 @@ class NpcPage extends GenericPage
                 $this->lvTabs[] = [SoundList::$brickFile, $tabData];
             }
         }
+
+        // tab: conditions
+        $cnd = new Conditions();
+        if ($cnd->getBySourceEntry($this->typeId, Conditions::SRC_CREATURE_TEMPLATE_VEHICLE))
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab();
+        }
     }
 
     protected function generateTooltip()
@@ -1044,49 +1006,6 @@ class NpcPage extends GenericPage
             $this->soundIds = array_merge($this->soundIds, $soundIds);
 
         return [$quotes, $nQuotes];
-    }
-
-    private function getConditions($itemId, $data)
-    {
-        foreach ($data as $datum)
-        {
-            if ($datum['SourceEntry'] == $itemId)
-            {
-                return [CND_SKILL, $datum['ConditionValue1'], $datum['ConditionValue2']];
-            }
-        }
-
-        return null;
-    }
-
-    private function extendWithConditions($creatureLoot, $lootConditions, &$extraCols, &$reqQuest)
-    {
-        $hasExtraCol = false;
-        $reqSkill = [];
-
-        foreach ($creatureLoot->iterate() as &$lv)
-        {
-            if ($lv['quest'])
-            {
-                $hasExtraCol = true;
-                $reqQuest[$lv['id']] = 0;
-                $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
-            }
-            elseif ($skill = $this->getConditions($lv['id'], $lootConditions))
-            {
-                $hasExtraCol = true;
-                $lv['condition'][0][$this->typeId][] = [$skill];
-                $reqSkill[] = $skill[1];
-            }
-        }
-
-        if ($hasExtraCol)
-        {
-            $extraCols[] = '$Listview.extraCols.condition';
-        }
-
-        $reqSkills = new SkillList(['OR', ['id', array_unique($reqSkill)]]);
-        $this->extendGlobalData($reqSkills->getJSGlobals());
     }
 }
 

@@ -266,6 +266,15 @@ class AchievementPage extends GenericPage
             $this->extendGlobalData($coList->getJSGlobals());
         }
 
+        // tab: condition for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::ACHIEVEMENT, $this->typeId))
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
+
+
         /*****************/
         /* Criteria List */
         /*****************/
