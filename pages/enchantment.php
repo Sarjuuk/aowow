@@ -98,30 +98,29 @@ class EnchantmentPage extends GenericPage
 
             switch ($_ty)
             {
-                case 1:
-                case 3:
-                case 7:
-                    $sArr = $this->subject->getField('spells')[$i];
-                    $spl  = $this->subject->getRelSpell($sArr[0]);
-                    $this->effects[$i]['name']  = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'Type: '.$_ty, Lang::item('trigger', $sArr[1])) : Lang::item('trigger', $sArr[1]);
-                    $this->effects[$i]['proc']  = $sArr[3];
+                case ENCHANTMENT_TYPE_COMBAT_SPELL:
+                case ENCHANTMENT_TYPE_EQUIP_SPELL:
+                case ENCHANTMENT_TYPE_USE_SPELL:
+                    [$spellId, $trigger, $charges, $procChance] = $this->subject->getField('spells')[$i];
+                    $spl  = $this->subject->getRelSpell($spellId);
+                    $this->effects[$i]['name']  = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'Type: '.$_ty, Lang::item('trigger', $trigger)) : Lang::item('trigger', $trigger);
+                    $this->effects[$i]['proc']  = $procChance;
                     $this->effects[$i]['value'] = $_qty ?: null;
                     $this->effects[$i]['icon']  = array(
-                        'name'  => !$spl ? Util::ucFirst(Lang::game('spell')).' #'.$sArr[0] : Util::localizedString($spl, 'name'),
-                        'id'    => $sArr[0],
-                        'count' => $sArr[2]
+                        'name'  => !$spl ? Util::ucFirst(Lang::game('spell')).' #'.$spellId : Util::localizedString($spl, 'name'),
+                        'id'    => $spellId,
+                        'count' => $charges
                     );
                     break;
-                case 5:
-                    if ($_obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
-                        $_obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
-
-                    $this->effects[$i]['tip'] = [$_obj, Game::$itemMods[$_obj]];
+                case ENCHANTMENT_TYPE_STAT:
+                    if ($idx = Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $_obj))
+                        if ($jsonStat = Stat::getJsonString($idx))
+                            $this->effects[$i]['tip'] = [$_obj, $jsonStat];
                     // DO NOT BREAK!
-                case 2:
-                case 6:
-                case 8:
-                case 4:
+                case ENCHANTMENT_TYPE_DAMAGE:
+                case ENCHANTMENT_TYPE_TOTEM:
+                case ENCHANTMENT_TYPE_PRISMATIC_SOCKET:
+                case ENCHANTMENT_TYPE_RESISTANCE:
                     $this->effects[$i]['name']  = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'Type: '.$_ty, Lang::enchantment('types', $_ty)) : Lang::enchantment('types', $_ty);
                     $this->effects[$i]['value'] = $_qty;
                     if ($_ty == 4)

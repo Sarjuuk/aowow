@@ -73,7 +73,7 @@ if (!CLI)
             {
                 if (!$enchantments->getEntry($pop['enchId']))
                 {
-                    CLI::write(' * could not find enchantment #'.$pop['enchId'].' referenced by item #'.$gem['itemId'], CLI::LOG_WARN);
+                    CLI::write(' * could not find enchantment #'.$pop['enchId'].' referenced by item #'.$pop['itemId'], CLI::LOG_WARN);
                     continue;
                 }
 
@@ -82,10 +82,10 @@ if (!CLI)
                     'quality'     => $pop['quality'],
                     'icon'        => strToLower($pop['icon']),
                     'enchantment' => $enchantments->getField('name', true),
-                    'jsonequip'   => $enchantments->getStatGain(),
+                    'jsonequip'   => $enchantments->getStatGainForCurrent(),
                     'colors'      => $pop['colors'],
                     'expansion'   => $pop['expansion'],
-                    'gearscore'   => Util::getGemScore($pop['itemLevel'], $pop['quality'], $pop['requiredSkill'] == 755, $pop['itemId'])
+                    'gearscore'   => Util::getGemScore($pop['itemLevel'], $pop['quality'], $pop['requiredSkill'] == SKILL_JEWELCRAFTING, $pop['itemId'])
                 );
             }
 

@@ -145,7 +145,7 @@ if (!CLI)
                     'skill'       => -1,                    // modified if skill
                     'slots'       => [],                    // determined per spell but set per item
                     'enchantment' => $enchantments->getField('name', true),
-                    'jsonequip'   => $enchantments->getStatGain(),
+                    'jsonequip'   => $enchantments->getStatGainForCurrent(),
                     'temp'        => 0,                     // always 0
                     'classes'     => 0,                     // modified by item
                     'gearscore'   => 0                      // set later

@@ -4772,7 +4772,7 @@ var LANG = {
     su_addscale:     "Gewichtung",
     su_additem:      "Gegenstand",
     su_addset:       "Set",
-    su_toggle:       "Klickt, um die Darstellung anzuzeigen",
+    su_toggle:       "Klickt, um die Darstellung umzuschalten",
 
     su_preset:       "Vorlage: ",
     su_name:         "Name: ",

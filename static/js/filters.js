@@ -169,7 +169,7 @@ var fi_filters = {
         { id: 87,  name: 'reagentforability',       type: 'profession' },
         { id: 63,  name: 'buyprice',                type: 'num', noweights: 1 },
         { id: 154, name: 'refundable',              type: 'yn' },
-        { id: 165, name: 'repaircost',              type: 'num' },
+        { id: 165, name: 'repaircost',              type: 'num', noweights: 1 },
         { id: 64,  name: 'sellprice',               type: 'num', noweights: 1 },
         { id: 157, name: 'smartloot',               type: 'yn' },
         { id: 6,   name: 'startsquest',             type: 'side' },

@@ -23,6 +23,7 @@ if ($error)
 
 
 require_once 'includes/defines.php';
+require_once 'includes/stats.class.php';                    // Game entity statistics conversion
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/utilities.php';                      // helper functions
 require_once 'includes/config.class.php';                   // Config holder

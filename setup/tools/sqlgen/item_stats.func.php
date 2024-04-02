@@ -9,17 +9,17 @@ if (!CLI)
 
 class ItemStatSetup extends ItemList
 {
-    private $statCols = [];
+    private $relSpells   = [];
+    private $relEnchants = [];
 
-    public function __construct($start, $limit, array $ids, array $enchStats)
+    public function __construct($start, $limit, array $ids, array $relEnchants, array $relSpells)
     {
-        $this->statCols = DB::Aowow()->selectCol('SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` LIKE "%item_stats"');
         $this->queryOpts['i']['o'] = 'i.id ASC';
         unset($this->queryOpts['is']);                      // do not reference the stats table we are going to write to
 
         $conditions = array(
             ['i.id', $start, '>'],
-            ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR, ITEM_CLASS_CONSUMABLE]],
+            ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR, ITEM_CLASS_CONSUMABLE, ITEM_CLASS_AMMUNITION]],
             $limit
         );
 
@@ -28,102 +28,26 @@ class ItemStatSetup extends ItemList
 
         parent::__construct($conditions);
 
-        $this->enchParsed = $enchStats;
+        $this->relSpells   = $relSpells;
+        $this->relEnchants = $relEnchants;
     }
 
     public function writeStatsTable()
     {
-        $enchantments = [];                                 // buffer Ids for lookup id => src; src>0: socketBonus; src<0: gemEnchant
-
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $id => $curTpl)
         {
-            $this->itemMods[$this->id] = [];
+            $spellIds  = [];
 
-            // also occurs as seperate field (gets summed in calculation but not in tooltip)
-            if ($_ = $this->getField('block'))
-                $this->itemMods[$this->id][ITEM_MOD_BLOCK_VALUE] = $_;
+            for ($i = 1; $i <= 5; $i++)
+                if ($this->curTpl['spellId'.$i] > 0 && !isset($this->relSpells[$this->curTpl['spellId'.$i]]) && (($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE && $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_USE) || $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_EQUIP))
+                    $spellIds[] = $this->curTpl['spellId'.$i];
 
-            // convert itemMods to stats
-            for ($h = 1; $h <= 10; $h++)
-            {
-                $mod = $this->curTpl['statType'.$h];
-                $val = $this->curTpl['statValue'.$h];
-                if (!$mod || !$val)
-                    continue;
+            if ($spellIds)                                  // array_merge kills the keys
+                $this->relSpells = array_replace($this->relSpells, DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spellIds));
 
-                Util::arraySumByKey($this->itemMods[$this->id], [$mod => $val]);
-            }
-
-            // convert spells to stats
-            $equipSpells = [];
-            for ($h = 1; $h <= 5; $h++)
-            {
-                if ($this->curTpl['spellId'.$h] <= 0)
-                    continue;
-
-                // armor & weapons only onEquip && consumables only onUse
-                if (!(in_array($this->curTpl['class'],  [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) && $this->curTpl['spellTrigger'.$h] == SPELL_TRIGGER_EQUIP) &&
-                    !(         $this->curTpl['class'] == ITEM_CLASS_CONSUMABLE                 && $this->curTpl['spellTrigger'.$h] == SPELL_TRIGGER_USE))
-                    continue;
-
-                $equipSpells[] = $this->curTpl['spellId'.$h];
-            }
-
-            if ($equipSpells)
-            {
-                $eqpSplList = new SpellList(array(['s.id', $equipSpells]));
-                foreach ($eqpSplList->getStatGain() as $stats)
-                    Util::arraySumByKey($this->itemMods[$this->id], $stats);
-            }
-
-            // prepare: convert enchantments to stats
-            if (!empty($this->json[$this->id]['socketbonus']))
-                $enchantments[$this->json[$this->id]['socketbonus']][] = $this->id;
-            if ($geId = $this->curTpl['gemEnchantmentId'])
-                $enchantments[$geId][] = -$this->id;
-        }
-
-        // execute: convert enchantments to stats
-        // and merge enchantments back
-        foreach ($enchantments as $eId => $items)
-        {
-            if (empty($this->enchParsed[$eId]))
-                continue;
-
-            foreach ($items as $item)
-            {
-                if ($item > 0)                          // apply socketBonus
-                    $this->json[$item]['socketbonusstat'] = $this->enchParsed[$eId];
-                else /* if ($item < 0) */               // apply gemEnchantment
-                    Util::arraySumByKey($this->json[-$item], $this->enchParsed[$eId]);
-            }
-        }
-
-        // collect data and write to DB
-        foreach ($this->iterate() as $__)
-        {
-            $updateFields = ['type' => Type::ITEM, 'typeId' => $this->id];
-
-            foreach (@$this->json[$this->id] as $k => $v)
-            {
-                if (!in_array($k, $this->statCols) || !$v || $k == 'id')
-                    continue;
-
-                $updateFields[$k] = number_format($v, 2, '.', '');
-            }
-
-            if (isset($this->itemMods[$this->id]))
-            {
-                foreach ($this->itemMods[$this->id] as $k => $v)
-                {
-                    if (!$v)
-                        continue;
-                    if ($str = Game::$itemMods[$k])
-                        $updateFields[$str] = number_format($v, 2, '.', '');
-                }
-            }
-
-            DB::Aowow()->query('REPLACE INTO ?_item_stats (?#) VALUES (?a)', array_keys($updateFields), array_values($updateFields));
+            // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
+            if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($curTpl)->fromJson($this->json[$id])->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
+                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_merge(['type', 'typeId'], array_keys($stats)), array_merge([Type::ITEM, $this->id], array_values($stats)));
         }
     }
 }
@@ -135,127 +59,50 @@ SqlGen::register(new class extends SetupScript
     protected $tblDependencyAowow = ['items', 'spell'];
     protected $dbcSourceFiles     = ['spellitemenchantment'];
 
-    private function enchantment_stats() : array
+    private   $relSpells = [];
+
+    private function enchantment_stats(?int &$total = 0, ?int &$effective = 0) : array
     {
-        $statCols   = DB::Aowow()->selectCol('SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` LIKE "%item_stats"');
-        $enchants   = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_spellitemenchantment');
-        $spells     = [];
-        $spellStats = [];
+        $enchants  = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_spellitemenchantment');
+        $spells    = [];
+        $result    = [];
+        $effective = 0;
+        $total     = count($enchants);
 
         foreach ($enchants as $eId => $e)
-        {
-            for ($i = 1; $i <=3; $i++)
-            {
-                // trigger: onEquip + valid SpellId
-                if ($e['object'.$i] > 0 && $e['type'.$i] == 3)
+            for ($i = 1; $i <= 3; $i++)
+                if ($e['object'.$i] > 0 && $e['type'.$i] == ENCHANTMENT_TYPE_EQUIP_SPELL)
                     $spells[] = $e['object'.$i];
-            }
-        }
 
         if ($spells)
-            $spellStats = (new SpellList(array(['id', $spells], Cfg::get('SQL_LIMIT_NONE'))))->getStatGain();
+            $this->relSpells = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spells);
 
-        $result = [];
         foreach ($enchants as $eId => $e)
-        {
-            // parse stats
-            $result[$eId] = [];
-            for ($h = 1; $h <= 3; $h++)
+            if ($result[$eId] = (new StatsContainer($this->relSpells))->fromEnchantment($e)->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
             {
-                $obj = (int)$e['object'.$h];
-                $val = (int)$e['amount'.$h];
-
-                switch ($e['type'.$h])
-                {
-                    case 6:                                 // TYPE_TOTEM               +AmountX as DPS (Rockbiter)
-                        $result[$eId]['dps'] = $val;        // we do not use dps as itemMod, so apply it directly
-                        $obj = null;
-                        break;
-                    case 2:                                 // TYPE_DAMAGE              +AmountX damage
-                        $obj = ITEM_MOD_WEAPON_DMG;
-                        break;
-                 // case 1:                                 // TYPE_COMBAT_SPELL        proc spell from ObjectX (amountX == procChance)
-                 // case 7:                                 // TYPE_USE_SPELL           Engineering gadgets
-                    case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
-                        if (!empty($spellStats[$obj]))
-                            foreach ($spellStats[$obj] as $mod => $val)
-                                if ($str = Game::$itemMods[$mod])
-                                    Util::arraySumByKey($result[$eId], [$str => $val]);
-
-                        $obj = null;
-                        break;
-                    case 4:                                 // TYPE_RESISTANCE          +AmountX resistance for ObjectX School
-                        switch ($obj)
-                        {
-                            case 0:                         // Physical
-                                $obj = ITEM_MOD_ARMOR;
-                                break;
-                            case 1:                         // Holy
-                                $obj = ITEM_MOD_HOLY_RESISTANCE;
-                                break;
-                            case 2:                         // Fire
-                                $obj = ITEM_MOD_FIRE_RESISTANCE;
-                                break;
-                            case 3:                         // Nature
-                                $obj = ITEM_MOD_NATURE_RESISTANCE;
-                                break;
-                            case 4:                         // Frost
-                                $obj = ITEM_MOD_FROST_RESISTANCE;
-                                break;
-                            case 5:                         // Shadow
-                                $obj = ITEM_MOD_SHADOW_RESISTANCE;
-                                break;
-                            case 6:                         // Arcane
-                                $obj = ITEM_MOD_ARCANE_RESISTANCE;
-                                break;
-                            default:
-                                $obj = null;
-                        }
-                        break;
-                    case 5:                                 // TYPE_STAT                +AmountX for Statistic by type of ObjectX
-                        if ($obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
-                            $obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
-
-                        break;                              // stats are directly assigned below
-                    case 8:                                 // TYPE_PRISMATIC_SOCKET    Extra Sockets AmountX as socketCount (ignore)
-                        $result[$eId]['nsockets'] = $val;   // there is no itemmod for sockets, so apply it directly
-                    default:                                // TYPE_NONE                dnd stuff; skip assignment below
-                        $obj = null;
-                }
-
-                if ($obj !== null)
-                    if ($str = Game::$itemMods[$obj])       // check if we use these mods
-                        Util::arraySumByKey($result[$eId], [$str => $val]);
+                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_merge(['type', 'typeId'], array_keys($result[$eId])), array_merge([Type::ENCHANTMENT, $eId], array_values($result[$eId])));
+                $effective++;
             }
 
-            $updateCols = ['type' => Type::ENCHANTMENT, 'typeId' => $eId];
-            foreach ($result[$eId] as $k => $v)
-            {
-                if (!in_array($k, $statCols) || !$v || $k == 'id')
-                    continue;
-
-                $updateCols[$k] = number_format($v, 2, '.', '');
-            }
-
-            DB::Aowow()->query('REPLACE INTO ?_item_stats (?#) VALUES (?a)', array_keys($updateCols), array_values($updateCols));
-        }
-
-        return $result;
+        return $enchants;
     }
 
     public function generate(array $ids = []) : bool
     {
-        $offset = 0;
+        DB::Aowow()->query('TRUNCATE ?_item_stats');
 
         CLI::write(' - applying stats for enchantments');
-        $enchStats = $this->enchantment_stats();
-        CLI::write('   '.count($enchStats).' enchantments parsed');
+
+        $enchStats = $this->enchantment_stats($total, $effective);
+        CLI::write('   '.$effective.'+'.($total - $effective).' enchantments parsed');
+
         CLI::write(' - applying stats for items');
 
         $i = 0;
+        $offset = 0;
         while (true)
         {
-            $items = new ItemStatSetup($offset, SqlGen::$sqlBatchSize, $ids, $enchStats);
+            $items = new ItemStatSetup($offset, SqlGen::$sqlBatchSize, $ids, $enchStats, $this->relSpells);
             if ($items->error)
                 break;
 

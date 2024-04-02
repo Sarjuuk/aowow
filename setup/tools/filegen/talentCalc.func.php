@@ -122,23 +122,23 @@ if (!CLI)
                     }
 
                     $result[$tabIdx]['t'][$talentIdx] = array(
-                        'i' => $i,
-                        'n' => $n,
-                        'm' => $m,
-                        'd' => $d,
-                        's' => $s,
-                        'x' => $x,
-                        'y' => $y,
-                        'j' => $j
+                        'i' => $i,                          // talent id
+                        'n' => $n,                          // talent name
+                        'm' => $m,                          // maxRank
+                        'd' => $d,                          // [descriptions]
+                        's' => $s,                          // [spellIds]
+                        'x' => $x,                          // col #
+                        'y' => $y,                          // row #
+                        'j' => $j                           // spell mods applied when used in profiler
                     );
 
-                    if (isset($r))
+                    if (isset($r))                          // [reqTalentId, reqRank]
                         $result[$tabIdx]['t'][$talentIdx]['r'] = $r;
 
-                    if (!empty($t))
+                    if (!empty($t))                         // talentspell tooltip
                         $result[$tabIdx]['t'][$talentIdx]['t'] = $t;
 
-                    if (!empty($f))
+                    if (!empty($f))                         // [petFamilyId]
                         $result[$tabIdx]['t'][$talentIdx]['f'] = $f;
 
                     if ($class)

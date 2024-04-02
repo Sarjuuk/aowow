@@ -33,17 +33,6 @@ class Game
         null,   'warrior', 'paladin', 'hunter', 'rogue', 'priest', 'deathknight', 'shaman', 'mage', 'warlock', null, 'druid'
     );
 
-    private static $combatRatingToItemMod    = array(        // zero-indexed idx:CR; val:Mod
-        null,           12,             13,             14,             15,             16,             17,             18,             19,
-        20,             21,             22,             23,             24,             25,             26,             27,             28,
-        29,             30,             null,           null,           null,           37,             44
-    );
-
-    public static $lvlIndepRating           = array(        // rating doesn't scale with level
-        ITEM_MOD_MANA,                  ITEM_MOD_HEALTH,                ITEM_MOD_ATTACK_POWER,          ITEM_MOD_MANA_REGENERATION,     ITEM_MOD_SPELL_POWER,
-        ITEM_MOD_HEALTH_REGEN,          ITEM_MOD_SPELL_PENETRATION,     ITEM_MOD_BLOCK_VALUE
-    );
-
     public static $questClasses             = array(
         -2 =>  [    0],
          0 =>  [    1,     3,     4,     8,     9,    10,    11,    12,    25,    28,    33,    36,    38,    40,    41,    44,    45,    46,    47,    51,    85,   130,   132,   139,   154,   267,  1497,  1519,  1537,  2257,  3430,  3431,  3433,  3487,  4080,  4298],
@@ -146,19 +135,6 @@ class Game
         'meta',                         'red',                          'yellow',                       'blue'
     );
 
-    // 'replicates' $WH.g_statToJson
-    public static $itemMods                 = array(        // zero-indexed; "mastrtng": unused mastery; _[a-z] => taken mods..
-        'dmg',              'mana',             'health',           'agi',              'str',              'int',              'spi',
-        'sta',              'energy',           'rage',             'focus',            'runicpwr',         'defrtng',          'dodgertng',
-        'parryrtng',        'blockrtng',        'mlehitrtng',       'rgdhitrtng',       'splhitrtng',       'mlecritstrkrtng',  'rgdcritstrkrtng',
-        'splcritstrkrtng',  '_mlehitrtng',      '_rgdhitrtng',      '_splhitrtng',      '_mlecritstrkrtng', '_rgdcritstrkrtng', '_splcritstrkrtng',
-        'mlehastertng',     'rgdhastertng',     'splhastertng',     'hitrtng',          'critstrkrtng',     '_hitrtng',         '_critstrkrtng',
-        'resirtng',         'hastertng',        'exprtng',          'atkpwr',           'rgdatkpwr',        'feratkpwr',        'splheal',
-        'spldmg',           'manargn',          'armorpenrtng',     'splpwr',           'healthrgn',        'splpen',           'block',                                          // ITEM_MOD_BLOCK_VALUE
-        'mastrtng',         'armor',            'firres',           'frores',           'holres',           'shares',           'natres',
-        'arcres',           'firsplpwr',        'frosplpwr',        'holsplpwr',        'shasplpwr',        'natsplpwr',        'arcsplpwr'
-    );
-
     public static $class2SpellFamily        = array(
     //  null    Warrior Paladin Hunter  Rogue   Priest  DK      Shaman  Mage    Warlock null    Druid
         null,   4,      10,     9,      8,      6,      15,     11,     3,      5,      null,   7
@@ -170,31 +146,6 @@ class Game
         3456 => 6, 3715 => 2, 3848 => 3, 3849 => 2, 4075 => 2, 4100 => 2, 4131 => 2,  4196 => 2, 4228 => 4, 4272 => 2,
         4273 => 6, 4277 => 3, 4395 => 2, 4494 => 2, 4722 => 2, 4812 => 8
     );
-
-    public static function itemModByRatingMask($mask)
-    {
-        if (($mask & 0x1C000) == 0x1C000)                   // special case resilience
-            return ITEM_MOD_RESILIENCE_RATING;
-
-        if (($mask & 0x00E0) == 0x00E0)                     // hit rating - all subcats (mle, rgd, spl)
-            return ITEM_MOD_HIT_RATING;
-
-        if (($mask & 0x0700) == 0x0700)                     // crit rating - all subcats (mle, rgd, spl)
-            return ITEM_MOD_CRIT_RATING;
-
-        for ($j = 0; $j < count(self::$combatRatingToItemMod); $j++)
-        {
-            if (!self::$combatRatingToItemMod[$j])
-                continue;
-
-            if (!($mask & (1 << $j)))
-                continue;
-
-            return self::$combatRatingToItemMod[$j];
-        }
-
-        return 0;
-    }
 
     public static function sideByRaceMask($race)
     {

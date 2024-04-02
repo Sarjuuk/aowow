@@ -35,35 +35,25 @@ class EnchantmentList extends BaseType
                 if ($curTpl['object'.$i] <= 0)
                     continue;
 
-                switch ($curTpl['type'.$i])
+                switch ($curTpl['type'.$i])                 // SPELL_TRIGGER_* just reused for wording
                 {
-                    case 1:
+                    case ENCHANTMENT_TYPE_COMBAT_SPELL:
                         $proc = -$this->getField('ppmRate') ?: ($this->getField('procChance') ?: $this->getField('amount'.$i));
-                        $curTpl['spells'][$i] = [$curTpl['object'.$i], 2, $curTpl['charges'], $proc];
+                        $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_HIT, $curTpl['charges'], $proc];
                         $this->relSpells[]    =  $curTpl['object'.$i];
                         break;
-                    case 3:
-                        $curTpl['spells'][$i] = [$curTpl['object'.$i], 1, $curTpl['charges'], 0];
+                    case ENCHANTMENT_TYPE_EQUIP_SPELL:
+                        $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_EQUIP, $curTpl['charges'], 0];
                         $this->relSpells[]    =  $curTpl['object'.$i];
                         break;
-                    case 7:
-                        $curTpl['spells'][$i] = [$curTpl['object'.$i], 0, $curTpl['charges'], 0];
+                    case ENCHANTMENT_TYPE_USE_SPELL:
+                        $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_USE, $curTpl['charges'], 0];
                         $this->relSpells[]    =  $curTpl['object'.$i];
                         break;
                 }
             }
 
-            // floats are fetched as string from db :<
-            $curTpl['dmg'] = floatVal($curTpl['dmg']);
-            $curTpl['dps'] = floatVal($curTpl['dps']);
-
-            // remove zero-stats
-            foreach (Game::$itemMods as $str)
-                if ($curTpl[$str] == 0)                     // empty(0.0f) => true .. yeah, sure
-                    unset($curTpl[$str]);
-
-            if ($curTpl['dps'] == 0)
-                unset($curTpl['dps']);
+            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true);
         }
 
         if ($this->relSpells)
@@ -99,18 +89,18 @@ class EnchantmentList extends BaseType
             if ($this->curTpl['requiredLevel'] > 0)
                 $data[$this->id]['reqlevel'] = $this->curTpl['requiredLevel'];
 
-            foreach ($this->curTpl['spells'] as $s)
+            foreach ($this->curTpl['spells'] as [$spellId, $trigger, $charges, $procChance])
             {
                 // enchant is procing or onUse
-                if ($s[1] == 2 || $s[1] == 0)
-                    $data[$this->id]['spells'][$s[0]] = $s[2];
+                if ($trigger == SPELL_TRIGGER_HIT || $trigger == SPELL_TRIGGER_USE)
+                    $data[$this->id]['spells'][$spellId] = $charges;
                 // spell is procing
-                else if ($this->relSpells && $this->relSpells->getEntry($s[0]) && ($_ = $this->relSpells->canTriggerSpell()))
+                else if ($this->relSpells && $this->relSpells->getEntry($spellId) && ($_ = $this->relSpells->canTriggerSpell()))
                 {
                     foreach ($_ as $idx)
                     {
                         $this->triggerIds[] = $this->relSpells->getField('effect'.$idx.'TriggerSpell');
-                        $data[$this->id]['spells'][$this->relSpells->getField('effect'.$idx.'TriggerSpell')] = $s[2];
+                        $data[$this->id]['spells'][$this->relSpells->getField('effect'.$idx.'TriggerSpell')] = $charges;
                     }
                 }
             }
@@ -118,88 +108,15 @@ class EnchantmentList extends BaseType
             if (!$data[$this->id]['spells'])
                 unset($data[$this->id]['spells']);
 
-            Util::arraySumByKey($data[$this->id], $this->getStatGain());
+            Util::arraySumByKey($data[$this->id], $this->jsonStats[$this->id]->toJson());
         }
 
         return $data;
     }
 
-    public function getStatGain($addScalingKeys = false)
+    public function getStatGainForCurrent() : array
     {
-        $data = [];
-
-        foreach (Game::$itemMods as $str)
-            if (isset($this->curTpl[$str]))
-                $data[$str] = $this->curTpl[$str];
-
-        if (isset($this->curTpl['dps']))
-            $data['dps'] = $this->curTpl['dps'];
-
-        // scaling enchantments are saved as 0 to item_stats, thus return empty
-        if ($addScalingKeys)
-        {
-            $spellStats = [];
-            if ($this->relSpells)
-                $spellStats = $this->relSpells->getStatGain();
-
-            for ($h = 1; $h <= 3; $h++)
-            {
-                $obj = (int)$this->curTpl['object'.$h];
-
-                switch ($this->curTpl['type'.$h])
-                {
-                    case 3:                                 // TYPE_EQUIP_SPELL         Spells from ObjectX (use of amountX?)
-                        if (!empty($spellStats[$obj]))
-                            foreach ($spellStats[$obj] as $mod => $_)
-                                if ($str = Game::$itemMods[$mod])
-                                    Util::arraySumByKey($data, [$str => 0]);
-
-                        $obj = null;
-                        break;
-                    case 4:                                 // TYPE_RESISTANCE          +AmountX resistance for ObjectX School
-                        switch ($obj)
-                        {
-                            case 0:                         // Physical
-                                $obj = ITEM_MOD_ARMOR;
-                                break;
-                            case 1:                         // Holy
-                                $obj = ITEM_MOD_HOLY_RESISTANCE;
-                                break;
-                            case 2:                         // Fire
-                                $obj = ITEM_MOD_FIRE_RESISTANCE;
-                                break;
-                            case 3:                         // Nature
-                                $obj = ITEM_MOD_NATURE_RESISTANCE;
-                                break;
-                            case 4:                         // Frost
-                                $obj = ITEM_MOD_FROST_RESISTANCE;
-                                break;
-                            case 5:                         // Shadow
-                                $obj = ITEM_MOD_SHADOW_RESISTANCE;
-                                break;
-                            case 6:                         // Arcane
-                                $obj = ITEM_MOD_ARCANE_RESISTANCE;
-                                break;
-                            default:
-                                $obj = null;
-                        }
-                        break;
-                    case 5:                                 // TYPE_STAT                +AmountX for Statistic by type of ObjectX
-                        if ($obj < 2)                       // [mana, health] are on [0, 1] respectively and are expected on [1, 2] ..
-                            $obj++;                         // 0 is weaponDmg .. ehh .. i messed up somewhere
-
-                        break;                              // stats are directly assigned below
-                    default:                                // TYPE_NONE                dnd stuff; skip assignment below
-                        $obj = null;
-                }
-
-                if ($obj !== null)
-                    if ($str = Game::$itemMods[$obj])       // check if we use these mods
-                        Util::arraySumByKey($data, [$str => 0]);
-            }
-        }
-
-        return $data;
+        return $this->jsonStats[$this->id]->toJson();
     }
 
     public function getRelSpell($id)

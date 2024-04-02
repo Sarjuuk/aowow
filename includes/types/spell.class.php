@@ -58,6 +58,9 @@ class SpellList extends BaseType
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_ENVIRONMENTAL_DAMAGE,              SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN,
         SPELL_EFFECT_HEAL_MAX_HEALTH
     );
+    public const EFFECTS_ENCHANTMENT      = array(
+        SPELL_EFFECT_ENCHANT_ITEM,          SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY,            SPELL_EFFECT_ENCHANT_HELD_ITEM,                 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
+    );
 
     public const AURAS_HEAL               = array(
         SPELL_AURA_DUMMY,                   SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_HEALTH_FUNNEL,              SPELL_AURA_SCHOOL_ABSORB,                       SPELL_AURA_MANA_SHIELD,
@@ -190,196 +193,19 @@ class SpellList extends BaseType
     // end static use
 
     // required for item-comparison
-    public function getStatGain()
+    public function getStatGain() : array
     {
         $data = [];
 
         foreach ($this->iterate() as $__)
         {
-            $stats = [];
+            $data[$this->id] = new StatsContainer();
 
-            for ($i = 1; $i <= 3; $i++)
-            {
-                $pts = $this->calculateAmountForCurrent($i)[1];
-                $mv  = $this->curTpl['effect'.$i.'MiscValue'];
-                $au  = $this->curTpl['effect'.$i.'AuraId'];
+            foreach ($this->canEnchantmentItem() as $i)
+                $data[$this->id]->fromDB(Type::ENCHANTMENT, $this->curTpl['effect'.$i.'MiscValue']);
 
-                if (in_array($this->curTpl['effect'.$i.'Id'], [SPELL_EFFECT_ENCHANT_ITEM, SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY]))
-                {
-                    if ($mv && ($json = DB::Aowow()->selectRow('SELECT * FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', Type::ENCHANTMENT, $mv)))
-                    {
-                        $mods = [];
-                        foreach ($json as $str => $val)
-                            if ($val && ($idx = array_search($str, Game::$itemMods)))
-                                $mods[$idx] = $val;
-
-                        if ($mods)
-                            Util::arraySumByKey($stats, $mods);
-                    }
-
-                    continue;
-                }
-
-                switch ($au)
-                {
-                    case SPELL_AURA_MOD_STAT:
-                        if ($mv < 0)                        // all stats
-                        {
-                            for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
-                                Util::arraySumByKey($stats, [$iMod => $pts]);
-                        }
-                        else if ($mv == STAT_STRENGTH)      // one stat
-                            Util::arraySumByKey($stats, [ITEM_MOD_STRENGTH => $pts]);
-                        else if ($mv == STAT_AGILITY)
-                            Util::arraySumByKey($stats, [ITEM_MOD_AGILITY => $pts]);
-                        else if ($mv == STAT_STAMINA)
-                            Util::arraySumByKey($stats, [ITEM_MOD_STAMINA => $pts]);
-                        else if ($mv == STAT_INTELLECT)
-                            Util::arraySumByKey($stats, [ITEM_MOD_INTELLECT => $pts]);
-                        else if ($mv == STAT_SPIRIT)
-                            Util::arraySumByKey($stats, [ITEM_MOD_SPIRIT => $pts]);
-                        else                                // one bullshit
-                            trigger_error('AuraId 29 of spell #'.$this->id.' has wrong statId #'.$mv, E_USER_WARNING);
-
-                        break;
-                    case SPELL_AURA_MOD_INCREASE_HEALTH:
-                    case SPELL_AURA_MOD_INCREASE_HEALTH_NONSTACK:
-                    case SPELL_AURA_MOD_INCREASE_HEALTH_2:
-                        Util::arraySumByKey($stats, [ITEM_MOD_HEALTH => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_DAMAGE_DONE:
-                        // + weapon damage
-                        if ($mv == (1 << SPELL_SCHOOL_NORMAL))
-                        {
-                            Util::arraySumByKey($stats, [ITEM_MOD_WEAPON_DMG => $pts]);
-                            break;
-                        }
-
-                        // full magic mask, also counts towards healing
-                        if ($mv == SPELL_MAGIC_SCHOOLS)
-                        {
-                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_POWER       => $pts]);
-                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_DAMAGE_DONE => $pts]);
-                        }
-                        else
-                        {
-                            // HolySpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_HOLY))
-                                Util::arraySumByKey($stats, [ITEM_MOD_HOLY_POWER   => $pts]);
-
-                            // FireSpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_FIRE))
-                                Util::arraySumByKey($stats, [ITEM_MOD_FIRE_POWER   => $pts]);
-
-                            // NatureSpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_NATURE))
-                                Util::arraySumByKey($stats, [ITEM_MOD_NATURE_POWER => $pts]);
-
-                            // FrostSpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_FROST))
-                                Util::arraySumByKey($stats, [ITEM_MOD_FROST_POWER  => $pts]);
-
-                            // ShadowSpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_SHADOW))
-                                Util::arraySumByKey($stats, [ITEM_MOD_SHADOW_POWER => $pts]);
-
-                            // ArcaneSpellpower (deprecated; still used in randomproperties)
-                            if ($mv & (1 << SPELL_SCHOOL_ARCANE))
-                                Util::arraySumByKey($stats, [ITEM_MOD_ARCANE_POWER => $pts]);
-                        }
-
-                        break;
-                    case SPELL_AURA_MOD_HEALING_DONE:       // not as a mask..
-                        Util::arraySumByKey($stats, [ITEM_MOD_SPELL_HEALING_DONE => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_INCREASE_ENERGY:    // MiscVal:type see defined Powers only energy/mana in use
-                        if ($mv == POWER_HEALTH)
-                            Util::arraySumByKey($stats, [ITEM_MOD_HEALTH      => $pts]);
-                        else if ($mv == POWER_ENERGY)
-                            Util::arraySumByKey($stats, [ITEM_MOD_ENERGY      => $pts]);
-                        else if ($mv == POWER_RAGE)
-                            Util::arraySumByKey($stats, [ITEM_MOD_RAGE        => $pts]);
-                        else if ($mv == POWER_MANA)
-                            Util::arraySumByKey($stats, [ITEM_MOD_MANA        => $pts]);
-                        else if ($mv == POWER_RUNIC_POWER)
-                            Util::arraySumByKey($stats, [ITEM_MOD_RUNIC_POWER => $pts]);
-
-                        break;
-                    case SPELL_AURA_MOD_RATING:
-                    case SPELL_AURA_MOD_RATING_FROM_STAT:
-                        if ($mod = Game::itemModByRatingMask($mv))
-                            Util::arraySumByKey($stats, [$mod => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
-                    case SPELL_AURA_MOD_BASE_RESISTANCE:
-                    case SPELL_AURA_MOD_RESISTANCE:
-                        // Armor only if explicitly specified
-                        if ($mv == (1 << SPELL_SCHOOL_NORMAL))
-                        {
-                            Util::arraySumByKey($stats, [ITEM_MOD_ARMOR => $pts]);
-                            break;
-                        }
-
-                        // Holy resistance only if explicitly specified (shouldn't even exist...?)
-                        if ($mv == (1 << SPELL_SCHOOL_HOLY))
-                        {
-                            Util::arraySumByKey($stats, [ITEM_MOD_HOLY_RESISTANCE => $pts]);
-                            break;
-                        }
-
-                        for ($j = 0; $j < 7; $j++)
-                        {
-                            if (($mv & (1 << $j)) == 0)
-                                continue;
-
-                            switch ($j)
-                            {
-                                case SPELL_SCHOOL_FIRE:
-                                    Util::arraySumByKey($stats, [ITEM_MOD_FIRE_RESISTANCE   => $pts]);
-                                    break;
-                                case SPELL_SCHOOL_NATURE:
-                                    Util::arraySumByKey($stats, [ITEM_MOD_NATURE_RESISTANCE => $pts]);
-                                    break;
-                                case SPELL_SCHOOL_FROST:
-                                    Util::arraySumByKey($stats, [ITEM_MOD_FROST_RESISTANCE  => $pts]);
-                                    break;
-                                case SPELL_SCHOOL_SHADOW:
-                                    Util::arraySumByKey($stats, [ITEM_MOD_SHADOW_RESISTANCE => $pts]);
-                                    break;
-                                case SPELL_SCHOOL_ARCANE:
-                                    Util::arraySumByKey($stats, [ITEM_MOD_ARCANE_RESISTANCE => $pts]);
-                                    break;
-                            }
-                        }
-                        break;
-                    case SPELL_AURA_PERIODIC_HEAL:          // hp5
-                    case SPELL_AURA_MOD_REGEN:
-                    case SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT:
-                        Util::arraySumByKey($stats, [ITEM_MOD_HEALTH_REGEN        => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_POWER_REGEN:        // mp5
-                        Util::arraySumByKey($stats, [ITEM_MOD_MANA_REGENERATION   => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_ATTACK_POWER:
-                        Util::arraySumByKey($stats, [ITEM_MOD_ATTACK_POWER        => $pts]);
-                        break;                              // ?carries over to rngatkpwr?
-                    case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
-                        Util::arraySumByKey($stats, [ITEM_MOD_RANGED_ATTACK_POWER => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_SHIELD_BLOCKVALUE:
-                        Util::arraySumByKey($stats, [ITEM_MOD_BLOCK_VALUE         => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_EXPERTISE:
-                        Util::arraySumByKey($stats, [ITEM_MOD_EXPERTISE_RATING    => $pts]);
-                        break;
-                    case SPELL_AURA_MOD_TARGET_RESISTANCE:
-                        if ($mv == 0x7C && $pts < 0)
-                            Util::arraySumByKey($stats, [ITEM_MOD_SPELL_PENETRATION => -$pts]);
-                        break;
-                }
-            }
-
-            $data[$this->id] = $stats;
+            // todo: should enchantments be included here...?
+            $data[$this->id]->fromSpell($this->curTpl);
         }
 
         return $data;
@@ -390,21 +216,10 @@ class SpellList extends BaseType
         // weapon hand check: param: slot, class, subclass, value
         $whCheck = '$function() { var j, w = _inventory.getInventory()[%d]; if (!w[0] || !g_items[w[0]]) { return 0; } j = g_items[w[0]].jsonequip; return (j.classs == %d && (%d & (1 << (j.subclass)))) ? %d : 0; }';
 
-        $data = $this->getStatGain();                       // flat gains
-        foreach ($data as $id => &$spellData)
+        $data = [];                       // flat gains
+        foreach ($this->getStatGain() as $id => $spellData)
         {
-            foreach ($spellData as $modId => $val)
-            {
-                if (!isset(Game::$itemMods[$modId]))
-                    continue;
-
-                if ($modId == ITEM_MOD_EXPERTISE_RATING)    // not a rating .. pure expertise
-                    $spellData['exp'] = $val;
-                else
-                    $spellData[Game::$itemMods[$modId]] = $val;
-
-                unset($spellData[$modId]);
-            }
+            $data[$id] = $spellData->toJson(STAT::FLAG_ITEM | STAT::FLAG_PROFILER);
 
             // apply weapon restrictions
             $this->getEntry($id);
@@ -414,8 +229,8 @@ class SpellList extends BaseType
             if ($class != ITEM_CLASS_WEAPON || !$subClass)
                 continue;
 
-            foreach ($spellData as $json => $pts)
-                $spellData[$json] = [1, 'functionOf', sprintf($whCheck, $slot, $class, $subClass, $pts)];
+            foreach ($data[$id] as $key => $amt)
+                $data[$id][$key] = [1, 'functionOf', sprintf($whCheck, $slot, $class, $subClass, $amt)];
         }
 
         // 4 possible modifiers found
@@ -470,22 +285,9 @@ class SpellList extends BaseType
 
         foreach ($this->iterate() as $id => $__)
         {
-            // Priest: Spirit of Redemption is a spell but also a passive. *yaaayyyy*
-            if (($this->getField('cuFlags') & SPELL_CU_TALENTSPELL) && $id != 20711)
+            // kept for reference - if (($this->getField('cuFlags') & SPELL_CU_TALENTSPELL) && $id != 20711)
+            if (!($this->getField('attributes0') & SPELL_ATTR0_PASSIVE))
                 continue;
-
-            // curious cases of OH MY FUCKING GOD WHY?!
-            if ($id == 16268)                               // Shaman - Spirit Weapons (parry is normaly stored in g_statistics)
-            {
-                $data[$id]['parrypct'] = [5, 'add'];
-                continue;
-            }
-
-            if ($id == 20550)                               // Tauren - Endurance (dependant on base health) ... if you are looking for something elegant, look away!
-            {
-                $data[$id]['health'] = [0.05, 'functionOf', '$function(p) { return g_statistics.combo[p.classs][p.level][5]; }'];
-                continue;
-            }
 
             for ($i = 1; $i < 4; $i++)
             {
@@ -501,6 +303,15 @@ class SpellList extends BaseType
                     mods formated like ['<statName>' => [<points>, 'percentOf', '<statName>']] are applied as multiplier and not
                     as a flat value (that is equal to the percentage, like they should be). So the stats-table won't show the actual deficit
                 */
+
+
+                // Shaman - Spirit Weapons (16268) (parry is normaly stored in g_statistics)
+                // i should recurse into SPELL_EFFECT_LEARN_SPELL and apply SPELL_EFFECT_PARRY from there
+                if ($id = 16268)
+                {
+                    $data[$id]['parrypct'] = [5, 'add'];
+                    continue;
+                }
 
                 switch ($au)
                 {
@@ -524,7 +335,9 @@ class SpellList extends BaseType
                             $modXByStat($data[$id], null, $pts);
                         else if ($mv < 0)                   // all stats
                             for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
-                                $data[$id][Game::$itemMods[$iMod]] = [$pts / 100, 'percentOf', Game::$itemMods[$iMod]];
+                                if ($idx = Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $iMod))
+                                    if ($key = Stat::getJsonString($idx))
+                                        $data[$id][$key] = [$pts / 100, 'percentOf', $key];
                         break;
                     case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
@@ -579,14 +392,17 @@ class SpellList extends BaseType
                         else if ($mv == POWER_ENERGY)
                             $data[$id]['energy'] = [$pts / 100, 'percentOf', 'energy'];
                         else if ($mv == POWER_MANA)
-                            $data[$id]['mana'] = [$pts / 100, 'percentOf', 'mana'];
+                            $data[$id]['mana']   = [$pts / 100, 'percentOf', 'mana'];
                         else if ($mv == POWER_RAGE)
-                            $data[$id]['rage'] = [$pts / 100, 'percentOf', 'rage'];
+                            $data[$id]['rage']   = [$pts / 100, 'percentOf', 'rage'];
                         else if ($mv == POWER_RUNIC_POWER)
-                            $data[$id]['runic'] = [$pts / 100, 'percentOf', 'runic'];
+                            $data[$id]['runic']  = [$pts / 100, 'percentOf', 'runic'];
                         break;
                     case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
                         $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
+                        break;
+                    case SPELL_AURA_MOD_BASE_HEALTH_PCT:    // only Tauren - Endurance (20550) ... if you are looking for something elegant, look away!
+                        $data[$id]['health'] = [$pts / 100, 'functionOf', '$function(p) { return g_statistics.combo[p.classs][p.level][5]; }'];
                         break;
                     case SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT:
                         $data[$id]['block'] = [$pts / 100, 'percentOf', 'block'];
@@ -910,7 +726,7 @@ class SpellList extends BaseType
         ];
     }
 
-    public function canCreateItem()
+    public function canCreateItem() : array
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
@@ -921,7 +737,7 @@ class SpellList extends BaseType
         return $idx;
     }
 
-    public function canTriggerSpell()
+    public function canTriggerSpell() : array
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
@@ -932,13 +748,23 @@ class SpellList extends BaseType
         return $idx;
     }
 
-    public function canTeachSpell()
+    public function canTeachSpell() : array
     {
         $idx = [];
         for ($i = 1; $i < 4; $i++)
             if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_TEACH))
                 if ($this->curTpl['effect'.$i.'TriggerSpell'] > 0)
                     $idx[] = $i;
+
+        return $idx;
+    }
+
+    public function canEnchantmentItem() : array
+    {
+        $idx = [];
+        for ($i = 1; $i < 4; $i++)
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_ENCHANTMENT))
+                $idx[] = $i;
 
         return $idx;
     }
@@ -1243,16 +1069,16 @@ class SpellList extends BaseType
                 }
 
                 // Aura giving combat ratings
-                $rType = 0;
+                $rType = [];
                 if ($aura == SPELL_AURA_MOD_RATING)
-                    if ($rType = Game::itemModByRatingMask($mv))
+                    if ($rType = StatsContainer::convertCombatRating($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
 
                 if ($rType)
                 {
                     $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
-                    $result[4] = $rType;
+                    $result[4] = $rType[0];                 // could be multiple ratings in theory, but not expected to be
                 }
 /*  todo: export to and solve formulas in javascript e.g.: spell 10187 - ${$42213m1*8*$<mult>} with $mult = ${${$?s31678[${1.05}][${${$?s31677[${1.04}][${${$?s31676[${1.03}][${${$?s31675[${1.02}][${${$?s31674[${1.01}][${1}]}}]}}]}}]}}]}*${$?s12953[${1.06}][${${$?s12952[${1.04}][${${$?s11151[${1.02}][${1}]}}]}}]}}
                 else if ($this->interactive && ($modStrMin || $modStrMax))
@@ -1336,16 +1162,16 @@ class SpellList extends BaseType
                     eval("\$max = $max $op $oparg;");
                 }
                 // Aura giving combat ratings
-                $rType = 0;
+                $rType = [];
                 if ($aura == SPELL_AURA_MOD_RATING)
-                    if ($rType = Game::itemModByRatingMask($mv))
+                    if ($rType = StatsContainer::convertCombatRating($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
 
                 if ($rType)
                 {
                     $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
-                    $result[4] = $rType;
+                    $result[4] = $rType[0];                 // could be multiple ratings in theory, but not expected to be
                 }
                 else if (($modStrMin || $modStrMax) && $this->interactive)
                 {
@@ -1659,7 +1485,7 @@ class SpellList extends BaseType
     // step 4: find and eliminate regular variables
         $data = $this->handleVariables($data, true);
 
-    // step 5: variable-dependant variable-text
+    // step 5: variable-dependent variable-text
         // special case $lONE:ELSE[:ELSE2]; or $|ONE:ELSE[:ELSE2];
         while (preg_match('/([\d\.]+)([^\d]*)(\$[l|]:*)([^:]*):([^;]*);/i', $data, $m))
         {

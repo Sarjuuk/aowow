@@ -213,22 +213,16 @@ SqlGen::register(new class extends SetupScript
             /* calc statbonuses */
             /********************/
 
-            $gains = $spells = $mods = [];
+            $spells = [];
 
             for ($i = 1; $i < 9; $i++)
                 if ($setData['spellId'.$i] > 0 && $setData['itemCount'.$i] > 0)
                     $spells[$i] = [$setData['spellId'.$i], $setData['itemCount'.$i]];
 
             $bonusSpells = new SpellList(array(['s.id', array_column($spells, 0)]));
-            $mods = $bonusSpells->getStatGain();
 
             $spells = array_pad($spells, 8, [0, 0]);
 
-            for ($i = 1; $i < 9; $i++)
-                if ($setData['itemCount'.$i] > 0 && !empty($mods[$setData['spellId'.$i]]))
-                    $gains[$setData['itemCount'.$i]] = $mods[$setData['spellId'.$i]];
-
-            $row['bonusParsed'] = serialize($gains);
             foreach (array_column($spells, 0) as $idx => $spellId)
                 $row['spell'.($idx+1)] = $spellId;
             foreach (array_column($spells, 1) as $idx => $nItems)

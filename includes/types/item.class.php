@@ -13,7 +13,7 @@ class ItemList extends BaseType
     public static   $dataTable  = '?_items';
 
     public          $json       = [];
-    public          $itemMods   = [];
+    public          $jsonStats  = [];
 
     public          $rndEnchIds = [];
     public          $subItems   = [];
@@ -48,7 +48,9 @@ class ItemList extends BaseType
             // fix missing icons
             $_curTpl['iconString'] = $_curTpl['iconString'] ?: DEFAULT_ICON;
 
+            // from json to json .. the gentle fuckups of legacy code integration
             $this->initJsonStats();
+            $this->jsonStats[$this->id] = (new StatsContainer())->fromJson($_curTpl, true)->toJson(Stat::FLAG_ITEM /* | Stat::FLAG_SERVERSIDE */);
 
             if ($miscData)
             {
@@ -280,7 +282,7 @@ class ItemList extends BaseType
     public function getListviewData($addInfoMask = 0x0, $miscData = null)
     {
         /*
-        * ITEMINFO_JSON     (0x01): itemMods (including spells) and subitems parsed
+        * ITEMINFO_JSON     (0x01): jsonStats (including spells) and subitems parsed
         * ITEMINFO_SUBITEMS (0x02): searched by comparison
         * ITEMINFO_VENDOR   (0x04): costs-obj, when displayed as vendor
         * ITEMINFO_GEM      (0x10): gem infos and score
@@ -294,7 +296,10 @@ class ItemList extends BaseType
             $this->initSubItems();
 
         if ($addInfoMask & ITEMINFO_JSON)
+        {
             $this->extendJsonStats();
+            Util::arraySumByKey($data, $this->jsonStats);
+        }
 
         $extCosts = [];
         if ($addInfoMask & ITEMINFO_VENDOR)
@@ -321,9 +326,6 @@ class ItemList extends BaseType
 
             if ($addInfoMask & ITEMINFO_JSON)
             {
-                foreach ($this->itemMods[$this->id] as $k => $v)
-                    $data[$this->id][$k] = $v;
-
                 if ($_ = intVal(($this->curTpl['minMoneyLoot'] + $this->curTpl['maxMoneyLoot']) / 2))
                     $data[$this->id]['avgmoney'] = $_;
 
@@ -679,7 +681,7 @@ class ItemList extends BaseType
                 $x .= sprintf(Lang::item('damage', 'single', $sc2 ? 3 : 2), $this->curTpl['dmgMin2'], $sc2 ? Lang::game('sc', $sc2) : null).'<br />';
 
             if ($_class == ITEM_CLASS_WEAPON)
-                $x .= '<!--dps-->'.sprintf(Lang::item('dps'), $dps).'<br />'; // do not use localized format here!
+                $x .= '<!--dps-->'.Lang::item('dps', [$dps]).'<br />';
 
             // display FeralAttackPower if set
             if ($fap = $this->getFeralAP())
@@ -1126,7 +1128,7 @@ class ItemList extends BaseType
             {
                 $xCraft = '';
                 if ($desc = $this->getField('description', true))
-                    $x .= '<span class="q2">'.Lang::item('trigger', 0).' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
+                    $x .= '<span class="q2">'.Lang::item('trigger', SPELL_TRIGGER_USE).' <a href="?spell='.$this->curTpl['spellId2'].'">'.$desc.'</a></span><br />';
 
                 // recipe handling (some stray Techniques have subclass == 0), place at bottom of tooltipp
                 if ($_class == ITEM_CLASS_RECIPE || $this->curTpl['bagFamily'] == 16)
@@ -1208,7 +1210,7 @@ class ItemList extends BaseType
                     $this->curTpl['scalingStatValue']       // scaleFlags
                 );
             }
-            else                                            // may still use level dependant ratings
+            else                                            // may still use level dependent ratings
             {
                 array_push($link,
                     $causesScaling ? MAX_LEVEL : 1,         // scaleMaxLevel
@@ -1311,12 +1313,6 @@ class ItemList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            $this->itemMods[$this->id] = [];
-
-            foreach (Game::$itemMods as $mod)
-                if ($_ = floatVal($this->curTpl[$mod]))
-                    Util::arraySumByKey($this->itemMods[$this->id], [$mod => $_]);
-
             // fetch and add socketbonusstats
             if (!empty($this->json[$this->id]['socketbonus']))
                 $enchantments[$this->json[$this->id]['socketbonus']][] = $this->id;
@@ -1353,28 +1349,28 @@ class ItemList extends BaseType
                     unset($this->json[$item][$k]);
     }
 
-    public function getOnUseStats()
+    public function getOnUseStats() : ?StatsContainer
     {
-        $onUseStats = [];
+        if ($this->curTpl['class'] != ITEM_CLASS_CONSUMABLE)
+            return null;
+
+        $onUseStats = new StatsContainer();
 
         // convert Spells
-        $useSpells = [];
         for ($h = 1; $h <= 5; $h++)
         {
             if ($this->curTpl['spellId'.$h] <= 0)
                 continue;
 
-            if ($this->curTpl['class'] != ITEM_CLASS_CONSUMABLE || $this->curTpl['spellTrigger'.$h])
+            if ($this->curTpl['spellTrigger'.$h] != SPELL_TRIGGER_USE)
                 continue;
 
-            $useSpells[] = $this->curTpl['spellId'.$h];
-        }
-
-        if ($useSpells)
-        {
-            $eqpSplList = new SpellList(array(['s.id', $useSpells]));
-            foreach ($eqpSplList->getStatGain() as $stat)
-                Util::arraySumByKey($onUseStats, $stat);
+            if ($spell = DB::Aowow()->selectRow(
+               'SELECT effect1AuraId, effect1MiscValue, effect1BasePoints, effect1DieSides, effect2AuraId, effect2MiscValue, effect2BasePoints, effect2DieSides, effect3AuraId, effect3MiscValue, effect3BasePoints, effect3DieSides
+                FROM ?_spell
+                WHERE id = ?d',
+                $this->curTpl['spellId'.$h]))
+                $onUseStats->fromSpell($spell);
         }
 
         return $onUseStats;
@@ -1414,32 +1410,33 @@ class ItemList extends BaseType
         return true;
     }
 
-    private function getFeralAP()
+    private function getFeralAP() : float
     {
         // must be weapon
         if ($this->curTpl['class'] != ITEM_CLASS_WEAPON)
-            return 0;
-
-        $subClasses = [14];                                 // Misc Weapons
-        $druid = new CharClassList(array(['id', log(CLASS_DRUID, 2) + 1]));
-        if (!$druid->error)
-            for ($i = 0; $i < 21; $i++)
-                if ($druid->getField('weaponTypeMask') & (1 << $i))
-                    $subClasses[] = $i;
-
-        if (!in_array($this->curTpl['subClass'], $subClasses))
-            return 0;
+            return 0.0;
 
         // thats fucked up..
         if (!$this->curTpl['delay'])
-            return 0;
+            return 0.0;
 
         // must have enough damage
         $dps = ($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']) / (2 * $this->curTpl['delay'] / 1000);
-        if ($dps < 54.8)
-            return 0;
+        if ($dps <= 54.8)
+            return 0.0;
 
-        return round(($dps - 54.8) * 14, 0);
+        $subClasses = [14];                                 // Misc Weapons
+        $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ?_classes WHERE `id` = ?d', log(CLASS_DRUID, 2) + 1);
+        if ($weaponTypeMask)
+            for ($i = 0; $i < 21; $i++)
+                if ($weaponTypeMask & (1 << $i))
+                    $subClasses[] = $i;
+
+        // cannot be used by druids
+        if (!in_array($this->curTpl['subClass'], $subClasses))
+            return 0.0;
+
+        return round(($dps - 54.8) * 14);
     }
 
     private function parseRating($type, $value, $interactive = false, &$scaling = false)
@@ -1449,29 +1446,28 @@ class ItemList extends BaseType
         $reqLvl = $this->curTpl['requiredLevel'] > 1 ? $this->curTpl['requiredLevel'] : MAX_LEVEL;
         $level  = min(max($reqLvl, $ssdLvl), MAX_LEVEL);
 
-         // unknown rating
-        if (in_array($type, [2, 8, 9, 10, 11]) || $type > ITEM_MOD_BLOCK_VALUE || $type < 0)
+        // unknown rating
+        if (!Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $type))
         {
             if (User::isInGroup(U_GROUP_EMPLOYEE))
                 return sprintf(Lang::item('statType', count(Lang::item('statType')) - 1), $type, $value);
             else
                 return null;
         }
-        // level independant Bonus
-        else if (in_array($type, Game::$lvlIndepRating))
-            return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
+
+        // level independent Bonus
+        if (Stat::isLevelIndependent($type))
+            return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
+
         // rating-Bonuses
+        $scaling = true;
+
+        if ($interactive)
+            $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</small>';
         else
-        {
-            $scaling = true;
+            $js = '&nbsp;<small>('.Util::setRatingLevel($level, $type, $value).')</small>';
 
-            if ($interactive)
-                $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</small>';
-            else
-                $js = '&nbsp;<small>('.Util::setRatingLevel($level, $type, $value).')</small>';
-
-            return Lang::item('trigger', 1).str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::item('statType', $type));
-        }
+        return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::item('statType', $type));
     }
 
     private function getSSDMod($type)
@@ -1583,7 +1579,7 @@ class ItemList extends BaseType
         {
             $this->rndEnchIds[$eId] = array(
                 'text'  => $enchants->getField('name', true),
-                'stats' => $enchants->getStatGain(true)
+                'stats' => $enchants->getStatGainForCurrent()
             );
         }
 
@@ -1677,7 +1673,7 @@ class ItemList extends BaseType
             'subclass'    => $this->curTpl['subClass'],
             'subsubclass' => $this->curTpl['subSubClass'],
             'heroic'      => ($this->curTpl['flags'] & 0x8) >> 3,
-            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? 3 - ($this->curTpl['flagsExtra'] & 0x3) : Game::sideByRaceMask($this->curTpl['requiredRace']),
+            'side'        => $this->curTpl['flagsExtra'] & 0x3 ? SIDE_BOTH - ($this->curTpl['flagsExtra'] & 0x3) : Game::sideByRaceMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
             'level'       => $this->curTpl['itemLevel'],
@@ -1690,7 +1686,7 @@ class ItemList extends BaseType
             'frores'      => $this->curTpl['resFrost'],
             'shares'      => $this->curTpl['resShadow'],
             'arcres'      => $this->curTpl['resArcane'],
-            'armorbonus'  => max(0, intVal($this->curTpl['armorDamageModifier'])),
+            'armorbonus'  => $this->curTpl['class'] != ITEM_CLASS_ARMOR || $this->curTpl['armorDamageModifier'] <= 0 ? 0 : intVal($this->curTpl['armorDamageModifier']),
             'armor'       => $this->curTpl['tplArmor'],
             'dura'        => $this->curTpl['durability'],
             'itemset'     => $this->curTpl['itemset'],
@@ -1709,8 +1705,8 @@ class ItemList extends BaseType
             $json['dmgtype1'] = $this->curTpl['dmgType1'];
             $json['dmgmin1']  = $this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'];
             $json['dmgmax1']  = $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2'];
-            $json['speed']    = number_format($this->curTpl['delay'] / 1000, 2);
-            $json['dps']      = !floatVal($json['speed']) ? 0 : number_format(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1);
+            $json['speed']    = round($this->curTpl['delay'] / 1000, 2);
+            $json['dps']      = $json['speed'] ? round(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1) : 0;
 
             if (in_array($json['subclass'], [2, 3, 18, 19]))
             {
@@ -1734,7 +1730,7 @@ class ItemList extends BaseType
         if ($this->curTpl['class'] == ITEM_CLASS_ARMOR || $this->curTpl['class'] == ITEM_CLASS_WEAPON)
             $json['gearscore'] = Util::getEquipmentScore($json['level'], $this->getField('quality'), $json['slot'], $json['nsockets']);
         else if ($this->curTpl['class'] == ITEM_CLASS_GEM)
-            $json['gearscore'] = Util::getGemScore($json['level'], $this->getField('quality'), $this->getField('requiredSkill') == 755, $this->id);
+            $json['gearscore'] = Util::getGemScore($json['level'], $this->getField('quality'), $this->getField('requiredSkill') == SKILL_JEWELCRAFTING, $this->id);
 
         // clear zero-values afterwards
         foreach ($json as $k => $v)
@@ -1809,7 +1805,7 @@ class ItemListFilter extends Filter
            14 => -1,
            15 => -1
        ),
-       128 => array(                                       // source
+       128 => array(                                        // source
              1 => true,                                     // Any
              2 => false,                                    // None
              3 => 1,                                        // Crafted
@@ -2036,18 +2032,15 @@ class ItemListFilter extends Filter
 
         foreach ($this->fiData['v']['wt'] as $k => $v)
         {
-            $str = Util::$itemFilter[$v];
-            $qty = intVal($this->fiData['v']['wtv'][$k]);
+            if ($idx = Stat::getIndexFrom(Stat::IDX_FILTER_CR_ID, $v))
+            {
+                $str = Stat::getJsonString($idx);
+                $qty = intVal($this->fiData['v']['wtv'][$k]);
 
-            if ($str == 'rgdspeed')                     // dont need no duplicate column
-                $str = 'speed';
-
-            if ($str == 'mledps')                       // todo (med): unify rngdps and mledps to dps
-                $str = 'dps';
-
-            $select[]      = '(`is`.`'.$str.'` * '.$qty.')';
-            $this->wtCnd[] = ['is.'.$str, 0, '>'];
-            $wtSum        += $qty;
+                $select[]      = '(IFNULL(`is`.`'.$str.'`, 0) * '.$qty.')';
+                $this->wtCnd[] = ['is.'.$str, 0, '>'];
+                $wtSum        += $qty;
+            }
         }
 
         if (count($this->wtCnd) > 1)
@@ -2681,7 +2674,7 @@ class ItemListFilter extends Filter
         if (preg_match('/\W/i', $v))
             return false;
 
-        return isset(Util::$itemFilter[$v]);
+        return Stat::getIndexFrom(Stat::IDX_FILTER_CR_ID, $v) > 0;
     }
 }
 

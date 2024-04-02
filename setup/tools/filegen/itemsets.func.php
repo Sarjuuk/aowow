@@ -81,40 +81,38 @@ if (!CLI)
                     if ($set['item'.$i])
                         $setOut['pieces'][] = $set['item'.$i];
 
+                $_spells = [];
                 for ($i = 1; $i < 9; $i++)
                 {
-                    if (!$set['bonus'.$i] || !$set['spell'.$i])
+                    if (!$set['spell'.$i] || isset($jsonBonus[$set['spell'.$i]]))
                         continue;
 
-                    // costy and locale-independant -> cache
-                    if (!isset($jsonBonus[$set['spell'.$i]]))
-                        $jsonBonus[$set['spell'.$i]] = (new SpellList(array(['s.id', (int)$set['spell'.$i]])))->getStatGain()[$set['spell'.$i]];
-
-                    if (!isset($setOut['setbonus'][$set['bonus'.$i]]))
-                        $setOut['setbonus'][$set['bonus'.$i]] = $jsonBonus[$set['spell'.$i]];
-                    else
-                        Util::arraySumByKey($setOut['setbonus'][$set['bonus'.$i]], $jsonBonus[$set['spell'.$i]]);
+                    $_spells[] = $set['spell'.$i];
                 }
 
-                foreach ($setOut['setbonus'] as $k => $v)
+                // costy and locale-independant -> cache
+                if ($_spells)
+                    $jsonBonus += (new SpellList(array(['s.id', $_spells])))->getStatGain();
+
+                $setbonus = [];
+                for ($i = 1; $i < 9; $i++)
                 {
-                    if (empty($v))
-                        unset($setOut['setbonus'][$k]);
-                    else
+                    $itemQty = $set['bonus'.$i];
+                    $itemSpl = $set['spell'.$i];
+                    if (!$itemQty || !$itemSpl || !isset($jsonBonus[$itemSpl]))
+                        continue;
+
+                    if ($x = $jsonBonus[$itemSpl]->toJson(Stat::FLAG_ITEM))
                     {
-                        foreach ($v as $sk => $sv)
-                        {
-                            if ($str = Game::$itemMods[$sk])
-                            {
-                                $setOut['setbonus'][$k][$str] = $sv;
-                                unset($setOut['setbonus'][$k][$sk]);
-                            }
-                        }
+                        if (!isset($setbonus[$itemQty]))
+                            $setbonus[$itemQty] = [];
+
+                        Util::arraySumByKey($setbonus[$itemQty], $x);
                     }
                 }
 
-                if (empty($setOut['setbonus']))
-                    unset($setOut['setbonus']);
+                if ($setbonus)
+                    $setOut['setbonus'] = $setbonus;
 
                 $itemsetOut[$setOut['id']] = $setOut;
             }

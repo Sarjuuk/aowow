@@ -422,6 +422,52 @@ define('STAT_STAMINA',                      2);
 define('STAT_INTELLECT',                    3);
 define('STAT_SPIRIT',                       4);
 
+// ItemMods
+define('ITEM_MOD_MANA',                     0);
+define('ITEM_MOD_HEALTH',                   1);
+define('ITEM_MOD_AGILITY',                  3);
+define('ITEM_MOD_STRENGTH',                 4);
+define('ITEM_MOD_INTELLECT',                5);
+define('ITEM_MOD_SPIRIT',                   6);
+define('ITEM_MOD_STAMINA',                  7);
+define('ITEM_MOD_DEFENSE_SKILL_RATING',     12);
+define('ITEM_MOD_DODGE_RATING',             13);
+define('ITEM_MOD_PARRY_RATING',             14);
+define('ITEM_MOD_BLOCK_RATING',             15);
+define('ITEM_MOD_HIT_MELEE_RATING',         16);
+define('ITEM_MOD_HIT_RANGED_RATING',        17);
+define('ITEM_MOD_HIT_SPELL_RATING',         18);
+define('ITEM_MOD_CRIT_MELEE_RATING',        19);
+define('ITEM_MOD_CRIT_RANGED_RATING',       20);
+define('ITEM_MOD_CRIT_SPELL_RATING',        21);
+define('ITEM_MOD_HIT_TAKEN_MELEE_RATING',   22);
+define('ITEM_MOD_HIT_TAKEN_RANGED_RATING',  23);
+define('ITEM_MOD_HIT_TAKEN_SPELL_RATING',   24);
+define('ITEM_MOD_CRIT_TAKEN_MELEE_RATING',  25);
+define('ITEM_MOD_CRIT_TAKEN_RANGED_RATING', 26);
+define('ITEM_MOD_CRIT_TAKEN_SPELL_RATING',  27);
+define('ITEM_MOD_HASTE_MELEE_RATING',       28);
+define('ITEM_MOD_HASTE_RANGED_RATING',      29);
+define('ITEM_MOD_HASTE_SPELL_RATING',       30);
+define('ITEM_MOD_HIT_RATING',               31);
+define('ITEM_MOD_CRIT_RATING',              32);
+define('ITEM_MOD_HIT_TAKEN_RATING',         33);
+define('ITEM_MOD_CRIT_TAKEN_RATING',        34);
+define('ITEM_MOD_RESILIENCE_RATING',        35);
+define('ITEM_MOD_HASTE_RATING',             36);
+define('ITEM_MOD_EXPERTISE_RATING',         37);
+define('ITEM_MOD_ATTACK_POWER',             38);
+define('ITEM_MOD_RANGED_ATTACK_POWER',      39);
+define('ITEM_MOD_FERAL_ATTACK_POWER',       40);
+define('ITEM_MOD_SPELL_HEALING_DONE',       41);
+define('ITEM_MOD_SPELL_DAMAGE_DONE',        42);
+define('ITEM_MOD_MANA_REGENERATION',        43);
+define('ITEM_MOD_ARMOR_PENETRATION_RATING', 44);
+define('ITEM_MOD_SPELL_POWER',              45);
+define('ITEM_MOD_HEALTH_REGEN',             46);
+define('ITEM_MOD_SPELL_PENETRATION',        47);
+define('ITEM_MOD_BLOCK_VALUE',              48);
+
 // Powers
 define('POWER_MANA',                        0);
 define('POWER_RAGE',                        1);
@@ -777,70 +823,16 @@ define('ITEM_FLAG_SMARTLOOT',               0x02000000);
 define('ITEM_FLAG_ACCOUNTBOUND',            0x08000000);
 define('ITEM_FLAG_MILLABLE',                0x20000000);
 
-// ItemMod  (differ slightly from client, see g_statToJson)
-define('ITEM_MOD_WEAPON_DMG',               0);             // < custom
-define('ITEM_MOD_MANA',                     1);
-define('ITEM_MOD_HEALTH',                   2);
-define('ITEM_MOD_AGILITY',                  3);             // stats v
-define('ITEM_MOD_STRENGTH',                 4);
-define('ITEM_MOD_INTELLECT',                5);
-define('ITEM_MOD_SPIRIT',                   6);
-define('ITEM_MOD_STAMINA',                  7);
-define('ITEM_MOD_ENERGY',                   8);             // powers v
-define('ITEM_MOD_RAGE',                     9);
-define('ITEM_MOD_FOCUS',                    10);
-define('ITEM_MOD_RUNIC_POWER',              11);
-define('ITEM_MOD_DEFENSE_SKILL_RATING',     12);            // ratings v
-define('ITEM_MOD_DODGE_RATING',             13);
-define('ITEM_MOD_PARRY_RATING',             14);
-define('ITEM_MOD_BLOCK_RATING',             15);
-define('ITEM_MOD_HIT_MELEE_RATING',         16);
-define('ITEM_MOD_HIT_RANGED_RATING',        17);
-define('ITEM_MOD_HIT_SPELL_RATING',         18);
-define('ITEM_MOD_CRIT_MELEE_RATING',        19);
-define('ITEM_MOD_CRIT_RANGED_RATING',       20);
-define('ITEM_MOD_CRIT_SPELL_RATING',        21);
-define('ITEM_MOD_HIT_TAKEN_MELEE_RATING',   22);
-define('ITEM_MOD_HIT_TAKEN_RANGED_RATING',  23);
-define('ITEM_MOD_HIT_TAKEN_SPELL_RATING',   24);
-define('ITEM_MOD_CRIT_TAKEN_MELEE_RATING',  25);
-define('ITEM_MOD_CRIT_TAKEN_RANGED_RATING', 26);
-define('ITEM_MOD_CRIT_TAKEN_SPELL_RATING',  27);
-define('ITEM_MOD_HASTE_MELEE_RATING',       28);
-define('ITEM_MOD_HASTE_RANGED_RATING',      29);
-define('ITEM_MOD_HASTE_SPELL_RATING',       30);
-define('ITEM_MOD_HIT_RATING',               31);
-define('ITEM_MOD_CRIT_RATING',              32);
-define('ITEM_MOD_HIT_TAKEN_RATING',         33);
-define('ITEM_MOD_CRIT_TAKEN_RATING',        34);
-define('ITEM_MOD_RESILIENCE_RATING',        35);
-define('ITEM_MOD_HASTE_RATING',             36);
-define('ITEM_MOD_EXPERTISE_RATING',         37);
-define('ITEM_MOD_ATTACK_POWER',             38);
-define('ITEM_MOD_RANGED_ATTACK_POWER',      39);
-define('ITEM_MOD_FERAL_ATTACK_POWER',       40);
-define('ITEM_MOD_SPELL_HEALING_DONE',       41);            // deprecated
-define('ITEM_MOD_SPELL_DAMAGE_DONE',        42);            // deprecated
-define('ITEM_MOD_MANA_REGENERATION',        43);
-define('ITEM_MOD_ARMOR_PENETRATION_RATING', 44);
-define('ITEM_MOD_SPELL_POWER',              45);
-define('ITEM_MOD_HEALTH_REGEN',             46);
-define('ITEM_MOD_SPELL_PENETRATION',        47);
-define('ITEM_MOD_BLOCK_VALUE',              48);
-// define('ITEM_MOD_MASTERY_RATING',        49);
-define('ITEM_MOD_ARMOR',                    50);            // resistances v
-define('ITEM_MOD_FIRE_RESISTANCE',          51);
-define('ITEM_MOD_FROST_RESISTANCE',         52);
-define('ITEM_MOD_HOLY_RESISTANCE',          53);
-define('ITEM_MOD_SHADOW_RESISTANCE',        54);
-define('ITEM_MOD_NATURE_RESISTANCE',        55);
-define('ITEM_MOD_ARCANE_RESISTANCE',        56);            // custom v
-define('ITEM_MOD_FIRE_POWER',               57);
-define('ITEM_MOD_FROST_POWER',              58);
-define('ITEM_MOD_HOLY_POWER',               59);
-define('ITEM_MOD_SHADOW_POWER',             60);
-define('ITEM_MOD_NATURE_POWER',             61);
-define('ITEM_MOD_ARCANE_POWER',             62);
+// ItemEnchantment types
+define('ENCHANTMENT_TYPE_NONE',             0);
+define('ENCHANTMENT_TYPE_COMBAT_SPELL',     1);
+define('ENCHANTMENT_TYPE_DAMAGE',           2);
+define('ENCHANTMENT_TYPE_EQUIP_SPELL',      3);
+define('ENCHANTMENT_TYPE_RESISTANCE',       4);
+define('ENCHANTMENT_TYPE_STAT',             5);
+define('ENCHANTMENT_TYPE_TOTEM',            6);
+define('ENCHANTMENT_TYPE_USE_SPELL',        7);
+define('ENCHANTMENT_TYPE_PRISMATIC_SOCKET', 8);
 
 // Spell Effects and Auras
 define('SPELL_EFFECT_NONE',                             0);

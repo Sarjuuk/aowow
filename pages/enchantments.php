@@ -59,8 +59,8 @@ class EnchantmentsPage extends GenericPage
             $this->filter['initData']['sc'] = $x;
 
         $xCols = $this->filterObj->getExtraCols();
-        foreach (Util::$itemFilter as $fiId => $str)
-            if (array_column($tabData['data'], $str))
+        foreach (Stat::getFilterCriteriumIdFor() as $idx => $fiId)
+            if (array_column($tabData['data'], Stat::getJsonString($idx)))
                 $xCols[] = $fiId;
 
         if (array_column($tabData['data'], 'dmg'))

@@ -1112,12 +1112,12 @@ class ItemPage extends genericPage
             if ($_ = $this->subject->getField('cooldown'))           // cooldown
                 $json['cooldown'] = $_ / 1000;
 
-            foreach ($this->subject->itemMods[$this->typeId] as $mod => $qty)
-                $json[$mod] = $qty;
+            Util::arraySumByKey($json, $this->subject->jsonStats[$this->typeId] ?? []);
 
             foreach ($this->subject->json[$this->typeId] as $name => $qty)
-                if (in_array($name, Util::$itemFilter))
-                    $json[$name] = $qty;
+                if ($idx = Stat::getIndexFrom(Stat::IDX_JSON_STR, $name))
+                    if (Stat::getFilterCriteriumId($idx))
+                        $json[$name] = $qty;
 
             $xml->addChild('jsonEquip')->addCData(substr(json_encode($json), 1, -1));
 
@@ -1125,8 +1125,8 @@ class ItemPage extends genericPage
             if ($onUse = $this->subject->getOnUseStats())
             {
                 $j = '';
-                foreach ($onUse as $idx => $qty)
-                    $j .= ',"'.Game::$itemMods[$idx].'":'.$qty;
+                foreach ($onUse->toJson() as $key => $amt)
+                    $j .= ',"'.$key.'":'.$amt;
 
                 $xml->addChild('jsonUse')->addCData(substr($j, 1));
             }
