@@ -264,6 +264,8 @@ define('GUIDE_STATUS_APPROVED',             3);
 define('GUIDE_STATUS_REJECTED',             4);
 define('GUIDE_STATUS_ARCHIVED',             5);
 
+define('DEFAULT_ICON',                      'inv_misc_questionmark');
+
 /*
  * Game
  */

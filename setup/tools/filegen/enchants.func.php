@@ -65,7 +65,7 @@ if (!CLI)
                 effect1MiscValue,
                 equippedItemClass, equippedItemInventoryTypeMask, equippedItemSubClassMask,
                 skillLine1,
-                IFNULL(i.name, "inv_misc_questionmark") AS iconString,
+                IFNULL(i.name, ?) AS iconString,
                 name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8
             FROM
                 ?_spell s
@@ -74,7 +74,7 @@ if (!CLI)
             WHERE
                 effect1Id = ?d AND
                 name_loc0 NOT LIKE "QA%"'
-        , 53);                                              // enchantItemPermanent && !qualityAssurance
+        ,DEFAULT_ICON, SPELL_EFFECT_ENCHANT_ITEM);
 
         // check directory-structure
         foreach (Util::$localeStrings as $dir)

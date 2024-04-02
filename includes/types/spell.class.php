@@ -171,8 +171,8 @@ class SpellList extends BaseType
             unset($_curTpl['skillLine1']);
             unset($_curTpl['skillLine2OrMask']);
 
-            if (!$_curTpl['iconString'])
-                $_curTpl['iconString'] = 'inv_misc_questionmark';
+            // fix missing icons
+            $_curTpl['iconString'] = $_curTpl['iconString'] ?: DEFAULT_ICON;
 
             $this->scaling[$this->id] = false;
         }

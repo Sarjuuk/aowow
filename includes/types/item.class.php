@@ -45,6 +45,9 @@ class ItemList extends BaseType
             if ($_curTpl['scalingStatDistribution'] > 0 && $_curTpl['scalingStatValue'] > 0)
                 $this->initScalingStats();
 
+            // fix missing icons
+            $_curTpl['iconString'] = $_curTpl['iconString'] ?: DEFAULT_ICON;
+
             $this->initJsonStats();
 
             if ($miscData)
