@@ -130,7 +130,7 @@ $lang = array(
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d à H:i A",
         'timeAgo'       => 'il y a %s',
-        'nfSeparators'  => [' ', ','],
+        'nfSeparators'  => [' ', ','],
 
         // error
         'intError'      => "[An internal error occured.]",
@@ -1476,6 +1476,10 @@ $lang = array(
         '_collapseAll'  => "Replier Tout",
         '_expandAll'    => "Déplier Tout",
         '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        '_affected'     => "Sorts affectés",
+        '_seeMore'      => "[See more]",
+        '_rankRange'    => "Rang&nbsp;:&nbsp;%d&nbsp;-&nbsp;%d",
+        '_showXmore'    => "En afficher %d de plus",
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Appris via une découverte",
         'ppm'           => "(%s déclenchements par minute)",

@@ -251,6 +251,63 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
 <?php
     endif;
+
+    if (isset($e['modifies'])):
+?>
+                            <br><small><?=Lang::spell('_affected').Lang::main('colon');?></small>
+<?php
+        for ($type = 0; $type < 2; $type++):
+            if (!$e['modifies'][$type])
+                continue;
+
+            $folded   = false;
+            $iconData = [];
+
+            if ($type && count($e['modifies'][0]))
+                echo '<a href="javascript:" class="disclosure-off" onclick="return g_disclose($(\'#effectspells-85645'.($i - 1).'\')[0], this);">'.Lang::spell('_seeMore').'</a><div id="effectspells-85645'.($i - 1).'" style="display: none">';
+
+            echo '<table class="icontab">';
+
+            foreach ($e['modifies'][$type] as $idx => [$id, $name, $minRank, $maxRank]):
+                if (!$idx || !($idx % 3))
+                    echo "<tr".($folded ? ' style="display:none;"' : '').">";
+
+                $iconData[] = [++$iconTabIdx, $id];
+                echo "<th id=\"icontab-icon".$iconTabIdx."\"></th><td><a href=\"?spell=".$id."\">".($type ? $name : "<b>".$name."</b>")."</a>".($minRank != $maxRank ? "<br><small>(".Lang::spell('_rankRange', [$minRank, $maxRank]).")</small>" : '')."</td>\n";
+
+                if ($idx == count($e['modifies'][$type]) - 1 || !(($idx + 1) % 3))
+                    echo "</tr>";
+
+                if ($idx == 17 && count($e['modifies'][$type]) > 21):
+                    $folded = true;
+?>
+                <tr class="icontab-revealer">
+                    <td colspan="6">
+                        <a onclick="$(this).closest('table').addClass('show-all')">
+                            <?=Lang::spell('_showXmore', [count($e['modifies'][$type]) - 18]); ?>
+                        </a>
+                    </td>
+                </tr>
+<?php
+                endif;
+
+            endforeach;
+?>
+                            </table>
+
+                            <script type="text/javascript">//<![CDATA[
+<?php
+            foreach ($iconData as [$icon, $spell])
+                echo sprintf("                                \$WH.ge('icontab-icon%d').appendChild(g_spells.createIcon(%d, 0, \"0\"));\n", $icon, $spell);
+?>
+                            //]]></script>
+
+<?php
+            if ($type && count($e['modifies'][0]))
+                echo '</div>';
+
+        endfor;
+    endif;
 ?>
                         </td>
                     </tr>

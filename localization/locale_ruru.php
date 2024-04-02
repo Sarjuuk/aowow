@@ -130,7 +130,7 @@ $lang = array(
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d в H:i A",
         'timeAgo'       => '%s назад',
-        'nfSeparators'  => [' ', ','],
+        'nfSeparators'  => [' ', ','],
 
         // error
         'intError'      => "[An internal error occured.]",
@@ -1476,6 +1476,10 @@ $lang = array(
         '_collapseAll'  => "Свернуть все",
         '_expandAll'    => "Развернуть все",
         '_transfer'     => 'Этот предмет превратится в <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        '_affected'     => "Влияет на заклинания",
+        '_seeMore'      => "[See more]",
+        '_rankRange'    => "Ранг:&nbsp;%d&nbsp;-&nbsp;%d",
+        '_showXmore'    => "Показать на %d больше",
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Изучается путём освоения местности",
         'ppm'           => "(Срабатывает %s раз в минуту)",
