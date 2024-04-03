@@ -34,6 +34,8 @@
 .wowhead-tooltip ins { color: #5DF644; text-decoration: none; border-bottom: 1px dotted; }
 .wowhead-tooltip del { color: #FF8040; text-decoration: none; border-bottom: 1px dotted; }
 
+.wowhead-tooltip span.icontiny { padding-left: 18px !important; background: left center no-repeat; }
+
 .wowhead-tooltip-powered {
     /* background: url(../images/powered.png) no-repeat; */
     width: 53px;
