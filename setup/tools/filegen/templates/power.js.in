@@ -101,9 +101,8 @@ if (typeof $WowheadPower == "undefined") {
                 8: "ruru"
             },
             REDIRECTS = {
-                wotlk: "www",
-                ptr:   "www",
-                www:   "en"
+             // wotlk: "www",
+             // ptr:   "www"
             };
 
         if (isRemote) {

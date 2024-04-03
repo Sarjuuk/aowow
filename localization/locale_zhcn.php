@@ -1545,7 +1545,7 @@ $lang = array(
             -142 => "愤怒"
         ),
         'scaling'       => array(
-            'directSP' => "直接效果的攻击强度 +%.2f%%",         'directAP' => "直接效果的攻击强度 +%.2f%%t",
+            'directSP' => "直接效果的攻击强度 +%.2f%%",         'directAP' => "直接效果的攻击强度 +%.2f%%",
             'dotSP'    => "每个周期的法术强度 +%.2f%%",                    'dotAP'    => "每个周期的攻击强度 +%.2f%%"
         ),
         'relItems'      => array(
