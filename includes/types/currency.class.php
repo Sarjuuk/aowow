@@ -21,8 +21,7 @@ class CurrencyList extends BaseType
         parent::__construct($conditions);
 
         foreach ($this->iterate() as &$_curTpl)
-            if (!$_curTpl['iconString'])
-                $_curTpl['iconString'] = 'inv_misc_questionmark';
+            $_curTpl['iconString'] = $_curTpl['iconString'] ?: DEFAULT_ICON;
     }
 
 

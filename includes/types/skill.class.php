@@ -34,7 +34,7 @@ class SkillList extends BaseType
             }
 
             if (!$_curTpl['iconId'])
-                $_curTpl['iconString'] = 'inv_misc_questionmark';
+                $_curTpl['iconString'] = DEFAULT_ICON;
         }
     }
 
