@@ -13,7 +13,6 @@ class DB
 {
     private static $interfaceCache  = [];
     private static $optionsCache    = [];
-    private static $connectionCache = [];
 
     private static $logs            = [];
 
@@ -39,14 +38,15 @@ class DB
             $interface->setIdentPrefix($options['prefix']);
 
         // disable STRICT_TRANS_TABLES and STRICT_ALL_TABLES off. It prevents usage of implicit default values.
-        if ($idx == DB_AOWOW)
-            $interface->query("SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
         // disable ONLY_FULL_GROUP_BY (Allows for non-aggregated selects in a group-by query)
-        else
-            $interface->query("SET SESSION sql_mode = ''");
+        $extraModes = ['STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES', 'ONLY_FULL_GROUP_BY'];
+        $oldModes   = explode(',', $interface->selectCell('SELECT @@sql_mode'));
+        $newModes = array_diff($oldModes, $extraModes);
+
+        if ($oldModes != $newModes)
+            $interface->query("SET SESSION sql_mode = ?", implode(',', $newModes));
 
         self::$interfaceCache[$idx] = &$interface;
-        self::$connectionCache[$idx] = true;
     }
 
     public static function test(array $options, ?string &$err = '') : bool
@@ -122,7 +122,7 @@ class DB
 
     public static function isConnected($idx)
     {
-        return isset(self::$connectionCache[$idx]);
+        return isset(self::$interfaceCache[$idx]);
     }
 
     public static function isConnectable($idx)
