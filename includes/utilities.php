@@ -371,12 +371,8 @@ abstract class CLI
                     $char  = stream_get_contents(STDIN, 1);
                     $keyId = ord($char);
 
-                    // ignore this one
-                    if ($keyId == self::CHR_TAB)
-                        continue;
-
-                    // WIN sends \r\n as sequence, ignore one
-                    if ($keyId == self::CHR_CR && OS_WIN)
+                    // ignore these ones
+                    if ($keyId == self::CHR_TAB || $keyId == self::CHR_CR)
                         continue;
 
                     // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
