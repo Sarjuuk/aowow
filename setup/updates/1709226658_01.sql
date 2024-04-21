@@ -1,1 +1,1 @@
-UPDATE `aowow_dbversion` SET `sql` = CONCAT(IFNULL(`build`, ''), ' power');
+UPDATE `aowow_dbversion` SET `build` = CONCAT(IFNULL(`build`, ''), ' power');

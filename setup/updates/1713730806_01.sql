@@ -1,0 +1,24 @@
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'searchplugin', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'power', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'searchboxScript', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'demo', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'searchboxBody', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'realmMenu', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'locales', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'markup', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'itemScaling', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'realms', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'statistics', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'simpleImg', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'complexImg', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'talentCalc', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'pets', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'talentIcons', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'glyphs', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'itemsets', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'enchants', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'gems', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'profiler', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'weightPresets', '');
+UPDATE aowow_dbversion SET `sql` = REPLACE(`sql`, 'soundfiles', '');
+
