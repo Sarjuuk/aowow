@@ -308,6 +308,12 @@ class Loot
 
             if (empty($loot['reference']))                  // regular drop
             {
+                if (!isset($foo[$loot['content']]))
+                {
+                    trigger_error('Item #'.$loot['content'].' referenced by loot does not exist!', E_USER_WARNING);
+                    continue;
+                }
+
                 if (!User::isInGroup(U_GROUP_EMPLOYEE))
                 {
                     if (!isset($this->results[$loot['content']]))
