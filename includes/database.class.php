@@ -39,7 +39,7 @@ class DB
 
         // disable STRICT_TRANS_TABLES and STRICT_ALL_TABLES off. It prevents usage of implicit default values.
         // disable ONLY_FULL_GROUP_BY (Allows for non-aggregated selects in a group-by query)
-        $extraModes = ['STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES', 'ONLY_FULL_GROUP_BY'];
+        $extraModes = ['STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES', 'ONLY_FULL_GROUP_BY', 'NO_ZERO_DATE', 'NO_ZERO_IN_DATE', 'ERROR_FOR_DIVISION_BY_ZERO'];
         $oldModes   = explode(',', $interface->selectCell('SELECT @@sql_mode'));
         $newModes = array_diff($oldModes, $extraModes);
 
