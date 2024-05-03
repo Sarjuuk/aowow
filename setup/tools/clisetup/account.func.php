@@ -19,6 +19,14 @@ function account() : void
         'pass2' => ['Confirm Password', true ]
     );
 
+    if (!DB::isConnected(DB_AOWOW))
+    {
+        CLI::write('Database not yet set up!', CLI::LOG_WARN);
+        CLI::write('Please use '.CLI::bold('"php aowow --dbconfig"').' for setup', CLI::LOG_BLANK);
+        CLI::write();
+        return;
+    }
+
     User::useLocale(LOCALE_EN);
     Lang::load(LOCALE_EN);
 

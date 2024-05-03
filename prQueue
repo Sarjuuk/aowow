@@ -1,6 +1,6 @@
 <?php
 
-require 'includes/shared.php';
+require 'includes/kernel.php';
 
 /* todo (med):
     * tidy this file

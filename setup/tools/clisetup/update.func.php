@@ -13,6 +13,14 @@ if (!CLI)
 
 function update(?array &$sql = [], ?array &$build = []) : void
 {
+    if (!DB::isConnected(DB_AOWOW))
+    {
+        CLI::write('Database not yet set up!', CLI::LOG_WARN);
+        CLI::write('Please use '.CLI::bold('"php aowow --dbconfig"').' for setup', CLI::LOG_BLANK);
+        CLI::write();
+        return;
+    }
+
     [$date, $part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
 
     if (CLISetup::getOpt('help'))

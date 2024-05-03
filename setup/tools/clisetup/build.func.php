@@ -13,6 +13,14 @@ if (!CLI)
 
 function build($syncMe = null) : array
 {
+    if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD))
+    {
+        CLI::write('Database not yet set up!', CLI::LOG_WARN);
+        CLI::write('Please use '.CLI::bold('"php aowow --dbconfig"').' for setup', CLI::LOG_BLANK);
+        CLI::write();
+        return [];
+    }
+
     require_once 'setup/tools/fileGen.class.php';
 
     if(!FileGen::init($syncMe !== null ? FileGen::MODE_UPDATE : FileGen::MODE_NORMAL, $syncMe ?: []))

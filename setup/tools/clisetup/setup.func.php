@@ -168,6 +168,12 @@ function setup() : void
             return false;
         };
 
+        if (!DB::isConnected(DB_AOWOW))
+        {
+            $error[] = ' * not connected to DB';
+            return false;
+        }
+
         $res   = DB::Aowow()->selectCol('SELECT `key` AS ARRAY_KEY, value FROM ?_config WHERE `key` IN ("site_host", "static_host", "force_ssl")');
         $prot  = $res['force_ssl'] ? 'https://' : 'http://';
         $cases = array(

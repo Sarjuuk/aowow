@@ -29,13 +29,17 @@ class DB
         $options = &self::$optionsCache[$idx];
         $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));
 
-        if (!$interface || $interface->error)
-            die('Failed to connect to database on index #'.$idx.".\n");
-
         $interface->setErrorHandler(['DB', 'errorHandler']);
-        $interface->query('SET NAMES ?', 'utf8mb4');
         if ($options['prefix'])
             $interface->setIdentPrefix($options['prefix']);
+
+        self::$interfaceCache[$idx] = &$interface;
+
+        // should be caught by registered error handler
+        if (!$interface || !$interface->link)
+            return;
+
+        $interface->query('SET NAMES ?', 'utf8mb4');
 
         // disable STRICT_TRANS_TABLES and STRICT_ALL_TABLES off. It prevents usage of implicit default values.
         // disable ONLY_FULL_GROUP_BY (Allows for non-aggregated selects in a group-by query)
@@ -45,8 +49,6 @@ class DB
 
         if ($oldModes != $newModes)
             $interface->query("SET SESSION sql_mode = ?", implode(',', $newModes));
-
-        self::$interfaceCache[$idx] = &$interface;
     }
 
     public static function test(array $options, ?string &$err = '') : bool
@@ -56,15 +58,14 @@ class DB
         if (strstr($options['host'], ':'))
             [$options['host'], $port] = explode(':', $options['host']);
 
-        if ($link = @mysqli_connect($options['host'], $options['user'], $options['pass'], $options['db'], $port ?: $defPort))
-            mysqli_close($link);
-        else
+        if ($link = mysqli_connect($options['host'], $options['user'], $options['pass'], $options['db'], $port ?: $defPort))
         {
-            $err = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
-            return false;
+            mysqli_close($link);
+            return true;
         }
 
-        return true;
+        $err = '['.mysqli_connect_errno().'] '.mysqli_connect_error();
+        return false;
     }
 
     public static function errorHandler($message, $data)
@@ -78,15 +79,17 @@ class DB
         // make number sensible again
         $data['code'] = abs($data['code']);
 
-        $error = "DB ERROR:<br /><br />\n\n<pre>".print_r($data, true)."</pre>";
+        if (defined('CFG_DEBUG') && CFG_DEBUG)
+        {
+            echo "\nDB ERROR\n";
+            foreach ($data as $k => $v)
+                echo '  '.str_pad($k.':', 10).$v."\n";
+        }
 
-        echo CLI ? strip_tags($error) : $error;
-
-        if ($isError)
-            exit;
+        trigger_error($message, $isError ? E_USER_ERROR : E_USER_WARNING);
     }
 
-    public static function logger($self, $query, $trace)
+    public static function profiler($self, $query, $trace)
     {
         if ($trace)                                         // actual query
             self::$logs[] = [substr(str_replace("\n", ' ', $query), 0, 200)];
@@ -97,7 +100,7 @@ class DB
         }
     }
 
-    public static function getLogs()
+    public static function getProfiles()
     {
         $out = '<pre><table style="font-size:12;"><tr><th></th><th>Time</th><th>Query</th></tr>';
         foreach (self::$logs as $i => [$l, $t])
@@ -122,20 +125,12 @@ class DB
 
     public static function isConnected($idx)
     {
-        return isset(self::$interfaceCache[$idx]);
+        return isset(self::$interfaceCache[$idx]) && self::$interfaceCache[$idx]->link;
     }
 
     public static function isConnectable($idx)
     {
         return isset(self::$optionsCache[$idx]);
-    }
-
-    private static function safeGetDB($idx)
-    {
-        if (!self::isConnected($idx))
-            self::connect($idx);
-
-        return self::getDB($idx);
     }
 
     /**
@@ -147,7 +142,7 @@ class DB
         if (!isset(self::$optionsCache[DB_CHARACTERS.$realm]))
             die('Connection info not found for live database of realm #'.$realm.'. Aborted.');
 
-        return self::safeGetDB(DB_CHARACTERS.$realm);
+        return self::getDB(DB_CHARACTERS.$realm);
     }
 
     /**
@@ -156,7 +151,7 @@ class DB
      */
     public static function Auth()
     {
-        return self::safeGetDB(DB_AUTH);
+        return self::getDB(DB_AUTH);
     }
 
     /**
@@ -165,7 +160,7 @@ class DB
      */
     public static function World()
     {
-        return self::safeGetDB(DB_WORLD);
+        return self::getDB(DB_WORLD);
     }
 
     /**
@@ -174,12 +169,13 @@ class DB
      */
     public static function Aowow()
     {
-        return self::safeGetDB(DB_AOWOW);
+        return self::getDB(DB_AOWOW);
     }
 
     public static function load($idx, $config)
     {
         self::$optionsCache[$idx] = $config;
+        self::connect($idx);
     }
 }
 
