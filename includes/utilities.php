@@ -907,7 +907,7 @@ abstract class Util
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
             $result .= '%';
 
-        return sprintf(Lang::item('ratingString'), '<!--rtg%'.$type.'-->'.$result, '<!--lvl-->'.$level);
+        return Lang::item('ratingString', [$type, $result, $level]);
     }
 
     public static function powerUseLocale($domain = 'www')
