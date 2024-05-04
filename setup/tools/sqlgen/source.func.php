@@ -1161,7 +1161,6 @@ SqlGen::register(new class extends SetupScript
     {
         CLI::write('   * #13 cuStrings', CLI::LOG_BLANK, true, true);
 
-        Lang::load(LOCALE_EN);
         foreach (Lang::game('pvpSources') as $src => $__)
             $this->pushBuffer(Type::TITLE, $src, SRC_CUSTOM_STRING, $src);
     }
