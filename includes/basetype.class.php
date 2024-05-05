@@ -318,7 +318,7 @@ abstract class BaseType
             break;
         }
         while (next($this->templates));
-   }
+    }
 
     protected function reset()
     {
@@ -461,17 +461,20 @@ abstract class BaseType
 
 trait listviewHelper
 {
-    public function hasSetFields($fields)
+    public function hasSetFields(?string ...$fields) : int
     {
-        if (!is_array($fields))
-            return 0x0;
-
         $result = 0x0;
 
         foreach ($this->iterate() as $__)
         {
             foreach ($fields as $k => $str)
             {
+                if (!$str)
+                {
+                    unset($fields[$k]);
+                    continue;
+                }
+
                 if ($this->getField($str))
                 {
                     $result |= 1 << $k;
@@ -489,11 +492,8 @@ trait listviewHelper
         return $result;
     }
 
-    public function hasDiffFields($fields)
+    public function hasDiffFields(?string ...$fields) : int
     {
-        if (!is_array($fields))
-            return 0x0;
-
         $base   = [];
         $result = 0x0;
 
@@ -504,6 +504,12 @@ trait listviewHelper
         {
             foreach ($fields as $k => $str)
             {
+                if (!$str)
+                {
+                    unset($fields[$k]);
+                    continue;
+                }
+
                 if ($base[$str] != $this->getField($str))
                 {
                     $result |= 1 << $k;

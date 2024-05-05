@@ -73,7 +73,7 @@ class ZonesPage extends GenericPage
 
         $zones = new ZoneList($conditions);
 
-        if (!$zones->hasSetFields(['type']))
+        if (!$zones->hasSetFields('type'))
             $hiddenCols[] = 'instancetype';
 
         $tabData = ['data' => array_values($zones->getListviewData())];

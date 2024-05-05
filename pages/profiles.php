@@ -140,7 +140,7 @@ class ProfilesPage extends GenericPage
 
             // init roster-listview
             // $_GET['roster'] = 1|2|3|4 originally supplemented this somehow .. 2,3,4 arenateam-size (4 => 5-man), 1 guild
-            if ($this->roster == 1 && !$profiles->hasDiffFields(['guild']) && $profiles->getField('guild'))
+            if ($this->roster == 1 && !$profiles->hasDiffFields('guild') && $profiles->getField('guild'))
             {
                 $tabData['roster']        = $this->roster;
                 $tabData['visibleCols'][] = 'guildrank';
@@ -148,7 +148,7 @@ class ProfilesPage extends GenericPage
 
                 $this->roster  = Lang::profiler('guildRoster', [$profiles->getField('guildname')]);
             }
-            else if ($this->roster && !$profiles->hasDiffFields(['arenateam']) && $profiles->getField('arenateam'))
+            else if ($this->roster && !$profiles->hasDiffFields('arenateam') && $profiles->getField('arenateam'))
             {
                 $tabData['roster']        = $this->roster;
                 $tabData['visibleCols'][] = 'rating';

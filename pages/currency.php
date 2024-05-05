@@ -180,7 +180,7 @@ class CurrencyPage extends GenericPage
                     'id'   => 'created-by',
                 );
 
-                if ($createdBy->hasSetFields(['reagent1']))
+                if ($createdBy->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                     $tabData['visibleCols'] = ['reagents'];
 
                 $this->lvTabs[] = [SpellList::$brickFile, $tabData];

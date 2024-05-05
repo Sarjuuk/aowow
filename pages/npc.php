@@ -639,7 +639,7 @@ class NpcPage extends GenericPage
             {
                 $colAddIn  = null;
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
-                    if ($soldItems->hasSetFields(['condition']))
+                    if ($soldItems->hasSetFields('condition'))
                         $extraCols[] = '$Listview.extraCols.condition';
 
                 $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [Type::NPC => [$this->typeId]]);

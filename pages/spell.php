@@ -374,7 +374,7 @@ class SpellPage extends GenericPage
                     'visibleCols' => ['level'],
                 );
 
-                if (!$abilities->hasSetFields(['skillLines']))
+                if (!$abilities->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
                 $this->lvTabs[] = [SpellList::$brickFile, $tabData];
@@ -432,7 +432,7 @@ class SpellPage extends GenericPage
                     }
 
                 $modifiesData += $modSpells->getListviewData();
-                if ($modSpells->hasSetFields(['skillLines']))
+                if ($modSpells->hasSetFields('skillLines'))
                     $hideSkillCol = false;
 
                 $this->extendGlobalData($modSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -500,7 +500,7 @@ class SpellPage extends GenericPage
                     'visibleCols' => ['level'],
                 );
 
-                if (!$modsSpell->hasSetFields(['skillLines']))
+                if (!$modsSpell->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
                 $this->lvTabs[] = [SpellList::$brickFile, $tabData];
@@ -562,7 +562,7 @@ class SpellPage extends GenericPage
                 'visibleCols' => ['level'],
             );
 
-            if (!$saSpells->hasSetFields(['skillLines']))
+            if (!$saSpells->hasSetFields('skillLines'))
                 $tabData['hiddenCols'] = ['skill'];
 
             if (isset($saE))
@@ -812,7 +812,7 @@ class SpellPage extends GenericPage
                         foreach ($data as $k => $d)
                             $data[$k]['stackRule'] = $groups[$k];
 
-                        if (!$stacks->hasSetFields(['skillLines']))
+                        if (!$stacks->hasSetFields('skillLines'))
                             $sH = ['skill'];
 
                         $tabData = array(
@@ -1100,7 +1100,7 @@ class SpellPage extends GenericPage
                     'visibleCols' => $vis,
                 );
 
-                if (!$teaches->hasSetFields(['skillLines']))
+                if (!$teaches->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
                 $this->lvTabs[] = [SpellList::$brickFile, $tabData];

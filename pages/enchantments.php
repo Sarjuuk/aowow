@@ -81,7 +81,7 @@ class EnchantmentsPage extends GenericPage
         if (array_filter(array_column($tabData['data'], 'spells')))
             $tabData['visibleCols'] = ['trigger'];
 
-        if (!$ench->hasSetFields(['skillLine']))
+        if (!$ench->hasSetFields('skillLine'))
             $tabData['hiddenCols'] = ['skill'];
 
         if ($this->filterObj->error)

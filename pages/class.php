@@ -162,7 +162,7 @@ class ClassPage extends GenericPage
             $this->extendGlobalData($items->getJSGlobals());
 
             $hiddenCols = null;
-            if ($items->hasDiffFields(['requiredRace']))
+            if ($items->hasDiffFields('requiredRace'))
                 $hiddenCols = ['side'];
 
             $this->lvTabs[] = [ItemList::$brickFile, array(

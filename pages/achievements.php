@@ -98,7 +98,7 @@ class AchievementsPage extends GenericPage
             $this->extendGlobalData($acvList->getJSGlobals());
 
             // if we are have different cats display field
-            if ($acvList->hasDiffFields(['category']))
+            if ($acvList->hasDiffFields('category'))
                 $tabData['visibleCols'] = ['category'];
 
             if (!empty($this->filter['fi']['extraCols']))

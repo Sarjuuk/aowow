@@ -571,7 +571,7 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
 
                 $hCols = ['side'];
-                if (!$contains->hasSetFields(['slot']))
+                if (!$contains->hasSetFields('slot'))
                     $hCols[] = 'slot';
 
                 $this->lvTabs[] = [ItemList::$brickFile, array(
@@ -618,7 +618,7 @@ class ItemPage extends genericPage
                 'visibleCols' => ['category']
             );
 
-            if (!$criteriaOf->hasSetFields(['reward_loc0']))
+            if (!$criteriaOf->hasSetFields('reward_loc0'))
                 $tabData['hiddenCols'] = ['rewards'];
 
             $this->lvTabs[] = [AchievementList::$brickFile, $tabData];
@@ -927,7 +927,7 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($taughtSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 $visCols = ['level', 'schools'];
-                if ($taughtSpells->hasSetFields(['reagent1']))
+                if ($taughtSpells->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                     $visCols[] = 'reagents';
 
                 $this->lvTabs[] = [SpellList::$brickFile, array(
