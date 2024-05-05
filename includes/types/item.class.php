@@ -983,7 +983,7 @@ class ItemList extends BaseType
                 $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
                 foreach ($itemSpells->iterate() as $sId => $__)
                 {
-                    $parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0];
+                    [$parsed, $_, $scaling] = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
                     if (!$parsed && User::isInGroup(U_GROUP_EMPLOYEE))
                         $parsed = '<span style="opacity:.75">&lt;'.$itemSpells->getField('name', true, true).'&gt;</span>';
                     else if (!$parsed)
@@ -991,6 +991,9 @@ class ItemList extends BaseType
 
                     if ($interactive)
                     {
+                        if ($scaling)
+                            $causesScaling = true;
+
                         $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
                         $parsed = preg_replace_callback('/([^;]*)(&nbsp;<small>.*?<\/small>)([^&]*)/i', function($m) use($link) {
                                 $m[1] = $m[1] ? sprintf($link, $m[1]) : '';
@@ -1084,8 +1087,12 @@ class ItemList extends BaseType
                     $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
                     foreach ($boni->iterate() as $__)
                     {
+                        [$parsed, $_, $scaling] = $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
+                        if ($scaling && $interactive)
+                            $causesScaling = true;
+
                         $setSpells[] = array(
-                            'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0],
+                            'tooltip' => $parsed,
                             'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$boni->id]),
                             'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$boni->id])
                         );

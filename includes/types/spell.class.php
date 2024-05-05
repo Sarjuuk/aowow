@@ -874,17 +874,17 @@ class SpellList extends BaseType
     }
 
     // formulae base from TC
-    private function calculateAmountForCurrent($effIdx, $altTpl = null)
+    private function calculateAmountForCurrent(int $effIdx, ?SpellList $altTpl = null, int $nTicks = 1) : array
     {
         $ref     = $altTpl ?: $this;
         $level   = $this->charLevel;
+        $maxBase = 0;
         $rppl    = $ref->getField('effect'.$effIdx.'RealPointsPerLevel');
         $base    = $ref->getField('effect'.$effIdx.'BasePoints');
         $add     = $ref->getField('effect'.$effIdx.'DieSides');
         $maxLvl  = $ref->getField('maxLevel');
         $baseLvl = $ref->getField('baseLevel');
 
-        /* when should level scaling be actively worked into tooltips?
         if ($rppl)
         {
             if ($level > $maxLvl && $maxLvl > 0)
@@ -895,15 +895,18 @@ class SpellList extends BaseType
             if (!$ref->getField('atributes0') & SPELL_ATTR0_PASSIVE)
                 $level -= $ref->getField('spellLevel');
 
-            $base  += (int)($level * $rppl);
+            $maxBase += (int)(($level - $baseLvl) * $rppl);
+            $maxBase *= $nTicks;
         }
-        */
+
+        $min = $nTicks * ($add ? $base + 1 : $base);
+        $max = $nTicks * ($add + $base);
 
         return [
-            $add ? $base + 1 : $base,
-            $base + $add,
-            $rppl ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + max(1, $add)).':'.$rppl.'-->' : null,
-            $rppl ? '<!--ppl'.$baseLvl.':'.$maxLvl.':'.($base + $add).':'.$rppl.'-->' : null
+            $min + $maxBase,
+            $max + $maxBase,
+            $rppl ? '<!--ppl'.$baseLvl.':'.$level.':'.$min.':'.($rppl * 100 * $nTicks).'-->' : null,
+            $rppl ? '<!--ppl'.$baseLvl.':'.$level.':'.$max.':'.($rppl * 100 * $nTicks).'-->' : null
         ];
     }
 
@@ -1228,18 +1231,16 @@ class SpellList extends BaseType
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
-                $base = $srcSpell->getField('effect'.$effIdx.'BasePoints');
-                $add  = $srcSpell->getField('effect'.$effIdx.'DieSides');
+                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
 
-                if (ctype_lower($var))
-                    $add = 1;
-
-                $base += $add;
-
-                if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
-                    eval("\$base = $base $op $oparg;");
+                if (in_array($op, $signs) && is_numeric($oparg))
+                {
+                    eval("\$min = $min $op $oparg;");
+                    eval("\$max = $max $op $oparg;");
+                }
 
                 // Aura giving combat ratings
                 $rType = 0;
@@ -1253,8 +1254,14 @@ class SpellList extends BaseType
                     $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
                     $result[4] = $rType;
                 }
-
-                $result[0] = $base;
+/*  todo: export to and solve formulas in javascript e.g.: spell 10187 - ${$42213m1*8*$<mult>} with $mult = ${${$?s31678[${1.05}][${${$?s31677[${1.04}][${${$?s31676[${1.03}][${${$?s31675[${1.02}][${${$?s31674[${1.01}][${1}]}}]}}]}}]}}]}*${$?s12953[${1.06}][${${$?s12952[${1.04}][${${$?s11151[${1.02}][${1}]}}]}}]}}
+                else if ($this->interactive && ($modStrMin || $modStrMax))
+                {
+                    $this->scaling[$this->id] = true;
+                    $result[2] = $modStrMin.'%s';
+                }
+*/
+                $result[0] = ctype_lower($var) ? $min : $max;
                 break;
             case 'n':                                       // ProcCharges
             case 'N':
@@ -1267,7 +1274,6 @@ class SpellList extends BaseType
                 break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
-                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
                 $periode  = $srcSpell->getField('effect'.$effIdx.'Periode');
                 $duration = $srcSpell->getField('duration');
 
@@ -1281,8 +1287,7 @@ class SpellList extends BaseType
                         $periode = 3000;
                 }
 
-                $min  *= $duration / $periode;
-                $max  *= $duration / $periode;
+                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell, intVal($duration / $periode));
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -1290,8 +1295,10 @@ class SpellList extends BaseType
                     eval("\$max = $max $op $oparg;");
                 }
 
-                if ($this->interactive)
+                if ($this->interactive && ($modStrMin || $modStrMax))
                 {
+                    $this->scaling[$this->id] = true;
+
                     $result[2] = $modStrMin.'%s';
                     $result[3] = $modStrMax.'%s';
                 }
@@ -1340,8 +1347,9 @@ class SpellList extends BaseType
                     $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
                     $result[4] = $rType;
                 }
-                else if ($aura == SPELL_AURA_MOD_RATING && $this->interactive)
+                else if (($modStrMin || $modStrMax) && $this->interactive)
                 {
+                    $this->scaling[$this->id] = true;
                     $result[2] = $modStrMin.'%s';
                     $result[3] = $modStrMax.'%s';
                 }
@@ -1367,7 +1375,7 @@ class SpellList extends BaseType
 
                 $result[0] = $base;
                 break;
-            case 'v':                                   // MaxTargetLevel
+            case 'v':                                       // MaxTargetLevel
             case 'V':
                 $base = $srcSpell->getField('MaxTargetLevel');
 
@@ -1376,7 +1384,7 @@ class SpellList extends BaseType
 
                 $result[0] = $base;
                 break;
-            case 'x':                                   // ChainTargetCount
+            case 'x':                                       // ChainTargetCount
             case 'X':
                 $base = $srcSpell->getField('effect'.$effIdx.'ChainTarget');
 
@@ -1385,7 +1393,7 @@ class SpellList extends BaseType
 
                 $result[0] = $base;
                 break;
-            case 'z':                                   // HomeZone
+            case 'z':                                       // HomeZone
                 $result[2] = Lang::spell('home');
                 break;
         }
@@ -1396,7 +1404,7 @@ class SpellList extends BaseType
         if (isset($result[1]) && is_float($result[1]))
             $result[1] = round($result[1], 2);
 
-        return $result;
+        return $result;                                     // minPoints, maxPoints, fmtStringMin, fmtStringMax, combatRatingId
     }
 
     // description-, buff-parsing component
@@ -1505,7 +1513,7 @@ class SpellList extends BaseType
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
     // although it seems to be pretty fast, even on those pesky test-spells with extra complex tooltips (Ron Test Spell X))
-    public function parseText($type = 'description', $level = MAX_LEVEL, $interactive = false)
+    public function parseText($type = 'description', $level = MAX_LEVEL)
     {
         // oooo..kaaayy.. parsing text in 6 or 7 easy steps
         // we don't use the internal iterator here. This func has to be called for the individual template.
@@ -1588,7 +1596,6 @@ class SpellList extends BaseType
             $max(a, b)     - max()
     */
 
-        $this->interactive = $interactive;
         $this->charLevel   = $level;
 
     // step -1: already handled?
@@ -1701,7 +1708,7 @@ class SpellList extends BaseType
         // cache result
         $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive] = [$data, $relSpells];
 
-        return [$data, $relSpells];
+        return [$data, $relSpells, $this->scaling[$this->id]];
     }
 
     private function handleFormulas($data, $topLevel = false)
@@ -1959,8 +1966,10 @@ class SpellList extends BaseType
 
         $x .= '</td></tr></table>';
 
+        $min = $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1;
+        $max = $this->scaling[$this->id] ? MAX_LEVEL : 1;
         // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':1:'.($this->scaling[$this->id] ? MAX_LEVEL : 1).':'.$this->charLevel.'-->';
+        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
 
         return [$x, Util::parseHtmlText($btt[1])];
     }
@@ -2110,8 +2119,10 @@ class SpellList extends BaseType
         if ($xTmp)
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
+        $min = $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1;
+        $max = $this->scaling[$this->id] ? MAX_LEVEL : 1;
         // scaling information - spellId:min:max:curr
-        $x .= '<!--?'.$this->id.':1:'.($this->scaling[$this->id] ? MAX_LEVEL : 1).':'.$this->charLevel.'-->';
+        $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
 
         return [$x, Util::parseHtmlText($desc[1])];
     }
