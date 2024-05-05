@@ -1167,9 +1167,15 @@ class ItemList extends BaseType
         if ($this->curTpl['pageTextId'])
             $xMisc[] = '<span class="q2">'.Lang::item('readClick').'</span>';
 
-        // charges (i guess checking first spell is enough)
-        if ($this->curTpl['spellCharges1'])
-            $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges1'])]).'</span>';
+        // charges
+        for ($i = 1; $i < 6; $i++)
+        {
+            if (in_array($this->curTpl['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_SOULSTONE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_LEARN]) && $this->curTpl['spellCharges'.$i])
+            {
+                $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges'.$i])]).'</span>';
+                break;
+            }
+        }
 
         // list required reagents
         if (isset($xCraft))
