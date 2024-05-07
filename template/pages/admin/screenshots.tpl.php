@@ -31,8 +31,8 @@ endforeach;
 ?>
                             </select>
                         </td>
-                        <td>#<input type="number" size="5" id="pagetypeid"></td>
-                        <td>&raquo;&nbsp;<a href="#" onClick="ss_Manage(null, $('#pagetype').val(), $('#pagetypeid').val())">Search by Page</a></td>
+                        <td>#<input type="text" size="10" id="pagetypeid"></td>
+                        <td>&raquo;&nbsp;<a href="#" onClick="ss_Manage(null, $('#pagetype').val(), parseInt($('#pagetypeid').val()) || 0)">Search by Page</a></td>
                     </tr>
                 </table>
                 <hr />

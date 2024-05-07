@@ -18,7 +18,7 @@ class DB
 
     private static function createConnectSyntax(&$options)
     {
-        return 'mysqli://'.urlencode($options['user']).':'.urlencode($options['pass']).'@'.$options['host'].'/'.$options['db'];
+        return 'mysqli://'.$options['user'].':'.$options['pass'].'@'.$options['host'].'/'.$options['db'];
     }
 
     public static function connect($idx)
