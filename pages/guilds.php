@@ -97,7 +97,7 @@ class GuildsPage extends GenericPage
         {
             $guilds->initializeLocalEntries();
 
-            $dFields = $guilds->hasDiffFields(['faction', 'type']);
+            $dFields = $guilds->hasDiffFields('faction', 'type');
             if (!($dFields & 0x1))
                 $tabData['hiddenCols'][] = 'faction';
 

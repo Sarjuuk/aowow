@@ -446,15 +446,15 @@ class SpellsPage extends GenericPage
             $tabData['_errors'] = 1;
 
 
-        $mask = $spells->hasSetFields(['reagent1', 'skillLines', 'trainingCost', 'reqClassMask']);
-        if ($mask & 0x1)
-            $visibleCols[] = 'reagents';
-        if (!($mask & 0x2) && $this->category && !in_array($this->category[0], [9, 11]))
+        $mask = $spells->hasSetFields('skillLines', 'trainingCost', 'reqClassMask', null, 'reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8');
+        if (!($mask & 0x1) && $this->category && !in_array($this->category[0], [9, 11]))
             $hiddenCols[] = 'skill';
-        if ($mask & 0x4)
+        if ($mask & 0x2)
             $visibleCols[] = 'trainingcost';
-        if (($mask & 0x8) && !in_array('singleclass', $visibleCols))
+        if (($mask & 0x4) && !in_array('singleclass', $visibleCols))
             $visibleCols[] = 'classes';
+        if ($mask & 0xFF0)
+            $visibleCols[] = 'reagents';
 
 
         if ($visibleCols)

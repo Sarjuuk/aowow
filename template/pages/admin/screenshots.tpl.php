@@ -31,8 +31,8 @@ endforeach;
 ?>
                             </select>
                         </td>
-                        <td>#<input type="number" size="5" id="pagetypeid"></td>
-                        <td>&raquo;&nbsp;<a href="#" onClick="ss_Manage(null, $('#pagetype').val(), $('#pagetypeid').val())">Search by Page</a></td>
+                        <td>#<input type="number" size="6" id="pagetypeid"></td>
+                        <td>&raquo;&nbsp;<a href="#" onClick="ss_Manage(null, $('#pagetype').val(), parseInt($('#pagetypeid').val()) || 0)">Search by Page</a></td>
                     </tr>
                 </table>
                 <hr />
@@ -108,12 +108,12 @@ endforeach;
                     $WH.ge('pagetypeid').onkeydown = function(e)
                     {
                         e = $WH.$E(e);
-                        var validKeys = [8, 9, 13, 35, 36, 37, 39, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
+                        var validKeys = [8, 9, 13, 35, 36, 37, 38, 39, 40, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 173];
                         if (!e.ctrlKey && $WH.in_array(validKeys, e.keyCode) == -1)
                             return false;
 
                         if (e.keyCode == 13 && this.value != '')
-                            ss_Manage();
+                            ss_Manage(null, $('#pagetype').val(), parseInt($('#pagetypeid').val()) || 0);
 
                         return true;
                     }

@@ -229,7 +229,7 @@ class ItemsetPage extends GenericPage
                     'name' => '$LANG.tab_seealso'
                 );
 
-                if (!$relSets->hasDiffFields(['classMask']))
+                if (!$relSets->hasDiffFields('classMask'))
                     $tabData['hiddenCols'] = ['classes'];
 
                 $this->lvTabs[] = [ItemsetList::$brickFile, $tabData];

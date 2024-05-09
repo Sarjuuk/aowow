@@ -280,6 +280,14 @@ class DBC
         if (empty($this->_fields[$file]) || empty($this->_formats[$file]))
         {
             CLI::write('no structure known for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
+            CLI::write();
+            return;
+        }
+
+        if (!DB::isConnected(DB_AOWOW))
+        {
+            CLI::write('not connected to db, aborting.', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
 
@@ -291,6 +299,7 @@ class DBC
         if (count($this->fields) != strlen(str_ireplace('x', '', $this->format)))
         {
             CLI::write('known field types ['.count($this->fields).'] and names ['.strlen(str_ireplace('x', '', $this->format)).'] do not match for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
 
@@ -327,6 +336,7 @@ class DBC
         if (!$this->fileRefs)
         {
             CLI::write('no suitable files found for '.$file.'.dbc, aborting.', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
 
@@ -336,18 +346,21 @@ class DBC
         if (count($x) != 1)
         {
             CLI::write('some DBCs have differenct record counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
         $x = array_unique(array_column($headers, 'fieldCount'));
         if (count($x) != 1)
         {
             CLI::write('some DBCs have differenct field counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
         $x = array_unique(array_column($headers, 'recordSize'));
         if (count($x) != 1)
         {
             CLI::write('some DBCs have differenct record sizes ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
+            CLI::write();
             return;
         }
 

@@ -16,9 +16,10 @@ function siteconfig() : void
     $reqKeys    = ['site_host', 'static_host'];
     $updScripts = [];
 
-    if (!DB::isConnectable(DB_AOWOW))
+    if (!DB::isConnected(DB_AOWOW))
     {
-        CLI::write("database not yet set up!\n        Please use --dbconfig for setup", CLI::LOG_WARN);
+        CLI::write('Database not yet set up!', CLI::LOG_WARN);
+        CLI::write('Please use '.CLI::bold('"php aowow --dbconfig"').' for setup', CLI::LOG_BLANK);
         CLI::write();
         return;
     }

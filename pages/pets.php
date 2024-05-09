@@ -48,7 +48,7 @@ class PetsPage extends GenericPage
                 'computeDataFunc' => '$_'
             );
 
-            if (!$pets->hasDiffFields(['type']))
+            if (!$pets->hasDiffFields('type'))
                 $data['hiddenCols'] = ['type'];
         };
         $this->lvTabs[] = [PetList::$brickFile, $data, 'petFoodCol'];

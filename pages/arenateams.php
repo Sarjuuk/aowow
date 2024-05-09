@@ -104,7 +104,7 @@ class ArenaTeamsPage extends GenericPage
         {
             $teams->initializeLocalEntries();
 
-            $dFields = $teams->hasDiffFields(['faction', 'type']);
+            $dFields = $teams->hasDiffFields('faction', 'type');
             if (!($dFields & 0x1))
                 $tabData['hiddenCols'][] = 'faction';
 

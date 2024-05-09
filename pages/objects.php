@@ -59,7 +59,7 @@ class ObjectsPage extends GenericPage
         if (!$objects->error)
         {
             $tabData['data'] = array_values($objects->getListviewData());
-            if ($objects->hasSetFields(['reqSkill']))
+            if ($objects->hasSetFields('reqSkill'))
                 $tabData['visibleCols'] = ['skill'];
 
             // create note if search limit was exceeded

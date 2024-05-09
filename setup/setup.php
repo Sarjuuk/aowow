@@ -58,10 +58,7 @@ switch ($cmd)                                               // we accept only on
 
             $dbc = new DBC(trim($n), ['temporary' => false]);
             if ($dbc->error)
-            {
-                CLI::write('CLISetup::loadDBC() - required DBC '.$n.'.dbc not found!', CLI::LOG_ERROR);
                 return false;
-            }
 
             if (!$dbc->readFile())
             {

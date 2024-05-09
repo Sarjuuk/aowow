@@ -130,7 +130,7 @@ class CLISetup
                 self::$localeIds[] = $idx;
 
         // get site status
-        if (DB::isConnectable(DB_AOWOW))
+        if (DB::isConnected(DB_AOWOW))
             self::$lock = (int)DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = "maintenance"');
         else
             self::$lock = self::LOCK_ON;
@@ -199,7 +199,7 @@ class CLISetup
 
     public static function siteLock(int $mode = self::LOCK_RESTORE) : void
     {
-        if (DB::isConnectable(DB_AOWOW))
+        if (DB::isConnected(DB_AOWOW))
             DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', (int)!!($mode == self::LOCK_RESTORE ? self::$lock : $mode));
     }
 

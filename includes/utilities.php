@@ -175,14 +175,14 @@ abstract class CLI
                 $nCols = count($row);
 
             for ($j = 0; $j < $nCols - 1; $j++)             // don't pad last column
-                $pads[$j] = max($pads[$j] ?? 0, mb_strlen($row[$j]));
+                $pads[$j] = max($pads[$j] ?? 0, mb_strlen($row[$j] ?? ''));
         }
         self::write();
 
         foreach ($out as $row)
         {
             for ($i = 0; $i < $nCols - 1; $i++)             // don't pad last column
-                $row[$i] = str_pad($row[$i], $pads[$i] + 2);
+                $row[$i] = str_pad($row[$i] ?? '', $pads[$i] + 2);
 
             self::write('  '.implode($row), -1, $timestamp);
         }
@@ -907,7 +907,7 @@ abstract class Util
         if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
             $result .= '%';
 
-        return sprintf(Lang::item('ratingString'), '<!--rtg%'.$type.'-->'.$result, '<!--lvl-->'.$level);
+        return Lang::item('ratingString', [$type, $result, $level]);
     }
 
     public static function powerUseLocale($domain = 'www')

@@ -370,7 +370,7 @@ class ItemsPage extends GenericPage
             }
 
             if (!empty($this->filterObj->getSetWeights()))
-                if ($items->hasSetFields(['armor']))
+                if ($items->hasSetFields('armor'))
                     $tabData['visibleCols'][] = 'armor';
 
             // create note if search limit was exceeded; overwriting 'note' is intentional

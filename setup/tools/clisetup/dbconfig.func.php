@@ -24,18 +24,19 @@ function dbconfig() : void
     );
     $testDB    = function($idx, $name, $dbInfo)
     {
-        $buff = '['.CLI::bold($idx).'] '.str_pad($name, 17);
+        $buff = ['['.CLI::bold($idx).']', $name];
 
         if ($dbInfo['host'])
         {
             DB::test($dbInfo, $errStr);
 
-            $buff .= $errStr ? CLI::red('ERR   ') : CLI::green('OK    ');
-            $buff .= 'mysqli://'.$dbInfo['user'].':'.str_pad('', mb_strlen($dbInfo['pass']), '*').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
-            $buff .= ($dbInfo['prefix'] ? '    table prefix: '.$dbInfo['prefix'] : null).'    '.$errStr;
+            $buff[] = $errStr ? CLI::red('ERR') : CLI::green('OK');
+            $buff[] = 'mysqli://'.$dbInfo['user'].':'.($dbInfo['pass'] ? '**********' : '').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
+            $buff[] = $dbInfo['prefix'] ? 'table prefix: '.$dbInfo['prefix'] : '';
+            $buff[] = $errStr;
         }
         else
-            $buff .= '      '.CLI::bold('<empty>');
+            $buff[] = CLI::bold('<empty>');
 
         return $buff;
     };
@@ -52,17 +53,18 @@ function dbconfig() : void
         CLI::write("select a numerical index to use the corresponding entry");
 
         $nCharDBs = 0;
+        $tblRows = [];
         foreach ($databases as $idx => $name)
         {
             if ($idx != 3)
-                CLI::write($testDB($idx, $name, $AoWoWconf[$name]));
+                $tblRows[] = $testDB($idx, $name, $AoWoWconf[$name]);
             else if (!empty($AoWoWconf[$name]))
                 foreach ($AoWoWconf[$name] as $charIdx => $dbInfo)
-                    CLI::write($testDB($idx + $nCharDBs++, $name.' ['.$charIdx.']', $AoWoWconf[$name][$charIdx]));
+                    $tblRows[] = $testDB($idx + $nCharDBs++, $name.' ['.$charIdx.']', $AoWoWconf[$name][$charIdx]);
         }
 
-        CLI::write("[".CLI::bold(3 + $nCharDBs)."] add an additional Character DB");
-        CLI::write();
+        $tblRows[] = ['['.CLI::bold(3 + $nCharDBs).']', 'add new character DB'];
+        CLI::writeTable($tblRows, true);
 
         while (true)
         {

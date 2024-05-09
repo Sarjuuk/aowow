@@ -983,7 +983,7 @@ class ItemList extends BaseType
                 $itemSpells = new SpellList(array(['s.id', array_keys($itemSpellsAndTrigger)]));
                 foreach ($itemSpells->iterate() as $sId => $__)
                 {
-                    $parsed = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0];
+                    [$parsed, $_, $scaling] = $itemSpells->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
                     if (!$parsed && User::isInGroup(U_GROUP_EMPLOYEE))
                         $parsed = '<span style="opacity:.75">&lt;'.$itemSpells->getField('name', true, true).'&gt;</span>';
                     else if (!$parsed)
@@ -991,6 +991,9 @@ class ItemList extends BaseType
 
                     if ($interactive)
                     {
+                        if ($scaling)
+                            $causesScaling = true;
+
                         $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
                         $parsed = preg_replace_callback('/([^;]*)(&nbsp;<small>.*?<\/small>)([^&]*)/i', function($m) use($link) {
                                 $m[1] = $m[1] ? sprintf($link, $m[1]) : '';
@@ -1084,8 +1087,12 @@ class ItemList extends BaseType
                     $boni = new SpellList(array(['s.id', array_keys($setSpellsAndIdx)]));
                     foreach ($boni->iterate() as $__)
                     {
+                        [$parsed, $_, $scaling] = $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL);
+                        if ($scaling && $interactive)
+                            $causesScaling = true;
+
                         $setSpells[] = array(
-                            'tooltip' => $boni->parseText('description', $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL, false, $causesScaling)[0],
+                            'tooltip' => $parsed,
                             'entry'   => $itemset->getField('spell'.$setSpellsAndIdx[$boni->id]),
                             'bonus'   => $itemset->getField('bonus'.$setSpellsAndIdx[$boni->id])
                         );
@@ -1167,9 +1174,15 @@ class ItemList extends BaseType
         if ($this->curTpl['pageTextId'])
             $xMisc[] = '<span class="q2">'.Lang::item('readClick').'</span>';
 
-        // charges (i guess checking first spell is enough)
-        if ($this->curTpl['spellCharges1'])
-            $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges1'])]).'</span>';
+        // charges
+        for ($i = 1; $i < 6; $i++)
+        {
+            if (in_array($this->curTpl['spellTrigger'.$i], [SPELL_TRIGGER_USE, SPELL_TRIGGER_SOULSTONE, SPELL_TRIGGER_USE_NODELAY, SPELL_TRIGGER_LEARN]) && $this->curTpl['spellCharges'.$i])
+            {
+                $xMisc[] = '<span class="q1">'.Lang::item('charges', [abs($this->curTpl['spellCharges'.$i])]).'</span>';
+                break;
+            }
+        }
 
         // list required reagents
         if (isset($xCraft))

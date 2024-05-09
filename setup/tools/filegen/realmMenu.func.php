@@ -62,6 +62,7 @@ if (!CLI)
         if (!$set)
             CLI::write(' - realmMenu: Auth-DB not set up .. realm menu will be empty', CLI::LOG_WARN);
 
+        // why is this file not localized!?
         foreach (Util::$regions as $idx => $n)
             if ($set & (1 << $idx))
                 $menu[] = [$n, Lang::profiler('regions', $n), null, &$subs[$idx]];

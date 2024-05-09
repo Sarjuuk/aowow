@@ -30,6 +30,14 @@ function sync(array $s = [], array $b = []) : void
         return;
     }
 
+    if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD))
+    {
+        CLI::write('Database not yet set up!', CLI::LOG_WARN);
+        CLI::write('Please use '.CLI::bold('"php aowow --dbconfig"').' for setup', CLI::LOG_BLANK);
+        CLI::write();
+        return;
+    }
+
     $_s = sql($s);
     if ($s)
     {

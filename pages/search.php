@@ -647,7 +647,7 @@ class SearchPage extends GenericPage
             }
 
             $vis = ['level', 'schools'];
-            if ($abilities->hasSetFields(['reagent1']))
+            if ($abilities->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                 $vis[] = 'reagents';
 
             $vis[] = $multiClass > 1 ? 'classes' : 'singleclass';
@@ -700,7 +700,7 @@ class SearchPage extends GenericPage
                 $this->extendGlobalData($talents->getJSGlobals());
 
             $vis = ['level', 'singleclass', 'schools'];
-            if ($talents->hasSetFields(['reagent1']))
+            if ($talents->hasSetFields('reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8'))
                 $vis[] = 'reagents';
 
             $osInfo = [Type::SPELL, ' (Talent)', $talents->getMatches(), [], []];
@@ -1353,7 +1353,7 @@ class SearchPage extends GenericPage
             if (array_filter(array_column($result['data'], 'spells')))
                 $result['visibleCols'] = ['trigger'];
 
-            if (!$enchantment->hasSetFields(['skillLine']))
+            if (!$enchantment->hasSetFields('skillLine'))
                 $result['hiddenCols'] = ['skill'];
 
             if ($enchantment->getMatches() > $this->maxResults)

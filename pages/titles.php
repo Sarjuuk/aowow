@@ -42,7 +42,7 @@ class TitlesPage extends GenericPage
         {
             $tabData['data'] = array_values($titles->getListviewData());
 
-            if ($titles->hasDiffFields(['category']))
+            if ($titles->hasDiffFields('category'))
                 $tabData['visibleCols'] = ['category'];
 
             if (!$titles->hasAnySource())

@@ -1,22 +1,31 @@
 <?php
 
-if (!defined('AOWOW_REVISION'))
-    die('illegal access');
+mb_internal_encoding('UTF-8');
+mysqli_report(MYSQLI_REPORT_ERROR);
+
+define('AOWOW_REVISION', 35);
+define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
+define('CLI', PHP_SAPI === 'cli');
+define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences
+    (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
+
+
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'/*, 'gmp'*/];
+$error  = '';
+if ($ext = array_filter($reqExt, function($x) { return !extension_loaded($x); }))
+    $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
+
+if (version_compare(PHP_VERSION, '8.0.0') < 0)
+    $error .= 'PHP Version <b>8.0</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
+
+if ($error)
+    die(CLI ? strip_tags($error) : $error);
 
 
 if (file_exists('config/config.php'))
     require_once 'config/config.php';
 else
     $AoWoWconf = [];
-
-
-mb_internal_encoding('UTF-8');
-
-// OS_WIN as per compile info of php
-define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');
-
-// WIN10 and later usually support ANSI escape sequences
-define('CLI_HAS_E', CLI && (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
 
 
 require_once 'includes/defines.php';
@@ -78,6 +87,78 @@ spl_autoload_register(function ($class) {
         require_once 'pages/'.strtr($class, ['page' => '']).'.php';
 });
 
+set_error_handler(function($errNo, $errStr, $errFile, $errLine)
+{
+    // either from test function or handled separately
+    if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
+        return true;
+
+    $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
+    $uGroup  = U_GROUP_EMPLOYEE;
+
+    if ($errNo == E_WARNING)                                // 0x0002
+        $errName = 'E_WARNING';
+    else if ($errNo == E_PARSE)                             // 0x0004
+        $errName = 'E_PARSE';
+    else if ($errNo == E_NOTICE)                            // 0x0008
+        $errName = 'E_NOTICE';
+    else if ($errNo == E_USER_ERROR)                        // 0x0100
+        $errName = 'E_USER_ERROR';
+    else if ($errNo == E_USER_WARNING)                      // 0x0200
+        $errName = 'E_USER_WARNING';
+    else if ($errNo == E_USER_NOTICE)                       // 0x0400
+    {
+        $errName = 'E_USER_NOTICE';
+        $uGroup  = U_GROUP_STAFF;
+    }
+    else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
+        $errName = 'E_RECOVERABLE_ERROR';
+
+    Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
+    if (CLI)
+        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & 0x40A ? CLI::LOG_WARN : CLI::LOG_ERROR);
+
+    if (DB::isConnected(DB_AOWOW))
+        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $errStr
+        );
+
+    return true;
+}, E_AOWOW);
+
+// handle exceptions
+set_exception_handler(function ($e)
+{
+    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
+
+    if (DB::isConnected(DB_AOWOW))
+        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+            AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e->getMessage()
+        );
+
+    if (!CLI)
+        (new GenericPage())->error();
+    else
+        echo "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n";
+});
+
+// handle fatal errors
+register_shutdown_function(function()
+{
+    if (($e = error_get_last()) && $e['type'] & (E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR))
+    {
+        if (DB::isConnected(DB_AOWOW))
+            DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
+                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e['message']
+            );
+
+        if (CLI)
+            echo "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n";
+
+        // cant generate a page for web view :(
+        die();
+    }
+});
 
 // Setup DB-Wrapper
 if (!empty($AoWoWconf['aowow']['db']))
@@ -98,7 +179,7 @@ if (!empty($AoWoWconf['characters']))
 // load config to constants
 function loadConfig(bool $noPHP = false) : void
 {
-    $sets = DB::isConnectable(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
+    $sets = DB::isConnected(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
     foreach ($sets as $k => $v)
     {
         $php = $v['flags'] & CON_FLAG_PHP;
@@ -136,81 +217,14 @@ function loadConfig(bool $noPHP = false) : void
         else if (!defined('CFG_'.strtoupper($k)))
             define('CFG_'.strtoupper($k), $val);
     }
+
+    $required = ['CFG_SCREENSHOT_MIN_SIZE', 'CFG_CONTACT_EMAIL', 'CFG_NAME', 'CFG_NAME_SHORT', 'CFG_FORCE_SSL', 'CFG_DEBUG'];
+    foreach ($required as $r)
+        if (!defined($r))
+            define($r, '');
 }
 loadConfig();
 
-// handle non-fatal errors and notices
-error_reporting(!empty($AoWoWconf['aowow']) && CFG_DEBUG ? E_AOWOW : 0);
-set_error_handler(function($errNo, $errStr, $errFile, $errLine)
-{
-    $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
-    $uGroup  = U_GROUP_EMPLOYEE;
-
-    if ($errNo == E_WARNING)                                // 0x0002
-        $errName = 'E_WARNING';
-    else if ($errNo == E_PARSE)                             // 0x0004
-        $errName = 'E_PARSE';
-    else if ($errNo == E_NOTICE)                            // 0x0008
-        $errName = 'E_NOTICE';
-    else if ($errNo == E_USER_ERROR)                        // 0x0100
-        $errName = 'E_USER_ERROR';
-    else if ($errNo == E_USER_WARNING)                      // 0x0200
-        $errName = 'E_USER_WARNING';
-    else if ($errNo == E_USER_NOTICE)                       // 0x0400
-    {
-        $errName = 'E_USER_NOTICE';
-        $uGroup  = U_GROUP_STAFF;
-    }
-    else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
-        $errName = 'E_RECOVERABLE_ERROR';
-
-    Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
-    if (CLI)
-        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & 0x40A ? CLI::LOG_WARN : CLI::LOG_ERROR);
-
-    if (DB::isConnectable(DB_AOWOW))
-        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $errStr
-        );
-
-    return true;
-}, E_AOWOW);
-
-// handle exceptions
-set_exception_handler(function ($ex)
-{
-    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$ex->getMessage().' @ '.$ex->getFile(). ':'.$ex->getLine()."\n".$ex->getTraceAsString());
-
-    if (DB::isConnectable(DB_AOWOW))
-        DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $ex->getCode(), $ex->getFile(), $ex->getLine(), CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $ex->getMessage()
-        );
-
-    if (!CLI)
-        (new GenericPage())->error();
-    else
-        echo 'Exception - '.$ex->getMessage()."\n   ".$ex->getFile(). '('.$ex->getLine().")\n".$ex->getTraceAsString()."\n";
-});
-
-// handle fatal errors
-register_shutdown_function(function()
-{
-    if (($e = error_get_last()) && $e['type'] & (E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR))
-    {
-        Util::addNote(U_GROUP_EMPLOYEE, 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']);
-
-        if (DB::isConnectable(DB_AOWOW))
-            DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e['message']
-            );
-
-        if (CLI)
-            echo 'Fatal Error - '.$e['message'].' @ '.$e['file']. ':'.$e['line']."\n";
-
-        // cant generate a page for web view :(
-        die();
-    }
-});
 
 $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || (!empty($AoWoWconf['aowow']) && CFG_FORCE_SSL);
 if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts
@@ -220,10 +234,15 @@ if (defined('CFG_SITE_HOST'))                               // points js to exec
     define('HOST_URL',   ($secure ? 'https://' : 'http://').CFG_SITE_HOST);
 
 
+// handle non-fatal errors and notices
+error_reporting(CFG_DEBUG ? E_AOWOW : 0);
+
+
 if (!CLI)
 {
-    if (!defined('CFG_SITE_HOST') || !defined('CFG_STATIC_HOST'))
-        die('error: SITE_HOST or STATIC_HOST not configured');
+    // not displaying the brb gnomes as static_host is missing, but eh...
+    if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !defined('HOST_URL') || !defined('STATIC_URL'))
+        (new GenericPage())->maintenance();
 
     // Setup Session
     if (CFG_SESSION_CACHE_DIR && Util::writeDir(CFG_SESSION_CACHE_DIR))
@@ -234,39 +253,36 @@ if (!CLI)
     if (!session_start())
     {
         trigger_error('failed to start session', E_USER_ERROR);
-        exit;
+        (new GenericPage())->error();
     }
 
-    if (!empty($AoWoWconf['aowow']) && User::init())
+    if (User::init())
         User::save();                                       // save user-variables in session
 
     // set up some logging (~10 queries will execute before we init the user and load the config)
     if (CFG_DEBUG && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
-        DB::Aowow()->setLogger(['DB', 'logger']);
-        DB::World()->setLogger(['DB', 'logger']);
+        DB::Aowow()->setLogger(['DB', 'profiler']);
+        DB::World()->setLogger(['DB', 'profiler']);
         if (DB::isConnected(DB_AUTH))
-            DB::Auth()->setLogger(['DB', 'logger']);
+            DB::Auth()->setLogger(['DB', 'profiler']);
 
         if (!empty($AoWoWconf['characters']))
             foreach ($AoWoWconf['characters'] as $idx => $__)
                 if (DB::isConnected(DB_CHARACTERS . $idx))
-                    DB::Characters($idx)->setLogger(['DB', 'logger']);
+                    DB::Characters($idx)->setLogger(['DB', 'profiler']);
     }
 
     // hard-override locale for this call (should this be here..?)
     // all strings attached..
-    if (!empty($AoWoWconf['aowow']))
+    if (isset($_GET['locale']))
     {
-        if (isset($_GET['locale']))
-        {
-            $loc = intVal($_GET['locale']);
-            if ($loc <= MAX_LOCALES && $loc >= 0 && (CFG_LOCALES & (1 << $loc)))
-                User::useLocale($loc);
-        }
-
-        Lang::load(User::$localeId);
+        $loc = intVal($_GET['locale']);
+        if ($loc <= MAX_LOCALES && $loc >= 0 && (CFG_LOCALES & (1 << $loc)))
+            User::useLocale($loc);
     }
+
+    Lang::load(User::$localeId);
 
     // parse page-parameters .. sanitize before use!
     $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING'] ?? ''), 2)[0];
@@ -274,7 +290,7 @@ if (!CLI)
     $pageCall  = $_[0];
     $pageParam = $_[1] ?? '';
 }
-else if (!empty($AoWoWconf['aowow']))
+else if (DB::isConnected(DB_AOWOW))
     Lang::load(LOCALE_EN);
 
 $AoWoWconf = null;                                          // empty auths
