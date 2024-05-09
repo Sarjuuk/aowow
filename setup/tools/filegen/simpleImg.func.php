@@ -27,7 +27,7 @@ if (!CLI)
             $file = $path.'.png';
             if (CLISetup::fileExists($file))
             {
-                CLI::write('manually converted png file present for '.$path.'.', CLI::LOG_INFO);
+                CLI::write('manually converted png file present for: '.$path, CLI::LOG_INFO);
                 $result = imagecreatefrompng($file);
             }
 
@@ -64,19 +64,19 @@ if (!CLI)
             ['loadingscreens/small/',    '.jpg', 0,  244, 0]
         );
         $paths    = array(                                  // src, [dest, ext, srcSize, destSize, borderOffset], pattern, isIcon, tileSize, resourcePath
-             0 => ['Icons/',                                                $iconDirs,                                                    '/.*\.blp$',                           true,   0, null],
-             1 => ['Spellbook/',                                            [['Interface/Spellbook/',     '.png', 0,  0, 0]],             '/UI-Glyph-Rune-?\d+.blp$',            true,   0, null],
-             2 => ['PaperDoll/',                                            array_slice($iconDirs, 0, 3),                                 '/UI-(Backpack|PaperDoll)-.*\.blp$',   true,   0, null],
-             3 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Races.blp',    $iconDirs,                                                    '',                                    true,  64, null],
-             4 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-CLASSES.blp',  $iconDirs,                                                    '',                                    true,  64, null],
-             5 => ['GLUES/CHARACTERCREATE/UI-CharacterCreate-Factions.blp', $iconDirs,                                                    '',                                    true,  64, null],
-          // 6 => ['Minimap/OBJECTICONS.BLP',                               [['icons/tiny/',              '.gif', 0, 16, 2]],             '',                                    true,  32, null],
-             7 => ['FlavorImages/',                                         [['Interface/FlavorImages/',  '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
-             8 => ['Pictures/',                                             [['Interface/Pictures/',      '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
-             9 => ['PvPRankBadges/',                                        [['Interface/PvPRankBadges/', '.png', 0,  0, 0]],             '/.*\.blp$',                           false,  0, null],
-            10 => ['Calendar/Holidays/',                                    $calendarDirs,                                                '/.*(start|[ayhs])\.blp$',             true,   0, null],
-            11 => ['GLUES/LOADINGSCREENS/',                                 $loadScreenDirs,                                              '/lo.*\.blp$',                         false,  0, null],
-            12 => ['PVPFrame/',                                             array_map(function($x) { $x[4] = 2; return $x; }, $iconDirs), '/PVP-(ArenaPoints|Currency).*\.blp$', true,   0, null]
+             0 => ['Icons/',                 $iconDirs,                                                    '/.*\.(blp|png)$',                           true,   0, null],
+             1 => ['Spellbook/',             [['Interface/Spellbook/',     '.png', 0,  0, 0]],             '/UI-Glyph-Rune-?\d+.(blp|png)$',            true,   0, null],
+             2 => ['PaperDoll/',             array_slice($iconDirs, 0, 3),                                 '/UI-(Backpack|PaperDoll)-.*\.(blp|png)$',   true,   0, null],
+             3 => ['GLUES/CHARACTERCREATE/', $iconDirs,                                                    '/UI-CharacterCreate-Races.(blp|png)',       true,  64, null],
+             4 => ['GLUES/CHARACTERCREATE/', $iconDirs,                                                    '/UI-CharacterCreate-CLASSES.(blp|png)',     true,  64, null],
+             5 => ['GLUES/CHARACTERCREATE/', $iconDirs,                                                    '/UI-CharacterCreate-Factions.(blp|png)',    true,  64, null],
+          // 6 => ['Minimap/',               [['icons/tiny/',              '.gif', 0, 16, 2]],             '/OBJECTICONS.(BLP|png)',                    true,  32, null],
+             7 => ['FlavorImages/',          [['Interface/FlavorImages/',  '.png', 0,  0, 0]],             '/.*\.(blp|png)$',                           false,  0, null],
+             8 => ['Pictures/',              [['Interface/Pictures/',      '.png', 0,  0, 0]],             '/.*\.(blp|png)$',                           false,  0, null],
+             9 => ['PvPRankBadges/',         [['Interface/PvPRankBadges/', '.png', 0,  0, 0]],             '/.*\.(blp|png)$',                           false,  0, null],
+            10 => ['Calendar/Holidays/',     $calendarDirs,                                                '/.*(start|[ayhs])\.(blp|png)$',             true,   0, null],
+            11 => ['GLUES/LOADINGSCREENS/',  $loadScreenDirs,                                              '/lo.*\.(blp|png)$',                         false,  0, null],
+            12 => ['PVPFrame/',              array_map(function($x) { $x[4] = 2; return $x; }, $iconDirs), '/PVP-(ArenaPoints|Currency).*\.(blp|png)$', true,   0, null]
         );
         // textures are composed of 64x64 icons
         // numeric indexed arrays mimick the position on the texture
@@ -246,7 +246,7 @@ if (!CLI)
         if (count(array_filter(array_column($paths, 5))) != count($paths))
         {
             CLI::write('one or more required directories are missing:', CLI::LOG_ERROR);
-            return;
+            return false;
         }
         else
             sleep(1);
@@ -274,9 +274,11 @@ if (!CLI)
 
             foreach ($siRows as $icon)
             {
-                if (stristr($icon, $paths[0][0]))           // Icons/
+                // Icons/
+                if (isset($paths[0]) && stristr($icon, $paths[0][0]))
                     $dbcEntries[] = strtolower($paths[0][5].substr(strrchr($icon, '\\'), 1));
-                else if (stristr($icon, $paths[1][0]))      // Spellbook/
+                // Spellbook/
+                else if (isset($paths[1]) && stristr($icon, $paths[1][0]))
                     $dbcEntries[] = strtolower($paths[1][5].substr(strrchr($icon, '\\'), 1));
             }
         }
@@ -285,11 +287,11 @@ if (!CLI)
         {
             $itemIcons = DB::Aowow()->selectCol('SELECT inventoryIcon1 FROM dbc_itemdisplayinfo WHERE inventoryIcon1 <> ""');
             foreach ($itemIcons as $icon)
-                $dbcEntries[] = strtolower($paths[0][5].'/'.$icon.'.blp');
+                $dbcEntries[] = strtolower($paths[0][5].'/'.$icon);
 
             $eventIcons = DB::Aowow()->selectCol('SELECT textureString FROM dbc_holidays WHERE textureString <> ""');
             foreach ($eventIcons as $icon)
-                $dbcEntries[] = strtolower($paths[10][5].'/'.$icon.'Start.blp');
+                $dbcEntries[] = strtolower($paths[10][5].'/'.$icon.'start');
         }
 
         // case-insensitive array_unique *vomits silently into a corner*
@@ -303,7 +305,14 @@ if (!CLI)
                 $search = '/'.str_replace('/', '\\/', $search).'/i';
 
             $files    = CLISetup::filesInPath($search, !!$pattern);
-            $allPaths = array_merge($allPaths, $files);
+            $allPaths = array_merge($allPaths, array_map(function ($x) { return substr($x, 0, -4); }, $files));
+
+            if (!$files)
+            {
+                CLI::write('source directory "'.CLI::bold($search).'" does not contain files matching "'.CLI::bold($pattern), CLI::LOG_ERROR);
+                $success = false;
+                continue;
+            }
 
             CLI::write('processing '.count($files).' files in '.$path.'...');
 
