@@ -521,7 +521,7 @@ if (!CLI)
                     $multiLevel   = 0;
                     do
                     {
-                        if (!CLISetup::filesInPath('/'.$textureStr.'\/'.$textureStr.($multiLevel + 1).'_\d\.blp/i', true))
+                        if (!CLISetup::filesInPath('/'.$textureStr.'\/'.$textureStr.($multiLevel + 1).'_\d\.(blp|png)/i', true))
                             break;
 
                         $multiLevel++;
@@ -530,8 +530,7 @@ if (!CLI)
                     while ($multiLevel < 18);               // Karazhan has 17 frickin floors
 
                     // check if we can create base map anyway
-                    $file       = $path.'/'.$textureStr.'1.blp';
-                    $hasBaseMap = CLISetup::fileExists($file);
+                    $hasBaseMap = CLISetup::fileExists($path.'/'.$textureStr.'1.blp') || CLISetup::fileExists($path.'/'.$textureStr.'1.png');
 
                     CLI::write(' - area has '.($multiLeveled ? $multiLevel . ' levels' : 'only base level'));
 
@@ -683,7 +682,7 @@ if (!CLI)
                 $files     = CLISetup::filesInPath('/'.str_replace('/', '\\/', $paths[0x8][2]).'/i', true);
                 foreach ($files as $f)
                 {
-                    if (preg_match('/([^\/]+)(\d).blp/i', $f, $m))
+                    if (preg_match('/([^\/]+)(\d).(blp|png)/i', $f, $m))
                     {
                         if ($m[1] && $m[2])
                         {

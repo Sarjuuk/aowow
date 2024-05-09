@@ -266,7 +266,7 @@ class CLISetup
                 return false;
 
         // backslash to forward slash
-        $_ = strtolower(str_replace('\\', '/', $file));
+        $_ = strtolower(CLI::nicePath($file));
 
         // remove trailing slash
         if (mb_substr($_, -1, 1) == '/')
@@ -291,7 +291,7 @@ class CLISetup
                 return [];
 
         // backslash to forward slash
-        $_ = strtolower(str_replace('\\', '/', $path));
+        $_ = strtolower(CLI::nicePath($path));
 
         foreach (self::$mpqFiles as $lowerFile => $realFile)
         {
