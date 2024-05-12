@@ -299,7 +299,10 @@ function setup() : void
             if (strpos($step[0], '::'))
                 $res = call_user_func($step[0], $step[1]);
             else
-                $res = $step[0](...$step[1]);
+            {
+                $args = &$step[1];
+                $res = $step[0]($args);
+            }
 
             // check script result
             if ($step[2])

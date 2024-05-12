@@ -530,7 +530,9 @@ if (!CLI)
                     while ($multiLevel < 18);               // Karazhan has 17 frickin floors
 
                     // check if we can create base map anyway
-                    $hasBaseMap = CLISetup::fileExists($path.'/'.$textureStr.'1.blp') || CLISetup::fileExists($path.'/'.$textureStr.'1.png');
+                    $png = $path.'/'.$textureStr.'1.png';
+                    $blp = $path.'/'.$textureStr.'1.blp';
+                    $hasBaseMap = CLISetup::fileExists($blp) || CLISetup::fileExists($png);
 
                     CLI::write(' - area has '.($multiLeveled ? $multiLevel . ' levels' : 'only base level'));
 
