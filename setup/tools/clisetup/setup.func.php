@@ -300,7 +300,7 @@ function setup() : void
                 $res = call_user_func($step[0], $step[1]);
             else
             {
-                $args = &$step[1];
+                $args = &$step[1];                          // see: https://github.com/php/php-src/issues/14202
                 $res = $step[0]($args);
             }
 

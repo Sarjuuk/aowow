@@ -55,7 +55,7 @@ if (!CLI)
             if ($idx !== false)
             {
                 $set |= (1 << $idx);
-                $subs[$idx][] = [Profiler::urlize($row['name'], true), $row['name']];
+                $subs[$idx][] = [Profiler::urlize($row['name'], true), $row['name'], null, null, $row['access'] ? ['requiredAccess' => $row['access']] : null];
             }
 
         }

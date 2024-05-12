@@ -2150,9 +2150,16 @@ define('SAI_TEMPLATE_CAGED_GO_PART',  4);                   //
 define('SAI_TEMPLATE_CAGED_NPC_PART', 5);                   //
 
 define('SAI_SPAWN_FLAG_NONE',           0x00);
-define('SAI_SPAWN_FLAG_IGNORE_RESPAWN', 0x01);               // onSpawnIn - ignore & reset respawn timer
-define('SAI_SPAWN_FLAG_FORCE_SPAWN',    0x02);               // onSpawnIn - force additional spawn if already in world
-define('SAI_SPAWN_FLAG_NOSAVE_RESPAWN', 0x04);               // onDespawn - remove respawn time
+define('SAI_SPAWN_FLAG_IGNORE_RESPAWN', 0x01);              // onSpawnIn - ignore & reset respawn timer
+define('SAI_SPAWN_FLAG_FORCE_SPAWN',    0x02);              // onSpawnIn - force additional spawn if already in world
+define('SAI_SPAWN_FLAG_NOSAVE_RESPAWN', 0x04);              // onDespawn - remove respawn time
+
+// TrinityCore - Account Security
+define('SEC_PLAYER',        0);
+define('SEC_MODERATOR',     1);
+define('SEC_GAMEMASTER',    2);
+define('SEC_ADMINISTRATOR', 3);
+define('SEC_CONSOLE',       4);                             // console only - should not be encountered
 
 // profiler queue interactions
 define('PR_QUEUE_STATUS_ENDED',   0);

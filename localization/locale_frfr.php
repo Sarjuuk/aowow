@@ -244,7 +244,8 @@ $lang = array(
             'eu' => "L'Europe",
             'kr' => "Corée",
             'tw' => "Taïwan",
-            'cn' => "Chine"
+            'cn' => "Chine",
+            'dev' => "Développement"
         ),
         'encounterNames'=> array(
             243 => "Les Sept",

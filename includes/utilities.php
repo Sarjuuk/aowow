@@ -473,7 +473,7 @@ abstract class Util
     );
 
     public static $regions                   = array(
-        'us',           'eu',           'kr',           'tw',           'cn'
+        'us',           'eu',           'kr',           'tw',           'cn',           'dev'
     );
 
     # todo (high): find a sensible way to write data here on setup

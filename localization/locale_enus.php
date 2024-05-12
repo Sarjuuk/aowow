@@ -244,7 +244,8 @@ $lang = array(
             'eu' => "Europe",
             'kr' => "Korea",
             'tw' => "Taiwan",
-            'cn' => "China"
+            'cn' => "China",
+            'dev' => "Development"
         ),
         'encounterNames'=> array(                           // from dungeonencounter.dbc
             243 => "The Seven",

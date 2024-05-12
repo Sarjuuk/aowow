@@ -244,7 +244,8 @@ $lang = array(
             'eu' => "欧洲",
             'kr' => "韩国",
             'tw' => "台湾",
-            'cn' => "中国"
+            'cn' => "中国",
+            'dev' => "开发"
         ),
         'encounterNames'=> array(
             243 => "黑铁七贤",
