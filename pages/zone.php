@@ -36,6 +36,9 @@ class ZonePage extends GenericPage
     {
         $this->addScript([SC_JS_FILE, '?data=zones']);
 
+        $parentArea = $this->subject->getField('parentArea');
+
+
         /***********/
         /* Infobox */
         /***********/
@@ -43,11 +46,11 @@ class ZonePage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // City
-        if ($this->subject->getField('flags') & 0x8 && !$this->subject->getField('parentArea'))
+        if ($this->subject->getField('flags') & 0x8 && !$parentArea)
             $infobox[] = Lang::zone('city');
 
         // Auto repop
-        if ($this->subject->getField('flags') & 0x1000 && !$this->subject->getField('parentArea'))
+        if ($this->subject->getField('flags') & 0x1000 && !$parentArea)
             $infobox[] = Lang::zone('autoRez');
 
         // Level
@@ -163,10 +166,10 @@ class ZonePage extends GenericPage
             }
         };
 
-        if ($_ = $this->subject->getField('parentArea'))
+        if ($parentArea)
         {
-            $this->extraText = sprintf(Lang::zone('zonePartOf'), $_);
-            $this->extendGlobalIds(Type::ZONE, $_);
+            $this->extraText = sprintf(Lang::zone('zonePartOf'), $parentArea);
+            $this->extendGlobalIds(Type::ZONE, $parentArea);
         }
 
         // we cannot fetch spawns via lists. lists are grouped by entry
@@ -642,7 +645,9 @@ class ZonePage extends GenericPage
 
             $note = '';
             if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $this->typeId))
-               $note = '<b class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \''.Lang::zone('fishingSkill').'\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML).'</b>';
+                $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
+            else if ($parentArea && ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $parentArea)))
+                $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
 
             $this->lvTabs[] = [ItemList::$brickFile, array(
                 'data'       => array_values($fish->getResult()),

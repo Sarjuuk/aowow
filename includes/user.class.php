@@ -661,11 +661,12 @@ class User
 
         foreach (self::$profiles->iterate() as $id => $_)
             if (self::$profiles->getField('cuFlags') & PROFILER_CU_PINNED)
-                return [
-                    $id,
-                    self::$profiles->getField('name'),
-                    self::$profiles->getField('region') . '.' . Profiler::urlize($realms[self::$profiles->getField('realm')]['name'], true) . '.' . Profiler::urlize(self::$profiles->getField('name'), true, true)
-                ];
+                if (isset($realms[self::$profiles->getField('realm')]))
+                    return [
+                        $id,
+                        self::$profiles->getField('name'),
+                        self::$profiles->getField('region') . '.' . Profiler::urlize($realms[self::$profiles->getField('realm')]['name'], true) . '.' . Profiler::urlize(self::$profiles->getField('name'), true, true)
+                    ];
 
         return [];
     }

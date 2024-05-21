@@ -473,7 +473,7 @@ abstract class Util
     );
 
     public static $regions                   = array(
-        'us',           'eu',           'kr',           'tw',           'cn'
+        'us',           'eu',           'kr',           'tw',           'cn',           'dev'
     );
 
     # todo (high): find a sensible way to write data here on setup
@@ -518,8 +518,8 @@ abstract class Util
     public static $dateFormatInternal       = "Y/m/d H:i:s";
 
     public static $changeLevelString        = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_staticTooltipLevelClick(this, null, 0)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"><!--lvl-->%s</a>';
-
     public static $setRatingLevelString     = '<a href="javascript:;" onmousedown="return false" class="tip" style="color: white; cursor: pointer" onclick="$WH.g_setRatingLevel(this, %s, %s, %s)" onmouseover="$WH.Tooltip.showAtCursor(event, \'<span class=\\\'q2\\\'>\' + LANG.tooltip_changelevel + \'</span>\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</a>';
+    public static $lvTabNoteString          = '<b class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, \'%s\', 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()">%s</b>';
 
     public static $filterResultString       = '$$WH.sprintf(LANG.lvnote_filterresults, \'%s\')';
     public static $tryFilteringString       = '$$WH.sprintf(%s, %s, %s) + LANG.dash + LANG.lvnote_tryfiltering.replace(\'<a>\', \'<a href="javascript:;" onclick="fi_toggle()">\')';

@@ -182,31 +182,54 @@ class Profiler
     {
         if (DB::isConnectable(DB_AUTH) && !self::$realms)
         {
-            self::$realms = DB::Auth()->select('SELECT
-                id AS ARRAY_KEY,
-                `name`,
-                CASE
-                    WHEN timezone IN (2, 3, 4) THEN "us"
-                    WHEN timezone IN (8, 9, 10, 11, 12) THEN "eu"
-                    WHEN timezone = 6 THEN "kr"
-                    WHEN timezone = 14 THEN "tw"
-                    WHEN timezone = 16 THEN "cn"
-                END AS region
-                FROM
-                    realmlist
-                WHERE
-                    allowedSecurityLevel = 0 AND
-                    gamebuild = ?d',
+            self::$realms = DB::Auth()->select(
+               'SELECT `id` AS ARRAY_KEY,
+                       `name`,
+                       CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
+                            WHEN `timezone` BETWEEN  6 AND  7 THEN "kr" # KR, KR-Tournament
+                            WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
+                            WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
+                            WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
+                            ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 28: QA, 30: Test2, 31+: misc
+                       `allowedSecurityLevel` AS "access"
+                FROM   `realmlist`
+                WHERE  `gamebuild` = ?d',
                 WOW_BUILD
             );
 
-            foreach (self::$realms as $rId => $rData)
+            foreach (self::$realms as $rId => &$rData)
             {
-                if (DB::isConnectable(DB_CHARACTERS . $rId))
-                    continue;
-
                 // realm in db but no connection info set
-                unset(self::$realms[$rId]);
+                if (!DB::isConnectable(DB_CHARACTERS . $rId))
+                {
+                    unset(self::$realms[$rId]);
+                    continue;
+                }
+
+                // filter by access level
+                if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
+                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
+                else if ($rData['access'] == SEC_GAMEMASTER && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD)))
+                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD;
+                else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
+                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
+                else if ($rData['access'] > SEC_PLAYER && !CLI)
+                {
+                    unset(self::$realms[$rId]);
+                    continue;
+                }
+
+                // filter dev realms
+                if ($rData['region'] === 'dev')
+                {
+                    if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+                        $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
+                    else
+                    {
+                        unset(self::$realms[$rId]);
+                        continue;
+                    }
+                }
             }
         }
 

@@ -501,6 +501,9 @@ class AjaxProfile extends AjaxHandler
             if ($rId == $pBase['realm'])
                 break;
 
+        if (!$rData)                                        // realm doesn't exist or access is restricted
+            return '';
+
         $profile = array(
             'id'                => $pBase['id'],
             'source'            => $pBase['id'],

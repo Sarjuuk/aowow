@@ -35,6 +35,9 @@ if (!CLI)
             // foreach ($realms as &$r)
                 // $r['battlegroup'] = CFG_BATTLEGROUP;
 
+        // remove access column
+        array_walk($realms, function (&$x) { unset($x['access']); });
+
         $toFile = "var g_realms = ".Util::toJSON($realms).";";
         $file   = 'datasets/realms';
 
