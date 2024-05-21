@@ -209,7 +209,7 @@ CREATE TABLE `aowow_account_weightscales` (
   `name` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `icon` varchar(48) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`,`userId`),
+  PRIMARY KEY (`id`),
   KEY `FK_acc_weights` (`userId`),
   CONSTRAINT `FK_acc_weights` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
@@ -3250,7 +3250,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1709133536,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1716305877,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
