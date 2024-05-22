@@ -687,7 +687,7 @@ class RemoteProfileList extends ProfileList
         if ($guildData)
         {
             foreach (Util::createSqlBatchInsert($guildData) as $ins)
-                DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_guild (?#) VALUES '.$ins, array_keys(reset($guildData)));
+                DB::Aowow()->query('INSERT INTO ?_profiler_guild (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($guildData)));
 
             // merge back local ids
             $localGuilds = DB::Aowow()->selectCol('SELECT realm AS ARRAY_KEY, realmGUID AS ARRAY_KEY2, id FROM ?_profiler_guild WHERE realm IN (?a) AND realmGUID IN (?a)',

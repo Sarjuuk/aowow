@@ -173,6 +173,8 @@ function siteconfig() : void
         $inp = ['idx' => ['', false, '/\d/']];
         if (CLI::read($inp) && $inp && $inp['idx'] !== '')
         {
+            $inp['idx'] = intVal($inp['idx']);
+
             // add new php setting
             if ($inp['idx'] == $sumNum)
             {

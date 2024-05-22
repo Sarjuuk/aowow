@@ -266,7 +266,7 @@ class RemoteArenaTeamList extends ArenaTeamList
 
         // basic arena team data
         foreach (Util::createSqlBatchInsert($data) as $ins)
-            DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team (?#) VALUES '.$ins, array_keys(reset($data)));
+            DB::Aowow()->query('INSERT INTO ?_profiler_arena_team (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($data)));
 
         // merge back local ids
         $localIds = DB::Aowow()->selectCol(

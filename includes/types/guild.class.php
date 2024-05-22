@@ -251,7 +251,7 @@ class RemoteGuildList extends GuildList
 
         // basic guild data
         foreach (Util::createSqlBatchInsert($data) as $ins)
-            DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_guild (?#) VALUES '.$ins, array_keys(reset($data)));
+            DB::Aowow()->query('INSERT INTO ?_profiler_guild (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($data)));
 
         // merge back local ids
         $localIds = DB::Aowow()->selectCol(

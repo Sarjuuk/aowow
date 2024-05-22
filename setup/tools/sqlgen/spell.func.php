@@ -111,7 +111,7 @@ SqlGen::register(new class extends SetupScript
                 stanceMask,         stanceMaskNot,
                 targets,
                 spellFocus,
-                IFNULL(sct.baseTime, 0) / 1000 AS castTime,
+                GREATEST(IFNULL(sct.baseTime, 0), 0) / 1000 AS castTime,
                 recoveryTime,       recoveryTimeCategory,
                 startRecoveryTime,  startRecoveryCategory,
                 procChance,         procCharges,
@@ -269,7 +269,7 @@ SqlGen::register(new class extends SetupScript
             ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2         not used for now
         */
 
-        CLI::write(' - linking with skillineability');
+        CLI::write(' - linking with skilllineability');
 
         $results  = DB::Aowow()->select('SELECT spellId AS ARRAY_KEY, id AS ARRAY_KEY2, skillLineId, reqRaceMask, reqClassMask, reqSkillLevel, acquireMethod, skillLevelGrey, skillLevelYellow FROM dbc_skilllineability sla');
         foreach ($results as $spellId => $sets)
@@ -501,7 +501,7 @@ SqlGen::register(new class extends SetupScript
         $itemInfo   = DB::World()->select('SELECT entry AS ARRAY_KEY, displayId AS d, Quality AS q FROM item_template WHERE entry IN (?a)', $itemSpells);
         foreach ($itemSpells as $sId => $itemId)
             if (isset($itemInfo[$itemId]))
-                DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconIdAlt = ?d, s.cuFlags = s.cuFlags | ?d WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND s.id = ?d', -$itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
+                DB::Aowow()->query('UPDATE ?_spell s, ?_icons ic, dbc_spellicon si SET s.iconIdAlt = ?d, s.cuFlags = s.cuFlags | ?d WHERE s.iconIdBak = si.id AND ic.name = LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AND s.id = ?d', $itemInfo[$itemId]['d'], ((7 - $itemInfo[$itemId]['q']) << 8), $sId);
 
         $itemReqs = DB::World()->selectCol('SELECT entry AS ARRAY_KEY, requiredSpell FROM item_template WHERE requiredSpell NOT IN (?a)', [0, 34090, 34091]); // not riding
         foreach ($itemReqs AS $itemId => $req)

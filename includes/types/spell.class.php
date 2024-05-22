@@ -1605,7 +1605,7 @@ class SpellList extends BaseType
     // step 0: get text
         $data = $this->getField($type, true);
         if (empty($data) || $data == "[]")                  // empty tooltip shouldn't be displayed anyway
-            return ['', []];
+            return ['', [], false];
 
     // step 1: if the text is supplemented with text-variables, get and replace them
         if ($this->curTpl['spellDescriptionVariableId'] > 0)
@@ -1706,7 +1706,7 @@ class SpellList extends BaseType
         $data = strtr($data, ["\r" => '', "\n" => '<br />']);
 
         // cache result
-        $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive] = [$data, $relSpells];
+        $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
 
         return [$data, $relSpells, $this->scaling[$this->id]];
     }
