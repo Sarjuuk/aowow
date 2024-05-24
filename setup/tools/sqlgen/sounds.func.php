@@ -165,9 +165,9 @@ SqlGen::register(new class extends SetupScript
 
         CLI::write(' - linking to race');
 
-        DB::Aowow()->query('TRUNCATE ?_races_sounds');
-        DB::Aowow()->query('INSERT IGNORE INTO ?_races_sounds SELECT raceId, soundIdMale,   1 FROM dbc_vocaluisounds WHERE soundIdMale <> soundIdFemale AND soundIdMale   > 0');
-        DB::Aowow()->query('INSERT IGNORE INTO ?_races_sounds SELECT raceId, soundIdFemale, 2 FROM dbc_vocaluisounds WHERE soundIdMale <> soundIdFemale AND soundIdFemale > 0');
+        DB::Aowow()->query('TRUNCATE ?_races_sounds');                                                                                                                        // just to silence expected duplicate key errors
+        DB::Aowow()->query('INSERT INTO ?_races_sounds SELECT `raceId`, `soundIdMale`,   1 FROM dbc_vocaluisounds WHERE `soundIdMale` <> `soundIdFemale` AND `soundIdMale`   > 0 ON DUPLICATE KEY UPDATE `soundId` = `soundId`');
+        DB::Aowow()->query('INSERT INTO ?_races_sounds SELECT `raceId`, `soundIdFemale`, 2 FROM dbc_vocaluisounds WHERE `soundIdMale` <> `soundIdFemale` AND `soundIdFemale` > 0 ON DUPLICATE KEY UPDATE `soundId` = `soundId`');
 
         // ps: im too dumb to union this
 
@@ -178,8 +178,8 @@ SqlGen::register(new class extends SetupScript
 
         CLI::write(' - linking to emotes');
 
-        DB::Aowow()->query('TRUNCATE ?_emotes_sounds');
-        DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_sounds SELECT emotesTextId, raceId, gender + 1, soundId FROM dbc_emotestextsound');
+        DB::Aowow()->query('TRUNCATE ?_emotes_sounds');                                                                                // just to silence expected duplicate key errors
+        DB::Aowow()->query('INSERT INTO ?_emotes_sounds SELECT `emotesTextId`, `raceId`, `gender` + 1, `soundId` FROM dbc_emotestextsound ON DUPLICATE KEY UPDATE `emoteId` = `emoteId`');
 
 
         /*******************/
@@ -200,32 +200,32 @@ SqlGen::register(new class extends SetupScript
                 ?_creature_sounds (`id`, `greeting`, `farewell`, `angry`, `exertion`, `exertioncritical`, `injury`, `injurycritical`, `death`, `stun`, `stand`, `aggro`, `wingflap`, `wingglide`, `alert`, `fidget`, `customattack`, `loop`, `jumpstart`, `jumpend`, `petattack`, `petorder`, `petdismiss`, `birth`, `spellcast`, `submerge`, `submerged`)
             SELECT
                 cdi.id,
-                IFNULL(ns.greetSoundId, 0),
-                IFNULL(ns.byeSoundId,   0),
-                IFNULL(ns.angrySoundId, 0),
-                IF(csdA.exertion,         csdA.exertion,         IFNULL(csdB.exertion,         0)),
-                IF(csdA.exertionCritical, csdA.exertionCritical, IFNULL(csdB.exertionCritical, 0)),
-                IF(csdA.injury,           csdA.injury,           IFNULL(csdB.injury,           0)),
-                IF(csdA.injuryCritical,   csdA.injuryCritical,   IFNULL(csdB.injuryCritical,   0)),
-                IF(csdA.death,            csdA.death,            IFNULL(csdB.death,            0)),
-                IF(csdA.stun,             csdA.stun,             IFNULL(csdB.stun,             0)),
-                IF(csdA.stand,            csdA.stand,            IFNULL(csdB.stand,            0)),
-                IF(csdA.aggro,            csdA.aggro,            IFNULL(csdB.aggro,            0)),
-                IF(csdA.wingFlap,         csdA.wingFlap,         IFNULL(csdB.wingFlap,         0)),
-                IF(csdA.wingGlide,        csdA.wingGlide,        IFNULL(csdB.wingGlide,        0)),
-                IF(csdA.alert,            csdA.alert,            IFNULL(csdB.alert,            0)),
-                IF(csdA.fidget,           csdA.fidget,           IFNULL(csdB.fidget,           0)),
-                IF(csdA.customAttack,     csdA.customAttack,     IFNULL(csdB.customAttack,     0)),
-                IF(csdA.loop,             csdA.loop,             IFNULL(csdB.loop,             0)),
-                IF(csdA.jumpStart,        csdA.jumpStart,        IFNULL(csdB.jumpStart,        0)),
-                IF(csdA.jumpEnd,          csdA.jumpEnd,          IFNULL(csdB.jumpEnd,          0)),
-                IF(csdA.petAttack,        csdA.petAttack,        IFNULL(csdB.petAttack,        0)),
-                IF(csdA.petOrder,         csdA.petOrder,         IFNULL(csdB.petOrder,         0)),
-                IF(csdA.petDismiss,       csdA.petDismiss,       IFNULL(csdB.petDismiss,       0)),
-                IF(csdA.birth,            csdA.birth,            IFNULL(csdB.birth,            0)),
-                IF(csdA.spellcast,        csdA.spellcast,        IFNULL(csdB.spellcast,        0)),
-                IF(csdA.submerge,         csdA.submerge,         IFNULL(csdB.submerge,         0)),
-                IF(csdA.submerged,        csdA.submerged,        IFNULL(csdB.submerged,        0))
+                GREATEST(IFNULL(ns.greetSoundId, 0), 0),
+                GREATEST(IFNULL(ns.byeSoundId,   0), 0),
+                GREATEST(IFNULL(ns.angrySoundId, 0), 0),
+                GREATEST(IF(csdA.exertion,         csdA.exertion,         IFNULL(csdB.exertion,         0)), 0),
+                GREATEST(IF(csdA.exertionCritical, csdA.exertionCritical, IFNULL(csdB.exertionCritical, 0)), 0),
+                GREATEST(IF(csdA.injury,           csdA.injury,           IFNULL(csdB.injury,           0)), 0),
+                GREATEST(IF(csdA.injuryCritical,   csdA.injuryCritical,   IFNULL(csdB.injuryCritical,   0)), 0),
+                GREATEST(IF(csdA.death,            csdA.death,            IFNULL(csdB.death,            0)), 0),
+                GREATEST(IF(csdA.stun,             csdA.stun,             IFNULL(csdB.stun,             0)), 0),
+                GREATEST(IF(csdA.stand,            csdA.stand,            IFNULL(csdB.stand,            0)), 0),
+                GREATEST(IF(csdA.aggro,            csdA.aggro,            IFNULL(csdB.aggro,            0)), 0),
+                GREATEST(IF(csdA.wingFlap,         csdA.wingFlap,         IFNULL(csdB.wingFlap,         0)), 0),
+                GREATEST(IF(csdA.wingGlide,        csdA.wingGlide,        IFNULL(csdB.wingGlide,        0)), 0),
+                GREATEST(IF(csdA.alert,            csdA.alert,            IFNULL(csdB.alert,            0)), 0),
+                GREATEST(IF(csdA.fidget,           csdA.fidget,           IFNULL(csdB.fidget,           0)), 0),
+                GREATEST(IF(csdA.customAttack,     csdA.customAttack,     IFNULL(csdB.customAttack,     0)), 0),
+                GREATEST(IF(csdA.loop,             csdA.loop,             IFNULL(csdB.loop,             0)), 0),
+                GREATEST(IF(csdA.jumpStart,        csdA.jumpStart,        IFNULL(csdB.jumpStart,        0)), 0),
+                GREATEST(IF(csdA.jumpEnd,          csdA.jumpEnd,          IFNULL(csdB.jumpEnd,          0)), 0),
+                GREATEST(IF(csdA.petAttack,        csdA.petAttack,        IFNULL(csdB.petAttack,        0)), 0),
+                GREATEST(IF(csdA.petOrder,         csdA.petOrder,         IFNULL(csdB.petOrder,         0)), 0),
+                GREATEST(IF(csdA.petDismiss,       csdA.petDismiss,       IFNULL(csdB.petDismiss,       0)), 0),
+                GREATEST(IF(csdA.birth,            csdA.birth,            IFNULL(csdB.birth,            0)), 0),
+                GREATEST(IF(csdA.spellcast,        csdA.spellcast,        IFNULL(csdB.spellcast,        0)), 0),
+                GREATEST(IF(csdA.submerge,         csdA.submerge,         IFNULL(csdB.submerge,         0)), 0),
+                GREATEST(IF(csdA.submerged,        csdA.submerged,        IFNULL(csdB.submerged,        0)), 0)
             FROM
                 dbc_creaturedisplayinfo cdi
             LEFT JOIN
@@ -256,20 +256,20 @@ SqlGen::register(new class extends SetupScript
                 ?_spell_sounds (`id`, `precast`, `cast`, `impact`, `state`, `statedone`, `channel`, `missile`, `animation`, `casterimpact`, `targetimpact`, `missiletargeting`, `instantarea`, `impactarea`, `persistentarea`)
             SELECT
                 sv.id,
-                IFNULL(svk1.soundId, 0),
-                IFNULL(svk2.soundId, 0),
-                IFNULL(svk3.soundId, 0),
-                IFNULL(svk4.soundId, 0),
-                IFNULL(svk5.soundId, 0),
-                IFNULL(svk6.soundId, 0),
-                missileSoundId,
-                animationSoundId,
-                IFNULL(svk7.soundId, 0),
-                IFNULL(svk8.soundId, 0),
-                IFNULL(svk9.soundId, 0),
-                IFNULL(svk10.soundId, 0),
-                IFNULL(svk11.soundId, 0),
-                IFNULL(svk12.soundId, 0)
+                GREATEST(IFNULL(svk1.soundId, 0), 0),
+                GREATEST(IFNULL(svk2.soundId, 0), 0),
+                GREATEST(IFNULL(svk3.soundId, 0), 0),
+                GREATEST(IFNULL(svk4.soundId, 0), 0),
+                GREATEST(IFNULL(svk5.soundId, 0), 0),
+                GREATEST(IFNULL(svk6.soundId, 0), 0),
+                GREATEST(missileSoundId, 0),
+                GREATEST(animationSoundId, 0),
+                GREATEST(IFNULL(svk7.soundId, 0), 0),
+                GREATEST(IFNULL(svk8.soundId, 0), 0),
+                GREATEST(IFNULL(svk9.soundId, 0), 0),
+                GREATEST(IFNULL(svk10.soundId, 0), 0),
+                GREATEST(IFNULL(svk11.soundId, 0), 0),
+                GREATEST(IFNULL(svk12.soundId, 0), 0)
             FROM
                 dbc_spellvisual sv
             LEFT JOIN

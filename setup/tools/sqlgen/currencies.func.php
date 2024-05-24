@@ -20,9 +20,9 @@ SqlGen::register(new class extends SetupScript
     public function generate(array $ids = []) : bool
     {
         if (!$ids)
-            DB::Aowow()->query('REPLACE INTO ?_currencies (id, category, itemId) SELECT id, category, itemId FROM dbc_currencytypes');
+            DB::Aowow()->query('REPLACE INTO ?_currencies (`id`, `category`, `itemId`) SELECT `id`, LEAST(`category`, 41), `itemId` FROM dbc_currencytypes');
 
-        $moneyItems = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM dbc_currencytypes{ WHERE id IN (?a)}', $ids ?: DBSIMPLE_SKIP);
+        $moneyItems = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `itemId` FROM dbc_currencytypes{ WHERE `id` IN (?a)}', $ids ?: DBSIMPLE_SKIP);
 
         // apply names & cap
         $moneyNames = DB::World()->select('
@@ -52,7 +52,7 @@ SqlGen::register(new class extends SetupScript
                 $strings = $moneyNames[$itemId];
             else
             {
-                CLI::write('item #'.$itemId.' required by currency #'.$cId.' not in item_template', CLI::LOG_WARN);
+                CLI::write('item #'.$itemId.' referenced by currency #'.$cId.' not in item_template', CLI::LOG_WARN);
                 $strings = ['name_loc0' => 'Item #'.$itemId.' not in DB', 'iconId' => 0, 'cuFlags' => CUSTOM_EXCLUDE_FOR_LISTVIEW, 'category' => 3];
             }
 

@@ -52,7 +52,7 @@ function sync(array $s = [], array $b = []) : void
         DB::Aowow()->query('UPDATE ?_dbversion SET `build` = ?', $_ ? implode(' ', $_) : '');
     }
 
-    if (!$s && !$_s && !$b && !$_b)
+    if (!$s && !$_s && !$b && !$_b && !CLISetup::getOpt('setup'))
         CLI::write('no valid table names supplied', CLI::LOG_ERROR);
 }
 

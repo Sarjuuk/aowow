@@ -19,9 +19,9 @@ SqlGen::register(new class extends SetupScript
         // has no unique keys..
         DB::Aowow()->query('TRUNCATE TABLE ?_spelldifficulty');
 
-        DB::Aowow()->query('INSERT INTO ?_spelldifficulty SELECT * FROM dbc_spelldifficulty');
+        DB::Aowow()->query('INSERT INTO ?_spelldifficulty SELECT GREATEST(`normal10`, 0), GREATEST(`normal25`, 0), GREATEST(`heroic10`, 0), GREATEST(`heroic25`, 0) FROM dbc_spelldifficulty');
 
-        $rows = DB::World()->select('SELECT spellid0, spellid1, spellid2, spellid3 FROM spelldifficulty_dbc');
+        $rows = DB::World()->select('SELECT `spellid0`, `spellid1`, `spellid2`, `spellid3` FROM spelldifficulty_dbc');
         foreach ($rows as $r)
             DB::Aowow()->query('INSERT INTO ?_spelldifficulty VALUES (?a)', array_values($r));
 

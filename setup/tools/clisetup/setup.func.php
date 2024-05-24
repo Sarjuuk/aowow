@@ -155,7 +155,7 @@ function setup() : void
 
             if ($rCode == 301 || $rCode == 302)
             {
-                if (!empty($res['Location']) && preg_match("/(https?:\/\/)(.*)".strtr($testFile, ['/' => '\/', '.' => '\.'])."/i", $res['Location'], $n))
+                if (!empty($res['Location']) && preg_match("/(https?:\/\/)(.*)".strtr($testFile, ['/' => '\/', '.' => '\.'])."/i", is_array($res['Location']) ? array_pop($res['Location']) : $res['Location'], $n))
                 {
                     $protocol = $n[1];
                     $host     = $n[2];
