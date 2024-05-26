@@ -116,7 +116,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 
     Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
     if (CLI)
-        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & 0x40A ? CLI::LOG_WARN : CLI::LOG_ERROR);
+        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & (E_WARNING | E_USER_WARNING | E_NOTICE | E_USER_NOTICE) ? CLI::LOG_WARN : CLI::LOG_ERROR);
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
