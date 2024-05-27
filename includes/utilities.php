@@ -853,6 +853,12 @@ abstract class Util
         ));
     }
 
+    // todo: create Locale object and integrate
+    public static function isLogographic(int $localeId) : bool
+    {
+        return $localeId == LOCALE_CN || $localeId == LOCALE_TW || $localeId == LOCALE_KR;
+    }
+
     // default back to enUS if localization unavailable
     public static function localizedString(array $data, string $field, bool $silent = false) : string
     {
