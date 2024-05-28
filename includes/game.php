@@ -48,7 +48,7 @@ class Game
         -2 =>  [    0],
          0 =>  [    1,     3,     4,     8,     9,    10,    11,    12,    25,    28,    33,    36,    38,    40,    41,    44,    45,    46,    47,    51,    85,   130,   132,   139,   154,   267,  1497,  1519,  1537,  2257,  3430,  3431,  3433,  3487,  4080,  4298],
          1 =>  [   14,    15,    16,    17,   141,   148,   188,   215,   220,   331,   357,   361,   363,   400,   405,   406,   440,   490,   493,   618,  1377,  1637,  1638,  1657,  1769,  3524,  3525,  3526,  3557],
-         2 =>  [  206,   209,   491,   717,   718,   719,   721,   722,   796,  1176,  1196,  1337,  1417,  1581,  1583,  1584,  1941,  2017,  2057,  2100,  2366,  2367,  2437,  2557,  3535,  3562,  3688,  3713,  3714,  3715,  3716,  3717,  3789,  3790,  3791,  3792,  3842,  3847,  3848,  3849,  3905,  4100,  4131,  4196,  4228,  4264,  4265,  4272,  4277,  4415,  4416,  4494,  4522,  4723,  4809,  4813,  4820],
+         2 =>  [  206,   209,   491,   717,   718,   719,   721,   722,   796,  1176,  1196,  1337,  1477,  1581,  1583,  1584,  1941,  2017,  2057,  2100,  2366,  2367,  2437,  2557,  3535,  3562,  3688,  3713,  3714,  3715,  3716,  3717,  3789,  3790,  3791,  3792,  3842,  3847,  3848,  3849,  3905,  4100,  4131,  4196,  4228,  4264,  4265,  4272,  4277,  4415,  4416,  4494,  4522,  4723,  4809,  4813,  4820],
          3 =>  [ 1977,  2159,  2677,  2717,  3428,  3429,  3456,  3457,  3606,  3607,  3805,  3836,  3845,  3923,  3959,  4075,  4273,  4493,  4500,  4603,  4722,  4812,  4987],
          4 =>  [ -372,  -263,  -262,  -261,  -162,  -161,  -141,   -82,   -81,   -61],
          5 =>  [ -373,  -371,  -324,  -304,  -264,  -201,  -182,  -181,  -121,  -101,   -24],
@@ -59,26 +59,66 @@ class Game
         10 =>  [   65,    66,    67,   210,   394,   495,  2817,  3537,  3711,  4024,  4197,  4395,  4742]
     );
 
+    // zoneorsort for quests need updating
+    // partially points non-instanced area with identical name for instance quests
+    public static $questSortFix             = array(
+        -221 => 440,                                        // Treasure Map => Tanaris
+        -284 => 0,                                          // Special => Misc (some quests get shuffled into seasonal)
+        151  => 0,                                          // Designer Island => Misc
+        22   => 0,                                          // Programmer Isle
+        35   => 33,                                         // Booty Bay => Stranglethorn Vale
+        131  => 132,                                        // Kharanos => Coldridge Valley
+        24   => 9,                                          // Northshire Abbey => Northshire Valley
+        279  => 36,                                         // Dalaran Crater => Alterac Mountains
+        4342 => 4298,                                       // Acherus: The Ebon Hold => The Scarlet Enclave
+        2079 => 15,                                         // Alcaz Island => Dustwallow Marsh
+        1939 => 440,                                        // Abyssal Sands => Tanaris
+        393  => 363,                                        // Darkspeer Strand => Valley of Trials
+        702  => 141,                                        // Rut'theran Village => Teldrassil
+        221  => 220,                                        // Camp Narache => Red Cloud Mesa
+        1116 => 357,                                        // Feathermoon Stronghold => Feralas
+        236  => 209,                                        // Shadowfang Keep
+        4769 => 4742,                                       // Hrothgar's Landing => Hrothgar's Landing
+        4613 => 4395,                                       // Dalaran City => Dalaran
+        4522 => 210,                                        // Icecrown Citadell => Icecrown
+        3896 => 3703,                                       // Aldor Rise => Shattrath City
+        3696 => 3522,                                       // The Barrier Hills => Blade's Edge Mountains
+        2839 => 2597,                                       // Alterac Valley
+        19   => 1977,                                       // Zul'Gurub
+        4445 => 4273,                                       // Ulduar
+        2300 => 1941,                                       // Caverns of Time
+        3545 => 3535,                                       // Hellfire Citadel
+        2562 => 3457,                                       // Karazhan
+        3840 => 3959,                                       // Black Temple
+        1717 => 491,                                        // Razorfen Kraul
+        978  => 1176,                                       // Zul'Farrak
+        133  => 721,                                        // Gnomeregan
+        3607 => 3905,                                       // Serpentshrine Cavern
+        3845 => 3842,                                       // Tempest Keep
+        1517 => 1337,                                       // Uldaman
+        1417 => 1477                                        // Sunken Temple
+    );
+
     public static $questSubCats             = array(
-        1    => [132],              // Dun Morogh: Coldridge Valley
-        12   => [9],                // Elwynn Forest: Northshire Valley
-        141  => [188],              // Teldrassil: Shadowglen
-        3524 => [3526],             // Azuremyst Isle: Ammen Vale
+        1    => [132],                                      // Dun Morogh: Coldridge Valley
+        12   => [9],                                        // Elwynn Forest: Northshire Valley
+        141  => [188],                                      // Teldrassil: Shadowglen
+        3524 => [3526],                                     // Azuremyst Isle: Ammen Vale
 
-        14   => [363],              // Durotar: Valley of Trials
-        85   => [154],              // Tirisfal Glades: Deathknell
-        215  => [220],              // Mulgore: Red Cloud Mesa
-        3430 => [3431],             // Eversong Woods: Sunstrider Isle
+        14   => [363],                                      // Durotar: Valley of Trials
+        85   => [154],                                      // Tirisfal Glades: Deathknell
+        215  => [220],                                      // Mulgore: Red Cloud Mesa
+        3430 => [3431],                                     // Eversong Woods: Sunstrider Isle
 
-        46   => [25],               // Burning Steppes: Blackrock Mountain
-        361  => [1769],             // Felwood: Timbermaw Hold
-        3519 => [3679],             // Terokkar: Skettis
-        3535 => [3562, 3713, 3714], // Hellfire Citadel
-        3905 => [3715, 3716, 3717], // Coilfang Reservoir
-        3688 => [3789, 3790, 3792], // Auchindoun
-        1941 => [2366, 2367, 4100], // Caverns of Time
-        3842 => [3847, 3848, 3849], // Tempest Keep
-        4522 => [4809, 4813, 4820]  // Icecrown Citadel
+        46   => [25],                                       // Burning Steppes: Blackrock Mountain
+        361  => [1769],                                     // Felwood: Timbermaw Hold
+        3519 => [3679],                                     // Terokkar: Skettis
+        3535 => [3562, 3713, 3714],                         // Hellfire Citadel
+        3905 => [3715, 3716, 3717],                         // Coilfang Reservoir
+        3688 => [3789, 3790, 3792],                         // Auchindoun
+        1941 => [2366, 2367, 4100],                         // Caverns of Time
+        3842 => [3847, 3848, 3849],                         // Tempest Keep
+        4522 => [4809, 4813, 4820]                          // Icecrown Citadel
     );
 
     /*  why:
@@ -382,6 +422,10 @@ class Game
             trigger_error('Game::worldPosToZonePos - dbc query failed', E_USER_ERROR);
             return [];
         }
+
+        // Black Temple and Sunwell floor offset bullshit
+        if ($points && in_array($mapId, [564, 580]))
+            $points[0]['floor']++;
 
         return $points;
     }

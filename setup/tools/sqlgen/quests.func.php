@@ -9,6 +9,8 @@ if (!CLI)
 
 SqlGen::register(new class extends SetupScript
 {
+    use TrCustomData;                                       // import custom data from DB
+
     protected $command = 'quests';
 
     protected $tblDependencyTC    = ['quest_template', 'quest_template_addon', 'quest_template_locale', 'game_event', 'game_event_seasonal_questrelation', 'disables'];
@@ -193,46 +195,7 @@ SqlGen::register(new class extends SetupScript
         for ($i = 1; $i < 6; $i++)
             DB::Aowow()->query($repQuery, $i, $i, $i, $i, $ids ?: DBSIMPLE_SKIP);
 
-        // zoneorsort for quests need updating
-        // partially points non-instanced area with identic name for instance quests
-        $subcats = array(
-            -221 => 440,                                    // Treasure Map => Tanaris
-            -284 => 0,                                      // Special => Misc (some quests get shuffled into seasonal)
-            151  => 0,                                      // Designer Island => Misc
-            22   => 0,                                      // Programmer Isle
-            35   => 33,                                     // Booty Bay => Stranglethorn Vale
-            131  => 132,                                    // Kharanos => Coldridge Valley
-            24   => 9,                                      // Northshire Abbey => Northshire Valley
-            279  => 36,                                     // Dalaran Crater => Alterac Mountains
-            4342 => 4298,                                   // Acherus: The Ebon Hold => The Scarlet Enclave
-            2079 => 15,                                     // Alcaz Island => Dustwallow Marsh
-            1939 => 440,                                    // Abyssal Sands => Tanaris
-            393  => 363,                                    // Darkspeer Strand => Valley of Trials
-            702  => 141,                                    // Rut'theran Village => Teldrassil
-            221  => 220,                                    // Camp Narache => Red Cloud Mesa
-            1116 => 357,                                    // Feathermoon Stronghold => Feralas
-            236  => 209,                                    // Shadowfang Keep
-            4769 => 4742,                                   // Hrothgar's Landing => Hrothgar's Landing
-            4613 => 4395,                                   // Dalaran City => Dalaran
-            4522 => 210,                                    // Icecrown Citadell => Icecrown
-            3896 => 3703,                                   // Aldor Rise => Shattrath City
-            3696 => 3522,                                   // The Barrier Hills => Blade's Edge Mountains
-            2839 => 2597,                                   // Alterac Valley
-            19   => 1977,                                   // Zul'Gurub
-            4445 => 4273,                                   // Ulduar
-            2300 => 1941,                                   // Caverns of Time
-            3545 => 3535,                                   // Hellfire Citadel
-            2562 => 3457,                                   // Karazhan
-            3840 => 3959,                                   // Black Temple
-            1717 => 491,                                    // Razorfen Kraul
-            978  => 1176,                                   // Zul'Farrak
-            133  => 721,                                    // Gnomeregan
-            3607 => 3905,                                   // Serpentshrine Cavern
-            3845 => 3842,                                   // Tempest Keep
-            1517 => 1337                                    // Uldaman
-        );
-
-        foreach ($subcats as $child => $parent)
+        foreach (Game::$questSortFix as $child => $parent)
             DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE zoneOrSortBak = ?d', $parent, $child);
 
          // move quests liked to holidays into appropirate quests-sorts. create dummy sorts as needed

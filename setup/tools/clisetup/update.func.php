@@ -45,7 +45,7 @@ function update(?array &$sql = [], ?array &$build = []) : void
         $pi = pathinfo($file);
         [$fDate, $fPart] = explode('_', $pi['filename']);
 
-        $fData = intVal($fDate);
+        $fDate = intVal($fDate);
 
         if ($date && $fDate < $date)
             continue;

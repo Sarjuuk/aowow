@@ -453,9 +453,9 @@ SqlGen::register(new class extends SetupScript
                 $q['zone'] = 0;                             // todo: do not use questSort for zoneId, but .. questender? (starter can be item)
 
             if ($_ = $this->taughtSpell($q))
-                $this->pushBuffer(Type::SPELL, $_, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $areaParent[$q['zone']] ?? $q['zone']);
+                $this->pushBuffer(Type::SPELL, $_, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $areaParent[$q['zone']] ?? Game::$questSortFix[$q['zone']] ?? $q['zone']);
 
-            $this->pushBuffer(Type::ITEM, $iId, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $areaParent[$q['zone']] ?? $q['zone']);
+            $this->pushBuffer(Type::ITEM, $iId, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['quest'], $areaParent[$q['zone']] ?? Game::$questSortFix[$q['zone']] ?? $q['zone']);
         }
 
         $mailLoot = DB::World()->select(
@@ -480,10 +480,10 @@ SqlGen::register(new class extends SetupScript
                 foreach ($this->refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer(Type::SPELL, $_, SRC_QUEST, $l['side'], $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $areaParent[$l['zone']] ?? $l['zone']);
+                        $this->pushBuffer(Type::SPELL, $_, SRC_QUEST, $l['side'], $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $areaParent[$l['zone']] ?? Game::$questSortFix[$l['zone']] ?? $l['zone']);
 
                     $itemOT[] = $iId;
-                    $this->pushBuffer(Type::ITEM, $iId, SRC_QUEST, $l['side'], $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $areaParent[$l['zone']] ?? $l['zone']);
+                    $this->pushBuffer(Type::ITEM, $iId, SRC_QUEST, $l['side'], $l['qty'] > 1 ? 0 : Type::QUEST, $l['entry'], $areaParent[$l['zone']] ?? Game::$questSortFix[$l['zone']] ?? $l['zone']);
                 }
 
                 continue;
@@ -1011,7 +1011,7 @@ SqlGen::register(new class extends SetupScript
         foreach ($qSpells as $sId => $spell)
             for ($i = 1; $i <= 3; $i++)
                 if ($spell['effect'.$i.'Id'] == SPELL_EFFECT_LEARN_SPELL)
-                    $this->pushBuffer(Type::SPELL, $spell['effect'.$i.'TriggerSpell'], SRC_QUEST, $quests[$sId]['side'], $quests[$sId]['qty'] > 1 ? 0 : Type::QUEST, $quests[$sId]['id'], $areaParent[$quests[$sId]['zone']] ?? $quests[$sId]['zone']);
+                    $this->pushBuffer(Type::SPELL, $spell['effect'.$i.'TriggerSpell'], SRC_QUEST, $quests[$sId]['side'], $quests[$sId]['qty'] > 1 ? 0 : Type::QUEST, $quests[$sId]['id'], $areaParent[$quests[$sId]['zone']] ?? Game::$questSortFix[$quests[$sId]['zone']] ?? $quests[$sId]['zone']);
     }
 
     private function spellTrainer() : void
@@ -1134,7 +1134,7 @@ SqlGen::register(new class extends SetupScript
         $areaParent = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, parentArea FROM ?_zones WHERE id IN (?a) AND parentArea > 0', array_filter(array_column($quests, 'zone')));
 
         foreach ($quests as $titleId => $q)
-            $this->pushBuffer(Type::TITLE, $titleId, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['id'], $areaParent[$q['zone']] ?? $q['zone']);
+            $this->pushBuffer(Type::TITLE, $titleId, SRC_QUEST, $q['side'], $q['qty'] > 1 ? 0 : Type::QUEST, $q['id'], $areaParent[$q['zone']] ?? Game::$questSortFix[$q['zone']] ?? $q['zone']);
     }
 
     private function titleAchievement() : void
