@@ -57,10 +57,10 @@
 
         // predict replacement patch files
         // ref: http://www.zezula.net/en/mpq/patchfiles.html
-        if (substr($data, 0x0, 0x4) == "PTCH")
+        if (substr($data, 0x0, 4) == "PTCH")
         {
             // strip patch header
-            if (substr($data, 0x40, 0x43) == "COPY")
+            if (substr($data, 0x40, 4) == "COPY")
                 $data = substr($data, 0x44);
             else
             {
