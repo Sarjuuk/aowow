@@ -177,7 +177,7 @@ class ZonePage extends GenericPage
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::NPC);
         $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE areaId = ?d AND type = ?d', $this->typeId, Type::AREATRIGGER) : [];
 
-        $conditions = [CFG_SQL_LIMIT_NONE, ['s.areaId', $this->typeId]];
+        $conditions = [Cfg::get('SQL_LIMIT_NONE'), ['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -522,7 +522,7 @@ class ZonePage extends GenericPage
                 'note' => sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0')
             );
 
-            if ($creatureSpawns->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($creatureSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($creatureSpawns->getJSGlobals(GLOBALINFO_SELF));
@@ -538,7 +538,7 @@ class ZonePage extends GenericPage
                 'note' => sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0')
             );
 
-            if ($objectSpawns->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($objectSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($objectSpawns->getJSGlobals(GLOBALINFO_SELF));

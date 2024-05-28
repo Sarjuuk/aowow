@@ -328,7 +328,7 @@ class SoundPage extends GenericPage
         if ($creatureIds || $displayIds)
         {
             $extra = [];
-            $cnds = [CFG_SQL_LIMIT_NONE, &$extra];
+            $cnds = [Cfg::get('SQL_LIMIT_NONE'), &$extra];
             if (!User::isInGroup(U_GROUP_STAFF))
                 $cnds[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

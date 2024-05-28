@@ -25,20 +25,20 @@ class MorePage extends GenericPage
 
     private   $page          = [];
     private   $req2priv      = array(
-             1 => CFG_REP_REQ_COMMENT,                      // write comments
-             2 => 0,                                        // NYI post external links
-             4 => 0,                                        // NYI no captcha
-             5 => CFG_REP_REQ_SUPERVOTE,                    // votes count for more
-             9 => CFG_REP_REQ_VOTEMORE_BASE,                // more votes per day
-            10 => CFG_REP_REQ_UPVOTE,                       // can upvote
-            11 => CFG_REP_REQ_DOWNVOTE,                     // can downvote
-            12 => CFG_REP_REQ_REPLY,                        // can reply
-            13 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
-            14 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
-            15 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
-            16 => 0,                                        // avatar border [NYI: checked by js, avatars not in use]
-            17 => CFG_REP_REQ_PREMIUM                       // premium status
-        );
+         1 => 'REP_REQ_COMMENT',                            // write comments
+    //   2 => 'REP_REQ_EXT_LINKS',                          // NYI post external links
+    //   4 => 'REP_REQ_NO_CAPTCHA',                         // NYI no captcha
+         5 => 'REP_REQ_SUPERVOTE',                          // votes count for more
+         9 => 'REP_REQ_VOTEMORE_BASE',                      // more votes per day
+        10 => 'REP_REQ_UPVOTE',                             // can upvote
+        11 => 'REP_REQ_DOWNVOTE',                           // can downvote
+        12 => 'REP_REQ_REPLY',                              // can reply
+        13 => 'REP_REQ_BORDER_UNCO',                        // uncommon avatar border  [NYI: hardcoded in Icon.getPrivilegeBorder(), avatars not in use]
+        14 => 'REP_REQ_BORDER_RARE',                        // rare avatar border      [NYI: hardcoded in Icon.getPrivilegeBorder(), avatars not in use]
+        15 => 'REP_REQ_BORDER_EPIC',                        // epic avatar border      [NYI: hardcoded in Icon.getPrivilegeBorder(), avatars not in use]
+        16 => 'REP_REQ_BORDER_LEGE',                        // legendary avatar border [NYI: hardcoded in Icon.getPrivilegeBorder(), avatars not in use]
+        17 => 'REP_REQ_PREMIUM'                             // premium status
+    );
 
     private   $validPages   = array(                        // [tabId, path[, subPaths]]
         'whats-new'     => [2, [2,  7]],
@@ -49,7 +49,7 @@ class MorePage extends GenericPage
         'searchplugins' => [2, [2,  8]],
         'help'          => [2, [2, 13], ['commenting-and-you', 'modelviewer', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'item-comparison', 'profiler', 'markup-guide']],
         'reputation'    => [1, [3, 10]],
-        'privilege'     => [1, [3, 10], [1, 2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 16, 17]],
+        'privilege'     => [1, [3, 10], [1, /* 2, 4, */ 5, 9, 10, 11, 12, 13, 14, 15, 16, 17]],
         'privileges'    => [1, [3, 10, 0]],
         'top-users'     => [1, [3, 11]]
     );
@@ -90,7 +90,10 @@ class MorePage extends GenericPage
         else
             $this->error();
 
-        // order by requirement ASC
+        // apply actual values and order by requirement ASC
+        foreach ($this->req2priv as &$var)
+            $var = Cfg::get($var);
+
         asort($this->req2priv);
     }
 
@@ -123,14 +126,7 @@ class MorePage extends GenericPage
             $this->page[0] != 'privilege')
             return;
 
-        $consts = get_defined_constants(true);
-        foreach ($consts['user'] as $k => $v)
-        {
-            if (strstr($k, 'CFG_REP_'))
-                $txt = str_replace($k, Lang::nf($v), $txt);
-            else if ($k == 'CFG_USER_MAX_VOTES' || $k == 'CFG_BOARD_URL')
-                $txt = str_replace($k, $v, $txt);
-        }
+        $txt = Cfg::applyToString($txt);
     }
 
     protected function generatePath() { }
@@ -208,7 +204,7 @@ class MorePage extends GenericPage
                 GROUP BY a.id
                 ORDER BY reputation DESC
                 LIMIT ?d
-            ', $t ?: DBSIMPLE_SKIP, CFG_SQL_LIMIT_SEARCH);
+            ', $t ?: DBSIMPLE_SKIP, Cfg::get('SQL_LIMIT_SEARCH'));
 
             $data = [];
             if ($res)

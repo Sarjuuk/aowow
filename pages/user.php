@@ -161,7 +161,7 @@ class UserPage extends GenericPage
                 '_totalCount'    => $nFound
             );
 
-            if ($nFound > CFG_SQL_LIMIT_DEFAULT)
+            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['name'] = '$LANG.tab_latestcomments';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
@@ -180,7 +180,7 @@ class UserPage extends GenericPage
                 '_totalCount'    => $nFound
             );
 
-            if ($nFound > CFG_SQL_LIMIT_DEFAULT)
+            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['name'] = '$LANG.tab_latestreplies';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')';
@@ -197,7 +197,7 @@ class UserPage extends GenericPage
                 '_totalCount' => $nFound
             );
 
-            if ($nFound > CFG_SQL_LIMIT_DEFAULT)
+            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['name'] = '$LANG.tab_latestscreenshots';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')';
@@ -214,7 +214,7 @@ class UserPage extends GenericPage
                 '_totalCount' => $nFound
             );
 
-            if ($nFound > CFG_SQL_LIMIT_DEFAULT)
+            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['name'] = '$LANG.tab_latestvideos';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')';

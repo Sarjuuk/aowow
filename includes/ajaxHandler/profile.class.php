@@ -48,7 +48,7 @@ class AjaxProfile extends AjaxHandler
         if (!$this->params)
             return;
 
-        if (!CFG_PROFILER_ENABLE)
+        if (!Cfg::get('PROFILER_ENABLE'))
             return;
 
         switch ($this->params[0])
@@ -563,7 +563,7 @@ class AjaxProfile extends AjaxHandler
         if ($pBase['realm'])
         {
             $profile['region']      = [$rData['region'], Lang::profiler('regions', $rData['region'])];
-            $profile['battlegroup'] = [Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP];
+            $profile['battlegroup'] = [Profiler::urlize(Cfg::get('BATTLEGROUP')), Cfg::get('BATTLEGROUP')];
             $profile['realm']       = [Profiler::urlize($rData['name'], true), $rData['name']];
         }
 
@@ -616,7 +616,7 @@ class AjaxProfile extends AjaxHandler
                     $profile['titles'] = $data;
                     break;
                 case Type::QUEST:
-                    $qList   = new QuestList(array(['id', array_keys($data)], CFG_SQL_LIMIT_NONE));
+                    $qList   = new QuestList(array(['id', array_keys($data)], Cfg::get('SQL_LIMIT_NONE')));
                     $qResult = [];
                     foreach ($qList->iterate() as $id => $__)
                         $qResult[$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
@@ -691,7 +691,7 @@ class AjaxProfile extends AjaxHandler
 
         if ($items = DB::Aowow()->select('SELECT * FROM ?_profiler_items WHERE id = ?d', $pBase['id']))
         {
-            $itemz = new ItemList(array(['id', array_column($items, 'item')], CFG_SQL_LIMIT_NONE));
+            $itemz = new ItemList(array(['id', array_column($items, 'item')], Cfg::get('SQL_LIMIT_NONE')));
             if (!$itemz->error)
             {
                 $data = $itemz->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
@@ -720,7 +720,7 @@ class AjaxProfile extends AjaxHandler
 
         // if ($au = $char->getField('auras'))
         // {
-            // $auraz = new SpellList(array(['id', $char->getField('auras')], CFG_SQL_LIMIT_NONE));
+            // $auraz = new SpellList(array(['id', $char->getField('auras')], Cfg::get('SQL_LIMIT_NONE')));
             // $dataz = $auraz->getListviewData();
             // $modz  = $auraz->getProfilerMods();
 

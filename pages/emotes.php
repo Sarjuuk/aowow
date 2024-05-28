@@ -25,7 +25,7 @@ class EmotesPage extends GenericPage
 
     protected function generateContent()
     {
-        $cnd = [CFG_SQL_LIMIT_NONE];
+        $cnd = [Cfg::get('SQL_LIMIT_NONE')];
         if (!User::isInGroup(U_GROUP_STAFF))
             $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

@@ -1,8 +1,8 @@
     <title><?=Util::htmlEscape(implode(' - ', $this->title)); ?></title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="SHORTCUT ICON" href="<?=STATIC_URL; ?>/images/logos/favicon.ico" />
-    <link rel="search" type="application/opensearchdescription+xml" href="<?=STATIC_URL; ?>/download/searchplugins/aowow.xml" title="Aowow" />
+    <link rel="SHORTCUT ICON" href="<?=Cfg::get('STATIC_URL'); ?>/images/logos/favicon.ico" />
+    <link rel="search" type="application/opensearchdescription+xml" href="<?=Cfg::get('STATIC_URL'); ?>/download/searchplugins/aowow.xml" title="Aowow" />
 <?php
 foreach ($this->css as [$type, $css]):
     if ($type == SC_CSS_FILE):
@@ -14,8 +14,8 @@ endforeach;
 ?>
     <script type="text/javascript">
         var g_serverTime = new Date('<?=date(Util::$dateFormatInternal); ?>');
-        var g_staticUrl = "<?=STATIC_URL; ?>";
-        var g_host = "<?=HOST_URL; ?>";
+        var g_staticUrl = "<?=Cfg::get('STATIC_URL'); ?>";
+        var g_host = "<?=Cfg::get('HOST_URL'); ?>";
 <?php
 if ($this->gDataKey):
         echo "        var g_dataKey = '".$_SESSION['dataKey']."'\n";
@@ -41,7 +41,7 @@ endif;
     </script>
 
 <?php
-if (CFG_ANALYTICS_USER):
+if (Cfg::get('ANALYTICS_USER')):
 ?>
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -49,7 +49,7 @@ if (CFG_ANALYTICS_USER):
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-        ga('create', '<?=CFG_ANALYTICS_USER; ?>', 'auto');
+        ga('create', '<?=Cfg::get('ANALYTICS_USER'); ?>', 'auto');
         ga('send', 'pageview');
     </script>
 <?php

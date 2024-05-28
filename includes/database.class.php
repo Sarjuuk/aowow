@@ -79,7 +79,7 @@ class DB
         // make number sensible again
         $data['code'] = abs($data['code']);
 
-        if (defined('CFG_DEBUG') && CFG_DEBUG)
+        if (Cfg::get('DEBUG') >= CLI::LOG_INFO)
         {
             echo "\nDB ERROR\n";
             foreach ($data as $k => $v)

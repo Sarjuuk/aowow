@@ -54,7 +54,7 @@ $this->brick('pageTemplate');
                     <td><select name="locale" id="locale" required="required" size="1">
 <?php
 foreach (Lang::locales() as $i => $l):
-    if (CFG_LOCALES & (1 << $i))
+    if (Cfg::get('LOCALES') & (1 << $i))
         echo '                    <option value="'.$i.'"'.($this->editorFields('locale', true) == $i ? ' selected="selected"' : '').'>'.$l."</option>\n";
 endforeach;
 ?>
@@ -284,7 +284,7 @@ endif;
                 </div>
             </div>
 
-            <img src="<?=STATIC_URL;?>/images/icons/ajax.gif" style="display:none" class="spinning-circle">
+            <img src="<?=Cfg::get('STATIC_URL');?>/images/icons/ajax.gif" style="display:none" class="spinning-circle">
             <span id="save-status"></span>
         </form>
     </div>

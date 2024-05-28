@@ -153,7 +153,7 @@ SqlGen::register(new class extends SetupScript
         }
 
         if ($spells)
-            $spellStats = (new SpellList(array(['id', $spells], CFG_SQL_LIMIT_NONE)))->getStatGain();
+            $spellStats = (new SpellList(array(['id', $spells], Cfg::get('SQL_LIMIT_NONE'))))->getStatGain();
 
         $result = [];
         foreach ($enchants as $eId => $e)

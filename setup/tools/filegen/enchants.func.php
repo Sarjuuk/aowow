@@ -83,7 +83,7 @@ if (!CLI)
 
         $enchIds = array_column($enchantSpells, 'effect1MiscValue');
 
-        $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        $enchantments = new EnchantmentList(array(['id', $enchIds], Cfg::get('SQL_LIMIT_NONE')));
         if ($enchantments->error)
         {
             CLI::write('Required table ?_itemenchantment seems to be empty! Leaving enchants()...', CLI::LOG_ERROR);
@@ -91,7 +91,7 @@ if (!CLI)
             return false;
         }
 
-        $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!'], CFG_SQL_LIMIT_NONE));
+        $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!'], Cfg::get('SQL_LIMIT_NONE')));
 
         foreach (CLISetup::$localeIds as $lId)
         {

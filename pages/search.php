@@ -45,7 +45,7 @@ class SearchPage extends GenericPage
         'opensearch' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
     );
 
-    private   $maxResults    = CFG_SQL_LIMIT_SEARCH;
+    private   $maxResults    = 500;
     private   $searchMask    = 0x0;
     private   $query         = '';                          // lookup
     private   $included      = [];
@@ -84,6 +84,9 @@ class SearchPage extends GenericPage
                 $this->statWeights = [$wt, $wtv];
         }
 
+        if ($limit = Cfg::get('SQL_LIMIT_SEARCH'))
+            $this->maxResults = $limit;
+
         // select search mode
         if ($this->_get['json'])
         {
@@ -99,21 +102,21 @@ class SearchPage extends GenericPage
         }
         else if ($this->_get['opensearch'])
         {
-            $this->maxResults = CFG_SQL_LIMIT_QUICKSEARCH;
+            $this->maxResults = Cfg::get('SQL_LIMIT_QUICKSEARCH');
             $this->searchMask |= SEARCH_TYPE_OPEN | SEARCH_MASK_OPEN;
         }
         else
             $this->searchMask |= SEARCH_TYPE_REGULAR | SEARCH_MASK_ALL;
 
         // handle maintenance status for js-cases
-        if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE) && !($this->searchMask & SEARCH_TYPE_REGULAR))
+        if (Cfg::get('MAINTENANCE') && !User::isInGroup(U_GROUP_EMPLOYEE) && !($this->searchMask & SEARCH_TYPE_REGULAR))
             $this->notFound();
 
         // fill include, exclude and ignore
         $this->tokenizeQuery();
 
         // invalid conditions: not enough characters to search OR no types to search
-        if ((CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE)) ||
+        if ((Cfg::get('MAINTENANCE') && !User::isInGroup(U_GROUP_EMPLOYEE)) ||
             (!$this->included && ($this->searchMask & (SEARCH_TYPE_OPEN | SEARCH_TYPE_REGULAR))) ||
             (($this->searchMask & SEARCH_TYPE_JSON) && !$this->included && !$this->statWeights))
         {
@@ -303,7 +306,7 @@ class SearchPage extends GenericPage
 
                 $hasQ        = is_numeric($data['name'][0]) || $data['name'][0] == '@';
                 $result[1][] = ($hasQ ? mb_substr($data['name'], 1) : $data['name']).$osInfo[1];
-                $result[3][] = HOST_URL.'/?'.Type::getFileString($osInfo[0]).'='.$data['id'];
+                $result[3][] = Cfg::get('HOST_URL').'/?'.Type::getFileString($osInfo[0]).'='.$data['id'];
 
                 $extra       = [$osInfo[0], $data['id']];   // type, typeId
 
@@ -552,7 +555,7 @@ class SearchPage extends GenericPage
 
         if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x20) && !empty($shared['pcsToSet']))
         {
-            $cnd      = [['i.id', array_keys($shared['pcsToSet'])], CFG_SQL_LIMIT_NONE];
+            $cnd      = [['i.id', array_keys($shared['pcsToSet'])], Cfg::get('SQL_LIMIT_NONE')];
             $miscData = ['pcsToSet' => $shared['pcsToSet']];
         }
         else if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x40))

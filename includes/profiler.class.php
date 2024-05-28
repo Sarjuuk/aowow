@@ -243,7 +243,7 @@ class Profiler
             // not on already scheduled - recalc time and set status to PR_QUEUE_STATUS_WAITING
             if ($rData['status'] != PR_QUEUE_STATUS_WAITING)
             {
-                $newTime = CFG_DEBUG ? time() : max($rData['time'] + CFG_PROFILER_RESYNC_DELAY, time());
+                $newTime = Cfg::get('DEBUG') ? time() : max($rData['time'] + Cfg::get('PROFILER_RESYNC_DELAY'), time());
                 DB::Aowow()->query('UPDATE ?_profiler_sync SET requestTime = ?d, status = ?d, errorCode = 0 WHERE realm = ?d AND realmGUID = ?d AND `type` = ?d AND typeId = ?d', $newTime, PR_QUEUE_STATUS_WAITING, $realmId, $guid, $type, $localId);
             }
         }
@@ -287,7 +287,7 @@ class Profiler
 
     public static function resyncStatus($type, array $subjectGUIDs)
     {
-        $response = [CFG_PROFILER_ENABLE ? 2 : 0];          // in theory you could have multiple queues; used as divisor for: (15 / x) + 2
+        $response = [Cfg::get('PROFILER_ENABLE') ? 2 : 0];  // in theory you could have multiple queues; used as divisor for: (15 / x) + 2
         if (!$subjectGUIDs)
             $response[] = [PR_QUEUE_STATUS_ENDED, 0, 0, PR_QUEUE_ERROR_CHAR];
         else
@@ -306,7 +306,7 @@ class Profiler
                 else
                     $response[] = array(
                         $subjectStatus[$guid]['status'],
-                        $subjectStatus[$guid]['status'] != PR_QUEUE_STATUS_READY ? CFG_PROFILER_RESYNC_PING : 0,
+                        $subjectStatus[$guid]['status'] != PR_QUEUE_STATUS_READY ? Cfg::get('PROFILER_RESYNC_PING') : 0,
                         array_search($type.':'.$guid, $queue) + 1,
                         0,
                         1                                   // nResycTries - unsure about this one

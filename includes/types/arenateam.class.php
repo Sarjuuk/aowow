@@ -152,7 +152,7 @@ class RemoteArenaTeamList extends ArenaTeamList
         foreach ($this->iterate() as $guid => &$curTpl)
         {
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
             // realm, rank
             $r = explode(':', $guid);
@@ -208,7 +208,7 @@ class RemoteArenaTeamList extends ArenaTeamList
             );
 
         // equalize subject distribution across realms
-        $limit = CFG_SQL_LIMIT_DEFAULT;
+        $limit = Cfg::get('SQL_LIMIT_DEFAULT');
         foreach ($conditions as $c)
             if (is_int($c))
                 $limit = $c;
@@ -244,7 +244,7 @@ class RemoteArenaTeamList extends ArenaTeamList
             foreach ($teams as $team)
                 $gladiators = array_merge($gladiators, array_keys($team));
 
-            $profiles[$realmId] = new RemoteProfileList(array(['c.guid', $gladiators], CFG_SQL_LIMIT_NONE), ['sv' => $realmId]);
+            $profiles[$realmId] = new RemoteProfileList(array(['c.guid', $gladiators], Cfg::get('SQL_LIMIT_NONE')), ['sv' => $realmId]);
 
             if (!$profiles[$realmId]->error)
                 $profiles[$realmId]->initializeLocalEntries();
@@ -346,7 +346,7 @@ class LocalArenaTeamList extends ArenaTeamList
             }
 
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
             $curTpl['members'] = $members[$id];
         }

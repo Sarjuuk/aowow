@@ -283,7 +283,7 @@ class Loot
         if (!$struct)
             return false;
 
-        $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
+        $items = new ItemList(array(['i.id', $struct[1]], Cfg::get('SQL_LIMIT_NONE')));
         $this->jsGlobals = $items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
         $foo = $items->getListviewData();
 
@@ -386,12 +386,15 @@ class Loot
         return true;
     }
 
-    public function getByItem(int $entry, int $maxResults = CFG_SQL_LIMIT_DEFAULT, array $lootTableList = []) : bool
+    public function getByItem(int $entry, int $maxResults = -1, array $lootTableList = []) : bool
     {
         $this->entry = intVal($entry);
 
         if (!$this->entry)
             return false;
+
+        if ($maxResults < 0)
+            $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(

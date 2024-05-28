@@ -31,7 +31,7 @@ if (!CLI)
     function talentCalc()
     {
         $success   = true;
-        $spellMods = (new SpellList(array(['typeCat', -2], CFG_SQL_LIMIT_NONE)))->getProfilerMods();
+        $spellMods = (new SpellList(array(['typeCat', -2], Cfg::get('SQL_LIMIT_NONE'))))->getProfilerMods();
 
         $buildTree = function ($class) use (&$petFamIcons, &$tSpells, $spellMods)
         {
@@ -171,7 +171,7 @@ if (!CLI)
                 $success = false;
 
         $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc_talent UNION SELECT rank2 FROM dbc_talent UNION SELECT rank3 FROM dbc_talent UNION SELECT rank4 FROM dbc_talent UNION SELECT rank5 FROM dbc_talent');
-        $tSpells   = new SpellList(array(['s.id', $tSpellIds], CFG_SQL_LIMIT_NONE));
+        $tSpells   = new SpellList(array(['s.id', $tSpellIds], Cfg::get('SQL_LIMIT_NONE')));
 
         foreach (CLISetup::$localeIds as $lId)
         {

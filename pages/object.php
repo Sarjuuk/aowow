@@ -467,9 +467,9 @@ class ObjectPage extends GenericPage
                 $this->extendGlobalData($focusSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 // create note if search limit was exceeded
-                if ($focusSpells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                if ($focusSpells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 {
-                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                     $tabData['_truncated'] = 1;
                 }
 

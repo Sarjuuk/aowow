@@ -42,8 +42,8 @@ if (!CLI)
         $set  = 0x0;
         $menu = [
             // skip usage of battlegroup
-            // ['us', Lang::profiler('regions', 'us'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subUS]]],
-            // ['eu', Lang::profiler('regions', 'eu'), null,[[Profiler::urlize(CFG_BATTLEGROUP), CFG_BATTLEGROUP, null, &$subEU]]]
+            // ['us', Lang::profiler('regions', 'us'), null,[[Profiler::urlize(Cfg::get('BATTLEGROUP')), Cfg::get('BATTLEGROUP'), null, &$subUS]]],
+            // ['eu', Lang::profiler('regions', 'eu'), null,[[Profiler::urlize(Cfg::get('BATTLEGROUP')), Cfg::get('BATTLEGROUP'), null, &$subEU]]]
         ];
 
         foreach (Util::$regions as $idx => $n)

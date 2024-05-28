@@ -53,7 +53,7 @@ $lang = array(
         'or'            => " oder ",
         'back'          => "Zurück",
         'reputationTip' => "Rufpunkte",
-        'byUser'        => 'Von <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ',
+        'byUser'        => 'Von <a href="HOST_URL/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Hilfe",
         'status'        => "Status",
         'yes'           => "Ja",
@@ -270,7 +270,7 @@ $lang = array(
         ),
         'error'         => array(
             'unkFormat'   => "Unbekanntes Bildformat.",
-            'tooSmall'    => "Euer Screenshot ist viel zu klein. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'tooSmall'    => "Euer Screenshot ist viel zu klein. (&lt; CFG_SCREENSHOT_MIN_SIZE x CFG_SCREENSHOT_MIN_SIZE).",
             'selectSS'    => "Wählt bitte den Screenshot aus, den Ihr hochladen möchtet.",
             'notAllowed'  => "Es ist euch nicht erlaubt einen Screenshot hochzuladen!",
         )
@@ -877,7 +877,7 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Diese E-Mail-Adresse ist ungültig.", // message_emailnotvalid
-        'emailNotFound' => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br><br>Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte ".CFG_CONTACT_EMAIL." für Hilfestellung.",
+        'emailNotFound' => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br><br>Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte CFG_CONTACT_EMAIL für Hilfestellung.",
         'createAccSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Konto zu erstellen.",
         'recovUserSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euren Benutzernamen zu erhalten.",
         'recovPassSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Kennwort zurückzusetzen.",
@@ -914,9 +914,9 @@ $lang = array(
         'posts'         => "Forenbeiträge",
         // user mail
         'tokenExpires'  => "Das Token wird in %s verfallen.",
-        'accConfirm'    => ["Kontobestätigung",     "Willkommen bei ".CFG_NAME_SHORT."!\r\n\r\nKlicke auf den Link um euren Account zu aktivieren.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
-        'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
-        'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
+        'accConfirm'    => ["Kontobestätigung",     "Willkommen bei CFG_NAME_SHORT!\r\n\r\nKlicke auf den Link um euren Account zu aktivieren.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
+        'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
+        'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
     ),
     'emote' => array(
         'notFound'      => "Dieses Emote existiert nicht.",
@@ -1081,7 +1081,7 @@ $lang = array(
         'slain'         => "getötet",
         'reqNumCrt'     => "Benötigt",
         'rfAvailable'   => "Verfügbar auf Realm: ",
-        '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+        '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(
                 1 => "Statistiken",                                                  21 => "Spieler gegen Spieler",
                81 => "Heldentaten",                                                  92 => "Allgemein",
@@ -1477,7 +1477,7 @@ $lang = array(
         '_inSlot'       => "im Platz",
         '_collapseAll'  => "Alle einklappen",
         '_expandAll'    => "Alle ausklappen",
-        '_transfer'     => 'Dieser Zauber wird mit <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+        '_transfer'     => 'Dieser Zauber wird mit <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         '_affected'     => "Betroffene Zauber",
         '_seeMore'      => "Mehr anzeigen",
         '_rankRange'    => "Rang:&nbsp;%d&nbsp;-&nbsp;%d",
@@ -1838,7 +1838,7 @@ $lang = array(
         'tool'          => "Werkzeug",
         'cost'          => "Preis",
         'content'       => "Inhalt",
-        '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
+        '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",

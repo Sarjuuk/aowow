@@ -132,19 +132,19 @@ trait TrRequestData
 
 abstract class CLI
 {
-    const CHR_BELL      = 7;
-    const CHR_BACK      = 8;
-    const CHR_TAB       = 9;
-    const CHR_LF        = 10;
-    const CHR_CR        = 13;
-    const CHR_ESC       = 27;
-    const CHR_BACKSPACE = 127;
+    private const CHR_BELL      = 7;
+    private const CHR_BACK      = 8;
+    private const CHR_TAB       = 9;
+    private const CHR_LF        = 10;
+    private const CHR_CR        = 13;
+    private const CHR_ESC       = 27;
+    private const CHR_BACKSPACE = 127;
 
-    const LOG_BLANK     = 0;
-    const LOG_OK        = 1;
-    const LOG_WARN      = 2;
-    const LOG_ERROR     = 3;
-    const LOG_INFO      = 4;
+    public const LOG_BLANK      = 0;
+    public const LOG_ERROR      = 1;
+    public const LOG_WARN       = 2;
+    public const LOG_INFO       = 3;
+    public const LOG_OK         = 4;
 
     private static $logHandle   = null;
     private static $hasReadline = null;
@@ -214,6 +214,11 @@ abstract class CLI
             $file = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
             self::$logHandle = fopen($file, 'w');
         }
+    }
+
+    public static function grey(string $str) : string
+    {
+        return CLI_HAS_E ? "\e[90m".$str."\e[0m" : $str;
     }
 
     public static function red(string $str) : string
@@ -536,17 +541,6 @@ abstract class Util
         null,           'bc',           'wotlk',            'cata',                'mop'
     );
 
-    public static $bgImagePath              = array (
-        'tiny'   => 'style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"',
-        'small'  => 'style="background-image: url(%s/images/wow/icons/small/%s.jpg)"',
-        'medium' => 'style="background-image: url(%s/images/wow/icons/medium/%s.jpg)"',
-        'large'  => 'style="background-image: url(%s/images/wow/icons/large/%s.jpg)"',
-    );
-
-    public static $configCats               = array(        // don't mind the ordering ... please?
-        1 => 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler', 0 => 'Other'
-    );
-
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
     private static $notes                   = [];
 
@@ -737,7 +731,7 @@ abstract class Util
             // html may contain 'Pictures' and FlavorImages and "stuff"
             $text = preg_replace_callback(
                 '/src="([^"]+)"/i',
-                function ($m) { return 'src="'.STATIC_URL.'/images/wow/'.strtr($m[1], ['\\' => '/']).'.png"'; },
+                function ($m) { return sprintf('src="%s/images/wow/%s.png"', Cfg::get('STATIC_URL'), strtr($m[1], ['\\' => '/'])); },
                 strtr($text, $pairs)
             );
         }
@@ -848,8 +842,8 @@ abstract class Util
         return strtr($data, array(
             '<script'    => '<scr"+"ipt',
             'script>'    => 'scr"+"ipt>',
-            'HOST_URL'   => HOST_URL,
-            'STATIC_URL' => STATIC_URL
+            'HOST_URL'   => Cfg::get('HOST_URL'),
+            'STATIC_URL' => Cfg::get('STATIC_URL')
         ));
     }
 
@@ -955,43 +949,59 @@ abstract class Util
         return mb_strtolower($str);
     }
 
-    // note: valid integer > 32bit are returned as float
+    // doesn't handle scientific notation .. why would you input 3e3 for 3000..?
     public static function checkNumeric(&$data, $typeCast = NUM_ANY)
     {
         if ($data === null)
             return false;
-        else if (!is_array($data))
+
+        if (is_array($data))
         {
-            $rawData = $data;                               // do not transform strings
-
-            $data = trim($data);
-            if (preg_match('/^-?\d*,\d+$/', $data))
-                $data = strtr($data, ',', '.');
-
-            if (is_numeric($data))
-            {
-                $data += 0;                                 // becomes float or int
-
-                if ((is_float($data) && $typeCast == NUM_REQ_INT) ||
-                    (is_int($data) && $typeCast == NUM_REQ_FLOAT))
-                    return false;
-
-                if (is_float($data) && $typeCast == NUM_CAST_INT)
-                    $data = intval($data);
-
-                if (is_int($data) && $typeCast == NUM_CAST_FLOAT)
-                    $data = floatval($data);
-
-                return true;
-            }
-
-            $data = $rawData;
-            return false;
+            array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
+            return false;                                   // always false for passed arrays
         }
 
-        array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
+        // already in required state
+        if ((is_float($data) && $typeCast == NUM_REQ_FLOAT) ||
+            (is_int($data) && $typeCast == NUM_REQ_INT))
+            return true;
 
-        return false;                                       // always false for passed arrays
+        // irreconcilable state
+        if ((!is_int($data) && $typeCast == NUM_REQ_INT) ||
+            (!is_float($data) && $typeCast == NUM_REQ_FLOAT))
+            return false;
+
+        $number = $data;                                    // do not transform strings, store state
+        $nMatches = 0;
+
+        $number = trim($number);
+        $number = preg_replace('/^(-?\d*)[.,](\d+)$/', '$1.$2', $number, -1, $nMatches);
+
+        // is float string
+        if ($nMatches)
+        {
+            if ($typeCast == NUM_CAST_INT)
+                $data = intVal($number);
+            else if ($typeCast == NUM_CAST_FLOAT)
+                $data = floatVal($number);
+
+            return true;
+        }
+
+        // is int string (is_numeric can only handle strings in base 10)
+        if (is_numeric($number) || preg_match('/0[xb]?\d+/', $number))
+        {
+            $number = intVal($number, 0);                   // 'base 0' auto-detects base
+            if ($typeCast == NUM_CAST_INT)
+                $data = $number;
+            else if ($typeCast == NUM_CAST_FLOAT)
+                $data = floatVal($number);
+
+            return true;
+        }
+
+        // is string string
+        return false;
     }
 
     public static function arraySumByKey(array &$ref, array ...$adds) : void
@@ -1090,18 +1100,18 @@ abstract class Util
         switch ($action)
         {
             case SITEREP_ACTION_REGISTER:
-                $x['amount'] = CFG_REP_REWARD_REGISTER;
+                $x['amount'] = Cfg::get('REP_REWARD_REGISTER');
                 break;
             case SITEREP_ACTION_DAILYVISIT:
                 $x['sourceA'] = time();
-                $x['amount']  = CFG_REP_REWARD_DAILYVISIT;
+                $x['amount']  = Cfg::get('REP_REWARD_DAILYVISIT');
                 break;
             case SITEREP_ACTION_COMMENT:
                 if (empty($miscData['id']))
                     return false;
 
                 $x['sourceA'] = $miscData['id'];            // commentId
-                $x['amount']  = CFG_REP_REWARD_COMMENT;
+                $x['amount']  = Cfg::get('REP_REWARD_COMMENT');
                 break;
             case SITEREP_ACTION_UPVOTED:
             case SITEREP_ACTION_DOWNVOTED:
@@ -1118,7 +1128,7 @@ abstract class Util
 
                 $x['sourceA'] = $miscData['id'];            // commentId
                 $x['sourceB'] = $miscData['voterId'];
-                $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? CFG_REP_REWARD_UPVOTED : CFG_REP_REWARD_DOWNVOTED;
+                $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? Cfg::get('REP_REWARD_UPVOTED') : Cfg::get('REP_REWARD_DOWNVOTED');
                 break;
             case SITEREP_ACTION_UPLOAD:
                 if (empty($miscData['id']) || empty($miscData['what']))
@@ -1126,7 +1136,7 @@ abstract class Util
 
                 $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
                 $x['sourceB'] = $miscData['what'];          // screenshot:1 or video:NYD
-                $x['amount']  = CFG_REP_REWARD_UPLOAD;
+                $x['amount']  = Cfg::get('REP_REWARD_UPLOAD');
                 break;
             case SITEREP_ACTION_GOOD_REPORT:                // NYI
             case SITEREP_ACTION_BAD_REPORT:
@@ -1134,14 +1144,14 @@ abstract class Util
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? CFG_REP_REWARD_GOOD_REPORT : CFG_REP_REWARD_BAD_REPORT;
+                $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? Cfg::get('REP_REWARD_GOOD_REPORT') : Cfg::get('REP_REWARD_BAD_REPORT');
                 break;
             case SITEREP_ACTION_ARTICLE:
                 if (empty($miscData['id']))                 // guideId
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = CFG_REP_REWARD_ARTICLE;
+                $x['amount']  = Cfg::get('REP_REWARD_ARTICLE');
                 break;
             case SITEREP_ACTION_USER_WARNED:                // NYI
             case SITEREP_ACTION_USER_SUSPENDED:
@@ -1149,7 +1159,7 @@ abstract class Util
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = $action == SITEREP_ACTION_USER_WARNED ? CFG_REP_REWARD_USER_WARNED : CFG_REP_REWARD_USER_SUSPENDED;
+                $x['amount']  = $action == SITEREP_ACTION_USER_WARNED ? Cfg::get('REP_REWARD_USER_WARNED') : Cfg::get('REP_REWARD_USER_SUSPENDED');
                 break;
         }
 
@@ -1318,7 +1328,7 @@ abstract class Util
     {
         $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
 
-        if (CFG_DEBUG && !$forceFlags)
+        if (Cfg::get('DEBUG') && !$forceFlags)
             $flags |= JSON_PRETTY_PRINT;
 
         $json = json_encode($data, $flags);
@@ -1658,7 +1668,7 @@ abstract class Util
         return [(int)$deg, $desc];
     }
 
-    static function mask2bits($bitmask, $offset = 0)
+    static function mask2bits(int $bitmask, int $offset = 0) : array
     {
         $bits = [];
         $i    = 0;

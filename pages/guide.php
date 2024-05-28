@@ -482,7 +482,7 @@ class GuidePage extends GenericPage
                 return false;
 
             // req: valid data
-            if (!in_array($this->_post['category'], $this->validCats) || !(CFG_LOCALES & (1 << $this->_post['locale'])))
+            if (!in_array($this->_post['category'], $this->validCats) || !(Cfg::get('LOCALES') & (1 << $this->_post['locale'])))
                 return false;
 
             // sanitize: spec / class

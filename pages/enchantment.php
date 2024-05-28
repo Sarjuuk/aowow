@@ -285,7 +285,7 @@ class EnchantmentPage extends GenericPage
                 foreach ($iet as $tplId => $data)
                     $randIds[$ire[$data['ench']]['id'] > 0 ? $tplId : -$tplId] = $ire[$data['ench']]['id'];
 
-                $randItems = new ItemList(array(CFG_SQL_LIMIT_NONE, ['randomEnchant', array_keys($randIds)]));
+                $randItems = new ItemList(array(Cfg::get('SQL_LIMIT_NONE'), ['randomEnchant', array_keys($randIds)]));
                 if (!$randItems->error)
                 {
                     $data = $randItems->getListviewData();

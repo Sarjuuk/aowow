@@ -13,7 +13,6 @@ if (!CLI)
 
 function siteconfig() : void
 {
-    $reqKeys    = ['site_host', 'static_host'];
     $updScripts = [];
 
     if (!DB::isConnected(DB_AOWOW))
@@ -24,195 +23,124 @@ function siteconfig() : void
         return;
     }
 
-    $onChange = function($key, $val) use (&$updScripts)
+    function toOptList(string $options, $curVal, bool $bitmask = false) : string
     {
-        $fn = null;
-
-        switch ($key)
+        $result = '';
+        foreach (explode(', ', $options) as $opt)
         {
-            case 'battlegroup':
-                array_push($updScripts, 'realms', 'realmMenu');
-                break;
-            case 'name_short':
-                array_push($updScripts, 'searchboxBody', 'demo', 'searchplugin');
-                break;
-            case 'site_host':
-                array_push($updScripts, 'searchplugin', 'demo', 'power', 'searchboxBody');
-                break;
-            case 'static_host':
-                array_push($updScripts, 'searchplugin', 'power', 'searchboxBody', 'searchboxScript');
-                break;
-            case 'contact_email':
-                array_push($updScripts, 'markup');
-                break;
-            case 'locales':
-                array_push($updScripts, 'locales');
-                CLI::write(' * remember to rebuild all static files for the language you just added.', CLI::LOG_INFO);
-                CLI::write(' * you can speed this up by supplying the regionCode to the setup: '.CLI::bold('--locales=<regionCodes,> -f'));
-                break;
-            case 'profiler_enable':
-                array_push($updScripts, 'realms', 'realmMenu');
-                $fn = function($x) {
-                    if (!$x)
-                        return true;
+            [$val, $name] = explode(':', $opt);
+            $equal = $bitmask ? ($curVal & (1 << $val)) : $curVal == $val;
 
-                    $ok = Profiler::queueStart($msg);
-                    if ($msg)
-                        CLI::write($msg, CLI::LOG_ERROR);
-
-                    return $ok;
-                };
-                break;
-            case 'acc_auth_mode':
-                $fn = function($x) {
-                    if ($x == 1 && !extension_loaded('gmp'))
-                    {
-                        CLI::write('PHP extension GMP is required to use TrinityCore as auth source, but it is currently not enabled.', CLI::LOG_ERROR);
-                        return false;
-                    }
-
-                    return true;
-                };
-                break;
-            default:                                        // nothing to do, everything is fine
-                return true;
+            $result .= '['.($equal ? 'x' : ' ').']'.$name.' ';
         }
 
-        return $fn ? $fn($val) : true;
-    };
+        return substr($result, 0, -1);
+    }
+
+    function formatValue($value, $flags, $opts) : string
+    {
+        if ($flags & Cfg::FLAG_TYPE_BOOL)
+            return '[bool]  '.($value ? '<Enabled>' : '<Disabled>');
+
+        if ($flags & Cfg::FLAG_OPT_LIST)
+            return '[opt]   '.toOptList($opts, $value, false);
+
+        if ($flags & Cfg::FLAG_BITMASK)
+            return '[mask]  '.toOptList($opts, $value, true);
+
+        if ($flags & Cfg::FLAG_TYPE_FLOAT)
+            return '[float] '.floatVal($value);
+
+        if ($flags & Cfg::FLAG_TYPE_INT)
+            return '[int]   '.intVal($value);
+
+        // if ($flags & Cfg::FLAG_TYPE_STRING)
+        if ($value === '')
+            return '[str]   '.(($flags & Cfg::FLAG_REQUIRED) ? CLI::red('<empty>') : CLI::grey('<empty>'));
+        else
+            return '[str]   "'.$value.'"';
+    }
 
     while (true)
     {
-        CLI::write('select a numerical index to use the corresponding entry');
+        CLI::write('select a numerical index or name to use the corresponding entry');
         CLI::write();
 
         $sumNum   = 0;
         $cfgList  = [];
         $hasEmpty = false;
-        $mainBuff = [];
-        $miscBuff = [];                                     // catg 'misc' should come last
+        $listBuff = [];
 
-        foreach (Util::$configCats as $idx => $cat)
+        foreach (Cfg::$categories as $idx => $cat)
         {
-            if ($idx)
-                $mainBuff[] = '=====  '.$cat.'  =====';
-            else
-                $miscBuff[] = '=====  '.$cat.'  =====';
+            $listBuff[] = '=====  '.$cat.'  =====';
 
-            $results  = DB::Aowow()->select('SELECT *, (flags & ?d) AS php FROM ?_config WHERE `cat` = ?d ORDER BY `key` ASC', CON_FLAG_PHP, $idx);
-
-            foreach ($results as $num => $data)
+            foreach (Cfg::forCategory($idx) as $key => [$value, $flags, $catg, $default, $comment])
             {
-                if (!($data['flags'] & CON_FLAG_PHP) && $data['value'] === '' && in_array($data['key'], $reqKeys))
+                $isPhp = $flags & Cfg::FLAG_PHP;
+
+                if ($value === '' && ($flags & Cfg::FLAG_REQUIRED))
                     $hasEmpty = true;
 
-                $cfgList[$sumNum + $num] = $data;
+                $cfgList[$sumNum] = strtolower($key);
 
-                $php   = $data['flags'] & CON_FLAG_PHP;
-                $buff  = "[".CLI::bold($sumNum + $num)."] ".(($sumNum + $num) > 9 ? '' : ' ').($php ? '  PHP   ' : ' AOWOW  ');
-                $buff .= str_pad($php ? strtolower($data['key']) : strtoupper($data['key']), 35);
-                if ($data['value'] === '')
-                    $buff .= in_array($data['key'], $reqKeys) ? CLI::red('<empty>') : '<empty>';
-                else
-                {
-                    $info = explode(' - ', $data['comment']);
+                $row  = '['.CLI::bold($sumNum).'] '.(($sumNum) > 9 ? '' : ' ').($isPhp ? '  PHP   ' : ' AOWOW  ');
+                $row .= str_pad($isPhp ? strtolower($key) : strtoupper($key), 35);
 
-                    if ($data['flags'] & CON_FLAG_TYPE_BOOL)
-                        $buff .= '[bool] '.($data['value'] ? '<Enabled>' : '<Disabled>');
-                    else if ($data['flags'] & CON_FLAG_OPT_LIST && !empty($info[2]))
-                    {
-                        $buff .= "[opt]  ";
-                        foreach (explode(', ', $info[2]) as $option)
-                        {
-                            $opt = explode(':', $option);
-                            $buff .= '['.($data['value'] == $opt[0] ? 'x' : ' ').']'.$opt[1].' ';
-                        }
-                    }
-                    else if ($data['flags'] & CON_FLAG_BITMASK && !empty($info[2]))
-                    {
-                        $buff .= "[mask] ";
-                        foreach (explode(', ', $info[2]) as $option)
-                        {
-                            $opt = explode(':', $option);
-                            $buff .= '['.($data['value'] & (1 << $opt[0]) ? 'x' : ' ').']'.$opt[1].' ';
-                        }
-                    }
-                    else if ($data['flags'] & CON_FLAG_TYPE_STRING)
-                        $buff .= "[str]  ".$data['value'];
-                    else if ($data['flags'] & CON_FLAG_TYPE_FLOAT)
-                        $buff .= "[float] ".floatVal($data['value']);
-                    else /* if ($data['flags'] & CON_FLAG_TYPE_INT) */
-                        $buff .= "[int]  ".intVal($data['value']);
-                }
+                $opts = explode(' - ', $comment);
+                $row .= formatValue($value, $flags, $opts[1] ?? '');
 
-                if ($idx)
-                    $mainBuff[] = $buff;
-                else
-                    $miscBuff[] = $buff;
-
+                $listBuff[] = $row;
+                $sumNum++;
             }
-
-            $sumNum += count($results);
         }
 
-        foreach ($mainBuff as $b)
+        foreach ($listBuff as $b)
             CLI::write($b);
 
-        foreach ($miscBuff as $b)
-            CLI::write($b);
-
-        CLI::write(str_pad("[".CLI::bold($sumNum)."]", 21)."add another php configuration");
+        CLI::write(str_pad('['.CLI::bold($sumNum).']', 21).'add another php configuration');
         CLI::write();
 
         if ($hasEmpty)
         {
-            CLI::write("please configure the required empty settings", CLI::LOG_WARN);
+            CLI::write('please configure the required empty settings', CLI::LOG_WARN);
             CLI::write();
         }
 
-        $inp = ['idx' => ['', false, '/\d/']];
+        $inp = ['idx' => ['', false, Cfg::PATTERN_CONF_KEY]];
         if (CLI::read($inp) && $inp && $inp['idx'] !== '')
         {
-            $inp['idx'] = intVal($inp['idx']);
+            $idx = array_search(strtolower($inp['idx']), $cfgList);
+            if ($idx === false)
+                $idx = intVal($inp['idx']);
 
             // add new php setting
-            if ($inp['idx'] == $sumNum)
+            if ($idx == $sumNum)
             {
-                CLI::write("Adding additional php configuration.");
+                CLI::write('Adding additional php configuration.');
                 CLI::write();
 
                 while (true)
                 {
                     $setting = array(
-                        'key' => ['option name', false, '/[\w_\.\-]/i'],
+                        'key' => ['option name', false, Cfg::PATTERN_CONF_KEY],
                         'val' => ['value',                            ]
                     );
                     if (CLI::read($setting) && $setting)
                     {
                         $key = strtolower($setting['key']);
-                        if (ini_get($key) === false || ini_set($key, $setting['val']) === false)
-                        {
-                            CLI::write("this configuration option cannot be set", CLI::LOG_ERROR);
-                            sleep(1);
-                        }
-                        else if (DB::Aowow()->selectCell('SELECT 1 FROM ?_config WHERE `flags` & ?d AND `key` = ?', CON_FLAG_PHP, $key))
-                        {
-                            CLI::write("this configuration option is already in use", CLI::LOG_ERROR);
-                            sleep(1);
-                        }
+                        if ($err = Cfg::add($key, $setting['val']))
+                            CLI::write($err, CLI::LOG_ERROR);
                         else
-                        {
-                            DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, 0, ?d)', $key, $setting['val'], CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
-                            CLI::write("new php configuration added", CLI::LOG_OK);
-                            sleep(1);
-                        }
+                            CLI::write('new php configuration added', CLI::LOG_OK);
 
+                        sleep(1);
                         CLI::write();
                         break;
                     }
                     else
                     {
-                        CLI::write("edit canceled! returning to list...", CLI::LOG_INFO);
+                        CLI::write('edit canceled! returning to list...', CLI::LOG_INFO);
                         CLI::write();
                         sleep(1);
                         break;
@@ -220,58 +148,30 @@ function siteconfig() : void
                 }
             }
             // edit existing setting
-            else if ($inp['idx'] >= 0 && $inp['idx'] < $sumNum)
+            else if ($idx >= 0 && $idx < $sumNum)
             {
-                $conf = $cfgList[$inp['idx']];
-                $info = explode(' - ', $conf['comment']);
-                $key  = strtolower($conf['key']);
+                [$value, $flags, , $default, $comment] = Cfg::get($cfgList[$idx], false, true);
+                $key  = $cfgList[$idx];
+                $info = explode(' - ', $comment);
                 $buff = '';
 
-                $buff .= $conf['flags'] & CON_FLAG_PHP ? "  PHP: " : "AOWOW: ";
-                $buff .= $conf['flags'] & CON_FLAG_PHP ? $key : strtoupper('cfg_'.$conf['key']);
+                $buff .= $flags & Cfg::FLAG_PHP ? 'PHP: ' : 'AOWOW: ';
+                $buff .= $flags & Cfg::FLAG_PHP ? $key : 'Cfg::'.strtoupper($key);
 
-                if (!empty($info[1]))
-                    $buff .= " - ".$info[1];
-
-                CLI::write($buff);
-                CLI::write();
-
-                $buff = "VALUE: ";
-
-                if ($conf['flags'] & CON_FLAG_TYPE_BOOL)
-                    $buff .= $conf['value'] ? '<Enabled>' : '<Disabled>';
-                else if ($conf['flags'] & CON_FLAG_OPT_LIST && !empty($info[2]))
-                {
-                    foreach (explode(', ', $info[2]) as $option)
-                    {
-                        $opt   = explode(':', $option);
-                        $buff .= '['.($conf['value'] == $opt[0] ? 'x' : ' ').'] '.$opt[1].' ';
-                    }
-                }
-                else if ($conf['flags'] & CON_FLAG_BITMASK && !empty($info[2]))
-                {
-                    foreach (explode(', ', $info[2]) as $option)
-                    {
-                        $opt = explode(':', $option);
-                        $buff .= '['.($conf['value'] & (1 << $opt[0]) ? 'x' : ' ').'] '.$opt[1].' ';
-                    }
-                }
-                else if ($conf['flags'] & CON_FLAG_TYPE_STRING)
-                    $buff .= $conf['value'];
-                else if ($conf['flags'] & CON_FLAG_TYPE_FLOAT)
-                    $buff .= floatVal($conf['value']);
-                else /* if ($conf['flags'] & CON_FLAG_TYPE_INT) */
-                    $buff .= intVal($conf['value']);
+                if (!empty($info[0]))
+                    $buff .= ' - '.$info[0];
 
                 CLI::write($buff);
                 CLI::write();
-                CLI::write("[".CLI::bold('E')."]dit");
+                CLI::write('VALUE: '.formatValue($value, $flags, $info[1] ?? ''));
+                CLI::write();
+                CLI::write('['.CLI::bold('E').']dit');
 
-                if (!($conf['flags'] & CON_FLAG_PERSISTENT))
-                    CLI::write("[".CLI::bold('D')."]elete");
+                if (!($flags & Cfg::FLAG_PERSISTENT))
+                    CLI::write('['.CLI::bold('D').']elete');
 
-                if (strstr($info[0], 'default:'))
-                    CLI::write("[".CLI::bold('R')."]estore Default - ".trim(explode('default:', $info[0])[1]));
+                if ($default)
+                    CLI::write('['.CLI::bold('R').']estore Default - '.$default);
 
                 CLI::write();
 
@@ -287,48 +187,34 @@ function siteconfig() : void
                                 $single  = false;
                                 $value   = ['idx' => ['Select new value', false, &$pattern]];
 
-                                if ($conf['flags'] & CON_FLAG_OPT_LIST)
+                                if ($flags & Cfg::FLAG_OPT_LIST)
                                 {
-                                    $_valid = [];
-                                    foreach (explode(', ', $info[2]) as $option)
+                                    foreach (explode(', ', $info[1]) as $option)
                                     {
-                                        $opt = explode(':', $option);
-                                        $_valid[] = $opt[0];
-                                        CLI::write('['.CLI::bold($opt[0]).'] '.$opt[1]);
+                                        [$val, $name] = explode(':', $option);
+                                        CLI::write('['.CLI::bold($val).'] '.$name);
                                     }
                                     $single   = true;
                                     $pattern  = '/\d/';
-                                    $validate = function ($v) use($_valid) { return in_array($v, $_valid); };
                                 }
-                                else if ($conf['flags'] & CON_FLAG_BITMASK)
+                                else if ($flags & Cfg::FLAG_BITMASK)
                                 {
                                     CLI::write('Bitmask: sum fields to select multiple options');
-                                    $_valid = 0x0;
-                                    foreach (explode(', ', $info[2]) as $option)
+                                    foreach (explode(', ', $info[1]) as $option)
                                     {
-                                        $opt = explode(':', $option);
-                                        $_valid |= (1 << $opt[0]);
-                                        CLI::write('['.CLI::bold(1 << $opt[0]).']'.str_pad('', 4-strlen(1 << $opt[0])).$opt[1]);
+                                        [$val, $name] = explode(':', $option);
+                                        CLI::write('['.CLI::bold(1 << $val).']'.str_pad('', 6 - strlen(1 << $val)).$name);
                                     }
                                     $pattern  = '/\d+/';
-                                    $validate = function ($v) use($_valid) { $v = ($v ?: 0) & $_valid; return $v; };
                                 }
-                                else if ($conf['flags'] & CON_FLAG_TYPE_BOOL)
+                                else if ($flags & Cfg::FLAG_TYPE_BOOL)
                                 {
                                     CLI::write('['.CLI::bold(0).'] Disabled');
                                     CLI::write('['.CLI::bold(1).'] Enabled');
 
                                     $single   = true;
                                     $pattern  = '/[01]/';
-                                    $validate = function ($v) { return true; };
                                 }
-                                else if ($conf['flags'] & CON_FLAG_TYPE_INT)
-                                    $validate = function ($v) { return preg_match('/^-?\d+$/i', $v); };
-                                else if ($conf['flags'] & CON_FLAG_TYPE_FLOAT)
-                                    $validate = function ($v) { return preg_match('/^-?\d*(,|.)?\d+$/i', $v); };
-                                else            // string
-                                    $validate = function ($v) { return true; };
-
 
                                 while (true)
                                 {
@@ -338,33 +224,23 @@ function siteconfig() : void
                                         CLI::write();
 
                                         $inp = $use['idx'] ?? '';
-                                        if (!$validate($inp))
+
+                                        if ($err = Cfg::set($key, $inp, $updScripts))
                                         {
-                                            CLI::write("value not in range", CLI::LOG_ERROR);
+                                            CLI::write($err, CLI::LOG_ERROR);
                                             sleep(1);
                                             continue;
                                         }
                                         else
                                         {
-                                            $oldVal = DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = ?', $key);
-                                            DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $inp, $key);
-
-                                            // postChange returned false => reset value
-                                            if (!$onChange($key, $inp))
-                                            {
-                                                DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldVal, $key);
-                                                sleep(1);
-                                                break;
-                                            }
-
-                                            CLI::write("setting updated", CLI::LOG_OK);
+                                            CLI::write('setting updated', CLI::LOG_OK);
                                             sleep(1);
                                             break 3;
                                         }
                                     }
                                     else
                                     {
-                                        CLI::write("edit canceled! returning to selection...", CLI::LOG_INFO);
+                                        CLI::write('edit canceled! returning to selection...', CLI::LOG_INFO);
                                         sleep(1);
                                         break;
                                     }
@@ -372,29 +248,26 @@ function siteconfig() : void
 
                                 break 2;
                             case 'R':           // restore default
-                                if (!strstr($info[0], 'default:'))
+                                if (!$default)
                                     continue 2;
 
-                                // @eval .. some dafault values are supplied as bitmask or the likes
-                                $val = trim(explode('default:', $info[0])[1]);
-                                if (!($conf['flags'] & CON_FLAG_TYPE_STRING))
-                                    $val = @eval('return ('.$val.');');
-                                if (DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, $key))
-                                {
-                                    CLI::write("default value restored", CLI::LOG_OK);
-                                    $onChange($key, $val);
-                                    sleep(1);
-                                }
+                                if ($err = Cfg::reset($key, $updScripts))
+                                    CLI::write($err, CLI::LOG_ERROR);
+                                else
+                                    CLI::write('default value restored', CLI::LOG_OK);
+
+                                sleep(1);
                                 break 2;
                             case 'D':           // delete config pair
-                                if ($conf['flags'] & CON_FLAG_PERSISTENT)
+                                if ($flags & Cfg::FLAG_PERSISTENT)
                                     continue 2;
 
-                                if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $key, CON_FLAG_PERSISTENT))
-                                {
-                                    CLI::write("php setting deleted ['".$conf['key']."': '".$conf['value']."']", CLI::LOG_OK);
-                                    sleep(1);
-                                }
+                                if ($err = Cfg::delete($key))
+                                    CLI::write($err, CLI::LOG_ERROR);
+                                else
+                                    CLI::write("php setting deleted ['".$key."': '".$value."']", CLI::LOG_OK);
+
+                                sleep(1);
                                 break 2;
                         }
                     }
@@ -440,9 +313,6 @@ function siteconfig() : void
             $updScripts = [];
         }
     }
-
-    // actually load set constants
-    loadConfig(true);
 }
 
 ?>

@@ -565,7 +565,7 @@ class ItemPage extends genericPage
         // tab: container can contain
         if ($this->subject->getField('slots') > 0)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], CFG_SQL_LIMIT_NONE));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], Cfg::get('SQL_LIMIT_NONE')));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -586,7 +586,7 @@ class ItemPage extends genericPage
         // tab: can be contained in (except keys)
         else if ($_bagFamily != 0x0100)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], CFG_SQL_LIMIT_NONE));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], Cfg::get('SQL_LIMIT_NONE')));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -1193,7 +1193,7 @@ class ItemPage extends genericPage
             }
 
             // link
-            $xml->addChild('link', HOST_URL.'?item='.$this->subject->id);
+            $xml->addChild('link', Cfg::get('HOST_URL').'?item='.$this->subject->id);
         }
 
         return $root->asXML();

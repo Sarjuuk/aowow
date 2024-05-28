@@ -99,7 +99,7 @@ class ClassPage extends GenericPage
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => true,
             BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$this->typeId] * 3], 'pet' => false],
-            BUTTON_FORUM   => false                         // todo (low): CFG_BOARD_URL + X
+            BUTTON_FORUM   => false                         // todo (low): Cfg::get('BOARD_URL') + X
         );
 
 
@@ -127,7 +127,7 @@ class ClassPage extends GenericPage
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
             ],
-            CFG_SQL_LIMIT_NONE
+            Cfg::get('SQL_LIMIT_NONE')
         );
 
         $genSpells = new SpellList($conditions);
@@ -153,7 +153,7 @@ class ClassPage extends GenericPage
             ['requiredClass', $_mask, '&'],
             [['requiredClass', CLASS_MASK_ALL, '&'], CLASS_MASK_ALL, '!'],
             ['itemset', 0],                                     // hmm, do or dont..?
-            CFG_SQL_LIMIT_NONE
+            Cfg::get('SQL_LIMIT_NONE')
         );
 
         $items = new ItemList($conditions);

@@ -72,9 +72,9 @@ class EnchantmentsPage extends GenericPage
         if ($xCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
-        if ($ench->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+        if ($ench->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_enchantmentsfound', $ench->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
             $tabData['_truncated'] = 1;
         }
 

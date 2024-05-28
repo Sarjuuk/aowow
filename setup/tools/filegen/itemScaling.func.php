@@ -69,9 +69,9 @@ if (!CLI)
         $mods = DB::Aowow()->selectCol('SELECT idx - 1 AS ARRAY_KEY, ratio FROM dbc_gtoctclasscombatratingscalar WHERE idx IN (?a)', $offsets);
 
         foreach ($data as $itemMod => &$val)
-            $val = CFG_DEBUG ? $base[$val].' / '.$mods[$val] : $base[$val] / $mods[$val];
+            $val = Cfg::get('DEBUG') ? $base[$val].' / '.$mods[$val] : $base[$val] / $mods[$val];
 
-        if (!CFG_DEBUG)
+        if (!Cfg::get('DEBUG'))
             return Util::toJSON($data);
 
         $buff = [];
@@ -97,7 +97,7 @@ if (!CLI)
         foreach ($data as &$d)
             $d = array_values($d);                          // strip indizes
 
-        return CFG_DEBUG ? debugify($data) : Util::toJSON($data);
+        return Cfg::get('DEBUG') ? debugify($data) : Util::toJSON($data);
     }
 
     function itemScalingSD()
@@ -109,7 +109,6 @@ if (!CLI)
             array_splice($row, 0, 1);
         }
 
-        return CFG_DEBUG ? debugify($data) : Util::toJSON($data);
+        return Cfg::get('DEBUG') ? debugify($data) : Util::toJSON($data);
     }
-
 ?>

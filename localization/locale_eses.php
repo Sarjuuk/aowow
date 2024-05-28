@@ -53,7 +53,7 @@ $lang = array(
         'or'            => " o ",
         'back'          => "Atrás",
         'reputationTip' => "Puntos de reputación",
-        'byUser'        => 'Por <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ',
+        'byUser'        => 'Por <a href="HOST_URL/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Ayuda",
         'status'        => "Estado",
         'yes'           => "Sí",
@@ -270,7 +270,7 @@ $lang = array(
         ),
         'error'         => array(
             'unkFormat'   => "Formato de imagen desconocido.",
-            'tooSmall'    => "Su captura de pantalla es muy pequeña. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'tooSmall'    => "Su captura de pantalla es muy pequeña. (&lt; CFG_SCREENSHOT_MIN_SIZE x CFG_SCREENSHOT_MIN_SIZE).",
             'selectSS'    => "Por favor seleccione la captura de pantalla para subir.",
             'notAllowed'  => "¡No estás permitido para subir capturas de pantalla!",
         )
@@ -877,7 +877,7 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Esa dirección de correo electrónico no es válida.", // message_emailnotvalid
-        'emailNotFound' => "El correo electrónico que ingresaste no está asociado con ninguna cuenta.<br><br>Si olvistaste el correo electronico con el que registraste la cuenta, escribe a ".CFG_CONTACT_EMAIL." para asistencia.",
+        'emailNotFound' => "El correo electrónico que ingresaste no está asociado con ninguna cuenta.<br><br>Si olvistaste el correo electronico con el que registraste la cuenta, escribe a CFG_CONTACT_EMAIL para asistencia.",
         'createAccSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para crear su cuenta.",
         'recovUserSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para recuperar su nombre de usuario.",
         'recovPassSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para reiniciar su contraseña.",
@@ -914,9 +914,9 @@ $lang = array(
         'posts'         => "Mensajes en los foros",
         // user mail
         'tokenExpires'  => "Este token expira en %s",
-        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a ".CFG_NAME_SHORT."!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
+        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a CFG_NAME_SHORT!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
+        'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
+        'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
     ),
     'emote' => array(
         'notFound'      => "Este emoticón no existe",
@@ -1081,7 +1081,7 @@ $lang = array(
         'slain'         => "matado",
         'reqNumCrt'     => "Requiere",
         'rfAvailable'   => "Disponible en reino: ",
-        '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'cat'           => array(
                 1 => "Estadísticas",                                                 21 => "Jugador contra Jugador",
                81 => "Proezas de fuerza",                                            92 => "General",
@@ -1477,7 +1477,7 @@ $lang = array(
         '_inSlot'       => "en la casilla",
         '_collapseAll'  => "Contraer todo",
         '_expandAll'    => "Expandier todo",
-        '_transfer'     => 'Este hechizo será convertido a <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Este hechizo será convertido a <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         '_affected'     => "Hechizos affectados",
         '_seeMore'      => "[See more]",
         '_rankRange'    => "Rango:&nbsp;%d&nbsp;-&nbsp;%d",
@@ -1838,7 +1838,7 @@ $lang = array(
         'tool'          => "Herramienta",
         'cost'          => "Coste",
         'content'       => "Contenido",
-        '_transfer'     => 'Este objeto será convertido a <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Este objeto será convertido a <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Este objeto no está disponible para los jugadores.",
         '_rndEnchants'  => "Encantamientos aleatorios",
         '_chance'       => "(probabilidad %s%%)",

@@ -61,7 +61,7 @@
 
             <div class="pad3"></div>
 <?php
-if (CFG_ACC_ALLOW_REGISTER):
+if (Cfg::get('ACC_ALLOW_REGISTER')):
     echo '            <div style="text-align: center; line-height: 1.5em; font-size: 125%">'.Lang::account('accCreate')."</div>\n";
 endif;
 ?>

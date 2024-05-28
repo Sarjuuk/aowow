@@ -324,20 +324,7 @@ class AjaxAdmin extends AjaxHandler
         $key = trim($this->_get['key']);
         $val = trim(urldecode($this->_get['val']));
 
-        if ($key === null)
-            return 'empty option name given';
-
-        if (!strlen($key))
-            return 'invalid chars in option name: [a-z 0-9 _ . -] are allowed';
-
-        if (ini_get($key) === false || ini_set($key, $val) === false)
-            return 'this configuration option cannot be set';
-
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_config WHERE `flags` & ?d AND `key` = ?', CON_FLAG_PHP, $key))
-            return 'this configuration option is already in use';
-
-        DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, 0, ?d)', $key, $val, CON_FLAG_TYPE_STRING | CON_FLAG_PHP);
-        return '';
+        return Cfg::add($key, $val);
     }
 
     protected function confRemove() : string
@@ -345,39 +332,15 @@ class AjaxAdmin extends AjaxHandler
         if (!$this->reqGET('key'))
             return 'invalid configuration option given';
 
-        if (DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0', $this->_get['key'], CON_FLAG_PERSISTENT))
-            return '';
-        else
-            return 'option name is either protected or was not found';
+        return Cfg::delete($this->_get['key']);
     }
 
     protected function confUpdate() : string
     {
         $key = trim($this->_get['key']);
         $val = trim(urldecode($this->_get['val']));
-        $msg = '';
 
-        if (!strlen($key))
-            return 'empty option name given';
-
-        $cfg = DB::Aowow()->selectRow('SELECT `flags`, `value` FROM ?_config WHERE `key` = ?', $key);
-        if (!$cfg)
-            return 'configuration option not found';
-
-        if (!($cfg['flags'] & CON_FLAG_TYPE_STRING) && !strlen($val))
-            return 'empty value given';
-        else if ($cfg['flags'] & CON_FLAG_TYPE_INT && !preg_match('/^-?\d+$/i', $val))
-            return "value must be integer";
-        else if ($cfg['flags'] & CON_FLAG_TYPE_FLOAT && !preg_match('/^-?\d*(,|.)?\d+$/i', $val))
-            return "value must be float";
-        else if ($cfg['flags'] & CON_FLAG_TYPE_BOOL && $val != '1')
-            $val = '0';
-
-        DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $val, $key);
-        if (!$this->confOnChange($key, $val, $msg))
-            DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $cfg['value'], $key);
-
-        return $msg;
+        return Cfg::set($key, $val);
     }
 
     protected function wtSave() : string
@@ -563,7 +526,7 @@ class AjaxAdmin extends AjaxHandler
     protected static function checkKey(string $val) : string
     {
         // expecting string
-        if (preg_match('/[^a-z0-9_\.\-]/i', $val))
+        if (preg_match(Cfg::PATTERN_INV_CONF_KEY, $val))
             return '';
 
         return strtolower($val);
@@ -585,73 +548,6 @@ class AjaxAdmin extends AjaxHandler
             return $val;
 
         return '';
-    }
-
-
-    /**********/
-    /* helper */
-    /**********/
-
-    private static function confOnChange(string $key, string $val, string &$msg) : bool
-    {
-        $fn = $buildList = null;
-
-        switch ($key)
-        {
-            case 'battlegroup':
-                $buildList = 'realms,realmMenu';
-                break;
-            case 'name_short':
-                $buildList = 'searchboxBody,demo,searchplugin';
-                break;
-            case 'site_host':
-                $buildList = 'searchplugin,demo,power,searchboxBody';
-                break;
-            case 'static_host':
-                $buildList = 'searchplugin,power,searchboxBody,searchboxScript';
-                break;
-            case 'contact_email':
-                $buildList = 'markup';
-                break;
-            case 'locales':
-                $buildList = 'locales';
-                $msg .= ' * remember to rebuild all static files for the language you just added.<br />';
-                $msg .= ' * you can speed this up by supplying the regionCode to the setup: <pre class="q1">--locales=<regionCodes,> -f</pre>';
-                break;
-            case 'profiler_enable':
-                $buildList = 'realms,realmMenu';
-                $fn = function($x) use (&$msg) {
-                    if (!$x)
-                        return true;
-
-                    return Profiler::queueStart($msg);
-                };
-                break;
-            case 'acc_auth_mode':
-                $fn = function($x) use (&$msg) {
-                    if ($x == 1 && !extension_loaded('gmp'))
-                    {
-                        $msg .= 'PHP extension GMP is required to use TrinityCore as auth source, but is not currently enabled.<br />';
-                        return false;
-                    }
-
-                    return true;
-                };
-                break;
-            default:                                        // nothing to do, everything is fine
-                return true;
-        }
-
-        if ($buildList)
-        {
-            // we need to use exec as build() can only be run from CLI
-            exec('php aowow --build='.$buildList, $out);
-            foreach ($out as $o)
-                if (strstr($o, 'ERR'))
-                    $msg .= explode('0m]', $o)[1]."<br />\n";
-        }
-
-        return $fn ? $fn($val) : true;
     }
 }
 

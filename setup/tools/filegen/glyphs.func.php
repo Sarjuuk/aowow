@@ -48,7 +48,7 @@ if (!CLI)
             if (!CLISetup::writeDir('datasets/'.$dir))
                 $success = false;
 
-        $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], CFG_SQL_LIMIT_NONE));
+        $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], Cfg::get('SQL_LIMIT_NONE')));
 
         foreach (CLISetup::$localeIds as $lId)
         {

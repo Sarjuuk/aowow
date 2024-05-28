@@ -436,9 +436,9 @@ class SpellsPage extends GenericPage
         }
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
-        if ($spells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+        if ($spells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
             $tabData['_truncated'] = 1;
         }
 
