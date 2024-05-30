@@ -630,8 +630,13 @@ trait spawnHelper
             $opts   = $menu = $tt = $info = [];
             $footer = '';
 
-            if ($s['respawn'])
-                $info[1] = '<span class="q0">'.Lang::npc('respawnIn').Lang::main('colon').Lang::formatTime($s['respawn'] * 1000, 'game', 'timeAbbrev', true).'</span>';
+            if ($s['respawn'] > 0)
+                $info[1] = '<span class="q0">'.Lang::npc('respawnIn', [Lang::formatTime($s['respawn'] * 1000, 'game', 'timeAbbrev', true)]).'</span>';
+            else if ($s['respawn'] < 0)
+            {
+                $info[1] = '<span class="q0">'.Lang::npc('despawnAfter', [Lang::formatTime(-$s['respawn'] * 1000, 'game', 'timeAbbrev', true)]).'</span>';
+                $opts['type'] = 4;                          // make pip purple
+            }
 
             if (User::isInGroup(U_GROUP_STAFF))
             {

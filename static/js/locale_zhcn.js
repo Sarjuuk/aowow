@@ -427,7 +427,7 @@ var mn_quests = [
         [1176,"祖尔法拉克"], // Zul'Farrak,
         [1196,"乌特加德之巅"], // Utgarde Pinnacle,
         [1337,"奥达曼"], // Uldaman,
-        [1417,"沉没的神庙"], // Sunken Temple
+        [1477,"沉没的神庙"], // Sunken Temple
         [1581,"死亡矿井"], // The Deadmines,
         [1583,"黑石塔"], // Blackrock Spire,
         [1584,"黑石深渊"], // Blackrock Depths,
@@ -1639,7 +1639,7 @@ var g_quest_sorts = {
        1196: '乌特加德之巅',
        1337: '奥达曼',
        1377: '希利苏斯',
-       1417: '沉没的神庙',
+       1477: '沉没的神庙',
        1497: '幽暗城',
        1517: '奥达曼',
        1519: '暴风城',

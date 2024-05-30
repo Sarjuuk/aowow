@@ -21,7 +21,7 @@ SqlGen::register(new class extends SetupScript
               'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
               'creature spawns', Type::NPC],
 
-        2 => ['SELECT c.guid, 2 AS "type", c.id AS typeId, ABS(c.spawntimesecs) AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
+        2 => ['SELECT c.guid, 2 AS "type", c.id AS typeId, c.spawntimesecs AS respawn, c.phaseMask, c.zoneId AS areaId, c.map, 0 as pathId, c.position_y AS `posX`, c.position_x AS `posY` ' .
               'FROM gameobject c',
               'gameobject spawns', Type::OBJECT],
 
@@ -133,7 +133,8 @@ SqlGen::register(new class extends SetupScript
                 // cannot be placed, but we know the instanced map and can thus at least assign a zone
                 if (!$points && !in_array($spawn['map'], [0, 1, 530, 571]) && $idx < 5)
                 {
-                    $area = DB::Aowow()->selectCell('SELECT id FROM dbc_areatable WHERE mapId = ?d AND areaTable = 0', $spawn['map']);
+                    // use server calculated areaId if possible
+                    $area = $area ?: DB::Aowow()->selectCell('SELECT id FROM aowow_zones WHERE mapId = ?d AND parentArea = 0 AND (cuFlags & ?d) = 0', $spawn['map'], CUSTOM_EXCLUDE_FOR_LISTVIEW);
                     if (!$area)
                     {
                         CLI::write('tried to default GUID '.$spawn['guid'].' to instanced area by mapId, but returned empty [M:'.$spawn['map'].']', CLI::LOG_WARN);
@@ -149,13 +150,7 @@ SqlGen::register(new class extends SetupScript
                     continue;
                 }
                 else                                        // if areaId is set, area was determined by TC .. we're fine .. mostly
-                {
-                    // Black Temple and Sunwell floor offset bullshit
-                    if (in_array($spawn['map'], [564, 580]))
-                        $points[0]['floor']++;
-
                     $final = $area ? $points[0] : Game::checkCoords($points);
-                }
 
                 if ($idx < 5)
                 {

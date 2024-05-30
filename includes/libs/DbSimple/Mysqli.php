@@ -169,7 +169,7 @@ class DbSimple_Mysqli extends DbSimple_Database
         if ($this->link->warning_count) {
             if ($warn = $this->link->query("SHOW WARNINGS")) {
                 while ($warnRow = $warn->fetch_row())
-                    if ($warnRow[0] !== 'Note')
+                    if ($warnRow[0] === 'Warning')
                         $this->_setLastError(-$warnRow[1], $warnRow[2], $queryMain[0]);
 
                 $warn->close();

@@ -157,10 +157,13 @@ define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GRO
 
 // Locales
 define('LOCALE_EN',                         0);
+define('LOCALE_KR',                         1);             // unused
 define('LOCALE_FR',                         2);
 define('LOCALE_DE',                         3);
 define('LOCALE_CN',                         4);
+define('LOCALE_TW',                         5);             // unused
 define('LOCALE_ES',                         6);
+define('LOCALE_MX',                         7);             // unused
 define('LOCALE_RU',                         8);
 
 // red buttons on the top of the page
