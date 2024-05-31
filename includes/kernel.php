@@ -136,7 +136,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 
     if (Cfg::get('DEBUG') >= $logLevel)
     {
-        Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
+        Util::addNote($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $uGroup, $logLevel);
         if (CLI)
             CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & (E_WARNING | E_USER_WARNING | E_NOTICE | E_USER_NOTICE) ? CLI::LOG_WARN : CLI::LOG_ERROR);
     }
@@ -147,7 +147,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 // handle exceptions
 set_exception_handler(function ($e)
 {
-    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
+    Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',

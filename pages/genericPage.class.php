@@ -343,7 +343,7 @@ class GenericPage
         if (Cfg::get('MAINTENANCE') && !User::isInGroup(U_GROUP_EMPLOYEE))
             $this->maintenance();
         else if (Cfg::get('MAINTENANCE') && User::isInGroup(U_GROUP_EMPLOYEE))
-            Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
+            Util::addNote('Maintenance mode enabled!');
 
         // get errors from previous page from session and apply to template
         if (method_exists($this, 'applyCCErrors'))
@@ -602,9 +602,14 @@ class GenericPage
             $this->announcements = [];
 
         // display occured notices
-        if ($_ = Util::getNotes())
+        if (([$notes, $level] = Util::getNotes()) && $notes)
         {
-            array_unshift($_, 'One or more errors occured, while generating this page.');
+            array_unshift($notes, 'One or more issues occured, while generating this page.');
+            $colors = array(   // [border, text]
+                CLI::LOG_ERROR => ['C50F1F', 'E51223'],
+                CLI::LOG_WARN  => ['C19C00', 'E5B700'],
+                CLI::LOG_INFO  => ['3A96DD', '42ADFF']
+            );
 
             $this->announcements[0] = array(
                 'parent' => 'announcement-0',
@@ -612,8 +617,8 @@ class GenericPage
                 'mode'   => 1,
                 'status' => 1,
                 'name'   => 'internal error',
-                'style'  => 'color: #ff3333; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.Cfg::get('STATIC_URL').'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                'text'   => '[span]'.implode("[br]", $_).'[/span]'
+                'style'  => 'color: #'.($colors[$level][1] ?? 'fff').'; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.Cfg::get('STATIC_URL').'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #'.($colors[$level][0] ?? 'fff').';',
+                'text'   => '[span]'.implode("[br]", $notes).'[/span]'
             );
         }
 

@@ -544,20 +544,27 @@ abstract class Util
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
     private static $notes                   = [];
 
-    public static function addNote(int $uGroupMask, string $str) : void
+    public static function addNote(string $note, int $uGroupMask = U_GROUP_EMPLOYEE, int $level = CLI::LOG_ERROR) : void
     {
-        self::$notes[] = [$uGroupMask, $str];
+        self::$notes[] = [$note, $uGroupMask, $level];
     }
 
     public static function getNotes() : array
     {
         $notes = [];
+        $severity = CLI::LOG_INFO;
+        foreach (self::$notes as [$note, $uGroup, $level])
+        {
+            if ($uGroup && !User::isInGroup($uGroup))
+                continue;
 
-        foreach (self::$notes as $data)
-            if (!$data[0] || User::isInGroup($data[0]))
-                $notes[] = $data[1];
+            if ($level < $severity)
+                $severity = $level;
 
-        return $notes;
+            $notes[] = $note;
+        }
+
+        return [$notes, $severity];
     }
 
     private static $execTime = 0.0;
