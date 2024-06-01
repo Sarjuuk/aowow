@@ -677,7 +677,7 @@ class Lang
                 switch ($fmt)
                 {
                     case self::FMT_HTML:
-                        return '<span class="icontiny" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/'.Util::lower($iconName).'.gif)">';
+                        return '<span class="icontiny" style="background-image: url('.Cfg::get('STATIC_URL').'/images/wow/icons/tiny/'.Util::lower($iconName).'.gif)">';
                     case self::FMT_MARKUP:
                         return '[icon name='.Util::lower($iconName).']';
                     case self::FMT_RAW:

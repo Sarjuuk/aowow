@@ -996,7 +996,7 @@ abstract class Util
         }
 
         // is int string (is_numeric can only handle strings in base 10)
-        if (is_numeric($number) || preg_match('/0[xb]?\d+/', $number))
+        if (is_numeric($number) || preg_match('/^0[xb]?\d+/', $number))
         {
             $number = intVal($number, 0);                   // 'base 0' auto-detects base
             if ($typeCast == NUM_CAST_INT)
