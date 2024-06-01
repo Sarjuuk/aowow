@@ -37,7 +37,7 @@ class ProfilesPage extends GenericPage
 
         parent::__construct($pageCall, $pageParam);
 
-        if (!CFG_PROFILER_ENABLE)
+        if (!Cfg::get('PROFILER_ENABLE'))
             $this->error();
 
         $realms = [];
@@ -62,7 +62,7 @@ class ProfilesPage extends GenericPage
     protected function generateTitle()
     {
         if ($this->realm)
-            array_unshift($this->title, $this->realm,/* CFG_BATTLEGROUP,*/ Lang::profiler('regions', $this->region), Lang::game('profiles'));
+            array_unshift($this->title, $this->realm,/* Cfg::get('BATTLEGROUP'),*/ Lang::profiler('regions', $this->region), Lang::game('profiles'));
         else if ($this->region)
             array_unshift($this->title, Lang::profiler('regions', $this->region), Lang::game('profiles'));
         else
@@ -166,12 +166,12 @@ class ProfilesPage extends GenericPage
                     $tabData['visibleCols'][] = 'guildrank';
 
             // create note if search limit was exceeded
-            if ($this->filter['query'] && $profiles->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($this->filter['query'] && $profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound2', $this->sumSubjects, $profiles->getMatches());
                 $tabData['_truncated'] = 1;
             }
-            else if ($profiles->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            else if ($profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound', $this->sumSubjects, 0);
 
             if ($this->filterObj->useLocalList)

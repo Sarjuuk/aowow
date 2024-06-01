@@ -53,7 +53,7 @@ $lang = array(
         'or'            => " ou ",
         'back'          => "Redro",
         'reputationTip' => "Points de réputation",
-        'byUser'        => 'Par <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a> ',
+        'byUser'        => 'Par <a href="HOST_URL/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Aide",
         'status'        => "Statut",
         'yes'           => "Oui",
@@ -270,7 +270,7 @@ $lang = array(
         ),
         'error'         => array(
             'unkFormat'   => "Format d'image inconnu.",
-            'tooSmall'    => "Votre capture est bien trop petite. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'tooSmall'    => "Votre capture est bien trop petite. (&lt; CFG_SCREENSHOT_MIN_SIZE x CFG_SCREENSHOT_MIN_SIZE).",
             'selectSS'    => "Veuillez sélectionner la capture d'écran à envoyer.",
             'notAllowed'  => "Vous n'êtes pas autorisés à exporter des captures d'écran.",
         )
@@ -877,7 +877,7 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Cette adresse courriel est invalide.", // message_emailnotvalid
-        'emailNotFound' => "L'address email que vous avez entrée n'est pas associée à un compte.<br><br>Si vous avez oublié l'address email avec laquelle vous avez enregistré votre compte".CFG_CONTACT_EMAIL." pour obtenir de l'aide.",
+        'emailNotFound' => "L'address email que vous avez entrée n'est pas associée à un compte.<br><br>Si vous avez oublié l'address email avec laquelle vous avez enregistré votre compteCFG_CONTACT_EMAIL pour obtenir de l'aide.",
         'createAccSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour créer votre compte.",
         'recovUserSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour récupérer votre nom d'utilisateur.",
         'recovPassSent' => "Un email a été envoyé à <b>%s</b>. Suivez les instructions pour réinitialiser votre mot de passe.",
@@ -914,9 +914,9 @@ $lang = array(
         'posts'         => "Messages sur le forum",
         // user mail
         'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Activation de compte",             "Bienvenue sur ".CFG_NAME_SHORT."!\r\n\r\nCliquez sur le lien ci-dessous pour activer votre compte.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
-        'recoverUser'   => ["Récupération d'utilisateur",       "Suivez ce lien pour vous connecter.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
-        'resetPass'     => ["Réinitialisation du mot de passe", "Suivez ce lien pour réinitialiser votre mot de passe.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nSi vous n'avez pas fait de demande de réinitialisation, ignorez cet email."]
+        'accConfirm'    => ["Activation de compte",             "Bienvenue sur CFG_NAME_SHORT!\r\n\r\nCliquez sur le lien ci-dessous pour activer votre compte.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
+        'recoverUser'   => ["Récupération d'utilisateur",       "Suivez ce lien pour vous connecter.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
+        'resetPass'     => ["Réinitialisation du mot de passe", "Suivez ce lien pour réinitialiser votre mot de passe.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nSi vous n'avez pas fait de demande de réinitialisation, ignorez cet email."]
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",
@@ -1081,7 +1081,7 @@ $lang = array(
         'slain'         => "tué",
         'reqNumCrt'     => "Nécessite",
         'rfAvailable'   => "Disponibles sur les royaumes : ",
-        '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'cat'           => array(
                 1 => "Statistiques",                                                 21 => "Joueur contre Joueur",
                81 => "Tours de force",                                               92 => "Général",
@@ -1477,7 +1477,7 @@ $lang = array(
         '_inSlot'       => "dans l'emplacement",
         '_collapseAll'  => "Replier Tout",
         '_expandAll'    => "Déplier Tout",
-        '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Cet sort sera converti en <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         '_affected'     => "Sorts affectés",
         '_seeMore'      => "[See more]",
         '_rankRange'    => "Rang&nbsp;:&nbsp;%d&nbsp;-&nbsp;%d",
@@ -1838,7 +1838,7 @@ $lang = array(
         'tool'          => "Outil",
         'cost'          => "Coût",
         'content'       => "Contenu",
-        '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Cet objet n'est pas disponible pour les joueurs.",
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",

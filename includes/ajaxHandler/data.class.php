@@ -86,7 +86,7 @@ class AjaxData extends AjaxHandler
                 case 'item-scaling':
                 case 'realms':
                 case 'statistics':
-                    if (!Util::loadStaticFile($set, $result) && CFG_DEBUG)
+                    if (!Util::loadStaticFile($set, $result) && Cfg::get('DEBUG'))
                         $result .= "alert('could not fetch static data: ".$set."');";
 
                     $result .= "\n\n";
@@ -102,7 +102,7 @@ class AjaxData extends AjaxHandler
                 case 'enchants':
                 case 'itemsets':
                 case 'pets':
-                    if (!Util::loadStaticFile($set, $result, true) && CFG_DEBUG)
+                    if (!Util::loadStaticFile($set, $result, true) && Cfg::get('DEBUG'))
                         $result .= "alert('could not fetch static data: ".$set." for locale: ".User::$localeString."');";
 
                     $result .= "\n\n";

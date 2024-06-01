@@ -1,4 +1,4 @@
-                    <h2><img src="<?=STATIC_URL; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">Reminder</h2>
+                    <h2><img src="<?=Cfg::get('STATIC_URL'); ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">Reminder</h2>
                     Your screenshot will <b class="q10">not</b> be approved if it doesn't correspond to the following guidelines.
 
                     <ul>

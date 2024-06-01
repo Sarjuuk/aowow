@@ -126,8 +126,8 @@ trait TrProfiler
 
         $this->region = $cat[0];
 
-        // if ($cat[1] == Profiler::urlize(CFG_BATTLEGROUP))
-            // $this->battlegroup = CFG_BATTLEGROUP;
+        // if ($cat[1] == Profiler::urlize(Cfg::get('BATTLEGROUP')))
+            // $this->battlegroup = Cfg::get('BATTLEGROUP');
         if (isset($cat[1]))
         {
             foreach (Profiler::getRealms() as $rId => $r)
@@ -173,7 +173,7 @@ trait TrProfiler
             if ($this->realm)
                 $this->path[] = Profiler::urlize($this->realm, true);
             // else
-                // $this->path[] = Profiler::urlize(CFG_BATTLEGROUP);
+                // $this->path[] = Profiler::urlize(Cfg::get('BATTLEGROUP'));
         }
     }
 }
@@ -193,7 +193,7 @@ class GenericPage
 
     protected $jsGlobals    = [];
     protected $lvData       = [];
-    protected $title        = [CFG_NAME];                   // for title-Element
+    protected $title        = [];                           // for title-Element
     protected $name         = '';                           // for h1-Element
     protected $tabId        = null;
     protected $gDataKey     = false;                        // adds the dataKey to the user vars
@@ -272,6 +272,8 @@ class GenericPage
 
         $this->initRequestData();
 
+        $this->title[] = Cfg::get('NAME');
+
         if (!isset($this->contribute))
             $this->contribute = CONTRIBUTE_NONE;
 
@@ -279,8 +281,9 @@ class GenericPage
         if ($pageParam)
             $this->fullParams .= '='.$pageParam;
 
-        if (CFG_CACHE_DIR && Util::writeDir(CFG_CACHE_DIR))
-            $this->cacheDir = mb_substr(CFG_CACHE_DIR, -1) != '/' ? CFG_CACHE_DIR.'/' : CFG_CACHE_DIR;
+        $cacheDir = Cfg::get('CACHE_DIR');
+        if ($cacheDir && Util::writeDir($cacheDir))
+            $this->cacheDir = mb_substr($cacheDir, -1) != '/' ? $cacheDir.'/' : $cacheDir;
 
         // force page refresh
         if (isset($_GET['refresh']) && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_DEV))
@@ -337,10 +340,10 @@ class GenericPage
                 $this->forwardToSignIn($_SERVER['QUERY_STRING'] ?? '');
         }
 
-        if (CFG_MAINTENANCE && !User::isInGroup(U_GROUP_EMPLOYEE))
+        if (Cfg::get('MAINTENANCE') && !User::isInGroup(U_GROUP_EMPLOYEE))
             $this->maintenance();
-        else if (CFG_MAINTENANCE && User::isInGroup(U_GROUP_EMPLOYEE))
-            Util::addNote(U_GROUP_EMPLOYEE, 'Maintenance mode enabled!');
+        else if (Cfg::get('MAINTENANCE') && User::isInGroup(U_GROUP_EMPLOYEE))
+            Util::addNote('Maintenance mode enabled!');
 
         // get errors from previous page from session and apply to template
         if (method_exists($this, 'applyCCErrors'))
@@ -514,7 +517,7 @@ class GenericPage
             switch ($type)
             {
                 case SC_JS_FILE:
-                    $str = ($dynData ? HOST_URL : STATIC_URL).'/'.$str;
+                    $str = ($dynData ? Cfg::get('HOST_URL') : Cfg::get('STATIC_URL')).'/'.$str;
                 case SC_JS_STRING:
                     if ($flags & SC_FLAG_PREFIX)
                         array_unshift($this->js, [$type, $str]);
@@ -522,7 +525,7 @@ class GenericPage
                         $this->js[] = [$type, $str];
                     break;
                 case SC_CSS_FILE:
-                    $str = STATIC_URL.'/'.$str;
+                    $str = Cfg::get('STATIC_URL').'/'.$str;
                 case SC_CSS_STRING:
                     if ($flags & SC_FLAG_PREFIX)
                         array_unshift($this->css, [$type, $str]);
@@ -599,9 +602,14 @@ class GenericPage
             $this->announcements = [];
 
         // display occured notices
-        if ($_ = Util::getNotes())
+        if (([$notes, $level] = Util::getNotes()) && $notes)
         {
-            array_unshift($_, 'One or more errors occured, while generating this page.');
+            array_unshift($notes, 'One or more issues occured, while generating this page.');
+            $colors = array(   // [border, text]
+                CLI::LOG_ERROR => ['C50F1F', 'E51223'],
+                CLI::LOG_WARN  => ['C19C00', 'E5B700'],
+                CLI::LOG_INFO  => ['3A96DD', '42ADFF']
+            );
 
             $this->announcements[0] = array(
                 'parent' => 'announcement-0',
@@ -609,8 +617,8 @@ class GenericPage
                 'mode'   => 1,
                 'status' => 1,
                 'name'   => 'internal error',
-                'style'  => 'color: #ff3333; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.STATIC_URL.'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #C03030;',
-                'text'   => '[span]'.implode("[br]", $_).'[/span]'
+                'style'  => 'color: #'.($colors[$level][1] ?? 'fff').'; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.Cfg::get('STATIC_URL').'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #'.($colors[$level][0] ?? 'fff').';',
+                'text'   => '[span]'.implode("[br]", $notes).'[/span]'
             );
         }
 
@@ -959,7 +967,7 @@ class GenericPage
 
             $this->initJSGlobal($type);
 
-            $obj = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', array_unique($ids, SORT_NUMERIC)]]);
+            $obj = Type::newList($type, [Cfg::get('SQL_LIMIT_NONE'), ['id', array_unique($ids, SORT_NUMERIC)]]);
             if (!$obj)
                 continue;
 
@@ -981,7 +989,7 @@ class GenericPage
         if ($this->mode == CACHE_TYPE_NONE)
             return;
 
-        if (!CFG_CACHE_MODE || CFG_DEBUG)
+        if (!Cfg::get('CACHE_MODE') || Cfg::get('DEBUG'))
             return;
 
         $noCache = ['coError', 'ssError', 'viError'];
@@ -1004,7 +1012,7 @@ class GenericPage
         else
             $cache = $saveString;
 
-        if (CFG_CACHE_MODE & CACHE_MODE_MEMCACHED)
+        if (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED)
         {
             // on &refresh also clear related
             if ($this->skipCache == CACHE_MODE_MEMCACHED)
@@ -1030,7 +1038,7 @@ class GenericPage
             $this->memcached()->set($cKey, $data);
         }
 
-        if (CFG_CACHE_MODE & CACHE_MODE_FILECACHE)
+        if (Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE)
         {
             $data  = time()." ".AOWOW_REVISION." ".($saveString ? '1' : '0')."\n";
             $data .= gzcompress($saveString ? $cache : serialize($cache), 9);
@@ -1062,27 +1070,27 @@ class GenericPage
         if ($this->mode == CACHE_TYPE_NONE)
             return false;
 
-        if (!CFG_CACHE_MODE || CFG_DEBUG)
+        if (!Cfg::get('CACHE_MODE') || Cfg::get('DEBUG'))
             return false;
 
         $cKey = $this->generateCacheKey();
         $rev = $type = $cache = $data = null;
 
-        if ((CFG_CACHE_MODE & CACHE_MODE_MEMCACHED) && !($this->skipCache & CACHE_MODE_MEMCACHED))
+        if ((Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED) && !($this->skipCache & CACHE_MODE_MEMCACHED))
         {
             if ($cache = $this->memcached()->get($cKey))
             {
                 $type = $cache['isString'];
                 $data = $cache['data'];
 
-                if ($cache['timestamp'] + CFG_CACHE_DECAY <= time() || $cache['revision'] != AOWOW_REVISION)
+                if ($cache['timestamp'] + Cfg::get('CACHE_DECAY') <= time() || $cache['revision'] != AOWOW_REVISION)
                     $cache = null;
                 else
                     $this->cacheLoaded = [CACHE_MODE_MEMCACHED, $cache['timestamp']];
             }
         }
 
-        if (!$cache && (CFG_CACHE_MODE & CACHE_MODE_FILECACHE) && !($this->skipCache & CACHE_MODE_FILECACHE))
+        if (!$cache && (Cfg::get('CACHE_MODE') & CACHE_MODE_FILECACHE) && !($this->skipCache & CACHE_MODE_FILECACHE))
         {
             if (!file_exists($this->cacheDir.$cKey))
                 return false;
@@ -1098,7 +1106,7 @@ class GenericPage
 
             [$time, $rev, $type] = explode(' ', $cache[0]);
 
-            if ($time + CFG_CACHE_DECAY <= time() || $rev != AOWOW_REVISION)
+            if ($time + Cfg::get('CACHE_DECAY') <= time() || $rev != AOWOW_REVISION)
                 $cache = null;
             else
             {
@@ -1131,7 +1139,7 @@ class GenericPage
 
     private function memcached() : Memcached
     {
-        if (!$this->memcached && (CFG_CACHE_MODE & CACHE_MODE_MEMCACHED))
+        if (!$this->memcached && (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED))
         {
             $this->memcached = new Memcached();
             $this->memcached->addServer('localhost', 11211);

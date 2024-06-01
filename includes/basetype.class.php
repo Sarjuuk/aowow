@@ -59,7 +59,7 @@ abstract class BaseType
     {
         $where     = [];
         $linking   = ' AND ';
-        $limit     = CFG_SQL_LIMIT_DEFAULT;
+        $limit     = Cfg::get('SQL_LIMIT_DEFAULT');
 
         if (!$this->queryBase || $conditions === null)
             return;
@@ -859,9 +859,9 @@ trait sourceHelper
     protected $sources    = [];
     protected $sourceMore = null;
 
-    public function getSources(?array &$s, ?array &$sm) : bool
+    public function getSources(?array &$s = [], ?array &$sm = []) : bool
     {
-        $s = $sm = null;
+        $s = $sm = [];
         if (empty($this->sources[$this->id]))
             return false;
 
@@ -875,7 +875,7 @@ trait sourceHelper
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $ids]]);
+                $this->sourceMore[$type] = Type::newList($type, [Cfg::get('SQL_LIMIT_NONE'), ['id', $ids]]);
         }
 
         $s = array_keys($this->sources[$this->id]);

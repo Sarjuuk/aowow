@@ -55,9 +55,9 @@ class AreaTriggersPage extends GenericPage
             $tabData['data'] = array_values($trigger->getListviewData());
 
             // create note if search limit was exceeded; overwriting 'note' is intentional
-            if ($trigger->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($trigger->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', CFG_SQL_LIMIT_DEFAULT);
+                $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', Cfg::get('SQL_LIMIT_DEFAULT'));
                 $tabData['_truncated'] = 1;
             }
 

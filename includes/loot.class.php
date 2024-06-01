@@ -137,20 +137,21 @@ class Loot
         return array_combine($retKeys, $retData);
     }
 
-    private function getByContainerRecursive(string $tableName, int $lootId, array &$handledRefs, int $groupId = 0, float $baseChance = 1.0) : ?array
+    private function getByContainerRecursive(string $tableName, int $lootId, array &$handledRefs, int $groupId = 0, float $baseChance = 1.0) : array
     {
         $loot     = [];
         $rawItems = [];
 
         if (!$tableName || !$lootId)
-            return null;
+            return [null, null];
 
         $rows = DB::World()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, $lootId, $groupId ?: DBSIMPLE_SKIP);
         if (!$rows)
-            return null;
+            return [null, null];
 
         $groupChances = [];
         $nGroupEquals = [];
+        $cnd = new Conditions();
         foreach ($rows as $entry)
         {
             $set = array(
@@ -160,6 +161,11 @@ class Loot
                 'realChanceMod' => $baseChance,
                 'groupChance'   => 0
             );
+
+            if ($entry['QuestRequired'])
+                foreach (DB::Aowow()->selectCol('SELECT id FROM ?_quests WHERE (`reqSourceItemId1` = ?d OR `reqSourceItemId2` = ?d OR `reqSourceItemId3` = ?d OR `reqSourceItemId4` = ?d OR `reqItemId1` = ?d OR `reqItemId2` = ?d OR `reqItemId3` = ?d OR `reqItemId4` = ?d OR `reqItemId5` = ?d OR `reqItemId6` = ?d) AND (`cuFlags` & ?d) = 0',
+                    $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE) as $questId)
+                    $cnd->addExternalCondition(Conditions::lootTableToConditionSource($tableName), $lootId . ':' . $entry['Item'], [Conditions::QUESTTAKEN, $questId]);
 
             // if ($entry['LootMode'] > 1)
             // {
@@ -240,7 +246,8 @@ class Loot
                 continue;
             }
 
-            $loot[] = $set;
+            $cndKey = $lootId . ':' . (-1 * ($set['reference'] ?? -$set['content']));
+            $loot[$cndKey] = $set;
         }
 
         foreach (array_keys($nGroupEquals) as $k)
@@ -257,6 +264,12 @@ class Loot
             $groupChances[$k] = (100 - $sum) / ($nGroupEquals[$k] ?: 1);
         }
 
+        if ($cnd->getBySourceGroup($lootId, Conditions::lootTableToConditionSource($tableName)))
+        {
+            self::storeJSGlobals($cnd->getJsGlobals());
+            $cnd->toListviewColumn($loot, $this->extraCols);
+        }
+
         return [$loot, array_unique($rawItems)];
     }
 
@@ -268,10 +281,6 @@ class Loot
             return false;
 
         /*
-            todo (high): implement conditions on loot (and conditions in general)
-
-        also
-
             // if (is_array($this->entry) && in_array($table, [LOOT_CREATURE, LOOT_GAMEOBJECT])
                 // iterate over the 4 available difficulties and assign modes
 
@@ -279,16 +288,16 @@ class Loot
             modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
         */
         $handledRefs = [];
-        $struct = self::getByContainerRecursive($table, $this->entry, $handledRefs);
-        if (!$struct)
+        [$lootRows, $itemIds] = self::getByContainerRecursive($table, $this->entry, $handledRefs);
+        if (!$lootRows)
             return false;
 
-        $items = new ItemList(array(['i.id', $struct[1]], CFG_SQL_LIMIT_NONE));
-        $this->jsGlobals = $items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED);
+        $items = new ItemList(array(['i.id', $itemIds], Cfg::get('SQL_LIMIT_NONE')));
+        self::storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         $foo = $items->getListviewData();
 
         // assign listview LV rows to loot rows, not the other way round! The same item may be contained multiple times
-        foreach ($struct[0] as $loot)
+        foreach ($lootRows as $loot)
         {
             $base = array(
                 'percent' => round($loot['groupChance'] * $loot['realChanceMod'], 3),
@@ -302,6 +311,9 @@ class Loot
 
             if ($_ = $loot['parentRef'])
                 $base['reference'] = $_;
+
+            if (isset($loot['condition']))
+                $base['condition'] = $loot['condition'];
 
             if ($_ = self::createStack($loot))
                 $base['pctstack'] = $_;
@@ -386,12 +398,15 @@ class Loot
         return true;
     }
 
-    public function getByItem(int $entry, int $maxResults = CFG_SQL_LIMIT_DEFAULT, array $lootTableList = []) : bool
+    public function getByItem(int $entry, int $maxResults = -1, array $lootTableList = []) : bool
     {
-        $this->entry = intVal($entry);
+        $this->entry = $entry;
 
         if (!$this->entry)
             return false;
+
+        if ($maxResults < 0)
+            $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
 
         //  [fileName, tabData, tabName, tabId, extraCols, hiddenCols, visibleCols]
         $tabsFinal  = array(
@@ -442,6 +457,16 @@ class Loot
             $this->entry
         );
 
+    /*  i'm currently not seeing a reasonable way to blend this into creature/gobject/etc tabs as one entity may drop the same item multiple times, with and without conditions.
+        if ($newRefs)
+        {
+            $cnd = new Conditions();
+            if ($cnd->getBySourceEntry($this->entry, Conditions::SRC_REFERENCE_LOOT_TEMPLATE))
+                if ($cnd->toListviewColumn($newRefs, $x, $this->entry))
+                    self::storejsGlobals($cnd->getJsGlobals());
+        }
+    */
+
         while ($newRefs)
         {
             $curRefs = $newRefs;
@@ -457,14 +482,17 @@ class Loot
         /*
             search the real loot-templates for the itemId and gathered refds
         */
-        for ($i = 1; $i < count($this->lootTemplates); $i++)
+        foreach ($this->lootTemplates as $lootTemplate)
         {
-            if ($lootTableList && !in_array($this->lootTemplates[$i], $lootTableList))
+            if ($lootTableList && !in_array($lootTemplate, $lootTableList))
+                continue;
+
+            if ($lootTemplate == LOOT_REFERENCE)
                 continue;
 
             $result = $this->calcChance(DB::World()->select(
                 sprintf($query, '{lt1.reference IN (?a) OR }(lt1.reference = 0 AND lt1.item = ?d)'),
-                $this->lootTemplates[$i], $this->lootTemplates[$i],
+                $lootTemplate, $lootTemplate,
                 $refResults ? array_keys($refResults) : DBSIMPLE_SKIP,
                 $this->entry
             ));
@@ -480,10 +508,10 @@ class Loot
             }
 
             // cap fetched entries to the sql-limit to guarantee, that the highest chance items get selected first
-            // screws with GO-loot and skinnig-loot as these templates are shared for several tabs (fish, herb, ore) (herb, ore, leather)
+            // screws with GO-loot and skinning-loot as these templates are shared for several tabs (fish, herb, ore) (herb, ore, leather)
             $ids = array_slice(array_keys($result), 0, $maxResults);
 
-            switch ($this->lootTemplates[$i])
+            switch ($lootTemplate)
             {
                 case LOOT_CREATURE:     $field = 'lootId';              $tabId =  4;    break;
                 case LOOT_PICKPOCKET:   $field = 'pickpocketLootId';    $tabId =  5;    break;

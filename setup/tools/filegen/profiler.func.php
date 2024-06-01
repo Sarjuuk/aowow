@@ -63,7 +63,7 @@ if (!CLI)
             $questorder = [];
             $questtotal = [];
             $condition  = [
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 'AND',
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
                 [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE | QUEST_FLAG_AUTO_REWARDED, '&'], 0],
@@ -151,7 +151,7 @@ if (!CLI)
         {
             $success   = true;
             $condition = array(
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             );
             $titlez = new TitleList($condition);
@@ -193,14 +193,14 @@ if (!CLI)
         {
             $success   = true;
             $condition = array(
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
                 ['typeCat', -5],
                 ['castTime', 0, '!']
             );
             $mountz = new SpellList($condition);
 
-            $conditionSet = DB::World()->selectCol('SELECT SourceEntry AS ARRAY_KEY, ConditionValue1 FROM conditions WHERE SourceTypeOrReferenceId = ?d AND ConditionTypeOrReference = ?d AND SourceEntry IN (?a)', CND_SRC_SPELL, CND_SKILL, $mountz->getFoundIDs());
+            $conditionSet = DB::World()->selectCol('SELECT SourceEntry AS ARRAY_KEY, ConditionValue1 FROM conditions WHERE SourceTypeOrReferenceId = ?d AND ConditionTypeOrReference = ?d AND SourceEntry IN (?a)', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
 
             // get mounts for exclusion
             foreach ($conditionSet as $mount => $skill)
@@ -212,7 +212,7 @@ if (!CLI)
             }
 
             foreach ($mountz->iterate() as $id => $_)
-                if (!$mountz->getSources($__, $___))
+                if (!$mountz->getSources())
                     $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
             foreach (CLISetup::$localeIds as $l)
@@ -253,7 +253,7 @@ if (!CLI)
         {
             $success   = true;
             $condition = array(
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
                 ['typeCat', -6]
             );
@@ -261,7 +261,7 @@ if (!CLI)
             $legit      = DB::Aowow()->selectCol('SELECT `spellId2` FROM ?_items WHERE `class` = ?d AND `subClass` = ?d AND `spellId1` IN (?a) AND `spellId2` IN (?a)', ITEM_CLASS_MISC, 2, LEARN_SPELLS, $companionz->getFoundIDs());
 
             foreach ($companionz->iterate() as $id => $_)
-                if (!$companionz->getSources($__, $___))
+                if (!$companionz->getSources())
                     $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
             foreach (CLISetup::$localeIds as $l)
@@ -297,7 +297,7 @@ if (!CLI)
         {
             $success   = true;
             $condition = array(                             // todo (med): exclude non-gaining reputation-header
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
             );
             $factionz = new FactionList($condition);
@@ -331,7 +331,7 @@ if (!CLI)
             $skills  = array_merge(SKILLS_TRADE_PRIMARY, [[185, 129, 356]]);
             $success = true;
             $baseCnd = array(
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
                 ['effect1Id', [6, 45, 57, 127, 33, 158, 99, 28, 95], '!'],  // aura, tradeSkill, Tracking, Prospecting, Decipher, Milling, Disenchant, Summon (Engineering), Skinning
                 ['effect2Id', [118, 60], '!'],                              // not the skill itself
@@ -346,7 +346,7 @@ if (!CLI)
                 $created = '';
                 foreach ($recipez->iterate() as $id => $__)
                 {
-                    if (!$recipez->getSources($__, $___))
+                    if (!$recipez->getSources())
                         $exAdd(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
                     foreach ($recipez->canCreateItem() as $idx)
@@ -397,7 +397,7 @@ if (!CLI)
         {
             $success   = true;
             $condition = array(
-                CFG_SQL_LIMIT_NONE,
+                Cfg::get('SQL_LIMIT_NONE'),
                 [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
                 [['flags', 1, '&'], 0],                     // no statistics
             );

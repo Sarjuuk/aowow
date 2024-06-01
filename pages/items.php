@@ -231,7 +231,7 @@ class ItemsPage extends GenericPage
         $nameSource = [];
         $grouping   = isset($this->filter['gb']) ? $this->filter['gb'] : null;
         $extraOpts  = [];
-        $maxResults = CFG_SQL_LIMIT_DEFAULT;
+        $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
 
         switch ($grouping)
         {
@@ -409,7 +409,7 @@ class ItemsPage extends GenericPage
             }
             else if ($items->getMatches() > $maxResults)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                 $tabData['_truncated'] = 1;
             }
 

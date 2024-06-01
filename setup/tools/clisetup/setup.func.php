@@ -27,8 +27,8 @@ function setup() : void
     $upd   = [[], []];                                      // ref to pass commands from 'update' to 'sync'
     $steps = array(
         // clisetup, params, test function, introText, errorText
-        ['dbconfig',          [null],                     'testDB',    'Please enter your database credentials.', 'could not establish connection to:'],
-        ['siteconfig',        [null],                     'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.', 'could not access:'],
+        ['dbconfig',          [null, null],               'testDB',    'Please enter your database credentials.', 'could not establish connection to:'],
+        ['siteconfig',        [null, null],               'testSelf',  'SITE_HOST and STATIC_HOST '.CLI::bold('must').' be set. Also enable FORCE_SSL if needed. You may also want to change other variables such as NAME, NAME_SHORT or LOCALES.', 'could not access:'],
         // sql- and build- stuff here
         ['SqlGen::generate',  'areatrigger',              null, null, null],
         ['SqlGen::generate',  'achievementcriteria',      null, null, null],
@@ -103,7 +103,7 @@ function setup() : void
         // apply sql-updates from repository
         ['update',            &$upd,                      null, null, null],
         ['sync',              &$upd,                      null, null, null],
-        ['account',           [null],                    'testAcc',  'Please create your admin account.', 'There is no user with administrator privileges in the DB.']
+        ['account',           [null, null],               'testAcc',  'Please create your admin account.', 'There is no user with administrator privileges in the DB.']
     );
 
 
@@ -174,11 +174,10 @@ function setup() : void
             return false;
         }
 
-        $res   = DB::Aowow()->selectCol('SELECT `key` AS ARRAY_KEY, value FROM ?_config WHERE `key` IN ("site_host", "static_host", "force_ssl")');
-        $prot  = $res['force_ssl'] ? 'https://' : 'http://';
+        $prot  = Cfg::get('FORCE_SSL') ? 'https://' : 'http://';
         $cases = array(
-            'site_host'   => [$prot, $res['site_host'],   '/README.md'],
-            'static_host' => [$prot, $res['static_host'], '/css/aowow.css']
+            'site_host'   => [$prot, Cfg::get('SITE_HOST'),   '/README.md'],
+            'static_host' => [$prot, Cfg::get('STATIC_HOST'), '/css/aowow.css']
         );
 
         foreach ($cases as $conf => [$protocol, $host, $testFile])
@@ -195,8 +194,8 @@ function setup() : void
                             $error[] = ' * '.$protocol.$host.$testFile.' ['.$resp.']';
                         else
                         {
-                            DB::Aowow()->query('UPDATE ?_config SET `value` = ?  WHERE `key` = ?', $host, $conf);
-                            DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "force_ssl"', intVal($protocol == 'https://'));
+                            Cfg::set($conf, $host);
+                            Cfg::set('FORCE_SSL', $protocol == 'https://');
                         }
 
                         CLI::write();
@@ -290,7 +289,7 @@ function setup() : void
             CLI::write($step[3]);
 
             $inp = ['x' => ['Press any key to continue', true]];
-            if (!CLI::read($inp, true))                // we don't actually care about the input
+            if (!CLI::read($inp, true))                     // we don't actually care about the input
                 return;
         }
 
@@ -301,7 +300,7 @@ function setup() : void
             else
             {
                 $args = &$step[1];                          // see: https://github.com/php/php-src/issues/14202
-                $res = $step[0]($args);
+                $res = $step[0]($args[0], $args[1]);
             }
 
             // check script result

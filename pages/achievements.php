@@ -105,9 +105,9 @@ class AchievementsPage extends GenericPage
                 $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
             // create note if search limit was exceeded
-            if ($acvList->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($acvList->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                 $tabData['_truncated'] = 1;
             }
 

@@ -178,7 +178,7 @@ class SpellList extends BaseType
         }
 
         if ($foo)
-            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], CFG_SQL_LIMIT_NONE));
+            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], Cfg::get('SQL_LIMIT_NONE')));
     }
 
     // use if you JUST need the name

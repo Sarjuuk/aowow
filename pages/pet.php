@@ -114,7 +114,7 @@ class PetPage extends GenericPage
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
-        $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list], CFG_SQL_LIMIT_NONE));
+        $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list], Cfg::get('SQL_LIMIT_NONE')));
         $this->extendGlobalData($food->getJSGlobals());
 
         $this->lvTabs[] = [ItemList::$brickFile, array(

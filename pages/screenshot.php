@@ -23,7 +23,7 @@ class ScreenshotPage extends GenericPage
     private   $tmpPath     = 'static/uploads/temp/';
     private   $pendingPath = 'static/uploads/screenshots/pending/';
     private   $destination = null;
-    private   $minSize     = CFG_SCREENSHOT_MIN_SIZE;
+    private   $minSize     = 200;
     private   $command     = '';
 
     protected $validCats   = ['add', 'crop', 'complete', 'thankyou'];
@@ -43,11 +43,10 @@ class ScreenshotPage extends GenericPage
         $this->name    = Lang::screenshot('submission');
         $this->command = $pageParam;
 
-        if ($this->minSize <= 0)
-        {
-            trigger_error('config error: dimensions for uploaded screenshots equal or less than zero. Value forced to 200', E_USER_WARNING);
-            $this->minSize = 200;
-        }
+        if ($ms = Cfg::get('SCREENSHOT_MIN_SIZE'))
+            $this->minSize = abs($ms);
+        else
+            trigger_error('config error: Invalid value for minimum screenshot dimensions. Value forced to '.$this->minSize, E_USER_WARNING);
 
         // get screenshot destination
         // target delivered as screenshot=<command>&<type>.<typeId>.<hash:16> (hash is optional)
@@ -194,7 +193,7 @@ class ScreenshotPage extends GenericPage
         // r: x <= 488 && y <= 325  while x proportional to y
         // mincrop is optional and specifies the minimum resulting image size
         $this->cropper = [
-            'url'     => STATIC_URL.'/uploads/temp/'.$this->ssName().'.jpg',
+            'url'     => Cfg::get('STATIC_URL').'/uploads/temp/'.$this->ssName().'.jpg',
             'parent'  => 'ss-container',
             'oWidth'  => $oSize[0],
             'rWidth'  => $rSize[0],

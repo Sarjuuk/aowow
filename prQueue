@@ -40,12 +40,12 @@ $error = function ($type, $realmGUID, $realmId)
 };
 
 
-// if (CFG_PROFILER_ENABLE) - wont work because it is not redefined if changed in config
-while (DB::Aowow()->selectCell('SELECT value FROM ?_config WHERE `key` = "profiler_enable"'))
+while (Cfg::get('PROFILER_ENABLE', true))
 {
-    if (($tDiff = (microtime(true) - $tCycle)) < (CFG_PROFILER_QUEUE_DELAY / 1000))
+    $delay = Cfg::get('PROFILER_QUEUE_DELAY') / 1000;
+    if (($tDiff = (microtime(true) - $tCycle)) < $delay)
     {
-        $wait = (CFG_PROFILER_QUEUE_DELAY / 1000) - $tDiff;
+        $wait = $delay - $tDiff;
         CLI::write('sleeping '.Lang::nf($wait, 2).'s..');
         usleep($wait * 1000 * 1000);
     }

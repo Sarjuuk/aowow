@@ -443,8 +443,8 @@ class ItemPage extends genericPage
                 foreach ($lvData as $sId => &$data)
                 {
                     $data['percent'] = $perfItem[$sId]['perfectCreateChance'];
-                    $data['condition'][0][$this->typeId] = [[[CND_SPELL, $perfItem[$sId]['requiredSpecialization']]]];
-                    $this->extendGlobalIDs(Type::SPELL, $perfItem[$sId]['requiredSpecialization']);
+                    if (Conditions::extendListviewRow($data, Conditions::SRC_NONE, $this->typeId, [Conditions::SPELL, $perfItem[$sId]['requiredSpecialization']]))
+                        $this->extendGlobalIDs(Type::SPELL, $perfItem[$sId]['requiredSpecialization']);
                 }
 
                 $this->lvTabs[] = [SpellList::$brickFile, array(
@@ -471,7 +471,6 @@ class ItemPage extends genericPage
                 if ($idx == 16)
                     $createdBy = array_column($tabData['data'], 'id');
 
-                $s = $sm = null;
                 if ($idx == 4 && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
                 {
                     switch ($sm[0]['dd'])
@@ -492,80 +491,40 @@ class ItemPage extends genericPage
 
         // tabs: this item contains..
         $sourceFor = array(
-             [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          , []],
-             [LOOT_PROSPECTING, $this->subject->id,                       '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
-             [LOOT_MILLING,     $this->subject->id,                       '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []],
-             [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel'], []]
+             [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
+             [LOOT_PROSPECTING, $this->subject->id,                       '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+             [LOOT_MILLING,     $this->subject->id,                       '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+             [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
         );
 
-        $reqQuest = [];
-        foreach ($sourceFor as $sf)
+        foreach ($sourceFor as [$lootTemplate, $lootId, $tabName, $tabId, $extraCols, $hiddenCols])
         {
             $lootTab = new Loot();
-            if ($lootTab->getByContainer($sf[0], $sf[1]))
+            if ($lootTab->getByContainer($lootTemplate, $lootId))
             {
                 $this->extendGlobalData($lootTab->jsGlobals);
-                $sf[4] = array_merge($sf[4], $lootTab->extraCols);
-
-                foreach ($lootTab->iterate() as $lv)
-                {
-                    if (!$lv['quest'])
-                        continue;
-
-                    $sf[4] = array_merge($sf[4], ['$Listview.extraCols.condition']);
-
-                    $reqQuest[$lv['id']] = 0;
-
-                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
-                }
+                $extraCols = array_merge($extraCols, $lootTab->extraCols);
 
                 $tabData = array(
                     'data' => array_values($lootTab->getResult()),
-                    'name' => $sf[2],
-                    'id'   => $sf[3],
+                    'name' => $tabName,
+                    'id'   => $tabId,
                 );
 
-                if ($sf[4])
-                    $tabData['extraCols']   = array_unique($sf[4]);
+                if ($extraCols)
+                    $tabData['extraCols']  = array_unique($extraCols);
 
-                if ($sf[5])
-                    $tabData['hiddenCols']  = array_unique($sf[5]);
-
-                if ($sf[6])
-                    $tabData['visibleCols'] = array_unique($sf[6]);
+                if ($hiddenCols)
+                    $tabData['hiddenCols'] = array_unique($hiddenCols);
 
                 $this->lvTabs[] = [ItemList::$brickFile, $tabData];
-            }
-        }
-
-        if ($reqIds = array_keys($reqQuest))                // apply quest-conditions as back-reference
-        {
-            $conditions = array(
-                'OR',
-                ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
-                ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
-                ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
-                ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
-            );
-
-            $reqQuests = new QuestList($conditions);
-            $reqQuests->getJSGlobals(GLOBALINFO_SELF);
-
-            foreach ($reqQuests->iterate() as $qId => $__)
-            {
-                if (empty($reqQuests->requires[$qId][Type::ITEM]))
-                    continue;
-
-                foreach ($reqIds as $rId)
-                    if (in_array($rId, $reqQuests->requires[$qId][Type::ITEM]))
-                        $reqQuest[$rId] = $reqQuests->id;
             }
         }
 
         // tab: container can contain
         if ($this->subject->getField('slots') > 0)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], CFG_SQL_LIMIT_NONE));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], Cfg::get('SQL_LIMIT_NONE')));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -586,7 +545,7 @@ class ItemPage extends genericPage
         // tab: can be contained in (except keys)
         else if ($_bagFamily != 0x0100)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], CFG_SQL_LIMIT_NONE));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], Cfg::get('SQL_LIMIT_NONE')));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -795,7 +754,7 @@ class ItemPage extends genericPage
 
                 $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
-                $holidays = [];
+                $cnd = new Conditions();
                 foreach ($sbData as $k => &$row)
                 {
                     $currency = [];
@@ -817,13 +776,7 @@ class ItemPage extends genericPage
                     $row['cost']  = [empty($vendors[$k][0][0]) ? 0 : $vendors[$k][0][0]];
 
                     if ($e = $vendors[$k][0]['event'])
-                    {
-                        if (count($extraCols) == 3)
-                            $extraCols[] = '$Listview.extraCols.condition';
-
-                        $this->extendGlobalIds(Type::WORLDEVENT, $e);
-                        $row['condition'][0][$this->typeId][] = [[CND_ACTIVE_EVENT, $e]];
-                    }
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $k, [Conditions::ACTIVE_EVENT, $e]);
 
                     if ($currency || $tokens)               // fill idx:3 if required
                         $row['cost'][] = $currency;
@@ -841,6 +794,8 @@ class ItemPage extends genericPage
                         $row['stack'] = $x;
                 }
 
+                if ($cnd->toListviewColumn($sbData, $extraCols))
+                    $this->extendGlobalData($cnd->getJsGlobals());
 
                 $this->lvTabs[] = [CreatureList::$brickFile, array(
                     'data'       => array_values($sbData),
@@ -1102,11 +1057,11 @@ class ItemPage extends genericPage
             }
 
             // itemsource
-            if ($this->subject->getSources($s, $m))
+            if ($this->subject->getSources($s, $sm))
             {
                 $json['source'] = $s;
-                if ($m)
-                    $json['sourcemore'] = $m;
+                if ($sm)
+                    $json['sourcemore'] = $sm;
             }
 
             $xml->addChild('json')->addCData(substr(json_encode($json), 1, -1));
@@ -1193,7 +1148,7 @@ class ItemPage extends genericPage
             }
 
             // link
-            $xml->addChild('link', HOST_URL.'?item='.$this->subject->id);
+            $xml->addChild('link', Cfg::get('HOST_URL').'?item='.$this->subject->id);
         }
 
         return $root->asXML();

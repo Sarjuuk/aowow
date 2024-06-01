@@ -41,7 +41,7 @@ class User
         // check IP bans
         if ($ipBan = DB::Aowow()->selectRow('SELECT count, unbanDate FROM ?_account_bannedips WHERE ip = ? AND type = 0', self::$ip))
         {
-            if ($ipBan['count'] > CFG_ACC_FAILED_AUTH_COUNT && $ipBan['unbanDate'] > time())
+            if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['unbanDate'] > time())
                 return false;
             else if ($ipBan['unbanDate'] <= time())
                 DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE ip = ?', self::$ip);
@@ -193,11 +193,12 @@ class User
         }
 
         // check; pick first viable if failed
-        if (CFG_LOCALES && !(CFG_LOCALES & (1 << $loc)))
+        $allowedLoc = Cfg::get('LOCALES');
+        if ($allowedLoc && !($allowedLoc & (1 << $loc)))
         {
             foreach (Util::$localeStrings as $idx => $__)
             {
-                if (CFG_LOCALES & (1 << $idx))
+                if ($allowedLoc & (1 << $idx))
                 {
                     $loc = $idx;
                     break;
@@ -236,7 +237,7 @@ class User
         $user = 0;
         $hash = '';
 
-        switch (CFG_ACC_AUTH_MODE)
+        switch (Cfg::get('ACC_AUTH_MODE'))
         {
             case AUTH_MODE_SELF:
             {
@@ -246,11 +247,11 @@ class User
                 // handle login try limitation
                 $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 0 AND ip = ?', self::$ip);
                 if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, CFG_ACC_FAILED_AUTH_BLOCK);
+                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
                 else                                        // entry already exists; increment count
-                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', CFG_ACC_FAILED_AUTH_BLOCK, self::$ip);
+                    DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ?', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
 
-                if ($ip && $ip['count'] >= CFG_ACC_FAILED_AUTH_COUNT && $ip['unbanDate'] >= time())
+                if ($ip && $ip['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ip['unbanDate'] >= time())
                     return AUTH_IPBANNED;
 
                 $query = DB::Aowow()->SelectRow('
@@ -406,12 +407,12 @@ class User
         // different auth modes require different usernames
         $min = 0;                                           // external case
         $max = 0;
-        if (CFG_ACC_AUTH_MODE == AUTH_MODE_SELF)
+        if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF)
         {
             $min = 4;
             $max = 16;
         }
-        else if (CFG_ACC_AUTH_MODE == AUTH_MODE_REALM)
+        else if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_REALM)
         {
             $min = 3;
             $max = 32;
@@ -430,7 +431,7 @@ class User
         $errCode = 0;
 
         // only enforce for own passwords
-        if (mb_strlen($pass) < 6 && CFG_ACC_AUTH_MODE == AUTH_MODE_SELF)
+        if (mb_strlen($pass) < 6 && Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF)
             $errCode = 1;
      // else if (preg_match('/[^\w\d!"#\$%]/', $pass))    // such things exist..? :o
          // $errCode = 2;
@@ -443,7 +444,7 @@ class User
         $_SESSION['user']    = self::$id;
         $_SESSION['hash']    = self::$passHash;
         $_SESSION['locale']  = self::$localeId;
-        $_SESSION['timeout'] = self::$expires ? time() + CFG_SESSION_TIMEOUT_DELAY : 0;
+        $_SESSION['timeout'] = self::$expires ? time() + Cfg::get('SESSION_TIMEOUT_DELAY') : 0;
         // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
     }
 
@@ -475,7 +476,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
             return false;
 
-        return self::$perms || self::$reputation >= CFG_REP_REQ_COMMENT;
+        return self::$perms || self::$reputation >= Cfg::get('REP_REQ_COMMENT');
     }
 
     public static function canReply()
@@ -483,7 +484,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
             return false;
 
-        return self::$perms || self::$reputation >= CFG_REP_REQ_REPLY;
+        return self::$perms || self::$reputation >= Cfg::get('REP_REQ_REPLY');
     }
 
     public static function canUpvote()
@@ -491,7 +492,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
             return false;
 
-        return self::$perms || (self::$reputation >= CFG_REP_REQ_UPVOTE && self::$dailyVotes > 0);
+        return self::$perms || (self::$reputation >= Cfg::get('REP_REQ_UPVOTE') && self::$dailyVotes > 0);
     }
 
     public static function canDownvote()
@@ -499,7 +500,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
             return false;
 
-        return self::$perms || (self::$reputation >= CFG_REP_REQ_DOWNVOTE && self::$dailyVotes > 0);
+        return self::$perms || (self::$reputation >= Cfg::get('REP_REQ_DOWNVOTE') && self::$dailyVotes > 0);
     }
 
     public static function canSupervote()
@@ -507,7 +508,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
             return false;
 
-        return self::$reputation >= CFG_REP_REQ_SUPERVOTE;
+        return self::$reputation >= Cfg::get('REP_REQ_SUPERVOTE');
     }
 
     public static function canUploadScreenshot()
@@ -536,7 +537,7 @@ class User
 
     public static function isPremium()
     {
-        return self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= CFG_REP_REQ_PREMIUM;
+        return self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= Cfg::get('REP_REQ_PREMIUM');
     }
 
     /**************/
@@ -559,7 +560,7 @@ class User
         if (!self::$id || self::$banStatus & (ACC_BAN_PERM | ACC_BAN_TEMP))
             return 0;
 
-        return CFG_USER_MAX_VOTES + (self::$reputation >= CFG_REP_REQ_VOTEMORE_BASE ? 1 + intVal((self::$reputation - CFG_REP_REQ_VOTEMORE_BASE) / CFG_REP_REQ_VOTEMORE_ADD) : 0);
+        return Cfg::get('USER_MAX_VOTES') + (self::$reputation >= Cfg::get('REP_REQ_VOTEMORE_BASE') ? 1 + intVal((self::$reputation - Cfg::get('REP_REQ_VOTEMORE_BASE')) / Cfg::get('REP_REQ_VOTEMORE_ADD')) : 0);
     }
 
     public static function getReputation()
@@ -585,8 +586,8 @@ class User
         $gUser['canDownvote']       = self::canDownvote();
         $gUser['canPostReplies']    = self::canReply();
         $gUser['superCommentVotes'] = self::canSupervote();
-        $gUser['downvoteRep']       = CFG_REP_REQ_DOWNVOTE;
-        $gUser['upvoteRep']         = CFG_REP_REQ_UPVOTE;
+        $gUser['downvoteRep']       = Cfg::get('REP_REQ_DOWNVOTE');
+        $gUser['upvoteRep']         = Cfg::get('REP_REQ_UPVOTE');
         $gUser['characters']        = self::getCharacters();
         $gUser['excludegroups']     = self::$excludeGroups;
         $gUser['settings']          = (new StdClass);       // profiler requires this to be set; has property premiumborder (NYI)

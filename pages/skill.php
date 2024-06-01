@@ -82,7 +82,7 @@ class SkillPage extends GenericPage
             $condition = array(
                 ['OR', ['s.reagent1', 0, '>'], ['s.reagent2', 0, '>'], ['s.reagent3', 0, '>'], ['s.reagent4', 0, '>'], ['s.reagent5', 0, '>'], ['s.reagent6', 0, '>'], ['s.reagent7', 0, '>'], ['s.reagent8', 0, '>']],
                 ['OR', ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]],
-                CFG_SQL_LIMIT_NONE
+                Cfg::get('SQL_LIMIT_NONE')
             );
 
             $recipes = new SpellList($condition);           // also relevant for 3
@@ -104,7 +104,7 @@ class SkillPage extends GenericPage
             $conditions   = array(
                 ['requiredSkill', $this->typeId],
                 ['class', ITEM_CLASS_RECIPE],
-                CFG_SQL_LIMIT_NONE
+                Cfg::get('SQL_LIMIT_NONE')
             );
 
             $recipeItems = new ItemList($conditions);
@@ -134,7 +134,7 @@ class SkillPage extends GenericPage
 
             if ($created)
             {
-                $created = new ItemList(array(['i.id', $created], CFG_SQL_LIMIT_NONE));
+                $created = new ItemList(array(['i.id', $created], Cfg::get('SQL_LIMIT_NONE')));
                 if (!$created->error)
                 {
                     $this->extendGlobalData($created->getJSGlobals(GLOBALINFO_SELF));
@@ -156,7 +156,7 @@ class SkillPage extends GenericPage
             $conditions = array(
                 ['requiredSkill', $this->typeId],
                 ['class', ITEM_CLASS_RECIPE, '!'],
-                CFG_SQL_LIMIT_NONE
+                Cfg::get('SQL_LIMIT_NONE')
             );
 
             $reqBy = new ItemList($conditions);
@@ -179,7 +179,7 @@ class SkillPage extends GenericPage
             // tab: required by [itemset]
             $conditions = array(
                 ['skillId', $this->typeId],
-                CFG_SQL_LIMIT_NONE
+                Cfg::get('SQL_LIMIT_NONE')
             );
 
             $reqBy = new ItemsetList($conditions);
@@ -201,7 +201,7 @@ class SkillPage extends GenericPage
         $condition = array(
             ['AND', ['s.reagent1', 0], ['s.reagent2', 0], ['s.reagent3', 0], ['s.reagent4', 0], ['s.reagent5', 0], ['s.reagent6', 0], ['s.reagent7', 0], ['s.reagent8', 0]],
             ['OR',  ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]],
-            CFG_SQL_LIMIT_NONE
+            Cfg::get('SQL_LIMIT_NONE')
         );
 
         foreach (Game::$skillLineMask as $line1 => $sets)
@@ -266,7 +266,7 @@ class SkillPage extends GenericPage
             {
                 $this->addScript([SC_JS_FILE, '?data=zones']);
 
-                $trainer = new CreatureList(array(CFG_SQL_LIMIT_NONE, ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $trainer = new CreatureList(array(Cfg::get('SQL_LIMIT_NONE'), ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
 
                 if (!$trainer->error)
                 {
@@ -302,7 +302,7 @@ class SkillPage extends GenericPage
 
             if ($sort)
             {
-                $quests = new QuestList(array(['zoneOrSort', -$sort], CFG_SQL_LIMIT_NONE));
+                $quests = new QuestList(array(['zoneOrSort', -$sort], Cfg::get('SQL_LIMIT_NONE')));
                 if (!$quests->error)
                 {
                     $this->extendGlobalData($quests->getJSGlobals());

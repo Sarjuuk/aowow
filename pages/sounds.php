@@ -54,9 +54,9 @@ class SoundsPage extends GenericPage
             $tabData['data'] = array_values($sounds->getListviewData());
 
             // create note if search limit was exceeded; overwriting 'note' is intentional
-            if ($sounds->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($sounds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                 $tabData['_truncated'] = 1;
             }
 

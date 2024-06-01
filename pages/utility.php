@@ -87,10 +87,10 @@ class UtilityPage extends GenericPage
                         // todo (low): preview should be html-formated
                         $this->feedData[] = array(
                             'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']],
+                            'link'        => [false, [], Cfg::get('HOST_URL').'/?go-to-comment&amp;id='.$d['id']],
                             'description' => [true,  [], htmlentities($d['preview'])."<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true)],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
-                            'guid'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']]
+                            'guid'        => [false, [], Cfg::get('HOST_URL').'/?go-to-comment&amp;id='.$d['id']]
                          // 'domain'      => [false, [], null]
                         );
                     }
@@ -100,10 +100,10 @@ class UtilityPage extends GenericPage
                         // todo (low): preview should be html-formated
                         $this->feedData[] = array(
                             'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']],
+                            'link'        => [false, [], Cfg::get('HOST_URL').'/?go-to-comment&amp;id='.$d['id']],
                             'description' => [true,  [], htmlentities($d['preview'])."<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true)],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
-                            'guid'        => [false, [], HOST_URL.'/?go-to-comment&amp;id='.$d['id']]
+                            'guid'        => [false, [], Cfg::get('HOST_URL').'/?go-to-comment&amp;id='.$d['id']]
                          // 'domain'      => [false, [], null]
                         );
                     }
@@ -125,7 +125,7 @@ class UtilityPage extends GenericPage
                 {
                     foreach ($data as $d)
                     {
-                        $desc = '<a href="'.HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id'].'"><img src="'.STATIC_URL.'/uploads/screenshots/thumb/'.$d['id'].'.jpg" alt="" /></a>';
+                        $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id'].'"><img src="'.Cfg::get('STATIC_URL').'/uploads/screenshots/thumb/'.$d['id'].'.jpg" alt="" /></a>';
                         if ($d['caption'])
                             $desc .= '<br />'.$d['caption'];
                         $desc .= "<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true);
@@ -133,11 +133,11 @@ class UtilityPage extends GenericPage
                         // enclosure/length => filesize('static/uploads/screenshots/thumb/'.$d['id'].'.jpg') .. always set to this placeholder value though
                         $this->feedData[] = array(
                             'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
+                            'link'        => [false, [], Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
                             'description' => [true,  [], $desc],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
-                            'enclosure'   => [false, ['url' => STATIC_URL.'/uploads/screenshots/thumb/'.$d['id'].'.jpg', 'length' => 12345, 'type' => 'image/jpeg'], null],
-                            'guid'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
+                            'enclosure'   => [false, ['url' => Cfg::get('STATIC_URL').'/uploads/screenshots/thumb/'.$d['id'].'.jpg', 'length' => 12345, 'type' => 'image/jpeg'], null],
+                            'guid'        => [false, [], Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#screenshots:id='.$d['id']],
                          // 'domain'      => [false, [], live|ptr]
                         );
                     }
@@ -156,7 +156,7 @@ class UtilityPage extends GenericPage
                 {
                     foreach ($data as $d)
                     {
-                        $desc = '<a href="'.HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id'].'"><img src="//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg" alt="" /></a>';
+                        $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id'].'"><img src="//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg" alt="" /></a>';
                         if ($d['caption'])
                             $desc .= '<br />'.$d['caption'];
                             $desc .= "<br /><br />".Lang::main('byUser', [$d['user'], '']) . Util::formatTimeDiff($d['date'], true);
@@ -164,11 +164,11 @@ class UtilityPage extends GenericPage
                         // is enclosure/length .. is this even relevant..?
                         $this->feedData[] = array(
                             'title'       => [true,  [], Lang::typeName($d['type']).Lang::main('colon').htmlentities($d['subject'])],
-                            'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
+                            'link'        => [false, [], Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
                             'description' => [true,  [], $desc],
                             'pubDate'     => [false, [], date(DATE_RSS, $d['date'])],
                             'enclosure'   => [false, ['url' => '//i3.ytimg.com/vi/'.$d['videoId'].'/default.jpg', 'length' => 12345, 'type' => 'image/jpeg'], null],
-                            'guid'        => [false, [], HOST_URL.'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
+                            'guid'        => [false, [], Cfg::get('HOST_URL').'/?'.Type::getFileString($d['type']).'='.$d['typeId'].'#videos:id='.$d['id']],
                          // 'domain'      => [false, [], live|ptr]
                         );
                     }
@@ -238,7 +238,7 @@ class UtilityPage extends GenericPage
                                 $this->feedData[] = array(
                                     'title'       => [true,  [], htmlentities(Type::getFileString($type) == 'item' ? mb_substr($d['name'], 1) : $d['name'])],
                                     'type'        => [false, [], Type::getFileString($type)],
-                                    'link'        => [false, [], HOST_URL.'/?'.Type::getFileString($type).'='.$d['id']],
+                                    'link'        => [false, [], Cfg::get('HOST_URL').'/?'.Type::getFileString($type).'='.$d['id']],
                                     'ncomments'   => [false, [], $comments[$typeId]]
                                 );
                             }
@@ -272,11 +272,11 @@ class UtilityPage extends GenericPage
 
         $channel = $root->addChild('channel');
 
-        $channel->addChild('title',         CFG_NAME_SHORT.' - '.$this->name);
-        $channel->addChild('link',          HOST_URL.'/?'.$this->page . ($this->category ? '='.$this->category[0] : null));
-        $channel->addChild('description',   CFG_NAME);
+        $channel->addChild('title',         Cfg::get('NAME_SHORT').' - '.$this->name);
+        $channel->addChild('link',          Cfg::get('HOST_URL').'/?'.$this->page . ($this->category ? '='.$this->category[0] : null));
+        $channel->addChild('description',   Cfg::get('NAME'));
         $channel->addChild('language',      implode('-', str_split(User::$localeString, 2)));
-        $channel->addChild('ttl',           CFG_TTL_RSS);
+        $channel->addChild('ttl',           Cfg::get('TTL_RSS'));
         $channel->addChild('lastBuildDate', date(DATE_RSS));
 
         foreach ($this->feedData as $row)

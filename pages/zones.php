@@ -31,7 +31,7 @@ class ZonesPage extends GenericPage
 
     protected function generateContent()
     {
-        $conditions  = [CFG_SQL_LIMIT_NONE];
+        $conditions  = [Cfg::get('SQL_LIMIT_NONE')];
         $visibleCols = [];
         $hiddenCols  = [];
         $mapFile     = 0;

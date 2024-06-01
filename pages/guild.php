@@ -31,7 +31,7 @@ class GuildPage extends GenericPage
     {
         parent::__construct($pageCall, $pageParam);
 
-        if (!CFG_PROFILER_ENABLE)
+        if (!Cfg::get('PROFILER_ENABLE'))
             $this->error();
 
         $params = array_map('urldecode', explode('.', $pageParam));
@@ -124,7 +124,7 @@ class GuildPage extends GenericPage
         /**************/
 
         // tab: members
-        $member = new LocalProfileList(array(['p.guild', $this->subjectGUID], CFG_SQL_LIMIT_NONE));
+        $member = new LocalProfileList(array(['p.guild', $this->subjectGUID], Cfg::get('SQL_LIMIT_NONE')));
         if (!$member->error)
         {
             $this->lvTabs[] = [ProfileList::$brickFile, array(

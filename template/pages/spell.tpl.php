@@ -241,7 +241,7 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
     if (isset($e['perfItem'])):
 ?>
-                            <small><a href="?spell=<?=$e['perfItem']['cndSpellId'];?>" class="icontiny"><img src="<?=STATIC_URL;?>/images/wow/icons/tiny/<?=$e['perfItem']['icon'];?>.gif" align="absmiddle">
+                            <small><a href="?spell=<?=$e['perfItem']['cndSpellId'];?>" class="icontiny"><img src="<?=Cfg::get('STATIC_URL');?>/images/wow/icons/tiny/<?=$e['perfItem']['icon'];?>.gif" align="absmiddle">
                                 <span class="tinyicontxt"><?=$e['perfItem']['cndSpellName'];?></span></a><?=Lang::main('colon').' '.$e['perfItem']['chance'].'%';?></small><table class="icontab">
                             <tr><th id="icontab-icon<?=++$iconTabIdx;?>"></th><td><small><a href="?item=<?=$e['perfItem']['itemId'];?>" class="q<?=$e['perfItem']['quality'];?>"><?=$e['perfItem']['itemName'];?></a></small></td></tr></table>
 

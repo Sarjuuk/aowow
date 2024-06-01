@@ -116,7 +116,7 @@ class CommunityContent
             if (!$_)
                 continue;
 
-            $obj = Type::newList($type, [CFG_SQL_LIMIT_NONE, ['id', $_]]);
+            $obj = Type::newList($type, [Cfg::get('SQL_LIMIT_NONE'), ['id', $_]]);
             if (!$obj)
                 continue;
 
@@ -154,7 +154,7 @@ class CommunityContent
             CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
-            CFG_SQL_LIMIT_DEFAULT
+            Cfg::get('SQL_LIMIT_DEFAULT')
         );
 
         foreach ($comments as $c)
@@ -320,7 +320,7 @@ class CommunityContent
                 if (!$ids)
                     continue;
 
-                $obj = Type::newList($t, [CFG_SQL_LIMIT_NONE, ['id', $ids]]);
+                $obj = Type::newList($t, [Cfg::get('SQL_LIMIT_NONE'), ['id', $ids]]);
                 if (!$obj || $obj->error)
                     continue;
 
@@ -410,13 +410,13 @@ class CommunityContent
     {
         $videos = DB::Aowow()->selectPage($nFound, self::$viQuery,
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId             : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId                     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'               : DBSIMPLE_SKIP,
-            !$typeOrUser    ? CFG_SQL_LIMIT_SEARCH : DBSIMPLE_SKIP
+            !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
+            !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
         );
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId
@@ -455,13 +455,13 @@ class CommunityContent
     {
         $screenshots = DB::Aowow()->selectPage($nFound, self::$ssQuery,
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser         : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser         : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId             : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId                     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'               : DBSIMPLE_SKIP,
-            !$typeOrUser    ? CFG_SQL_LIMIT_SEARCH : DBSIMPLE_SKIP
+            !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
+            !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
         );
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId

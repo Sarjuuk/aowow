@@ -22,15 +22,10 @@ if ($error)
     die(CLI ? strip_tags($error) : $error);
 
 
-if (file_exists('config/config.php'))
-    require_once 'config/config.php';
-else
-    $AoWoWconf = [];
-
-
 require_once 'includes/defines.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/utilities.php';                      // helper functions
+require_once 'includes/config.class.php';                   // Config holder
 require_once 'includes/game.php';                           // game related data & functions
 require_once 'includes/profiler.class.php';
 require_once 'includes/user.class.php';
@@ -38,7 +33,8 @@ require_once 'includes/markup.class.php';                   // manipulate markup
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/community.class.php';                // handle comments, screenshots and videos
 require_once 'includes/loot.class.php';                     // build lv-tabs containing loot-information
-require_once 'includes/smartAI.class.php';
+require_once 'includes/smartAI.class.php';                  // TC: SmartAI system
+require_once 'includes/conditions.class.php';               // TC: Conditions system
 require_once 'localization/lang.class.php';
 require_once 'pages/genericPage.class.php';
 
@@ -93,35 +89,58 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
     if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
         return true;
 
-    $errName = 'unknown error';                             // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
-    $uGroup  = U_GROUP_EMPLOYEE;
+    $errName  = 'unknown error';                            // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
+    $uGroup   = U_GROUP_EMPLOYEE;
+    $logLevel = CLI::LOG_BLANK;
 
     if ($errNo == E_WARNING)                                // 0x0002
-        $errName = 'E_WARNING';
+    {
+        $errName  = 'E_WARNING';
+        $logLevel = CLI::LOG_WARN;
+    }
     else if ($errNo == E_PARSE)                             // 0x0004
-        $errName = 'E_PARSE';
+    {
+        $errName  = 'E_PARSE';
+        $logLevel = CLI::LOG_ERROR;
+    }
     else if ($errNo == E_NOTICE)                            // 0x0008
-        $errName = 'E_NOTICE';
+    {
+        $errName  = 'E_NOTICE';
+        $logLevel = CLI::LOG_INFO;
+    }
     else if ($errNo == E_USER_ERROR)                        // 0x0100
-        $errName = 'E_USER_ERROR';
+    {
+        $errName  = 'E_USER_ERROR';
+        $logLevel = CLI::LOG_ERROR;
+    }
     else if ($errNo == E_USER_WARNING)                      // 0x0200
-        $errName = 'E_USER_WARNING';
+    {
+        $errName  = 'E_USER_WARNING';
+        $logLevel = CLI::LOG_WARN;
+    }
     else if ($errNo == E_USER_NOTICE)                       // 0x0400
     {
-        $errName = 'E_USER_NOTICE';
-        $uGroup  = U_GROUP_STAFF;
+        $errName  = 'E_USER_NOTICE';
+        $uGroup   = U_GROUP_STAFF;
+        $logLevel = CLI::LOG_INFO;
     }
     else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
-        $errName = 'E_RECOVERABLE_ERROR';
-
-    Util::addNote($uGroup, $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine);
-    if (CLI)
-        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & (E_WARNING | E_USER_WARNING | E_NOTICE | E_USER_NOTICE) ? CLI::LOG_WARN : CLI::LOG_ERROR);
+    {
+        $errName  = 'E_RECOVERABLE_ERROR';
+        $logLevel = CLI::LOG_ERROR;
+    }
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $errStr
         );
+
+    if (Cfg::get('DEBUG') >= $logLevel)
+    {
+        Util::addNote($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $uGroup, $logLevel);
+        if (CLI)
+            CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & (E_WARNING | E_USER_WARNING | E_NOTICE | E_USER_NOTICE) ? CLI::LOG_WARN : CLI::LOG_ERROR);
+    }
 
     return true;
 }, E_AOWOW);
@@ -129,7 +148,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 // handle exceptions
 set_exception_handler(function ($e)
 {
-    Util::addNote(U_GROUP_EMPLOYEE, 'Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
+    Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
@@ -161,6 +180,11 @@ register_shutdown_function(function()
 });
 
 // Setup DB-Wrapper
+if (file_exists('config/config.php'))
+    require_once 'config/config.php';
+else
+    $AoWoWconf = [];
+
 if (!empty($AoWoWconf['aowow']['db']))
     DB::load(DB_AOWOW, $AoWoWconf['aowow']);
 
@@ -175,80 +199,29 @@ if (!empty($AoWoWconf['characters']))
         if (!empty($charDBInfo))
             DB::load(DB_CHARACTERS . $realm, $charDBInfo);
 
-
-// load config to constants
-function loadConfig(bool $noPHP = false) : void
-{
-    $sets = DB::isConnected(DB_AOWOW) ? DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value`, `flags` FROM ?_config') : [];
-    foreach ($sets as $k => $v)
-    {
-        $php = $v['flags'] & CON_FLAG_PHP;
-        if ($php && $noPHP)
-            continue;
-
-        // this should not have been possible
-        if (!strlen($v['value']) && !($v['flags'] & CON_FLAG_TYPE_STRING) && !$php)
-        {
-            trigger_error('Aowow config value CFG_'.strtoupper($k).' is empty - config will not be used!', E_USER_ERROR);
-            continue;
-        }
-
-        if ($v['flags'] & CON_FLAG_TYPE_INT)
-            $val = intVal($v['value']);
-        else if ($v['flags'] & CON_FLAG_TYPE_FLOAT)
-            $val = floatVal($v['value']);
-        else if ($v['flags'] & CON_FLAG_TYPE_BOOL)
-            $val = (bool)$v['value'];
-        else if ($v['flags'] & CON_FLAG_TYPE_STRING)
-            $val = preg_replace("/[\p{C}]/ui", '', $v['value']);
-        else if ($php)
-        {
-            trigger_error('PHP config value '.strtolower($k).' has no type set - config will not be used!', E_USER_ERROR);
-            continue;
-        }
-        else // if (!$php)
-        {
-            trigger_error('Aowow config value CFG_'.strtoupper($k).' has no type set - value forced to 0!', E_USER_ERROR);
-            $val = 0;
-        }
-
-        if ($php)
-            ini_set(strtolower($k), $val);
-        else if (!defined('CFG_'.strtoupper($k)))
-            define('CFG_'.strtoupper($k), $val);
-    }
-
-    $required = ['CFG_SCREENSHOT_MIN_SIZE', 'CFG_CONTACT_EMAIL', 'CFG_NAME', 'CFG_NAME_SHORT', 'CFG_FORCE_SSL', 'CFG_DEBUG'];
-    foreach ($required as $r)
-        if (!defined($r))
-            define($r, '');
-}
-loadConfig();
+$AoWoWconf = null;                                          // empty auths
 
 
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || (!empty($AoWoWconf['aowow']) && CFG_FORCE_SSL);
-if (defined('CFG_STATIC_HOST'))                             // points js to images & scripts
-    define('STATIC_URL', ($secure ? 'https://' : 'http://').CFG_STATIC_HOST);
-
-if (defined('CFG_SITE_HOST'))                               // points js to executable files
-    define('HOST_URL',   ($secure ? 'https://' : 'http://').CFG_SITE_HOST);
+// load config from DB
+Cfg::load();
 
 
 // handle non-fatal errors and notices
-error_reporting(CFG_DEBUG ? E_AOWOW : 0);
+error_reporting(Cfg::get('DEBUG') ? E_AOWOW : 0);
 
 
 if (!CLI)
 {
     // not displaying the brb gnomes as static_host is missing, but eh...
-    if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !defined('HOST_URL') || !defined('STATIC_URL'))
+    if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !Cfg::get('HOST_URL') || !Cfg::get('STATIC_URL'))
         (new GenericPage())->maintenance();
 
     // Setup Session
-    if (CFG_SESSION_CACHE_DIR && Util::writeDir(CFG_SESSION_CACHE_DIR))
-        session_save_path(getcwd().'/'.CFG_SESSION_CACHE_DIR);
+    $cacheDir = Cfg::get('SESSION_CACHE_DIR');
+    if ($cacheDir && Util::writeDir($cacheDir))
+        session_save_path(getcwd().'/'.$cacheDir);
 
-    session_set_cookie_params(15 * YEAR, '/', '', $secure, true);
+    session_set_cookie_params(15 * YEAR, '/', '', (($_SERVER['HTTPS'] ?? 'off') != 'off') || Cfg::get('FORCE_SSL'), true);
     session_cache_limiter('private');
     if (!session_start())
     {
@@ -260,7 +233,7 @@ if (!CLI)
         User::save();                                       // save user-variables in session
 
     // set up some logging (~10 queries will execute before we init the user and load the config)
-    if (CFG_DEBUG && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+    if (Cfg::get('DEBUG') >= CLI::LOG_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
         DB::Aowow()->setLogger(['DB', 'profiler']);
         DB::World()->setLogger(['DB', 'profiler']);
@@ -278,7 +251,7 @@ if (!CLI)
     if (isset($_GET['locale']))
     {
         $loc = intVal($_GET['locale']);
-        if ($loc <= MAX_LOCALES && $loc >= 0 && (CFG_LOCALES & (1 << $loc)))
+        if ($loc <= MAX_LOCALES && $loc >= 0 && (Cfg::get('LOCALES') & (1 << $loc)))
             User::useLocale($loc);
     }
 
@@ -292,7 +265,5 @@ if (!CLI)
 }
 else if (DB::isConnected(DB_AOWOW))
     Lang::load(LOCALE_EN);
-
-$AoWoWconf = null;                                          // empty auths
 
 ?>

@@ -2407,67 +2407,158 @@ var g_world_object_types = {
     7: 'Spielerleiche'
 };
 
-var g_condition_types = {
-     1: ['Plündern',         'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand aus [npc=$1] geplündert werden.'],                          // CND_SRC_CREATURE_LOOT_TEMPLATE
-     2: ['Entzaubern',       'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand aus [item=$1] entzaubert werden.'],                         // CND_SRC_DISENCHANT_LOOT_TEMPLATE
-     3: ['Angeln',           'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Angeln in [zone=$1] gefunden werden.'],                // CND_SRC_FISHING_LOOT_TEMPLATE
-     4: ['Objekt Öffnen',    'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand in [object=$1] gefunden werden.'],                          // CND_SRC_GAMEOBJECT_LOOT_TEMPLATE
-     5: ['Gegenst. Öffnen',  'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand in [item=$1] gefunden werden.'],                            // CND_SRC_ITEM_LOOT_TEMPLATE
-     6: ['Brief Anhang',     'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand an diesem Brief angehängt sein.'],                          // CND_SRC_MAIL_LOOT_TEMPLATE
-     7: ['Mahlen',           'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Mahlen von [item=$1] gefunden werden.'],               // CND_SRC_MILLING_LOOT_TEMPLATE
-     8: ['Stehlen',          'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand von [npc=$1] gesammelt werden.'],                           // CND_SRC_PICKPOCKETING_LOOT_TEMPLATE
-     9: ['Sondieren',        'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Sondieren von [item=$1] gefunden werden.'],            // CND_SRC_PROSPECTING_LOOT_TEMPLATE
-    10: ['Ref. Plündern',    ''],                                                                                                                // CND_SRC_REFERENCE_LOOT_TEMPLATE
-    11: ['Kürschnern',       'Wenn die Bedingung erfüllt ist, kann dieser Gegenstand beim Kürschnern von [item=$1] gefunden werden.'],           // CND_SRC_SKINNING_LOOT_TEMPLATE
-    12: ['Herstellen',       'Wenn die Bedingung erfüllt ist, kann beim Wirken von [spell=$1] zusätzlich dieser Gegenstand erzeugt werden.'],    // CND_SRC_SPELL_LOOT_TEMPLATE
-    13: ['Autom. Zielwahl',  'Nur Ziele, welche diese Bedinungen erfüllen, können von diesem Zauber betroffen sein.'],                           // CND_SRC_SPELL_IMPLICIT_TARGET
-    14: ['Dialog',           'Zeige den verwandten Dialog, wenn die Bedingungen erfüllt sind.'],                                                 // CND_SRC_GOSSIP_MENU
-    15: ['Dialog Menü',      'Zeige das verwandte Dialogmenü, wenn die Bedingungen erfüllt sind.'],                                              // CND_SRC_GOSSIP_MENU_OPTION
-    16: ['Vehicle',          'Diese Kreatur kann als Fahrzeug benutzt werden, wenn die Bedingungen erfüllt sind.'],                              // CND_SRC_CREATURE_TEMPLATE_VEHICLE
-    17: ['Zauber',           'Der Zauber kann nur gewirkt werden, wenn die Bedingungen erfüllt sind.'],                                          // CND_SRC_SPELL
-    18: ['Klick',            'Wenn die Bedingung erfüllt ist, wirkt [npc=$2] [spell=$1], wenn man darauf klickt.'],                              // CND_SRC_SPELL_CLICK_EVENT
-    19: ['Quest Annahme',    'Der Spieler kann dieses Quest annehmen, wenn die Bedingungen erfüllt sind.'],                                      // CND_SRC_QUEST_SHOW_MARK
-    20: ['Quest Symbol',     'Ein [icon name=quest_startend]&nbsp;[/icon] wird für dieses Quest angezeigt, wenn die Bedingungen erfüllt sind.'], // CND_SRC_QUEST_ACCEPT
-    21: ['Fahrzeug Fähigk.', 'Wenn die Bedingung erfüllt ist, ist im Fahrzeug [npc=$2] [spell=$1] verfügbar'],                                   // CND_SRC_VEHICLE_SPELL
-    22: ['SmartAI',          'Wenn die Bedingung erfüllt ist, kann die KI dieser Kreatur zusätzliche Handlungen durchführen.'],                  // CND_SRC_SMART_EVENT
-    23: ['Händler',          'Wenn die Bedingung erfüllt ist, hat der Händler diesen Gegenstand im Sortiment.'],                                 // CND_SRC_NPC_VENDOR
-    24: ['Zauberauslösung',  'Wenn die Bedingung erfüllt ist, kann der Zauber auslösen.']                                                        // CND_SRC_SPELL_PROC
+var g_instance_info = {
+    0: 'Data',
+    1: 'GUID',
+    2: 'Bosszustand',
+    3: 'Data64'
+};
+
+var g_unit_states = {
+     0: 'Gestorben',
+     1: 'Angreifend',
+     2: 'Bezaubert',
+     3: 'Betäubt',
+     4: 'Umherwandernd',
+     5: 'Verfolgend',
+     6: 'Fokussiert',
+     7: 'Fliehend',
+     8: 'Im Flug',
+     9: 'Folgend',
+    10: 'Festegewurzelt',
+    11: 'Verwirrt',
+    12: 'Abgelenkt',
+    13: 'Isoliert',
+    14: 'Spieler angreifend',
+    15: 'Zaubernd',
+    16: 'Besessen',
+    17: 'Anstürmend',
+    18: 'Springend',
+    19: 'In Formation folgend',
+    20: 'In Bewegung',
+    21: 'In Rotation',
+    22: 'Entkommend',
+    23: 'Umherwandernde Bewegung',
+    24: 'Verwirrte Bewegung',
+    25: 'Fliehende Bewegung',
+    26: 'Verfolgende Bewegung',
+    27: 'Folgende Bewegung',
+    28: 'Ignoriere Wegfindung',
+    29: 'In Formation folgende Bewegung'
+};
+
+var g_relation_types = {
+    0: 'ist$N: nicht; sich selbst',
+    1: 'ist$N: nicht; in einer Gruppe mit $3',
+    2: 'ist$N: nicht; in einem Raid oder Gruppe mit $3',
+    3: 'ist$N: nicht; im Besitz von $3',
+    4: 'ist$N: kein; Passagier von $3',
+    5: 'wurde$N: nicht; von $3 beschworen'
+};
+
+var g_stand_states = {
+    0: 'steht$N: nicht;',
+    1: 'sitzt$N: nicht;',
+    2: 'sitzt$N: nicht; auf einem Stuhl',
+    3: 'schläft$N: nicht;',
+    4: 'sitzt$N: nicht; auf einem niedrigen Stuhl',
+    5: 'sitzt$N: nicht; auf einem mittleren Stuhl',
+    6: 'sitzt$N: nicht; auf einem hohen Stuhl',
+    7: 'ist$N: nicht; tot',
+    8: 'knieht$N: nicht;',
+    9: 'ist$N: nicht; untergetaucht'
+};
+
+var g_quest_states = {
+    0: 'bisher nicht gesehen',
+    1: 'abgeschlossen',
+    3: 'angenommen',
+    5: 'versagt',
+    6: 'Belohnungen erhalten',
+};
+
+var g_condition_sources = {
+     0: [['Spieler', null],       ''],
+     1: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] aus [npc=$1] geplündert werden.'],
+     2: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] aus [item=$1] entzaubert werden.'],
+     3: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] beim Angeln in [zone=$1] gefunden werden.'],
+     4: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] in [object=$1] gefunden werden.'],
+     5: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] in [item=$1] gefunden werden.'],
+     6: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] an den Brief aus [quest=$1] angehängt sein.'],
+     7: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] beim Mahlen von [item=$1] gefunden werden.'],
+     8: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] von [npc=$1] gestohlen werden.'],
+     9: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] beim Sondieren von [item=$1] gefunden werden.'],
+    10: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] im Template #$1 referenziert werden.'],
+    11: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [item=$2] von [npc=$1] gesammelt werden.'],
+    12: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann beim Wirken von [spell=$1] zusätzlich [item=$2] erzeugt werden.'],
+    13: [['Ziel', 'Zauberer'],    'Nur ein $T% welches:% welcher; die Bedingung erfüllt, kann von [spell=$2] betroffen sein.'],
+    14: [['Spieler', 'Entität'],  'Zeige Dialogtext #$2 aus Menu #$1, wenn $Tder %:die %; die Bedingung erfüllt.'],
+    15: [['Spieler', 'Entität'],  'Zeige Dialogoption #$2 aus Menu #$1, wenn $Tder %:die %; die Bedingung erfüllt.'],
+    16: [['Spieler', 'Kreatur'],  '[npc=$2] kann als Fahrzeug benutzt werden, wenn $Tder %:es; die Bedingung erfüllt.'],
+    17: [['Zauberer', 'Ziel'],    '[spell=$2] kann nur dann gewirkt werden, wenn $Tder %:das %; die Bedingung erfüllt.'],
+    18: [['Spieler', 'Kreatur'],  'Wenn $Tdie %:der %; die Bedingung erfüllt wirkt [npc=$1] [spell=$2], wenn angeklickt.'],
+    19: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [quest=$2] angenommen werden.'],
+    20: [['Spieler', null],       'Wenn die Bedingung erfüllt ist wird ein [icon name=quest_startend]&nbsp;[/icon] für [quest=$2] angezeigt.'],
+    21: [['Spieler', 'Kreatur'],  'Fahrzeug [npc=$1] verfügt über [spell=$2], wenn $Tder %:es; die Bedingung erfüllt.'],
+    22: [['Auslöser', 'Entität'], 'Wenn $Tder %:die %; die Bedingung erfüllt kann die KI zusätzliche Handlungen durchführen.'],
+    23: [['Spieler', 'Kreatur'],  'Wenn $Tder %:die %; die Bedingung erfüllt hat [npc=$1] [item=$2] im Sortiment.'],
+    24: [['Zauberer', 'Ziel'],    'Wenn $Tder %:das %; die Bedingung erfüllt kann [spell=$2] auslösen.'],
+    30: [['Spieler', null],       'Wenn die Bedingung erfüllt ist kann [url=?areatrigger=$2]Areatrigger #$2[/url] ausgelöst werden.']
 };
 
 var g_conditions = {
-     1: 'Der Spieler hat $eine:keine; Aura von $1',
-     2: 'Der Spieler besitzt$: nicht; $1',
-     3: 'Der Spieler hat$: nicht; $1 ausgerüstet',
-     4: 'Der Spieler befindet sich$: nicht; in $1',                           // also used by 22, 23
-     5: 'Der Ruf bei $1 ist$: nicht; $2',
-     6: 'Der Spieler ist$: nicht; $1',
-     7: 'Der Spieler beherrscht $1$: nicht;',
-     8: 'Der Spieler hat $1$: nicht; beendet',
-     9: 'Der Spieler hat $1$: nicht; angenommen',
-    10: 'Der Spieler ist$: nicht; $1',
-    11: 'WorldState #$1 ist$: nicht; $2',
-    12: '$1 ist$: nicht; aktiv',
-    13: 'Die Instanz hat einen bestimmten Zustand$: nicht;',                  // nyi
-    14: 'Der Spieler hat $nie :;mit $1 interagiert',
-    15: 'Der Spieler ist$: nicht; ein $1',                                    // also used by 16
-    17: 'Der Spieler hat $1$: nicht; erlangt',
-    18: 'Der Spieler hat $1$: nicht; erhalten',
-    20: 'Des Spielers Geschlecht is$: nicht; [span class=icon-$2]$1[/span]',
-    21: 'Das Ziel hat einen bestimmten Zustand$: nicht;',                     // nyi
-    24: '',                                                                   // not used
-    25: 'Der Spieler kennt$: nicht; $1',
-    26: 'Die Kreatur befindet sich$: nicht; in Phase $1',
-    27: 'Die Stufe des Ziels ist$: nicht; $2 $1',
-    28: 'Der Spieler hat $1$: nicht; abgeschlossen',
-    29: 'Der Spieler befindet sich$: nicht; in $2m zu $1',                    // also used by 30
-    31: 'Das Ziel des Zaubers ist$: nicht;: $1',                              // also used by 32
-    33: 'Der Spieler hat eine bestimmte Beziehung mit dem Ziel$: nicht;',     // nyi
-    34: 'Der Spieler hat eine bestimmte Ruf-Reaktion mit dem Ziel$: nicht;',  // nyi
-    35: 'Das Ziel ist$: nicht; $2 $1m entfernt',
-    36: 'Das Ziel ist$: nicht; am Leben',
-    37: 'Die Gesundheit des Ziels ist$: nicht; $2 $1',
-    38: 'Die Gesundheit des Ziels ist$: nicht; $2 $1%'
+     0: 'Immer $Nwahr:falsch;',
+     1: 'Das Ziel hat $Neine:keine; Aura von [spell=$1]',
+     2: 'Der Spieler hat $N:nicht; $2 [item=$1] im Inventar$C$3 oder der Bank:;',
+     3: 'Der Spieler hat $N:nicht; [item=$1] ausgerüstet',
+     4: 'Der Spieler befindet sich$N: nicht; in [zone=$1]',
+     5: 'Des Spielers Ruf bei [faction=$1] ist$N: nicht; $2',
+     6: 'Der Spieler gehört$N: nicht; der $1 an',
+     7: 'Der Spieler beherrscht [skill=$1]$N: nicht;$C$2 (min. $2):;',
+     8: 'Der Spieler wurde$N: nicht; für [quest=$1] entlohnt',
+     9: 'Der Spieler hat $N: nicht; [quest=$1] angenommen',
+    10: 'Der Spieler ist $N: nicht; $1',
+    11: 'WorldState #$1 ist$N: nicht; $2',
+    12: '[event=$1] findet gerade$N: nicht; statt',
+    13: '$3 der Instanz auf Index #$1 ist $Ngleich:ungleich; "$2"',
+    14: 'Der Spieler hat $Nniemals:; mit [quest=$1] interagiert',
+    15: 'Der Spieler ist $Nein:kein; $1',
+    16: 'Der Spieler ist $Nein:kein; $1',
+    17: 'Der Spieler hat$N: nicht; [achievement=$1] erlangt',
+    17: 'Der Spieler hat$N: nicht; [title=$1] erhalten',
+    19: 'Die Spawnmaske der Entität is $Ngleich:ungleich; "$1"',
+    20: 'Des Spielers Geschlecht is$N: nicht; $1',
+    21: 'Der Zustand der Kreatur ist$N: nicht; $1',
+    22: 'Das Ziel ist$N: nicht; in $1',
+    23: 'Das Ziel ist$N: nicht; in [zone=$1]',
+    24: 'Die Kreatur ist $Nein:kein; $1',
+    25: 'Der Spieler kennt [spell=$1]$N: nicht;',
+    26: 'Die Entität befindet sich$N: nicht; in Phase $1',
+    27: 'Die Stufe des Ziels ist$N: nicht; $2 $1',
+    28: 'Der Spieler hat [quest=$1]$N: nicht; abgeschlossen',
+    29: 'Das Ziel befindet sich$N: nicht; innerhalb von $2m zur $C$verstorbenen:lebendigen; Kreatur [npc=$1]',
+    30: 'Das Ziel befindet sich$N: nicht; innerhalb von $2m zu [object=$1]',
+    31: 'Die Entität ist$N: nicht; $C$2: vom Typ; $1$C$3 (GUID $3):;',
+    32: 'Die Entität ist$N: nicht; vom Typ $1',
+    33: '$1 $2',                                            // see g_relation_types
+    34: 'Die Kreatur is$N: nicht; $2 gegenüber $1',
+    35: 'Das Ziel ist$N: nicht; $3 $2m von $1 entfernt',
+    36: 'Das Ziel ist$Nlebendig:tot;',
+    37: 'Die Gesundheit des Ziels ist$N: nicht; $2 $1 Punkte',
+    38: 'Die Gesundheit des Ziels ist$N: nicht; $2 $1%',
+    39: '[achievement=$1] wurde auf diesem Realm$N: bisher nicht; erlangt',
+    40: 'Das Ziel schwimmt gerade$N: nicht;',
+    42: 'Die Kreatur $1',                                   // negation in g_stand_states
+    43: 'Der Spieler hat heute $Nbereits:noch nicht; [quest=$1] abgeschlossen',
+    44: 'Die Kreatur ist$N: nicht; bezaubert',
+    45: 'Der Spieler besitzt $Neinen:keinen; $C$1gezähmten:beschworenen; Begleiter',
+    46: 'Der Spieler fliegt gerade$N: nicht; auf einem Taxi',
+    47: 'Der Spieler hat [quest=$1]$N: nicht; $2',
+    48: 'Der Questfortschritt für Ziel #$2 von [quest=$1] ist$N: nicht; $3',
+    49: 'Der aktuelle Schwierigkeitsgrad für diese Instanz ist #$1',
+    50: 'Der Spieler $C$1kann$N: nicht; Gamemaster sein:ist $Nein:kein; Gamemaster;'
 };
+
 /* end aowow custom */
 
 var LANG = {
@@ -4841,6 +4932,11 @@ var LANG = {
     },
 
     /* AoWoW: start custom */
+
+    tab_conditions:    'Bedingungen',
+    tab_condition_for: 'Bedingung for',
+    cnd_either:        'Entweder',
+    cnd_or:            'Oder',
 
     // Guide
     myguides:          'Meine Leitfäden',

@@ -49,7 +49,7 @@ function account() : void
                 $fields['name'],
                 User::hashCrypt($fields['pass1']),
                 Util::ucFirst($fields['name']),
-                CFG_CONTACT_EMAIL,
+                Cfg::get('CONTACT_EMAIL'),
                 U_GROUP_ADMIN
             );
             if ($ok)

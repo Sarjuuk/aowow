@@ -599,6 +599,8 @@ class Lang
         if (!$var)                                          // may be null or empty. Handled differently depending on context
             return $var;
 
+        $var = Cfg::applyToString($var);
+
         if ($args)
             $var = vsprintf($var, $args);
 

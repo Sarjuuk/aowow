@@ -241,7 +241,7 @@ SqlGen::register(new class extends SetupScript
 
             $descText = [];
 
-            foreach (Util::mask2bits(CFG_LOCALES) as $loc)
+            foreach (Util::mask2bits(Cfg::get('LOCALES')) as $loc)
             {
                 User::useLocale($loc);
 

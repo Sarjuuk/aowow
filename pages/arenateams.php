@@ -33,7 +33,7 @@ class ArenaTeamsPage extends GenericPage
     {
         parent::__construct($pageCall, $pageParam);
 
-        if (!CFG_PROFILER_ENABLE)
+        if (!Cfg::get('PROFILER_ENABLE'))
             $this->error();
 
         $this->getSubjectFromUrl($pageParam);
@@ -58,7 +58,7 @@ class ArenaTeamsPage extends GenericPage
     protected function generateTitle()
     {
         if ($this->realm)
-            array_unshift($this->title, $this->realm,/* CFG_BATTLEGROUP,*/ Lang::profiler('regions', $this->region), Lang::profiler('arenaTeams'));
+            array_unshift($this->title, $this->realm,/* Cfg::get('BATTLEGROUP'),*/ Lang::profiler('regions', $this->region), Lang::profiler('arenaTeams'));
         else if ($this->region)
             array_unshift($this->title, Lang::profiler('regions', $this->region), Lang::profiler('arenaTeams'));
         else
@@ -111,12 +111,12 @@ class ArenaTeamsPage extends GenericPage
             $tabData['data'] = array_values($teams->getListviewData());
 
             // create note if search limit was exceeded
-            if ($this->filter['query'] && $teams->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($this->filter['query'] && $teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound2', $this->sumSubjects, $teams->getMatches());
                 $tabData['_truncated'] = 1;
             }
-            else if ($teams->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            else if ($teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound', $this->sumSubjects, 0);
 
             if ($this->filterObj->error)

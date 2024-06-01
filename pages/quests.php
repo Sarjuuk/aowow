@@ -75,9 +75,9 @@ class QuestsPage extends GenericPage
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded
-        if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+        if ($quests->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
             $tabData['_truncated'] = 1;
         }
         else if (isset($this->category[1]) && $this->category[1] > 0)

@@ -184,7 +184,7 @@ class FactionPage extends GenericPage
                 'sort'      => ['standing', 'name']
             );
 
-            if ($items->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($items->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
             $this->lvTabs[] = [ItemList::$brickFile, $tabData, 'itemStandingCol'];
@@ -217,7 +217,7 @@ class FactionPage extends GenericPage
                         'sort'      => ['-reputation', 'name']
                     );
 
-                    if ($killCreatures->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                    if ($killCreatures->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                         $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
                     $this->lvTabs[] = [CreatureList::$brickFile, $tabData, 'npcRepCol'];
@@ -237,7 +237,7 @@ class FactionPage extends GenericPage
                     'name' => '$LANG.tab_members'
                 );
 
-                if ($members->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                if ($members->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
                 $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
@@ -271,7 +271,7 @@ class FactionPage extends GenericPage
                 'extraCols' => '$_'
             );
 
-            if ($quests->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+            if ($quests->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
             $this->lvTabs[] = [QuestList::$brickFile, $tabData, 'questRepCol'];

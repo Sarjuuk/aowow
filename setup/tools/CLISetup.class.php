@@ -126,12 +126,12 @@ class CLISetup
 
         // restrict actual locales
         foreach (self::$locales as $idx => $str)
-            if (!defined('CFG_LOCALES') || CFG_LOCALES & (1 << $idx))
+            if (!($l = Cfg::get('LOCALES')) || ($l & (1 << $idx)))
                 self::$localeIds[] = $idx;
 
         // get site status
         if (DB::isConnected(DB_AOWOW))
-            self::$lock = (int)DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = "maintenance"');
+            self::$lock = (int)Cfg::get('MAINTENANCE');
         else
             self::$lock = self::LOCK_ON;
     }
@@ -200,7 +200,7 @@ class CLISetup
     public static function siteLock(int $mode = self::LOCK_RESTORE) : void
     {
         if (DB::isConnected(DB_AOWOW))
-            DB::Aowow()->query('UPDATE ?_config SET `value` = ?d WHERE `key` = "maintenance"', (int)!!($mode == self::LOCK_RESTORE ? self::$lock : $mode));
+            Cfg::set('MAINTENANCE', $mode == self::LOCK_RESTORE ? self::$lock : $mode);
     }
 
 

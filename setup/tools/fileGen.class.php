@@ -60,14 +60,6 @@ class FileGen
         'static/wowsounds/'
     );
 
-    private static $txtConstants = array(
-        'CFG_NAME'          => '',
-        'CFG_NAME_SHORT'    => '',
-        'CFG_CONTACT_EMAIL' => '',
-        'HOST_URL'          => '',
-        'STATIC_URL'        => ''
-    );
-
     public static function init(int $mode = self::MODE_NORMAL, array $updScripts = []) : bool
     {
         self::$defaultExecTime = ini_get('max_execution_time');
@@ -186,14 +178,10 @@ class FileGen
         {
             [$file, $destPath, $deps] = self::$tplFiles[$key];
 
-            foreach (self::$txtConstants as $n => &$c)
-                if (!$c && defined($n))
-                    $c = constant($n);
-
             if ($content = file_get_contents(self::$tplPath.$file.'.in'))
             {
                 // replace constants
-                $content = strtr($content, self::$txtConstants);
+                $content = Cfg::applyToString($content);
 
                 // check for required auxiliary DBC files
                 foreach ($reqDBC as $req)

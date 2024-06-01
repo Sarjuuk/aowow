@@ -132,19 +132,19 @@ trait TrRequestData
 
 abstract class CLI
 {
-    const CHR_BELL      = 7;
-    const CHR_BACK      = 8;
-    const CHR_TAB       = 9;
-    const CHR_LF        = 10;
-    const CHR_CR        = 13;
-    const CHR_ESC       = 27;
-    const CHR_BACKSPACE = 127;
+    private const CHR_BELL      = 7;
+    private const CHR_BACK      = 8;
+    private const CHR_TAB       = 9;
+    private const CHR_LF        = 10;
+    private const CHR_CR        = 13;
+    private const CHR_ESC       = 27;
+    private const CHR_BACKSPACE = 127;
 
-    const LOG_BLANK     = 0;
-    const LOG_OK        = 1;
-    const LOG_WARN      = 2;
-    const LOG_ERROR     = 3;
-    const LOG_INFO      = 4;
+    public const LOG_BLANK      = 0;
+    public const LOG_ERROR      = 1;
+    public const LOG_WARN       = 2;
+    public const LOG_INFO       = 3;
+    public const LOG_OK         = 4;
 
     private static $logHandle   = null;
     private static $hasReadline = null;
@@ -214,6 +214,11 @@ abstract class CLI
             $file = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
             self::$logHandle = fopen($file, 'w');
         }
+    }
+
+    public static function grey(string $str) : string
+    {
+        return CLI_HAS_E ? "\e[90m".$str."\e[0m" : $str;
     }
 
     public static function red(string $str) : string
@@ -536,34 +541,30 @@ abstract class Util
         null,           'bc',           'wotlk',            'cata',                'mop'
     );
 
-    public static $bgImagePath              = array (
-        'tiny'   => 'style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"',
-        'small'  => 'style="background-image: url(%s/images/wow/icons/small/%s.jpg)"',
-        'medium' => 'style="background-image: url(%s/images/wow/icons/medium/%s.jpg)"',
-        'large'  => 'style="background-image: url(%s/images/wow/icons/large/%s.jpg)"',
-    );
-
-    public static $configCats               = array(        // don't mind the ordering ... please?
-        1 => 'Site', 'Caching', 'Account', 'Session', 'Site Reputation', 'Google Analytics', 'Profiler', 0 => 'Other'
-    );
-
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
     private static $notes                   = [];
 
-    public static function addNote(int $uGroupMask, string $str) : void
+    public static function addNote(string $note, int $uGroupMask = U_GROUP_EMPLOYEE, int $level = CLI::LOG_ERROR) : void
     {
-        self::$notes[] = [$uGroupMask, $str];
+        self::$notes[] = [$note, $uGroupMask, $level];
     }
 
     public static function getNotes() : array
     {
         $notes = [];
+        $severity = CLI::LOG_INFO;
+        foreach (self::$notes as [$note, $uGroup, $level])
+        {
+            if ($uGroup && !User::isInGroup($uGroup))
+                continue;
 
-        foreach (self::$notes as $data)
-            if (!$data[0] || User::isInGroup($data[0]))
-                $notes[] = $data[1];
+            if ($level < $severity)
+                $severity = $level;
 
-        return $notes;
+            $notes[] = $note;
+        }
+
+        return [$notes, $severity];
     }
 
     private static $execTime = 0.0;
@@ -737,7 +738,7 @@ abstract class Util
             // html may contain 'Pictures' and FlavorImages and "stuff"
             $text = preg_replace_callback(
                 '/src="([^"]+)"/i',
-                function ($m) { return 'src="'.STATIC_URL.'/images/wow/'.strtr($m[1], ['\\' => '/']).'.png"'; },
+                function ($m) { return sprintf('src="%s/images/wow/%s.png"', Cfg::get('STATIC_URL'), strtr($m[1], ['\\' => '/'])); },
                 strtr($text, $pairs)
             );
         }
@@ -848,8 +849,8 @@ abstract class Util
         return strtr($data, array(
             '<script'    => '<scr"+"ipt',
             'script>'    => 'scr"+"ipt>',
-            'HOST_URL'   => HOST_URL,
-            'STATIC_URL' => STATIC_URL
+            'HOST_URL'   => Cfg::get('HOST_URL'),
+            'STATIC_URL' => Cfg::get('STATIC_URL')
         ));
     }
 
@@ -955,43 +956,59 @@ abstract class Util
         return mb_strtolower($str);
     }
 
-    // note: valid integer > 32bit are returned as float
+    // doesn't handle scientific notation .. why would you input 3e3 for 3000..?
     public static function checkNumeric(&$data, $typeCast = NUM_ANY)
     {
         if ($data === null)
             return false;
-        else if (!is_array($data))
+
+        if (is_array($data))
         {
-            $rawData = $data;                               // do not transform strings
-
-            $data = trim($data);
-            if (preg_match('/^-?\d*,\d+$/', $data))
-                $data = strtr($data, ',', '.');
-
-            if (is_numeric($data))
-            {
-                $data += 0;                                 // becomes float or int
-
-                if ((is_float($data) && $typeCast == NUM_REQ_INT) ||
-                    (is_int($data) && $typeCast == NUM_REQ_FLOAT))
-                    return false;
-
-                if (is_float($data) && $typeCast == NUM_CAST_INT)
-                    $data = intval($data);
-
-                if (is_int($data) && $typeCast == NUM_CAST_FLOAT)
-                    $data = floatval($data);
-
-                return true;
-            }
-
-            $data = $rawData;
-            return false;
+            array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
+            return false;                                   // always false for passed arrays
         }
 
-        array_walk($data, function(&$x) use($typeCast) { self::checkNumeric($x, $typeCast); });
+        // already in required state
+        if ((is_float($data) && $typeCast == NUM_REQ_FLOAT) ||
+            (is_int($data) && $typeCast == NUM_REQ_INT))
+            return true;
 
-        return false;                                       // always false for passed arrays
+        // irreconcilable state
+        if ((!is_int($data) && $typeCast == NUM_REQ_INT) ||
+            (!is_float($data) && $typeCast == NUM_REQ_FLOAT))
+            return false;
+
+        $number = $data;                                    // do not transform strings, store state
+        $nMatches = 0;
+
+        $number = trim($number);
+        $number = preg_replace('/^(-?\d*)[.,](\d+)$/', '$1.$2', $number, -1, $nMatches);
+
+        // is float string
+        if ($nMatches)
+        {
+            if ($typeCast == NUM_CAST_INT)
+                $data = intVal($number);
+            else if ($typeCast == NUM_CAST_FLOAT)
+                $data = floatVal($number);
+
+            return true;
+        }
+
+        // is int string (is_numeric can only handle strings in base 10)
+        if (is_numeric($number) || preg_match('/0[xb]?\d+/', $number))
+        {
+            $number = intVal($number, 0);                   // 'base 0' auto-detects base
+            if ($typeCast == NUM_CAST_INT)
+                $data = $number;
+            else if ($typeCast == NUM_CAST_FLOAT)
+                $data = floatVal($number);
+
+            return true;
+        }
+
+        // is string string
+        return false;
     }
 
     public static function arraySumByKey(array &$ref, array ...$adds) : void
@@ -1090,18 +1107,18 @@ abstract class Util
         switch ($action)
         {
             case SITEREP_ACTION_REGISTER:
-                $x['amount'] = CFG_REP_REWARD_REGISTER;
+                $x['amount'] = Cfg::get('REP_REWARD_REGISTER');
                 break;
             case SITEREP_ACTION_DAILYVISIT:
                 $x['sourceA'] = time();
-                $x['amount']  = CFG_REP_REWARD_DAILYVISIT;
+                $x['amount']  = Cfg::get('REP_REWARD_DAILYVISIT');
                 break;
             case SITEREP_ACTION_COMMENT:
                 if (empty($miscData['id']))
                     return false;
 
                 $x['sourceA'] = $miscData['id'];            // commentId
-                $x['amount']  = CFG_REP_REWARD_COMMENT;
+                $x['amount']  = Cfg::get('REP_REWARD_COMMENT');
                 break;
             case SITEREP_ACTION_UPVOTED:
             case SITEREP_ACTION_DOWNVOTED:
@@ -1118,7 +1135,7 @@ abstract class Util
 
                 $x['sourceA'] = $miscData['id'];            // commentId
                 $x['sourceB'] = $miscData['voterId'];
-                $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? CFG_REP_REWARD_UPVOTED : CFG_REP_REWARD_DOWNVOTED;
+                $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? Cfg::get('REP_REWARD_UPVOTED') : Cfg::get('REP_REWARD_DOWNVOTED');
                 break;
             case SITEREP_ACTION_UPLOAD:
                 if (empty($miscData['id']) || empty($miscData['what']))
@@ -1126,7 +1143,7 @@ abstract class Util
 
                 $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
                 $x['sourceB'] = $miscData['what'];          // screenshot:1 or video:NYD
-                $x['amount']  = CFG_REP_REWARD_UPLOAD;
+                $x['amount']  = Cfg::get('REP_REWARD_UPLOAD');
                 break;
             case SITEREP_ACTION_GOOD_REPORT:                // NYI
             case SITEREP_ACTION_BAD_REPORT:
@@ -1134,14 +1151,14 @@ abstract class Util
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? CFG_REP_REWARD_GOOD_REPORT : CFG_REP_REWARD_BAD_REPORT;
+                $x['amount']  = $action == SITEREP_ACTION_GOOD_REPORT ? Cfg::get('REP_REWARD_GOOD_REPORT') : Cfg::get('REP_REWARD_BAD_REPORT');
                 break;
             case SITEREP_ACTION_ARTICLE:
                 if (empty($miscData['id']))                 // guideId
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = CFG_REP_REWARD_ARTICLE;
+                $x['amount']  = Cfg::get('REP_REWARD_ARTICLE');
                 break;
             case SITEREP_ACTION_USER_WARNED:                // NYI
             case SITEREP_ACTION_USER_SUSPENDED:
@@ -1149,7 +1166,7 @@ abstract class Util
                     return false;
 
                 $x['sourceA'] = $miscData['id'];
-                $x['amount']  = $action == SITEREP_ACTION_USER_WARNED ? CFG_REP_REWARD_USER_WARNED : CFG_REP_REWARD_USER_SUSPENDED;
+                $x['amount']  = $action == SITEREP_ACTION_USER_WARNED ? Cfg::get('REP_REWARD_USER_WARNED') : Cfg::get('REP_REWARD_USER_SUSPENDED');
                 break;
         }
 
@@ -1160,149 +1177,6 @@ abstract class Util
         ));
 
         return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
-    }
-
-    public static function getServerConditions($srcType, $srcGroup = null, $srcEntry = null)
-    {
-        if (!$srcGroup && !$srcEntry)
-            return [];
-
-        $result    = [];
-        $jsGlobals = [];
-
-        $conditions = DB::World()->select(
-            'SELECT  SourceTypeOrReferenceId, SourceEntry, SourceGroup, ElseGroup,
-                     ConditionTypeOrReference, ConditionTarget, ConditionValue1, ConditionValue2, ConditionValue3, NegativeCondition
-            FROM     conditions
-            WHERE    SourceTypeOrReferenceId IN (?a) AND ?# = ?d
-            ORDER BY SourceTypeOrReferenceId, SourceEntry, SourceGroup, ElseGroup ASC',
-            is_array($srcType) ? $srcType : [$srcType],
-            $srcGroup ? 'SourceGroup' : 'SourceEntry',
-            $srcGroup ?: $srcEntry
-        );
-
-        foreach ($conditions as $c)
-        {
-            switch ($c['SourceTypeOrReferenceId'])
-            {
-                case CND_SRC_SPELL_CLICK_EVENT:             // 18
-                case CND_SRC_VEHICLE_SPELL:                 // 21
-                case CND_SRC_NPC_VENDOR:                    // 23
-                    $jsGlobals[Type::NPC][] = $c['SourceGroup'];
-                    break;
-            }
-
-            switch ($c['ConditionTypeOrReference'])
-            {
-                case CND_AURA:                              // 1
-                    $c['ConditionValue2'] = null;           // do not use his param
-                case CND_SPELL:                             // 25
-                    $jsGlobals[Type::SPELL][] = $c['ConditionValue1'];
-                    break;
-                case CND_ITEM:                              // 2
-                    $c['ConditionValue3'] = null;           // do not use his param
-                case CND_ITEM_EQUIPPED:                     // 3
-                    $jsGlobals[Type::ITEM][] = $c['ConditionValue1'];
-                    break;
-                case CND_MAPID:                             // 22 - break down to area or remap for use with g_zone_categories
-                    switch ($c['ConditionValue1'])
-                    {
-                        case 530:                           // outland
-                            $c['ConditionValue1'] = 8;
-                            break;
-                        case 571:                           // northrend
-                            $c['ConditionValue1'] = 10;
-                            break;
-                        case 0:                             // old world is fine
-                        case 1:
-                            break;
-                        default:                            // remap for area
-                            $cnd = array(
-                                ['mapId', (int)$c['ConditionValue1']],
-                                ['parentArea', 0],          // not child zones
-                                [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
-                                1                           // only one result
-                            );
-                            $zone = new ZoneList($cnd);
-                            if (!$zone->error)
-                            {
-                                $jsGlobals[Type::ZONE][] = $zone->getField('id');
-                                $c['ConditionTypeOrReference'] = CND_ZONEID;
-                                $c['ConditionValue1'] = $zone->getField('id');
-                                break;
-                            }
-                            else
-                                continue 3;
-                    }
-                case CND_ZONEID:                            // 4
-                case CND_AREAID:                            // 23
-                    $jsGlobals[Type::ZONE][] = $c['ConditionValue1'];
-                    break;
-                case CND_REPUTATION_RANK:                   // 5
-                    $jsGlobals[Type::FACTION][] = $c['ConditionValue1'];
-                    break;
-                case CND_SKILL:                             // 7
-                    $jsGlobals[Type::SKILL][] = $c['ConditionValue1'];
-                    break;
-                case CND_QUESTREWARDED:                     // 8
-                case CND_QUESTTAKEN:                        // 9
-                case CND_QUEST_NONE:                        // 14
-                case CND_QUEST_COMPLETE:                    // 28
-                    $jsGlobals[Type::QUEST][] = $c['ConditionValue1'];
-                    break;
-                case CND_ACTIVE_EVENT:                      // 12
-                    $jsGlobals[Type::WORLDEVENT][] = $c['ConditionValue1'];
-                    break;
-                case CND_ACHIEVEMENT:                       // 17
-                    $jsGlobals[Type::ACHIEVEMENT][] = $c['ConditionValue1'];
-                    break;
-                case CND_TITLE:                             // 18
-                    $jsGlobals[Type::TITLE][] = $c['ConditionValue1'];
-                    break;
-                case CND_NEAR_CREATURE:                     // 29
-                    $jsGlobals[Type::NPC][] = $c['ConditionValue1'];
-                    break;
-                case CND_NEAR_GAMEOBJECT:                   // 30
-                    $jsGlobals[Type::OBJECT][] = $c['ConditionValue1'];
-                    break;
-                case CND_CLASS:                             // 15
-                    for ($i = 0; $i < 11; $i++)
-                        if ($c['ConditionValue1'] & (1 << $i))
-                            $jsGlobals[Type::CHR_CLASS][] = $i + 1;
-                    break;
-                case CND_RACE:                              // 16
-                    for ($i = 0; $i < 11; $i++)
-                        if ($c['ConditionValue1'] & (1 << $i))
-                            $jsGlobals[Type::CHR_RACE][] = $i + 1;
-                    break;
-                case CND_OBJECT_ENTRY:                      // 31
-                    if ($c['ConditionValue1'] == 3)
-                        $jsGlobals[Type::NPC][] = $c['ConditionValue2'];
-                    else if ($c['ConditionValue1'] == 5)
-                        $jsGlobals[Type::OBJECT][] = $c['ConditionValue2'];
-                    break;
-                case CND_TEAM:                              // 6
-                    if ($c['ConditionValue1'] == 469)       // Alliance
-                        $c['ConditionValue1'] = 1;
-                    else if ($c['ConditionValue1'] == 67)   // Horde
-                        $c['ConditionValue1'] = 2;
-                    else
-                        continue 2;
-            }
-
-            $res = [$c['NegativeCondition'] ? -$c['ConditionTypeOrReference'] : $c['ConditionTypeOrReference']];
-            foreach ([1, 2, 3] as $i)
-                if (($_ = $c['ConditionValue'.$i]) || $c['ConditionTypeOrReference'] = CND_DISTANCE_TO)
-                    $res[] = $_;
-
-            $group = $c['SourceEntry'];
-            if (!in_array($c['SourceTypeOrReferenceId'], [CND_SRC_CREATURE_TEMPLATE_VEHICLE, CND_SRC_SPELL, CND_SRC_QUEST_ACCEPT, CND_SRC_QUEST_SHOW_MARK, CND_SRC_SPELL_PROC]))
-                $group = $c['SourceEntry'] . ':' . $c['SourceGroup'];
-
-            $result[$c['SourceTypeOrReferenceId']] [$group] [$c['ElseGroup']] [] = $res;
-        }
-
-        return [$result, $jsGlobals];
     }
 
     public static function sendNoCacheHeader()
@@ -1318,7 +1192,7 @@ abstract class Util
     {
         $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
 
-        if (CFG_DEBUG && !$forceFlags)
+        if (Cfg::get('DEBUG') && !$forceFlags)
             $flags |= JSON_PRETTY_PRINT;
 
         $json = json_encode($data, $flags);
@@ -1656,7 +1530,7 @@ abstract class Util
         return [(int)$deg, $desc];
     }
 
-    static function mask2bits($bitmask, $offset = 0)
+    static function mask2bits(int $bitmask, int $offset = 0) : array
     {
         $bits = [];
         $i    = 0;

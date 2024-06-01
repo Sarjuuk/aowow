@@ -182,7 +182,7 @@ class RemoteGuildList extends GuildList
         foreach ($this->iterate() as $guid => &$curTpl)
         {
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
             $r = explode(':', $guid)[0];
             if (!empty($realms[$r]))
@@ -213,7 +213,7 @@ class RemoteGuildList extends GuildList
                 $distrib[$curTpl['realm']]++;
         }
 
-        $limit = CFG_SQL_LIMIT_DEFAULT;
+        $limit = Cfg::get('SQL_LIMIT_DEFAULT');
         foreach ($conditions as $c)
             if (is_int($c))
                 $limit = $c;
@@ -292,7 +292,7 @@ class LocalGuildList extends GuildList
             }
 
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
         }
     }
 

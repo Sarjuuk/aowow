@@ -33,7 +33,7 @@ if (!CLI)
             CLI::write(' - realms: Auth-DB not set up .. static data g_realms will be empty', CLI::LOG_WARN);
         // else
             // foreach ($realms as &$r)
-                // $r['battlegroup'] = CFG_BATTLEGROUP;
+                // $r['battlegroup'] = Cfg::get('BATTLEGROUP');
 
         // remove access column
         array_walk($realms, function (&$x) { unset($x['access']); });

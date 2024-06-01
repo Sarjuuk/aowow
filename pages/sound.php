@@ -249,7 +249,7 @@ class SoundPage extends GenericPage
 
                     foreach ($zoneIds as $zData)
                         if ($zData['worldStateId'])
-                            $zoneData[$zData['id']]['condition'][0][$this->typeId][] = [[CND_WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]];
+                            Conditions::extendListviewRow($zoneData[$zData['id']], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]);
                 }
 
                 $tabData['data'] = array_values($zoneData);
@@ -328,7 +328,7 @@ class SoundPage extends GenericPage
         if ($creatureIds || $displayIds)
         {
             $extra = [];
-            $cnds = [CFG_SQL_LIMIT_NONE, &$extra];
+            $cnds = [Cfg::get('SQL_LIMIT_NONE'), &$extra];
             if (!User::isInGroup(U_GROUP_STAFF))
                 $cnds[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

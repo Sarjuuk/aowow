@@ -53,7 +53,7 @@ $lang = array(
         'or'            => " или ",
         'back'          => "Назад",
         'reputationTip' => "Очки репутации",
-        'byUser'        => 'От <a href="'.HOST_URL.'/?user=%1$s"%2$s>%1s</a> ',
+        'byUser'        => 'От <a href="HOST_URL/?user=%1$s"%2$s>%1s</a> ',
         'help'          => "Справка",
         'status'        => "Статус",
         'yes'           => "Да",
@@ -270,7 +270,7 @@ $lang = array(
         ),
         'error'         => array(
             'unkFormat'   => "неизвестный формат изображения.",
-            'tooSmall'    => "Изображение слишком маленькое. (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'tooSmall'    => "Изображение слишком маленькое. (&lt; CFG_SCREENSHOT_MIN_SIZE x CFG_SCREENSHOT_MIN_SIZE).",
             'selectSS'    => "Выберите изображение для загрузки.",
             'notAllowed'  => "[You are not allowed to upload screenshots!]",
         )
@@ -877,7 +877,7 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Недопустимый адрес email.", // message_emailnotvalid
-        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email ".CFG_CONTACT_EMAIL." for assistance.",
+        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email CFG_CONTACT_EMAIL for assistance.",
         'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
         'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
         'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
@@ -914,9 +914,9 @@ $lang = array(
         'posts'         => "Сообщений на форумах",
         // user mail
         'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Account Confirmation", "Welcome to ".CFG_NAME_SHORT."!\r\n\r\nClick the Link below to activate your account.\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+        'accConfirm'    => ["Account Confirmation", "Welcome to CFG_NAME_SHORT!\r\n\r\nClick the Link below to activate your account.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
+        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",
@@ -1081,7 +1081,7 @@ $lang = array(
         'slain'         => "убито",
         'reqNumCrt'     => "Требуется",
         'rfAvailable'   => "[Available on realm]: ",
-        '_transfer'     => 'Этот предмет превратится в <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Этот предмет превратится в <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'cat'           => array(
                 1 => "Статистика",                                                   21 => "PvP",
                81 => "Великие подвиги",                                              92 => "Общее",
@@ -1477,7 +1477,7 @@ $lang = array(
         '_inSlot'       => "в слот",
         '_collapseAll'  => "Свернуть все",
         '_expandAll'    => "Развернуть все",
-        '_transfer'     => 'Этот предмет превратится в <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Этот предмет превратится в <a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         '_affected'     => "Влияет на заклинания",
         '_seeMore'      => "[See more]",
         '_rankRange'    => "Ранг:&nbsp;%d&nbsp;-&nbsp;%d",
@@ -1838,7 +1838,7 @@ $lang = array(
         'tool'          => "Инструмент",
         'cost'          => "Цена",
         'content'       => "Материал",
-        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
+        '_transfer'     => 'Этот предмет превратится в <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Этот предмет не доступен игрокам.",
         '_rndEnchants'  => "Случайные улучшения",
         '_chance'       => "(шанс %s%%)",

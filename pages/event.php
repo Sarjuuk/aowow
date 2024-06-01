@@ -244,21 +244,16 @@ class EventPage extends GenericPage
                 $this->extendGlobalData($relEvents->getJSGlobals());
                 $relData   = $relEvents->getListviewData();
                 foreach ($relEvents->getFoundIDs() as $id)
-                    $relData[$id]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $this->eId]];
+                    Conditions::extendListviewRow($relData[$id], Conditions::SRC_NONE, $this->typeId, [-Conditions::ACTIVE_EVENT, $this->eId]);
 
                 $this->extendGlobalData($this->subject->getJSGlobals());
+                $d = $this->subject->getListviewData();
                 foreach ($rel as $r)
-                {
-                    if ($r <= 0)
-                        continue;
+                    if ($r > 0)
+                        if (Conditions::extendListviewRow($d[$this->eId], Conditions::SRC_NONE, $this->typeId, [-Conditions::ACTIVE_EVENT, $r]))
+                            $this->extendGlobalIds(Type::WORLDEVENT, $r);
 
-                    $this->extendGlobalIds(Type::WORLDEVENT, $r);
-
-                    $d = $this->subject->getListviewData();
-                    $d[$this->eId]['condition'][0][$this->typeId][] = [[-CND_ACTIVE_EVENT, $r]];
-
-                    $relData = array_merge($relData, $d);
-                }
+                $relData = array_merge($relData, $d);
 
                 $this->lvTabs[] = [WorldEventList::$brickFile, array(
                     'data'       => array_values($relData),
@@ -268,6 +263,14 @@ class EventPage extends GenericPage
                     'extraCols'  => ['$Listview.extraCols.condition']
                 )];
             }
+        }
+
+        // tab: condition for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::WORLDEVENT, $this->typeId))
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
         }
     }
 
@@ -343,7 +346,6 @@ class EventPage extends GenericPage
                     $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
                     $data['rec']       = $updated['rec'];
                 }
-
             }
         }
     }

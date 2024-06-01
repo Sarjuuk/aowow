@@ -44,7 +44,7 @@ class ProfilePage extends GenericPage
     {
         parent::__construct($pageCall, $pageParam);
 
-        if (!CFG_PROFILER_ENABLE)
+        if (!Cfg::get('PROFILER_ENABLE'))
             $this->error();
 
         $params = array_map('urldecode', explode('.', $pageParam));

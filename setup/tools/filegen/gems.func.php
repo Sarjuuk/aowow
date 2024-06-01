@@ -53,7 +53,7 @@ if (!CLI)
         foreach ($gems as $pop)
             $enchIds[] = $pop['enchId'];
 
-        $enchantments = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        $enchantments = new EnchantmentList(array(['id', $enchIds], Cfg::get('SQL_LIMIT_NONE')));
         if ($enchantments->error)
         {
             CLI::write('Required table ?_itemenchantment seems to be empty! Leaving gems()...', CLI::LOG_ERROR);

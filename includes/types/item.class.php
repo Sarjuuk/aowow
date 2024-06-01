@@ -371,10 +371,8 @@ class ItemList extends BaseType
                         $costArr['restock'] = $entries['restock'];
 
                         if ($entries['event'])
-                        {
-                            $this->jsGlobals[Type::WORLDEVENT][$entries['event']] = $entries['event'];
-                            $costArr['condition'][0][$this->id][] = [[CND_ACTIVE_EVENT, $entries['event']]];
-                        }
+                            if (Conditions::extendListviewRow($costArr, Conditions::SRC_NONE, $this->id, [Conditions::ACTIVE_EVENT, $entries['event']]))
+                                $this->jsGlobals[Type::WORLDEVENT][$entries['event']] = $entries['event'];
 
                         if ($currency || $tokens)           // fill idx:3 if required
                             $costArr['cost'][] = $currency;
@@ -834,7 +832,7 @@ class ItemList extends BaseType
             $pop       = array_pop($enhance['g']);
             $col       = $pop ? 1 : 0;
             $hasMatch &= $pop ? (($gems[$pop]['colorMask'] & (1 << $colorId)) ? 1 : 0) : 0;
-            $icon      = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
+            $icon      = $pop ? sprintf('style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"', Cfg::get('STATIC_URL'), strtolower($gems[$pop]['iconString'])) : null;
             $text      = $pop ? Util::localizedString($gems[$pop], 'name') : Lang::item('socket', $colorId);
 
             if ($interactive)
@@ -848,7 +846,7 @@ class ItemList extends BaseType
         {
             $pop  = array_pop($enhance['g']);
             $col  = $pop ? 1 : 0;
-            $icon = $pop ? sprintf(Util::$bgImagePath['tiny'], STATIC_URL, strtolower($gems[$pop]['iconString'])) : null;
+            $icon = $pop ? sprintf('style="background-image: url(%s/images/wow/icons/tiny/%s.gif)"', Cfg::get('STATIC_URL'), strtolower($gems[$pop]['iconString'])) : null;
             $text = $pop ? Util::localizedString($gems[$pop], 'name') : Lang::item('socket', -1);
 
             if ($interactive)
@@ -1580,7 +1578,7 @@ class ItemList extends BaseType
             array_column($randEnchants, 'enchantId5')
         ));
 
-        $enchants = new EnchantmentList(array(['id', $enchIds], CFG_SQL_LIMIT_NONE));
+        $enchants = new EnchantmentList(array(['id', $enchIds], Cfg::get('SQL_LIMIT_NONE')));
         foreach ($enchants->iterate() as $eId => $_)
         {
             $this->rndEnchIds[$eId] = array(

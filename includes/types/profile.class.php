@@ -531,7 +531,7 @@ class RemoteProfileList extends ProfileList
         $talentSpells = [];
         $talentLookup = [];
         $distrib      = null;
-        $limit        = CFG_SQL_LIMIT_DEFAULT;
+        $limit        = Cfg::get('SQL_LIMIT_DEFAULT');
 
         foreach ($conditions as $c)
             if (is_int($c))
@@ -541,7 +541,7 @@ class RemoteProfileList extends ProfileList
         foreach ($this->iterate() as $guid => &$curTpl)
         {
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
             // realm
             [$r, $g] = explode(':', $guid);
@@ -575,7 +575,7 @@ class RemoteProfileList extends ProfileList
             $curTpl['activespec'] = $curTpl['activeTalentGroup'];
 
             // equalize distribution
-            if ($limit != CFG_SQL_LIMIT_NONE)
+            if ($limit != Cfg::get('SQL_LIMIT_NONE'))
             {
                 if (empty($distrib[$curTpl['realm']]))
                     $distrib[$curTpl['realm']] = 1;
@@ -753,7 +753,7 @@ class LocalProfileList extends ProfileList
             }
 
             // battlegroup
-            $curTpl['battlegroup'] = CFG_BATTLEGROUP;
+            $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
         }
     }
 

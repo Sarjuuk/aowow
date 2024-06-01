@@ -53,7 +53,7 @@ $lang = array(
         'or'            => "或",
         'back'          => "返回",
         'reputationTip' => "声望点数",
-        'byUser'        => '由<a href="'.HOST_URL.'/?user=%1$s"%2$s>%1$s</a>',
+        'byUser'        => '由<a href="HOST_URL/?user=%1$s"%2$s>%1$s</a>',
         'help'          => "帮助",
         'status'        => "状态",
         'yes'           => "是",
@@ -270,7 +270,7 @@ $lang = array(
         ),
         'error'         => array(
             'unkFormat'   => "未知图像格式。",
-            'tooSmall'    => "你的截图太小了。 (&lt; ".CFG_SCREENSHOT_MIN_SIZE."x".CFG_SCREENSHOT_MIN_SIZE.").",
+            'tooSmall'    => "你的截图太小了。 (&lt; CFG_SCREENSHOT_MIN_SIZE x CFG_SCREENSHOT_MIN_SIZE).",
             'selectSS'    => "请选择截图上传。",
             'notAllowed'  => "你不允许上传截图！",
         )
@@ -876,7 +876,7 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "该电子邮件地址无效。", // message_emailnotvalid
-        'emailNotFound' => "你输入的电子邮件地址与任何帐户不关联。<br><br>如果您忘记了使用哪个电子邮件注册了您的帐户，请发送电子邮件至".CFG_CONTACT_EMAIL."寻求帮助。",
+        'emailNotFound' => "你输入的电子邮件地址与任何帐户不关联。<br><br>如果您忘记了使用哪个电子邮件注册了您的帐户，请发送电子邮件至CFG_CONTACT_EMAIL寻求帮助。",
         'createAccSent' => "电子邮件发送到<b>%s</b>。只需按照说明创建你的帐户。",
         'recovUserSent' => "电子邮件发送到<b>%s</b>。只需按照说明恢复你的用户名。",
         'recovPassSent' => "电子邮件发送到<b>%s</b>。只需按照说明重置你的密码。",
@@ -913,9 +913,9 @@ $lang = array(
         'posts'         => "论坛帖子",
         // user mail
         'tokenExpires'  => "此令牌将在%s过期。",
-        'accConfirm'    => ["账户确认", "欢迎来到".CFG_NAME_SHORT."!\r\n\r\n点击下方链接以激活您的账户。\r\n\r\n".HOST_URL."?account=signup&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
-        'recoverUser'   => ["用户恢复",        "点击此链接登录\r\n\r\n".HOST_URL."?account=signin&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
-        'resetPass'     => ["重置密码",       "点击此链接以重置您的密码。\r\n\r\n".HOST_URL."?account=forgotpassword&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"]
+        'accConfirm'    => ["账户确认", "欢迎来到CFG_NAME_SHORT!\r\n\r\n点击下方链接以激活您的账户。\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
+        'recoverUser'   => ["用户恢复",        "点击此链接登录\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
+        'resetPass'     => ["重置密码",       "点击此链接以重置您的密码。\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"]
     ),
     'emote' => array(
         'notFound'      => "这个表情不存在。",
@@ -1080,7 +1080,7 @@ $lang = array(
         'slain'         => "杀死",
         'reqNumCrt'     => "要求",
         'rfAvailable'   => "在服务器上可用：",
-        '_transfer'     => '这个成就将被转换到<a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
+        '_transfer'     => '这个成就将被转换到<a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
                 1 => "属性",                                                           21 => "PvP",
                81 => "光辉事迹",                                                         92 => "综合",
@@ -1476,7 +1476,7 @@ $lang = array(
         '_inSlot'       => "在插槽中",
         '_collapseAll'  => "折叠全部",
         '_expandAll'    => "展开全部",
-        '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
+        '_transfer'     => '这个法术将被转换到<a href="?spell=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         '_affected'     => "受影响法术",
         '_seeMore'      => "[See more]",
         '_rankRange'    => "排名:&nbsp;%d&nbsp;-&nbsp;%d",
@@ -1837,7 +1837,7 @@ $lang = array(
         'tool'          => "工具",
         'cost'          => "花费",
         'content'       => "内容",
-        '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url('.STATIC_URL.'/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
+        '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         '_unavailable'  => "这个物品对玩家不可用。",
         '_rndEnchants'  => "随机附魔",
         '_chance'       => "（%s%%几率）",

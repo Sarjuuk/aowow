@@ -230,7 +230,7 @@ class ObjectPage extends GenericPage
 
 
         $relBoss = null;
-        if ($ll = DB::Aowow()->selectRow('SELECT * FROM ?_loot_link WHERE objectId = ?d ORDER BY priority DESC LIMIT 1', $this->typeId))
+        if ($ll = DB::Aowow()->selectRow('SELECT * FROM ?_loot_link WHERE `objectId` = ?d ORDER BY `priority` DESC LIMIT 1', $this->typeId))
         {
             // group encounter
             if ($ll['encounterId'])
@@ -386,7 +386,6 @@ class ObjectPage extends GenericPage
         }
 
         // tab: contains
-        $reqQuest = [];
         if ($_ = $this->subject->getField('lootId'))
         {
             $goLoot = new Loot();
@@ -397,24 +396,18 @@ class ObjectPage extends GenericPage
                 $hiddenCols  = ['source', 'side', 'slot', 'reqlevel'];
 
                 $this->extendGlobalData($goLoot->jsGlobals);
+                $lootResult = $goLoot->getResult();
 
-                foreach ($goLoot->iterate() as &$lv)
+                foreach ($hiddenCols as $k => $str)
                 {
-                    if (!empty($hiddenCols))
-                        foreach ($hiddenCols as $k => $str)
-                            if (!empty($lv[$str]))
-                                unset($hiddenCols[$k]);
-
-                    if (!$lv['quest'])
-                        continue;
-
-                    $extraCols[] = '$Listview.extraCols.condition';
-                    $reqQuest[$lv['id']] = 0;
-                    $lv['condition'][0][$this->typeId][] = [[CND_QUESTTAKEN, &$reqQuest[$lv['id']]]];
+                    if ($k == 1 && array_filter(array_column($lootResult, $str), function ($x) { return $x != SIDE_BOTH; }))
+                        unset($hiddenCols[$k]);
+                    else if ($k != 1 && array_column($lootResult, $str))
+                        unset($hiddenCols[$k]);
                 }
 
                 $tabData = array(
-                    'data'      => array_values($goLoot->getResult()),
+                    'data'      => array_values($lootResult),
                     'id'        => 'contains',
                     'name'      => '$LANG.tab_contains',
                     'sort'      => ['-percent', 'name'],
@@ -422,33 +415,9 @@ class ObjectPage extends GenericPage
                 );
 
                 if ($hiddenCols)
-                    $tabData['hiddenCols'] = $hiddenCols;
+                    $tabData['hiddenCols'] = array_values($hiddenCols);
 
                 $this->lvTabs[] = [ItemList::$brickFile, $tabData];
-            }
-        }
-
-        if ($reqIds = array_keys($reqQuest))                    // apply quest-conditions as back-reference
-        {
-            $conditions = array(
-                'OR',
-                ['reqSourceItemId1', $reqIds], ['reqSourceItemId2', $reqIds],
-                ['reqSourceItemId3', $reqIds], ['reqSourceItemId4', $reqIds],
-                ['reqItemId1', $reqIds], ['reqItemId2', $reqIds], ['reqItemId3', $reqIds],
-                ['reqItemId4', $reqIds], ['reqItemId5', $reqIds], ['reqItemId6', $reqIds]
-            );
-
-            $reqQuests = new QuestList($conditions);
-            $this->extendGlobalData($reqQuests->getJSGlobals());
-
-            foreach ($reqQuests->iterate() as $qId => $__)
-            {
-                if (empty($reqQuests->requires[$qId][Type::ITEM]))
-                    continue;
-
-                foreach ($reqIds as $rId)
-                    if (in_array($rId, $reqQuests->requires[$qId][Type::ITEM]))
-                        $reqQuest[$rId] = $reqQuests->id;
             }
         }
 
@@ -467,9 +436,9 @@ class ObjectPage extends GenericPage
                 $this->extendGlobalData($focusSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 // create note if search limit was exceeded
-                if ($focusSpells->getMatches() > CFG_SQL_LIMIT_DEFAULT)
+                if ($focusSpells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 {
-                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), CFG_SQL_LIMIT_DEFAULT);
+                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                     $tabData['_truncated'] = 1;
                 }
 
