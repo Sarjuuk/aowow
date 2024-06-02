@@ -556,7 +556,10 @@ CREATE TABLE `aowow_creature` (
   KEY `idx_name` (`name_loc0`),
   KEY `difficultyEntry1` (`difficultyEntry1`),
   KEY `difficultyEntry2` (`difficultyEntry2`),
-  KEY `difficultyEntry3` (`difficultyEntry3`)
+  KEY `difficultyEntry3` (`difficultyEntry3`),
+  KEY `idx_loot` (`lootId`),
+  KEY `idx_pickpocketloot` (`pickpocketLootId`),
+  KEY `idx_skinloot` (`skinLootId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3225,7 +3228,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1717076299,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1717354215,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

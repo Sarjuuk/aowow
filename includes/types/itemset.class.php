@@ -113,7 +113,7 @@ class ItemsetList extends BaseType
         if ($_ = $this->getField('contentGroup'))
             $x .= Lang::itemset('notes', $_).($this->getField('heroic') ? ' <i class="q2">('.Lang::item('heroic').')</i>' : '').'<br />';
 
-        if (!$nCl || !$this->getField('contentGroup'))
+        if (!$nCl || !$this->getField('type'))
             $x.= Lang::itemset('types', $this->getField('type')).'<br />';
 
         if ($bonuses = $this->getBonuses())

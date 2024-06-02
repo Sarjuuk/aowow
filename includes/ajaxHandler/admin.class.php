@@ -423,8 +423,9 @@ class AjaxAdmin extends AjaxHandler
                                         'areaId' => $point[0]['areaId'],
                                         'floor'  => $point[0]['floor']
                                     );
+
+                                    DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
                                 }
-                                DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
                             }
                         }
                     }

@@ -344,7 +344,7 @@ class Conditions
         $success = false;
         foreach ($lvRows as $key => &$row)
         {
-            $key = $row['id'].':'.$srcEntry;                // it's a listview row .. if it doesn't have a numeric id something truely fucked up happened. ... also its past 2a.m.
+            $key = ($row['id'] ?? $key).':'.$srcEntry;      // loot rows don't have an 'id' while being generated, but they have a usable $key
             while (substr_count($key, ':') < 3)             // pad with missing srcEntry, SrcId, cndTarget to group key
                 $key .= ':0';
 

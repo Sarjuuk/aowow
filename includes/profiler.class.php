@@ -560,7 +560,7 @@ class Profiler
                     $petData['entry']
                 );
 
-                $_ = DB::Aowow()->selectCol('SELECT `spell` AS ARRAY_KEY, MAX(IF(`spell` IN (?a), `rank`, 0)) FROM ?_talents WHERE `class` = 0 AND `petTypeMask` = ?d GROUP BY `id` ORDER BY `row`, `col` ASC', $petSpells ?: [0], 1 << $morePet['type']);
+                $_ = DB::Aowow()->selectCol('SELECT `spell` AS ARRAY_KEY, MAX(IF(`spell` IN (?a), `rank`, 0)) FROM ?_talents WHERE `class` = 0 AND `petTypeMask` = ?d GROUP BY `row`, `col` ORDER BY `row`, `col` ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
                     'owner'     => $profileId,
