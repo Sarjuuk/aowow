@@ -1745,8 +1745,6 @@ class ItemList extends BaseType
 
         $this->json[$json['id']] = $json;
     }
-
-    public function addRewardsToJScript(&$ref) { }
 }
 
 

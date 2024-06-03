@@ -56,7 +56,6 @@ class CharClassList extends BaseType
         return $data;
     }
 
-    public function addRewardsToJScript(&$ref) { }
     public function renderTooltip() { }
 }
 

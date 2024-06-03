@@ -275,10 +275,6 @@ class CreatureList extends BaseType
 
         return $data;
     }
-
-    public function addRewardsToJScript(&$refs) { }
-
-
 }
 
 
