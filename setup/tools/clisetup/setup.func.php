@@ -130,7 +130,11 @@ function setup() : void
 
             // init proper access for further setup
             if (DB::test($AoWoWconf[$what], $err))
+            {
                 DB::load($idx, $AoWoWconf[$what]);
+                if ($idx == DB_AOWOW)
+                    Cfg::load();                            // first time load after successful db setup
+            }
             else
                 $error[] = ' * '.$what.': '.$err;
         }
