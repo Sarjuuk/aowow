@@ -42,7 +42,8 @@ class Cfg
     private const IDX_DEFAULT  = 3;
     private const IDX_COMMENT  = 4;
 
-    private static $store = [];                             // name => [value, flags, cat, default, comment]
+    private static $store    = [];                          // name => [value, flags, cat, default, comment]
+    private static $isLoaded = false;
 
     private static $rebuildScripts = array(
     //  'rep_req_border_unco' => ['global'],                // currently not a template or buildScript
@@ -70,20 +71,20 @@ class Cfg
 
             if ($err = self::validate($value, $flags, $comment))
             {
-                trigger_error('Aowow config '.strtoupper($key).' failed validation and was skipped: '.$err, E_USER_ERROR);
+                self::throwError('Aowow config '.strtoupper($key).' failed validation and was skipped: '.$err);
                 continue;
             }
 
             if ($flags & self::FLAG_INTERNAL)
             {
-                trigger_error('Aowow config '.strtoupper($key).' is flagged as internaly generated and should not have been set in DB.', E_USER_ERROR);
+                self::throwError('Aowow config '.strtoupper($key).' is flagged as internaly generated and should not have been set in DB.');
                 continue;
             }
 
             if ($flags & self::FLAG_ON_LOAD_FN)
             {
                 if (!method_exists('Cfg', $key))
-                    trigger_error('Aowow config '.strtoupper($key).' flagged for onLoadFN handling, but no handler was set', E_USER_WARNING);
+                    self::throwError('Aowow config '.strtoupper($key).' flagged for onLoadFN handling, but no handler was set');
                 else
                     self::{$key}($value);
             }
@@ -93,10 +94,21 @@ class Cfg
 
             self::$store[strtolower($key)] = [$value, $flags, $catg, $default, $comment];
         }
+
+        if (CLI && !count(self::$store))
+        {
+            CLI::write('Cfg::load - aowow_config unexpectedly empty.', CLI::LOG_WARN);
+            return;
+        }
+
+        self::$isLoaded = true;
     }
 
     public static function add(string $key, /*int|string*/ $value) : string
     {
+        if (!self::$isLoaded)
+            return 'used add() on uninitialized config';
+
         if (!$key)
             return 'empty option name given';
 
@@ -124,6 +136,9 @@ class Cfg
 
     public static function delete(string $key) : string
     {
+        if (!self::$isLoaded)
+            return 'used delete() on uninitialized config';
+
         $key = strtolower($key);
 
         if (!isset(self::$store[$key]))
@@ -151,7 +166,9 @@ class Cfg
 
         if (!isset(self::$store[$key]))
         {
-            trigger_error('cfg not defined: '.$key, E_USER_ERROR);
+            if (self::$isLoaded)
+                self::throwError('cfg not defined: '.strtoupper($key));
+
             return '';
         }
 
@@ -167,6 +184,9 @@ class Cfg
 
     public static function set(string $key, /*int|string*/ $value, ?array &$rebuildFiles = []) : string
     {
+        if (!self::$isLoaded)
+            return 'used set() on uninitialized config';
+
         $key = strtolower($key);
 
         if (!isset(self::$store[$key]))
@@ -202,7 +222,6 @@ class Cfg
                 DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldValue, $key);
                 self::$store[$key][self::IDX_VALUE] = $oldValue;
 
-                // trigger_error($errMsg) ?
                 return $errMsg;
             }
         }
@@ -221,12 +240,15 @@ class Cfg
 
     public static function reset(string $key, ?array &$rebuildFiles = []) : string
     {
+        if (!self::$isLoaded)
+            return 'used reset() on uninitialized config';
+
         $key = strtolower($key);
 
         if (!isset(self::$store[$key]))
             return 'configuration option not found';
 
-        [, $flags, , $default, ] = self::$store[$key];
+        [$oldValue, $flags, , $default, ] = self::$store[$key];
         if ($flags & self::FLAG_INTERNAL)
             return 'can\'t set internal options directly';
 
@@ -239,6 +261,25 @@ class Cfg
 
         DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $default, $key);
         self::$store[$key][self::IDX_VALUE] = $default;
+
+        // validate change
+        if ($flags & self::FLAG_ON_SET_FN)
+        {
+            $errMsg = '';
+            if (!method_exists('Cfg', $key))
+                $errMsg = 'required onSetFN validator not set';
+            else
+                self::{$key}($default, $errMsg);
+
+            if ($errMsg)
+            {
+                // rollback change
+                DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldValue, $key);
+                self::$store[$key][self::IDX_VALUE] = $oldValue;
+
+                return $errMsg;
+            }
+        }
 
         // trigger setup build
         return self::handleFileBuild($key, $rebuildFiles);
@@ -333,7 +374,32 @@ class Cfg
         return $msg;
     }
 
-    private static function acc_auth_mode(/*int|string*/ $value, ?string $msg = '') : bool
+    private static function throwError($msg) : void
+    {
+        if (CLI)
+            CLI::write($msg, CLI::LOG_ERROR);
+        else
+            trigger_error($msg, E_USER_ERROR);
+    }
+
+    private static function locales(/*int|string*/ $value, ?string &$msg = '') : bool
+    {
+        if (!CLI)
+            return true;
+
+        CLISetup::$localeIds = [];
+        foreach (CLISetup::$locales as $idx => $_)
+            if (!($value) || ($value & (1 << $idx)))
+                CLISetup::$localeIds[] = $idx;
+
+        if (!empty(CLISetup::$localeIds))
+            return true;
+
+        $msg .= 'no valid locales set';
+        return false;
+    }
+
+    private static function acc_auth_mode(/*int|string*/ $value, ?string &$msg = '') : bool
     {
         if ($value == 1 && !extension_loaded('gmp'))
         {
@@ -344,7 +410,7 @@ class Cfg
         return true;
     }
 
-    private static function profiler_enable(/*int|string*/ $value, ?string $msg = '') : bool
+    private static function profiler_enable(/*int|string*/ $value, ?string &$msg = '') : bool
     {
         if ($value != 1)
             return true;
@@ -352,7 +418,7 @@ class Cfg
         return Profiler::queueStart($msg);
     }
 
-    private static function static_host(/*int|string*/ $value, ?string $msg = '') : bool
+    private static function static_host(/*int|string*/ $value, ?string &$msg = '') : bool
     {
         self::$store['static_url'] = array(                 // points js to images & scripts
             (self::useSSL() ? 'https://' : 'http://').$value,
@@ -365,7 +431,7 @@ class Cfg
         return true;
     }
 
-    private static function site_host(/*int|string*/ $value, ?string $msg = '') : bool
+    private static function site_host(/*int|string*/ $value, ?string &$msg = '') : bool
     {
         self::$store['host_url'] = array(                   // points js to executable files
             (self::useSSL() ? 'https://' : 'http://').$value,

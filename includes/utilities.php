@@ -171,8 +171,7 @@ abstract class CLI
                 continue;
             }
 
-            if (!$nCols)
-                $nCols = count($row);
+            $nCols = max($nCols, count($row));
 
             for ($j = 0; $j < $nCols - 1; $j++)             // don't pad last column
                 $pads[$j] = max($pads[$j] ?? 0, mb_strlen($row[$j] ?? ''));
