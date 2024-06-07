@@ -355,6 +355,8 @@ abstract class CLI
         if (self::$hasReadline)
             readline_callback_handler_install('', function() { });
 
+        stream_set_blocking(STDIN, false);
+
         foreach ($fields as $name => $data)
         {
             $vars = ['desc', 'isHidden', 'validPattern'];
@@ -371,24 +373,35 @@ abstract class CLI
                 $w = $e = null;
                 $n = stream_select($r, $w, $e, 200000);
 
-                if ($n && in_array(STDIN, $r)) {
-                    $char  = stream_get_contents(STDIN, 1);
-                    $keyId = ord($char);
+                if (!$n || !in_array(STDIN, $r))
+                    continue;
 
-                    // ignore these ones
-                    if ($keyId == self::CHR_TAB || $keyId == self::CHR_CR)
-                        continue;
+                $chars    = str_split(stream_get_contents(STDIN));
+                $ordinals = array_map('ord', $chars);
 
-                    // will not be send on WIN .. other ways of returning from setup? (besides ctrl + c)
-                    if ($keyId == self::CHR_ESC)
+                if ($ordinals[0] == self::CHR_ESC)
+                {
+                    if (count($ordinals) == 1)
                     {
                         echo chr(self::CHR_BELL);
                         return false;
                     }
-                    else if ($keyId == self::CHR_BACKSPACE)
+                    else
+                        continue;
+                }
+
+                foreach ($chars as $idx => $char)
+                {
+                    $keyId = $ordinals[$idx];
+
+                    // ignore these ones
+                    if ($keyId == self::CHR_TAB || $keyId == self::CHR_CR)
+                        continue 2;
+
+                    if ($keyId == self::CHR_BACKSPACE)
                     {
                         if (!$charBuff)
-                            continue;
+                            continue 2;
 
                         $charBuff = mb_substr($charBuff, 0, -1);
                         if (!$isHidden && self::$hasReadline)
@@ -397,7 +410,7 @@ abstract class CLI
                     else if ($keyId == self::CHR_LF)
                     {
                         $fields[$name] = $charBuff;
-                        break;
+                        break 2;
                     }
                     else if (!$validPattern || preg_match($validPattern, $char))
                     {
@@ -408,7 +421,7 @@ abstract class CLI
                         if ($singleChar && self::$hasReadline)
                         {
                             $fields[$name] = $charBuff;
-                            break;
+                            break 2;
                         }
                     }
                 }
