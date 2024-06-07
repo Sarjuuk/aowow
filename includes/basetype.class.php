@@ -1254,7 +1254,7 @@ abstract class Filter
                             $unsetme = true;
                         break;
                     case FILTER_CR_ENUM:
-                        if (!Util::checkNumeric($_crs[$i], NUM_REQ_INT))
+                        if (!Util::checkNumeric($_crs[$i], NUM_CAST_INT))
                             $unsetme = true;
                         break;
                 }

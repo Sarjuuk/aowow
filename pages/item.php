@@ -206,7 +206,8 @@ class ItemPage extends genericPage
         {
             $vendors  = $this->subject->getExtendedCost()[$this->subject->id];
             $stack    = $this->subject->getField('buyCount');
-            $each     = $this->subject->getField('stackable') > 1 ? '[color=q0] ('.Lang::item('each').')[/color]' : null;
+            $divisor  = $stack;
+            $each     = '';
             $handled  = [];
             $costList = [];
             foreach ($vendors as $npcId => $entries)
@@ -229,35 +230,63 @@ class ItemPage extends genericPage
 
                         if ($c < 0)                         // currency items (and honor or arena)
                         {
-                            $currency[] = -$c.','.($qty / $stack);
+                            if (is_float($qty / $stack))
+                                $divisor = 1;
+
+                            $currency[] = [-$c, $qty];
                             $this->extendGlobalIds(Type::CURRENCY, -$c);
                         }
                         else if ($c > 0)                    // plain items (item1,count1,item2,count2,...)
                         {
-                            $tokens[$c] = $c.','.($qty / $stack);
+                            if (is_float($qty / $stack))
+                                $divisor = 1;
+
+                            $tokens[] = [$c, $qty];
                             $this->extendGlobalIds(Type::ITEM, $c);
                         }
                     }
 
                     // display every cost-combination only once
-                    if (in_array(md5(serialize($data)), $handled))
+                    $hash = md5(serialize($data));
+                    if (in_array($hash, $handled))
                         continue;
 
-                    $handled[] = md5(serialize($data));
+                    $handled[] = $hash;
 
-                    $cost = isset($data[0]) ? '[money='.($data[0] / $stack) : '[money';
+                    if (isset($data[0]))
+                    {
+                        if (is_float($data[0] / $stack))
+                            $divisor = 1;
+
+                        $cost = '[money='.($data[0] / $divisor);
+                    }
+                    else
+                        $cost = '[money';
+
+                    $stringify = function(&$v) use ($divisor) { return $v = $v[0] . ',' . ($v[1] / $divisor); };
 
                     if ($tokens)
+                    {
+                        array_walk($tokens, $stringify, $divisor);
                         $cost .= ' items='.implode(',', $tokens);
+                    }
 
                     if ($currency)
+                    {
+                        array_walk($currency, $stringify, $divisor);
                         $cost .= ' currency='.implode(',', $currency);
+                    }
 
                     $cost .= ']';
 
                     $costList[] = $cost;
                 }
             }
+
+            if ($stack > 1 && $divisor > 1)
+                $each = '[color=q0] ('.Lang::item('each').')[/color]';
+            else if ($stack > 1)
+                $each = '[color=q0] ('.$stack.')[/color]';
 
             if (count($costList) == 1)
                 $infobox[] = Lang::item('cost').Lang::main('colon').$costList[0].$each;
