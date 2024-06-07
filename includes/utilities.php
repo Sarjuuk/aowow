@@ -394,9 +394,9 @@ abstract class CLI
                 {
                     $keyId = $ordinals[$idx];
 
-                    // ignore these ones
-                    if ($keyId == self::CHR_TAB || $keyId == self::CHR_CR)
-                        continue 2;
+                    // skip char if horizontal tab or \r if followed by \n
+                    if ($keyId == self::CHR_TAB || ($keyId == self::CHR_CR && ($ordinals[$i + 1] ?? '') == self::CHR_LF))
+                        continue;
 
                     if ($keyId == self::CHR_BACKSPACE)
                     {
@@ -407,7 +407,8 @@ abstract class CLI
                         if (!$isHidden && self::$hasReadline)
                             echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
                     }
-                    else if ($keyId == self::CHR_LF)
+                    // standalone \n or \r
+                    else if ($keyId == self::CHR_LF || $keyId == self::CHR_CR)
                     {
                         $fields[$name] = $charBuff;
                         break 2;
