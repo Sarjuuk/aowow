@@ -24,7 +24,10 @@ class DB
     public static function connect($idx)
     {
         if (self::isConnected($idx))
-            return;
+        {
+            self::$interfaceCache[$idx]->link->close();
+            self::$interfaceCache[$idx] = null;
+        }
 
         $options = &self::$optionsCache[$idx];
         $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));

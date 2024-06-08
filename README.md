@@ -26,7 +26,7 @@ Also, this project is not meant to be used for commercial puposes of any kind!
   + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
-+ [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101)
++ [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101) (no other other providers are supported at this time)
 + WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
 + Tools require cmake: Please refer to the individual repositories for detailed information
   + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
