@@ -141,10 +141,10 @@ function setup() : void
                             $error[] = ' * '.$what.': doesn\'t seem to contain aowow tables!';
                         break;
                     case DB_WORLD:
-                        if (!DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'version'))
+                        if (!DB::World()->selectCell('SHOW TABLES LIKE ?', 'version'))
                             $error[] = ' * '.$what.': doesn\'t seem to contain TrinityCore world tables!';
-                        else if (DB::Aowow()->selectCell('SELECT `cache_id` FROM `version`') < TDB_WORLD_MINIMUM_VER)
-                            $error[] = ' * '.$what.': TCDB world db is structurally outdated! (min rev.: '.CLI::bold(TDB_WORLD_MINIMUM_VER).')';
+                        else if (DB::World()->selectCell('SELECT `cache_id` FROM `version`') < TDB_WORLD_MINIMUM_VER)
+                            $error[] = ' * '.$what.': TDB world db is structurally outdated! (min rev.: '.CLI::bold(TDB_WORLD_MINIMUM_VER).')';
                         break;
                     default:
                        // no further checks at this time
