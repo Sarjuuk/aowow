@@ -393,7 +393,7 @@ class CreatureListFilter extends Filter
         if (!$this->parentCats || $this->parentCats[0] != 1)
             return false;
 
-        if (!Util::checkNumeric($val, NUM_REQ_INT))
+        if (!Util::checkNumeric($val, NUM_CAST_INT))
             return false;
 
         $type  = FILTER_V_LIST;
@@ -518,7 +518,7 @@ class CreatureListFilter extends Filter
 
     protected function cbFaction($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
         if (!in_array($cr[1], $this->enums[$cr[0]]))

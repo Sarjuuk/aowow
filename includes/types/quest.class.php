@@ -557,7 +557,7 @@ class QuestListFilter extends Filter
 
     protected function cbReputation($cr, $sign)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
         if (!in_array($cr[1], $this->enums[$cr[0]]))
@@ -593,7 +593,7 @@ class QuestListFilter extends Filter
 
     protected function cbCurrencyReward($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
         if (!in_array($cr[1], $this->enums[$cr[0]]))
@@ -672,7 +672,7 @@ class QuestListFilter extends Filter
 
     protected function cbEarnReputation($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
         if ($cr[1] == FILTER_ENUM_ANY)              // any

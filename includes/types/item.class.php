@@ -2503,7 +2503,7 @@ class ItemListFilter extends Filter
 
     protected function cbDisenchantsInto($cr)
     {
-        if (!Util::checkNumeric($cr[1], NUM_REQ_INT))
+        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
         if (!in_array($cr[1], $this->enums[$cr[0]]))
@@ -2620,7 +2620,7 @@ class ItemListFilter extends Filter
         if (!$this->parentCats)
             return false;
 
-        if (!Util::checkNumeric($v, NUM_REQ_INT))
+        if (!Util::checkNumeric($v, NUM_CAST_INT))
             return false;
 
         $c = $this->parentCats;
@@ -2650,7 +2650,7 @@ class ItemListFilter extends Filter
 
     protected function cbSlotCheck(&$v)
     {
-        if (!Util::checkNumeric($v, NUM_REQ_INT))
+        if (!Util::checkNumeric($v, NUM_CAST_INT))
             return false;
 
         // todo (low): limit to concrete slots

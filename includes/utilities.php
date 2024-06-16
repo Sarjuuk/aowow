@@ -970,7 +970,7 @@ abstract class Util
     }
 
     // doesn't handle scientific notation .. why would you input 3e3 for 3000..?
-    public static function checkNumeric(&$data, $typeCast = NUM_ANY)
+    public static function checkNumeric(&$data, $typeCast = NUM_ANY) : bool
     {
         if ($data === null)
             return false;
@@ -991,7 +991,7 @@ abstract class Util
             (!is_float($data) && $typeCast == NUM_REQ_FLOAT))
             return false;
 
-        $number = $data;                                    // do not transform strings, store state
+        $number   = $data;                                  // do not transform strings, store state
         $nMatches = 0;
 
         $number = trim($number);
@@ -1002,7 +1002,7 @@ abstract class Util
         {
             if ($typeCast == NUM_CAST_INT)
                 $data = intVal($number);
-            else if ($typeCast == NUM_CAST_FLOAT)
+            else                                            // NUM_CAST_FLOAT || NUM_ANY
                 $data = floatVal($number);
 
             return true;
@@ -1012,10 +1012,10 @@ abstract class Util
         if (is_numeric($number) || preg_match('/^0[xb]?\d+/', $number))
         {
             $number = intVal($number, 0);                   // 'base 0' auto-detects base
-            if ($typeCast == NUM_CAST_INT)
-                $data = $number;
-            else if ($typeCast == NUM_CAST_FLOAT)
+            if ($typeCast == NUM_CAST_FLOAT)
                 $data = floatVal($number);
+            else                                            // NUM_CAST_INT || NUM_ANY
+                $data = $number;
 
             return true;
         }
@@ -1034,9 +1034,19 @@ abstract class Util
             foreach ($arr as $k => $v)
             {
                 if (!isset($ref[$k]))
-                    $ref[$k] = 0;
+                {
+                    if (is_array($v))
+                        $ref[$k] = [];
+                    else if (Util::checkNumeric($v))
+                        $ref[$k] = 0;
+                    else
+                        continue;
+                }
 
-                $ref[$k] += $v;
+                if (is_array($ref[$k]) && is_array($v))
+                    Util::arraySumByKey($ref[$k], $v);
+                else if (Util::checkNumeric($ref[$k]) && Util::checkNumeric($v))
+                    $ref[$k] += $v;
             }
         }
     }

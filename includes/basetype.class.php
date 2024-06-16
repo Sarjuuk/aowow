@@ -166,7 +166,7 @@ abstract class BaseType
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
                     $val = '('.implode(', ', $c[1]).')';
                 }
-                else if (Util::checkNumeric($c[1]))
+                else if (Util::checkNumeric($c[1]))         // Note: should this be a NUM_REQ_* check?
                 {
                     $op  = (isset($c[2]) && $c[2] == '!') ? '<>' : '=';
                     $val = $c[1];
@@ -880,7 +880,7 @@ trait sourceHelper
 
         $s = array_keys($this->sources[$this->id]);
         if ($this->curTpl['moreType'] && $this->curTpl['moreTypeId'] && ($srcData = $this->sourceMore[$this->curTpl['moreType']]->getSourceData($this->curTpl['moreTypeId'])))
-            $sm = $srcData;
+            $sm = $srcData[$this->curTpl['moreTypeId']];
         else if (!empty($this->sources[$this->id][SRC_PVP]))
             $sm['p'] = $this->sources[$this->id][SRC_PVP][0];
 

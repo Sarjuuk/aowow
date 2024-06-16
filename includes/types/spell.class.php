@@ -2678,7 +2678,7 @@ class SpellListFilter extends Filter
         if (!$this->parentCats || !in_array($this->parentCats[0], [-13, -2, 7]))
             return false;
 
-        if (!Util::checkNumeric($val, NUM_REQ_INT))
+        if (!Util::checkNumeric($val, NUM_CAST_INT))
             return false;
 
         $type  = FILTER_V_LIST;
@@ -2692,7 +2692,7 @@ class SpellListFilter extends Filter
         if (!$this->parentCats || $this->parentCats[0] != -13)
             return false;
 
-        if (!Util::checkNumeric($val, NUM_REQ_INT))
+        if (!Util::checkNumeric($val, NUM_CAST_INT))
             return false;
 
         $type  = FILTER_V_LIST;
