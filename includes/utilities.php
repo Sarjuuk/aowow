@@ -366,7 +366,7 @@ abstract class CLI
         this also means, you can't hide input at all, least process it
     */
 
-    public static function read(array &$fields, bool $singleChar = false) : bool
+    public static function read(array $fields, ?array &$userInput = []) : bool
     {
         // first time set
         if (self::$hasReadline === null)
@@ -378,12 +378,11 @@ abstract class CLI
 
         stream_set_blocking(STDIN, false);
 
-        foreach ($fields as $name => $data)
-        {
-            $vars = ['desc', 'isHidden', 'validPattern'];
-            foreach ($vars as $idx => $v)
-                $$v = isset($data[$idx]) ? $data[$idx] : false;
+        // pad default values onto $fields
+        array_walk($fields, function(&$val, $_, $pad) { $val += $pad; }, ['', false, false, '']);
 
+        foreach ($fields as $name => [$desc, $isHidden, $singleChar, $validPattern])
+        {
             $charBuff = '';
 
             if ($desc)
@@ -431,7 +430,7 @@ abstract class CLI
                     // standalone \n or \r
                     else if ($keyId == self::CHR_LF || $keyId == self::CHR_CR)
                     {
-                        $fields[$name] = $charBuff;
+                        $userInput[$name] = $charBuff;
                         break 2;
                     }
                     else if (!$validPattern || preg_match($validPattern, $char))
@@ -442,7 +441,7 @@ abstract class CLI
 
                         if ($singleChar && self::$hasReadline)
                         {
-                            $fields[$name] = $charBuff;
+                            $userInput[$name] = $charBuff;
                             break 2;
                         }
                     }
@@ -452,11 +451,11 @@ abstract class CLI
 
         echo chr(self::CHR_BELL);
 
-        foreach ($fields as $f)
-            if (strlen($f))
+        foreach ($userInput as $ui)
+            if (strlen($ui))
                 return true;
 
-        $fields = null;
+        $userInput = null;
         return true;
     }
 }

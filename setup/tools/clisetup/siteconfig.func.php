@@ -107,12 +107,11 @@ function siteconfig() : void
             CLI::write();
         }
 
-        $inp = ['idx' => ['', false, Cfg::PATTERN_CONF_KEY]];
-        if (CLI::read($inp) && $inp && $inp['idx'] !== '')
+        if (CLI::read(['idx' => ['', false, false, Cfg::PATTERN_CONF_KEY]], $uiIndex) && $uiIndex && $uiIndex['idx'] !== '')
         {
-            $idx = array_search(strtolower($inp['idx']), $cfgList);
+            $idx = array_search(strtolower($uiIndex['idx']), $cfgList);
             if ($idx === false)
-                $idx = intVal($inp['idx']);
+                $idx = intVal($uiIndex['idx']);
 
             // add new php setting
             if ($idx == $sumNum)
@@ -123,13 +122,13 @@ function siteconfig() : void
                 while (true)
                 {
                     $setting = array(
-                        'key' => ['option name', false, Cfg::PATTERN_CONF_KEY],
+                        'key' => ['option name', false, false, Cfg::PATTERN_CONF_KEY],
                         'val' => ['value',                            ]
                     );
-                    if (CLI::read($setting) && $setting)
+                    if (CLI::read($setting, $uiSetting) && $uiSetting)
                     {
-                        $key = strtolower($setting['key']);
-                        if ($err = Cfg::add($key, $setting['val']))
+                        $key = strtolower($uiSetting['key']);
+                        if ($err = Cfg::add($key, $uiSetting['val']))
                             CLI::write($err, CLI::LOG_ERROR);
                         else
                             CLI::write('new php configuration added', CLI::LOG_OK);
@@ -177,15 +176,14 @@ function siteconfig() : void
 
                 while (true)
                 {
-                    $action = ['idx' => ['', true, '/[edr]/i']];
-                    if (CLI::read($action, true) && $action)
+                    if (CLI::read(['idx' => ['', true, true, '/[edr]/i']], $uiEDR) && $uiEDR)
                     {
-                        switch (strtoupper($action['idx']))
+                        switch (strtoupper($uiEDR['idx']))
                         {
                             case 'E':           // edit value
                                 $pattern = false;
                                 $single  = false;
-                                $value   = ['idx' => ['Select new value', false, &$pattern]];
+                                $prompt  = ['idx' => ['Select new value', false, &$single, &$pattern]];
 
                                 if ($flags & Cfg::FLAG_OPT_LIST)
                                 {
@@ -218,12 +216,11 @@ function siteconfig() : void
 
                                 while (true)
                                 {
-                                    $use = $value;
-                                    if (CLI::read($use, $single))
+                                    if (CLI::read($prompt, $uiValue))
                                     {
                                         CLI::write();
 
-                                        $inp = $use['idx'] ?? '';
+                                        $inp = $uiValue['idx'] ?? '';
 
                                         if ($err = Cfg::set($key, $inp, $updScripts))
                                         {

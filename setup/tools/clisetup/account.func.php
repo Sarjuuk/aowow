@@ -30,34 +30,34 @@ function account() : void
     User::useLocale(LOCALE_EN);
     Lang::load(LOCALE_EN);
 
-    if (CLI::read($fields))
+    if (CLI::read($fields, $uiAccount))
     {
         CLI::write();
 
-        if (!User::isValidName($fields['name'], $e))
+        if (!User::isValidName($uiAccount['name'], $e))
             CLI::write(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLI::LOG_ERROR);
-        else if (!User::isValidPass($fields['pass1'], $e))
+        else if (!User::isValidPass($uiAccount['pass1'], $e))
             CLI::write(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLI::LOG_ERROR);
-        else if ($fields['pass1'] != $fields['pass2'])
+        else if ($uiAccount['pass1'] != $uiAccount['pass2'])
             CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
-        else if ($_ = DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE user = ? AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $fields['name'], ACC_STATUS_NEW, ACC_STATUS_NEW))
+        else if ($_ = DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE user = ? AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $uiAccount['name'], ACC_STATUS_NEW, ACC_STATUS_NEW))
             CLI::write(Lang::account('nameInUse'), CLI::LOG_ERROR);
         else
         {
             // write to db
             $ok = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, joindate, email, allowExpire, userGroups, userPerms) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, 0, ?d, 1)',
-                $fields['name'],
-                User::hashCrypt($fields['pass1']),
-                Util::ucFirst($fields['name']),
+                $uiAccount['name'],
+                User::hashCrypt($uiAccount['pass1']),
+                Util::ucFirst($uiAccount['name']),
                 Cfg::get('CONTACT_EMAIL'),
                 U_GROUP_ADMIN
             );
             if ($ok)
             {
-                $newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $fields['name']);
+                $newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $uiAccount['name']);
                 Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
-                CLI::write("account ".$fields['name']." created successfully", CLI::LOG_OK);
+                CLI::write("account ".$uiAccount['name']." created successfully", CLI::LOG_OK);
             }
             else                                            // something went wrong
                 CLI::write(Lang::main('intError'), CLI::LOG_ERROR);

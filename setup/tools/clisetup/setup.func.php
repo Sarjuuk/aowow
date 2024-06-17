@@ -212,8 +212,7 @@ function setup() : void
                     if ($resp == 301 || $resp == 302)
                     {
                         CLI::write('self test received status '.CLI::bold($resp).' (page moved) for '.$conf.', pointing to: '.$protocol.$host.$testFile, CLI::LOG_WARN);
-                        $inp = ['x' => ['should '.CLI::bold($conf).' be set to '.CLI::bold($host).' and force_ssl be updated? (y/n)', true, '/y|n/i']];
-                        if (!CLI::read($inp, true) || !$inp || strtolower($inp['x']) == 'n')
+                        if (!CLI::read(['x' => ['should '.CLI::bold($conf).' be set to '.CLI::bold($host).' and force_ssl be updated? (y/n)', true, true, '/y|n/i']], $uiYN) || !$uiYN || strtolower($uiYN['x']) == 'n')
                             $error[] = ' * '.$protocol.$host.$testFile.' ['.$resp.']';
                         else
                         {
@@ -277,9 +276,8 @@ function setup() : void
     {
 
         CLI::write('Found firstrun progression info. (Halted on subscript '.($steps[$startStep][1][0] ? $steps[$startStep][1] : $steps[$startStep][0]).')', CLI::LOG_INFO);
-        $inp = ['x' => ['continue setup? (y/n)', true, '/y|n/i']];
         $msg = '';
-        if (!CLI::read($inp, true) || !$inp || strtolower($inp['x']) == 'n')
+        if (!CLI::read(['x' => ['continue setup? (y/n)', true, true, '/y|n/i']], $uiYN) || !$uiYN || strtolower($uiYN['x']) == 'n')
         {
             $msg = 'Starting setup from scratch...';
             $startStep = 0;
@@ -311,8 +309,7 @@ function setup() : void
         {
             CLI::write($step[3]);
 
-            $inp = ['x' => ['Press any key to continue', true]];
-            if (!CLI::read($inp, true))                     // we don't actually care about the input
+            if (!CLI::read([['Press any key to continue', true]]))    // we don't actually care about the input
                 return;
         }
 
@@ -348,11 +345,10 @@ function setup() : void
                 break;
             }
 
-            $inp = ['x' => ['['.CLI::bold('c').']ontinue anyway? ['.CLI::bold('r').']etry? ['.CLI::bold('a').']bort?', true, '/c|r|a/i']];
-            if (CLI::read($inp, true) && $inp)
+            if (CLI::read(['x' => ['['.CLI::bold('c').']ontinue anyway? ['.CLI::bold('r').']etry? ['.CLI::bold('a').']bort?', true, true, '/c|r|a/i']], $uiCRA) && $uiCRA)
             {
                 CLI::write();
-                switch(strtolower($inp['x']))
+                switch(strtolower($uiCRA['x']))
                 {
                     case 'c':
                         $saveProgress($idx);

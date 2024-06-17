@@ -128,44 +128,43 @@ function dbconfig() : void
 
         while (true)
         {
-            $inp = ['idx' => ['', true, '/\d|R|N/i']];
-            if (CLI::read($inp, true) && $inp)
+            if (CLI::read(['idx' => ['', true, true, '/\d|R|N/i']], $uiIndex) && $uiIndex)
             {
-                if (strtoupper($inp['idx']) == 'R')
+                if (strtoupper($uiIndex['idx']) == 'R')
                     continue 2;
-                else if (($inp['idx'] >= DB_AOWOW && $inp['idx'] < (DB_CHARACTERS + $nCharDBs)) || strtoupper($inp['idx']) == 'N')
+                else if (($uiIndex['idx'] >= DB_AOWOW && $uiIndex['idx'] < (DB_CHARACTERS + $nCharDBs)) || strtoupper($uiIndex['idx']) == 'N')
                 {
-                    $curFields = $inp['idx'] ? $dbFields : array_slice($dbFields, 0, 4);
+                    $curFields = $uiIndex['idx'] ? $dbFields : array_slice($dbFields, 0, 4);
 
-                    if (strtoupper($inp['idx']) == 'N')     // add new characters DB
-                        $curFields['realmId'] = ['Realm Id',  false, '/\d{1,3}/'];
+                    if (strtoupper($uiIndex['idx']) == 'N')     // add new characters DB
+                        $curFields['realmId'] = ['Realm Id', false, false, '/\d{1,3}/'];
 
-                    if (CLI::read($curFields))
+                    if (CLI::read($curFields, $uiRealm))
                     {
-                        if ($inp['idx'] == DB_AOWOW && $curFields)
-                            $curFields['prefix'] = 'aowow_';
+                        if ($uiIndex['idx'] == DB_AOWOW && $uiRealm)
+                            $uiRealm['prefix'] = 'aowow_';
 
-                        if (strtoupper($inp['idx']) == 'N') // new char DB
+                        if (strtoupper($uiIndex['idx']) == 'N') // new char DB
                         {
-                            if ($curFields)
+                            if ($uiRealm)
                             {
-                                $_ = $curFields['realmId'];
-                                unset($curFields['realmId']);
-                                $AoWoWconf[$databases[DB_CHARACTERS]][$_] = $curFields;
+                                $_ = $uiRealm['realmId'];
+                                unset($uiRealm['realmId']);
+                                $AoWoWconf[$databases[DB_CHARACTERS]][$_] = $uiRealm;
                             }
                         }
-                        else if ($inp['idx'] < DB_CHARACTERS) // auth, world or aowow
-                            $AoWoWconf[$databases[$inp['idx']]] = $curFields ?: array_combine(array_keys($dbFields), ['', '', '', '', '']);
+                        else if ($uiIndex['idx'] < DB_CHARACTERS) // auth, world or aowow
+                            $AoWoWconf[$databases[$uiIndex['idx']]] = $uiRealm ?: array_combine(array_keys($dbFields), ['', '', '', '', '']);
                         else                                // existing char DB
                         {
                             $i = 0;
                             foreach ($AoWoWconf[$databases[DB_CHARACTERS]] as $realmId => &$dbInfo)
                             {
-                                if ($inp['idx'] - DB_CHARACTERS != $i++)
+                                if ($uiIndex['idx'] - DB_CHARACTERS != $i++)
                                     continue;
 
-                                if ($curFields)
-                                    $dbInfo = $curFields;
+                                if ($uiRealm)
+                                    $dbInfo = $uiRealm;
                                 else
                                     unset($AoWoWconf[$databases[DB_CHARACTERS]][$realmId]);
                             }
