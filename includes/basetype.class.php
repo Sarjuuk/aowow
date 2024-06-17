@@ -566,10 +566,10 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_SHORT] = new StdClass;
 
         // first get zone/floor with the most spawns
-        if ($res = DB::Aowow()->selectRow('SELECT areaId, floor FROM ?_spawns WHERE type = ?d AND typeId = ?d AND posX > 0 AND posY > 0 GROUP BY areaId, floor ORDER BY count(1) DESC LIMIT 1', self::$type, $this->id))
+        if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$type, $this->id))
         {
             // get relevant spawn points
-            $points = DB::Aowow()->select('SELECT posX, posY FROM ?_spawns WHERE type = ?d AND typeId = ?d AND areaId = ?d AND floor = ?d AND posX > 0 AND posY > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
+            $points = DB::Aowow()->select('SELECT `posX`, `posY` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `areaId` = ?d AND `floor` = ?d AND `posX` > 0 AND `posY` > 0', self::$type, $this->id, $res['areaId'], $res['floor']);
             $spawns = [];
             foreach ($points as $p)
                 $spawns[] = [$p['posX'], $p['posY']];
@@ -585,7 +585,7 @@ trait spawnHelper
         $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
-        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE type = ?d AND typeId = ?d AND posX > 0 AND posY > 0", self::$type, $this->id);
+        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `posX` > 0 AND `posY` > 0", self::$type, $this->id);
 
         if (!$spawns)
             return;
@@ -751,7 +751,7 @@ trait spawnHelper
 
     private function createZoneSpawns()                     // [zoneId1, zoneId2, ..]             for locations-column in listview
     {
-        $res = DB::Aowow()->selectCol("SELECT typeId AS ARRAY_KEY, GROUP_CONCAT(DISTINCT areaId) FROM ?_spawns WHERE type = ?d AND typeId IN (?a) GROUP BY typeId", self::$type, $this->getfoundIDs());
+        $res = DB::Aowow()->selectCol("SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`", self::$type, $this->getfoundIDs());
         foreach ($res as &$r)
         {
             $r = explode(',', $r);
@@ -767,7 +767,7 @@ trait spawnHelper
         if (self::$type == Type::SOUND)
             return;
 
-        $res    = DB::Aowow()->select('SELECT areaId, floor, typeId, posX, posY FROM ?_spawns WHERE type = ?d AND typeId IN (?a) AND posX > 0 AND posY > 0', self::$type, $this->getFoundIDs());
+        $res    = DB::Aowow()->select('SELECT `areaId`, `floor`, `typeId`, `posX`, `posY` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0', self::$type, $this->getFoundIDs());
         $spawns = [];
         foreach ($res as $data)
         {
