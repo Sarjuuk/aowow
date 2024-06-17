@@ -51,21 +51,14 @@ switch ($cmd)                                               // we accept only on
         sync($s, $b);
         finish();
     case 'dbc':
-        foreach (CLISetup::getOpt('dbc') as $n)
-        {
-            if (empty($n))
-                continue;
+        require_once 'setup/tools/clisetup/dbc.func.php';
 
-            $dbc = new DBC(trim($n), ['temporary' => false]);
-            if ($dbc->error)
-                return false;
+        $args = [];
+        foreach ($argv as $i => $str)
+            if ($i && $str[0] != '-')
+                $args[] = $str;
 
-            if (!$dbc->readFile())
-            {
-                CLI::write('CLISetup::loadDBC() - DBC '.$n.'.dbc could not be written to DB!', CLI::LOG_ERROR);
-                return false;
-            }
-        }
+        dbc($args);
         break;
 }
 
