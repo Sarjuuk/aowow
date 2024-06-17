@@ -1114,7 +1114,6 @@ abstract class Filter
     private function evaluatePOST()
     {
         // doesn't need to set formData['form']; this happens in GET-step
-
         foreach ($this->inputFields as $inp => [$type, $valid, $asArray])
         {
             if (!isset($_POST[$inp]) || $_POST[$inp] === '')

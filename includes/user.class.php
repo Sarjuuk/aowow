@@ -592,6 +592,9 @@ class User
         $gUser['excludegroups']     = self::$excludeGroups;
         $gUser['settings']          = (new StdClass);       // profiler requires this to be set; has property premiumborder (NYI)
 
+        if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
+            $gUser['debug'] = true;                         // csv id-list output option on listviews
+
         if ($_ = self::getProfilerExclusions())
             $gUser = array_merge($gUser, $_);
 

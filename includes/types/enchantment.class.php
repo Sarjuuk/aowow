@@ -183,7 +183,7 @@ class EnchantmentListFilter extends Filter
          38 => [FILTER_CR_NUMERIC, 'is.rgdatkpwr',       NUM_CAST_INT,         true], // rgdatkpwr
          39 => [FILTER_CR_NUMERIC, 'is.rgdhitrtng',      NUM_CAST_INT,         true], // rgdhitrtng
          40 => [FILTER_CR_NUMERIC, 'is.rgdcritstrkrtng', NUM_CAST_INT,         true], // rgdcritstrkrtng
-         41 => [FILTER_CR_NUMERIC, 'is.armor'   ,        NUM_CAST_INT,         true], // armor
+         41 => [FILTER_CR_NUMERIC, 'is.armor',           NUM_CAST_INT,         true], // armor
          42 => [FILTER_CR_NUMERIC, 'is.defrtng',         NUM_CAST_INT,         true], // defrtng
          43 => [FILTER_CR_NUMERIC, 'is.block',           NUM_CAST_INT,         true], // block
          44 => [FILTER_CR_NUMERIC, 'is.blockrtng',       NUM_CAST_INT,         true], // blockrtng

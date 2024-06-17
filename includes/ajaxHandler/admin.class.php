@@ -459,7 +459,7 @@ class AjaxAdmin extends AjaxHandler
 
             DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `status`) VALUES (?d, ?d, ?d, ?d)', $id, time(), User::$id, $status);
             if ($msg)
-                DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `msg`)    VALUES (?d, ?d, ?d, ?)' , $id, time(), User::$id, $msg);
+                DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `msg`)    VALUES (?d, ?d, ?d, ?)', $id, time(), User::$id, $msg);
             return true;
         };
 

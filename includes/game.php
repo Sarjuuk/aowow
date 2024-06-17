@@ -263,7 +263,7 @@ class Game
         }
 
         if (empty(self::$alphaMapCache[$areaId]))
-        self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
+            self::$alphaMapCache[$areaId] = imagecreatefrompng($file);
 
         // alphaMaps are 1000 x 1000, adapt points [black => valid point]
         if (!imagecolorat(self::$alphaMapCache[$areaId], $set['posX'] * 10, $set['posY'] * 10))
@@ -318,16 +318,16 @@ class Game
         switch ($type)
         {
             case Type::NPC:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM creature WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid`    AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM creature        WHERE `guid`    IN (?a)', $guids);
                 break;
             case Type::OBJECT:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid`    AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject      WHERE `guid`    IN (?a)', $guids);
                 break;
             case Type::SOUND:
-                $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`, `mapId`, `posX`, `posY` FROM ?_soundemitters WHERE `soundId` IN (?a)', $guids);
+                $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_soundemitters WHERE `soundId` IN (?a)', $guids);
                 break;
             case Type::AREATRIGGER:
-                $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM ?_areatrigger WHERE `id` IN (?a)', $guids);
+                $result = DB::AoWoW()->select('SELECT `id`      AS ARRAY_KEY,              `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_areatrigger   WHERE `id`      IN (?a)', $guids);
                 break;
             default:
                 trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE #'.$type, E_USER_WARNING);

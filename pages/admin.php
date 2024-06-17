@@ -213,7 +213,7 @@ class AdminPage extends GenericPage
         $ssData   = [];
         $nMatches = 0;
 
-        if ($this->_get['type'] && $this->_get['typeId'])
+        if ($this->_get['type'] && $this->_get['typeid'])
         {
             $ssData   = CommunityContent::getScreenshotsForManager($this->_get['type'], $this->_get['typeid']);
             $nMatches = count($ssData);

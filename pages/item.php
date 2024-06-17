@@ -430,8 +430,8 @@ class ItemPage extends genericPage
                     if ($prev['jsonequip'] == $cur['jsonequip'] && $prev['name'] == $cur['name'])
                     {
                         $prev['chance'] += $cur['chance'];
-                        array_splice($this->subItems['data'], $i , 1);
-                        array_splice($this->subItems['randIds'], $i , 1);
+                        array_splice($this->subItems['data'], $i, 1);
+                        array_splice($this->subItems['randIds'], $i, 1);
                         $i = 1;
                     }
                 }

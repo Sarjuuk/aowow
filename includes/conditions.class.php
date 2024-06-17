@@ -222,11 +222,11 @@ class Conditions
     public function getBySourceEntry(int $entry, int ...$srcType) : bool
     {
         $this->rows = DB::World()->select(
-            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
-                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
-             FROM     conditions
-             WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceEntry` = ?d
-             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
+           'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
+                     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
+            FROM     conditions
+            WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceEntry` = ?d
+            ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
             $srcType, $entry
         );
 
@@ -236,11 +236,11 @@ class Conditions
     public function getBySourceGroup(int $group, int ...$srcType) : bool
     {
         $this->rows = DB::World()->select(
-            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
-                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
-             FROM     conditions
-             WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceGroup` = ?d
-             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
+           'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
+                     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
+            FROM     conditions
+            WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceGroup` = ?d
+            ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
             $srcType, $group
         );
 
@@ -258,13 +258,14 @@ class Conditions
             return false;
 
         $this->rows = DB::World()->select(sprintf(
-            'SELECT   c1.`SourceTypeOrReferenceId`, c1.`SourceEntry`, c1.`SourceGroup`, c1.`SourceId`, c1.`ElseGroup`,
-                      c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`NegativeCondition`
-             FROM     conditions c1
-             JOIN     conditions c2 ON c1.SourceTypeOrReferenceId = c2.SourceTypeOrReferenceId AND c1.SourceEntry = c2.SourceEntry AND c1.SourceGroup = c2.SourceGroup AND c1.SourceId = c2.SourceId
-             WHERE    %s
-             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC'
-        , implode(' OR ', $lookups)));
+           'SELECT   c1.`SourceTypeOrReferenceId`, c1.`SourceEntry`, c1.`SourceGroup`, c1.`SourceId`, c1.`ElseGroup`,
+                     c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`NegativeCondition`
+            FROM     conditions c1
+            JOIN     conditions c2 ON c1.SourceTypeOrReferenceId = c2.SourceTypeOrReferenceId AND c1.SourceEntry = c2.SourceEntry AND c1.SourceGroup = c2.SourceGroup AND c1.SourceId = c2.SourceId
+            WHERE    %s
+            ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
+            implode(' OR ', $lookups))
+        );
 
         return $this->fromSource();
     }

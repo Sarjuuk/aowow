@@ -1,5 +1,8 @@
 <?php
 
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
 class Lang
 {
     private static $timeUnits;
@@ -640,7 +643,7 @@ class Lang
                     default:
                         return '';
                 }
-            } , $var);
+            }, $var);
 
         // color                        |c<aarrggbb><word>|r
         $var = preg_replace_callback('/\|c([[:xdigit:]]{2})([[:xdigit:]]{6})(.+?)\|r/is', function ($m) use ($fmt)

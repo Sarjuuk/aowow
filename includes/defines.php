@@ -149,15 +149,19 @@ define('U_GROUP_COMMENTS_MODERATOR',        (U_GROUP_MODERATOR|U_GROUP_LOCALIZER
 define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GROUP_VIP));
 
 // Locales
-define('LOCALE_EN',                         0);
-define('LOCALE_KR',                         1);             // unused
-define('LOCALE_FR',                         2);
-define('LOCALE_DE',                         3);
-define('LOCALE_CN',                         4);
-define('LOCALE_TW',                         5);             // unused
-define('LOCALE_ES',                         6);
-define('LOCALE_MX',                         7);             // unused
-define('LOCALE_RU',                         8);
+define('LOCALE_EN',                         0);             // enGB, enUS
+define('LOCALE_KR',                         1);             // koKR         [aowwo unused]
+define('LOCALE_FR',                         2);             // frFR
+define('LOCALE_DE',                         3);             // deDE
+define('LOCALE_CN',                         4);             // zhCN, enCN
+define('LOCALE_TW',                         5);             // zhTW, enTW   [aowow unused]
+define('LOCALE_ES',                         6);             // esES
+define('LOCALE_MX',                         7);             // esMX         [aowow unused]
+define('LOCALE_RU',                         8);             // ruRU
+define('LOCALE_JP',                         9);             // jaJP         [aowow & 335 unused]
+define('LOCALE_PT',                        10);             // ptPT, ptBR   [aowow unused]
+define('LOCALE_IT',                        11);             // itIT         [aowow & 335 unused]
+define('LOCALE_MASK_ALL',      0b000101011101);
 
 // red buttons on the top of the page
 define('BUTTON_WOWHEAD',                    0);

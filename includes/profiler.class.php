@@ -6,8 +6,17 @@ if (!defined('AOWOW_REVISION'))
 
 class Profiler
 {
-    const PID_FILE     = 'config/pr-queue-pid';
-    const CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20;           // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
+    public const PID_FILE     = 'config/pr-queue-pid';
+    public const CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20;    // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
+
+    public const REGIONS = array(                           // see cfg_categories.dbc
+        'us' => [2, 3, 4, 5],                               // US (us, oceanic, latin america, americas - tournament)
+        'kr' => [6, 7],                                     // KR (kr, tournament)
+        'eu' => [8, 9, 10, 11, 12, 13],                     // EU (english, german, french, spanish, russian, eu - tournament)
+        'tw' => [14, 15],                                   // TW (tw, tournament)
+        'cn' => [16, 17, 18, 19, 20, 21, 22, 23, 24, 25],   // CN (cn, CN1-8, tournament)
+       'dev' => [1, 26, 27, 28, 30]                         // Development, Test Server, Test Server - tournament, QA Server, Test Server 2
+    );
 
     private static $realms  = [];
 
@@ -190,7 +199,7 @@ class Profiler
                             WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
                             WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
                             WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
-                            ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 28: QA, 30: Test2, 31+: misc
+                            ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 27: Test Tournament, 28: QA, 30: Test2, 31+: misc
                        `allowedSecurityLevel` AS "access"
                 FROM   `realmlist`
                 WHERE  `gamebuild` = ?d',

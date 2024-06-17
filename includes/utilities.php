@@ -415,7 +415,7 @@ abstract class CLI
                     $keyId = $ordinals[$idx];
 
                     // skip char if horizontal tab or \r if followed by \n
-                    if ($keyId == self::CHR_TAB || ($keyId == self::CHR_CR && ($ordinals[$i + 1] ?? '') == self::CHR_LF))
+                    if ($keyId == self::CHR_TAB || ($keyId == self::CHR_CR && ($ordinals[$idx + 1] ?? '') == self::CHR_LF))
                         continue;
 
                     if ($keyId == self::CHR_BACKSPACE)
@@ -1336,8 +1336,11 @@ abstract class Util
     /* Good Skill */
     /**************/
 
-    public static function getEquipmentScore($itemLevel, $quality, $slot, $nSockets = 0)
+    public static function getEquipmentScore(int $itemLevel, int $quality, int $slot, int $nSockets = 0) : float
     {
+        if ($itemLevel < 0)                                 // can this even happen?
+            $itemLevel = 0;
+
         $score = $itemLevel;
 
         // quality mod
@@ -1416,10 +1419,10 @@ abstract class Util
                 $score -= $nSockets * self::GEM_SCORE_BASE_BC;
         }
 
-        return round(max(0.0, $score), 4);
+        return round($score, 4);
     }
 
-    public static function getGemScore($itemLevel, $quality, $profSpec = false, $itemId = 0)
+    public static function getGemScore(int $itemLevel, int $quality, bool $profSpec = false, int $itemId = 0) : float
     {
         // prepare score-lookup
         if (empty(self::$perfectGems))
@@ -1463,8 +1466,11 @@ abstract class Util
         return 0.0;
     }
 
-    public static function getEnchantmentScore($itemLevel, $quality, $profSpec = false, $idOverride = 0)
+    public static function getEnchantmentScore(int $itemLevel, int $quality, bool $profSpec = false, int $idOverride = 0) : float
     {
+        if ($itemLevel < 0)                                 // can this even happen?
+            $itemLevel = 0;
+
         // some hardcoded values, that defy lookups (cheaper but not skillbound profession versions of spell threads, leg armor)
         if (in_array($idOverride, [3327, 3328, 3872, 3873]))
             return 20.0;
@@ -1473,25 +1479,25 @@ abstract class Util
             return 40.0;
 
         // other than the constraints (0 - 20 points; 40 for profession perks), everything in here is guesswork
-        $score = max(min($itemLevel, 80), 0);
+        $score = min($itemLevel, 80);
 
         switch ($quality)
         {
             case ITEM_QUALITY_HEIRLOOM:                 // because i say so!
-                $score = 80.0;
+                $score = 20.0;
                 break;
             case ITEM_QUALITY_RARE:
-                $score /= 1.2;
+                $score /= 4.8;
                 break;
             case ITEM_QUALITY_UNCOMMON:
-                $score /= 1.6;
+                $score /= 6.4;
                 break;
             case ITEM_QUALITY_NORMAL:
-                $score /= 2.5;
+                $score /= 10.0;
                 break;
         }
 
-        return round(max(0.0, $score / 4), 4);
+        return round($score, 4);
     }
 
     public static function fixWeaponScores($class, $talents, $mainHand, $offHand)
@@ -1594,6 +1600,7 @@ abstract class Util
         return $bits;
     }
 }
+
 
 abstract class Type
 {

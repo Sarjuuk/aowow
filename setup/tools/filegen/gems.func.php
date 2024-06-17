@@ -31,7 +31,7 @@ if (!CLI)
         $gems   = DB::Aowow()->Select(
            'SELECT    i.id AS itemId,
                       i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc4, i.name_loc6, i.name_loc8,
-                      IF (i.id < 36000 OR i.itemLevel < 70, 1 , 2) AS expansion,
+                      IF (i.id < 36000 OR i.itemLevel < 70, ?d, ?d) AS expansion,
                       i.quality,
                       ic.name AS icon,
                       i.gemEnchantmentId AS enchId,
@@ -41,7 +41,9 @@ if (!CLI)
             FROM      ?_items i
             JOIN      ?_icons ic ON ic.id = i.iconId
             WHERE     i.gemEnchantmentId <> 0
-            ORDER BY  i.id DESC');
+            ORDER BY  i.id DESC',
+            EXP_BC, EXP_WOTLK
+        );
         $success = true;
 
         // check directory-structure

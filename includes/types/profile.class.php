@@ -659,8 +659,11 @@ class RemoteProfileList extends ProfileList
         $baseData = $guildData = [];
         foreach ($this->iterate() as $guid => $__)
         {
+            $realmId   = $this->getField('realm');
+            $guildGUID = $this->getField('guild');
+
             $baseData[$guid] = array(
-                'realm'     => $this->getField('realm'),
+                'realm'     => $realmId,
                 'realmGUID' => $this->getField('guid'),
                 'name'      => $this->getField('name'),
                 'renameItr' => $this->getField('renameItr'),
@@ -668,15 +671,15 @@ class RemoteProfileList extends ProfileList
                 'class'     => $this->getField('class'),
                 'level'     => $this->getField('level'),
                 'gender'    => $this->getField('gender'),
-                'guild'     => $this->getField('guild') ?: null,
-                'guildrank' => $this->getField('guild') ? $this->getField('guildrank') : null,
+                'guild'     => $guildGUID ?: null,
+                'guildrank' => $guildGUID ? $this->getField('guildrank') : null,
                 'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
             );
 
-            if ($this->getField('guild'))
-                $guildData[] = array(
-                    'realm'     => $this->getField('realm'),
-                    'realmGUID' => $this->getField('guild'),
+            if ($guildGUID && empty($guildData[$realmId.'-'.$guildGUID]))
+                $guildData[$realmId.'-'.$guildGUID] = array(
+                    'realm'     => $realmId,
+                    'realmGUID' => $guildGUID,
                     'name'      => $this->getField('guildname'),
                     'nameUrl'   => Profiler::urlize($this->getField('guildname')),
                     'cuFlags'   => PROFILER_CU_NEEDS_RESYNC

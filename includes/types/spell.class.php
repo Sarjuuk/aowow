@@ -2083,7 +2083,6 @@ class SpellList extends BaseType
             if ($mask = $this->curTpl['reqRaceMask'])
                 $data[$this->id]['reqrace'] = $mask;
 
-
             if ($addInfoMask & ITEMINFO_MODEL)
             {
                 // may have multiple models set, in this case i've no idea what should be picked
@@ -2132,10 +2131,8 @@ class SpellList extends BaseType
 
             if ($addMask & GLOBALINFO_SELF)
             {
-                $iconString = $this->curTpl['iconStringAlt'] ? 'iconStringAlt' : 'iconString';
-
                 $data[Type::SPELL][$id] = array(
-                    'icon' => $this->curTpl[$iconString],
+                    'icon' => $this->curTpl['iconStringAlt'] ?: $this->curTpl['iconString'],
                     'name' => $this->getField('name', true),
                 );
             }
@@ -2255,7 +2252,7 @@ class SpellList extends BaseType
                 'ti'   => $this->id,
                 's'    => empty($this->curTpl['skillLines']) ? 0 : $this->curTpl['skillLines'][0],
                 'c'    => $this->curTpl['typeCat'],
-                'icon' => $this->curTpl['iconStringAlt'] ? $this->curTpl['iconStringAlt'] : $this->curTpl['iconString'],
+                'icon' => $this->curTpl['iconStringAlt'] ?: $this->curTpl['iconString'],
             );
         }
 
