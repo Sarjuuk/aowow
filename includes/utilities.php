@@ -495,11 +495,17 @@ class Timer
 
 abstract class Util
 {
-    const FILE_ACCESS = 0755;
-    const DIR_ACCESS  = 0777;
+    /* NOTE!
+     * FILE_ACCESS should be 0755 or less, but CLI and web interface both access the same files. While in CLI php is executed with the current users perms,
+     * while the web interface is always executed by www-data (or whoever runs the web server) who does not own the files previously created via CLI.
+     * And thus web interface actions fail with permission denied, unless the files are flagged +wx for everyone.
+     * This probably has to be solved on the system level by having www-data and the CLI user share a group or something.
+     */
+    public const FILE_ACCESS = 0777;
+    public const DIR_ACCESS  = 0777;
 
-    const GEM_SCORE_BASE_WOTLK = 16;                        // rare quality wotlk gem score
-    const GEM_SCORE_BASE_BC    = 8;                         // rare quality bc gem score
+    private const GEM_SCORE_BASE_WOTLK = 16;                // rare quality wotlk gem score
+    private const GEM_SCORE_BASE_BC    = 8;                 // rare quality bc gem score
 
     private static $perfectGems             = null;
 
@@ -1294,25 +1300,32 @@ abstract class Util
             trigger_error('could not create file', E_USER_ERROR);
 
         if ($success)
-            @chmod($file, Util::FILE_ACCESS);
+            @chmod($file, self::FILE_ACCESS);
 
         return $success;
     }
 
-    public static function writeDir($dir)
+    public static function writeDir(string $dir, bool &$exist = true) : bool
     {
-        // remove multiple slashes
-        $dir = preg_replace('|/+|', '/', $dir);
+        // remove multiple slashes; trailing slashes
+        $dir   = preg_replace(['/\/+/', '/\/$/'], ['/', ''], $dir);
+        $exist = is_dir($dir);
 
-        if (is_dir($dir))
+        if ($exist)
         {
-            if (!is_writable($dir) && !@chmod($dir, Util::DIR_ACCESS))
-                trigger_error('cannot write into directory', E_USER_ERROR);
+            if (fileperms($dir) != self::DIR_ACCESS && !@chmod($dir, self::DIR_ACCESS))
+                trigger_error(CLI::bold($dir) . ' may be inaccessible to the web service.', E_USER_WARNING);
 
             return is_writable($dir);
         }
 
-        if (@mkdir($dir, Util::DIR_ACCESS, true))
+        // apparently chmod can't edit a whole path at once
+        $path = '';
+        foreach(explode('/', $dir) as $segment)
+            if (is_dir($path .= $segment.'/') && fileperms($path) != self::DIR_ACCESS)
+                @chmod($path, self::DIR_ACCESS);
+
+        if (@mkdir($dir, self::DIR_ACCESS, true))
             return true;
 
         trigger_error('could not create directory', E_USER_ERROR);
