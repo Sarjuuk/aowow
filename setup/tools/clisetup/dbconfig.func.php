@@ -90,7 +90,7 @@ function dbconfig() : void
 
             $buff[] = $result;
             $buff[] = 'mysqli://'.$dbInfo['user'].':'.($dbInfo['pass'] ? '**********' : '').'@'.$dbInfo['host'].'/'.$dbInfo['db'];
-            $buff[] = $dbInfo['prefix'] ? 'table prefix: '.$dbInfo['prefix'] : '';
+            $buff[] = $dbInfo['prefix'] ? 'pre.: '.$dbInfo['prefix'] : '';
             $buff[] = $note;
 
         }
@@ -109,7 +109,7 @@ function dbconfig() : void
 
     while (true)
     {
-        CLI::write('select an index to use the corresponding entry');
+        CLI::write('select an index to use the corresponding entry', -1, false);
 
         $nCharDBs = 0;
         $tblRows = [];
@@ -124,7 +124,7 @@ function dbconfig() : void
 
         $tblRows[] = ['['.CLI::bold('N').']', 'new characters DB'];
         $tblRows[] = ['['.CLI::bold('R').']', 'retest / reload DBs'];
-        CLI::writeTable($tblRows, true);
+        CLI::writeTable($tblRows, false, true);
 
         while (true)
         {

@@ -155,7 +155,7 @@ abstract class CLI
     /* formatted output */
     /********************/
 
-    public static function writeTable(array $out, bool $timestamp = false) : void
+    public static function writeTable(array $out, bool $timestamp = false, bool $headless = false) : void
     {
         if (!$out)
             return;
@@ -173,18 +173,23 @@ abstract class CLI
 
             $nCols = max($nCols, count($row));
 
-            for ($j = 0; $j < $nCols - 1; $j++)             // don't pad last column
-                $pads[$j] = max($pads[$j] ?? 0, mb_strlen($row[$j] ?? ''));
+            for ($j = 0; $j < $nCols; $j++)
+                $pads[$j] = max($pads[$j] ?? 0, mb_strlen(self::purgeEscapes($row[$j] ?? '')));
         }
-        self::write();
 
-        foreach ($out as $row)
+        foreach ($out as $j => $row)
         {
-            for ($i = 0; $i < $nCols - 1; $i++)             // don't pad last column
-                $row[$i] = str_pad($row[$i] ?? '', $pads[$i] + 2);
+            for ($i = 0; $i < $nCols; $i++)
+                $row[$i] = str_pad($row[$i] ?? '', $pads[$i] ?? 0);
 
-            self::write('  '.implode($row), -1, $timestamp);
+            if ($j || $headless)
+                self::write(' '.implode(' ' . self::tblDelim(' ') . ' ', $row), -1, $timestamp);
+            else
+                self::write(self::tblHead(' '.implode('   ', $row)), -1, $timestamp);
         }
+
+        if (!$headless)
+            self::write(self::tblHead(str_pad('', array_sum($pads) + (count($pads) - 1) * 3)), -1, $timestamp);
 
         self::write();
     }
@@ -213,6 +218,16 @@ abstract class CLI
             $file = $logFileParts['dirname'].'/'.$logFileParts['filename'].$i.(isset($logFileParts['extension']) ? '.'.$logFileParts['extension'] : '');
             self::$logHandle = fopen($file, 'w');
         }
+    }
+
+    private static function tblHead(string $str) : string
+    {
+        return CLI_HAS_E ? "\e[1;39;100m".$str."\e[0m" : $str;
+    }
+
+    private static function tblDelim(string $str) : string
+    {
+        return CLI_HAS_E ? "\e[39;100m".$str."\e[0m" : $str;
     }
 
     public static function grey(string $str) : string
@@ -275,15 +290,21 @@ abstract class CLI
             $msg .= $txt;
         }
 
+        // https://shiroyasha.svbtle.com/escape-sequences-a-quick-guide-1#movement_1
         $msg = (self::$overwriteLast && CLI_HAS_E ? "\e[1G\e[0K" : "\n") . $msg;
         self::$overwriteLast = $tmpRow;
 
         echo $msg;
 
         if (self::$logHandle)                               // remove control sequences from log
-            fwrite(self::$logHandle, preg_replace(["/\e\[\d+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg));
+            fwrite(self::$logHandle, self::purgeEscapes($msg));
 
         flush();
+    }
+
+    private static function purgeEscapes(string $msg) : string
+    {
+        return preg_replace(["/\e\[\d+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg);
     }
 
     public static function nicePath(string $fileOrPath, string ...$pathParts) : string
