@@ -617,7 +617,7 @@ class Profiler
             DB::Aowow()->query('
                 INSERT INTO ?_profiler_completion
                 SELECT      ?d, ?d, spellId, NULL, NULL
-                FROM        dbc_skilllineability
+                FROM        ?_skilllineability
                 WHERE       skillLineId IN (?a) AND
                             acquireMethod = 1 AND
                             (reqRaceMask  = 0 OR reqRaceMask  & ?d) AND

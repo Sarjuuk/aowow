@@ -324,10 +324,10 @@ class Game
                 $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY, `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject WHERE `guid` IN (?a)', $guids);
                 break;
             case Type::SOUND:
-                $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`, `mapId`, `posX`, `posY` FROM dbc_soundemitters WHERE `soundId` IN (?a)', $guids);
+                $result = DB::AoWoW()->select('SELECT `soundId` AS ARRAY_KEY, `soundId` AS `id`, `mapId`, `posX`, `posY` FROM ?_soundemitters WHERE `soundId` IN (?a)', $guids);
                 break;
             case Type::AREATRIGGER:
-                $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM dbc_areatrigger WHERE `id` IN (?a)', $guids);
+                $result = DB::AoWoW()->select('SELECT `id` AS ARRAY_KEY, `id`, `mapId`, `posX`, `posY` FROM ?_areatrigger WHERE `id` IN (?a)', $guids);
                 break;
             default:
                 trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE #'.$type, E_USER_WARNING);
@@ -345,19 +345,19 @@ class Game
             return [];
 
         $query = 'SELECT
-                    dm.id,
-                    wma.areaId,
-                    IFNULL(dm.floor, 0) AS floor,
-                    100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)), 1) AS `posX`,
-                    100 - ROUND(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)), 1) AS `posY`,
-                    SQRT(POWER(abs(IF(dm.id IS NOT NULL, (?f - dm.minY) * 100 / (dm.maxY - dm.minY), (?f - wma.right)  * 100 / (wma.left - wma.right)) - 50), 2) +
-                         POWER(abs(IF(dm.id IS NOT NULL, (?f - dm.minX) * 100 / (dm.maxX - dm.minX), (?f - wma.bottom) * 100 / (wma.top - wma.bottom)) - 50), 2)) AS `dist`
+                    dm.`id`,
+                    wma.`areaId`,
+                    IFNULL(dm.`floor`, 0) AS `floor`,
+                    100 - ROUND(IF(dm.`id` IS NOT NULL, (?f - dm.`minY`) * 100 / (dm.`maxY` - dm.`minY`), (?f - wma.`right`)  * 100 / (wma.`left` - wma.`right`)), 1) AS `posX`,
+                    100 - ROUND(IF(dm.`id` IS NOT NULL, (?f - dm.`minX`) * 100 / (dm.`maxX` - dm.`minX`), (?f - wma.`bottom`) * 100 / (wma.`top` - wma.`bottom`)), 1) AS `posY`,
+                    SQRT(POWER(ABS(IF(dm.`id` IS NOT NULL, (?f - dm.`minY`) * 100 / (dm.`maxY` - dm.`minY`), (?f - wma.`right`)  * 100 / (wma.`left` - wma.`right`)) - 50), 2) +
+                         POWER(ABS(IF(dm.`id` IS NOT NULL, (?f - dm.`minX`) * 100 / (dm.`maxX` - dm.`minX`), (?f - wma.`bottom`) * 100 / (wma.`top` - wma.`bottom`)) - 50), 2)) AS `dist`
                 FROM
-                    dbc_worldmaparea wma
+                    ?_worldmaparea wma
                 LEFT JOIN
-                    dbc_dungeonmap dm ON dm.mapId = IF(?d AND (wma.mapId NOT IN (0, 1, 530, 571) OR wma.areaId = 4395), wma.mapId, -1)
+                    ?_dungeonmap dm ON dm.`mapId` = IF(?d AND (wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395), wma.`mapId`, -1)
                 WHERE
-                    wma.mapId = ?d AND IF(?d, wma.areaId = ?d, wma.areaId <> 0){ AND IF(dm.floor IS NULL, 1, dm.floor = ?d)}
+                    wma.`mapId` = ?d AND IF(?d, wma.`areaId` = ?d, wma.`areaId` <> 0){ AND IF(dm.`floor` IS NULL, 1, dm.`floor` = ?d)}
                 HAVING
                     (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
                 ORDER BY

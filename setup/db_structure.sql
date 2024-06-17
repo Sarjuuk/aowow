@@ -344,8 +344,11 @@ CREATE TABLE `aowow_areatrigger` (
   `id` int unsigned NOT NULL,
   `cuFlags` int unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
   `type` smallint unsigned NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
+  `mapId` smallint unsigned NOT NULL COMMENT 'world pos. from dbc',
+  `posX` float NOT NULL COMMENT 'world pos. from dbc',
+  `posY` float NOT NULL COMMENT 'world pos. from dbc',
   `orientation` float NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
   `quest` mediumint unsigned DEFAULT NULL,
   `teleportA` smallint unsigned DEFAULT NULL,
   `teleportX` float unsigned DEFAULT NULL,
@@ -3227,7 +3230,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1718468661,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1718629022,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
