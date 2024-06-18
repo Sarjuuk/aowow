@@ -427,7 +427,7 @@ class DBC
 
                     $outIdx = $j + $offset;
 
-                    if (isset($row[$outIdx]) && $type != 'S')
+                    if (!empty($row[$outIdx]) && $type != 'S')
                         continue;
 
                     switch ($type)
