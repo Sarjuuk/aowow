@@ -436,11 +436,11 @@ $lang = array(
             11 => ['Balance',          'Feral Combat', 'Restoration' ]
         ),
         'pvpRank'       => array(                           // PVP_RANK_\d_\d(_FEMALE)?
-            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
-            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
-            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
+            null,                                                           ["Scout", "Private"],                                           ["Grunt", "Corporal"],
+            ["Sergeant", "Sergeant"],                                       ["Senior Sergeant", "Master Sergeant"],                         ["First Sergeant", "Sergeant Major"],
+            ["Stone Guard", "Knight"],                                      ["Blood Guard", "Knight-Lieutenant"],                           ["Legionnaire", "Knight-Captain"],
+            ["Centurion", "Knight-Champion"],                               ["Champion", "Lieutenant Commander"],                           ["Lieutenant General", "Commander"],
+            ["General", "Marshal"],                                         ["Warlord", "Field Marshal"],                                   ["High Warlord", "Grand Marshal"]
         ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
@@ -1540,7 +1540,7 @@ $lang = array(
         'powerCostRunes'=> ["%d Blood", "%d Unholy", "%d Frost"],   // RUNE_COST_*
         'powerRunes'    => ["Blood", "Unholy", "Frost", "Death"],   // COMBAT_TEXT_RUNE_*
         'powerTypes'    => array(
-            // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER / *_COST / *COST_PER_TIME
+            // conventional - HEALTH, MANA, RAGE, FOCUS, ENERGY, HAPPINESS, RUNES, RUNIC_POWER
               -2 => "Health",              0 => "Mana",                1 => "Rage",                2 => "Focus",               3 => "Energy",              4 => "Happiness",
                5 => "Runes",               6 => "Runic Power",
             // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
@@ -1978,14 +1978,14 @@ $lang = array(
             13 => "Keys",
         ),
         'statType'      => array(                           // ITEM_MOD_*
-            "Mana",
-            "Health",
+            "%c%d Mana",
+            "%c%d Health",
             null,
-            "Agility",
-            "Strength",
-            "Intellect",
-            "Spirit",
-            "Stamina",
+            "%c%d Agility",
+            "%c%d Strength",
+            "%c%d Intellect",
+            "%c%d Spirit",
+            "%c%d Stamina",
             null, null, null, null,
             "Increases defense rating by %d.",
             "Increases your dodge rating by %d.",
@@ -2010,14 +2010,14 @@ $lang = array(
             "Improves critical strike rating by %d.",
             "Improves hit avoidance rating by %d.",
             "Improves critical avoidance rating by %d.",
-            "Increases your resilience rating by %d.",
-            "Increases your haste rating by %d.",
-            "Increases expertise rating by %d.",
+            "Improves your resilience rating by %d.",
+            "Improves haste rating by %d.",
+            "Increases your expertise rating by %d.",
             "Increases attack power by %d.",
             "Increases ranged attack power by %d.",
             "Increases attack power by %d in Cat, Bear, Dire Bear, and Moonkin forms only.",
-            "Increases damage done by magical spells and effects by up to %d.",
             "Increases healing done by magical spells and effects by up to %d.",
+            "Increases damage done by magical spells and effects by up to %d.",
             "Restores %d mana per 5 sec.",
             "Increases your armor penetration rating by %d.",
             "Increases spell power by %d.",

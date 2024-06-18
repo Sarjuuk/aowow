@@ -6,7 +6,6 @@ if (!defined('AOWOW_REVISION'))
 /*
     some translations have yet to be taken from or improved by the use of:
     <path>\World of Warcraft\Data\esES\patch-esES-3.MPQ\Interface\FrameXML\GlobalStrings.lua
-    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
 */
 
 $lang = array(
@@ -435,12 +434,12 @@ $lang = array(
              9 => ['Aflicción',          'Demonología',   'Destrucción'  ],
              1 => ['Armas',              'Furia',         'Protección'   ]
         ),
-        'pvpRank'       => array(
-            null,                                                           "Soldado / Explorador",                                         "Cabo / Bruto",
-            "Sargento / Sargento",                                          "Sargento maestro / Sargento jefe",                             "Sargento mayor / Sargento primero",
-            "Caballero / Guardian de Piedra",                               "Teniente caballero / Guardia de sangre",                       "Capitán caballero / Legionario",
-            "Campeón caballero / Centurion",                                "Teniente coronel / Campeón",                                   "Comandante / Teniente general",
-            "Mariscal / General",                                           "Mariscal de campo / Señor de la Guerra",                       "Gran mariscal / Gran Señor de la Guerra"
+        'pvpRank'       => array(                           // PVP_RANK_*
+            null,                                                           ["Explorador", "Soldado"],                                      ["Bruto", "Cabo"],
+            ["Capataz", "Sargento"],                                        ["Capataz primero", "Sargento primero"],                        ["Gran capataz", "Alférez"],
+            ["Guardia de piedra", "Caballero"],                             ["Guardia de sangre", "Teniente caballero"],                    ["Legionario", "Capitán caballero"],
+            ["Centurión", "Campeón caballero"],                             ["Campeón", "Teniente coronel"],                                ["General", "Comandante"],
+            ["Gran general", "Mariscal"],                                   ["Señor de la Guerra", "Mariscal de campo"],                    ["Gran Señor de la Guerra", "Gran mariscal"]
         ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
@@ -1539,7 +1538,7 @@ $lang = array(
         'powerDisplayCost' => ["%d %s", "%d %s, más %d por seg."],
         'powerCostRunes'=> ["%d sangre", "%d Profano", "%d Escarcha"],
         'powerRunes'    => ["Sangre", "Profano", "Escarcha", "Muerte"],
-        'powerTypes'    => array(
+        'powerTypes'    => array(                           // POWER_TYPE_*
             // conventional
               -2 => "Salud",               0 => "Maná",                1 => "Ira",                 2 => "Enfoque",             3 => "Energía",             4 => "Felicidad",
                5 => "Runa",                6 => "Poder rúnico",
@@ -1900,7 +1899,7 @@ $lang = array(
             "Uso: ",                "Equipar: ",        "Probabilidad al acertar: ", "",                            "",
             "",                     ""
         ),
-        'bonding'       => array(
+        'bonding'       => array(                           // ITEM_BIND_*
             "Se liga a la cuenta",                      "Se liga al recogerlo",                                     "Se liga al equiparlo",
             "Se liga al usarlo",                        "Objeto de misión",                                         "Objeto de misión"
         ),
@@ -1977,15 +1976,15 @@ $lang = array(
             12 => "Misión",
             13 => "Llaves",
         ),
-        'statType'      => array(
-            "Maná",
-            "Salud",
+        'statType'      => array(                           // ITEM_MOD_*
+            "%c%d Maná",
+            "%c%d Salud",
             null,
-            "agilidad",
-            "fuerza",
-            "intelecto",
-            "espíritu",
-            "aguante",
+            "%c%d Agilidad",
+            "%c%d Fuerza",
+            "%c%d Intelecto",
+            "%c%d Espíritu",
+            "%c%d Aguante",
             null, null, null, null,
             "Aumenta tu índice de defensa %d p.",
             "Aumenta tu índice de esquivar %d p.",
@@ -1994,7 +1993,7 @@ $lang = array(
             "Mejora tu índice de golpe cuerpo a cuerpo %d p.",
             "Mejora tu índice de golpe a distancia %d p.",
             "Mejora tu índice de golpe con hechizos %d p.",
-            "Mejora tu índice de golpe crítico cuerpo a cuerpo %d p. ",
+            "Mejora tu índice de golpe crítico cuerpo a cuerpo %d p.",
             "Mejora tu índice de golpe crítico a distancia %d p.",
             "Mejora tu índice de golpe crítico con hechizos %d p.",
             "Mejora tu índice de evasión de golpes cuerpo a cuerpo %d p.",
@@ -2016,15 +2015,15 @@ $lang = array(
             "Aumenta el poder de ataque %d p.",
             "Aumenta el poder de ataque a distancia %d p.",
             "Aumenta el poder de ataque %d p. solo con las formas de gato, oso, oso temible y lechúcico lunar.",
-            "Aumenta el daño infligido con hechizos y efectos mágicos hasta %d p.",
             "Aumenta la sanación hecha con hechizos y efectos mágicos hasta %d p.",
+            "Aumenta el daño infligido con hechizos y efectos mágicos hasta %d p.",
             "Restaura %d p. de maná cada 5 s.",
             "Aumenta tu índice de penetración de armadura %d p.",
             "Aumenta el poder con hechizos %d p.",
-            "Restaura %d p. de salud cada 5 s.",
+            "Restaura %d p. de salud cada 5 s",
             "Aumenta la penetración de hechizos %d p.",
             "Aumenta el valor de bloqueo de tu escudo %d p.",
-            "Estadística no utilizada #%d (%d)",
+            "Estadística no utilizada #%d (%d)"
         )
     )
 );

@@ -902,7 +902,7 @@ class ItemList extends BaseType
 
         // required honorRank (not used anymore)
         if ($rhr = $this->curTpl['requiredHonorRank'])
-            $x .= sprintf(Lang::game('requires'), Lang::game('pvpRank', $rhr)).'<br />';
+            $x .= Lang::game('requires', [implode(' / ', Lang::game('pvpRank', $rhr))]).'<br />';
 
         // required CityRank..?
         // what the f..

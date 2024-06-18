@@ -6,7 +6,6 @@ if (!defined('AOWOW_REVISION'))
 /*
     some translations have yet to be taken from or improved by the use of:
     <path>\World of Warcraft\Data\deDE\patch-deDE-3.MPQ\Interface\FrameXML\GlobalStrings.lua
-    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
 */
 
 $lang = array(
@@ -435,12 +434,12 @@ $lang = array(
              9 => ['Gebrechen',      'Dämonologie',     'Zerstörung'       ],
              1 => ['Waffen',         'Furor',           'Schutz'           ]
         ),
-        'pvpRank'       => array(
-            null,                                                           "Gefreiter / Späher",                                           "Fußknecht / Grunzer",
-            "Landsknecht / Waffenträger",                                   "Feldwebel / Schlachtrufer",                                    "Fähnrich / Rottenmeister",
-            "Leutnant / Steingardist",                                      "Hauptmann / Blutgardist",                                      "Kürassier / Zornbringer",
-            "Ritter der Allianz / Klinge der Horde",                        "Feldkomandant / Feldherr",                                     "Rittmeister / Sturmreiter",
-            "Marschall / Kriegsherr",                                       "Feldmarschall / Kriegsfürst",                                  "Großmarschall / Oberster Kriegsfürst"
+        'pvpRank'       => array(                           // PVP_RANK_*
+            null,                                                           ["Späher", "Gefreiter"],                                        ["Grunzer", "Fußknecht"],
+            ["Waffenträger", "Landsknecht"],                                ["Schlachtrufer", "Feldwebel"],                                 ["Rottenmeister", "Fähnrich"],
+            ["Steingardist", "Leutnant"],                                   ["Blutgardist", "Hauptmann"],                                   ["Zornbringer", "Kürassier"],
+            ["Klinge der Horde", "Ritter der Allianz"],                     ["Feldherr", "Feldkommandant"],                                 ["Sturmreiter", "Rittmeister"],
+            ["Kriegsherr", "Marschall"],                                    ["Kriegsfürst", "Feldmarschall"],                               ["Oberster Kriegsfürst", "Großmarschall"]
         ),
         'orientation'   => ['Nord', 'Nordost', 'Ost', 'Südost', 'Süd', 'Südwest', 'West', 'Nordwest']
     ),
@@ -1539,7 +1538,7 @@ $lang = array(
         'powerDisplayCost' => ["%d %s", "%d %s, plus %d pro Sek"],
         'powerCostRunes'=> ["%d Blut", "%d Unheilig", "%d Frost"],
         'powerRunes'    => ["Blut", "Unheilig", "Frost", "Tod"],
-        'powerTypes'    => array(
+        'powerTypes'    => array(                           // POWER_TYPE_*
             // conventional
               -2 => "Gesundheit",          0 => "Mana",                1 => "Wut",                 2 => "Fokus",               3 => "Energie",             4 => "Zufriedenheit",
                5 => "Runen",               6 => "Runenmacht",
@@ -1900,7 +1899,7 @@ $lang = array(
             "Benutzen: ",           "Anlegen: ",        "Chance bei Treffer: ", "",                             "",
             "",                     ""
         ),
-        'bonding'       => array(
+        'bonding'       => array(                           // ITEM_BIND_*
             "Accountgebunden",                          "Wird beim Aufheben gebunden",                          "Wird beim Anlegen gebunden",
             "Wird bei Benutzung gebunden",              "Questgegenstand",                                      "Questgegenstand"
         ),
@@ -1977,54 +1976,54 @@ $lang = array(
             12 => "Quest",
             13 => "Schlüssel",
         ),
-        'statType'      => array(
-            "Mana",
-            "Gesundheit",
+        'statType'      => array(                           // ITEM_MOD_*
+            '%1$c%2$d Mana',
+            '%1$c%2$d Gesundheit',
             null,
-            "Beweglichkeit",
-            "Stärke",
-            "Intelligenz",
-            "Willenskraft",
-            "Ausdauer",
+            '%1$c%2$d Beweglichkeit',
+            '%1$c%2$d Stärke',
+            '%1$c%2$d Intelligenz',
+            '%1$c%2$d Willenskraft',
+            '%1$c%2$d Ausdauer',
             null, null, null, null,
             "Erhöht die Verteidigungswertung um %d.",
             "Erhöht Eure Ausweichwertung um %d.",
             "Erhöht Eure Parierwertung um %d.",
             "Erhöht Eure Blockwertung um %d.",
             "Erhöht Nahkampftrefferwertung um %d.",
-            "Erhöht Fernkampftrefferwertung um %d.",
+            "Erhöht Distanztrefferwertung um %d.",
             "Erhöht Zaubertrefferwertung um %d.",
             "Erhöht kritische Nahkampftrefferwertung um %d.",
-            "Erhöht kritische Fernkampftrefferwertung um %d.",
+            "Erhöht kritische Distanztrefferwertung um %d.",
             "Erhöht kritische Zaubertrefferwertung um %d.",
-            "Erhöht Vermeidungswertung für Nahkampftreffer um +3.",
+            "Erhöht Vermeidungswertung für Nahkampftreffer um %d.",
             "Erhöht Vermeidungswertung für Distanztreffer um %d.",
             "Erhöht Vermeidungswertung für Zaubertreffer um %d.",
             "Erhöht Vermeidungswertung für kritische Nahkampftreffer um %d.",
             "Erhöht Vermeidungswertung für kritische Distanztreffer um %d.",
             "Erhöht Vermeidungswertung für kritische Zaubertreffer um %d.",
             "Erhöht Nahkampftempowertung um %d.",
-            "Erhöht Fernkampftempowertung um %d.",
+            "Erhöht Distanztempowertung um %d.",
             "Erhöht Zaubertempowertung um %d.",
-            "Erhöht Eure Trefferwertung um %d.",
-            "Erhöht Eure kritische Trefferwertung um %d.",
+            "Erhöht Trefferwertung um %d.",
+            "Erhöht kritische Trefferwertung um %d.",
             "Erhöht Vermeidungswertung um %d.",
             "Erhöht Vermeidungswertung für kritische Treffer um %d.",
             "Erhöht Eure Abhärtungswertung um %d.",
-            "Erhöht Eure Tempowertung um %d.",
-            "Erhöht Waffenkundewertung um %d.",
+            "Erhöht Tempowertung um %d.",
+            "Erhöht Eure Waffenkundewertung um %d.",
             "Erhöht Angriffskraft um %d.",
             "Erhöht Distanzangriffskraft um %d.",
             "Erhöht die Angriffskraft in Katzen-, Bären-, Terrorbären- und Mondkingestalt um %d.",
-            "Erhöht den von Zaubern und Effekten verursachten Schaden um bis zu %d.",
             "Erhöht die von Zaubern und Effekten verursachte Heilung um bis zu %d.",
+            "Erhöht den von Zaubern und Effekten verursachten Schaden um bis zu %d.",
             "Stellt alle 5 Sek. %d Mana wieder her.",
-            "Erhöht Euren Rüstungsdurchschlagwert um %d.",
+            "Erhöht Eure Rüstungsdurchschlagwertung um %d.",
             "Erhöht die Zaubermacht um %d.",
             "Stellt alle 5 Sek. %d Gesundheit wieder her.",
             "Erhöht den Zauberdurchschlag um %d.",
-            "Erhöht Blockwert um %d.",
-            "Unbekannter Bonus #%d (%d)",
+            "Erhöht den Blockwert Eures Schilds um %d.",
+            "Unbekannter Bonus #%d (%d)"
         )
     )
 );

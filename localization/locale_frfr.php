@@ -6,7 +6,6 @@ if (!defined('AOWOW_REVISION'))
 /*
     some translations have yet to be taken from or improved by the use of:
     <path>\World of Warcraft\Data\frFR\patch-frFR-3.MPQ\Interface\FrameXML\GlobalStrings.lua
-    like: ITEM_MOD_*, POWER_TYPE_*, ITEM_BIND_*, PVP_RANK_*
 */
 
 $lang = array(
@@ -435,12 +434,12 @@ $lang = array(
              9 => ['Affliction',         'Démonologie',     'Destruction'      ],
              1 => ['Armes',              'Fureur',          'Protection'       ]
         ),
-        'pvpRank'       => array(
-            null,                                                           "Private / Scout",                                              "Corporal / Grunt",
-            "Sergeant / Sergeant",                                          "Master Sergeant / Senior Sergeant",                            "Sergeant Major / First Sergeant",
-            "Knight / Stone Guard",                                         "Knight-Lieutenant / Blood Guard",                              "Knight-Captain / Legionnare",
-            "Knight-Champion / Centurion",                                  "Lieutenant Commander / Champion",                              "Commander / Lieutenant General",
-            "Marshal / General",                                            "Field Marshal / Warlord",                                      "Grand Marshal / High Warlord"
+        'pvpRank'       => array(                           // PVP_RANK_*
+            null,                                                           ["Éclaireur", "Soldat"],                                        ["Grunt", "Caporal"],
+            ["Sergent", "Sergent"],                                         ["Sergent-chef", "Sergent-chef"],                               ["Adjudant", "Sergent-major"],
+            ["Garde de pierre", "Chevalier"],                               ["Garde de sang", "Chevalier-lieutenant"],                      ["Légionnaire", "Chevalier-capitaine"],
+            ["Centurion", "Chevalier-champion"],                            ["Champion", "Lieutenant-commandant"],                          ["Lieutenant-général", "Commandant"],
+            ["Général", "Maréchal"],                                        ["Seigneur de guerre", "Grand maréchal"],                       ["Grand seigneur de guerre", "Connétable"]
         ),
         'orientation'   => ['North', 'Northeast', 'East', 'Southeast', 'South', 'Southwest', 'West', 'Northwest']
     ),
@@ -1539,7 +1538,7 @@ $lang = array(
         'powerDisplayCost' => ["%d %s", "%d %s, plus %d par seconde"],
         'powerCostRunes'=> ["%d sang", "%d impie", "%d givre"],
         'powerRunes'    => ["Sang", "Impie", "Givre", "Mort"],
-        'powerTypes'    => array(
+        'powerTypes'    => array(                           // POWER_TYPE_*
             // conventional
               -2 => "vie",                 0 => "mana",                1 => "rage",                2 => "focus",               3 => "énergie",             4 => "Satisfaction",
                5 => "Runes",               6 => "puissance runique",
@@ -1900,7 +1899,7 @@ $lang = array(
             "Utilise : ",           "Équipé : ",        "Chances quand vous touchez : ", "",                    "",
             "",                     ""
         ),
-        'bonding'       => array(
+        'bonding'       => array(                           // ITEM_BIND_*
             "Lié au compte",                            "Lié quand ramassé",                                    "Lié quand équipé",
             "Lié quand utilisé",                        "Objet de quête",                                       "Objet de quête"
         ),
@@ -1977,21 +1976,21 @@ $lang = array(
             12 => "Quête",
             13 => "Clés",
         ),
-        'statType'      => array(
-            "Mana",
-            "Vie",
+        'statType'      => array(                           // ITEM_MOD_*
+            "%c%d Mana",
+            "%c%d Vie",
             null,
-            "Agilité",
-            "Force",
-            "Intelligence",
-            "Esprit",
-            "Endurance",
+            "%c%d Agilité",
+            "%c%d Force",
+            "%c%d Intelligence",
+            "%c%d Esprit",
+            "%c%d Endurance",
             null, null, null, null,
             "Augmente le score de défense de %d.",
             "Augmente de %d le score d'esquive.",
             "Augmente de %d le score de parade.",
             "Augmente de %d le score de blocage.",
-            "Augmente de %d le score de toucher en mêlée. ",
+            "Augmente de %d le score de toucher en mêlée.",
             "Augmente de %d le score de toucher à distance.",
             "Augmente de %d le score de toucher des sorts.",
             "Augmente de %d le score de coup critique en mêlée.",
@@ -2006,25 +2005,25 @@ $lang = array(
             "Augmente de %d le score de hâte en mêlée.",
             "Augmente de %d le score de hâte à distance.",
             "Augmente de %d le score de hâte des sorts.",
-            "Augmente votre score de toucher de %d.",
-            "Augmente votre score de coup critique de %d.",
+            "Augmente de %d le score de toucher.",
+            "Augmente de %d le score de coup critique.",
             "Augmente de %d le score d'évitement des coups.",
             "Augmente de %d le score d'évitement des critiques.",
-            "Augmente votre score de résilience de %d.",
-            "Augmente votre score de hâte de %d.",
-            "Augmente votre score d'expertise de +%d.",
+            "Augmente de %d le score de résilience.",
+            "Augmente de %d le score de hâte.",
+            "Augmente votre score d'expertise de %d.",
             "Augmente la puissance d'attaque de %d.",
             "Augmente la puissance d'attaque à distance de %d.",
-            "Augmente de %d la puissance d'attaque pour les formes de félin, d'ours, d'ours redoutable et de sélénien uniquement.",
-            "Augmente les dégâts des sorts et des effets magiques d'un maximum de %d.",
+            "Augmente la puissance d'attaque de %d seulement en forme de félin, ours, ours redoutable ou sélénien.",
             "Augmente les soins des sorts et des effets magiques d'un maximum de %d.",
+            "Augmente les dégâts des sorts et des effets magiques d'un maximum de %d.",
             "Rend %d points de mana toutes les 5 secondes.",
             "Augmente de %d votre score de pénétration d'armure.",
             "Augmente la puissance des sorts de %d.",
-            "Rend %d points de vie toutes les 5 s.",
+            "Rend %d points de vie toutes les 5 secondes.",
             "Augmente la pénétration des sorts de %d.",
             "Augmente la valeur de blocage de votre bouclier de %d.",
-            "Stat Inutilisée #%d (%d)",
+            "Stat Inutilisée #%d (%d)"
         )
     )
 );
