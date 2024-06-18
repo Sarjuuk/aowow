@@ -122,107 +122,120 @@ abstract class Stat                                         // based on g_statTo
     public const IDX_FLAGS         = 4;
 
     private static /* array */ $data = array(
-        self::HEALTH                => ['health',           ITEM_MOD_HEALTH,                   null,  115, self::FLAG_ITEM],
-        self::MANA                  => ['mana',             ITEM_MOD_MANA,                     null,  116, self::FLAG_ITEM],
-        self::AGILITY               => ['agi',              ITEM_MOD_AGILITY,                  null,   21, self::FLAG_ITEM],
-        self::STRENGTH              => ['str',              ITEM_MOD_STRENGTH,                 null,   20, self::FLAG_ITEM],
-        self::INTELLECT             => ['int',              ITEM_MOD_INTELLECT,                null,   23, self::FLAG_ITEM],
-        self::SPIRIT                => ['spi',              ITEM_MOD_SPIRIT,                   null,   24, self::FLAG_ITEM],
-        self::STAMINA               => ['sta',              ITEM_MOD_STAMINA,                  null,   22, self::FLAG_ITEM],
-        self::ENERGY                => ['energy',           null,                              null, null, self::FLAG_ITEM],
-        self::RAGE                  => ['rage',             null,                              null, null, self::FLAG_ITEM],
-        self::FOCUS                 => ['focus',            null,                              null, null, self::FLAG_ITEM],
-        self::RUNIC_POWER           => ['runic',            null,                              null, null, self::FLAG_ITEM | self::FLAG_SERVERSIDE],
-        self::DEFENSE_RTG           => ['defrtng',          ITEM_MOD_DEFENSE_SKILL_RATING,     1,      42, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::DODGE_RTG             => ['dodgertng',        ITEM_MOD_DODGE_RATING,             2,      45, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::PARRY_RTG             => ['parryrtng',        ITEM_MOD_PARRY_RATING,             3,      46, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::BLOCK_RTG             => ['blockrtng',        ITEM_MOD_BLOCK_RATING,             4,      44, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::MELEE_HIT_RTG         => ['mlehitrtng',       ITEM_MOD_HIT_MELEE_RATING,         5,      95, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RANGED_HIT_RTG        => ['rgdhitrtng',       ITEM_MOD_HIT_RANGED_RATING,        6,      39, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_HIT_RTG         => ['splhitrtng',       ITEM_MOD_HIT_SPELL_RATING,         7,      48, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::MELEE_CRIT_RTG        => ['mlecritstrkrtng',  ITEM_MOD_CRIT_MELEE_RATING,        8,      84, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RANGED_CRIT_RTG       => ['rgdcritstrkrtng',  ITEM_MOD_CRIT_RANGED_RATING,       9,      40, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_CRIT_RTG        => ['splcritstrkrtng',  ITEM_MOD_CRIT_SPELL_RATING,        10,     49, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::MELEE_HIT_TAKEN_RTG   => ['_mlehitrtng',      ITEM_MOD_HIT_TAKEN_MELEE_RATING,   11,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RANGED_HIT_TAKEN_RTG  => ['_rgdhitrtng',      ITEM_MOD_HIT_TAKEN_RANGED_RATING,  12,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_HIT_TAKEN_RTG   => ['_splhitrtng',      ITEM_MOD_HIT_TAKEN_SPELL_RATING,   13,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::MELEE_CRIT_TAKEN_RTG  => ['_mlecritstrkrtng', ITEM_MOD_CRIT_TAKEN_MELEE_RATING,  14,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RANGED_CRIT_TAKEN_RTG => ['_rgdcritstrkrtng', ITEM_MOD_CRIT_TAKEN_RANGED_RATING, 15,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_CRIT_TAKEN_RTG  => ['_splcritstrkrtng', ITEM_MOD_CRIT_TAKEN_SPELL_RATING,  16,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::MELEE_HASTE_RTG       => ['mlehastertng',     ITEM_MOD_HASTE_MELEE_RATING,       17,     78, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RANGED_HASTE_RTG      => ['rgdhastertng',     ITEM_MOD_HASTE_RANGED_RATING,      18,    101, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_HASTE_RTG       => ['splhastertng',     ITEM_MOD_HASTE_SPELL_RATING,       19,    102, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::HIT_RTG               => ['hitrtng',          ITEM_MOD_HIT_RATING,               null,  119, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::CRIT_RTG              => ['critstrkrtng',     ITEM_MOD_CRIT_RATING,              null,   96, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::HIT_TAKEN_RTG         => ['_hitrtng',         ITEM_MOD_HIT_TAKEN_RATING,         null, null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::CRIT_TAKEN_RTG        => ['_critstrkrtng',    ITEM_MOD_CRIT_TAKEN_RATING,        null, null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::RESILIENCE_RTG        => ['resirtng',         ITEM_MOD_RESILIENCE_RATING,        null,   79, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::HASTE_RTG             => ['hastertng',        ITEM_MOD_HASTE_RATING,             null,  103, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::EXPERTISE_RTG         => ['exprtng',          ITEM_MOD_EXPERTISE_RATING,         23,    117, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::ATTACK_POWER          => ['atkpwr',           ITEM_MOD_ATTACK_POWER,             null,   77, self::FLAG_ITEM],
-        self::RANGED_ATTACK_POWER   => ['rgdatkpwr',        ITEM_MOD_RANGED_ATTACK_POWER,      null,   38, self::FLAG_ITEM],
-        self::FERAL_ATTACK_POWER    => ['feratkpwr',        ITEM_MOD_FERAL_ATTACK_POWER,       null,   97, self::FLAG_ITEM],
-        self::HEALING_SPELL_POWER   => ['splheal',          ITEM_MOD_SPELL_HEALING_DONE,       null,   50, self::FLAG_ITEM],
-        self::DAMAGE_SPELL_POWER    => ['spldmg',           ITEM_MOD_SPELL_DAMAGE_DONE,        null,   51, self::FLAG_ITEM],
-        self::MANA_REGENERATION     => ['manargn',          ITEM_MOD_MANA_REGENERATION,        null,   61, self::FLAG_ITEM],
-        self::ARMOR_PENETRATION_RTG => ['armorpenrtng',     ITEM_MOD_ARMOR_PENETRATION_RATING, 24,    114, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
-        self::SPELL_POWER           => ['splpwr',           ITEM_MOD_SPELL_POWER,              null,  123, self::FLAG_ITEM],
-        self::HEALTH_REGENERATION   => ['healthrgn',        ITEM_MOD_HEALTH_REGEN,             null,   60, self::FLAG_ITEM],
-        self::SPELL_PENETRATION     => ['splpen',           ITEM_MOD_SPELL_PENETRATION,        null,   94, self::FLAG_ITEM],
-        self::BLOCK                 => ['block',            ITEM_MOD_BLOCK_VALUE,              null,   43, self::FLAG_ITEM],
-     // self::MASTERY_RTG           => ['mastrtng',         null,                              null, null, self::FLAG_NONE],
-        self::ARMOR                 => ['armor',            null,                              null,   41, self::FLAG_ITEM],
-        self::FIRE_RESISTANCE       => ['firres',           null,                              null,   26, self::FLAG_ITEM],
-        self::FROST_RESISTANCE      => ['frores',           null,                              null,   28, self::FLAG_ITEM],
-        self::HOLY_RESISTANCE       => ['holres',           null,                              null,   30, self::FLAG_ITEM],
-        self::SHADOW_RESISTANCE     => ['shares',           null,                              null,   29, self::FLAG_ITEM],
-        self::NATURE_RESISTANCE     => ['natres',           null,                              null,   27, self::FLAG_ITEM],
-        self::ARCANE_RESISTANCE     => ['arcres',           null,                              null,   25, self::FLAG_ITEM],
-        self::FIRE_SPELL_POWER      => ['firsplpwr',        null,                              null,   53, self::FLAG_ITEM],
-        self::FROST_SPELL_POWER     => ['frosplpwr',        null,                              null,   54, self::FLAG_ITEM],
-        self::HOLY_SPELL_POWER      => ['holsplpwr',        null,                              null,   55, self::FLAG_ITEM],
-        self::SHADOW_SPELL_POWER    => ['shasplpwr',        null,                              null,   57, self::FLAG_ITEM],
-        self::NATURE_SPELL_POWER    => ['natsplpwr',        null,                              null,   56, self::FLAG_ITEM],
-        self::ARCANE_SPELL_POWER    => ['arcsplpwr',        null,                              null,   52, self::FLAG_ITEM],
+        self::HEALTH                => ['health',           ITEM_MOD_HEALTH,                   null,                  115, self::FLAG_ITEM],
+        self::MANA                  => ['mana',             ITEM_MOD_MANA,                     null,                  116, self::FLAG_ITEM],
+        self::AGILITY               => ['agi',              ITEM_MOD_AGILITY,                  null,                   21, self::FLAG_ITEM],
+        self::STRENGTH              => ['str',              ITEM_MOD_STRENGTH,                 null,                   20, self::FLAG_ITEM],
+        self::INTELLECT             => ['int',              ITEM_MOD_INTELLECT,                null,                   23, self::FLAG_ITEM],
+        self::SPIRIT                => ['spi',              ITEM_MOD_SPIRIT,                   null,                   24, self::FLAG_ITEM],
+        self::STAMINA               => ['sta',              ITEM_MOD_STAMINA,                  null,                   22, self::FLAG_ITEM],
+        self::ENERGY                => ['energy',           null,                              null,                 null, self::FLAG_ITEM],
+        self::RAGE                  => ['rage',             null,                              null,                 null, self::FLAG_ITEM],
+        self::FOCUS                 => ['focus',            null,                              null,                 null, self::FLAG_ITEM],
+        self::RUNIC_POWER           => ['runic',            null,                              null,                 null, self::FLAG_ITEM | self::FLAG_SERVERSIDE],
+        self::DEFENSE_RTG           => ['defrtng',          ITEM_MOD_DEFENSE_SKILL_RATING,     CR_DEFENSE_SKILL,       42, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::DODGE_RTG             => ['dodgertng',        ITEM_MOD_DODGE_RATING,             CR_DODGE,               45, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::PARRY_RTG             => ['parryrtng',        ITEM_MOD_PARRY_RATING,             CR_PARRY,               46, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::BLOCK_RTG             => ['blockrtng',        ITEM_MOD_BLOCK_RATING,             CR_BLOCK,               44, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::MELEE_HIT_RTG         => ['mlehitrtng',       ITEM_MOD_HIT_MELEE_RATING,         CR_HIT_MELEE,           95, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RANGED_HIT_RTG        => ['rgdhitrtng',       ITEM_MOD_HIT_RANGED_RATING,        CR_HIT_RANGED,          39, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_HIT_RTG         => ['splhitrtng',       ITEM_MOD_HIT_SPELL_RATING,         CR_HIT_SPELL,           48, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::MELEE_CRIT_RTG        => ['mlecritstrkrtng',  ITEM_MOD_CRIT_MELEE_RATING,        CR_CRIT_MELEE,          84, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RANGED_CRIT_RTG       => ['rgdcritstrkrtng',  ITEM_MOD_CRIT_RANGED_RATING,       CR_CRIT_RANGED,         40, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_CRIT_RTG        => ['splcritstrkrtng',  ITEM_MOD_CRIT_SPELL_RATING,        CR_CRIT_SPELL,          49, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::MELEE_HIT_TAKEN_RTG   => ['_mlehitrtng',      ITEM_MOD_HIT_TAKEN_MELEE_RATING,   CR_HIT_TAKEN_MELEE,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RANGED_HIT_TAKEN_RTG  => ['_rgdhitrtng',      ITEM_MOD_HIT_TAKEN_RANGED_RATING,  CR_HIT_TAKEN_RANGED,  null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_HIT_TAKEN_RTG   => ['_splhitrtng',      ITEM_MOD_HIT_TAKEN_SPELL_RATING,   CR_HIT_TAKEN_SPELL,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::MELEE_CRIT_TAKEN_RTG  => ['_mlecritstrkrtng', ITEM_MOD_CRIT_TAKEN_MELEE_RATING,  CR_CRIT_TAKEN_MELEE,  null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RANGED_CRIT_TAKEN_RTG => ['_rgdcritstrkrtng', ITEM_MOD_CRIT_TAKEN_RANGED_RATING, CR_CRIT_TAKEN_RANGED, null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_CRIT_TAKEN_RTG  => ['_splcritstrkrtng', ITEM_MOD_CRIT_TAKEN_SPELL_RATING,  CR_CRIT_TAKEN_SPELL,  null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::MELEE_HASTE_RTG       => ['mlehastertng',     ITEM_MOD_HASTE_MELEE_RATING,       CR_HASTE_MELEE,         78, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RANGED_HASTE_RTG      => ['rgdhastertng',     ITEM_MOD_HASTE_RANGED_RATING,      CR_HASTE_RANGED,       101, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_HASTE_RTG       => ['splhastertng',     ITEM_MOD_HASTE_SPELL_RATING,       CR_HASTE_SPELL,        102, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::HIT_RTG               => ['hitrtng',          ITEM_MOD_HIT_RATING,              -CR_HIT_MELEE,          119, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::CRIT_RTG              => ['critstrkrtng',     ITEM_MOD_CRIT_RATING,             -CR_CRIT_MELEE,          96, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::HIT_TAKEN_RTG         => ['_hitrtng',         ITEM_MOD_HIT_TAKEN_RATING,        -CR_HIT_TAKEN_MELEE,   null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::CRIT_TAKEN_RTG        => ['_critstrkrtng',    ITEM_MOD_CRIT_TAKEN_RATING,       -CR_CRIT_TAKEN_MELEE,  null, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::RESILIENCE_RTG        => ['resirtng',         ITEM_MOD_RESILIENCE_RATING,       -CR_CRIT_TAKEN_MELEE,    79, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::HASTE_RTG             => ['hastertng',        ITEM_MOD_HASTE_RATING,            -CR_HASTE_MELEE,        103, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::EXPERTISE_RTG         => ['exprtng',          ITEM_MOD_EXPERTISE_RATING,         CR_EXPERTISE,          117, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::ATTACK_POWER          => ['atkpwr',           ITEM_MOD_ATTACK_POWER,             null,                   77, self::FLAG_ITEM],
+        self::RANGED_ATTACK_POWER   => ['rgdatkpwr',        ITEM_MOD_RANGED_ATTACK_POWER,      null,                   38, self::FLAG_ITEM],
+        self::FERAL_ATTACK_POWER    => ['feratkpwr',        ITEM_MOD_FERAL_ATTACK_POWER,       null,                   97, self::FLAG_ITEM],
+        self::HEALING_SPELL_POWER   => ['splheal',          ITEM_MOD_SPELL_HEALING_DONE,       null,                   50, self::FLAG_ITEM],
+        self::DAMAGE_SPELL_POWER    => ['spldmg',           ITEM_MOD_SPELL_DAMAGE_DONE,        null,                   51, self::FLAG_ITEM],
+        self::MANA_REGENERATION     => ['manargn',          ITEM_MOD_MANA_REGENERATION,        null,                   61, self::FLAG_ITEM],
+        self::ARMOR_PENETRATION_RTG => ['armorpenrtng',     ITEM_MOD_ARMOR_PENETRATION_RATING, CR_ARMOR_PENETRATION,  114, self::FLAG_ITEM | self::FLAG_LVL_SCALING],
+        self::SPELL_POWER           => ['splpwr',           ITEM_MOD_SPELL_POWER,              null,                  123, self::FLAG_ITEM],
+        self::HEALTH_REGENERATION   => ['healthrgn',        ITEM_MOD_HEALTH_REGEN,             null,                   60, self::FLAG_ITEM],
+        self::SPELL_PENETRATION     => ['splpen',           ITEM_MOD_SPELL_PENETRATION,        null,                   94, self::FLAG_ITEM],
+        self::BLOCK                 => ['block',            ITEM_MOD_BLOCK_VALUE,              null,                   43, self::FLAG_ITEM],
+     // self::MASTERY_RTG           => ['mastrtng',         null,                              CR_MASTERY,           null, self::FLAG_NONE],
+        self::ARMOR                 => ['armor',            null,                              null,                   41, self::FLAG_ITEM],
+        self::FIRE_RESISTANCE       => ['firres',           null,                              null,                   26, self::FLAG_ITEM],
+        self::FROST_RESISTANCE      => ['frores',           null,                              null,                   28, self::FLAG_ITEM],
+        self::HOLY_RESISTANCE       => ['holres',           null,                              null,                   30, self::FLAG_ITEM],
+        self::SHADOW_RESISTANCE     => ['shares',           null,                              null,                   29, self::FLAG_ITEM],
+        self::NATURE_RESISTANCE     => ['natres',           null,                              null,                   27, self::FLAG_ITEM],
+        self::ARCANE_RESISTANCE     => ['arcres',           null,                              null,                   25, self::FLAG_ITEM],
+        self::FIRE_SPELL_POWER      => ['firsplpwr',        null,                              null,                   53, self::FLAG_ITEM],
+        self::FROST_SPELL_POWER     => ['frosplpwr',        null,                              null,                   54, self::FLAG_ITEM],
+        self::HOLY_SPELL_POWER      => ['holsplpwr',        null,                              null,                   55, self::FLAG_ITEM],
+        self::SHADOW_SPELL_POWER    => ['shasplpwr',        null,                              null,                   57, self::FLAG_ITEM],
+        self::NATURE_SPELL_POWER    => ['natsplpwr',        null,                              null,                   56, self::FLAG_ITEM],
+        self::ARCANE_SPELL_POWER    => ['arcsplpwr',        null,                              null,                   52, self::FLAG_ITEM],
         // v not part of g_statToJson v
-        self::WEAPON_DAMAGE         => ['dmg',              null,                              null, null, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
-        self::WEAPON_DAMAGE_TYPE    => ['damagetype',       null,                              null,   35, self::FLAG_SERVERSIDE],
-        self::WEAPON_DAMAGE_MIN     => ['dmgmin1',          null,                              null,   33, self::FLAG_SERVERSIDE],
-        self::WEAPON_DAMAGE_MAX     => ['dmgmax1',          null,                              null,   34, self::FLAG_SERVERSIDE],
-        self::WEAPON_SPEED          => ['speed',            null,                              null,   36, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
-        self::WEAPON_DPS            => ['dps',              null,                              null,   32, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
-        self::MELEE_DAMAGE_MIN      => ['mledmgmin',        null,                              null,  135, self::FLAG_SERVERSIDE],
-        self::MELEE_DAMAGE_MAX      => ['mledmgmax',        null,                              null,  136, self::FLAG_SERVERSIDE],
-        self::MELEE_SPEED           => ['mlespeed',         null,                              null,  137, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
-        self::MELEE_DPS             => ['mledps',           null,                              null,  134, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE | self::FLAG_PROFILER],
-        self::RANGED_DAMAGE_MIN     => ['rgddmgmin',        null,                              null,  139, self::FLAG_SERVERSIDE],
-        self::RANGED_DAMAGE_MAX     => ['rgddmgmax',        null,                              null,  140, self::FLAG_SERVERSIDE],
-        self::RANGED_SPEED          => ['rgdspeed',         null,                              null,  141, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
-        self::RANGED_DPS            => ['rgddps',           null,                              null,  138, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE | self::FLAG_PROFILER],
-        self::EXTRA_SOCKETS         => ['nsockets',         null,                              null,  100, self::FLAG_SERVERSIDE],
-        self::ARMOR_BONUS           => ['armorbonus',       null,                              null,  109, self::FLAG_SERVERSIDE],
-        self::MELEE_ATTACK_POWER    => ['mleatkpwr',        null,                              null,   37, self::FLAG_SERVERSIDE | self::FLAG_PROFILER],
+        self::WEAPON_DAMAGE         => ['dmg',              null,                              null,                 null, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
+        self::WEAPON_DAMAGE_TYPE    => ['damagetype',       null,                              null,                   35, self::FLAG_SERVERSIDE],
+        self::WEAPON_DAMAGE_MIN     => ['dmgmin1',          null,                              null,                   33, self::FLAG_SERVERSIDE],
+        self::WEAPON_DAMAGE_MAX     => ['dmgmax1',          null,                              null,                   34, self::FLAG_SERVERSIDE],
+        self::WEAPON_SPEED          => ['speed',            null,                              null,                   36, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
+        self::WEAPON_DPS            => ['dps',              null,                              null,                   32, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
+        self::MELEE_DAMAGE_MIN      => ['mledmgmin',        null,                              null,                  135, self::FLAG_SERVERSIDE],
+        self::MELEE_DAMAGE_MAX      => ['mledmgmax',        null,                              null,                  136, self::FLAG_SERVERSIDE],
+        self::MELEE_SPEED           => ['mlespeed',         null,                              null,                  137, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
+        self::MELEE_DPS             => ['mledps',           null,                              null,                  134, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE | self::FLAG_PROFILER],
+        self::RANGED_DAMAGE_MIN     => ['rgddmgmin',        null,                              null,                  139, self::FLAG_SERVERSIDE],
+        self::RANGED_DAMAGE_MAX     => ['rgddmgmax',        null,                              null,                  140, self::FLAG_SERVERSIDE],
+        self::RANGED_SPEED          => ['rgdspeed',         null,                              null,                  141, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE],
+        self::RANGED_DPS            => ['rgddps',           null,                              null,                  138, self::FLAG_SERVERSIDE | self::FLAG_FLOAT_VALUE | self::FLAG_PROFILER],
+        self::EXTRA_SOCKETS         => ['nsockets',         null,                              null,                  100, self::FLAG_SERVERSIDE],
+        self::ARMOR_BONUS           => ['armorbonus',       null,                              null,                  109, self::FLAG_SERVERSIDE],
+        self::MELEE_ATTACK_POWER    => ['mleatkpwr',        null,                              null,                   37, self::FLAG_SERVERSIDE | self::FLAG_PROFILER],
         // v Profiler only v
-        self::EXPERTISE             => ['exp',              null,                              null, null, self::FLAG_PROFILER],
-        self::ARMOR_PENETRATION_PCT => ['armorpenpct',      null,                              null, null, self::FLAG_PROFILER],
-        self::MELEE_HIT_PCT         => ['mlehitpct',        null,                              null, null, self::FLAG_PROFILER],
-        self::MELEE_CRIT_PCT        => ['mlecritstrkpct',   null,                              null, null, self::FLAG_PROFILER],
-        self::MELEE_HASTE_PCT       => ['mlehastepct',      null,                              null, null, self::FLAG_PROFILER],
-        self::RANGED_HIT_PCT        => ['rgdhitpct',        null,                              null, null, self::FLAG_PROFILER],
-        self::RANGED_CRIT_PCT       => ['rgdcritstrkpct',   null,                              null, null, self::FLAG_PROFILER],
-        self::RANGED_HASTE_PCT      => ['rgdhastepct',      null,                              null, null, self::FLAG_PROFILER],
-        self::SPELL_HIT_PCT         => ['splhitpct',        null,                              null, null, self::FLAG_PROFILER],
-        self::SPELL_CRIT_PCT        => ['splcritstrkpct',   null,                              null, null, self::FLAG_PROFILER],
-        self::SPELL_HASTE_PCT       => ['splhastepct',      null,                              null, null, self::FLAG_PROFILER],
-        self::MANA_REGENERATION_SPI => ['spimanargn',       null,                              null, null, self::FLAG_PROFILER],
-        self::MANA_REGENERATION_OC  => ['oocmanargn',       null,                              null, null, self::FLAG_PROFILER],
-        self::MANA_REGENERATION_IC  => ['icmanargn',        null,                              null, null, self::FLAG_PROFILER],
-        self::ARMOR_TOTAL           => ['fullarmor',        null,                              null, null, self::FLAG_PROFILER],
-        self::DEFENSE               => ['def',              null,                              null, null, self::FLAG_PROFILER],
-        self::DODGE_PCT             => ['dodgepct',         null,                              null, null, self::FLAG_PROFILER],
-        self::PARRY_PCT             => ['parrypct',         null,                              null, null, self::FLAG_PROFILER],
-        self::BLOCK_PCT             => ['blockpct',         null,                              null, null, self::FLAG_PROFILER],
-        self::RESILIENCE_PCT        => ['resipct',          null,                              null, null, self::FLAG_PROFILER]
+        self::EXPERTISE             => ['exp',              null,                              null,                 null, self::FLAG_PROFILER],
+        self::ARMOR_PENETRATION_PCT => ['armorpenpct',      null,                              null,                 null, self::FLAG_PROFILER],
+        self::MELEE_HIT_PCT         => ['mlehitpct',        null,                              null,                 null, self::FLAG_PROFILER],
+        self::MELEE_CRIT_PCT        => ['mlecritstrkpct',   null,                              null,                 null, self::FLAG_PROFILER],
+        self::MELEE_HASTE_PCT       => ['mlehastepct',      null,                              null,                 null, self::FLAG_PROFILER],
+        self::RANGED_HIT_PCT        => ['rgdhitpct',        null,                              null,                 null, self::FLAG_PROFILER],
+        self::RANGED_CRIT_PCT       => ['rgdcritstrkpct',   null,                              null,                 null, self::FLAG_PROFILER],
+        self::RANGED_HASTE_PCT      => ['rgdhastepct',      null,                              null,                 null, self::FLAG_PROFILER],
+        self::SPELL_HIT_PCT         => ['splhitpct',        null,                              null,                 null, self::FLAG_PROFILER],
+        self::SPELL_CRIT_PCT        => ['splcritstrkpct',   null,                              null,                 null, self::FLAG_PROFILER],
+        self::SPELL_HASTE_PCT       => ['splhastepct',      null,                              null,                 null, self::FLAG_PROFILER],
+        self::MANA_REGENERATION_SPI => ['spimanargn',       null,                              null,                 null, self::FLAG_PROFILER],
+        self::MANA_REGENERATION_OC  => ['oocmanargn',       null,                              null,                 null, self::FLAG_PROFILER],
+        self::MANA_REGENERATION_IC  => ['icmanargn',        null,                              null,                 null, self::FLAG_PROFILER],
+        self::ARMOR_TOTAL           => ['fullarmor',        null,                              null,                 null, self::FLAG_PROFILER],
+        self::DEFENSE               => ['def',              null,                              null,                 null, self::FLAG_PROFILER],
+        self::DODGE_PCT             => ['dodgepct',         null,                              null,                 null, self::FLAG_PROFILER],
+        self::PARRY_PCT             => ['parrypct',         null,                              null,                 null, self::FLAG_PROFILER],
+        self::BLOCK_PCT             => ['blockpct',         null,                              null,                 null, self::FLAG_PROFILER],
+        self::RESILIENCE_PCT        => ['resipct',          null,                              null,                 null, self::FLAG_PROFILER]
+    );
+
+    /* Combat Rating needed for 1% effect at level 60 (Note: Shaman, Druid, Paladin and Death Knight have a /1.3 modifier on HASTE not set here)
+     * Data taken from gtcombatratings.dbc for level 60 [idx % 100 = 59]
+     * Corrections from gtoctclasscombatratingscalar.dbc with Warrior as base [idx = ratingId + 1]
+     * Maybe create this data during setup, but then again it will never change for 3.3.5a
+     */
+    private static $crPerPctPoint = array(
+        CR_WEAPON_SKILL          =>  2.50, CR_DEFENSE_SKILL        =>  1.50, CR_DODGE               => 13.80, CR_PARRY           => 13.80, CR_BLOCK             =>  5.00,
+        CR_HIT_MELEE             => 10.00, CR_HIT_RANGED           => 10.00, CR_HIT_SPELL           =>  8.00, CR_CRIT_MELEE      => 14.00, CR_CRIT_RANGED       => 14.00,
+        CR_CRIT_SPELL            => 14.00, CR_HIT_TAKEN_MELEE      => 10.00, CR_HIT_TAKEN_RANGED    => 10.00, CR_HIT_TAKEN_SPELL =>  8.00, CR_CRIT_TAKEN_MELEE  => 28.75,
+        CR_CRIT_TAKEN_RANGED     => 28.75, CR_CRIT_TAKEN_SPELL     => 28.75, CR_HASTE_MELEE         => 10.00, CR_HASTE_RANGED    => 10.00, CR_HASTE_SPELL       => 10.00,
+        CR_WEAPON_SKILL_MAINHAND =>  2.50, CR_WEAPON_SKILL_OFFHAND =>  2.50, CR_WEAPON_SKILL_RANGED =>  2.50, CR_EXPERTISE       =>  2.50, CR_ARMOR_PENETRATION =>  4.69512 / 1.1,
     );
 
     public static function isLevelIndependent(int $stat) : bool
@@ -231,6 +244,19 @@ abstract class Stat                                         // based on g_statTo
             return false;
 
         return !(self::$data[$stat][self::IDX_FLAGS] & self::FLAG_LVL_SCALING);
+    }
+
+    public static function getRatingPctFactor(int $stat) : float
+    {
+        // Note: this makes the weapon skill related combat ratings inaccessible. Is this relevant..?
+        if (!isset(self::$data[$stat]) || self::$data[$stat][self::IDX_COMBAT_RATING] === null)
+            return 0.0;
+
+        // note: originally any CRIT_TAKEN_RTG stat was set to 0 in favor of RESILIENCE_RTG
+        //       we keep the dbc value and just link RESILIENCE_RTG to CRIT_TAKEN_RTG
+        // note2: the js expects some stats to be directly mapped to a combat rating that doesn't exist
+        //        picked the next best one in this case and denoted it with a negative value in the $data dump
+        return self::$crPerPctPoint[abs(self::$data[$stat][self::IDX_COMBAT_RATING])];
     }
 
     public static function getJsonString(int $stat) : string
@@ -271,7 +297,7 @@ abstract class Stat                                         // based on g_statTo
     {
         $x = [];
         foreach (self::$data as $k => [, , $c, , $f])
-            if ($c && (!$flags || $flags & $f))
+            if ($c > 0 && (!$flags || $flags & $f))
                 $x[$k] = $c;
 
         return $x;
@@ -416,7 +442,7 @@ class StatsContainer
         return $this;
     }
 
-    public function fromDB(int $type, int $typeId, int $fieldFlags = 0x0) : self
+    public function fromDB(int $type, int $typeId, int $fieldFlags = Stat::FLAG_NONE) : self
     {
         foreach (DB::Aowow()->selectRow('SELECT (?#) FROM ?_item_stats WHERE `type` = ?d AND `typeId` = ?d', Stat::getJsonStringsFor($fieldFlags ?: (Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE)), $type, $typeId) as $key => $amt)
         {
@@ -446,7 +472,7 @@ class StatsContainer
     /* Output */
     /**********/
 
-    public function toJson(int $outFlags = 0x0) : array
+    public function toJson(int $outFlags = Stat::FLAG_NONE) : array
     {
         $out = [];
         foreach ($this->store as $stat => $amt)
@@ -523,13 +549,17 @@ class StatsContainer
 
     public static function convertCombatRating(int $mask) : array
     {
-        if (($mask & 0x00E0) == 0x00E0)                     // hit rating - all subcats (5:mle, 6:rgd, 7:spl)
+        $hitMask = (1 << CR_HIT_MELEE) | (1 << CR_HIT_RANGED) | (1 << CR_HIT_SPELL);
+        if (($mask & $hitMask) == $hitMask)
             return [Stat::HIT_RTG];                         // generic hit rating
 
-        if (($mask & 0x0700) == 0x0700)                     // crit done rating - all subcats (8:mle, 9:rgd, 10:spl)
+        $critMask = (1 << CR_CRIT_MELEE) | (1 << CR_CRIT_RANGED) | (1 << CR_CRIT_SPELL);
+        if (($mask & $critMask) == $critMask)
             return [Stat::CRIT_RTG];                        // generic crit rating
 
-        if (($mask & 0x1C000) == 0x1C000)                   // crit taken rating - all subcats (14:mle, 15:rgd, 16:spl)
+
+        $takentMask = (1 << CR_CRIT_TAKEN_MELEE) | (1 << CR_CRIT_TAKEN_RANGED) | (1 << CR_CRIT_TAKEN_SPELL);
+        if (($mask & $takentMask) == $takentMask)
             return [Stat::RESILIENCE_RTG];                  // resilience
 
         $result = [];                                       // there really shouldn't be multiple ratings in that mask besides the cases above, but who knows..

@@ -472,6 +472,34 @@ define('ITEM_MOD_HEALTH_REGEN',             46);
 define('ITEM_MOD_SPELL_PENETRATION',        47);
 define('ITEM_MOD_BLOCK_VALUE',              48);
 
+// Combat Ratings
+define('CR_WEAPON_SKILL',          0);
+define('CR_DEFENSE_SKILL',         1);
+define('CR_DODGE',                 2);
+define('CR_PARRY',                 3);
+define('CR_BLOCK',                 4);
+define('CR_HIT_MELEE',             5);
+define('CR_HIT_RANGED',            6);
+define('CR_HIT_SPELL',             7);
+define('CR_CRIT_MELEE',            8);
+define('CR_CRIT_RANGED',           9);
+define('CR_CRIT_SPELL',            10);
+define('CR_HIT_TAKEN_MELEE',       11);
+define('CR_HIT_TAKEN_RANGED',      12);
+define('CR_HIT_TAKEN_SPELL',       13);
+define('CR_CRIT_TAKEN_MELEE',      14);
+define('CR_CRIT_TAKEN_RANGED',     15);
+define('CR_CRIT_TAKEN_SPELL',      16);
+define('CR_HASTE_MELEE',           17);
+define('CR_HASTE_RANGED',          18);
+define('CR_HASTE_SPELL',           19);
+define('CR_WEAPON_SKILL_MAINHAND', 20);
+define('CR_WEAPON_SKILL_OFFHAND',  21);
+define('CR_WEAPON_SKILL_RANGED',   22);
+define('CR_EXPERTISE',             23);
+define('CR_ARMOR_PENETRATION',     24);
+// define('CR_MASTERY',               25);                  // not in 335a
+
 // Powers
 define('POWER_MANA',                        0);
 define('POWER_RAGE',                        1);
@@ -553,7 +581,7 @@ define('LOCK_PROPERTY_MINING',              3);
 define('NPC_TYPEFLAG_HERBLOOT',             0x0100);
 define('NPC_TYPEFLAG_MININGLOOT',           0x0200);
 define('NPC_TYPEFLAG_ENGINEERLOOT',         0x8000);
-define('NPC_TYPEFLAG_SPECIALLOOT',          0x8300);
+define('NPC_TYPEFLAG_SPECIALLOOT',          NPC_TYPEFLAG_ENGINEERLOOT | NPC_TYPEFLAG_MININGLOOT | NPC_TYPEFLAG_HERBLOOT);
 
 define('NPC_RANK_NORMAL',                   0);
 define('NPC_RANK_ELITE',                    1);

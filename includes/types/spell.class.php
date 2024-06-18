@@ -955,18 +955,22 @@ class SpellList extends BaseType
     }
 
     // description-, buff-parsing component
-    // returns [min, max, minFulltext, maxFulltext, ratingId]
-    private function resolveVariableString($varParts)
+    private function resolveVariableString(array $varParts) : array
     {
         $signs  = ['+', '-', '/', '*', '%', '^'];
 
         foreach ($varParts as $k => $v)
             $$k = $v;
 
-        $result = [null];
+        // returns
+        $minPoints    = null;
+        $maxPoints    = null;
+        $fmtStringMin = null;
+        $fmtStringMax = null;
+        $statId       = null;
 
         if (!$var)
-            return $result;
+            return [null, null, null, null, null];
 
         if (!$effIdx)                                       // if EffectIdx is omitted, assume EffectIdx: 1
             $effIdx = 1;
@@ -977,7 +981,7 @@ class SpellList extends BaseType
 
         $srcSpell = $lookup && $lookup != $this->id ? $this->refSpells[$lookup] : $this;
         if ($srcSpell->error)
-            return $result;
+            return [null, null, null, null, null];
 
         switch ($var)
         {
@@ -988,7 +992,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'b':                                       // PointsPerComboPoint
             case 'B':
@@ -997,18 +1001,18 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'd':                                       // SpellDuration
             case 'D':                                       // todo (med): min/max?; /w unit?
                 $base = $srcSpell->getField('duration');
 
-                $result[2] = Lang::formatTime($srcSpell->getField('duration'), 'spell', 'duration');
+                $fmtStringMin = Lang::formatTime($srcSpell->getField('duration'), 'spell', 'duration');
 
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base < 0 ? 0 : $base;
+                $minPoints = $base < 0 ? 0 : $base;
                 break;
             case 'e':                                       // EffectValueMultiplier
             case 'E':
@@ -1017,7 +1021,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'f':                                       // EffectDamageMultiplier
             case 'F':
@@ -1026,11 +1030,11 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'g':                                       // boolean choice with casters gender as condition $gX:Y;
             case 'G':
-                $result[2] = '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
+                $fmtStringMin = '&lt;'.$switch[0].'/'.$switch[1].'&gt;';
                 break;
             case 'h':                                       // ProcChance
             case 'H':
@@ -1039,7 +1043,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'i':                                       // MaxAffectedTargets
             case 'I':
@@ -1048,12 +1052,12 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'l':                                       // boolean choice with last value as condition $lX:Y;
             case 'L':
                 // resolve later by backtracking
-                $result[2] = '$l'.$switch[0].':'.$switch[1].';';
+                $fmtStringMin = '$l'.$switch[0].':'.$switch[1].';';
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
@@ -1069,25 +1073,25 @@ class SpellList extends BaseType
                 }
 
                 // Aura giving combat ratings
-                $rType = [];
+                $stats = [];
                 if ($aura == SPELL_AURA_MOD_RATING)
-                    if ($rType = StatsContainer::convertCombatRating($mv))
+                    if ($stats = StatsContainer::convertCombatRating($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
 
-                if ($rType)
+                if ($stats)
                 {
-                    $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
-                    $result[4] = $rType[0];                 // could be multiple ratings in theory, but not expected to be
+                    $fmtStringMin = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
+                    $statId = $stats[0];                    // could be multiple ratings in theory, but not expected to be
                 }
 /*  todo: export to and solve formulas in javascript e.g.: spell 10187 - ${$42213m1*8*$<mult>} with $mult = ${${$?s31678[${1.05}][${${$?s31677[${1.04}][${${$?s31676[${1.03}][${${$?s31675[${1.02}][${${$?s31674[${1.01}][${1}]}}]}}]}}]}}]}*${$?s12953[${1.06}][${${$?s12952[${1.04}][${${$?s11151[${1.02}][${1}]}}]}}]}}
                 else if ($this->interactive && ($modStrMin || $modStrMax))
                 {
                     $this->scaling[$this->id] = true;
-                    $result[2] = $modStrMin.'%s';
+                    $fmtStringMin = $modStrMin.'%s';
                 }
 */
-                $result[0] = ctype_lower($var) ? $min : $max;
+                $minPoints = ctype_lower($var) ? $min : $max;
                 break;
             case 'n':                                       // ProcCharges
             case 'N':
@@ -1096,7 +1100,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'o':                                       // TotalAmount for periodic auras (with variance)
             case 'O':
@@ -1125,12 +1129,12 @@ class SpellList extends BaseType
                 {
                     $this->scaling[$this->id] = true;
 
-                    $result[2] = $modStrMin.'%s';
-                    $result[3] = $modStrMax.'%s';
+                    $fmtStringMin = $modStrMin.'%s';
+                    $fmtStringMax = $modStrMax.'%s';
                 }
 
-                $result[0] = $min;
-                $result[1] = $max;
+                $minPoints = $min;
+                $maxPoints = $max;
                 break;
             case 'q':                                       // EffectMiscValue
             case 'Q':
@@ -1139,7 +1143,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'r':                                       // SpellRange
             case 'R':
@@ -1148,7 +1152,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
@@ -1162,26 +1166,26 @@ class SpellList extends BaseType
                     eval("\$max = $max $op $oparg;");
                 }
                 // Aura giving combat ratings
-                $rType = [];
+                $stats = [];
                 if ($aura == SPELL_AURA_MOD_RATING)
-                    if ($rType = StatsContainer::convertCombatRating($mv))
+                    if ($stats = StatsContainer::convertCombatRating($mv))
                         $this->scaling[$this->id] = true;
                 // Aura end
 
-                if ($rType)
+                if ($stats)
                 {
-                    $result[2] = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
-                    $result[4] = $rType[0];                 // could be multiple ratings in theory, but not expected to be
+                    $fmtStringMin = '<!--rtg%s-->%s&nbsp;<small>(%s)</small>';
+                    $statId = $stats[0];                    // could be multiple ratings in theory, but not expected to be
                 }
                 else if (($modStrMin || $modStrMax) && $this->interactive)
                 {
                     $this->scaling[$this->id] = true;
-                    $result[2] = $modStrMin.'%s';
-                    $result[3] = $modStrMax.'%s';
+                    $fmtStringMin = $modStrMin.'%s';
+                    $fmtStringMax = $modStrMax.'%s';
                 }
 
-                $result[0] = $min;
-                $result[1] = $max;
+                $minPoints = $min;
+                $maxPoints = $max;
                 break;
             case 't':                                       // Periode
             case 'T':
@@ -1190,7 +1194,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'u':                                       // StackCount
             case 'U':
@@ -1199,7 +1203,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'v':                                       // MaxTargetLevel
             case 'V':
@@ -1208,7 +1212,7 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'x':                                       // ChainTargetCount
             case 'X':
@@ -1217,27 +1221,27 @@ class SpellList extends BaseType
                 if (in_array($op, $signs) && is_numeric($oparg) && is_numeric($base))
                     eval("\$base = $base $op $oparg;");
 
-                $result[0] = $base;
+                $minPoints = $base;
                 break;
             case 'z':                                       // HomeZone
-                $result[2] = Lang::spell('home');
+                $fmtStringMin = Lang::spell('home');
                 break;
         }
 
         // handle excessively precise floats
-        if (is_float($result[0]))
-            $result[0] = round($result[0], 2);
-        if (isset($result[1]) && is_float($result[1]))
-            $result[1] = round($result[1], 2);
+        if (is_float($minPoints))
+            $minPoints = round($minPoints, 2);
+        if (isset($maxPoints) && is_float($maxPoints))
+            $maxPoints = round($maxPoints, 2);
 
-        return $result;                                     // minPoints, maxPoints, fmtStringMin, fmtStringMax, combatRatingId
+        return [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId];
     }
 
     // description-, buff-parsing component
-    private function resolveFormulaString($formula, $precision = 0)
+    private function resolveFormulaString(string $formula, int $precision = 0)
     {
         $fSuffix = '%s';
-        $fRating = 0;
+        $fStat   = 0;
 
         // step 1: formula unpacking redux
         while (($formStartPos = strpos($formula, '${')) !== false)
@@ -1273,7 +1277,7 @@ class SpellList extends BaseType
                 ++$formCurPos;                              // for some odd reason the precision decimal survives if we dont increment further..
             }
 
-            [$formOutStr, $fSuffix, $fRating] = $this->resolveFormulaString($formOutStr, $formPrecision);
+            [$formOutStr, $fSuffix, $fStat] = $this->resolveFormulaString($formOutStr, $formPrecision);
 
             $formula = substr_replace($formula, $formOutStr, $formStartPos, ($formCurPos - $formStartPos));
         }
@@ -1307,34 +1311,34 @@ class SpellList extends BaseType
             $pos += $len;
 
             // we are resolving a formula -> omit ranges
-            $var = $this->resolveVariableString($varParts);
+            [$minPoints, , $fmtStringMin, , $statId] = $this->resolveVariableString($varParts);
 
             // time within formula -> rebase to seconds and omit timeUnit
             if (strtolower($varParts['var']) == 'd')
             {
-               $var[0] /= 1000;
-               unset($var[2]);
+               $minPoints /= 1000;
+               unset($fmtStringMin);
             }
 
-            $str .= $var[0];
+            $str .= $minPoints;
 
             // overwrite eventually inherited strings
-            if (isset($var[2]))
-                $fSuffix = $var[2];
+            if (isset($fmtStringMin))
+                $fSuffix = $fmtStringMin;
 
-            // overwrite eventually inherited ratings
-            if (isset($var[4]))
-                $fRating = $var[4];
+            // overwrite eventually inherited stat
+            if (isset($statId))
+                $fStat = $statId;
         }
         $str .= substr($formula, $pos);
-        $str  = str_replace('#', '$', $str);                // reset marks
+        $str  = str_replace('#', '$', $str);                // reset markers
 
         // step 3: try to evaluate result
         $evaled = $this->resolveEvaluation($str);
 
         $return = is_numeric($evaled) ? round($evaled, $precision) : $evaled;
 
-        return [$return, $fSuffix, $fRating];
+        return [$return, $fSuffix, $fStat];
     }
 
     // should probably used only once to create ?_spell. come to think of it, it yields the same results every time.. it absolutely has to!
@@ -1576,12 +1580,12 @@ class SpellList extends BaseType
                 $formPrecision = $data[$formCurPos + 1];
                 $formCurPos += 2;
             }
-            [$formOutVal, $formOutStr, $ratingId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10));
+            [$formOutVal, $formOutStr, $statId] = $this->resolveFormulaString($formOutStr, $formPrecision ?: ($topLevel ? 0 : 10));
 
-            if ($ratingId && Util::checkNumeric($formOutVal) && $this->interactive)
-                $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal))));
-            else if ($ratingId && Util::checkNumeric($formOutVal))
-                $resolved = sprintf($formOutStr, $ratingId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $ratingId, abs($formOutVal)));
+            if ($statId && Util::checkNumeric($formOutVal) && $this->interactive)
+                $resolved = sprintf($formOutStr, $statId, abs($formOutVal), sprintf(Util::$setRatingLevelString, $this->charLevel, $statId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $statId, abs($formOutVal))));
+            else if ($statId && Util::checkNumeric($formOutVal))
+                $resolved = sprintf($formOutStr, $statId, abs($formOutVal), Util::setRatingLevel($this->charLevel, $statId, abs($formOutVal)));
             else
                 $resolved = sprintf($formOutStr, Util::checkNumeric($formOutVal) ? abs($formOutVal) : $formOutVal);
 
@@ -1614,23 +1618,23 @@ class SpellList extends BaseType
 
             $pos += $len;
 
-            $var = $this->resolveVariableString($varParts);
-            $resolved = is_numeric($var[0]) ? abs($var[0]) : $var[0];
-            if (isset($var[2]))
+            [$minPoints, $maxPoints, $fmtStringMin, $fmtStringMax, $statId] = $this->resolveVariableString($varParts);
+            $resolved = is_numeric($minPoints) ? abs($minPoints) : $minPoints;
+            if (isset($fmtStringMin))
             {
-                if (isset($var[4]) && $this->interactive)
-                    $resolved = sprintf($var[2], $var[4], abs($var[0]), sprintf(Util::$setRatingLevelString, $this->charLevel, $var[4], abs($var[0]), Util::setRatingLevel($this->charLevel, $var[4], abs($var[0]))));
-                else if (isset($var[4]))
-                    $resolved = sprintf($var[2], $var[4], abs($var[0]), Util::setRatingLevel($this->charLevel, $var[4], abs($var[0])));
+                if (isset($statId) && $this->interactive)
+                    $resolved = sprintf($fmtStringMin, $statId, abs($minPoints), sprintf(Util::$setRatingLevelString, $this->charLevel, $statId, abs($minPoints), Util::setRatingLevel($this->charLevel, $statId, abs($minPoints))));
+                else if (isset($statId))
+                    $resolved = sprintf($fmtStringMin, $statId, abs($minPoints), Util::setRatingLevel($this->charLevel, $statId, abs($minPoints)));
                 else
-                    $resolved = sprintf($var[2], $resolved);
+                    $resolved = sprintf($fmtStringMin, $resolved);
             }
 
-            if (isset($var[1]) && $var[0] != $var[1] && !isset($var[4]))
+            if (isset($maxPoints) && $minPoints != $maxPoints && !isset($statId))
             {
-                $_ = is_numeric($var[1]) ? abs($var[1]) : $var[1];
+                $_ = is_numeric($maxPoints) ? abs($maxPoints) : $maxPoints;
                 $resolved .= Lang::game('valueDelim');
-                $resolved .= isset($var[3]) ? sprintf($var[3], $_) : $_;
+                $resolved .= isset($fmtStringMax) ? sprintf($fmtStringMax, $_) : $_;
             }
 
             $str .= $resolved;

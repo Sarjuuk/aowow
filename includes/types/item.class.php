@@ -755,22 +755,22 @@ class ItemList extends BaseType
             if (!$qty || $type <= 0)
                 continue;
 
+            $statId = Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $type);
+
             // base stat
-            switch ($type)
+            switch ($statId)
             {
-                case ITEM_MOD_MANA:
-                case ITEM_MOD_HEALTH:
-                    // $type += 1;                          // i think i fucked up somewhere mapping item_mods: offsets may be required somewhere
-                case ITEM_MOD_AGILITY:
-                case ITEM_MOD_STRENGTH:
-                case ITEM_MOD_INTELLECT:
-                case ITEM_MOD_SPIRIT:
-                case ITEM_MOD_STAMINA:
-                    $x .= '<span><!--stat'.$type.'-->'.($qty > 0 ? '+' : '-').abs($qty).' '.Lang::item('statType', $type).'</span><br />';
+                case Stat::MANA:
+                case Stat::HEALTH:
+                case Stat::AGILITY:
+                case Stat::STRENGTH:
+                case Stat::INTELLECT:
+                case Stat::SPIRIT:
+                case Stat::STAMINA:
+                    $x .= '<span><!--stat'.$statId.'-->'.Lang::item('statType', $type, [ord($qty > 0 ? '+' : '-'), abs($qty)]).'</span><br />';
                     break;
                 default:                                    // rating with % for reqLevel
-                    $green[] = $this->parseRating($type, $qty, $interactive, $causesScaling);
-
+                    $green[] = $this->formatRating($statId, $type, $qty, $interactive, $causesScaling);
             }
         }
 
@@ -1439,7 +1439,7 @@ class ItemList extends BaseType
         return round(($dps - 54.8) * 14);
     }
 
-    private function parseRating($type, $value, $interactive = false, &$scaling = false)
+    private function formatRating(int $statId, int $itemMod, int $qty, bool $interactive = false, bool &$scaling = false) : string
     {
         // clamp level range
         $ssdLvl = isset($this->ssd[$this->id]) ? $this->ssd[$this->id]['maxLevel'] : 1;
@@ -1447,27 +1447,27 @@ class ItemList extends BaseType
         $level  = min(max($reqLvl, $ssdLvl), MAX_LEVEL);
 
         // unknown rating
-        if (!Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $type))
+        if (!$statId)
         {
             if (User::isInGroup(U_GROUP_EMPLOYEE))
-                return sprintf(Lang::item('statType', count(Lang::item('statType')) - 1), $type, $value);
+                return Lang::item('statType', count(Lang::item('statType')) - 1, [$itemMod, $qty]);
             else
-                return null;
+                return '';
         }
 
         // level independent Bonus
-        if (Stat::isLevelIndependent($type))
-            return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$type.'-->'.$value, Lang::item('statType', $type));
+        if (Stat::isLevelIndependent($statId))
+            return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$statId.'-->'.$qty, Lang::item('statType', $itemMod));
 
         // rating-Bonuses
         $scaling = true;
 
         if ($interactive)
-            $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $type, $value)).')</small>';
+            $js = '&nbsp;<small>('.sprintf(Util::$changeLevelString, Util::setRatingLevel($level, $statId, $qty)).')</small>';
         else
-            $js = '&nbsp;<small>('.Util::setRatingLevel($level, $type, $value).')</small>';
+            $js = '&nbsp;<small>('.Util::setRatingLevel($level, $statId, $qty).')</small>';
 
-        return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$type.'-->'.$value.$js, Lang::item('statType', $type));
+        return Lang::item('trigger', SPELL_TRIGGER_EQUIP).str_replace('%d', '<!--rtg'.$statId.'-->'.$qty.$js, Lang::item('statType', $itemMod));
     }
 
     private function getSSDMod($type)

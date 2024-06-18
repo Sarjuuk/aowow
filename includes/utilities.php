@@ -520,13 +520,6 @@ abstract class Util
         'us',           'eu',           'kr',           'tw',           'cn',           'dev'
     );
 
-    # todo (high): find a sensible way to write data here on setup
-    private static $gtCombatRatings         = array(
-        12 => 1.5,      13 => 13.8,     14 => 13.8,     15 => 5,        16 => 10,       17 => 10,       18 => 8,        19 => 14,       20 => 14,
-        21 => 14,       22 => 10,       23 => 10,       24 => 8,        25 => 0,        26 => 0,        27 => 0,        28 => 10,       29 => 10,
-        30 => 10,       31 => 10,       32 => 14,       33 => 0,        34 => 0,        35 => 28.75,    36 => 10,       37 => 2.5,      44 => 4.268292513760655
-    );
-
     public static $ssdMaskFields            = array(
         'shoulderMultiplier',           'trinketMultiplier',            'weaponMultiplier',             'primBudged',
         'rangedMultiplier',             'clothShoulderArmor',           'leatherShoulderArmor',         'mailShoulderArmor',
@@ -917,12 +910,13 @@ abstract class Util
     }
 
     // for item and spells
-    public static function setRatingLevel(int $level, int $type, int $val) : string
+    public static function setRatingLevel(int $level, int $statId, int $val) : string
     {
-        if (in_array($type, [ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING, ITEM_MOD_RESILIENCE_RATING]) && $level < 34)
+        if (in_array($statId, [Stat::DEFENSE_RTG, Stat::DODGE_RTG, Stat::PARRY_RTG, Stat::BLOCK_RTG, Stat::RESILIENCE_RTG]) && $level < 34)
             $level = 34;
 
-        if (!isset(self::$gtCombatRatings[$type]))
+        $factor = Stat::getRatingPctFactor($statId);
+        if (!$factor)
             $result = 0;
         else
         {
@@ -936,13 +930,13 @@ abstract class Util
                 $c = 2 / 52;
 
             // do not use localized number format here!
-            $result = number_format($val / self::$gtCombatRatings[$type] / $c, 2);
+            $result = number_format($val / $factor / $c, 2);
         }
 
-        if (!in_array($type, array(ITEM_MOD_DEFENSE_SKILL_RATING, ITEM_MOD_EXPERTISE_RATING)))
+        if (!in_array($statId, [Stat::DEFENSE_RTG, Stat::EXPERTISE_RTG]))
             $result .= '%';
 
-        return Lang::item('ratingString', [$type, $result, $level]);
+        return Lang::item('ratingString', [$statId, $result, $level]);
     }
 
     public static function powerUseLocale($domain = 'www')
