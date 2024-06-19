@@ -24,8 +24,9 @@ SqlGen::register(new class extends SetupScript
         Util::arraySumByKey($classes, $races);
 
         // add skills
-        $skills = DB::Aowow()->select('SELECT LOG(2, classMask) + 1 AS ARRAY_KEY, GROUP_CONCAT(skillLine SEPARATOR \' \') AS skills FROM dbc_skillraceclassinfo WHERE flags = 1040 GROUP BY classMask HAVING ARRAY_KEY = CAST(LOG(2, classMask) + 1 AS SIGNED)');
-        Util::arraySumByKey($classes, $skills);
+        if ($skills = DB::Aowow()->selectCol('SELECT LOG(2, classMask) + 1 AS ARRAY_KEY, GROUP_CONCAT(skillLine SEPARATOR \' \') FROM dbc_skillraceclassinfo WHERE flags = ?d GROUP BY classMask HAVING ARRAY_KEY = CAST(LOG(2, classMask) + 1 AS SIGNED)', 0x410))
+            foreach ($skills as $classId => $skillStr)
+                $classes[$classId]['skills'] = $skillStr;
 
         // add weaponTypeMask & armorTypeMask
         foreach ($classes as $id => &$data)
