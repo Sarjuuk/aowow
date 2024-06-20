@@ -1,12 +1,12 @@
+#!/usr/bin/env php
 <?php
 
-require 'includes/kernel.php';
-
-if (!CLI)
+if (PHP_SAPI !== 'cli')
     die("this script must be run from CLI\n");
-if (CLI && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
-    die("this script must be run from root directory\n");
-else
-    require 'setup/setup.php';
+if (PHP_SAPI === 'cli' && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
+    die("this script must be run from the aowow root directory\n");
+
+require 'includes/kernel.php';
+require 'setup/setup.php';
 
 ?>

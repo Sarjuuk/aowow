@@ -671,7 +671,7 @@ trait spawnHelper
                         $floors = [];
                         foreach ($points as $p)
                         {
-                            if (isset(Game::$areaFloors[$p['areaId']]))
+                            if ($p['floor'])
                                 $floors[$p['areaId']][] = $p['floor'];
 
                             if (isset($menu[$p['areaId']]))

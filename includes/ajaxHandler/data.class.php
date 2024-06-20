@@ -81,7 +81,6 @@ class AjaxData extends AjaxHandler
                     break;
                 // locale independant
                 case 'quick-excludes':
-                case 'zones':
                 case 'weight-presets':
                 case 'item-scaling':
                 case 'realms':
@@ -102,6 +101,7 @@ class AjaxData extends AjaxHandler
                 case 'enchants':
                 case 'itemsets':
                 case 'pets':
+                case 'zones':
                     if (!Util::loadStaticFile($set, $result, true) && Cfg::get('DEBUG'))
                         $result .= "alert('could not fetch static data: ".$set." for locale: ".User::$localeString."');";
 

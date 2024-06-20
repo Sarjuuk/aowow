@@ -2133,44 +2133,7 @@ var g_zones = {
     4987: 'Le sanctum Rubis'
 };
 
-var g_zone_areas = {
-     206: ['Préparation de Norndir', 'Ascension d\'Écorche-dragon', 'Terrasse de Tyr'],
-     209: ['La cour', 'Salle à manger', 'Antre Vacant', 'Observatoire Inférieur', 'Observatoire Supérieur', 'Chambre du seigneur Godfrey', 'Le chemin de ronde'],
-     719: ['Le Bassin d\'Ask\'ar', 'Sanctuaire d’Écrin-de-Lune', 'Les bassins Oubliés'],
-     721: ['Le Hall des engrenages', 'Le dortoir', 'Baie de lancement', 'Cour du Bricoleur'],
-     796: ['Cimetière', 'La Bibliothèque', 'Armurerie', 'Cathédrale'],
-    1196: ['Pinnacle inférieur', 'Pinacle Supérieur'],
-    1337: ['Hall des Gardiens', 'Siège de Khaz\'goroth'],
-    1581: ['Les Mortemines', 'Crique du Cuirassé'],
-    1583: ['Tazz\'Alaor', 'Tunnels de Toile-grouillante', 'Cité d\'Hordemar', 'Hall de Main-noire', 'Hall de la Flèche des dragons', 'La colonie', 'Stade Rochenoire'],
-    1584: ['Le mitard', 'Ville des Ombreforges'],
-    2017: ['Place des Croisés', 'Le Défi'],
-    2057: ['Le Reliquaire', 'Chambre d\'invocation', 'Bureau du proviseur', '[Barov Family Vault]'],
-    2100: ['Cavernes de Maraudon', 'Tombe de Zaetar'],
-    2557: ['Communs gordok', 'Grands jardins', 'Cours des Bien-nés', 'Prison d\'Immol\'Thar', 'Quartier de Crochebois', 'Le sanctuaire d\'Eldretharr'],
-    2677: ['Garnison des Gueules-de-dragon', 'Halls des conflits', 'Laboratoires Cramoisis', 'Antre de Nefarian'],
-    3428: ['Les souterrains de la ruche', 'Portes du Temple', 'Caveau de C\'Thun'],
-    3456: ['Le quartier des Assemblages', 'Le Quartier des Arachnide', 'Le Quartier Militaire', 'Le quartier de la Peste', 'La Nécropole Inférieure', 'La Nécropole Supérieure'],
-    3457: ['Quartiers des serviteurs', 'Écuries supérieures', 'La salle de banquet', 'Les Appartements des hôtes', 'Balcon de l’Opéra', 'Terrasse du maître', 'Partie inférieure de l’Escalier brisé', 'Partie supérieure de l’Escalier brisé', 'La Ménagerie', 'Bibliothèque du Gardien', 'Le Dépôt', 'Bibliothèque supérieure', 'Le Guet céleste', 'Hall du Flambeur', 'Appartements de Medivh', 'Centrale électrique', 'Néantespace'],
-    3715: ['Le caveau de la Vapeur', 'Les bassins de refroidissement'],
-    3790: ['Les salles de l’Après-vie', 'Le pont des âmes'],
-    3791: ['Voile Sethekk', 'Les salles du Deuil'],
-    3848: ['Bloc de stase : Trion', 'Bloc de stase : Maximus', 'Cœur de confinement'],
-    3849: ['Le Méchanar', 'Chambre des Calculs'],
-    3959: ['Terrain d\'entraînement Illidari', 'Égouts de Karabor', 'Sanctuaire des ombres', 'Les salles de l’Angoisse', 'Veillée de Fielsang', 'Tanière des délices mortels', 'Chambre de commandement', 'Sommet du temple'],
-    4075: ['Plateau du Puits de soleil', 'Sanctuaire de l’eclipse'],
-    4100: ['La Route de Stratholme', 'Stratholme'],
-    4131: ['Asile du grand magistère', 'Terrain d’observation'],
-    4196: ['Le Vestibule de Drak\'Tharon', 'Surplombe de Drak\'Tharon'],
-    4228: ['Bande d\'Écart', 'Bande d\'Accélération', 'Bande de Transmutation', 'Bande d\'Alignement'],
-    4272: ['La garnison inflexible', 'Promenade des Faiseurs'],
-    4273: ['Le Grand abord', 'L\'antichambre d\'Ulduar', 'Le sanctum intérieur d\'Ulduar', 'La prison de Yogg-Saron', 'L\'Étincelle d\'imagination', 'La Vue de l\'esprit'],
-    4277: ['La Fosse des couvées', 'Antre d\'Hadronox', 'La Porte de la Daurade'],
-    4395: ['Dalaran', 'Les Entrailles'],
-    4494: ['Ahn\'kahet', 'Plancher 2'],
-    4722: ['L\'colisée d\'Argent', 'Les Profondeurs Glacées'],
-    4812: ['La Citadelle Inférieure', 'Le Rempart des Cranes', 'Ascension de Porte-mort', 'Le repaire de la reine du Givre', 'Les étages supérieurs', 'Quartiers Royaux', 'Le Trône Gelé', 'Deuillegivre']
-};
+var g_zone_areas = {};
 
 var g_zone_categories = {
      0: 'Royaumes de l\'est',

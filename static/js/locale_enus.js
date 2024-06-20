@@ -2181,44 +2181,7 @@ var g_zones = {
     4987: 'The Ruby Sanctum'
 };
 
-var g_zone_areas = {
-    206:  ['Norndir Preparation', 'Dragonflayer Ascent', 'Tyr\'s Terrace'],
-    209:  ['The Courtyard', 'Dining Hall', 'The Vacant Den', 'Lower Observatory', 'Upper Observatory', 'Lord Godfrey\'s Chamber', 'The Wall Walk'],
-    719:  ['The Pool of Ask\'Ar', 'Moonshrine Sanctum', 'The Forgotten Pool'],
-    721:  ['The Hall of Gears', 'The Dormitory', 'Launch Bay', 'Tinkers\' Court'],
-    796:  ['Graveyard', 'Library', 'Armory', 'Cathedral'],
-    1196: ['Lower Pinnacle', 'Upper Pinnacle'],
-    1337: ['Hall of the Keepers', 'Khaz\'Goroth\'s Seat'],
-    1581: ['The Deadmines', 'Ironclad Cove'],
-    1583: ['Tazz\'Alaor', 'Skitterweb Tunnels', 'Hordemar City', 'Hall of Blackhand', 'Dragonspire Hall', 'The Rookery', 'Blackrock Stadium'],
-    1584: ['Detention Block', 'Shadowforge City'],
-    2017: ['Crusader\'s Square', 'The Gauntlet'],
-    2057: ['The Reliquary', 'Chamber of Summoning', 'The Headmaster\'s Study', 'Barov Family Vault'],
-    2100: ['Caverns of Maraudon', 'Zaetar\'s Grave'],
-    2557: ['Gordok Commons', 'Capital Gardens', 'Court of the Highborne', 'Prison of Immol\'Thar', 'Warpwood Quarter', 'The Shrine of Eldretharr'],
-    2677: ['Dragonmaw Garrison', 'Halls of Strife', 'Crimson Laboratories', 'Nefarian\'s Lair'],
-    3428: ['The Hive Undergrounds', 'The Temple Gates', 'Vault of C\'Thun'],
-    3456: ['The Construct Quarter', 'The Arachnid Quarter', 'The Military Quarter', 'The Plague Quarter', 'Overview', 'Frostwyrm Lair'],
-    3457: ['Servant\'s Quarters', 'Upper Livery Stables', 'The Banquet Hall', 'The Guest Chambers', 'Opera Hall Balcony', 'Master\'s Terrace', 'Lower Broken Stair', 'Upper Broken Stair', 'The Menagerie', 'Guardian\'s Library', 'The Repository', 'Upper Library', 'The Celestial Watch', 'Gamesman\'s Hall', 'Medivh\'s Chambers', 'The Power Station', 'Netherspace'],
-    3715: ['The Steamvault', 'The Cooling Pools'],
-    3790: ['Halls of the Hereafter', 'Bridge of Souls'],
-    3791: ['Veil Sethekk', 'Halls of Mourning'],
-    3848: ['Stasis Block: Trion', 'Stasis Block: Maximus', 'Containment Core'],
-    3849: ['The Mechanar', 'Calculation Chamber'],
-    3959: ['Illidari Training Grounds', 'Karabor Sewers', 'Sanctuary of Shadows', 'Halls of Anguish', 'Gorefiend\'s Vigil', 'Den of Mortal Delights', 'Chamber of Command', 'Temple Summit'],
-    4075: ['Sunwell Plateau', 'Shrine of the Eclipse'],
-    4100: ['Outside Stratholme', 'Stratholme City'],
-    4131: ['Grand Magister\'s Asylum', 'Observation Grounds'],
-    4196: ['The Vestibules of Drak\'Tharon', 'Drak\'Tharon Overlook'],
-    4228: ['Band of Variance', 'Band of Acceleration', 'Band of Transmutation', 'Band of Alignment'],
-    4272: ['Unyielding Garrison', 'Walk of the Makers'],
-    4273: ['The Grand Approach', 'The Antechamber of Ulduar', 'The Inner Sanctum of Ulduar', 'The Prison of Yogg-Saron', 'The Spark of Imagination', 'The Mind\'s Eye'],
-    4277: ['The Brood Pit', 'Hadronox\'s Lair', 'The Gilded Gate'],
-    4395: ['Dalaran City', 'The Underbelly'],
-    4494: ['Ahn\'Kahet', 'Level 2'],
-    4722: ['Crusaders\' Coliseum', 'The Icy Depths'],
-    4812: ['The Lower Citadel', 'The Rampart of Skulls', 'Deathbringer\'s Rise', 'The Frost Queen\'s Lair', 'The Upper Reaches', 'Royal Quarters', 'The Frozen Throne', 'Frostmourne']
-};
+var g_zone_areas = {};
 
 var g_zone_categories = {
      0: 'Eastern Kingdoms',
