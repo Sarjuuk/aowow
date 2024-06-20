@@ -145,13 +145,13 @@ class Cfg
             return 'configuration option not found';
 
         if (self::$store[$key][self::IDX_FLAGS] & self::FLAG_PERSISTENT)
-            return 'can\'t delete persistent options';
+            return 'can\'t delete persistent option';
 
         if (!(self::$store[$key][self::IDX_FLAGS] & self::FLAG_PHP))
-            return 'can\'t delete non-php options';
+            return 'can\'t delete non-php option';
 
         if (self::$store[$key][self::IDX_FLAGS] & self::FLAG_INTERNAL)
-            return 'can\'t delete internal options';
+            return 'can\'t delete internal option';
 
         if (!DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0 AND (`flags` & ?d) > 0', $key, self::FLAG_PERSISTENT, self::FLAG_PHP))
             return 'internal error';
@@ -169,7 +169,7 @@ class Cfg
             if (self::$isLoaded)
                 self::throwError('cfg not defined: '.strtoupper($key));
 
-            return '';
+            return null;
         }
 
         if ($fromDB && $fullInfo)
@@ -195,7 +195,7 @@ class Cfg
         [$oldValue, $flags, , , $comment] = self::$store[$key];
 
         if ($flags & self::FLAG_INTERNAL)
-            return 'can\'t set internal options directly';
+            return 'can\'t set an internal option directly';
 
         if ($err = self::validate($value, $flags, $comment))
             return $err;
@@ -250,7 +250,7 @@ class Cfg
 
         [$oldValue, $flags, , $default, ] = self::$store[$key];
         if ($flags & self::FLAG_INTERNAL)
-            return 'can\'t set internal options directly';
+            return 'can\'t set an internal option directly';
 
         if (!$default)
             return 'config option has no default value';

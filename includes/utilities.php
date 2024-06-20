@@ -177,19 +177,26 @@ abstract class CLI
                 $pads[$j] = max($pads[$j] ?? 0, mb_strlen(self::purgeEscapes($row[$j] ?? '')));
         }
 
-        foreach ($out as $j => $row)
+        foreach ($out as $i => $row)
         {
-            for ($i = 0; $i < $nCols; $i++)
-                $row[$i] = str_pad($row[$i] ?? '', $pads[$i] ?? 0);
+            for ($j = 0; $j < $nCols; $j++)
+            {
+                if (!isset($row[$j]))
+                    break;
 
-            if ($j || $headless)
+                $len = ($pads[$j] - mb_strlen(self::purgeEscapes($row[$j])));
+                for ($k = 0; $k < $len; $k++)               // can't use str_pad(). it counts invisible chars.
+                    $row[$j] .= ' ';
+            }
+
+            if ($i || $headless)
                 self::write(' '.implode(' ' . self::tblDelim(' ') . ' ', $row), -1, $timestamp);
             else
                 self::write(self::tblHead(' '.implode('   ', $row)), -1, $timestamp);
         }
 
         if (!$headless)
-            self::write(self::tblHead(str_pad('', array_sum($pads) + (count($pads) - 1) * 3)), -1, $timestamp);
+            self::write(self::tblHead(str_pad('', array_sum($pads) + count($pads) * 3 - 2)), -1, $timestamp);
 
         self::write();
     }
@@ -222,12 +229,12 @@ abstract class CLI
 
     private static function tblHead(string $str) : string
     {
-        return CLI_HAS_E ? "\e[1;39;100m".$str."\e[0m" : $str;
+        return CLI_HAS_E ? "\e[1;48;5;236m".$str."\e[0m" : $str;
     }
 
     private static function tblDelim(string $str) : string
     {
-        return CLI_HAS_E ? "\e[39;100m".$str."\e[0m" : $str;
+        return CLI_HAS_E ? "\e[48;5;236m".$str."\e[0m" : $str;
     }
 
     public static function grey(string $str) : string
@@ -304,7 +311,7 @@ abstract class CLI
 
     private static function purgeEscapes(string $msg) : string
     {
-        return preg_replace(["/\e\[\d+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg);
+        return preg_replace(["/\e\[[\d;]+[mK]/", "/\e\[\d+G/"], ['', "\n"], $msg);
     }
 
     public static function nicePath(string $fileOrPath, string ...$pathParts) : string
