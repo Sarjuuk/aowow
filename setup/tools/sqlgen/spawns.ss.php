@@ -139,7 +139,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 }
                 else if (!$points)                          // still impossible (there are areas that are intentionally off the map (e.g. the isles south of tanaris))
                 {
-                    CLI::write('[spawns] '.str_pad('['.$spawn['guid'].']', 9).' '.($idx < 5 ? '' : 'with path/point ['.$spawn['npcOrPath'].'; '.$spawn['point']).'] could not be matched to displayable area [A:'.$area.'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
+                    CLI::write('[spawns] '.str_pad('['.$spawn['guid'].']', 9).' '.($idx < 5 ? '' : 'with path/point ['.$spawn['npcOrPath'].'; '.$spawn['point'].'] ').'could not be matched to displayable area [A:'.$area.'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
                     $time->reset();
                     continue;
                 }
