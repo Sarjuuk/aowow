@@ -1151,6 +1151,7 @@ $lang = array(
         'Miscellaneous' => "Miscelánea",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Mapa cósmico",
+        'floorN'        => "Nivel %d"
     ),
     'privileges' => array(
         'main'          => "Aquí, en AoWoW, puedes conseguir <a href=\"?reputation\">reputación</a>. La forma principal de conseguirla es conseguir que tus comentarios sean votados de forma positiva.<br /><br />Así pues, la reputación es algo que mide, más o menos, cúanto has contribuido a la comunidad.<br /><br />Conforme consigues reputación, te ganas la confianza de la comunidad y tendrás privilegios adicionales. Puedes encontrar una lista completa debajo.",

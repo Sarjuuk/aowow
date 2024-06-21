@@ -483,7 +483,7 @@ class DBC
 
         $this->writeToDB();
 
-        $this->endCLean();
+        $this->endClean();
 
         return true;
     }

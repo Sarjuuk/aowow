@@ -1151,6 +1151,7 @@ $lang = array(
         'Miscellaneous' => "Diverse",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Kosmische Karte",
+        'floorN'        => "%d. Stockwerk"
     ),
     'privileges' => array(
         'main'          => "Auf unserer Seite könnt Ihr <a href=\"?reputation\">Ruf</a> erringen. Hauptsächlich erringt man Ruf dadurch, dass Eure Kommentare positiv bewertet werden.<br><br>Das heißt, Euer Ruf hängt in gewissem Maße davon ab, wie sehr Ihr der Community beiträgt.<br><br>Mit dem Sammeln von Ruf verdient Ihr Euch auch das Vertrauen der Gemeinschaft ein, und Ihr erhält Privilegien. Unten könnt Ihr eine vollständige Liste einsehen.",

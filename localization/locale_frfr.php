@@ -1151,6 +1151,7 @@ $lang = array(
         'Miscellaneous' => "Divers",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Carte cosmique",
+        'floorN'        => "Plancher %d"
     ),
     'privileges' => array(
         'main'          => "Sur AoWoW, vous pouvez accumuler de la <a href=\"?reputation\">réputation</a>. Le principal moyen d'en accumuler est d'avoir un score élevé pour vos commentaires.<br><br>Ainsi, la réputation est une vision sommaire de vos contributions à la communauté.<br><br>En amassant de la réputation, vous gagnez le respect de la communauté et vous obtiendrez certains privilèges. Vous pouvez en trouver la liste complète ci-dessous.",

@@ -1150,7 +1150,8 @@ $lang = array(
         'Battlegrounds' => "战场",
         'Miscellaneous' => "其他",
         'Azeroth'       => "艾泽拉斯",
-        'CosmicMap'     => "宇宙地图"
+        'CosmicMap'     => "宇宙地图",
+        'floorN'        => "[Level %d]"
     ),
     'privileges' => array(
         'main'          => "在我们的网站上，你可以通过 <a href=\"?reputation\">声望</a>. 来获取特权。获取声望的主要途径是获得评论的赞同。<br><br>因此，声望是衡量你对社区的贡献程度的一个大致指标。<br><br>随着声望的积累，你将获得社区的信任，并被赋予额外的特权。以下是完整的特权列表。",

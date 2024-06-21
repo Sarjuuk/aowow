@@ -34,7 +34,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private const A_THRESHOLD   = 95;                       // alpha threshold to define subZones: set it too low and you have unspawnable areas inside a zone; set it too high and the border regions overlap
     private const COLOR_WHITE   = [255, 255, 255];          // rgb
     private const COLOR_BLACK   = [  0,   0,   0];          // rgb
-    private const COLOR_SUBZONE = [255,  64, 192, 64];      // rgba
+    private const COLOR_SUBZONE = [  0, 230, 255, 74];      // rgba - note: rgb is 0-255, a is 0-127
 
     private const AREA_FLAG_DEFAULT_FLOOR_TERRAIN = 0x004;  // Default Dungeon Floor is Terrain
     private const AREA_FLAG_NO_DEFAULT_FLOOR      = 0x100;  // Don't use Default Dungeon Floor (typically 1)
@@ -54,22 +54,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
         [9, 10, 11, 12]
     );
 
-    private const LEVEL_N = array(                           // todo: move this hackfix to locales?
-        LOCALE_EN => 'Level %d',
-        LOCALE_FR => 'Plancher %d',
-        LOCALE_DE => '%d. Stockwerk',
-        LOCALE_CN => '[Level %d]',
-        LOCALE_ES => 'Nivel %d',
-        LOCALE_RU => 'Уровень %d'
-    );
-
     private const MAP_FILE_PATTERN = '/((\w{4})\/interface\/worldmap(?:\/microdungeon\/([^\/]+))?\/([^\/]+)\/)(\4)(?:(\d{1,2})_)?(\d{1,2})\.(?:blp|png)/i';
 
     // src, resourcePath, localized, [tileOrder], [[dest, destW, destH]]
     private $genSteps = array(
-        self::M_MAPS     => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS                   ],
-        self::M_SPAWNS   => ['WorldMap/', null, true,  self::TILEORDER, [['cache/setup/alphaMaps/', 0, 0]]],
-        self::M_SUBZONES => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS                   ]
+        self::M_MAPS     => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ],
+        self::M_SPAWNS   => ['WorldMap/', null, true,  self::TILEORDER, [['cache/alphaMaps/', 0, 0]]],
+        self::M_SUBZONES => ['WorldMap/', null, true,  self::TILEORDER, self::DEST_DIRS             ]
     );
 
     private $progress        = 0;
@@ -114,8 +105,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $mask |= self::M_MAPS;
 
         // unless manually prompted drop spawnmap generation if 90% of spawns have core generated area info
-        $npcPct = DB::World()->selectCell('SELECT SUM(IF(zoneId > 0, 1, 0)) / COUNT(*) FROM creature')   ?? 0;
-        $goPct  = DB::World()->selectCell('SELECT SUM(IF(zoneId > 0, 1, 0)) / COUNT(*) FROM gameobject') ?? 0;
+        $npcPct = DB::World()->selectCell('SELECT SUM(IF(`zoneId` > 0, 1, 0)) / COUNT(*) FROM creature')   ?? 0;
+        $goPct  = DB::World()->selectCell('SELECT SUM(IF(`zoneId` > 0, 1, 0)) / COUNT(*) FROM gameobject') ?? 0;
 
         if (!($mask & self::M_SPAWNS) && $npcPct > 0.9 && $goPct > 0.9)
             $this->modeMask &= ~self::M_SPAWNS;
@@ -132,7 +123,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         if (!$this->checkSourceDirs())
         {
-            CLI::write('one or more source directories are missing:', CLI::LOG_ERROR);
+            CLI::write('[img-maps] One or more source directories are missing.', CLI::LOG_ERROR);
             $this->success = false;
             return false;
         }
@@ -190,15 +181,15 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     {
                         ksort($floorData);
 
-                        $overlay = null;
+                        $resOverlay = null;
                         if (!$isMultilevel)
-                            $overlay = $this->generateOverlay($wmaId, $name, $basePath);
+                            $resOverlay = $this->generateOverlay($wmaId, $name, $basePath);
 
                         // create spawn-maps if wanted
-                        if ($overlay && $this->modeMask & self::M_SPAWNS)
+                        if ($resOverlay && $this->modeMask & self::M_SPAWNS)
                         {
                             $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
-                            if (!$this->generateSpawnMap($overlay, $outFile))
+                            if (!$this->buildSpawnMap($resOverlay, $outFile))
                                 $this->success = false;
                         }
 
@@ -293,84 +284,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     continue;
                 }
 
-                $overlay = null;
+                $resOverlay = null;
 
                 // zone has overlays (is in open world; is not multilevel)
                 if (isset($this->wmOverlays[$wmaId]))
                 {
-                    $overlay = $this->createAlphaImage(self::MAP_W, self::MAP_H);
-
-                    foreach ($this->wmOverlays[$wmaId] as &$row)
-                    {
-                        $i = 1;
-                        $y = 0;
-                        while ($y < $row['h'])
-                        {
-                            $x = 0;
-                            while ($x < $row['w'])
-                            {
-                                $img = $this->loadImageFile($srcPath . '/' . $row['textureString'] . $i);
-                                if (!$img)
-                                {
-                                    CLI::write(' - complexImg: tile '.$srcPath.'/'.$row['textureString'].$i.'.blp missing.', CLI::LOG_ERROR);
-                                    break 2;
-                                }
-
-                                imagecopy($overlay, $img, $row['x'] + $x, $row['y'] + $y, 0, 0, imagesx($img), imagesy($img));
-
-                                // prepare subzone image
-                                if ($this->modeMask & self::M_SUBZONES)
-                                {
-                                    if (!isset($row['maskimage']))
-                                    {
-                                        $row['maskimage'] = $this->createAlphaImage($row['w'], $row['h']);
-                                        $row['maskcolor'] = imagecolorallocatealpha($row['maskimage'], ...self::COLOR_SUBZONE);
-                                    }
-
-                                    for ($my = 0; $my < imagesy($img); $my++)
-                                        for ($mx = 0; $mx < imagesx($img); $mx++)
-                                            if ((imagecolorat($img, $mx, $my) >> 24) < self::A_THRESHOLD)
-                                                imagesetpixel($row['maskimage'], $x + $mx, $y + $my, $row['maskcolor']);
-                                }
-
-                                imagedestroy($img);
-
-                                $x += 256;
-                                $i++;
-                            }
-                            $y += 256;
-                        }
-                    }
+                    $resOverlay = $this->generateOverlay($wmaId, $srcPath);
 
                     // create spawn-maps if wanted
                     if ($this->modeMask & self::M_SPAWNS)
-                    {
-                        $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
-
-                        if (CLISetup::getOpt('force') || !file_exists($outFile))
-                        {
-                            $tmp = imagecreate(self::SPAWNMAP_WH, self::SPAWNMAP_WH);
-                            $cbg = imagecolorallocate($tmp, ...self::COLOR_WHITE);
-                            $cfg = imagecolorallocate($tmp, ...self::COLOR_BLACK);
-
-                            for ($y = 0; $y < self::SPAWNMAP_WH; $y++)
-                            {
-                                for ($x = 0; $x < self::SPAWNMAP_WH; $x++)
-                                {
-                                    $a = imagecolorat($overlay, ($x * self::MAP_W) / self::SPAWNMAP_WH, ($y * self::MAP_H) / self::SPAWNMAP_WH) >> 24;
-                                    imagesetpixel($tmp, $x, $y, $a < self::A_THRESHOLD ? $cfg : $cbg);
-                                }
-                            }
-
-                            imagecolordeallocate($tmp, $cbg);
-                            imagecolordeallocate($tmp, $cfg);
-
-                            if (!$this->writeImageFile($tmp, $outFile, self::SPAWNMAP_WH, self::SPAWNMAP_WH))
-                                $this->success = false;
-                        }
-                        else
-                            CLI::write($this->status.' - file '.$outFile.' was already processed', CLI::LOG_BLANK, true, true);
-                    }
+                        $this->buildSpawnMap($resOverlay, $zoneId);
                 }
 
                 if (!($this->modeMask & self::M_MAPS))
@@ -385,7 +308,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($zoneId == 4494)
                     $floors[] = 2;
 
-                $map = null;
+                $resMap = null;
                 foreach ($floors as $floorIdx)
                 {
                     ini_set('max_execution_time', $this->maxExecTime);
@@ -430,18 +353,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($doSkip == 0xF)
                         continue;
 
-                    $map = $this->assembleImage($file, self::TILEORDER, self::MAP_W, self::MAP_H);
-                    if (!$map)
+                    $resMap = $this->assembleImage($file, self::TILEORDER, self::MAP_W, self::MAP_H);
+                    if (!$resMap)
                     {
                         CLI::write(' - could not create image resource for zone '.$zoneId.($nFloors ? ' floor '.$floorIdx : ''), CLI::LOG_ERROR);
                         $this->success = false;
                         continue;
                     }
 
-                    if ($overlay && !$floorIdx)
+                    if ($resOverlay && !$floorIdx)
                     {
-                        imagecopymerge($map, $overlay, 0, 0, 0, 0, imagesx($overlay), imagesy($overlay), 100);
-                        imagedestroy($overlay);
+                        imagecopymerge($resMap, $resOverlay, 0, 0, 0, 0, imagesx($resOverlay), imagesy($resOverlay), 100);
+                        imagedestroy($resOverlay);
                     }
 
                     // create map
@@ -452,52 +375,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             if ($doSkip & (1 << $sizeIdx))
                                 continue;
 
-                            if (!$this->writeImageFile($map, $outFile[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
+                            if (!$this->writeImageFile($resMap, $outFile[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
                                 $this->success = false;
                         }
                     }
                 }
 
                 // also create subzone-maps
-                if ($map && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
-                {
-                    foreach ($this->wmOverlays[$wmaId] as &$row)
-                    {
-                        $doSkip  = 0x0;
-                        $outFile = [];
+                if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
+                    $this->buildSubZones($resMap, $wmaId, $l);
 
-                        foreach (self::DEST_DIRS as $sizeIdx => [$path, , ])
-                        {
-                            $outFile[$sizeIdx] = sprintf($path, strtolower(Util::$localeStrings[$l]).'/') . $row['areaTableId'].'.jpg';
-                            if (!CLISetup::getOpt('force') && file_exists($outFile[$sizeIdx]))
-                            {
-                                CLI::write($this->status.' - file '.$outFile[$sizeIdx].' was already processed', CLI::LOG_BLANK, true, true);
-                                $doSkip |= (1 << $sizeIdx);
-                            }
-                        }
-
-                        if ($doSkip == 0xF)
-                            continue;
-
-                        $subZone = imagecreatetruecolor(self::MAP_W, self::MAP_H);
-                        imagecopy($subZone, $map, 0, 0, 0, 0, imagesx($map), imagesy($map));
-                        imagecopy($subZone, $row['maskimage'], $row['x'], $row['y'], 0, 0, imagesx($row['maskimage']), imagesy($row['maskimage']));
-
-                        foreach (self::DEST_DIRS as $sizeIdx => [, $width, $height])
-                        {
-                            if ($doSkip & (1 << $sizeIdx))
-                                continue;
-
-                            if (!$this->writeImageFile($subZone, $outFile[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
-                                $this->success = false;
-                        }
-
-                        imagedestroy($subZone);
-                    }
-                }
-
-                if ($map)
-                    imagedestroy($map);
+                if ($resMap)
+                    imagedestroy($resMap);
 
                 // this takes a while; ping mysql just in case
                 DB::Aowow()->selectCell('SELECT 1');
@@ -512,7 +401,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $this->dmFloorData = DB::Aowow()->select('SELECT IF(`mapId` IN (?a), -`worldMapAreaId`, `mapId`) AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `floor` SEPARATOR " ") AS "0", COUNT(DISTINCT `floor`) AS "1" FROM dbc_dungeonmap WHERE `worldMapAreaId` <> 0 GROUP BY ARRAY_KEY', self::CONTINENTS);
         if (!$this->wmOverlays || !$this->wmAreas || !$this->dmFloorData)
         {
-            CLI::write(' - could not read required dbc files: WorldMapArea.dbc ['.count($this->wmAreas ?: []).' entries]; WorldMapOverlay.dbc ['.count($this->wmOverlays ?: []).'] entries; DungeonMap.dbc ['.count($this->dmFloorData ?: []).' entries]', CLI::LOG_ERROR);
+            CLI::write('[img-maps] - could not read required dbc files: WorldMapArea.dbc ['.count($this->wmAreas ?: []).' entries]; WorldMapOverlay.dbc ['.count($this->wmOverlays ?: []).'] entries; DungeonMap.dbc ['.count($this->dmFloorData ?: []).' entries]', CLI::LOG_ERROR);
             $this->success = false;
             return false;
         }
@@ -616,7 +505,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $sumAreas  = count($this->wmAreas);
         $sumMaps   = count(CLISetup::$localeIds) * ($sumAreas + $sumFloors);
 
-        CLI::write('Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, array_flip(CLISetup::$localeIds))));
+        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, array_flip(CLISetup::$localeIds))));
 
         foreach (CLISetup::$localeIds as $l)
         {
@@ -630,13 +519,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $mapSrcDir = $this->genSteps[self::M_MAPS][1][$l] ?? '';
             if (!$mapSrcDir)
             {
+                CLI::write('[img-maps] - No suitable localized map files found for locale ['.$l.': '.Util::$localeStrings[$l].'].', CLI::LOG_ERROR);
                 $this->success = false;
-                CLI::write(' - no suitable localized map files found for locale '.$l, CLI::LOG_ERROR);
                 continue;
             }
 
             foreach ($this->wmAreas as $areaEntry)
             {
+                $resOverlay = null;
+                $resMap     = null;
+
                 $wmaId      = $areaEntry['id'];
                 $zoneId     = $areaEntry['areaId'];
                 $mapId      = $areaEntry['mapId'];
@@ -672,109 +564,40 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $srcPath = $mapSrcDir.'/'.$textureStr;
                 if (!CLISetup::fileExists($srcPath))
                 {
+                    CLI::write('[img-maps] - WorldMap file path '.$srcPath.' missing for selected locale '.Util::$localeStrings[$l], CLI::LOG_ERROR);
                     $this->success = false;
-                    CLI::write('worldmap file path '.$srcPath.' missing for selected locale '.Util::$localeStrings[$l], CLI::LOG_ERROR);
                     continue;
                 }
 
-                $overlay = null;
+                $srcPath .= '/';
 
                 // zone has overlays (is in open world; is not multilevel)
                 if (isset($this->wmOverlays[$wmaId]) && ($this->modeMask & (self::M_MAPS | self::M_SPAWNS | self::M_SUBZONES)))
                 {
-                    $overlay = $this->createAlphaImage(self::MAP_W, self::MAP_H);
-
-                    foreach ($this->wmOverlays[$wmaId] as &$row)
-                    {
-                        $i = 1;
-                        $y = 0;
-                        while ($y < $row['h'])
-                        {
-                            $x = 0;
-                            while ($x < $row['w'])
-                            {
-                                $img = $this->loadImageFile($srcPath . '/' . $row['textureString'] . $i);
-                                if (!$img)
-                                {
-                                    CLI::write(' - complexImg: tile '.$srcPath.'/'.$row['textureString'].$i.'.blp missing.', CLI::LOG_ERROR);
-                                    break 2;
-                                }
-
-                                imagecopy($overlay, $img, $row['x'] + $x, $row['y'] + $y, 0, 0, imagesx($img), imagesy($img));
-
-                                // prepare subzone image
-                                if ($this->modeMask & self::M_SUBZONES)
-                                {
-                                    if (!isset($row['maskimage']))
-                                    {
-                                        $row['maskimage'] = $this->createAlphaImage($row['w'], $row['h']);
-                                        $row['maskcolor'] = imagecolorallocatealpha($row['maskimage'], ...self::COLOR_SUBZONE);
-                                    }
-
-                                    for ($my = 0; $my < imagesy($img); $my++)
-                                        for ($mx = 0; $mx < imagesx($img); $mx++)
-                                            if ((imagecolorat($img, $mx, $my) >> 24) < self::A_THRESHOLD)
-                                                imagesetpixel($row['maskimage'], $x + $mx, $y + $my, $row['maskcolor']);
-                                }
-
-                                imagedestroy($img);
-
-                                $x += 256;
-                                $i++;
-                            }
-                            $y += 256;
-                        }
-                    }
+                    $resOverlay = $this->generateOverlay($wmaId, $srcPath);
 
                     // create spawn-maps if wanted
-                    if ($this->modeMask & self::M_SPAWNS)
-                    {
-                        $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
-
-                        if (CLISetup::getOpt('force') || !file_exists($outFile))
-                        {
-                            $tmp = imagecreate(self::SPAWNMAP_WH, self::SPAWNMAP_WH);
-                            $cbg = imagecolorallocate($tmp, ...self::COLOR_WHITE);
-                            $cfg = imagecolorallocate($tmp, ...self::COLOR_BLACK);
-
-                            for ($y = 0; $y < self::SPAWNMAP_WH; $y++)
-                            {
-                                for ($x = 0; $x < self::SPAWNMAP_WH; $x++)
-                                {
-                                    $a = imagecolorat($overlay, ($x * self::MAP_W) / self::SPAWNMAP_WH, ($y * self::MAP_H) / self::SPAWNMAP_WH) >> 24;
-                                    imagesetpixel($tmp, $x, $y, $a < self::A_THRESHOLD ? $cfg : $cbg);
-                                }
-                            }
-
-                            imagecolordeallocate($tmp, $cbg);
-                            imagecolordeallocate($tmp, $cfg);
-
-                            if (!$this->writeImageFile($tmp, $outFile, self::SPAWNMAP_WH, self::SPAWNMAP_WH))
-                                $this->success = false;
-                        }
-                        else
-                            CLI::write($this->status.' - file '.$outFile.' was already processed', CLI::LOG_BLANK, true, true);
-                    }
+                    if ($resOverlay && ($this->modeMask & self::M_SPAWNS))
+                        $this->buildSpawnMap($resOverlay, $zoneId);
                 }
 
                 // check if we can create base map anyway
-                $png = $srcPath.'/'.$textureStr.'1.png';
-                $blp = $srcPath.'/'.$textureStr.'1.blp';
+                $png = $srcPath.$textureStr.'1.png';
+                $blp = $srcPath.$textureStr.'1.blp';
                 $hasBaseMap = CLISetup::fileExists($blp) || CLISetup::fileExists($png);
 
-                $map = null;
                 foreach ($dmFloors as $srcFloorIdx => $outFloorIdx)
                 {
                     ini_set('max_execution_time', $this->maxExecTime);
 
                     $doSkip   = 0x0;
                     $outPaths = [];
-                    $srcFile  = $srcPath.'/'.$textureStr;
+                    $srcFile  = $srcPath.$textureStr;
                     $outFile  = $zoneId;
 
                     if (!$srcFloorIdx && !$hasBaseMap)
                     {
-                        CLI::Write('[img-maps] zone has no base floor, but it is referenced with base floor in dmFloors? Smells like an error. areaId: '.$zoneId, CLI::LOG_WARN);
+                        CLI::write('[img-maps] - Zone has no base floor, but is referenced with base floor in dmFloors.', CLI::LOG_WARN);
                         continue;
                     }
 
@@ -802,21 +625,22 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         }
                     }
 
-                    if ($doSkip == 0xF)
+                    // can't skip map creation if we are to generate subzones later. although they may already exist and get skipped anyway *shrug*
+                    if ($doSkip == 0xF && !($this->modeMask & self::M_SUBZONES))
                         continue;
 
-                    $map = $this->assembleImage($srcFile, self::TILEORDER, self::MAP_W, self::MAP_H);
-                    if (!$map)
+                    $resMap = $this->assembleImage($srcFile, self::TILEORDER, self::MAP_W, self::MAP_H);
+                    if (!$resMap)
                     {
-                        CLI::write(' - could not create image resource for zone '.$zoneId.($nFloors ? ' floor '.$srcFloorIdx : ''));
+                        CLI::write('[img-maps] - Could not create image resource for '.($nFloors ? 'floor '.$srcFloorIdx : 'base level'), CLI::LOG_ERROR);
                         $this->success = false;
                         continue;
                     }
 
-                    if ($overlay && !$nFloors)
+                    if ($resOverlay && !$nFloors)
                     {
-                        imagecopymerge($map, $overlay, 0, 0, 0, 0, imagesx($overlay), imagesy($overlay), 100);
-                        imagedestroy($overlay);
+                        imagecopymerge($resMap, $resOverlay, 0, 0, 0, 0, imagesx($resOverlay), imagesy($resOverlay), 100);
+                        imagedestroy($resOverlay);
                     }
 
                     // create map
@@ -827,52 +651,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             if ($doSkip & (1 << $sizeIdx))
                                 continue;
 
-                            if (!$this->writeImageFile($map, $outPaths[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
+                            if (!$this->writeImageFile($resMap, $outPaths[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
                                 $this->success = false;
                         }
                     }
                 }
 
                 // also create subzone-maps
-                if ($map && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
-                {
-                    foreach ($this->wmOverlays[$wmaId] as &$row)
-                    {
-                        $doSkip   = 0x0;
-                        $outFiles = [];
+                if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
+                    $this->buildSubZones($resMap, $wmaId, $l);
 
-                        foreach (self::DEST_DIRS as $sizeIdx => [$path, , ])
-                        {
-                            $outFile[$sizeIdx] = sprintf($path, strtolower(Util::$localeStrings[$l]).'/') . $row['areaTableId'].'.jpg';
-                            if (!CLISetup::getOpt('force') && file_exists($outFiles[$sizeIdx]))
-                            {
-                                CLI::write($this->status.' - file '.$outFiles[$sizeIdx].' was already processed', CLI::LOG_BLANK, true, true);
-                                $doSkip |= (1 << $sizeIdx);
-                            }
-                        }
-
-                        if ($doSkip == 0xF)
-                            continue;
-
-                        $subZone = imagecreatetruecolor(self::MAP_W, self::MAP_H);
-                        imagecopy($subZone, $map, 0, 0, 0, 0, imagesx($map), imagesy($map));
-                        imagecopy($subZone, $row['maskimage'], $row['x'], $row['y'], 0, 0, imagesx($row['maskimage']), imagesy($row['maskimage']));
-
-                        foreach (self::DEST_DIRS as $sizeIdx => [, $width, $height])
-                        {
-                            if ($doSkip & (1 << $sizeIdx))
-                                continue;
-
-                            if (!$this->writeImageFile($subZone, $outFiles[$sizeIdx], $width ?: self::MAP_W, $height ?: self::MAP_H))
-                                $this->success = false;
-                        }
-
-                        imagedestroy($subZone);
-                    }
-                }
-
-                if ($map)
-                    imagedestroy($map);
+                if ($resMap)
+                    imagedestroy($resMap);
 
                 // this takes a while; ping mysql just in case
                 DB::Aowow()->selectCell('SELECT 1');
@@ -880,7 +670,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
     }
 
-    private function buildZonesFile() : bool
+    private function buildZonesFile() : void
     {
         $areaNames = array_combine(
             array_column($this->wmAreas, 'areaId'),
@@ -910,14 +700,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         $zoneAreas[$lId][$zId][$floor] = $nameLOC;
             }
             else
-                CLI::write('[img-maps] internal zone name from GlobalStrings.lua not found in WorldMapArea.dbc ['.$nameINT.']', CLI::LOG_WARN);
+                CLI::write('[img-maps] ['.$nameINT.'] from GlobalStrings.lua not found in WorldMapArea.dbc', CLI::LOG_WARN);
         }
 
         foreach (CLISetup::$locales as $lId => $loc)
         {
+            Lang::load($lId);
+
             // "custom" - show second level of Ahn'Kahet not shown but present in-game
             if (isset($zoneAreas[$lId][4494]))
-                $zoneAreas[$lId][4494][2] = sprintf(self::LEVEL_N[$lId], 2);
+                $zoneAreas[$lId][4494][2] = Lang::maps('floorN', [2]);
 
             foreach ($zoneAreas[$lId] as $zoneId => $floorData)
             {
@@ -927,7 +719,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     continue;
 
                 // todo: just note for now, try to compensate later?
-                CLI::write('[img-maps] floor count mismatch for zone #'.$zoneId.' GlobalStrings: '.$nStrings.' image files: '.$nFloors, CLI::LOG_WARN);
+                CLI::write('[img-maps] ['.$loc.'] '.str_pad('['.$zoneId.']', 7).'floor count mismatch between GlobalStrings: '.$nStrings.' and image files: '.$nFloors, CLI::LOG_WARN);
             }
 
             ksort($zoneAreas[$lId]);
@@ -942,75 +734,24 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;
         }
-
-        return $this->success;
     }
 
-    private function generateOverlay(int $wmaId, string $name, string $basePath) // : ?GdImage
-    {
-        if (!isset($this->wmOverlays[$wmaId]))
-            return null;
-
-        $overlay = $this->createAlphaImage(self::MAP_W, self::MAP_H);
-
-        foreach ($this->wmOverlays[$wmaId] as &$this->wmOverlays)
-        {
-            $i = 1;
-            $y = 0;
-            while ($y < $this->wmOverlays['h'])
-            {
-                $x = 0;
-                while ($x < $this->wmOverlays['w'])
-                {
-                    $img = $this->loadImageFile($basePath . $name . $i);
-                    if (!$img)
-                    {
-                        CLI::write(' - complexImg: tile '.$basePath.$name.$i.'.blp missing.', CLI::LOG_ERROR);
-                        break 2;
-                    }
-
-                    imagecopy($overlay, $img, $this->wmOverlays['x'] + $x, $this->wmOverlays['y'] + $y, 0, 0, imagesx($img), imagesy($img));
-
-                    // prepare subzone image
-                    if ($this->modeMask & self::M_SUBZONES)
-                    {
-                        if (!isset($this->wmOverlays['maskimage']))
-                        {
-                            $this->wmOverlays['maskimage'] = $this->createAlphaImage($this->wmOverlays['w'], $this->wmOverlays['h']);
-                            $this->wmOverlays['maskcolor'] = imagecolorallocatealpha($this->wmOverlays['maskimage'], ...self::COLOR_SUBZONE);
-                        }
-
-                        for ($my = 0; $my < imagesy($img); $my++)
-                            for ($mx = 0; $mx < imagesx($img); $mx++)
-                                if ((imagecolorat($img, $mx, $my) >> 24) < self::A_THRESHOLD)
-                                    imagesetpixel($this->wmOverlays['maskimage'], $x + $mx, $y + $my, $this->wmOverlays['maskcolor']);
-                    }
-
-                    imagedestroy($img);
-
-                    $x += 256;
-                    $i++;
-                }
-                $y += 256;
-            }
-        }
-
-        return $overlay;
-    }
-
-    private function generateSpawnMap(/*GdImage*/ $overlay, string $outFile) : bool
+    private function buildSpawnMap(/*GdImage*/ $resOverlay, int $zoneId) : void
     {
         // GdImage: < 8.0 resource; >= 8.0 object
-        if (gettype($overlay) != 'resource' && gettype($overlay) != 'object')
+        if (gettype($resOverlay) != 'resource' && gettype($resOverlay) != 'object')
         {
-            CLI::write('[img-maps] no GdImage passed to generateSpawnMap', CLI::LOG_ERROR);
-            return false;
+            CLI::write('[img-maps] - no GdImage passed to buildSpawnMap', CLI::LOG_ERROR);
+            $this->success = false;
+            return;
         }
+
+        $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
 
         if (!CLISetup::getOpt('force') && file_exists($outFile))
         {
             CLI::write($this->status.' - file '.$outFile.' was already processed', CLI::LOG_BLANK, true, true);
-            return true;
+            return;
         }
 
         $tmp = imagecreate(self::SPAWNMAP_WH, self::SPAWNMAP_WH);
@@ -1021,7 +762,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         {
             for ($x = 0; $x < self::SPAWNMAP_WH; $x++)
             {
-                $a = imagecolorat($overlay, ($x * self::MAP_W) / self::SPAWNMAP_WH, ($y * self::MAP_H) / self::SPAWNMAP_WH) >> 24;
+                $a = imagecolorat($resOverlay, ($x * self::MAP_W) / self::SPAWNMAP_WH, ($y * self::MAP_H) / self::SPAWNMAP_WH) >> 24;
                 imagesetpixel($tmp, $x, $y, $a < self::A_THRESHOLD ? $cfg : $cbg);
             }
         }
@@ -1029,16 +770,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
         imagecolordeallocate($tmp, $cbg);
         imagecolordeallocate($tmp, $cfg);
 
-        return $this->writeImageFile($tmp, $outFile, self::SPAWNMAP_WH, self::SPAWNMAP_WH);
+        if (!$this->writeImageFile($tmp, $outFile, self::SPAWNMAP_WH, self::SPAWNMAP_WH))
+            $this->success = false;
     }
 
-    private function generateSubZones(/*GdImage*/ $map, int $wmaId, int $locId) : bool
+    private function buildSubZones(/*GdImage*/ $resMap, int $wmaId, int $locId) : void
     {
         // GdImage: < 8.0 resource; >= 8.0 object
-        if (gettype($map) != 'resource' && gettype($map) != 'object')
+        if (gettype($resMap) != 'resource' && gettype($resMap) != 'object')
         {
-            CLI::write('[img-maps] no GdImage passed to generateSubZones', CLI::LOG_ERROR);
-            return false;
+            CLI::write('[img-maps] - no GdImage passed to buildSubZones()', CLI::LOG_ERROR);
+            $this->success = false;
+            return;
         }
 
         foreach ($this->wmOverlays[$wmaId] as &$row)
@@ -1060,7 +803,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 continue;
 
             $subZone = imagecreatetruecolor(self::MAP_W, self::MAP_H);
-            imagecopy($subZone, $map, 0, 0, 0, 0, imagesx($map), imagesy($map));
+            imagecopy($subZone, $resMap, 0, 0, 0, 0, imagesx($resMap), imagesy($resMap));
             imagecopy($subZone, $row['maskimage'], $row['x'], $row['y'], 0, 0, imagesx($row['maskimage']), imagesy($row['maskimage']));
 
             foreach (self::DEST_DIRS as $sizeIdx => [, $width, $height])
@@ -1074,8 +817,58 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             imagedestroy($subZone);
         }
+    }
 
-        return true;
+    private function generateOverlay(int $wmaId, string $basePath) // : ?GdImage
+    {
+        if (!isset($this->wmOverlays[$wmaId]))
+            return null;
+
+        $resOverlay = $this->createAlphaImage(self::MAP_W, self::MAP_H);
+
+        foreach ($this->wmOverlays[$wmaId] as &$row)
+        {
+            $i = 1;
+            $y = 0;
+            while ($y < $row['h'])
+            {
+                $x = 0;
+                while ($x < $row['w'])
+                {
+                    $img = $this->loadImageFile($basePath . $row['textureString'] . $i);
+                    if (!$img)
+                    {
+                        CLI::write('[img-maps] - overlay tile ' . $basePath . $row['textureString'] . $i . '.blp missing.', CLI::LOG_ERROR);
+                        break 2;
+                    }
+
+                    imagecopy($resOverlay, $img, $row['x'] + $x, $row['y'] + $y, 0, 0, imagesx($img), imagesy($img));
+
+                    // prepare subzone image
+                    if ($this->modeMask & self::M_SUBZONES)
+                    {
+                        if (!isset($row['maskimage']))
+                        {
+                            $row['maskimage'] = $this->createAlphaImage($row['w'], $row['h']);
+                            $row['maskcolor'] = imagecolorallocatealpha($row['maskimage'], ...self::COLOR_SUBZONE);
+                        }
+
+                        for ($my = 0; $my < imagesy($img); $my++)
+                            for ($mx = 0; $mx < imagesx($img); $mx++)
+                                if ((imagecolorat($img, $mx, $my) >> 24) < self::A_THRESHOLD)
+                                    imagesetpixel($row['maskimage'], $x + $mx, $y + $my, $row['maskcolor']);
+                    }
+
+                    imagedestroy($img);
+
+                    $x += 256;
+                    $i++;
+                }
+                $y += 256;
+            }
+        }
+
+        return $resOverlay;
     }
 });
 

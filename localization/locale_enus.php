@@ -1152,6 +1152,7 @@ $lang = array(
         'Miscellaneous' => "Miscellaneous",
         'Azeroth'       => "Azeroth",
         'CosmicMap'     => "Cosmic Map",
+        'floorN'        => "Level %d"
     ),
     'privileges' => array(
         'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br><br>So, reputation is a rough measure of how much you contributed to the community.<br><br>As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",

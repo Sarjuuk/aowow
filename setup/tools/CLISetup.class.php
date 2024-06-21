@@ -341,7 +341,7 @@ class CLISetup
                 return false;
         }
 
-        $args = array_pad($args, 4, []);
+        $args = array_pad($args, 4, null);
 
         $success = $us->run($args);
 

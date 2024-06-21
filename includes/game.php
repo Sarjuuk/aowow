@@ -244,7 +244,7 @@ class Game
 
     private static function alphaMapCheck(int $areaId, array &$set) : bool
     {
-        $file = 'setup/generated/alphaMaps/'.$areaId.'.png';
+        $file = 'cache/alphaMaps/'.$areaId.'.png';
         if (!file_exists($file))                            // file does not exist (probably instanced area)
             return false;
 

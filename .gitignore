@@ -3,8 +3,8 @@
 
 # cache
 /cache/template/*
-/setup/generated/alphaMaps/*.png
-/cache/firstrun
+/cache/alphaMaps/*
+/cache/setup/*
 
 # extract from MPQ
 /setup/mpqdata/*
