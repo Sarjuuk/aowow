@@ -383,6 +383,9 @@ abstract class CLI
         if (self::$hasReadline)
             readline_callback_handler_install('', function() { });
 
+        if (!STDIN)
+            return false;
+
         stream_set_blocking(STDIN, false);
 
         // pad default values onto $fields
@@ -396,6 +399,9 @@ abstract class CLI
                 echo "\n".$desc.": ";
 
             while (true) {
+                if (feof(STDIN))
+                    return false;
+
                 $r = [STDIN];
                 $w = $e = null;
                 $n = stream_select($r, $w, $e, 200000);
