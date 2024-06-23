@@ -25,9 +25,8 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public const SITE_LOCK     = CLISetup::LOCK_ON;
 
-    private $startStep  = 0;
-    private $dynArgs    = ['doSql' => [], 'doBuild' => []]; // ref to pass commands from 'update' to 'sync'
-    private $steps      = array(
+    private $dynArgs = ['doSql' => [], 'doBuild' => []]; // ref to pass commands from 'update' to 'sync'
+    private $steps   = array(
      // [staticUS, $name, [...args]]
         ['database',  '', []],
         ['configure', '', []],
@@ -39,21 +38,21 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     private const STEP_FILE = 'cache/setup/firstrun';
 
-    // Note! Must be loaded after all SetupScripts have been registered
-    public function __construct()
+    private function getSavedStartStep() : int
     {
-        /********************/
-        /* get current step */
-        /********************/
-
         if (file_exists(self::STEP_FILE))
         {
             $rows = file(self::STEP_FILE);
             if ((int)$rows[0] == AOWOW_REVISION)
-                $this->startStep = (int)$rows[1];
+                return (int)$rows[1];
         }
 
+        return 0;
+    }
 
+    // Note! Must be loaded after all SetupScripts have been registered
+    public function __construct()
+    {
         /****************/
         /* define steps */
         /****************/
@@ -78,22 +77,43 @@ CLISetup::registerUtility(new class extends UtilityScript
     // args: null, null, null, null // nnnn
     public function run(&$args) : bool
     {
-        if ($this->startStep)
+        /******************/
+        /* get start step */
+        /******************/
+
+        $startStep = 0;
+        if (($cliStartStep = CLISetup::getOpt('step')) !== false)
         {
-            CLI::write('[setup] found firstrun progression info. (Halted on subscript: '.($this->steps[$this->startStep][1] ?: $this->steps[$this->startStep][0]).')', CLI::LOG_INFO);
-            $msg = '';
-            if (!CLI::read(['x' => ['continue setup? (y/n)', true, true, '/y|n/i']], $uiN) || !$uiN || strtolower($uiN['x']) == 'n')
+            $startStep = ((int)$cliStartStep) - 1;
+            if ($startStep < 0 || $startStep >= count($this->steps))
             {
-                $msg = '[setup] starting from scratch...';
-                $this->startStep = 0;
+                CLI::write('Invalid step number. Use --step <1-'.count($this->steps).'>', CLI::LOG_ERROR);
+                return false;
             }
-            else
-                $msg = '[setup] resuming from step '.($this->startStep + 1).'...';
+
+            CLI::write('[setup] starting from step '.($startStep + 1).'...');
+        }
+        elseif (($startStep = $this->getSavedStartStep()) !== 0)
+        {
+            CLI::write('[setup] found firstrun progression info. (Halted on subscript: '.($this->steps[$startStep][1] ?: $this->steps[$startStep][0]).')', CLI::LOG_INFO);
+            if (!CLI::read(['x' => ['continue setup? (y/n)', true, true, '/y|n/i']], $uiN))
+            {
+                CLI::write('Failed to read answer. Use --step in a non-interactive environment.', CLI::LOG_ERROR);
+                return false;
+            }
 
             CLI::write();
-            CLI::write($msg);
+            if (strtolower($uiN['x']) == 'n')
+            {
+                $startStep = 0;
+                CLI::write('[setup] starting from scratch...');
+            }
+            else
+                CLI::write('[setup] resuming from step '.($startStep + 1).'...');
+
             sleep(1);
         }
+
 
         // init temp setup dir
         if ($info = new \SplFileInfo(self::STEP_FILE))
@@ -106,7 +126,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
         foreach ($this->steps as $idx => [$usName, , $param])
         {
-            if ($this->startStep > $idx)
+            if ($startStep > $idx)
                 continue;
 
             while (true)
@@ -147,17 +167,17 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public function writeCLIHelp() : bool
     {
-        CLI::write('  usage: php aowow --setup [--locales: --datasrc:]', -1, false);
+        CLI::write('  usage: php aowow --setup [--locales: --datasrc:] [--step=<step>]', -1, false);
         CLI::write();
         CLI::write('  Initially essential connection information are set up and basic connectivity tests run afterwards.', -1, false);
         CLI::write('  In the main stage dbc and world data is compiled into the database and required sound, image and data files are generated.', -1, false);
         CLI::write('    This should not require further input and will take about 15-20 minutes, plus 10 minutes per additional locale.', -1, false);
         CLI::write('  Lastly pending updates are applied and you are prompted to create an administrator account.', -1, false);
 
-        if ($this->startStep)
+        if (($startStep = $this->getSavedStartStep()) !== 0)
         {
             CLI::write();
-            CLI::write('  You are currently on step '.($this->startStep + 1).' / '.count($this->steps).' ('.($this->steps[$this->startStep][1] ?: $this->steps[$this->startStep][0]).'). You can resume or restart the setup process.', -1, false);
+            CLI::write('  You are currently on step '.($startStep + 1).' / '.count($this->steps).' ('.($this->steps[$startStep][1] ?: $this->steps[$startStep][0]).'). You can resume or restart the setup process.', -1, false);
         }
 
         CLI::write();

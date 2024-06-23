@@ -46,6 +46,7 @@ class CLISetup
         'force'   => [self::OPT_GRP_MISC, ['f'], self::ARGV_NONE,                        'Force existing files to be overwritten.',                                                                   ''               ],
         'locales' => [self::OPT_GRP_MISC, [],    self::ARGV_ARRAY | self::ARGV_OPTIONAL, 'Limit setup to enUS, frFR, deDE, zhCN, esES and/or ruRU. (does not override config settings)',              '=<regionCodes,>'],
         'datasrc' => [self::OPT_GRP_MISC, [],    self::ARGV_OPTIONAL,                    'Manually point to directory with extracted mpq files. This is limited to setup/ (default: setup/mpqdata/)', '=path/'         ],
+        'step'    => [self::OPT_GRP_MISC, [],    self::ARGV_REQUIRED,                    'Start setup at given step (can be used to better automate the setup process).',                             '=step'          ],
     );
 
     private static $utilScriptRefs  = [];
