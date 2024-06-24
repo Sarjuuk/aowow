@@ -635,21 +635,22 @@ class CLISetup
     {
         if (Util::writeFile($file, $content))
         {
-            CLI::write(sprintf(ERR_NONE, CLI::bold($file)), CLI::LOG_OK, true, true);
+            CLI::write('created file '. CLI::bold($file), CLI::LOG_OK, true, true);
             return true;
         }
 
-        $e = error_get_last();
-        CLI::write($e['message'].' '.CLI::bold($file), CLI::LOG_ERROR);
         return false;
     }
 
     public static function writeDir(string $dir, bool &$exist = true) : bool
     {
         if (Util::writeDir($dir, $exist))
+        {
+            if (!$exist)
+                CLI::write('created dir '. CLI::bold($dir), CLI::LOG_OK, true, true);
             return true;
+        }
 
-        CLI::write(error_get_last()['message'].' '.CLI::bold($dir), CLI::LOG_ERROR);
         return false;
     }
 

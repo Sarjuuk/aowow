@@ -91,44 +91,26 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
         return true;
 
     $errName  = 'unknown error';                            // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
-    $uGroup   = U_GROUP_EMPLOYEE;
-    $logLevel = CLI::LOG_BLANK;
+    $logLevel = CLI::logLevelFromE($errNo);
 
-    if ($errNo == E_WARNING)                                // 0x0002
+    switch ($errNo)
     {
-        $errName  = 'E_WARNING';
-        $logLevel = CLI::LOG_WARN;
-    }
-    else if ($errNo == E_PARSE)                             // 0x0004
-    {
-        $errName  = 'E_PARSE';
-        $logLevel = CLI::LOG_ERROR;
-    }
-    else if ($errNo == E_NOTICE)                            // 0x0008
-    {
-        $errName  = 'E_NOTICE';
-        $logLevel = CLI::LOG_INFO;
-    }
-    else if ($errNo == E_USER_ERROR)                        // 0x0100
-    {
-        $errName  = 'E_USER_ERROR';
-        $logLevel = CLI::LOG_ERROR;
-    }
-    else if ($errNo == E_USER_WARNING)                      // 0x0200
-    {
-        $errName  = 'E_USER_WARNING';
-        $logLevel = CLI::LOG_WARN;
-    }
-    else if ($errNo == E_USER_NOTICE)                       // 0x0400
-    {
-        $errName  = 'E_USER_NOTICE';
-        $uGroup   = U_GROUP_STAFF;
-        $logLevel = CLI::LOG_INFO;
-    }
-    else if ($errNo == E_RECOVERABLE_ERROR)                 // 0x1000
-    {
-        $errName  = 'E_RECOVERABLE_ERROR';
-        $logLevel = CLI::LOG_ERROR;
+        case E_WARNING:
+        case E_USER_WARNING:
+            $errName  = 'WARNING';
+            break;
+        case E_NOTICE:
+        case E_USER_NOTICE:
+            $errName  = 'NOTICE';
+            break;
+        case E_USER_ERROR:
+            $errName  = 'USER_ERROR';
+        case E_USER_ERROR:
+            $errName  = 'RECOVERABLE_ERROR';
+        case E_STRICT:                                      // ignore STRICT and DEPRECATED
+        case E_DEPRECATED:
+        case E_USER_DEPRECATED:
+            return true;
     }
 
     if (DB::isConnected(DB_AOWOW))
@@ -136,47 +118,43 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $errStr
         );
 
-    if (Cfg::get('DEBUG') >= $logLevel)
-    {
-        Util::addNote($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $uGroup, $logLevel);
-        if (CLI)
-            CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $errNo & (E_WARNING | E_USER_WARNING | E_NOTICE | E_USER_NOTICE) ? CLI::LOG_WARN : CLI::LOG_ERROR);
-    }
+    if (CLI)
+        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $logLevel);
+    else if (Cfg::get('DEBUG') >= $logLevel)
+        Util::addNote($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, U_GROUP_EMPLOYEE, $logLevel);
 
     return true;
-}, E_AOWOW);
+}, E_ALL);
 
 // handle exceptions
 set_exception_handler(function ($e)
 {
-    Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString());
-
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e->getMessage()
         );
 
-    if (!CLI)
-        (new GenericPage())->error();
-    else
+    if (CLI)
         echo "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n";
+    else
+    {
+        Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, CLI::LOG_ERROR);
+        (new GenericPage())->error();
+    }
 });
 
 // handle fatal errors
 register_shutdown_function(function()
 {
-    if (($e = error_get_last()) && $e['type'] & (E_ERROR | E_COMPILE_ERROR | E_CORE_ERROR))
+    if ($e = error_get_last())
     {
         if (DB::isConnected(DB_AOWOW))
             DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
                 AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), User::$groups, $e['message']
             );
 
-        if (CLI)
+        if (CLI || User::isInGroup(U_GROUP_EMPLOYEE))
             echo "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n";
-
-        // cant generate a page for web view :(
-        die();
     }
 });
 
@@ -208,7 +186,7 @@ Cfg::load();
 
 
 // handle non-fatal errors and notices
-error_reporting(Cfg::get('DEBUG') ? E_AOWOW : 0);
+error_reporting(E_ALL);
 
 
 if (!CLI)

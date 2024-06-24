@@ -7,7 +7,6 @@ if (!defined('AOWOW_REVISION'))
  * Page
  */
 
-define('E_AOWOW',                 E_ALL & ~(E_DEPRECATED | E_USER_DEPRECATED | E_STRICT));
 define('JSON_AOWOW_POWER',        JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 define('FILTER_FLAG_STRIP_AOWOW', FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
 
@@ -25,14 +24,6 @@ define('MIME_TYPE_OPENSEARCH', 'Content-Type: application/x-suggestions+json; ch
 define('MIME_TYPE_RSS',        'Content-Type: application/rss+xml; charset=utf-8');
 define('MIME_TYPE_JPEG',       'Content-Type: image/jpeg');
 define('MIME_TYPE_PNG',        'Content-Type: image/png');
-
-// shared setup strings
-define('ERR_CREATE_FILE',  'could not create file at destination %s');
-define('ERR_WRITE_FILE',   'could not write to file at destination %s');
-define('ERR_READ_FILE',    'file %s could not be read');
-define('ERR_MISSING_FILE', 'file %s not found');
-define('ERR_NONE',         'created file %s');
-define('ERR_MISSING_INCL', 'required function %s() could not be found at %s');
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);

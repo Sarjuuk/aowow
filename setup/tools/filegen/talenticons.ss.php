@@ -91,7 +91,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 }
 
                 if (@imagejpeg($res, $outFile))
-                    CLI::write('[talenticons] '.sprintf(ERR_NONE, CLI::bold($outFile)), CLI::LOG_OK, true, true);
+                    CLI::write('[talenticons] created file '.CLI::bold($outFile), CLI::LOG_OK, true, true);
                 else
                 {
                     $this->success = false;
