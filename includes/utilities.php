@@ -1293,6 +1293,11 @@ abstract class Util
     public static function writeFile($file, $content)
     {
         $success = false;
+
+        $parentDir = mb_substr($file, 0, mb_strrpos($file, '/'));
+        if (!self::writeDir($parentDir))
+            return false;
+
         if ($handle = @fOpen($file, "w"))
         {
             if (fWrite($handle, $content))
@@ -1314,7 +1319,7 @@ abstract class Util
     public static function writeDir(string $dir, bool &$exist = true) : bool
     {
         // remove multiple slashes; trailing slashes
-        $dir   = preg_replace(['/\/+/', '/\/$/'], ['/', ''], $dir);
+        $dir   = preg_replace(['/\/+/', '/\/$/'], ['/', ''], $dir) ?: '.';
         $exist = is_dir($dir);
 
         if ($exist)
