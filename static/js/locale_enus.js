@@ -2181,8 +2181,6 @@ var g_zones = {
     4987: 'The Ruby Sanctum'
 };
 
-var g_zone_areas = {};
-
 var g_zone_categories = {
      0: 'Eastern Kingdoms',
      1: 'Kalimdor',

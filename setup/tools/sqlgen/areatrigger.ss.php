@@ -38,10 +38,10 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         CLI::write('[areatrigger] - calculation teleporter coordinates');
 
         $addData = DB::World()->select(
-           'SELECT ID          AS ARRAY_KEY, Name  AS `name`,    target_map AS `map`, target_position_x AS `posY`, target_position_y AS `posX`, target_orientation AS `orientation`
+           'SELECT ID          AS ARRAY_KEY, Name  AS `name`,    target_map AS `map`, target_position_x AS `posX`, target_position_y AS `posY`, target_orientation AS `orientation`
             FROM   areatrigger_teleport
             UNION
-            SELECT entryorguid AS ARRAY_KEY, "TBD" AS `name`, action_param1 AS `map`, target_x          AS `posY`, target_y          AS `posX`, target_o AS           `orientation`
+            SELECT entryorguid AS ARRAY_KEY, "TBD" AS `name`, action_param1 AS `map`, target_x          AS `posX`, target_y          AS `posY`, target_o AS           `orientation`
             FROM   smart_scripts
             WHERE  source_type = 2 AND action_type = 62'
         );

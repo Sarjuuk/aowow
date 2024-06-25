@@ -311,10 +311,10 @@ class Game
         switch ($type)
         {
             case Type::NPC:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM creature        WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN (?a)', $guids);
                 break;
             case Type::OBJECT:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_y` AS `posX`, `position_x` AS `posY` FROM gameobject      WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN (?a)', $guids);
                 break;
             case Type::SOUND:
                 $result = DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_soundemitters WHERE `id`   IN (?a)', $guids);
@@ -337,39 +337,40 @@ class Game
         if (!$mapId < 0)
             return [];
 
-        $query = 'SELECT
-                    dm.`id`,
-                    wma.`areaId`,
-                    IFNULL(dm.`floor`, 0) AS `floor`,
-                    100 - ROUND(IF(dm.`id` IS NOT NULL, (?f - dm.`minY`) * 100 / (dm.`maxY` - dm.`minY`), (?f - wma.`right`)  * 100 / (wma.`left` - wma.`right`)), 1) AS `posX`,
-                    100 - ROUND(IF(dm.`id` IS NOT NULL, (?f - dm.`minX`) * 100 / (dm.`maxX` - dm.`minX`), (?f - wma.`bottom`) * 100 / (wma.`top` - wma.`bottom`)), 1) AS `posY`,
-                    SQRT(POWER(ABS(IF(dm.`id` IS NOT NULL, (?f - dm.`minY`) * 100 / (dm.`maxY` - dm.`minY`), (?f - wma.`right`)  * 100 / (wma.`left` - wma.`right`)) - 50), 2) +
-                         POWER(ABS(IF(dm.`id` IS NOT NULL, (?f - dm.`minX`) * 100 / (dm.`maxX` - dm.`minX`), (?f - wma.`bottom`) * 100 / (wma.`top` - wma.`bottom`)) - 50), 2)) AS `dist`
-                FROM
-                    ?_worldmaparea wma
-                LEFT JOIN
-                    ?_dungeonmap dm ON dm.`mapId` = IF(?d AND (wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395), wma.`mapId`, -1)
-                WHERE
-                    wma.`mapId` = ?d AND IF(?d, wma.`areaId` = ?d, wma.`areaId` <> 0){ AND IF(dm.`floor` IS NULL, 1, dm.`floor` = ?d)}
-                HAVING
-                    (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
-                ORDER BY
-                    `dist` ASC';
+        $query =
+           'SELECT
+                x.`id`,
+                x.`areaId`,
+                IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
+                IF(dm.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`,
+                ROUND((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
+                ROUND((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
+                SQRT(POWER(ABS((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
+                     POWER(ABS((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`) - 50), 2)) AS `dist`
+            FROM
+                (SELECT 0 AS `id`, `areaId`,     `mapId`, `right` AS `minY`, `left` AS `maxY`, `top` AS `maxX`, `bottom` AS `minX`, 0 AS `floor`, 0 AS `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma UNION
+                 SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma
+                 JOIN   ?_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
+            LEFT JOIN
+                ?_dungeonmap dm ON dm.`mapId` = x.`mapId` AND dm.`worldMapAreaId` = x.`worldMapAreaId` AND dm.`floor` <> x.`floor` AND dm.`worldMapAreaId` > 0
+            WHERE
+                x.`mapId` = ?d AND IF(?d, x.`areaId` = ?d, x.`areaId` <> 0){ AND x.`floor` = ?d - IF(x.`defaultDungeonMapId` < 0, 1, 0)}
+            GROUP BY
+                x.`id`, x.`areaId`
+            HAVING
+                (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
+            ORDER BY
+                `multifloor` DESC, `dist` ASC';
 
         // dist BETWEEN 0 (center) AND 70.7 (corner)
-        $points = DB::Aowow()->select($query, $posX, $posX, $posY, $posY, $posX, $posX, $posY, $posY, 1, $mapId, $areaId, $areaId, $floor < 0 ? DBSIMPLE_SKIP : $floor);
-        if (!$points)                                       // retry: TC counts pre-instance subareas as instance-maps .. which have no map file
-            $points = DB::Aowow()->select($query, $posX, $posX, $posY, $posY, $posX, $posX, $posY, $posY, 0, $mapId, 0, 0, DBSIMPLE_SKIP);
-
+        $points = DB::Aowow()->select($query, $posY, $posX, $posY, $posX, $mapId, $areaId, $areaId, $floor < 0 ? DBSIMPLE_SKIP : $floor);
+        if (!$points)                                       // retry: pre-instance subareas belong to the instance-maps but are displayed on the outside. There also cases where the zone reaches outside it's own map.
+            $points = DB::Aowow()->select($query, $posY, $posX, $posY, $posX, $mapId, 0, 0, DBSIMPLE_SKIP);
         if (!is_array($points))
         {
             trigger_error('Game::worldPosToZonePos - dbc query failed', E_USER_ERROR);
             return [];
         }
-
-        // Black Temple and Sunwell floor offset bullshit
-        if ($points && in_array($mapId, [564, 580]))
-            $points[0]['floor']++;
 
         return $points;
     }

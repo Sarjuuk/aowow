@@ -404,9 +404,9 @@ class AjaxAdmin extends AjaxHandler
                 if ($type == Type::NPC)
                 {
                     $jobs = array(
-                        'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_y AS `posX`, w.position_x AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
-                        'SELECT `entry`, `pointId`, `location_y` AS `posX`, `location_x` AS `posY` FROM `script_waypoint` WHERE `entry` = ?d',
-                        'SELECT `entry`, `pointId`, `position_y` AS `posX`, `position_x` AS `posY` FROM `waypoints` WHERE `entry` = ?d'
+                        'SELECT -w.id AS `entry`, w.point AS `pointId`, w.position_x AS `posX`, w.position_y AS `posY` FROM creature_addon ca JOIN waypoint_data w ON w.id = ca.path_id WHERE ca.guid = ?d AND ca.path_id <> 0',
+                        'SELECT `entry`, `pointId`, `location_x` AS `posX`, `location_y` AS `posY` FROM `script_waypoint` WHERE `entry` = ?d',
+                        'SELECT `entry`, `pointId`, `position_x` AS `posX`, `position_y` AS `posY` FROM `waypoints` WHERE `entry` = ?d'
                     );
 
                     foreach ($jobs as $idx => $job)

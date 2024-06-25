@@ -2133,8 +2133,6 @@ var g_zones = {
     4987: 'Das Rubinsanktum'
 };
 
-var g_zone_areas = {};
-
 var g_zone_categories = {
     0:  'Östliche Königreiche',
     1:  'Kalimdor',

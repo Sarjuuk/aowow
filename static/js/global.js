@@ -19470,7 +19470,7 @@ Mapper.onlyOneFloor = {
 };
 
 Mapper.zoneLevelOffset = {
-    4273: 0 // Ulduar
+    // 4273: 0 // Ulduar                                    // aowow - removed. why did this exist. what did i miss..?
 };
 
 Mapper.zoneDefaultLevel = {
@@ -20401,9 +20401,7 @@ Mapper.prototype = {
     }
 };
 
-/* aowow: already defined in locale_xx instead of being fetched later
 var g_zone_areas = {};
-*/
 
 var MapViewer = new function()
 {

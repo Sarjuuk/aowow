@@ -2133,8 +2133,6 @@ var g_zones = {
     4987: 'Le sanctum Rubis'
 };
 
-var g_zone_areas = {};
-
 var g_zone_categories = {
      0: 'Royaumes de l\'est',
      1: 'Kalimdor',

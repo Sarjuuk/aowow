@@ -2180,8 +2180,6 @@ var g_zones = {
     4987: '红玉圣殿'
 };
 
-var g_zone_areas = {};
-
 var g_zone_categories = {
      0: "东部王国",
      1: "卡利姆多",

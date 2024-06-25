@@ -591,7 +591,8 @@ trait spawnHelper
             return;
 
         if (User::isInGroup(U_GROUP_MODERATOR))
-            $worldPos = Game::getWorldPosForGUID(self::$type, ...array_column($spawns, 'guid'));
+            if ($guids = array_filter(array_column($spawns, 'guid'), function ($x) { return $x > 0; }))
+                $worldPos = Game::getWorldPosForGUID(self::$type, ...$guids);
 
         foreach ($spawns as $s)
         {
@@ -671,7 +672,7 @@ trait spawnHelper
                         $floors = [];
                         foreach ($points as $p)
                         {
-                            if ($p['floor'])
+                            if ($p['multifloor'])
                                 $floors[$p['areaId']][] = $p['floor'];
 
                             if (isset($menu[$p['areaId']]))
@@ -679,7 +680,7 @@ trait spawnHelper
                             else if ($p['areaId'] == $s['areaId'])
                                 $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '', null, ['class' => 'checked q0']];
                             else
-                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$p['areaId'].', -1)', null, null];
+                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$p['areaId'].', 0)', null, null];
                         }
 
                         foreach ($floors as $area => $f)
@@ -691,16 +692,10 @@ trait spawnHelper
 
                             foreach ($f as $n)
                             {
-                                $jsRef = $n;
-                                if ($area != 4273)          // Ulduar is weird maaaan.....
-                                    $jsRef--;
-
-                                // todo: 3959 (BT) and 4075 (Sunwell) start at level 0 or something
-
                                 if ($n == $s['floor'])
-                                    $menu[$area][3][] = [$jsRef, '$g_zone_areas['.$area.']['.$jsRef.']', '', null, ['class' => 'checked q0']];
+                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '', null, ['class' => 'checked q0']];
                                 else
-                                    $menu[$area][3][] = [$jsRef, '$g_zone_areas['.$area.']['.$jsRef.']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
+                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
                             }
                         }
 

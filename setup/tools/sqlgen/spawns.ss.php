@@ -20,11 +20,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
 
     private $querys = array(
-        1 => ['SELECT       c.`guid`,   1 AS `type`,    c.`id` AS `typeId`, c.`spawntimesecs` AS `respawn`,    c.`phaseMask`, c.`zoneId` AS `areaId`,          c.`map`, IFNULL(ca.`path_id`, 0) AS `pathId`, c.`position_y` AS `posX`, c.`position_x` AS `posY` ' .
+        1 => ['SELECT       c.`guid`,   1 AS `type`,    c.`id` AS `typeId`, c.`spawntimesecs` AS `respawn`,    c.`phaseMask`, c.`zoneId` AS `areaId`,          c.`map`, IFNULL(ca.`path_id`, 0) AS `pathId`, c.`position_x` AS `posX`, c.`position_y` AS `posY` ' .
               'FROM creature c LEFT JOIN creature_addon ca ON ca.guid = c.guid',
               '`creature` spawns', Type::NPC],
 
-        2 => ['SELECT       c.`guid`,   2 AS `type`,    c.`id` AS `typeId`, c.`spawntimesecs` AS `respawn`,    c.`phaseMask`, c.`zoneId` AS `areaId`,          c.`map`,                       0 AS `pathId`, c.`position_y` AS `posX`, c.`position_x` AS `posY` ' .
+        2 => ['SELECT       c.`guid`,   2 AS `type`,    c.`id` AS `typeId`, c.`spawntimesecs` AS `respawn`,    c.`phaseMask`, c.`zoneId` AS `areaId`,          c.`map`,                       0 AS `pathId`, c.`position_x` AS `posX`, c.`position_y` AS `posY` ' .
               'FROM gameobject c',
               '`gameobject` spawns', Type::OBJECT],
 
@@ -36,15 +36,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
               'FROM dbc_areatrigger',
               'AreaTrigger.dbc spawns', Type::AREATRIGGER],
 
-        5 => ['SELECT c.`guid`, w.`entry` AS `npcOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`, w.`waittime` AS `wait`, w.`location_y` AS `posX`, w.`location_x` AS `posY` ' .
+        5 => ['SELECT c.`guid`, w.`entry` AS `npcOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`, w.`waittime` AS `wait`, w.`location_x` AS `posX`, w.`location_y` AS `posY` ' .
               'FROM creature c JOIN script_waypoint w ON c.`id` = w.`entry`',
               '`script_waypoint`', Type::NPC],
 
-        6 => ['SELECT c.`guid`, w.`entry` AS `npcOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`,            0 AS `wait`, w.`position_y` AS `posX`, w.`position_x` AS `posY` ' .
+        6 => ['SELECT c.`guid`, w.`entry` AS `npcOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`,            0 AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY` ' .
               'FROM creature c JOIN waypoints w ON c.`id` = w.`entry`',
               '`waypoints`', Type::NPC],
 
-        7 => ['SELECT c.`guid`,   -w.`id` AS `npcOrPath`,              w.`point`, c.`zoneId` AS `areaId`, c.`map`,    w.`delay` AS `wait`, w.`position_y` AS `posX`, w.`position_x` AS `posY` ' .
+        7 => ['SELECT c.`guid`,   -w.`id` AS `npcOrPath`,              w.`point`, c.`zoneId` AS `areaId`, c.`map`,    w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY` ' .
               'FROM creature c JOIN creature_addon ca ON ca.`guid` = c.`guid` JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`path_id` <> 0',
               '`waypoint_data`', Type::NPC]
     );
@@ -99,12 +99,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     CLI::write(' * '.$idx.'/'.count($this->querys).': '. CLI::bold($q[1]).' - '.sprintf('%'.$qtLen.'d / %d (%4.1f%%)', $sum,  $qryTotal, round(100 * $sum / $qryTotal, 1)), CLI::LOG_BLANK, true, true);
 
                 // npc/object is on a transport -> apply offsets to path of transport
-                // note, that the coordinates are mixed up .. again
-                // also note, that transport DO spawn outside of displayable area maps .. another todo i guess..
+                // note, that transport DO spawn outside of displayable area maps .. another todo i guess..
                 if (isset($transports[$spawn['map']]))
                 {
-                    $spawn['posX'] += $transports[$spawn['map']]['posY'];
-                    $spawn['posY'] += $transports[$spawn['map']]['posX'];
+                    $spawn['posX'] += $transports[$spawn['map']]['posX'];
+                    $spawn['posY'] += $transports[$spawn['map']]['posY'];
                     $spawn['map']   = $transports[$spawn['map']]['mapId'];
                 }
 
