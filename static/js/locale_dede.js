@@ -1261,7 +1261,7 @@ var g_item_subclasses = {
            6: 'Leder',
            7: 'Metall & Stein',
            8: 'Fleisch',
-           9: 'Kräut',
+           9: 'Kräuter',
           10: 'Elementar',
           12: 'Verzauberkunst',
           13: 'Material',

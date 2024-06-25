@@ -631,7 +631,7 @@ var Markup = {
             allowInReplies: true,
             attr:
             {
-                unnamed: { req: true,  valid: /^[0-9]+$/ },
+                unnamed: { req: true,  valid: /^-?[0-9]+$/ },
                 domain:  { req: false, valid: MarkupDomainRegexMap.lang },
                 site:    { req: false, valid: MarkupDomainRegexMap.lang }
             },
