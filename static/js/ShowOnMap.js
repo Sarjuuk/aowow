@@ -505,12 +505,13 @@ ShowOnMap.prototype.checkMenu = function(path) {
 ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
     var combined = {};
     var coord = null, tmpCoord = null;
-    var x, y;
+    var x, y, l;
     var nPins = 0;
 
-    var getCoord = function(coord, tight) {
+    var getCoord = function(coord, level, tight) {
         var x = Math.floor(coord[0]);
         var y = Math.floor(coord[1]);
+        var l = level || 0;
         if (!tight) {
             if (x % 2 == 1) {
                 x += 1;
@@ -520,11 +521,14 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
             }
         }
 
-        if (combined[x] === undefined) {
-            combined[x] = {};
+        if (combined[l] === undefined) {
+            combined[l] = {};
         }
-        if (combined[x][y] === undefined) {
-            combined[x][y] = [];
+        if (combined[l][x] === undefined) {
+            combined[l][x] = {};
+        }
+        if (combined[l][x][y] === undefined) {
+            combined[l][x][y] = [];
         }
 
         return [x, y];
@@ -577,34 +581,36 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
         }
         else {
             for (var c = 0; c < pin.coords.length; ++c) {
-                coord = getCoord(pin.coords[c]);
-                x = coord[0]; y = coord[1];
+                coord = getCoord(pin.coords[c], pin.level);
+                x = coord[0]; y = coord[1]; l = pin.level || 0;
                 var newPin = $WH.dO(pin);
                 newPin.coord = pin.coords[c];
 
-                if (combined[x][y].length > 3) {
-                    var temp = combined[x][y];
-                    combined[x][y] = [];
+                if (combined[l][x][y].length > 3) {
+                    var temp = combined[l][x][y];
+                    combined[l][x][y] = [];
                     for (var i = 0; i < temp.length; ++i) {
-                        tmpCoord = getCoord(temp[i].coord, true);
-                        combined[tmpCoord[0]][tmpCoord[1]].push(temp[i]);
+                        tmpCoord = getCoord(temp[i].coord, temp[i].level, true);
+                        combined[temp[i].level][tmpCoord[0]][tmpCoord[1]].push(temp[i]);
                     }
                 }
 
-                combined[x][y].push(newPin);
+                combined[l][x][y].push(newPin);
                 nPins++;
             }
         }
     }
 
     var complete = [];
-    for (x in combined) {
-        for (y in combined[x]) {
-            complete.push({
-                coord: [combined[x][y][0].coord[0], combined[x][y][0].coord[1]],
-                level: combined[x][y][0].level,
-                list:  combined[x][y]
-            });
+    for (l in combined) {
+        for (x in combined[l]) {
+            for (y in combined[l][x]) {
+                complete.push({
+                    coord: [combined[l][x][y][0].coord[0], combined[l][x][y][0].coord[1]],
+                    level: l,
+                    list:  combined[l][x][y]
+                });
+            }
         }
     }
 
