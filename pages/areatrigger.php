@@ -58,36 +58,7 @@ class AreaTriggerPage extends GenericPage
         $map = null;
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
         {
-            $ta = $this->subject->getField('teleportA');
-            $tf = $this->subject->getField('teleportF');
-            $tx = $this->subject->getField('teleportX');
-            $ty = $this->subject->getField('teleportY');
-            $to = $this->subject->getField('teleportO');
-
-            // add teleport target
-            if ($ta && $tx && $ty)
-            {
-                $o = Util::O2Deg($to);
-                $endPoint = array($tx, $ty, array(
-                    'type' => 4,
-                    'tooltip' => array(
-                        'Teleport Destination' => array(
-                            'info' => ['Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')']
-                        )
-                    )
-                ));
-
-                if (isset($spawns[$ta][$tf]))
-                    $spawns[$ta][$tf]['coords'][] = $endPoint;
-                else
-                    $spawns[$ta][$tf]['coords'] = [$endPoint];
-            }
-
-            $map = array(
-                'data'       => ['parent' => 'mapper-generic'],
-                'mapperData' => &$spawns
-            );
-
+            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns];
             foreach ($spawns as $areaId => &$areaData)
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
         }

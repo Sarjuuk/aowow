@@ -591,14 +591,16 @@ trait spawnHelper
             return;
 
         if (User::isInGroup(U_GROUP_MODERATOR))
-            if ($guids = array_filter(array_column($spawns, 'guid'), function ($x) { return $x > 0; }))
+            if ($guids = array_column(array_filter($spawns, function ($x) { return $x['guid'] > 0 || $x['type'] != Type::NPC; }), 'guid'))
                 $worldPos = Game::getWorldPosForGUID(self::$type, ...$guids);
 
         foreach ($spawns as $s)
         {
+            $isAccessory = $s['guid'] < 0 && $s['type'] == Type::NPC;
+
             // check, if we can attach waypoints to creature
             // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
-            if (count($spawns) < 6 && self::$type == Type::NPC)
+            if (count($spawns) < 6 && $s['type'] == Type::NPC)
             {
                 if ($wPoints = DB::Aowow()->select('SELECT * FROM ?_creature_waypoints WHERE creatureOrPath = ?d AND floor = ?d', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
                 {
@@ -641,7 +643,10 @@ trait spawnHelper
 
             if (User::isInGroup(U_GROUP_STAFF))
             {
-                $info[0] = $s['guid'] < 0 ? 'Vehicle Accessory' : 'GUID'.Lang::main('colon').$s['guid'];
+                if ($isAccessory)
+                    $info[0] = 'Vehicle Accessory';
+                else if ($s['guid'] > 0 && ($s['type'] == Type::NPC || $s['type'] == Type::OBJECT))
+                    $info[0] = 'GUID'.Lang::main('colon').$s['guid'];
 
                 if ($s['phaseMask'] > 1 && ($s['phaseMask'] & 0xFFFF) != 0xFFFF)
                     $info[2] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
@@ -658,56 +663,27 @@ trait spawnHelper
                     $info[4] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
                 }
 
-                if (self::$type == Type::AREATRIGGER)
+                if ($s['type'] == Type::AREATRIGGER)
                 {
-                    $o = Util::O2Deg($this->getField('orientation'));
-                    $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
+                    // teleporter endpoint
+                    if ($s['guid'] < 0)
+                    {
+                        $opts['type'] = 4;
+                        $info[5] = 'Teleport Destination';
+                    }
+                    else
+                    {
+                        $o = Util::O2Deg($this->getField('orientation'));
+                        $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
+                    }
                 }
 
                 // guid < 0 are vehicle accessories. those are moved by moving the vehicle
-                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && $s['guid'] > 0 && isset($worldPos[$s['guid']]))
-                {
-                    if ($points = Game::worldPosToZonePos($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY']))
-                    {
-                        $floors = [];
-                        foreach ($points as $p)
-                        {
-                            if ($p['multifloor'])
-                                $floors[$p['areaId']][] = $p['floor'];
+                if (User::isInGroup(U_GROUP_MODERATOR) && $worldPos && !$isAccessory && isset($worldPos[$s['guid']]))
+                    $menu = Util::buildPosFixMenu($worldPos[$s['guid']]['mapId'], $worldPos[$s['guid']]['posX'], $worldPos[$s['guid']]['posY'], $s['type'], $s['guid'], $s['areaId'], $s['floor']);
 
-                            if (isset($menu[$p['areaId']]))
-                                continue;
-                            else if ($p['areaId'] == $s['areaId'])
-                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '', null, ['class' => 'checked q0']];
-                            else
-                                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$p['areaId'].', 0)', null, null];
-                        }
-
-                        foreach ($floors as $area => $f)
-                        {
-                            $menu[$area][2] = '';
-                            $menu[$area][3] = [];
-                            if ($menu[$area][4])
-                                $menu[$area][4]['class'] = 'checked';
-
-                            foreach ($f as $n)
-                            {
-                                if ($n == $s['floor'])
-                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '', null, ['class' => 'checked q0']];
-                                else
-                                    $menu[$area][3][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '$spawnposfix.bind(null, '.self::$type.', '.$s['guid'].', '.$area.', '.$n.')'];
-                            }
-                        }
-
-                        $menu = array_values($menu);
-                    }
-
-                    if ($menu)
-                    {
-                        $footer = '<br /><span class="q2">Click to move displayed spawn point</span>';
-                        array_unshift($menu, [null, "Move to..."]);
-                    }
-                }
+                if ($menu)
+                    $footer = '<br /><span class="q2">Click to move pin</span>';
             }
 
             if ($info)

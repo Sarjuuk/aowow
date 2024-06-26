@@ -113,21 +113,19 @@ class ZonePage extends GenericPage
         }
 
         // Instances
-        if ($_ = DB::Aowow()->selectCol('SELECT `id` FROM ?_zones WHERE `parentAreaId` = ?d AND (`cuFlags` & ?d) = 0', $this->typeId, CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        if ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_spawns WHERE `type`= ?d AND `areaId` = ?d ', Type::ZONE, $this->typeId))
         {
             $this->extendGlobalIds(Type::ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
         }
 
         // location (if instance)
-        if ($pa = $this->subject->getField('parentAreaId'))
+        if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ?_spawns WHERE `type`= ?d AND `typeId` = ?d ', Type::ZONE, $this->typeId))
         {
-            $paO = new ZoneList(array(['id', $pa]));
-            if (!$paO->error)
-            {
-                $pins = str_pad($this->subject->getField('parentX') * 10, 3, '0', STR_PAD_LEFT) . str_pad($this->subject->getField('parentY') * 10, 3, '0', STR_PAD_LEFT);
-                $infobox[] = Lang::zone('location').Lang::main('colon').'[lightbox=map zone='.$pa.' pins='.$pins.']'.$paO->getField('name', true).'[/lightbox]';
-            }
+            $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
+
+            $pins = str_pad($pa['posX'] * 10, 3, '0', STR_PAD_LEFT) . str_pad($pa['posY'] * 10, 3, '0', STR_PAD_LEFT);
+            $infobox[] = Lang::zone('location').Lang::main('colon').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneList::getName($pa['areaId']).'[/lightbox]';
         }
 
 /*  has to be defined in an article, i think
@@ -413,6 +411,9 @@ class ZonePage extends GenericPage
 
             foreach ($aSpawns as $spawn)
             {
+                if ($spawn['guid'] < 0)                     // skip teleporter endpoints
+                    continue;
+
                 $tpl = $atSpawns->getEntry($spawn['typeId']);
                 if (!$tpl)
                     continue;
@@ -423,7 +424,7 @@ class ZonePage extends GenericPage
                     'name'          => Util::localizedString($tpl, 'name', true, true),
                     'type'          => Type::AREATRIGGER,
                     'id'            => $spawn['typeId'],
-                    'description'   => 'Type: '.Lang::areatrigger('types', $tpl['type'])
+                    'description'   => Lang::game('type').Lang::main('colon').Lang::areatrigger('types', $tpl['type'])
                 ));
             }
 
@@ -783,6 +784,25 @@ class ZonePage extends GenericPage
                     $this->zoneMusic['intro'] = $_;
             }
         }
+    }
+
+    private function addMoveLocationMenu($parentArea, $parentFloor)
+    {
+        // hide for non-staff
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            return;
+
+        $worldPos = Game::getWorldPosForGUID(Type::ZONE, -$this->typeId);
+        if (!$worldPos)
+            return;
+
+        $menu = Util::buildPosFixMenu($worldPos[-$this->typeId]['mapId'], $worldPos[-$this->typeId]['posX'], $worldPos[-$this->typeId]['posY'], Type::ZONE, -$this->typeId, $parentArea, $parentFloor);
+        if (!$menu)
+            return;
+
+        $menu = [1002, 'Edit DB Entry', null, $menu];
+
+        $this->addScript([SC_JS_STRING, '$(document).ready(function () { mn_staff.push('.Util::toJSON(array_values($menu)).'); });']);
     }
 
     protected function generatePath()

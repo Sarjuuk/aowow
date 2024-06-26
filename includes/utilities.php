@@ -140,6 +140,7 @@ abstract class CLI
     private const CHR_ESC       = 27;
     private const CHR_BACKSPACE = 127;
 
+    public const LOG_NONE       = -1;
     public const LOG_BLANK      = 0;
     public const LOG_ERROR      = 1;
     public const LOG_WARN       = 2;
@@ -190,13 +191,13 @@ abstract class CLI
             }
 
             if ($i || $headless)
-                self::write(' '.implode(' ' . self::tblDelim(' ') . ' ', $row), -1, $timestamp);
+                self::write(' '.implode(' ' . self::tblDelim(' ') . ' ', $row), CLI::LOG_NONE, $timestamp);
             else
-                self::write(self::tblHead(' '.implode('   ', $row)), -1, $timestamp);
+                self::write(self::tblHead(' '.implode('   ', $row)), CLI::LOG_NONE, $timestamp);
         }
 
         if (!$headless)
-            self::write(self::tblHead(str_pad('', array_sum($pads) + count($pads) * 3 - 2)), -1, $timestamp);
+            self::write(self::tblHead(str_pad('', array_sum($pads) + count($pads) * 3 - 2)), CLI::LOG_NONE, $timestamp);
 
         self::write();
     }
@@ -1576,7 +1577,7 @@ abstract class Util
     }
 
     // orientation is 2*M_PI for a full circle, increasing counterclockwise
-    static function O2Deg($o)
+    public static function O2Deg($o)
     {
         // orientation values can exceed boundaries (for whatever reason)
         while ($o < 0)
@@ -1609,7 +1610,7 @@ abstract class Util
         return [(int)$deg, $desc];
     }
 
-    static function mask2bits(int $bitmask, int $offset = 0) : array
+    public static function mask2bits(int $bitmask, int $offset = 0) : array
     {
         $bits = [];
         $i    = 0;
@@ -1624,6 +1625,46 @@ abstract class Util
         }
 
         return $bits;
+    }
+
+    public static function buildPosFixMenu(int $mapId, float $posX, float $posY, int $type, int $guid, int $parentArea = 0, int $parentFloor = 0) : array
+    {
+        $points = Game::worldPosToZonePos($mapId, $posX, $posY);
+        if (!$points || count($points) < 2)
+            return [];
+
+        $floors = [];
+        $menu   = [[null, "Move Location to..."]];
+        foreach ($points as $p)
+        {
+            if ($p['multifloor'])
+                $floors[$p['areaId']][] = $p['floor'];
+
+            if (isset($menu[$p['areaId']]))
+                continue;
+            else if ($p['areaId'] == $parentArea)
+                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '', null, ['class' => 'checked q0']];
+            else
+                $menu[$p['areaId']] = [$p['areaId'], '$g_zones['.$p['areaId'].']', '$spawnposfix.bind(null, '.$type.', '.$guid.', '.$p['areaId'].', 0)', null, null];
+        }
+
+        foreach ($floors as $area => $f)
+        {
+            $menu[$area][MENU_IDX_URL] = null;
+            $menu[$area][MENU_IDX_SUB] = [];
+            if ($menu[$area][MENU_IDX_OPT])
+                $menu[$area][MENU_IDX_OPT]['class'] = 'checked';
+
+            foreach ($f as $n)
+            {
+                if ($n == $parentFloor)
+                    $menu[$area][MENU_IDX_SUB][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '', null, ['class' => 'checked q0']];
+                else
+                    $menu[$area][MENU_IDX_SUB][] = [$n, '$g_zone_areas['.$area.']['.($n - 1).']', '$spawnposfix.bind(null, '.$type.', '.$guid.', '.$area.', '.$n.')'];
+            }
+        }
+
+        return array_values($menu);
     }
 }
 

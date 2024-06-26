@@ -383,7 +383,7 @@ class AjaxAdmin extends AjaxHandler
         $area  = $this->_get['area'];
         $floor = $this->_get['floor'];
 
-        if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER]))
+        if (!in_array($type, [Type::NPC, Type::OBJECT, Type::SOUND, Type::AREATRIGGER, Type::ZONE]))
             return '-3';
 
         DB::Aowow()->query('REPLACE INTO ?_spawns_override VALUES (?d, ?d, ?d, ?d, ?d)', $type, $guid, $area, $floor, AOWOW_REVISION);

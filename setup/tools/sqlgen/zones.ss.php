@@ -20,8 +20,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'zones' => [[], CLISetup::ARGV_PARAM, 'Compiles supplemental data for type: Zone from dbc and world db.']
     );
 
-    protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist'];
-    protected $worldDependency = ['access_requirement'];
+    protected $dbcSourceFiles  = ['worldmaptransforms', 'worldmaparea', 'map', 'mapdifficulty', 'areatable', 'lfgdungeons', 'battlemasterlist', 'areatrigger'];
+    protected $worldDependency = ['access_requirement', 'areatrigger_teleport'];
     protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []];
 
     public function generate(array $ids = []) : bool
@@ -49,9 +49,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IF(a.flags & 0x8, ?d, IFNULL(bm.maxLevel, IFNULL(lfgIni.levelMax, IFNULL(lfgOpen.levelMax, 0)))) AS `levelMax`,
                       "" AS `attunementsN`,
                       "" AS `attunementsH`,
-                      m.parentMapId, -- IFNULL(pa.areaId, 0),
-                      m.parentX, -- IFNULL(pa.posX, 0),
-                      m.parentY, -- IFNULL(pa.posY, 0),
+                      GREATEST(m.parentMapId, 0),
+                      m.parentX,
+                      m.parentY,
                       IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc0, m.name_loc0),
                       IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc2, m.name_loc2),
                       IF(wma.id IS NULL OR m.areaType = 0 OR a.mapId IN (269, 560) OR a.areaTable, a.name_loc3, m.name_loc3),
@@ -77,25 +77,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             CUSTOM_EXCLUDE_FOR_LISTVIEW, MAX_LEVEL
         );
 
-        foreach ($baseData as &$bd)
-        {
-            // usually parent = -1 means no parent but some maps have this touple set to 0
-            if (!$bd['parentMapId'] && !$bd['parentX'] && !$bd['parentY'])
-                continue;
-
-            if ($gPos = Game::worldPosToZonePos($bd['parentMapId'], $bd['parentY'], $bd['parentX']))
-            {
-                $pos = Game::checkCoords($gPos);
-                $bd['parentMapId'] = $pos['areaId'] ?? $gPos[0]['areaId'];
-                $bd['parentX']     = $pos['posX']   ?? $gPos[0]['posX'];
-                $bd['parentY']     = $pos['posY']   ?? $gPos[0]['posY'];
-                continue;
-            }
-
-            $bd['parentMapId'] = 0;
-        }
-
         DB::Aowow()->query('INSERT INTO ?_zones VALUES (?a)', $baseData);
+
+
+        // set missing graveyards from areatrigger data (auto-resurrect map or just plain errors)
+        // grouped because naxxramas _just has_ to be special with 4 entrances...
+        if ($missingMaps = DB::Aowow()->selectCol('SELECT `id` FROM dbc_map WHERE `parentX` = 0 AND `parentY` = 0 AND `parentMapId` > -1 AND `areaType` NOT IN (0, 3, 4)'))
+            if ($triggerIds = DB::World()->selectCol('SELECT `target_map`, `id` AS ARRAY_KEY FROM areatrigger_teleport WHERE `target_map` IN (?a) GROUP BY `target_map`', $missingMaps))
+                if ($positions = DB::Aowow()->select('SELECT `id` AS `ARRAY_KEY`, `mapId` AS "parentMapId", `posX` AS "parentX", `posY` AS "parentY" FROM dbc_areatrigger WHERE `id` IN (?a)', array_keys($triggerIds)))
+                    foreach ($positions as $atId => $parentPos)
+                        DB::Aowow()->query('UPDATE ?_zones SET ?a WHERE `mapId` = ?d', $parentPos, $triggerIds[$atId]);
+
 
         // get requirements from world.access_requirement
         $zoneReq = DB::World()->select(

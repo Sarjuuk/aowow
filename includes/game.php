@@ -311,16 +311,27 @@ class Game
         switch ($type)
         {
             case Type::NPC:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM creature        WHERE `guid` IN (?a)', $guids);
                 break;
             case Type::OBJECT:
-                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map` AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN (?a)', $guids);
+                $result = DB::World()->select('SELECT `guid` AS ARRAY_KEY,              `id`, `map`         AS `mapId`, `position_x` AS `posX`, `position_y` AS `posY` FROM gameobject      WHERE `guid` IN (?a)', $guids);
                 break;
             case Type::SOUND:
-                $result = DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_soundemitters WHERE `id`   IN (?a)', $guids);
+                $result = DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY, `soundId` AS `id`,                  `mapId`,                 `posX`,                 `posY` FROM ?_soundemitters WHERE `id`   IN (?a)', $guids);
+                break;
+            case Type::ZONE:
+                $result = DB::Aowow()->select('SELECT -`id`  AS ARRAY_KEY,              `id`, `parentMapId` AS `mapId`, `parentX`    AS `posX`, `parentY`    AS `posY` FROM ?_zones         WHERE -`id`  IN (?a)', $guids);
                 break;
             case Type::AREATRIGGER:
-                $result = DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY,              `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_areatrigger   WHERE `id`   IN (?a)', $guids);
+                $result = [];
+                if ($base = array_filter($guids, function ($x) { return $x > 0; }))
+                    $result = array_replace($result, DB::AoWoW()->select('SELECT `id`   AS ARRAY_KEY,          `id`,          `mapId`,                 `posX`,                 `posY` FROM ?_areatrigger   WHERE `id`   IN (?a)', $base));
+                if ($endpoints = array_filter($guids, function ($x) { return $x < 0; }))
+                    $result = array_replace($result, DB::World()->select(
+                       'SELECT -`ID`          AS ARRAY_KEY, ID          AS `id`,    `target_map` AS `mapId`, `target_position_x` AS `posX`, `target_position_y` AS `posY` FROM areatrigger_teleport WHERE -`id`          IN (?a) UNION
+                        SELECT -`entryorguid` AS ARRAY_KEY, entryorguid AS `id`, `action_param1` AS `mapId`, `target_x`          AS `posX`, `target_y`          AS `posY` FROM smart_scripts        WHERE -`entryorguid` IN (?a) AND `source_type` = ?d AND `action_type` = ?d',
+                        $endpoints, $endpoints, SAI_SRC_TYPE_AREATRIGGER, SAI_ACTION_TELEPORT
+                     ));
                 break;
             default:
                 trigger_error('Game::getWorldPosForGUID - instanced with unsupported TYPE #'.$type, E_USER_WARNING);

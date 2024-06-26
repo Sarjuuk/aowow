@@ -15,12 +15,11 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
     protected $dbcSourceFiles  = ['areatrigger'];
     protected $worldDependency = ['areatrigger_involvedrelation', 'areatrigger_scripts', 'areatrigger_tavern', 'areatrigger_teleport', 'quest_template', 'quest_template_addon'];
-    protected $setupAfter      = [['dungeonmap', 'worldmaparea'], []];
 
     public function generate(array $ids = []) : bool
     {
         DB::Aowow()->query('TRUNCATE ?_areatrigger');
-        DB::Aowow()->query('INSERT INTO ?_areatrigger SELECT `id`, 0, 0, `mapId`, `posX`, `posY`, `orientation`, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM dbc_areatrigger');
+        DB::Aowow()->query('INSERT INTO ?_areatrigger SELECT `id`, 0, 0, `mapId`, `posX`, `posY`, `orientation`, NULL, NULL FROM dbc_areatrigger');
 
         /* notes:
          * while areatrigger DO have dimensions, displaying them on a map is almost always futile,
@@ -34,40 +33,18 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         foreach ($addData as $id => $ad)
             DB::Aowow()->query('UPDATE ?_areatrigger SET ?a WHERE `id` = ?d', $ad, $id);
 
-        // 2: Teleporter + teleporting 4: Smart Trigger
-        CLI::write('[areatrigger] - calculation teleporter coordinates');
+
+        // 2: Teleporter
+        CLI::write('[areatrigger] - teleporter type and name');
 
         $addData = DB::World()->select(
-           'SELECT ID          AS ARRAY_KEY, Name  AS `name`,    target_map AS `map`, target_position_x AS `posX`, target_position_y AS `posY`, target_orientation AS `orientation`
-            FROM   areatrigger_teleport
-            UNION
-            SELECT entryorguid AS ARRAY_KEY, "TBD" AS `name`, action_param1 AS `map`, target_x          AS `posX`, target_y          AS `posY`, target_o AS           `orientation`
-            FROM   smart_scripts
-            WHERE  source_type = 2 AND action_type = 62'
+           'SELECT `ID`          AS ARRAY_KEY, `Name`         AS `name` FROM areatrigger_teleport UNION
+            SELECT `entryorguid` AS ARRAY_KEY, "SAI Teleport" AS `name` FROM smart_scripts WHERE `source_type` = ?d AND `action_type` = ?d',
+            SAI_SRC_TYPE_AREATRIGGER, SAI_ACTION_TELEPORT
         );
-
         foreach ($addData as $id => $ad)
-        {
-            $points = Game::worldPosToZonePos($ad['map'], $ad['posX'], $ad['posY']);
-            if (!$points)
-            {
-                CLI::write('[areatrigger]   '.str_pad('['.$id.']', 8).' teleporter endpoint '.CLI::bold($ad['name']).' could not be matched to displayable area [M:'.$ad['map'].'; X:'.$ad['posY'].'; Y:'.$ad['posX'].']', CLI::LOG_WARN);
-                DB::Aowow()->query('UPDATE ?_areatrigger SET `name` = ?, `type` = ?d WHERE `id` = ?d', $ad['name'], AT_TYPE_TELEPORT, $id);
-                continue;
-            }
+            DB::Aowow()->query('UPDATE ?_areatrigger SET `name` = ?, `type` = ?d WHERE `id` = ?d', $ad['name'], AT_TYPE_TELEPORT, $id);
 
-            $update = array(
-                'name'      => $ad['name'],
-                'type'      => AT_TYPE_TELEPORT,
-                'teleportA' => $points[0]['areaId'],
-                'teleportX' => $points[0]['posX'],
-                'teleportY' => $points[0]['posY'],
-                'teleportO' => $ad['orientation'],
-                'teleportF' => $points[0]['floor']
-            );
-
-            DB::Aowow()->query('UPDATE ?_areatrigger SET ?a WHERE `id` = ?d', $update, $id);
-        }
 
         // 3: Quest Objectives
         CLI::write('[areatrigger] - satisfying quest objectives');
@@ -80,6 +57,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
             DB::Aowow()->query('UPDATE ?_areatrigger SET `name` = ?, type = ?d, `quest` = ?d WHERE `id` = ?d', $ad['name'], AT_TYPE_OBJECTIVE, $ad['quest'], $id);
         }
+
 
         // 4/5 Scripted
         CLI::write('[areatrigger] - assigning scripts');

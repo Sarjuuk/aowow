@@ -257,6 +257,13 @@ define('GUIDE_STATUS_ARCHIVED',             5);
 
 define('DEFAULT_ICON',                      'inv_misc_questionmark');
 
+define('MENU_IDX_ID',   0);                                 //      ID: A number or string; null makes the menu item a separator
+define('MENU_IDX_NAME', 1);                                 //    Name: A string
+define('MENU_IDX_URL',  2);                                 //     URL: A string for the URL, or a function to call when the menu item is clicked
+define('MENU_IDX_SUB',  3);                                 // Submenu: Child menu
+define('MENU_IDX_OPT',  4);                                 // Options: JSON array with additional options
+
+
 /*
  * Game
  */
