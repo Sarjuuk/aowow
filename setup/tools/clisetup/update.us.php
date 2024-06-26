@@ -89,8 +89,8 @@ CLISetup::registerUtility(new class extends UtilityScript
         // fetch sql/build after applying updates, as they may contain sync-prompts
         [$sql, $build] = DB::Aowow()->selectRow('SELECT `sql` AS "0", `build` AS "1" FROM ?_dbversion');
 
-        $sql   = trim($sql)   ? array_unique(explode(' ', trim(preg_replace('/[^a-z]+/i', ' ', $sql))))   : [];
-        $build = trim($build) ? array_unique(explode(' ', trim(preg_replace('/[^a-z]+/i', ' ', $build)))) : [];
+        $sql   = trim($sql)   ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $sql))))   : [];
+        $build = trim($build) ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $build)))) : [];
 
         sleep(1);
 
