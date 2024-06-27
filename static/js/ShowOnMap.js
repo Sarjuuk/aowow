@@ -553,30 +553,30 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
         }
         else if (hasPaths) {
             // Don't combine pins that have paths
-            coord = getCoord([pin.id, 0], true);
-            x = coord[0]; y = coord[1];
+            coord = getCoord([pin.id, 0], pin.level, true);
+            x = coord[0]; y = coord[1]; l = pin.level || 0;
             var newPin = $WH.dO(pin);
             newPin.coord = pin.coords[0];
 
-            combined[x][y].push(newPin);
+            combined[l][x][y].push(newPin);
             nPins++;
 
             continue;
         }
 
         if (pin.point == 'start' || pin.point == 'end') {
-            coord = getCoord(pin.coord);
-            x = coord[0]; y = coord[1];
-            if (combined[x][y].length > 3) {
-                var temp = combined[x][y];
-                combined[x][y] = [];
+            coord = getCoord(pin.coord, pin.level);
+            x = coord[0]; y = coord[1]; l = pin.level || 0;
+            if (combined[l][x][y].length > 3) {
+                var temp = combined[l][x][y];
+                combined[l][x][y] = [];
                 for (var i = 0; i < temp.length; ++i) {
-                    tmpCoord = getCoord(temp[i].coord, true);
-                    combined[tmpCoord[0]][tmpCoord[1]].push(temp[i]);
+                    tmpCoord = getCoord(temp[i].coord, pin.level, true);
+                    combined[l][tmpCoord[0]][tmpCoord[1]].push(temp[i]);
                 }
             }
 
-            combined[x][y].push(pin);
+            combined[l][x][y].push(pin);
             nPins++;
         }
         else {
@@ -591,7 +591,7 @@ ShowOnMap.combinePins = function(pins, dailyOnly, hasPaths) {
                     combined[l][x][y] = [];
                     for (var i = 0; i < temp.length; ++i) {
                         tmpCoord = getCoord(temp[i].coord, temp[i].level, true);
-                        combined[temp[i].level][tmpCoord[0]][tmpCoord[1]].push(temp[i]);
+                        combined[temp[i].level || 0][tmpCoord[0]][tmpCoord[1]].push(temp[i]);
                     }
                 }
 

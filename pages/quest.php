@@ -613,7 +613,7 @@ class QuestPage extends GenericPage
 
                         switch ($file)
                         {
-                            case 'creature':
+                            case 'npc':
                                 $mapNPCs[] = [$data['id'], $method, $itemId];
                                 break;
                             case 'object':
