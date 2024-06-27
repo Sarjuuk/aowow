@@ -493,7 +493,7 @@ class ZonePage extends GenericPage
                 $som['instance'] = true;
 
             $this->map = array(
-                'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId],
+                'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId, 'zoneLink' => false],
                 'som'  => $som
             );
         }

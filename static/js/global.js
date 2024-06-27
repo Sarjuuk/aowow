@@ -19327,9 +19327,11 @@ function Mapper(opt, noScroll) {
     this.buttons = (this.buttons == null ? true : this.buttons);
 
     this.zoneLink = (this.zoneLink == null ? true : this.zoneLink);
-    if(location.href.indexOf('zone=') != -1) {
-        this.zoneLink = false;
-    }
+    /*  aowow - disabled
+     *  if(location.href.indexOf('zone=') != -1) {
+     *      this.zoneLink = false;
+     *  }
+     */
 
     this.zoom = (this.zoom == null ? 0 : this.zoom);
     this.zone = (this.zone == null ? 0 : this.zone);
