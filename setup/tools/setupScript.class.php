@@ -439,7 +439,7 @@ abstract class SetupScript
         $sub = [];
 
         if (count($this->info) > 1)
-            $sub = array_slice($this->info, 1, 10, true);
+            $sub = array_slice($this->info, 1, null, true);
 
         return $sub;
     }
@@ -500,10 +500,59 @@ abstract class SetupScript
 
     public function writeCLIHelp() : bool
     {
-        // CLI::write('example info', -1, false);           // some info
-        // CLI::write();                                    // empty new line
-        // return true;                                     // help was provided, skip help in parent
-        return false;
+        if (count($this->info) < 2)
+            return false;                                   // help not provided, display parents help text
+
+        $lines = [];
+        foreach ($this->info as $cmd => [$shortOpts, $flags, $text])
+        {
+            $line = ($flags & CLISetup::ARGV_PARAM ? '' : '--').$cmd;
+            foreach ($shortOpts as $so)
+                $line .= ' | '.(strlen($so) == 1 ? '-'.$so : '--'.$so);
+
+            $lines[] = [$line, $text];
+        }
+
+        CLI::writeTable($lines);
+
+        if ($this->dbcSourceFiles)
+        {
+            sort($this->dbcSourceFiles);
+            CLI::write('Will use client data tables:', CLI::LOG_NONE, false);
+            foreach ($this->dbcSourceFiles as $dbc)
+                CLI::write(' * '.$dbc.'.dbc', CLI::LOG_NONE, false);
+            CLI::write();
+        }
+
+        if ($this->worldDependency)
+        {
+            sort($this->worldDependency);
+            CLI::write('Depends on world db tables:', CLI::LOG_NONE, false);
+            foreach ($this->worldDependency as $tbl)
+                CLI::write(' * '.$tbl, CLI::LOG_NONE, false);
+            CLI::write();
+        }
+
+        if ($this->setupAfter[0])
+        {
+            sort($this->setupAfter[0]);
+            CLI::write('Requires data generators:', CLI::LOG_NONE, false);
+            foreach ($this->setupAfter[0] as $sql)
+                CLI::write(' * '.$sql, CLI::LOG_NONE, false);
+            CLI::write();
+        }
+
+        if ($this->setupAfter[1])
+        {
+            sort($this->setupAfter[1]);
+            CLI::write('Requires file generators:', CLI::LOG_NONE, false);
+            foreach ($this->setupAfter[1] as $build)
+                CLI::write(' * '.$build, CLI::LOG_NONE, false);
+            CLI::write();
+        }
+
+        CLI::write();
+        return true;                                        // help was provided, skip help from parent
     }
 
     protected function reapplyCCFlags(string $tbl, int $type) : void
