@@ -72,11 +72,10 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    
    .. once is enough (still apply the localeCode though):
    > \<localeCode>/Interface/TalentFrame/  
-   > \<localeCode>/Interface/Glues/Credits/  
    > \<localeCode>/Interface/Icons/  
    > \<localeCode>/Interface/Spellbook/  
    > \<localeCode>/Interface/PaperDoll/  
-   > \<localeCode>/Interface/GLUES/CHARACTERCREATE/  
+   > \<localeCode>/Interface/Glues/CharacterCreate/  
    > \<localeCode>/Interface/Pictures  
    > \<localeCode>/Interface/PvPRankBadges  
    > \<localeCode>/Interface/FlavorImages  
@@ -84,7 +83,8 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Sound/  
    
    .. optionaly (not used in AoWoW):
-   > \<localeCode>/Interface/GLUES/LOADINGSCREENS/  
+   > \<localeCode>/Interface/Glues/Loadingscreens/  
+   > \<localeCode>/Interface/Glues/Credits/  
 
 #### 5. Reencode the audio files
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
