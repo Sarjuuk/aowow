@@ -123,7 +123,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
                 $point = $this->transformPoint($spawn, $type, $notice);
 
-                if (!$notice && !$lastOverride)
+                if ($notice && $lastOverride != $spawn['guid'])
                 {
                     CLI::write($notice, CLI::LOG_INFO);
                     $time->reset();
@@ -289,7 +289,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     }
 
 
-    private function transformPoint(array $point, int $type, ?string $notice = '') : array
+    private function transformPoint(array $point, int $type, ?string &$notice = '') : array
     {
         // npc/object is on a transport -> apply offsets to path of transport
         // note, that transport DO spawn outside of displayable area maps .. another todo i guess..
