@@ -44,7 +44,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $setList   = DB::Aowow()->Select('SELECT * FROM ?_itemset ORDER BY refSetId DESC');
         $jsonBonus = [];
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             User::useLocale($lId);
             Lang::load($lId);
@@ -120,7 +120,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_itemsets = ".Util::toJSON($itemsetOut).";";
-            $file   = 'datasets/'.User::$localeString.'/itemsets';
+            $file   = 'datasets/'.$jsonStr.'/itemsets';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

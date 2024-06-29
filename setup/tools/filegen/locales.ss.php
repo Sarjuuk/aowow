@@ -63,7 +63,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
 
         $result = [];
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $_)
             if (isset($available[$l]))
                 $result[] = $available[$l];
 

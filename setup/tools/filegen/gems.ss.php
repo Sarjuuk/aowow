@@ -59,7 +59,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             set_time_limit(5);
 
@@ -88,7 +88,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_gems = ".Util::toJSON($gemsOut).";";
-            $file   = 'datasets/'.User::$localeString.'/gems';
+            $file   = 'datasets/'.$jsonStr.'/gems';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

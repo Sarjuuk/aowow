@@ -97,7 +97,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             User::useLocale($lId);
             Lang::load($lId);
@@ -254,7 +254,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         $ench[$k] = $v[0];
 
             $toFile = "var g_enchants = ".Util::toJSON($enchantsOut).";";
-            $file   = 'datasets/'.User::$localeString.'/enchants';
+            $file   = 'datasets/'.$jsonStr.'/enchants';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

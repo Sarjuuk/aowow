@@ -57,7 +57,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`, `areaId`', Type::NPC, array_column($petList, 'id'));
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             User::useLocale($lId);
             Lang::load($lId);
@@ -82,7 +82,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_pets = ".Util::toJSON($petsOut).";";
-            $file   = 'datasets/'.User::$localeString.'/pets';
+            $file   = 'datasets/'.$jsonStr.'/pets';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

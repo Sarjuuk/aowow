@@ -90,7 +90,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $relCurr = new CurrencyList(array(['id', $_]));
 
-            foreach (CLISetup::$localeIds as $l)
+            foreach (CLISetup::$locales as $l => $jsonStr)
             {
                 set_time_limit(20);
 
@@ -108,7 +108,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 foreach ($questz->getListviewData() as $id => $data)
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
-                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-quests-'.$cat2, $buff))
+                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-quests-'.$cat2, $buff))
                     $this->success = false;
             }
         }
@@ -135,7 +135,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (empty($titlez->sources[$id][4]) && empty($titlez->sources[$id][12]))
                 $this->addExclusion(Type::TITLE, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $jsonStr)
         {
             set_time_limit(5);
 
@@ -152,7 +152,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-titles-'.$g, $buff))
+                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-titles-'.$g, $buff))
                     $this->success = false;
             }
         }
@@ -179,7 +179,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!$mountz->getSources())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $jsonStr)
         {
             set_time_limit(5);
 
@@ -203,7 +203,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
             }
 
-            if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-mounts', $buff))
+            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-mounts', $buff))
                 $this->success = false;
         }
     }
@@ -222,7 +222,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!$companionz->getSources())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $jsonStr)
         {
             set_time_limit(5);
 
@@ -241,7 +241,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
             }
 
-            if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-companions', $buff))
+            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-companions', $buff))
                 $this->success = false;
         }
     }
@@ -254,7 +254,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $factionz = new FactionList($condition);
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $jsonStr)
         {
             set_time_limit(5);
 
@@ -267,7 +267,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
-            if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-factions', $buff))
+            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-factions', $buff))
                 $this->success = false;
         }
     }
@@ -307,7 +307,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 }
             }
 
-            foreach (CLISetup::$localeIds as $l)
+            foreach (CLISetup::$locales as $l => $jsonStr)
             {
                 set_time_limit(10);
 
@@ -324,7 +324,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (!$buff)
                 {
                     // this behaviour is intended, do not create an error
-                    CLI::write('[profiler] - file datasets/'.User::$localeString.'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_INFO);
+                    CLI::write('[profiler] - file datasets/'.$jsonStr.'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_INFO);
                     continue;
                 }
 
@@ -333,7 +333,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (is_array($s))
                     $buff .= "\ng_skill_order = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356];\n";
 
-                if (!CLISetup::writeFile('datasets/'.User::$localeString.'/p-recipes-'.$file, $buff))
+                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-recipes-'.$file, $buff))
                     $this->success = false;
             }
         }
@@ -348,7 +348,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $achievez = new AchievementList($condition);
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $jsonStr)
         {
             set_time_limit(5);
 
@@ -368,7 +368,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // sum points
             $buff .= "\ng_achievement_points = [".$sumPoints."];\n";
 
-            if (!CLISetup::writeFile('datasets/'.User::$localeString.'/achievements', $buff))
+            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/achievements', $buff))
                 $this->success = false;
         }
     }

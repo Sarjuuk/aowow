@@ -54,7 +54,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc_talent UNION SELECT rank2 FROM dbc_talent UNION SELECT rank3 FROM dbc_talent UNION SELECT rank4 FROM dbc_talent UNION SELECT rank5 FROM dbc_talent');
         $this->tSpells = new SpellList(array(['s.id', $tSpellIds], Cfg::get('SQL_LIMIT_NONE')));
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             User::useLocale($lId);
             Lang::load($lId);
@@ -67,7 +67,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 set_time_limit(20);
 
-                $file   = 'datasets/'.User::$localeString.'/talents-'.$i;
+                $file   = 'datasets/'.$jsonStr.'/talents-'.$i;
                 $toFile = '$WowheadTalentCalculator.registerClass('.$i.', '.Util::toJSON($this->buildTree(1 << ($i - 1))).')';
 
                 if (!CLISetup::writeFile($file, $toFile))
@@ -77,7 +77,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // PetCalc
             $toFile  = "var g_pet_icons = ".$petIcons.";\n\n";
             $toFile .= 'var g_pet_talents = '.Util::toJSON($this->buildTree(0)).';';
-            $file    = 'datasets/'.User::$localeString.'/pet-talents';
+            $file    = 'datasets/'.$jsonStr.'/pet-talents';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

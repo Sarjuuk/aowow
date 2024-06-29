@@ -112,7 +112,7 @@ class DBC
         $foundMask = 0x0;
         foreach (CLISetup::$expectedPaths as $locStr => $locId)
         {
-            if (!in_array($locId, CLISetup::$localeIds))
+            if (!in_array($locId, array_keys(CLISetup::$locales)))
                 continue;
 
             if ($foundMask & (1 << $locId))

@@ -84,8 +84,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (strpos($dir[0], '%s') === false)
                     $this->requiredDirs[] = $dir[0];
                 else
-                    foreach (CLISetup::$localeIds as $l)
-                        $this->requiredDirs[] = sprintf($dir[0], strtolower(Util::$localeStrings[$l]).'/');
+                    foreach (CLISetup::$locales as $l => $locJsonStr)
+                        $this->requiredDirs[] = sprintf($dir[0], $locJsonStr.'/');
             }
         }
     }
@@ -143,9 +143,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $sumFloors = array_sum(array_column($this->dmFloorData, 1));
         $sumAreas  = count($this->wmAreas);
-        $sumMaps   = count(CLISetup::$localeIds) * ($sumAreas + $sumFloors);
+        $sumMaps   = count(CLISetup::$locales) * ($sumAreas + $sumFloors);
 
-        CLI::write('Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, array_flip(CLISetup::$localeIds))));
+        CLI::write('Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, CLISetup::$locales)));
 
         /*  todo: retrain brain and generate maps by given files and GlobalStrings. Then assign dbc data to them not the other way round like it is now.
                 foreach ($this->mapFiles as $name => [$floors, $isMultilevel])
@@ -236,8 +236,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 }
         */
 
-        foreach (CLISetup::$localeIds as $progressLoc => $l)
+        $progressLoc = -1;
+        foreach (CLISetup::$locales as $l => $locJsonStr)
         {
+            $progressLoc++;
+
             // source for mapFiles
             $mapSrcDir = '';
             if ($this->modeMask & self::M_SPAWNS)
@@ -280,7 +283,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (!CLISetup::fileExists($srcPath))
                 {
                     $this->success = false;
-                    CLI::write('worldmap file '.$srcPath.' missing for selected locale '.Util::$localeStrings[$l], CLI::LOG_ERROR);
+                    CLI::write('worldmap file '.$srcPath.' missing for selected locale '.$locJsonStr, CLI::LOG_ERROR);
                     continue;
                 }
 
@@ -330,7 +333,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                     foreach (self::DEST_DIRS as $sizeIdx => [$path, $width, $height])
                     {
-                        $outFile[$sizeIdx] = sprintf($path, strtolower(Util::$localeStrings[$l]).'/') . $zoneId;
+                        $outFile[$sizeIdx] = sprintf($path, $locJsonStr.'/') . $zoneId;
 
                         /* dataset 'zones' requires that ...
                          * 3959 - Black Temple: starts with empty floor suffix
@@ -503,11 +506,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $sumFloors = array_sum(array_column($this->dmFloorData, 1));
         $sumAreas  = count($this->wmAreas);
-        $sumMaps   = count(CLISetup::$localeIds) * ($sumAreas + $sumFloors);
+        $sumMaps   = count(CLISetup::$locales) * ($sumAreas + $sumFloors);
 
-        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, array_flip(CLISetup::$localeIds))));
+        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, CLISetup::$locales)));
 
-        foreach (CLISetup::$localeIds as $l)
+        foreach (CLISetup::$locales as $l => $locJsonStr)
         {
             // source for mapFiles
             $mapSrcDir = '';
@@ -519,7 +522,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $mapSrcDir = $this->genSteps[self::M_MAPS][1][$l] ?? '';
             if (!$mapSrcDir)
             {
-                CLI::write('[img-maps] - No suitable localized map files found for locale ['.$l.': '.Util::$localeStrings[$l].'].', CLI::LOG_ERROR);
+                CLI::write('[img-maps] - No suitable localized map files found for locale ['.$l.': '.$locJsonStr.'].', CLI::LOG_ERROR);
                 $this->success = false;
                 continue;
             }
@@ -554,7 +557,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     $dmFloors = array_combine($dmFloors, $dmFloors);
 
                 CLI::write(
-                    '['.Util::$localeStrings[$l].'] ' .
+                    '['.$locJsonStr.'] ' .
                     str_pad('['.$areaEntry['areaId'].']', 7) .
                     str_pad($areaEntry['nameINT'], 22) .
                     str_pad('Overlays: '.count($this->wmOverlays[$areaEntry['id']] ?? []), 14) .
@@ -564,7 +567,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $srcPath = $mapSrcDir.'/'.$textureStr;
                 if (!CLISetup::fileExists($srcPath))
                 {
-                    CLI::write('[img-maps] - WorldMap file path '.$srcPath.' missing for selected locale '.Util::$localeStrings[$l], CLI::LOG_ERROR);
+                    CLI::write('[img-maps] - WorldMap file path '.$srcPath.' missing for selected locale '.$locJsonStr, CLI::LOG_ERROR);
                     $this->success = false;
                     continue;
                 }
@@ -616,7 +619,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                     foreach (self::DEST_DIRS as $sizeIdx => [$path, $width, $height])
                     {
-                        $outPaths[$sizeIdx] = sprintf($path, strtolower(Util::$localeStrings[$l]).'/') . $outFile . '.jpg';
+                        $outPaths[$sizeIdx] = sprintf($path, strtolower($locJsonStr).'/') . $outFile . '.jpg';
 
                         if (!CLISetup::getOpt('force') && file_exists($outPaths[$sizeIdx]))
                         {

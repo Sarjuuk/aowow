@@ -52,7 +52,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], Cfg::get('SQL_LIMIT_NONE')));
 
-        foreach (CLISetup::$localeIds as $lId)
+        foreach (CLISetup::$locales as $lId => $jsonStr)
         {
             set_time_limit(30);
 
@@ -82,7 +82,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_glyphs = ".Util::toJSON($glyphsOut).";";
-            $file   = 'datasets/'.User::$localeString.'/glyphs';
+            $file   = 'datasets/'.$jsonStr.'/glyphs';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

@@ -10,7 +10,6 @@ if (!CLI)
 class CLISetup
 {
     public  static $locales       = [];
-    public  static $localeIds     = [];
 
     public  static $srcDir        = 'setup/mpqdata/';
 
@@ -199,14 +198,10 @@ class CLISetup
 
         // restrict actual locales
         foreach (self::$locales as $idx => $_)
-        {
-            if (!($l = Cfg::get('LOCALES')) || ($l & (1 << $idx)))
-                self::$localeIds[] = $idx;
-            else
+            if (($l = Cfg::get('LOCALES')) && !($l & (1 << $idx)))
                 unset(self::$locales[$idx]);
-        }
 
-        if (!self::$localeIds)
+        if (!self::$locales)
             CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
 
         // get site status
@@ -562,7 +557,7 @@ class CLISetup
 
         foreach (self::$expectedPaths as $xp => $locId)
         {
-            if (!in_array($locId, self::$localeIds))
+            if (!in_array($locId, array_keys(self::$locales)))
                 continue;
 
             if (isset($result[$locId]))
@@ -582,7 +577,7 @@ class CLISetup
         if (!$matchAll && !$result)
             $status = false;
 
-        if ($matchAll && array_diff(self::$localeIds, array_keys($result)))
+        if ($matchAll && array_diff_key(self::$locales, $result))
             $status = false;
 
         return $result;
@@ -606,7 +601,7 @@ class CLISetup
                 self::$gsFiles[$lId] = file($gsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         }
 
-        if ($missing = array_diff(self::$localeIds, array_keys(self::$gsFiles)))
+        if ($missing = array_diff_key(self::$locales, self::$gsFiles))
         {
             ClI::write('GlobalStrings.lua not found for locale '. Lang::concat($missing), CLI::LOG_WARN);
             return false;

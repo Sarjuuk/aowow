@@ -179,7 +179,7 @@ trait TrImageProcessor
 
         $locList = [];
         foreach (CLISetup::$expectedPaths as $xp => $locId)
-            if (in_array($locId, CLISetup::$localeIds))
+            if (in_array($locId, array_keys(CLISetup::$locales)))
                 $locList[] = $xp;
 
         CLI::write('[img-proc] required resources overview:', CLI::LOG_INFO);
@@ -202,11 +202,11 @@ trait TrImageProcessor
             {
                 $foundLoc = [];
                 foreach (CLISetup::$expectedPaths as $xp => $lId)
-                    if (in_array($lId, CLISetup::$localeIds))
+                    if (in_array($lId, array_keys(CLISetup::$locales)))
                         if (isset($realPaths[$lId]) && ($n = stripos($realPaths[$lId], '/'.$xp.'/')))
                             $foundLoc[$lId] = substr($realPaths[$lId], $n + 1, 4);
 
-                if ($diff = array_diff(CLISetup::$localeIds, array_keys($foundLoc)))
+                if ($diff = array_diff_key(CLISetup::$locales, $foundLoc))
                 {
                     $buff = [];
                     foreach ($diff as $d)

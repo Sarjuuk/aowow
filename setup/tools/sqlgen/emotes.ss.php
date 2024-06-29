@@ -24,7 +24,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $allOK       = true;
         $locPath     = CLISetup::filesInPathLocalized($globStrPath, $allOK);
 
-        if ($x = array_diff(CLISetup::$localeIds, array_keys($locPath)))
+        if ($x = array_diff_key(CLISetup::$locales, $locPath))
         {
             $locs = array_intersect_key(CLISetup::$locales, array_flip($x));
             CLI::write('[emotes] '.sprintf($globStrPath, CLI::bold('['.implode('/,', $locs).'/]')) . ' not found!', CLI::LOG_WARN);
