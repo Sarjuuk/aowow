@@ -132,7 +132,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
                 if (!$point)
                 {
-                    CLI::write('[points] '.str_pad('['.$spawn['guid'].']', 9).' '.(isset($spawn['point']) ? 'with path/point ['.$spawn['npcOrPath'].'; '.$spawn['point'].'] ' : '').'could not be matched to displayable area [A:'.($spawn['areaId'] ?? 0).'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
+                    CLI::write('[points] '.str_pad('['.$spawn['guid'].']', 9).' '.(isset($spawn['point']) ? 'with path/point ['.$spawn['creatureOrPath'].'; '.$spawn['point'].'] ' : '').'could not be matched to displayable area [A:'.($spawn['areaId'] ?? 0).'; X:'.$spawn['posY'].'; Y:'.$spawn['posX'].']', CLI::LOG_WARN);
                     $time->reset();
                     continue;
                 }

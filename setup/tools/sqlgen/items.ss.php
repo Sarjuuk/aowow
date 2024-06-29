@@ -206,13 +206,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // assign slot from onUse spell to item (todo (med): handle multi slot enchantments (like armor kits))
         DB::Aowow()->query(
             'UPDATE ?_items i
-             JOIN   (SELECT id, LOG(2, equippedItemInventoryTypeMask & ~?d) AS mask
+             JOIN   (SELECT `id`, LOG(2, `equippedItemInventoryTypeMask` & ~?d) AS `mask`
                      FROM dbc_spell
-                     WHERE equippedItemInventoryTypeMask > 0
-                     HAVING CAST(mask AS INT) = CAST(mask AS FLOAT)) s
-             ON     s.id = i.spellId1
-             SET    i.slot = s.mask
-             WHERE  i.spellId1 > 0 AND i.class = 0 AND i.subClass IN (6, -3)',
+                     WHERE `equippedItemInventoryTypeMask` > 0
+                     HAVING CAST(`mask` AS UNSIGNED) = CAST(`mask` AS FLOAT)) s
+             ON     s.`id` = i.`spellId1`
+             SET    i.`slot` = s.`mask`
+             WHERE  i.`spellId1` > 0 AND i.`class` = 0 AND i.`subClass` IN (6, -3)',
              1 << INVTYPE_ROBE | 1 << INVTYPE_RANGEDRIGHT   // just unset. _CHEST and _RANGED are set in parallel
          );
 

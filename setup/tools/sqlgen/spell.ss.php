@@ -21,28 +21,35 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     public function generate(array $ids = []) : bool
     {
-        $ssQuery = 'SELECT id AS ARRAY_KEY,
-                           id,
+        $ssQuery = 'SELECT id,
                            0 AS category,
                            Dispel,
                            Mechanic,
                            Attributes,         AttributesEx,       AttributesEx2,      AttributesEx3,      AttributesEx4,      AttributesEx5,      AttributesEx6,      AttributesEx7,
+                           ?d AS cuFlags,
+                           0 AS typeCat,
                            Stances,            StancesNot,
                            Targets,
                            0 AS spellFocus,
-                           CastingTimeIndex,
-                           0 AS recoveryTime,  0 AS recoveryTimeCategory,
+                           CastingTimeIndex AS castTime,
+                           0 AS recoveryTime,      0 AS recoveryTimeCategory,
+                           0 AS startRecoveryTime, 0 AS startRecoveryCategory,
                            ProcChance,         ProcCharges,
-                           MaxLevel,           BaseLevel,          SpellLevel,
-                           DurationIndex,
+                           0 AS procCustom,    0 AS procCooldown,
+                           MaxLevel,           BaseLevel,          SpellLevel,         0 AS talentLevel,
+                           DurationIndex AS duration,
                            0 AS powerType,
                            0 AS powerCost,
                            0 AS powerCostPerLevel,
+                           0 AS powerCostPercent,
                            0 AS powerPerSecond,
                            0 AS powerPerSecondPerLevel,
+                           0 AS powerGainRunicPower,
+                           0 AS powerCostRunes,
                            RangeIndex,
                            StackAmount,
                            0 AS tool1,         0 AS tool2,
+                           0 AS toolCategory1, 0 AS toolCategory2,
                            0 AS reagent1,      0 AS reagent2,      0 AS reagent3,      0 AS reagent4,      0 AS reagent5,      0 AS reagent6,      0 AS reagent7,      0 AS reagent8,
                            0 AS reagentCount1, 0 AS reagentCount2, 0 AS reagentCount3, 0 AS reagentCount4, 0 AS reagentCount5, 0 AS reagentCount6, 0 AS reagentCount7, 0 AS reagentCount8,
                            EquippedItemClass,
@@ -55,7 +62,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                            EffectMechanic1,                        EffectMechanic2,                        EffectMechanic3,
                            EffectImplicitTargetA1,                 EffectImplicitTargetA2,                 EffectImplicitTargetA3,
                            EffectImplicitTargetB1,                 EffectImplicitTargetB2,                 EffectImplicitTargetB3,
-                           EffectRadiusIndex1,                     EffectRadiusIndex2,                     EffectRadiusIndex3,
+                           EffectRadiusIndex1 AS effect1RadiusMin, 0 AS effect1RadiusMax,
+                           EffectRadiusIndex2 AS effect2RadiusMin, 0 AS effect2RadiusMax,
+                           EffectRadiusIndex3 AS effect3RadiusMin, 0 AS effect3RadiusMax,
                            EffectApplyAuraName1,                   EffectApplyAuraName2,                   EffectApplyAuraName3,
                            EffectAmplitude1,                       EffectAmplitude2,                       EffectAmplitude3,
                            EffectMultipleValue1,                   EffectMultipleValue2,                   EffectMultipleValue3,
@@ -68,33 +77,33 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                            EffectSpellClassMaskA1,                 EffectSpellClassMaskA2,                 EffectSpellClassMaskA3,
                            EffectSpellClassMaskB1,                 EffectSpellClassMaskB2,                 EffectSpellClassMaskB3,
                            EffectSpellClassMaskC1,                 EffectSpellClassMaskC2,                 EffectSpellClassMaskC3,
-                           0 AS iconId,                            0 AS iconIdAlt,
+                           DmgMultiplier1,                         DmgMultiplier2,                         DmgMultiplier3,
+                           0 AS effect1BonusMultiplier,            0 AS effect2BonusMultiplier,            0 AS effect3BonusMultiplier,
+                           0 AS iconId,                            0 AS iconIdBak,                         0 AS iconIdAlt,
                            0 AS rankId,                            0 AS spellVisualId1,
                            CONCAT("Serverside - ",SpellName) AS name_loc0,CONCAT("Serverside - ",SpellName) AS name_loc2,CONCAT("Serverside - ",SpellName) AS name_loc3,CONCAT("Serverside - ",SpellName) AS name_loc4,CONCAT("Serverside - ",SpellName) AS name_loc6,CONCAT("Serverside - ",SpellName) AS name_loc8,
                            "" AS rank_loc0,                        "" AS rank_loc2,                        "" AS rank_loc3,                        "" AS rank_loc4,                        "" AS rank_loc6,                        "" AS rank_loc8,
                            "" AS description_loc0,                 "" AS description_loc2,                 "" AS description_loc3,                 "" AS description_loc4,                 "" AS description_loc6,                 "" AS description_loc8,
                            "" AS buff_loc0,                        "" AS buff_loc2,                        "" AS buff_loc3,                        "" AS buff_loc4,                        "" AS buff_loc6,                        "" AS buff_loc8,
-                           0 AS powerCostPercent,
-                           0 AS startRecoveryCategory,
-                           0 AS startRecoveryTime,
                            MaxTargetLevel,
                            SpellFamilyName,
-                           SpellFamilyFlags1,
-                           SpellFamilyFlags2,
-                           SpellFamilyFlags3,
+                           SpellFamilyFlags1,                      SpellFamilyFlags2,                      SpellFamilyFlags3,
                            MaxAffectedTargets,
                            DmgClass,
-                           DmgMultiplier1,                         DmgMultiplier2,                         DmgMultiplier3,
-                           0 AS toolCategory1,                     0 AS toolCategory2,
-                           SchoolMask,
-                           0 AS runeCostId,
-                           0 AS powerDisplayId,
-                           0 AS effect1BonusMultiplier,            0 AS effect2BonusMultiplier,            0 AS effect3BonusMultiplier,
+                           0 AS skillLine1,
+                           0 AS skillLine2OrMask,
+                           0 AS reqRaceMask,
+                           0 AS reqClassMask,
+                           0 AS reqSpellId,
+                           0 AS reqSkillLevel,
+                           0 AS learnedAt,
+                           0 AS skillLevelGrey,
+                           0 AS skillLevelYellow,
+                           schoolMask,
                            0 AS spellDescriptionVariable,
-                           0 AS spellDifficulty
+                           0 AS trainingCost
                     FROM   spell_dbc
-                    WHERE  id > ?d
-                    LIMIT  ?d';
+                    LIMIT  ?d,?d';
 
         $baseQry = 'SELECT    s.id,
                               category,
@@ -177,48 +186,23 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                               schoolMask,
                               GREATEST(spellDescriptionVariable, 0),
                               0 AS trainingCost
-                    FROM      tmp_spell s
+                    FROM      dbc_spell s
                     LEFT JOIN dbc_spellcasttimes sct ON s.castTimeId      = sct.id
                     LEFT JOIN dbc_spellrunecost  src ON s.runeCostId      = src.id
                     LEFT JOIN dbc_spellduration   sd ON s.durationId      = sd.id
                     LEFT JOIN dbc_spellradius    sr1 ON s.effect1RadiusId = sr1.id
                     LEFT JOIN dbc_spellradius    sr2 ON s.effect2RadiusId = sr2.id
                     LEFT JOIN dbc_spellradius    sr3 ON s.effect3RadiusId = sr3.id
-                    WHERE     s.id > ?d
-                    LIMIT     ?d';
+                    LIMIT     ?d,?d';
 
-        $serverside = [];
 
         DB::Aowow()->query('TRUNCATE ?_spell');
 
-        if (!(new DBC('spell', ['temporary' => true, 'tableName' => 'tmp_spell']))->readFile())
-        {
-            CLI::write('[spell] could not create temprary spell table to merge spell_dbc into', CLI::LOG_ERROR);
-            return false;
-        }
-
-        // merge serverside spells into tmp_spell
+        // merge serverside spells into aowow_spell
         $lastMax = 0;
-        CLI::write('[spell] - merging serverside spells into spell.dbc');
-        while ($spells = DB::World()->select($ssQuery, $lastMax, CLISetup::SQL_BATCH))
-        {
-            $newMax = max(array_column($spells, 'id'));
-
-            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax, CLI::LOG_BLANK, true, true);
-
-            $lastMax = $newMax;
-
-            foreach ($spells as $id => $spell)
-            {
-                $serverside[] = $id;
-                DB::Aowow()->query('INSERT INTO tmp_spell VALUES (?a)', array_values($spell));
-            }
-        }
-
-        // merge everything into aowow_spell
-        $lastMax = 0;
-        CLI::write('[spell] - filling aowow_spell');
-        while ($spells = DB::Aowow()->select($baseQry, $lastMax, CLISetup::SQL_BATCH))
+        $n = 0;
+        CLI::write('[spell] - copying serverside spells into aowow_spell');
+        while ($spells = DB::World()->select($ssQuery, CUSTOM_SERVERSIDE, $n++ * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH))
         {
             $newMax = max(array_column($spells, 'id'));
 
@@ -230,9 +214,28 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 DB::Aowow()->query('INSERT INTO ?_spell VALUES (?a)', array_values($spell));
         }
 
-        // apply flag: CUSTOM_SERVERSIDE
-        if ($serverside)
-            DB::Aowow()->query('UPDATE ?_spell SET `cuFlags` = `cuFlags` | ?d WHERE `id` IN (?a)', CUSTOM_SERVERSIDE, $serverside);
+        // apply spell radii, duration & casting time
+        DB::Aowow()->query('UPDATE ?_spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect1RadiusMin` = sr.`id`  SET s.`effect1RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect1RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
+        DB::Aowow()->query('UPDATE ?_spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect2RadiusMin` = sr.`id`  SET s.`effect2RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect2RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
+        DB::Aowow()->query('UPDATE ?_spell s LEFT JOIN dbc_spellradius    sr  ON s.`effect3RadiusMin` = sr.`id`  SET s.`effect3RadiusMin` = IFNULL(sr.`radiusMin`, 0), s.`effect3RadiusMax` = IFNULL(sr.`radiusMax`, 0)');
+        DB::Aowow()->query('UPDATE ?_spell s LEFT JOIN dbc_spellduration  sd  ON s.`duration`         = sd.`id`  SET s.`duration` = IF(sd.`baseTime` iS NULL, -1, IF(sd.`baseTime` <> -1, ABS(sd.`baseTime`), -1))');
+        DB::Aowow()->query('UPDATE ?_spell s LEFT JOIN dbc_spellcasttimes sct ON s.`castTime`         = sct.`id` SET s.`castTime` = GREATEST(IFNULL(sct.`baseTime`, 0), 0) / 1000');
+
+        // merge spell.dbc into aowow_spell
+        $lastMax = 0;
+        $n = 0;
+        CLI::write('[spell] - merging spell.dbc into aowow_spell');
+        while ($spells = DB::Aowow()->select($baseQry, $n++ * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH))
+        {
+            $newMax = max(array_column($spells, 'id'));
+
+            CLI::write(' * sets '.($lastMax + 1).' - '.$newMax, CLI::LOG_BLANK, true, true);
+
+            $lastMax = $newMax;
+
+            foreach ($spells as $spell)
+                DB::Aowow()->query('INSERT INTO ?_spell VALUES (?a)', array_values($spell));
+        }
 
         // apply flag: CUSTOM_DISABLED [0xD: players (0x1), pets (0x4), general (0x8); only generally disabled spells]
         if ($disables = DB::World()->selectCol('SELECT `entry` FROM disables WHERE `sourceType` = 0 AND `params_0` = "" AND `params_1` = "" AND `flags` & 0xD'))
@@ -344,7 +347,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // fill learnedAt, trainingCost from trainer
         if ($trainer = DB::World()->select('SELECT `spellID` AS ARRAY_KEY, MIN(`ReqSkillRank`) AS `reqSkill`, MIN(`MoneyCost`) AS `cost`, `ReqAbility1` AS `reqSpellId`, COUNT(*) AS `count` FROM trainer_spell GROUP BY `SpellID`'))
         {
-            $spells = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `effect1Id`, `effect2Id`, `effect3Id`, `effect1TriggerSpell`, `effect2TriggerSpell`, `effect3TriggerSpell` FROM tmp_spell WHERE `id` IN (?a)', array_keys($trainer));
+            $spells = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `effect1Id`, `effect2Id`, `effect3Id`, `effect1TriggerSpell`, `effect2TriggerSpell`, `effect3TriggerSpell` FROM dbc_spell WHERE `id` IN (?a)', array_keys($trainer));
             $links  = [];
 
             // todo (med): this skips some spells (e.g. riding)
@@ -467,21 +470,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // altIcons and quality for craftSpells
         $itemSpells = DB::Aowow()->selectCol(
            'SELECT    s.id AS ARRAY_KEY, effect1CreateItemId
-            FROM      tmp_spell s
+            FROM      dbc_spell s
             LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
             LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
             LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
             WHERE     effect1CreateItemId > 0 AND (effect1Id in (?a) OR effect1AuraId in (?a)) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
             UNION
             SELECT    s.id AS ARRAY_KEY, effect2CreateItemId
-            FROM      tmp_spell s
+            FROM      dbc_spell s
             LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
             LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
             LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
             WHERE     effect2CreateItemId > 0 AND (effect2Id in (?a) OR effect2AuraId in (?a)) AND t1.id IS NULL AND t2.id IS NULL AND t3.id IS NULL
             UNION
             SELECT    s.id AS ARRAY_KEY, effect3CreateItemId
-            FROM      tmp_spell s
+            FROM      dbc_spell s
             LEFT JOIN dbc_talent t1 ON t1.rank1 = s.id
             LEFT JOIN dbc_talent t2 ON t2.rank2 = s.id
             LEFT JOIN dbc_talent t3 ON t3.rank3 = s.id
