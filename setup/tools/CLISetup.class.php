@@ -170,18 +170,8 @@ class CLISetup
                 yield $name => [$src, $ref];
     }
 
-    public static function init() : void
+    public static function setLocales() : bool
     {
-        self::evalOpts();
-
-        // optional logging
-        if (isset(self::$opts['log']))
-            CLI::initLogFile(trim(self::$opts['log']));
-
-        // alternative data source (no quotes, use forward slash)
-        if (isset(self::$opts['datasrc']))
-            self::$srcDir = CLI::nicePath(self::$opts['datasrc']);
-
         // optional limit handled locales
         if (isset(self::$opts['locales']))
         {
@@ -201,7 +191,22 @@ class CLISetup
             if (($l = Cfg::get('LOCALES')) && !($l & (1 << $idx)))
                 unset(self::$locales[$idx]);
 
-        if (!self::$locales)
+        return !!self::$locales;
+    }
+
+    public static function init() : void
+    {
+        self::evalOpts();
+
+        // optional logging
+        if (isset(self::$opts['log']))
+            CLI::initLogFile(trim(self::$opts['log']));
+
+        // alternative data source (no quotes, use forward slash)
+        if (isset(self::$opts['datasrc']))
+            self::$srcDir = CLI::nicePath(self::$opts['datasrc']);
+
+        if (!self::setLocales())
             CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
 
         // get site status

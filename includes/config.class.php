@@ -212,7 +212,7 @@ class Cfg
         {
             $errMsg = '';
             if (!method_exists('Cfg', $key))
-                $errMsg = 'required onSetFN validator not set';
+                $errMsg = 'Aowow config '.strtoupper($key).' flagged for onSetFN validation, but no handler was set';
             else
                 self::{$key}($value, $errMsg);
 
@@ -387,12 +387,8 @@ class Cfg
         if (!CLI)
             return true;
 
-        CLISetup::$localeIds = [];
-        foreach (CLISetup::$locales as $idx => $_)
-            if (!($value) || ($value & (1 << $idx)))
-                CLISetup::$localeIds[] = $idx;
-
-        if (!empty(CLISetup::$localeIds))
+        // note: Change is written to db and storage at this point, but can be rolled back.
+        if (CLISetup::setLocales())
             return true;
 
         $msg .= 'no valid locales set';
