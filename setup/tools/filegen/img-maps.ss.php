@@ -838,10 +838,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $x = 0;
                 while ($x < $row['w'])
                 {
-                    $img = $this->loadImageFile($basePath . $row['textureString'] . $i);
+                    $img = $this->loadImageFile($basePath . $row['textureString'] . $i, $noSrcFile);
                     if (!$img)
                     {
-                        CLI::write('[img-maps] - overlay tile ' . $basePath . $row['textureString'] . $i . '.blp missing.', CLI::LOG_ERROR);
+                        if ($noSrcFile)
+                            CLI::write('[img-maps] - overlay tile ' . $basePath . $row['textureString'] . $i . '.blp missing.', CLI::LOG_ERROR);
+
                         break 2;
                     }
 

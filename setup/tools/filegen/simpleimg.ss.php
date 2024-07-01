@@ -225,11 +225,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
                                 }
 
                                 if (!$src)
-                                    $src = $this->loadImageFile($f);
+                                    $src = $this->loadImageFile($f, $noSrcFile);
 
                                 if (!$src)                  // error should be created by imagecreatefromblp
                                 {
-                                    $this->success = false;
+                                    if (!$noSrcFile)        // there are a couple of void file references in dbc, so this can't be a hard error.
+                                        $this->success = false;
+
                                     continue;
                                 }
 
@@ -293,10 +295,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             continue;
                         }
 
-                        $src = $this->loadImageFile($f);
+                        $src = $this->loadImageFile($f, $noSrcFile);
                         if (!$src)                          // error should be created by imagecreatefromblp
                         {
-                            $this->success = false;
+                            if (!$noSrcFile)                // there are a couple of void file references in dbc, so this can't be a hard error.
+                                $this->success = false;
+
                             continue;
                         }
 

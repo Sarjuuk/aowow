@@ -236,9 +236,10 @@ trait TrImageProcessor
     // prefer manually converted PNG files (as the imagecreatefromblp-script has issues with some formats)
     // alpha channel issues observed with locale deDE Hilsbrad and Elwynn - maps
     // see: https://github.com/Kanma/BLPConverter
-    private function loadImageFile(string $path) // : ?GdImage
+    private function loadImageFile(string $path, ?bool &$noSrc = false) // : ?GdImage
     {
         $result = null;
+        $noSrc  = false;
         $path   = preg_replace('/\.(png|blp)$/i', '', $path);
 
         $file = $path.'.png';
@@ -253,6 +254,8 @@ trait TrImageProcessor
             $file = $path.'.blp';
             if (CLISetup::fileExists($file))
                 $result = imagecreatefromblp($file);
+            else
+                $noSrc = true;
         }
 
         return $result;
@@ -360,10 +363,12 @@ trait TrComplexImage
             $tileW = $destW;
             foreach ($row as $x => $suffix)
             {
-                $src = $this->loadImageFile($baseName.$suffix);
+                $src = $this->loadImageFile($baseName.$suffix, $noSrcFile);
                 if (!$src)
                 {
-                    CLI::write('[img-proc-c] tile '.$baseName.$suffix.'.blp missing.', CLI::LOG_ERROR);
+                    if ($noSrcFile)
+                        CLI::write('[img-proc-c] tile '.$baseName.$suffix.'.blp missing.', CLI::LOG_ERROR);
+
                     unset($dest);
                     return null;
                 }
