@@ -1467,8 +1467,8 @@ $lang = array(
         'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'castTime' => array(
             "Instant cast",                                 // SPELL_CAST_TIME_INSTANT
-            "Wirken in %.3g Sek.",                          // SPELL_CAST_TIME_SEC
-            "Wirken in %.3g Min."                           // SPELL_CAST_TIME_MIN
+            "%.3g sec cast",                                // SPELL_CAST_TIME_SEC
+            "%.3g min cast"                                 // SPELL_CAST_TIME_MIN
         ),
         'cooldown' => array(
             "Instant cooldown",                             // SPELL_RECAST_TIME_INSTANT not used?
