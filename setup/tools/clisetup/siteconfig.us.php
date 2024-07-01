@@ -44,7 +44,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         switch (strtoupper($action))
         {
             case 'E':
-                $result = $this->doEdit($name, $value);
+                $result = $this->doEdit($name, $args[2]);
                 break;
             case 'R':
                 $result = $this->doRestore($name);
@@ -146,7 +146,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
         $setting = array(
             'key' => ['option name', false, false, Cfg::PATTERN_CONF_KEY],
-            'val' => ['value',                            ]
+            'val' => ['value']
         );
         if (CLI::read($setting, $uiSetting) && $uiSetting)
             $this->doNew($uiSetting['key'], $uiSetting['val']);
@@ -226,19 +226,19 @@ CLISetup::registerUtility(new class extends UtilityScript
             foreach (explode(', ', $info[1]) as $option)
             {
                 [$val, $name] = explode(':', $option);
-                CLI::write('['.CLI::bold($val).'] '.$name);
+                $typeHint[] = '['.CLI::bold($val).'] '.$name;
             }
             $single  = true;
             $pattern = '/^\d$/';
         }
         else if ($flags & Cfg::FLAG_BITMASK)
         {
-            $typeHint[] = 'Bitmask: sum fields to select multiple options';
             foreach (explode(', ', $info[1]) as $option)
             {
                 [$val, $name] = explode(':', $option);
-                CLI::write('['.CLI::bold(1 << $val).']'.str_pad('', 6 - strlen(1 << $val)).$name);
+                $typeHint[] = '['.CLI::bold(1 << $val).']'.str_pad('', 6 - strlen(1 << $val)).$name;
             }
+            $typeHint[] = 'Bitmask: sum fields to select multiple options';
             $pattern = '/^\d+$/';
         }
         else if ($flags & Cfg::FLAG_TYPE_BOOL)
@@ -265,6 +265,8 @@ CLISetup::registerUtility(new class extends UtilityScript
                 CLI::write();
 
                 $val = $newVal ?? $uiValue['idx'] ?? '';
+                unset($newVal);                             // we loop infinitely if this is set and invalid
+
                 if ($err = Cfg::set($key, $val, $this->updScripts))
                 {
                     CLI::write($err, CLI::LOG_ERROR);
