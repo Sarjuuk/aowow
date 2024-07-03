@@ -8,6 +8,8 @@ class ProfileList extends BaseType
 {
     use profilerHelper, listviewHelper;
 
+    public static $contribute = CONTRIBUTE_NONE;
+
     public function getListviewData($addInfo = 0, array $reqCols = [])
     {
         $data = [];
@@ -35,7 +37,7 @@ class ProfileList extends BaseType
                 'talenttree3'       => $this->getField('talenttree3'),
                 'talentspec'        => $this->getField('activespec') + 1,                       // 0 => 1; 1 => 2
                 'achievementpoints' => $this->getField('achievementpoints'),
-                'guild'             => '$"'.str_replace ('"', '', $this->curTpl['guildname']).'"',// force this to be a string
+                'guild'             => $this->curTpl['guildname'] ? '$"'.str_replace ('"', '', $this->curTpl['guildname']).'"' : '', // force this to be a string
                 'guildrank'         => $this->getField('guildrank'),
                 'realm'             => Profiler::urlize($this->getField('realmName'), true),
                 'realmname'         => $this->getField('realmName'),

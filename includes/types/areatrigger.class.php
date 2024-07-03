@@ -8,9 +8,10 @@ class AreaTriggerList extends BaseType
 {
     use spawnHelper;
 
-    public static   $type      = Type::AREATRIGGER;
-    public static   $brickFile = 'areatrigger';
-    public static   $dataTable = '?_areatrigger';
+    public static   $type       = Type::AREATRIGGER;
+    public static   $brickFile  = 'areatrigger';
+    public static   $dataTable  = '?_areatrigger';
+    public static   $contribute = CONTRIBUTE_CO;
 
     protected       $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ?_areatrigger a';
     protected       $queryOpts = array(

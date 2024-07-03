@@ -1144,7 +1144,7 @@ abstract class DbSimple_Database extends DbSimple_LastError
                 $len = 0;
                 $values = array();
                 foreach ($rows[0] as $k=>$v) {
-                    $len += strlen($v);
+                    $len += strlen($v ?? '');
                     if ($len > $this->MAX_LOG_ROW_LEN) {
                         break;
                     }

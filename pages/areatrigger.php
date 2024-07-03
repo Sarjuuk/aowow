@@ -20,8 +20,6 @@ class AreaTriggerPage extends GenericPage
 
     public function __construct($pageCall, $id)
     {
-        $this->contribute    = CONTRIBUTE_NONE;
-
         parent::__construct($pageCall, $id);
 
         $this->typeId = intVal($id);

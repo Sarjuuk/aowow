@@ -16,9 +16,10 @@ class GuideList extends BaseType
         GUIDE_STATUS_ARCHIVED => '#FFD100'
     );
 
-    public static   $type      = Type::GUIDE;
-    public static   $brickFile = 'guide';
-    public static   $dataTable = '?_guides';
+    public static   $type       = Type::GUIDE;
+    public static   $brickFile  = 'guide';
+    public static   $dataTable  = '?_guides';
+    public static   $contribute = CONTRIBUTE_CO;
 
     private         $article   = [];
     private         $jsGlobals = [];

@@ -10,6 +10,8 @@ class ArenaTeamList extends BaseType
 
     private $rankOrder = [];
 
+    public static $contribute = CONTRIBUTE_NONE;
+
     public function getListviewData()
     {
         $data = [];

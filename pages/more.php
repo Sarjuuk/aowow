@@ -10,7 +10,6 @@ if (!defined('AOWOW_REVISION'))
 
 class MorePage extends GenericPage
 {
-    protected $articleUrl    = '';
     protected $tabsTitle     = '';
     protected $privReqPoints = '';
     protected $forceTabs     = true;

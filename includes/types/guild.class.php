@@ -8,6 +8,8 @@ class GuildList extends BaseType
 {
     use profilerHelper, listviewHelper;
 
+    public static $contribute = CONTRIBUTE_NONE;
+
     public function getListviewData()
     {
         $this->getGuildScores();

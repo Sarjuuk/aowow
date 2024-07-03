@@ -9,7 +9,7 @@
 
     $this->brick('pageTemplate');
 
-    if (isset($this->notFound)):
+    if ($this->notFound):
 ?>
             <div class="pad3"></div>
 

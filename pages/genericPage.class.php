@@ -22,12 +22,8 @@ trait TrDetailPage
     protected $redButtons = [];                             // see template/redButtons.tpl.php
     protected $smartAI    = null;
     protected $map        = null;
-    protected $article    = null;
     protected $headIcons  = [];
     protected $expansion  = EXP_CLASSIC;
-
-
-    protected $contribute = CONTRIBUTE_ANY;
 
     protected function generateCacheKey(bool $withStaff = true) : string
     {
@@ -149,7 +145,6 @@ trait TrProfiler
     {
         $this->prepareContent();
 
-        $this->contribute = CONTRIBUTE_NONE;
         $this->notFound   = array(
             'title' => sprintf(Lang::profiler('firstUseTitle'), $this->subjectName, $this->realm),
             'msg'   => ''
@@ -187,7 +182,7 @@ class GenericPage
     protected $reqUGroup    = U_GROUP_NONE;
     protected $reqAuth      = false;
     protected $mode         = CACHE_TYPE_NONE;
- // protected $contribute;                                  // defined in __construct()
+    protected $contribute   = CONTRIBUTE_NONE;
 
     protected $wowheadLink  = 'https://wowhead.com/';
 
@@ -197,6 +192,12 @@ class GenericPage
     protected $name         = '';                           // for h1-Element
     protected $tabId        = null;
     protected $gDataKey     = false;                        // adds the dataKey to the user vars
+    protected $notFound     = [];
+    protected $pageTemplate = [];
+    protected $article      = null;
+    protected $articleUrl   = '';
+    protected $editAccess   = null;                         // 0 is valid access value, so null
+
     protected $scripts      = array(
         [SC_JS_FILE,  'js/jquery-3.7.0.min.js',  SC_FLAG_NO_TIMESTAMP                        ],
         [SC_JS_FILE,  'js/basic.js'                                                          ],
@@ -212,23 +213,24 @@ class GenericPage
     );
 
     // private vars don't get cached
-    private   $time         = 0;
-    private   $cacheDir     = 'cache/template/';
-    private   $jsgBuffer    = [];
-    private   $gPageInfo    = [];
-    private   $gUser        = [];
-    private   $pageTemplate = [];
-    private   $community    = ['co' => [], 'sc' => [], 'vi' => []];
+    private   $time          = 0;
+    private   $cacheDir      = 'cache/template/';
+    private   $jsgBuffer     = [];
+    private   $gPageInfo     = [];
+    private   $gUser         = [];
+    private   $gFavorites    = [];
+    private   $community     = ['co' => [], 'sc' => [], 'vi' => []];
+    private   $announcements = [];
 
-    private   $cacheLoaded  = [];
-    private   $skipCache    = 0x0;
-    private   $memcached    = null;
-    private   $mysql        = ['time' => 0, 'count' => 0];
+    private   $cacheLoaded   = [];
+    private   $skipCache     = 0x0;
+    private   $memcached     = null;
+    private   $mysql         = ['time' => 0, 'count' => 0];
 
-    private   $js           = [];
-    private   $css          = [];
-    private   $headerLogo   = '';
-    private   $fullParams   = '';
+    private   $js            = [];
+    private   $css           = [];
+    private   $headerLogo    = '';
+    private   $fullParams    = '';
 
     private   $lvTemplates  = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'parent' => 'lv-generic', 'data' => [], 'name' => '$LANG.tab_achievements'  ],
@@ -273,9 +275,6 @@ class GenericPage
         $this->initRequestData();
 
         $this->title[] = Cfg::get('NAME');
-
-        if (!isset($this->contribute))
-            $this->contribute = CONTRIBUTE_NONE;
 
         $this->fullParams = $pageCall;
         if ($pageParam)
@@ -439,7 +438,7 @@ class GenericPage
         {
             $this->gPageInfo = array(
                 'articleUrl' => $this->fullParams,          // is actually be the url-param
-                'editAccess' => isset($this->editAccess) ? $this->editAccess : (U_GROUP_ADMIN | U_GROUP_EDITOR | U_GROUP_BUREAU)
+                'editAccess' => $this->editAccess ?? (U_GROUP_ADMIN | U_GROUP_EDITOR | U_GROUP_BUREAU)
             );
         }
 
@@ -453,7 +452,7 @@ class GenericPage
             $this->postCache();
 
         // determine contribute tabs
-        if (isset($this->subject) && !isset($this->contribute))
+        if (isset($this->subject))
         {
             $x = get_class($this->subject);
             $this->contribute = $x::$contribute;
@@ -469,7 +468,7 @@ class GenericPage
             $this->community['vi'] = CommunityContent::getVideos($this->type, $this->typeId);
 
         // as comments are not cached, those globals cant be either
-        if ($this->contribute)
+        if ($this->contribute != CONTRIBUTE_NONE)
         {
             $this->extendGlobalData(CommunityContent::getJSGlobals());
             $this->applyGlobals();
@@ -716,12 +715,12 @@ class GenericPage
     // unknown page
     public function error() : void
     {
-        $this->path       = null;
-        $this->tabId      = null;
+        // $this->path       = null;
+        // $this->tabId      = null;
         $this->articleUrl = 'page-not-found';
         $this->title[]    = Lang::main('errPageTitle');
         $this->name       = Lang::main('errPageTitle');
-        $this->lvTabs     = [];
+        // $this->lvTabs     = [];
 
         $this->addArticle();
 

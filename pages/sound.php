@@ -10,8 +10,6 @@ class SoundPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $articleUrl    = '';
-
     protected $type          = Type::SOUND;
     protected $typeId        = 0;
     protected $tpl           = 'sound';

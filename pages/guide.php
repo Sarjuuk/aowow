@@ -30,7 +30,6 @@ class GuidePage extends GenericPage
     protected /* string */ $author        = '';
     protected /* array */  $gPageInfo     = [];
     protected /* int */    $show          = self::SHOW_GUIDE;
-    protected /* int */    $articleUrl    = '';
 
     private   /* array */  $validCats     = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     private   /* string */ $extra         = '';
@@ -59,8 +58,6 @@ class GuidePage extends GenericPage
 
     public function __construct($pageCall, $pageParam)
     {
-        $this->contribute = CONTRIBUTE_CO;
-
         $guide = explode( "&", $pageParam, 2);
 
         parent::__construct($pageCall, $pageParam);
