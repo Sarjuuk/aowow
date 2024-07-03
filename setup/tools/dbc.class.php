@@ -324,7 +324,7 @@ class DBC
         else
             $query = substr($query, 0, -2);
 
-        $query .=  ') COLLATE=\'utf8mb4_unicode_ci\' ENGINE=MyISAM';
+        $query .=  ') COLLATE=\'utf8mb4_unicode_ci\' ENGINE=InnoDB';
 
         DB::Aowow()->query('DROP TABLE IF EXISTS ?#', $this->tableName);
         DB::Aowow()->query($query);
