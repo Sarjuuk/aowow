@@ -1005,13 +1005,13 @@ class SpellPage extends GenericPage
                         $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questStart, $questStartState]);
 
                     if ($questEnd && $questEnd != $questStart)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::QUESTSTATE, $questEnd, $questEndState]);
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::QUESTSTATE, $questEnd, $questEndState]);
 
                     if ($raceMask)
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::CHR_RACE, $raceMask]);
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::CHR_RACE, $raceMask]);
 
                     if ($gender != 2)                       // 2: both
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [-Conditions::GENDER, $gender + 1]);
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $lv['id'], [Conditions::GENDER, $gender]);
 
                     // remove temp storage from result
                     unset($resultLv[$idx]['__condition']);

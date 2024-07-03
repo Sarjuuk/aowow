@@ -1768,7 +1768,7 @@ abstract class Type
         self::CHR_CLASS   => ['CharClassList',   'class',       'g_classes',           0x1],
         self::CHR_RACE    => ['CharRaceList',    'race',        'g_races',             0x1],
         self::SKILL       => ['SkillList',       'skill',       'g_skills',            0x1],
-        self::STATISTIC   => ['AchievementList', 'achievement', 'g_achievements',      0x1], // alias for achievements; exists only for Markup
+        self::STATISTIC   => ['AchievementList', 'achievement', 'g_achievements',      0x0], // alias for achievements; exists only for Markup
         self::CURRENCY    => ['CurrencyList',    'currency',    'g_gatheredcurrencies',0x1],
         self::SOUND       => ['SoundList',       'sound',       'g_sounds',            0x1],
         self::ICON        => ['IconList',        'icon',        'g_icons',             0x1],

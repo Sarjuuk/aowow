@@ -193,7 +193,7 @@ class UtilityPage extends GenericPage
                     $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
 
-                foreach (Type::getClassesFor(Type::FLAG_NONE, 'contribute', CONTRIBUTE_SS) as $type => $classStr)
+                foreach (Type::getClassesFor(Type::FLAG_RANDOM_SEARCHABLE, 'contribute', CONTRIBUTE_SS) as $type => $classStr)
                 {
                     $typeObj = new $classStr($cnd);
                     if (!$typeObj->error)

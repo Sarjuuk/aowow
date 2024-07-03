@@ -95,7 +95,7 @@ class DB
     public static function profiler($self, $query, $trace)
     {
         if ($trace)                                         // actual query
-            self::$logs[] = [substr(str_replace("\n", ' ', $query), 0, 200)];
+            self::$logs[] = [str_replace("\n", ' ', $query)];
         else                                                // the statistics
         {
             end(self::$logs);
