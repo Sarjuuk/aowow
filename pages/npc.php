@@ -108,6 +108,10 @@ class NpcPage extends GenericPage
                 }
             }
         }
+        else if ($d = DB::Aowow()->selectCell('SELECT MAX(`difficulty`) FROM ?_loot_link WHERE `npcId` = ?d', $this->typeId))
+            $mapType = $d > 2 ? 2 : 1;
+        else if ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = ?d, 1, 2) FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId))
+            $mapType = $mt;
         else if ($_altIds)                                  // not spawned, but has difficultyDummies
         {
             if (count($_altIds) > 1)                        // 3 or more version -> definitly raid (10/25 + hc)
@@ -115,9 +119,6 @@ class NpcPage extends GenericPage
             else                                            // 2 versions; may be Heroic (use this), but may also be 10/25-raid
                 $mapType = 1;
         }
-
-
-
 
 
         /***********/
@@ -676,9 +677,9 @@ class NpcPage extends GenericPage
     */
 
         $sourceFor = array(
-             [LOOT_CREATURE,   $this->subject->getField('lootId'),           '$LANG.tab_drops',         'drops',         []                          ],
-             [LOOT_PICKPOCKET, $this->subject->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel']],
-             [LOOT_SKINNING,   $this->subject->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['side', 'slot', 'reqlevel']]
+            0 => [LOOT_CREATURE,   $this->subject->getField('lootId'),           '$LANG.tab_drops',         'drops',         [                          ], ''],
+            8 => [LOOT_PICKPOCKET, $this->subject->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
+            9 => [LOOT_SKINNING,   $this->subject->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
         );
 
         // temp: manually add loot for difficulty-versions
@@ -697,18 +698,19 @@ class NpcPage extends GenericPage
             foreach ($_altNPCs->iterate() as $id => $__)
             {
                 $mode = ($_altIds[$id] + 1) * ($mapType == 1 ? -1 : 1);
-                if ($lootGO = DB::Aowow()->selectRow('SELECT o.id, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE l.npcId = ?d', $id))
-                    array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lootGO['lootId'], $langref[$mode], 'drops-object-'.abs($mode), [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lootGO['id'].', "'.Util::localizedString($lootGO, 'name').'")']]);
+                foreach (DB::Aowow()->select('SELECT o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8`, l.`difficulty` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d', $id) as $l)
+                    $sourceFor[(($l['difficulty'] - 1) * 2) + 1] = [LOOT_GAMEOBJECT, $l['lootId'], $langref[$l['difficulty'] * ($mapType == 1 ? -1 : 1)], 'drops-object-'.$l['difficulty'], [], '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$l['id'].', "'.Util::localizedString($l, 'name').'")'];
                 if ($lootId = $_altNPCs->getField('lootId'))
-                    array_splice($sourceFor, 1, 0, [[LOOT_CREATURE,   $lootId,           $langref[$mode], 'drops-'.abs($mode), []]]);
+                    $sourceFor[($mode - 1) * 2] =                  [LOOT_CREATURE,   $lootId,      $langref[$mode],                                       'drops-'.abs($mode),              []];
             }
         }
 
-        if ($lootGOs = DB::Aowow()->select('SELECT o.id, IF(npcId < 0, 1, 0) AS modeDummy, o.lootId, o.name_loc0, o.name_loc2, o.name_loc3, o.name_loc6, o.name_loc8 FROM ?_loot_link l JOIN ?_objects o ON o.id = l.objectId WHERE ABS(l.npcId) = ?d', $this->typeId))
-            foreach ($lootGOs as $idx => $lgo)
-                array_splice($sourceFor, 1, 0, [[LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[($mapType == 1 ? -1 : 1) + ($lgo['modeDummy'] ? 1 : 0)] : '$LANG.tab_drops', 'drops-object-'.$idx, [], 'note' => '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")']]);
+        foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d', $this->typeId) as $difficulty => $lgo)
+            $sourceFor[(($difficulty - 1) * 2) + 1] = [LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[$difficulty * ($mapType == 1 ? -1 : 1)] : '$LANG.tab_drops', 'drops-object-'.$difficulty, [], '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")'];
 
-        foreach ($sourceFor as [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols])
+        ksort($sourceFor);
+
+        foreach ($sourceFor as $i => [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols, $note])
         {
             $creatureLoot = new Loot();
             if ($creatureLoot->getByContainer($lootTpl, $lootId))
@@ -726,8 +728,8 @@ class NpcPage extends GenericPage
                     'sort'      => ['-percent', 'name']
                 );
 
-                if (!empty($sf['note']))
-                    $tabData['note'] = $sf['note'];
+                if ($note)
+                    $tabData['note'] = $note;
                 else if ($lootTpl == LOOT_SKINNING)
                     $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel')), Lang::FMT_HTML).'</b>';
 

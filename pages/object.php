@@ -236,10 +236,10 @@ class ObjectPage extends GenericPage
             if ($ll['encounterId'])
                 $relBoss = [$ll['npcId'], Lang::profiler('encounterNames', $ll['encounterId'])];
             // difficulty dummy
-            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE difficultyEntry1 = ?d OR difficultyEntry2 = ?d OR difficultyEntry3 = ?d', abs($ll['npcId']), abs($ll['npcId']), abs($ll['npcId'])))
+            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $ll['npcId'], $ll['npcId'], $ll['npcId']))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
             // base creature
-            else if ($c = DB::Aowow()->selectRow('SELECT id, name_loc0, name_loc2, name_loc3, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', abs($ll['npcId'])))
+            else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `id` = ?d', $ll['npcId']))
                 $relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
