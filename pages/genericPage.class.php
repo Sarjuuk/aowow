@@ -113,7 +113,7 @@ trait TrProfiler
         // cat[0] is always region
         // cat[1] is realm or bGroup (must be realm if cat[2] is set)
         // cat[2] is arena-team, guild or player
-        $cat = explode('.', $pageParam, 3);
+        $cat = explode('.', mb_strtolower($pageParam), 3);
 
         $cat = array_map('urldecode', $cat);
 

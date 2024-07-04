@@ -237,9 +237,9 @@ if (!CLI)
     Lang::load(User::$localeId);
 
     // parse page-parameters .. sanitize before use!
-    $str = explode('&', mb_strtolower($_SERVER['QUERY_STRING'] ?? ''), 2)[0];
+    $str = explode('&', $_SERVER['QUERY_STRING'] ?? '', 2)[0];
     $_   = explode('=', $str, 2);
-    $pageCall  = $_[0];
+    $pageCall  = mb_strtolower($_[0]);
     $pageParam = $_[1] ?? '';
 }
 else if (DB::isConnected(DB_AOWOW))
