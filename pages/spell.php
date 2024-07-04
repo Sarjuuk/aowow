@@ -1300,11 +1300,11 @@ class SpellPage extends GenericPage
         if (in_array($_iId, $alreadyUsed))
             return false;
 
-        $item = DB::Aowow()->selectRow('
-            SELECT  name_loc0, name_loc2, name_loc3, name_loc6, name_loc8, i.id, ic.name AS iconString, quality
-            FROM    ?_items i
-            LEFT JOIN ?_icons ic ON ic.id = i.iconId
-            WHERE   i.id = ?d',
+        $item = DB::Aowow()->selectRow(
+           'SELECT    `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, i.`id`, ic.`name` AS `iconString`, `quality`
+            FROM      ?_items i
+            LEFT JOIN ?_icons ic ON ic.`id` = i.`iconId`
+            WHERE     i.`id` = ?d',
             $_iId
         );
 
@@ -1341,18 +1341,18 @@ class SpellPage extends GenericPage
     {
         $_level++;
         // assume that tradeSpells only use the first index  to create items, so this runs somewhat efficiently >.<
-        $spells = DB::Aowow()->select('
-            SELECT  reagent1,      reagent2,      reagent3,      reagent4,      reagent5,      reagent6,      reagent7,      reagent8,
-                    reagentCount1, reagentCount2, reagentCount3, reagentCount4, reagentCount5, reagentCount6, reagentCount7, reagentCount8,
-                    name_loc0,     name_loc2,     name_loc3,     name_loc6,     name_loc8,
-                    iconIdBak,
-                    s.id AS ARRAY_KEY, ic.name AS iconString
-            FROM    ?_spell s
-            JOIN    ?_icons ic ON s.iconId = ic.id
-            WHERE   (effect1CreateItemId = ?d AND effect1Id = 24)',// OR
-                    // (effect2CreateItemId = ?d AND effect2Id = 24) OR
-                    // (effect3CreateItemId = ?d AND effect3Id = 24)',
-            $_iId //, $_iId, $_iId
+        $spells = DB::Aowow()->select(
+           'SELECT `reagent1`,      `reagent2`,      `reagent3`,      `reagent4`,      `reagent5`,      `reagent6`,      `reagent7`,      `reagent8`,
+                   `reagentCount1`, `reagentCount2`, `reagentCount3`, `reagentCount4`, `reagentCount5`, `reagentCount6`, `reagentCount7`, `reagentCount8`,
+                   `name_loc0`,     `name_loc2`,     `name_loc3`,     `name_loc4`,     `name_loc6`,     `name_loc8`,
+                   `iconIdBak`,
+                   s.`id` AS ARRAY_KEY, ic.`name` AS `iconString`
+            FROM   ?_spell s
+            JOIN   ?_icons ic ON s.`iconId` = ic.`id`
+            WHERE  (`effect1CreateItemId` = ?d AND `effect1Id` = ?d)',// OR
+                // (`effect2CreateItemId` = ?d AND `effect2Id` = ?d) OR
+                // (`effect3CreateItemId` = ?d AND `effect3Id` = ?d)',
+            $_iId, SPELL_EFFECT_CREATE_ITEM //, $_iId, SPELL_EFFECT_CREATE_ITEM, $_iId, SPELL_EFFECT_CREATE_ITEM
         );
 
         if (!$spells)
