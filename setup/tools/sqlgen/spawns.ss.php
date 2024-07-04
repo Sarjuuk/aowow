@@ -288,7 +288,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
     }
 
-
     private function transformPoint(array $point, int $type, ?string &$notice = '') : array
     {
         // npc/object is on a transport -> apply offsets to path of transport
@@ -311,19 +310,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         if ($points = Game::worldPosToZonePos($point['map'], $point['posX'], $point['posY'], $area, $floor))
         {
-            if ($area)                                      // if areaId is set, area was determined by TC .. we're fine .. mostly
-                return ['areaId' => $area, 'posX' => $points[0]['posX'], 'posY' => $points[0]['posY'], 'floor' => $points[0]['floor']];
+            // if areaId is set and we match it .. we're fine .. mostly
+            if (count($points) == 1 && $area == $points[0]['areaId'])
+                return ['areaId' => $points[0]['areaId'], 'posX' => $points[0]['posX'], 'posY' => $points[0]['posY'], 'floor' => $points[0]['floor']];
 
             $point = Game::checkCoords($points);            // try to determine best found point by alphamap
             return ['areaId' => $point['areaId'], 'posX' => $point['posX'], 'posY' => $point['posY'], 'floor' => $point['floor']];
         }
 
-        // cannot be placed on a map, try to reuse TC assigned areaId
-        if ($area)
-        {
-            $selfOrParent = DB::Aowow()->selectCell('SELECT IF(`parentArea`, `parentArea`, `id`) FROM ?_zones WHERE `id` = ?d', $area);
+        // cannot be placed on a map, try to reuse TC assigned areaId (note: area has been invalid in the past)
+        if ($area && ($selfOrParent = DB::Aowow()->selectCell('SELECT IF(`parentArea`, `parentArea`, `id`) FROM ?_zones WHERE `id` = ?d', $area)))
             return ['areaId' => $selfOrParent, 'posX' => 0, 'posY' => 0, 'floor' => 0];
-        }
 
         // we know the instanced map; try to assign a zone this way
         if (!in_array($point['map'], [0, 1, 530, 571]))
