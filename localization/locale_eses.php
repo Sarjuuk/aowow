@@ -1018,6 +1018,7 @@ $lang = array(
         'resistances'   => "Resitencias",
         'foundIn'       => "Este PNJ se puede encontrar en",
         'tameable'      => "Domesticable (%s)",
+        'spirit'        => "[tooltip name=spirit]Only visible to dead players[/tooltip][span class=tip tooltip=spirit]Spirit[/span]",
         'waypoint'      => "punto de recorrido",
         'wait'          => "Tiempo de espera",
         'respawnIn'     => "Reingreso en: %s",

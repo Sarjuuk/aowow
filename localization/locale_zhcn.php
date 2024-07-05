@@ -1018,6 +1018,7 @@ $lang = array(
         'resistances'   => "韧性",
         'foundIn'       => "这个NPC能在以下地区找到：",
         'tameable'      => "可驯服的(%s)",
+        'spirit'        => "[tooltip name=spirit][Only visible to dead players][/tooltip][span class=tip tooltip=spirit][Spirit][/span]",
         'waypoint'      => "路径点",
         'wait'          => "等待",
         'respawnIn'     => "重生：%s",

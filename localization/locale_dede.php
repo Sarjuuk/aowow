@@ -1018,6 +1018,7 @@ $lang = array(
         'resistances'   => "Widerstände",
         'foundIn'       => "Dieser NPC befindet sich in",
         'tameable'      => "Zähmbar (%s)",
+        'spirit'        => "[tooltip name=spirit]Nur für tote Spieler sichtbar[/tooltip][span class=tip tooltip=spirit]Geist[/span]",
         'waypoint'      => "Wegpunkt",
         'wait'          => "Wartezeit",
         'respawnIn'     => "Respawn in: %s",

@@ -1018,6 +1018,7 @@ $lang = array(
         'resistances'   => "Сопротивление",
         'foundIn'       => "Этот объект может быть найден в следующих зонах:",
         'tameable'      => "Можно приручить (%s)",
+        'spirit'        => "[tooltip name=spirit][Only visible to dead players][/tooltip][span class=tip tooltip=spirit][Spirit][/span]",
         'waypoint'      => "Путевой точки",
         'wait'          => "Период ожидания",
         'respawnIn'     => "Reentry in: %s",

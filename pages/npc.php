@@ -174,7 +174,7 @@ class NpcPage extends GenericPage
         // Tameable
         if ($_typeFlags & 0x1)
             if ($_ = $this->subject->getField('family'))
-                $infobox[] = sprintf(Lang::npc('tameable'), '[url=pet='.$_.']'.Lang::game('fa', $_).'[/url]');
+                $infobox[] = Lang::npc('tameable', ['[url=pet='.$_.']'.Lang::game('fa', $_).'[/url]']);
 
         // Wealth
         if ($_ = intVal(($this->subject->getField('minGold') + $this->subject->getField('maxGold')) / 2))
@@ -183,6 +183,10 @@ class NpcPage extends GenericPage
         // is Vehicle
         if ($this->subject->getField('vehicleId'))
             $infobox[] = Lang::npc('vehicle');
+
+        // is visible as ghost
+        if ($this->subject->getField('npcflag') & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
+            $infobox[] = Lang::npc('spirit');
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
