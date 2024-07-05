@@ -1019,7 +1019,7 @@ $lang = array(
         'resistances'   => "Resistances",
         'foundIn'       => "This NPC can be found in",
         'tameable'      => "Tameable (%s)",
-        'spirit'        => "[tooltip name=spirit][Only visible to dead players][/tooltip][span class=tip tooltip=spirit][Spirit][/span]",
+        'spirit'        => "[tooltip name=spirit]Only visible to dead players[/tooltip][span class=tip tooltip=spirit]Spirit[/span]",
         'waypoint'      => "Waypoint",
         'wait'          => "Wait",
         'respawnIn'     => "Respawn in: %s",

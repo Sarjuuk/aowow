@@ -705,7 +705,7 @@ class NpcPage extends GenericPage
                 foreach (DB::Aowow()->select('SELECT o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8`, l.`difficulty` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d', $id) as $l)
                     $sourceFor[(($l['difficulty'] - 1) * 2) + 1] = [LOOT_GAMEOBJECT, $l['lootId'], $langref[$l['difficulty'] * ($mapType == 1 ? -1 : 1)], 'drops-object-'.$l['difficulty'], [], '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$l['id'].', "'.Util::localizedString($l, 'name').'")'];
                 if ($lootId = $_altNPCs->getField('lootId'))
-                    $sourceFor[($mode - 1) * 2] =                  [LOOT_CREATURE,   $lootId,      $langref[$mode],                                       'drops-'.abs($mode),              []];
+                    $sourceFor[($mode - 1) * 2] =                  [LOOT_CREATURE,   $lootId,      $langref[$mode],                                       'drops-'.abs($mode),              [], ''];
             }
         }
 
