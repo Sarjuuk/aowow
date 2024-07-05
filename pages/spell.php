@@ -1952,12 +1952,13 @@ class SpellPage extends GenericPage
                         $bar = $effMV;
                         switch ($effAura)
                         {
-                            case SPELL_AURA_MOD_STEALTH_DETECT:                        // Mod Stealth Detection
+                            case SPELL_AURA_MOD_STEALTH_DETECT:
                                 if ($_ = Lang::spell('stealthType', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
 
                                 break;
-                            case SPELL_AURA_MOD_INVISIBILITY_DETECT:                        // Mod Invisibility Detection
+                            case SPELL_AURA_MOD_INVISIBILITY:
+                            case SPELL_AURA_MOD_INVISIBILITY_DETECT:
                                 if ($_ = Lang::spell('invisibilityType', $effMV))
                                     $bar = User::isInGroup(U_GROUP_EMPLOYEE) ? sprintf(Util::$dfnString, 'MiscValue'.Lang::main('colon').$effMV, $_) : $_;
 

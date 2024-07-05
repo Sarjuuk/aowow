@@ -289,6 +289,14 @@ class SpellList extends BaseType
             if (!($this->getField('attributes0') & SPELL_ATTR0_PASSIVE))
                 continue;
 
+            // Shaman - Spirit Weapons (16268) (parry is normaly stored in g_statistics)
+            // i should recurse into SPELL_EFFECT_LEARN_SPELL and apply SPELL_EFFECT_PARRY from there
+            if ($id == 16268)
+            {
+                $data[$id]['parrypct'] = [5, 'add'];
+                continue;
+            }
+
             for ($i = 1; $i < 4; $i++)
             {
                 $pts      = $this->calculateAmountForCurrent($i)[1];
@@ -303,15 +311,6 @@ class SpellList extends BaseType
                     mods formated like ['<statName>' => [<points>, 'percentOf', '<statName>']] are applied as multiplier and not
                     as a flat value (that is equal to the percentage, like they should be). So the stats-table won't show the actual deficit
                 */
-
-
-                // Shaman - Spirit Weapons (16268) (parry is normaly stored in g_statistics)
-                // i should recurse into SPELL_EFFECT_LEARN_SPELL and apply SPELL_EFFECT_PARRY from there
-                if ($id = 16268)
-                {
-                    $data[$id]['parrypct'] = [5, 'add'];
-                    continue;
-                }
 
                 switch ($au)
                 {
@@ -419,7 +418,7 @@ class SpellList extends BaseType
                     case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
                         $data[$id]['splheal'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
                         break;
-                    case SPELL_AURA_MOD_ATTACK_POWER_PCT:   // ingmae only melee..?
+                    case SPELL_AURA_MOD_ATTACK_POWER_PCT:   // ingame only melee..?
                         $data[$id]['mleatkpwr'] = [$pts / 100, 'percentOf', 'mleatkpwr'];
                         break;
                     case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:
