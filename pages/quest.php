@@ -884,16 +884,26 @@ class QuestPage extends GenericPage
         // ..process zone data
         if ($mObjectives)
         {
+            // sort zones by amount of mapper points most -> least
+            $zoneOrder = [];
+            foreach ($mObjectives as $zoneId => $data)
+                $zoneOrder[$zoneId] = array_reduce($data['levels'], function($carry, $spawns) { foreach ($spawns as $s) { $carry += count($s['coords']); } return $carry; });
+
+            arsort($zoneOrder);
+            $zoneOrder = array_flip(array_keys($zoneOrder));
+
             $areas = new ZoneList(array(['id', array_keys($mObjectives)]));
             if (!$areas->error)
             {
-                $someIDX = 0;                               // todo (low): UNK value ... map priority, floor, mapId..? values seen: 0 - 3; doesn't seem to affect anything
                 foreach ($areas->iterate() as $id => $__)
                 {
+                    // [zoneId, selectionPriority] - determines which map link is preselected. (highest index)
+                    $mZones[$zoneOrder[$id]]  = [$id, count($zoneOrder) - $zoneOrder[$id]];
                     $mObjectives[$id]['zone'] = $areas->getField('name', true);
-                    $mZones[] = [$id, ++$someIDX];
                 }
             }
+
+            ksort($mZones);
         }
 
         // has start & end?
