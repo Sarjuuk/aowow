@@ -34,20 +34,20 @@ CLISetup::registerSetup("build", new class extends SetupScript
     );
 
     private $genSteps = array(
-      //       srcPath,                                             realPath, localized, [pattern, isIcon, tileSize, localized],         [[dest, ext, srcSize, destSize, borderOffset]]
-         0 => ['Icons/',                  null, false, ['/.*\.(blp|png)$',                           true,   0], self::ICON_DIRS,                                                 ],
-         1 => ['Spellbook/',              null, false, ['/UI-Glyph-Rune-?\d+.(blp|png)$',            false,  0], [['static/images/wow/Interface/Spellbook/',     'png', 0,  0, 0]]],
-         2 => ['PaperDoll/',              null, false, ['/UI-(Backpack|PaperDoll)-.*\.(blp|png)$',   true,   0], self::ICON_DIRS,                                                 ],
-         3 => ['GLUES/CHARACTERCREATE/',  null, false, ['/UI-CharacterCreate-Races.(blp|png)',       true,  64], self::ICON_DIRS,                                                 ],
-         4 => ['GLUES/CHARACTERCREATE/',  null, false, ['/UI-CharacterCreate-CLASSES.(blp|png)',     true,  64], self::ICON_DIRS,                                                 ],
-         5 => ['GLUES/CHARACTERCREATE/',  null, false, ['/UI-CharacterCreate-Factions.(blp|png)',    true,  64], self::ICON_DIRS,                                                 ],
-      // 6 => ['Minimap/'               , null, false, ['/OBJECTICONS.(BLP|png)',                    true,  32], [['static/images/wow/icons/tiny/',              'gif', 0, 16, 2]]],
-         7 => ['FlavorImages/',           null, false, ['/.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/FlavorImages/',  'png', 0,  0, 0]]],
-         8 => ['Pictures/',               null, false, ['/.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/Pictures/',      'png', 0,  0, 0]]],
-         9 => ['PvPRankBadges/',          null, false, ['/.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/PvPRankBadges/', 'png', 0,  0, 0]]],
-        10 => ['Calendar/Holidays/',      null, false, ['/.*(start|[ayhs])\.(blp|png)$',             true,   0], self::ICON_DIRS,                                                 ],
-        11 => ['GLUES/LOADINGSCREENS/',   null, false, ['/lo.*\.(blp|png)$',                         false,  0], [['cache/loadingscreens/',                      'png', 0,  0, 0]]],
-        12 => ['PVPFrame/',               null, false, ['/PVP-(ArenaPoints|Currency).*\.(blp|png)$', true,   0], self::ICON_DIRS,                                                 ]
+      //       srcPath,           realPath, localized, [pattern, isIcon, tileSize],                             [[dest, ext, srcSize, destSize, borderOffset]]
+         0 => ['Icons/',                  null, false, ['.*\.(blp|png)$',                           true,   0], self::ICON_DIRS,                                                 ],
+         1 => ['Spellbook/',              null, false, ['UI-Glyph-Rune-?\d+.(blp|png)$',            false,  0], [['static/images/wow/Interface/Spellbook/',     'png', 0,  0, 0]]],
+         2 => ['PaperDoll/',              null, false, ['UI-(Backpack|PaperDoll)-.*\.(blp|png)$',   true,   0], self::ICON_DIRS,                                                 ],
+         3 => ['GLUES/CHARACTERCREATE/',  null, false, ['UI-CharacterCreate-Races\.(blp|png)',      true,  64], self::ICON_DIRS,                                                 ],
+         4 => ['GLUES/CHARACTERCREATE/',  null, false, ['UI-CharacterCreate-CLASSES\.(blp|png)',    true,  64], self::ICON_DIRS,                                                 ],
+         5 => ['GLUES/CHARACTERCREATE/',  null, false, ['UI-CharacterCreate-Factions\.(blp|png)',   true,  64], self::ICON_DIRS,                                                 ],
+      // 6 => ['Minimap/'               , null, false, ['OBJECTICONS.(BLP|png)',                    true,  32], [['static/images/wow/icons/tiny/',              'gif', 0, 16, 2]]],
+         7 => ['FlavorImages/',           null, false, ['.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/FlavorImages/',  'png', 0,  0, 0]]],
+         8 => ['Pictures/',               null, false, ['.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/Pictures/',      'png', 0,  0, 0]]],
+         9 => ['PvPRankBadges/',          null, false, ['.*\.(blp|png)$',                           false,  0], [['static/images/wow/Interface/PvPRankBadges/', 'png', 0,  0, 0]]],
+        10 => ['Calendar/Holidays/',      null, false, ['.*(start|[ayhs])\.(blp|png)$',             true,   0], self::ICON_DIRS,                                                 ],
+        11 => ['GLUES/LOADINGSCREENS/',   null, false, ['lo.*\.(blp|png)$',                         false,  0], [['cache/loadingscreens/',                      'png', 0,  0, 0]]],
+        12 => ['PVPFrame/',               null, false, ['PVP-(ArenaPoints|Currency).*\.(blp|png)$', true,   0], self::ICON_DIRS,                                                 ]
     );
 
     // textures are composed of 64x64 icons
@@ -148,10 +148,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
         if (!$groups)                                       // by default do not generate loadingscreens
             $groups = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 12];
 
-        // removed unused generators
+        // removed unused generators and reset realPaths (in case of retry from failed attempt)
         foreach ($this->genSteps as $idx => $_)
+        {
             if (!in_array($idx, $groups))
                 unset($this->genSteps[$idx]);
+            else
+                $this->genSteps[$idx][self::$GEN_IDX_SRC_REAL] = null;
+        }
 
         if (!$this->checkSourceDirs())
         {
@@ -164,9 +168,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $allPaths = [];
         foreach ($this->genSteps as $i => [, $path, , [$pattern, $isIcon, $tileSize], $outInfo])
         {
-            $search = $path.$pattern;
+            $search = CLI::nicePath('', $path);
             if ($pattern)
-                $search = '/'.str_replace('/', '\\/', $search).'/i';
+                $search = '/'.strtr($search, ['\\' => '\\\\', '/' => '\\/']).$pattern.'/i';
 
             $files    = CLISetup::filesInPath($search, !!$pattern);
             $allPaths = array_merge($allPaths, array_map(function ($x) { return substr($x, 0, -4); }, $files));
@@ -186,7 +190,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 ini_set('max_execution_time', $this->maxExecTime);
 
                 $src   = null;
-                $na    = explode('/', $f);
+                $na    = explode(DIRECTORY_SEPARATOR, $f);
                 $img   = explode('.', array_pop($na));
                 array_pop($img);                            // there are a hand full of images with multiple file endings or random dots in the name
                 $img   = implode('.', $img);
@@ -214,7 +218,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             foreach ($row as $x => $name)
                             {
                                 $j++;
-                                $outFile = $dest.($isIcon ? strtolower($name) : $name).'.'.$ext;
+                                $outFile = CLI::nicePath(($isIcon ? strtolower($name) : $name).'.'.$ext, $dest);
 
                                 $this->status = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
 
@@ -287,7 +291,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     {
                         $j++;
                         $this->status = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
-                        $outFile = $dest.($isIcon ? strtolower($img) : $img).'.'.$ext;
+                        $outFile = CLI::nicePath(($isIcon ? strtolower($img) : $img).'.'.$ext, $dest);
 
                         if (!CLISetup::getOpt('force') && file_exists($outFile))
                         {
@@ -341,7 +345,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             if ($itemIcons = DB::Aowow()->selectCol('SELECT `inventoryIcon1` FROM dbc_itemdisplayinfo WHERE `inventoryIcon1` <> ""'))
                 foreach ($itemIcons as $icon)
-                    $dbcEntries[] = strtolower($this->genSteps[0][self::$GEN_IDX_SRC_REAL].'/'.$icon);
+                    $dbcEntries[] = strtolower($this->genSteps[0][self::$GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon);
         }
 
         if (in_array(1, $gens))                             // generates glyphs
@@ -353,7 +357,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         if (in_array(10, $gens))                            // generates holiday icons
             if ($eventIcons = DB::Aowow()->selectCol('SELECT `textureString` FROM dbc_holidays WHERE `textureString` <> ""'))
                 foreach ($eventIcons as $icon)
-                    $dbcEntries[] = strtolower($this->genSteps[10][self::$GEN_IDX_SRC_REAL].'/'.$icon.'start');
+                    $dbcEntries[] = strtolower($this->genSteps[10][self::$GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon.'start');
 
         // case-insensitive array_unique *vomits silently into a corner*
         $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));

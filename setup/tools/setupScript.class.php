@@ -171,7 +171,7 @@ trait TrImageProcessor
             if ($p = CLISetup::filesInPathLocalized($path, $this->success, $localized))
             {
                 $foundCache[$subDir] = $p;
-                $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = $p;  // pvp v7.3+ - make $realPaths areferene
+                $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = $p;  // php v8.2+ - make GEN_IDX_SRC_REAL a const
             }
             else
                 $this->success = false;
@@ -192,10 +192,9 @@ trait TrImageProcessor
                 continue;
 
             $foundCache[$subDir] = true;
-
             if (!$realPaths)
             {
-                CLI::write(CLI::red('MISSING').' - '.str_pad($subDir, 14).' @ '.sprintf($this->imgPath, '['.implode('/,', $locList).'/]').$subDir);
+                CLI::write(CLI::red('MISSING').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/,', $locList).'/]').$subDir);
                 $this->success = false;
             }
             else if ($localized)
@@ -203,13 +202,13 @@ trait TrImageProcessor
                 $foundLoc = [];
                 foreach (CLISetup::$expectedPaths as $xp => $lId)
                     if (in_array($lId, array_keys(CLISetup::$locales)))
-                        if (isset($realPaths[$lId]) && ($n = stripos($realPaths[$lId], '/'.$xp.'/')))
+                        if (isset($realPaths[$lId]) && ($n = stripos($realPaths[$lId], DIRECTORY_SEPARATOR.$xp.DIRECTORY_SEPARATOR)))
                             $foundLoc[$lId] = substr($realPaths[$lId], $n + 1, 4);
 
                 if ($diff = array_diff_key(CLISetup::$locales, $foundLoc))
                 {
                     $buff = [];
-                    foreach ($diff as $d)
+                    foreach ($diff as $d => $_)
                         $buff[] = CLI::red(Util::$localeStrings[$d]);
                     foreach ($foundLoc as $str)
                         $buff[] = CLI::green($str);
@@ -227,7 +226,7 @@ trait TrImageProcessor
 
         // if not localized directly return result
         foreach ($this->genSteps as $i => [$subDir, $realPaths, $localized, , ])
-            if (!$localized)
+            if (!$localized && $realPaths)
                 $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = reset($realPaths);
 
         return $this->success;
@@ -466,7 +465,7 @@ abstract class SetupScript
                 $dirs[] = $dir;
             else
                 foreach (CLISetup::$locales as $str)
-                    $dirs[] = $dir . $str . '/';
+                    $dirs[] = $dir . $str . DIRECTORY_SEPARATOR;
 
             foreach ($dirs as $d)
             {

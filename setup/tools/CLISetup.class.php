@@ -204,7 +204,7 @@ class CLISetup
 
         // alternative data source (no quotes, use forward slash)
         if (isset(self::$opts['datasrc']))
-            self::$srcDir = CLI::nicePath(self::$opts['datasrc']);
+            self::$srcDir = CLI::nicePath('', self::$opts['datasrc']);
 
         if (!self::setLocales())
             CLI::write('No valid locale specified. Check your config or --locales parameter, if used', CLI::LOG_ERROR);
@@ -475,15 +475,12 @@ class CLISetup
         $setupDirs = glob('setup/*');
         foreach ($setupDirs as $sd)
         {
-            if (mb_substr(self::$srcDir, -1) == '/')
-                self::$srcDir = mb_substr(self::$srcDir, 0, -1);
-
-            if (mb_substr($sd, -1) == '/')
+            if (mb_substr($sd, -1) == DIRECTORY_SEPARATOR)
                 $sd = mb_substr($sd, 0, -1);
 
             if (Util::lower($sd) == Util::lower(self::$srcDir))
             {
-                self::$srcDir = $sd.'/';
+                self::$srcDir = $sd.DIRECTORY_SEPARATOR;
                 break;
             }
         }
@@ -495,7 +492,7 @@ class CLISetup
 
             foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST) as $path)
             {
-                $_ = str_replace('\\', '/', $path->getPathname());
+                $_ = CLI::nicePath($path->getPathname());
                 self::$mpqFiles[strtolower($_)] = $_;
             }
 
@@ -521,7 +518,7 @@ class CLISetup
         $_ = strtolower(CLI::nicePath($file));
 
         // remove trailing slash
-        if (mb_substr($_, -1, 1) == '/')
+        if (mb_substr($_, -1, 1) == DIRECTORY_SEPARATOR)
             $_ = mb_substr($_, 0, -1);
 
         if (isset(self::$mpqFiles[$_]))
@@ -569,7 +566,7 @@ class CLISetup
                 continue;
 
             if ($xp)                                        // if in subDir add trailing slash
-                $xp .= '/';
+                $xp .= DIRECTORY_SEPARATOR;
 
             $path = sprintf($pathPattern, $xp);
             if (self::fileExists($path))
@@ -599,7 +596,7 @@ class CLISetup
                 continue;
 
             if ($xp)
-                $xp .= '/';
+                $xp .= DIRECTORY_SEPARATOR;
 
             $gsFile = sprintf(self::GLOBALSTRINGS_LUA, self::$srcDir, $xp);
             if (self::fileExists($gsFile))

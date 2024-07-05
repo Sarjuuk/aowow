@@ -343,8 +343,9 @@ abstract class CLI
 
         $path .= ($path ? DIRECTORY_SEPARATOR : '').trim($fileOrPath);
 
-        // remove quotes (from erronous user input)
-        $path = str_replace(['"', "'"], ['', ''], $path);
+        // remove double quotes (from erronous user input), single quotes are
+        // valid chars for filenames and removing those mutilates several wow icons
+        $path = str_replace('"', '', $path);
 
         if (!$path)                                         // empty strings given. (faulty dbc data?)
             return '';
