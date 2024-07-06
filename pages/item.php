@@ -541,7 +541,7 @@ class ItemPage extends genericPage
                 );
 
                 if ($extraCols)
-                    $tabData['extraCols']  = array_unique($extraCols);
+                    $tabData['extraCols']  = array_values(array_unique($extraCols));
 
                 if ($hiddenCols)
                     $tabData['hiddenCols'] = array_unique($hiddenCols);
@@ -784,6 +784,7 @@ class ItemPage extends genericPage
                 $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
                 $cnd = new Conditions();
+                $cnd->getBySourceEntry($this->typeId, Conditions::SRC_NPC_VENDOR)->prepare();
                 foreach ($sbData as $k => &$row)
                 {
                     $currency = [];
@@ -805,7 +806,7 @@ class ItemPage extends genericPage
                     $row['cost']  = [empty($vendors[$k][0][0]) ? 0 : $vendors[$k][0][0]];
 
                     if ($e = $vendors[$k][0]['event'])
-                        $cnd->addExternalCondition(Conditions::SRC_NONE, $k, [Conditions::ACTIVE_EVENT, $e]);
+                        $cnd->addExternalCondition(Conditions::SRC_NONE, $k.':'.$this->typeId, [Conditions::ACTIVE_EVENT, $e]);
 
                     if ($currency || $tokens)               // fill idx:3 if required
                         $row['cost'][] = $currency;
@@ -823,7 +824,7 @@ class ItemPage extends genericPage
                         $row['stack'] = $x;
                 }
 
-                if ($cnd->toListviewColumn($sbData, $extraCols))
+                if ($cnd->toListviewColumn($sbData, $extraCols, 'id', $this->typeId))
                     $this->extendGlobalData($cnd->getJsGlobals());
 
                 $this->lvTabs[] = [CreatureList::$brickFile, array(
@@ -1006,6 +1007,14 @@ class ItemPage extends genericPage
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
                 $this->lvTabs[] = [SoundList::$brickFile, ['data' => array_values($sounds->getListviewData())]];
             }
+        }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::ITEM, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
         }
 
 

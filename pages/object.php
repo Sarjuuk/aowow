@@ -472,6 +472,14 @@ class ObjectPage extends GenericPage
                 'id'   => 'same-model-as'
             )];
         }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::OBJECT, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 
     protected function generateTooltip()

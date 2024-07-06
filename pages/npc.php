@@ -490,6 +490,11 @@ class NpcPage extends GenericPage
                     }
                 }
 
+                $cnd = new Conditions();
+                $cnd->getBySourceGroup($this->typeId, Conditions::SRC_VEHICLE_SPELL)->prepare();
+                if ($cnd->toListviewColumn($controled, $extraCols, $this->typeId, 'id'))
+                    $this->extendGlobalData($cnd->getJsGlobals());
+
                 if ($normal)
                     $this->lvTabs[] = [SpellList::$brickFile, array(
                         'data' => array_values($normal),
@@ -498,11 +503,17 @@ class NpcPage extends GenericPage
                     )];
 
                 if ($controled)
-                    $this->lvTabs[] = [SpellList::$brickFile, array(
+                {
+                    $lvTab = array(
                         'data' => array_values($controled),
                         'name' => '$LANG.tab_controlledabilities',
                         'id'   => 'controlled-abilities'
-                    )];
+                    );
+                    if ($extraCols)
+                        $lvTab['extraCols'] = $extraCols;
+
+                    $this->lvTabs[] = [SpellList::$brickFile, $lvTab];
+                }
             }
         }
 
@@ -645,10 +656,10 @@ class NpcPage extends GenericPage
                 }
 
                 $cnd = new Conditions();
-                if ($cnd->getBySourceGroup($this->typeId, Conditions::SRC_NPC_VENDOR))
+                if ($cnd->getBySourceGroup($this->typeId, Conditions::SRC_NPC_VENDOR)->prepare())
                 {
                     $this->extendGlobalData($cnd->getJsGlobals());
-                    $cnd->toListviewColumn($lvData, $extraCols);
+                    $cnd->toListviewColumn($lvData, $extraCols, $this->typeId, 'id');
                 }
 
                 $this->lvTabs[] = [ItemList::$brickFile, array(
@@ -877,10 +888,14 @@ class NpcPage extends GenericPage
 
         // tab: conditions
         $cnd = new Conditions();
-        if ($cnd->getBySourceEntry($this->typeId, Conditions::SRC_CREATURE_TEMPLATE_VEHICLE))
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_CREATURE_TEMPLATE_VEHICLE)
+            ->getBySourceGroup($this->typeId, Conditions::SRC_SPELL_CLICK_EVENT)
+            ->getByCondition(Type::NPC, $this->typeId)
+            ->prepare();
+        if ($tab = $cnd->toListviewTab())
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $cnd->toListviewTab();
+            $this->lvTabs[] = $tab;
         }
     }
 

@@ -294,6 +294,14 @@ class FactionPage extends GenericPage
                 'visibleCols' => ['category']
             )];
         }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::FACTION, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 }
 

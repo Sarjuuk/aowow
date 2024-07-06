@@ -336,6 +336,14 @@ class SkillPage extends GenericPage
             if (!$races->error)
                 $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
         }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::SKILL, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 }
 

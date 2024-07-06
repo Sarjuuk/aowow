@@ -230,6 +230,14 @@ class ClassPage extends GenericPage
         $races = new CharRaceList(array(['classMask', $_mask, '&']));
         if (!$races->error)
             $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::CHR_CLASS, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 }
 

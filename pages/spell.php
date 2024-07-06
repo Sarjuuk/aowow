@@ -1084,7 +1084,7 @@ class SpellPage extends GenericPage
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
 
                     $cnd   = new Conditions();
-                    $skill = $this->subject->getField('skill');
+                    $skill = $this->subject->getField('skillLines');
 
                     foreach ($trainers as $tId => $train)
                     {
@@ -1240,18 +1240,13 @@ class SpellPage extends GenericPage
 
         // tab: conditions
         $cnd = new Conditions();
-        if ($cnd->getBySourceEntry($this->typeId, Conditions::SRC_SPELL_LOOT_TEMPLATE, Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC))
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC)
+            ->getByCondition(Type::SPELL, $this->typeId)
+            ->prepare();
+        if ($tab = $cnd->toListviewTab())
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $cnd->toListviewTab();
-        }
-
-        // tab: condition for
-        $cnd = new Conditions();
-        if ($cnd->getByCondition(Type::SPELL, $this->typeId))
-        {
-            $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+            $this->lvTabs[] = $tab;
         }
     }
 

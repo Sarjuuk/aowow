@@ -246,8 +246,7 @@ class Loot
                 continue;
             }
 
-            $cndKey = $lootId . ':' . (-1 * ($set['reference'] ?? -$set['content']));
-            $loot[$cndKey] = $set;
+            $loot[] = $set;
         }
 
         foreach (array_keys($nGroupEquals) as $k)
@@ -264,10 +263,10 @@ class Loot
             $groupChances[$k] = (100 - $sum) / ($nGroupEquals[$k] ?: 1);
         }
 
-        if ($cnd->getBySourceGroup($lootId, Conditions::lootTableToConditionSource($tableName)))
+        if ($cnd->getBySourceGroup($lootId, Conditions::lootTableToConditionSource($tableName))->prepare())
         {
             self::storeJSGlobals($cnd->getJsGlobals());
-            $cnd->toListviewColumn($loot, $this->extraCols);
+            $cnd->toListviewColumn($loot, $this->extraCols, $lootId, 'content');
         }
 
         return [$loot, array_unique($rawItems)];

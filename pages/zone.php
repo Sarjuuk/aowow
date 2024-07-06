@@ -784,6 +784,14 @@ class ZonePage extends GenericPage
                     $this->zoneMusic['intro'] = $_;
             }
         }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::ZONE, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 
     private function addMoveLocationMenu($parentArea, $parentFloor)

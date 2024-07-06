@@ -131,7 +131,30 @@ class TitlePage extends GenericPage
             }
         }
 
-        // tab: criteria of (to be added by TC)
+        // tab: criteria of
+        if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = 23 AND `value1` = ?d', $this->typeId))
+        {
+            $acvs = new AchievementList(array(['ac.id', $crt]));
+            if (!$acvs->error)
+            {
+                $this->extendGlobalData($acvs->getJSGlobals());
+
+                $this->lvTabs[] = [AchievementList::$brickFile, array(
+                    'data'        => array_values($acvs->getListviewData()),
+                    'id'          => 'criteria-of',
+                    'name'        => '$LANG.tab_criteriaof',
+                    'visibleCols' => ['category']
+                )];
+            }
+        }
+
+        // tab: condition-for
+        $cnd = new Conditions();
+        if ($cnd->getByCondition(Type::TITLE, $this->typeId)->prepare())
+        {
+            $this->extendGlobalData($cnd->getJsGlobals());
+            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+        }
     }
 }
 

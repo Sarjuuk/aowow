@@ -122,33 +122,33 @@ class Conditions
     private const IDX_SRC_ID    = 2;
     private const IDX_SRC_FN    = 3;
 
-    private static $source = array(           // [Group, Entry, Id]
-        self::SRC_NONE                        => [null,         null,        null, null],
-        self::SRC_CREATURE_LOOT_TEMPLATE      => [Type::NPC,    Type::ITEM,  null, 'lootIdToNpc'],
-        self::SRC_DISENCHANT_LOOT_TEMPLATE    => [Type::ITEM,   Type::ITEM,  null, 'disenchantIdToItem'],
-        self::SRC_FISHING_LOOT_TEMPLATE       => [Type::ZONE,   Type::ITEM,  null, null],
-        self::SRC_GAMEOBJECT_LOOT_TEMPLATE    => [Type::OBJECT, Type::ITEM,  null, 'lootIdToGObject'],
-        self::SRC_ITEM_LOOT_TEMPLATE          => [Type::ITEM,   Type::ITEM,  null, null],
-        self::SRC_MAIL_LOOT_TEMPLATE          => [Type::QUEST,  Type::ITEM,  null, 'RewardTemplateToQuest'],
-        self::SRC_MILLING_LOOT_TEMPLATE       => [Type::ITEM,   Type::ITEM,  null, null],
-        self::SRC_PICKPOCKETING_LOOT_TEMPLATE => [Type::NPC,    Type::ITEM,  null, 'PickpocketLootToNpc'],
-        self::SRC_PROSPECTING_LOOT_TEMPLATE   => [Type::ITEM,   Type::ITEM,  null, null],
-        self::SRC_REFERENCE_LOOT_TEMPLATE     => [null,         Type::ITEM,  null, null],
-        self::SRC_SKINNING_LOOT_TEMPLATE      => [Type::NPC,    Type::ITEM,  null, 'SkinLootToNpc'],
-        self::SRC_SPELL_LOOT_TEMPLATE         => [Type::SPELL,  Type::ITEM,  null, null],
-        self::SRC_SPELL_IMPLICIT_TARGET       => [true,         Type::SPELL, null, null],
-        self::SRC_GOSSIP_MENU                 => [true,         true,        null, null],
-        self::SRC_GOSSIP_MENU_OPTION          => [true,         true,        null, null],
-        self::SRC_CREATURE_TEMPLATE_VEHICLE   => [null,         Type::NPC,   null, null],
-        self::SRC_SPELL                       => [null,         Type::SPELL, null, null],
-        self::SRC_SPELL_CLICK_EVENT           => [Type::NPC,    Type::SPELL, null, null],
-        self::SRC_QUEST_AVAILABLE             => [null,         Type::QUEST, null, null],
-        self::SRC_QUEST_SHOW_MARK             => [null,         Type::QUEST, null, null],
-        self::SRC_VEHICLE_SPELL               => [Type::NPC,    Type::SPELL, null, null],
-        self::SRC_SMART_EVENT                 => [true,         true,        true, null],
-        self::SRC_NPC_VENDOR                  => [Type::NPC,    Type::ITEM,  null, null],
-        self::SRC_SPELL_PROC                  => [null,         Type::SPELL, null, null],
-        self::SRC_AREATRIGGER_CLIENT          => [null,         true,        null, null]
+    private static $source = array(           // [Group,        Entry,             Id,   typeResolverFN]
+        self::SRC_NONE                        => [null,         null,              null, null],
+        self::SRC_CREATURE_LOOT_TEMPLATE      => [Type::NPC,    Type::ITEM,        null, 'lootIdToNpc'],
+        self::SRC_DISENCHANT_LOOT_TEMPLATE    => [Type::ITEM,   Type::ITEM,        null, 'disenchantIdToItem'],
+        self::SRC_FISHING_LOOT_TEMPLATE       => [Type::ZONE,   Type::ITEM,        null, null],
+        self::SRC_GAMEOBJECT_LOOT_TEMPLATE    => [Type::OBJECT, Type::ITEM,        null, 'lootIdToGObject'],
+        self::SRC_ITEM_LOOT_TEMPLATE          => [Type::ITEM,   Type::ITEM,        null, null],
+        self::SRC_MAIL_LOOT_TEMPLATE          => [Type::QUEST,  Type::ITEM,        null, 'RewardTemplateToQuest'],
+        self::SRC_MILLING_LOOT_TEMPLATE       => [Type::ITEM,   Type::ITEM,        null, null],
+        self::SRC_PICKPOCKETING_LOOT_TEMPLATE => [Type::NPC,    Type::ITEM,        null, 'PickpocketLootToNpc'],
+        self::SRC_PROSPECTING_LOOT_TEMPLATE   => [Type::ITEM,   Type::ITEM,        null, null],
+        self::SRC_REFERENCE_LOOT_TEMPLATE     => [null,         Type::ITEM,        null, null],
+        self::SRC_SKINNING_LOOT_TEMPLATE      => [Type::NPC,    Type::ITEM,        null, 'SkinLootToNpc'],
+        self::SRC_SPELL_LOOT_TEMPLATE         => [Type::SPELL,  Type::ITEM,        null, null],
+        self::SRC_SPELL_IMPLICIT_TARGET       => [true,         Type::SPELL,       null, null],
+        self::SRC_GOSSIP_MENU                 => [true,         true,              null, null],
+        self::SRC_GOSSIP_MENU_OPTION          => [true,         true,              null, null],
+        self::SRC_CREATURE_TEMPLATE_VEHICLE   => [null,         Type::NPC,         null, null],
+        self::SRC_SPELL                       => [null,         Type::SPELL,       null, null],
+        self::SRC_SPELL_CLICK_EVENT           => [Type::NPC,    Type::SPELL,       null, null],
+        self::SRC_QUEST_AVAILABLE             => [null,         Type::QUEST,       null, null],
+        self::SRC_QUEST_SHOW_MARK             => [null,         Type::QUEST,       null, null],
+        self::SRC_VEHICLE_SPELL               => [Type::NPC,    Type::SPELL,       null, null],
+        self::SRC_SMART_EVENT                 => [true,         true,              true, null],
+        self::SRC_NPC_VENDOR                  => [Type::NPC,    Type::ITEM,        null, null],
+        self::SRC_SPELL_PROC                  => [null,         Type::SPELL,       null, null],
+        self::SRC_AREATRIGGER_CLIENT          => [null,         Type::AREATRIGGER, null, null]
     );
 
     private const IDX_CND_VAL1 = 0;
@@ -219,55 +219,61 @@ class Conditions
     /* IN */
     /******/
 
-    public function getBySourceEntry(int $entry, int ...$srcType) : bool
+    public function getBySourceEntry(int $entry, int ...$srcType) : self
     {
-        $this->rows = DB::World()->select(
+        $this->rows = array_merge($this->rows, DB::World()->select(
            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
             FROM     conditions
             WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceEntry` = ?d
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
             $srcType, $entry
-        );
+        ));
 
-        return $this->fromSource();
+        return $this;
     }
 
-    public function getBySourceGroup(int $group, int ...$srcType) : bool
+    public function getBySourceGroup(int $group, int ...$srcType) : self
     {
-        $this->rows = DB::World()->select(
+        $this->rows = array_merge($this->rows, DB::World()->select(
            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
             FROM     conditions
             WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceGroup` = ?d
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
             $srcType, $group
-        );
+        ));
 
-        return $this->fromSource();
+        return $this;
     }
 
-    public function getByCondition(int $type, int $typeId/* , int ...$conditionIds */) : bool
+    public function getByCondition(int $type, int $typeId/* , int ...$conditionIds */) : self
     {
         $lookups = [];                                      // can only be in val1 for now
         foreach (self::$conditions as $cId => [$cVal1, , , ])
             if ($type === $cVal1 /* && (!$conditionIds || in_array($cId, $conditionIds)) */ )
-                $lookups[] = sprintf("(c2.`ConditionTypeOrReference` = %d AND c2.`ConditionValue1` = %d)", $cId, $typeId);
+            {
+                if ($cId == self::CHR_CLASS || $cId == self::CHR_RACE)
+                    $lookups[] = sprintf("(c2.`ConditionTypeOrReference` = %d AND (c2.`ConditionValue1` & %d) > 0)", $cId, 1 << ($typeId - 1));
+                else
+                    $lookups[] = sprintf("(c2.`ConditionTypeOrReference` = %d AND  c2.`ConditionValue1` = %d)", $cId, $typeId);
+            }
 
         if (!$lookups)
-            return false;
+            return $this;
 
-        $this->rows = DB::World()->select(sprintf(
+        $this->rows = array_merge($this->rows, DB::World()->select(sprintf(
            'SELECT   c1.`SourceTypeOrReferenceId`, c1.`SourceEntry`, c1.`SourceGroup`, c1.`SourceId`, c1.`ElseGroup`,
                      c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`NegativeCondition`
             FROM     conditions c1
             JOIN     conditions c2 ON c1.SourceTypeOrReferenceId = c2.SourceTypeOrReferenceId AND c1.SourceEntry = c2.SourceEntry AND c1.SourceGroup = c2.SourceGroup AND c1.SourceId = c2.SourceId
             WHERE    %s
+            GROUP BY `SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
             implode(' OR ', $lookups))
-        );
+        ));
 
-        return $this->fromSource();
+        return $this;
     }
 
     public function addExternalCondition(int $srcType, string $groupKey, array $condition, bool $orGroup = false) : void
@@ -337,25 +343,35 @@ class Conditions
         return [null, $tab];
     }
 
-    public function toListviewColumn(array &$lvRows, ?array &$extraCols = [], int $srcEntry = 0) : bool
+    // $keyX params are string(ref to lv column) or int(fixed value)
+    public function toListviewColumn(array &$lvRows, ?array &$extraCols = [], $keyGroup = 'id', $keyEntry = 0, $keyId = 0) : bool
     {
         if (!$this->result)
             return false;
 
         $success = false;
-        foreach ($lvRows as $key => &$row)
+        foreach ($lvRows as &$row)
         {
-            $key = ($row['id'] ?? $key).':'.$srcEntry;      // loot rows don't have an 'id' while being generated, but they have a usable $key
-            while (substr_count($key, ':') < 3)             // pad with missing srcEntry, SrcId, cndTarget to group key
-                $key .= ':0';
+            $srcKey = implode(':', array(
+                is_string($keyGroup) ? ($row[$keyGroup] ?? 0) : $keyGroup,
+                is_string($keyEntry) ? ($row[$keyEntry] ?? 0) : $keyEntry,
+                is_string($keyId)    ? ($row[$keyId]    ?? 0) : $keyId,
+                ''                                           // cndTarget - 0 / 1
+            ));
 
             foreach ($this->result as $cndData)
             {
-                if (empty($cndData[$key]))
-                    continue;
+                if (isset($cndData[$srcKey.'0']))
+                {
+                    $row['condition'][self::SRC_NONE][$srcKey.'0'] = $cndData[$srcKey.'0'];
+                    $success = true;
+                }
 
-                $row['condition'][self::SRC_NONE][$key] = $cndData[$key];
-                $success = true;
+                if (isset($cndData[$srcKey.'1']))
+                {
+                    $row['condition'][self::SRC_NONE][$srcKey.'1'] = $cndData[$srcKey.'1'];
+                    $success = true;
+                }
             }
         }
 
@@ -413,7 +429,7 @@ class Conditions
         return true;
     }
 
-    private function fromSource() : bool
+    public function prepare() : bool
     {
         // itr over rows and prep data
         if (!$this->rows)
@@ -496,7 +512,7 @@ class Conditions
         return $result;
     }
 
-    private function factionToSide($cId, &$cVal1, $cVal2, $cVal3) : bool
+    private function factionToSide($cndId, &$cVal1, $cVal2, $cVal3) : bool
     {
         if ($cVal1 == 469)
             $cVal1 = SIDE_ALLIANCE;
@@ -508,7 +524,7 @@ class Conditions
         return true;
     }
 
-    private function mapToZone($cId, &$cVal1, &$cVal2, $cVal3) : bool
+    private function mapToZone($cndId, &$cVal1, &$cVal2, $cVal3) : bool
     {
         // use g_zone_categories id
         if ($cVal1 == 530)                                  // outland
@@ -533,16 +549,16 @@ class Conditions
         return true;
     }
 
-    private function maskToBits($cId, &$cVal1, $cVal2, $cVal3) : bool
+    private function maskToBits($cndId, &$cVal1, $cVal2, $cVal3) : bool
     {
-        if ($cId == self::CHR_CLASS)
+        if ($cndId == self::CHR_CLASS)
         {
             $cVal1 &= CLASS_MASK_ALL;
             foreach (Util::mask2bits($cVal1, 1) as $cId)
                 $this->jsGlobals[Type::CHR_CLASS][$cId] = $cId;
         }
 
-        if ($cId == self::CHR_RACE)
+        if ($cndId == self::CHR_RACE)
         {
             $cVal1 &= RACE_MASK_ALL;
             foreach (Util::mask2bits($cVal1, 1) as $rId)
@@ -552,7 +568,7 @@ class Conditions
         return true;
     }
 
-    private function typeidToId($cId, $cVal1, &$cVal2, &$cVal3) : bool
+    private function typeidToId($cndId, $cVal1, &$cVal2, &$cVal3) : bool
     {
         if ($cVal1 == self::TYPEID_UNIT)
         {

@@ -1023,7 +1023,9 @@ class QuestPage extends GenericPage
 
         // tab: conditions
         $cnd = new Conditions();
-        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_QUEST_AVAILABLE, Conditions::SRC_QUEST_SHOW_MARK);
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_QUEST_AVAILABLE, Conditions::SRC_QUEST_SHOW_MARK)
+            ->getByCondition(Type::QUEST, $this->typeId)
+            ->prepare();
 
         if ($_ = $this->subject->getField('reqMinRepFaction'))
             $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, $this->typeId, [Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))]);

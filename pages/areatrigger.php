@@ -86,7 +86,7 @@ class AreaTriggerPage extends GenericPage
 
         // tab: conditions
         $cnd = new Conditions();
-        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_AREATRIGGER_CLIENT);
+        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_AREATRIGGER_CLIENT)->prepare();
         if ($tab = $cnd->toListviewTab());
         {
             $this->extendGlobalData($cnd->getJsGlobals());
