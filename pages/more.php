@@ -225,7 +225,7 @@ class MorePage extends GenericPage
             }
 
             $this->lvTabs[] = ['topusers', array(
-                'hiddenCols'  => ['achievements', 'posts', 'uploads'],
+                'hiddenCols'  => ['achievements', 'posts', 'uploads', 'reports'],
                 'visibleCols' => ['created'],
                 'name'        => '$LANG.lastweek_stc',
                 'name'        => $tabName,
