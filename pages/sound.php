@@ -241,13 +241,19 @@ class SoundPage extends GenericPage
                     }
                 }
 
-                if (array_filter(array_column($zoneIds, 'worldStateId')))
+                if ($worldStates = array_filter($zoneIds, function ($x) { return $x['worldStateId'] > 0; }))
                 {
                     $tabData['extraCols']  = ['$Listview.extraCols.condition'];
 
-                    foreach ($zoneIds as $zData)
-                        if ($zData['worldStateId'])
-                            Conditions::extendListviewRow($zoneData[$zData['id']], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $zData['worldStateId'], $zData['worldStateValue']]);
+                    foreach ($worldStates as $state)
+                    {
+                        if (isset($zoneData[$state['id']]))
+                            Conditions::extendListviewRow($zoneData[$state['id']], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $state['worldStateId'], $state['worldStateValue']]);
+                        else
+                            foreach ($zoneData as &$d)
+                                if (in_array($state['id'], $d['subzones']))
+                                    Conditions::extendListviewRow($d, Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $state['worldStateId'], $state['worldStateValue']]);
+                    }
                 }
 
                 $tabData['data'] = array_values($zoneData);
