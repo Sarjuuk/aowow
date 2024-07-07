@@ -1,0 +1,4 @@
+DELETE FROM `aowow_loot_link` WHERE `npcId` IN (25740,26338,12018);
+INSERT INTO `aowow_loot_link` VALUES
+  (25740,187892,0,0,0),
+  (12018,179703,0,0,0);
