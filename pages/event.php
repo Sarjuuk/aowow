@@ -190,7 +190,10 @@ class EventPage extends GenericPage
 
                 $questItems = [];
                 foreach (array_column($quests->rewards, Type::ITEM) as $arr)
-                    $questItems = array_merge($questItems, $arr);
+                    $questItems = array_merge($questItems, array_keys($arr));
+
+                foreach (array_column($quests->choices, Type::ITEM) as $arr)
+                    $questItems = array_merge($questItems, array_keys($arr));
 
                 foreach (array_column($quests->requires, Type::ITEM) as $arr)
                     $questItems = array_merge($questItems, $arr);
