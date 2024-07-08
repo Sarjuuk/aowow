@@ -2419,7 +2419,7 @@ CREATE TABLE `aowow_setup_custom_data` (
   `command` varchar(100) NOT NULL DEFAULT '',
   `entry` int NOT NULL DEFAULT 0 COMMENT 'typeId',
   `field` varchar(100) NOT NULL DEFAULT '',
-  `value` varchar(100) DEFAULT NULL,
+  `value` text DEFAULT NULL,
   `comment` text DEFAULT NULL,
   KEY `aowow_setup_custom_data_command_IDX` (`command`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -3226,7 +3226,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1720385208,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1720448854,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
