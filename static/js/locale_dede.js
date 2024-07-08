@@ -4894,8 +4894,8 @@ var LANG = {
 
     /* AoWoW: start custom */
 
-    tab_conditions:    'Bedingungen',
-    tab_condition_for: 'Bedingung for',
+    tab_conditions:    'Konditionen',
+    tab_condition_for: 'Kondition für',
     cnd_either:        'Entweder',
     cnd_or:            'Oder',
 

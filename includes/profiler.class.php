@@ -533,8 +533,14 @@ class Profiler
             // cant reasonably get to the castItem from enchantId and slot
 
             $profSpec = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, skillLevel AS "1", skillLine AS "0" FROM ?_itemenchantment WHERE id IN (?a)', $permEnch);
-            foreach ($permEnch as $eId)
+            foreach ($permEnch as $slot => $eId)
             {
+                if (!isset($profSpec[$eId]))
+                {
+                    trigger_error('char #'.$charGuid.' on realm #'.$realmId.' has item in slot #'.$slot.' with invalid perm enchantment #'.CLI::bold($eId), E_USER_WARNING);
+                    continue;
+                }
+
                 if ($x = Util::getEnchantmentScore(0, 0, !!$profSpec[$eId][1], $eId))
                     $data['gearscore'] += $x;
                 else if ($profSpec[$eId][0] != 776)         // not runeforging

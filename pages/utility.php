@@ -114,7 +114,7 @@ class UtilityPage extends GenericPage
                     $this->lvTabs[] = ['commentpreview', ['data' => $comments]];
 
                     array_walk($replies, fn(&$d) => $d['date'] = date(Util::$dateFormatInternal, $d['date']));
-                    $this->lvTabs[] = ['commentpreview', ['data' => $replies]];
+                    $this->lvTabs[] = ['replypreview', ['data' => $replies]];
                 }
 
                 break;
