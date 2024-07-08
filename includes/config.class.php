@@ -342,7 +342,7 @@ class Cfg
             foreach (explode(', ', $info) as $option)
                 $mask |= (1 << explode(':', $option)[0]);
 
-            if (!($value &= $mask))
+            if (!($value &= $mask) && ($flags & self::FLAG_REQUIRED))
                 return 'value not in range';
         }
 

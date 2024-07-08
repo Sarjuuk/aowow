@@ -193,12 +193,6 @@
 
             value = value.toString().trim();
 
-            if (!value.length && (node.tagName != 'INPUT' || node.type != 'text'))
-            {
-                $WH.ae(_status, createStatusIcon('value is empty'));
-                return;
-            }
-
             $(_status).append(CreateAjaxLoader());
 
             new Ajax('?admin=siteconfig&action=update&key=' + id + '&val=' + escape(value), {
