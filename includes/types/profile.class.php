@@ -397,16 +397,16 @@ class ProfileListFilter extends Filter
         if ($this->useLocalList)
         {
             $this->extraOpts[$k] = array(
-                'j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.Type::SKILL.' AND '.$k.'.typeId = '.$skillId.' AND '.$k.'.cur '.$cr[1].' '.$cr[2], true],
-                's' => [', '.$k.'.cur AS '.$col]
+                'j' => [sprintf('?_profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $cr[1], $cr[2]), true],
+                's' => [', '.$k.'.`value` AS '.$col]
             );
-            return [$k.'.typeId', null, '!'];
+            return [$k.'.skillId', null, '!'];
         }
         else
         {
             $this->extraOpts[$k] = array(
-                'j' => ['character_skills '.$k.' ON '.$k.'.guid = c.guid AND '.$k.'.skill = '.$skillId.' AND '.$k.'.value '.$cr[1].' '.$cr[2], true],
-                's' => [', '.$k.'.value AS '.$col]
+                'j' => [sprintf('character_skills %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`skill` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $cr[1], $cr[2]), true],
+                's' => [', '.$k.'.`value` AS '.$col]
             );
             return [$k.'.skill', null, '!'];
         }
@@ -424,12 +424,12 @@ class ProfileListFilter extends Filter
 
         if ($this->useLocalList)
         {
-            $this->extraOpts[$k] = ['j' => ['?_profiler_completion '.$k.' ON '.$k.'.id = p.id AND '.$k.'.`type` = '.Type::ACHIEVEMENT.' AND '.$k.'.typeId = '.$cr[2], true]];
-            return [$k.'.typeId', null, '!'];
+            $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_completion_achievements %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`achievementId` = %2$d', $k, $cr[2]), true]];
+            return [$k.'.achievementId', null, '!'];
         }
         else
         {
-            $this->extraOpts[$k] = ['j' => ['character_achievement '.$k.' ON '.$k.'.guid = c.guid AND '.$k.'.achievement = '.$cr[2], true]];
+            $this->extraOpts[$k] = ['j' => [sprintf('character_achievement %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`achievement` = %2$d', $k, $cr[2]), true]];
             return [$k.'.achievement', null, '!'];
         }
     }
@@ -439,12 +439,12 @@ class ProfileListFilter extends Filter
         if (!Util::checkNumeric($cr[2], NUM_CAST_INT))
             return false;
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE id = ?d', $cr[2]))
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE `id` = ?d', $cr[2]))
             return false;
 
         $k = 'i_'.Util::createHash(12);
 
-        $this->extraOpts[$k] = ['j' => ['?_profiler_items '.$k.' ON '.$k.'.id = p.id AND '.$k.'.item = '.$cr[2], true]];
+        $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $cr[2]), true]];
         return [$k.'.item', null, '!'];
     }
 

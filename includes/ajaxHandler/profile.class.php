@@ -601,60 +601,40 @@ class AjaxProfile extends AjaxHandler
         */
 
 
-        $completion = DB::Aowow()->select('SELECT type AS ARRAY_KEY, typeId AS ARRAY_KEY2, cur, max FROM ?_profiler_completion WHERE id = ?d', $pBase['id']);
-        foreach ($completion as $type => $data)
+        // questId => [cat1, cat2]
+        $profile['quests'] = [];
+        if ($quests = DB::Aowow()->selectCol('SELECT `questId` FROM ?_profiler_completion_quests WHERE `id` = ?d', $pBase['id']))
         {
-            switch ($type)
-            {
-                case Type::FACTION:                          // factionId => amount
-                    $profile['reputation'] = array_combine(array_keys($data), array_column($data, 'cur'));
-                    break;
-                case Type::TITLE:
-                    foreach ($data as &$d)
-                        $d = 1;
-
-                    $profile['titles'] = $data;
-                    break;
-                case Type::QUEST:
-                    $qList   = new QuestList(array(['id', array_keys($data)], Cfg::get('SQL_LIMIT_NONE')));
-                    $qResult = [];
-                    foreach ($qList->iterate() as $id => $__)
-                        $qResult[$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
-
-                    $profile['quests'] = $qResult;
-                    break;
-                case Type::SPELL:
-                    foreach ($data as &$d)
-                        $d = 1;
-
-                    $profile['spells'] = $data;
-                    break;
-                case Type::ACHIEVEMENT:
-                    $achievements = array_filter($data, function ($x) { return $x['max'] === null; });
-                    $statistics   = array_filter($data, function ($x) { return $x['max'] !== null; });
-
-                    // achievements
-                    $profile['achievements']      = array_combine(array_keys($achievements), array_column($achievements, 'cur'));
-                    $profile['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(points) FROM ?_achievement WHERE id IN (?a)', array_keys($achievements));
-
-                    // raid progression
-                    $activity = array_filter($statistics, function ($x) { return $x['cur'] > (time() - MONTH); });
-                    foreach ($activity as &$r)
-                        $r = 1;
-
-                    // ony .. subtract 10-man from 25-man
-
-                    $profile['statistics'] = array_combine(array_keys($statistics), array_column($statistics, 'max'));
-                    $profile['activity']   = $activity;
-                    break;
-                case Type::SKILL:
-                    foreach ($data as &$d)
-                        $d = [$d['cur'], $d['max']];
-
-                    $profile['skills'] = $data;
-                    break;
-            }
+            $qList = new QuestList(array(['id', $quests], Cfg::get('SQL_LIMIT_NONE')));
+            if (!$qList->error)
+                foreach ($qList->iterate() as $id => $__)
+                    $profile['quests'][$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
         }
+
+        // skillId => [value, max]
+        $profile['skills'] = DB::Aowow()->select('SELECT `skillId` AS ARRAY_KEY, `value` AS "0", `max` AS "1" FROM ?_profiler_completion_skills WHERE `id` = ?d', $pBase['id']);
+
+        // factionId => amount
+        $profile['reputation'] = DB::Aowow()->selectCol('SELECT `factionId` AS ARRAY_KEY, `standing` FROM ?_profiler_completion_reputation WHERE `id` = ?d', $pBase['id']);
+
+        // titleId => 1
+        $profile['titles'] = DB::Aowow()->selectCol('SELECT `titleId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_titles WHERE `id` = ?d', $pBase['id']);
+
+        // achievementId => date
+        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `date` FROM ?_profiler_completion_achievements WHERE `id` = ?d', $pBase['id']);
+
+        // just points
+        $profile['achievementpoints'] = $profile['achievements'] ? DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ?_achievement WHERE `id` IN (?a)', array_keys($profile['achievements'])) : 0;
+
+        // achievementId => counter
+        $profile['statistics'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `counter` FROM ?_profiler_completion_statistics WHERE `id` = ?d', $pBase['id']);
+
+        // achievementId => 1
+        $profile['activity'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_statistics WHERE `id` = ?d AND `date` > ?d', $pBase['id'], time() - MONTH);
+
+        // spellId => 1
+        $profile['spells'] = DB::Aowow()->selectCol('SELECT `spellId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_spells WHERE `id` = ?d', $pBase['id']);
+
 
         $gItems = [];
 

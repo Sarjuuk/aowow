@@ -597,103 +597,95 @@ class Profiler
         /* completion data */
         /*******************/
 
-        DB::Aowow()->query('DELETE FROM ?_profiler_completion WHERE id = ?d', $profileId);
+        // done quests //
 
-        // done quests
-        if ($quests = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, quest AS typeId FROM character_queststatus_rewarded WHERE guid = ?d', $profileId, Type::QUEST, $char['guid']))
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_quests WHERE `id` = ?d', $profileId);
+
+        if ($quests = DB::Characters($realmId)->select('SELECT ?d AS `id`, `quest` AS `questId` FROM character_queststatus_rewarded WHERE `guid` = ?d', $profileId, $char['guid']))
             foreach (Util::createSqlBatchInsert($quests) as $q)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$q, array_keys($quests[0]));
+                DB::Aowow()->query('INSERT INTO ?_profiler_completion_quests (?#) VALUES '.$q, array_keys($quests[0]));
 
         CLI::write(' ..quests');
 
 
-        // known skills (professions only)
+        // known skills (professions only) //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_skills WHERE `id` = ?d', $profileId);
+
         $skAllowed = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` IN (9, 11) AND (`cuFlags` & ?d) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
-        $skills    = DB::Characters($realmId)->select('SELECT ?d AS `id`, ?d AS `type`, `skill` AS typeId, `value` AS cur, `max` FROM character_skills WHERE guid = ?d AND `skill` IN (?a)', $profileId, Type::SKILL, $char['guid'], $skAllowed);
+        $skills    = DB::Characters($realmId)->select('SELECT ?d AS `id`, `skill` AS `skillId`, `value`, `max` FROM character_skills WHERE `guid` = ?d AND `skill` IN (?a)', $profileId, $char['guid'], $skAllowed);
         $racials   = DB::Aowow()->select('SELECT `effect1MiscValue` AS ARRAY_KEY, `effect1DieSides` + `effect1BasePoints` AS qty, `reqRaceMask`, `reqClassMask` FROM ?_spell WHERE `typeCat` = -4 AND `effect1Id` = 6 AND `effect1AuraId` = 98');
-        // apply racial profession bonuses
-        foreach ($skills as &$sk)
+
+        foreach ($skills as &$sk)                           // apply racial profession bonuses
         {
-            if (!isset($racials[$sk['typeId']]))
+            if (!isset($racials[$sk['skillId']]))
                 continue;
 
-            $r = $racials[$sk['typeId']];
+            $r = $racials[$sk['skillId']];
             if ((!$r['reqRaceMask'] || $r['reqRaceMask'] & (1 << ($char['race'] - 1))) && (!$r['reqClassMask'] || $r['reqClassMask'] & (1 << ($char['class'] - 1))))
             {
-                $sk['cur'] += $r['qty'];
-                $sk['max'] += $r['qty'];
+                $sk['value'] += $r['qty'];
+                $sk['max']   += $r['qty'];
             }
         }
         unset($sk);
 
         if ($skills)
-        {
-            // apply auto-learned trade skills
-            DB::Aowow()->query('
-                INSERT INTO ?_profiler_completion
-                SELECT      ?d, ?d, spellId, NULL, NULL
-                FROM        ?_skilllineability
-                WHERE       skillLineId IN (?a) AND
-                            acquireMethod = 1 AND
-                            (reqRaceMask  = 0 OR reqRaceMask  & ?d) AND
-                            (reqClassMask = 0 OR reqClassMask & ?d)',
-                $profileId, Type::SPELL,
-                array_column($skills, 'typeId'),
-                1 << ($char['race']  - 1),
-                1 << ($char['class'] - 1)
-            );
-
             foreach (Util::createSqlBatchInsert($skills) as $sk)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$sk, array_keys($skills[0]));
-        }
+                DB::Aowow()->query('INSERT INTO ?_profiler_completion_skills (?#) VALUES '.$sk, array_keys($skills[0]));
 
         CLI::write(' ..professions');
 
 
-        // reputation
+        // reputation //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_reputation WHERE `id` = ?d', $profileId);
 
         // get base values for this race/class
         $reputation = [];
-        $baseRep    = DB::Aowow()->selectCol('
-            SELECT id AS ARRAY_KEY, baseRepValue1 FROM aowow_factions WHERE baseRepValue1 && (baseRepRaceMask1 & ?d || (!baseRepRaceMask1 AND baseRepClassMask1)) &&
-            ((baseRepClassMask1 & ?d) || !baseRepClassMask1) UNION
-            SELECT id AS ARRAY_KEY, baseRepValue2 FROM aowow_factions WHERE baseRepValue2 && (baseRepRaceMask2 & ?d || (!baseRepRaceMask2 AND baseRepClassMask2)) &&
-            ((baseRepClassMask2 & ?d) || !baseRepClassMask2) UNION
-            SELECT id AS ARRAY_KEY, baseRepValue3 FROM aowow_factions WHERE baseRepValue3 && (baseRepRaceMask3 & ?d || (!baseRepRaceMask3 AND baseRepClassMask3)) &&
-            ((baseRepClassMask3 & ?d) || !baseRepClassMask3) UNION
-            SELECT id AS ARRAY_KEY, baseRepValue4 FROM aowow_factions WHERE baseRepValue4 && (baseRepRaceMask4 & ?d || (!baseRepRaceMask4 AND baseRepClassMask4)) &&
-            ((baseRepClassMask4 & ?d) || !baseRepClassMask4)
-        ', $ra, $cl, $ra, $cl, $ra, $cl, $ra, $cl);
+        $baseRep    = DB::Aowow()->selectCol(
+           'SELECT `id` AS ARRAY_KEY, `baseRepValue1` FROM aowow_factions WHERE `baseRepValue1` && (`baseRepRaceMask1` & ?d || (!`baseRepRaceMask1` AND `baseRepClassMask1`)) &&
+            ((`baseRepClassMask1` & ?d) || !`baseRepClassMask1`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue2` FROM aowow_factions WHERE `baseRepValue2` && (`baseRepRaceMask2` & ?d || (!`baseRepRaceMask2` AND `baseRepClassMask2`)) &&
+            ((`baseRepClassMask2` & ?d) || !`baseRepClassMask2`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue3` FROM aowow_factions WHERE `baseRepValue3` && (`baseRepRaceMask3` & ?d || (!`baseRepRaceMask3` AND `baseRepClassMask3`)) &&
+            ((`baseRepClassMask3` & ?d) || !`baseRepClassMask3`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue4` FROM aowow_factions WHERE `baseRepValue4` && (`baseRepRaceMask4` & ?d || (!`baseRepRaceMask4` AND `baseRepClassMask4`)) &&
+            ((`baseRepClassMask4` & ?d) || !`baseRepClassMask4`)',
+            $ra, $cl, $ra, $cl, $ra, $cl, $ra, $cl
+        );
 
-        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, faction AS typeId, standing AS cur FROM character_reputation WHERE guid = ?d AND (flags & 0x4) = 0', $profileId, Type::FACTION, $char['guid']))
+        if ($reputation = DB::Characters($realmId)->select('SELECT ?d AS `id`, `faction` AS `factionId`, `standing` FROM character_reputation WHERE `guid` = ?d AND (`flags` & 0x4) = 0', $profileId, $char['guid']))
         {
             // merge back base values for encountered factions
             foreach ($reputation as &$set)
             {
-                if (empty($baseRep[$set['typeId']]))
+                if (empty($baseRep[$set['factionId']]))
                     continue;
 
-                $set['cur'] += $baseRep[$set['typeId']];
-                unset($baseRep[$set['typeId']]);
+                $set['standing'] += $baseRep[$set['factionId']];
+                unset($baseRep[$set['factionId']]);
             }
         }
 
         // insert base values for not yet encountered factions
         foreach ($baseRep as $id => $val)
             $reputation[] = array(
-                'id'     => $profileId,
-                'type'   => Type::FACTION,
-                'typeId' => $id,
-                'cur'    => $val
+                'id'        => $profileId,
+                'factionId' => $id,
+                'standing'  => $val
             );
 
         foreach (Util::createSqlBatchInsert($reputation) as $rep)
-            DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$rep, array_keys($reputation[0]));
+            DB::Aowow()->query('INSERT INTO ?_profiler_completion_reputation (?#) VALUES '.$rep, array_keys($reputation[0]));
 
         CLI::write(' ..reputation');
 
 
-        // known titles
+        // known titles //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_titles WHERE `id` = ?d', $profileId);
+
         $tBlocks = explode(' ', $char['knownTitles']);
         $indizes = [];
         for ($i = 0; $i < 6; $i++)
@@ -702,38 +694,63 @@ class Profiler
                     $indizes[] = $j + ($i * 32);
 
         if ($indizes)
-            DB::Aowow()->query('INSERT INTO ?_profiler_completion SELECT ?d, ?d, id, NULL, NULL FROM ?_titles WHERE bitIdx IN (?a)', $profileId, Type::TITLE, $indizes);
+            DB::Aowow()->query('INSERT INTO ?_profiler_completion_titles SELECT ?d, `id` FROM ?_titles WHERE `bitIdx` IN (?a)', $profileId, $indizes);
 
         CLI::write(' ..titles');
 
 
-        // achievements
-        if ($achievements = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, achievement AS typeId, date AS cur FROM character_achievement WHERE guid = ?d', $profileId, Type::ACHIEVEMENT, $char['guid']))
+        // achievements //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_achievements WHERE `id` = ?d', $profileId);
+
+        if ($achievements = DB::Characters($realmId)->select('SELECT ?d AS id, `achievement` AS `achievementId`, `date` FROM character_achievement WHERE `guid` = ?d', $profileId, $char['guid']))
         {
             foreach (Util::createSqlBatchInsert($achievements) as $a)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$a, array_keys($achievements[0]));
+                DB::Aowow()->query('INSERT INTO ?_profiler_completion_achievements (?#) VALUES '.$a, array_keys($achievements[0]));
 
-            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(points) FROM ?_achievement WHERE id IN (?a) AND (flags & ?d) = 0', array_column($achievements, 'typeId'), ACHIEVEMENT_FLAG_COUNTER);
+            $data['achievementpoints'] = DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ?_achievement WHERE `id` IN (?a) AND (`flags` & ?d) = 0', array_column($achievements, 'achievementId'), ACHIEVEMENT_FLAG_COUNTER);
         }
 
         CLI::write(' ..achievements');
 
 
-        // raid progression
-        if ($progress = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, criteria AS typeId, date AS cur, counter AS `max` FROM character_achievement_progress WHERE guid = ?d AND criteria IN (?a)', $profileId, Type::ACHIEVEMENT, $char['guid'], self::$raidProgression))
+        // raid progression //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_statistics WHERE `id` = ?d', $profileId);
+
+        if ($progress = DB::Characters($realmId)->select('SELECT ?d AS `id`, `criteria` AS `achievementId`, `date`, `counter` FROM character_achievement_progress WHERE `guid` = ?d AND `criteria` IN (?a)', $profileId, $char['guid'], self::$raidProgression))
         {
-            array_walk($progress, function (&$val) { $val['typeId'] = array_search($val['typeId'], self::$raidProgression); });
+            array_walk($progress, function (&$val) { $val['achievementId'] = array_search($val['achievementId'], self::$raidProgression); });
             foreach (Util::createSqlBatchInsert($progress) as $p)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$p, array_keys($progress[0]));
+                DB::Aowow()->query('INSERT INTO ?_profiler_completion_statistics (?#) VALUES '.$p, array_keys($progress[0]));
         }
 
         CLI::write(' ..raid progression');
 
 
-        // known spells
-        if ($spells = DB::Characters($realmId)->select('SELECT ?d AS id, ?d AS `type`, spell AS typeId FROM character_spell WHERE guid = ?d AND disabled = 0', $profileId, Type::SPELL, $char['guid']))
+        // known spells //
+
+        DB::Aowow()->query('DELETE FROM ?_profiler_completion_spells WHERE `id` = ?d', $profileId);
+
+        if ($spells = DB::Characters($realmId)->select('SELECT ?d AS `id`, `spell` AS `spellId` FROM character_spell WHERE `guid` = ?d AND `disabled` = 0', $profileId, $char['guid']))
             foreach (Util::createSqlBatchInsert($spells) as $s)
-                DB::Aowow()->query('INSERT INTO ?_profiler_completion (?#) VALUES '.$s, array_keys($spells[0]));
+                DB::Aowow()->query('INSERT INTO ?_profiler_completion_spells (?#) VALUES '.$s, array_keys($spells[0]));
+
+        // apply auto-learned spells from trade skills
+        if ($skills)
+            DB::Aowow()->query(
+               'INSERT INTO ?_profiler_completion_spells
+                SELECT      ?d, `spellId`
+                FROM        ?_skilllineability
+                WHERE       `skillLineId` IN (?a) AND
+                            `acquireMethod` = 1 AND
+                            (`reqRaceMask`  = 0 OR `reqRaceMask`  & ?d) AND
+                            (`reqClassMask` = 0 OR `reqClassMask` & ?d)',
+                $profileId,
+                array_column($skills, 'skillId'),
+                1 << ($char['race']  - 1),
+                1 << ($char['class'] - 1)
+            );
 
         CLI::write(' ..known spells (vanity pets & mounts)');
 

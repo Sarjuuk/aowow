@@ -1281,12 +1281,7 @@ abstract class Util
             if (count($d) != $nItems)
                 return [];
 
-            $d = array_map(function ($x) {
-                if ($x === null)
-                    return 'NULL';
-
-                return DB::Aowow()->escape($x);
-            }, $d);
+            $d = array_map(function ($x) { return $x === null ? 'NULL' : DB::Aowow()->escape($x); }, $d);
 
             $buff[] = implode(',', $d);
 

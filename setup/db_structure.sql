@@ -1821,23 +1821,117 @@ CREATE TABLE `aowow_profiler_arena_team_member` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_profiler_completion_achievements`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_achievements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_achievements` (
+  `id` int(10) unsigned NOT NULL,
+  `achievementId` smallint(5) unsigned NOT NULL,
+  `date` int(10) unsigned DEFAULT NULL,
+  KEY `id` (`id`),
+  KEY `typeId` (`achievementId`),
+  CONSTRAINT `FK_pr_completion_achievements` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_profiler_completion_quests`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_quests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_quests` (
+  `id` int(10) unsigned NOT NULL,
+  `questId` mediumint(8) unsigned NOT NULL,
+  KEY `id` (`id`),
+  CONSTRAINT `FK_pr_completion_quests` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_profiler_completion_reputation`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_reputation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_reputation` (
+  `id` int(10) unsigned NOT NULL,
+  `factionId` smallint(5) unsigned NOT NULL,
+  `standing` mediumint(9) DEFAULT NULL,
+  KEY `id` (`id`),
+  CONSTRAINT `FK_pr_completion_reputation` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_profiler_completion_skills`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_skills`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_skills` (
+  `id` int(10) unsigned NOT NULL,
+  `skillId` smallint(5) unsigned NOT NULL,
+  `value` smallint(5) unsigned DEFAULT NULL,
+  `max` smallint(5) unsigned DEFAULT NULL,
+  KEY `id` (`id`),
+  KEY `typeId` (`skillId`),
+  CONSTRAINT `FK_pr_completion_skills` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_profiler_completion_spells`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_spells`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_spells` (
+  `id` int(10) unsigned NOT NULL,
+  `spellId` mediumint(8) unsigned NOT NULL,
+  KEY `id` (`id`),
+  CONSTRAINT `FK_pr_completion_spells` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_profiler_completion_statistics`
+--
+
+DROP TABLE IF EXISTS `aowow_profiler_completion_statistics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `aowow_profiler_completion_statistics` (
+  `id` int(10) unsigned NOT NULL,
+  `achievementId` smallint(6) NOT NULL,
+  `date` int(10) unsigned DEFAULT NULL,
+  `counter` smallint(5) unsigned DEFAULT NULL,
+  KEY `id` (`id`),
+  KEY `typeId` (`achievementId`),
+  CONSTRAINT `FK_pr_completion_statistics` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_profiler_completion`
 --
 
-DROP TABLE IF EXISTS `aowow_profiler_completion`;
+DROP TABLE IF EXISTS `aowow_profiler_completion_titles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `aowow_profiler_completion` (
-  `id` int unsigned NOT NULL,
-  `type` smallint unsigned NOT NULL,
-  `typeId` mediumint NOT NULL,
-  `cur` int DEFAULT NULL,
-  `max` int DEFAULT NULL,
+CREATE TABLE `aowow_profiler_completion_titles` (
+  `id` int(10) unsigned NOT NULL,
+  `titleId` tinyint(3) unsigned NOT NULL,
   KEY `id` (`id`),
-  KEY `type` (`type`),
-  KEY `typeId` (`typeId`),
-  CONSTRAINT `FK_pr_completion` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `FK_pr_completion_titles` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -3226,7 +3320,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1720451579,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1720455279,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
