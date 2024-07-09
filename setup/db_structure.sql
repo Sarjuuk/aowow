@@ -1834,7 +1834,7 @@ CREATE TABLE `aowow_profiler_completion_achievements` (
   KEY `id` (`id`),
   KEY `typeId` (`achievementId`),
   CONSTRAINT `FK_pr_completion_achievements` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1849,7 +1849,7 @@ CREATE TABLE `aowow_profiler_completion_quests` (
   `questId` mediumint(8) unsigned NOT NULL,
   KEY `id` (`id`),
   CONSTRAINT `FK_pr_completion_quests` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1865,7 +1865,7 @@ CREATE TABLE `aowow_profiler_completion_reputation` (
   `standing` mediumint(9) DEFAULT NULL,
   KEY `id` (`id`),
   CONSTRAINT `FK_pr_completion_reputation` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1883,7 +1883,7 @@ CREATE TABLE `aowow_profiler_completion_skills` (
   KEY `id` (`id`),
   KEY `typeId` (`skillId`),
   CONSTRAINT `FK_pr_completion_skills` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1898,7 +1898,7 @@ CREATE TABLE `aowow_profiler_completion_spells` (
   `spellId` mediumint(8) unsigned NOT NULL,
   KEY `id` (`id`),
   CONSTRAINT `FK_pr_completion_spells` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1916,7 +1916,7 @@ CREATE TABLE `aowow_profiler_completion_statistics` (
   KEY `id` (`id`),
   KEY `typeId` (`achievementId`),
   CONSTRAINT `FK_pr_completion_statistics` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1931,7 +1931,7 @@ CREATE TABLE `aowow_profiler_completion_titles` (
   `titleId` tinyint(3) unsigned NOT NULL,
   KEY `id` (`id`),
   CONSTRAINT `FK_pr_completion_titles` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
