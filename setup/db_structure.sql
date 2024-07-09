@@ -415,8 +415,8 @@ DROP TABLE IF EXISTS `aowow_comments`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `aowow_comments` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Comment ID',
-  `type` smallint unsigned NOT NULL COMMENT 'Type of Page',
-  `typeId` mediumint NOT NULL COMMENT 'ID Of Page',
+  `type` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'Type of Page',
+  `typeId` mediumint NOT NULL DEFAULT 0 COMMENT 'ID Of Page',
   `userId` int unsigned DEFAULT NULL COMMENT 'User ID',
   `roles` smallint unsigned NOT NULL,
   `body` text NOT NULL COMMENT 'Comment text',
@@ -3320,7 +3320,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1720455279,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1720523765,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
