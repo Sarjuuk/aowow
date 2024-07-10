@@ -74,9 +74,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                            EffectMiscValueB1,                      EffectMiscValueB2,                      EffectMiscValueB3,
                            EffectTriggerSpell1,                    EffectTriggerSpell2,                    EffectTriggerSpell3,
                            0 AS effect1PointsPerComboPoint,        0 AS effect2PointsPerComboPoint,        0 AS effect3PointsPerComboPoint,
-                           EffectSpellClassMaskA1,                 EffectSpellClassMaskA2,                 EffectSpellClassMaskA3,
-                           EffectSpellClassMaskB1,                 EffectSpellClassMaskB2,                 EffectSpellClassMaskB3,
-                           EffectSpellClassMaskC1,                 EffectSpellClassMaskC2,                 EffectSpellClassMaskC3,
+                           EffectSpellClassMaskA1,                 EffectSpellClassMaskB1,                 EffectSpellClassMaskC1,
+                           EffectSpellClassMaskA2,                 EffectSpellClassMaskB2,                 EffectSpellClassMaskC2,
+                           EffectSpellClassMaskA3,                 EffectSpellClassMaskB3,                 EffectSpellClassMaskC3,
                            DmgMultiplier1,                         DmgMultiplier2,                         DmgMultiplier3,
                            0 AS effect1BonusMultiplier,            0 AS effect2BonusMultiplier,            0 AS effect3BonusMultiplier,
                            0 AS iconId,                            0 AS iconIdBak,                         0 AS iconIdAlt,
@@ -158,9 +158,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                               effect1MiscValueB,                      effect2MiscValueB,                      effect3MiscValueB,
                               effect1TriggerSpell,                    effect2TriggerSpell,                    effect3TriggerSpell,
                               effect1PointsPerComboPoint,             effect2PointsPerComboPoint,             effect3PointsPerComboPoint,
-                              effect1SpellClassMaskA,                 effect2SpellClassMaskA,                 effect3SpellClassMaskA,
-                              effect1SpellClassMaskB,                 effect2SpellClassMaskB,                 effect3SpellClassMaskB,
-                              effect1SpellClassMaskC,                 effect2SpellClassMaskC,                 effect3SpellClassMaskC,
+                              effect1SpellClassMaskA,                 effect1SpellClassMaskB,                 effect1SpellClassMaskC,
+                              effect2SpellClassMaskA,                 effect2SpellClassMaskB,                 effect2SpellClassMaskC,
+                              effect3SpellClassMaskA,                 effect3SpellClassMaskB,                 effect3SpellClassMaskC,
                               effect1DamageMultiplier,                effect2DamageMultiplier,                effect3DamageMultiplier,
                               effect1BonusMultiplier,                 effect2BonusMultiplier,                 effect3BonusMultiplier,
                               0 AS iconId,                            iconId AS iconIdBak,                    0 AS iconIdAlt,
@@ -668,9 +668,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                    s1.spellFamilyId,
                    s1.spellFamilyFlags1,      s1.spellFamilyFlags2,       s1.spellFamilyFlags3,
                    s1.effect1Id,              s1.effect2Id,               s1.effect3Id,
-                   s1.effect1SpellClassMaskA, s1.effect1SpellClassMaskB,  s1.effect1SpellClassMaskC,
-                   s1.effect2SpellClassMaskA, s1.effect2SpellClassMaskB,  s1.effect2SpellClassMaskC,
-                   s1.effect3SpellClassMaskA, s1.effect3SpellClassMaskB,  s1.effect3SpellClassMaskC
+                   s1.effect1SpellClassMaskA, s1.effect2SpellClassMaskA,  s1.effect3SpellClassMaskA,
+                   s1.effect1SpellClassMaskB, s1.effect2SpellClassMaskB,  s1.effect3SpellClassMaskB,
+                   s1.effect1SpellClassMaskC, s1.effect2SpellClassMaskC,  s1.effect3SpellClassMaskC
             FROM   dbc_glyphproperties gp
             JOIN   ?_spell s1 ON s1.id = gp.spellId
             JOIN   ?_spell s2 ON s2.effect1MiscValue = gp.id AND s2.effect1Id = 74
@@ -679,7 +679,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         foreach ($effects as $applyId => $glyphEffect)
         {
-            $l     = [null, 'A', 'B', 'C'];
             $i     = 0;
             $icons = [];
             $fam   = $glyphEffect['spellFamilyId'];
@@ -708,9 +707,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             while (empty($icons) && $i < 3)
             {
                 $i++;
-                $m1  = $glyphEffect['effect1SpellClassMask'.$l[$i]];
-                $m2  = $glyphEffect['effect2SpellClassMask'.$l[$i]];
-                $m3  = $glyphEffect['effect3SpellClassMask'.$l[$i]];
+                $m1  = $glyphEffect['effect'.$i.'SpellClassMaskA'];
+                $m2  = $glyphEffect['effect'.$i.'SpellClassMaskB'];
+                $m3  = $glyphEffect['effect'.$i.'SpellClassMaskC'];
 
                 if ($glyphEffect['effect'.$i.'Id'] != 6 || (!$m1 && !$m2 && !$m3))
                     continue;

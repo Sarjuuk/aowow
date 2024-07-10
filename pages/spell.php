@@ -350,8 +350,6 @@ class SpellPage extends GenericPage
         /* Extra Tabs */
         /**************/
 
-        $j = [null, 'A', 'B', 'C'];
-
         $ubSAI = SmartAI::getOwnerOfSpellCast($this->typeId);
 
         // tab: abilities [of shapeshift form]
@@ -398,9 +396,9 @@ class SpellPage extends GenericPage
             if (!in_array($this->subject->getField('effect'.$i.'AuraId'), self::$modAuras))
                 continue;
 
-            $m1 = $this->subject->getField('effect1SpellClassMask'.$j[$i]);
-            $m2 = $this->subject->getField('effect2SpellClassMask'.$j[$i]);
-            $m3 = $this->subject->getField('effect3SpellClassMask'.$j[$i]);
+            $m1 = $this->subject->getField('effect'.$i.'SpellClassMaskA');
+            $m2 = $this->subject->getField('effect'.$i.'SpellClassMaskB');
+            $m3 = $this->subject->getField('effect'.$i.'SpellClassMaskC');
 
             if (!$m1 && !$m2 && !$m3)
                 continue;
@@ -481,9 +479,9 @@ class SpellPage extends GenericPage
                 ['s.effect'.$i.'AuraId', self::$modAuras],
                 [
                     'OR',
-                    ['s.effect1SpellClassMask'.$j[$i], $m1, '&'],
-                    ['s.effect2SpellClassMask'.$j[$i], $m2, '&'],
-                    ['s.effect3SpellClassMask'.$j[$i], $m3, '&']
+                    ['s.effect'.$i.'SpellClassMaskA', $m1, '&'],
+                    ['s.effect'.$i.'SpellClassMaskB', $m2, '&'],
+                    ['s.effect'.$i.'SpellClassMaskC', $m3, '&']
                 ]
             );
         }
