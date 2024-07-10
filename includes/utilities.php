@@ -1519,6 +1519,8 @@ abstract class Util
             case ITEM_QUALITY_NORMAL:
                 $score /= 10.0;
                 break;
+            default:
+                $score /= 4.0;
         }
 
         return round($score, 4);
