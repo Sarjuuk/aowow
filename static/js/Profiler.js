@@ -7573,8 +7573,7 @@ function ProfilerCompletion(_parent) {
             }
 
             if ((!_opt.compute || _opt.compute(row, data[i])) && data[i]) {
-                // row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));                     // aowow: idk a way to generate a jScript-TimeObject in php (there probably isn't), but one is expected here
-                row.completed = (data[i] > 946681200 ? new Date(data[i] * 1000) : (_opt.showQuantity ? data[i] : 1));   // so we create a dateObject from data[i] if it is a unixtime past the 1.1.2000 - 0:00 (wich probably isn't used as a sensible int anyway)
+                row.completed = (data[i].getTime ? data[i] : (_opt.showQuantity ? data[i] : 1));
                 hasData = true;
             }
             else {

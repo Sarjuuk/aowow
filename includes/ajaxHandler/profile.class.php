@@ -620,8 +620,8 @@ class AjaxProfile extends AjaxHandler
         // titleId => 1
         $profile['titles'] = DB::Aowow()->selectCol('SELECT `titleId` AS ARRAY_KEY, 1 FROM ?_profiler_completion_titles WHERE `id` = ?d', $pBase['id']);
 
-        // achievementId => date
-        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, `date` FROM ?_profiler_completion_achievements WHERE `id` = ?d', $pBase['id']);
+        // achievementId => js date object
+        $profile['achievements'] = DB::Aowow()->selectCol('SELECT `achievementId` AS ARRAY_KEY, CONCAT("$new Date(", `date` * 1000, ")") FROM ?_profiler_completion_achievements WHERE `id` = ?d', $pBase['id']);
 
         // just points
         $profile['achievementpoints'] = $profile['achievements'] ? DB::Aowow()->selectCell('SELECT SUM(`points`) FROM ?_achievement WHERE `id` IN (?a)', array_keys($profile['achievements'])) : 0;
