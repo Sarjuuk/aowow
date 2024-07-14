@@ -797,6 +797,7 @@ CREATE TABLE `aowow_errors` (
   `file` varchar(150) NOT NULL,
   `line` smallint unsigned NOT NULL,
   `query` varchar(250) NOT NULL,
+  `post` text NOT NULL,
   `userGroups` smallint unsigned NOT NULL,
   `message` text DEFAULT NULL,
   PRIMARY KEY (`file`,`line`,`phpError`,`version`,`userGroups`)
@@ -3320,7 +3321,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1720523765,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1720969086,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
