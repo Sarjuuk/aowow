@@ -91,18 +91,23 @@ class EnchantmentList extends BaseType
 
             foreach ($this->curTpl['spells'] as [$spellId, $trigger, $charges, $procChance])
             {
-                // enchant is procing or onUse
-                if ($trigger == SPELL_TRIGGER_HIT || $trigger == SPELL_TRIGGER_USE)
-                    $data[$this->id]['spells'][$spellId] = $charges;
                 // spell is procing
-                else if ($this->relSpells && $this->relSpells->getEntry($spellId) && ($_ = $this->relSpells->canTriggerSpell()))
+                $trgSpell = 0;
+                if ($this->relSpells && $this->relSpells->getEntry($spellId) && ($_ = $this->relSpells->canTriggerSpell()))
                 {
                     foreach ($_ as $idx)
                     {
-                        $this->triggerIds[] = $this->relSpells->getField('effect'.$idx.'TriggerSpell');
-                        $data[$this->id]['spells'][$this->relSpells->getField('effect'.$idx.'TriggerSpell')] = $charges;
+                        if ($trgSpell = $this->relSpells->getField('effect'.$idx.'TriggerSpell'))
+                        {
+                            $this->triggerIds[] = $trgSpell;
+                            $data[$this->id]['spells'][$trgSpell] = $charges;
+                        }
                     }
                 }
+
+                // spell was not proccing
+                if (!$trgSpell)
+                    $data[$this->id]['spells'][$spellId] = $charges;
             }
 
             if (!$data[$this->id]['spells'])
