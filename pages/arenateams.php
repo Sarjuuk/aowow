@@ -93,7 +93,7 @@ class ArenaTeamsPage extends GenericPage
         if (empty($this->filter['sz']))
             $tabData['visibleCols'][] = 'size';
 
-        $miscParams = [];
+        $miscParams = ['calcTotal' => true];
         if ($this->realm)
             $miscParams['sv'] = $this->realm;
         if ($this->region)

@@ -55,11 +55,14 @@ abstract class BaseType
     *   results in
     *       WHERE ((`id` = 45) OR (`name` NOT LIKE "test%") OR ((`flags` & 255) AND (`flags2` & 15)) OR ((`mask` & 3) = 0)) OR (`joinedTbl`.`field` IS NULL) LIMIT 5
     */
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         $where     = [];
         $linking   = ' AND ';
         $limit     = Cfg::get('SQL_LIMIT_DEFAULT');
+
+        $calcTotal  = false;
+        $totalQuery = '';
 
         if (!$this->queryBase || $conditions === null)
             return;
@@ -70,10 +73,13 @@ abstract class BaseType
         else
             $prefixes['base'] = '';
 
-        if ($miscData && !empty($miscData['extraOpts']))
+        if (!empty($miscData['extraOpts']))
             $this->extendQueryOpts($miscData['extraOpts']);
 
-        $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes, $miscData)
+        if (!empty($miscData['calcTotal']))
+            $calcTotal = true;
+
+        $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes)
         {
             $subLink = '';
 
@@ -253,20 +259,28 @@ abstract class BaseType
         if ($o = array_filter(array_column($this->queryOpts, 'o')))
             $this->queryBase .= ' ORDER BY '.implode(', ', $o);
 
+        // without applied LIMIT
+        if ($calcTotal)
+            $totalQuery = $this->queryBase;
+
         // apply limit
         if ($limit)
             $this->queryBase .= ' LIMIT '.$limit;
 
         // execute query (finally)
-        $mtch = 0;
         $rows = [];
         // this is purely because of multiple realms per server
         foreach ($this->dbNames as $dbIdx => $n)
         {
             $query = str_replace('DB_IDX', $dbIdx, $this->queryBase);
-            if ($rows  = DB::{$n}($dbIdx)->SelectPage($mtch, $query))
+            if ($rows  = DB::{$n}($dbIdx)->select($query))
             {
-                $this->matches += $mtch;
+                if ($calcTotal)
+                {
+                    $totalQuery = substr_replace($totalQuery, 'SELECT COUNT(*) ', 0, strpos($totalQuery, 'FROM'));
+                    $this->matches += DB::{$n}($dbIdx)->selectCell($totalQuery);
+                }
+
                 foreach ($rows as $id => $row)
                 {
                     if (isset($this->templates[$id]))

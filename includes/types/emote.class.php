@@ -12,9 +12,9 @@ class EmoteList extends BaseType
 
     protected       $queryBase = 'SELECT e.*, e.id AS ARRAY_KEY FROM ?_emotes e';
 
-    public function __construct($conditions = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         // post processing
         foreach ($this->iterate() as &$curTpl)

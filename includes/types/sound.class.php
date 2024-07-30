@@ -21,9 +21,9 @@ class SoundList extends BaseType
                         SOUND_TYPE_MP3 => 'audio/mpeg'
                     );
 
-    public function __construct($conditions = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)

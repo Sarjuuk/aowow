@@ -47,7 +47,7 @@ class QuestsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $quests = new QuestList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
+        $quests = new QuestList($conditions, ['extraOpts' => $this->filterObj->extraOpts, 'calcTotal' => true]);
 
         $this->extendGlobalData($quests->getJSGlobals());
 

@@ -34,9 +34,9 @@ class IconList extends BaseType
                     );
     */
 
-    public function __construct($conditions)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         if (!$this->getFoundIDs())
             return;

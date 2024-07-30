@@ -40,7 +40,7 @@ class CommunityContent
         WHERE     c.`replyTo` = ?d AND c.`type` = ?d AND c.`typeId` = ?d AND
                   ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)
         GROUP BY  c.`id`
-        ORDER BY  `date` ASC';
+        ORDER BY  c.`date` ASC';
 
     private static string $ssQuery =
        'SELECT    s.`id` AS ARRAY_KEY, s.`id`, a.`displayName` AS `user`, s.`date`, s.`width`, s.`height`, s.`caption`, IF(s.`status` & ?d, 1, 0) AS "sticky", s.`type`, s.`typeId`
@@ -75,8 +75,8 @@ class CommunityContent
         WHERE     %s
                   ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)
         GROUP BY  c.`id`
-        ORDER BY  `date` DESC
-        LIMIT     ?d';
+        ORDER BY  c.`date` DESC
+      { LIMIT     ?d }';
 
     private static function addSubject(int $type, int $typeId) : void
     {
@@ -123,14 +123,27 @@ class CommunityContent
      // else
      //     pick both and no extra constraint needed for that
 
-        $comments  = DB::Aowow()->selectPage(
-            $nFound,
-            sprintf(self::$previewQuery, implode(' ', $w)),
+        $query = sprintf(self::$previewQuery, implode(' ', $w));
+
+        $comments = DB::Aowow()->select(
+            $query,
             CC_FLAG_DELETED,
             CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
             Cfg::get('SQL_LIMIT_DEFAULT')
+        );
+
+        if (!$comments)
+            return [];
+
+        $nFound = DB::Aowow()->selectCell(
+            substr_replace($query, 'SELECT COUNT(*) ', 0, strpos($query, 'FROM')),
+            CC_FLAG_DELETED,
+            CC_FLAG_DELETED,
+            User::$id,
+            User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
+            DBSIMPLE_SKIP
         );
 
         foreach ($comments as $c)
@@ -172,31 +185,38 @@ class CommunityContent
         $query = $limit > 0 ? self::$coQuery.' LIMIT '.$limit : self::$coQuery;
 
         // get replies
-        $results = DB::Aowow()->selectPage($nFound, $query, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
-        foreach ($results as $r)
+        if ($results = DB::Aowow()->select($query, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR)))
         {
-            (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
-
-            $reply = array(
-                'commentid'    => $commentId,
-                'id'           => $r['id'],
-                'body'         => $r['body'],
-                'username'     => $r['user'],
-                'roles'        => $r['roles'],
-                'creationdate' => date(Util::$dateFormatInternal, $r['date']),
-                'lasteditdate' => date(Util::$dateFormatInternal, $r['editDate']),
-                'rating'       => (string)$r['rating']
+            $nFound = DB::Aowow()->selectCell(
+                substr_replace(self::$coQuery, 'SELECT COUNT(*) ', 0, strpos(self::$coQuery, 'FROM')),
+                User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR)
             );
 
-            if ($r['userReported'])
-                $reply['reportedByUser'] = true;
+            foreach ($results as $r)
+            {
+                (new Markup($r['body']))->parseGlobalsFromText(self::$jsGlobals);
 
-            if ($r['userRating'] > 0)
-                $reply['votedByUser'] = true;
-            else if ($r['userRating'] < 0)
-                $reply['downvotedByUser'] = true;
+                $reply = array(
+                    'commentid'    => $commentId,
+                    'id'           => $r['id'],
+                    'body'         => $r['body'],
+                    'username'     => $r['user'],
+                    'roles'        => $r['roles'],
+                    'creationdate' => date(Util::$dateFormatInternal, $r['date']),
+                    'lasteditdate' => date(Util::$dateFormatInternal, $r['editDate']),
+                    'rating'       => (string)$r['rating']
+                );
 
-            $replies[] = $reply;
+                if ($r['userReported'])
+                    $reply['reportedByUser'] = true;
+
+                if ($r['userRating'] > 0)
+                    $reply['votedByUser'] = true;
+                else if ($r['userRating'] < 0)
+                    $reply['downvotedByUser'] = true;
+
+                $replies[] = $reply;
+            }
         }
 
         return $replies;
@@ -383,9 +403,9 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true) : array
     {
-        $videos = DB::Aowow()->selectPage($nFound, self::$viQuery,
+        $videos = DB::Aowow()->select(self::$viQuery,
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
@@ -394,6 +414,21 @@ class CommunityContent
             CC_FLAG_DELETED,
             !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
             !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
+        );
+
+        if (!$videos)
+            return [];
+
+        $nFound = DB::Aowow()->selectCell(
+            substr_replace(self::$viQuery, 'SELECT COUNT(*) ', 0, strpos(self::$viQuery, 'FROM')),
+            CC_FLAG_STICKY,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
+            CC_FLAG_APPROVED,
+            CC_FLAG_DELETED,
+            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
+            DBSIMPLE_SKIP
         );
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId
@@ -428,9 +463,9 @@ class CommunityContent
         return array_values($videos);
     }
 
-    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true) : array
     {
-        $screenshots = DB::Aowow()->selectPage($nFound, self::$ssQuery,
+        $screenshots = DB::Aowow()->select(self::$ssQuery,
             CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
@@ -439,6 +474,21 @@ class CommunityContent
             CC_FLAG_DELETED,
             !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
             !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
+        );
+
+        if (!$screenshots)
+            return [];
+
+        $nFound = DB::Aowow()->selectCell(
+            substr_replace(self::$ssQuery, 'SELECT COUNT(*) ', 0, strpos(self::$ssQuery, 'FROM')),
+            CC_FLAG_STICKY,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
+            CC_FLAG_APPROVED,
+            CC_FLAG_DELETED,
+            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
+            DBSIMPLE_SKIP
         );
 
         if ($typeOrUser <= 0)                               // not for search by type/typeId

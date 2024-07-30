@@ -52,7 +52,7 @@ class NpcsPage extends GenericPage
             $conditions[] = $_;
 
         // beast subtypes are selected via filter
-        $npcs = new CreatureList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
+        $npcs = new CreatureList($conditions, ['extraOpts' => $this->filterObj->extraOpts, 'calcTotal' => true]);
 
         // recreate form selection
         $this->filter             = $this->filterObj->getForm();

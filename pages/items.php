@@ -315,7 +315,7 @@ class ItemsPage extends GenericPage
                     $finalCnd = $conditions;
             }
 
-            $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $this->filterObj->extraOpts)]);
+            $items = new ItemList($finalCnd, ['extraOpts' => array_merge($extraOpts, $this->filterObj->extraOpts), 'calcTotal' => true]);
 
             if ($items->error)
                 continue;

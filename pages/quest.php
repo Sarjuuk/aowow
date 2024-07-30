@@ -121,7 +121,7 @@ class QuestPage extends GenericPage
             $loremaster = new AchievementList($conditions);
             $this->extendGlobalData($loremaster->getJSGlobals(GLOBALINFO_SELF));
 
-            switch ($loremaster->getMatches())
+            switch (count($loremaster->getFoundIds()))
             {
                 case 0:
                     break;

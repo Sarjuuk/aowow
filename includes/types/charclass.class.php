@@ -12,9 +12,9 @@ class CharClassList extends BaseType
 
     protected       $queryBase = 'SELECT c.*, id AS ARRAY_KEY FROM ?_classes c';
 
-    public function __construct($conditions = [])
+    public function __construct($conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         foreach ($this->iterate() as $k => &$_curTpl)
             $_curTpl['skills'] = explode(' ', $_curTpl['skills']);

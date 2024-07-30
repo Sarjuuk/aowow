@@ -386,7 +386,7 @@ class SpellsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $spells = new SpellList($conditions);
+        $spells = new SpellList($conditions, ['calcTotal' => true]);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 

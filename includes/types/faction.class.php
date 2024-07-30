@@ -17,9 +17,9 @@ class FactionList extends BaseType
                         'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
                     );
 
-    public function __construct($conditions = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         if ($this->error)
             return;

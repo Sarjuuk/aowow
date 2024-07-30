@@ -173,7 +173,7 @@ class FactionPage extends GenericPage
         /**************/
 
         // tab: items
-        $items = new ItemList(array(['requiredFaction', $this->typeId]));
+        $items = new ItemList(array(['requiredFaction', $this->typeId]), ['calcTotal' => true]);
         if (!$items->error)
         {
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
@@ -204,7 +204,7 @@ class FactionPage extends GenericPage
 
             if ($cRep)
             {
-                $killCreatures = new CreatureList(array(['id', array_keys($cRep)]));
+                $killCreatures = new CreatureList(array(['id', array_keys($cRep)]), ['calcTotal' => true]);
                 if (!$killCreatures->error)
                 {
                     $data = $killCreatures->getListviewData();
@@ -228,7 +228,7 @@ class FactionPage extends GenericPage
         // tab: members
         if ($_ = $this->subject->getField('templateIds'))
         {
-            $members = new CreatureList(array(['faction', $_]));
+            $members = new CreatureList(array(['faction', $_]), ['calcTotal' => true]);
             if (!$members->error)
             {
                 $tabData = array(
@@ -261,7 +261,7 @@ class FactionPage extends GenericPage
             ['AND', ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']],
             'OR'
         );
-        $quests = new QuestList($conditions);
+        $quests = new QuestList($conditions, ['calcTotal' => true]);
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_ANY));

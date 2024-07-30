@@ -14,7 +14,7 @@ class ZoneList extends BaseType
 
     protected       $queryBase = 'SELECT z.*, id AS ARRAY_KEY FROM ?_zones z';
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

@@ -179,8 +179,8 @@ class ZonePage extends GenericPage
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-        $objectSpawns   = new GameObjectList($conditions);
-        $creatureSpawns = new CreatureList($conditions);
+        $objectSpawns   = new GameObjectList($conditions, ['calcTotal' => true]);
+        $creatureSpawns = new CreatureList($conditions, ['calcTotal' => true]);
         $atSpawns       = new AreaTriggerList($conditions);
 
         $questsLV = $rewardsLV = [];

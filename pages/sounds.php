@@ -48,7 +48,7 @@ class SoundsPage extends GenericPage
         $this->filter['query'] = $this->_get['filter'];
 
         $tabData = [];
-        $sounds  = new SoundList($conditions);
+        $sounds  = new SoundList($conditions, ['calcTotal' => true]);
         if (!$sounds->error)
         {
             $tabData['data'] = array_values($sounds->getListviewData());

@@ -513,7 +513,7 @@ class RemoteProfileList extends ProfileList
 
     private     $rnItr     = [];                            // rename iterator [name => nCharsWithThisName]
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         // select DB by realm
         if (!$this->selectRealms($miscData))
@@ -708,7 +708,7 @@ class RemoteProfileList extends ProfileList
         if ($baseData)
         {
             foreach (Util::createSqlBatchInsert($baseData) as $ins)
-                DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE name = VALUES(name), renameItr = VALUES(renameItr)', array_keys(reset($baseData)));
+                DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES '.$ins.' AS newP(`r`, `rg`, `na`, `itr`, `ra`, `cl`, `lvl`, `ge`, `g`, `gr`, `cf`) ON DUPLICATE KEY UPDATE `name` = newP.`na`, `renameItr` = newP.`itr`', array_keys(reset($baseData)));
 
             // merge back local ids
             $localIds = DB::Aowow()->select(
@@ -737,7 +737,7 @@ class LocalProfileList extends ProfileList
                         'g'   => ['j' => ['?_profiler_guild g ON g.id = p.guild', true], 's' => ', g.name AS guildname']
                     );
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

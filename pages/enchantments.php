@@ -45,7 +45,7 @@ class EnchantmentsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $ench = new EnchantmentList($conditions);
+        $ench = new EnchantmentList($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = array_values($ench->getListviewData());
         $this->extendGlobalData($ench->getJSGlobals());

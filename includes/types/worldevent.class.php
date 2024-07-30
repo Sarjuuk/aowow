@@ -16,9 +16,9 @@ class WorldEventList extends BaseType
                         'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
                     );
 
-    public function __construct($conditions = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         // unseting elements while we iterate over the array will cause the pointer to reset
         $replace = [];

@@ -161,7 +161,7 @@ class RemoteGuildList extends GuildList
                     'c'  => ['j' => 'characters c ON c.guid = gm.guid', 's' => ', BIT_OR(IF(c.race IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS faction']
                 );
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         // select DB by realm
         if (!$this->selectRealms($miscData))
@@ -273,7 +273,7 @@ class LocalGuildList extends GuildList
 {
     protected       $queryBase = 'SELECT g.*, g.id AS ARRAY_KEY FROM ?_profiler_guild g';
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

@@ -44,7 +44,7 @@ class IconsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $icons = new IconList($conditions);
+        $icons = new IconList($conditions, ['calcTotal' => true]);
 
         $tabData['data'] = array_values($icons->getListviewData());
         $this->extendGlobalData($icons->getJSGlobals());

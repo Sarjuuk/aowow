@@ -55,7 +55,7 @@ class ObjectsPage extends GenericPage
             $conditions[] = $_;
 
         $tabData = ['data' => []];
-        $objects = new GameObjectList($conditions, ['extraOpts' => $this->filterObj->extraOpts]);
+        $objects = new GameObjectList($conditions, ['extraOpts' => $this->filterObj->extraOpts, 'calcTotal' => true]);
         if (!$objects->error)
         {
             $tabData['data'] = array_values($objects->getListviewData());

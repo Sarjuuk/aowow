@@ -424,7 +424,7 @@ class ObjectPage extends GenericPage
         // tab: Spell Focus for
         if ($sfId = $this->subject->getField('spellFocusId'))
         {
-            $focusSpells = new SpellList(array(['spellFocusObject', $sfId]));
+            $focusSpells = new SpellList(array(['spellFocusObject', $sfId]), ['calcTotal' => true]);
             if (!$focusSpells->error)
             {
                 $tabData = array(

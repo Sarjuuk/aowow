@@ -35,7 +35,7 @@ class ItemList extends BaseType
                         'src' => ['j' => ['?_source     `src` ON `src`.`type` = 3 AND `src`.`typeId` = `i`.`id`', true], 's' => ', moreType, moreTypeId, moreZoneId, moreMask, src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
                     );
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 
@@ -1037,15 +1037,12 @@ class ItemList extends BaseType
                 // handle special cases where:
                 // > itemset has items of different qualities (handled by not limiting for this in the initial query)
                 // > itemset is virtual and multiple instances have the same itemLevel but not quality (filter below)
-                if ($itemset->getMatches() > 1)
+                foreach ($itemset->iterate() as $id => $__)
                 {
-                    foreach ($itemset->iterate() as $id => $__)
+                    if ($itemset->getField('quality') == $this->curTpl['quality'])
                     {
-                        if ($itemset->getField('quality') == $this->curTpl['quality'])
-                        {
-                            $itemset->pieceToSet = array_filter($itemset->pieceToSet, function($x) use ($id) { return $id == $x; });
-                            break;
-                        }
+                        $itemset->pieceToSet = array_filter($itemset->pieceToSet, function($x) use ($id) { return $id == $x; });
+                        break;
                     }
                 }
 

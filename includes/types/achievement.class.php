@@ -25,7 +25,7 @@ class AchievementList extends BaseType
         todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation
     */
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

@@ -19,9 +19,9 @@ class AreaTriggerList extends BaseType
                         's'      => ['j' => ['?_spawns s ON s.type = 503 AND s.typeId = a.id', true], 's' => ', s.areaId']
                     );
 
-    public function __construct($conditions)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         foreach ($this->iterate() as $id => &$_curTpl)
             if (!$_curTpl['name'])

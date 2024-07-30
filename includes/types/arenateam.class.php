@@ -126,7 +126,7 @@ class RemoteArenaTeamList extends ArenaTeamList
     private     $members   = [];
     private     $rankOrder = [];
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         // select DB by realm
         if (!$this->selectRealms($miscData))
@@ -324,7 +324,7 @@ class LocalArenaTeamList extends ArenaTeamList
 {
     protected       $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

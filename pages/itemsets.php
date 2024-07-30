@@ -41,7 +41,7 @@ class ItemsetsPage extends GenericPage
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $itemsets = new ItemsetList($conditions);
+        $itemsets = new ItemsetList($conditions, ['calcTotal' => true]);
         $this->extendGlobalData($itemsets->getJSGlobals());
 
         // recreate form selection

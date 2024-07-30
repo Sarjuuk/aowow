@@ -24,7 +24,7 @@ class CreatureList extends BaseType
                         's'      => ['j' => ['?_spawns s ON s.type = 1 AND s.typeId = ct.id', true]]
                     );
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

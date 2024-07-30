@@ -21,7 +21,7 @@ class GameObjectList extends BaseType
                         's'   => ['j' => '?_spawns s ON s.type = 2 AND s.typeId = o.id']
                     );
 
-    public function __construct($conditions = [], $miscData = null)
+    public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
 

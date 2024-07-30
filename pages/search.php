@@ -378,7 +378,7 @@ class SearchPage extends GenericPage
     private function _searchCharClass($cndBase)             // 0 Classes: $searchMask & 0x00000001
     {
         $cnd     = array_merge($cndBase, [$this->createLookup()]);
-        $classes = new CharClassList($cnd);
+        $classes = new CharClassList($cnd, ['calcTotal' => true]);
 
         if ($data = $classes->getListviewData())
         {
@@ -404,7 +404,7 @@ class SearchPage extends GenericPage
     private function _searchCharRace($cndBase)              // 1 Races: $searchMask & 0x00000002
     {
         $cnd   = array_merge($cndBase, [$this->createLookup()]);
-        $races = new CharRaceList($cnd);
+        $races = new CharRaceList($cnd, ['calcTotal' => true]);
 
         if ($data = $races->getListviewData())
         {
@@ -430,7 +430,7 @@ class SearchPage extends GenericPage
     private function _searchTitle($cndBase)                 // 2 Titles: $searchMask & 0x00000004
     {
         $cnd    = array_merge($cndBase, [$this->createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
-        $titles = new TitleList($cnd);
+        $titles = new TitleList($cnd, ['calcTotal' => true]);
 
         if ($data = $titles->getListviewData())
         {
@@ -462,7 +462,7 @@ class SearchPage extends GenericPage
                 ['AND', $this->createLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
-        $wEvents = new WorldEventList($cnd);
+        $wEvents = new WorldEventList($cnd, ['calcTotal' => true]);
 
         if ($data = $wEvents->getListviewData())
         {
@@ -489,7 +489,7 @@ class SearchPage extends GenericPage
     private function _searchCurrency($cndBase)              // 4 Currencies $searchMask & 0x0000010
     {
         $cnd   = array_merge($cndBase, [$this->createLookup()]);
-        $money = new CurrencyList($cnd);
+        $money = new CurrencyList($cnd, ['calcTotal' => true]);
 
         if ($data = $money->getListviewData())
         {
@@ -515,7 +515,7 @@ class SearchPage extends GenericPage
     private function _searchItemset($cndBase, &$shared)     // 5 Itemsets $searchMask & 0x0000020
     {
         $cnd  = array_merge($cndBase, [is_int($this->query) ? ['id', $this->query] : $this->createLookup()]);
-        $sets = new ItemsetList($cnd);
+        $sets = new ItemsetList($cnd, ['calcTotal' => true]);
 
         if ($data = $sets->getListviewData())
         {
@@ -550,7 +550,7 @@ class SearchPage extends GenericPage
 
     private function _searchItem($cndBase, &$shared)        // 6 Items $searchMask & 0x0000040
     {
-        $miscData = [];
+        $miscData = ['calcTotal' => true];
         $cndAdd   = empty($this->query) ? [] : (is_int($this->query) ? ['id', $this->query] : $this->createLookup());
 
         if (($this->searchMask & SEARCH_TYPE_JSON) && ($this->searchMask & 0x20) && !empty($shared['pcsToSet']))
@@ -630,7 +630,7 @@ class SearchPage extends GenericPage
             [['s.attributes0', 0x80, '&'], 0],
             $this->createLookup()
         ));
-        $abilities = new SpellList($cnd);
+        $abilities = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $abilities->getListviewData())
         {
@@ -695,7 +695,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', [-7, -2]],
             $this->createLookup()
         ));
-        $talents = new SpellList($cnd);
+        $talents = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $talents->getListviewData())
         {
@@ -746,7 +746,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', -13],
             $this->createLookup()
         ));
-        $glyphs = new SpellList($cnd);
+        $glyphs = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $glyphs->getListviewData())
         {
@@ -788,7 +788,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', -11],
             $this->createLookup()
         ));
-        $prof = new SpellList($cnd);
+        $prof = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $prof->getListviewData())
         {
@@ -830,7 +830,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', [9, 11]],
             $this->createLookup()
         ));
-        $prof = new SpellList($cnd);
+        $prof = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $prof->getListviewData())
         {
@@ -872,7 +872,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', -6],
             $this->createLookup()
         ));
-        $vPets = new SpellList($cnd);
+        $vPets = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $vPets->getListviewData())
         {
@@ -914,7 +914,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', -5],
             $this->createLookup()
         ));
-        $mounts = new SpellList($cnd);
+        $mounts = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $mounts->getListviewData())
         {
@@ -956,7 +956,7 @@ class SearchPage extends GenericPage
             [['cuFlags', NPC_CU_DIFFICULTY_DUMMY, '&'], 0], // exclude difficulty entries
             $this->createLookup()
         ));
-        $npcs = new CreatureList($cnd);
+        $npcs = new CreatureList($cnd, ['calcTotal' => true]);
 
         if ($data = $npcs->getListviewData())
         {
@@ -990,7 +990,7 @@ class SearchPage extends GenericPage
             [['flags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
             $this->createLookup()
         ));
-        $quests = new QuestList($cnd);
+        $quests = new QuestList($cnd, ['calcTotal' => true]);
 
         if ($data = $quests->getListviewData())
         {
@@ -1023,7 +1023,7 @@ class SearchPage extends GenericPage
             [['flags', ACHIEVEMENT_FLAG_COUNTER, '&'], 0],  // not a statistic
             $this->createLookup()
         ));
-        $acvs = new AchievementList($cnd);
+        $acvs = new AchievementList($cnd, ['calcTotal' => true]);
 
         if ($data = $acvs->getListviewData())
         {
@@ -1063,7 +1063,7 @@ class SearchPage extends GenericPage
             ['flags', ACHIEVEMENT_FLAG_COUNTER, '&'],       // is a statistic
             $this->createLookup()
         ));
-        $stats = new AchievementList($cnd);
+        $stats = new AchievementList($cnd, ['calcTotal' => true]);
 
         if ($data = $stats->getListviewData())
         {
@@ -1099,7 +1099,7 @@ class SearchPage extends GenericPage
     private function _searchZone($cndBase)                  // 18 Zones $searchMask & 0x0040000
     {
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
-        $zones  = new ZoneList($cnd);
+        $zones  = new ZoneList($cnd, ['calcTotal' => true]);
 
         if ($data = $zones->getListviewData())
         {
@@ -1124,7 +1124,7 @@ class SearchPage extends GenericPage
     private function _searchObject($cndBase)                // 19 Objects $searchMask & 0x0080000
     {
         $cnd     = array_merge($cndBase, [$this->createLookup()]);
-        $objects = new GameObjectList($cnd);
+        $objects = new GameObjectList($cnd, ['calcTotal' => true]);
 
         if ($data = $objects->getListviewData())
         {
@@ -1154,7 +1154,7 @@ class SearchPage extends GenericPage
     private function _searchFaction($cndBase)               // 20 Factions $searchMask & 0x0100000
     {
         $cnd      = array_merge($cndBase, [$this->createLookup()]);
-        $factions = new FactionList($cnd);
+        $factions = new FactionList($cnd, ['calcTotal' => true]);
 
         if ($data = $factions->getListviewData())
         {
@@ -1176,7 +1176,7 @@ class SearchPage extends GenericPage
     private function _searchSkill($cndBase)                 // 21 Skills $searchMask & 0x0200000
     {
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
-        $skills = new SkillList($cnd);
+        $skills = new SkillList($cnd, ['calcTotal' => true]);
 
         if ($data = $skills->getListviewData())
         {
@@ -1202,7 +1202,7 @@ class SearchPage extends GenericPage
     private function _searchPet($cndBase)                   // 22 Pets $searchMask & 0x0400000
     {
         $cnd    = array_merge($cndBase, [$this->createLookup()]);
-        $pets   = new PetList($cnd);
+        $pets   = new PetList($cnd, ['calcTotal' => true]);
 
         if ($data = $pets->getListviewData())
         {
@@ -1234,7 +1234,7 @@ class SearchPage extends GenericPage
             ['s.typeCat', -8],
             $this->createLookup()
         ));
-        $npcAbilities = new SpellList($cnd);
+        $npcAbilities = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $npcAbilities->getListviewData())
         {
@@ -1283,7 +1283,7 @@ class SearchPage extends GenericPage
             ],
             $this->createLookup()
         ));
-        $misc = new SpellList($cnd);
+        $misc = new SpellList($cnd, ['calcTotal' => true]);
 
         if ($data = $misc->getListviewData())
         {
@@ -1322,7 +1322,7 @@ class SearchPage extends GenericPage
     private function _searchEmote($cndBase)                 // 25 Emotes $searchMask & 0x2000000
     {
         $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'meToExt_loc'.User::$localeId, 'meToNone_loc'.User::$localeId, 'extToMe_loc'.User::$localeId, 'extToExt_loc'.User::$localeId, 'extToNone_loc'.User::$localeId])]);
-        $emote = new EmoteList($cnd);
+        $emote = new EmoteList($cnd, ['calcTotal' => true]);
 
         if ($data = $emote->getListviewData())
         {
@@ -1341,7 +1341,7 @@ class SearchPage extends GenericPage
     private function _searchEnchantment($cndBase)           // 26 Enchantments $searchMask & 0x4000000
     {
         $cnd         = array_merge($cndBase, [$this->createLookup(['name_loc'.User::$localeId])]);
-        $enchantment = new EnchantmentList($cnd);
+        $enchantment = new EnchantmentList($cnd, ['calcTotal' => true]);
 
         if ($data = $enchantment->getListviewData())
         {
@@ -1374,7 +1374,7 @@ class SearchPage extends GenericPage
     private function _searchSound($cndBase)                 // 27 Sounds $searchMask & 0x8000000
     {
         $cnd    = array_merge($cndBase, [$this->createLookup(['name'])]);
-        $sounds = new SoundList($cnd);
+        $sounds = new SoundList($cnd, ['calcTotal' => true]);
 
         if ($data = $sounds->getListviewData())
         {

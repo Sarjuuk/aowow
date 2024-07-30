@@ -614,7 +614,7 @@ class Profiler
 
         $skAllowed = DB::Aowow()->selectCol('SELECT `id` FROM ?_skillline WHERE `typeCat` IN (9, 11) AND (`cuFlags` & ?d) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW);
         $skills    = DB::Characters($realmId)->select('SELECT ?d AS `id`, `skill` AS `skillId`, `value`, `max` FROM character_skills WHERE `guid` = ?d AND `skill` IN (?a)', $profileId, $char['guid'], $skAllowed);
-        $racials   = DB::Aowow()->select('SELECT `effect1MiscValue` AS ARRAY_KEY, `effect1DieSides` + `effect1BasePoints` AS qty, `reqRaceMask`, `reqClassMask` FROM ?_spell WHERE `typeCat` = -4 AND `effect1Id` = 6 AND `effect1AuraId` = 98');
+        $racials   = DB::Aowow()->select('SELECT `effect1MiscValue` AS ARRAY_KEY, `effect1DieSides` + `effect1BasePoints` AS qty, `reqRaceMask`, `reqClassMask` FROM ?_spell WHERE `typeCat` = -4 AND `effect1Id` = ?d AND `effect1AuraId` = ?d', SPELL_EFFECT_APPLY_AURA, SPELL_AURA_MOD_SKILL_TALENT);
 
         foreach ($skills as &$sk)                           // apply racial profession bonuses
         {
@@ -644,14 +644,10 @@ class Profiler
         // get base values for this race/class
         $reputation = [];
         $baseRep    = DB::Aowow()->selectCol(
-           'SELECT `id` AS ARRAY_KEY, `baseRepValue1` FROM aowow_factions WHERE `baseRepValue1` && (`baseRepRaceMask1` & ?d || (!`baseRepRaceMask1` AND `baseRepClassMask1`)) &&
-            ((`baseRepClassMask1` & ?d) || !`baseRepClassMask1`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue2` FROM aowow_factions WHERE `baseRepValue2` && (`baseRepRaceMask2` & ?d || (!`baseRepRaceMask2` AND `baseRepClassMask2`)) &&
-            ((`baseRepClassMask2` & ?d) || !`baseRepClassMask2`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue3` FROM aowow_factions WHERE `baseRepValue3` && (`baseRepRaceMask3` & ?d || (!`baseRepRaceMask3` AND `baseRepClassMask3`)) &&
-            ((`baseRepClassMask3` & ?d) || !`baseRepClassMask3`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue4` FROM aowow_factions WHERE `baseRepValue4` && (`baseRepRaceMask4` & ?d || (!`baseRepRaceMask4` AND `baseRepClassMask4`)) &&
-            ((`baseRepClassMask4` & ?d) || !`baseRepClassMask4`)',
+           'SELECT `id` AS ARRAY_KEY, `baseRepValue1` FROM aowow_factions WHERE `baseRepValue1` AND (`baseRepRaceMask1` & ?d OR (`baseRepClassMask1` AND NOT `baseRepRaceMask1`)) AND ((`baseRepClassMask1` & ?d) OR NOT `baseRepClassMask1`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue2` FROM aowow_factions WHERE `baseRepValue2` AND (`baseRepRaceMask2` & ?d OR (`baseRepClassMask2` AND NOT `baseRepRaceMask2`)) AND ((`baseRepClassMask2` & ?d) OR NOT `baseRepClassMask2`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue3` FROM aowow_factions WHERE `baseRepValue3` AND (`baseRepRaceMask3` & ?d OR (`baseRepClassMask3` AND NOT `baseRepRaceMask3`)) AND ((`baseRepClassMask3` & ?d) OR NOT `baseRepClassMask3`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue4` FROM aowow_factions WHERE `baseRepValue4` AND (`baseRepRaceMask4` & ?d OR (`baseRepClassMask4` AND NOT `baseRepRaceMask4`)) AND ((`baseRepClassMask4` & ?d) OR NOT `baseRepClassMask4`)',
             $ra, $cl, $ra, $cl, $ra, $cl, $ra, $cl
         );
 
@@ -760,7 +756,7 @@ class Profiler
         /****************/
 
         // guilds
-        if ($guild = DB::Characters($realmId)->selectRow('SELECT g.name AS name, g.guildid AS id, gm.rank FROM guild_member gm JOIN guild g ON g.guildid = gm.guildid WHERE gm.guid = ?d', $char['guid']))
+        if ($guild = DB::Characters($realmId)->selectRow('SELECT g.`name` AS `name`, g.`guildid` AS `id`, gm.`rank` FROM guild_member gm JOIN guild g ON g.`guildid` = gm.`guildid` WHERE gm.`guid` = ?d', $char['guid']))
         {
             $guildId = 0;
             if (!($guildId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $realmId, $guild['id'])))
@@ -784,11 +780,11 @@ class Profiler
 
 
         // arena teams
-        $teams = DB::Characters($realmId)->select('SELECT at.arenaTeamId AS ARRAY_KEY, at.name, at.type, IF(at.captainGuid = atm.guid, 1, 0) AS captain, atm.* FROM arena_team at JOIN arena_team_member atm ON atm.arenaTeamId = at.arenaTeamId WHERE atm.guid = ?d', $char['guid']);
+        $teams = DB::Characters($realmId)->select('SELECT at.`arenaTeamId` AS ARRAY_KEY, at.`name`, at.`type`, IF(at.`captainGuid` = atm.`guid`, 1, 0) AS `captain`, atm.* FROM arena_team at JOIN arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId` WHERE atm.`guid` = ?d', $char['guid']);
         foreach ($teams as $rGuid => $t)
         {
             $teamId = 0;
-            if (!($teamId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_arena_team WHERE realm = ?d AND realmGUID = ?d', $realmId, $rGuid)))
+            if (!($teamId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_arena_team WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $rGuid)))
             {
                 $team = array(                                  // only most basic data
                     'realm'     => $realmId,
@@ -832,15 +828,15 @@ class Profiler
         /* mark char as done */
         /*********************/
 
-        if (DB::Aowow()->query('UPDATE ?_profiler_profiles SET ?a WHERE realm = ?d AND realmGUID = ?d', $data, $realmId, $charGuid) !== null)
-            DB::Aowow()->query('UPDATE ?_profiler_profiles SET cuFlags = cuFlags & ?d WHERE id = ?d', ~PROFILER_CU_NEEDS_RESYNC, $profileId);
+        if (DB::Aowow()->query('UPDATE ?_profiler_profiles SET ?a WHERE `realm` = ?d AND `realmGUID` = ?d', $data, $realmId, $charGuid) !== null)
+            DB::Aowow()->query('UPDATE ?_profiler_profiles SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $profileId);
 
         return true;
     }
 
     public static function getGuildFromRealm($realmId, $guildGuid)
     {
-        $guild = DB::Characters($realmId)->selectRow('SELECT guildId, name, createDate, info, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM guild WHERE guildId = ?d', $guildGuid);
+        $guild = DB::Characters($realmId)->selectRow('SELECT `guildId`, `name`, `createDate`, `info`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM guild WHERE `guildId` = ?d', $guildGuid);
         if (!$guild)
             return false;
 
@@ -851,7 +847,7 @@ class Profiler
         }
 
         // reminder: this query should not fail: a placeholder entry is created as soon as a team listview is created or team detail page is called
-        $guildId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $realmId, $guild['guildId']);
+        $guildId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $realmId, $guild['guildId']);
 
         CLI::write('fetching guild #'.$guildGuid.' from realm #'.$realmId);
         CLI::write('writing...');
@@ -867,8 +863,8 @@ class Profiler
         DB::Aowow()->query('UPDATE ?_profiler_guild SET ?a WHERE realm = ?d AND realmGUID = ?d', $guild, $realmId, $guildGuid);
 
         // ranks
-        DB::Aowow()->query('DELETE FROM ?_profiler_guild_rank WHERE guildId = ?d', $guildId);
-        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS guildId, rid AS `rank`, rname AS name FROM guild_rank WHERE guildid = ?d', $guildId, $guildGuid))
+        DB::Aowow()->query('DELETE FROM ?_profiler_guild_rank WHERE `guildId` = ?d', $guildId);
+        if ($ranks = DB::Characters($realmId)->select('SELECT ?d AS `guildId`, `rid` AS `rank`, `rname` AS `name` FROM guild_rank WHERE `guildid` = ?d', $guildId, $guildGuid))
             foreach (Util::createSqlBatchInsert($ranks) as $r)
                 DB::Aowow()->query('INSERT INTO ?_profiler_guild_rank (?#) VALUES '.$r, array_keys(reset($ranks)));
 
@@ -900,14 +896,14 @@ class Profiler
         /* mark guild as done */
         /*********************/
 
-        DB::Aowow()->query('UPDATE ?_profiler_guild SET cuFlags = cuFlags & ?d WHERE id = ?d', ~PROFILER_CU_NEEDS_RESYNC, $guildId);
+        DB::Aowow()->query('UPDATE ?_profiler_guild SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $guildId);
 
         return true;
     }
 
     public static function getArenaTeamFromRealm($realmId, $teamGuid)
     {
-        $team = DB::Characters($realmId)->selectRow('SELECT arenaTeamId, name, type, captainGuid, rating, seasonGames, seasonWins, weekGames, weekWins, `rank`, backgroundColor, emblemStyle, emblemColor, borderStyle, borderColor FROM arena_team WHERE arenaTeamId = ?d', $teamGuid);
+        $team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = ?d', $teamGuid);
         if (!$team)
             return false;
 
@@ -933,7 +929,7 @@ class Profiler
         unset($team['arenaTeamId']);
         $team['nameUrl'] = self::urlize($team['name']);
 
-        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET ?a WHERE realm = ?d AND realmGUID = ?d', $team, $realmId, $teamGuid);
+        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET ?a WHERE `realm` = ?d AND `realmGUID` = ?d', $team, $realmId, $teamGuid);
 
         CLI::write(' ..team data');
 
@@ -942,18 +938,14 @@ class Profiler
         /* Member Data */
         /***************/
 
-        $members = DB::Characters($realmId)->select('
-            SELECT
-                atm.guid AS ARRAY_KEY, atm.arenaTeamId, atm.weekGames, atm.weekWins, atm.seasonGames, atm.seasonWins, atm.personalrating
-            FROM
-                arena_team_member atm
-            JOIN
-                characters c ON c.guid = atm.guid AND
-                c.deleteInfos_Account IS NULL AND
-                c.level <= ?d AND
-                (c.extra_flags & ?d) = 0
-            WHERE
-                arenaTeamId = ?d',
+        $members = DB::Characters($realmId)->select(
+           'SELECT atm.`guid` AS ARRAY_KEY, atm.`arenaTeamId`, atm.`weekGames`, atm.`weekWins`, atm.`seasonGames`, atm.`seasonWins`, atm.`personalrating`
+            FROM   arena_team_member atm
+            JOIN   characters c ON c.`guid` = atm.`guid` AND
+                   c.`deleteInfos_Account` IS NULL AND
+                   c.`level` <= ?d AND
+                   (c.`extra_flags` & ?d) = 0
+            WHERE  `arenaTeamId` = ?d',
             MAX_LEVEL,
             self::CHAR_GMFLAGS,
             $teamGuid
@@ -991,7 +983,7 @@ class Profiler
             );
 
             // ...and purge this teams member
-            DB::Aowow()->query('DELETE FROM ?_profiler_arena_team_member WHERE arenaTeamId = ?d', $teamId);
+            DB::Aowow()->query('DELETE FROM ?_profiler_arena_team_member WHERE `arenaTeamId` = ?d', $teamId);
 
             foreach (Util::createSqlBatchInsert($members) as $m)
                 DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$m, array_keys(reset($members)));
@@ -1005,7 +997,7 @@ class Profiler
         /* mark team as done */
         /*********************/
 
-        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET cuFlags = cuFlags & ?d WHERE id = ?d', ~PROFILER_CU_NEEDS_RESYNC, $teamId);
+        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $teamId);
 
         return true;
     }

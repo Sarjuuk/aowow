@@ -49,7 +49,7 @@ class AreaTriggersPage extends GenericPage
             $conditions[] = $_;
 
         $tabData = [];
-        $trigger = new AreaTriggerList($conditions);
+        $trigger = new AreaTriggerList($conditions, ['calcTotal' => true]);
         if (!$trigger->error)
         {
             $tabData['data'] = array_values($trigger->getListviewData());

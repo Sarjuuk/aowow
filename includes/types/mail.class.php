@@ -13,9 +13,9 @@ class MailList extends BaseType
     protected       $queryBase = 'SELECT m.*, m.id AS ARRAY_KEY FROM ?_mails m';
     protected       $queryOpts = [];
 
-    public function __construct($conditions = [])
+    public function __construct(array $conditions = [], array $miscData = [])
     {
-        parent::__construct($conditions);
+        parent::__construct($conditions, $miscData);
 
         if ($this->error)
             return;

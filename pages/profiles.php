@@ -117,7 +117,7 @@ class ProfilesPage extends GenericPage
             $tabData['extraCols'] = $xc;
         }
 
-        $miscParams = [];
+        $miscParams = ['calcTotal' => true];
         if ($this->realm)
             $miscParams['sv'] = $this->realm;
         if ($this->region)

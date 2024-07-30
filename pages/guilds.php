@@ -86,7 +86,7 @@ class GuildsPage extends GenericPage
             'hiddenCols'  => ['guild'],
         );
 
-        $miscParams = [];
+        $miscParams = ['calcTotal' => true];
         if ($this->realm)
             $miscParams['sv'] = $this->realm;
         if ($this->region)
