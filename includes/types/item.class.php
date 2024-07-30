@@ -1661,15 +1661,18 @@ class ItemList extends BaseType
 
     private function initJsonStats()
     {
+        $class    = $this->curTpl['class'];
+        $subclass = $this->curTpl['subClass'];
+
         $json = array(
             'id'          => $this->id,
             'name'        => $this->getField('name', true),
             'quality'     => ITEM_QUALITY_HEIRLOOM - $this->curTpl['quality'],
             'icon'        => $this->curTpl['iconString'],
-            'classs'      => $this->curTpl['class'],
-            'subclass'    => $this->curTpl['subClass'],
+            'classs'      => $class,
+            'subclass'    => $subclass,
             'subsubclass' => $this->curTpl['subSubClass'],
-            'heroic'      => ($this->curTpl['flags'] & 0x8) >> 3,
+            'heroic'      => ($this->curTpl['flags'] & ITEM_FLAG_HEROIC) >> 3,
             'side'        => $this->curTpl['flagsExtra'] & 0x3 ? SIDE_BOTH - ($this->curTpl['flagsExtra'] & 0x3) : Game::sideByRaceMask($this->curTpl['requiredRace']),
             'slot'        => $this->curTpl['slot'],
             'slotbak'     => $this->curTpl['slotBak'],
@@ -1683,7 +1686,7 @@ class ItemList extends BaseType
             'frores'      => $this->curTpl['resFrost'],
             'shares'      => $this->curTpl['resShadow'],
             'arcres'      => $this->curTpl['resArcane'],
-            'armorbonus'  => $this->curTpl['class'] != ITEM_CLASS_ARMOR || $this->curTpl['armorDamageModifier'] <= 0 ? 0 : intVal($this->curTpl['armorDamageModifier']),
+            'armorbonus'  => $class != ITEM_CLASS_ARMOR ? 0 : max(0, intVal($this->curTpl['armorDamageModifier'])),
             'armor'       => $this->curTpl['tplArmor'],
             'dura'        => $this->curTpl['durability'],
             'itemset'     => $this->curTpl['itemset'],
@@ -1696,23 +1699,24 @@ class ItemList extends BaseType
             'scaflags'    => $this->curTpl['scalingStatValue']
         );
 
-        if ($this->curTpl['class'] == ITEM_CLASS_WEAPON || $this->curTpl['class'] == ITEM_CLASS_AMMUNITION)
+        if ($class == ITEM_CLASS_AMMUNITION)
+            $json['dps'] = round(($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']) / 2, 2);
+        else if ($class == ITEM_CLASS_WEAPON)
         {
-
             $json['dmgtype1'] = $this->curTpl['dmgType1'];
             $json['dmgmin1']  = $this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'];
             $json['dmgmax1']  = $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2'];
             $json['speed']    = round($this->curTpl['delay'] / 1000, 2);
             $json['dps']      = $json['speed'] ? round(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1) : 0;
 
-            if (in_array($json['subclass'], [2, 3, 18, 19]))
+            if (in_array($subclass, [2, 3, 18, 19]))
             {
                 $json['rgddmgmin'] = $json['dmgmin1'];
                 $json['rgddmgmax'] = $json['dmgmax1'];
                 $json['rgdspeed']  = $json['speed'];
                 $json['rgddps']    = $json['dps'];
             }
-            else if ($json['classs'] != ITEM_CLASS_AMMUNITION)
+            else
             {
                 $json['mledmgmin'] = $json['dmgmin1'];
                 $json['mledmgmax'] = $json['dmgmax1'];
@@ -1724,9 +1728,9 @@ class ItemList extends BaseType
                 $json['feratkpwr'] = $fap;
         }
 
-        if ($this->curTpl['class'] == ITEM_CLASS_ARMOR || $this->curTpl['class'] == ITEM_CLASS_WEAPON)
+        if ($class == ITEM_CLASS_ARMOR || $class == ITEM_CLASS_WEAPON)
             $json['gearscore'] = Util::getEquipmentScore($json['level'], $this->getField('quality'), $json['slot'], $json['nsockets']);
-        else if ($this->curTpl['class'] == ITEM_CLASS_GEM)
+        else if ($class == ITEM_CLASS_GEM)
             $json['gearscore'] = Util::getGemScore($json['level'], $this->getField('quality'), $this->getField('requiredSkill') == SKILL_JEWELCRAFTING, $this->id);
 
         // clear zero-values afterwards
