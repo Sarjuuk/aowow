@@ -26,6 +26,7 @@ if (CLISetup::getOpt('delete'))                         // generated with TEMPOR
 
 CLISetup::runInitial();
 
-die("\n");
+fwrite(STDOUT, "\n");
+exit;
 
 ?>

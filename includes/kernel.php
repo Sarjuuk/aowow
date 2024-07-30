@@ -135,7 +135,7 @@ set_exception_handler(function ($e)
         );
 
     if (CLI)
-        echo "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n";
+        fwrite(STDERR, "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n");
     else
     {
         Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, CLI::LOG_ERROR);
@@ -154,7 +154,7 @@ register_shutdown_function(function()
             );
 
         if (CLI || User::isInGroup(U_GROUP_EMPLOYEE))
-            echo "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n";
+            fwrite(STDERR, "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n");
     }
 });
 

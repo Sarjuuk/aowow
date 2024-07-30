@@ -302,7 +302,7 @@ abstract class CLI
         $msg = (self::$overwriteLast && CLI_HAS_E ? "\e[1G\e[0K" : "\n") . $msg;
         self::$overwriteLast = $tmpRow;
 
-        echo $msg;
+        fwrite($lvl == self::LOG_ERROR ? STDERR : STDOUT, $msg);
 
         if (self::$logHandle)                               // remove control sequences from log
             fwrite(self::$logHandle, self::purgeEscapes($msg));
@@ -412,7 +412,7 @@ abstract class CLI
             $charBuff = '';
 
             if ($desc)
-                echo "\n".$desc.": ";
+                fwrite(STDOUT, "\n".$desc.": ");
 
             while (true) {
                 if (feof(STDIN))
@@ -433,7 +433,7 @@ abstract class CLI
                 {
                     if (count($ordinals) == 1)
                     {
-                        echo chr(self::CHR_BELL);
+                        fwrite(STDOUT, chr(self::CHR_BELL));
                         return false;
                     }
                     else
@@ -455,7 +455,7 @@ abstract class CLI
 
                         $charBuff = mb_substr($charBuff, 0, -1);
                         if (!$isHidden && self::$hasReadline)
-                            echo chr(self::CHR_BACK)." ".chr(self::CHR_BACK);
+                            fwrite(STDOUT, chr(self::CHR_BACK)." ".chr(self::CHR_BACK));
                     }
                     // standalone \n or \r
                     else if ($keyId == self::CHR_LF || $keyId == self::CHR_CR)
@@ -467,7 +467,7 @@ abstract class CLI
                     {
                         $charBuff .= $char;
                         if (!$isHidden && self::$hasReadline)
-                            echo $char;
+                            fwrite(STDOUT, $char);
 
                         if ($singleChar && self::$hasReadline)
                         {
@@ -479,7 +479,7 @@ abstract class CLI
             }
         }
 
-        echo chr(self::CHR_BELL);
+        fwrite(STDOUT, chr(self::CHR_BELL));
 
         foreach ($userInput as $ui)
             if (strlen($ui))
