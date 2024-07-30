@@ -1,4 +1,14 @@
+* text=input
+
 *.php text eol=lf
 *.js text eol=lf
 *.css text eol=lf
 *.sql text eol=lf
+aowow text eol=lf
+prQueue text eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.ttf binary
+*.swf binary
