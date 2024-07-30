@@ -145,7 +145,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public function writeCLIHelp() : bool
     {
-        CLI::write('  usage: php aowow --setup [--locales: --mpqDataDir:]', -1, false);
+        CLI::write('  usage: php aowow --setup [--locales: --datasrc:]', -1, false);
         CLI::write();
         CLI::write('  Initially essential connection information are set up and basic connectivity tests run afterwards.', -1, false);
         CLI::write('  In the main stage dbc and world data is compiled into the database and required sound, image and data files are generated.', -1, false);
