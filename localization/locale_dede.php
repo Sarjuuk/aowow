@@ -57,6 +57,8 @@ $lang = array(
         'status'        => "Status",
         'yes'           => "Ja",
         'no'            => "Nein",
+        'any'           => "Beliebig",
+        'all'           => "Alle",
 
         // filter
         'extSearch'     => "Erweiterte Suche",
@@ -1577,7 +1579,7 @@ $lang = array(
         ),
         'spellModOp'    => array(
             "Schaden",                              "Dauer",                                "Bedrohung",                            "Effekt 1",                             "Aufladungen",
-            "Reichweite",                           "Radius",                               "kritische Trefferchance",              "Alle Effekte",                         "Zauberzeitverlust",
+            "Reichweite",                           "Radius",                               "Kritische Trefferchance",              "Alle Effekte",                         "Zauberzeitverlust",
             "Zauberzeit",                           "Abklingzeit",                          "Effekt 2",                             "Ignoriere Rüstung",                    "Kosten",
             "Kritischer Bonusschaden",              "Trefferchance",                        "Sprung-Ziele",                         "Chance auf Auslösung",                 "Intervall",
             "Multiplikator (Schaden)",              "Globale Abklingzeit",                  "Schaden über Zeit",                    "Effekt 3",                             "Multiplikator (Bonus)",
@@ -1590,6 +1592,9 @@ $lang = array(
             "kritische Zaubertrefferchance",        "erhaltene Nahkampftreffer",            "erhaltene Fernkampftreffer",           "erhaltene Zaubertreffer",              "erhaltene kritische Nahkampftreffer",
             "erhaltene kritische Fernkampftreffer", "erhaltene kritische Zaubertreffer",    "Nahkampftempo",                        "Fernkampftempo",                       "Zaubertempo",
             "Waffenfertigkeit Haupthand",           "Waffenfertigkeit Nebenhand",           "Waffenfertigkeit Fernkampf",           "Waffenkunde",                          "Rüstungsdurchschlag"
+        ),
+        'combatRatingMask' => array(
+                0xE0 => "Trefferchance",            0x700 => "Kritische Trefferchance",     0x1C000 => "Abhärtung"
         ),
         'lockType'      => array(
             null,                                   "Schlossknacken",                       "Kräuterkunde",                         "Bergbau",                              "Falle entschärfen",
@@ -1659,6 +1664,8 @@ $lang = array(
             89 => "Verwendbar, während Ihr verängstigt seid",
             65 => "Braucht alle Ressourcen auf"
         ),
+        'summonControl' => ["Ungesteuert", "Wächter", "Begleiter", "Bezaubert", "Gesteuertes Fahrzeug", "Ungesteuertes Fahrzeug"],
+        'summonSlot'    => ["Begleiter", "Feuertotem", "Erdtotem", "Wassertotem", "Lufttotem", "Haustier", "Quest"],
         'unkEffect'     => 'Unknown Effect (%1$d)',
         'effects'       => array(
 /*0-5    */ 'None',                     'Instakill',                'School Damage',            'Dummy',                    'Portal Teleport',          'Teleport Units',
@@ -1683,11 +1690,11 @@ $lang = array(
 /*114+   */ 'Taunt',                    'Durability Damage - %',    'Skin Player Corpse (PvP)', 'AoE Resurrect with % Health','Learn Skill',            'Apply Area Aura - Pet',
 /*120+   */ 'Teleport to Graveyard',    'Normalized Weapon Damage', null,                       'Take Flight Path',         'Pull Towards',             'Modify Threat - %',
 /*126+   */ 'Spell Steal ',             'Prospect',                 'Apply Area Aura - Friend', 'Apply Area Aura - Enemy',  'Redirect Done Threat %',   'Play Sound',
-/*132+   */ 'Play Music',               'Unlearn Specialization',   'Kill Credit2',             'Call Pet',                 'Heal for % of Total Health','Give % of Total Power',
+/*132+   */ 'Play Music',               'Unlearn Specialization',   'Kill Credit 2',            'Call Pet',                 'Heal for % of Total Health','Give % of Total Power',
 /*138+   */ 'Leap Back',                'Abandon Quest',            'Force Cast',               'Force Spell Cast with Value','Trigger Spell with Value','Apply Area Aura - Pet Owner',
 /*144+   */ 'Knockback to Dest.',       'Pull Towards Dest.',       'Activate Rune',            'Fail Quest',               null,                       'Charge to Dest',
 /*150+   */ 'Start Quest',              'Trigger Spell 2',          'Summon - Refer-A-Friend',  'Create Tamed Pet',         'Discover Flight Path',     'Dual Wield 2H Weapons',
-/*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
+/*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               'Force Cast 2',             'Change Talent Spec. Count',
 /*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
         ),
         'unkAura'       => 'Unknown Aura (%1$d)',

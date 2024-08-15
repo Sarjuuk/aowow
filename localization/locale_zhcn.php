@@ -58,6 +58,8 @@ $lang = array(
         'status'        => "状态",
         'yes'           => "是",
         'no'            => "无",
+        'any'           => "任意",
+        'all'           => "全部",
 
         // filter
         'extSearch'     => "扩展搜索",
@@ -1591,6 +1593,9 @@ $lang = array(
             "受到远程暴击几率",     			"受到法术暴击几率",      			"急速（近战）",                     "急速（远程）",                   "急速（法术）",
             "主手武器技能",                		"副手武器技能",                 	"远程武器技能",                  	"精准",                           "护甲穿透"
         ),
+        'combatRatingMask' => array(
+            0xE0 => "[Hit Chance]",                 0x700 => "[Critical Hit Chance]",       0x1C000 => "韧性"
+        ),
         'lockType'      => array(
             null,                                   "锁上的物品",                          "药草",                            "矿点",                               "陷阱",
             "未锁上的物品",                                 "宝物",                       "钙化精灵宝石",           "未锁上的物品",                                "陷阱",
@@ -1659,6 +1664,8 @@ $lang = array(
             89 => "恐惧时可用",
             65 => "消耗所有力量"
         ),
+        'summonControl' => ['[Uncontrolled]', "守护者", "宠物", "被魅惑", '[Possessed Vehicle]', '[Uncontrolled Vehicle]'],
+        'summonSlot'    => ["宠物", "火焰图腾", "大地图腾", "水图腾", "空气图腾", "非战斗宠物", "任务"],
         'unkEffect'     => '未知效果 (%1$d)',
         'effects'       => array(
 /*0-5    */ '无',                     '杀死',                '类型伤害',            'Dummy',                    '传送门',          '传送单位',
@@ -1683,11 +1690,11 @@ $lang = array(
 /*114+   */ 'Taunt',                    'Durability Damage - %',    'Skin Player Corpse (PvP)', 'AoE Resurrect with % Health','Learn Skill',            'Apply Area Aura - Pet',
 /*120+   */ 'Teleport to Graveyard',    'Normalized Weapon Damage', null,                       'Take Flight Path',         'Pull Towards',             'Modify Threat - %',
 /*126+   */ 'Spell Steal ',             'Prospect',                 'Apply Area Aura - Friend', 'Apply Area Aura - Enemy',  'Redirect Done Threat %',   'Play Sound',
-/*132+   */ 'Play Music',               'Unlearn Specialization',   'Kill Credit2',             'Call Pet',                 'Heal for % of Total Health','Give % of Total Power',
+/*132+   */ 'Play Music',               'Unlearn Specialization',   'Kill Credit 2',            'Call Pet',                 'Heal for % of Total Health','Give % of Total Power',
 /*138+   */ 'Leap Back',                'Abandon Quest',            'Force Cast',               'Force Spell Cast with Value','Trigger Spell with Value','Apply Area Aura - Pet Owner',
 /*144+   */ 'Knockback to Dest.',       'Pull Towards Dest.',       'Activate Rune',            'Fail Quest',               null,                       'Charge to Dest',
 /*150+   */ 'Start Quest',              'Trigger Spell 2',          'Summon - Refer-A-Friend',  'Create Tamed Pet',         'Discover Flight Path',     'Dual Wield 2H Weapons',
-/*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               null,                       'Change Talent Spec. Count',
+/*156+   */ 'Add Socket to Item',       'Create Tradeskill Item',   'Milling',                  'Rename Pet',               'Force Cast 2',             'Change Talent Spec. Count',
 /*162-167*/ 'Activate Talent Spec.',    null,                       'Remove Aura',              null,                       null,                       'Update Player Phase'
         ),
         'unkAura'       => '未知光环 (%1$d)',

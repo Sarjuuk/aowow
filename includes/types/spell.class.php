@@ -187,8 +187,10 @@ class SpellList extends BaseType
     // use if you JUST need the name
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_spell WHERE id = ?d', $id );
-        return Util::localizedString($n, 'name');
+        if ($n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_spell WHERE id = ?d', $id))
+            return Util::localizedString($n, 'name');
+
+        return '';
     }
     // end static use
 
@@ -484,9 +486,10 @@ class SpellList extends BaseType
         return $this->tools;
     }
 
-    public function getModelInfo($spellId = 0, $effIdx = 0)
+    public function getModelInfo(int $spellId = 0, int $effIdx = 0) : array
     {
-        $displays = [0 => []];
+        $displays = $results = [];
+
         foreach ($this->iterate() as $id => $__)
         {
             if ($spellId && $spellId != $id)
@@ -494,6 +497,9 @@ class SpellList extends BaseType
 
             for ($i = 1; $i < 4; $i++)
             {
+                if ($spellId && $effIdx && $effIdx != $i)
+                    continue;
+
                 $effMV = $this->curTpl['effect'.$i.'MiscValue'];
                 if (!$effMV)
                     continue;
@@ -524,24 +530,22 @@ class SpellList extends BaseType
                         2289 => [2289, 29415, 29418, 29419, 29420, 29421]   // Bear - Tauren
                     );
 
-                    if ($st = DB::Aowow()->selectRow('SELECT *, displayIdA as model1, displayIdH as model2 FROM ?_shapeshiftforms WHERE id = ?d', $effMV))
+                    if ($st = DB::Aowow()->selectRow('SELECT *, `displayIdA` AS `model1`, `displayIdH` AS `model2` FROM ?_shapeshiftforms WHERE `id` = ?d', $effMV))
                     {
                         foreach ([1, 2] as $j)
                             if (isset($subForms[$st['model'.$j]]))
                                 $st['model'.$j] = $subForms[$st['model'.$j]][array_rand($subForms[$st['model'.$j]])];
 
-                        $displays[0][$id][$i] = array(
-                            'typeId'       => 0,
-                            'displayId'    => $st['model2'] ? $st['model'.rand(1, 2)] : $st['model1'],
+                        $results[$id][$i] = array(
+                            'type'         => Type::NPC,
                             'creatureType' => $st['creatureType'],
+                            'displayId'    => $st['model2'] ? $st['model'.rand(1, 2)] : $st['model1'],
                             'displayName'  => Lang::game('st', $effMV)
                         );
                     }
                 }
             }
         }
-
-        $results = $displays[0];
 
         if (!empty($displays[Type::NPC]))
         {
@@ -555,6 +559,7 @@ class SpellList extends BaseType
                         foreach ($indizes as $idx)
                         {
                             $res = array(
+                                'type'        => Type::NPC,
                                 'typeId'      => $nId,
                                 'displayId'   => $nModels->getRandomModelId(),
                                 'displayName' => $nModels->getField('name', true)
@@ -582,6 +587,7 @@ class SpellList extends BaseType
                         foreach ($indizes as $idx)
                         {
                             $results[$srcId][$idx] = array(
+                                'type'        => Type::OBJECT,
                                 'typeId'      => $oId,
                                 'displayId'   => $oModels->getField('displayId'),
                                 'displayName' => $oModels->getField('name', true)
@@ -593,12 +599,15 @@ class SpellList extends BaseType
         }
 
         if ($spellId && $effIdx)
-            return !empty($results[$spellId][$effIdx]) ? $results[$spellId][$effIdx] : 0;
+            return $results[$spellId][$effIdx] ?? [];
+
+        if ($spellId)
+            return $results[$spellId] ?? [];
 
         return $results;
     }
 
-    private function createRangesForCurrent()
+    private function createRangesForCurrent() : string
     {
         if (!$this->curTpl['rangeMaxHostile'])
             return '';
@@ -620,7 +629,7 @@ class SpellList extends BaseType
             return sprintf(Lang::spell('range'), $this->curTpl['rangeMaxHostile']);
     }
 
-    public function createPowerCostForCurrent()
+    public function createPowerCostForCurrent() : string
     {
         $str = '';
 
@@ -664,7 +673,7 @@ class SpellList extends BaseType
         return $str;
     }
 
-    public function createCastTimeForCurrent($short = true, $noInstant = true)
+    public function createCastTimeForCurrent(bool $short = true, bool $noInstant = true) : string
     {
         if (!$this->curTpl['castTime'] && $this->isChanneledSpell())
             return Lang::spell('channeled');
@@ -678,7 +687,7 @@ class SpellList extends BaseType
             return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : Util::formatTime($this->curTpl['castTime'] * 1000);
     }
 
-    private function createCooldownForCurrent()
+    private function createCooldownForCurrent() : string
     {
         if ($this->curTpl['recoveryTime'])
             return Lang::formatTime($this->curTpl['recoveryTime'], 'spell', 'cooldown');
@@ -689,16 +698,15 @@ class SpellList extends BaseType
     }
 
     // formulae base from TC
-    private function calculateAmountForCurrent(int $effIdx, ?SpellList $altTpl = null, int $nTicks = 1) : array
+    private function calculateAmountForCurrent(int $effIdx, int $nTicks = 1) : array
     {
-        $ref     = $altTpl ?: $this;
         $level   = $this->charLevel;
         $maxBase = 0;
-        $rppl    = $ref->getField('effect'.$effIdx.'RealPointsPerLevel');
-        $base    = $ref->getField('effect'.$effIdx.'BasePoints');
-        $add     = $ref->getField('effect'.$effIdx.'DieSides');
-        $maxLvl  = $ref->getField('maxLevel');
-        $baseLvl = $ref->getField('baseLevel');
+        $rppl    = $this->getField('effect'.$effIdx.'RealPointsPerLevel');
+        $base    = $this->getField('effect'.$effIdx.'BasePoints');
+        $add     = $this->getField('effect'.$effIdx.'DieSides');
+        $maxLvl  = $this->getField('maxLevel');
+        $baseLvl = $this->getField('baseLevel');
 
         if ($rppl)
         {
@@ -707,8 +715,8 @@ class SpellList extends BaseType
             else if ($level < $baseLvl)
                 $level = $baseLvl;
 
-            if (!$ref->getField('atributes0') & SPELL_ATTR0_PASSIVE)
-                $level -= $ref->getField('spellLevel');
+            if (!$this->getField('atributes0') & SPELL_ATTR0_PASSIVE)
+                $level -= $this->getField('spellLevel');
 
             $maxBase += (int)(($level - $baseLvl) * $rppl);
             $maxBase *= $nTicks;
@@ -1060,7 +1068,7 @@ class SpellList extends BaseType
                 break;
             case 'm':                                       // BasePoints (minValue)
             case 'M':                                       // BasePoints (maxValue)
-                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx);
 
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
@@ -1116,7 +1124,7 @@ class SpellList extends BaseType
                         $periode = 3000;
                 }
 
-                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell, intVal($duration / $periode));
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx, intVal($duration / $periode));
 
                 if (in_array($op, $signs) && is_numeric($oparg))
                 {
@@ -1155,7 +1163,7 @@ class SpellList extends BaseType
                 break;
             case 's':                                       // BasePoints (with variance)
             case 'S':
-                [$min, $max, $modStrMin, $modStrMax] = $this->calculateAmountForCurrent($effIdx, $srcSpell);
+                [$min, $max, $modStrMin, $modStrMax] = $srcSpell->calculateAmountForCurrent($effIdx);
                 $mv   = $srcSpell->getField('effect'.$effIdx.'MiscValue');
                 $aura = $srcSpell->getField('effect'.$effIdx.'AuraId');
 

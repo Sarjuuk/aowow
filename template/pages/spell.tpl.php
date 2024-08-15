@@ -21,41 +21,41 @@
 <?php
 $this->brick('tooltip');
 
+if ($this->tools):
+    echo "                <div style=\"float: left; margin-right: 75px\">\n";
+endif;
+
 if ($this->reagents[1]):
-    if ($this->tools):
-        echo "                <div style=\"float: left; margin-right: 75px\">\n";
-    endif;
-
     $this->brick('reagentList', ['reagents' => $this->reagents[1], 'enhanced' => $this->reagents[0]]);
+endif;
 
-    if ($this->tools):
-        echo "                </div>\n";
+if ($this->tools):
+    echo "                </div>\n";
 
-        if ($this->reagents[0]):
-            echo "                <div style=\"float: left\">\n";
-        endif;
+    if ($this->reagents[0]):
+        echo "                <div style=\"float: left\">\n";
+    endif;
 ?>
                 <h3><?=Lang::spell('tools'); ?></h3>
                 <table class="iconlist">
 <?php
-        foreach ($this->tools as $i => $t):
-            echo '                    <tr><th align="right" id="iconlist-icon'.($i + 1).'"></th><td><span class="q1"><a href="'.$t['url'].'">'.$t['name']."</a></span></td></tr>\n";
-        endforeach;
+    foreach ($this->tools as $i => $t):
+        echo '                    <tr><th align="right" id="iconlist-icon'.($i + 1).'"></th><td><span class="q1"><a href="'.$t['url'].'">'.$t['name']."</a></span></td></tr>\n";
+    endforeach;
 ?>
                 </table>
                 <script type="text/javascript">
 <?php
-        foreach ($this->tools as $i => $t):
-            if (isset($t['itemId'])):
-                echo "                    \$WH.ge('iconlist-icon.".($i + 1)."').appendChild(g_items.createIcon(".$t['itemId'].", 0, 1));\n";
-            endif;
-        endforeach;
+    foreach ($this->tools as $i => $t):
+        if (isset($t['itemId'])):
+            echo $this->fmtCreateIcon($i + 1, Type::ITEM, $t['itemId'], 20, 'iconlist-icon', size: 0);
+        endif;
+    endforeach;
 ?>
                 </script>
 <?php
-        if ($this->reagents[0]):
-            echo "                </div>\n";
-        endif;
+    if ($this->reagents[0]):
+        echo "                </div>\n";
     endif;
 endif;
 ?>
@@ -86,23 +86,23 @@ endif;
                             </tr>
                             <tr>
                                 <th style="border-left: 0; border-top: 0"><?=Lang::game('duration');?></th>
-                                <td width="100%" style="border-top: 0"><?=(!empty($this->duration) ? $this->duration : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->duration ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('school'); ?></th>
-                                <td width="100%" style="border-top: 0"><?=(!empty($this->school[1]) ? (User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, $this->school[0], $this->school[1]) : $this->school[1]) : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->school ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('mechanic');?></th>
-                                <td width="100%" style="border-top: 0"><?=(!empty($this->mechanic) ? $this->mechanic : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->mechanic ?:'<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('dispelType');?></th>
-                                <td width="100%" style="border-top: 0"><?=(!empty($this->dispel) ? $this->dispel : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->dispel ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-bottom: 0; border-left: 0"><?=Lang::spell('_gcdCategory');?></th>
-                                <td style="border-bottom: 0"><?=(!empty($this->gcdCat) ? $this->gcdCat : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td style="border-bottom: 0"><?=($this->gcdCat ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                             </tr>
                             </table>
                         </td>
@@ -113,7 +113,7 @@ endif;
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_range');?></th>
-                        <td><?=$this->range.' '.Lang::spell('_distUnit').' <small>('.$this->rangeName;?>)</small></td>
+                        <td><?=$this->range.' '.Lang::spell('_distUnit').' <small>('.$this->rangeName.')</small>';?></td>
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_castTime');?></th>
@@ -121,7 +121,7 @@ endif;
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_cooldown');?></th>
-                        <td><?=(!empty($this->cooldown) ? $this->cooldown : '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                        <td><?=($this->cooldown ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
                     </tr>
                     <tr>
                         <th><dfn title="<?=Lang::spell('_globCD').'">'.Lang::spell('_gcd');?></dfn></th>
@@ -138,7 +138,7 @@ if (!in_array(array_values($this->scaling), [[-1, -1, 0, 0], [0, 0, 0, 0]])):
 <?php
     foreach ($this->scaling as $k => $s):
         if ($s > 0):
-            echo '                            '.sprintf(Lang::spell('scaling', $k), $s * 100)."<br>\n";
+            echo '                            '.Lang::spell('scaling', $k, [$s * 100])."<br>\n";
         endif;
     endforeach;
 ?>
@@ -147,7 +147,7 @@ if (!in_array(array_values($this->scaling), [[-1, -1, 0, 0], [0, 0, 0, 0]])):
 <?php
 endif;
 
-if (!empty($this->stances)):
+if ($this->stances):
 ?>
                     <tr>
                         <th><?=Lang::spell('_forms');?></th>
@@ -156,16 +156,16 @@ if (!empty($this->stances)):
 <?php
 endif;
 
-if (!empty($this->items)):
+if ($this->items):
 ?>
                     <tr>
                         <th><?=Lang::game('requires2');?></th>
-                        <td colspan="3"><?=(User::isInGroup(U_GROUP_STAFF) ? sprintf(Util::$dfnString, implode('<br />', $this->items[0]), $this->items[1]) : $this->items[1]);?></td>
+                        <td colspan="3"><?=$this->items;?></td>
                     </tr>
 <?php
 endif;
 
-$iconTabIdx = -1;
+$iconTabIdx = 0;
 foreach ($this->effects as $i => $e):
 ?>
                     <tr>
@@ -174,42 +174,8 @@ foreach ($this->effects as $i => $e):
 <?php
     echo '                            '.$e['name'];
 
-    $smallBuf = '';
-    if (isset($e['value'])):
-        $smallBuf .= '<br>'.Lang::spell('_value').Lang::main('colon').$e['value'];
-    endif;
-
-    if (isset($e['radius'])):
-        $smallBuf .= '<br>'.Lang::spell('_radius').Lang::main('colon').$e['radius'].' '.Lang::spell('_distUnit');
-    endif;
-
-    if (isset($e['interval'])):
-        $smallBuf .= '<br>'.Lang::spell('_interval').Lang::main('colon').$e['interval'];
-    endif;
-
-    if (isset($e['mechanic'])):
-        $smallBuf .= '<br>'.Lang::game('mechanic')  .Lang::main('colon').$e['mechanic'];
-    endif;
-
-    if (isset($e['procData'])):
-        $smallBuf .= '<br>';
-
-        if ($e['procData'][0] < 0):
-            $smallBuf .= sprintf(Lang::spell('ppm'), Lang::nf(-$e['procData'][0], 1));
-        elseif ($e['procData'][0] < 100.0):
-            $smallBuf .= Lang::spell('procChance').Lang::main('colon').$e['procData'][0].'%';
-        endif;
-
-        if ($e['procData'][1]):
-            if ($e['procData'][0] < 100.0):
-                $smallBuf .= '<br>';
-            endif;
-            $smallBuf .= sprintf(Lang::game('cooldown'), $e['procData'][1]);
-        endif;
-    endif;
-
-    if ($smallBuf):
-        echo "<small>".$smallBuf."</small>\n";
+    if ($e['footer']):
+        echo "<small><br>".implode("<br>", $e['footer'])."</small>\n";
     endif;
 
     if (isset($e['markup'])):
@@ -218,35 +184,37 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 //]]></script>';
     endif;
 
-    if (isset($e['icon'])):
+    if ($e['icon']):
+        ['type' => $ty, 'typeId' => $ti, 'name' => $na, 'quality' => $qu, 'count' => $co] = $e['icon'];
 ?>
                             <table class="icontab">
                                 <tr>
                                     <th id="icontab-icon<?=++$iconTabIdx;?>"></th>
 <?php
-        if (isset($e['icon']['quality'])):
-            echo '                                    <td><span class="q'.$e['icon']['quality'].'"><a href="?item='.$e['icon']['id'].'">'.$e['icon']['name']."</a></span></td>\n";
+        if ($qu):
+            echo '                                    <td><span class="q'.$qu.'">'.($na ? sprintf('<a href="?item=%d">%s</a>', $ti, $na) : Util::ucFirst(Lang::game('item')).' #'.$ti)."</span></td>\n";
         else:
-            echo '                                    <td>'.(strpos($e['icon']['name'], '#') ? $e['icon']['name'] : sprintf('<a href="?spell=%d">%s</a>', $e['icon']['id'], $e['icon']['name']))."</td>\n";
+            echo '                                    <td>'.($na ? sprintf('<a href="?spell=%d">%s</a>', $ti, $na) : Util::ucFirst(Lang::game('spell')).' #'.$ti)."</td>\n";
         endif;
 ?>
                                     <th></th><td></td>
                                 </tr>
                             </table>
                             <script type="text/javascript">
-                                <?='$WH.ge(\'icontab-icon'.$iconTabIdx.'\').appendChild('.(isset($e['icon']['quality']) ? 'g_items' : 'g_spells').'.createIcon('.$e['icon']['id'].', 1, '.$e['icon']['count']."));\n";?>
+                                <?=$this->fmtCreateIcon($iconTabIdx, $ty, $ti, num: $co);?>
                             </script>
 <?php
     endif;
 
-    if (isset($e['perfItem'])):
+    if ($e['perfectItem']):
+        ['spellId' => $si, 'spellName' => $sn, 'itemId' => $ii, 'itemName' => $in, 'quality' => $qu, 'icon' => $ic, 'chance' => $ch] = $e['perfectItem'];
 ?>
-                            <small><a href="?spell=<?=$e['perfItem']['cndSpellId'];?>" class="icontiny"><img src="<?=Cfg::get('STATIC_URL');?>/images/wow/icons/tiny/<?=$e['perfItem']['icon'];?>.gif" align="absmiddle">
-                                <span class="tinyicontxt"><?=$e['perfItem']['cndSpellName'];?></span></a><?=Lang::main('colon').' '.$e['perfItem']['chance'].'%';?></small><table class="icontab">
-                            <tr><th id="icontab-icon<?=++$iconTabIdx;?>"></th><td><small><a href="?item=<?=$e['perfItem']['itemId'];?>" class="q<?=$e['perfItem']['quality'];?>"><?=$e['perfItem']['itemName'];?></a></small></td></tr></table>
+                            <small><a href="?spell=<?=$si;?>" class="icontiny"><img src="<?=Cfg::get('STATIC_URL');?>/images/wow/icons/tiny/<?=$ic;?>.gif" align="absmiddle">
+                                <span class="tinyicontxt"><?=$sn;?></span></a><?=Lang::main('colon').' '.$ch.'%';?></small><table class="icontab">
+                            <tr><th id="icontab-icon<?=++$iconTabIdx;?>"></th><td><small><a href="?item=<?=$ii;?>" class="q<?=$qu;?>"><?=$in;?></a></small></td></tr></table>
 
                             <script type="text/javascript">//<![CDATA[
-                                $WH.ge('icontab-icon<?=$iconTabIdx;?>').appendChild(g_items.createIcon(<?=$e['perfItem']['itemId'];?>, 0, "0"));
+                                <?=$this->fmtCreateIcon($iconTabIdx, Type::ITEM, $ii);?>
                             //]]></script>
 
 <?php
@@ -263,8 +231,8 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
             $folded   = false;
             $iconData = [];
 
-            if ($type && count($e['modifies'][0]))
-                echo '<a href="javascript:" class="disclosure-off" onclick="return g_disclose($(\'#effectspells-85645'.($i - 1).'\')[0], this);">'.Lang::spell('_seeMore').'</a><div id="effectspells-85645'.($i - 1).'" style="display: none">';
+            if ($type && count($e['modifies'][0]))          // #effectspells-856451 < the number is ID from SpellEffect.db2 (not available in 3.3.5a, use effectIdx instead)
+                echo '<a href="javascript:" class="disclosure-off" onclick="return g_disclose($(\'#effectspells-'.$i.'\')[0], this);">'.Lang::spell('_seeMore').'</a><div id="effectspells-'.$i.'" style="display: none">';
 
             echo '<table class="icontab">';
 
@@ -297,8 +265,8 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
                             <script type="text/javascript">//<![CDATA[
 <?php
-            foreach ($iconData as [$icon, $spell])
-                echo sprintf("                                \$WH.ge('icontab-icon%d').appendChild(g_spells.createIcon(%d, 0, \"0\"));\n", $icon, $spell);
+            foreach ($iconData as [$idx, $spell])
+                echo $this->fmtCreateIcon($idx, Type::SPELL, $spell, 32, size: 0);
 ?>
                             //]]></script>
 

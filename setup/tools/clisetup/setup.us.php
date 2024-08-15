@@ -155,7 +155,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         if ($this->startStep)
         {
             CLI::write();
-            CLI::write('  You are currently on step '.($this->startStep + 1).' / '.count($this->steps).' ('.($this->steps[$this->startStep][1] ?: $this->steps[$this->startStep][0][1]).'). You can resume or restart the setup process.', -1, false);
+            CLI::write('  You are currently on step '.($this->startStep + 1).' / '.count($this->steps).' ('.($this->steps[$this->startStep][1] ?: $this->steps[$this->startStep][0]).'). You can resume or restart the setup process.', -1, false);
         }
 
         CLI::write();

@@ -861,8 +861,44 @@ class GenericPage
         return $buff;
     }
 
+    protected function fmtCreateIcon(int $iconIdx, int $type, int $typeId, int $pad = 0, string $element = 'icontab-icon', int $size = 1, int $num = 0, int $qty = 0) : string
+    {
+        // $element, $iconTabIdx,  [typeId, size, num, qty]
+        $createIconString = "\$WH.ge('%s%d').appendChild(%s.createIcon(%s));\n";
+
+        if ($size < 0 || $size > 3)
+        {
+            trigger_error('GenericPage::fmtCreateIcon - invalid icon size '.$size.'. Normalied to 1 [small]', E_USER_WARNING);
+            $size = 1;
+        }
+
+        $jsg = Type::getJSGlobalString($type);
+        if (!$jsg)
+        {
+            trigger_error('GenericPage::fmtCreateIcon - invalid type '.$type.'. Assumed '.Type::SPELL.' [spell]', E_USER_WARNING);
+            $jsg = Type::getJSGlobalString(Type::SPELL);
+        }
+
+        $params = [$typeId, $size];
+        if ($num || $qty)
+            $params[] = is_numeric($num) ? $num : "'".$num."'";
+        if ($qty)
+            $params[] = is_numeric($qty) ? $qty : "'".$qty."'";
+
+        // $WH.ge('icontab-icon1').appendChild(g_spells.createIcon(40120, 1, '1-4', 0));
+        return str_repeat(' ', $pad) . sprintf($createIconString, $element, $iconIdx, $jsg, implode(', ', $params));
+    }
+
+    protected function fmtStaffTip(string $text, string $tip) : string
+    {
+        if (User::isInGroup(U_GROUP_EMPLOYEE))
+            return sprintf(Util::$dfnString, $tip, $text);
+        else
+            return $text;
+    }
+
     // load brick
-    public function brick(string $file, array $localVars = []) : void
+    protected function brick(string $file, array $localVars = []) : void
     {
         foreach ($localVars as $n => $v)
             $$n = $v;
@@ -874,7 +910,7 @@ class GenericPage
     }
 
     // load listview addIns
-    public function lvBrick(string $file) : void
+    protected function lvBrick(string $file) : void
     {
         if (!$this->isSaneInclude('template/listviews/', $file))
             trigger_error('Nonexistant Listview addin requested: template/listviews/'.$file.'.tpl.php', E_USER_ERROR);
@@ -883,7 +919,7 @@ class GenericPage
     }
 
     // load brick with more text then vars
-    public function localizedBrick(string $file, int $loc = LOCALE_EN) : void
+    protected function localizedBrick(string $file, int $loc = LOCALE_EN) : void
     {
         if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc))
         {

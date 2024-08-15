@@ -399,11 +399,16 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getMagicSchools(int $schoolMask) : string
+    public static function getMagicSchools(int $schoolMask, bool $short = false) : string
     {
         $schoolMask &= SPELL_ALL_SCHOOLS;                   // clamp to available schools..
         $tmp = [];
         $i   = 0;
+
+        if ($short && $schoolMask == SPELL_ALL_SCHOOLS)
+            return self::main('all');
+        if ($short && $schoolMask == SPELL_MAGIC_SCHOOLS)
+            return self::main('all').' ('.self::game('dt', 1).')';
 
         while ($schoolMask)
         {
