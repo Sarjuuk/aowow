@@ -263,8 +263,14 @@ class ItemList extends BaseType
                     }
 
                     // reqRating ins't really a cost .. so pass it by ref instead of return
-                    // use highest total value
-                    if (isset($data[$npcId]) && $costs['reqRating'] && (!$reqRating || $reqRating[0] < $costs['reqRating']))
+                    // data was invalid and deleted or some source doesn't require arena rating
+                    if (!isset($data[$npcId]) || ($reqRating && !$reqRating[0]))
+                        continue;
+
+                    // use lowest total value
+                    if (!$costs['reqRating'])
+                        $reqRating = [0, 2];
+                    else if ($costs['reqRating'] && (!$reqRating || $reqRating[0] > $costs['reqRating']))
                         $reqRating = [$costs['reqRating'], $costs['reqBracket']];
                 }
             }
@@ -914,7 +920,7 @@ class ItemList extends BaseType
             $x .= sprintf(Lang::item('reqMinLevel'), $_reqLvl).'<br />';
 
         // required arena team rating / personal rating / todo (low): sort out what kind of rating
-        if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating)
+        if (!empty($this->getExtendedCost([], $reqRating)[$this->id]) && $reqRating && $reqRating[0])
             $x .= sprintf(Lang::item('reqRating', $reqRating[1]), $reqRating[0]).'<br />';
 
         // item level

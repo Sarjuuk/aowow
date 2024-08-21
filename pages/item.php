@@ -293,7 +293,7 @@ class ItemPage extends genericPage
             else if (count($costList) > 1)
                 $infobox[] = Lang::item('cost').$each.Lang::main('colon').'[ul][li]'.implode('[/li][li]', $costList).'[/li][/ul]';
 
-            if ($_reqRating)
+            if ($_reqRating && $_reqRating[0])
             {
                 $text = str_replace('<br />', ' ', Lang::item('reqRating', $_reqRating[1], [$_reqRating[0]]));
                 $infobox[] = Lang::breakTextClean($text, 30, LANG::FMT_MARKUP);
