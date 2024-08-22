@@ -255,13 +255,13 @@ abstract class BaseType
         if ($h = array_filter(array_column($this->queryOpts, 'h')))
             $this->queryBase .= ' HAVING '.implode(' AND ', $h);
 
+        // without applied LIMIT and ORDER
+        if ($calcTotal)
+            $totalQuery = $this->queryBase;
+
         // append ordering
         if ($o = array_filter(array_column($this->queryOpts, 'o')))
             $this->queryBase .= ' ORDER BY '.implode(', ', $o);
-
-        // without applied LIMIT
-        if ($calcTotal)
-            $totalQuery = $this->queryBase;
 
         // apply limit
         if ($limit)
@@ -1019,7 +1019,7 @@ abstract class Filter
     /* get prepared values */
     /***********************/
 
-    public function getFilterString(array $override = [], array $addCr = [])
+    public function getFilterString(array $override = [], array $addCr = []) : string
     {
         $_ = [];
         foreach (array_merge($this->fiData['c'], $this->fiData['v'], $override) as $k => $v)
@@ -1047,32 +1047,32 @@ abstract class Filter
         return implode(';', $_);
     }
 
-    public function getExtraCols()
+    public function getExtraCols() : array
     {
         return array_unique($this->formData['extraCols']);
     }
 
-    public function getSetCriteria()
+    public function getSetCriteria() : array
     {
         return $this->formData['setCriteria'];
     }
 
-    public function getSetWeights()
+    public function getSetWeights() : array
     {
         return $this->formData['setWeights'];
     }
 
-    public function getReputationCols()
+    public function getReputationCols() : array
     {
         return $this->formData['reputationCols'];
     }
 
-    public function getForm()
+    public function getForm() : array
     {
         return $this->formData['form'];
     }
 
-    public function getConditions()
+    public function getConditions() : array
     {
         if (!$this->cndSet)
         {
@@ -1096,7 +1096,7 @@ abstract class Filter
     /* input sanitization */
     /**********************/
 
-    private function evaluatePOST()
+    private function evaluatePOST() : void
     {
         // doesn't need to set formData['form']; this happens in GET-step
         foreach ($this->inputFields as $inp => [$type, $valid, $asArray])
@@ -1125,7 +1125,7 @@ abstract class Filter
         $this->setCriteria();
     }
 
-    private function evaluateGET()
+    private function evaluateGET() : void
     {
         if (empty($_GET['filter']))
             return;
@@ -1165,7 +1165,7 @@ abstract class Filter
                     if ($k == 'v')
                         $this->formData['form'][$inp] = $buff;
 
-                    $this->fiData[$k][$inp] = array_map(function ($x) { return strtr($x, Filter::$wCards); }, $buff);
+                    $this->fiData[$k][$inp] = $buff;
                 }
             }
             else if ($val !== '' && $this->checkInput($type, $valid, $val) && $val !== '')
@@ -1173,7 +1173,7 @@ abstract class Filter
                 if ($k == 'v')
                     $this->formData['form'][$inp] = $val;
 
-                $this->fiData[$k][$inp] = strtr($val, Filter::$wCards);
+                $this->fiData[$k][$inp] = $val;
             }
         }
 
@@ -1181,7 +1181,7 @@ abstract class Filter
         $this->setCriteria();
     }
 
-    private function setCriteria()                          // [cr]iterium, [cr].[s]ign, [cr].[v]alue
+    private function setCriteria() : void                   // [cr]iterium, [cr].[s]ign, [cr].[v]alue
     {
         if (empty($this->fiData['c']['cr']) && empty($this->fiData['c']['crs']) && empty($this->fiData['c']['crv']))
             return;
@@ -1192,7 +1192,6 @@ abstract class Filter
             unset($this->fiData['c']['crv']);
 
             $this->error = true;
-
             return;
         }
 
@@ -1261,27 +1260,24 @@ abstract class Filter
         );
     }
 
-    private function setWeights()
+    private function setWeights() : void
     {
+        // both empty: not in use
         if (empty($this->fiData['v']['wt']) && empty($this->fiData['v']['wtv']))
             return;
 
+        // one empty: erroneous manual input?
+        if (empty($this->fiData['v']['wt']) || empty($this->fiData['v']['wtv']))
+        {
+            unset($this->fiData['v']['wt']);
+            unset($this->fiData['v']['wtv']);
+
+            $this->error = true;
+            return;
+        }
+
         $_wt  = &$this->fiData['v']['wt'];
         $_wtv = &$this->fiData['v']['wtv'];
-
-        if (empty($_wt) && !empty($_wtv))
-        {
-            unset($_wtv);
-            $this->error = true;
-            return;
-        }
-
-        if (empty($_wtv) && !empty($_wt))
-        {
-            unset($_wt);
-            $this->error = true;
-            return;
-        }
 
         $nwt  = count($_wt);
         $nwtv = count($_wtv);
@@ -1358,23 +1354,33 @@ abstract class Filter
         return false;
     }
 
-    protected function modularizeString(array $fields, $string = '', $exact = false, $shortStr = false)
+    protected function transformString(string $string, bool $exact) : string
+    {
+        // escape manually entered _; entering % should be prohibited
+        $string = str_replace('_', '\\_', $string);
+
+        // now replace search wildcards with sql wildcards
+        $string = strtr($string, Filter::$wCards);
+
+        return sprintf($exact ? '%s' : '%%%s%%', $string);
+    }
+
+    protected function modularizeString(array $fields, string $string = '', bool $exact = false, bool $shortStr = false) : array
     {
         if (!$string && !empty($this->fiData['v']['na']))
             $string = $this->fiData['v']['na'];
 
         $qry  = [];
-        $exPH = $exact ? '%s' : '%%%s%%';
-        foreach ($fields as $n => $f)
+        foreach ($fields as $f)
         {
             $sub   = [];
             $parts = $exact ? [$string] : array_filter(explode(' ', $string));
             foreach ($parts as $p)
             {
                 if ($p[0] == '-' && (mb_strlen($p) > 3 || $shortStr))
-                    $sub[] = [$f, sprintf($exPH, str_replace('_', '\\_', mb_substr($p, 1))), '!'];
+                    $sub[] = [$f, $this->transformString(mb_substr($p, 1), $exact), '!'];
                 else if ($p[0] != '-' && (mb_strlen($p) > 2 || $shortStr))
-                    $sub[] = [$f, sprintf($exPH, str_replace('_', '\\_', $p))];
+                    $sub[] = [$f, $this->transformString($p, $exact)];
             }
 
             // single cnd?
