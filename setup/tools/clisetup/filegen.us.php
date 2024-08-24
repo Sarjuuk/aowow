@@ -141,7 +141,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 return true;
         }
 
-        CLI::write('  usage: php aowow --build=<SetupScriptList,> [--mpqDataDir: --locales:]', -1, false);
+        CLI::write('  usage: php aowow --build=<SetupScriptList,> [--datasrc: --locales:]', -1, false);
         CLI::write();
         CLI::write('  Compiles files for a given SetupScript. Existing files are kept by default. Dependencies are taken into account by the triggered calls of --sync --update', -1, false);
         CLI::write();

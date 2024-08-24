@@ -127,7 +127,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 return true;
         }
 
-        CLI::write('  usage: php aowow --sql=<SetupScriptList,> [--mpqDataDir: --locales:]', -1, false);
+        CLI::write('  usage: php aowow --sql=<SetupScriptList,> [--datasrc: --locales:]', -1, false);
         CLI::write();
         CLI::write('  Regenerates DB table content for a given SetupScript. Dependencies are taken into account by the triggered calls of --sync and --update', -1, false);
         CLI::write();

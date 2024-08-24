@@ -88,7 +88,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     public function writeCLIHelp() : bool
     {
-        CLI::write('  usage: php aowow --sync=<tableList,> [--locales: --mpqDataDir: --force -f]', -1, false);
+        CLI::write('  usage: php aowow --sync=<tableList,> [--locales: --datasrc: --force -f]', -1, false);
         CLI::write();
         CLI::write('  Truncates and recreates AoWoW tables and static data files that depend on the given TC world table. Use this command after you updated your world database.', -1, false);
         CLI::write();

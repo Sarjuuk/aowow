@@ -17,7 +17,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     public $optGroup    = CLISetup::OPT_GRP_UTIL;
 
     public const COMMAND      = 'dbc';
-    public const DESCRIPTION  = 'Extract dbc files from mpqDataDir into sql table. Structural ini file must be defined in setup/tools/dbc/.';
+    public const DESCRIPTION  = 'Extract dbc files from datasrc into sql table. Structural ini file must be defined in setup/tools/dbc/.';
     public const APPENDIX     = '=<dbcfileList,> [tablename [wowbuild]]';
 
     public const REQUIRED_DB = [DB_AOWOW];
@@ -62,7 +62,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     {
         CLI::write('  usage: php aowow --dbc=<dbcfileList,..> [--locales=<regionCodes,..>] [tablename [wowbuild]]', -1, false);
         CLI::write();
-        CLI::write('  Extract dbc files from mpqDataDir into sql table. If the dbc file contains a locale block, data from all available locales gets merged into the same table.', -1, false);
+        CLI::write('  Extract dbc files from datasrc into sql table. If the dbc file contains a locale block, data from all available locales gets merged into the same table.', -1, false);
         CLI::write();
         CLI::write('  Known WoW builds:', -1, false);
 
