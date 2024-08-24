@@ -1463,6 +1463,7 @@ $lang = array(
         'pctCostOf'     => "的基础%s",
         'costPerSec'    => "，加%s每秒",
         'costPerLevel'  => "，加%s每级",
+        'pointsPerCP'   => "，加%s每连击",
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "缩放比例",

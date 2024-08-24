@@ -1464,6 +1464,7 @@ $lang = array(
         'pctCostOf'     => "of base %s",
         'costPerSec'    => ", plus %s per sec",             // see 'powerTypes'
         'costPerLevel'  => ", plus %s per level",           // not used?
+        'pointsPerCP'   => ", plus %s per combo point",
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
         '_scaling'      => "Scaling",

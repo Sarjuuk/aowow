@@ -1463,6 +1463,7 @@ $lang = array(
         'pctCostOf'     => "от базовой %s",
         'costPerSec'    => ", плюс %s в секунду",
         'costPerLevel'  => ", плюс %s за уровень",
+        'pointsPerCP'   => ", плюс %s в прием в серии",
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
         '_scaling'      => "[Scaling]",

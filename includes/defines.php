@@ -519,6 +519,12 @@ define('SPELL_SCHOOL_ARCANE',               6);
 define('SPELL_MAGIC_SCHOOLS',               0x7E);
 define('SPELL_ALL_SCHOOLS',                 0x7F);
 
+// DamageClass
+define('SPELL_DAMAGE_CLASS_NONE',           0);
+define('SPELL_DAMAGE_CLASS_MAGIC',          1);
+define('SPELL_DAMAGE_CLASS_MELEE',          2);
+define('SPELL_DAMAGE_CLASS_RANGED',         3);
+
 // CharacterSlot
 define('SLOT_HEAD',                         0);
 define('SLOT_NECK',                         1);

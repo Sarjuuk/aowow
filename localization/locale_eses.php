@@ -1463,6 +1463,7 @@ $lang = array(
         'pctCostOf'     => "del %s base",
         'costPerSec'    => ", mas %s por segundo",
         'costPerLevel'  => ", mas %s por nivel",
+        'pointsPerCP'   => ", mas %s por punto de combo",
         'stackGroup'    => "Grupo de aplilamiento",
         'linkedWith'    => "Asociado con",
         '_scaling'      => "Escala",

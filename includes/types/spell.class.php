@@ -678,7 +678,7 @@ class SpellList extends BaseType
         if (!$this->curTpl['castTime'] && $this->isChanneledSpell())
             return Lang::spell('channeled');
         // SPELL_ATTR0_ABILITY instant ability.. yeah, wording thing only (todo (low): rule is imperfect)
-        else if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != 1 || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
+        else if (!$this->curTpl['castTime'] && ($this->curTpl['damageClass'] != SPELL_DAMAGE_CLASS_MAGIC || $this->curTpl['attributes0'] & SPELL_ATTR0_ABILITY))
             return Lang::spell('instantPhys');
         // show instant only for player/pet/npc abilities (todo (low): unsure when really hidden (like talent-case))
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
@@ -1957,7 +1957,7 @@ class SpellList extends BaseType
             $x .= '<table><tr><td>'.implode('<br />', $xTmp).'</td></tr></table>';
 
         $min = $this->scaling[$this->id] ? ($this->getField('baseLevel') ?: 1) : 1;
-        $max = $this->scaling[$this->id] ? MAX_LEVEL : 1;
+        $max = $this->scaling[$this->id] ? ($this->getField('maxLevel') ?: MAX_LEVEL) : 1;
         // scaling information - spellId:min:max:curr
         $x .= '<!--?'.$this->id.':'.$min.':'.$max.':'.min($this->charLevel, $max).'-->';
 

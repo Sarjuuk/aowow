@@ -1470,23 +1470,43 @@ class SpellPage extends GenericPage
 
     private function createScalingData() : array            // calculation mostly like seen in TC
     {
-        $scaling = array_merge(
-            array(
-                'directSP' => -1,
-                'dotSP'    => -1,
-                'directAP' =>  0,
-                'dotAP'    =>  0
-            ),
-            (array)DB::World()->selectRow('SELECT `direct_bonus` AS `directSP`, `dot_bonus` AS `dotSP`, `ap_bonus` AS `directAP`, `ap_dot_bonus` AS `dotAP` FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank)
-        );
+        $scaling = ['directSP' => 0, 'dotSP' => 0, 'directAP' => 0, 'dotAP' =>  0];
+        $pMask   = $this->subject->periodicEffectsMask();
+        $allDoTs = true;
+
+        for ($i = 1; $i < 4; $i++)
+        {
+            if (!$this->subject->getField('effect'.$i.'Id'))
+                continue;
+
+            if ($pMask & 1 << ($i - 1))
+            {
+                $scaling['dotSP'] = $this->subject->getField('effect'.$i.'BonusMultiplier');
+                continue;
+            }
+            else
+                $scaling['directSP'] = $this->subject->getField('effect'.$i.'BonusMultiplier');
+
+            $allDoTs = false;
+        }
+
+        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS `directSP`, `dot_bonus` AS `dotSP`, `ap_bonus` AS `directAP`, `ap_dot_bonus` AS `dotAP` FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
+            $scaling = $s;
 
         if (!$this->subject->isDamagingSpell() && !$this->subject->isHealingSpell())
-            return $scaling;
+            return array_filter($scaling, fn($x) => $x > 0);
+
+        // only calculate for class/pet spells
+        if (!in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]))
+            return array_filter($scaling, fn($x) => $x > 0);
+
+        if ($this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
+            return array_filter($scaling, fn($x) => $x > 0);
 
         foreach ($scaling as $k => $v)
         {
-            // only calculate for class/pet spells
-            if ($v != -1 || !in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]))
+            // recalculate if spell_bonus_data says so
+            if ($v != -1)
                 continue;
 
             // no known calculation for physical abilities
@@ -1494,12 +1514,10 @@ class SpellPage extends GenericPage
                 continue;
 
             // dont use spellPower to scale physical Abilities
-            if ($this->subject->getField('schoolMask') == 0x1 && ($k == 'directSP' || $k == 'dotSP'))
+            if ($this->subject->getField('schoolMask') == (1 << SPELL_SCHOOL_NORMAL) && ($k == 'directSP' || $k == 'dotSP'))
                 continue;
 
             $isDOT = false;
-            $pMask = $this->subject->periodicEffectsMask();
-
             if ($k == 'dotSP' || $k == 'dotAP')
             {
                 if ($pMask)
@@ -1507,23 +1525,8 @@ class SpellPage extends GenericPage
                 else
                     continue;
             }
-            else                                            // if all used effects are periodic, dont calculate direct component
-            {
-                $bar = true;
-                for ($i = 1; $i < 4; $i++)
-                {
-                    if (!$this->subject->getField('effect'.$i.'Id'))
-                        continue;
-
-                    if ($pMask & 1 << ($i - 1))
-                        continue;
-
-                    $bar = false;
-                }
-
-                if ($bar)
-                    continue;
-            }
+            else if ($allDoTs)                              // if all used effects are periodic, dont calculate direct component
+                continue;
 
             // Damage over Time spells bonus calculation
             $dotFactor = 1.0;
@@ -1546,8 +1549,7 @@ class SpellPage extends GenericPage
             // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
             for ($j = 1; $j < 4; ++$j)
             {
-                // SPELL_EFFECT_HEALTH_LEECH || SPELL_AURA_PERIODIC_LEECH
-                if ($this->subject->getField('effectId'.$j) == 9 || $this->subject->getField('effect'.$j.'AuraId') == 53)
+                if ($this->subject->getField('effectId'.$j) == SPELL_EFFECT_HEALTH_LEECH || $this->subject->getField('effect'.$j.'AuraId') == SPELL_AURA_PERIODIC_LEECH)
                 {
                     $castingTime /= 2;
                     break;
@@ -1558,13 +1560,13 @@ class SpellPage extends GenericPage
                 $castingTime *= 1.88;
 
             // SPELL_SCHOOL_MASK_NORMAL
-            if ($this->subject->getField('schoolMask') != 0x1)
+            if ($this->subject->getField('schoolMask') != (1 << SPELL_SCHOOL_NORMAL))
                 $scaling[$k] = ($castingTime / 3500.0) * $dotFactor;
             else
                 $scaling[$k] = 0;                           // would be 1 ($dotFactor), but we dont want it to be displayed
         }
 
-        return $scaling;
+        return array_filter($scaling, fn($x) => $x > 0);
     }
 
     private function createRequiredItems() : string
@@ -1650,6 +1652,7 @@ class SpellPage extends GenericPage
             $effBP   = $this->subject->getField('effect'.$i.'BasePoints');
             $effDS   = $this->subject->getField('effect'.$i.'DieSides');
             $effRPPL = $this->subject->getField('effect'.$i.'RealPointsPerLevel');
+            $effPPCP = $this->subject->getField('effect'.$i.'PointsPerComboPoint');
             $effAura = $this->subject->getField('effect'.$i.'AuraId');
 
             /* Effect Format
@@ -1950,6 +1953,9 @@ class SpellPage extends GenericPage
                         case SPELL_AURA_MOD_POWER_REGEN:
                             if ($_ = Lang::spell('powerTypes', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
+
+                            if ($effMV == POWER_RAGE || $effMV == POWER_RUNIC_POWER)
+                                array_walk($_footer['value'], fn(&$x) => $x /= 10);
                             break;
                         case SPELL_AURA_MOD_PERCENT_STAT:
                         case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
@@ -2217,6 +2223,8 @@ class SpellPage extends GenericPage
                         case SPELL_AURA_MOD_CRIT_PCT:
                         case SPELL_AURA_MOD_SPELL_HIT_CHANCE:
                         case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
+                        case SPELL_AURA_MOD_MELEE_RANGED_HASTE:
+                        case SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK:
                             $valueFmt = '%s%%';
                             break;
                     }
@@ -2240,6 +2248,8 @@ class SpellPage extends GenericPage
                     $buffer .= Lang::game('valueDelim').sprintf($valueFmt, $_footer['value'][1]);
                 if ($effRPPL != 0)
                     $buffer .= sprintf(Lang::spell('costPerLevel'), sprintf($valueFmt, $effRPPL));
+                if ($effPPCP != 0)
+                    $buffer .= sprintf(Lang::spell('pointsPerCP'), sprintf($valueFmt, $effPPCP));
                 if (isset($_footer['value'][2]))
                     $buffer .= $_footer['value'][2];
 

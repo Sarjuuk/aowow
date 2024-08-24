@@ -129,17 +129,15 @@ endif;
                     </tr>
 <?php
 // not default values
-if (!in_array(array_values($this->scaling), [[-1, -1, 0, 0], [0, 0, 0, 0]])):
+if ($this->scaling):
 ?>
                     <tr>
                         <th><?=Lang::spell('_scaling');?></th>
                         <td colspan="3">
 
 <?php
-    foreach ($this->scaling as $k => $s):
-        if ($s > 0):
-            echo '                            '.Lang::spell('scaling', $k, [$s * 100])."<br>\n";
-        endif;
+    foreach ($this->scaling as $k => $v):
+        echo '                            '.Lang::spell('scaling', $k, [$v * 100])."<br>\n";
     endforeach;
 ?>
                         </td>
