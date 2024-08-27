@@ -861,7 +861,7 @@ class GenericPage
         return $buff;
     }
 
-    protected function fmtCreateIcon(int $iconIdx, int $type, int $typeId, int $pad = 0, string $element = 'icontab-icon', int $size = 1, int $num = 0, int $qty = 0) : string
+    protected function fmtCreateIcon(int $iconIdx, int $type, int $typeId, int $pad = 0, string $element = 'icontab-icon', int $size = 1, string $num = '', string $qty = '') : string
     {
         // $element, $iconTabIdx,  [typeId, size, num, qty]
         $createIconString = "\$WH.ge('%s%d').appendChild(%s.createIcon(%s));\n";
