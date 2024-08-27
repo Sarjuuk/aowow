@@ -14,7 +14,7 @@ class TitleList extends BaseType
 
     public          $sources   = [];
 
-    protected       $queryBase = 'SELECT t.*, id AS ARRAY_KEY FROM ?_titles t';
+    protected       $queryBase = 'SELECT t.*, t.id AS ARRAY_KEY FROM ?_titles t';
     protected       $queryOpts = array(
                         't'   => [['src']],                 //    11: Type::TITLE
                         'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']

@@ -379,16 +379,15 @@ abstract class BaseType
         return $data;
     }
 
-    public function getRandomId()
+    public function getRandomId() : int
     {
         // ORDER BY RAND() is not optimal, so if anyone has an alternative idea..
-        $where   = User::isInGroup(U_GROUP_EMPLOYEE) ? 'WHERE (cuFlags & '.CUSTOM_EXCLUDE_FOR_LISTVIEW.') = 0' : null;
-        $pattern = '/SELECT .* (-?`?[\w_]*\`?.?`?(id|entry)`?) AS ARRAY_KEY,?.* FROM (\?[\w_-]+) (`?\w*`?)/i';
-        $replace = 'SELECT $1 FROM $3 $4 '.$where.' ORDER BY RAND() ASC LIMIT 1';
+        $where = User::isInGroup(U_GROUP_EMPLOYEE) ? ' WHERE (`cuFlags` & '.CUSTOM_EXCLUDE_FOR_LISTVIEW.') = 0' : '';
 
-        $query   = preg_replace($pattern, $replace, $this->queryBase);
+        if (preg_match('/SELECT .*? FROM (\?\_[\w_-]+) /i', $this->queryBase, $m))
+            return DB::Aowow()->selectCell(sprintf('SELECT `id` FROM %s%s ORDER BY RAND() ASC LIMIT 1', $m[1], $where));
 
-        return DB::Aowow()->selectCell($query);
+        return 0;
     }
 
     public function getFoundIDs()

@@ -72,7 +72,7 @@ class UtilityPage extends GenericPage
         {
             case 'random':
                 $type   = array_rand(Type::getClassesFor(Type::FLAG_RANDOM_SEARCHABLE));
-                $typeId = (Type::newList($type, null))?->getRandomId();
+                $typeId = (Type::newList($type))?->getRandomId();
 
                 header('Location: ?'.Type::getFileString($type).'='.$typeId, true, 302);
                 die();

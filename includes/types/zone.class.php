@@ -12,7 +12,7 @@ class ZoneList extends BaseType
     public static   $brickFile = 'zone';
     public static   $dataTable = '?_zones';
 
-    protected       $queryBase = 'SELECT z.*, id AS ARRAY_KEY FROM ?_zones z';
+    protected       $queryBase = 'SELECT z.*, z.id AS ARRAY_KEY FROM ?_zones z';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
