@@ -1934,7 +1934,7 @@ class Report
     public const AR_OUT_OF_DATE       = 46;
     public const AR_MISCELLANEOUS     = 48;
 
-    private /* array */ $context = array(
+    private array $context = array(
         self::MODE_GENERAL => array(
             self::GEN_FEEDBACK         => true,
             self::GEN_BUG_REPORT       => true,
@@ -1997,16 +1997,12 @@ class Report
     public  const STATUS_CLOSED_WONTFIX = 2;
     public  const STATUS_CLOSED_SOLVED  = 3;
 
-    private /* int */    $mode      = 0;
-    private /* int */    $reason    = 0;
-    private /* int */    $subject   = 0;
-
-    public  /* readonly int */ $errorCode;
+    private int $errorCode = self::ERR_NONE;
 
 
-    public function __construct(int $mode, int $reason, int $subject = 0)
+    public function __construct(private int $mode, private int $reason, private ?int $subject = 0)
     {
-        if ($mode < 0 || $reason <= 0 || !$subject)
+        if ($mode < 0 || $reason <= 0)
         {
             trigger_error('Report - malformed contact request received', E_USER_ERROR);
             $this->errorCode = self::ERR_MISCELLANEOUS;
@@ -2027,9 +2023,7 @@ class Report
             return;
         }
 
-        $this->mode    = $mode;
-        $this->reason  = $reason;
-        $this->subject = $subject;                          // 0 for utility, tools and misc pages?
+        $this->subject ??= 0;                               // 0 for utility, tools and misc pages?
     }
 
     private function checkTargetContext() : int
@@ -2151,6 +2145,11 @@ class Report
     {
         // assignedTo = 0 ? status = STATUS_OPEN : status = STATUS_ASSIGNED, userId = assignedTo
         return false;
+    }
+
+    public function getError() : int
+    {
+        return $this->errorCode;
     }
 }
 

@@ -38,8 +38,8 @@ class AjaxContactus extends AjaxHandler
         $report = new Report($this->_post['mode'], $this->_post['reason'], $this->_post['id']);
         if ($report->create($this->_post['desc'], $this->_post['ua'], $this->_post['appname'], $this->_post['page'], $this->_post['relatedurl'], $this->_post['email']))
             return 0;
-        else if ($report->errorCode > 0)
-            return $report->errorCode;
+        else if (($e = $report->getError()) > 0)
+            return $e;
         else
             return Lang::main('intError');
     }
