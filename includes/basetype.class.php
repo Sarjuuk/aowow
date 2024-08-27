@@ -277,8 +277,13 @@ abstract class BaseType
             {
                 if ($calcTotal)
                 {
-                    $totalQuery = substr_replace($totalQuery, 'SELECT COUNT(*) ', 0, strpos($totalQuery, 'FROM'));
-                    $this->matches += DB::{$n}($dbIdx)->selectCell($totalQuery);
+                    // hackfix the inner items query to not contain duplicate column names
+                    // yes i know the real solution would be to not have items and item_stats share column names
+                    // soon™....
+                    if (get_class($this) == 'ItemList')
+                        $totalQuery = str_replace([', `is`.*', ', i.id AS id'], '', $totalQuery);
+
+                    $this->matches += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$totalQuery.') x');
                 }
 
                 foreach ($rows as $id => $row)
