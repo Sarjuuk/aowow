@@ -94,24 +94,24 @@ class AjaxAccount extends AjaxHandler
 
             if ($this->_post['id'] && ($id = $this->_post['id'][0]))
             {
-                if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE userId = ?d AND id = ?d', User::$id, $id))
+                if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account_weightscales WHERE `userId` = ?d AND `id` = ?d', User::$id, $id))
                 {
                     trigger_error('AjaxAccount::handleWeightscales - scale #'.$id.' not in db or owned by user #'.User::$id, E_USER_ERROR);
                     return '0';
                 }
 
-                DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE id = ?d', $this->_post['name'], $id);
+                DB::Aowow()->query('UPDATE ?_account_weightscales SET `name` = ? WHERE `id` = ?d', $this->_post['name'], $id);
             }
             else
             {
-                $nScales = DB::Aowow()->selectCell('SELECT COUNT(id) FROM ?_account_weightscales WHERE userId = ?d', User::$id);
+                $nScales = DB::Aowow()->selectCell('SELECT COUNT(`id`) FROM ?_account_weightscales WHERE `userId` = ?d', User::$id);
                 if ($nScales >= 5)                          // more or less hard-defined in LANG.message_weightscalesaveerror
                     return '0';
 
                 $id = DB::Aowow()->query('INSERT INTO ?_account_weightscales (`userId`, `name`) VALUES (?d, ?)', User::$id, $this->_post['name']);
             }
 
-            DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE id = ?d', $id);
+            DB::Aowow()->query('DELETE FROM ?_account_weightscale_data WHERE `id` = ?d', $id);
 
             foreach (explode(',', $this->_post['scale']) as $s)
             {
@@ -125,12 +125,13 @@ class AjaxAccount extends AjaxHandler
             return (string)$id;
         }
         else if ($this->_post['delete'] && $this->_post['id'] && $this->_post['id'][0])
-            DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE id = ?d AND userId = ?d', $this->_post['id'][0], User::$id);
-        else
         {
-            trigger_error('AjaxAccount::handleWeightscales - malformed request received', E_USER_ERROR);
-            return '0';
+            DB::Aowow()->query('DELETE FROM ?_account_weightscales WHERE `id` = ?d AND `userId` = ?d', $this->_post['id'][0], User::$id);
+            return '';
         }
+
+        trigger_error('AjaxAccount::handleWeightscales - malformed request received', E_USER_ERROR);
+        return '0';
     }
 
     protected function handleFavorites() : void
