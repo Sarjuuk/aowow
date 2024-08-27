@@ -475,10 +475,11 @@ class ObjectPage extends GenericPage
 
         // tab: condition-for
         $cnd = new Conditions();
-        if ($cnd->getByCondition(Type::OBJECT, $this->typeId)->prepare())
+        $cnd->getByCondition(Type::OBJECT, $this->typeId)->prepare();
+        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+            $this->lvTabs[] = $tab;
         }
     }
 

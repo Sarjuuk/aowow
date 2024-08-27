@@ -787,10 +787,11 @@ class ZonePage extends GenericPage
 
         // tab: condition-for
         $cnd = new Conditions();
-        if ($cnd->getByCondition(Type::ZONE, $this->typeId)->prepare())
+        $cnd->getByCondition(Type::ZONE, $this->typeId)->prepare();
+        if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for');
+            $this->lvTabs[] = $tab;
         }
     }
 
