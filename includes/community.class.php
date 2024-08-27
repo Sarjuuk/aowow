@@ -140,7 +140,6 @@ class CommunityContent
         $nFound = DB::Aowow()->selectCell(
             substr_replace($query, 'SELECT COUNT(*) ', 0, strpos($query, 'FROM')),
             CC_FLAG_DELETED,
-            CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
             DBSIMPLE_SKIP
@@ -421,7 +420,6 @@ class CommunityContent
 
         $nFound = DB::Aowow()->selectCell(
             substr_replace(self::$viQuery, 'SELECT COUNT(*) ', 0, strpos(self::$viQuery, 'FROM')),
-            CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
@@ -481,7 +479,6 @@ class CommunityContent
 
         $nFound = DB::Aowow()->selectCell(
             substr_replace(self::$ssQuery, 'SELECT COUNT(*) ', 0, strpos(self::$ssQuery, 'FROM')),
-            CC_FLAG_STICKY,
             $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
             $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
