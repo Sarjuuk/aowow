@@ -2032,7 +2032,7 @@ class ItemListFilter extends Filter
     public function createConditionsForWeights() : array
     {
         if (empty($this->fiData['v']['wt']))
-            return null;
+            return [];
 
         $this->wtCnd = [];
         $select = [];
@@ -2084,7 +2084,8 @@ class ItemListFilter extends Filter
             // gm - gem quality (qualityId)
             // jc - jc-gems included (bool)
 
-            $parts[] = $this->createConditionsForWeights();
+            if ($_ = $this->createConditionsForWeights())
+                $parts[] = $_;
 
             foreach ($_v['wt'] as $_)
                 $this->formData['extraCols'][] = $_;
