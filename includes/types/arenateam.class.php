@@ -314,7 +314,7 @@ class RemoteArenaTeamList extends ArenaTeamList
             }
 
             foreach (Util::createSqlBatchInsert($memberData) as $ins)
-                DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($memberData)));
+                DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `profileId` = `profileId`', array_keys(reset($memberData)));
         }
     }
 }
