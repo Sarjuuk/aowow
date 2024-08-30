@@ -345,7 +345,7 @@ if (typeof $WowheadPower == "undefined") {
             if (url) {
                 var
                     locale,
-                    domain = "www";
+                    domain = "en";
 
                 currentA = t;
                 if (params.domain) {

@@ -13973,7 +13973,7 @@ Listview.templates = {
             /** Variables **/
             var container = $('<div></div>');
             var hidden = (comment.__minPatch && g_getPatchVersion.T[comment.__minPatch] > new Date(comment.date));
-            comment.locale = (this.id == 'english-comments' ? 'www' : '');
+            comment.locale = (this.id == 'english-comments' ? 'en' : '');
 
             /** Initialization.. Create base HTML skeleton */
             container.append('<table><tr><td class="vote-column">' +

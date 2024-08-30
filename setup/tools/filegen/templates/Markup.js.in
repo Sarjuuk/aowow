@@ -28,8 +28,8 @@ MarkupSourceMap[MARKUP_SOURCE_PTR]  = 'ptr';
 MarkupSourceMap[MARKUP_SOURCE_BETA] = 'beta';
 
 var MarkupDomainRegexMap = {
-    betaPtrLang: /^(www|fr|de|cn|es|ru)$/,                  // Aowow - /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/
-    lang: /^(www|fr|de|cn|es|ru)$/                          // Aowow - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
+    betaPtrLang: /^(www|en|fr|de|cn|es|ru)$/,               // Aowow - /^(beta|legion|wod|mop|ptr|www|ko|fr|de|cn|es|ru|pt|it)$/
+    lang: /^(www|en|fr|de|cn|es|ru)$/                       // Aowow - /^(www|ko|fr|de|cn|es|ru|pt|it)$/
 };
 
 var Markup = {
@@ -70,6 +70,7 @@ var Markup = {
     nameCol: 'name_enus',
     domainToLocale: {
         'www': 'enus',
+        'en': 'enus',
      // 'ptr': 'ptr',
      // 'beta': 'beta',
      // 'mop': 'beta',

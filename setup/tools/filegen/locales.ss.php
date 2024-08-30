@@ -27,7 +27,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             LOCALE_EN => "        0: { // English\r\n" .
                          "            id: LOCALE_ENUS,\r\n" .
                          "            name: 'enus',\r\n" .
-                         "            domain: 'www',\r\n" .
+                         "            domain: 'en',\r\n" .
                          "            description: 'English'\r\n" .
                          "        }",
             LOCALE_FR => "        2: { // French\r\n" .

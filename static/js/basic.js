@@ -928,7 +928,7 @@ $WH.g_getLocaleFromDomain.L = {
     cn:  4,
     es:  6,
     ru:  8,
-    www: 0
+    en:  0
 };
 
 $WH.g_getDomainFromLocale = function(locale) {
@@ -941,7 +941,7 @@ $WH.g_getDomainFromLocale = function(locale) {
         lookup = $WH.g_getDomainFromLocale.L = $WH.g_createReverseLookupJson($WH.g_getLocaleFromDomain.L);
     }
 
-    return (lookup[locale] ? lookup[locale] : 'www');
+    return (lookup[locale] ? lookup[locale] : 'en');
 }
 
 $WH.g_getIdFromTypeName = function (typeName) {

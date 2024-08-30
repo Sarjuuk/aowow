@@ -969,23 +969,20 @@ abstract class Util
         return Lang::item('ratingString', [$statId, $result, $level]);
     }
 
-    public static function powerUseLocale($domain = 'www')
+    public static function powerUseLocale(string $domain = 'en') : void
     {
-        foreach (Util::$localeStrings as $k => $v)
+        foreach (Util::$subDomains as $k => $v)
         {
-            if (strstr($v, $domain))
-            {
-                User::useLocale($k);
-                Lang::load($k);
-                return;
-            }
+            if ($domain != $v)
+                continue;
+
+            User::useLocale($k);
+            Lang::load($k);
+            return;
         }
 
-        if ($domain == 'www')
-        {
-            User::useLocale(LOCALE_EN);
-            Lang::load(LOCALE_EN);
-        }
+        User::useLocale(LOCALE_EN);
+        Lang::load(LOCALE_EN);
     }
 
     // default ucFirst doesn't convert UTF-8 chars
