@@ -403,6 +403,10 @@ class StatsContainer
         if (!$spell)
             return $this;
 
+        // if spells grant an equal, non-zero amount of SPELL_DAMAGE and SPELL_HEALING, combine them to SPELL_POWER
+        // this probably does not affect enchantments
+        $tmpStore = [];
+
         for ($i = 1; $i <= 3; $i++)
         {
             $eff  = $spell['effect'.$i.'Id'];
@@ -414,8 +418,17 @@ class StatsContainer
                 $this->fromEnchantment($relE);
             else
                 foreach ($this->convertSpellEffect($aura, $mVal, $amt) as $idx)
-                    Util::arraySumByKey($this->store, [$idx => $amt]);
+                    $tmpStore[] = [$idx => $amt];
         }
+
+        if (!empty($tmpStore[Stat::HEALING_SPELL_POWER]) && !empty($tmpStore[Stat::DAMAGE_SPELL_POWER]) && $tmpStore[Stat::HEALING_SPELL_POWER] == $tmpStore[Stat::DAMAGE_SPELL_POWER])
+        {
+            $tmpStore[] = [Stat::SPELL_POWER => $tmpStore[Stat::HEALING_SPELL_POWER]];
+            unset($tmpStore[Stat::HEALING_SPELL_POWER]);
+            unset($tmpStore[Stat::DAMAGE_SPELL_POWER]);
+        }
+
+        Util::arraySumByKey($this->store, $tmpStore);
 
         return $this;
     }
@@ -600,9 +613,9 @@ class StatsContainer
                 if ($miscValue == (1 << SPELL_SCHOOL_NORMAL))
                     return [Stat::WEAPON_DAMAGE];
 
-                // full magic mask, also counts towards healing
+                // full magic mask
                 if ($miscValue == SPELL_MAGIC_SCHOOLS)
-                    return [Stat::SPELL_POWER, Stat::DAMAGE_SPELL_POWER, Stat::HEALING_SPELL_POWER];
+                    return [Stat::DAMAGE_SPELL_POWER];
 
                 // HolySpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_HOLY))

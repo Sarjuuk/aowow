@@ -842,6 +842,75 @@ define('ITEM_CLASS_PERMANENT',              14);
 define('ITEM_CLASS_MISC',                   15);
 define('ITEM_CLASS_GLYPH',                  16);
 
+// ItemSubClass - Consumable (0)
+define('ITEM_SUBCLASS_CONSUMABLE',          0);
+define('ITEM_SUBCLASS_POTION',              1);
+define('ITEM_SUBCLASS_ELIXIR',              2);
+define('ITEM_SUBCLASS_FLASK',               3);
+define('ITEM_SUBCLASS_SCROLL',              4);
+define('ITEM_SUBCLASS_FOOD',                5);
+define('ITEM_SUBCLASS_ITEM_ENHANCEMENT',    6);
+define('ITEM_SUBCLASS_BANDAGE',             7);
+define('ITEM_SUBCLASS_MISC_CONSUMABLE',     8);
+
+// ItemSubClass - Container (1)
+define('ITEM_SUBCLASS_BAG',                 0);
+define('ITEM_SUBCLASS_SOUL_BAG',            1);
+define('ITEM_SUBCLASS_HERB_BAG',            2);
+define('ITEM_SUBCLASS_ENCHANTING_BAG',      3);
+define('ITEM_SUBCLASS_ENGINEERING_BAG',     4);
+define('ITEM_SUBCLASS_GEM_BAG',             5);
+define('ITEM_SUBCLASS_MINING_BAG',          6);
+define('ITEM_SUBCLASS_LEATHERWORKING_BAG',  7);
+define('ITEM_SUBCLASS_INSCRIPTION_BAG',     8);
+
+// ItemSubClass - Weapon (2)
+define('ITEM_SUBCLASS_1H_AXE',              0);
+define('ITEM_SUBCLASS_2H_AXE',              1);
+define('ITEM_SUBCLASS_BOW',                 2);
+define('ITEM_SUBCLASS_GUN',                 3);
+define('ITEM_SUBCLASS_1H_MACE',             4);
+define('ITEM_SUBCLASS_2H_MACE',             5);
+define('ITEM_SUBCLASS_POLEARM',             6);
+define('ITEM_SUBCLASS_1H_SWORD',            7);
+define('ITEM_SUBCLASS_2H_SWORD',            8);
+define('ITEM_SUBCLASS_OBSOLETE',            9);
+define('ITEM_SUBCLASS_STAFF',               10);
+define('ITEM_SUBCLASS_1H_EXOTIC',           11);
+define('ITEM_SUBCLASS_2H_EXOTIC',           12);
+define('ITEM_SUBCLASS_FIST_WEAPON',         13);
+define('ITEM_SUBCLASS_MISC_WEAPON',         14);
+define('ITEM_SUBCLASS_DAGGER',              15);
+define('ITEM_SUBCLASS_THROWN',              16);
+define('ITEM_SUBCLASS_SPEAR',               17);
+define('ITEM_SUBCLASS_CROSSBOW',            18);
+define('ITEM_SUBCLASS_WAND',                19);
+define('ITEM_SUBCLASS_FISHING_POLE',        20);
+
+// ItemSubClass - Gem (3)
+define('ITEM_SUBCLASS_RED_GEM',             0);
+define('ITEM_SUBCLASS_BLUE_GEM',            1);
+define('ITEM_SUBCLASS_YELLOW_GEM',          2);
+define('ITEM_SUBCLASS_PURPLE_GEM',          3);
+define('ITEM_SUBCLASS_GREEN_GEM',           4);
+define('ITEM_SUBCLASS_ORANGE_GEM',          5);
+define('ITEM_SUBCLASS_META_GEM',            6);
+define('ITEM_SUBCLASS_SIMPLE_GEM',          7);
+define('ITEM_SUBCLASS_PRISMATIC_GEM',       8);
+
+// ItemSubClass - Armor (4)
+define('ITEM_SUBCLASS_MISC_ARMOR',          0);
+define('ITEM_SUBCLASS_CLOTH_ARMOR',         1);
+define('ITEM_SUBCLASS_LETHER_ARMOR',        2);
+define('ITEM_SUBCLASS_MAIL_ARMOR',          3);
+define('ITEM_SUBCLASS_PLATE_ARMOR',         4);
+define('ITEM_SUBCLASS_BUCKLER',             5);
+define('ITEM_SUBCLASS_SHIELD',              6);
+define('ITEM_SUBCLASS_LIBRAM',              7);
+define('ITEM_SUBCLASS_IDOL',                8);
+define('ITEM_SUBCLASS_TOTEM',               9);
+define('ITEM_SUBCLASS_SIGIL',               10);
+
 // ItemFlags
 define('ITEM_FLAG_CONJURED',                0x00000002);
 define('ITEM_FLAG_OPENABLE',                0x00000004);

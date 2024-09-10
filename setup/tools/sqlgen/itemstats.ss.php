@@ -47,7 +47,19 @@ class ItemStatSetup extends ItemList
 
             // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
             if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($curTpl)->fromJson($this->json[$id])->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
-                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_merge(['type', 'typeId'], array_keys($stats)), array_merge([Type::ITEM, $this->id], array_values($stats)));
+            {
+                // manually set stats 0 if empty to distinguish from items that cant have them
+                $shared = ['dps' => 0, 'dmgmin1' => 0, 'dmgmax1' => 0, 'speed' => 0];
+                if ($this->getField('class') == ITEM_CLASS_WEAPON)
+                    $stats += $shared + ($this->isRangedWeapon() ? ['rgddps' => 0, 'rgddmgmin' => 0, 'rgddmgmax' => 0, 'rgdspeed' => 0] : ['mledps' => 0, 'mledmgmin' => 0, 'mledmgmax' => 0, 'mlespeed' => 0]);
+                else if ($this->getField('class') == ITEM_CLASS_ARMOR)
+                    $stats += ['armorbonus' => 0];          //ArmorDamageModifier only valid on armor(?)
+
+                // apply PK
+                $stats += ['type' => Type::ITEM, 'typeId' => $this->id];
+
+                DB::Aowow()->query('INSERT INTO ?_item_stats (?#) VALUES (?a)', array_keys($stats), array_values($stats));
+            }
         }
     }
 }

@@ -1429,7 +1429,7 @@ class ItemList extends BaseType
         if ($dps <= 54.8)
             return 0.0;
 
-        $subClasses = [14];                                 // Misc Weapons
+        $subClasses = [ITEM_SUBCLASS_MISC_WEAPON];
         $weaponTypeMask = DB::Aowow()->selectCell('SELECT `weaponTypeMask` FROM ?_classes WHERE `id` = ?d', log(CLASS_DRUID, 2) + 1);
         if ($weaponTypeMask)
             for ($i = 0; $i < 21; $i++)
@@ -1441,6 +1441,14 @@ class ItemList extends BaseType
             return 0.0;
 
         return round(($dps - 54.8) * 14);
+    }
+
+    public function isRangedWeapon() : bool
+    {
+        if ($this->curTpl['class'] != ITEM_CLASS_WEAPON)
+            return false;
+
+        return in_array($this->curTpl['subClassBak'], [ITEM_SUBCLASS_BOW, ITEM_SUBCLASS_GUN, ITEM_SUBCLASS_THROWN, ITEM_SUBCLASS_CROSSBOW, ITEM_SUBCLASS_WAND]);
     }
 
     private function formatRating(int $statId, int $itemMod, int $qty, bool $interactive = false, bool &$scaling = false) : string
@@ -1716,7 +1724,7 @@ class ItemList extends BaseType
             $json['speed']    = round($this->curTpl['delay'] / 1000, 2);
             $json['dps']      = $json['speed'] ? round(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1) : 0;
 
-            if (in_array($subclass, [2, 3, 18, 19]))
+            if ($this->isRangedWeapon())
             {
                 $json['rgddmgmin'] = $json['dmgmin1'];
                 $json['rgddmgmax'] = $json['dmgmax1'];
@@ -2015,7 +2023,7 @@ class ItemListFilter extends Filter
         foreach ($classes as $cId => [$weaponTypeMask, $armorTypeMask])
         {
             // preselect misc subclasses
-            $this->ubFilter[$cId] = [ITEM_CLASS_WEAPON => [14], ITEM_CLASS_ARMOR => [0]];
+            $this->ubFilter[$cId] = [ITEM_CLASS_WEAPON => [ITEM_SUBCLASS_MISC_WEAPON], ITEM_CLASS_ARMOR => [ITEM_SUBCLASS_MISC_ARMOR]];
 
             for ($i = 0; $i < 21; $i++)
                 if ($weaponTypeMask & (1 << $i))
@@ -2284,7 +2292,7 @@ class ItemListFilter extends Filter
             $set['name'] = Util::localizedString($randIds[$set['ench']], 'name', true);
         }
 
-        // only enhance search results if enchantment by name is unique (implies only one enchantment per item is availabel)
+        // only enhance search results if enchantment by name is unique (implies only one enchantment per item is available)
         if (count(array_unique(array_column($randIds, 'name_loc0'))) == 1)
             $this->extraOpts['relEnchant'] = $tplIds;
 
@@ -2567,7 +2575,7 @@ class ItemListFilter extends Filter
         if (!isset($this->enums[$cr[0]][$cr[1]]))
             return false;
 
-        $_ =  $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr[0]][$cr[1]];
         if ($_ === null)
             return false;
 
@@ -2667,7 +2675,7 @@ class ItemListFilter extends Filter
             return in_array($v, $sl);
 
         // consumables - any; perm / temp item enhancements
-        else if ($c[0] == 0 && (!isset($c[1]) || in_array($c[1], [-3, 6])))
+        else if ($c[0] == ITEM_CLASS_CONSUMABLE && (!isset($c[1]) || in_array($c[1], [-3, 6])))
             return in_array($v, $sl);
 
         // weapons - always
@@ -2675,7 +2683,7 @@ class ItemListFilter extends Filter
             return in_array($v, $sl);
 
         // armor - any; any armor
-        else if ($c[0] == ITEM_CLASS_ARMOR && (!isset($c[1]) || in_array($c[1], [1, 2, 3, 4])))
+        else if ($c[0] == ITEM_CLASS_ARMOR && (!isset($c[1]) || in_array($c[1], [ITEM_SUBCLASS_CLOTH_ARMOR, ITEM_SUBCLASS_LETHER_ARMOR, ITEM_SUBCLASS_MAIL_ARMOR, ITEM_SUBCLASS_PLATE_ARMOR])))
             return in_array($v, $sl);
 
         return false;
