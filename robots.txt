@@ -1,0 +1,15 @@
+User-Agent: *
+Disallow: /?account
+Disallow: /account/
+Disallow: /?account=*
+Disallow: /?profile
+Disallow: /profile/
+Disallow: /?profile=*
+Disallow: /?profiles
+Disallow: /profiles/
+Disallow: /?profiles=*
+Disallow: /?random
+Disallow: /random/
+Disallow: /?search
+Disallow: /search/
+Disallow: /?search=*
