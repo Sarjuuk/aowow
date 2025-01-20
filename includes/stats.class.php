@@ -418,12 +418,12 @@ class StatsContainer
                 $this->fromEnchantment($relE);
             else
                 foreach ($this->convertSpellEffect($aura, $mVal, $amt) as $idx)
-                    $tmpStore[] = [$idx => $amt];
+                    Util::arraySumByKey($tmpStore, [$idx => $amt]);
         }
 
         if (!empty($tmpStore[Stat::HEALING_SPELL_POWER]) && !empty($tmpStore[Stat::DAMAGE_SPELL_POWER]) && $tmpStore[Stat::HEALING_SPELL_POWER] == $tmpStore[Stat::DAMAGE_SPELL_POWER])
         {
-            $tmpStore[] = [Stat::SPELL_POWER => $tmpStore[Stat::HEALING_SPELL_POWER]];
+            Util::arraySumByKey($tmpStore, [Stat::SPELL_POWER => $tmpStore[Stat::HEALING_SPELL_POWER]]);
             unset($tmpStore[Stat::HEALING_SPELL_POWER]);
             unset($tmpStore[Stat::DAMAGE_SPELL_POWER]);
         }
