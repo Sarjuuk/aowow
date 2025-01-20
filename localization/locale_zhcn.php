@@ -130,7 +130,7 @@ $lang = array(
         // formating
         'colon'         => '：',
         'dateFmtShort'  => "Y/m/d",
-        'dateFmtLong'   => "Y/m/d \a\\t H:i A",
+        'dateFmtLong'   => "Y/m/d \a\\t g:i A",
         'timeAgo'       => '%s之前',
         'nfSeparators'  => [',', '.'],
 
