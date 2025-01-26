@@ -1263,7 +1263,7 @@ abstract class Util
         return $json;
     }
 
-    public static function createSqlBatchInsert(array $data)
+    public static function createSqlBatchInsert(array $data) : array
     {
         $nRows  = 100;
         $nItems = count(reset($data));
@@ -1278,7 +1278,7 @@ abstract class Util
             if (count($d) != $nItems)
                 return [];
 
-            $d = array_map(function ($x) { return $x === null ? 'NULL' : DB::Aowow()->escape($x); }, $d);
+            $d = array_map(fn($x) => $x === null ? 'NULL' : DB::Aowow()->escape($x), $d);
 
             $buff[] = implode(',', $d);
 

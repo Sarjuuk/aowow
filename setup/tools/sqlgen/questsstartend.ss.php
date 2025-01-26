@@ -37,7 +37,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
             $data = DB::World()->select($q);
             foreach ($data as $d)
-                DB::Aowow()->query('INSERT INTO ?_quests_startend (?#) VALUES (?a) AS newQSE(`t`, `ti`, `qi`, `m`, `ei`) ON DUPLICATE KEY UPDATE `method` = `method` | newQSE.`m`, `eventId` = IF(`eventId` = 0, newQSE.`ei`, `eventId`)', array_keys($d), array_values($d));
+                DB::Aowow()->query('INSERT INTO ?_quests_startend (?#) VALUES (?a) ON DUPLICATE KEY UPDATE `method` = `method` | ?d, `eventId` = IF(`eventId` = 0, ?d, `eventId`)', array_keys($d), array_values($d), $d['method'], $d['eventId']);
         }
 
         // update quests without start as unavailable
