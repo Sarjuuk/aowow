@@ -1004,7 +1004,7 @@ $lang = array(
         'react'         => "Reaktion",
         'worth'         => "Wert",
         'unkPosition'   => "Der Aufenthaltsort dieses NPCs ist nicht bekannt.",
-        'difficultyPH'  => "Dieser NPC ist ein Platzhalter für einen anderen Modus von",
+        'difficultyPH'  => 'Dieser NPC ist ein Platzhalter für einen anderen Modus von <a href="?npc=%1$d">%2$s</a>.',
         'seat'          => "Sitz",
         'accessory'     => "Zusätze",
         'accessoryFor'  => "Dieser NPC ist Zusatz für Fahrzeug",

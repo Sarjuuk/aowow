@@ -26,8 +26,8 @@ if ($this->accessory):
     echo ".</div>\n";
 endif;
 
-if (is_array($this->placeholder)):
-    echo '                <div>'.Lang::npc('difficultyPH').' <a href="?npc='.$this->placeholder[0].'">'.$this->placeholder[1]."</a>.</div>\n";
+if ($this->placeholder):
+    echo '                <div>'.Lang::npc('difficultyPH', $this->placeholder)."</div>\n";
 ?>
                 <div class="pad"></div>
 <?php

@@ -1005,7 +1005,7 @@ $lang = array(
         'react'         => "React",
         'worth'         => "Worth",
         'unkPosition'   => "The location of this NPC is unknown.",
-        'difficultyPH'  => "This NPC is a placeholder for a different mode of",
+        'difficultyPH'  => 'This NPC is a placeholder for a different mode of <a href="?npc=%1$d">%2$s</a>.',
         'seat'          => "Seat",
         'accessory'     => "Accessories",
         'accessoryFor'  => "This NPC is an accessory for vehicle",

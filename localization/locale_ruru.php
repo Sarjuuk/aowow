@@ -1004,7 +1004,7 @@ $lang = array(
         'react'         => "Реакция",
         'worth'         => "Деньги",
         'unkPosition'   => "Местоположение этого НИП неизвестно.",
-        'difficultyPH'  => "[Этот НИП является прототипом для другого режима]",
+        'difficultyPH'  => '[Этот НИП является прототипом для другого режима <a href="?npc=%1$d">%2$s</a>.]',
         'seat'          => "[Seat]",
         'accessory'     => "[Accessory]",
         'accessoryFor'  => "[This creature is an accessory for vehicle]",

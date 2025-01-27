@@ -10,7 +10,7 @@ class NpcPage extends GenericPage
 {
     use TrDetailPage;
 
-    protected $placeholder  = null;
+    protected $placeholder  = [];
     protected $accessory    = [];
     protected $quotes       = [];
     protected $reputation   = [];
@@ -67,7 +67,7 @@ class NpcPage extends GenericPage
         $_typeFlags  = $this->subject->getField('typeFlags');
         $_altIds     = [];
         $_altNPCs    = null;
-        $placeholder = null;
+        $placeholder = [];
         $accessory   = [];
 
         // difficulty entries of self
@@ -83,7 +83,7 @@ class NpcPage extends GenericPage
                 $_altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
         }
 
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT entry FROM vehicle_template_accessory WHERE accessory_entry = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT `entry` FROM vehicle_template_accessory WHERE `accessory_entry` = ?d', $this->typeId))
         {
             $vehicles = new CreatureList(array(['id', $_]));
             foreach ($vehicles->iterate() as $id => $__)
@@ -92,11 +92,11 @@ class NpcPage extends GenericPage
 
         // try to determine, if it's spawned in a dungeon or raid (shaky at best, if spawned by script)
         $mapType = 0;
-        if ($maps = DB::Aowow()->selectCol('SELECT DISTINCT areaId from ?_spawns WHERE type = ?d AND typeId = ?d', Type::NPC, $this->typeId))
+        if ($maps = DB::Aowow()->selectCol('SELECT DISTINCT `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $this->typeId))
         {
             if (count($maps) == 1)                          // should only exist in one instance
             {
-                switch (DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE id = ?d', $maps[0]))
+                switch (DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps[0]))
                 {
                  // case MAP_TYPE_DUNGEON:
                     case MAP_TYPE_DUNGEON_HC:
@@ -108,17 +108,15 @@ class NpcPage extends GenericPage
                 }
             }
         }
-        else if ($d = DB::Aowow()->selectCell('SELECT MAX(`difficulty`) FROM ?_loot_link WHERE `npcId` = ?d', $this->typeId))
-            $mapType = $d > 2 ? 2 : 1;
-        else if ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = ?d, 1, 2) FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId))
-            $mapType = $mt;
-        else if ($_altIds)                                  // not spawned, but has difficultyDummies
-        {
-            if (count($_altIds) > 1)                        // 3 or more version -> definitly raid (10/25 + hc)
-                $mapType = 2;
-            else                                            // 2 versions; may be Heroic (use this), but may also be 10/25-raid
-                $mapType = 1;
-        }
+        // npc is difficulty dummy: get max difficulty from parent npc
+        if ($placeholder && ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = ?d, 1, 2) FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId)))
+            $mapType = max($mapType, $mt);
+        // npc has difficulty dummys: 2+ dummies -> definitely raid (10/25 + hc); 1 dummy -> may be heroic (used here), but may also be 10/25-raid
+        if ($_altIds)
+            $mapType = max($mapType, count($_altIds) > 1 ? 2 : 1);
+        // for event encounters a single npc may be reused over multiple difficulties but have different chests assigned
+        if ($d = DB::Aowow()->selectCell('SELECT MAX(`difficulty`) FROM ?_loot_link WHERE `npcId` IN (?a)', array_merge($_altIds, [$this->typeId])))
+            $mapType = max($mapType, $d > 2 ? 2 : 1);
 
 
         /***********/
@@ -128,7 +126,7 @@ class NpcPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event (ignore events, where the object only gets removed)
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_creature gec, creature c WHERE ge.eventEntry = gec.eventEntry AND c.guid = gec.guid AND c.id = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_creature gec, creature c WHERE ge.`eventEntry` = gec.`eventEntry` AND c.`guid` = gec.`guid` AND c.`id` = ?d', $this->typeId))
         {
             $this->extendGlobalIds(Type::WORLDEVENT, ...$_);
             $ev = [];
@@ -725,7 +723,7 @@ class NpcPage extends GenericPage
 
         ksort($sourceFor);
 
-        foreach ($sourceFor as $i => [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols, $note])
+        foreach ($sourceFor as [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols, $note])
         {
             $creatureLoot = new Loot();
             if ($creatureLoot->getByContainer($lootTpl, $lootId))
@@ -828,7 +826,7 @@ class NpcPage extends GenericPage
         }
 
         // tab: passengers
-        if ($_ = DB::World()->selectCol('SELECT accessory_entry AS ARRAY_KEY, GROUP_CONCAT(seat_id) FROM vehicle_template_accessory WHERE entry = ?d GROUP BY accessory_entry', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT `accessory_entry` AS ARRAY_KEY, GROUP_CONCAT(`seat_id`) FROM vehicle_template_accessory WHERE `entry` = ?d GROUP BY `accessory_entry`', $this->typeId))
         {
             $passengers = new CreatureList(array(['id', array_keys($_)]));
             if (!$passengers->error)
@@ -863,7 +861,7 @@ class NpcPage extends GenericPage
         $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SAI_SRC_TYPE_CREATURE));
 
         // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
-        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE id = ?d', $this->subject->getField('displayId1'));
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE `id` = ?d', $this->subject->getField('displayId1'));
         array_shift($activitySounds);                       // remove id-column
         $this->soundIds = array_merge($this->soundIds, array_values($activitySounds));
 
@@ -912,14 +910,14 @@ class NpcPage extends GenericPage
         return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
-    private function getRepForId($entries, &$spillover)
+    private function getRepForId(array $entries, array &$spillover) : array
     {
-        $rows  = DB::World()->select('
-            SELECT creature_id AS npc, RewOnKillRepFaction1 AS faction, RewOnKillRepValue1 AS qty, MaxStanding1 AS maxRank, isTeamAward1 AS spillover
-            FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction1 > 0 UNION
-            SELECT creature_id AS npc, RewOnKillRepFaction2 As faction, RewOnKillRepValue2 AS qty, MaxStanding2 AS maxRank, isTeamAward2 AS spillover
-            FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction2 > 0',
-            (array)$entries, (array)$entries
+        $rows  = DB::World()->select(
+           'SELECT `creature_id` AS "npc", `RewOnKillRepFaction1` AS "faction", `RewOnKillRepValue1` AS "qty", `MaxStanding1` AS "maxRank", `isTeamAward1` AS "spillover"
+            FROM   creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction1` > 0 UNION
+            SELECT `creature_id` AS "npc", `RewOnKillRepFaction2` AS "faction", `RewOnKillRepValue2` AS "qty", `MaxStanding2` AS "maxRank", `isTeamAward2` AS "spillover"
+            FROM   creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction2` > 0',
+            $entries, $entries
         );
 
         $factions = new FactionList(array(['id', array_column($rows, 'faction')]));
@@ -938,7 +936,7 @@ class NpcPage extends GenericPage
                 'cap'  => $row['maxRank'] && $row['maxRank'] < REP_EXALTED ? Lang::game('rep', $row['maxRank']) : null
             );
 
-            $cuRate = DB::World()->selectCell('SELECT creature_rate FROM reputation_reward_rate WHERE creature_rate <> 1 AND faction = ?d', $row['faction']);
+            $cuRate = DB::World()->selectCell('SELECT `creature_rate` FROM reputation_reward_rate WHERE `creature_rate` <> 1 AND `faction` = ?d', $row['faction']);
             if ($cuRate !== null)
                 $set['qty'][1] = $set['qty'][0] * ($cuRate - 1);
 
@@ -957,13 +955,13 @@ class NpcPage extends GenericPage
         return $result;
     }
 
-    private function getOnKillRep($dummyIds, $mapType)
+    private function getOnKillRep(array $dummyIds, int $mapType) : array
     {
         $spilledParents = [];
         $reputation     = [];
 
         // base NPC
-        if ($base = $this->getRepForId($this->typeId, $spilledParents))
+        if ($base = $this->getRepForId([$this->typeId], $spilledParents))
             $reputation[] = [Lang::npc('modes', 1, 0), $base];
 
         // difficulty dummys
@@ -1019,7 +1017,7 @@ class NpcPage extends GenericPage
         return $reputation;
     }
 
-    private function getQuotes()
+    private function getQuotes() : array
     {
         [$quotes, $nQuotes, $soundIds] = Game::getQuotesForCreature($this->typeId, true, $this->subject->getField('name', true));
 

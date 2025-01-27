@@ -1004,7 +1004,7 @@ $lang = array(
         'react'         => "Réaction",
         'worth'         => "Vaut",
         'unkPosition'   => "L'emplacement de ce PNJ est inconnu.",
-        'difficultyPH'  => "Ce PNJ est un espace réservé pour un autre mode de difficulté.",
+        'difficultyPH'  => 'Ce PNJ est un espace réservé pour un autre mode de difficulté <a href="?npc=%1$d">%2$s</a>.',
         'seat'          => "Siège",
         'accessory'     => "Passager",
         'accessoryFor'  => "Ce PNJ est un passager pour un véhicule.",

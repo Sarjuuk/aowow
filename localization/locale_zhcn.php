@@ -1004,7 +1004,7 @@ $lang = array(
         'react'         => "反应",
         'worth'         => "价值",
         'unkPosition'   => "这个NPC的位置未知。",
-        'difficultyPH'  => "这个NPC是不同模式下的占位符，是",
+        'difficultyPH'  => '这个NPC是不同模式下的占位符，是 <a href="?npc=%1$d">%2$s</a>.',
         'seat'          => "Seat",
         'accessory'     => "附件",
         'accessoryFor'  => "这个NPC是载具的附件",
