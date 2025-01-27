@@ -153,8 +153,10 @@ register_shutdown_function(function()
                 AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
             );
 
-        if (CLI || User::isInGroup(U_GROUP_EMPLOYEE))
+        if (CLI)
             fwrite(STDERR, "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n");
+        else if (User::isInGroup(U_GROUP_EMPLOYEE))
+            echo "\nFatal Error - ".$e['message'].' @ '.$e['file']. ':'.$e['line']."\n\n";
     }
 });
 
