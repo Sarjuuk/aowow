@@ -44,28 +44,21 @@ class Lang
     private static $emote;
     private static $enchantment;
 
-    private static $locId;
-    private static $locales = array(
-        LOCALE_EN => 'English',
-        LOCALE_FR => 'Français',
-        LOCALE_DE => 'Deutsch',
-        LOCALE_CN => '简体中文',
-        LOCALE_ES => 'Español',
-        LOCALE_RU => 'Русский'
-    );
+    private static ?Locale $locale = null;
 
     public const FMT_RAW    = 0;
     public const FMT_HTML   = 1;
     public const FMT_MARKUP = 2;
 
-    public static function load(int $locale) : void
+    public static function load(Locale $loc) : void
     {
-        if (!isset(Util::$localeStrings[$locale]))
-            die($locale.' is not a known locale!');
-        if (!file_exists('localization/locale_'.Util::$localeStrings[$locale].'.php'))
-            die('File for locale '.$locale.' not found.');
+        if (self::$locale == $loc)
+            return;
+
+        if (!file_exists('localization/locale_'.$loc->json().'.php'))
+            die('File for locale '.$loc->name.' not found.');
         else
-            require 'localization/locale_'.Util::$localeStrings[$locale].'.php';
+            require 'localization/locale_'.$loc->json().'.php';
 
         foreach ($lang as $k => $v)
             self::$$k = $v;
@@ -75,10 +68,15 @@ class Lang
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
 
-        self::$locId = $locale;
+        self::$locale = $loc;
     }
 
-    public static function __callStatic(string $prop, array $args) // : ?string|array
+    public static function getLocale() : Locale
+    {
+        return self::$locale;
+    }
+
+    public static function __callStatic(string $prop, ?array $args = []) : string|array|null
     {
         $vspfArgs = [];
         foreach ($args as $i => $arg)
@@ -96,9 +94,11 @@ class Lang
         $dbt  = debug_backtrace()[0];
         $file = explode(DIRECTORY_SEPARATOR, $dbt['file']);
         trigger_error('Lang - undefined property Lang::$'.$prop.'[\''.implode('\'][\'', $args).'\'], called in '.array_pop($file).':'.$dbt['line'], E_USER_WARNING);
+
+        return null;
     }
 
-    public static function exist(string $prop, ...$args)
+    public static function exist(string $prop, string ...$args) : string|array|null
     {
         if (!isset(self::$$prop))
             return null;
@@ -120,12 +120,12 @@ class Lang
         $b = '';
         $i = 0;
         $n = count($args);
+
+        $callback ??= fn($x) => $x;
+
         foreach ($args as $k => $arg)
         {
-            if (is_callable($callback))
-                $b .= $callback($arg, $k);
-            else
-                $b .= $arg;
+            $b .= $callback($arg, $k);
 
             if ($n > 1 && $i < ($n - 2))
                 $b .= ', ';
@@ -192,13 +192,13 @@ class Lang
         foreach ($row as &$r)
             $r = implode(' ', $r);
 
-        switch ($fmt)
+        $separator = match ($fmt)
         {
-            case self::FMT_HTML:   $separator = '<br />'; break;
-            case self::FMT_MARKUP: $separator = '[br]';   break;
-            case self::FMT_RAW:
-            default:               $separator = "\n";     break;
-        }
+            self::FMT_HTML   => '<br />',
+            self::FMT_MARKUP => '[br]',
+            self::FMT_RAW    => "\n",
+            default          => "\n"
+        };
 
         return implode($separator, $row);
     }
@@ -223,20 +223,20 @@ class Lang
     }
 
     // todo: expand
-    public static function getInfoBoxForFlags(int $flags) : array
+    public static function getInfoBoxForFlags(int $cuFlags) : array
     {
         $tmp = [];
 
-        if ($flags & CUSTOM_DISABLED)
+        if ($cuFlags & CUSTOM_DISABLED)
             $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::main('disabledHint')).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::main('disabled')).'[/span]';
 
-        if ($flags & CUSTOM_SERVERSIDE)
+        if ($cuFlags & CUSTOM_SERVERSIDE)
             $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::main('serversideHint')).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::main('serverside')).'[/span]';
 
-        if ($flags & CUSTOM_UNAVAILABLE)
+        if ($cuFlags & CUSTOM_UNAVAILABLE)
             $tmp[] = self::main('unavailable');
 
-        if ($flags & CUSTOM_EXCLUDE_FOR_LISTVIEW && User::isInGroup(U_GROUP_STAFF))
+        if ($cuFlags & CUSTOM_EXCLUDE_FOR_LISTVIEW && User::isInGroup(U_GROUP_STAFF))
             $tmp[] = '[tooltip name=excludedHint]This entry is excluded from lists and is not searchable.[/tooltip][span tooltip=excludedHint class="tip q10"]Hidden[/span]';
 
         return $tmp;
@@ -246,7 +246,7 @@ class Lang
     {
         $locks = [];
         $ids   = [];
-        $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE id = ?d', $lockId);
+        $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE `id` = ?d', $lockId);
         if (!$lock)
             return $locks;
 
@@ -518,13 +518,13 @@ class Lang
     {
         $tmp = self::game('difficulty').self::main('colon');
 
-        switch ($fmt)
+        $base = match ($fmt)
         {
-            case self::FMT_HTML:   $base = '<span class="r%1$d">%2$s</span> '; break;
-            case self::FMT_MARKUP: $base = '[color=r%1$d]%2$s[/color] '; break;
-            case self::FMT_RAW:
-            default:               $base = '%2$s '; break;
-        }
+            self::FMT_HTML   => '<span class="r%1$d">%2$s</span> ',
+            self::FMT_MARKUP => '[color=r%1$d]%2$s[/color] ',
+            self::FMT_RAW    => '%2$s ',
+            default          => '%2$s '
+        };
 
         for ($i = 0; $i < 4; $i++)
             if (!empty($bp[$i]))
@@ -594,7 +594,7 @@ class Lang
         return '';
     }
 
-    private static function vspf(/* array|string */ $var, array $args = []) // : array|string
+    private static function vspf(null|array|string $var, array $args = []) : null|array|string
     {
         if (is_array($var))
         {
@@ -775,7 +775,7 @@ class Lang
                 switch (strtolower($word[1]))
                 {
                     case 'h':
-                        if (self::$locId != LOCALE_FR)
+                        if (self::$locale != Locale::FR)
                             return 'de ' . $word;
                     case 'a':
                     case 'e':
@@ -810,7 +810,7 @@ class Lang
             {
                 [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 
-                if (self::$locId != LOCALE_RU || !$plural2)
+                if (self::$locale != Locale::RU || !$plural2)
                     return $num . $pad . ($num == 1 ? $singular : $plural1);
 
                 // singular - ends in 1, but not teen number

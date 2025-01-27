@@ -1479,7 +1479,7 @@ abstract class Filter
     private function genericString($field, $value, $strFlags)
     {
         if ($strFlags & STR_LOCALIZED)
-            $field .= '_loc'.User::$localeId;
+            $field .= '_loc'.Lang::getLocale()->value;
 
         return $this->modularizeString([$field], (string)$value, $strFlags & STR_MATCH_EXACT, $strFlags & STR_ALLOW_SHORT);
     }

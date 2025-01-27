@@ -136,17 +136,17 @@ trait TrTemplateFile
 
 trait TrImageProcessor
 {
-    private $imgPath = '%sInterface/';
-    private $status  = '';
-    private $maxExecTime  = 30;
+    private $imgPath     = '%sInterface/';
+    private $status      = '';
+    private $maxExecTime = 30;
 
-    private static $GEN_IDX_SRC_PATH  = 0;                  // php v8.0 make static > const
-    private static $GEN_IDX_SRC_REAL  = 1;
-    private static $GEN_IDX_LOCALE    = 2;
-    private static $GEN_IDX_SRC_INFO  = 3;
-    private static $GEN_IDX_DEST_INFO = 4;
+    private const GEN_IDX_SRC_PATH  = 0;
+    private const GEN_IDX_SRC_REAL  = 1;
+    private const GEN_IDX_LOCALE    = 2;
+    private const GEN_IDX_SRC_INFO  = 3;
+    private const GEN_IDX_DEST_INFO = 4;
 
-    private static $JPEG_QUALITY = 85;                      // 0: worst - 100: best
+    private const JPEG_QUALITY = 85;                        // 0: worst - 100: best
 
     private function checkSourceDirs() : bool
     {
@@ -161,7 +161,7 @@ trait TrImageProcessor
             // multiple genSteps can require the same resource
             if (isset($foundCache[$subDir]))
             {
-                $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = $foundCache[$subDir];
+                $this->genSteps[$i][self::GEN_IDX_SRC_REAL] = $foundCache[$subDir];
                 continue;
             }
 
@@ -171,16 +171,20 @@ trait TrImageProcessor
             if ($p = CLISetup::filesInPathLocalized($path, $this->success, $localized))
             {
                 $foundCache[$subDir] = $p;
-                $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = $p;  // php v8.2+ - make GEN_IDX_SRC_REAL a const
+                $this->genSteps[$i][self::GEN_IDX_SRC_REAL] = $p;
             }
             else
                 $this->success = false;
         }
 
         $locList = [];
-        foreach (CLISetup::$expectedPaths as $xp => $locId)
-            if (in_array($locId, array_keys(CLISetup::$locales)))
-                $locList[] = $xp;
+        foreach (Locale::cases() as $loc)
+        {
+            if (!$loc->validate() || !in_array($loc, CLISetup::$locales))
+                continue;
+
+            $locList = array_merge($locList, $loc->gameDirs());
+        }
 
         CLI::write('[img-proc] required resources overview:', CLI::LOG_INFO);
 
@@ -194,29 +198,29 @@ trait TrImageProcessor
             $foundCache[$subDir] = true;
             if (!$realPaths)
             {
-                CLI::write(CLI::red('MISSING').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/,', $locList).'/]').$subDir);
+                CLI::write(CLI::red('MISSING').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/ ', $locList).'/]').$subDir);
                 $this->success = false;
             }
             else if ($localized)
             {
                 $foundLoc = [];
-                foreach (CLISetup::$expectedPaths as $xp => $lId)
-                    if (in_array($lId, array_keys(CLISetup::$locales)))
+                foreach (CLISetup::$locales as $lId => $loc)
+                    foreach ($loc->gameDirs() as $xp)
                         if (isset($realPaths[$lId]) && ($n = stripos($realPaths[$lId], DIRECTORY_SEPARATOR.$xp.DIRECTORY_SEPARATOR)))
                             $foundLoc[$lId] = substr($realPaths[$lId], $n + 1, 4);
 
                 if ($diff = array_diff_key(CLISetup::$locales, $foundLoc))
                 {
                     $buff = [];
-                    foreach ($diff as $d => $_)
-                        $buff[] = CLI::red(Util::$localeStrings[$d]);
+                    foreach ($diff as $loc)
+                        $buff[] = CLI::red($loc->json());
                     foreach ($foundLoc as $str)
                         $buff[] = CLI::green($str);
 
-                    CLI::write(CLI::yellow('PARTIAL').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/,', $buff).'/]').$subDir);
+                    CLI::write(CLI::yellow('PARTIAL').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/ ', $buff).'/]').$subDir);
                 }
                 else
-                    CLI::write(CLI::green('FOUND  ').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/,', $foundLoc).'/]').$subDir);
+                    CLI::write(CLI::green('FOUND  ').' - '.str_pad($subDir, $outTblLen).' @ '.sprintf($this->imgPath, '['.implode('/ ', $foundLoc).'/]').$subDir);
             }
             else
                 CLI::write(CLI::green('FOUND  ').' - '.str_pad($subDir, $outTblLen).' @ '.reset($realPaths));
@@ -227,7 +231,7 @@ trait TrImageProcessor
         // if not localized directly return result
         foreach ($this->genSteps as $i => [$subDir, $realPaths, $localized, , ])
             if (!$localized && $realPaths)
-                $this->genSteps[$i][self::$GEN_IDX_SRC_REAL] = reset($realPaths);
+                $this->genSteps[$i][self::GEN_IDX_SRC_REAL] = reset($realPaths);
 
         return $this->success;
     }
@@ -235,7 +239,7 @@ trait TrImageProcessor
     // prefer manually converted PNG files (as the imagecreatefromblp-script has issues with some formats)
     // alpha channel issues observed with locale deDE Hilsbrad and Elwynn - maps
     // see: https://github.com/Kanma/BLPConverter
-    private function loadImageFile(string $path, ?bool &$noSrc = false) // : ?GdImage
+    private function loadImageFile(string $path, ?bool &$noSrc = false) : ?GdImage
     {
         $result = null;
         $noSrc  = false;
@@ -260,7 +264,7 @@ trait TrImageProcessor
         return $result;
     }
 
-    private function writeImageFile(/* GdImage */ $src, string $outFile, array $srcDims, array $destDims) : bool
+    private function writeImageFile(GdImage $src, string $outFile, array $srcDims, array $destDims) : bool
     {
         $success = false;
         $outRes  = imagecreatetruecolor($destDims['w'], $destDims['h']);
@@ -279,7 +283,7 @@ trait TrImageProcessor
         switch ($ext)
         {
             case 'jpg':
-                $success = imagejpeg($outRes, $outFile, self::$JPEG_QUALITY);
+                $success = imagejpeg($outRes, $outFile, self::JPEG_QUALITY);
                 break;
             case 'gif':
                 $success = imagegif($outRes, $outFile);
@@ -309,7 +313,7 @@ trait TrComplexImage
 {
     use TrImageProcessor { TrImageProcessor::writeImageFile as _writeImageFile; }
 
-    private function writeImageFile(/* GdImage */ $src, string $outFile, int $w, int $h) : bool
+    private function writeImageFile(GdImage $src, string $outFile, int $w, int $h) : bool
     {
         $srcDims = array(
             'x' => 0,
@@ -327,7 +331,7 @@ trait TrComplexImage
         return $this->_writeImageFile($src, $outFile, $srcDims, $destDims);
     }
 
-    private function createAlphaImage(int $w, int $h) //: ?GdImage
+    private function createAlphaImage(int $w, int $h) : ?GdImage
     {
         $img = imagecreatetruecolor($w, $h);
         if (!$img)
@@ -347,7 +351,7 @@ trait TrComplexImage
         return $img;
     }
 
-    private function assembleImage(string $baseName, array $tileData, int $destW, int $destH) //: ?GdImage
+    private function assembleImage(string $baseName, array $tileData, int $destW, int $destH) : ?GdImage
     {
         $dest = imagecreatetruecolor($destW, $destH);
         if (!$dest)
@@ -464,8 +468,8 @@ abstract class SetupScript
             if (!$this->localized)
                 $dirs[] = $dir;
             else
-                foreach (CLISetup::$locales as $str)
-                    $dirs[] = $dir . $str . DIRECTORY_SEPARATOR;
+                foreach (CLISetup::$locales as $loc)
+                    $dirs[] = $dir . $loc->json() . DIRECTORY_SEPARATOR;
 
             foreach ($dirs as $d)
             {

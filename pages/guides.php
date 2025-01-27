@@ -52,7 +52,7 @@ class GuidesPage extends GenericPage
         else
         {
             $conditions = array(
-                ['locale', User::$localeId],
+                ['locale', Lang::getLocale()->value],
                 ['status', GUIDE_STATUS_ARCHIVED, '!'],     // never archived guides
                 [
                     'OR',

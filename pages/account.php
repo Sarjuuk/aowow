@@ -437,7 +437,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             $this->_post['email'],
             User::$ip,
             $this->_post['remember_me'] != 'yes',
-            User::$localeId,
+            Lang::getLocale()->value,
             U_GROUP_PENDING,
             ACC_STATUS_NEW,
             Cfg::get('ACC_CREATE_SAVE_DECAY'),

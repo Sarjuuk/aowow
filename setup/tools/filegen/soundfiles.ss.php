@@ -19,7 +19,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     public function generate() : bool
     {
         // ALL files
-        $files  = DB::Aowow()->selectCol('SELECT ABS(id) AS ARRAY_KEY, CONCAT(path, "/", `file`) FROM ?_sounds_files');
+        $files  = DB::Aowow()->selectCol('SELECT ABS(`id`) AS ARRAY_KEY, CONCAT(`path`, "/", `file`) FROM ?_sounds_files');
         $nFiles = count($files);
         $qtLen  = strlen($nFiles);
         $sum    = 0;
@@ -37,31 +37,31 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // expect converted files as file.wav_ or file.mp3_
             $filePath .= '_';
 
-            // just use the first locale available .. there is no support for multiple audio files anyway
-            foreach (CLISetup::$expectedPaths as $locStr => $__)
+            // just use the first locale available .. there is no support for multiple audio files for now
+            foreach (CLISetup::$locales as $loc)
             {
-                // get your paths straight!
-                $p = CLI::nicePath($filePath, CLISetup::$srcDir, $locStr);
-
-                if (CLISetup::fileExists($p))
+                foreach ($loc->gameDirs() as $dir)
                 {
-                    // copy over to static/wowsounds/
-                    if (!copy($p, 'static/wowsounds/'.$fileId))
-                    {
-                        $this->success = false;
-                        CLI::write('[soundfiles]  - could not copy '.CLI::bold($p).' into '.CLI::bold('static/wowsounds/'.$fileId), CLI::LOG_ERROR);
-                        $time->reset();
-                        break 2;
-                    }
+                    // get your paths straight!
+                    $p = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
 
-                    continue 2;
+                    if (!CLISetup::fileExists($p))
+                        continue;
+
+                    // copy over to static/wowsounds/
+                    if (copy($p, 'static/wowsounds/'.$fileId))
+                        continue 3;
+
+                    $this->success = false;
+                    CLI::write('[soundfiles]  - could not copy '.CLI::bold($p).' into '.CLI::bold('static/wowsounds/'.$fileId), CLI::LOG_ERROR);
+                    $time->reset();
                 }
             }
 
-            CLI::write('[soundfiles]  - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '['.implode(',', CLISetup::$locales).']')), CLI::LOG_WARN);
+            CLI::write('[soundfiles]  - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '['.implode(',', array_map(fn($x) => $x->json(), CLISetup::$locales)).']')), CLI::LOG_WARN);
             $time->reset();
             // flag as unusable in DB
-            DB::Aowow()->query('UPDATE ?_sounds_files SET id = ?d WHERE ABS(id) = ?d', -$fileId, $fileId);
+            DB::Aowow()->query('UPDATE ?_sounds_files SET `id` = ?d WHERE ABS(`id`) = ?d', -$fileId, $fileId);
         }
 
         return $this->success;

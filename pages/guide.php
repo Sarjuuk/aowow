@@ -180,7 +180,7 @@ class GuidePage extends GenericPage
     {
         // init required template vars
         $this->editorFields = array(
-            'locale' => User::$localeId,
+            'locale' => Lang::getLocale()->value,
             'status' => GUIDE_STATUS_DRAFT
         );
     }
@@ -522,11 +522,11 @@ class GuidePage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = strip_tags($this->name);
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'name_'.Lang::getLocale()->json()}    = strip_tags($this->name);
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
         }
 
-        return sprintf($this->powerTpl, Util::toJSON($this->articleUrl ?: $this->typeId), User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, Util::toJSON($this->articleUrl ?: $this->typeId), Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     protected function generatePath() : void

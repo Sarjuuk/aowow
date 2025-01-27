@@ -44,7 +44,7 @@ endforeach;
 <?php
 $idx = 0;
 foreach ($this->pieces as $iId => $piece):
-    echo '                    <tr><th align="right" id="iconlist-icon'.(++$idx).'"></th><td><span class="q'.$piece['quality'].'"><a href="?item='.$iId.'">'.$piece['name_'.User::$localeString]."</a></span></td></tr>\n";
+    echo '                    <tr><th align="right" id="iconlist-icon'.(++$idx).'"></th><td><span class="q'.$piece['quality'].'"><a href="?item='.$iId.'">'.$piece['name_'.Lang::getLocale()->json()]."</a></span></td></tr>\n";
 endforeach;
 ?>
                 </table>

@@ -45,9 +45,13 @@ class TitleList extends BaseType
             unset($_curTpl['src3']);
 
             // shorthand for more generic access
-            foreach (Util::$localeStrings as $i => $str)
-                if ($str)
-                    $_curTpl['name_loc'.$i] = trim(str_replace('%s', '', $_curTpl['male_loc'.$i]));
+            // i don't see it being used anywhere..?
+        /*
+            foreach (Locale::cases() as $loc)
+                if ($loc->validate())
+                    $_curTpl['name'] = new LocString($_curTpl, 'male', fn($x) => trim(str_replace('%s', '', $x)));
+                //  $_curTpl['name_loc'.$loc->value] = trim(str_replace('%s', '', $_curTpl['male_loc'.$loc->value]));
+        */
         }
     }
 

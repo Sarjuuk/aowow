@@ -220,7 +220,7 @@ class Game
         $pages = [];
         while ($ptId)
         {
-            if ($row = DB::World()->selectRow('SELECT ptl.Text AS Text_loc?d, pt.* FROM page_text pt LEFT JOIN page_text_locale ptl ON pt.ID = ptl.ID AND locale = ? WHERE pt.ID = ?d', User::$localeId, User::$localeString, $ptId))
+            if ($row = DB::World()->selectRow('SELECT ptl.Text AS Text_loc?d, pt.* FROM page_text pt LEFT JOIN page_text_locale ptl ON pt.ID = ptl.ID AND locale = ? WHERE pt.ID = ?d', Lang::getLocale()->value, Lang::getLocale()->json(), $ptId))
             {
                 $ptId = $row['NextPageID'];
                 $pages[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
@@ -392,28 +392,20 @@ class Game
         $quotes   = [];
         $soundIds = [];
 
-        $quoteSrc = DB::World()->select('
-            SELECT
-                ct.GroupID AS ARRAY_KEY, ct.ID as ARRAY_KEY2,
-                ct.`Type` AS `talkType`,
-                ct.TextRange AS `range`,
-                IFNULL(bct.`LanguageID`, ct.`Language`) AS lang,
-                IFNULL(NULLIF(bct.Text, ""), IFNULL(NULLIF(bct.Text1, ""), IFNULL(ct.`Text`, ""))) AS text_loc0,
-               {IFNULL(NULLIF(bctl.Text, ""), IFNULL(NULLIF(bctl.Text1, ""), IFNULL(ctl.Text, ""))) AS text_loc?d,}
-                IF(bct.SoundEntriesID > 0, bct.SoundEntriesID, ct.Sound) AS soundId
-            FROM
-                creature_text ct
-           {LEFT JOIN
-                creature_text_locale ctl ON ct.CreatureID = ctl.CreatureID AND ct.GroupID = ctl.GroupID AND ct.ID = ctl.ID AND ctl.Locale = ?}
-            LEFT JOIN
-                broadcast_text bct ON ct.BroadcastTextId = bct.ID
-           {LEFT JOIN
-                broadcast_text_locale bctl ON ct.BroadcastTextId = bctl.ID AND bctl.locale = ?}
-            WHERE
-                ct.CreatureID = ?d',
-            User::$localeId ?: DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-            User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
+        $quoteSrc = DB::World()->select(
+           'SELECT    ct.`GroupID` AS ARRAY_KEY, ct.`ID` AS ARRAY_KEY2, ct.`Type` AS "talkType", ct.TextRange AS "range",
+                      IFNULL(bct.`LanguageID`, ct.`Language`) AS "lang",
+                      IFNULL(NULLIF(bct.`Text`, ""),  IFNULL(NULLIF(bct.`Text1`, ""),  IFNULL(ct.`Text`, "")))  AS "text_loc0",
+                    { IFNULL(NULLIF(bctl.`Text`, ""), IFNULL(NULLIF(bctl.`Text1`, ""), IFNULL(ctl.`Text`, ""))) AS text_loc?d, }
+                      IF(bct.`SoundEntriesID` > 0, bct.`SoundEntriesID`, ct.`Sound`) AS "soundId"
+            FROM      creature_text ct
+          { LEFT JOIN creature_text_locale ctl   ON ct.`CreatureID`      = ctl.`CreatureID` AND ct.`GroupID` = ctl.`GroupID` AND ct.`ID` = ctl.`ID` AND ctl.`Locale` = ? }
+            LEFT JOIN broadcast_text bct         ON ct.`BroadcastTextId` = bct.`ID`
+          { LEFT JOIN broadcast_text_locale bctl ON ct.`BroadcastTextId` = bctl.`ID` AND bctl.`locale` = ? }
+            WHERE     ct.`CreatureID` = ?d',
+            Lang::getLocale()->value ?: DBSIMPLE_SKIP,
+            Lang::getLocale()->value ? Lang::getLocale()->json() : DBSIMPLE_SKIP,
+            Lang::getLocale()->value ? Lang::getLocale()->json() : DBSIMPLE_SKIP,
             $creatureId
         );
 

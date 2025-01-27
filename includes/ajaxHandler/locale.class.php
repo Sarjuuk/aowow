@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxLocale extends AjaxHandler
 {
     protected $_get = array(
-        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkLocale']
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFrom']
     );
 
     public function __construct(array $params)
@@ -23,8 +23,11 @@ class AjaxLocale extends AjaxHandler
     */
     protected function handleLocale() : string
     {
-        User::setLocale($this->_get['locale']);
-        User::save();
+        if ($this->_get['locale']?->validate())
+        {
+            User::$preferedLoc = $this->_get['locale'];
+            User::save(true);
+        }
 
         return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '.';
     }

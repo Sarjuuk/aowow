@@ -1436,8 +1436,8 @@ class SpellList extends BaseType
         $this->charLevel   = $level;
 
     // step -1: already handled?
-        if (isset($this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive]))
-            return $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive];
+        if (isset($this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive]))
+            return $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive];
 
     // step 0: get text
         $data = $this->getField($type, true);
@@ -1543,7 +1543,7 @@ class SpellList extends BaseType
         $data = strtr($data, ["\r" => '', "\n" => '<br />']);
 
         // cache result
-        $this->parsedText[$this->id][$type][User::$localeId][$this->charLevel][(int)$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
+        $this->parsedText[$this->id][$type][Lang::getLocale()->value][$this->charLevel][(int)$this->interactive] = [$data, $relSpells, $this->scaling[$this->id]];
 
         return [$data, $relSpells, $this->scaling[$this->id]];
     }
@@ -2451,9 +2451,9 @@ class SpellListFilter extends Filter
         {
             $_ = [];
             if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $_ = $this->modularizeString(['name_loc'.User::$localeId, 'buff_loc'.User::$localeId, 'description_loc'.User::$localeId]);
+                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value, 'buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->modularizeString(['name_loc'.User::$localeId]);
+                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;

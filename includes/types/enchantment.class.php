@@ -13,7 +13,7 @@ class EnchantmentList extends BaseType
     public static   $dataTable  = '?_itemenchantment';
 
     private         $jsonStats  = [];
-    private         $relSpells  = [];
+    private SpellList $relSpells;
     private         $triggerIds = [];
 
     protected       $queryBase  = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
@@ -25,6 +25,8 @@ class EnchantmentList extends BaseType
     public function __construct(array $conditions = [], array $miscData = [])
     {
         parent::__construct($conditions, $miscData);
+
+        $relSpells = [];
 
         // post processing
         foreach ($this->iterate() as &$curTpl)
@@ -40,15 +42,15 @@ class EnchantmentList extends BaseType
                     case ENCHANTMENT_TYPE_COMBAT_SPELL:
                         $proc = -$this->getField('ppmRate') ?: ($this->getField('procChance') ?: $this->getField('amount'.$i));
                         $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_HIT, $curTpl['charges'], $proc];
-                        $this->relSpells[]    =  $curTpl['object'.$i];
+                        $relSpells[]          =  $curTpl['object'.$i];
                         break;
                     case ENCHANTMENT_TYPE_EQUIP_SPELL:
                         $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_EQUIP, $curTpl['charges'], 0];
-                        $this->relSpells[]    =  $curTpl['object'.$i];
+                        $relSpells[]          =  $curTpl['object'.$i];
                         break;
                     case ENCHANTMENT_TYPE_USE_SPELL:
                         $curTpl['spells'][$i] = [$curTpl['object'.$i], SPELL_TRIGGER_USE, $curTpl['charges'], 0];
-                        $this->relSpells[]    =  $curTpl['object'.$i];
+                        $relSpells[]          =  $curTpl['object'.$i];
                         break;
                 }
             }
@@ -56,8 +58,8 @@ class EnchantmentList extends BaseType
             $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true);
         }
 
-        if ($this->relSpells)
-            $this->relSpells = new SpellList(array(['id', $this->relSpells]));
+        if ($relSpells)
+            $this->relSpells = new SpellList(array(['id', $relSpells]));
     }
 
     // use if you JUST need the name
@@ -241,7 +243,7 @@ class EnchantmentListFilter extends Filter
 
         //string
         if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // type

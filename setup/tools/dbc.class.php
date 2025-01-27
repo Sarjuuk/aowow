@@ -110,21 +110,27 @@ class DBC
         $this->isGameTable = array_values($this->format) == ['f'] && substr($file, 0, 2) == 'gt';
 
         $foundMask = 0x0;
-        foreach (CLISetup::$expectedPaths as $locStr => $locId)
+        foreach (Locale::cases() as $loc)
         {
-            if (!in_array($locId, array_keys(CLISetup::$locales)))
+            if (!in_array($loc, CLISetup::$locales))
                 continue;
 
-            if ($foundMask & (1 << $locId))
+            if ($foundMask & (1 << $loc->value))
                 continue;
 
-            $fullPath = CLI::nicePath($this->file.'.dbc', CLISetup::$srcDir, $locStr, 'DBFilesClient');
-            if (!CLISetup::fileExists($fullPath))
-                continue;
+            foreach ($loc->gameDirs() as $dir)
+            {
+                $fullPath = CLI::nicePath($this->file.'.dbc', CLISetup::$srcDir, $dir, 'DBFilesClient');
+                if (!CLISetup::fileExists($fullPath))
+                    continue;
 
-            $this->curFile = $fullPath;
-            if ($this->validateFile($locId))
-                $foundMask |= (1 << $locId);
+                $this->curFile = $fullPath;
+                if ($this->validateFile($loc))
+                {
+                    $foundMask |= (1 << $loc->value);
+                    break;
+                }
+            }
         }
 
         if (!$this->fileRefs)
@@ -138,7 +144,7 @@ class DBC
         $x = array_unique(array_column($headers, 'recordCount'));
         if (count($x) != 1)
         {
-            CLI::write('some DBCs have differenct record counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
+            CLI::write('some DBCs have different record counts ('.implode(', ', $x).' respectively). cannot merge!', CLI::LOG_ERROR);
             return;
         }
         $x = array_unique(array_column($headers, 'fieldCount'));
@@ -165,7 +171,7 @@ class DBC
         $this->createTable();
 
         if ($this->localized)
-            CLI::write(' - DBC: reading and merging '.$this->file.'.dbc for locales '.Lang::concat(array_intersect_key(Util::$localeStrings, $this->fileRefs), true, 'CLI::bold'));
+            CLI::write(' - DBC: reading and merging '.$this->file.'.dbc for locales '.Lang::concat(array_keys($this->fileRefs), callback: fn($x) => CLI::bold(Locale::from($x)->name)));
         else
             CLI::write(' - DBC: reading '.$this->file.'.dbc');
 
@@ -212,25 +218,25 @@ class DBC
         $this->dataBuffer = null;
     }
 
-    private function readHeader(&$handle = null)
+    private function readHeader(&$handle = null) : array
     {
         if (!is_resource($handle))
             $handle = fopen($this->curFile, 'rb');
 
         if (!$handle)
-            return false;
+            return [];
 
         if (fread($handle, 4) != 'WDBC')
         {
             CLI::write('file '.$this->curFile.' has incorrect magic bytes', CLI::LOG_ERROR);
             fclose($handle);
-            return false;
+            return [];
         }
 
         return unpack('VrecordCount/VfieldCount/VrecordSize/VstringSize', fread($handle, 16));
     }
 
-    private function validateFile($locId)
+    private function validateFile(Locale $loc) : bool
     {
         $filesize = filesize($this->curFile);
         if ($filesize < 20)
@@ -266,7 +272,7 @@ class DBC
             return false;
         }
 
-        $this->fileRefs[$locId] = [$handle, $this->curFile, $header];
+        $this->fileRefs[$loc->value] = [$handle, $this->curFile, $header];
 
         return true;
     }

@@ -21,8 +21,8 @@ if (!empty($this->gPageInfo)):
 endif;
 
 if (!empty($this->pageTemplate)):
-    if (User::$localeId && $this->pageTemplate['pageName'] != 'home'):
-        echo "                Locale.set(".User::$localeId.");\n";
+    if (Lang::getLocale()->value && $this->pageTemplate['pageName'] != 'home'):
+        echo "                Locale.set(".Lang::getLocale()->value.");\n";
     endif;
 
     echo "                PageTemplate.set(".Util::toJSON($this->pageTemplate).");\n";
@@ -35,4 +35,3 @@ if (!empty($fi)):
 endif;
 ?>
             //]]></script>
-

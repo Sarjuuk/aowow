@@ -35,19 +35,19 @@ CLISetup::registerSetup("build", new class extends SetupScript
         // sketchy, but should work
         // id < 36'000 || ilevel < 70 ? BC : WOTLK
         $gems = DB::Aowow()->select(
-           'SELECT    i.id AS itemId,
-                      i.name_loc0, i.name_loc2, i.name_loc3, i.name_loc4, i.name_loc6, i.name_loc8,
-                      IF (i.id < 36000 OR i.itemLevel < 70, ?d, ?d) AS expansion,
-                      i.quality,
-                      ic.name AS icon,
-                      i.gemEnchantmentId AS enchId,
-                      i.gemColorMask AS colors,
-                      i.requiredSkill,
-                      i.itemLevel
+           'SELECT    i.`id` AS "itemId",
+                      i.`name_loc0`, i.`name_loc2`, i.`name_loc3`, i.`name_loc4`, i.`name_loc6`, i.`name_loc8`,
+                      IF (i.`id` < 36000 OR i.`itemLevel` < 70, ?d, ?d) AS "expansion",
+                      i.`quality`,
+                      ic.`name` AS "icon",
+                      i.`gemEnchantmentId` AS "enchId",
+                      i.`gemColorMask` AS "colors",
+                      i.`requiredSkill`,
+                      i.`itemLevel`
             FROM      ?_items i
-            JOIN      ?_icons ic ON ic.id = i.iconId
-            WHERE     i.gemEnchantmentId <> 0
-            ORDER BY  i.id DESC',
+            JOIN      ?_icons ic ON ic.`id` = i.`iconId`
+            WHERE     i.`gemEnchantmentId` <> 0
+            ORDER BY  i.`id` DESC',
             EXP_BC, EXP_WOTLK
         );
 
@@ -59,12 +59,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        foreach (CLISetup::$locales as $lId => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($lId);
-            Lang::load($lId);
+            Lang::load($loc);
 
             $gemsOut = [];
             foreach ($gems as $g)
@@ -88,7 +87,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_gems = ".Util::toJSON($gemsOut).";";
-            $file   = 'datasets/'.$jsonStr.'/gems';
+            $file   = 'datasets/'.$loc->json().'/gems';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

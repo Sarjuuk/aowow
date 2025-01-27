@@ -353,9 +353,9 @@ class CreatureListFilter extends Filter
         {
             $_ = [];
             if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $_ = $this->modularizeString(['name_loc'.User::$localeId, 'subname_loc'.User::$localeId]);
+                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value, 'subname_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->modularizeString(['name_loc'.User::$localeId]);
+                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;

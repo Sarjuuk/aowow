@@ -38,8 +38,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     // args: username, password, email, null // iiin
     public function run(&$args) : bool
     {
-        User::useLocale(LOCALE_EN);
-        Lang::load(LOCALE_EN);
+        Lang::load(Locale::EN);
 
         $name  = $args[0] ?? '';
         $passw = $args[1] ?? '';
@@ -67,21 +66,21 @@ CLISetup::registerUtility(new class extends UtilityScript
         {
             CLI::write();
 
-            if (!$name && !User::isValidName($uiAccount['name'], $e))
+            if (!$name && !User::isValidName($uiAccount['name'] ?? '', $e))
                 CLI::write(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLI::LOG_ERROR);
             else if (!$name)
                 $name = $uiAccount['name'];
 
-            if (!$passw && !User::isValidPass($uiAccount['pass1'], $e))
+            if (!$passw && !User::isValidPass($uiAccount['pass1'] ?? '', $e))
                 CLI::write(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLI::LOG_ERROR);
             else if (!$passw && $uiAccount['pass1'] != $uiAccount['pass2'])
                 CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
             else if (!$passw)
                 $passw = $uiAccount['pass1'];
 
-            if (!$email && Util::isValidEmail($uiAccount['email']))
+            if (!$email && Util::isValidEmail($uiAccount['email'] ?? ''))
                 $email = $uiAccount['email'];
-            else if (!$email && $uiAccount['email'])
+            else if (!$email && $uiAccount && $uiAccount['email'])
                 CLI::write('[account] email invalid ... using default: ' . Cfg::get('CONTACT_EMAIL'), CLI::LOG_INFO);
         }
         else if ($this->fields)
@@ -92,7 +91,7 @@ CLISetup::registerUtility(new class extends UtilityScript
             return true;
         }
 
-        if (DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE user = ? AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $name, ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if (DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE `user` = ? AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, ACC_STATUS_NEW, ACC_STATUS_NEW))
         {
             CLI::write('[account] ' . Lang::account('nameInUse'), CLI::LOG_ERROR);
             CLI::write();
@@ -102,10 +101,10 @@ CLISetup::registerUtility(new class extends UtilityScript
         if (!$name || !$passw)
             return false;
 
-        if (DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, joindate, email, allowExpire, userGroups, userPerms) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, 0, ?d, 1)',
+        if (DB::Aowow()->query('REPLACE INTO ?_account (`user`, `passHash`, `displayName`, `joindate`, `email`, `allowExpire`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, 0, ?d, 1)',
             $name, User::hashCrypt($passw), Util::ucFirst($name), $email ?: Cfg::get('CONTACT_EMAIL'), U_GROUP_ADMIN))
         {
-            $newId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $name);
+            $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `user` = ?', $name);
             Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
             CLI::write("[account] admin ".$name." created successfully", CLI::LOG_OK);

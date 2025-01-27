@@ -14,14 +14,6 @@ class CLISetup
     public  static $srcDir        = 'setup/mpqdata/';
 
     private static $mpqFiles      = [];
-    public  static $expectedPaths = array(                  // update paths [yes, you can have en empty string as key]
-        ''     => LOCALE_EN,    'enGB' => LOCALE_EN,    'enUS' => LOCALE_EN,
-        'frFR' => LOCALE_FR,
-        'deDE' => LOCALE_DE,
-        'zhCN' => LOCALE_CN,    'enCN' => LOCALE_CN,
-        'esES' => LOCALE_ES,
-        'ruRU' => LOCALE_RU
-    );
 
     public  const SQL_BATCH       = 1000;                   // max. n items per sql insert
 
@@ -175,21 +167,15 @@ class CLISetup
         // optional limit handled locales
         if (isset(self::$opts['locales']))
         {
-            // engb and enus are identical for all intents and purposes
-            $from = ['engb', 'encn'];
-            $to   = ['enus', 'zhcn'];
-
-            self::$opts['locales'] = str_ireplace($from, $to, self::$opts['locales']);
-
-            self::$locales = array_intersect(Util::$localeStrings, array_map('strtolower', self::$opts['locales']));
+            $opt = array_map('strtolower', self::$opts['locales']);
+            foreach (Locale::cases() as $loc)
+                if ($loc->validate() && array_intersect(array_map('strtolower', $loc->gameDirs()), $opt))
+                    self::$locales[$loc->value] = $loc;
         }
         if (!self::$locales)
-            self::$locales = array_filter(Util::$localeStrings);
-
-        // restrict actual locales
-        foreach (self::$locales as $idx => $_)
-            if (($l = Cfg::get('LOCALES')) && !($l & (1 << $idx)))
-                unset(self::$locales[$idx]);
+            foreach (Locale::cases() as $loc)
+                if ($loc->validate())
+                    self::$locales[$loc->value] = $loc;
 
         return !!self::$locales;
     }
@@ -557,22 +543,19 @@ class CLISetup
     {
         $result = [];
 
-        foreach (self::$expectedPaths as $xp => $locId)
+        foreach (self::$locales as $locId => $loc)
         {
-            if (!in_array($locId, array_keys(self::$locales)))
-                continue;
-
-            if (isset($result[$locId]))
-                continue;
-
-            if ($xp)                                        // if in subDir add trailing slash
-                $xp .= DIRECTORY_SEPARATOR;
-
-            $path = sprintf($pathPattern, $xp);
-            if (self::fileExists($path))
+            foreach ($loc->gameDirs() as $gDir)
             {
-                $result[$locId] = $path;
-                continue;
+                if ($gDir)                                  // if in subDir add trailing slash
+                    $gDir .= DIRECTORY_SEPARATOR;
+
+                $path = sprintf($pathPattern, $gDir);
+                if (self::fileExists($path))
+                {
+                    $result[$locId] = $path;
+                    break;
+                }
             }
         }
 
@@ -590,17 +573,23 @@ class CLISetup
         CLI::write('loading required GlobalStrings', CLI::LOG_INFO);
 
         // try to load globalstrings for all selected locales
-        foreach (self::$expectedPaths as $xp => $lId)
+        foreach (self::$locales as $locId => $loc)
         {
-            if (isset(self::$gsFiles[$lId]))
+            if (isset(self::$gsFiles[$locId]))
                 continue;
 
-            if ($xp)
-                $xp .= DIRECTORY_SEPARATOR;
+            foreach ($loc->gameDirs() as $gDir)
+            {
+                if ($gDir)
+                    $gDir .= DIRECTORY_SEPARATOR;
 
-            $gsFile = sprintf(self::GLOBALSTRINGS_LUA, self::$srcDir, $xp);
-            if (self::fileExists($gsFile))
-                self::$gsFiles[$lId] = file($gsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                $gsFile = sprintf(self::GLOBALSTRINGS_LUA, self::$srcDir, $gDir);
+                if (self::fileExists($gsFile))
+                {
+                    self::$gsFiles[$locId] = file($gsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                    break;
+                }
+            }
         }
 
         if ($missing = array_diff_key(self::$locales, self::$gsFiles))
@@ -612,7 +601,7 @@ class CLISetup
         return true;
     }
 
-    public static function searchGlobalStrings(string $pattern) : generator
+    public static function searchGlobalStrings(string $pattern) : Generator
     {
         if (!self::$gsFiles)
             return;

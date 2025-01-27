@@ -248,7 +248,7 @@ class AjaxComment extends AjaxHandler
         if ($this->_get['rating'] < 0)
             $val *= -1;
 
-        if (User::getCurDailyVotes() <= 0)
+        if (User::getCurrentDailyVotes() <= 0)
             return Util::toJSON(['error' => 1, 'message' => Lang::main('tooManyVotes')]);
         else if (!$target || $val != $this->_get['rating'])
             return Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);

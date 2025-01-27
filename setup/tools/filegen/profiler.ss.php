@@ -90,12 +90,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $relCurr = new CurrencyList(array(['id', $_]));
 
-            foreach (CLISetup::$locales as $l => $jsonStr)
+            foreach (CLISetup::$locales as $loc)
             {
                 set_time_limit(20);
 
-                User::useLocale($l);
-                Lang::load($l);
+                Lang::load($loc);
 
                 if (!$relCurr->error)
                 {
@@ -108,7 +107,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 foreach ($questz->getListviewData() as $id => $data)
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
 
-                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-quests-'.$cat2, $buff))
+                if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-quests-'.$cat2, $buff))
                     $this->success = false;
             }
         }
@@ -132,15 +131,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         // get titles for exclusion
         foreach ($titlez->iterate() as $id => $__)
-            if (empty($titlez->sources[$id][4]) && empty($titlez->sources[$id][12]))
+            if (empty($titlez->sources[$id][SRC_QUEST]) && empty($titlez->sources[$id][SRC_ACHIEVEMENT]))
                 $this->addExclusion(Type::TITLE, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$locales as $l => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($l);
-            Lang::load($l);
+            Lang::load($loc);
 
             foreach ([GENDER_MALE, GENDER_FEMALE] as $g)
             {
@@ -152,7 +150,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
                 }
 
-                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-titles-'.$g, $buff))
+                if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-titles-'.$g, $buff))
                     $this->success = false;
             }
         }
@@ -168,7 +166,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $mountz = new SpellList($condition);
 
-        $conditionSet = DB::World()->selectCol('SELECT SourceEntry AS ARRAY_KEY, ConditionValue1 FROM conditions WHERE SourceTypeOrReferenceId = ?d AND ConditionTypeOrReference = ?d AND SourceEntry IN (?a)', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
+        $conditionSet = DB::World()->selectCol('SELECT `SourceEntry` AS ARRAY_KEY, `ConditionValue1` FROM conditions WHERE `SourceTypeOrReferenceId` = ?d AND `ConditionTypeOrReference` = ?d AND `SourceEntry` IN (?a)', Conditions::SRC_SPELL, Conditions::SKILL, $mountz->getFoundIDs());
 
         // get mounts for exclusion
         foreach ($conditionSet as $mount => $skill)
@@ -179,12 +177,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!$mountz->getSources())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$locales as $l => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($l);
-            Lang::load($l);
+            Lang::load($loc);
 
             $buff = "var _ = g_spells;\n";
             foreach ($mountz->getListviewData(ITEMINFO_MODEL) as $id => $data)
@@ -203,7 +200,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
             }
 
-            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-mounts', $buff))
+            if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-mounts', $buff))
                 $this->success = false;
         }
     }
@@ -222,12 +219,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!$companionz->getSources())
                 $this->addExclusion(Type::SPELL, $id, PR_EXCLUDE_GROUP_UNAVAILABLE);
 
-        foreach (CLISetup::$locales as $l => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($l);
-            Lang::load($l);
+            Lang::load($loc);
 
             $buff = "var _ = g_spells;\n";
             foreach ($companionz->getListviewData(ITEMINFO_MODEL) as $id => $data)
@@ -241,7 +237,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $buff .= '_['.$id.'] = '.Util::toJSON($data).";\n";
             }
 
-            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-companions', $buff))
+            if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-companions', $buff))
                 $this->success = false;
         }
     }
@@ -254,12 +250,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $factionz = new FactionList($condition);
 
-        foreach (CLISetup::$locales as $l => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($l);
-            Lang::load($l);
+            Lang::load($loc);
 
             $buff = "var _ = g_factions;\n";
             foreach ($factionz->getListviewData() as $id => $data)
@@ -267,7 +262,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             $buff .= "\ng_faction_order = [0, 469, 891, 1037, 1118, 67, 1052, 892, 936, 1117, 169, 980, 1097];\n";
 
-            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-factions', $buff))
+            if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-factions', $buff))
                 $this->success = false;
         }
     }
@@ -284,8 +279,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $baseCnd = array(
             Cfg::get('SQL_LIMIT_NONE'),
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
-            ['effect1Id', [6, 45, 57, 127, 33, 158, 99, 28, 95], '!'],  // aura, tradeSkill, Tracking, Prospecting, Decipher, Milling, Disenchant, Summon (Engineering), Skinning
-            ['effect2Id', [118, 60], '!'],                              // not the skill itself
+            //                                                                                          Inscryption                                                            Engineering
+            ['effect1Id', [SPELL_EFFECT_APPLY_AURA, SPELL_EFFECT_TRADE_SKILL, SPELL_EFFECT_PROSPECTING, SPELL_EFFECT_OPEN_LOCK, SPELL_EFFECT_MILLING, SPELL_EFFECT_DISENCHANT, SPELL_EFFECT_SUMMON, SPELL_EFFECT_SKINNING], '!'],
+            // not the skill itself
+            ['effect2Id', [SPELL_EFFECT_SKILL, SPELL_EFFECT_PROFICIENCY], '!'],
             ['OR', ['typeCat', 9], ['typeCat', 11]]
         );
 
@@ -307,12 +304,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 }
             }
 
-            foreach (CLISetup::$locales as $l => $jsonStr)
+            foreach (CLISetup::$locales as $loc)
             {
                 set_time_limit(10);
 
-                User::useLocale($l);
-                Lang::load($l);
+                Lang::load($loc);
 
                 $buff = '';
                 foreach ($recipez->getListviewData() as $id => $data)
@@ -324,7 +320,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (!$buff)
                 {
                     // this behaviour is intended, do not create an error
-                    CLI::write('[profiler] - file datasets/'.$jsonStr.'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_INFO);
+                    CLI::write('[profiler] - file datasets/'.$loc->json().'/p-recipes-'.$file.' has no content => skipping', CLI::LOG_INFO);
                     continue;
                 }
 
@@ -333,7 +329,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (is_array($s))
                     $buff .= "\ng_skill_order = [171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356];\n";
 
-                if (!CLISetup::writeFile('datasets/'.$jsonStr.'/p-recipes-'.$file, $buff))
+                if (!CLISetup::writeFile('datasets/'.$loc->json().'/p-recipes-'.$file, $buff))
                     $this->success = false;
             }
         }
@@ -348,12 +344,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
         $achievez = new AchievementList($condition);
 
-        foreach (CLISetup::$locales as $l => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(5);
 
-            User::useLocale($l);
-            Lang::load($l);
+            Lang::load($loc);
 
             $sumPoints = 0;
             $buff      = "var _ = g_achievements;\n";
@@ -368,7 +363,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // sum points
             $buff .= "\ng_achievement_points = [".$sumPoints."];\n";
 
-            if (!CLISetup::writeFile('datasets/'.$jsonStr.'/achievements', $buff))
+            if (!CLISetup::writeFile('datasets/'.$loc->json().'/achievements', $buff))
                 $this->success = false;
         }
     }
@@ -378,7 +373,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         set_time_limit(2);
 
         CLI::write('[profiler] applying '.count($this->exclusions).' baseline exclusions');
-        DB::Aowow()->query('DELETE FROM ?_profiler_excludes WHERE comment = ""');
+        DB::Aowow()->query('DELETE FROM ?_profiler_excludes WHERE `comment` = ""');
 
         foreach ($this->exclusions as $ex)
             DB::Aowow()->query('REPLACE INTO ?_profiler_excludes (?#) VALUES (?a)', array_keys($ex), array_values($ex));
@@ -389,10 +384,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $exData = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `groups` FROM ?_profiler_excludes');
         for ($i = 0; (1 << $i) < PR_EXCLUDE_GROUP_ANY; $i++)
             foreach ($exData as $type => $data)
-                if ($ids = array_keys(array_filter($data, function ($x) use ($i) { return $x & (1 << $i); } )))
+                if ($ids = array_keys(array_filter($data, fn($x) => $x & (1 << $i))))
                     $excludes[$type][$i + 1] = $ids;
 
-        $buff = "g_excludes = ".Util::toJSON($excludes ?: (new Stdclass)).";\n";
+        $buff = "g_excludes = ".Util::toJSON($excludes ?: (new StdClass)).";\n";
 
         if (!CLISetup::writeFile('datasets/quick-excludes', $buff))
             $this->success = false;
@@ -400,13 +395,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function getExcludeForSkill(int $skillId) : int
     {
-        switch ($skillId)
+        return match ($skillId)
         {
-            case SKILL_FISHING:     return PR_EXCLUDE_GROUP_REQ_FISHING;
-            case SKILL_ENGINEERING: return PR_EXCLUDE_GROUP_REQ_ENGINEERING;
-            case SKILL_TAILORING:   return PR_EXCLUDE_GROUP_REQ_TAILORING;
-            default:                return 0;
-        }
+            SKILL_FISHING     => PR_EXCLUDE_GROUP_REQ_FISHING,
+            SKILL_ENGINEERING => PR_EXCLUDE_GROUP_REQ_ENGINEERING,
+            SKILL_TAILORING   => PR_EXCLUDE_GROUP_REQ_TAILORING,
+            default           => 0
+        };
     }
 
     private function addExclusion(int $type, int $typeId, int $groups, string $comment = '') : void
@@ -423,7 +418,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
     }
 
-    private function sumTotal (array &$sumArr, int $raceMask = -1, int $classMask= -1) : void
+    private function sumTotal(array &$sumArr, int $raceMask = -1, int $classMask= -1) : void
     {
         for ($i = 0; $i < RACE_MASK_ALL; $i++)
         {

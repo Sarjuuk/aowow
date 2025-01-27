@@ -19,7 +19,7 @@ class EventPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerHoliday(%d, %d, %s);';
     private   $hId           = 0;
@@ -31,7 +31,7 @@ class EventPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -283,15 +283,15 @@ class EventPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString} = $this->subject->getField('name', true);
+            $power->{'name_'.Lang::getLocale()->json()} = $this->subject->getField('name', true);
 
             if ($this->subject->getField('iconString') != 'trade_engineering')
                 $power->icon = rawurlencode($this->subject->getField('iconString', true, true));
 
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     protected function postCache()
@@ -309,7 +309,7 @@ class EventPage extends GenericPage
         else
         {
             if ($this->hId)
-                $this->wowheadLink = sprintf(WOWHEAD_LINK, Util::$subDomains[User::$localeId], 'event', $this->hId);
+                $this->wowheadLink = sprintf(WOWHEAD_LINK, Lang::getLocale()->domain(), 'event', $this->hId);
 
             /********************/
             /* finalize infobox */

@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxHandler::checkLocale'  ],
+        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'Locale::tryFrom'           ],
         't'         => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxHandler::checkTextLine'],
         'catg'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
         'skill'     => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxData::checkSkill'      ],
@@ -18,8 +18,8 @@ class AjaxData extends AjaxHandler
     {
         parent::__construct($params);
 
-        if (is_numeric($this->_get['locale']))
-            User::useLocale($this->_get['locale']);
+        if ($this->_get['locale']?->validate())
+            Lang::load($this->_get['locale']);
 
         // always this one
         $this->handler = 'handleData';
@@ -103,7 +103,7 @@ class AjaxData extends AjaxHandler
                 case 'pets':
                 case 'zones':
                     if (!Util::loadStaticFile($set, $result, true) && Cfg::get('DEBUG'))
-                        $result .= "alert('could not fetch static data: ".$set." for locale: ".User::$localeString."');";
+                        $result .= "alert('could not fetch static data: ".$set." for locale: ".Lang::getLocale()->json()."');";
 
                     $result .= "\n\n";
                     break;
@@ -118,7 +118,7 @@ class AjaxData extends AjaxHandler
 
     protected static function checkSkill(string $val) : array
     {
-        return array_intersect([171, 164, 333, 202, 182, 773, 755, 165, 186, 393, 197, 185, 129, 356], explode(',', $val));
+        return array_intersect(array_merge(SKILLS_TRADE_PRIMARY, [SKILL_FIRST_AID, SKILL_COOKING, SKILL_FISHING]), explode(',', $val));
     }
 
     protected static function checkCallback(string $val) : bool

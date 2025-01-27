@@ -89,7 +89,7 @@ class EmotePage extends GenericPage
 
         if ($this->subject->getField('cuFlags') & EMOTE_CU_MISSING_CMD)
             $text .= Lang::emote('noCommand').'[br][br]';
-        else if ($aliasses = DB::Aowow()->selectCol('SELECT command FROM ?_emotes_aliasses WHERE id = ?d AND locales & ?d', $this->typeId, 1 << User::$localeId))
+        else if ($aliasses = DB::Aowow()->selectCol('SELECT command FROM ?_emotes_aliasses WHERE id = ?d AND locales & ?d', $this->typeId, 1 << Lang::getLocale()->value))
         {
             $text .= '[h3]'.Lang::emote('aliases').'[/h3][ul]';
             foreach ($aliasses as $a)

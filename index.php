@@ -121,7 +121,7 @@ switch ($pageCall)
             if (is_callable([$classInstance, 'display']))
                 $classInstance->display();
             else if (isset($_GET['power']))
-                die('$WowheadPower.register(0, '.User::$localeId.', {})');
+                die('$WowheadPower.register(0, '.Lang::getLocale()->value.', {})');
             else                                            // in conjunction with a proper rewriteRule in .htaccess...
                 (new GenericPage($pageCall))->error();
         }
@@ -153,7 +153,7 @@ switch ($pageCall)
         break;
     default:                                                // unk parameter given -> ErrorPage
         if (isset($_GET['power']))
-            die('$WowheadPower.register(0, '.User::$localeId.', {})');
+            die('$WowheadPower.register(0, '.Lang::getLocale()->value.', {})');
         else                                                // in conjunction with a proper rewriteRule in .htaccess...
             (new GenericPage($pageCall))->error();
         break;

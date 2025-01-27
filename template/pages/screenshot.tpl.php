@@ -31,7 +31,7 @@ $this->brick('infobox');
                     <?=Lang::screenshot('caption').Lang::main('colon'); ?><input type="text" name="screenshotalt" style="width: 55%" maxlength="200" /> <small> <?=Lang::screenshot('charLimit'); ?></small><br />
                     <div class="pad"></div>
 
-<?php $this->localizedBrick('ssReminder', User::$localeId); ?>
+<?php $this->localizedBrick('ssReminder', Lang::getLocale()); ?>
 
                     <input type="submit" value="<?=Lang::main('submit'); ?>" />
                     <input type="hidden" name="coords" />

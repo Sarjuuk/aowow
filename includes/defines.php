@@ -139,21 +139,6 @@ define('U_GROUP_MODERATOR',                 (U_GROUP_ADMIN|U_GROUP_MOD|U_GROUP_B
 define('U_GROUP_COMMENTS_MODERATOR',        (U_GROUP_MODERATOR|U_GROUP_LOCALIZER));
 define('U_GROUP_PREMIUM_PERMISSIONS',       (U_GROUP_PREMIUM|U_GROUP_STAFF|U_GROUP_VIP));
 
-// Locales
-define('LOCALE_EN',                         0);             // enGB, enUS
-define('LOCALE_KR',                         1);             // koKR         [aowwo unused]
-define('LOCALE_FR',                         2);             // frFR
-define('LOCALE_DE',                         3);             // deDE
-define('LOCALE_CN',                         4);             // zhCN, enCN
-define('LOCALE_TW',                         5);             // zhTW, enTW   [aowow unused]
-define('LOCALE_ES',                         6);             // esES
-define('LOCALE_MX',                         7);             // esMX         [aowow unused]
-define('LOCALE_RU',                         8);             // ruRU
-define('LOCALE_JP',                         9);             // jaJP         [aowow & 335 unused]
-define('LOCALE_PT',                        10);             // ptPT, ptBR   [aowow unused]
-define('LOCALE_IT',                        11);             // itIT         [aowow & 335 unused]
-define('LOCALE_MASK_ALL',      0b000101011101);
-
 // red buttons on the top of the page
 define('BUTTON_WOWHEAD',                    0);
 define('BUTTON_UPGRADE',                    1);
@@ -330,7 +315,6 @@ define('GUIDE_CU_NO_RATING',                0x200);
 
 define('MAX_LEVEL',                         80);
 define('MAX_SKILL',                         450);
-define('MAX_LOCALES',                       16);            // technical limitation, 6 in use here
 define('WOW_BUILD',                         12340);
 
 // Loot handles

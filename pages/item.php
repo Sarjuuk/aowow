@@ -29,7 +29,7 @@ class ItemPage extends genericPage
     );
 
     protected $_get          = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain'],
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
         'rand'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
         'ench'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
         'gems'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
@@ -50,7 +50,7 @@ class ItemPage extends genericPage
         {
             // temp locale
             if ($this->_get['domain'])
-                Util::powerUseLocale($this->_get['domain']);
+                Lang::load($this->_get['domain']);
 
             if ($this->_get['rand'])
                 $this->enhancedTT['r'] = $this->_get['rand'];
@@ -65,11 +65,11 @@ class ItemPage extends genericPage
         {
             // temp locale
             if ($this->_get['domain'])
-                Util::powerUseLocale($this->_get['domain']);
+                Lang::load($this->_get['domain']);
 
             // allow lookup by name for xml
             if (!is_numeric($param))
-                $conditions = [['name_loc'.User::$localeId, urldecode($param)]];
+                $conditions = [['name_loc'.Lang::getLocale()->value, urldecode($param)]];
         }
 
         $this->subject = new ItemList($conditions);
@@ -672,7 +672,7 @@ class ItemPage extends genericPage
             ['id', $this->typeId, '!'],
             [
                 'OR',
-                ['name_loc'.User::$localeId, $this->subject->getField('name', true)],
+                ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
                 [
                     'AND',
                     ['class',         $_class],
@@ -1030,10 +1030,10 @@ class ItemPage extends genericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW);
-            $power->quality                          = $this->subject->getField('quality');
-            $power->icon                             = rawurlencode($this->subject->getField('iconString', true, true));
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip(false, 0, $this->enhancedTT);
+            $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW);
+            $power->quality                                = $this->subject->getField('quality');
+            $power->icon                                   = rawurlencode($this->subject->getField('iconString', true, true));
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip(false, 0, $this->enhancedTT);
         }
 
         $itemString = $this->typeId;
@@ -1044,7 +1044,7 @@ class ItemPage extends genericPage
             $itemString = "'".$itemString."'";
         }
 
-        return sprintf($this->powerTpl, $itemString, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $itemString,Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     protected function generateXML()

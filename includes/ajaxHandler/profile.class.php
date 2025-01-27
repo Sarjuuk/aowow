@@ -654,10 +654,10 @@ class AjaxProfile extends AjaxHandler
                         {
                             // get and apply inventory
                             $gItems[$iId] = array(
-                                'name_'.User::$localeString => $phItems->getField('name', true),
-                                'quality'                   => $phItems->getField('quality'),
-                                'icon'                      => $phItems->getField('iconString'),
-                                'jsonequip'                 => $data[$iId]
+                                'name_'.Lang::getLocale()->json() => $phItems->getField('name', true),
+                                'quality'                         => $phItems->getField('quality'),
+                                'icon'                            => $phItems->getField('iconString'),
+                                'jsonequip'                       => $data[$iId]
                             );
                             $profile['inventory'][$slot] = [$iId, 0, 0, 0, 0, 0, 0, 0];
 
@@ -682,10 +682,10 @@ class AjaxProfile extends AjaxHandler
                     {
                         // get and apply inventory
                         $gItems[$i['item']] = array(
-                            'name_'.User::$localeString => $itemz->getField('name', true),
-                            'quality'                   => $itemz->getField('quality'),
-                            'icon'                      => $itemz->getField('iconString'),
-                            'jsonequip'                 => $data[$i['item']]
+                            'name_'.Lang::getLocale()->json() => $itemz->getField('name', true),
+                            'quality'                         => $itemz->getField('quality'),
+                            'icon'                            => $itemz->getField('iconString'),
+                            'jsonequip'                       => $data[$i['item']]
                         );
                         $profile['inventory'][$i['slot']] = [$i['item'], $i['subItem'], $i['permEnchant'], $i['tempEnchant'], $i['gem1'], $i['gem2'], $i['gem3'], $i['gem4']];
                     }
@@ -719,7 +719,7 @@ class AjaxProfile extends AjaxHandler
                     // }
                 // }
 
-                // $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(mb_substr($data['name'], 1))."', icon:'".$data['icon']."', modifier:".Util::toJSON($mods)."});\n";
+                // $buff .= 'g_spells.add('.$id.", {id:".$id.", name:'".Util::jsEscape(mb_substr($data['name'], 1))."', icon:'".$data['icon']."', callback:".Util::toJSON($mods)."});\n";
             // }
             // $buff .= "\n";
         // }

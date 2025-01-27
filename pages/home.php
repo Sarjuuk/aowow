@@ -41,7 +41,7 @@ class HomePage extends GenericPage
             $this->extendGlobalData($_);
 
         if (empty($this->featuredBox['boxBG']))
-            $this->featuredBox['boxBG'] = Cfg::get('STATIC_URL').'/images/'.User::$localeString.'/mainpage-bg-news.jpg';
+            $this->featuredBox['boxBG'] = Cfg::get('STATIC_URL').'/images/'.Lang::getLocale()->json().'/mainpage-bg-news.jpg';
 
         // load overlay links
         $this->featuredBox['overlays'] = DB::Aowow()->select('SELECT * FROM ?_home_featuredbox_overlay WHERE featureId = ?d', $this->featuredBox['id']);
@@ -54,7 +54,7 @@ class HomePage extends GenericPage
 
     protected function generateTitle()
     {
-        if ($_ = DB::Aowow()->selectCell('SELECT title FROM ?_home_titles WHERE active = 1 AND locale = ?d ORDER BY RAND() LIMIT 1', User::$localeId))
+        if ($_ = DB::Aowow()->selectCell('SELECT title FROM ?_home_titles WHERE active = 1 AND locale = ?d ORDER BY RAND() LIMIT 1', Lang::getLocale()->value))
             $this->homeTitle = Cfg::get('NAME').Lang::main('colon').$_;
     }
 

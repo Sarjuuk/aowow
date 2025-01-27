@@ -1935,7 +1935,7 @@ class ItemListFilter extends Filter
         104 => [FILTER_CR_STRING,    'description',            STR_LOCALIZED                          ], // flavortext
         105 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1             ], // dropsinnormal [heroicdungeon-any]
         106 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2             ], // dropsinheroic [heroicdungeon-any]
-        107 => [FILTER_CR_NYI_PH,    null,                     1,                                     ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.User::$localeId, $cr[2]]
+        107 => [FILTER_CR_NYI_PH,    null,                     1,                                     ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
         109 => [FILTER_CR_CALLBACK,  'cbArmorBonus',           null,                    null          ], // armorbonus [op] [int]
         111 => [FILTER_CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true          ], // reqskillrank
         113 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
@@ -2122,7 +2122,7 @@ class ItemListFilter extends Filter
 
         // name
         if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // usable-by (not excluded by requiredClass && armor or weapons match mask from ?_classes)
@@ -2277,7 +2277,7 @@ class ItemListFilter extends Filter
         $n = preg_replace(Filter::PATTERN_NAME, '', $cr[2]);
         $n = $this->transformString($n, false);
 
-        $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', User::$localeId, User::$localeId, $n);
+        $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
         $tplIds  = $randIds ? DB::World()->select('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN (?a)', array_column($randIds, 'id')) : [];
         foreach ($tplIds as &$set)
         {

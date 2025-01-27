@@ -84,8 +84,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (strpos($dir[0], '%s') === false)
                     $this->requiredDirs[] = $dir[0];
                 else
-                    foreach (CLISetup::$locales as $l => $locJsonStr)
-                        $this->requiredDirs[] = sprintf($dir[0], $locJsonStr.'/');
+                    foreach (CLISetup::$locales as $loc)
+                        $this->requiredDirs[] = sprintf($dir[0], $loc->json().DIRECTORY_SEPARATOR);
             }
         }
     }
@@ -145,7 +145,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $sumAreas  = count($this->wmAreas);
         $sumMaps   = count(CLISetup::$locales) * ($sumAreas + $sumFloors);
 
-        CLI::write('Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, CLISetup::$locales)));
+        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(CLISetup::$locales, callback: fn($x) => $x->name));
 
         /*  todo: retrain brain and generate maps by given files and GlobalStrings. Then assign dbc data to them not the other way round like it is now.
                 foreach ($this->mapFiles as $name => [$floors, $isMultilevel])
@@ -188,7 +188,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         // create spawn-maps if wanted
                         if ($resOverlay && $this->modeMask & self::M_SPAWNS)
                         {
-                            $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
+                            $outFile = $this->genSteps[self::M_SPAWNS][self::GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
                             if (!$this->buildSpawnMap($resOverlay, $outFile))
                                 $this->success = false;
                         }
@@ -237,7 +237,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         */
 
         $progressLoc = -1;
-        foreach (CLISetup::$locales as $l => $locJsonStr)
+        foreach (CLISetup::$locales as $l => $loc)
         {
             $progressLoc++;
 
@@ -279,11 +279,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     str_pad('Dungeon Maps: '.($nFloors + ((($flags ?? 0) & self::AREA_FLAG_DEFAULT_FLOOR_TERRAIN) ? 1 : 0)), 18)
                 );
 
-                $srcPath = $mapSrcDir.'/'.$textureStr;
+                $srcPath = $mapSrcDir.DIRECTORY_SEPARATOR.$textureStr;
                 if (!CLISetup::fileExists($srcPath))
                 {
                     $this->success = false;
-                    CLI::write('worldmap file '.$srcPath.' missing for selected locale '.$locJsonStr, CLI::LOG_ERROR);
+                    CLI::write('worldmap file '.$srcPath.' missing for selected locale '.$loc->name, CLI::LOG_ERROR);
                     continue;
                 }
 
@@ -316,7 +316,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 {
                     ini_set('max_execution_time', $this->maxExecTime);
 
-                    $file = $srcPath.'/'.$textureStr;
+                    $file = $srcPath.DIRECTORY_SEPARATOR.$textureStr;
 
                     // todo: Dalaran [4395] has no level 0 but is not skipped here
                     if (!$floorIdx && !($flags & self::AREA_FLAG_DEFAULT_FLOOR_TERRAIN) && !in_array($mapId, self::CONTINENTS))
@@ -333,7 +333,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                     foreach (self::DEST_DIRS as $sizeIdx => [$path, $width, $height])
                     {
-                        $outFile[$sizeIdx] = sprintf($path, $locJsonStr.'/') . $zoneId;
+                        $outFile[$sizeIdx] = sprintf($path, $loc->json().DIRECTORY_SEPARATOR) . $zoneId;
 
                         /* dataset 'zones' requires that ...
                          * 3959 - Black Temple: starts with empty floor suffix
@@ -386,7 +386,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 // also create subzone-maps
                 if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
-                    $this->buildSubZones($resMap, $wmaId, $l);
+                    $this->buildSubZones($resMap, $wmaId, $loc);
 
                 if ($resMap)
                     imagedestroy($resMap);
@@ -508,9 +508,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $sumAreas  = count($this->wmAreas);
         $sumMaps   = count(CLISetup::$locales) * ($sumAreas + $sumFloors);
 
-        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(array_intersect_key(Util::$localeStrings, CLISetup::$locales)));
+        CLI::write('[img-maps] Processing '.$sumAreas.' zone maps and '.$sumFloors.' dungeon maps from Interface/WorldMap/ for locale: '.Lang::concat(CLISetup::$locales, callback: fn($x) => CLI::bold($x->name)));
 
-        foreach (CLISetup::$locales as $l => $locJsonStr)
+        foreach (CLISetup::$locales as $l => $loc)
         {
             // source for mapFiles
             $mapSrcDir = '';
@@ -522,7 +522,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 $mapSrcDir = $this->genSteps[self::M_MAPS][1][$l] ?? '';
             if (!$mapSrcDir)
             {
-                CLI::write('[img-maps] - No suitable localized map files found for locale ['.$l.': '.$locJsonStr.'].', CLI::LOG_ERROR);
+                CLI::write('[img-maps] - No suitable localized map files found for locale '.CLI::bold($loc->name).'.', CLI::LOG_ERROR);
                 $this->success = false;
                 continue;
             }
@@ -551,28 +551,28 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                     // .. which is not set in dbc              0 => 1, 1 => 2, etc.
                     if ($flags & self::AREA_FLAG_NO_DEFAULT_FLOOR)
-                        $dmFloors = array_combine($dmFloors, array_map(function ($x) { return ++$x; }, $dmFloors));
+                        $dmFloors = array_combine($dmFloors, array_map(fn($x) => ++$x, $dmFloors));
                 }
                 else if ($dmFloors != [0])                  // 1 => 1, 2 => 2, etc.
                     $dmFloors = array_combine($dmFloors, $dmFloors);
 
                 CLI::write(
-                    '['.$locJsonStr.'] ' .
+                    '['.$loc->json().'] ' .
                     str_pad('['.$areaEntry['areaId'].']', 7) .
                     str_pad($areaEntry['nameINT'], 22) .
                     str_pad('Overlays: '.count($this->wmOverlays[$areaEntry['id']] ?? []), 14) .
                     str_pad('Dungeon Maps: '.$nFloors, 18)
                 );
 
-                $srcPath = $mapSrcDir.'/'.$textureStr;
+                $srcPath = $mapSrcDir.DIRECTORY_SEPARATOR.$textureStr;
                 if (!CLISetup::fileExists($srcPath))
                 {
-                    CLI::write('[img-maps] - WorldMap file path '.$srcPath.' missing for selected locale '.$locJsonStr, CLI::LOG_ERROR);
+                    CLI::write('[img-maps] - WorldMap file path '.$srcPath.' missing for selected locale '.CLI::bold($loc->name), CLI::LOG_ERROR);
                     $this->success = false;
                     continue;
                 }
 
-                $srcPath .= '/';
+                $srcPath .= DIRECTORY_SEPARATOR;
 
                 // zone has overlays (is in open world; is not multilevel)
                 if (isset($this->wmOverlays[$wmaId]) && ($this->modeMask & (self::M_MAPS | self::M_SPAWNS | self::M_SUBZONES)))
@@ -619,7 +619,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                     foreach (self::DEST_DIRS as $sizeIdx => [$path, $width, $height])
                     {
-                        $outPaths[$sizeIdx] = sprintf($path, strtolower($locJsonStr).'/') . $outFile . '.jpg';
+                        $outPaths[$sizeIdx] = sprintf($path, strtolower($loc->json()).DIRECTORY_SEPARATOR) . $outFile . '.jpg';
 
                         if (!CLISetup::getOpt('force') && file_exists($outPaths[$sizeIdx]))
                         {
@@ -662,7 +662,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 // also create subzone-maps
                 if ($resMap && isset($this->wmOverlays[$wmaId]) && $this->modeMask & self::M_SUBZONES)
-                    $this->buildSubZones($resMap, $wmaId, $l);
+                    $this->buildSubZones($resMap, $wmaId, $loc);
 
                 if ($resMap)
                     imagedestroy($resMap);
@@ -677,7 +677,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     {
         $areaNames = array_combine(
             array_column($this->wmAreas, 'areaId'),
-            array_map(function ($x) { return strtoupper($x); }, array_column($this->wmAreas, 'nameINT'))
+            array_map(fn($x) => strtoupper($x), array_column($this->wmAreas, 'nameINT'))
         );
 
         if ($this->multiLevelZones)
@@ -708,7 +708,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         foreach (CLISetup::$locales as $lId => $loc)
         {
-            Lang::load($lId);
+            Lang::load($loc);
 
             // "custom" - show second level of Ahn'Kahet not shown but present in-game
             if (isset($zoneAreas[$lId][4494]))
@@ -722,7 +722,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     continue;
 
                 // todo: just note for now, try to compensate later?
-                CLI::write('[img-maps] ['.$loc.'] '.str_pad('['.$zoneId.']', 7).'floor count mismatch between GlobalStrings: '.$nStrings.' and image files: '.$nFloors, CLI::LOG_WARN);
+                CLI::write('[img-maps] ['.$loc->json().'] '.str_pad('['.$zoneId.']', 7).'floor count mismatch between GlobalStrings: '.$nStrings.' and image files: '.$nFloors, CLI::LOG_WARN);
             }
 
             ksort($zoneAreas[$lId]);
@@ -732,24 +732,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // don't convert numbers to int in json
             $toFile  = "Mapper.multiLevelZones = ".Util::toJSON($this->multiLevelZones, 0x0).";\n\n";
             $toFile .= "var g_zone_areas = ".Util::toJSON($zoneAreas[$lId]).";";
-            $file    = 'datasets/'.$loc.'/zones';
+            $file    = 'datasets/'.$loc->json().'/zones';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;
         }
     }
 
-    private function buildSpawnMap(/*GdImage*/ $resOverlay, int $zoneId) : void
+    private function buildSpawnMap(GdImage $resOverlay, int $zoneId) : void
     {
-        // GdImage: < 8.0 resource; >= 8.0 object
-        if (gettype($resOverlay) != 'resource' && gettype($resOverlay) != 'object')
-        {
-            CLI::write('[img-maps] - no GdImage passed to buildSpawnMap', CLI::LOG_ERROR);
-            $this->success = false;
-            return;
-        }
-
-        $outFile = $this->genSteps[self::M_SPAWNS][self::$GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
+        $outFile = $this->genSteps[self::M_SPAWNS][self::GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
 
         if (!CLISetup::getOpt('force') && file_exists($outFile))
         {
@@ -777,16 +769,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $this->success = false;
     }
 
-    private function buildSubZones(/*GdImage*/ $resMap, int $wmaId, int $locId) : void
+    private function buildSubZones(GdImage $resMap, int $wmaId, Locale $loc) : void
     {
-        // GdImage: < 8.0 resource; >= 8.0 object
-        if (gettype($resMap) != 'resource' && gettype($resMap) != 'object')
-        {
-            CLI::write('[img-maps] - no GdImage passed to buildSubZones()', CLI::LOG_ERROR);
-            $this->success = false;
-            return;
-        }
-
         foreach ($this->wmOverlays[$wmaId] as &$row)
         {
             $doSkip  = 0x0;
@@ -794,7 +778,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
             foreach (self::DEST_DIRS as $sizeIdx => [$path, , ])
             {
-                $outFile[$sizeIdx] = sprintf($path, strtolower(Util::$localeStrings[$locId]).'/') . $row['areaTableId'].'.jpg';
+                $outFile[$sizeIdx] = sprintf($path, $loc->json() . DIRECTORY_SEPARATOR) . $row['areaTableId'].'.jpg';
                 if (!CLISetup::getOpt('force') && file_exists($outFile[$sizeIdx]))
                 {
                     CLI::write($this->status.' - file '.$outFile[$sizeIdx].' was already processed', CLI::LOG_BLANK, true, true);
@@ -822,7 +806,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
     }
 
-    private function generateOverlay(int $wmaId, string $basePath) // : ?GdImage
+    private function generateOverlay(int $wmaId, string $basePath) : ?GdImage
     {
         if (!isset($this->wmOverlays[$wmaId]))
             return null;

@@ -74,14 +74,14 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - serverside achievement data');
 
-        $serverAchievements = DB::World()->select('SELECT ID AS "id", IF(requiredFaction = -1, 3, IF(requiredFaction = 0, 2, 1)) AS "faction", mapID AS "map", points, flags, count AS "reqCriteriaCount", refAchievement FROM achievement_dbc{ WHERE id IN (?a)}',
+        $serverAchievements = DB::World()->select('SELECT `ID` AS "id", IF(`requiredFaction` = -1, 3, IF(`requiredFaction` = 0, 2, 1)) AS "faction", `mapID` AS "map", `points`, `flags`, `count` AS "reqCriteriaCount", `refAchievement` FROM achievement_dbc{ WHERE `id` IN (?a)}',
             $ids ?: DBSIMPLE_SKIP
         );
 
         foreach ($serverAchievements as &$sa)
         {
             $sa['cuFlags'] = CUSTOM_SERVERSIDE;
-            foreach (Util::$localeStrings as $i => $_)
+            foreach (CLISetup::$locales as $i => $_)
                 if ($_)
                     $sa['name_loc'.$i] = 'Serverside - #'.$sa['id'];
         }
@@ -98,11 +98,11 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - linking achievements to chain');
 
-        $parents = DB::Aowow()->selectCol('SELECT a.id FROM dbc_achievement a JOIN dbc_achievement b ON b.previous = a.id WHERE a.previous = 0');
+        $parents = DB::Aowow()->selectCol('SELECT a.`id` FROM dbc_achievement a JOIN dbc_achievement b ON b.`previous` = a.`id` WHERE a.`previous` = 0');
         foreach ($parents as $chainId => $next)
         {
             $tree = [null, $next];
-            while ($next = DB::Aowow()->selectCell('SELECT id FROM dbc_achievement WHERE previous = ?d', $next))
+            while ($next = DB::Aowow()->selectCell('SELECT `id` FROM dbc_achievement WHERE `previous` = ?d', $next))
                 $tree[] = $next;
 
             foreach ($tree as $idx => $aId)
@@ -110,7 +110,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
                 if (!$aId)
                     continue;
 
-                DB::Aowow()->query('UPDATE ?_achievement SET cuFlags = cuFlags | ?d, chainId = ?d, chainPos = ?d WHERE id = ?d',
+                DB::Aowow()->query('UPDATE ?_achievement SET `cuFlags` = `cuFlags` | ?d, `chainId` = ?d, `chainPos` = ?d WHERE `id` = ?d',
                     $idx == 1 ? ACHIEVEMENT_CU_FIRST_SERIES : (count($tree) == $idx + 1 ? ACHIEVEMENT_CU_LAST_SERIES : 0),
                     $chainId + 1,
                     $idx,
@@ -126,8 +126,8 @@ CLISetup::registerSetup('sql', new class extends SetupScript
 
         CLI::write('[achievement] - disabling disabled achievements from table disables');
 
-        if ($criteria = DB::World()->selectCol('SELECT entry FROM disables WHERE sourceType = 4'))
-            DB::Aowow()->query('UPDATE ?_achievement a JOIN ?_achievementcriteria ac ON a.id = ac.refAchievementId SET a.cuFlags = ?d WHERE ac.id IN (?a)', CUSTOM_DISABLED, $criteria);
+        if ($criteria = DB::World()->selectCol('SELECT `entry` FROM disables WHERE `sourceType` = 4'))
+            DB::Aowow()->query('UPDATE ?_achievement a JOIN ?_achievementcriteria ac ON a.`id` = ac.`refAchievementId` SET a.`cuFlags` = ?d WHERE ac.`id` IN (?a)', CUSTOM_DISABLED, $criteria);
 
         $this->reapplyCCFlags('achievement', Type::ACHIEVEMENT);
 

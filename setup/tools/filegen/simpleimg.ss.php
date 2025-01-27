@@ -118,18 +118,18 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $this->maxExecTime = ini_get('max_execution_time');
 
         // init directories to be checked when registered
-        foreach (array_column($this->genSteps, self::$GEN_IDX_DEST_INFO) as $subDirs)
+        foreach (array_column($this->genSteps, self::GEN_IDX_DEST_INFO) as $subDirs)
             foreach ($subDirs as $sd)
                 $this->requiredDirs[] = $sd[0];
 
         // fix genSteps 2 [icons] - no tiny inventory backgrounds
-        $this->genSteps[2][self::$GEN_IDX_DEST_INFO] = array_slice($this->genSteps[2][self::$GEN_IDX_DEST_INFO], 0, 3);
+        $this->genSteps[2][self::GEN_IDX_DEST_INFO] = array_slice($this->genSteps[2][self::GEN_IDX_DEST_INFO], 0, 3);
 
         // fix genSteps 12 [pvp money icons] - smaller border offset for pvp currency icons
-        array_walk($this->genSteps[12][self::$GEN_IDX_DEST_INFO], function(&$x) { $x[4] = 2; });
+        array_walk($this->genSteps[12][self::GEN_IDX_DEST_INFO], function(&$x) { $x[4] = 2; });
 
         // fix genSteps 10 [holoday icons] - img src size is 90px
-        array_walk($this->genSteps[10][self::$GEN_IDX_DEST_INFO], function(&$x) { $x[2] = 90; });
+        array_walk($this->genSteps[10][self::GEN_IDX_DEST_INFO], function(&$x) { $x[2] = 90; });
     }
 
     public function generate() : bool
@@ -154,7 +154,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if (!in_array($idx, $groups))
                 unset($this->genSteps[$idx]);
             else
-                $this->genSteps[$idx][self::$GEN_IDX_SRC_REAL] = null;
+                $this->genSteps[$idx][self::GEN_IDX_SRC_REAL] = null;
         }
 
         if (!$this->checkSourceDirs())
@@ -340,24 +340,24 @@ CLISetup::registerSetup("build", new class extends SetupScript
         {
             if ($siRows = DB::Aowow()->selectCol('SELECT `iconPath` FROM dbc_spellicon WHERE `iconPath` NOT LIKE "%glyph-rune%"'))
                 foreach ($siRows as $icon)
-                    if (stristr($icon, $this->genSteps[0][self::$GEN_IDX_SRC_PATH]))  // Icons/
-                        $dbcEntries[] = strtolower($this->genSteps[0][self::$GEN_IDX_SRC_REAL].substr(strrchr($icon, '\\'), 1));
+                    if (stristr($icon, $this->genSteps[0][self::GEN_IDX_SRC_PATH]))  // Icons/
+                        $dbcEntries[] = strtolower($this->genSteps[0][self::GEN_IDX_SRC_REAL].substr(strrchr($icon, '\\'), 1));
 
             if ($itemIcons = DB::Aowow()->selectCol('SELECT `inventoryIcon1` FROM dbc_itemdisplayinfo WHERE `inventoryIcon1` <> ""'))
                 foreach ($itemIcons as $icon)
-                    $dbcEntries[] = strtolower($this->genSteps[0][self::$GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon);
+                    $dbcEntries[] = strtolower($this->genSteps[0][self::GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon);
         }
 
         if (in_array(1, $gens))                             // generates glyphs
             if ($siRows = DB::Aowow()->selectCol('SELECT `iconPath` FROM dbc_spellicon WHERE `iconPath` LIKE "%glyph-rune%"'))
                 foreach ($siRows as $icon)
-                    if (stristr($icon, $this->genSteps[1][self::$GEN_IDX_SRC_PATH]))  // Spellbook/
-                        $dbcEntries[] = strtolower($this->genSteps[1][self::$GEN_IDX_SRC_REAL].substr(strrchr($icon, '\\'), 1));
+                    if (stristr($icon, $this->genSteps[1][self::GEN_IDX_SRC_PATH]))  // Spellbook/
+                        $dbcEntries[] = strtolower($this->genSteps[1][self::GEN_IDX_SRC_REAL].substr(strrchr($icon, '\\'), 1));
 
         if (in_array(10, $gens))                            // generates holiday icons
             if ($eventIcons = DB::Aowow()->selectCol('SELECT `textureString` FROM dbc_holidays WHERE `textureString` <> ""'))
                 foreach ($eventIcons as $icon)
-                    $dbcEntries[] = strtolower($this->genSteps[10][self::$GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon.'start');
+                    $dbcEntries[] = strtolower($this->genSteps[10][self::GEN_IDX_SRC_REAL].DIRECTORY_SEPARATOR.$icon.'start');
 
         // case-insensitive array_unique *vomits silently into a corner*
         $dbcEntries = array_intersect_key($dbcEntries, array_unique($dbcEntries));

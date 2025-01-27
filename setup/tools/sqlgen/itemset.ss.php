@@ -79,16 +79,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         29 => [901, 900, 899, 898, 897, 896, 895, 894, 893, 892, 891, 890, 889, 888, 887, 886, 885, 884, 883]
     );
 
-    // well .. fuck
-    private $tagsByNamePart = array(
-        17 => ['gladiator'],                                // "Arena Season 1 Set",
-        19 => ['merciless'],                                // "Arena Season 2 Set",
-        20 => ['vengeful'],                                 // "Arena Season 3 Set",
-        22 => ['brutal'],                                   // "Arena Season 4 Set",
-        24 => ['deadly', 'hateful', 'savage'],              // "Arena Season 5 Set",
-        26 => ['furious'],                                  // "Arena Season 6 Set",
-        28 => ['relentless'],                               // "Arena Season 7 Set",
-        30 => ['wrathful']                                  // "Arena Season 8 Set",
+    // in pvp we hope nobody fucked with the item level
+    private $tagsByItemlevel = array(
+        123 => 17,                                          // "Arena Season 1 Set"
+        136 => 19,                                          // "Arena Season 2 Set"
+        146 => 20,                                          // "Arena Season 3 Set"
+        159 => 22,                                          // "Arena Season 4 Set"
+        200 => 24,                                          // "Arena Season 5 Set"
+        213 => 24,                                          //
+        232 => 26,                                          // "Arena Season 6 Set"
+        251 => 28,                                          // "Arena Season 7 Set"
+        270 => 30                                           // "Arena Season 8 Set"
     );
 
     private function getSetType(array $items) : int
@@ -113,11 +114,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             {
                 switch ($item['subclass'])
                 {
-                    case  0: $type =  8; break;             // 1H-Axe
-                    case  4: $type =  9; break;             // 1H-Mace
-                    case  7: $type = 10; break;             // 1H-Sword
-                    case 13: $type =  7; break;             // Fist Weapon
-                    case 15: $type =  5; break;             // Dagger
+                    case ITEM_SUBCLASS_1H_AXE:      $type =  8; break;
+                    case ITEM_SUBCLASS_1H_MACE:     $type =  9; break;
+                    case ITEM_SUBCLASS_1H_SWORD:    $type = 10; break;
+                    case ITEM_SUBCLASS_FIST_WEAPON: $type =  7; break;
+                    case ITEM_SUBCLASS_DAGGER:      $type =  5; break;
                 }
             }
             else if ($item['class'] == ITEM_CLASS_ARMOR)
@@ -150,11 +151,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 return $tag;
 
         // try arena set
-        if ($item['ItemLevel'] >= 120 && $item['AllowableClass'] && ($item['AllowableClass'] & CLASS_MASK_ALL) != CLASS_MASK_ALL)
-            foreach ($this->tagsByNamePart as $tag => $strings)
-                foreach ($strings as $str)
-                    if (stripos($item['name'], $str) === 0)
-                        return $tag;
+        if ($item['AllowableClass'] && ($item['AllowableClass'] & CLASS_MASK_ALL) != CLASS_MASK_ALL)
+            return $this->tagsByItemlevel[$item['ItemLevel']] ?? 0;
 
         return 0;
     }
@@ -188,14 +186,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     public function generate(array $ids = []) : bool
     {
         // find events associated with holidayIds
-        if ($pairs = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday IN (?a)', array_values($this->setToHoliday)))
+        if ($pairs = DB::World()->selectCol('SELECT `holiday` AS ARRAY_KEY, `eventEntry` FROM game_event WHERE `holiday` IN (?a)', array_values($this->setToHoliday)))
             foreach ($this->setToHoliday as &$hId)
                 $hId = !empty($pairs[$hId]) ? $pairs[$hId] : 0;
 
         DB::Aowow()->query('TRUNCATE TABLE ?_itemset');
 
         $virtualId = 0;
-        $sets      = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM dbc_itemset');
+        $sets      = DB::Aowow()->select('SELECT *, `id` AS ARRAY_KEY FROM dbc_itemset');
 
         foreach ($sets as $setId => $setData)
         {
@@ -237,22 +235,22 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
             $descText = [];
 
-            foreach (Util::mask2bits(Cfg::get('LOCALES')) as $loc)
+            foreach (CLISetup::$locales as $locId => $loc)
             {
-                User::useLocale($loc);
+                Lang::load($loc);
 
-                $row['name_loc'.$loc] = Util::localizedString($setData, 'name');
+                $row['name_loc'.$locId] = Util::localizedString($setData, 'name');
 
                 foreach ($bonusSpells->iterate() as $__)
                 {
-                    if (!isset($descText[$loc]))
-                        $descText[$loc] = '';
+                    if (!isset($descText[$locId]))
+                        $descText[$locId] = '';
 
-                    $descText[$loc] .= $bonusSpells->parseText()[0]."\n";
+                    $descText[$locId] .= $bonusSpells->parseText()[0]."\n";
                 }
 
                 // strip rating blocks - e.g. <!--rtg19-->14&nbsp;<small>(<!--rtg%19-->0.30%&nbsp;@&nbsp;L<!--lvl-->80)</small>
-                $row['bonusText_loc'.$loc] = preg_replace('/<!--rtg\d+-->(\d+)&nbsp.*?<\/small>/i', '\1', $descText[$loc]);
+                $row['bonusText_loc'.$locId] = preg_replace('/<!--rtg\d+-->(\d+)&nbsp.*?<\/small>/i', '\1', $descText[$locId]);
             }
 
 
@@ -260,7 +258,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             /* determine type and reuse from pieces */
             /****************************************/
 
-            $pieces = DB::World()->select('SELECT entry, name, class, subclass, Quality, AllowableClass, ItemLevel, RequiredLevel, itemset, IF (Flags & ?d, 1, 0) AS heroic, IF(InventoryType = 15, 26, IF(InventoryType = 5, 20, InventoryType)) AS slot, entry AS ARRAY_KEY FROM item_template WHERE itemset = ?d', ITEM_FLAG_HEROIC, $setId);
+            $pieces = DB::World()->select('SELECT `entry`, `name`, `class`, `subclass`, `Quality`, `AllowableClass`, `ItemLevel`, `RequiredLevel`, `itemset`, IF (`Flags` & ?d, 1, 0) AS "heroic", IF(`InventoryType` = 15, 26, IF(`InventoryType` = 5, 20, `InventoryType`)) AS "slot", `entry` AS ARRAY_KEY FROM item_template WHERE `itemset` = ?d', ITEM_FLAG_HEROIC, $setId);
 
             /*
                 possible cases:
@@ -294,7 +292,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 else if (in_array($data['slot'], [INVTYPE_WEAPON, INVTYPE_FINGER, INVTYPE_TRINKET]))
                     $sorted[$k][-$data['slot']] = $data;
                 // slot confict. If item is being sold, replace old item (imperfect solution :/)
-                else if (DB::World()->selectCell('SELECT SUM(n) FROM (SELECT COUNT(1) AS n FROM npc_vendor WHERE item = ?d UNION SELECT COUNT(1) AS n FROM game_event_npc_vendor WHERE item = ?d) x', $data['entry'], $data['entry']))
+                else if (DB::World()->selectCell('SELECT SUM(`n`) FROM (SELECT COUNT(1) AS "n" FROM npc_vendor WHERE `item` = ?d UNION SELECT COUNT(1) AS "n" FROM game_event_npc_vendor WHERE `item` = ?d) x', $data['entry'], $data['entry']))
                     $sorted[$k][$data['slot']] = $data;
             }
 

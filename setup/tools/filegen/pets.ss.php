@@ -39,28 +39,29 @@ CLISetup::registerSetup("build", new class extends SetupScript
     public function generate() : bool
     {
         $petList   = DB::Aowow()->Select(
-           'SELECT  cr.id,
-                    cr.name_loc0, cr.name_loc2, cr.name_loc3, cr.name_loc4, cr.name_loc6, cr.name_loc8,
-                    cr.minLevel, cr.maxLevel,
-                    ft.A, ft.H,
-                    cr.rank AS classification,
-                    cr.family,
-                    cr.displayId1 AS displayId,
-                    cr.textureString AS skin,
-                    LOWER(SUBSTRING_INDEX(cf.iconString, "\\\\", -1)) AS icon,
-                    cf.petTalentType AS type
-            FROM      ?_creature cr
-            JOIN      ?_factiontemplate  ft ON ft.id = cr.faction
-            JOIN      dbc_creaturefamily cf ON cf.id = cr.family
-            WHERE     cr.typeFlags & 0x1 AND (cr.cuFlags & 0x2) = 0
-            ORDER BY  cr.id ASC');
+           'SELECT   cr.`id`,
+                     cr.`name_loc0`, cr.`name_loc2`, cr.`name_loc3`, cr.`name_loc4`, cr.`name_loc6`, cr.`name_loc8`,
+                     cr.`minLevel`, cr.`maxLevel`,
+                     ft.`A`, ft.`H`,
+                     cr.`rank` AS "classification",
+                     cr.`family`,
+                     cr.`displayId1` AS "displayId",
+                     cr.`textureString` AS "skin",
+                     LOWER(SUBSTRING_INDEX(cf.`iconString`, "\\\\", -1)) AS "icon",
+                     cf.`petTalentType` AS "type"
+            FROM     ?_creature cr
+            JOIN     ?_factiontemplate  ft ON ft.`id` = cr.`faction`
+            JOIN     dbc_creaturefamily cf ON cf.`id` = cr.`family`
+            WHERE    cr.`typeFlags` & 0x1 AND (cr.`cuFlags` & ?d) = 0
+            ORDER BY cr.`id` ASC',
+            NPC_CU_DIFFICULTY_DUMMY
+        );
 
         $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`, `areaId`', Type::NPC, array_column($petList, 'id'));
 
-        foreach (CLISetup::$locales as $lId => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
-            User::useLocale($lId);
-            Lang::load($lId);
+            Lang::load($loc);
 
             $petsOut = [];
             foreach ($petList as $pet)
@@ -82,7 +83,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_pets = ".Util::toJSON($petsOut).";";
-            $file   = 'datasets/'.$jsonStr.'/pets';
+            $file   = 'datasets/'.$loc->json().'/pets';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

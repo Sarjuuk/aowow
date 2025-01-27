@@ -195,9 +195,9 @@ class ZonePage extends GenericPage
         }
 
         // see if we can actually display a map
-        $hasMap = file_exists('static/images/wow/maps/'.Util::$localeStrings[User::$localeId].'/normal/'.$this->typeId.'.jpg');
+        $hasMap = file_exists('static/images/wow/maps/'.Lang::getLocale()->json().'/normal/'.$this->typeId.'.jpg');
         if (!$hasMap)                                       // try multilayered
-            $hasMap = file_exists('static/images/wow/maps/'.Util::$localeStrings[User::$localeId].'/normal/'.$this->typeId.'-1.jpg');
+            $hasMap = file_exists('static/images/wow/maps/'.Lang::getLocale()->json().'/normal/'.$this->typeId.'-1.jpg');
         if (!$hasMap)                                       // try english fallback
             $hasMap = file_exists('static/images/wow/maps/enus/normal/'.$this->typeId.'.jpg');
         if (!$hasMap)                                       // try english fallback, multilayered

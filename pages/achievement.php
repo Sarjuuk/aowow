@@ -38,7 +38,7 @@ class AchievementPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerAchievement(%d, %d, %s);';
 
@@ -48,7 +48,7 @@ class AchievementPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -233,7 +233,7 @@ class AchievementPage extends GenericPage
 
         // tab: see also
         $conditions = array(
-            ['name_loc'.User::$localeId, $this->subject->getField('name', true)],
+            ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
             ['id', $this->typeId, '!']
         );
         $saList = new AchievementList($conditions);
@@ -551,12 +551,12 @@ class AchievementPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
-            $power->icon                             = rawurlencode($this->subject->getField('iconString', true, true));
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'name_'.Lang::getLocale()->json()}    = $this->subject->getField('name', true);
+            $power->icon                                   = rawurlencode($this->subject->getField('iconString', true, true));
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function createMail(&$reqCss = false)

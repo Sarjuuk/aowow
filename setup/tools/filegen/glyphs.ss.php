@@ -32,32 +32,31 @@ CLISetup::registerSetup("build", new class extends SetupScript
     public function generate() : bool
     {
         $glyphList = DB::Aowow()->Select(
-           'SELECT i.id AS itemId,
+           'SELECT i.`id` AS "itemId",
                    i.*,
-                   IF (g.typeFlags & 0x1, 2, 1) AS type,
-                   i.subclass AS classs,
-                   i.requiredLevel AS level,
-                   s1.id AS glyphSpell,
-                   ic.name AS icon,
-                   s1.skillLine1 AS skillId,
-                   s2.id AS glyphEffect,
-                   s2.id AS ARRAY_KEY
+                   IF (g.`typeFlags` & 0x1, 2, 1) AS "type",
+                   i.`subclass` AS "classs",
+                   i.`requiredLevel` AS "level",
+                   s1.`id` AS "glyphSpell",
+                   ic.`name` AS "icon",
+                   s1.`skillLine1` AS "skillId",
+                   s2.`id` AS "glyphEffect",
+                   s2.`id` AS ARRAY_KEY
             FROM   ?_items i
-            JOIN   ?_spell s1 ON s1.id = i.spellid1
-            JOIN   ?_glyphproperties g ON g.id = s1.effect1MiscValue
-            JOIN   ?_spell s2 ON s2.id = g.spellId
-            JOIN   ?_icons ic ON ic.id = s1.iconIdAlt
+            JOIN   ?_spell s1 ON s1.`id` = i.`spellid1`
+            JOIN   ?_glyphproperties g ON g.`id` = s1.`effect1MiscValue`
+            JOIN   ?_spell s2 ON s2.`id` = g.`spellId`
+            JOIN   ?_icons ic ON ic.`id` = s1.`iconIdAlt`
             WHERE  i.classBak = ?d',
             ITEM_CLASS_GLYPH);
 
         $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], Cfg::get('SQL_LIMIT_NONE')));
 
-        foreach (CLISetup::$locales as $lId => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
             set_time_limit(30);
 
-            User::useLocale($lId);
-            Lang::load($lId);
+            Lang::load($loc);
 
             $glyphsOut = [];
             foreach ($glyphSpells->iterate() as $__)
@@ -67,7 +66,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if (!$pop['glyphEffect'])
                     continue;
 
-                if ($glyphSpells->getField('effect1Id') != 6 && $glyphSpells->getField('effect2Id') != 6 && $glyphSpells->getField('effect3Id') != 6)
+                if ($glyphSpells->getField('effect1Id') != SPELL_EFFECT_APPLY_AURA && $glyphSpells->getField('effect2Id') != SPELL_EFFECT_APPLY_AURA && $glyphSpells->getField('effect3Id') != SPELL_EFFECT_APPLY_AURA)
                     continue;
 
                 $glyphsOut[$pop['itemId']] = array(
@@ -82,7 +81,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             }
 
             $toFile = "var g_glyphs = ".Util::toJSON($glyphsOut).";";
-            $file   = 'datasets/'.$jsonStr.'/glyphs';
+            $file   = 'datasets/'.$loc->json().'/glyphs';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

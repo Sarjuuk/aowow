@@ -77,22 +77,6 @@ trait TrRequestData
         return 0;
     }
 
-    private static function checkLocale(string $val) : int
-    {
-        if (preg_match('/^'.implode('|', array_keys(array_filter(Util::$localeStrings))).'$/', $val))
-            return intVal($val);
-
-        return -1;
-    }
-
-    private static function checkDomain(string $val) : string
-    {
-        if (preg_match('/^'.implode('|', array_filter(Util::$subDomains)).'$/i', $val))
-            return strtolower($val);
-
-        return '';
-    }
-
     private static function checkIdList(string $val) : array
     {
         if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
@@ -538,14 +522,6 @@ abstract class Util
 
     private static $perfectGems             = null;
 
-    public static $localeStrings            = array(        // zero-indexed
-        'enus',         null,           'frfr',         'dede',         'zhcn',         null,           'eses',         null,           'ruru'
-    );
-
-    public static $subDomains               = array(
-        'en',           null,           'fr',           'de',           'cn',           null,           'es',           null,           'ru'
-    );
-
     public static $regions                   = array(
         'us',           'eu',           'kr',           'tw',           'cn',           'dev'
     );
@@ -919,19 +895,19 @@ abstract class Util
             $silent = true;
 
         // default case: selected locale available
-        if (!empty($data[$field.'_loc'.User::$localeId]))
-            return $data[$field.'_loc'.User::$localeId];
+        if (!empty($data[$field.'_loc'.Lang::getLocale()->value]))
+            return $data[$field.'_loc'.Lang::getLocale()->value];
 
         // locale not enUS; aowow-type localization available; add brackets if not silent
-        else if (User::$localeId != LOCALE_EN && !empty($data[$field.'_loc0']))
+        else if (Lang::getLocale() != Locale::EN && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
         // locale not enUS; TC localization; add brackets if not silent
-        else if (User::$localeId != LOCALE_EN && !empty($data[$field]))
+        else if (Lang::getLocale() != Locale::EN && !empty($data[$field]))
             return $silent ? $data[$field] : '['.$data[$field].']';
 
         // locale enUS; TC localization; return normal
-        else if (User::$localeId == LOCALE_EN && !empty($data[$field]))
+        else if (Lang::getLocale() == Locale::EN && !empty($data[$field]))
             return $data[$field];
 
         // nothing to find; be empty
@@ -967,22 +943,6 @@ abstract class Util
             $result .= '%';
 
         return Lang::item('ratingString', [$statId, $result, $level]);
-    }
-
-    public static function powerUseLocale(string $domain = 'en') : void
-    {
-        foreach (Util::$subDomains as $k => $v)
-        {
-            if ($domain != $v)
-                continue;
-
-            User::useLocale($k);
-            Lang::load($k);
-            return;
-        }
-
-        User::useLocale(LOCALE_EN);
-        Lang::load(LOCALE_EN);
     }
 
     // default ucFirst doesn't convert UTF-8 chars
@@ -1097,8 +1057,8 @@ abstract class Util
         $success = true;
         if ($localized)
         {
-            if (file_exists('datasets/'.User::$localeString.'/'.$file))
-                $result .= file_get_contents('datasets/'.User::$localeString.'/'.$file);
+            if (file_exists('datasets/'.Lang::getLocale()->json().'/'.$file))
+                $result .= file_get_contents('datasets/'.Lang::getLocale()->json().'/'.$file);
             else if (file_exists('datasets/enus/'.$file))
                 $result .= file_get_contents('datasets/enus/'.$file);
             else

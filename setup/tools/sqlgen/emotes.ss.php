@@ -26,8 +26,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         if ($x = array_diff_key(CLISetup::$locales, $locPath))
         {
-            $locs = array_intersect_key(CLISetup::$locales, array_flip($x));
-            CLI::write('[emotes] '.sprintf($globStrPath, CLI::bold('['.implode('/,', $locs).'/]')) . ' not found!', CLI::LOG_WARN);
+            $locs = array_intersect_key(CLISetup::$locales, $x);
+            CLI::write('[emotes] '.sprintf($globStrPath, '[' . Lang::concat($locs, callback: fn($x) => CLI::bold(implode('/, ', $x->gameDirs()) . '/')) . ']') . ' not found!', CLI::LOG_WARN);
             CLI::write('         Emote aliasses can not be generated for affected locales!', CLI::LOG_WARN);
         }
 
@@ -51,9 +51,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             12  female  others      no          4               -
         */
 
-        $this->textData = DB::Aowow()->select('SELECT id AS ARRAY_KEY, text_loc0 AS "0", text_loc2 AS "2", text_loc3 AS "3", text_loc4 AS "4", text_loc6 AS "6", text_loc8 AS "8" FROM dbc_emotestextdata');
+        $this->textData = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `text_loc0` AS "0", `text_loc2` AS "2", `text_loc3` AS "3", `text_loc4` AS "4", `text_loc6` AS "6", `text_loc8` AS "8" FROM dbc_emotestextdata');
 
-        $texts = DB::Aowow()->select('SELECT et.id AS ARRAY_KEY, LOWER(command) AS `cmd`, IF(e.animationId, 1, 0) AS `anim`, -emoteId AS "parent", e.soundId, etd0, etd1, etd2, etd4, etd6, etd8, etd9, etd12 FROM dbc_emotestext et LEFT JOIN dbc_emotes e ON e.id = et.emoteId');
+        $texts = DB::Aowow()->select('SELECT et.`id` AS ARRAY_KEY, LOWER(`command`) AS "cmd", IF(e.`animationId`, 1, 0) AS "anim", -`emoteId` AS "parent", e.`soundId`, `etd0`, `etd1`, `etd2`, `etd4`, `etd6`, `etd8`, `etd9`, `etd12` FROM dbc_emotestext et LEFT JOIN dbc_emotes e ON e.`id` = et.`emoteId`');
         foreach ($texts AS $id => $t)
         {
             DB::Aowow()->query(
@@ -68,12 +68,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 VALUES
                     (?d, ?, ?d, ?d, ?d, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 $id, $t['cmd'], $t['anim'], $t['parent'], $t['soundId'],
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_EN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_EN), $this->textData[$t['etd2']][LOCALE_EN] ?? '', $this->textData[$t['etd6']][LOCALE_EN] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_FR), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_FR), $this->textData[$t['etd2']][LOCALE_FR] ?? '', $this->textData[$t['etd6']][LOCALE_FR] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_DE), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_DE), $this->textData[$t['etd2']][LOCALE_DE] ?? '', $this->textData[$t['etd6']][LOCALE_DE] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_CN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_CN), $this->textData[$t['etd2']][LOCALE_CN] ?? '', $this->textData[$t['etd6']][LOCALE_CN] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_ES), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_ES), $this->textData[$t['etd2']][LOCALE_ES] ?? '', $this->textData[$t['etd6']][LOCALE_ES] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], LOCALE_RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], LOCALE_RU), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], LOCALE_RU), $this->textData[$t['etd2']][LOCALE_RU] ?? '', $this->textData[$t['etd6']][LOCALE_RU] ?? ''
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::EN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::EN), $this->textData[$t['etd2']][Locale::EN->value] ?? '', $this->textData[$t['etd6']][Locale::EN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::FR), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::FR), $this->textData[$t['etd2']][Locale::FR->value] ?? '', $this->textData[$t['etd6']][Locale::FR->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::DE), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::DE), $this->textData[$t['etd2']][Locale::DE->value] ?? '', $this->textData[$t['etd6']][Locale::DE->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::CN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::CN), $this->textData[$t['etd2']][Locale::CN->value] ?? '', $this->textData[$t['etd6']][Locale::CN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::ES), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::ES), $this->textData[$t['etd2']][Locale::ES->value] ?? '', $this->textData[$t['etd6']][Locale::ES->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::RU), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::RU), $this->textData[$t['etd2']][Locale::RU->value] ?? '', $this->textData[$t['etd6']][Locale::RU->value] ?? ''
             );
         }
 
@@ -114,10 +114,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         return $allOK;
     }
 
-    private function mergeGenderedStrings(int $maleTextId, int $femaleTextId, int $locale) : string
+    private function mergeGenderedStrings(int $maleTextId, int $femaleTextId, Locale $loc) : string
     {
-        $maleText   = $this->textData[$maleTextId][$locale]   ?? '';
-        $femaleText = $this->textData[$femaleTextId][$locale] ?? '';
+        $maleText   = $this->textData[$maleTextId][$loc->value]   ?? '';
+        $femaleText = $this->textData[$femaleTextId][$loc->value] ?? '';
 
         if (!$maleText && !$femaleText)
             return '';

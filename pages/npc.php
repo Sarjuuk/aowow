@@ -24,7 +24,7 @@ class NpcPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_CSS_FILE, 'css/Profiler.css']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $soundIds      = [];
     private   $powerTpl      = '$WowheadPower.registerNpc(%d, %d, %s);';
@@ -35,7 +35,7 @@ class NpcPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -902,12 +902,12 @@ class NpcPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
-            $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
+            $power->{'name_'.Lang::getLocale()->json()}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
+            $power->map                                    = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function getRepForId(array $entries, array &$spillover) : array

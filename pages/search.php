@@ -138,14 +138,14 @@ class SearchPage extends GenericPage
                 continue;
             else if ($clean[0] == '-')
             {
-                if (mb_strlen($clean) < 4 && !Util::isLogographic(User::$localeId))
+                if (mb_strlen($clean) < 4 && !Util::isLogographic(Lang::getLocale()->value))
                     $this->invalid[] = mb_substr($raw, 1);
                 else
                     $this->excluded[] = mb_substr(str_replace('_', '\\_', $clean), 1);
             }
             else if ($clean !== '')
             {
-                if (mb_strlen($clean) < 3 && !Util::isLogographic(User::$localeId))
+                if (mb_strlen($clean) < 3 && !Util::isLogographic(Lang::getLocale()->value))
                     $this->invalid[] = $raw;
                 else
                     $this->included[] = str_replace('_', '\\_', $clean);
@@ -157,7 +157,7 @@ class SearchPage extends GenericPage
     {
         $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
 
-        $key = [$this->mode, $this->searchMask, md5($this->query), $staff, User::$localeId];
+        $key = [$this->mode, $this->searchMask, md5($this->query), $staff, Lang::getLocale()->value];
 
         return implode('_', $key);
     }
@@ -212,7 +212,7 @@ class SearchPage extends GenericPage
         $this->performSearch();
     }
 
-    public function notFound(string $title = '', string $msg = '') : void
+    public function notFound(string $title = '', string $msg = '') : never
     {
         if ($this->searchMask & SEARCH_TYPE_REGULAR)
         {
@@ -237,7 +237,7 @@ class SearchPage extends GenericPage
         }
     }
 
-    public function display(string $override = '') : void
+    public function display(string $override = '') : never
     {
         if ($override || ($this->searchMask & SEARCH_TYPE_REGULAR))
             parent::display($override);
@@ -330,7 +330,7 @@ class SearchPage extends GenericPage
     {
         // default to name-field
         if (!$fields)
-            $fields[] = 'name_loc'.User::$localeId;
+            $fields[] = 'name_loc'.Lang::getLocale()->value;
 
         $qry = [];
         foreach ($fields as $f)
@@ -429,7 +429,7 @@ class SearchPage extends GenericPage
 
     private function _searchTitle($cndBase)                 // 2 Titles: $searchMask & 0x00000004
     {
-        $cnd    = array_merge($cndBase, [$this->createLookup(['male_loc'.User::$localeId, 'female_loc'.User::$localeId])]);
+        $cnd    = array_merge($cndBase, [$this->createLookup(['male_loc'.Lang::getLocale()->value, 'female_loc'.Lang::getLocale()->value])]);
         $titles = new TitleList($cnd, ['calcTotal' => true]);
 
         if ($data = $titles->getListviewData())
@@ -458,7 +458,7 @@ class SearchPage extends GenericPage
         $cnd     = array_merge($cndBase, array(
             array(
                 'OR',
-                $this->createLookup(['h.name_loc'.User::$localeId]),
+                $this->createLookup(['h.name_loc'.Lang::getLocale()->value]),
                 ['AND', $this->createLookup(['e.description']), ['e.holidayId', 0]]
             )
         ));
@@ -1321,7 +1321,7 @@ class SearchPage extends GenericPage
 
     private function _searchEmote($cndBase)                 // 25 Emotes $searchMask & 0x2000000
     {
-        $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'meToExt_loc'.User::$localeId, 'meToNone_loc'.User::$localeId, 'extToMe_loc'.User::$localeId, 'extToExt_loc'.User::$localeId, 'extToNone_loc'.User::$localeId])]);
+        $cnd   = array_merge($cndBase, [$this->createLookup(['cmd', 'meToExt_loc'.Lang::getLocale()->value, 'meToNone_loc'.Lang::getLocale()->value, 'extToMe_loc'.Lang::getLocale()->value, 'extToExt_loc'.Lang::getLocale()->value, 'extToNone_loc'.Lang::getLocale()->value])]);
         $emote = new EmoteList($cnd, ['calcTotal' => true]);
 
         if ($data = $emote->getListviewData())
@@ -1340,7 +1340,7 @@ class SearchPage extends GenericPage
 
     private function _searchEnchantment($cndBase)           // 26 Enchantments $searchMask & 0x4000000
     {
-        $cnd         = array_merge($cndBase, [$this->createLookup(['name_loc'.User::$localeId])]);
+        $cnd         = array_merge($cndBase, [$this->createLookup(['name_loc'.Lang::getLocale()->value])]);
         $enchantment = new EnchantmentList($cnd, ['calcTotal' => true]);
 
         if ($data = $enchantment->getListviewData())

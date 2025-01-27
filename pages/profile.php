@@ -30,7 +30,7 @@ class ProfilePage extends GenericPage
     );
 
     protected $_get      = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain'],
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
         'new'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
     );
 
@@ -55,7 +55,7 @@ class ProfilePage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         if (count($params) == 1 && intval($params[0]))
         {
@@ -170,7 +170,7 @@ class ProfilePage extends GenericPage
 
         // dummy title from dungeon encounter
         foreach (Lang::profiler('encounterNames') as $id => $name)
-            $this->extendGlobalData([Type::NPC => [$id => ['name_'.User::$localeString => $name]]]);
+            $this->extendGlobalData([Type::NPC => [$id => ['name_'.Lang::getLocale()->json() => $name]]]);
     }
 
     protected function generatePath()
@@ -204,15 +204,15 @@ class ProfilePage extends GenericPage
                 if ($title = (new TitleList(array(['id', $_])))->getField($g ? 'female' : 'male', true))
                     $n = sprintf($title, $n);
 
-            $power->{'name_'.User::$localeString}    = $n;
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
-            $power->icon                             = '$$WH.g_getProfileIcon('.$r.', '.$c.', '.$g.', '.$l.', \''.$this->subject->getIcon().'\')';
+            $power->{'name_'.Lang::getLocale()->json()}    = $n;
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
+            $power->icon                                   = '$$WH.g_getProfileIcon('.$r.', '.$c.', '.$g.', '.$l.', \''.$this->subject->getIcon().'\')';
         }
 
-        return sprintf($this->powerTpl, $id, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $id, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
-    public function display(string $override = ''): void
+    public function display(string $override = ''): never
     {
         if ($this->mode != CACHE_TYPE_TOOLTIP)
             parent::display($override);
@@ -222,7 +222,7 @@ class ProfilePage extends GenericPage
         die($this->generateTooltip());
     }
 
-    public function notFound(string $title = '', string $msg = '') : void
+    public function notFound(string $title = '', string $msg = '') : never
     {
         parent::notFound($title ?: Util::ucFirst(Lang::profiler('profiler')), $msg ?: Lang::profiler('notFound', 'profile'));
     }

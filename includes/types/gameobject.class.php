@@ -180,7 +180,7 @@ class GameObjectListFilter extends Filter
 
         // name
         if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.User::$localeId]))
+            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         return $parts;

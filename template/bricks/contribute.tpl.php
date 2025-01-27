@@ -9,7 +9,7 @@ if (!empty($this->contribute)):
 <div class="text" style="margin-right: 310px">
     <div class="tabbed-contents" style="clear: none">
 <?php
-    $this->localizedBrick('contrib', User::$localeId);
+    $this->localizedBrick('contrib', Lang::getLocale());
 ?>
     </div>
 </div>

@@ -3,7 +3,7 @@
 mb_internal_encoding('UTF-8');
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-define('AOWOW_REVISION', 39);
+define('AOWOW_REVISION', 40);
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
 define('CLI', PHP_SAPI === 'cli');
 define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences
@@ -11,25 +11,30 @@ define('CLI_HAS_E', CLI &&                                  // WIN10 and later u
 
 
 $reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'/*, 'gmp'*/];
+$badExt = ['Intl'];                                          // Intl contains its own class Locale. What? Namespaces? Never heard of those!
 $error  = '';
-if ($ext = array_filter($reqExt, function($x) { return !extension_loaded($x); }))
+if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
     $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
 
-if (version_compare(PHP_VERSION, '8.0.0') < 0)
-    $error .= 'PHP Version <b>8.0</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
+if ($ext = array_filter($badExt, fn($x) => extension_loaded($x)))
+    $error .= 'Loaded Extension <b>'.implode(', ', $ext)."</b> is incompatible and must be disabled.\n\n";
+
+if (version_compare(PHP_VERSION, '8.2.0') < 0)
+    $error .= 'PHP Version <b>8.2</b> or higher required! Your version is <b>'.PHP_VERSION."</b>.\nCore functions are unavailable!\n";
 
 if ($error)
     die(CLI ? strip_tags($error) : $error);
 
 
 require_once 'includes/defines.php';
+require_once 'includes/locale.class.php';
 require_once 'includes/stats.class.php';                    // Game entity statistics conversion
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/utilities.php';                      // helper functions
 require_once 'includes/config.class.php';                   // Config holder
 require_once 'includes/game.php';                           // game related data & functions
-require_once 'includes/profiler.class.php';
-require_once 'includes/user.class.php';
+require_once 'includes/profiler.class.php';                 // Profiler feature
+require_once 'includes/user.class.php';                     // Session handling
 require_once 'includes/markup.class.php';                   // manipulate markup text
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/community.class.php';                // handle comments, screenshots and videos
@@ -213,6 +218,12 @@ if (!CLI)
     if (User::init())
         User::save();                                       // save user-variables in session
 
+    // hard override locale for this call (should this be here..?)
+    if (isset($_GET['locale']) && ($loc = Locale::tryFrom($_GET['locale'])))
+        Lang::load($loc);
+    else
+        Lang::load(User::$preferedLoc);
+
     // set up some logging (~10 queries will execute before we init the user and load the config)
     if (Cfg::get('DEBUG') >= CLI::LOG_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
@@ -227,17 +238,6 @@ if (!CLI)
                     DB::Characters($idx)->setLogger(['DB', 'profiler']);
     }
 
-    // hard-override locale for this call (should this be here..?)
-    // all strings attached..
-    if (isset($_GET['locale']))
-    {
-        $loc = intVal($_GET['locale']);
-        if ($loc <= MAX_LOCALES && $loc >= 0 && (Cfg::get('LOCALES') & (1 << $loc)))
-            User::useLocale($loc);
-    }
-
-    Lang::load(User::$localeId);
-
     // parse page-parameters .. sanitize before use!
     $str = explode('&', $_SERVER['QUERY_STRING'] ?? '', 2)[0];
     $_   = explode('=', $str, 2);
@@ -245,6 +245,6 @@ if (!CLI)
     $pageParam = $_[1] ?? '';
 }
 else if (DB::isConnected(DB_AOWOW))
-    Lang::load(LOCALE_EN);
+    Lang::load(Locale::EN);
 
 ?>

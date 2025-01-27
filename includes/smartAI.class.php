@@ -918,16 +918,18 @@ class SmartAI
                     $this->jsGlobals[Type::NPC][] = $e['param'][1];
                 break;
             case SAI_EVENT_LINK:                            // 61  -  Used to link together multiple events as a chain of events.
-                $e['param'][10] = LANG::concat(DB::World()->selectCol('SELECT CONCAT("#[b]", id, "[/b]") FROM smart_scripts WHERE link = ?d AND entryorguid = ?d AND source_type = ?d', $this->itr['id'], $this->entry, $this->srcType), false);
+                if ($links = DB::World()->selectCol('SELECT `id` FROM smart_scripts WHERE `link` = ?d AND `entryorguid` = ?d AND `source_type` = ?d', $this->itr['id'], $this->entry, $this->srcType))
+                    $e['param'][10] = LANG::concat($links, false, fn($x) => "#[b]".$x."[/b]");
                 break;
             case SAI_EVENT_GOSSIP_SELECT:                   // 62  -  On gossip clicked (gossip_menu_option335).
-                $gmo = DB::World()->selectRow('SELECT gmo.OptionText AS text_loc0 {, gmol.OptionText AS text_loc?d}
-                    FROM gossip_menu_option gmo LEFT JOIN gossip_menu_option_locale gmol ON gmo.MenuID = gmol.MenuID AND gmo.OptionID = gmol.OptionID AND gmol.Locale = ?d
-                    WHERE gmo.MenuId = ?d AND gmo.OptionID = ?d',
-                    User::$localeId ? Util::$localeStrings[User::$localeId] : DBSIMPLE_SKIP,
-                    User::$localeId,
-                    $e['param'][0],
-                    $e['param'][1]
+                $gmo = DB::World()->selectRow(
+                   'SELECT    gmo.`OptionText` AS "text_loc0" {, gmol.`OptionText` AS text_loc?d }
+                    FROM      gossip_menu_option gmo
+                    LEFT JOIN gossip_menu_option_locale gmol ON gmo.`MenuID` = gmol.`MenuID` AND gmo.`OptionID` = gmol.`OptionID` AND gmol.`Locale` = ?d
+                    WHERE     gmo.`MenuId` = ?d AND gmo.`OptionID` = ?d',
+                    Lang::getLocale() != Locale::EN ? Lang::getLocale()->json() : DBSIMPLE_SKIP,
+                    Lang::getLocale()->value,
+                    $e['param'][0], $e['param'][1]
                 );
 
                 if ($gmo)
@@ -941,11 +943,11 @@ class SmartAI
                 break;
             case SAI_EVENT_DISTANCE_CREATURE:               // 75  -  On creature guid OR any instance of creature entry is within distance.
                 if ($e['param'][0])
-                    $e['param'][10] = DB::World()->selectCell('SELECT id FROM creature WHERE guid = ?d', $e['param'][0]);
+                    $e['param'][10] = DB::World()->selectCell('SELECT `id` FROM creature WHERE `guid` = ?d', $e['param'][0]);
                 // do not break;
             case SAI_EVENT_DISTANCE_GAMEOBJECT:             // 76  -  On gameobject guid OR any instance of gameobject entry is within distance.
                 if ($e['param'][0] && !$e['param'][10])
-                    $e['param'][10] = DB::World()->selectCell('SELECT id FROM gameobject WHERE guid = ?d', $e['param'][0]);
+                    $e['param'][10] = DB::World()->selectCell('SELECT `id` FROM gameobject WHERE `guid` = ?d', $e['param'][0]);
                 else if ($e['param'][1])
                     $e['param'][10] = $e['param'][1];
                 else if (!$e['param'][10])
@@ -1244,7 +1246,7 @@ class SmartAI
                     JOIN ?_taxinodes tn1 ON tp.startNodeId = tn1.id
                     JOIN ?_taxinodes tn2 ON tp.endNodeId = tn2.id
                     WHERE tp.id = ?d',
-                    User::$localeId, User::$localeId, User::$localeId, User::$localeId, $a['param'][0]
+                    Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $a['param'][0]
                     );
                 $a['param'][6] = Util::localizedString($nodes, 'start');
                 $a['param'][7] = Util::localizedString($nodes, 'end');

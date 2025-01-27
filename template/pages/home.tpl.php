@@ -66,8 +66,8 @@ endif;
 ?>
         <script type="text/javascript">//<![CDATA[
 <?php
-if (User::$localeId):
-    echo "            Locale.set(".User::$localeId.");\n";
+if (Lang::getLocale()->value):
+    echo "            Locale.set(".Lang::getLocale()->value.");\n";
 endif;
 echo $this->writeGlobalVars();
 

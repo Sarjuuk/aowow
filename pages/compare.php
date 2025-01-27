@@ -87,10 +87,10 @@ class ComparePage extends GenericPage
                     $si['enchantment'] = implode(', ', $si['enchantment']);
 
             $this->cmpItems[$itemId] = [
-                'name_'.User::$localeString => $iList->getField('name', true),
-                'quality'                   => $iList->getField('quality'),
-                'icon'                      => $iList->getField('iconString'),
-                'jsonequip'                 => $data[$itemId]
+                'name_'.Lang::getLocale()->json() => $iList->getField('name', true),
+                'quality'                         => $iList->getField('quality'),
+                'icon'                            => $iList->getField('iconString'),
+                'jsonequip'                       => $data[$itemId]
             ];
         }
     }

@@ -33,7 +33,7 @@ class QuestPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/ShowOnMap.js'], [SC_CSS_FILE, 'css/Book.css']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
 
@@ -43,7 +43,7 @@ class QuestPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -981,7 +981,7 @@ class QuestPage extends GenericPage
         /**************/
 
         // tab: see also
-        $seeAlso = new QuestList(array(['name_loc'.User::$localeId, '%'.Util::htmlEscape($this->subject->getField('name', true)).'%'], ['id', $this->typeId, '!']));
+        $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, '%'.Util::htmlEscape($this->subject->getField('name', true)).'%'], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
@@ -1045,13 +1045,13 @@ class QuestPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
             if ($this->subject->isDaily())
                 $power->daily = 1;
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function createRewards($side)

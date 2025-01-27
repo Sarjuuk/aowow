@@ -42,7 +42,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $this->imgPath = CLISetup::$srcDir.$this->imgPath;
         $this->maxExecTime = ini_get('max_execution_time');
 
-        foreach ($this->genSteps[0][self::$GEN_IDX_DEST_INFO] as $dir)
+        foreach ($this->genSteps[0][self::GEN_IDX_DEST_INFO] as $dir)
             $this->requiredDirs[] = $dir[0];
     }
 

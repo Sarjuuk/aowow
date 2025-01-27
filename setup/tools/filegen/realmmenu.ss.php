@@ -74,8 +74,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             CLI::write('[realmmenu] no viable realms found .. realm menu will be empty', CLI::LOG_WARN);
 
         // why is this file not localized!?
-        User::useLocale(LOCALE_EN);
-        Lang::load(LOCALE_EN);
+        Lang::load(Locale::EN);
 
         foreach (Util::$regions as $idx => $n)
             if ($set & (1 << $idx))

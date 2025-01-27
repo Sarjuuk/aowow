@@ -84,7 +84,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                         CLI::write();
                         if (!DB::isConnectable(DB_AUTH) || !$this->test())
                             CLI::write('[db] auth server not yet set up.', CLI::LOG_ERROR);
-                        else if ($realms = DB::Auth()->select('SELECT id AS "0", name AS "1", icon AS "2", timezone AS "3", isRestricted AS "4" FROM realmlist'))
+                        else if ($realms = DB::Auth()->select('SELECT `id` AS "0", `name` AS "1", `icon` AS "2", `timezone` AS "3", `allowedSecurityLevel` AS "4" FROM realmlist'))
                         {
                             $tbl = [['Realm Id', 'Name', 'Type', 'Region', 'GMLevel', 'Status']];
                             foreach ($realms as [$id, $name, $icon, $region, $level])

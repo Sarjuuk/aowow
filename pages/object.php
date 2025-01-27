@@ -21,7 +21,7 @@ class ObjectPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerObject(%d, %d, %s);';
 
@@ -31,7 +31,7 @@ class ObjectPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -488,12 +488,12 @@ class ObjectPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
             $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 }
 

@@ -66,16 +66,16 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $castItems     = [];
         $enchantSpells = DB::Aowow()->select(
-           'SELECT   s.id AS ARRAY_KEY,
-                      effect1MiscValue,
-                      equippedItemClass, equippedItemInventoryTypeMask, equippedItemSubClassMask,
-                      skillLine1,
-                      IFNULL(i.name, ?) AS iconString,
-                      name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8
+           'SELECT    s.`id` AS ARRAY_KEY,
+                      `effect1MiscValue`,
+                      `equippedItemClass`, `equippedItemInventoryTypeMask`, `equippedItemSubClassMask`,
+                      `skillLine1`,
+                      IFNULL(i.`name`, ?) AS "iconString",
+                      `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`
             FROM      ?_spell s
-            LEFT JOIN ?_icons i ON i.id = s.iconId
-            WHERE     effect1Id = ?d AND
-                      name_loc0 NOT LIKE "QA%"',
+            LEFT JOIN ?_icons i ON i.`id` = s.`iconId`
+            WHERE     `effect1Id` = ?d AND
+                      `name_loc0` NOT LIKE "QA%"',
             DEFAULT_ICON, SPELL_EFFECT_ENCHANT_ITEM
         );
 
@@ -97,10 +97,9 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        foreach (CLISetup::$locales as $lId => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
-            User::useLocale($lId);
-            Lang::load($lId);
+            Lang::load($loc);
 
             $enchantsOut = [];
             foreach ($enchantSpells as $esId => $es)
@@ -121,7 +120,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($invType = $es['equippedItemInventoryTypeMask'])
                         $slot = $invType >> 1;
                     else  /* if (equippedItemSubClassMask == 64) */ // shields have it their own way <_<
-                        $slot = (1 << (14 - 1));
+                        $slot = (1 << (INVTYPE_SHIELD - 1));
                 }
                 else if ($es['equippedItemClass'] == ITEM_CLASS_WEAPON)
                 {
@@ -133,7 +132,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         if ((1 << $i) & $es['equippedItemSubClassMask'])
                         {
                             if ($sp == 13)                  // also mainHand & offHand *siiigh*
-                                $slot |= ((1 << (21 - 1)) | (1 << (22 - 1)));
+                                $slot |= ((1 << (INVTYPE_WEAPONMAINHAND - 1)) | (1 << (INVTYPE_WEAPONOFFHAND - 1)));
 
                             $slot |= (1 << ($sp - 1));
                         }
@@ -185,7 +184,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if ($cI->getField('spellId1') != $esId)
                         continue;
 
-                    $isScroll = substr($cI->getField('name_loc0'), 0, 17) == 'Scroll of Enchant';
+                    $isScroll = $cI->getField('class') == ITEM_CLASS_CONSUMABLE && $cI->getField('subClass') == ITEM_SUBCLASS_ITEM_ENHANCEMENT && $cI->getField('pickUpSoundId') == 1192;
 
                     if ($s = Util::getEnchantmentScore($cI->getField('itemLevel'), $isScroll ? -1 : $cI->getField('quality'), !!$enchantments->getField('skillLevel'), $eId))
                         if ($s > $ench['gearscore'])
@@ -254,7 +253,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                         $ench[$k] = $v[0];
 
             $toFile = "var g_enchants = ".Util::toJSON($enchantsOut).";";
-            $file   = 'datasets/'.$jsonStr.'/enchants';
+            $file   = 'datasets/'.$loc->json().'/enchants';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;

@@ -48,7 +48,7 @@ class UtilityPage extends GenericPage
         }
     }
 
-    public function display(string $override = '') : void
+    public function display(string $override = '') : never
     {
         if ($this->rss)                                     // this should not be cached
         {
@@ -275,7 +275,7 @@ class UtilityPage extends GenericPage
         $channel->addChild('title',         Cfg::get('NAME_SHORT').' - '.$this->name);
         $channel->addChild('link',          Cfg::get('HOST_URL').'/?'.$this->page . ($this->category ? '='.$this->category[0] : null));
         $channel->addChild('description',   Cfg::get('NAME'));
-        $channel->addChild('language',      implode('-', str_split(User::$localeString, 2)));
+        $channel->addChild('language',      implode('-', str_split(Lang::getLocale()->json(), 2)));
         $channel->addChild('ttl',           Cfg::get('TTL_RSS'));
         $channel->addChild('lastBuildDate', date(DATE_RSS));
 

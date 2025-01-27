@@ -49,15 +49,14 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $this->petFamIcons = ['Ability_Druid_KingoftheJungle', 'Ability_Druid_DemoralizingRoar', 'Ability_EyeOfTheOwl']; // .. i've no idea where to fetch these from
         $this->spellMods   = (new SpellList(array(['typeCat', -2], Cfg::get('SQL_LIMIT_NONE'))))->getProfilerMods();
 
-        $petIcons  = Util::toJSON(DB::Aowow()->SelectCol('SELECT id AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(iconString, "\\\\", -1)) AS iconString FROM dbc_creaturefamily WHERE petTalentType IN (0, 1, 2)'));
+        $petIcons  = Util::toJSON(DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(`iconString`, "\\\\", -1)) AS "iconString" FROM dbc_creaturefamily WHERE `petTalentType` IN (0, 1, 2)'));
 
-        $tSpellIds = DB::Aowow()->selectCol('SELECT rank1 FROM dbc_talent UNION SELECT rank2 FROM dbc_talent UNION SELECT rank3 FROM dbc_talent UNION SELECT rank4 FROM dbc_talent UNION SELECT rank5 FROM dbc_talent');
+        $tSpellIds = DB::Aowow()->selectCol('SELECT `rank1` FROM dbc_talent UNION SELECT `rank2` FROM dbc_talent UNION SELECT `rank3` FROM dbc_talent UNION SELECT `rank4` FROM dbc_talent UNION SELECT `rank5` FROM dbc_talent');
         $this->tSpells = new SpellList(array(['s.id', $tSpellIds], Cfg::get('SQL_LIMIT_NONE')));
 
-        foreach (CLISetup::$locales as $lId => $jsonStr)
+        foreach (CLISetup::$locales as $loc)
         {
-            User::useLocale($lId);
-            Lang::load($lId);
+            Lang::load($loc);
 
             // TalentCalc
             for ($i = 1; (1 << ($i - 1)) < CLASS_MASK_ALL; $i++ )
@@ -67,7 +66,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
                 set_time_limit(20);
 
-                $file   = 'datasets/'.$jsonStr.'/talents-'.$i;
+                $file   = 'datasets/'.$loc->json().'/talents-'.$i;
                 $toFile = '$WowheadTalentCalculator.registerClass('.$i.', '.Util::toJSON($this->buildTree(1 << ($i - 1))).')';
 
                 if (!CLISetup::writeFile($file, $toFile))
@@ -77,7 +76,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             // PetCalc
             $toFile  = "var g_pet_icons = ".$petIcons.";\n\n";
             $toFile .= 'var g_pet_talents = '.Util::toJSON($this->buildTree(0)).';';
-            $file    = 'datasets/'.$jsonStr.'/pet-talents';
+            $file    = 'datasets/'.$loc->json().'/pet-talents';
 
             if (!CLISetup::writeFile($file, $toFile))
                 $this->success = false;
@@ -91,12 +90,21 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $petCategories = [];
 
         // All "tabs" of a given class talent
-        $tabs   = DB::Aowow()->select('SELECT * FROM dbc_talenttab WHERE classMask = ?d ORDER BY `tabNumber`, `creatureFamilyMask`', $classMask);
+        $tabs   = DB::Aowow()->select('SELECT * FROM dbc_talenttab WHERE `classMask` = ?d ORDER BY `tabNumber`, `creatureFamilyMask`', $classMask);
         $result = [];
 
         for ($tabIdx = 0; $tabIdx < count($tabs); $tabIdx++)
         {
-            $talents = DB::Aowow()->select('SELECT t.id AS tId, t.*, IF(t.rank5, 5, IF(t.rank4, 4, IF(t.rank3, 3, IF(t.rank2, 2, 1)))) AS maxRank, s.name_loc0, s.name_loc2, s.name_loc3, s.name_loc4, s.name_loc6, s.name_loc8, LOWER(SUBSTRING_INDEX(si.iconPath, "\\\\", -1)) AS iconString FROM dbc_talent t, dbc_spell s, dbc_spellicon si WHERE si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1` ORDER  by t.`row`, t.`column`', $tabs[$tabIdx]['id']);
+            $talents = DB::Aowow()->select(
+                'SELECT  t.id AS "tId", t.*, IF(t.rank5, 5, IF(t.rank4, 4, IF(t.rank3, 3, IF(t.rank2, 2, 1)))) AS "maxRank",
+                         s.`name_loc0`, s.`name_loc2`, s.`name_loc3`, s.`name_loc4`, s.`name_loc6`, s.`name_loc8`,
+                         LOWER(SUBSTRING_INDEX(si.`iconPath`, "\\\\", -1)) AS "iconString"
+                FROM     dbc_talent t, dbc_spell s, dbc_spellicon si
+                WHERE    si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1`
+                ORDER BY t.`row`, t.`column`',
+                $tabs[$tabIdx]['id']
+            );
+
             $result[$tabIdx] = array(
                 'n' => Util::localizedString($tabs[$tabIdx], 'name'),
                 't' => []
@@ -106,7 +114,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             {
                 $petFamId                = log($tabs[$tabIdx]['creatureFamilyMask'], 2);
                 $result[$tabIdx]['icon'] = $this->petFamIcons[$petFamId];
-                $petCategories           = DB::Aowow()->SelectCol('SELECT id AS ARRAY_KEY, categoryEnumID FROM dbc_creaturefamily WHERE petTalentType = ?d', $petFamId);
+                $petCategories           = DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, `categoryEnumID` FROM dbc_creaturefamily WHERE `petTalentType` = ?d', $petFamId);
                 $result[$tabIdx]['f']    = array_keys($petCategories);
             }
 

@@ -38,7 +38,7 @@ class SpellPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $difficulties  = [];
     private   $firstRank     = 0;
@@ -56,7 +56,7 @@ class SpellPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -541,7 +541,7 @@ class SpellPage extends GenericPage
             ['s.effect2Id', $this->subject->getField('effect2Id')],
             ['s.effect3Id', $this->subject->getField('effect3Id')],
             ['s.id', $this->subject->id, '!'],
-            ['s.name_loc'.User::$localeId, $this->subject->getField('name', true)]
+            ['s.name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)]
         );
 
         $saSpells = new SpellList($conditions);
@@ -1283,15 +1283,15 @@ class SpellPage extends GenericPage
             [$tooltip, $ttSpells] = $this->subject->renderTooltip();
             [$buff,    $bfSpells] = $this->subject->renderBuff();
 
-            $power->{'name_'.User::$localeString}       = $this->subject->getField('name', true);
+            $power->{'name_'.Lang::getLocale()->json()}       = $this->subject->getField('name', true);
             $power->icon                                = rawurlencode($this->subject->getField('iconString', true, true));
-            $power->{'tooltip_'.User::$localeString}    = $tooltip;
-            $power->{'spells_'.User::$localeString}     = $ttSpells;
-            $power->{'buff_'.User::$localeString}       = $buff;
-            $power->{'buffspells_'.User::$localeString} = $bfSpells;
+            $power->{'tooltip_'.Lang::getLocale()->json()}    = $tooltip;
+            $power->{'spells_'.Lang::getLocale()->json()}     = $ttSpells;
+            $power->{'buff_'.Lang::getLocale()->json()}       = $buff;
+            $power->{'buffspells_'.Lang::getLocale()->json()} = $bfSpells;
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 
     private function buildPctStack(float $baseChance, int $maxStack) : string
@@ -1907,7 +1907,7 @@ class SpellPage extends GenericPage
                         JOIN   ?_taxinodes tn1 ON tp.`startNodeId` = tn1.`id`
                         JOIN   ?_taxinodes tn2 ON tp.`endNodeId` = tn2.`id`
                         WHERE  tp.`id` = ?d',
-                        User::$localeId, User::$localeId, User::$localeId, User::$localeId, $effMV
+                        Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $effMV
                     );
                     if ($_)
                         $_nameMV = $this->fmtStaffTip('<span class="breadcrumb-arrow">'.Util::localizedString($_, 'start').'</span>'.Util::localizedString($_, 'end'), 'MiscValue: '.$effMV);

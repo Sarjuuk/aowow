@@ -25,7 +25,7 @@ class ItemsetPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerItemSet(%d, %d, %s);';
 
@@ -35,7 +35,7 @@ class ItemsetPage extends GenericPage
 
         // temp locale
         if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Util::powerUseLocale($this->_get['domain']);
+            Lang::load($this->_get['domain']);
 
         $this->typeId = intVal($id);
 
@@ -149,7 +149,7 @@ class ItemsetPage extends GenericPage
             $compare[] = $itemId;
 
             $pieces[$itemId] = array(
-                'name_'.User::$localeString => $iList->getField('name', true),
+                'name_'.Lang::getLocale()->json() => $iList->getField('name', true),
                 'quality'                   => $iList->getField('quality'),
                 'icon'                      => $iList->getField('iconString'),
                 'jsonequip'                 => $data[$itemId]
@@ -244,11 +244,11 @@ class ItemsetPage extends GenericPage
         $power = new StdClass();
         if (!$this->subject->error)
         {
-            $power->{'name_'.User::$localeString}    = $this->subject->getField('name', true);
-            $power->{'tooltip_'.User::$localeString} = $this->subject->renderTooltip();
+            $power->{'name_'.Lang::getLocale()->json()}    = $this->subject->getField('name', true);
+            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
         }
 
-        return sprintf($this->powerTpl, $this->typeId, User::$localeId, Util::toJSON($power, JSON_AOWOW_POWER));
+        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
     }
 }
 

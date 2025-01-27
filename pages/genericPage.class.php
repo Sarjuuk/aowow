@@ -30,7 +30,7 @@ trait TrDetailPage
         $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
 
         //     mode,         type,        typeId,        employee-flag, localeId,        category, filter
-        $key = [$this->mode, $this->type, $this->typeId, $staff,        User::$localeId, '-1',     '-1'];
+        $key = [$this->mode, $this->type, $this->typeId, $staff,        Lang::getLocale()->value, '-1',     '-1'];
 
         // item special: can modify tooltips
         if (isset($this->enhancedTT))
@@ -70,7 +70,7 @@ trait TrListPage
         $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
 
         //     mode,         type,        typeId, employee-flag, localeId,
-        $key = [$this->mode, $this->type, '-1',   $staff,        User::$localeId];
+        $key = [$this->mode, $this->type, '-1',   $staff,        Lang::getLocale()->value];
 
         //category
         $key[] = $this->category ? implode('.', $this->category) : '-1';
@@ -100,7 +100,7 @@ trait TrProfiler
         $staff = intVal($withStaff && User::isInGroup(U_GROUP_EMPLOYEE));
 
         //     mode,         type,        typeId,                         employee-flag, localeId,        category, filter
-        $key = [$this->mode, $this->type, $this->subject->getField('id'), $staff,        User::$localeId, '-1',     '-1'];
+        $key = [$this->mode, $this->type, $this->subject->getField('id'), $staff,        Lang::getLocale()->value, '-1',     '-1'];
 
         return implode('_', $key);
     }
@@ -141,7 +141,7 @@ trait TrProfiler
         }
     }
 
-    protected function initialSync() : void
+    protected function initialSync() : never
     {
         $this->prepareContent();
 
@@ -320,7 +320,7 @@ class GenericPage
             $this->gFavorites = User::getFavorites();
             $this->pageTemplate['pageName'] = strtolower($pageCall);
 
-            $this->wowheadLink = sprintf(WOWHEAD_LINK, Util::$subDomains[User::$localeId], $pageCall, $pageParam);
+            $this->wowheadLink = sprintf(WOWHEAD_LINK,Lang::getLocale()->domain(), $pageCall, $pageParam);
 
             if (!$this->isValidPage())
                 $this->error();
@@ -495,15 +495,15 @@ class GenericPage
 
             // insert locale string
             if ($flags & SC_FLAG_LOCALIZED)
-                $str = sprintf($str, User::$localeString);
+                $str = sprintf($str, Lang::getLocale()->json());
 
             if ($dynData)
             {
-                $app[] = 'locale='.User::$localeId;
+                $app[] = 'locale='.Lang::getLocale()->value;
                 $app[] = 't='.$_SESSION['dataKey'];
             }
-            else if (($flags & SC_FLAG_APPEND_LOCALE) && User::$localeId)
-                $app[] = 'lang='.Util::$subDomains[User::$localeId];
+            else if (($flags & SC_FLAG_APPEND_LOCALE) && Lang::getLocale() != Locale::EN)
+                $app[] = 'lang='.Lang::getLocale()->domain();
 
             // append anti-cache timestamp
             if (!($flags & SC_FLAG_NO_TIMESTAMP) && !$dynData)
@@ -549,10 +549,10 @@ class GenericPage
                 Type::GUIDE, $this->typeId, $this->guideRevision);
         else if (!empty($this->articleUrl))
             $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
-                $this->articleUrl, [User::$localeId, LOCALE_EN]);
+                $this->articleUrl, [Lang::getLocale()->value, Locale::EN->value]);
         else if (!empty($this->type) && isset($this->typeId))
             $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
-                $this->type, $this->typeId, [User::$localeId, LOCALE_EN]);
+                $this->type, $this->typeId, [Lang::getLocale()->value, Locale::EN->value]);
 
         if ($article)
         {
@@ -586,7 +586,7 @@ class GenericPage
             if (empty($this->infobox) && !empty($article['quickInfo']))
                 $this->infobox = $article['quickInfo'];
 
-            if ($article['locale'] != User::$localeId)
+            if ($article['locale'] != Lang::getLocale()->value)
                 $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('langOnly', [Lang::lang($article['locale'])]).'</span></div>';
 
             if (method_exists($this, 'postArticle'))        // e.g. update variables in article
@@ -676,7 +676,7 @@ class GenericPage
     /*******************/
 
     // unknown entry
-    public function notFound(string $title = '', string $msg = '') : void
+    public function notFound(string $title = '', string $msg = '') : never
     {
         if ($this->mode == CACHE_TYPE_TOOLTIP && method_exists($this, 'generateTooltip'))
         {
@@ -713,7 +713,7 @@ class GenericPage
     }
 
     // unknown page
-    public function error() : void
+    public function error() : never
     {
         // $this->path       = null;
         // $this->tabId      = null;
@@ -733,7 +733,7 @@ class GenericPage
     }
 
     // display brb gnomes
-    public function maintenance() : void
+    public function maintenance() : never
     {
         header('HTTP/1.0 503 Service Temporarily Unavailable', true, 503);
         header('Retry-After: '.(3 * HOUR));
@@ -748,7 +748,7 @@ class GenericPage
     /*******************/
 
     // load given template string or GenericPage::$tpl
-    public function display(string $override = '') : void
+    public function display(string $override = '') : never
     {
         // Heisenbug: IE11 and FF32 will sometimes (under unknown circumstances) cache 302 redirects and stop
         // re-requesting them from the server but load them from local cache, thus breaking menu features.
@@ -797,7 +797,7 @@ class GenericPage
     }
 
     // generate and cache
-    public function displayExtra(callable $generator, string $mime = MIME_TYPE_JSON) : void
+    public function displayExtra(callable $generator, string $mime = MIME_TYPE_JSON) : never
     {
         $outString = '';
         if (!$this->loadCache($outString))
@@ -833,7 +833,7 @@ class GenericPage
                     // localizes expected fields .. except for icons .. icons are special
                     if (in_array($k, ['name', 'namefemale']) && $struct[0] != Type::getJSGlobalString(Type::ICON))
                     {
-                        $data[$k.'_'.User::$localeString] = $v;
+                        $data[$k.'_'.Lang::getLocale()->json()] = $v;
                         unset($data[$k]);
                     }
                 }
@@ -849,13 +849,13 @@ class GenericPage
 
                 // spell
                 if (!empty($x['tooltip']))                  // spell + item
-                    $buff .= "\n            _[".$x['id'].'].tooltip_'.User::$localeString.' = '.Util::toJSON($x['tooltip']).";\n";
+                    $buff .= "\n            _[".$x['id'].'].tooltip_'.Lang::getLocale()->json().' = '.Util::toJSON($x['tooltip']).";\n";
                 if (!empty($x['buff']))                     // spell
-                    $buff .= "            _[".$x['id'].'].buff_'.User::$localeString.' = '.Util::toJSON($x['buff']).";\n";
+                    $buff .= "            _[".$x['id'].'].buff_'.Lang::getLocale()->json().' = '.Util::toJSON($x['buff']).";\n";
                 if (!empty($x['spells']))                   // spell + item
-                    $buff .= "            _[".$x['id'].'].spells_'.User::$localeString.' = '.Util::toJSON($x['spells']).";\n";
+                    $buff .= "            _[".$x['id'].'].spells_'.Lang::getLocale()->json().' = '.Util::toJSON($x['spells']).";\n";
                 if (!empty($x['buffspells']))               // spell
-                    $buff .= "            _[".$x['id'].'].buffspells_'.User::$localeString.' = '.Util::toJSON($x['buffspells']).";\n";
+                    $buff .= "            _[".$x['id'].'].buffspells_'.Lang::getLocale()->json().' = '.Util::toJSON($x['buffspells']).";\n";
 
                 $buff .= "\n";
             }
@@ -922,17 +922,17 @@ class GenericPage
     }
 
     // load brick with more text then vars
-    protected function localizedBrick(string $file, int $loc = LOCALE_EN) : void
+    protected function localizedBrick(string $file, Locale $loc = Locale::EN) : void
     {
-        if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc))
+        if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc->value))
         {
-            if ($loc == LOCALE_EN || !$this->isSaneInclude('template/localized/', $file.'_'.LOCALE_EN))
-                trigger_error('Nonexistant template requested: template/localized/'.$file.'_'.$loc.'.tpl.php', E_USER_ERROR);
+            if ($loc == Locale::EN || !$this->isSaneInclude('template/localized/', $file.'_'.Locale::EN->value))
+                trigger_error('Nonexistant template requested: template/localized/'.$file.'_'.$loc->value.'.tpl.php', E_USER_ERROR);
             else
-                include('template/localized/'.$file.'_'.LOCALE_EN.'.tpl.php');
+                include('template/localized/'.$file.'_'.Locale::EN->value.'.tpl.php');
         }
         else
-            include('template/localized/'.$file.'_'.$loc.'.tpl.php');
+            include('template/localized/'.$file.'_'.$loc->value.'.tpl.php');
     }
 
 
