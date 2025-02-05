@@ -2288,7 +2288,7 @@ class SpellPage extends GenericPage
     {
         $cbBandageSpell = function()
         {
-            return ($this->subject->getField('attributes1') & 0x00004044) && ($this->subject->getField('effect1ImplicitTargetA') == 21);
+            return ($this->subject->getField('attributes1') & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET)) && ($this->subject->getField('effect1ImplicitTargetA') == 21);
         };
 
         $cbInverseFlag = function($field, $flag)
@@ -2305,7 +2305,7 @@ class SpellPage extends GenericPage
 
         $cbSpellstealable = function($field, $flag)
         {
-            return !($this->subject->getField($field) & $flag) && ($this->subject->getField('dispelType') == 1);
+            return !($this->subject->getField($field) & $flag) && ($this->subject->getField('dispelType') == SPELL_DAMAGE_CLASS_MAGIC);
         };
 
         $list = [];
@@ -2314,14 +2314,14 @@ class SpellPage extends GenericPage
         {
             if ($cr = $fi->getGenericFilter($idx))
             {
-                if ($cr[0] == FILTER_CR_CALLBACK)
+                if ($cr[0] == Filter::CR_CALLBACK)
                 {
                     if (!isset($cr[1]))
                         trigger_error('SpellDetailPage::createAttributesList - callback handler '.$cr[1].' not defined for IDX #'.$idx, E_USER_WARNING);
                     else if (${$cr[1]}($cr[2] ?? null, $cr[3] ?? null))
                         $list[] = $idx;
                 }
-                else if ($cr[0] == FILTER_CR_FLAG)
+                else if ($cr[0] == Filter::CR_FLAG)
                 {
                     if ($this->subject->getField($cr[1]) & $cr[2])
                         $list[] = $idx;

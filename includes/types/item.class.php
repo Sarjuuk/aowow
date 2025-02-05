@@ -1836,185 +1836,185 @@ class ItemListFilter extends Filter
     );
 
     protected $genericFilter = array(
-          2 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1             ], // bindonpickup [yn]
-          3 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2             ], // bindonequip [yn]
-          4 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3             ], // bindonuse [yn]
-          5 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'bonding',               [4, 5]        ], // questitem [yn]
-          6 => [FILTER_CR_CALLBACK,  'cbQuestRelation',        null,                    null          ], // startsquest [side]
-          7 => [FILTER_CR_BOOLEAN,   'description_loc0',       true                                   ], // hasflavortext
-          8 => [FILTER_CR_BOOLEAN,   'requiredDisenchantSkill'                                        ], // disenchantable
-          9 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED                     ], // conjureditem
-         10 => [FILTER_CR_BOOLEAN,   'lockId'                                                         ], // locked
-         11 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_OPENABLE                     ], // openable
-         12 => [FILTER_CR_BOOLEAN,   'itemset'                                                        ], // partofset
-         13 => [FILTER_CR_BOOLEAN,   'randomEnchant'                                                  ], // randomlyenchanted
-         14 => [FILTER_CR_BOOLEAN,   'pageTextId'                                                     ], // readable
-         15 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'maxCount',              1             ], // unique [yn]
-         16 => [FILTER_CR_CALLBACK,  'cbDropsInZone',          null,                    null          ], // dropsin [zone]
-         17 => [FILTER_CR_ENUM,      'requiredFaction',        true,                    true          ], // requiresrepwith
-         18 => [FILTER_CR_CALLBACK,  'cbFactionQuestReward',   null,                    null          ], // rewardedbyfactionquest [side]
-         20 => [FILTER_CR_NUMERIC,   'is.str',                 NUM_CAST_INT,            true          ], // str
-         21 => [FILTER_CR_NUMERIC,   'is.agi',                 NUM_CAST_INT,            true          ], // agi
-         22 => [FILTER_CR_NUMERIC,   'is.sta',                 NUM_CAST_INT,            true          ], // sta
-         23 => [FILTER_CR_NUMERIC,   'is.int',                 NUM_CAST_INT,            true          ], // int
-         24 => [FILTER_CR_NUMERIC,   'is.spi',                 NUM_CAST_INT,            true          ], // spi
-         25 => [FILTER_CR_NUMERIC,   'is.arcres',              NUM_CAST_INT,            true          ], // arcres
-         26 => [FILTER_CR_NUMERIC,   'is.firres',              NUM_CAST_INT,            true          ], // firres
-         27 => [FILTER_CR_NUMERIC,   'is.natres',              NUM_CAST_INT,            true          ], // natres
-         28 => [FILTER_CR_NUMERIC,   'is.frores',              NUM_CAST_INT,            true          ], // frores
-         29 => [FILTER_CR_NUMERIC,   'is.shares',              NUM_CAST_INT,            true          ], // shares
-         30 => [FILTER_CR_NUMERIC,   'is.holres',              NUM_CAST_INT,            true          ], // holres
-         32 => [FILTER_CR_NUMERIC,   'is.dps',                 NUM_CAST_FLOAT,          true          ], // dps
-         33 => [FILTER_CR_NUMERIC,   'is.dmgmin1',             NUM_CAST_INT,            true          ], // dmgmin1
-         34 => [FILTER_CR_NUMERIC,   'is.dmgmax1',             NUM_CAST_INT,            true          ], // dmgmax1
-         35 => [FILTER_CR_CALLBACK,  'cbDamageType',           null,                    null          ], // damagetype [enum]
-         36 => [FILTER_CR_NUMERIC,   'is.speed',               NUM_CAST_FLOAT,          true          ], // speed
-         37 => [FILTER_CR_NUMERIC,   'is.mleatkpwr',           NUM_CAST_INT,            true          ], // mleatkpwr
-         38 => [FILTER_CR_NUMERIC,   'is.rgdatkpwr',           NUM_CAST_INT,            true          ], // rgdatkpwr
-         39 => [FILTER_CR_NUMERIC,   'is.rgdhitrtng',          NUM_CAST_INT,            true          ], // rgdhitrtng
-         40 => [FILTER_CR_NUMERIC,   'is.rgdcritstrkrtng',     NUM_CAST_INT,            true          ], // rgdcritstrkrtng
-         41 => [FILTER_CR_NUMERIC,   'is.armor',               NUM_CAST_INT,            true          ], // armor
-         42 => [FILTER_CR_NUMERIC,   'is.defrtng',             NUM_CAST_INT,            true          ], // defrtng
-         43 => [FILTER_CR_NUMERIC,   'is.block',               NUM_CAST_INT,            true          ], // block
-         44 => [FILTER_CR_NUMERIC,   'is.blockrtng',           NUM_CAST_INT,            true          ], // blockrtng
-         45 => [FILTER_CR_NUMERIC,   'is.dodgertng',           NUM_CAST_INT,            true          ], // dodgertng
-         46 => [FILTER_CR_NUMERIC,   'is.parryrtng',           NUM_CAST_INT,            true          ], // parryrtng
-         48 => [FILTER_CR_NUMERIC,   'is.splhitrtng',          NUM_CAST_INT,            true          ], // splhitrtng
-         49 => [FILTER_CR_NUMERIC,   'is.splcritstrkrtng',     NUM_CAST_INT,            true          ], // splcritstrkrtng
-         50 => [FILTER_CR_NUMERIC,   'is.splheal',             NUM_CAST_INT,            true          ], // splheal
-         51 => [FILTER_CR_NUMERIC,   'is.spldmg',              NUM_CAST_INT,            true          ], // spldmg
-         52 => [FILTER_CR_NUMERIC,   'is.arcsplpwr',           NUM_CAST_INT,            true          ], // arcsplpwr
-         53 => [FILTER_CR_NUMERIC,   'is.firsplpwr',           NUM_CAST_INT,            true          ], // firsplpwr
-         54 => [FILTER_CR_NUMERIC,   'is.frosplpwr',           NUM_CAST_INT,            true          ], // frosplpwr
-         55 => [FILTER_CR_NUMERIC,   'is.holsplpwr',           NUM_CAST_INT,            true          ], // holsplpwr
-         56 => [FILTER_CR_NUMERIC,   'is.natsplpwr',           NUM_CAST_INT,            true          ], // natsplpwr
-         57 => [FILTER_CR_NUMERIC,   'is.shasplpwr',           NUM_CAST_INT,            true          ], // shasplpwr
-         59 => [FILTER_CR_NUMERIC,   'durability',             NUM_CAST_INT,            true          ], // dura
-         60 => [FILTER_CR_NUMERIC,   'is.healthrgn',           NUM_CAST_INT,            true          ], // healthrgn
-         61 => [FILTER_CR_NUMERIC,   'is.manargn',             NUM_CAST_INT,            true          ], // manargn
-         62 => [FILTER_CR_CALLBACK,  'cbCooldown',             null,                    null          ], // cooldown [op] [int]
-         63 => [FILTER_CR_NUMERIC,   'buyPrice',               NUM_CAST_INT,            true          ], // buyprice
-         64 => [FILTER_CR_NUMERIC,   'sellPrice',              NUM_CAST_INT,            true          ], // sellprice
-         65 => [FILTER_CR_CALLBACK,  'cbAvgMoneyContent',      null,                    null          ], // avgmoney [op] [int]
-         66 => [FILTER_CR_ENUM,      'requiredSpell'                                                  ], // requiresprofspec
-         68 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           15,                      null          ], // otdisenchanting [yn]
-         69 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           16,                      null          ], // otfishing [yn]
-         70 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           17,                      null          ], // otherbgathering [yn]
-         71 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT                    ], // otitemopening [yn]
-         72 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           2,                       null          ], // otlooting [yn]
-         73 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           19,                      null          ], // otmining [yn]
-         74 => [FILTER_CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT                  ], // otobjectopening [yn]
-         75 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           21,                      null          ], // otpickpocketing [yn]
-         76 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           23,                      null          ], // otskinning [yn]
-         77 => [FILTER_CR_NUMERIC,   'is.atkpwr',              NUM_CAST_INT,            true          ], // atkpwr
-         78 => [FILTER_CR_NUMERIC,   'is.mlehastertng',        NUM_CAST_INT,            true          ], // mlehastertng
-         79 => [FILTER_CR_NUMERIC,   'is.resirtng',            NUM_CAST_INT,            true          ], // resirtng
-         80 => [FILTER_CR_CALLBACK,  'cbHasSockets',           null,                    null          ], // has sockets [enum]
-         81 => [FILTER_CR_CALLBACK,  'cbFitsGemSlot',          null,                    null          ], // fits gem slot [enum]
-         83 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_UNIQUEEQUIPPED               ], // uniqueequipped
-         84 => [FILTER_CR_NUMERIC,   'is.mlecritstrkrtng',     NUM_CAST_INT,            true          ], // mlecritstrkrtng
-         85 => [FILTER_CR_CALLBACK,  'cbObjectiveOfQuest',     null,                    null          ], // objectivequest [side]
-         86 => [FILTER_CR_CALLBACK,  'cbCraftedByProf',        null,                    null          ], // craftedprof [enum]
-         87 => [FILTER_CR_CALLBACK,  'cbReagentForAbility',    null,                    null          ], // reagentforability [enum]
-         88 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           20,                      null          ], // otprospecting [yn]
-         89 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                 ], // prospectable
-         90 => [FILTER_CR_CALLBACK,  'cbAvgBuyout',            null,                    null          ], // avgbuyout [op] [int]
-         91 => [FILTER_CR_ENUM,      'totemCategory',          false,                   true          ], // tool
-         92 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           5,                       null          ], // soldbyvendor [yn]
-         93 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           3,                       null          ], // otpvp [pvp]
-         94 => [FILTER_CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true          ], // splpen
-         95 => [FILTER_CR_NUMERIC,   'is.mlehitrtng',          NUM_CAST_INT,            true          ], // mlehitrtng
-         96 => [FILTER_CR_NUMERIC,   'is.critstrkrtng',        NUM_CAST_INT,            true          ], // critstrkrtng
-         97 => [FILTER_CR_NUMERIC,   'is.feratkpwr',           NUM_CAST_INT,            true          ], // feratkpwr
-         98 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_PARTYLOOT                    ], // partyloot
-         99 => [FILTER_CR_ENUM,      'requiredSkill'                                                  ], // requiresprof
-        100 => [FILTER_CR_NUMERIC,   'is.nsockets',            NUM_CAST_INT                           ], // nsockets
-        101 => [FILTER_CR_NUMERIC,   'is.rgdhastertng',        NUM_CAST_INT,            true          ], // rgdhastertng
-        102 => [FILTER_CR_NUMERIC,   'is.splhastertng',        NUM_CAST_INT,            true          ], // splhastertng
-        103 => [FILTER_CR_NUMERIC,   'is.hastertng',           NUM_CAST_INT,            true          ], // hastertng
-        104 => [FILTER_CR_STRING,    'description',            STR_LOCALIZED                          ], // flavortext
-        105 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1             ], // dropsinnormal [heroicdungeon-any]
-        106 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2             ], // dropsinheroic [heroicdungeon-any]
-        107 => [FILTER_CR_NYI_PH,    null,                     1,                                     ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
-        109 => [FILTER_CR_CALLBACK,  'cbArmorBonus',           null,                    null          ], // armorbonus [op] [int]
-        111 => [FILTER_CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true          ], // reqskillrank
-        113 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
-        114 => [FILTER_CR_NUMERIC,   'is.armorpenrtng',        NUM_CAST_INT,            true          ], // armorpenrtng
-        115 => [FILTER_CR_NUMERIC,   'is.health',              NUM_CAST_INT,            true          ], // health
-        116 => [FILTER_CR_NUMERIC,   'is.mana',                NUM_CAST_INT,            true          ], // mana
-        117 => [FILTER_CR_NUMERIC,   'is.exprtng',             NUM_CAST_INT,            true          ], // exprtng
-        118 => [FILTER_CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithitem [enum]
-        119 => [FILTER_CR_NUMERIC,   'is.hitrtng',             NUM_CAST_INT,            true          ], // hitrtng
-        123 => [FILTER_CR_NUMERIC,   'is.splpwr',              NUM_CAST_INT,            true          ], // splpwr
-        124 => [FILTER_CR_CALLBACK,  'cbHasRandEnchant',       null,                    null          ], // randomenchants [str]
-        125 => [FILTER_CR_CALLBACK,  'cbReqArenaRating',       null,                    null          ], // reqarenartng [op] [int]  todo (low): 'find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
-        126 => [FILTER_CR_CALLBACK,  'cbQuestRewardIn',        null,                    null          ], // rewardedbyquestin [zone-any]
-        128 => [FILTER_CR_CALLBACK,  'cbSource',               null,                    null          ], // source [enum]
-        129 => [FILTER_CR_CALLBACK,  'cbSoldByNPC',            null,                    null          ], // soldbynpc [str-small]
-        130 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT                     ], // hascomments
-        132 => [FILTER_CR_CALLBACK,  'cbGlyphType',            null,                    null          ], // glyphtype [enum]
-        133 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_ACCOUNTBOUND                 ], // accountbound
-        134 => [FILTER_CR_NUMERIC,   'is.mledps',              NUM_CAST_FLOAT,          true          ], // mledps
-        135 => [FILTER_CR_NUMERIC,   'is.mledmgmin',           NUM_CAST_INT,            true          ], // mledmgmin
-        136 => [FILTER_CR_NUMERIC,   'is.mledmgmax',           NUM_CAST_INT,            true          ], // mledmgmax
-        137 => [FILTER_CR_NUMERIC,   'is.mlespeed',            NUM_CAST_FLOAT,          true          ], // mlespeed
-        138 => [FILTER_CR_NUMERIC,   'is.rgddps',              NUM_CAST_FLOAT,          true          ], // rgddps
-        139 => [FILTER_CR_NUMERIC,   'is.rgddmgmin',           NUM_CAST_INT,            true          ], // rgddmgmin
-        140 => [FILTER_CR_NUMERIC,   'is.rgddmgmax',           NUM_CAST_INT,            true          ], // rgddmgmax
-        141 => [FILTER_CR_NUMERIC,   'is.rgdspeed',            NUM_CAST_FLOAT,          true          ], // rgdspeed
-        142 => [FILTER_CR_STRING,    'ic.name'                                                        ], // icon
-        143 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           18,                      null          ], // otmilling [yn]
-        144 => [FILTER_CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null          ], // purchasablewithhonor [yn]
-        145 => [FILTER_CR_CALLBACK,  'cbPvpPurchasable',       'reqArenaPoints',        null          ], // purchasablewitharena [yn]
-        146 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC                       ], // heroic
-        147 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      1,            ], // dropsinnormal10 [multimoderaid-any]
-        148 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      2,            ], // dropsinnormal25 [multimoderaid-any]
-        149 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      4,            ], // dropsinheroic10 [heroicraid-any]
-        150 => [FILTER_CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      8,            ], // dropsinheroic25 [heroicraid-any]
-        151 => [FILTER_CR_NUMERIC,   'id',                     NUM_CAST_INT,            true          ], // id
-        152 => [FILTER_CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass',         CLASS_MASK_ALL], // classspecific [enum]
-        153 => [FILTER_CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace',          RACE_MASK_ALL ], // racespecific [enum]
-        154 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE                   ], // refundable
-        155 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA                 ], // usableinarenas
-        156 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED                ], // usablewhenshapeshifted
-        157 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT                    ], // smartloot
-        158 => [FILTER_CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithcurrency [enum]
-        159 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE                     ], // millable
-        160 => [FILTER_CR_NYI_PH,    null,                     1,                                     ], // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
-        161 => [FILTER_CR_CALLBACK,  'cbAvailable',            null,                    null          ], // availabletoplayers [yn]
-        162 => [FILTER_CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED                   ], // deprecated
-        163 => [FILTER_CR_CALLBACK,  'cbDisenchantsInto',      null,                    null          ], // disenchantsinto [disenchanting]
-        165 => [FILTER_CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true          ], // repaircost
-        167 => [FILTER_CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                       ], // hasvideos
-        168 => [FILTER_CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS  ], // teachesspell [yn]
-        169 => [FILTER_CR_ENUM,      'e.holidayId',            true,                    true          ], // requiresevent
-        171 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           8,                       null          ], // otredemption [yn]
-        172 => [FILTER_CR_CALLBACK,  'cbObtainedBy',           12,                      null          ], // rewardedbyachievement [yn]
-        176 => [FILTER_CR_STAFFFLAG, 'flags'                                                          ], // flags
-        177 => [FILTER_CR_STAFFFLAG, 'flagsExtra'                                                     ], // flags2
+          2 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1             ], // bindonpickup [yn]
+          3 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2             ], // bindonequip [yn]
+          4 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3             ], // bindonuse [yn]
+          5 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               [4, 5]        ], // questitem [yn]
+          6 => [parent::CR_CALLBACK,  'cbQuestRelation',        null,                    null          ], // startsquest [side]
+          7 => [parent::CR_BOOLEAN,   'description_loc0',       true                                   ], // hasflavortext
+          8 => [parent::CR_BOOLEAN,   'requiredDisenchantSkill'                                        ], // disenchantable
+          9 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_CONJURED                     ], // conjureditem
+         10 => [parent::CR_BOOLEAN,   'lockId'                                                         ], // locked
+         11 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_OPENABLE                     ], // openable
+         12 => [parent::CR_BOOLEAN,   'itemset'                                                        ], // partofset
+         13 => [parent::CR_BOOLEAN,   'randomEnchant'                                                  ], // randomlyenchanted
+         14 => [parent::CR_BOOLEAN,   'pageTextId'                                                     ], // readable
+         15 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'maxCount',              1             ], // unique [yn]
+         16 => [parent::CR_CALLBACK,  'cbDropsInZone',          null,                    null          ], // dropsin [zone]
+         17 => [parent::CR_ENUM,      'requiredFaction',        true,                    true          ], // requiresrepwith
+         18 => [parent::CR_CALLBACK,  'cbFactionQuestReward',   null,                    null          ], // rewardedbyfactionquest [side]
+         20 => [parent::CR_NUMERIC,   'is.str',                 NUM_CAST_INT,            true          ], // str
+         21 => [parent::CR_NUMERIC,   'is.agi',                 NUM_CAST_INT,            true          ], // agi
+         22 => [parent::CR_NUMERIC,   'is.sta',                 NUM_CAST_INT,            true          ], // sta
+         23 => [parent::CR_NUMERIC,   'is.int',                 NUM_CAST_INT,            true          ], // int
+         24 => [parent::CR_NUMERIC,   'is.spi',                 NUM_CAST_INT,            true          ], // spi
+         25 => [parent::CR_NUMERIC,   'is.arcres',              NUM_CAST_INT,            true          ], // arcres
+         26 => [parent::CR_NUMERIC,   'is.firres',              NUM_CAST_INT,            true          ], // firres
+         27 => [parent::CR_NUMERIC,   'is.natres',              NUM_CAST_INT,            true          ], // natres
+         28 => [parent::CR_NUMERIC,   'is.frores',              NUM_CAST_INT,            true          ], // frores
+         29 => [parent::CR_NUMERIC,   'is.shares',              NUM_CAST_INT,            true          ], // shares
+         30 => [parent::CR_NUMERIC,   'is.holres',              NUM_CAST_INT,            true          ], // holres
+         32 => [parent::CR_NUMERIC,   'is.dps',                 NUM_CAST_FLOAT,          true          ], // dps
+         33 => [parent::CR_NUMERIC,   'is.dmgmin1',             NUM_CAST_INT,            true          ], // dmgmin1
+         34 => [parent::CR_NUMERIC,   'is.dmgmax1',             NUM_CAST_INT,            true          ], // dmgmax1
+         35 => [parent::CR_CALLBACK,  'cbDamageType',           null,                    null          ], // damagetype [enum]
+         36 => [parent::CR_NUMERIC,   'is.speed',               NUM_CAST_FLOAT,          true          ], // speed
+         37 => [parent::CR_NUMERIC,   'is.mleatkpwr',           NUM_CAST_INT,            true          ], // mleatkpwr
+         38 => [parent::CR_NUMERIC,   'is.rgdatkpwr',           NUM_CAST_INT,            true          ], // rgdatkpwr
+         39 => [parent::CR_NUMERIC,   'is.rgdhitrtng',          NUM_CAST_INT,            true          ], // rgdhitrtng
+         40 => [parent::CR_NUMERIC,   'is.rgdcritstrkrtng',     NUM_CAST_INT,            true          ], // rgdcritstrkrtng
+         41 => [parent::CR_NUMERIC,   'is.armor',               NUM_CAST_INT,            true          ], // armor
+         42 => [parent::CR_NUMERIC,   'is.defrtng',             NUM_CAST_INT,            true          ], // defrtng
+         43 => [parent::CR_NUMERIC,   'is.block',               NUM_CAST_INT,            true          ], // block
+         44 => [parent::CR_NUMERIC,   'is.blockrtng',           NUM_CAST_INT,            true          ], // blockrtng
+         45 => [parent::CR_NUMERIC,   'is.dodgertng',           NUM_CAST_INT,            true          ], // dodgertng
+         46 => [parent::CR_NUMERIC,   'is.parryrtng',           NUM_CAST_INT,            true          ], // parryrtng
+         48 => [parent::CR_NUMERIC,   'is.splhitrtng',          NUM_CAST_INT,            true          ], // splhitrtng
+         49 => [parent::CR_NUMERIC,   'is.splcritstrkrtng',     NUM_CAST_INT,            true          ], // splcritstrkrtng
+         50 => [parent::CR_NUMERIC,   'is.splheal',             NUM_CAST_INT,            true          ], // splheal
+         51 => [parent::CR_NUMERIC,   'is.spldmg',              NUM_CAST_INT,            true          ], // spldmg
+         52 => [parent::CR_NUMERIC,   'is.arcsplpwr',           NUM_CAST_INT,            true          ], // arcsplpwr
+         53 => [parent::CR_NUMERIC,   'is.firsplpwr',           NUM_CAST_INT,            true          ], // firsplpwr
+         54 => [parent::CR_NUMERIC,   'is.frosplpwr',           NUM_CAST_INT,            true          ], // frosplpwr
+         55 => [parent::CR_NUMERIC,   'is.holsplpwr',           NUM_CAST_INT,            true          ], // holsplpwr
+         56 => [parent::CR_NUMERIC,   'is.natsplpwr',           NUM_CAST_INT,            true          ], // natsplpwr
+         57 => [parent::CR_NUMERIC,   'is.shasplpwr',           NUM_CAST_INT,            true          ], // shasplpwr
+         59 => [parent::CR_NUMERIC,   'durability',             NUM_CAST_INT,            true          ], // dura
+         60 => [parent::CR_NUMERIC,   'is.healthrgn',           NUM_CAST_INT,            true          ], // healthrgn
+         61 => [parent::CR_NUMERIC,   'is.manargn',             NUM_CAST_INT,            true          ], // manargn
+         62 => [parent::CR_CALLBACK,  'cbCooldown',             null,                    null          ], // cooldown [op] [int]
+         63 => [parent::CR_NUMERIC,   'buyPrice',               NUM_CAST_INT,            true          ], // buyprice
+         64 => [parent::CR_NUMERIC,   'sellPrice',              NUM_CAST_INT,            true          ], // sellprice
+         65 => [parent::CR_CALLBACK,  'cbAvgMoneyContent',      null,                    null          ], // avgmoney [op] [int]
+         66 => [parent::CR_ENUM,      'requiredSpell'                                                  ], // requiresprofspec
+         68 => [parent::CR_CALLBACK,  'cbObtainedBy',           15,                      null          ], // otdisenchanting [yn]
+         69 => [parent::CR_CALLBACK,  'cbObtainedBy',           16,                      null          ], // otfishing [yn]
+         70 => [parent::CR_CALLBACK,  'cbObtainedBy',           17,                      null          ], // otherbgathering [yn]
+         71 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_ITEMLOOT                    ], // otitemopening [yn]
+         72 => [parent::CR_CALLBACK,  'cbObtainedBy',           2,                       null          ], // otlooting [yn]
+         73 => [parent::CR_CALLBACK,  'cbObtainedBy',           19,                      null          ], // otmining [yn]
+         74 => [parent::CR_FLAG,      'cuFlags',                ITEM_CU_OT_OBJECTLOOT                  ], // otobjectopening [yn]
+         75 => [parent::CR_CALLBACK,  'cbObtainedBy',           21,                      null          ], // otpickpocketing [yn]
+         76 => [parent::CR_CALLBACK,  'cbObtainedBy',           23,                      null          ], // otskinning [yn]
+         77 => [parent::CR_NUMERIC,   'is.atkpwr',              NUM_CAST_INT,            true          ], // atkpwr
+         78 => [parent::CR_NUMERIC,   'is.mlehastertng',        NUM_CAST_INT,            true          ], // mlehastertng
+         79 => [parent::CR_NUMERIC,   'is.resirtng',            NUM_CAST_INT,            true          ], // resirtng
+         80 => [parent::CR_CALLBACK,  'cbHasSockets',           null,                    null          ], // has sockets [enum]
+         81 => [parent::CR_CALLBACK,  'cbFitsGemSlot',          null,                    null          ], // fits gem slot [enum]
+         83 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_UNIQUEEQUIPPED               ], // uniqueequipped
+         84 => [parent::CR_NUMERIC,   'is.mlecritstrkrtng',     NUM_CAST_INT,            true          ], // mlecritstrkrtng
+         85 => [parent::CR_CALLBACK,  'cbObjectiveOfQuest',     null,                    null          ], // objectivequest [side]
+         86 => [parent::CR_CALLBACK,  'cbCraftedByProf',        null,                    null          ], // craftedprof [enum]
+         87 => [parent::CR_CALLBACK,  'cbReagentForAbility',    null,                    null          ], // reagentforability [enum]
+         88 => [parent::CR_CALLBACK,  'cbObtainedBy',           20,                      null          ], // otprospecting [yn]
+         89 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PROSPECTABLE                 ], // prospectable
+         90 => [parent::CR_CALLBACK,  'cbAvgBuyout',            null,                    null          ], // avgbuyout [op] [int]
+         91 => [parent::CR_ENUM,      'totemCategory',          false,                   true          ], // tool
+         92 => [parent::CR_CALLBACK,  'cbObtainedBy',           5,                       null          ], // soldbyvendor [yn]
+         93 => [parent::CR_CALLBACK,  'cbObtainedBy',           3,                       null          ], // otpvp [pvp]
+         94 => [parent::CR_NUMERIC,   'is.splpen',              NUM_CAST_INT,            true          ], // splpen
+         95 => [parent::CR_NUMERIC,   'is.mlehitrtng',          NUM_CAST_INT,            true          ], // mlehitrtng
+         96 => [parent::CR_NUMERIC,   'is.critstrkrtng',        NUM_CAST_INT,            true          ], // critstrkrtng
+         97 => [parent::CR_NUMERIC,   'is.feratkpwr',           NUM_CAST_INT,            true          ], // feratkpwr
+         98 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_PARTYLOOT                    ], // partyloot
+         99 => [parent::CR_ENUM,      'requiredSkill'                                                  ], // requiresprof
+        100 => [parent::CR_NUMERIC,   'is.nsockets',            NUM_CAST_INT                           ], // nsockets
+        101 => [parent::CR_NUMERIC,   'is.rgdhastertng',        NUM_CAST_INT,            true          ], // rgdhastertng
+        102 => [parent::CR_NUMERIC,   'is.splhastertng',        NUM_CAST_INT,            true          ], // splhastertng
+        103 => [parent::CR_NUMERIC,   'is.hastertng',           NUM_CAST_INT,            true          ], // hastertng
+        104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                          ], // flavortext
+        105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1             ], // dropsinnormal [heroicdungeon-any]
+        106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2             ], // dropsinheroic [heroicdungeon-any]
+        107 => [parent::CR_NYI_PH,    null,                     1,                                     ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
+        109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null          ], // armorbonus [op] [int]
+        111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true          ], // reqskillrank
+        113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                  ], // hasscreenshots
+        114 => [parent::CR_NUMERIC,   'is.armorpenrtng',        NUM_CAST_INT,            true          ], // armorpenrtng
+        115 => [parent::CR_NUMERIC,   'is.health',              NUM_CAST_INT,            true          ], // health
+        116 => [parent::CR_NUMERIC,   'is.mana',                NUM_CAST_INT,            true          ], // mana
+        117 => [parent::CR_NUMERIC,   'is.exprtng',             NUM_CAST_INT,            true          ], // exprtng
+        118 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithitem [enum]
+        119 => [parent::CR_NUMERIC,   'is.hitrtng',             NUM_CAST_INT,            true          ], // hitrtng
+        123 => [parent::CR_NUMERIC,   'is.splpwr',              NUM_CAST_INT,            true          ], // splpwr
+        124 => [parent::CR_CALLBACK,  'cbHasRandEnchant',       null,                    null          ], // randomenchants [str]
+        125 => [parent::CR_CALLBACK,  'cbReqArenaRating',       null,                    null          ], // reqarenartng [op] [int]  todo (low): 'find out, why "IN (W, X, Y) AND IN (X, Y, Z)" doesn't result in "(X, Y)"
+        126 => [parent::CR_CALLBACK,  'cbQuestRewardIn',        null,                    null          ], // rewardedbyquestin [zone-any]
+        128 => [parent::CR_CALLBACK,  'cbSource',               null,                    null          ], // source [enum]
+        129 => [parent::CR_CALLBACK,  'cbSoldByNPC',            null,                    null          ], // soldbynpc [str-small]
+        130 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_COMMENT                     ], // hascomments
+        132 => [parent::CR_CALLBACK,  'cbGlyphType',            null,                    null          ], // glyphtype [enum]
+        133 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_ACCOUNTBOUND                 ], // accountbound
+        134 => [parent::CR_NUMERIC,   'is.mledps',              NUM_CAST_FLOAT,          true          ], // mledps
+        135 => [parent::CR_NUMERIC,   'is.mledmgmin',           NUM_CAST_INT,            true          ], // mledmgmin
+        136 => [parent::CR_NUMERIC,   'is.mledmgmax',           NUM_CAST_INT,            true          ], // mledmgmax
+        137 => [parent::CR_NUMERIC,   'is.mlespeed',            NUM_CAST_FLOAT,          true          ], // mlespeed
+        138 => [parent::CR_NUMERIC,   'is.rgddps',              NUM_CAST_FLOAT,          true          ], // rgddps
+        139 => [parent::CR_NUMERIC,   'is.rgddmgmin',           NUM_CAST_INT,            true          ], // rgddmgmin
+        140 => [parent::CR_NUMERIC,   'is.rgddmgmax',           NUM_CAST_INT,            true          ], // rgddmgmax
+        141 => [parent::CR_NUMERIC,   'is.rgdspeed',            NUM_CAST_FLOAT,          true          ], // rgdspeed
+        142 => [parent::CR_STRING,    'ic.name'                                                        ], // icon
+        143 => [parent::CR_CALLBACK,  'cbObtainedBy',           18,                      null          ], // otmilling [yn]
+        144 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqHonorPoints',        null          ], // purchasablewithhonor [yn]
+        145 => [parent::CR_CALLBACK,  'cbPvpPurchasable',       'reqArenaPoints',        null          ], // purchasablewitharena [yn]
+        146 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_HEROIC                       ], // heroic
+        147 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      1,            ], // dropsinnormal10 [multimoderaid-any]
+        148 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      2,            ], // dropsinnormal25 [multimoderaid-any]
+        149 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      4,            ], // dropsinheroic10 [heroicraid-any]
+        150 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_RAID_DROP,      8,            ], // dropsinheroic25 [heroicraid-any]
+        151 => [parent::CR_NUMERIC,   'id',                     NUM_CAST_INT,            true          ], // id
+        152 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredClass',         CLASS_MASK_ALL], // classspecific [enum]
+        153 => [parent::CR_CALLBACK,  'cbClassRaceSpec',        'requiredRace',          RACE_MASK_ALL ], // racespecific [enum]
+        154 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_REFUNDABLE                   ], // refundable
+        155 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_ARENA                 ], // usableinarenas
+        156 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_USABLE_SHAPED                ], // usablewhenshapeshifted
+        157 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_SMARTLOOT                    ], // smartloot
+        158 => [parent::CR_CALLBACK,  'cbPurchasableWith',      null,                    null          ], // purchasablewithcurrency [enum]
+        159 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_MILLABLE                     ], // millable
+        160 => [parent::CR_NYI_PH,    null,                     1,                                     ], // relatedevent [enum]      like 169 .. crawl though npc_vendor and loot_templates of event-related spawns
+        161 => [parent::CR_CALLBACK,  'cbAvailable',            null,                    null          ], // availabletoplayers [yn]
+        162 => [parent::CR_FLAG,      'flags',                  ITEM_FLAG_DEPRECATED                   ], // deprecated
+        163 => [parent::CR_CALLBACK,  'cbDisenchantsInto',      null,                    null          ], // disenchantsinto [disenchanting]
+        165 => [parent::CR_NUMERIC,   'repairPrice',            NUM_CAST_INT,            true          ], // repaircost
+        167 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_VIDEO                       ], // hasvideos
+        168 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'spellId1',              LEARN_SPELLS  ], // teachesspell [yn]
+        169 => [parent::CR_ENUM,      'e.holidayId',            true,                    true          ], // requiresevent
+        171 => [parent::CR_CALLBACK,  'cbObtainedBy',           8,                       null          ], // otredemption [yn]
+        172 => [parent::CR_CALLBACK,  'cbObtainedBy',           12,                      null          ], // rewardedbyachievement [yn]
+        176 => [parent::CR_STAFFFLAG, 'flags'                                                          ], // flags
+        177 => [parent::CR_STAFFFLAG, 'flagsExtra'                                                     ], // flags2
     );
 
     protected $inputFields   = array(
-        'wt'    => [FILTER_V_CALLBACK, 'cbWeightKeyCheck',                              true ], // weight keys
-        'wtv'   => [FILTER_V_RANGE,    [1, 999],                                        true ], // weight values
-        'jc'    => [FILTER_V_LIST,     [1],                                             false], // use jewelcrafter gems for weight calculation
-        'gm'    => [FILTER_V_LIST,     [2, 3, 4],                                       false], // gem rarity for weight calculation
-        'cr'    => [FILTER_V_RANGE,    [1, 177],                                        true ], // criteria ids
-        'crs'   => [FILTER_V_LIST,     [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX,    parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
-        'upg'   => [FILTER_V_REGEX,    '/[^\d:]/ui',                                    false], // upgrade item ids
-        'gb'    => [FILTER_V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
-        'na'    => [FILTER_V_REGEX,    parent::PATTERN_NAME,                            false], // name - only printable chars, no delimiter
-        'ma'    => [FILTER_V_EQUAL,    1,                                               false], // match any / all filter
-        'ub'    => [FILTER_V_LIST,     [[1, 9], 11],                                    false], // usable by classId
-        'qu'    => [FILTER_V_RANGE,    [0, 7],                                          true ], // quality ids
-        'ty'    => [FILTER_V_CALLBACK, 'cbTypeCheck',                                   true ], // item type - dynamic by current group
-        'sl'    => [FILTER_V_CALLBACK, 'cbSlotCheck',                                   true ], // item slot - dynamic by current group
-        'si'    => [FILTER_V_LIST,     [1, 2, 3, -1, -2],                               false], // side
-        'minle' => [FILTER_V_RANGE,    [1, 999],                                        false], // item level min
-        'maxle' => [FILTER_V_RANGE,    [1, 999],                                        false], // item level max
-        'minrl' => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                  false], // required level min
-        'maxrl' => [FILTER_V_RANGE,    [1, MAX_LEVEL],                                  false]  // required level max
+        'wt'    => [parent::V_CALLBACK, 'cbWeightKeyCheck',                              true ], // weight keys
+        'wtv'   => [parent::V_RANGE,    [1, 999],                                        true ], // weight values
+        'jc'    => [parent::V_LIST,     [1],                                             false], // use jewelcrafter gems for weight calculation
+        'gm'    => [parent::V_LIST,     [2, 3, 4],                                       false], // gem rarity for weight calculation
+        'cr'    => [parent::V_RANGE,    [1, 177],                                        true ], // criteria ids
+        'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]], true ], // criteria operators
+        'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
+        'upg'   => [parent::V_REGEX,    '/[^\d:]/ui',                                    false], // upgrade item ids
+        'gb'    => [parent::V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
+        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                            false], // name - only printable chars, no delimiter
+        'ma'    => [parent::V_EQUAL,    1,                                               false], // match any / all filter
+        'ub'    => [parent::V_LIST,     [[1, 9], 11],                                    false], // usable by classId
+        'qu'    => [parent::V_RANGE,    [0, 7],                                          true ], // quality ids
+        'ty'    => [parent::V_CALLBACK, 'cbTypeCheck',                                   true ], // item type - dynamic by current group
+        'sl'    => [parent::V_CALLBACK, 'cbSlotCheck',                                   true ], // item slot - dynamic by current group
+        'si'    => [parent::V_LIST,     [1, 2, 3, -1, -2],                               false], // side
+        'minle' => [parent::V_RANGE,    [1, 999],                                        false], // item level min
+        'maxle' => [parent::V_RANGE,    [1, 999],                                        false], // item level max
+        'minrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                  false], // required level min
+        'maxrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                  false]  // required level max
     );
 
     public function __construct($fromPOST = false, $opts = [])
@@ -2274,7 +2274,7 @@ class ItemListFilter extends Filter
 
     protected function cbHasRandEnchant($cr) : mixed
     {
-        $n = preg_replace(Filter::PATTERN_NAME, '', $cr[2]);
+        $n = preg_replace(parent::PATTERN_NAME, '', $cr[2]);
         $n = $this->transformString($n, false);
 
         $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
@@ -2332,7 +2332,7 @@ class ItemListFilter extends Filter
 
     protected function cbDamageType($cr) : mixed
     {
-        if (!$this->checkInput(FILTER_V_RANGE, [0, 6], $cr[1]))
+        if (!$this->checkInput(parent::V_RANGE, [0, 6], $cr[1]))
             return false;
 
         return ['OR', ['dmgType1', $cr[1]], ['dmgType2', $cr[1]]];
@@ -2365,7 +2365,7 @@ class ItemListFilter extends Filter
     {
         if (in_array($cr[1], $this->enums[$cr[0]]))
             return ['AND', ['src.src4', null, '!'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == FILTER_ENUM_ANY)
+        else if ($cr[1] == parent::ENUM_ANY)
             return ['src.src4', null, '!'];                 // well, this seems a bit redundant..
 
         return false;
@@ -2375,7 +2375,7 @@ class ItemListFilter extends Filter
     {
         if (in_array($cr[1], $this->enums[$cr[0]]))
             return ['AND', ['src.src2', null, '!'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == FILTER_ENUM_ANY)
+        else if ($cr[1] == parent::ENUM_ANY)
             return ['src.src2', null, '!'];                 // well, this seems a bit redundant..
 
         return false;
@@ -2385,7 +2385,7 @@ class ItemListFilter extends Filter
     {
         if (in_array($cr[1], $this->enums[$cr[0]]))
             return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == FILTER_ENUM_ANY)
+        else if ($cr[1] == parent::ENUM_ANY)
             return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&']];
 
         return false;
@@ -2395,7 +2395,7 @@ class ItemListFilter extends Filter
     {
         if (in_array($cr[1], $this->enums[$cr[0]]))
             $_ = (array)$cr[1];
-        else if ($cr[1] == FILTER_ENUM_ANY)
+        else if ($cr[1] == parent::ENUM_ANY)
             $_ = $this->enums[$cr[0]];
         else
             return false;

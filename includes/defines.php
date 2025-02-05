@@ -155,24 +155,6 @@ define('BUTTON_GUIDE_NEW',                 11);
 define('BUTTON_GUIDE_EDIT',                12);
 define('BUTTON_GUIDE_LOG',                 13);
 
-// generic filter handler
-define('FILTER_CR_BOOLEAN',                 1);
-define('FILTER_CR_FLAG',                    2);
-define('FILTER_CR_NUMERIC',                 3);
-define('FILTER_CR_STRING',                  4);
-define('FILTER_CR_ENUM',                    5);
-define('FILTER_CR_STAFFFLAG',               6);
-define('FILTER_CR_CALLBACK',                7);
-define('FILTER_CR_NYI_PH',                  999);
-define('FILTER_V_EQUAL',                    8);
-define('FILTER_V_RANGE',                    9);
-define('FILTER_V_LIST',                     10);
-define('FILTER_V_CALLBACK',                 11);
-define('FILTER_V_REGEX',                    12);
-
-define('FILTER_ENUM_ANY',                   -2323);
-define('FILTER_ENUM_NONE',                  -2324);
-
 // conditional information in template
 define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
 define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect

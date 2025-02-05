@@ -966,7 +966,7 @@ abstract class Util
     }
 
     // doesn't handle scientific notation .. why would you input 3e3 for 3000..?
-    public static function checkNumeric(&$data, $typeCast = NUM_ANY) : bool
+    public static function checkNumeric(mixed &$data, int $typeCast = NUM_ANY) : bool
     {
         if ($data === null)
             return false;
@@ -1770,7 +1770,7 @@ abstract class Type
 
     public static function getJSGlobalTemplate(int $type) : array
     {
-        if (!self::exists($type))
+        if (!self::exists($type) || !self::$data[$type][self::IDX_JSG_TPL])
             return [];
 
             // [key, [data], [extraData]]

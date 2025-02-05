@@ -43,12 +43,12 @@ class SoundList extends BaseType
 
         if ($this->fileBuffer)
         {
-            $files = DB::Aowow()->select('SELECT id AS ARRAY_KEY, `id`, `file` AS title, CAST(`type` AS UNSIGNED) AS type, `path` FROM ?_sounds_files sf WHERE id IN (?a)', array_keys($this->fileBuffer));
+            $files = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `id`, `file` AS "title", CAST(`type` AS UNSIGNED) AS "type", `path` FROM ?_sounds_files sf WHERE `id` IN (?a)', array_keys($this->fileBuffer));
             foreach ($files as $id => $data)
             {
                 // 3.3.5 bandaid - need fullpath to play via wow API, remove for cata and later
                 $data['path']  = str_replace('\\', '\\\\', $data['path'] ? $data['path'] . '\\' . $data['title'] : $data['title']);
-                // skipp file extension
+                // skip file extension
                 $data['title'] = substr($data['title'], 0, -4);
                 // enum to string
                 $data['type']  = self::$fileTypes[$data['type']];
@@ -97,8 +97,8 @@ class SoundList extends BaseType
 class SoundListFilter extends Filter
 {
     protected $inputFields = array(
-        'na' => [FILTER_V_REGEX, parent::PATTERN_NAME,                                                   false], // name - only printable chars, no delimiter
-        'ty' => [FILTER_V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
+        'na' => [parent::V_REGEX, parent::PATTERN_NAME,                                                   false], // name - only printable chars, no delimiter
+        'ty' => [parent::V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
     );
 
     protected function createSQLForValues()

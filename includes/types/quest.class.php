@@ -439,53 +439,53 @@ class QuestListFilter extends Filter
     );
 
     protected $genericFilter = array(
-         1 => [FILTER_CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
-         2 => [FILTER_CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
-         3 => [FILTER_CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT              ], // moneyrewarded
-         4 => [FILTER_CR_CALLBACK,  'cbSpellRewards',   null,                 null], // spellrewarded [yn]
-         5 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE       ], // sharable
-         6 => [FILTER_CR_NUMERIC,   'timeLimit',        NUM_CAST_INT              ], // timer
-         7 => [FILTER_CR_NYI_PH,    null,               1                         ], // firstquestseries
-         9 => [FILTER_CR_CALLBACK,  'cbEarnReputation', null,                 null], // objectiveearnrepwith [enum]
-        10 => [FILTER_CR_CALLBACK,  'cbReputation',     '<',                  null], // decreasesrepwith
-        11 => [FILTER_CR_NUMERIC,   'suggestedPlayers', NUM_CAST_INT              ], // suggestedplayers
-        15 => [FILTER_CR_NYI_PH,    null,               1                         ], // lastquestseries
-        16 => [FILTER_CR_NYI_PH,    null,               1                         ], // partseries
-        18 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
-        19 => [FILTER_CR_CALLBACK,  'cbQuestRelation',  0x1,                  null], // startsfrom [enum]
-        21 => [FILTER_CR_CALLBACK,  'cbQuestRelation',  0x2,                  null], // endsat [enum]
-        22 => [FILTER_CR_CALLBACK,  'cbItemRewards',    null,                 null], // itemrewards [op] [int]
-        23 => [FILTER_CR_CALLBACK,  'cbItemChoices',    null,                 null], // itemchoices [op] [int]
-        24 => [FILTER_CR_CALLBACK,  'cbLacksStartEnd',  null,                 null], // lacksstartend [yn]
-        25 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
-        27 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_DAILY          ], // daily
-        28 => [FILTER_CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
-        29 => [FILTER_CR_CALLBACK,  'cbRepeatable',     null                      ], // repeatable
-        30 => [FILTER_CR_NUMERIC,   'id',               NUM_CAST_INT,         true], // id
-        33 => [FILTER_CR_ENUM,      'e.holidayId',      true,                 true], // relatedevent
-        34 => [FILTER_CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
-        36 => [FILTER_CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
-        37 => [FILTER_CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
-        38 => [FILTER_CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
-        42 => [FILTER_CR_STAFFFLAG, 'flags'                                       ], // flags
-        43 => [FILTER_CR_CALLBACK,  'cbCurrencyReward', null,                 null], // currencyrewarded [enum]
-        44 => [FILTER_CR_CALLBACK,  'cbLoremaster',     null,                 null], // countsforloremaster_stc [yn]
-        45 => [FILTER_CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
+         1 => [parent::CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
+         2 => [parent::CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
+         3 => [parent::CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT              ], // moneyrewarded
+         4 => [parent::CR_CALLBACK,  'cbSpellRewards',   null,                 null], // spellrewarded [yn]
+         5 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE       ], // sharable
+         6 => [parent::CR_NUMERIC,   'timeLimit',        NUM_CAST_INT              ], // timer
+         7 => [parent::CR_NYI_PH,    null,               1                         ], // firstquestseries
+         9 => [parent::CR_CALLBACK,  'cbEarnReputation', null,                 null], // objectiveearnrepwith [enum]
+        10 => [parent::CR_CALLBACK,  'cbReputation',     '<',                  null], // decreasesrepwith
+        11 => [parent::CR_NUMERIC,   'suggestedPlayers', NUM_CAST_INT              ], // suggestedplayers
+        15 => [parent::CR_NYI_PH,    null,               1                         ], // lastquestseries
+        16 => [parent::CR_NYI_PH,    null,               1                         ], // partseries
+        18 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
+        19 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x1,                  null], // startsfrom [enum]
+        21 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x2,                  null], // endsat [enum]
+        22 => [parent::CR_CALLBACK,  'cbItemRewards',    null,                 null], // itemrewards [op] [int]
+        23 => [parent::CR_CALLBACK,  'cbItemChoices',    null,                 null], // itemchoices [op] [int]
+        24 => [parent::CR_CALLBACK,  'cbLacksStartEnd',  null,                 null], // lacksstartend [yn]
+        25 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_COMMENT        ], // hascomments
+        27 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_DAILY          ], // daily
+        28 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_WEEKLY         ], // weekly
+        29 => [parent::CR_CALLBACK,  'cbRepeatable',     null                      ], // repeatable
+        30 => [parent::CR_NUMERIC,   'id',               NUM_CAST_INT,         true], // id
+        33 => [parent::CR_ENUM,      'e.holidayId',      true,                 true], // relatedevent
+        34 => [parent::CR_CALLBACK,  'cbAvailable',      null,                 null], // availabletoplayers [yn]
+        36 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_VIDEO          ], // hasvideos
+        37 => [parent::CR_CALLBACK,  'cbClassSpec',      null,                 null], // classspecific [enum]
+        38 => [parent::CR_CALLBACK,  'cbRaceSpec',       null,                 null], // racespecific [enum]
+        42 => [parent::CR_STAFFFLAG, 'flags'                                       ], // flags
+        43 => [parent::CR_CALLBACK,  'cbCurrencyReward', null,                 null], // currencyrewarded [enum]
+        44 => [parent::CR_CALLBACK,  'cbLoremaster',     null,                 null], // countsforloremaster_stc [yn]
+        45 => [parent::CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
     );
 
     protected $inputFields = array(
-        'cr'    => [FILTER_V_RANGE, [1, 45],                                         true ], // criteria ids
-        'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, parent::PATTERN_INT,                             true ], // criteria values - only numerals
-        'na'    => [FILTER_V_REGEX, parent::PATTERN_NAME,                            false], // name / text - only printable chars, no delimiter
-        'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // also match subname
-        'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
-        'minle' => [FILTER_V_RANGE, [1, 99],                                         false], // min quest level
-        'maxle' => [FILTER_V_RANGE, [1, 99],                                         false], // max quest level
-        'minrl' => [FILTER_V_RANGE, [1, 99],                                         false], // min required level
-        'maxrl' => [FILTER_V_RANGE, [1, 99],                                         false], // max required level
-        'si'    => [FILTER_V_LIST,  [-2, -1, 1, 2, 3],                               false], // siede
-        'ty'    => [FILTER_V_LIST,  [0, 1, 21, 41, 62, [81, 85], 88, 89],            true ]  // type
+        'cr'    => [parent::V_RANGE, [1, 45],                                                             true ], // criteria ids
+        'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
+        'crv'   => [parent::V_REGEX, parent::PATTERN_INT,                                                 true ], // criteria values - only numerals
+        'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                                                false], // name / text - only printable chars, no delimiter
+        'ex'    => [parent::V_EQUAL, 'on',                                                                false], // also match subname
+        'ma'    => [parent::V_EQUAL, 1,                                                                   false], // match any / all filter
+        'minle' => [parent::V_RANGE, [1, 99],                                                             false], // min quest level
+        'maxle' => [parent::V_RANGE, [1, 99],                                                             false], // max quest level
+        'minrl' => [parent::V_RANGE, [1, 99],                                                             false], // min required level
+        'maxrl' => [parent::V_RANGE, [1, 99],                                                             false], // max required level
+        'si'    => [parent::V_LIST,  [-SIDE_HORDE, -SIDE_ALLIANCE, SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH], false], // side
+        'ty'    => [parent::V_LIST,  [0, 1, 21, 41, 62, [81, 85], 88, 89],                                true ]  // type
     );
 
     protected function createSQLForValues()
@@ -530,19 +530,19 @@ class QuestListFilter extends Filter
 
             switch ($_v['si'])
             {
-                case  3:
+                case  SIDE_BOTH:
                     $parts[] = $notEx;
                     break;
-                case  2:
+                case  SIDE_HORDE:
                     $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_HORDE, '&']];
                     break;
-                case -2:
+                case -SIDE_HORDE:
                     $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_HORDE, '&']];
                     break;
-                case  1:
+                case  SIDE_ALLIANCE:
                     $parts[] = ['OR', $notEx, ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     break;
-                case -1:
+                case -SIDE_ALLIANCE:
                     $parts[] = ['AND', $ex,   ['reqRaceMask', RACE_MASK_ALLIANCE, '&']];
                     break;
             }
@@ -563,7 +563,7 @@ class QuestListFilter extends Filter
         if (!in_array($cr[1], $this->enums[$cr[0]]))
             return false;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE id = ?d', $cr[1]))
+        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $cr[1]))
             $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
 
         return [
@@ -578,17 +578,13 @@ class QuestListFilter extends Filter
 
     protected function cbQuestRelation($cr, $flags)
     {
-        switch ($cr[1])
+        return match($cr[1])
         {
-            case 1:                                         // npc
-                return ['AND', ['qse.type', Type::NPC],    ['qse.method', $flags, '&']];
-            case 2:                                         // object
-                return ['AND', ['qse.type', Type::OBJECT], ['qse.method', $flags, '&']];
-            case 3:                                         // item
-                return ['AND', ['qse.type', Type::ITEM],   ['qse.method', $flags, '&']];
-        }
-
-        return false;
+            Type::NPC,
+            Type::OBJECT,
+            Type::ITEM   => ['AND', ['qse.type', $cr[1]], ['qse.method', $flags, '&']],
+            default      => false
+        };
     }
 
     protected function cbCurrencyReward($cr)
@@ -675,9 +671,9 @@ class QuestListFilter extends Filter
         if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
             return false;
 
-        if ($cr[1] == FILTER_ENUM_ANY)              // any
+        if ($cr[1] == parent::ENUM_ANY)              // any
             return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
-        else if ($cr[1] == FILTER_ENUM_NONE)        // none
+        else if ($cr[1] == parent::ENUM_NONE)        // none
             return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
         else if (in_array($cr[1], $this->enums[$cr[0]]))
             return ['OR', ['reqFactionId1', $cr[1]], ['reqFactionId2', $cr[1]]];
@@ -722,7 +718,7 @@ class QuestListFilter extends Filter
         if (!$this->int2Bool($cr[1]))
             return false;
 
-        $missing = DB::Aowow()->selectCol('SELECT questId, max(method) a, min(method) b FROM ?_quests_startend GROUP BY questId HAVING (a | b) <> 3');
+        $missing = DB::Aowow()->selectCol('SELECT `questId`, BIT_OR(`method`) AS "se" FROM ?_quests_startend GROUP BY `questId` HAVING "se" <> 3');
         if ($cr[1])
             return ['id', $missing];
         else

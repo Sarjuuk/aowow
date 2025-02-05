@@ -296,8 +296,8 @@ class AchievementListFilter extends Filter
               141 => 156,                                   // Feast of Winter Veil
               409 => -3456,                                 // Day of the Dead
               398 => -3457,                                 // Pirates' Day
-              FILTER_ENUM_ANY  => true,
-              FILTER_ENUM_NONE => false,
+              parent::ENUM_ANY  => true,
+              parent::ENUM_NONE => false,
               283 => -1,                                    // valid events without achievements
               285 => -1,   353 => -1,   420 => -1,
               400 => -1,   284 => -1,   374 => -1,
@@ -306,31 +306,31 @@ class AchievementListFilter extends Filter
     );
 
     protected $genericFilter = array(
-         2 => [FILTER_CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
-         3 => [FILTER_CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
-         4 => [FILTER_CR_NYI_PH,    null,          1,                               ], // location [enum]
-         5 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_FIRST_SERIES, null], // first in series [yn]
-         6 => [FILTER_CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_LAST_SERIES,  null], // last in series [yn]
-         7 => [FILTER_CR_BOOLEAN,   'chainId',                                      ], // partseries
-         9 => [FILTER_CR_NUMERIC,   'id',          NUM_CAST_INT,                true], // id
-        10 => [FILTER_CR_STRING,    'ic.name',                                      ], // icon
-        11 => [FILTER_CR_CALLBACK,  'cbRelEvent', null,                         null], // related event [enum]
-        14 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT               ], // hascomments
-        15 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT            ], // hasscreenshots
-        16 => [FILTER_CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO                 ], // hasvideos
-        18 => [FILTER_CR_STAFFFLAG, 'flags',                                        ]  // flags
+         2 => [parent::CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
+         3 => [parent::CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
+         4 => [parent::CR_NYI_PH,    null,          1,                               ], // location [enum]
+         5 => [parent::CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_FIRST_SERIES, null], // first in series [yn]
+         6 => [parent::CR_CALLBACK,  'cbSeries',    ACHIEVEMENT_CU_LAST_SERIES,  null], // last in series [yn]
+         7 => [parent::CR_BOOLEAN,   'chainId',                                      ], // partseries
+         9 => [parent::CR_NUMERIC,   'id',          NUM_CAST_INT,                true], // id
+        10 => [parent::CR_STRING,    'ic.name',                                      ], // icon
+        11 => [parent::CR_CALLBACK,  'cbRelEvent', null,                         null], // related event [enum]
+        14 => [parent::CR_FLAG,      'cuFlags',     CUSTOM_HAS_COMMENT               ], // hascomments
+        15 => [parent::CR_FLAG,      'cuFlags',     CUSTOM_HAS_SCREENSHOT            ], // hasscreenshots
+        16 => [parent::CR_FLAG,      'cuFlags',     CUSTOM_HAS_VIDEO                 ], // hasvideos
+        18 => [parent::CR_STAFFFLAG, 'flags',                                        ]  // flags
     );
 
     protected $inputFields = array(
-        'cr'    => [FILTER_V_RANGE, [2, 18],                                         true ], // criteria ids
-        'crs'   => [FILTER_V_LIST,  [FILTER_ENUM_NONE, FILTER_ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [FILTER_V_REGEX, parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
-        'na'    => [FILTER_V_REGEX, parent::PATTERN_NAME,                            false], // name / description - only printable chars, no delimiter
-        'ex'    => [FILTER_V_EQUAL, 'on',                                            false], // extended name search
-        'ma'    => [FILTER_V_EQUAL, 1,                                               false], // match any / all filter
-        'si'    => [FILTER_V_LIST,  [1, 2, 3, -1, -2],                               false], // side
-        'minpt' => [FILTER_V_RANGE, [1, 99],                                         false], // required level min
-        'maxpt' => [FILTER_V_RANGE, [1, 99],                                         false]  // required level max
+        'cr'    => [parent::V_RANGE, [2, 18],                                                             true ], // criteria ids
+        'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
+        'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
+        'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                                                false], // name / description - only printable chars, no delimiter
+        'ex'    => [parent::V_EQUAL, 'on',                                                                false], // extended name search
+        'ma'    => [parent::V_EQUAL, 1,                                                                   false], // match any / all filter
+        'si'    => [parent::V_LIST,  [SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH, -SIDE_ALLIANCE, -SIDE_HORDE], false], // side
+        'minpt' => [parent::V_RANGE, [1, 99],                                                             false], // required level min
+        'maxpt' => [parent::V_RANGE, [1, 99],                                                             false]  // required level max
     );
 
     protected function createSQLForValues()
@@ -364,13 +364,13 @@ class AchievementListFilter extends Filter
         {
             switch ($_v['si'])
             {
-                case -1:                                    // faction, exclusive both
-                case -2:
+                case -SIDE_ALLIANCE:                        // equals faction
+                case -SIDE_HORDE:
                     $parts[] = ['faction', -$_v['si']];
                     break;
-                case 1:                                     // faction, inclusive both
-                case 2:
-                case 3:                                     // both
+                case SIDE_ALLIANCE:                         // includes faction
+                case SIDE_HORDE:
+                case SIDE_BOTH:
                     $parts[] = ['faction', $_v['si'], '&'];
                     break;
             }
@@ -389,7 +389,7 @@ class AchievementListFilter extends Filter
             return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
         else
         {
-            $ids = array_filter($this->enums[$cr[0]], function($x) { return is_int($x) && $x > 0; });
+            $ids = array_filter($this->enums[$cr[0]], fn($x) => is_int($x) && $x > 0);
 
             return ['category', $ids, $_ ? null : '!'];
         }

@@ -46,7 +46,7 @@ class GuildList extends BaseType
         if (!$guilds)
             return;
 
-        $stats = DB::Aowow()->select('SELECT guild AS ARRAY_KEY, id AS ARRAY_KEY2, level, gearscore, achievementpoints, IF(cuFlags & ?d, 0, 1) AS synced FROM ?_profiler_profiles WHERE guild IN (?a) ORDER BY gearscore DESC', PROFILER_CU_NEEDS_RESYNC, $guilds);
+        $stats = DB::Aowow()->select('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints`, IF(`cuFlags` & ?d, 0, 1) AS "synced" FROM ?_profiler_profiles WHERE `guild` IN (?a) ORDER BY `gearscore` DESC', PROFILER_CU_NEEDS_RESYNC, $guilds);
         foreach ($this->iterate() as &$_curTpl)
         {
             $id = $_curTpl['id'];
@@ -91,12 +91,12 @@ class GuildListFilter extends Filter
     protected $genericFilter = [];
 
     protected $inputFields = array(
-        'na' => [FILTER_V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
-        'ma' => [FILTER_V_EQUAL,    1,                    false], // match any / all filter
-        'ex' => [FILTER_V_EQUAL,    'on',                 false], // only match exact
-        'si' => [FILTER_V_LIST,     [1, 2],               false], // side
-        'rg' => [FILTER_V_CALLBACK, 'cbRegionCheck',      false], // region
-        'sv' => [FILTER_V_CALLBACK, 'cbServerCheck',      false], // server
+        'na' => [parent::V_REGEX,    parent::PATTERN_NAME,        false], // name - only printable chars, no delimiter
+        'ma' => [parent::V_EQUAL,    1,                           false], // match any / all filter
+        'ex' => [parent::V_EQUAL,    'on',                        false], // only match exact
+        'si' => [parent::V_LIST,     [SIDE_ALLIANCE, SIDE_HORDE], false], // side
+        'rg' => [parent::V_CALLBACK, 'cbRegionCheck',             false], // region
+        'sv' => [parent::V_CALLBACK, 'cbServerCheck',             false], // server
     );
 
     protected function createSQLForValues()
@@ -114,9 +114,9 @@ class GuildListFilter extends Filter
         // side [list]
         if (!empty($_v['si']))
         {
-            if ($_v['si'] == 1)
+            if ($_v['si'] == SIDE_ALLIANCE)
                 $parts[] = ['c.race', [1, 3, 4, 7, 11]];
-            else if ($_v['si'] == 2)
+            else if ($_v['si'] == SIDE_HORDE)
                 $parts[] = ['c.race', [2, 5, 6, 8, 10]];
         }
 

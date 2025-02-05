@@ -48,13 +48,13 @@ class ArenaTeamListFilter extends Filter
     protected $genericFilter = [];
 
     protected $inputFields = array(
-        'na' => [FILTER_V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
-        'ma' => [FILTER_V_EQUAL,    1,                    false], // match any / all filter
-        'ex' => [FILTER_V_EQUAL,    'on',                 false], // only match exact
-        'si' => [FILTER_V_LIST,     [1, 2],               false], // side
-        'sz' => [FILTER_V_LIST,     [2, 3, 5],            false], // tema size
-        'rg' => [FILTER_V_CALLBACK, 'cbRegionCheck',      false], // region
-        'sv' => [FILTER_V_CALLBACK, 'cbServerCheck',      false], // server
+        'na' => [parent::V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
+        'ma' => [parent::V_EQUAL,    1,                    false], // match any / all filter
+        'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact
+        'si' => [parent::V_LIST,     [1, 2],               false], // side
+        'sz' => [parent::V_LIST,     [2, 3, 5],            false], // tema size
+        'rg' => [parent::V_CALLBACK, 'cbRegionCheck',      false], // region
+        'sv' => [parent::V_CALLBACK, 'cbServerCheck',      false], // server
     );
 
     protected function createSQLForValues()
@@ -72,9 +72,9 @@ class ArenaTeamListFilter extends Filter
         // side [list]
         if (!empty($_v['si']))
         {
-            if ($_v['si'] == 1)
+            if ($_v['si'] == SIDE_ALLIANCE)
                 $parts[] = ['c.race', [1, 3, 4, 7, 11]];
-            else if ($_v['si'] == 2)
+            else if ($_v['si'] == SIDE_HORDE)
                 $parts[] = ['c.race', [2, 5, 6, 8, 10]];
         }
 
