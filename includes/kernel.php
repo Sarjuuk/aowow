@@ -28,25 +28,45 @@ if ($error)
 
 require_once 'includes/defines.php';
 require_once 'includes/locale.class.php';
-require_once 'includes/stats.class.php';                    // Game entity statistics conversion
+require_once 'localization/lang.class.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
+require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/utilities.php';                      // helper functions
 require_once 'includes/config.class.php';                   // Config holder
+require_once 'includes/user.class.php';                     // Session handling (could be skipped for CLI context except for username and password validation used in account creation)
+
+// todo: make everything below autoloaded
+require_once 'includes/stats.class.php';                    // Game entity statistics conversion
 require_once 'includes/game.php';                           // game related data & functions
 require_once 'includes/profiler.class.php';                 // Profiler feature
-require_once 'includes/user.class.php';                     // Session handling
 require_once 'includes/markup.class.php';                   // manipulate markup text
-require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/community.class.php';                // handle comments, screenshots and videos
 require_once 'includes/loot.class.php';                     // build lv-tabs containing loot-information
-require_once 'includes/smartAI.class.php';                  // TC: SmartAI system
-require_once 'includes/conditions.class.php';               // TC: Conditions system
-require_once 'localization/lang.class.php';
 require_once 'pages/genericPage.class.php';
 
+// TC systems
+spl_autoload_register(function ($class)
+{
+    switch($class)
+    {
+        case 'SmartAI':
+        case 'SmartEvent':
+        case 'SmartAction':
+        case 'SmartTarget':
+            require_once 'includes/components/SmartAI/SmartAI.class.php';
+            require_once 'includes/components/SmartAI/SmartEvent.class.php';
+            require_once 'includes/components/SmartAI/SmartAction.class.php';
+            require_once 'includes/components/SmartAI/SmartTarget.class.php';
+            break;
+        case 'Conditions':
+            require_once 'includes/components/Conditions/Conditions.class.php';
+            break;
+    }
+});
 
 // autoload List-classes, associated filters and pages
-spl_autoload_register(function ($class) {
+spl_autoload_register(function ($class)
+{
     $class = strtolower(str_replace('ListFilter', 'List', $class));
 
     if (class_exists($class))                               // already registered

@@ -378,14 +378,14 @@ class NpcPage extends GenericPage
         $sai = null;
         if ($this->subject->getField('aiName') == 'SmartAI')
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, $this->typeId, ['name' => $this->subject->getField('name', true)]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_CREATURE, $this->typeId);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
-                $guids = DB::World()->selectCol('SELECT guid FROM creature WHERE id = ?d', $this->typeId);
+                $guids = DB::World()->selectCol('SELECT `guid` FROM creature WHERE `id` = ?d', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
-                    $sai = new SmartAI(SAI_SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'name' => $this->subject->getField('name', true), 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    $sai = new SmartAI(SmartAI::SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'title' => ' [small](for GUID: '.$_.')[/small]']);
                     if ($sai->prepare())
                         break;
                 }
@@ -431,7 +431,7 @@ class NpcPage extends GenericPage
         if ($tplSpells)
             $conditions[] = ['id', $tplSpells];
 
-        if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SAI_SRC_TYPE_CREATURE))
+        if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE))
             $genSpells = $smartSpells;
 
         if ($auras = DB::World()->selectCell('SELECT auras FROM creature_template_addon WHERE entry = ?d', $this->typeId))
@@ -518,9 +518,9 @@ class NpcPage extends GenericPage
         // tab: summoned by [spell]
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', [28, 56, 112]], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', [28, 56, 112]], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', [28, 56, 112]], ['effect3MiscValue', $this->typeId]]
+            ['AND', ['effect1Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect3MiscValue', $this->typeId]]
         );
 
         $sbSpell = new SpellList($conditions);
@@ -858,7 +858,7 @@ class NpcPage extends GenericPage
             * Dialogue VO => creature_text
             * onClick VO => CreatureDisplayInfo.dbc => NPCSounds.dbc
         */
-        $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SAI_SRC_TYPE_CREATURE));
+        $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE));
 
         // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
         $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE `id` = ?d', $this->subject->getField('displayId1'));

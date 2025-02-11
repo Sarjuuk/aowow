@@ -578,7 +578,7 @@ class QuestListFilter extends Filter
 
     protected function cbQuestRelation($cr, $flags)
     {
-        return match($cr[1])
+        return match ($cr[1])
         {
             Type::NPC,
             Type::OBJECT,

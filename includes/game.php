@@ -330,7 +330,7 @@ class Game
                     $result = array_replace($result, DB::World()->select(
                        'SELECT -`ID`          AS ARRAY_KEY, ID          AS `id`,    `target_map` AS `mapId`, `target_position_x` AS `posX`, `target_position_y` AS `posY` FROM areatrigger_teleport WHERE -`id`          IN (?a) UNION
                         SELECT -`entryorguid` AS ARRAY_KEY, entryorguid AS `id`, `action_param1` AS `mapId`, `target_x`          AS `posX`, `target_y`          AS `posY` FROM smart_scripts        WHERE -`entryorguid` IN (?a) AND `source_type` = ?d AND `action_type` = ?d',
-                        $endpoints, $endpoints, SAI_SRC_TYPE_AREATRIGGER, SAI_ACTION_TELEPORT
+                        $endpoints, $endpoints, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
                      ));
                 break;
             default:
@@ -425,7 +425,7 @@ class Game
                 if (in_array($t['talkType'], [2, 16]) && strpos($msg, '%s') === false)
                     $msg = '%s '.$msg;
 
-                // fixup: bad case-insensivity
+                // fixup: bad case-insensitivity
                 $msg = Util::parseHtmlText(str_replace('%S', '%s', htmlentities($msg)), !$asHTML);
 
                 if ($talkSource)

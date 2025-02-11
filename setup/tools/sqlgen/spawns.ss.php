@@ -254,7 +254,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             SELECT -`entryorguid` AS `guid`, ?d AS `type`, entryorguid AS `typeId`, `action_param1` AS `map`, `target_x`          AS `posX`, `target_y`          AS `posY`
             FROM   smart_scripts
             WHERE `source_type` = ?d AND `action_type` = ?d',
-            Type::AREATRIGGER, Type::AREATRIGGER, SAI_SRC_TYPE_AREATRIGGER, SAI_ACTION_TELEPORT
+            Type::AREATRIGGER, Type::AREATRIGGER, SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
         );
 
         return array_merge($base, $addData);
@@ -273,6 +273,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function waypoints() : array
     {
+        // todo (med): at least `waypoints` can contain paths that do not belong to a creature but get assigned by SmartAI (or script) during runtime
+        // in the future guid should be optional and additional parameters substituting guid should be passed down from NpcPage after SmartAI has been evaluated
         return DB::World()->select(
            'SELECT  c.`guid`, w.`entry` AS `creatureOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`, w.`waittime` AS `wait`, w.`location_x` AS `posX`, w.`location_y` AS `posY`
               FROM  creature c

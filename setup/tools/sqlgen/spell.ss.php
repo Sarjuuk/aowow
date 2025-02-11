@@ -599,7 +599,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $world = DB::World()->selectCol(
            'SELECT ss.`action_param1` FROM smart_scripts ss            WHERE ss.`action_type` IN (?a) UNION
             SELECT cts.`Spell`        FROM creature_template_spell cts',
-            [SAI_ACTION_CAST, SAI_ACTION_ADD_AURA, SAI_ACTION_SELF_CAST, SAI_ACTION_CROSS_CAST]
+            [SmartAction::ACTION_CAST, SmartAction::ACTION_ADD_AURA, SmartAction::ACTION_SELF_CAST, SmartAction::ACTION_CROSS_CAST]
         );
 
         $auras = DB::World()->selectCol('SELECT `entry` AS ARRAY_KEY, cta.`auras` FROM creature_template_addon cta WHERE `auras` <> ""');

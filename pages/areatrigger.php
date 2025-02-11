@@ -65,15 +65,14 @@ class AreaTriggerPage extends GenericPage
         $sai = null;
         if ($_type == AT_TYPE_SMART)
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_AREATRIGGER, $this->typeId, ['name' => $this->name, 'teleportA' => $this->subject->getField('teleportA')]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_AREATRIGGER, $this->typeId, ['teleportTargetArea' => $this->subject->getField('areaId')]);
             if ($sai->prepare())
                 $this->extendGlobalData($sai->getJSGlobals());
         }
 
-
         $this->map        = $map;
         $this->infobox    = false;
-        $this->smartAI    = $sai ? $sai->getMarkdown() : null;
+        $this->smartAI    = $sai?->getMarkdown();
         $this->redButtons = array(
             BUTTON_LINKS   => false,
             BUTTON_WOWHEAD => false
@@ -104,7 +103,7 @@ class AreaTriggerPage extends GenericPage
         }
         else if ($_type == AT_TYPE_TELEPORT)
         {
-            $relZone = new ZoneList(array(['id', $this->subject->getField('teleportA')]));
+            $relZone = new ZoneList(array(['id', $this->subject->getField('areaId')]));
             if (!$relZone->error)
             {
                 $this->lvTabs[] = [ZoneList::$brickFile, ['data' => array_values($relZone->getListviewData())]];

@@ -40,7 +40,7 @@ CLISetup::registerSetup('sql', new class extends SetupScript
         $addData = DB::World()->select(
            'SELECT `ID`          AS ARRAY_KEY, `Name`         AS `name` FROM areatrigger_teleport UNION
             SELECT `entryorguid` AS ARRAY_KEY, "SAI Teleport" AS `name` FROM smart_scripts WHERE `source_type` = ?d AND `action_type` = ?d',
-            SAI_SRC_TYPE_AREATRIGGER, SAI_ACTION_TELEPORT
+            SmartAI::SRC_TYPE_AREATRIGGER, SmartAction::ACTION_TELEPORT
         );
         foreach ($addData as $id => $ad)
             DB::Aowow()->query('UPDATE ?_areatrigger SET `name` = ?, `type` = ?d WHERE `id` = ?d', $ad['name'], AT_TYPE_TELEPORT, $id);

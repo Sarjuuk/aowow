@@ -247,14 +247,14 @@ class ObjectPage extends GenericPage
         $sai = null;
         if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
         {
-            $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, $this->typeId, ['name' => $this->subject->getField('name', true)]);
+            $sai = new SmartAI(SmartAI::SRC_TYPE_OBJECT, $this->typeId);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
-                $guids = DB::World()->selectCol('SELECT guid FROM gameobject WHERE id = ?d LIMIT 1', $this->typeId);
+                $guids = DB::World()->selectCol('SELECT `guid` FROM gameobject WHERE `id` = ?d', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
-                    $sai = new SmartAI(SAI_SRC_TYPE_OBJECT, -$_, ['name' => $this->subject->getField('name', true), 'title' => ' [small](for GUID: '.$_.')[/small]']);
+                    $sai = new SmartAI(SmartAI::SRC_TYPE_OBJECT, -$_, ['title' => ' [small](for GUID: '.$_.')[/small]']);
                     if ($sai->prepare())
                         break;
                 }
