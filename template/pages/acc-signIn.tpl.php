@@ -38,7 +38,7 @@
                     <table align="center">
                         <tr>
                             <td align="right"><?=Lang::account('user').Lang::main('colon'); ?></td>
-                            <td><input type="text" name="username" value="<?=$this->user; ?>" maxlength="16" id="username-generic" style="width: 10em" /></td>
+                            <td><input type="text" name="username" value="<?=$this->user; ?>" id="username-generic" style="width: 10em" /></td>
                         </tr>
                         <tr>
                             <td align="right"><?=Lang::account('pass').Lang::main('colon'); ?></td>

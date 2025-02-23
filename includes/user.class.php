@@ -324,7 +324,7 @@ class User
             return $_;
         }
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `user`, `displayName`, `joinDate`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, ?, ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `user`, `passHash`, `displayName`, `email`, `joinDate`, `allowExpire`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, ?, "", ?, "", UNIX_TIMESTAMP(), 0, ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
             $extId,
             $name,
             Util::ucFirst($name),
