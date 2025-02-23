@@ -962,8 +962,9 @@ class SpellPage extends GenericPage
                 $lvZones = $zones->getListviewData();
                 $this->extendGlobalData($zones->getJSGlobals());
 
-                $resultLv = [];
-                $parents  = [];
+                $resultLv  = [];
+                $parents   = [];
+                $extraCols = [];
                 foreach ($areaSpells as $areaId => $condition)
                 {
                     if (empty($lvZones[$areaId]))
@@ -1126,6 +1127,7 @@ class SpellPage extends GenericPage
                     }
 
                     $lvData = $tbTrainer->getListviewData();
+                    $extraCols = [];
                     if ($cnd->toListviewColumn($lvData, $extraCols))
                         $this->extendGlobalData($cnd->getJsGlobals());
 
@@ -1847,10 +1849,10 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_APPLY_GLYPH:
                     if ($_ = DB::Aowow()->selectCell('SELECT `spellId` FROM ?_glyphproperties WHERE `id` = ?d', $effMV))
                     {
-                        if ($_ = SpellList::getName($effMV))
-                            $_nameMV = '<a href="?spell='.$effMV.'">'.$_.'</a>';
+                        if ($n = SpellList::getName($_))
+                            $_nameMV = '<a href="?spell='.$_.'">'.$n.'</a>';
                         else
-                            $_nameMV = Util::ucFirst(Lang::game('spell')).' #'.$effMV;
+                            $_nameMV = Util::ucFirst(Lang::game('spell')).' #'.$_;
                     }
                     break;
                 case SPELL_EFFECT_SKINNING:
