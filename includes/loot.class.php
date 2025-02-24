@@ -165,7 +165,7 @@ class Loot
             if ($entry['QuestRequired'])
                 foreach (DB::Aowow()->selectCol('SELECT id FROM ?_quests WHERE (`reqSourceItemId1` = ?d OR `reqSourceItemId2` = ?d OR `reqSourceItemId3` = ?d OR `reqSourceItemId4` = ?d OR `reqItemId1` = ?d OR `reqItemId2` = ?d OR `reqItemId3` = ?d OR `reqItemId4` = ?d OR `reqItemId5` = ?d OR `reqItemId6` = ?d) AND (`cuFlags` & ?d) = 0',
                     $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE) as $questId)
-                    $cnd->addExternalCondition(Conditions::lootTableToConditionSource($tableName), $lootId . ':' . $entry['Item'], [Conditions::QUESTTAKEN, $questId]);
+                    $cnd->addExternalCondition(Conditions::lootTableToConditionSource($tableName), $lootId . ':' . $entry['Item'], [Conditions::QUESTTAKEN, $questId], true);
 
             // if ($entry['LootMode'] > 1)
             // {
