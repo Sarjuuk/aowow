@@ -1517,7 +1517,7 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
     // Rating to percent
     nMatch = [];
     tooltip = tooltip.replace(/(<!--rtg%(\d+)-->)([\.0-9]+)/g, function(_all, prefix, ratingId, percent) {
-/*  aowow: fix tooltips with multiple occurences of the same rating
+/*  aowow: fix tooltips with multiple occurences of the same rating (see item: 19948)
         _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)'));
         if (!_) {
             return _all;
@@ -1525,8 +1525,8 @@ $WH.g_setTooltipLevel = function(tooltip, level) {
 
         return prefix + Math.round($WH.g_convertRatingToPercent(level, ratingId, _[1]) * 100) / 100;
 */
-    if (!nMatch[ratingId])
-        nMatch[ratingId] = 0;
+        if (!nMatch[ratingId])
+            nMatch[ratingId] = 0;
 
         _ = tooltip.match(new RegExp('<!--rtg' + ratingId + '-->(\\d+)', 'g'))[nMatch[ratingId]++];
         if (!_) {

@@ -995,11 +995,11 @@ class ItemList extends BaseType
                     else if (!$parsed)
                         continue;
 
+                    if ($scaling)
+                        $causesScaling = true;
+
                     if ($interactive)
                     {
-                        if ($scaling)
-                            $causesScaling = true;
-
                         $link   = '<a href="?spell='.$itemSpells->id.'">%s</a>';
                         $parsed = preg_replace_callback('/([^;]*)(&nbsp;<small>.*?<\/small>)([^&]*)/i', function($m) use($link) {
                                 $m[1] = $m[1] ? sprintf($link, $m[1]) : '';
@@ -1204,24 +1204,24 @@ class ItemList extends BaseType
         // tooltip scaling
         if (!isset($xCraft))
         {
-            $link = [$subOf ? $subOf : $this->id, 1];       // itemId, scaleMinLevel
-            if (isset($this->ssd[$this->id]))               // is heirloom
-            {
-                array_push($link,
-                    $this->ssd[$this->id]['maxLevel'],      // scaleMaxLevel
-                    $this->ssd[$this->id]['maxLevel'],      // scaleCurLevel
-                    $this->curTpl['scalingStatDistribution'],  // scaleDist
-                    $this->curTpl['scalingStatValue']       // scaleFlags
-                );
-            }
-            else                                            // may still use level dependent ratings
-            {
-                array_push($link,
-                    $causesScaling ? MAX_LEVEL : 1,         // scaleMaxLevel
-                    $_reqLvl > 1 ? $_reqLvl : MAX_LEVEL     // scaleCurLevel
-                );
-            }
-            $x .= '<!--?'.implode(':', $link).'-->';
+            $itemId = $subOf ?: $this->id;
+
+            $x .= '<!--?';
+            // itemId
+            $x .= $itemId;
+            // scaleMinLevel
+            $x .= ':1';
+            // scaleMaxLevel
+            $x .= ':' . ($this->ssd[$itemId]['maxLevel'] ?? ($causesScaling ? MAX_LEVEL : 1));
+            // scaleCurLevel
+            $x .= ':' . ($this->ssd[$itemId]['maxLevel'] ?? ($_reqLvl ?: MAX_LEVEL));
+            // scaleDist
+            if ($this->curTpl['scalingStatDistribution'])
+                $x .= ':' . $this->curTpl['scalingStatDistribution'];
+            // scaleFlags
+            if ($this->curTpl['scalingStatValue'])
+                $x .= ':' . $this->curTpl['scalingStatValue'];
+            $x .= '-->';
         }
 
         return $x;
