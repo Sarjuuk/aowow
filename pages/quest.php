@@ -954,7 +954,7 @@ class QuestPage extends GenericPage
             BUTTON_LINKS   => array(
                 'linkColor' => 'ffffff00',
                 'linkId'    => 'quest:'.$this->typeId.':'.$_level,
-                'linkName'  => Util::htmlEscape($this->subject->getField('name', true)),
+                'linkName'  => Util::jsEscape($this->subject->getField('name', true)),
                 'type'      => $this->type,
                 'typeId'    => $this->typeId
             )
