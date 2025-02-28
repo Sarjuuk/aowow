@@ -414,7 +414,7 @@ enum ChrClass : int
     {
         $x = [];
         foreach (self::cases() as $cl)
-            if ($cl->value & $classMask)
+            if ($cl->toMask() & $classMask)
                 $x[] = $cl->value;
 
         return $x;
@@ -508,7 +508,7 @@ enum ChrRace : int
     {
         $x = [];
         foreach (self::cases() as $cl)
-            if ($cl->value & $raceMask)
+            if ($cl->toMask() & $raceMask)
                 $x[] = $cl->value;
 
         return $x;
