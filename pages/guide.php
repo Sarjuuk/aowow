@@ -555,7 +555,7 @@ class GuidePage extends GenericPage
     protected static function checkDescription(string $str) : string
     {
         // run checkTextBlob and also replace \n => \s and \s+ => \s
-        $str = preg_replace(parent::$PATTERN_TEXT_BLOB, '', $str);
+        $str = preg_replace(parent::PATTERN_TEXT_BLOB, '', $str);
 
         $str = strtr($str, ["\n" => ' ', "\r" => ' ']);
 

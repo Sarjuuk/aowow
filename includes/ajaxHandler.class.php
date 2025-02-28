@@ -37,10 +37,7 @@ class AjaxHandler
                 return false;
         }
 
-        $h   = $this->handler;
-        $out = $this->$h();
-        if ($out === null)
-            $out = '';
+        $out = $this->{$this->handler}() ?? '';
 
         return true;
     }
@@ -68,4 +65,5 @@ class AjaxHandler
         return true;
     }
 }
+
 ?>

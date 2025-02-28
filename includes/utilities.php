@@ -19,8 +19,8 @@ class SimpleXML extends SimpleXMLElement
 trait TrRequestData
 {
     // const in trait supported in php8.2+
-    public static $PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
-    public static $PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
+    public const PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
+    public const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
 
     protected $_get    = [];                                // fill with variables you that are going to be used; eg:
     protected $_post   = [];                                // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList']
@@ -104,13 +104,13 @@ trait TrRequestData
     private static function checkTextLine(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace(self::$PATTERN_TEXT_LINE, '', $val);
+        return preg_replace(self::PATTERN_TEXT_LINE, '', $val);
     }
 
     private static function checkTextBlob(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace(self::$PATTERN_TEXT_BLOB, '', $val);
+        return preg_replace(self::PATTERN_TEXT_BLOB, '', $val);
     }
 }
 
