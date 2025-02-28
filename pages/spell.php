@@ -1755,7 +1755,7 @@ class SpellPage extends GenericPage
             {
                 $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [Lang::nf(-$procData['chance'], 1)]) : Lang::spell('procChance') . Lang::main('colon') . $procData['chance'] . '%';
                 if ($procData['cooldown'])
-                    $_footer['procCD'] = Lang::game('cooldown', [$procData['cooldown']]);
+                    $_footer['procCD'] = Lang::game('cooldown', [Util::formatTime($procData['cooldown'], true)]);
             }
 
             // Effect Name
