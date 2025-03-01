@@ -2124,11 +2124,11 @@ class SpellList extends BaseType
         {
             if ($addMask & GLOBALINFO_RELATED)
             {
-                foreach (ChrClass::fromMask($this->curTpl['reqClassMask']) as $id)
-                    $data[Type::CHR_CLASS][$id] = $id;
+                foreach (ChrClass::fromMask($this->curTpl['reqClassMask']) as $cId)
+                    $data[Type::CHR_CLASS][$cId] = $cId;
 
-                foreach (ChrRace::fromMask($this->curTpl['reqRaceMask']) as $id)
-                    $data[Type::CHR_RACE][$id] = $id;
+                foreach (ChrRace::fromMask($this->curTpl['reqRaceMask']) as $rId)
+                    $data[Type::CHR_RACE][$rId] = $rId;
 
                 // play sound effect
                 for ($i = 1; $i < 4; $i++)
