@@ -1028,10 +1028,10 @@ class QuestPage extends GenericPage
             ->prepare();
 
         if ($_ = $this->subject->getField('reqMinRepFaction'))
-            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, $this->typeId, [Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))]);
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMinRepValue'))]);
 
         if ($_ = $this->subject->getField('reqMaxRepFaction'))
-            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, $this->typeId, [-Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))]);
+            $cnd->addExternalCondition(Conditions::SRC_QUEST_AVAILABLE, '0:'.$this->typeId, [-Conditions::REPUTATION_RANK, $_, 1 << Game::getReputationLevelForPoints($this->subject->getField('reqMaxRepValue'))]);
 
         if ($tab = $cnd->toListviewTab())
         {

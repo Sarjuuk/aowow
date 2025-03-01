@@ -288,6 +288,9 @@ class Conditions
         while (substr_count($groupKey, ':') < 3)
             $groupKey .= ':0';                              // pad with missing srcEntry, SrcId, cndTarget to group key
 
+        if (!$this->prepareSource($srcType, ...explode(':', $groupKey)))
+            return;
+
         if ($c = $this->prepareCondition($cId, $cVal1, $cVal2, $cVal3))
         {
             if ($orGroup)
