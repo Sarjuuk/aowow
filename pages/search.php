@@ -138,14 +138,14 @@ class SearchPage extends GenericPage
                 continue;
             else if ($clean[0] == '-')
             {
-                if (mb_strlen($clean) < 4 && !Util::isLogographic(Lang::getLocale()->value))
+                if (mb_strlen($clean) < 4 && !Lang::getLocale()->isLogographic())
                     $this->invalid[] = mb_substr($raw, 1);
                 else
                     $this->excluded[] = mb_substr(str_replace('_', '\\_', $clean), 1);
             }
             else if ($clean !== '')
             {
-                if (mb_strlen($clean) < 3 && !Util::isLogographic(Lang::getLocale()->value))
+                if (mb_strlen($clean) < 3 && !Lang::getLocale()->isLogographic())
                     $this->invalid[] = $raw;
                 else
                     $this->included[] = str_replace('_', '\\_', $clean);
