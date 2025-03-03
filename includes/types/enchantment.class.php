@@ -8,16 +8,16 @@ class EnchantmentList extends BaseType
 {
     use listviewHelper;
 
-    public static   $type       = Type::ENCHANTMENT;
-    public static   $brickFile  = 'enchantment';
-    public static   $dataTable  = '?_itemenchantment';
+    public static      $type       = Type::ENCHANTMENT;
+    public static      $brickFile  = 'enchantment';
+    public static      $dataTable  = '?_itemenchantment';
 
-    private         $jsonStats  = [];
-    private SpellList $relSpells;
-    private         $triggerIds = [];
+    private array      $jsonStats  = [];
+    private ?SpellList $relSpells  = null;
+    private array      $triggerIds = [];
 
-    protected       $queryBase  = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
-    protected       $queryOpts  = array(                    // 502 => Type::ENCHANTMENT
+    protected          $queryBase  = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
+    protected          $queryOpts  = array(                    // 502 => Type::ENCHANTMENT
                         'ie'  => [['is']],
                         'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
                     );
