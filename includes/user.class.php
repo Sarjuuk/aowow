@@ -22,7 +22,7 @@ class User
     private static int    $excludeGroups = 1;
 
     public  static Locale $preferedLoc;
-    private static LocalProfileList $profiles;
+    private static ?LocalProfileList $profiles = null;
 
     public static function init()
     {
