@@ -10,7 +10,7 @@ class WorldEventList extends BaseType
     public static   $brickFile = 'event';
     public static   $dataTable = '?_events';
 
-    protected       $queryBase = 'SELECT e.*, h.*, e.description AS nameINT, e.id AS id, e.id AS ARRAY_KEY FROM ?_events e';
+    protected       $queryBase = 'SELECT e.holidayId, e.cuFlags, e.startTime, e.endTime, e.occurence, e.length, e.requires, e.description AS nameINT, e.id AS eventId, e.id AS ARRAY_KEY, h.* FROM ?_events e';
     protected       $queryOpts = array(
                         'e' => [['h']],
                         'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
@@ -60,7 +60,7 @@ class WorldEventList extends BaseType
         foreach ($replace as $old => $data)
         {
             unset($this->templates[$old]);
-            $this->templates[$data['id']] = $data;
+            $this->templates[$data['eventId']] = $data;
         }
     }
 
