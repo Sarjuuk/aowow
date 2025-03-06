@@ -510,7 +510,7 @@ class AjaxProfile extends AjaxHandler
             'level'             => $pBase['level'],
             'classs'            => $pBase['class'],
             'race'              => $pBase['race'],
-            'faction'           => ChrRace::tryFrom($pBase['race'])?->getSide() ?? SIDE_NONE,
+            'faction'           => ChrRace::tryFrom($pBase['race'])?->getTeam() ?? TEAM_NEUTRAL,
             'gender'            => $pBase['gender'],
             'skincolor'         => $pBase['skincolor'],
             'hairstyle'         => $pBase['hairstyle'],

@@ -487,6 +487,18 @@ enum ChrRace : int
             return SIDE_NONE;
     }
 
+    public function getTeam() : int
+    {
+        if ($this->isHorde() && $this->isAlliance())
+            return TEAM_NEUTRAL;
+        else if ($this->isHorde())
+            return TEAM_HORDE;
+        else if ($this->isAlliance())
+            return TEAM_ALLIANCE;
+        else
+            return TEAM_NEUTRAL;
+    }
+
     public function json() : string
     {
         return match ($this)
@@ -529,6 +541,23 @@ enum ChrRace : int
             return SIDE_ALLIANCE;
 
         return SIDE_BOTH;
+    }
+
+    public static function teamFromMask(int $raceMask) : int
+    {
+        // Any
+        if (!$raceMask || ($raceMask & self::MASK_ALL) == self::MASK_ALL)
+            return TEAM_NEUTRAL;
+
+        // Horde
+        if ($raceMask & self::MASK_HORDE && !($raceMask & self::MASK_ALLIANCE))
+            return TEAM_HORDE;
+
+        // Alliance
+        if ($raceMask & self::MASK_ALLIANCE && !($raceMask & self::MASK_HORDE))
+            return TEAM_ALLIANCE;
+
+        return TEAM_NEUTRAL;
     }
 }
 
