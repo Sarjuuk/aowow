@@ -3777,7 +3777,8 @@ var LANG = {
                         ],
         itemsource:     [
                             [1, "Beliebig"],                        [11, "Erfolg"],                         [3, "Hergestellt"],                     [4, "Drop"],                            [10, "Ereignis"],
-                            [5, "PvP"],                             [6, "Quest"],                           [9, "Startausrüstung"],                 [7, "Händler"],                         [2, "Nichts"]
+                            [5, "PvP"],                             [6, "Quest"],                           [9, "Startausrüstung"],                 [7, "Händler"],                         [12, "Geangelt"],
+                            [2, "Nichts"]
                         ],
         glyphtype:      [[  1, "Erhebliche"],                       [2, "Geringe"]                          ],
         classs:         [

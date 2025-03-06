@@ -1831,7 +1831,8 @@ class ItemListFilter extends Filter
              7 => 5,                                        // Vendor
              9 => 10,                                       // Starter
             10 => 11,                                       // Event
-            11 => 12                                        // Achievement
+            11 => 12,                                       // Achievement
+            12 => 16                                        // Fished
         )
     );
 
@@ -2258,6 +2259,8 @@ class ItemListFilter extends Filter
                 $mask = 1 << ($cr[1] - 1);
                 return ['AND', ['gemEnchantmentId', 0, '!'], ['gemColorMask', $mask, '&']];
         }
+
+        return false;
     }
 
     protected function cbGlyphType($cr) : mixed
@@ -2406,6 +2409,8 @@ class ItemListFilter extends Filter
         );
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
             return ['id', $items];
+
+        return false;
     }
 
     protected function cbSoldByNPC($cr) : mixed
@@ -2618,14 +2623,7 @@ class ItemListFilter extends Filter
             return $foo;
         }
         else                                                // none
-        {
-            $foo = ['AND'];
-            foreach ($this->enums[$cr[0]] as $bar)
-                if (is_int($bar))
-                    $foo[] = ['src.src'.$bar, null];
-
-            return $foo;
-        }
+            return ['src.typeId', null];
     }
 
     protected function cbTypeCheck(&$v) : bool

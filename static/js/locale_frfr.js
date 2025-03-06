@@ -3779,7 +3779,8 @@ var LANG = {
                         ],
         itemsource:     [
                             [1, "N'importe quelle"],                [11, "Haut fait"],                      [3, "Fabriqué"],                        [4, "Butin"],                           [10, "Événement"],
-                            [5, "JcJ"],                             [6, "Quête"],                           [9, "Débutant"],                        [7, "Vendeur"],                         [2, "Aucun"]
+                            [5, "JcJ"],                             [6, "Quête"],                           [9, "Débutant"],                        [7, "Vendeur"],                         [12, "Pêché"],
+                            [2, "Aucun"]
                         ],
         glyphtype:      [   [1, "Majeur"],                          [2, "Mineur"]                           ],
         classs:         [

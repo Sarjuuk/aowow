@@ -3778,7 +3778,8 @@ var LANG = {
                         ],
         itemsource:     [
                             [1, "Cualquiera"],                      [11, "Logro"],                          [3, "Creado"],                          [4, "Encontrado"],                      [10, "Evento"],
-                            [5, "JcJ"],                             [6, "Misión"],                          [9, "Habilidad Inicial"],               [7, "Vendedor"],                        [2, "Ninguno"]
+                            [5, "JcJ"],                             [6, "Misión"],                          [9, "Habilidad Inicial"],               [7, "Vendedor"],                        [12, "Pescado"],
+                            [2, "Ninguno"]
                         ],
         glyphtype:      [   [1, "Sublime"],                         [2, "Menor"]                            ],
         classs:         [

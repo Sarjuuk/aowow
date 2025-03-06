@@ -3825,7 +3825,8 @@ var LANG = {
                         ],
         itemsource:     [
                             [1, "Any"],                             [11, "Achievement"],                    [3, "Crafted"],                         [4, "Drop"],                            [10, "Event"],
-                            [5, "PvP"],                             [6, "Quest"],                           [9, "Starter"],                         [7, "Vendor"],                          [2, "None"]
+                            [5, "PvP"],                             [6, "Quest"],                           [9, "Starter"],                         [7, "Vendor"],                          [12, "Fished"],
+                            [2, "None"]
                         ],
         glyphtype:      [   [1, "Major"],                           [2, "Minor"]                            ],
         classs:         [
