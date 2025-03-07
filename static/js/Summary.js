@@ -2483,6 +2483,7 @@ Summary.prototype = {
             if (g_items[p]) {
                 var
                     s = g_items[p].jsonequip.itemset,
+                    t = g_items[p].jsonequip.slot,
                     _ = g_itemsets[s];
 
                 if (_) {
@@ -2491,7 +2492,9 @@ Summary.prototype = {
                     if (itemsetpcs[s] == null) {
                         itemsetpcs[s] = {};
                     }
-                    itemsetpcs[s][p] = 1;
+                    // aowow: group by slot, not itemId, to avoid multiple items of the same slot activating boni
+                    // itemsetpcs[s][p] = 1;
+                    itemsetpcs[s][t] = 1;
                     itemsetbak[s] = _;
                 }
             }

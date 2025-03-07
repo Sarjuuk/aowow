@@ -296,15 +296,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     $sorted[$k][$data['slot']] = $data;
             }
 
-            foreach ($sorted as $i => $set)
+            $i = 0;
+            foreach ($sorted as $set)
             {
                 ksort($set);
 
                 $vRow = $row;
                 $this->getDataFromSet($vRow, $set);
 
-                // is virtual set
-                if ($i)
+                // only assign a virtual setId to followup sets or the ItemSummary tool can't find the setboni
+                // is this the correct way..?
+                if ($i++)
                     $vRow['id'] = --$virtualId;
 
                 DB::Aowow()->query('INSERT INTO ?_itemset (?#) VALUES (?a)', array_keys($vRow), array_values($vRow));
