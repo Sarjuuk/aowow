@@ -1936,7 +1936,7 @@ class ItemListFilter extends Filter
         104 => [parent::CR_STRING,    'description',            STR_LOCALIZED                              ], // flavortext
         105 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   1                 ], // dropsinnormal [heroicdungeon-any]
         106 => [parent::CR_CALLBACK,  'cbDropsInInstance',      SRC_FLAG_DUNGEON_DROP,   2                 ], // dropsinheroic [heroicdungeon-any]
-        107 => [parent::CR_NYI_PH,    null,                     1,                                         ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $cr[2]]
+        107 => [parent::CR_NYI_PH,    null,                     1,                                         ], // effecttext [str]                 not yet parsed              ['effectsParsed_loc'.Lang::getLocale()->value, $crv]
         109 => [parent::CR_CALLBACK,  'cbArmorBonus',           null,                    null              ], // armorbonus [op] [int]
         111 => [parent::CR_NUMERIC,   'requiredSkillRank',      NUM_CAST_INT,            true              ], // reqskillrank
         113 => [parent::CR_FLAG,      'cuFlags',                CUSTOM_HAS_SCREENSHOT                      ], // hasscreenshots
@@ -2161,19 +2161,19 @@ class ItemListFilter extends Filter
 
             switch ($_v['si'])
             {
-                case  3:
+                case  SIDE_BOTH:
                     $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', ChrRace::MASK_ALL], ['requiredRace', 0]];
                     break;
-                case  2:
+                case  SIDE_HORDE:
                     $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 1]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_HORDE, '&']]];
                     break;
-                case -2:
+                case -SIDE_HORDE:
                     $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 1],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_HORDE, '&']]];
                     break;
-                case  1:
+                case  SIDE_ALLIANCE:
                     $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 2]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
                     break;
-                case -1:
+                case -SIDE_ALLIANCE:
                     $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 2],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
                     break;
             }
@@ -2198,86 +2198,64 @@ class ItemListFilter extends Filter
         return $parts;
     }
 
-    protected function cbFactionQuestReward($cr) : mixed
+    protected function cbFactionQuestReward(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 1:                                         // Yes
-                return ['src.src4', null, '!'];
-            case 2:                                         // Alliance
-                return ['src.src4', SIDE_ALLIANCE];
-            case 3:                                         // Horde
-                return ['src.src4', SIDE_HORDE];
-            case 4:                                         // Both
-                return ['src.src4', SIDE_BOTH];
-            case 5:                                         // No
-                return ['src.src4', null];
-        }
-
-        return false;
+            1 => ['src.src4', null, '!'],                   // Yes
+            2 => ['src.src4', SIDE_ALLIANCE],               // Alliance
+            3 => ['src.src4', SIDE_HORDE],                  // Horde
+            4 => ['src.src4', SIDE_BOTH],                   // Both
+            5 => ['src.src4', null],                        // No
+            default => null
+        };
     }
 
-    protected function cbAvailable($cr) : mixed
+    protected function cbAvailable(int $cr, int $crs, string $crv) : ?array
     {
-        if ($this->int2Bool($cr[1]))
-            return [['cuFlags', CUSTOM_UNAVAILABLE, '&'], 0, $cr[1] ? null : '!'];
+        if ($this->int2Bool($crs))
+            return [['cuFlags', CUSTOM_UNAVAILABLE, '&'], 0, $crs ? null : '!'];
 
-        return false;
+        return null;
     }
 
-    protected function cbHasSockets($cr) : mixed
+    protected function cbHasSockets(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 5:                                         // Yes
-                return ['is.nsockets', 0, '!'];
-            case 6:                                         // No
-                return ['is.nsockets', 0];
-            case 1:                                         // Meta
-            case 2:                                         // Red
-            case 3:                                         // Yellow
-            case 4:                                         // Blue
-                $mask = 1 << ($cr[1] - 1);
-                return ['OR', ['socketColor1', $mask], ['socketColor2', $mask], ['socketColor3', $mask]];
-        }
-
-        return false;
+            // Meta, Red, Yellow, Blue
+            1, 2, 3, 4 => ['OR', ['socketColor1', 1 << ($crs - 1)], ['socketColor2', 1 << ($crs - 1)], ['socketColor3', 1 << ($crs - 1)]],
+            5 => ['is.nsockets', 0, '!'],                   // Yes
+            6 => ['is.nsockets', 0],                        // No
+            default => null
+        };
     }
 
-    protected function cbFitsGemSlot($cr) : mixed
+    protected function cbFitsGemSlot(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 5:                                         // Yes
-                return ['gemEnchantmentId', 0, '!'];
-            case 6:                                         // No
-                return ['gemEnchantmentId', 0];
-            case 1:                                         // Meta
-            case 2:                                         // Red
-            case 3:                                         // Yellow
-            case 4:                                         // Blue
-                $mask = 1 << ($cr[1] - 1);
-                return ['AND', ['gemEnchantmentId', 0, '!'], ['gemColorMask', $mask, '&']];
-        }
-
-        return false;
+            // Meta, Red, Yellow, Blue
+            1, 2, 3, 4 => ['AND', ['gemEnchantmentId', 0, '!'], ['gemColorMask', 1 << ($crs - 1), '&']],
+            5 => ['gemEnchantmentId', 0, '!'],              // Yes
+            6 => ['gemEnchantmentId', 0],                   // No
+            default => null
+        };
     }
 
-    protected function cbGlyphType($cr) : mixed
+    protected function cbGlyphType(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 1:                                         // Major
-            case 2:                                         // Minor
-                return ['AND', ['class', ITEM_CLASS_GLYPH], ['subSubClass', $cr[1]]];
-        }
-
-        return false;
+            // major, minor
+            1, 2 => ['AND', ['class', ITEM_CLASS_GLYPH], ['subSubClass', $crs]],
+            default => null
+        };
     }
 
-    protected function cbHasRandEnchant($cr) : mixed
+    protected function cbHasRandEnchant(int $cr, int $crs, string $crv) : ?array
     {
-        $n = preg_replace(parent::PATTERN_NAME, '', $cr[2]);
+        $n = preg_replace(parent::PATTERN_NAME, '', $crv);
         $n = $this->transformString($n, false);
 
         $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
@@ -2305,103 +2283,103 @@ class ItemListFilter extends Filter
             return [0];                                     // no results aren't really input errors
     }
 
-    protected function cbReqArenaRating($cr) : mixed
+    protected function cbReqArenaRating(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        $this->formData['extraCols'][] = $cr[0];
+        $this->formData['extraCols'][] = $cr;
 
         $items = [0];
-        if ($costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE `reqPersonalrating` '.$cr[1].' '.$cr[2]))
+        if ($costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE `reqPersonalrating` '.$crs.' '.$crv))
             $items = DB::World()->selectCol($this->extCostQuery, $costs, $costs);
 
         return ['id', $items];
     }
 
-    protected function cbClassRaceSpec($cr, $field, $mask) : mixed
+    protected function cbClassRaceSpec(int $cr, int $crs, string $crv, string $field, int $mask) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if (is_bool($_))
             return $_ ? ['AND', [[$field, $mask, '&'], $mask, '!'], [$field, 0, '>']] : ['OR', [[$field, $mask, '&'], $mask], [$field, 0]];
         else if (is_int($_))
             return ['AND', [[$field, $mask, '&'], $mask, '!'], [$field, 1 << ($_ - 1), '&']];
 
-        return false;
+        return null;
     }
 
-    protected function cbDamageType($cr) : mixed
+    protected function cbDamageType(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->checkInput(parent::V_RANGE, [0, 6], $cr[1]))
-            return false;
+        if (!$this->checkInput(parent::V_RANGE, [SPELL_SCHOOL_NORMAL, SPELL_SCHOOL_ARCANE], $crs))
+            return null;
 
-        return ['OR', ['dmgType1', $cr[1]], ['dmgType2', $cr[1]]];
+        return ['OR', ['dmgType1', $crs], ['dmgType2', $crs]];
     }
 
-    protected function cbArmorBonus($cr) : mixed
+    protected function cbArmorBonus(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_FLOAT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_FLOAT) || !$this->int2Op($crs))
+            return null;
 
-        $this->formData['extraCols'][] = $cr[0];
-        return ['AND', ['armordamagemodifier', $cr[2], $cr[1]], ['class', ITEM_CLASS_ARMOR]];
+        $this->formData['extraCols'][] = $cr;
+        return ['AND', ['armordamagemodifier', $crv, $crs], ['class', ITEM_CLASS_ARMOR]];
     }
 
-    protected function cbCraftedByProf($cr) : mixed
+    protected function cbCraftedByProf(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if (is_bool($_))
             return ['src.src1', null, $_ ? '!' : null];
         else if (is_int($_))
             return ['s.skillLine1', $_];
 
-        return false;
+        return null;
     }
 
-    protected function cbQuestRewardIn($cr) : mixed
+    protected function cbQuestRewardIn(int $cr, int $crs, string $crv) : ?array
     {
-        if (in_array($cr[1], $this->enums[$cr[0]]))
-            return ['AND', ['src.src4', null, '!'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == parent::ENUM_ANY)
+        if (in_array($crs, $this->enums[$cr]))
+            return ['AND', ['src.src4', null, '!'], ['src.moreZoneId', $crs]];
+        else if ($crs == parent::ENUM_ANY)
             return ['src.src4', null, '!'];                 // well, this seems a bit redundant..
 
-        return false;
+        return null;
     }
 
-    protected function cbDropsInZone($cr) : mixed
+    protected function cbDropsInZone(int $cr, int $crs, string $crv) : ?array
     {
-        if (in_array($cr[1], $this->enums[$cr[0]]))
-            return ['AND', ['src.src2', null, '!'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == parent::ENUM_ANY)
+        if (in_array($crs, $this->enums[$cr]))
+            return ['AND', ['src.src2', null, '!'], ['src.moreZoneId', $crs]];
+        else if ($crs == parent::ENUM_ANY)
             return ['src.src2', null, '!'];                 // well, this seems a bit redundant..
 
-        return false;
+        return null;
     }
 
-    protected function cbDropsInInstance($cr, $moreFlag, $modeBit) : mixed
+    protected function cbDropsInInstance(int $cr, int $crs, string $crv, int $moreFlag, int $modeBit) : ?array
     {
-        if (in_array($cr[1], $this->enums[$cr[0]]))
-            return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&'], ['src.moreZoneId', $cr[1]]];
-        else if ($cr[1] == parent::ENUM_ANY)
+        if (in_array($crs, $this->enums[$cr]))
+            return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&'], ['src.moreZoneId', $crs]];
+        else if ($crs == parent::ENUM_ANY)
             return ['AND', ['src.src2', $modeBit, '&'], ['src.moreMask', $moreFlag, '&']];
 
-        return false;
+        return null;
     }
 
-    protected function cbPurchasableWith($cr) : mixed
+    protected function cbPurchasableWith(int $cr, int $crs, string $crv) : ?array
     {
-        if (in_array($cr[1], $this->enums[$cr[0]]))
-            $_ = (array)$cr[1];
-        else if ($cr[1] == parent::ENUM_ANY)
-            $_ = $this->enums[$cr[0]];
+        if (in_array($crs, $this->enums[$cr]))
+            $_ = (array)$crs;
+        else if ($crs == parent::ENUM_ANY)
+            $_ = $this->enums[$cr];
         else
-            return false;
+            return null;
 
         $costs = DB::Aowow()->selectCol(
             'SELECT `id` FROM ?_itemextendedcost WHERE `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)',
@@ -2410,30 +2388,30 @@ class ItemListFilter extends Filter
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
             return ['id', $items];
 
-        return false;
+        return null;
     }
 
-    protected function cbSoldByNPC($cr) : mixed
+    protected function cbSoldByNPC(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT))
+            return null;
 
-        if ($iIds = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` = ?d UNION SELECT `item` FROM game_event_npc_vendor v JOIN creature c ON c.`guid` = v.`guid` WHERE c.`id` = ?d', $cr[2], $cr[2]))
+        if ($iIds = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` = ?d UNION SELECT `item` FROM game_event_npc_vendor v JOIN creature c ON c.`guid` = v.`guid` WHERE c.`id` = ?d', $crv, $crv))
             return ['i.id', $iIds];
         else
             return [0];
     }
 
-    protected function cbAvgBuyout($cr) : mixed
+    protected function cbAvgBuyout(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         foreach (Profiler::getRealms() as $rId => $__)
         {
             // todo: do something sensible..
             // // todo (med): get the avgbuyout into the listview
-            // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING buyout '.$cr[1].' ?f', $c[1]))
+            // if ($_ = DB::Characters()->select('SELECT ii.itemEntry AS ARRAY_KEY, AVG(ah.buyoutprice / ii.count) AS buyout FROM auctionhouse ah JOIN item_instance ii ON ah.itemguid = ii.guid GROUP BY ii.itemEntry HAVING buyout '.$crs.' ?f', $c[1]))
                 // return ['i.id', array_keys($_)];
             // else
                 // return [0];
@@ -2443,123 +2421,122 @@ class ItemListFilter extends Filter
         return [0];
     }
 
-    protected function cbAvgMoneyContent($cr) : mixed
+    protected function cbAvgMoneyContent(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        $this->formData['extraCols'][] = $cr[0];
-        return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $cr[2], $cr[1]]];
+        $this->formData['extraCols'][] = $cr;
+        return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $crv, $crs]];
     }
 
-    protected function cbCooldown($cr) : mixed
+    protected function cbCooldown(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        $cr[2] *= 1000;                                     // field supplied in milliseconds
+        $crv *= 1000;                                       // field supplied in milliseconds
 
-        $this->formData['extraCols'][] = $cr[0];
-        $this->extraOpts['is']['s'][]  = ', GREATEST(spellCooldown1, spellCooldown2, spellCooldown3, spellCooldown4, spellCooldown5) AS cooldown';
+        $this->formData['extraCols'][] = $cr;
+        $this->extraOpts['is']['s'][]  = ', GREATEST(`spellCooldown1`, `spellCooldown2`, `spellCooldown3`, `spellCooldown4`, `spellCooldown5`) AS "cooldown"';
 
         return [
             'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_USE], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_USE], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_USE], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_USE], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $cr[2], $cr[1]]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_USE], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $cr[2], $cr[1]]],
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_USE], ['spellId1', 0, '!'], ['spellCooldown1', 0, '>'], ['spellCooldown1', $crv, $crs]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_USE], ['spellId2', 0, '!'], ['spellCooldown2', 0, '>'], ['spellCooldown2', $crv, $crs]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_USE], ['spellId3', 0, '!'], ['spellCooldown3', 0, '>'], ['spellCooldown3', $crv, $crs]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_USE], ['spellId4', 0, '!'], ['spellCooldown4', 0, '>'], ['spellCooldown4', $crv, $crs]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_USE], ['spellId5', 0, '!'], ['spellCooldown5', 0, '>'], ['spellCooldown5', $crv, $crs]],
         ];
     }
 
-    protected function cbQuestRelation($cr) : mixed
+    protected function cbQuestRelation(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 1:                                         // any
-                return ['startQuest', 0, '>'];
-            case 2:                                         // exclude horde only
-                return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_HORDE]];
-            case 3:                                         // exclude alliance only
-                return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_ALLIANCE]];
-            case 4:                                         // both
-                return ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]];
-            case 5:                                         // none
-                return ['startQuest', 0];
-        }
-
-        return false;
+            // any
+            1 => ['startQuest', 0, '>'],
+            // exclude horde only
+            2 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_HORDE]],
+            // exclude alliance only
+            3 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], SIDE_ALLIANCE]],
+            // both
+            4 => ['AND', ['startQuest', 0, '>'], [['flagsExtra', 0x3, '&'], 0]],
+            // none
+            5 => ['startQuest', 0],
+            default => null
+        };
     }
 
-    protected function cbFieldHasVal($cr, $field, $val) : mixed
+    protected function cbFieldHasVal(int $cr, int $crs, string $crv, string $field, mixed $val) : ?array
     {
-        if ($this->int2Bool($cr[1]))
-            return [$field, $val, $cr[1] ? null : '!'];
+        if ($this->int2Bool($crs))
+            return [$field, $val, $crs ? null : '!'];
 
-        return false;
+        return null;
     }
 
-    protected function cbObtainedBy($cr, $field) : mixed
+    protected function cbObtainedBy(int $cr, int $crs, string $crv, string $field) : ?array
     {
-        if ($this->int2Bool($cr[1]))
-            return ['src.src'.$field, null, $cr[1] ? '!' : null];
+        if ($this->int2Bool($crs))
+            return ['src.src'.$field, null, $crs ? '!' : null];
 
-        return false;
+        return null;
     }
 
-    protected function cbPvpPurchasable($cr, $field) : mixed
+    protected function cbPvpPurchasable(int $cr, int $crs, string $crv, string $field) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
         $costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE ?# > 0', $field);
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))
-            return ['id', $items, $cr[1] ? null : '!'];
+            return ['id', $items, $crs ? null : '!'];
 
-        return false;
+        return null;
     }
 
-    protected function cbDisenchantsInto($cr) : mixed
+    protected function cbDisenchantsInto(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
 
-        if (!in_array($cr[1], $this->enums[$cr[0]]))
-            return false;
+        if (!in_array($crs, $this->enums[$cr]))
+            return null;
 
         $refResults = [];
-        $newRefs = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `item` = ?d AND `reference` = 0', LOOT_REFERENCE, $cr[1]);
+        $newRefs = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `item` = ?d AND `reference` = 0', LOOT_REFERENCE, $crs);
         while ($newRefs)
         {
             $refResults += $newRefs;
             $newRefs     = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `reference` IN (?a)', LOOT_REFERENCE, $newRefs);
         }
 
-        $lootIds = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE {`reference` IN (?a) OR }(`reference` = 0 AND `item` = ?d)', LOOT_DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $cr[1]);
+        $lootIds = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE {`reference` IN (?a) OR }(`reference` = 0 AND `item` = ?d)', LOOT_DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $crs);
 
         return $lootIds ? ['disenchantId', $lootIds] : [0];
     }
 
-    protected function cbObjectiveOfQuest($cr) : mixed
+    protected function cbObjectiveOfQuest(int $cr, int $crs, string $crv) : ?array
     {
         $w = '';
-        switch ($cr[1])
+        switch ($crs)
         {
-            case 1:                                 // Yes
-            case 5:                                 // No
+            case 1:                                         // Yes
+            case 5:                                         // No
                 $w = 1;
                 break;
-            case 2:                                 // Alliance
+            case 2:                                         // Alliance
                 $w = '`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND (`reqRaceMask` & '.ChrRace::MASK_HORDE.') = 0';
                 break;
-            case 3:                                 // Horde
+            case 3:                                         // Horde
                 $w = '`reqRaceMask` & '.ChrRace::MASK_HORDE.' AND (`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.') = 0';
                 break;
-            case 4:                                 // Both
+            case 4:                                         // Both
                 $w = '(`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND `reqRaceMask` & '.ChrRace::MASK_HORDE.') OR `reqRaceMask` = 0';
                 break;
             default:
-                return false;
+                return null;
         }
 
         $itemIds = DB::Aowow()->selectCol(sprintf(
@@ -2570,19 +2547,19 @@ class ItemListFilter extends Filter
         ));
 
         if ($itemIds)
-            return ['id', $itemIds, $cr[1] == 5 ? '!' : null];
+            return ['id', $itemIds, $crs == 5 ? '!' : null];
 
         return [0];
     }
 
-    protected function cbReagentForAbility($cr) : mixed
+    protected function cbReagentForAbility(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if ($_ === null)
-            return false;
+            return null;
 
         $ids    = [];
         $spells = DB::Aowow()->select(          // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
@@ -2605,18 +2582,18 @@ class ItemListFilter extends Filter
             return ['id', $ids, '!'];
     }
 
-    protected function cbSource($cr) : mixed
+    protected function cbSource(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if (is_int($_))                                     // specific
             return ['src.src'.$_, null, '!'];
         else if ($_)                                        // any
         {
             $foo = ['OR'];
-            foreach ($this->enums[$cr[0]] as $bar)
+            foreach ($this->enums[$cr] as $bar)
                 if (is_int($bar))
                     $foo[] = ['src.src'.$bar, null, '!'];
 
@@ -2626,7 +2603,7 @@ class ItemListFilter extends Filter
             return ['src.typeId', null];
     }
 
-    protected function cbTypeCheck(&$v) : bool
+    protected function cbTypeCheck(string &$v) : bool
     {
         if (!$this->parentCats)
             return false;
@@ -2659,7 +2636,7 @@ class ItemListFilter extends Filter
         return false;
     }
 
-    protected function cbSlotCheck(&$v) : bool
+    protected function cbSlotCheck(string &$v) : bool
     {
         if (!Util::checkNumeric($v, NUM_CAST_INT))
             return false;
@@ -2687,7 +2664,7 @@ class ItemListFilter extends Filter
         return false;
     }
 
-    protected function cbWeightKeyCheck(&$v) : bool
+    protected function cbWeightKeyCheck(string &$v) : bool
     {
         if (preg_match('/\W/i', $v))
             return false;

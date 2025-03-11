@@ -2498,12 +2498,12 @@ class SpellListFilter extends Filter
         return $parts;
     }
 
-    public function getGenericFilter($cr)                   // access required by SpellDetailPage's SpellAttributes list
+    public function getGenericFilter(int $cr) : array       // access required by SpellDetailPage's SpellAttributes list
     {
         return $this->genericFilter[$cr] ?? [];
     }
 
-    protected function cbClasses(&$val)
+    protected function cbClasses(string &$val) : bool
     {
         if (!$this->parentCats || !in_array($this->parentCats[0], [-13, -2, 7]))
             return false;
@@ -2512,12 +2512,12 @@ class SpellListFilter extends Filter
             return false;
 
         $type  = parent::V_LIST;
-        $valid = [[1, 9], 11];
+        $valid = ChrClass::fromMask(ChrClass::MASK_ALL);
 
         return $this->checkInput($type, $valid, $val);
     }
 
-    protected function cbGlyphs(&$val)
+    protected function cbGlyphs(string &$val) : bool
     {
         if (!$this->parentCats || $this->parentCats[0] != -13)
             return false;
@@ -2531,120 +2531,126 @@ class SpellListFilter extends Filter
         return $this->checkInput($type, $valid, $val);
     }
 
-    protected function cbCost($cr)
+    protected function cbCost(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         return ['OR',
-            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $cr[2]), $cr[1]]],
-            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $cr[2], $cr[1]]]
+            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER]], ['powerCost', (10 * $crv), $crs]],
+            ['AND', ['powerType', [POWER_RAGE, POWER_RUNIC_POWER], '!'], ['powerCost', $crv, $crs]]
         ];
     }
 
-    protected function cbSource($cr)
+    protected function cbSource(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
-        if (is_int($_))                         // specific
+        $_ = $this->enums[$cr][$crs];
+        if (is_int($_))                                     // specific
             return ['src.src'.$_, null, '!'];
-        else if ($_)                            // any
-            return ['OR', ['src.src1', null, '!'], ['src.src2', null, '!'], ['src.src4', null, '!'], ['src.src5', null, '!'], ['src.src6', null, '!'], ['src.src7', null, '!'], ['src.src9', null, '!'], ['src.src10', null, '!']];
-        else if (!$_)                           // none
-            return ['AND', ['src.src1', null], ['src.src2', null], ['src.src4', null], ['src.src5', null], ['src.src6', null], ['src.src7', null], ['src.src9', null], ['src.src10', null]];
+        else if ($_)                                        // any
+        {
+            $foo = ['OR'];
+            foreach ($this->enums[$cr] as $bar)
+                if (is_int($bar))
+                    $foo[] = ['src.src'.$bar, null, '!'];
 
-        return false;
+            return $foo;
+        }
+        else                                                // none
+            return ['src.typeId', null];
+
+        return null;
     }
 
-    protected function cbReagents($cr)
+    protected function cbReagents(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['OR', ['reagent1', 0, '>'], ['reagent2', 0, '>'], ['reagent3', 0, '>'], ['reagent4', 0, '>'], ['reagent5', 0, '>'], ['reagent6', 0, '>'], ['reagent7', 0, '>'], ['reagent8', 0, '>']];
         else
             return ['AND', ['reagent1', 0], ['reagent2', 0], ['reagent3', 0], ['reagent4', 0], ['reagent5', 0], ['reagent6', 0], ['reagent7', 0], ['reagent8', 0]];
     }
 
-    protected function cbAuraNames($cr)
+    protected function cbAuraNames(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_AURA], $cr[1]))
-            return false;
+        if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_AURA], $crs))
+            return null;
 
-        return ['OR', ['effect1AuraId', $cr[1]], ['effect2AuraId', $cr[1]], ['effect3AuraId', $cr[1]]];
+        return ['OR', ['effect1AuraId', $crs], ['effect2AuraId', $crs], ['effect3AuraId', $crs]];
     }
 
-    protected function cbEffectNames($cr)
+    protected function cbEffectNames(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_EFFECT], $cr[1]))
-            return false;
+        if (!$this->checkInput(parent::V_RANGE, [1, self::MAX_SPELL_EFFECT], $crs))
+            return null;
 
-        return ['OR', ['effect1Id', $cr[1]], ['effect2Id', $cr[1]], ['effect3Id', $cr[1]]];
+        return ['OR', ['effect1Id', $crs], ['effect2Id', $crs], ['effect3Id', $crs]];
     }
 
-    protected function cbInverseFlag($cr, $field, $flag)
+    protected function cbInverseFlag(int $cr, int $crs, string $crv, string $field, int $flag) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return [[$field, $flag, '&'], 0];
         else
             return [$field, $flag, '&'];
     }
 
-    protected function cbSpellstealable($cr, $field, $flag)
+    protected function cbSpellstealable(int $cr, int $crs, string $crv, string $field, int $flag) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['AND', [[$field, $flag, '&'], 0], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC]];
         else
             return ['OR', [$field, $flag, '&'], ['dispelType', SPELL_DAMAGE_CLASS_MAGIC, '!']];
     }
 
-    protected function cbReqFaction($cr)
+    protected function cbReqFaction(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 1:                                         // yes
-                return ['reqRaceMask', 0, '!'];
-            case 2:                                         // alliance
-                return ['AND', [['reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
-            case 3:                                         // horde
-                return ['AND', [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
-            case 4:                                         // both
-                return ['AND', ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
-            case 5:                                         // no
-                return ['reqRaceMask', 0];
-            default:
-                return false;
-        }
+            // yes
+            1 => ['reqRaceMask', 0, '!'],
+            // alliance
+            2 => ['AND', [['reqRaceMask', ChrRace::MASK_HORDE, '&'], 0], ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
+            // horde
+            3 => ['AND', [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], 0], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+            // both
+            4 => ['AND', ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+            // no
+            5 => ['reqRaceMask', 0],
+            default => null
+        };
     }
 
-    protected function cbEquippedWeapon($cr, $mask, $useInvType)
+    protected function cbEquippedWeapon(int $cr, int $crs, string $crv, int $mask, bool $useInvType) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
         $field = $useInvType ? 'equippedItemInventoryTypeMask' : 'equippedItemSubClassMask';
 
-        if ($cr[1])
+        if ($crs)
             return ['AND', ['equippedItemClass', ITEM_CLASS_WEAPON], [$field, $mask, '&']];
         else
             return ['OR', ['equippedItemClass', ITEM_CLASS_WEAPON, '!'], [[$field, $mask, '&'], 0]];
     }
 
-    protected function cbUsableInArena($cr)
+    protected function cbUsableInArena(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return  ['AND',
                         [['attributes4', SPELL_ATTR4_NOT_USABLE_IN_ARENA, '&'], 0],
                         ['OR', ['recoveryTime', 10 * MINUTE * 1000, '<='], ['attributes4', SPELL_ATTR4_USABLE_IN_ARENA, '&']]
@@ -2656,12 +2662,12 @@ class SpellListFilter extends Filter
                     ];
     }
 
-    protected function cbBandageSpell($cr)
+    protected function cbBandageSpell(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])                                         // match exact, not as flag
+        if ($crs)                                         // match exact, not as flag
             return ['AND', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET], ['effect1ImplicitTargetA', 21]];
         else
             return ['OR', ['attributes1', SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET, '!'], ['effect1ImplicitTargetA', 21, '!']];

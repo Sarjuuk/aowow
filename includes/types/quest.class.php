@@ -555,138 +555,138 @@ class QuestListFilter extends Filter
         return $parts;
     }
 
-    protected function cbReputation($cr, $sign)
+    protected function cbReputation(int $cr, int $crs, string $crv, string $sign) : ?array
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
 
-        if (!in_array($cr[1], $this->enums[$cr[0]]))
-            return false;
+        if (!in_array($crs, $this->enums[$cr]))
+            return null;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $cr[1]))
-            $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
+            $this->formData['reputationCols'][] = [$crs, Util::localizedString($_, 'name')];
 
         return [
             'OR',
-            ['AND', ['rewardFactionId1', $cr[1]], ['rewardFactionValue1', 0, $sign]],
-            ['AND', ['rewardFactionId2', $cr[1]], ['rewardFactionValue2', 0, $sign]],
-            ['AND', ['rewardFactionId3', $cr[1]], ['rewardFactionValue3', 0, $sign]],
-            ['AND', ['rewardFactionId4', $cr[1]], ['rewardFactionValue4', 0, $sign]],
-            ['AND', ['rewardFactionId5', $cr[1]], ['rewardFactionValue5', 0, $sign]]
+            ['AND', ['rewardFactionId1', $crs], ['rewardFactionValue1', 0, $sign]],
+            ['AND', ['rewardFactionId2', $crs], ['rewardFactionValue2', 0, $sign]],
+            ['AND', ['rewardFactionId3', $crs], ['rewardFactionValue3', 0, $sign]],
+            ['AND', ['rewardFactionId4', $crs], ['rewardFactionValue4', 0, $sign]],
+            ['AND', ['rewardFactionId5', $crs], ['rewardFactionValue5', 0, $sign]]
         ];
     }
 
-    protected function cbQuestRelation($cr, $flags)
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, $flags) : ?array
     {
-        return match ($cr[1])
+        return match ($crs)
         {
             Type::NPC,
             Type::OBJECT,
-            Type::ITEM   => ['AND', ['qse.type', $cr[1]], ['qse.method', $flags, '&']],
-            default      => false
+            Type::ITEM   => ['AND', ['qse.type', $crs], ['qse.method', $flags, '&']],
+            default      => null
         };
     }
 
-    protected function cbCurrencyReward($cr)
+    protected function cbCurrencyReward(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
 
-        if (!in_array($cr[1], $this->enums[$cr[0]]))
-            return false;
+        if (!in_array($crs, $this->enums[$cr]))
+            return null;
 
         return [
             'OR',
-            ['rewardItemId1', $cr[1]], ['rewardItemId2', $cr[1]], ['rewardItemId3', $cr[1]], ['rewardItemId4', $cr[1]],
-            ['rewardChoiceItemId1', $cr[1]], ['rewardChoiceItemId2', $cr[1]], ['rewardChoiceItemId3', $cr[1]], ['rewardChoiceItemId4', $cr[1]], ['rewardChoiceItemId5', $cr[1]], ['rewardChoiceItemId6', $cr[1]]
+            ['rewardItemId1', $crs], ['rewardItemId2', $crs], ['rewardItemId3', $crs], ['rewardItemId4', $crs],
+            ['rewardChoiceItemId1', $crs], ['rewardChoiceItemId2', $crs], ['rewardChoiceItemId3', $crs], ['rewardChoiceItemId4', $crs], ['rewardChoiceItemId5', $crs], ['rewardChoiceItemId6', $crs]
         ];
     }
 
-    protected function cbAvailable($cr)
+    protected function cbAvailable(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return [['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0];
         else
             return ['cuFlags', CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'];
     }
 
-    protected function cbRepeatable($cr)
+    protected function cbRepeatable(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['OR', ['flags', QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&']];
         else
             return ['AND', [['flags', QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE, '&'], 0]];
     }
 
-    protected function cbItemChoices($cr)
+    protected function cbItemChoices(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        $this->extraOpts['q']['s'][] = ', (IF(rewardChoiceItemId1, 1, 0) + IF(rewardChoiceItemId2, 1, 0) + IF(rewardChoiceItemId3, 1, 0) + IF(rewardChoiceItemId4, 1, 0) + IF(rewardChoiceItemId5, 1, 0) + IF(rewardChoiceItemId6, 1, 0)) as numChoices';
-        $this->extraOpts['q']['h'][] = 'numChoices '.$cr[1].' '.$cr[2];
+        $this->extraOpts['q']['s'][] = ', (IF(`rewardChoiceItemId1`, 1, 0) + IF(`rewardChoiceItemId2`, 1, 0) + IF(`rewardChoiceItemId3`, 1, 0) + IF(`rewardChoiceItemId4`, 1, 0) + IF(`rewardChoiceItemId5`, 1, 0) + IF(`rewardChoiceItemId6`, 1, 0)) AS "numChoices"';
+        $this->extraOpts['q']['h'][] = '`numChoices` '.$crs.' '.$crv;
         return [1];
     }
 
-    protected function cbItemRewards($cr)
+    protected function cbItemRewards(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        $this->extraOpts['q']['s'][] = ', (IF(rewardItemId1, 1, 0) + IF(rewardItemId2, 1, 0) + IF(rewardItemId3, 1, 0) + IF(rewardItemId4, 1, 0)) as numRewards';
-        $this->extraOpts['q']['h'][] = 'numRewards '.$cr[1].' '.$cr[2];
+        $this->extraOpts['q']['s'][] = ', (IF(`rewardItemId1`, 1, 0) + IF(`rewardItemId2`, 1, 0) + IF(`rewardItemId3`, 1, 0) + IF(`rewardItemId4`, 1, 0)) AS "numRewards"';
+        $this->extraOpts['q']['h'][] = '`numRewards` '.$crs.' '.$crv;
         return [1];
     }
 
-    protected function cbLoremaster($cr)
+    protected function cbLoremaster(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['AND', ['zoneOrSort', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
         else
             return ['OR', ['zoneOrSort', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
     }
 
-    protected function cbSpellRewards($cr)
+    protected function cbSpellRewards(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['OR', ['sourceSpellId', 0, '>'], ['rewardSpell', 0, '>'], ['rsc.effect1Id', SpellList::EFFECTS_TEACH], ['rsc.effect2Id', SpellList::EFFECTS_TEACH], ['rsc.effect3Id', SpellList::EFFECTS_TEACH]];
         else
             return ['AND', ['sourceSpellId', 0], ['rewardSpell', 0], ['rewardSpellCast', 0]];
     }
 
-    protected function cbEarnReputation($cr)
+    protected function cbEarnReputation(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
 
-        if ($cr[1] == parent::ENUM_ANY)              // any
+        if ($crs == parent::ENUM_ANY)
             return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
-        else if ($cr[1] == parent::ENUM_NONE)        // none
+        else if ($crs == parent::ENUM_NONE)
             return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
-        else if (in_array($cr[1], $this->enums[$cr[0]]))
-            return ['OR', ['reqFactionId1', $cr[1]], ['reqFactionId2', $cr[1]]];
+        else if (in_array($crs, $this->enums[$cr]))
+            return ['OR', ['reqFactionId1', $crs], ['reqFactionId2', $crs]];
 
-        return false;
+        return null;
     }
 
-    protected function cbClassSpec($cr)
+    protected function cbClassSpec(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if ($_ === true)
             return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
         else if ($_ === false)
@@ -694,15 +694,15 @@ class QuestListFilter extends Filter
         else if (is_int($_))
             return ['AND', ['reqClassMask', ChrClass::from($_)->toMask(), '&'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
 
-        return false;
+        return null;
     }
 
-    protected function cbRaceSpec($cr)
+    protected function cbRaceSpec(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if ($_ === true)
             return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
         else if ($_ === false)
@@ -710,16 +710,16 @@ class QuestListFilter extends Filter
         else if (is_int($_))
             return ['AND', ['reqRaceMask', ChrRace::from($_)->toMask(), '&'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
 
-        return false;
+        return null;
     }
 
-    protected function cbLacksStartEnd($cr)
+    protected function cbLacksStartEnd(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
         $missing = DB::Aowow()->selectCol('SELECT `questId`, BIT_OR(`method`) AS "se" FROM ?_quests_startend GROUP BY `questId` HAVING "se" <> 3');
-        if ($cr[1])
+        if ($crs)
             return ['id', $missing];
         else
             return ['id', $missing, '!'];

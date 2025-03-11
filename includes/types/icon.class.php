@@ -137,7 +137,7 @@ class IconListFilter extends Filter
         'ma'  => [parent::V_EQUAL, 1,                       false]  // match any / all filter
     );
 
-    private function _getCnd($op, $val, $tbl)
+    private function _getCnd(string $op, int $val, string $tbl) : ?array
     {
         switch ($op)
         {
@@ -158,6 +158,8 @@ class IconListFilter extends Filter
                 if ($val)
                     $op = '=';
                 break;
+            default:
+                return null;
         }
 
         $ids = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId` HAVING n '.$op.' '.$val, $tbl);
@@ -177,18 +179,18 @@ class IconListFilter extends Filter
         return $parts;
     }
 
-    protected function cbUseAny($cr, $value)
+    protected function cbUseAny(int $cr, int $crs, string $crv) : ?array
     {
-        if (Util::checkNumeric($cr[2], NUM_CAST_INT) && $this->int2Op($cr[1]))
-            return $this->_getCnd($cr[1], $cr[2], $this->criterion2field[$cr[0]]);
+        if (Util::checkNumeric($crv, NUM_CAST_INT) && $this->int2Op($crs))
+            return $this->_getCnd($crs, $crv, $this->criterion2field[$cr]);
 
-        return false;
+        return null;
     }
 
-    protected function cbUseAll($cr)
+    protected function cbUseAll(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         if (!$this->totalUses)
         {
@@ -202,19 +204,19 @@ class IconListFilter extends Filter
             }
         }
 
-        if ($cr[1] == '=')
-            $cr[1] = '==';
+        if ($crs == '=')
+            $crs = '==';
 
-        $op = $cr[1];
-        if ($cr[1] == '<=' && $cr[2])
+        $op = $crs;
+        if ($crs == '<=' && $crv)
             $op = '>';
-        else if ($cr[1] == '<' && $cr[2])
+        else if ($crs == '<' && $crv)
             $op = '>=';
-        else if ($cr[1] == '!=' && $cr[2])
+        else if ($crs == '!=' && $crv)
             $op = '==';
-        $ids = array_filter($this->totalUses, fn($x) => eval('return '.$x.' '.$op.' '.$cr[2].';'));
+        $ids = array_filter($this->totalUses, fn($x) => eval('return '.$x.' '.$op.' '.$crv.';'));
 
-        if ($cr[1] != $op)
+        if ($crs != $op)
             return $ids ? ['id', array_keys($ids), '!'] : [1];
         else
             return $ids ? ['id', array_keys($ids)] : ['id', array_keys($this->totalUses), '!'];

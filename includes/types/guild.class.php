@@ -115,15 +115,15 @@ class GuildListFilter extends Filter
         if (!empty($_v['si']))
         {
             if ($_v['si'] == SIDE_ALLIANCE)
-                $parts[] = ['c.race', [1, 3, 4, 7, 11]];
+                $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
             else if ($_v['si'] == SIDE_HORDE)
-                $parts[] = ['c.race', [2, 5, 6, 8, 10]];
+                $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
         }
 
         return $parts;
     }
 
-    protected function cbRegionCheck(&$v)
+    protected function cbRegionCheck(string &$v) : bool
     {
         if (in_array($v, Util::$regions))
         {
@@ -136,7 +136,7 @@ class GuildListFilter extends Filter
         return false;
     }
 
-    protected function cbServerCheck(&$v)
+    protected function cbServerCheck(string &$v) : bool
     {
         foreach (Profiler::getRealms() as $realm)
             if ($realm['name'] == $v)

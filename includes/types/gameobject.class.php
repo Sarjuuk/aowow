@@ -186,17 +186,17 @@ class GameObjectListFilter extends Filter
         return $parts;
     }
 
-    protected function cbOpenable($cr)
+    protected function cbOpenable(int $cr, int $crs, string $crv) : ?array
     {
-        if ($this->int2Bool($cr[1]))
-            return $cr[1] ? ['OR', ['flags', 0x2, '&'], ['type', 3]] : ['AND', [['flags', 0x2, '&'], 0], ['type', 3, '!']];
+        if ($this->int2Bool($crs))
+            return $crs ? ['OR', ['flags', 0x2, '&'], ['type', 3]] : ['AND', [['flags', 0x2, '&'], 0], ['type', 3, '!']];
 
-        return false;
+        return null;
     }
 
-    protected function cbQuestRelation($cr, $field, $value)
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, $field, $value) : ?array
     {
-        switch ($cr[1])
+        switch ($crs)
         {
             case 1:                                 // any
                 return ['AND', ['qse.method', $value, '&'], ['qse.questId', null, '!']];
@@ -211,12 +211,12 @@ class GameObjectListFilter extends Filter
                 return [1];
         }
 
-        return false;
+        return null;
     }
 
-    protected function cbRelEvent($cr)
+    protected function cbRelEvent(int $cr, int $crs, string $crv) : ?array
     {
-        if ($cr[1] == parent::ENUM_ANY)
+        if ($crs == parent::ENUM_ANY)
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` <> 0'))
                 if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN (?a)', $eventIds))
@@ -224,7 +224,7 @@ class GameObjectListFilter extends Filter
 
             return [0];
         }
-        else if ($cr[1] == parent::ENUM_NONE)
+        else if ($crs == parent::ENUM_NONE)
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` <> 0'))
                 if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN (?a)', $eventIds))
@@ -232,16 +232,16 @@ class GameObjectListFilter extends Filter
 
             return [0];
         }
-        else if (in_array($cr[1], $this->enums[$cr[0]]))
+        else if (in_array($crs, $this->enums[$cr]))
         {
-            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` = ?d', $cr[1]))
+            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` = ?d', $crs))
                 if ($goGuids  = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_gameobject WHERE `eventEntry` IN (?a)', $eventIds))
                     return ['s.guid', $goGuids];
 
             return [0];
         }
 
-        return false;
+        return null;
     }
 }
 

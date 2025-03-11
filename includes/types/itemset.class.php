@@ -242,17 +242,14 @@ class ItemsetListFilter extends Filter
         return $parts;
     }
 
-    protected function cbAvaliable($cr)
+    protected function cbAvaliable(int $cr, int $crs, string $crv) : ?array
     {
-        switch ($cr[1])
+        return match ($crs)
         {
-            case 1:                                         // Yes
-                return ['src.typeId', null, '!'];
-            case 2:                                         // No
-                return ['src.typeId', null];
-        }
-
-        return false;
+            1 => ['src.typeId', null, '!'],                 // Yes
+            2 => ['src.typeId', null],                      // No
+            default => null
+        };
     }
 }
 

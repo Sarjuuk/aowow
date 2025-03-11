@@ -1521,9 +1521,9 @@ abstract class Filter
     {
         if (is_bool($value))
             return [$field, 0, ($value ? '>' : '<=')];
-        else if ($value == self::ENUM_ANY)                  // any
+        else if ($value == self::ENUM_ANY)
             return [$field, 0, '!'];
-        else if ($value == self::ENUM_NONE)                 // none
+        else if ($value == self::ENUM_NONE)
             return [$field, 0];
         else if ($value !== null)
             return [$field, $value];
@@ -1563,7 +1563,7 @@ abstract class Filter
                     $result = $this->genericEnum($colOrFn, $crs);
                 break;
             case self::CR_CALLBACK:
-                $result = $this->{$colOrFn}([$cr, $crs, $crv], $param1, $param2);
+                $result = $this->{$colOrFn}($cr, $crs, $crv, $param1, $param2);
                 break;
             case self::CR_NYI_PH:                           // do not limit with not implemented filters
                 if (is_int($param1))

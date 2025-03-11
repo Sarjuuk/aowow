@@ -333,9 +333,9 @@ class ProfileListFilter extends Filter
         if (!empty($_v['si']))
         {
             if ($_v['si'] == SIDE_ALLIANCE)
-                $parts[] = [$k.'.race', [1, 3, 4, 7, 11]];
+                $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
             else if ($_v['si'] == SIDE_HORDE)
-                $parts[] = [$k.'.race', [2, 5, 6, 8, 10]];
+                $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
         }
 
         // race [list]
@@ -357,7 +357,7 @@ class ProfileListFilter extends Filter
         return $parts;
     }
 
-    protected function cbRegionCheck(&$v)
+    protected function cbRegionCheck(string &$v) : bool
     {
         if (in_array($v, Util::$regions))
         {
@@ -370,7 +370,7 @@ class ProfileListFilter extends Filter
         return false;
     }
 
-    protected function cbServerCheck(&$v)
+    protected function cbServerCheck(string &$v) : bool
     {
         foreach (Profiler::getRealms() as $realm)
             if ($realm['name'] == $v)
@@ -384,10 +384,10 @@ class ProfileListFilter extends Filter
         return false;
     }
 
-    protected function cbProfession($cr, $skillId)
+    protected function cbProfession(int $cr, int $crs, string $crv, $skillId) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         $k   = 'sk_'.Util::createHash(12);
         $col = 'skill'.$skillId;
@@ -397,7 +397,7 @@ class ProfileListFilter extends Filter
         if ($this->useLocalList)
         {
             $this->extraOpts[$k] = array(
-                'j' => [sprintf('?_profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $cr[1], $cr[2]), true],
+                'j' => [sprintf('?_profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
                 's' => [', '.$k.'.`value` AS '.$col]
             );
             return [$k.'.skillId', null, '!'];
@@ -405,96 +405,96 @@ class ProfileListFilter extends Filter
         else
         {
             $this->extraOpts[$k] = array(
-                'j' => [sprintf('character_skills %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`skill` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $cr[1], $cr[2]), true],
+                'j' => [sprintf('character_skills %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`skill` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
                 's' => [', '.$k.'.`value` AS '.$col]
             );
             return [$k.'.skill', null, '!'];
         }
     }
 
-    protected function cbCompletedAcv($cr)
+    protected function cbCompletedAcv(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT))
+            return null;
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_achievement WHERE `id` = ?d', $cr[2]))
-            return false;
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_achievement WHERE `id` = ?d', $crv))
+            return null;
 
         $k = 'acv_'.Util::createHash(12);
 
         if ($this->useLocalList)
         {
-            $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_completion_achievements %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`achievementId` = %2$d', $k, $cr[2]), true]];
+            $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_completion_achievements %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`achievementId` = %2$d', $k, $crv), true]];
             return [$k.'.achievementId', null, '!'];
         }
         else
         {
-            $this->extraOpts[$k] = ['j' => [sprintf('character_achievement %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`achievement` = %2$d', $k, $cr[2]), true]];
+            $this->extraOpts[$k] = ['j' => [sprintf('character_achievement %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`achievement` = %2$d', $k, $crv), true]];
             return [$k.'.achievement', null, '!'];
         }
     }
 
-    protected function cbWearsItems($cr)
+    protected function cbWearsItems(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT))
+            return null;
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE `id` = ?d', $cr[2]))
-            return false;
+        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE `id` = ?d', $crv))
+            return null;
 
         $k = 'i_'.Util::createHash(12);
 
-        $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $cr[2]), true]];
+        $this->extraOpts[$k] = ['j' => [sprintf('?_profiler_items %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`item` = %2$d', $k, $crv), true]];
         return [$k.'.item', null, '!'];
     }
 
-    protected function cbHasGuild($cr)
+    protected function cbHasGuild(int $cr, int $crs, string $crv) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
         if ($this->useLocalList)
-            return ['p.guild', null, $cr[1] ? '!' : null];
+            return ['p.guild', null, $crs ? '!' : null];
         else
-            return ['gm.guildId', null, $cr[1] ? '!' : null];
+            return ['gm.guildId', null, $crs ? '!' : null];
     }
 
-    protected function cbHasGuildRank($cr)
+    protected function cbHasGuildRank(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         if ($this->useLocalList)
-            return ['p.guildrank', $cr[2], $cr[1]];
+            return ['p.guildrank', $crv, $crs];
         else
-            return ['gm.rank', $cr[2], $cr[1]];
+            return ['gm.rank', $crv, $crs];
     }
 
-    protected function cbTeamName($cr, $size)
+    protected function cbTeamName(int $cr, int $crs, string $crv, $size) : ?array
     {
-        if ($_ = $this->modularizeString(['at.name'], $cr[2]))
+        if ($_ = $this->modularizeString(['at.name'], $crv))
             return ['AND', ['at.type', $size], $_];
 
-        return false;
+        return null;
     }
 
-    protected function cbTeamRating($cr, $size)
+    protected function cbTeamRating(int $cr, int $crs, string $crv, $size) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        return ['AND', ['at.type', $size], ['at.rating', $cr[2], $cr[1]]];
+        return ['AND', ['at.type', $size], ['at.rating', $crv, $crs]];
     }
 
-    protected function cbAchievs($cr)
+    protected function cbAchievs(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         if ($this->useLocalList)
-            return ['p.achievementpoints', $cr[2], $cr[1]];
+            return ['p.achievementpoints', $crv, $crs];
         else
-            return ['cap.counter', $cr[2], $cr[1]];
+            return ['cap.counter', $crv, $crs];
     }
 }
 

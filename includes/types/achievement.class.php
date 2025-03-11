@@ -379,30 +379,30 @@ class AchievementListFilter extends Filter
         return $parts;
     }
 
-    protected function cbRelEvent($cr, $value)
+    protected function cbRelEvent(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr[0]][$cr[1]]))
-            return false;
+        if (!isset($this->enums[$cr][$crs]))
+            return null;
 
-        $_ = $this->enums[$cr[0]][$cr[1]];
+        $_ = $this->enums[$cr][$crs];
         if (is_int($_))
             return ($_ > 0) ? ['category', $_] : ['id', abs($_)];
         else
         {
-            $ids = array_filter($this->enums[$cr[0]], fn($x) => is_int($x) && $x > 0);
+            $ids = array_filter($this->enums[$cr], fn($x) => is_int($x) && $x > 0);
 
             return ['category', $ids, $_ ? null : '!'];
         }
 
-        return false;
+        return null;
     }
 
-    protected function cbSeries($cr, $value)
+    protected function cbSeries(int $cr, int $crs, string $crv, int $seriesFlag) : ?array
     {
-        if ($this->int2Bool($cr[1]))
-            return $cr[1] ? ['AND', ['chainId', 0, '!'], ['cuFlags', $value, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', $value, '&'], 0]];
+        if ($this->int2Bool($crs))
+            return $crs ? ['AND', ['chainId', 0, '!'], ['cuFlags', $seriesFlag, '&']] : ['AND', ['chainId', 0, '!'], [['cuFlags', $seriesFlag, '&'], 0]];
 
-        return false;
+        return null;
     }
 }
 

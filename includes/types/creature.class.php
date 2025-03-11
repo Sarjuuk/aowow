@@ -388,7 +388,7 @@ class CreatureListFilter extends Filter
         return $parts;
     }
 
-    protected function cbPetFamily(&$val)
+    protected function cbPetFamily(string &$val) : bool
     {
         if (!$this->parentCats || $this->parentCats[0] != 1)
             return false;
@@ -402,9 +402,9 @@ class CreatureListFilter extends Filter
         return $this->checkInput($type, $valid, $val);
     }
 
-    protected function cbRelEvent($cr)
+    protected function cbRelEvent(int $cr, int $crs, string $crv) : ?array
     {
-        if ($cr[1] == parent::ENUM_ANY)
+        if ($crs == parent::ENUM_ANY)
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` <> 0'))
                 if ($cGuids   = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_creature WHERE `eventEntry` IN (?a)', $eventIds))
@@ -412,7 +412,7 @@ class CreatureListFilter extends Filter
 
             return [0];
         }
-        else if ($cr[1] == parent::ENUM_NONE)
+        else if ($crs == parent::ENUM_NONE)
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` <> 0'))
                 if ($cGuids   = DB::World()->selectCol('SELECT DISTINCT `guid` FROM game_event_creature WHERE `eventEntry` IN (?a)', $eventIds))
@@ -420,29 +420,29 @@ class CreatureListFilter extends Filter
 
             return [0];
         }
-        else if (in_array($cr[1], $this->enums[$cr[0]]))
+        else if (in_array($crs, $this->enums[$cr]))
         {
-            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` = ?d', $cr[1]))
+            if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` = ?d', $crs))
                 if ($cGuids   = DB::World()->selectCol('SELECT DISTINCT `guid` FROM `game_event_creature` WHERE `eventEntry` IN (?a)', $eventIds))
                     return ['s.guid', $cGuids];
 
             return [0];
         }
 
-        return false;
+        return null;
     }
 
-    protected function cbMoneyDrop($cr)
+    protected function cbMoneyDrop(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
-        return ['AND', ['((minGold + maxGold) / 2)', $cr[2], $cr[1]]];
+        return ['AND', ['((minGold + maxGold) / 2)', $crv, $crs]];
     }
 
-    protected function cbQuestRelation($cr, $field, $val)
+    protected function cbQuestRelation(int $cr, int $crs, string $crv, $field, $val) : ?array
     {
-        switch ($cr[1])
+        switch ($crs)
         {
             case 1:                                 // any
                 return ['AND', ['qse.method', $val, '&'], ['qse.questId', null, '!']];
@@ -457,25 +457,25 @@ class CreatureListFilter extends Filter
                 return [1];
         }
 
-        return false;
+        return null;
     }
 
-    protected function cbHealthMana($cr, $minField, $maxField)
+    protected function cbHealthMana(int $cr, int $crs, string $crv, $minField, $maxField) : ?array
     {
-        if (!Util::checkNumeric($cr[2], NUM_CAST_INT) || !$this->int2Op($cr[1]))
-            return false;
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+            return null;
 
         // remap OP for this special case
-        switch ($cr[1])
+        switch ($crs)
         {
             case '=':                               // min > max is totally possible
-                $this->extraOpts['ct']['h'][] = $minField.' = '.$maxField.' AND '.$minField.' = '.$cr[2];
+                $this->extraOpts['ct']['h'][] = $minField.' = '.$maxField.' AND '.$minField.' = '.$crv;
                 break;
             case '>':
             case '>=':
             case '<':
             case '<=':
-                $this->extraOpts['ct']['h'][] = 'IF('.$minField.' > '.$maxField.', '.$maxField.', '.$minField.') '.$cr[1].' '.$cr[2];
+                $this->extraOpts['ct']['h'][] = 'IF('.$minField.' > '.$maxField.', '.$maxField.', '.$minField.') '.$crs.' '.$crv;
                 break;
         }
 
@@ -483,54 +483,53 @@ class CreatureListFilter extends Filter
         return [1];                                 // always true, use post-filter
     }
 
-    protected function cbSpecialSkinLoot($cr, $typeFlag)
+    protected function cbSpecialSkinLoot(int $cr, int $crs, string $crv, $typeFlag) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
 
-        if ($cr[1])
+        if ($crs)
             return ['AND', ['skinLootId', 0, '>'], ['typeFlags', $typeFlag, '&']];
         else
             return ['OR', ['skinLootId', 0], [['typeFlags', $typeFlag, '&'], 0]];
     }
 
-    protected function cbRegularSkinLoot($cr, $typeFlag)
+    protected function cbRegularSkinLoot(int $cr, int $crs, string $crv, $typeFlag) : ?array
     {
-        if (!$this->int2Bool($cr[1]))
-            return false;
+        if (!$this->int2Bool($crs))
+            return null;
 
-        if ($cr[1])
+        if ($crs)
             return ['AND', ['skinLootId', 0, '>'], [['typeFlags', $typeFlag, '&'], 0]];
         else
             return ['OR', ['skinLootId', 0], ['typeFlags', $typeFlag, '&']];
     }
 
-    protected function cbReputation($cr, $op)
+    protected function cbReputation(int $cr, int $crs, string $crv, $op) : ?array
     {
-        if (!in_array($cr[1], $this->enums[$cr[0]]))
-            return false;
+        if (!in_array($crs, $this->enums[$cr]))
+            return null;
 
-        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $cr[1]))
-            $this->formData['reputationCols'][] = [$cr[1], Util::localizedString($_, 'name')];
+        if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
+            $this->formData['reputationCols'][] = [$crs, Util::localizedString($_, 'name')];
 
-        if ($cIds = DB::World()->selectCol('SELECT creature_id FROM creature_onkill_reputation WHERE (RewOnKillRepFaction1 = ?d AND RewOnKillRepValue1 '.$op.' 0) OR (RewOnKillRepFaction2 = ?d AND RewOnKillRepValue2 '.$op.' 0)', $cr[1], $cr[1]))
+        if ($cIds = DB::World()->selectCol('SELECT `creature_id` FROM creature_onkill_reputation WHERE (`RewOnKillRepFaction1` = ?d AND `RewOnKillRepValue1` '.$op.' 0) OR (`RewOnKillRepFaction2` = ?d AND `RewOnKillRepValue2` '.$op.' 0)', $crs, $crs))
             return ['id', $cIds];
         else
             return [0];
     }
 
-    protected function cbFaction($cr)
+    protected function cbFaction(int $cr, int $crs, string $crv) : ?array
     {
-        if (!Util::checkNumeric($cr[1], NUM_CAST_INT))
-            return false;
+        if (!Util::checkNumeric($crs, NUM_CAST_INT))
+            return null;
 
-        if (!in_array($cr[1], $this->enums[$cr[0]]))
-            return false;
-
+        if (!in_array($crs, $this->enums[$cr]))
+            return null;
 
         $facTpls = [];
-        $facs    = new FactionList(array('OR', ['parentFactionId', $cr[1]], ['id', $cr[1]]));
+        $facs    = new FactionList(array('OR', ['parentFactionId', $crs], ['id', $crs]));
         foreach ($facs->iterate() as $__)
             $facTpls = array_merge($facTpls, $facs->getField('templateIds'));
 
