@@ -500,6 +500,9 @@ class ItemPage extends genericPage
                 if ($idx == 16)
                     $createdBy = array_column($tabData['data'], 'id');
 
+                if ($idx == 1)
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=163;crs='.$this->typeId.';crv=0');
+
                 if ($idx == 4 && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
                 {
                     switch ($sm[0]['dd'])
