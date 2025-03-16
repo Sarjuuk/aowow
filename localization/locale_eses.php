@@ -1518,8 +1518,8 @@ $lang = array(
             "Reutilización instantánea",
             "Reutilización: %.3g s",
             "Reutilización: %.3g min",
-         // "Reutilización: %.3g h",
-         // "Reutilización: %.3g días"
+            "Reutilización: %.3g h",
+            "Reutilización: %.3g días"
         ),
         'duration'      => array(
             "hasta cancelación",

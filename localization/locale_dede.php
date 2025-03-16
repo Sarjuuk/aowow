@@ -1518,8 +1518,8 @@ $lang = array(
             "Keine Abklingzeit",
             "%.3g Sek. Abklingzeit",
             "%.3g Min. Abklingzeit",
-         // "%.3g |4Stunde:Stunden; Abklingzeit",
-         // "%.3g |4Tag:Tage; Abklingzeit"
+            "%.3g |4Stunde:Stunden; Abklingzeit",
+            "%.3g |4Tag:Tage; Abklingzeit"
         ),
         'duration'      => array(
             "bis Abbruch",

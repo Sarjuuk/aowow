@@ -1518,8 +1518,8 @@ $lang = array(
             "Instant cooldown",                             // SPELL_RECAST_TIME_INSTANT not used?
             "%.3g sec cooldown",                            // SPELL_RECAST_TIME_SEC
             "%.3g min cooldown",                            // SPELL_RECAST_TIME_MIN
-         // "%.3g hour cooldown",                           // SPELL_RECAST_TIME_HOURS not in 3.3.5
-         // "%.3g day cooldown"                             // SPELL_RECAST_TIME_DAYS not in 3.3.5
+            "%.3g hour cooldown",                           // SPELL_RECAST_TIME_HOURS - not in 3.3.5 but we display cooldowns the client hides anyways
+            "%.3g day cooldown"                             // SPELL_RECAST_TIME_DAYS - not in 3.3.5 but we display cooldowns the client hides anyways
         ),
         'duration'      => array(                           // SPELL_DURATION_*
             "until cancelled",

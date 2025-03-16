@@ -1518,8 +1518,8 @@ $lang = array(
             "Recharge instantanée",
             "%.3g sec. de recharge",                        // "Recharge en cours : %d |4seconde:secondes;";
             "%.3g min de recharge",                         // "Recharge en cours : %d |4minute:minutes;";
-         // "Recharge en cours : %d |4heure:heures;",
-         // "Recharge en cours : %d |4jour:jours;"
+            "Recharge en cours : %d |4heure:heures;",
+            "Recharge en cours : %d |4jour:jours;"
         ),
         'duration'      => array(
             "jusqu’à annulation",
