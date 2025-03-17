@@ -42,6 +42,8 @@ CLISetup::registerSetup("build", new class extends SetupScript
             {
                 foreach ($loc->gameDirs() as $dir)
                 {
+                    // get your paths straight!
+                    $p = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
                     $lower_p = CLI::nicePath(strtolower($filePath), CLISetup::$srcDir, $loc);
 
                     if (!CLISetup::fileExists($p) && !CLISetup::fileExists($lower_p))
