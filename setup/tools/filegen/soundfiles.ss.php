@@ -42,14 +42,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
             {
                 foreach ($loc->gameDirs() as $dir)
                 {
-                    // get your paths straight!
-                    $p = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
+                    $lower_p = CLI::nicePath(strtolower($filePath), CLISetup::$srcDir, $loc);
 
-                    if (!CLISetup::fileExists($p))
+                    if (!CLISetup::fileExists($p) && !CLISetup::fileExists($lower_p))
                         continue;
 
                     // copy over to static/wowsounds/
-                    if (copy($p, 'static/wowsounds/'.$fileId))
+                    if (copy($p, 'static/wowsounds/'.$fileId) or copy($lower_p, 'static/wowsounds/'.$fileId))
                         continue 3;
 
                     $this->success = false;
