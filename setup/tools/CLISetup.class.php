@@ -594,7 +594,7 @@ class CLISetup
 
         if ($missing = array_diff_key(self::$locales, self::$gsFiles))
         {
-            ClI::write('GlobalStrings.lua not found for locale '. Lang::concat($missing), CLI::LOG_WARN);
+            ClI::write('GlobalStrings.lua not found for locale '. Lang::concat($missing, callback: fn($x) => $x->name), CLI::LOG_WARN);
             return false;
         }
 
