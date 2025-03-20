@@ -4284,7 +4284,7 @@ var LANG = {
         hasscreenshots: "Verfügt über Screenshots",
         hasvideos:      "Verfügt über Videos",
 
-        sepstaffonly:   'Staff Only',
+        sepstaffonly:   'Nur für Personal',
         flags:          'Flags'
     },
 

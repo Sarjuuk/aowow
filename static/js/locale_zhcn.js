@@ -4276,7 +4276,7 @@ var LANG = {
         hasscreenshots:             "有截屏",
         hasvideos:                  "有视频",
 
-        sepstaffonly:               "Staff only",
+        sepstaffonly:               "仅限员工",
         flags1:                     "Flags (1)",
         flags2:                     "Flags (2)",
         flags3:                     "Flags (3)",

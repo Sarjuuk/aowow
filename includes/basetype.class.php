@@ -1257,12 +1257,12 @@ abstract class Filter
                         break;
                     case self::CR_BOOLEAN:
                     case self::CR_FLAG:
-                    case self::CR_STAFFFLAG:
                         $_ = $_crs[$i];
                         if (!$this->int2Bool($_))
                             $unsetme = true;
                         break;
                     case self::CR_ENUM:
+                    case self::CR_STAFFFLAG:
                         if (!Util::checkNumeric($_crs[$i], NUM_CAST_INT))
                             $unsetme = true;
                         break;
@@ -1545,8 +1545,8 @@ abstract class Filter
                 $result = $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2);
                 break;
             case self::CR_STAFFFLAG:
-                if (User::isInGroup(U_GROUP_EMPLOYEE) && $crs >= 0)
-                    $result = $this->genericBooleanFlags($colOrFn, (1 << $crs), true);
+                if (User::isInGroup(U_GROUP_EMPLOYEE) && $crs > 0)
+                    $result = $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true);
                 break;
             case self::CR_BOOLEAN:
                 $result = $this->genericBoolean($colOrFn, $crs, !empty($param1));
