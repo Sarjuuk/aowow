@@ -44,7 +44,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 {
                     // get your paths straight!
                     $p = CLI::nicePath($filePath, CLISetup::$srcDir, $dir);
-                    $lower_p = CLI::nicePath(strtolower($filePath), CLISetup::$srcDir, $loc);
+                    $lower_p = CLI::nicePath(strtolower($filePath), CLISetup::$srcDir, $dir);
 
                     if (!CLISetup::fileExists($p) && !CLISetup::fileExists($lower_p))
                         continue;
