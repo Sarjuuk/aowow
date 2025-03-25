@@ -21,7 +21,7 @@ You can easily run AoWoW locally downloading and running the docker image with t
 
 ```bash
 docker pull ghcr.io/sarjuuk/aowow:master
-docker run --name aowow-docker -p 80:80 2d6d03688f4c
+docker run --name aowow-docker -p 80:80 ghcr.io/sarjuuk/aowow:master
 ```
 
 Now you can visit http://127.0.0.1 and explore AoWoW!
