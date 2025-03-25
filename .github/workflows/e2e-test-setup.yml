@@ -1,0 +1,54 @@
+name: e2e-test-setup
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ['master']
+
+jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    env:
+      DB_DATABASE: aowow
+      DB_USER: root
+      DB_PASSWORD: root
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Test MySQL connection
+        run: |
+          sudo /etc/init.d/mysql start
+          sudo mysql -u$DB_USER -p$DB_PASSWORD -e "SHOW DATABASES;"
+
+      - name: Run script
+        run: sudo bash ./setup/scripts/docker-pipeline.sh
+
+      - name: Run web app
+        run: |
+          sudo systemctl stop apache2
+          cp setup/scripts/route.php route.php
+          sudo php -S 127.0.0.1:80 route.php > server.log 2>&1 &
+
+      - uses: karol-brejna-i/webpage-screenshot-action@v1
+        with:
+          url: http://127.0.0.1/?npc=123
+          output: npc-123-Riverpaw-Mongrel.png
+
+      - uses: karol-brejna-i/webpage-screenshot-action@v1
+        with:
+          url: http://127.0.0.1/?npc=28701#teaches
+          output: npc-28701-Timothy-Jones.png
+
+
+      - uses: karol-brejna-i/webpage-screenshot-action@v1
+        with:
+          url: http://127.0.0.1/?item=51432
+          output: item-51432-Wrathful-Gladiator-Greatstaff.png
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-screenshot
+          path: ${{ github.workspace }}/*.png
+          retention-days: 30
