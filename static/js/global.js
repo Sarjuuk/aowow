@@ -23484,6 +23484,7 @@ var g_types = {
      17: 'currency',
      19: 'sound',
      29: 'icon',
+    300: 'guide',
     501: 'emote',
     502: 'enchantment',
     503: 'areatrigger',
