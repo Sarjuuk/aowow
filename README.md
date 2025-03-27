@@ -30,7 +30,7 @@ Now you can visit http://127.0.0.1 and explore AoWoW!
 > If you're running Nginx or Apache2 (e.g., via XAMPP) locally, these services will occupy port 80, preventing AoWoW from running. Stop them before starting the Docker container.
 
 Things to keep in mind:
-- To speed up installation and reduce the Docker image size, WoW images are not included. When accessing AoWoW, images will be loaded from wowgaming.altervista.org, which may result in slower performance.
+- To speed up installation and reduce the Docker image size, WoW images are not included. When accessing AoWoW, images will not be loaded.
 - This Docker image is intended for development rather than production use.
 - The database may not be up to date with the latest version.
 

@@ -28,8 +28,7 @@ jobs:
       - name: Run web app
         run: |
           sudo systemctl stop apache2
-          cp setup/scripts/route.php route.php
-          sudo php -S 127.0.0.1:80 route.php > server.log 2>&1 &
+          sudo php -S 127.0.0.1:80 > server.log 2>&1 &
 
       - uses: karol-brejna-i/webpage-screenshot-action@v1
         with:

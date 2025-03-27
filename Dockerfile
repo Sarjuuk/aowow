@@ -30,6 +30,6 @@ EXPOSE 80
 # Start MySQL and run a test command
 CMD service mysql start && \
     mysql -u$DB_USER -p$DB_PASSWORD -e "SHOW DATABASES;" && \
-    php -S 0.0.0.0:80 route.php && \
+    php -S 0.0.0.0:80 && \
     tail -f /dev/null  # Keeps container running
 
