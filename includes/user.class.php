@@ -21,19 +21,19 @@ class User
     private static string $passHash      = '';
     private static int    $excludeGroups = 1;
 
-    public  static Locale $preferedLoc;
+    public  static WoWLocale $preferedLoc;
     private static ?LocalProfileList $profiles = null;
 
     public static function init()
     {
         self::setIP();
 
-        if (isset($_SESSION['locale']) && $_SESSION['locale'] instanceof Locale)
-            self::$preferedLoc = $_SESSION['locale']->validate() ?? Locale::getFallback();
-        else if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]) && ($loc = Locale::tryFromHttpAcceptLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"])))
+        if (isset($_SESSION['locale']) && $_SESSION['locale'] instanceof WoWLocale)
+            self::$preferedLoc = $_SESSION['locale']->validate() ?? WoWLocale::getFallback();
+        else if (!empty($_SERVER["HTTP_ACCEPT_LANGUAGE"]) && ($loc = WoWLocale::tryFromHttpAcceptLanguage($_SERVER["HTTP_ACCEPT_LANGUAGE"])))
             self::$preferedLoc = $loc;
         else
-            self::$preferedLoc = Locale::getFallback();
+            self::$preferedLoc = WoWLocale::getFallback();
 
         // session have a dataKey to access the JScripts (yes, also the anons)
         if (empty($_SESSION['dataKey']))
@@ -74,7 +74,7 @@ class User
         if (!$uData)
             return false;
 
-        if ($loc = Locale::tryFrom($uData['locale']))
+        if ($loc = WoWLocale::tryFrom($uData['locale']))
             self::$preferedLoc = $loc;
 
         // password changed, terminate session

@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-enum Locale : int
+enum WoWLocale : int
 {                                                           // unused by    TC WoW self
     case EN =  0;                                           // enGB, enUS
     case KR =  1;                                           // koKR                 ?
@@ -118,7 +118,7 @@ enum Locale : int
 
     public function isLogographic() : bool
     {
-        return $this == Locale::CN || $this == Locale::TW || $this == Locale::KR;
+        return $this == WoWLocale::CN || $this == WoWLocale::TW || $this == WoWLocale::KR;
     }
 
     public function validate() : ?self
@@ -164,12 +164,12 @@ enum Locale : int
 
     public static function getFallback() : self
     {
-        foreach (Locale::cases() as $l)
+        foreach (WoWLocale::cases() as $l)
             if ($l->validate())
                 return $l;
 
         // wow, you really fucked up your config mate!
-        trigger_error('Locale::getFallback - there are no valid locales', E_USER_ERROR);
+        trigger_error('WoWLocale::getFallback - there are no valid locales', E_USER_ERROR);
         return self::EN;
     }
 }
@@ -189,7 +189,7 @@ class LocString
         if (!array_filter($data, fn($v, $k) => $v && strstr($k, $key.'_loc'), ARRAY_FILTER_USE_BOTH))
             trigger_error('LocString - is entrirely empty', E_USER_WARNING);
 
-        foreach (Locale::cases() as $l)
+        foreach (WoWLocale::cases() as $l)
             $this->store[$l] = (string)$callback($data[$key.'_loc'.$l->value] ?? '');
     }
 
@@ -198,7 +198,7 @@ class LocString
         if ($str = $this->store[Lang::getLocale()])
             return $str;
 
-        foreach (Locale::cases() as $l)                // desired loc not set, use any other
+        foreach (WoWLocale::cases() as $l)                // desired loc not set, use any other
             if ($str = $this->store[$l])
                 return Cfg::get('DEBUG') ? '['.$str.']' : $str;
 

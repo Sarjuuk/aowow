@@ -288,7 +288,7 @@ class SmartEvent
                     FROM      gossip_menu_option gmo
                     LEFT JOIN gossip_menu_option_locale gmol ON gmo.`MenuID` = gmol.`MenuID` AND gmo.`OptionID` = gmol.`OptionID` AND gmol.`Locale` = ?d
                     WHERE     gmo.`MenuId` = ?d AND gmo.`OptionID` = ?d',
-                    Lang::getLocale() != Locale::EN ? Lang::getLocale()->value : DBSIMPLE_SKIP,
+                    Lang::getLocale() != WoWLocale::EN ? Lang::getLocale()->value : DBSIMPLE_SKIP,
                     Lang::getLocale()->json(),
                     $this->param[0], $this->param[1]
                 );

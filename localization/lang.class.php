@@ -44,13 +44,13 @@ class Lang
     private static $emote;
     private static $enchantment;
 
-    private static ?Locale $locale = null;
+    private static ?WoWLocale $locale = null;
 
     public const FMT_RAW    = 0;
     public const FMT_HTML   = 1;
     public const FMT_MARKUP = 2;
 
-    public static function load(Locale $loc) : void
+    public static function load(WoWLocale $loc) : void
     {
         if (self::$locale == $loc)
             return;
@@ -71,7 +71,7 @@ class Lang
         self::$locale = $loc;
     }
 
-    public static function getLocale() : Locale
+    public static function getLocale() : WoWLocale
     {
         return self::$locale;
     }
@@ -759,7 +759,7 @@ class Lang
                 switch (strtolower($word[1]))
                 {
                     case 'h':
-                        if (self::$locale != Locale::FR)
+                        if (self::$locale != WoWLocale::FR)
                             return 'de ' . $word;
                     case 'a':
                     case 'e':
@@ -794,7 +794,7 @@ class Lang
             {
                 [$_, $num, $pad, $singular, $plural1, $plural2] = array_pad($m, 6, null);
 
-                if (self::$locale != Locale::RU || !$plural2)
+                if (self::$locale != WoWLocale::RU || !$plural2)
                     return $num . $pad . ($num == 1 ? $singular : $plural1);
 
                 // singular - ends in 1, but not teen number

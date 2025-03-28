@@ -168,12 +168,12 @@ class CLISetup
         if (isset(self::$opts['locales']))
         {
             $opt = array_map('strtolower', self::$opts['locales']);
-            foreach (Locale::cases() as $loc)
+            foreach (WoWLocale::cases() as $loc)
                 if ($loc->validate() && array_intersect(array_map('strtolower', $loc->gameDirs()), $opt))
                     self::$locales[$loc->value] = $loc;
         }
         if (!self::$locales)
-            foreach (Locale::cases() as $loc)
+            foreach (WoWLocale::cases() as $loc)
                 if ($loc->validate())
                     self::$locales[$loc->value] = $loc;
 

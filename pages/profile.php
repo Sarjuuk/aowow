@@ -30,7 +30,7 @@ class ProfilePage extends GenericPage
     );
 
     protected $_get      = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'WoWLocale::tryFromDomain'],
         'new'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
     );
 

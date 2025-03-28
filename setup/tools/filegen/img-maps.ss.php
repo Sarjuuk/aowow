@@ -769,7 +769,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $this->success = false;
     }
 
-    private function buildSubZones(GdImage $resMap, int $wmaId, Locale $loc) : void
+    private function buildSubZones(GdImage $resMap, int $wmaId, WoWLocale $loc) : void
     {
         foreach ($this->wmOverlays[$wmaId] as &$row)
         {

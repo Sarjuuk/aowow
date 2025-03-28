@@ -178,7 +178,7 @@ trait TrImageProcessor
         }
 
         $locList = [];
-        foreach (Locale::cases() as $loc)
+        foreach (WoWLocale::cases() as $loc)
         {
             if (!$loc->validate() || !in_array($loc, CLISetup::$locales))
                 continue;

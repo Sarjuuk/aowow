@@ -68,12 +68,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 VALUES
                     (?d, ?, ?d, ?d, ?d, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 $id, $t['cmd'], $t['anim'], $t['parent'], $t['soundId'],
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::EN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::EN), $this->textData[$t['etd2']][Locale::EN->value] ?? '', $this->textData[$t['etd6']][Locale::EN->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::FR), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::FR), $this->textData[$t['etd2']][Locale::FR->value] ?? '', $this->textData[$t['etd6']][Locale::FR->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::DE), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::DE), $this->textData[$t['etd2']][Locale::DE->value] ?? '', $this->textData[$t['etd6']][Locale::DE->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::CN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::CN), $this->textData[$t['etd2']][Locale::CN->value] ?? '', $this->textData[$t['etd6']][Locale::CN->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::ES), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::ES), $this->textData[$t['etd2']][Locale::ES->value] ?? '', $this->textData[$t['etd6']][Locale::ES->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::RU), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::RU), $this->textData[$t['etd2']][Locale::RU->value] ?? '', $this->textData[$t['etd6']][Locale::RU->value] ?? ''
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::EN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::EN), $this->textData[$t['etd2']][WoWLocale::EN->value] ?? '', $this->textData[$t['etd6']][WoWLocale::EN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::FR), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::FR), $this->textData[$t['etd2']][WoWLocale::FR->value] ?? '', $this->textData[$t['etd6']][WoWLocale::FR->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::DE), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::DE), $this->textData[$t['etd2']][WoWLocale::DE->value] ?? '', $this->textData[$t['etd6']][WoWLocale::DE->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::CN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::CN), $this->textData[$t['etd2']][WoWLocale::CN->value] ?? '', $this->textData[$t['etd6']][WoWLocale::CN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::ES), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::ES), $this->textData[$t['etd2']][WoWLocale::ES->value] ?? '', $this->textData[$t['etd6']][WoWLocale::ES->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], WoWLocale::RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], WoWLocale::RU), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], WoWLocale::RU), $this->textData[$t['etd2']][WoWLocale::RU->value] ?? '', $this->textData[$t['etd6']][WoWLocale::RU->value] ?? ''
             );
         }
 
@@ -114,7 +114,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         return $allOK;
     }
 
-    private function mergeGenderedStrings(int $maleTextId, int $femaleTextId, Locale $loc) : string
+    private function mergeGenderedStrings(int $maleTextId, int $femaleTextId, WoWLocale $loc) : string
     {
         $maleText   = $this->textData[$maleTextId][$loc->value]   ?? '';
         $femaleText = $this->textData[$femaleTextId][$loc->value] ?? '';

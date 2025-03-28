@@ -25,7 +25,7 @@ class ItemsetPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'WoWLocale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerItemSet(%d, %d, %s);';
 

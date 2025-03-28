@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'Locale::tryFrom'           ],
+        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'WoWLocale::tryFrom'           ],
         't'         => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxHandler::checkTextLine'],
         'catg'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
         'skill'     => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxData::checkSkill'      ],

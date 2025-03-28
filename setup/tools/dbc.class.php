@@ -110,7 +110,7 @@ class DBC
         $this->isGameTable = array_values($this->format) == ['f'] && substr($file, 0, 2) == 'gt';
 
         $foundMask = 0x0;
-        foreach (Locale::cases() as $loc)
+        foreach (WoWLocale::cases() as $loc)
         {
             if (!in_array($loc, CLISetup::$locales))
                 continue;
@@ -171,7 +171,7 @@ class DBC
         $this->createTable();
 
         if ($this->localized)
-            CLI::write(' - DBC: reading and merging '.$this->file.'.dbc for locales '.Lang::concat(array_keys($this->fileRefs), callback: fn($x) => CLI::bold(Locale::from($x)->name)));
+            CLI::write(' - DBC: reading and merging '.$this->file.'.dbc for locales '.Lang::concat(array_keys($this->fileRefs), callback: fn($x) => CLI::bold(WoWLocale::from($x)->name)));
         else
             CLI::write(' - DBC: reading '.$this->file.'.dbc');
 
@@ -236,7 +236,7 @@ class DBC
         return unpack('VrecordCount/VfieldCount/VrecordSize/VstringSize', fread($handle, 16));
     }
 
-    private function validateFile(Locale $loc) : bool
+    private function validateFile(WoWLocale $loc) : bool
     {
         $filesize = filesize($this->curFile);
         if ($filesize < 20)

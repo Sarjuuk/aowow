@@ -38,7 +38,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     // args: username, password, email, null // iiin
     public function run(&$args) : bool
     {
-        Lang::load(Locale::EN);
+        Lang::load(WoWLocale::EN);
 
         $name  = $args[0] ?? '';
         $passw = $args[1] ?? '';

@@ -29,7 +29,7 @@ class ItemPage extends genericPage
     );
 
     protected $_get          = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'WoWLocale::tryFromDomain'],
         'rand'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
         'ench'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
         'gems'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],

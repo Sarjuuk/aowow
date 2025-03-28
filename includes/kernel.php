@@ -11,7 +11,7 @@ define('CLI_HAS_E', CLI &&                                  // WIN10 and later u
 
 
 $reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'/*, 'gmp'*/];
-$badExt = ['Intl'];                                          // Intl contains its own class Locale. What? Namespaces? Never heard of those!
+$badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
     $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
@@ -239,7 +239,7 @@ if (!CLI)
         User::save();                                       // save user-variables in session
 
     // hard override locale for this call (should this be here..?)
-    if (isset($_GET['locale']) && ($loc = Locale::tryFrom((int)$_GET['locale'])))
+    if (isset($_GET['locale']) && ($loc = WoWLocale::tryFrom((int)$_GET['locale'])))
         Lang::load($loc);
     else
         Lang::load(User::$preferedLoc);
@@ -265,6 +265,6 @@ if (!CLI)
     $pageParam = $_[1] ?? '';
 }
 else if (DB::isConnected(DB_AOWOW))
-    Lang::load(Locale::EN);
+    Lang::load(WoWLocale::EN);
 
 ?>

@@ -893,15 +893,15 @@ abstract class Util
             return $data[$field.'_loc'.Lang::getLocale()->value];
 
         // locale not enUS; aowow-type localization available; add brackets if not silent
-        else if (Lang::getLocale() != Locale::EN && !empty($data[$field.'_loc0']))
+        else if (Lang::getLocale() != WoWLocale::EN && !empty($data[$field.'_loc0']))
             return $silent ? $data[$field.'_loc0'] : '['.$data[$field.'_loc0'].']';
 
         // locale not enUS; TC localization; add brackets if not silent
-        else if (Lang::getLocale() != Locale::EN && !empty($data[$field]))
+        else if (Lang::getLocale() != WoWLocale::EN && !empty($data[$field]))
             return $silent ? $data[$field] : '['.$data[$field].']';
 
         // locale enUS; TC localization; return normal
-        else if (Lang::getLocale() == Locale::EN && !empty($data[$field]))
+        else if (Lang::getLocale() == WoWLocale::EN && !empty($data[$field]))
             return $data[$field];
 
         // nothing to find; be empty

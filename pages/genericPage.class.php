@@ -502,7 +502,7 @@ class GenericPage
                 $app[] = 'locale='.Lang::getLocale()->value;
                 $app[] = 't='.$_SESSION['dataKey'];
             }
-            else if (($flags & SC_FLAG_APPEND_LOCALE) && Lang::getLocale() != Locale::EN)
+            else if (($flags & SC_FLAG_APPEND_LOCALE) && Lang::getLocale() != WoWLocale::EN)
                 $app[] = 'lang='.Lang::getLocale()->domain();
 
             // append anti-cache timestamp
@@ -549,10 +549,10 @@ class GenericPage
                 Type::GUIDE, $this->typeId, $this->guideRevision);
         else if (!empty($this->articleUrl))
             $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
-                $this->articleUrl, [Lang::getLocale()->value, Locale::EN->value]);
+                $this->articleUrl, [Lang::getLocale()->value, WoWLocale::EN->value]);
         else if (!empty($this->type) && isset($this->typeId))
             $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
-                $this->type, $this->typeId, [Lang::getLocale()->value, Locale::EN->value]);
+                $this->type, $this->typeId, [Lang::getLocale()->value, WoWLocale::EN->value]);
 
         if ($article)
         {
@@ -922,14 +922,14 @@ class GenericPage
     }
 
     // load brick with more text then vars
-    protected function localizedBrick(string $file, Locale $loc = Locale::EN) : void
+    protected function localizedBrick(string $file, WoWLocale $loc = WoWLocale::EN) : void
     {
         if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc->value))
         {
-            if ($loc == Locale::EN || !$this->isSaneInclude('template/localized/', $file.'_'.Locale::EN->value))
+            if ($loc == WoWLocale::EN || !$this->isSaneInclude('template/localized/', $file.'_'.WoWLocale::EN->value))
                 trigger_error('Nonexistant template requested: template/localized/'.$file.'_'.$loc->value.'.tpl.php', E_USER_ERROR);
             else
-                include('template/localized/'.$file.'_'.Locale::EN->value.'.tpl.php');
+                include('template/localized/'.$file.'_'.WoWLocale::EN->value.'.tpl.php');
         }
         else
             include('template/localized/'.$file.'_'.$loc->value.'.tpl.php');

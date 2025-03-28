@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
 class AjaxLocale extends AjaxHandler
 {
     protected $_get = array(
-        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFrom']
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'WoWLocale::tryFrom']
     );
 
     public function __construct(array $params)
