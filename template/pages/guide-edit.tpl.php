@@ -53,9 +53,10 @@ $this->brick('pageTemplate');
                     <th><label for="locale"><?=Lang::main('language');?></label></th>
                     <td><select name="locale" id="locale" required="required" size="1">
 <?php
-foreach (Lang::locales() as $i => $l):
-    if (Cfg::get('LOCALES') & (1 << $i))
-        echo '                    <option value="'.$i.'"'.($this->editorFields('locale', true) == $i ? ' selected="selected"' : '').'>'.$l."</option>\n";
+foreach (Locale::cases() as $l):
+    if ($l->validate()):
+        echo '                    <option value="'.$l->value.'"'.($this->editorFields('locale', true) == $l->value ? ' selected="selected"' : '').'>'.$l->title()."</option>\n";
+    endif;
 endforeach;
 ?>
                     </select></td>
@@ -68,8 +69,9 @@ endforeach;
                         <select id="category" name="category" required="required"><option></option>
 <?php
 foreach (Lang::guide('category') as $i => $c):
-    if ($c)
+    if ($c):
         echo '                            <option value="'.$i.'"'.($this->editorFields('category', true) == $i ? ' selected="selected"' : '').'>'.$c."</option>\n";
+    endif;
 endforeach;
 ?>
                         </select>
