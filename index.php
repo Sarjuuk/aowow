@@ -89,6 +89,9 @@ switch ($pageCall)
     case 'edit':                                            // guide editor: targeted by QQ fileuploader, detail-page article editor
     case 'get-description':                                 // guide editor: shorten fulltext into description
     case 'filter':                                          // pre-evaluate filter POST-data; sanitize and forward as GET-data
+    case 'go-to-reply':                                     // find page the reply is on and forward
+        if ($pageCall == 'go-to-reply')
+            $altClass = 'go-to-comment';
     case 'go-to-comment':                                   // find page the comment is on and forward
     case 'locale':                                          // subdomain-workaround, change the language
         $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));

@@ -147,7 +147,6 @@ class GuidePage extends GenericPage
 
     protected function generateContent() : void
     {
-        /*
         match ($this->show)
         {
             self::SHOW_NEW       => $this->displayNew(),
@@ -156,24 +155,6 @@ class GuidePage extends GenericPage
             self::SHOW_CHANGELOG => $this->displayChangelog(),
             default              => trigger_error('GuidePage::generateContent - what content!?')
         };
-        */
-        switch ($this->show)
-        {
-            case self::SHOW_NEW:
-                $this->displayNew();
-                break;
-            case self::SHOW_EDITOR:
-                $this->displayEditor();
-                break;
-            case self::SHOW_GUIDE:
-                $this->displayGuide();
-                break;
-            case self::SHOW_CHANGELOG:
-                $this->displayChangelog();
-                break;
-            default:
-                trigger_error('GuidePage::generateContent - what content!?');
-        }
     }
 
     private function displayNew() : void

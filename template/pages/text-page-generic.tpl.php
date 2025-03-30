@@ -9,7 +9,7 @@ $this->brick('announcement');
 
 $this->brick('pageTemplate');
 
-if (isset($this->notFound)):
+if ($this->notFound):
 ?>
 <?php
     if (!empty($this->doResync)):
