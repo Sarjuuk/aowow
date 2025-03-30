@@ -468,6 +468,7 @@ class Game
         switch ($skillId)
         {
             case SKILL_SKINNING:
+                $reqLevel /= 5;                             // we pass creature level * 5 (so, skill value), but formula depends on actual creature level
                 if ($reqLevel < 10)
                     $reqLevel = 0;
                 else if ($reqLevel < 20)
@@ -479,15 +480,16 @@ class Game
             case SKILL_JEWELCRAFTING:
             case SKILL_INSCRIPTION:
             case SKILL_MINING:
-                $points = [$reqLevel];                              // red/orange
+            case SKILL_ENGINEERING:
+                $points = [$reqLevel];                      // red/orange
 
-                if ($reqLevel + 25 <= MAX_SKILL)                    // orange/yellow
+                if ($reqLevel + 25 <= MAX_SKILL)            // orange/yellow
                     $points[] = $reqLevel + 25;
 
-                if ($reqLevel + 50 <= MAX_SKILL)                    // yellow/green
+                if ($reqLevel + 50 <= MAX_SKILL)            // yellow/green
                     $points[] = $reqLevel + 50;
 
-                if ($reqLevel + 100 <= MAX_SKILL)                   // green/grey
+                if ($reqLevel + 100 <= MAX_SKILL)           // green/grey
                     $points[] = $reqLevel + 100;
 
                 return $points;

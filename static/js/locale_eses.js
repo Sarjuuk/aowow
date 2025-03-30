@@ -4023,7 +4023,7 @@ var LANG = {
         hasscreenshots:          "Tiene capturas de pantalla",
         hasvideos:               "Tiene vídeos",
 
-        sepstaffonly:            'Staff Only',
+        sepstaffonly:            'Sólo para empleados',
         flags:                   'Flags',
         flags2:                  'Flags (2)'
     },
@@ -4286,7 +4286,7 @@ var LANG = {
         hasscreenshots: "Tiene capturas de pantalla",
         hasvideos:      "Tiene vídeos",
 
-        sepstaffonly:   'Staff Only',
+        sepstaffonly:   'Sólo para empleados',
         flags:          'Flags'
     },
 

@@ -162,7 +162,7 @@ class CommunityContent
                 $c['date']    = $dateFmt ? date(Util::$dateFormatInternal, $c['date']) : intVal($c['date']);
 
                 // remove commentid if not looking for replies
-                if (empty($params['replies']))
+                if (empty($opt['replies']))
                     unset($c['commentid']);
 
                 // format text for listview

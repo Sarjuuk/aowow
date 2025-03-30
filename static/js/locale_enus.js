@@ -4069,7 +4069,7 @@ var LANG = {
         hasscreenshots:          "Has screenshots",
         hasvideos:               "Has videos",
 
-        sepstaffonly:            'Staff Only',
+        sepstaffonly:            'Staff only',
         flags:                   'Flags',
         flags2:                  'Flags (2)'
     },
@@ -4332,7 +4332,7 @@ var LANG = {
         hasscreenshots: "Has screenshots",
         hasvideos:      "Has videos",
 
-        sepstaffonly:   'Staff Only',
+        sepstaffonly:   'Staff only',
         flags:          'Flags'
     },
 

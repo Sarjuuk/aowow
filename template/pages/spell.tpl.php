@@ -176,7 +176,7 @@ foreach ($this->effects as $i => $e):
         echo "<small><br>".implode("<br>", $e['footer'])."</small>\n";
     endif;
 
-    if (isset($e['markup'])):
+    if ($e['markup']):
         echo '<br/><div id="spelleffectmarkup-'.$i.'" style="display: inline-block"></div><script type="text/javascript">//<![CDATA[
 $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML = Markup.toHtml(\''.$e['markup'].'\');});
 //]]></script>';
