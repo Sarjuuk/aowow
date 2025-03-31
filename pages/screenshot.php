@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -32,8 +34,8 @@ class ScreenshotPage extends GenericPage
     protected $imgHash     = '';
 
     protected $_post       = array(
-        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'ScreenshotPage::checkCoords'],
-        'screenshotalt' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob']
+        'coords'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\ScreenshotPage::checkCoords'],
+        'screenshotalt' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextBlob']
     );
 
     public function __construct($pageCall, $pageParam)
@@ -350,7 +352,7 @@ class ScreenshotPage extends GenericPage
         }
 
         // check if file is an image; allow jpeg, png
-        $finfo = new finfo(FILEINFO_MIME);                  // fileInfo appends charset information and other nonsense
+        $finfo = new \finfo(FILEINFO_MIME);                 // fileInfo appends charset information and other nonsense
         $mime  = $finfo->file($_FILES['screenshotfile']['tmp_name']);
         if (preg_match('/^image\/(png|jpe?g)/i', $mime, $m))
             $isPNG = $m[0] == 'image/png';

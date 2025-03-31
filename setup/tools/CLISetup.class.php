@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -149,13 +151,13 @@ class CLISetup
 
         // link SubScipts back to UtilityScript after all UtilityScripts have been loaded
         foreach (self::$utilScriptRefs as $name => $us)
-            if (in_array('TrSubScripts', class_uses($us)))
+            if (in_array(__NAMESPACE__.'\TrSubScripts', class_uses($us)))
                 $us->assignGenerators($name);
 
         self::evalOpts();
     }
 
-    public static function getSubScripts(string $invoker = '') : generator
+    public static function getSubScripts(string $invoker = '') : \Generator
     {
         foreach (self::$setupScriptRefs as [$src, $name, $ref])
             if (!$invoker || $src == $invoker)
@@ -473,10 +475,10 @@ class CLISetup
 
         try
         {
-            $iterator = new RecursiveDirectoryIterator(self::$srcDir);
-            $iterator->setFlags(RecursiveDirectoryIterator::SKIP_DOTS);
+            $iterator = new \RecursiveDirectoryIterator(self::$srcDir);
+            $iterator->setFlags(\RecursiveDirectoryIterator::SKIP_DOTS);
 
-            foreach (new RecursiveIteratorIterator($iterator, RecursiveIteratorIterator::SELF_FIRST) as $path)
+            foreach (new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST) as $path)
             {
                 $_ = CLI::nicePath($path->getPathname());
                 self::$mpqFiles[strtolower($_)] = $_;
@@ -484,7 +486,7 @@ class CLISetup
 
             CLI::write('indexing game data from '.self::$srcDir.' for first time use... done!', CLI::LOG_INFO);
         }
-        catch (UnexpectedValueException $e)
+        catch (\UnexpectedValueException $e)
         {
             CLI::write('- mpqData dir '.self::$srcDir.' does not exist', CLI::LOG_ERROR);
             return false;
@@ -601,7 +603,7 @@ class CLISetup
         return true;
     }
 
-    public static function searchGlobalStrings(string $pattern) : Generator
+    public static function searchGlobalStrings(string $pattern) : \Generator
     {
         if (!self::$gsFiles)
             return;

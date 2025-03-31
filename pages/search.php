@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -37,12 +39,12 @@ class SearchPage extends GenericPage
     protected $invalid       = [];
 
     protected $_get          = array(
-        'wt'         => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
-        'wtv'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
-        'slots'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
-        'type'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'json'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet'],
-        'opensearch' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+        'wt'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkIntArray'],
+        'wtv'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkIntArray'],
+        'slots'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkIntArray'],
+        'type'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'json'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet'],
+        'opensearch' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']
     );
 
     private   $maxResults    = 500;
@@ -235,6 +237,8 @@ class SearchPage extends GenericPage
             header(MIME_TYPE_JSON);
             exit(Util::toJSON([$this->search, [], []]));
         }
+
+        exit;
     }
 
     public function display(string $override = '') : never
@@ -245,6 +249,8 @@ class SearchPage extends GenericPage
             $this->displayExtra([$this, 'generateOpenSearch'], MIME_TYPE_OPENSEARCH);
         else if ($this->searchMask & SEARCH_TYPE_JSON)
             $this->displayExtra([$this, 'generateJsonSearch']);
+
+        exit;
     }
 
     // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;

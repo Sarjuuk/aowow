@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -19,7 +21,7 @@ class EventPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerHoliday(%d, %d, %s);';
     private   $hId           = 0;
@@ -280,7 +282,7 @@ class EventPage extends GenericPage
 
     protected function generateTooltip() : string
     {
-        $power = new StdClass();
+        $power = new \StdClass();
         if (!$this->subject->error)
         {
             $power->{'name_'.Lang::getLocale()->json()} = $this->subject->getField('name', true);

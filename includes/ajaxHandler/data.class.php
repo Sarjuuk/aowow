@@ -1,17 +1,19 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxData extends AjaxHandler
 {
     protected $_get = array(
-        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'Locale::tryFrom'           ],
-        't'         => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxHandler::checkTextLine'],
-        'catg'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
-        'skill'     => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxData::checkSkill'      ],
-        'class'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                          ],
-        'callback'  => ['filter' => FILTER_CALLBACK,           'options' => 'AjaxData::checkCallback'   ]
+        'locale'    => ['filter' => FILTER_CALLBACK,           'options' => 'Aowow\Locale::tryFrom'           ],
+        't'         => ['filter' => FILTER_CALLBACK,           'options' => 'Aowow\AjaxHandler::checkTextLine'],
+        'catg'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                                ],
+        'skill'     => ['filter' => FILTER_CALLBACK,           'options' => 'Aowow\AjaxData::checkSkill'      ],
+        'class'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                                ],
+        'callback'  => ['filter' => FILTER_CALLBACK,           'options' => 'Aowow\AjaxData::checkCallback'   ]
     );
 
     public function __construct(array $params)

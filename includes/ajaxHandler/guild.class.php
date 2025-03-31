@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -7,8 +9,8 @@ class AjaxGuild extends AjaxHandler
 {
     protected $validParams = ['resync', 'status'];
     protected $_get        = array(
-        'id'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'  ],
-        'profile' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
+        'id'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdList'  ],
+        'profile' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkEmptySet'],
     );
 
     public function __construct(array $params)

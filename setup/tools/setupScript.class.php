@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -48,7 +50,7 @@ trait TrCustomData
             {
                 DB::Aowow()->query('UPDATE ?_'.$this->getName().' SET ?a WHERE id = ?d', $data, $id);
             }
-            catch (Exception $e)
+            catch (\Exception $e)
             {
                 trigger_error('custom data for entry #'.$id.': '.$e->getMessage(), E_USER_ERROR);
                 $ok = false;
@@ -239,7 +241,7 @@ trait TrImageProcessor
     // prefer manually converted PNG files (as the imagecreatefromblp-script has issues with some formats)
     // alpha channel issues observed with locale deDE Hilsbrad and Elwynn - maps
     // see: https://github.com/Kanma/BLPConverter
-    private function loadImageFile(string $path, ?bool &$noSrc = false) : ?GdImage
+    private function loadImageFile(string $path, ?bool &$noSrc = false) : ?\GdImage
     {
         $result = null;
         $noSrc  = false;
@@ -264,7 +266,7 @@ trait TrImageProcessor
         return $result;
     }
 
-    private function writeImageFile(GdImage $src, string $outFile, array $srcDims, array $destDims) : bool
+    private function writeImageFile(\GdImage $src, string $outFile, array $srcDims, array $destDims) : bool
     {
         $success = false;
         $outRes  = imagecreatetruecolor($destDims['w'], $destDims['h']);
@@ -313,7 +315,7 @@ trait TrComplexImage
 {
     use TrImageProcessor { TrImageProcessor::writeImageFile as _writeImageFile; }
 
-    private function writeImageFile(GdImage $src, string $outFile, int $w, int $h) : bool
+    private function writeImageFile(\GdImage $src, string $outFile, int $w, int $h) : bool
     {
         $srcDims = array(
             'x' => 0,
@@ -331,7 +333,7 @@ trait TrComplexImage
         return $this->_writeImageFile($src, $outFile, $srcDims, $destDims);
     }
 
-    private function createAlphaImage(int $w, int $h) : ?GdImage
+    private function createAlphaImage(int $w, int $h) : ?\GdImage
     {
         $img = imagecreatetruecolor($w, $h);
         if (!$img)
@@ -351,7 +353,7 @@ trait TrComplexImage
         return $img;
     }
 
-    private function assembleImage(string $baseName, array $tileData, int $destW, int $destH) : ?GdImage
+    private function assembleImage(string $baseName, array $tileData, int $destW, int $destH) : ?\GdImage
     {
         $dest = imagecreatetruecolor($destW, $destH);
         if (!$dest)
@@ -487,7 +489,7 @@ abstract class SetupScript
             CLI::write('[build] created '.$newDirs.' extra paths');
 
         // load DBC files
-        if (!in_array('TrDBCcopy', class_uses($this)))
+        if (!in_array(__NAMESPACE__.'\TrDBCcopy', class_uses($this)))
         {
             foreach ($this->getRequiredDBCs() as $req)
             {

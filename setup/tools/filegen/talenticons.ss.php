@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -74,7 +76,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         return $this->success;
     }
 
-    private function compileTexture(string $ttField, int $searchMask, int $tabIdx) : ?GDImage
+    private function compileTexture(string $ttField, int $searchMask, int $tabIdx) : ?\GdImage
     {
         $icons = DB::Aowow()->SelectCol(
            'SELECT   ic.`name` AS "iconString"

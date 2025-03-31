@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -156,7 +158,7 @@ class ZonesPage extends GenericPage
                     'parent'   => 'mapper-generic'
                 ),
                 'som' => $somData,
-                'mapperData' => [$mapFile => new stdClass()]
+                'mapperData' => [$mapFile => new \StdClass()]
             );
         }
     }

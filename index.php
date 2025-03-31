@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 require 'includes/kernel.php';
 
 if (CLI)
@@ -98,7 +100,7 @@ switch ($pageCall)
         try                                                 // can it be handled as ajax?
         {
             $out   = '';
-            $class = 'Ajax'.$cleanName;
+            $class = __NAMESPACE__.'\\'.'Ajax'.$cleanName;
             $ajax  = new $class(explode('.', $pageParam));
 
             if ($ajax->handle($out))
@@ -114,11 +116,11 @@ switch ($pageCall)
                 }
             }
             else
-                throw new Exception('not handled as ajax');
+                throw new \Exception('not handled as ajax');
         }
-        catch (Exception $e)                                // no, apparently not..
+        catch (\Exception $e)                               // no, apparently not..
         {
-            $class = $cleanName.'Page';
+            $class = __NAMESPACE__.'\\'.$cleanName.'Page';
             $classInstance = new $class($pageCall, $pageParam);
 
             if (is_callable([$classInstance, 'display']))

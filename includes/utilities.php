@@ -1,12 +1,14 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class SimpleXML extends SimpleXMLElement
+class SimpleXML extends \SimpleXMLElement
 {
-    public function addCData(string $cData) : SimpleXMLElement
+    public function addCData(string $cData) : \SimpleXMLElement
     {
         $node = dom_import_simplexml($this);
         $no   = $node->ownerDocument;
@@ -23,7 +25,7 @@ trait TrRequestData
     public const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
 
     protected $_get    = [];                                // fill with variables you that are going to be used; eg:
-    protected $_post   = [];                                // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList']
+    protected $_post   = [];                                // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdList']
     protected $_cookie = [];
 
     private $filtered = false;
@@ -1702,35 +1704,35 @@ abstract class Type
     public const IDX_JSG_TPL  = 2;
     public const IDX_FLAGS    = 3;
 
-    private static /* array */ $data = array(
-        self::NPC         => ['CreatureList',    'npc',         'g_npcs',              0x1],
-        self::OBJECT      => ['GameObjectList',  'object',      'g_objects',           0x1],
-        self::ITEM        => ['ItemList',        'item',        'g_items',             0x1],
-        self::ITEMSET     => ['ItemsetList',     'itemset',     'g_itemsets',          0x1],
-        self::QUEST       => ['QuestList',       'quest',       'g_quests',            0x1],
-        self::SPELL       => ['SpellList',       'spell',       'g_spells',            0x1],
-        self::ZONE        => ['ZoneList',        'zone',        'g_gatheredzones',     0x1],
-        self::FACTION     => ['FactionList',     'faction',     'g_factions',          0x1],
-        self::PET         => ['PetList',         'pet',         'g_pets',              0x1],
-        self::ACHIEVEMENT => ['AchievementList', 'achievement', 'g_achievements',      0x1],
-        self::TITLE       => ['TitleList',       'title',       'g_titles',            0x1],
-        self::WORLDEVENT  => ['WorldEventList',  'event',       'g_holidays',          0x1],
-        self::CHR_CLASS   => ['CharClassList',   'class',       'g_classes',           0x1],
-        self::CHR_RACE    => ['CharRaceList',    'race',        'g_races',             0x1],
-        self::SKILL       => ['SkillList',       'skill',       'g_skills',            0x1],
-        self::STATISTIC   => ['AchievementList', 'achievement', 'g_achievements',      0x0], // alias for achievements; exists only for Markup
-        self::CURRENCY    => ['CurrencyList',    'currency',    'g_gatheredcurrencies',0x1],
-        self::SOUND       => ['SoundList',       'sound',       'g_sounds',            0x1],
-        self::ICON        => ['IconList',        'icon',        'g_icons',             0x1],
-        self::GUIDE       => ['GuideList',       'guide',       '',                    0x0],
-        self::PROFILE     => ['ProfileList',     '',            '',                    0x0], // x - not known in javascript
-        self::GUILD       => ['GuildList',       '',            '',                    0x0], // x
-        self::ARENA_TEAM  => ['ArenaTeamList',   '',            '',                    0x0], // x
-        self::USER        => ['UserList',        'user',        'g_users',             0x0], // x
-        self::EMOTE       => ['EmoteList',       'emote',       'g_emotes',            0x1],
-        self::ENCHANTMENT => ['EnchantmentList', 'enchantment', 'g_enchantments',      0x1],
-        self::AREATRIGGER => ['AreatriggerList', 'areatrigger', '',                    0x0],
-        self::MAIL        => ['MailList',        'mail',        '',                    0x1]
+    private static array $data = array(
+        self::NPC         => [__NAMESPACE__ . '\CreatureList',    'npc',         'g_npcs',              0x1],
+        self::OBJECT      => [__NAMESPACE__ . '\GameObjectList',  'object',      'g_objects',           0x1],
+        self::ITEM        => [__NAMESPACE__ . '\ItemList',        'item',        'g_items',             0x1],
+        self::ITEMSET     => [__NAMESPACE__ . '\ItemsetList',     'itemset',     'g_itemsets',          0x1],
+        self::QUEST       => [__NAMESPACE__ . '\QuestList',       'quest',       'g_quests',            0x1],
+        self::SPELL       => [__NAMESPACE__ . '\SpellList',       'spell',       'g_spells',            0x1],
+        self::ZONE        => [__NAMESPACE__ . '\ZoneList',        'zone',        'g_gatheredzones',     0x1],
+        self::FACTION     => [__NAMESPACE__ . '\FactionList',     'faction',     'g_factions',          0x1],
+        self::PET         => [__NAMESPACE__ . '\PetList',         'pet',         'g_pets',              0x1],
+        self::ACHIEVEMENT => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',      0x1],
+        self::TITLE       => [__NAMESPACE__ . '\TitleList',       'title',       'g_titles',            0x1],
+        self::WORLDEVENT  => [__NAMESPACE__ . '\WorldEventList',  'event',       'g_holidays',          0x1],
+        self::CHR_CLASS   => [__NAMESPACE__ . '\CharClassList',   'class',       'g_classes',           0x1],
+        self::CHR_RACE    => [__NAMESPACE__ . '\CharRaceList',    'race',        'g_races',             0x1],
+        self::SKILL       => [__NAMESPACE__ . '\SkillList',       'skill',       'g_skills',            0x1],
+        self::STATISTIC   => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',      0x0], // alias for achievements; exists only for Markup
+        self::CURRENCY    => [__NAMESPACE__ . '\CurrencyList',    'currency',    'g_gatheredcurrencies',0x1],
+        self::SOUND       => [__NAMESPACE__ . '\SoundList',       'sound',       'g_sounds',            0x1],
+        self::ICON        => [__NAMESPACE__ . '\IconList',        'icon',        'g_icons',             0x1],
+        self::GUIDE       => [__NAMESPACE__ . '\GuideList',       'guide',       '',                    0x0],
+        self::PROFILE     => [__NAMESPACE__ . '\ProfileList',     '',            '',                    0x0], // x - not known in javascript
+        self::GUILD       => [__NAMESPACE__ . '\GuildList',       '',            '',                    0x0], // x
+        self::ARENA_TEAM  => [__NAMESPACE__ . '\ArenaTeamList',   '',            '',                    0x0], // x
+        self::USER        => [__NAMESPACE__ . '\UserList',        'user',        'g_users',             0x0], // x
+        self::EMOTE       => [__NAMESPACE__ . '\EmoteList',       'emote',       'g_emotes',            0x1],
+        self::ENCHANTMENT => [__NAMESPACE__ . '\EnchantmentList', 'enchantment', 'g_enchantments',      0x1],
+        self::AREATRIGGER => [__NAMESPACE__ . '\AreatriggerList', 'areatrigger', '',                    0x0],
+        self::MAIL        => [__NAMESPACE__ . '\MailList',        'mail',        '',                    0x1]
     );
 
 

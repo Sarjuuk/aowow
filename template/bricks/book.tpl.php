@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (!empty($this->pageText)):
 ?>

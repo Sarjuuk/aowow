@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -281,14 +283,14 @@ class User
 
                 require 'config/extAuth.php';
 
-                if (!function_exists('extAuth'))
+                if (!function_exists('\extAuth'))
                 {
                     trigger_error('external auth function extAuth() not defined in config/extAuth.php');
                     return AUTH_INTERNAL_ERR;
                 }
 
                 $extGroup = -1;
-                $result   = extAuth($name, $pass, $extId, $extGroup);
+                $result   = \extAuth($name, $pass, $extId, $extGroup);
 
                 if ($result == AUTH_OK && $extId)
                 {
@@ -543,7 +545,7 @@ class User
         $gUser['upvoteRep']         = Cfg::get('REP_REQ_UPVOTE');
         $gUser['characters']        = self::getCharacters();
         $gUser['excludegroups']     = self::$excludeGroups;
-        $gUser['settings']          = (new StdClass);       // profiler requires this to be set; has property premiumborder (NYI)
+        $gUser['settings']          = (new \StdClass);      // profiler requires this to be set; has property premiumborder (NYI)
 
         if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
             $gUser['debug'] = true;                         // csv id-list output option on listviews

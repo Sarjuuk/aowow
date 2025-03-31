@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 Listview.templates.emote = {
     sort: [1],
     searchable: 1,

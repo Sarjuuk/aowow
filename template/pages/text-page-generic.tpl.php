@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php $this->brick('header'); ?>
 
     <div class="main" id="main">

@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -21,7 +23,7 @@ class UtilityPage extends GenericPage
         'unrated-comments', 11 => 'latest-videos',   12 => 'most-comments',   13 => 'missing-screenshots'
     );
 
-    protected $_get          = ['rss' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']];
+    protected $_get          = ['rss' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']];
 
     private $page            = '';
     private $rss             = false;

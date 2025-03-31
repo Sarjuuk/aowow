@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (!empty($this->headIcons)):
     foreach ($this->headIcons as $k => $v):

@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 var _ = [
     {
         id: 'standing',

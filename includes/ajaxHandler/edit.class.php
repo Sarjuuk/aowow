@@ -1,13 +1,15 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxEdit extends AjaxHandler
 {
     protected $_get = array(
-        'qqfile' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
-        'guide'  => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ]
+        'qqfile' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
+        'guide'  => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ]
     );
 
     public function __construct(array $params)
@@ -41,12 +43,12 @@ class AjaxEdit extends AjaxHandler
         $tmpPath    = 'static/uploads/temp/';
         $tmpFile    = User::$displayName.'-'.Type::GUIDE.'-0-'.Util::createHash(16);
 
-        $uploader = new qqFileUploader(['jpg', 'jpeg', 'png'], 10 * 1024 * 1024);
+        $uploader = new \qqFileUploader(['jpg', 'jpeg', 'png'], 10 * 1024 * 1024);
         $result   = $uploader->handleUpload($tmpPath, $tmpFile, true);
 
         if (isset($result['success']))
         {
-            $finfo = new finfo(FILEINFO_MIME);
+            $finfo = new \finfo(FILEINFO_MIME);
             $mime  = $finfo->file($tmpPath.$result['newFilename']);
             if (preg_match('/^image\/(png|jpe?g)/i', $mime, $m))
             {

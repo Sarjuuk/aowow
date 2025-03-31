@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -163,7 +165,7 @@ class Game
         switch (gettype($spell))
         {
             case 'object':
-                if (get_class($spell) != 'SpellList')
+                if (get_class($spell) != __NAMESPACE__.'\SpellList')
                     return [];
 
                 $lookup[] = $spell->id;

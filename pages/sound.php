@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -18,7 +20,7 @@ class SoundPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
 
     protected $special       = false;
-    protected $_get          = ['playlist' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']];
+    protected $_get          = ['playlist' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']];
 
     private   $cat           = 0;
 

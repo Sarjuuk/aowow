@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (isset($this->map) && empty($this->map)):
     echo Lang::zone('noMap');

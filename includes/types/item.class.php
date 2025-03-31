@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -488,7 +490,7 @@ class ItemList extends BaseType
                 $extra[$id] = array(
                     'id'      => $id,
                     'tooltip' => $this->renderTooltip(true),
-                    'spells'  => new StdClass               // placeholder for knownSpells
+                    'spells'  => new \StdClass              // placeholder for knownSpells
                 );
             }
         }

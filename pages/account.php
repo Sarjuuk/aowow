@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -44,10 +46,10 @@ class AccountPage extends GenericPage
 
     protected $_post     = array(
         'username'    => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'password'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
-        'c_password'  => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
+        'password'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextLine'],
+        'c_password'  => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextLine'],
         'token'       => ['filter' => FILTER_SANITIZE_SPECIAL_CHARS, 'flags' => FILTER_FLAG_STRIP_AOWOW],
-        'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'AccountPage::rememberCallback'],
+        'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AccountPage::rememberCallback'],
         'email'       => ['filter' => FILTER_SANITIZE_EMAIL]
     );
 

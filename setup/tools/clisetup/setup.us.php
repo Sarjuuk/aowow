@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -94,7 +96,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         }
 
         // init temp setup dir
-        if ($info = new SplFileInfo(self::STEP_FILE))
+        if ($info = new \SplFileInfo(self::STEP_FILE))
             CLISetup::writeDir($info->getPath());
 
 

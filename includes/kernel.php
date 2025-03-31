@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 mb_internal_encoding('UTF-8');
 mysqli_report(MYSQLI_REPORT_ERROR);
 
@@ -11,7 +13,7 @@ define('CLI_HAS_E', CLI &&                                  // WIN10 and later u
 
 
 $reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'/*, 'gmp'*/];
-$badExt = ['Intl'];                                          // Intl contains its own class Locale. What? Namespaces? Never heard of those!
+$badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
     $error .= 'Required Extension <b>'.implode(', ', $ext)."</b> was not found. Please check if it should exist, using \"<i>php -m</i>\"\n\n";
@@ -47,18 +49,18 @@ require_once 'pages/genericPage.class.php';
 // TC systems
 spl_autoload_register(function ($class)
 {
-    switch($class)
+    switch ($class)
     {
-        case 'SmartAI':
-        case 'SmartEvent':
-        case 'SmartAction':
-        case 'SmartTarget':
+        case __NAMESPACE__.'\SmartAI':
+        case __NAMESPACE__.'\SmartEvent':
+        case __NAMESPACE__.'\SmartAction':
+        case __NAMESPACE__.'\SmartTarget':
             require_once 'includes/components/SmartAI/SmartAI.class.php';
             require_once 'includes/components/SmartAI/SmartEvent.class.php';
             require_once 'includes/components/SmartAI/SmartAction.class.php';
             require_once 'includes/components/SmartAI/SmartTarget.class.php';
             break;
-        case 'Conditions':
+        case __NAMESPACE__.'\Conditions':
             require_once 'includes/components/Conditions/Conditions.class.php';
             break;
     }
@@ -71,6 +73,9 @@ spl_autoload_register(function ($class)
 
     if (class_exists($class))                               // already registered
         return;
+
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
 
     if (preg_match('/[^\w]/i', $class))                     // name should contain only letters
         return;
@@ -90,7 +95,7 @@ spl_autoload_register(function ($class)
         if (file_exists('includes/types/'.$cl.'.class.php'))
             require_once 'includes/types/'.$cl.'.class.php';
         else
-            throw new Exception('could not register type class: '.$cl);
+            throw new \Exception('could not register type class: '.$cl);
 
         return;
     }
@@ -101,7 +106,7 @@ spl_autoload_register(function ($class)
         if (file_exists('includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php'))
             require_once 'includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php';
         else
-            throw new Exception('could not register ajaxHandler class: '.$class);
+            throw new \Exception('could not register ajaxHandler class: '.$class);
 
         return;
     }
@@ -220,7 +225,10 @@ if (!CLI)
 {
     // not displaying the brb gnomes as static_host is missing, but eh...
     if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !Cfg::get('HOST_URL') || !Cfg::get('STATIC_URL'))
+    {
+        Lang::load(Locale::EN);
         (new GenericPage())->maintenance();
+    }
 
     // Setup Session
     $cacheDir = Cfg::get('SESSION_CACHE_DIR');
@@ -247,15 +255,15 @@ if (!CLI)
     // set up some logging (~10 queries will execute before we init the user and load the config)
     if (Cfg::get('DEBUG') >= CLI::LOG_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
-        DB::Aowow()->setLogger(['DB', 'profiler']);
-        DB::World()->setLogger(['DB', 'profiler']);
+        DB::Aowow()->setLogger(DB::profiler(...));
+        DB::World()->setLogger(DB::profiler(...));
         if (DB::isConnected(DB_AUTH))
-            DB::Auth()->setLogger(['DB', 'profiler']);
+            DB::Auth()->setLogger(DB::profiler(...));
 
         if (!empty($AoWoWconf['characters']))
             foreach ($AoWoWconf['characters'] as $idx => $__)
                 if (DB::isConnected(DB_CHARACTERS . $idx))
-                    DB::Characters($idx)->setLogger(['DB', 'profiler']);
+                    DB::Characters($idx)->setLogger(DB::profiler(...));
     }
 
     // parse page-parameters .. sanitize before use!

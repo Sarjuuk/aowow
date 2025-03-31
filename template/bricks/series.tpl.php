@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
     <tr><th id="infobox-series"><?=$listTitle ?: Lang::achievement('series'); ?></th></tr>
     <tr><td>
         <div class="infobox-spacer"></div>

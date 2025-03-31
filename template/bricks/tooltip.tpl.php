@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
     <div id="ic<?=$this->typeId; ?>" style="float: left"></div>
     <div id="tt<?=$this->typeId; ?>" class="wowhead-tooltip" style="float: left; padding-top: 1px"></div>
     <div style="clear: left"></div>

@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -38,7 +40,7 @@ class AchievementPage extends GenericPage
     protected $tabId         = 0;
     protected $mode          = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerAchievement(%d, %d, %s);';
 
@@ -548,7 +550,7 @@ class AchievementPage extends GenericPage
 
     protected function generateTooltip()
     {
-        $power = new StdClass();
+        $power = new \StdClass();
         if (!$this->subject->error)
         {
             $power->{'name_'.Lang::getLocale()->json()}    = $this->subject->getField('name', true);

@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 Listview.templates.areatrigger = {
     sort: [1],
     searchable: 1,

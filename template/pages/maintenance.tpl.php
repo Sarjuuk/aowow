@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <!DOCTYPE html>
 <html>
 <head>

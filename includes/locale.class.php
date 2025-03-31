@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -178,11 +180,11 @@ enum Locale : int
 /* The shape of things to come */
 class LocString
 {
-    private WeakMap $store;
+    private \WeakMap $store;
 
     public function __construct(array $data, string $key = 'name', ?callable $callback = null)
     {
-        $this->store = new WeakMap();
+        $this->store = new \WeakMap();
 
         $callback ??= fn($x) => $x;
 

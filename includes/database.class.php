@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -30,9 +32,9 @@ class DB
         }
 
         $options = &self::$optionsCache[$idx];
-        $interface = DbSimple_Generic::connect(self::createConnectSyntax($options));
+        $interface = \DbSimple_Generic::connect(self::createConnectSyntax($options));
 
-        $interface->setErrorHandler(['DB', 'errorHandler']);
+        $interface->setErrorHandler(self::errorHandler(...));
         if ($options['prefix'])
             $interface->setIdentPrefix($options['prefix']);
 

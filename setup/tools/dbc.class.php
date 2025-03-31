@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 /*
     DBC::read - PHP function for loading DBC file into array
     This file is a part of AoWoW project.

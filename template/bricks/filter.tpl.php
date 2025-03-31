@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
             <script type="text/javascript">//<![CDATA[
 <?php if (isset($this->region) && isset($this->realm)): ?>
                 pr_setRegionRealm($WH.ge('fi').firstChild, '<?=$this->region; ?>', '<?=$this->realm; ?>');

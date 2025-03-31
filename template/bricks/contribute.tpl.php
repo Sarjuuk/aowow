@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (!empty($this->contribute)):
 ?>
@@ -9,7 +11,7 @@ if (!empty($this->contribute)):
 <div class="text" style="margin-right: 310px">
     <div class="tabbed-contents" style="clear: none">
 <?php
-    $this->localizedBrick('contrib', Lang::getLocale());
+    $this->localizedBrick('contrib');
 ?>
     </div>
 </div>

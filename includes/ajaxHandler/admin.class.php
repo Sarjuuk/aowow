@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -7,25 +9,25 @@ class AjaxAdmin extends AjaxHandler
 {
     protected $validParams = ['screenshots', 'siteconfig', 'weight-presets', 'spawn-override', 'guide', 'comment'];
     protected $_get        = array(
-        'action' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'      ],
-        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
-        'key'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkKey'             ],
-        'all'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'      ],
-        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
-        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
-        'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkUser'            ],
-        'val'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
-        'guid'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
-        'area'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ],
-        'floor'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'           ]
+        'action' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'      ],
+        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdListUnsigned'],
+        'key'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAdmin::checkKey'             ],
+        'all'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkEmptySet'      ],
+        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'           ],
+        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'           ],
+        'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAdmin::checkUser'            ],
+        'val'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'      ],
+        'guid'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'           ],
+        'area'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'           ],
+        'floor'  => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'           ]
     );
     protected $_post       = array(
-        'alt'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'],
-        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'     ],
-        'scale'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkScale'     ],
-        '__icon' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAdmin::checkKey'       ],
-        'status' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'     ],
-        'msg'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob']
+        'alt'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'],
+        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'     ],
+        'scale'  => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAdmin::checkScale'     ],
+        '__icon' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAdmin::checkKey'       ],
+        'status' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'     ],
+        'msg'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob']
     );
 
     public function __construct(array $params)

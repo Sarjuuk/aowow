@@ -1,12 +1,14 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxLocale extends AjaxHandler
 {
     protected $_get = array(
-        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFrom']
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFrom']
     );
 
     public function __construct(array $params)

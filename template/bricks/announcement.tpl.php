@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 foreach ($this->announcements as $id => $data):
 ?>

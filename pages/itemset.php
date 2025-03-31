@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -25,7 +27,7 @@ class ItemsetPage extends GenericPage
     protected $mode          = CACHE_TYPE_PAGE;
     protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain']];
+    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
 
     private   $powerTpl      = '$WowheadPower.registerItemSet(%d, %d, %s);';
 
@@ -241,7 +243,7 @@ class ItemsetPage extends GenericPage
 
     protected function generateTooltip()
     {
-        $power = new StdClass();
+        $power = new \StdClass();
         if (!$this->subject->error)
         {
             $power->{'name_'.Lang::getLocale()->json()}    = $this->subject->getField('name', true);

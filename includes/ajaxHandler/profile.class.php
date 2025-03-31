@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -9,16 +11,16 @@ class AjaxProfile extends AjaxHandler
 
     protected $validParams = ['link', 'unlink', 'pin', 'unpin', 'public', 'private', 'avatar', 'resync', 'status', 'save', 'delete', 'purge', 'summary', 'load'];
     protected $_get        = array(
-        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'  ],
-        'items'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkItemList'],
-        'size'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
-        'guild'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
-        'arena-team' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkEmptySet'],
-        'user'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkUser'    ]
+        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdList'  ],
+        'items'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkItemList'],
+        'size'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
+        'guild'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkEmptySet'],
+        'arena-team' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkEmptySet'],
+        'user'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkUser'    ]
     );
 
     protected $_post        = array(
-        'name'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
+        'name'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
         'level'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'class'        => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'race'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
@@ -28,17 +30,17 @@ class AjaxProfile extends AjaxHandler
         'talenttree2'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'talenttree3'  => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'activespec'   => ['filter' => FILTER_SANITIZE_NUMBER_INT],
-        'talentbuild1' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkTalentString'],
-        'glyphs1'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkGlyphString' ],
-        'talentbuild2' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkTalentString'],
-        'glyphs2'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxProfile::checkGlyphString' ],
-        'icon'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'    ],
-        'description'  => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'    ],
+        'talentbuild1' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkTalentString'],
+        'glyphs1'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkGlyphString' ],
+        'talentbuild2' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkTalentString'],
+        'glyphs2'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxProfile::checkGlyphString' ],
+        'icon'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'    ],
+        'description'  => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'    ],
         'source'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'copy'         => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'public'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'gearscore'    => ['filter' => FILTER_SANITIZE_NUMBER_INT],
-        'inv'          => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned', 'flags' => FILTER_REQUIRE_ARRAY],
+        'inv'          => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdListUnsigned', 'flags' => FILTER_REQUIRE_ARRAY],
     );
 
     public function __construct(array $params)

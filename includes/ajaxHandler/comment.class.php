@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -11,23 +13,23 @@ class AjaxComment extends AjaxHandler
     const REPLY_LENGTH_MAX   = 600;
 
     protected $_post = array(
-        'id'          => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdListUnsigned'],
-        'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
-        'commentbody' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
-        'response'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
-        'reason'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'      ],
-        'remove'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
-        'commentId'   => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
-        'replyId'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
-        'sticky'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
-     // 'username'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'      ]
+        'id'          => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdListUnsigned'],
+        'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'      ],
+        'commentbody' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'      ],
+        'response'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'      ],
+        'reason'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'      ],
+        'remove'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                            ],
+        'commentId'   => ['filter' => FILTER_SANITIZE_NUMBER_INT                                            ],
+        'replyId'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                            ],
+        'sticky'      => ['filter' => FILTER_SANITIZE_NUMBER_INT                                            ],
+     // 'username'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'      ]
     );
 
     protected $_get  = array(
-        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
-        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
-        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt'],
-        'rating' => ['filter' => FILTER_SANITIZE_NUMBER_INT                           ]
+        'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'],
+        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'],
+        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt'],
+        'rating' => ['filter' => FILTER_SANITIZE_NUMBER_INT                                 ]
     );
 
     public function __construct(array $params)

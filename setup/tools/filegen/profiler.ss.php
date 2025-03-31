@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -387,7 +389,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                 if ($ids = array_keys(array_filter($data, fn($x) => $x & (1 << $i))))
                     $excludes[$type][$i + 1] = $ids;
 
-        $buff = "g_excludes = ".Util::toJSON($excludes ?: (new StdClass)).";\n";
+        $buff = "g_excludes = ".Util::toJSON($excludes ?: (new \StdClass)).";\n";
 
         if (!CLISetup::writeFile('datasets/quick-excludes', $buff))
             $this->success = false;

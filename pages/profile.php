@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -30,8 +32,8 @@ class ProfilePage extends GenericPage
     );
 
     protected $_get      = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
-        'new'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain'],
+        'new'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']
     );
 
     private   $isCustom  = false;
@@ -189,7 +191,7 @@ class ProfilePage extends GenericPage
         if (!$this->isCustom)
             $id = "'".$this->profile[0].'.'.urlencode($this->profile[1]).'.'.urlencode($this->profile[2])."'";
 
-        $power = new StdClass();
+        $power = new \StdClass();
         if ($this->subject && !$this->subject->error && $this->subject->isVisibleToUser())
         {
             $n = $this->subject->getField('name');

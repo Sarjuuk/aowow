@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if ($m = $this->mail):
     if (!isset($offset))                                        // in case we have multiple icons on the page (prominently quest-rewards)

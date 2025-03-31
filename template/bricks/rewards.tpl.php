@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 
 if (!isset($offset))                                        // in case we have multiple icons on the page (prominently quest-rewards)

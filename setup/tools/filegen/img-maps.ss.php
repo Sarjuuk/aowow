@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -739,7 +741,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
     }
 
-    private function buildSpawnMap(GdImage $resOverlay, int $zoneId) : void
+    private function buildSpawnMap(\GdImage $resOverlay, int $zoneId) : void
     {
         $outFile = $this->genSteps[self::M_SPAWNS][self::GEN_IDX_DEST_INFO][0][0] . $zoneId . '.png';
 
@@ -769,7 +771,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             $this->success = false;
     }
 
-    private function buildSubZones(GdImage $resMap, int $wmaId, Locale $loc) : void
+    private function buildSubZones(\GdImage $resMap, int $wmaId, Locale $loc) : void
     {
         foreach ($this->wmOverlays[$wmaId] as &$row)
         {
@@ -806,7 +808,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
     }
 
-    private function generateOverlay(int $wmaId, string $basePath) : ?GdImage
+    private function generateOverlay(int $wmaId, string $basePath) : ?\GdImage
     {
         if (!isset($this->wmOverlays[$wmaId]))
             return null;

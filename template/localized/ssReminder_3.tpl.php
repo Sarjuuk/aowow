@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
                     <h2><img src="<?=Cfg::get('STATIC_URL'); ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">Hinweis</h2>
                     Euer Screenshot wird <b class="q10">nicht</b> zugelassen werden, wenn er nicht unseren Richtlinien entspricht.
 

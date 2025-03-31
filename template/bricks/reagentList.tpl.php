@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <h3><?=Lang::spell('reagents'); ?></h3>
 
 <?php

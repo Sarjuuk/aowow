@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (!empty($this->lvTabs) || !empty($this->user['characterData']) || !empty($this->user['profileData']) || $this->contribute):
     $relTabs  = !empty($relTabs);

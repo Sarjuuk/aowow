@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -22,8 +24,8 @@ class AdminPage extends GenericPage
 
     protected $_get      = array(
         'all'    => ['filter' => FILTER_UNSAFE_RAW],
-        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
+        'type'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'typeid' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
         'user'   => ['filter' => FILTER_CALLBACK, 'options' => 'urldecode']
     );
 

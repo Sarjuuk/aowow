@@ -1,12 +1,14 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxGotocomment extends AjaxHandler
 {
     protected $_get = array(
-        'id' => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkInt']
+        'id' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkInt']
     );
 
     public function __construct(array $params)

@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (!empty($this->infobox) || !empty($this->contributions) || !empty($this->series) || $this->contribute & (CONTRIBUTE_SS | CONTRIBUTE_VI)):
 echo "    <table class=\"infobox\">\n";

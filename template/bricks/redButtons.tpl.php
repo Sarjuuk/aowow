@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 // link to wowhead
 if (isset($this->redButtons[BUTTON_WOWHEAD])):

@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -23,8 +25,8 @@ class ComparePage extends GenericPage
     protected $summary       = [];
     protected $cmpItems      = [];
 
-    protected $_get          = ['compare'        => ['filter' => FILTER_CALLBACK, 'options' => 'ComparePage::checkCompareString']];
-    protected $_cookie       = ['compare_groups' => ['filter' => FILTER_CALLBACK, 'options' => 'ComparePage::checkCompareString']];
+    protected $_get          = ['compare'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\ComparePage::checkCompareString']];
+    protected $_cookie       = ['compare_groups' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\ComparePage::checkCompareString']];
 
     private   $compareString = '';
 

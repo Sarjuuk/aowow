@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -83,7 +85,7 @@ class Cfg
 
             if ($flags & self::FLAG_ON_LOAD_FN)
             {
-                if (!method_exists('Cfg', $key))
+                if (!method_exists(__CLASS__, $key))
                     self::throwError('Aowow config '.strtoupper($key).' flagged for onLoadFN handling, but no handler was set');
                 else
                     self::{$key}($value);
@@ -211,7 +213,7 @@ class Cfg
         if ($flags & self::FLAG_ON_SET_FN)
         {
             $errMsg = '';
-            if (!method_exists('Cfg', $key))
+            if (!method_exists(__CLASS__, $key))
                 $errMsg = 'Aowow config '.strtoupper($key).' flagged for onSetFN validation, but no handler was set';
             else
                 self::{$key}($value, $errMsg);
@@ -228,7 +230,7 @@ class Cfg
 
         if ($flags & self::FLAG_ON_LOAD_FN)
         {
-            if (!method_exists('Cfg', $key))
+            if (!method_exists(__CLASS__, $key))
                 return 'Aowow config '.strtoupper($key).' flagged for onLoadFN handling, but no handler was set';
             else
                 self::{$key}($value);
@@ -266,7 +268,7 @@ class Cfg
         if ($flags & self::FLAG_ON_SET_FN)
         {
             $errMsg = '';
-            if (!method_exists('Cfg', $key))
+            if (!method_exists(__CLASS__, $key))
                 $errMsg = 'required onSetFN validator not set';
             else
                 self::{$key}($default, $errMsg);
@@ -285,7 +287,7 @@ class Cfg
         return self::handleFileBuild($key, $rebuildFiles);
     }
 
-    public static function forCategory(int $category) : Generator
+    public static function forCategory(int $category) : \Generator
     {
         foreach (self::$store as $k => [, $flags, $catg, , ])
             if ($catg == $category && !($flags & self::FLAG_INTERNAL))

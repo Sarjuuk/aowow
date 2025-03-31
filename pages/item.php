@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -29,11 +31,11 @@ class ItemPage extends genericPage
     );
 
     protected $_get          = array(
-        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Locale::tryFromDomain'],
-        'rand'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'ench'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'gems'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkIntArray'],
-        'sock'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet']
+        'domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain'],
+        'rand'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'ench'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'gems'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkIntArray'],
+        'sock'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']
     );
 
     private   $powerTpl      = '$WowheadPower.registerItem(%s, %d, %s);';
@@ -1030,7 +1032,7 @@ class ItemPage extends genericPage
 
     protected function generateTooltip()
     {
-        $power = new StdClass();
+        $power = new \StdClass();
         if (!$this->subject->error)
         {
             $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true, false, $this->enhancedTT), Lang::FMT_RAW);

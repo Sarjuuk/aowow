@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
         <div class="footer">
 <?php
 if (User::isInGroup(U_GROUP_EMPLOYEE) && ($this->time || isset($this->mysql) || $this->isCached)):

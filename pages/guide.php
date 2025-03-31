@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -38,22 +40,22 @@ class GuidePage extends GenericPage
     private   /* bool */   $save          = false;
 
     protected /* array */ $_get = array(
-        'id'  => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'rev' => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt']
+        'id'  => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'rev' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt']
     );
 
     protected /* array */ $_post = array(
-        'save'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet'],
-        'submit'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkEmptySet'],
-        'title'       => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
-        'name'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextLine'],
-        'description' => ['filter' => FILTER_CALLBACK, 'options' => 'GuidePage::checkDescription'],
-        'changelog'   => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob'],
-        'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkTextBlob'],
-        'locale'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'category'    => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'specId'      => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt'],
-        'classId'     => ['filter' => FILTER_CALLBACK, 'options' => 'GenericPage::checkInt']
+        'save'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet'],
+        'submit'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet'],
+        'title'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextLine'],
+        'name'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextLine'],
+        'description' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GuidePage::checkDescription'],
+        'changelog'   => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextBlob'],
+        'body'        => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkTextBlob'],
+        'locale'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'category'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'specId'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt'],
+        'classId'     => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkInt']
     );
 
     public function __construct($pageCall, $pageParam)
@@ -500,7 +502,7 @@ class GuidePage extends GenericPage
 
     protected function generateTooltip()
     {
-        $power = new StdClass();
+        $power = new \StdClass();
         if (!$this->subject->error)
         {
             $power->{'name_'.Lang::getLocale()->json()}    = strip_tags($this->name);

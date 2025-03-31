@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
         <div id="tab-add-your-comment" style="display: none">
             发表评论时请记住以下几点：
             <ul>

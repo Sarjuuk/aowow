@@ -1,4 +1,6 @@
-﻿<?php $this->brick('header'); ?>
+﻿<?php namespace Aowow; ?>
+
+<?php $this->brick('header'); ?>
 
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>

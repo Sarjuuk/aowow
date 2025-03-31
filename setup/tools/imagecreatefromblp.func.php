@@ -1,4 +1,6 @@
 <?php
+
+namespace Aowow;
 /*
     imagecreatefromblp - a PHP function which loads images from BLP files
     This file is a part of AoWoW project.
@@ -29,12 +31,12 @@
         die('not in cli mode');
 
 
-    function imagecreatefromblp($fileName, $imgId = 0)
+    function imagecreatefromblp(string $fileName, int $imgId = 0) : ?\GdImage
     {
         if (!CLISetup::fileExists($fileName))
         {
             CLI::write('file '.$fileName.' could not be found', CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $file = fopen($fileName, 'rb');
@@ -42,14 +44,14 @@
         if (!$file)
         {
             CLI::write('could not open file '.$fileName, CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $fileSize = fileSize($fileName);
         if ($fileSize < 16)
         {
             CLI::write('file '.$fileName.' is too small for a BLP file', CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $data = fread($file, $fileSize);
@@ -65,14 +67,14 @@
             else
             {
                 CLI::write('file '.$fileName.' is an incremental patch file and cannot be used by this script.', CLI::LOG_ERROR);
-                return;
+                return null;
             }
         }
 
         if (substr($data, 0, 4) != "BLP2")
         {
             CLI::write('file '.$fileName.' has incorrect/unsupported magic bytes', CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $header = unpack("Vformat/Ctype/CalphaBits/CalphaType/Cmips/Vwidth/Vheight", substr($data, 4, 16));
@@ -84,7 +86,7 @@
         if ($header['format'] != 1)
         {
             CLI::write('file '.$fileName.' has unsupported format'.$debugStr, CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $offs = $header['mipsOffs'][$imgId + 1];
@@ -100,12 +102,12 @@
         if ($size == 0)
         {
             CLI::write('file '.$fileName.' contains zeroes in a mips table'.$debugStr, CLI::LOG_ERROR);
-            return;
+            return null;
         }
         if ($offs + $size > $fileSize)
         {
             CLI::write('file '.$fileName.' is corrupted/incomplete'.$debugStr, CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         if ($header['type'] == 1)
@@ -117,16 +119,19 @@
         else
         {
             CLI::write('file '.$fileName.' has unsupported type'.$debugStr, CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         return $img;
     }
 
     // uncompressed
-    function icfb1($width, $height, $palette, $data)
+    function icfb1(int $width, int $height, $palette, string $data) : ?\GdImage
     {
         $img = imagecreatetruecolor($width, $height);
+        if (!$img)
+            return null;
+
         imagesavealpha($img, true);
         imagealphablending($img, false);
 
@@ -148,15 +153,18 @@
     }
 
     // DXTC
-    function icfb2($width, $height, $data, $alphaBits, $alphaType)
+    function icfb2(int $width, int $height, string $data, int $alphaBits, int $alphaType) : ?\GdImage
     {
         if (!in_array($alphaBits * 10 + $alphaType, [0, 10, 41, 81, 87, 88]))
         {
             CLI::write('unsupported compression type', CLI::LOG_ERROR);
-            return;
+            return null;
         }
 
         $img = imagecreatetruecolor($width, $height);
+        if (!$img)
+            return null;
+
         imagesavealpha($img, true);
         imagealphablending($img, false);
 
@@ -304,9 +312,12 @@
     }
 
     // plain
-    function icfb3($width, $height, $data)
+    function icfb3(int $width, int $height, string $data) : ?\GdImage
     {
         $img = imagecreatetruecolor($width, $height);
+        if (!$img)
+            return null;
+
         $i = unpack("V*", $data);
 
         for ($y = 0; $y < $height; $y++)

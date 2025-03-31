@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -10,9 +12,9 @@ class AjaxAccount extends AjaxHandler
         'groups'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'save'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'delete'     => ['filter' => FILTER_SANITIZE_NUMBER_INT],
-        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkIdList'],
-        'name'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAccount::checkName'  ],
-        'scale'      => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxAccount::checkScale' ],
+        'id'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdList'],
+        'name'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAccount::checkName'  ],
+        'scale'      => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxAccount::checkScale' ],
         'reset'      => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],
         'type'       => ['filter' => FILTER_SANITIZE_NUMBER_INT],

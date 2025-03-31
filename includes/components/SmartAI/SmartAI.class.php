@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -558,7 +560,7 @@ class SmartAI
     /* Structured Lisview Display */
     /******************************/
 
-    private function &iterate() : Generator
+    private function &iterate() : \Generator
     {
         reset($this->rawData);
 

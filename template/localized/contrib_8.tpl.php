@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
         <div id="tab-add-your-comment" style="display: none">
             При написании комментария, просим вас не забывать про следующее:
             <ul>

@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+namespace Aowow;
+
 require 'includes/kernel.php';
 
 /* todo (med):

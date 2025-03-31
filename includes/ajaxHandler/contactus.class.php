@@ -1,20 +1,22 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxContactus extends AjaxHandler
 {
     protected $_post = array(
-        'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
-        'reason'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
-        'ua'         => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
-        'appname'    => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
-        'page'       => ['filter' => FILTER_SANITIZE_URL                                       ],
-        'desc'       => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextBlob'],
-        'id'         => ['filter' => FILTER_SANITIZE_NUMBER_INT                                ],
-        'relatedurl' => ['filter' => FILTER_SANITIZE_URL                                       ],
-        'email'      => ['filter' => FILTER_SANITIZE_EMAIL                                     ]
+        'mode'       => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
+        'reason'     => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
+        'ua'         => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
+        'appname'    => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
+        'page'       => ['filter' => FILTER_SANITIZE_URL                                             ],
+        'desc'       => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextBlob'],
+        'id'         => ['filter' => FILTER_SANITIZE_NUMBER_INT                                      ],
+        'relatedurl' => ['filter' => FILTER_SANITIZE_URL                                             ],
+        'email'      => ['filter' => FILTER_SANITIZE_EMAIL                                           ]
     );
 
     public function __construct(array $params)

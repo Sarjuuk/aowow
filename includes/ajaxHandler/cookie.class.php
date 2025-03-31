@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -12,7 +14,7 @@ class AjaxCookie extends AjaxHandler
             return;
 
         $this->_get = array(
-            $params[0] => ['filter' => FILTER_CALLBACK, 'options' => 'AjaxHandler::checkTextLine'],
+            $params[0] => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'],
         );
 
         // NOW we know, what to expect and sanitize

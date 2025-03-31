@@ -1,12 +1,14 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 class AjaxGetdescription extends AjaxHandler
 {
     protected $_post = array(
-        'description' => [FILTER_CALLBACK, ['options' => 'AjaxHandler::checkTextBlob']]
+        'description' => [FILTER_CALLBACK, ['options' => 'Aowow\AjaxHandler::checkTextBlob']]
     );
 
     public function __construct(array $params)

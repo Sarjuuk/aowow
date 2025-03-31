@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
@@ -922,8 +924,10 @@ class GenericPage
     }
 
     // load brick with more text then vars
-    protected function localizedBrick(string $file, Locale $loc = Locale::EN) : void
+    protected function localizedBrick(string $file, ?Locale $loc = null) : void
     {
+        $loc ??= Lang::getLocale();
+
         if (!$this->isSaneInclude('template/localized/', $file.'_'.$loc->value))
         {
             if ($loc == Locale::EN || !$this->isSaneInclude('template/localized/', $file.'_'.Locale::EN->value))
@@ -1039,12 +1043,12 @@ class GenericPage
             {
                 try
                 {
-                    $rp = new ReflectionProperty($this, $key);
+                    $rp = new \ReflectionProperty($this, $key);
                     if ($rp && ($rp->isPublic() || $rp->isProtected()))
                         if (!in_array($key, $noCache))
                             $cache[$key] = $val;
                 }
-                catch (ReflectionException $e) { }          // shut up!
+                catch (\ReflectionException $e) { }         // shut up!
             }
         }
         else
@@ -1175,11 +1179,11 @@ class GenericPage
         return false;
     }
 
-    private function memcached() : Memcached
+    private function memcached() : \Memcached
     {
         if (!$this->memcached && (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED))
         {
-            $this->memcached = new Memcached();
+            $this->memcached = new \Memcached();
             $this->memcached->addServer('localhost', 11211);
         }
 

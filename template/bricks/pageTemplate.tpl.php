@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
             <script type="text/javascript">//<![CDATA[
 <?php
 if ($this->contribute & CONTRIBUTE_CO):

@@ -1,5 +1,7 @@
 <?php
 
+namespace Aowow;
+
 if (!defined('AOWOW_REVISION'))
     die("illegal access");
 
@@ -280,7 +282,7 @@ abstract class BaseType
                     // hackfix the inner items query to not contain duplicate column names
                     // yes i know the real solution would be to not have items and item_stats share column names
                     // soon™....
-                    if (get_class($this) == 'ItemList')
+                    if (get_class($this) == __NAMESPACE__.'\ItemList')
                         $totalQuery = str_replace([', `is`.*', ', i.id AS id'], '', $totalQuery);
 
                     $this->matches += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$totalQuery.') x');
@@ -581,7 +583,7 @@ trait spawnHelper
 
     private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
     {
-        $this->spawnResult[SPAWNINFO_SHORT] = new StdClass;
+        $this->spawnResult[SPAWNINFO_SHORT] = new \StdClass;
 
         // first get zone/floor with the most spawns
         if ($res = DB::Aowow()->selectRow('SELECT `areaId`, `floor` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `posX` > 0 AND `posY` > 0 GROUP BY `areaId`, `floor` ORDER BY COUNT(1) DESC LIMIT 1', self::$type, $this->id))
@@ -1023,7 +1025,7 @@ abstract class Filter
             $cats[$idx] = $cat;
     }
 
-    private function &criteriaIterator() : Generator
+    private function &criteriaIterator() : \Generator
     {
         if (!$this->fiData['c'])
             return;

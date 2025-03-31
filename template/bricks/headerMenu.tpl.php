@@ -1,3 +1,5 @@
+<?php namespace Aowow; ?>
+
 <?php
 if (User::$id):
     echo '<span id="toplinks-favorites"><a class="hassubmenu"></a>|</span>';
