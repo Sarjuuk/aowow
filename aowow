@@ -6,7 +6,10 @@ if (PHP_SAPI !== 'cli')
 if (PHP_SAPI === 'cli' && getcwd().DIRECTORY_SEPARATOR.'aowow' != __FILE__)
     die("this script must be run from the aowow root directory\n");
 
-require 'includes/kernel.php';
-require 'setup/setup.php';
+require_once 'includes/kernel.php';
+require_once 'includes/setup/cli.class.php';
+require_once 'includes/setup/timer.class.php';
+
+require_once 'setup/setup.php';
 
 ?>

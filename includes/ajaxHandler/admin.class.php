@@ -390,9 +390,9 @@ class AjaxAdmin extends AjaxHandler
 
         DB::Aowow()->query('REPLACE INTO ?_spawns_override VALUES (?d, ?d, ?d, ?d, ?d)', $type, $guid, $area, $floor, AOWOW_REVISION);
 
-        if ($wPos = Game::getWorldPosForGUID($type, $guid))
+        if ($wPos = WorldPosition::getForGUID($type, $guid))
         {
-            if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $wPos[$guid]['posX'], $wPos[$guid]['posY'], $area, $floor))
+            if ($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $wPos[$guid]['posX'], $wPos[$guid]['posY'], $area, $floor))
             {
                 $updGUIDs = [$guid];
                 $newPos   = array(
@@ -417,7 +417,7 @@ class AjaxAdmin extends AjaxHandler
                         {
                             foreach ($swp as $w)
                             {
-                                if ($point = Game::worldPosToZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
+                                if ($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
                                 {
                                     $p = array(
                                         'posX'   => $point[0]['posX'],

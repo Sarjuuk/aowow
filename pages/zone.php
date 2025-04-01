@@ -803,7 +803,7 @@ class ZonePage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             return;
 
-        $worldPos = Game::getWorldPosForGUID(Type::ZONE, -$this->typeId);
+        $worldPos = WorldPosition::getForGUID(Type::ZONE, -$this->typeId);
         if (!$worldPos)
             return;
 

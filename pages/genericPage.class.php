@@ -607,9 +607,9 @@ class GenericPage
         {
             array_unshift($notes, 'One or more issues occured, while generating this page.');
             $colors = array(   // [border, text]
-                CLI::LOG_ERROR => ['C50F1F', 'E51223'],
-                CLI::LOG_WARN  => ['C19C00', 'E5B700'],
-                CLI::LOG_INFO  => ['3A96DD', '42ADFF']
+                LOG_LEVEL_ERROR => ['C50F1F', 'E51223'],
+                LOG_LEVEL_WARN  => ['C19C00', 'E5B700'],
+                LOG_LEVEL_INFO  => ['3A96DD', '42ADFF']
             );
 
             $this->announcements[0] = array(

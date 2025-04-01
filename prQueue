@@ -3,7 +3,8 @@
 
 namespace Aowow;
 
-require 'includes/kernel.php';
+require_once 'includes/kernel.php';
+require_once 'includes/setup/cli.class.php';
 
 /* todo (med):
     * tidy this file

@@ -34,19 +34,40 @@ require_once 'localization/lang.class.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/utilities.php';                      // helper functions
-require_once 'includes/config.class.php';                   // Config holder
+require_once 'includes/type.class.php';                     // DB types storage and factory
+require_once 'includes/cfg.class.php';                      // Config holder
 require_once 'includes/user.class.php';                     // Session handling (could be skipped for CLI context except for username and password validation used in account creation)
+require_once 'includes/game/misc.php';                      // Misc game related data & functions
 
-// todo: make everything below autoloaded
-require_once 'includes/stats.class.php';                    // Game entity statistics conversion
-require_once 'includes/game.php';                           // game related data & functions
-require_once 'includes/profiler.class.php';                 // Profiler feature
-require_once 'includes/markup.class.php';                   // manipulate markup text
-require_once 'includes/community.class.php';                // handle comments, screenshots and videos
-require_once 'includes/loot.class.php';                     // build lv-tabs containing loot-information
-require_once 'pages/genericPage.class.php';
+// game client data interfaces
+spl_autoload_register(function ($class)
+{
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
 
-// TC systems
+    if (preg_match('/[^\w]/i', $class))
+        return;
+
+    if ($class == 'Stats' || $class == 'StatsContainer')    // entity statistics conversion
+        require_once 'includes/game/chrstatistics.php';
+    else if (file_exists('includes/game/'.strtolower($class).'.class.php'))
+        require_once 'includes/game/'.strtolower($class).'.class.php';
+});
+
+// our site components
+spl_autoload_register(function ($class)
+{
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
+
+    if (preg_match('/[^\w]/i', $class))
+        return;
+
+    if (file_exists('includes/components/'.strtolower($class).'.class.php'))
+        require_once 'includes/components/'.strtolower($class).'.class.php';
+});
+
+// TC systems in components
 spl_autoload_register(function ($class)
 {
     switch ($class)
@@ -66,52 +87,73 @@ spl_autoload_register(function ($class)
     }
 });
 
-// autoload List-classes, associated filters and pages
+// autoload List-classes, associated filters
 spl_autoload_register(function ($class)
 {
-    $class = strtolower(str_replace('ListFilter', 'List', $class));
-
-    if (class_exists($class))                               // already registered
-        return;
-
     if ($i = strrpos($class, '\\'))
         $class = substr($class, $i + 1);
 
-    if (preg_match('/[^\w]/i', $class))                     // name should contain only letters
+    if (preg_match('/[^\w]/i', $class))
         return;
 
-    if (stripos($class, 'list'))
+    if (!stripos($class, 'list'))
+        return;
+
+    $class = strtolower(str_replace('ListFilter', 'List', $class));
+
+    $cl = match ($class)
     {
-        require_once 'includes/basetype.class.php';
+        'localprofilelist',
+        'remoteprofilelist'   => 'profile',
+        'localarenateamlist',
+        'remotearenateamlist' => 'arenateam',
+        'localguildlist',
+        'remoteguildlist'     => 'guild',
+        default               => strtr($class, ['list' => ''])
+    };
 
-        $cl = strtr($class, ['list' => '']);
-        if ($cl == 'remoteprofile' || $cl == 'localprofile')
-            $cl = 'profile';
-        if ($cl == 'remotearenateam' || $cl == 'localarenateam')
-            $cl = 'arenateam';
-        if ($cl == 'remoteguild' || $cl == 'localguild')
-            $cl = 'guild';
-
-        if (file_exists('includes/types/'.$cl.'.class.php'))
-            require_once 'includes/types/'.$cl.'.class.php';
-        else
-            throw new \Exception('could not register type class: '.$cl);
-
-        return;
+    if (file_exists('includes/types/'.$cl.'.class.php'))
+    {
+        require_once 'includes/types/basetype.class.php';
+        require_once 'includes/types/'.$cl.'.class.php';
     }
-    else if (stripos($class, 'ajax') === 0)
-    {
-        require_once 'includes/ajaxHandler.class.php';      // handles ajax and jsonp requests
+    else
+        throw new \Exception('could not register type class: '.$cl);
+});
 
+// endpoint loader
+spl_autoload_register(function ($class)
+{
+    if ($i = strrpos($class, '\\'))
+        $class = substr($class, $i + 1);
+
+    if (preg_match('/[^\w]/i', $class))
+        return;
+
+    $class = strtolower($class);
+
+    if (stripos($class, 'ajax') === 0)                      // handles ajax and jsonp requests
+    {
         if (file_exists('includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php'))
+        {
+            require_once 'includes/ajaxHandler/ajaxHandler.class.php';
             require_once 'includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php';
+        }
         else
             throw new \Exception('could not register ajaxHandler class: '.$class);
 
         return;
     }
-    else if (file_exists('pages/'.strtr($class, ['page' => '']).'.php'))
-        require_once 'pages/'.strtr($class, ['page' => '']).'.php';
+    else if (stripos($class, 'page'))                       // handles templated pages
+    {
+        if (file_exists('pages/'.strtr($class, ['page' => '']).'.php'))
+        {
+            require_once 'pages/genericPage.class.php';
+            require_once 'pages/'.strtr($class, ['page' => '']).'.php';
+        }
+        else if ($class == 'genericpage')                   // may be called directly in fatal error case
+            require_once 'pages/genericPage.class.php';
+    }
 });
 
 set_error_handler(function($errNo, $errStr, $errFile, $errLine)
@@ -120,28 +162,25 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
     if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
         return true;
 
-    $errName  = 'unknown error';                            // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
-    $logLevel = CLI::logLevelFromE($errNo);
+    // we do not log deprecation notices
+    if ($errNo & (E_DEPRECATED | E_USER_DEPRECATED))
+        return true;
 
-    switch ($errNo)
+    $logLevel = match($errNo)
     {
-        case E_WARNING:
-        case E_USER_WARNING:
-            $errName  = 'WARNING';
-            break;
-        case E_NOTICE:
-        case E_USER_NOTICE:
-            $errName  = 'NOTICE';
-            break;
-        case E_USER_ERROR:
-            $errName  = 'USER_ERROR';
-        case E_USER_ERROR:
-            $errName  = 'RECOVERABLE_ERROR';
-        case E_STRICT:                                      // ignore STRICT and DEPRECATED
-        case E_DEPRECATED:
-        case E_USER_DEPRECATED:
-            return true;
-    }
+        E_RECOVERABLE_ERROR, E_USER_ERROR      => LOG_LEVEL_ERROR,
+        E_WARNING,           E_USER_WARNING    => LOG_LEVEL_WARN,
+        E_NOTICE,            E_USER_NOTICE     => LOG_LEVEL_INFO,
+        default => 0
+    };
+    $errName = match($errNo)
+    {
+        E_RECOVERABLE_ERROR       => 'RECOVERABLE_ERROR',
+        E_USER_ERROR              => 'USER_ERROR',
+        E_USER_WARNING, E_WARNING => 'WARNING',
+        E_USER_NOTICE, E_NOTICE   => 'NOTICE',
+        default                   => 'UNKNOWN_ERROR'        // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
+    };
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
@@ -168,7 +207,7 @@ set_exception_handler(function ($e)
         fwrite(STDERR, "\nException - ".$e->getMessage()."\n   ".$e->getFile(). '('.$e->getLine().")\n".$e->getTraceAsString()."\n\n");
     else
     {
-        Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, CLI::LOG_ERROR);
+        Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, LOG_LEVEL_ERROR);
         (new GenericPage())->error();
     }
 });
@@ -253,7 +292,7 @@ if (!CLI)
         Lang::load(User::$preferedLoc);
 
     // set up some logging (~10 queries will execute before we init the user and load the config)
-    if (Cfg::get('DEBUG') >= CLI::LOG_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+    if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
         DB::Aowow()->setLogger(DB::profiler(...));
         DB::World()->setLogger(DB::profiler(...));

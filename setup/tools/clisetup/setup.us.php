@@ -121,7 +121,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 if (CLI::read(['x' => ['['.CLI::bold('c').']ontinue anyway? ['.CLI::bold('r').']etry? ['.CLI::bold('a').']bort?', true, true, '/c|r|a/i']], $uiCRA) && $uiCRA)
                 {
                     CLI::write();
-                    switch(strtolower($uiCRA['x']))
+                    switch (strtolower($uiCRA['x']))
                     {
                         case 'c':
                             $this->saveProgress($idx);

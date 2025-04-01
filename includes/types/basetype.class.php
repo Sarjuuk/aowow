@@ -612,7 +612,7 @@ trait spawnHelper
 
         if (User::isInGroup(U_GROUP_MODERATOR))
             if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))
-                $worldPos = Game::getWorldPosForGUID(self::$type, ...$guids);
+                $worldPos = WorldPosition::getForGUID(self::$type, ...$guids);
 
         foreach ($spawns as $s)
         {

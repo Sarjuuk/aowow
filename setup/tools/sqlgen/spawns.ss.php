@@ -312,13 +312,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $notice = '[points] '.str_pad('['.$point['guid'].']', 9).' manually moved to [A:'.($point['areaId'] ?? 0).' => '.$area.'; F: '.$floor.']';
         }
 
-        if ($points = Game::worldPosToZonePos($point['map'], $point['posX'], $point['posY'], $area, $floor))
+        if ($points = WorldPosition::toZonePos($point['map'], $point['posX'], $point['posY'], $area, $floor))
         {
             // if areaId is set and we match it .. we're fine .. mostly
             if (count($points) == 1 && $area == $points[0]['areaId'])
                 return ['areaId' => $points[0]['areaId'], 'posX' => $points[0]['posX'], 'posY' => $points[0]['posY'], 'floor' => $points[0]['floor']];
 
-            $point = Game::checkCoords($points);            // try to determine best found point by alphamap
+            $point = WorldPosition::checkZonePos($points);  // try to determine best found point by alphamap
             return ['areaId' => $point['areaId'], 'posX' => $point['posX'], 'posY' => $point['posY'], 'floor' => $point['floor']];
         }
 

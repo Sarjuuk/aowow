@@ -480,7 +480,7 @@ class SmartAction
                 if ($this->smartAI->teleportTargetArea)
                     $this->param[10] = $this->smartAI->teleportTargetArea;
                 // try calc from SmartTarget data
-                else if ($pos = Game::worldPosToZonePos($this->param[0], $x, $y))
+                else if ($pos = WorldPosition::toZonePos($this->param[0], $x, $y))
                 {
                     $this->param[10] = $pos[0]['areaId'];
                     $this->param[11] = str_pad($pos[0]['posX'] * 10, 3, '0', STR_PAD_LEFT).str_pad($pos[0]['posY'] * 10, 3, '0', STR_PAD_LEFT);
