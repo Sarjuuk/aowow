@@ -1,5 +1,3 @@
-<?php namespace Aowow; ?>
-
 Listview.templates.enchantment = {
     sort: [1],
     searchable: 1,

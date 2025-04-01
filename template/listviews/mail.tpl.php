@@ -1,5 +1,3 @@
-<?php namespace Aowow; ?>
-
 Listview.templates.mail = {
     sort: [1],
     searchable: 1,

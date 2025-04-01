@@ -1,5 +1,3 @@
-<?php namespace Aowow; ?>
-
 Listview.extraCols.members = {
     id: 'members',
     name: LANG.members,

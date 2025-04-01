@@ -1,5 +1,3 @@
-<?php namespace Aowow; ?>
-
 var _ = {
     id: 'restock',
     name: LANG.restock,

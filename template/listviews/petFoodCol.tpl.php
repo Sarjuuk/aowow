@@ -1,5 +1,3 @@
-<?php namespace Aowow; ?>
-
 var _ = function(family)
 {
     family.foodCount = 0;
