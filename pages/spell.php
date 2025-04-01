@@ -272,10 +272,13 @@ class SpellPage extends GenericPage
         }
 
         // accquisition..   10: starter spell; 7: discovery
-        if (isset($this->subject->sources[$this->subject->id][10]))
-            $infobox[] = Lang::spell('starter');
-        else if (isset($this->subject->sources[$this->subject->id][7]))
-            $infobox[] = Lang::spell('discovered');
+        if ($this->subject->getSources($s))
+        {
+            if (in_array(SRC_STARTER, $s))
+                $infobox[] = Lang::spell('starter');
+            else if (in_array(SRC_DISCOVERY, $s))
+                $infobox[] = Lang::spell('discovered');
+        }
 
         // training cost
         if ($cost = $this->subject->getField('trainingCost'))
