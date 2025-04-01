@@ -845,7 +845,7 @@ trait profilerHelper
 
 trait sourceHelper
 {
-    protected $sources    = [];
+    public $sources    = [];
     protected $sourceMore = null;
 
     public function getSources(?array &$s = [], ?array &$sm = []) : bool
