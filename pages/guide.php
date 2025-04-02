@@ -489,7 +489,7 @@ class GuidePage extends GenericPage
             if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_guides WHERE `id` = ?d AND `status` <> ?d {AND `userId`  = ?d}', $this->typeId, GUIDE_STATUS_ARCHIVED, User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : User::$id))
                 $this->typeId = intVal($id);
         }
-        else if ($this->_get['id'] === 0)                 // create new guide and load in editor
+        else if ($this->_get['id'] === 0)                   // create new guide and load in editor
             $this->typeId = DB::Aowow()->query('INSERT INTO ?_guides (`userId`, `date`, `status`) VALUES (?d, ?d, ?d)', User::$id, time(), GUIDE_STATUS_DRAFT);
 
         return $this->typeId > 0;

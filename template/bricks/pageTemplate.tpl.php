@@ -17,7 +17,7 @@ if (!empty($this->gPageInfo)):
     echo "                var g_pageInfo = ".Util::toJSON($this->gPageInfo).";\n";
 
     // only used by item.php
-    if (User::$id > 0 && isset($this->redButtons[BUTTON_EQUIP]) && $this->redButtons[BUTTON_EQUIP]):
+    if (User::isLoggedIn() && isset($this->redButtons[BUTTON_EQUIP])):
         echo "                DomContentLoaded.addEvent(function() { pr_addEquipButton('equip-pinned-button', ".$this->typeId."); });\n";
     endif;
 endif;

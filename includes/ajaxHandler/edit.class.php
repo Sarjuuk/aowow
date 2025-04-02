@@ -34,7 +34,7 @@ class AjaxEdit extends AjaxHandler
     */
     protected function handleUpload() : string
     {
-        if (!User::$id || $this->_get['guide'] != 1)
+        if (!User::canWriteGuide() || $this->_get['guide'] != 1)
             return Util::toJSON(['success' => false, 'error' => '']);
 
         require_once('includes/libs/qqFileUploader.class.php');

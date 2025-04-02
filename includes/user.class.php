@@ -92,8 +92,8 @@ class User
         self::$expires       = (bool)$uData['allowExpire'];
         self::$reputation    = $uData['reputation'];
         self::$banStatus     = $uData['bans'];
-        self::$groups        = $uData['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($uData['userGroups']);
-        self::$perms         = $uData['bans'] & (ACC_BAN_TEMP | ACC_BAN_PERM) ? 0 : intval($uData['userPerms']);
+        self::$groups        = self::isBanned() ? 0 : intval($uData['userGroups']);
+        self::$perms         = self::isBanned() ? 0 : intval($uData['userPerms']);
         self::$dailyVotes    = $uData['dailyVotes'];
         self::$excludeGroups = $uData['excludeGroups'];
 
@@ -114,7 +114,7 @@ class User
         // - conscutive visits
         // - votes per day
         // - reputation for daily visit
-        if (self::$id)
+        if (self::isLoggedIn())
         {
             $lastLogin = DB::Aowow()->selectCell('SELECT curLogin FROM ?_account WHERE id = ?d', self::$id);
             // either the day changed or the last visit was >24h ago
@@ -133,7 +133,7 @@ class User
                 );
 
                 // gain rep for daily visit
-                if (!(self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM)) && !self::isInGroup(U_GROUP_PENDING))
+                if (!(self::isBanned()) && !self::isInGroup(U_GROUP_PENDING))
                     Util::gainSiteReputation(self::$id, SITEREP_ACTION_DAILYVISIT);
 
                 // increment consecutive visits (next day or first of new month and not more than 48h)
@@ -181,7 +181,7 @@ class User
         $_SESSION['timeout'] = self::$expires ? time() + Cfg::get('SESSION_TIMEOUT_DELAY') : 0;
         // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
 
-        if (self::$id && $toDB)
+        if (self::isLoggedIn() && $toDB)
             DB::Aowow()->query('UPDATE ?_account SET `locale` = ? WHERE `id` = ?', self::$preferedLoc->value, self::$id);
     }
 
@@ -427,7 +427,7 @@ class User
 
     public static function canComment() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_COMMENT))
             return false;
 
         return self::$perms || self::$reputation >= Cfg::get('REP_REQ_COMMENT');
@@ -435,7 +435,7 @@ class User
 
     public static function canReply() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_COMMENT))
             return false;
 
         return self::$perms || self::$reputation >= Cfg::get('REP_REQ_REPLY');
@@ -443,7 +443,7 @@ class User
 
     public static function canUpvote() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_COMMENT | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_COMMENT))
             return false;
 
         return self::$perms || (self::$reputation >= Cfg::get('REP_REQ_UPVOTE') && self::$dailyVotes > 0);
@@ -451,7 +451,7 @@ class User
 
     public static function canDownvote() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_RATE))
             return false;
 
         return self::$perms || (self::$reputation >= Cfg::get('REP_REQ_DOWNVOTE') && self::$dailyVotes > 0);
@@ -459,7 +459,7 @@ class User
 
     public static function canSupervote() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_RATE | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_RATE) || self::isInGroup(U_GROUP_PENDING))
             return false;
 
         return self::$reputation >= Cfg::get('REP_REQ_SUPERVOTE');
@@ -467,7 +467,7 @@ class User
 
     public static function canUploadScreenshot() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_SCREENSHOT | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_SCREENSHOT) || self::isInGroup(U_GROUP_PENDING))
             return false;
 
         return true;
@@ -475,7 +475,7 @@ class User
 
     public static function canWriteGuide() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_GUIDE | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_GUIDE) || self::isInGroup(U_GROUP_PENDING))
             return false;
 
         return true;
@@ -483,7 +483,7 @@ class User
 
     public static function canSuggestVideo() : bool
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_VIDEO | ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_VIDEO) || self::isInGroup(U_GROUP_PENDING))
             return false;
 
         return true;
@@ -492,6 +492,16 @@ class User
     public static function isPremium() : bool
     {
         return self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= Cfg::get('REP_REQ_PREMIUM');
+    }
+
+    public static function isLoggedIn() : bool
+    {
+        return self::$id > 0;                               // more checks? maybe check pending email verification here? (self::isInGroup(U_GROUP_PENDING))
+    }
+
+    public static function isBanned(int $addBanMask = 0x0) : bool
+    {
+        return self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM | $addBanMask);
     }
 
 
@@ -512,7 +522,7 @@ class User
 
     public static function getMaxDailyVotes() : int
     {
-        if (!self::$id || self::$banStatus & (ACC_BAN_PERM | ACC_BAN_TEMP))
+        if (!self::isLoggedIn() || self::isBanned())
             return 0;
 
         return Cfg::get('USER_MAX_VOTES') + (self::$reputation >= Cfg::get('REP_REQ_VOTEMORE_BASE') ? 1 + intVal((self::$reputation - Cfg::get('REP_REQ_VOTEMORE_BASE')) / Cfg::get('REP_REQ_VOTEMORE_ADD')) : 0);
@@ -533,7 +543,7 @@ class User
             'cookies'     => []
         );
 
-        if (!self::$id || self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM))
+        if (!self::isLoggedIn() || self::isBanned())
             return $gUser;
 
         $gUser['commentban']        = !self::canComment();
@@ -646,17 +656,15 @@ class User
 
     public static function getCookies() : array
     {
-        $data = [];
+        if (!self::isLoggedIn())
+            return [];
 
-        if (self::$id)
-            $data = DB::Aowow()->selectCol('SELECT `name` AS ARRAY_KEY, `data` FROM ?_account_cookies WHERE `userId` = ?d', self::$id);
-
-        return $data;
+        return DB::Aowow()->selectCol('SELECT `name` AS ARRAY_KEY, `data` FROM ?_account_cookies WHERE `userId` = ?d', self::$id);
     }
 
     public static function getFavorites() : array
     {
-        if (!self::$id)
+        if (!self::isLoggedIn())
             return [];
 
         $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_favorites WHERE `userId` = ?d', self::$id);

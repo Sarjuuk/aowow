@@ -172,7 +172,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleCommentDelete() : void
     {
-        if (!$this->_post['id'] || !User::$id)
+        if (!$this->_post['id'] || !User::isLoggedIn())
         {
             trigger_error('AjaxComment::handleCommentDelete - commentId empty or user not logged in', E_USER_ERROR);
             return;
@@ -204,7 +204,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleCommentUndelete() : void
     {
-        if (!$this->_post['id'] || !User::$id)
+        if (!$this->_post['id'] || !User::isLoggedIn())
         {
             trigger_error('AjaxComment::handleCommentUndelete - commentId empty or user not logged in', E_USER_ERROR);
             return;
@@ -242,7 +242,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleCommentVote() : string
     {
-        if (!User::$id || !$this->_get['id'] || !$this->_get['rating'])
+        if (!User::isLoggedIn() || !$this->_get['id'] || !$this->_get['rating'])
             return Util::toJSON(['error' => 1, 'message' => Lang::main('genericError')]);
 
         $target = DB::Aowow()->selectRow('SELECT c.`userId` AS owner, ur.`value` FROM ?_comments c LEFT JOIN ?_user_ratings ur ON ur.`type` = ?d AND ur.`entry` = c.id AND ur.`userId` = ?d WHERE c.id = ?d', RATING_COMMENT, User::$id, $this->_get['id']);
@@ -393,7 +393,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyDelete() : void
     {
-        if (!User::$id || !$this->_post['id'])
+        if (!User::isLoggedIn() || !$this->_post['id'])
         {
             trigger_error('AjaxComment::handleReplyDelete - commentId empty or user not logged in', E_USER_ERROR);
             return;
@@ -407,7 +407,7 @@ class AjaxComment extends AjaxHandler
 
     protected function handleReplyFlag() : void
     {
-        if (!User::$id || !$this->_post['id'])
+        if (!User::isLoggedIn() || !$this->_post['id'])
         {
             trigger_error('AjaxComment::handleReplyFlag - commentId empty or user not logged in', E_USER_ERROR);
             return;

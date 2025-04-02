@@ -25,7 +25,7 @@ class AjaxGetdescription extends AjaxHandler
     {
         $this->contentType = MIME_TYPE_TEXT;
 
-        if (!User::$id)
+        if (!User::canWriteGuide())
             return '';
 
         $desc = (new Markup($this->_post['description']))->stripTags();

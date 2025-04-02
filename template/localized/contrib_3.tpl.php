@@ -25,7 +25,7 @@
             <div class="comment-edit-body"><textarea class="comment-editbox" rows="10" cols="40" name="commentbody" disabled="disabled"></textarea></div>
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, oder <a href="?account=signup">registriert Euch</a>, um einen Kommentar einzusenden.</small>
 <?php
@@ -58,7 +58,7 @@
             <input type="file" name="screenshotfile" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, um einen Screenshot einzusenden.</small>
 <?php
@@ -85,7 +85,7 @@
             <input type="text" name="videourl" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, um ein Video vorzuschlagen.</small>
 <?php

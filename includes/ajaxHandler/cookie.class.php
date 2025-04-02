@@ -10,7 +10,7 @@ class AjaxCookie extends AjaxHandler
     public function __construct(array $params)
     {
         // note that parent::__construct has to come after this
-        if (!$params || !User::$id)
+        if (!$params || !User::isLoggedIn())
             return;
 
         $this->_get = array(
@@ -30,7 +30,7 @@ class AjaxCookie extends AjaxHandler
     */
     protected function handleCookie() : string
     {
-        if (User::$id && $this->params && $this->_get[$this->params[0]])
+        if (User::isLoggedIn() && $this->params && $this->_get[$this->params[0]])
         {
             if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->params[0], $this->_get[$this->params[0]]))
                 return '0';

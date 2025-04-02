@@ -25,7 +25,7 @@
             <div class="comment-edit-body"><textarea class="comment-editbox" rows="10" cols="40" name="commentbody" disabled="disabled"></textarea></div>
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>你尚未登录，请先<a href="?account=signin">登录</a>或<a href="?account=signup">注册一个账号</a> 以发表你的评论。</small>
 <?php
@@ -58,7 +58,7 @@
             <input type="file" name="screenshotfile" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>你尚未登录，请先<a href="?account=signin">登录</a>以提交截图。</small>
 <?php
@@ -85,7 +85,7 @@
             <input type="text" name="videourl" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::$id):
+    if (!User::isLoggedIn()):
 ?>
             <small>You are not signed in. Please <a href="?account=signin">sign in</a> to submit a video.</small>
 <?php

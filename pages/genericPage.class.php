@@ -329,13 +329,13 @@ class GenericPage
         }
 
         // requires authed user
-        if ($this->reqAuth && !User::$id)
+        if ($this->reqAuth && !User::isLoggedIn())
             $this->forwardToSignIn($_SERVER['QUERY_STRING'] ?? '');
 
         // restricted access
         if ($this->reqUGroup && !User::isInGroup($this->reqUGroup))
         {
-            if (User::$id)
+            if (User::isLoggedIn())
                 $this->error();
             else
                 $this->forwardToSignIn($_SERVER['QUERY_STRING'] ?? '');

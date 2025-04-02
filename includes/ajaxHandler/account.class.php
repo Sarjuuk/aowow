@@ -27,7 +27,7 @@ class AjaxAccount extends AjaxHandler
     {
         parent::__construct($params);
 
-        if (!$this->params || !User::$id)
+        if (!$this->params || !User::isLoggedIn())
             return;
 
         // select handler

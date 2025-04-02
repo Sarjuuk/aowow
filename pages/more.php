@@ -139,13 +139,12 @@ class MorePage extends GenericPage
 
     private function handleReputationPage()
     {
-        if (!User::$id)
+        if (!User::isLoggedIn())
             return;
 
-        if ($repData = DB::Aowow()->select('SELECT action, amount, date AS \'when\', IF(action IN (3, 4, 5), sourceA, 0) AS param FROM ?_account_reputation WHERE userId = ?d', User::$id))
+        if ($repData = DB::Aowow()->select('SELECT `action`, `amount`, `date` AS "when", IF(`action` IN (3, 4, 5), `sourceA`, 0) AS "param" FROM ?_account_reputation WHERE `userId` = ?d', User::$id))
         {
-            foreach ($repData as &$r)
-                $r['when'] = date(Util::$dateFormatInternal, $r['when']);
+            array_walk($repData, fn(&$x) => $x['when'] = date(Util::$dateFormatInternal, $x['when']));
 
             $this->tabsTitle = Lang::main('yourRepHistory');
             $this->lvTabs[] = ['reputationhistory', array(

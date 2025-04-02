@@ -29,7 +29,7 @@ class GuidesPage extends GenericPage
 
         if ($pageCall == 'my-guides')
         {
-            if (!User::$id)
+            if (!User::isLoggedIn())
                 $this->error();
 
             $this->name = Util::ucFirst(Lang::guide('myGuides'));
@@ -81,7 +81,7 @@ class GuidesPage extends GenericPage
 
         $this->lvTabs[] = [GuideList::$brickFile, $tabData];
 
-        $this->redButtons = [BUTTON_GUIDE_NEW => User::$id && User::canComment()];
+        $this->redButtons = [BUTTON_GUIDE_NEW => User::canWriteGuide()];
     }
 
     protected function generateTitle()

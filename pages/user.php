@@ -31,12 +31,12 @@ class UserPage extends GenericPage
         if ($pageParam)
         {
             // todo: check if account is disabled or something
-            if ($user = DB::Aowow()->selectRow('SELECT a.id, a.user, a.displayName, a.consecutiveVisits, a.userGroups, a.avatar, a.title, a.description, a.joinDate, a.prevLogin, IFNULL(SUM(ar.amount), 0) AS sumRep FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.id = ar.userId WHERE a.user = ? GROUP BY a.id', $pageParam))
+            if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`user`, a.`displayName`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep" FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`displayName`) = LOWER(?) GROUP BY a.`id`', $pageParam))
                 $this->user = $user;
             else
                 $this->notFound(sprintf(Lang::user('notFound'), $pageParam));
         }
-        else if (User::$id)
+        else if (User::isLoggedIn())
         {
             header('Location: ?user='.User::$displayName, true, 302);
             die();

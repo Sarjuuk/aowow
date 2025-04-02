@@ -134,7 +134,7 @@ class Report
             return;
         }
 
-        if (!User::$id && !User::$ip)
+        if (!User::isLoggedIn() && !User::$ip)
         {
             trigger_error('Report - could not determine IP for anonymous user', E_USER_ERROR);
             $this->errorCode = self::ERR_MISCELLANEOUS;
@@ -147,7 +147,7 @@ class Report
     private function checkTargetContext() : int
     {
         // check already reported
-        $field = User::$id ? 'userId' : 'ip';
+        $field = User::isLoggedIn() ? 'userId' : 'ip';
         if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $this->mode, $this->reason, $this->subject, $field, User::$id ?: User::$ip))
             return self::ERR_ALREADY_REPORTED;
 

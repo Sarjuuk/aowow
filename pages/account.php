@@ -63,10 +63,10 @@ class AccountPage extends GenericPage
         if ($pageParam)
         {
             // requires auth && not authed
-            if ($this->validCats[$pageParam][0] && !User::$id)
+            if ($this->validCats[$pageParam][0] && !User::isLoggedIn())
                 $this->forwardToSignIn('account='.$pageParam);
             // doesn't require auth && authed
-            else if (!$this->validCats[$pageParam][0] && User::$id)
+            else if (!$this->validCats[$pageParam][0] && User::isLoggedIn())
                 header('Location: ?account', true, 302);    // goto dashboard
         }
     }
@@ -200,7 +200,7 @@ class AccountPage extends GenericPage
 
     private function createDashboard()
     {
-        if (!User::$id)
+        if (!User::isLoggedIn())
             $this->forwardToSignIn('account');
 
         $user = DB::Aowow()->selectRow('SELECT * FROM ?_account WHERE id = ?d', User::$id);

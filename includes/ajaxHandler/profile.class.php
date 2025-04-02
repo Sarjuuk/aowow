@@ -103,7 +103,7 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handleLink() : void                  // links char with account
     {
-        if (!User::$id || empty($this->_get['id']))
+        if (!User::isLoggedIn() || empty($this->_get['id']))
         {
             trigger_error('AjaxProfile::handleLink - profileId empty or user not logged in', E_USER_ERROR);
             return;
@@ -143,7 +143,7 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handlePin() : void                   // (un)favorite
     {
-        if (!User::$id || empty($this->_get['id'][0]))
+        if (!User::isLoggedIn() || empty($this->_get['id'][0]))
         {
             trigger_error('AjaxProfile::handlePin - profileId empty or user not logged in', E_USER_ERROR);
             return;
@@ -173,7 +173,7 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handlePrivacy() : void               // public visibility
     {
-        if (!User::$id || empty($this->_get['id'][0]))
+        if (!User::isLoggedIn() || empty($this->_get['id'][0]))
         {
             trigger_error('AjaxProfile::handlePrivacy - profileId empty or user not logged in', E_USER_ERROR);
             return;
@@ -451,7 +451,7 @@ class AjaxProfile extends AjaxHandler
     */
     protected function handleDelete() : void                // kill a profile
     {
-        if (!User::$id || !$this->_get['id'])
+        if (!User::isLoggedIn() || !$this->_get['id'])
         {
             trigger_error('AjaxProfile::handleDelete - profileId empty or user not logged in', E_USER_ERROR);
             return;
