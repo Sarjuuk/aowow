@@ -1488,15 +1488,15 @@ class ItemList extends BaseType
     {
         $mask = $this->curTpl['scalingStatValue'];
 
-        switch ($type)
+        $mask &= match ($type)
         {
-            case 'stats':   $mask &= 0x04001F;  break;
-            case 'armor':   $mask &= 0xF001E0;  break;
-            case 'dps'  :   $mask &= 0x007E00;  break;
-            case 'spell':   $mask &= 0x008000;  break;
-            case 'fap'  :   $mask &= 0x010000;  break;      // unused
-            default:        $mask &= 0x0;
-        }
+            'stats' => 0x04001F,
+            'armor' => 0xF001E0,
+            'dps'   => 0x007E00,
+            'spell' => 0x008000,
+            'fap'   => 0x010000,                            // unused
+            default => 0x0
+        };
 
         $field = null;
         for ($i = 0; $i < count(Util::$ssdMaskFields); $i++)

@@ -1866,14 +1866,13 @@ class SpellPage extends GenericPage
                     }
                     break;
                 case SPELL_EFFECT_SKINNING:
-                    $_ = '';
-                    switch ($effMV)
+                    $_ = match ($effMV)
                     {
-                        case 0:  $_ = Lang::game('ct', 1).', '.Lang::game('ct', 2); break;    // Skinning > Beast, Dragonkin
-                        case 1:                                                               // Herb gathering > Elemental
-                        case 2:  $_ = Lang::game('ct', 4); break;                             // Mining > Elemental
-                        case 3:  $_ = Lang::game('ct', 9); break;                             // Dismantling > Mechanic
-                    }
+                        0       => $_ = Lang::game('ct', 1).', '.Lang::game('ct', 2), // Skinning > Beast, Dragonkin
+                        1, 2    => $_ = Lang::game('ct', 4),                          // Gathering, Mining > Elemental
+                        3       => $_ = Lang::game('ct', 9),                          // Dismantling > Mechanic
+                        default => ''
+                    };
                     if ($_)
                         $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                     break;
@@ -2181,30 +2180,18 @@ class SpellPage extends GenericPage
                         case SPELL_AURA_MOD_COMBAT_RESULT_CHANCE:
                             $valueFmt = '%s%%';
                         case SPELL_AURA_IGNORE_COMBAT_RESULT:
-                            $what = '';
-                            switch ($effMV)
+                            $what = match ($effMV)
                             {
-                                case 2:                 // Dodged
-                                    $what = Lang::spell('combatRating', 2);
-                                    break;
-                                case 3:                 // Blocked
-                                    $what = Lang::spell('combatRating', 4);
-                                    break;
-                                case 4:                 // Parried
-                                    $what = Lang::spell('combatRating', 3);
-                                    break;
-                                case 0;                 // Evaded
-                                case 1:                 // Missed
-                                case 5:                 // Glanced
-                                case 6:                 // Crited'ed..ed
-                                case 7:                 // Crushed
-                                case 8:                 // Regular
-                                default:
-                                    trigger_error('unused case #'.$effMV.' found for aura #'.$effAura);
-                            }
+                                2 => Lang::spell('combatRating', 2),    // Dodged
+                                3 => Lang::spell('combatRating', 4),    // Blocked
+                                4 => Lang::spell('combatRating', 3),    // Parried
+                                default => ''                           // Evaded(0) Missed(1) Glanced(5) Crited'ed..ed(6) Crushed(7) Regular(8)
+                            };
 
                             if ($what)
                                 $_nameMV = $this->fmtStaffTip($what, 'MiscValue: '.$effMV);
+                            else
+                                trigger_error('unused case #'.$effMV.' found for aura #'.$effAura);
                             break;
                         case SPELL_AURA_SCREEN_EFFECT:
                             if ($ses = DB::Aowow()->selectRow('SELECT `name`, `ambienceDay` AS "0", IF(`ambienceNight` <> `ambienceDay`, `ambienceNight`, 0) AS "1", `musicDay` AS "2", IF(`musicNight` <> `musicDay`, `musicNight`, 0) AS "3" FROM ?_screeneffect_sounds WHERE `id` = ?d', $effMV))

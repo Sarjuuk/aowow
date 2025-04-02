@@ -99,17 +99,12 @@ class AchievementPage extends GenericPage
             // todo (low)
 
         // faction
-        switch ($this->subject->getField('faction'))
+        $infobox[] = Lang::main('side').Lang::main('colon') . match ($this->subject->getField('faction'))
         {
-            case 1:
-                $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]';
-                break;
-            case 2:
-                $infobox[] = Lang::main('side').Lang::main('colon').'[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]';
-                break;
-            default:                                        // case 3
-                $infobox[] = Lang::main('side').Lang::main('colon').Lang::game('si', SIDE_BOTH);
-        }
+            SIDE_ALLIANCE => '[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]',
+            SIDE_HORDE    => '[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]',
+            default       => Lang::game('si', SIDE_BOTH)    // 0, 3
+        };
 
         // icon
         if ($_ = $this->subject->getField('iconId'))

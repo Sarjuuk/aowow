@@ -409,6 +409,7 @@ class Lang
 
         if ($short && $schoolMask == SPELL_ALL_SCHOOLS)
             return self::main('all');
+
         if ($short && $schoolMask == SPELL_MAGIC_SCHOOLS)
             return self::main('all').' ('.self::game('dt', 1).')';
 
@@ -429,27 +430,18 @@ class Lang
     {
         $classMask &= ChrClass::MASK_ALL;                   // clamp to available classes..
 
-        if ($classMask == ChrClass::MASK_ALL)               // available to all classes
+        if (!$classMask || $classMask == ChrClass::MASK_ALL)// available to all classes
             return '';
 
-        $tmp  = [];
-
-        switch ($fmt)
+        [$base, $br] = match ($fmt)
         {
-            case self::FMT_HTML:
-                $base = '<a href="?class=%1$d" class="c%1$d">%2$s</a>';
-                $br   = '';
-                break;
-            case self::FMT_MARKUP:
-                $base = '[class=%1$d]';
-                $br   = '[br]';
-                break;
-            case self::FMT_RAW:
-            default:
-                $base = '%2$s';
-                $br   = '';
-        }
+            self::FMT_HTML   => ['<a href="?class=%1$d" class="c%1$d">%2$s</a>', ''],
+            self::FMT_MARKUP => ['[class=%1$d]', '[br]'],
+            self::FMT_RAW    => ['%2$s', ''],
+            default          => ['%2$s', '']
+        };
 
+        $tmp = [];
         foreach (ChrClass::fromMask($classMask) as $c)
             $tmp[$c] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $c, self::game('cl', $c));
 
@@ -462,29 +454,8 @@ class Lang
     {
         $raceMask &= ChrRace::MASK_ALL;                     // clamp to available races..
 
-        if ($raceMask == ChrRace::MASK_ALL)                 // available to all races (we don't display 'both factions')
+        if (!$raceMask || $raceMask == ChrRace::MASK_ALL)   // available to all races (we don't display 'both factions')
             return '';
-
-        if (!$raceMask)
-            return '';
-
-        $tmp  = [];
-
-        switch ($fmt)
-        {
-            case self::FMT_HTML:
-                $base = '<a href="?race=%1$d" class="q1">%2$s</a>';
-                $br   = '';
-                break;
-            case self::FMT_MARKUP:
-                $base = '[race=%1$d]';
-                $br   = '[br]';
-                break;
-            case self::FMT_RAW:
-            default:
-                $base = '%2$s';
-                $br   = '';
-        }
 
         if ($raceMask == ChrRace::MASK_HORDE)
             return self::game('ra', -2);
@@ -492,8 +463,17 @@ class Lang
         if ($raceMask == ChrRace::MASK_ALLIANCE)
             return self::game('ra', -1);
 
+        [$base, $br] = match ($fmt)
+        {
+            self::FMT_HTML   => ['<a href="?race=%1$d" class="q1">%2$s</a>', ''],
+            self::FMT_MARKUP => ['[race=%1$d]', '[br]'],
+            self::FMT_RAW    => ['%2$s', ''],
+            default          => ['%2$s', '']
+        };
+
+        $tmp = [];
         foreach (ChrRace::fromMask($raceMask) as $r)
-            $tmp[$r] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $r, self::game('ra', $r));
+            $tmp[$r] = (!fMod(count($tmp) + 1, 3) ? $br : '').sprintf($base, $r, self::game('ra', $r));
 
         $ids = array_keys($tmp);
 

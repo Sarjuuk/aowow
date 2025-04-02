@@ -550,22 +550,21 @@ abstract class Util
         return Lang::item('ratingString', [$statId, $result, $level]);
     }
 
-    // default ucFirst doesn't convert UTF-8 chars
-    public static function ucFirst($str)
+    // default ucFirst doesn't convert UTF-8 chars (php 8.4 finally implemented this .. see ya in 2027)
+    public static function ucFirst(string $str) : string
     {
-        $len   = mb_strlen($str) - 1;
         $first = mb_substr($str, 0, 1);
-        $rest  = mb_substr($str, 1, $len);
+        $rest  = mb_substr($str, 1);
 
-        return mb_strtoupper($first).$rest;
+        return mb_strtoupper($first).mb_strtolower($rest);
     }
 
-    public static function ucWords($str)
+    public static function ucWords(string $str) : string
     {
         return mb_convert_case($str, MB_CASE_TITLE);
     }
 
-    public static function lower($str)
+    public static function lower(string $str) : string
     {
         return mb_strtolower($str);
     }
