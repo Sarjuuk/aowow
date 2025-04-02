@@ -76,8 +76,7 @@ class AjaxGuild extends AjaxHandler
     */
     protected function handleStatus() : string
     {
-        $response = Profiler::resyncStatus(Type::GUILD, $this->_get['id']);
-        return Util::toJSON($response);
+        return Profiler::resyncStatus(Type::GUILD, $this->_get['id']);
     }
 }
 

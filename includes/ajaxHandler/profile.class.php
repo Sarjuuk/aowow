@@ -307,8 +307,7 @@ class AjaxProfile extends AjaxHandler
             return Util::toJSON([1, [PR_QUEUE_STATUS_ERROR, 0, 0, PR_QUEUE_ERROR_CHAR]]);
         }
 
-        $response = Profiler::resyncStatus(Type::PROFILE, $ids);
-        return Util::toJSON($response);
+        return Profiler::resyncStatus(Type::PROFILE, $ids);
     }
 
     /*  params (get))

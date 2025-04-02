@@ -296,9 +296,34 @@ class Profiler
         return $newId;
     }
 
-    public static function resyncStatus($type, array $subjectGUIDs)
+    /*  return
+            <status object> [
+                nQueueProcesses,
+                [statusCode, timeToRefresh, curQueuePos, errorCode, nResyncs],
+                [<anotherStatus>]
+                ...
+            ]
+
+            statusCode:
+                0: end the request
+                1: waiting
+                2: working...
+                3: ready; click to view
+                4: error / retry
+            timeToRefresh:
+                msec till the client may ask for another update
+            curQueuePos:
+                position in the queue
+            errorCode:
+                0: unk error
+                1: char does not exist
+                2: armory gone
+            nResyncs:
+                ??? .. if !nResyncs && !timeToRefresh prints "Adding to queue..." but will not ping the server for updates...?
+    */
+    public static function resyncStatus(int $type, array $subjectGUIDs) : string
     {
-        $response = [Cfg::get('PROFILER_ENABLE') ? 2 : 0];  // in theory you could have multiple queues; used as divisor for: (15 / x) + 2
+        $response = [Cfg::get('PROFILER_ENABLE') ? 2 : 0];  // in theory you could have multiple queues; used as divisor in wait time estimation: (15 / x) + 2
         if (!$subjectGUIDs)
             $response[] = [PR_QUEUE_STATUS_ENDED, 0, 0, PR_QUEUE_ERROR_CHAR];
         else
@@ -320,12 +345,12 @@ class Profiler
                         $subjectStatus[$guid]['status'] != PR_QUEUE_STATUS_READY ? Cfg::get('PROFILER_RESYNC_PING') : 0,
                         array_search($type.':'.$guid, $queue) + 1,
                         0,
-                        1                                   // nResycTries - unsure about this one
+                        1                                   // nResyncs - unsure about this one
                     );
             }
         }
 
-        return $response;
+        return Util::toJSON($response);
     }
 
     public static function getCharFromRealm($realmId, $charGuid)
