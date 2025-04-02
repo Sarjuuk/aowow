@@ -83,6 +83,7 @@ abstract class Type
     public const FLAG_NONE              = 0x0;
     public const FLAG_RANDOM_SEARCHABLE = 0x1;
  /* public const FLAG_SEARCHABLE        = 0x2 general search? */
+    public const FLAG_DB_TYPE           = 0x4;
 
     public const IDX_LIST_OBJ = 0;
     public const IDX_FILE_STR = 1;
@@ -90,34 +91,34 @@ abstract class Type
     public const IDX_FLAGS    = 3;
 
     private static array $data = array(
-        self::NPC         => [__NAMESPACE__ . '\CreatureList',    'npc',         'g_npcs',              0x1],
-        self::OBJECT      => [__NAMESPACE__ . '\GameObjectList',  'object',      'g_objects',           0x1],
-        self::ITEM        => [__NAMESPACE__ . '\ItemList',        'item',        'g_items',             0x1],
-        self::ITEMSET     => [__NAMESPACE__ . '\ItemsetList',     'itemset',     'g_itemsets',          0x1],
-        self::QUEST       => [__NAMESPACE__ . '\QuestList',       'quest',       'g_quests',            0x1],
-        self::SPELL       => [__NAMESPACE__ . '\SpellList',       'spell',       'g_spells',            0x1],
-        self::ZONE        => [__NAMESPACE__ . '\ZoneList',        'zone',        'g_gatheredzones',     0x1],
-        self::FACTION     => [__NAMESPACE__ . '\FactionList',     'faction',     'g_factions',          0x1],
-        self::PET         => [__NAMESPACE__ . '\PetList',         'pet',         'g_pets',              0x1],
-        self::ACHIEVEMENT => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',      0x1],
-        self::TITLE       => [__NAMESPACE__ . '\TitleList',       'title',       'g_titles',            0x1],
-        self::WORLDEVENT  => [__NAMESPACE__ . '\WorldEventList',  'event',       'g_holidays',          0x1],
-        self::CHR_CLASS   => [__NAMESPACE__ . '\CharClassList',   'class',       'g_classes',           0x1],
-        self::CHR_RACE    => [__NAMESPACE__ . '\CharRaceList',    'race',        'g_races',             0x1],
-        self::SKILL       => [__NAMESPACE__ . '\SkillList',       'skill',       'g_skills',            0x1],
+        self::NPC         => [__NAMESPACE__ . '\CreatureList',    'npc',         'g_npcs',              0x5],
+        self::OBJECT      => [__NAMESPACE__ . '\GameObjectList',  'object',      'g_objects',           0x5],
+        self::ITEM        => [__NAMESPACE__ . '\ItemList',        'item',        'g_items',             0x5],
+        self::ITEMSET     => [__NAMESPACE__ . '\ItemsetList',     'itemset',     'g_itemsets',          0x5],
+        self::QUEST       => [__NAMESPACE__ . '\QuestList',       'quest',       'g_quests',            0x5],
+        self::SPELL       => [__NAMESPACE__ . '\SpellList',       'spell',       'g_spells',            0x5],
+        self::ZONE        => [__NAMESPACE__ . '\ZoneList',        'zone',        'g_gatheredzones',     0x5],
+        self::FACTION     => [__NAMESPACE__ . '\FactionList',     'faction',     'g_factions',          0x5],
+        self::PET         => [__NAMESPACE__ . '\PetList',         'pet',         'g_pets',              0x5],
+        self::ACHIEVEMENT => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',      0x5],
+        self::TITLE       => [__NAMESPACE__ . '\TitleList',       'title',       'g_titles',            0x5],
+        self::WORLDEVENT  => [__NAMESPACE__ . '\WorldEventList',  'event',       'g_holidays',          0x5],
+        self::CHR_CLASS   => [__NAMESPACE__ . '\CharClassList',   'class',       'g_classes',           0x5],
+        self::CHR_RACE    => [__NAMESPACE__ . '\CharRaceList',    'race',        'g_races',             0x5],
+        self::SKILL       => [__NAMESPACE__ . '\SkillList',       'skill',       'g_skills',            0x5],
         self::STATISTIC   => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',      0x0], // alias for achievements; exists only for Markup
-        self::CURRENCY    => [__NAMESPACE__ . '\CurrencyList',    'currency',    'g_gatheredcurrencies',0x1],
-        self::SOUND       => [__NAMESPACE__ . '\SoundList',       'sound',       'g_sounds',            0x1],
-        self::ICON        => [__NAMESPACE__ . '\IconList',        'icon',        'g_icons',             0x1],
+        self::CURRENCY    => [__NAMESPACE__ . '\CurrencyList',    'currency',    'g_gatheredcurrencies',0x5],
+        self::SOUND       => [__NAMESPACE__ . '\SoundList',       'sound',       'g_sounds',            0x5],
+        self::ICON        => [__NAMESPACE__ . '\IconList',        'icon',        'g_icons',             0x5],
         self::GUIDE       => [__NAMESPACE__ . '\GuideList',       'guide',       '',                    0x0],
         self::PROFILE     => [__NAMESPACE__ . '\ProfileList',     '',            '',                    0x0], // x - not known in javascript
         self::GUILD       => [__NAMESPACE__ . '\GuildList',       '',            '',                    0x0], // x
         self::ARENA_TEAM  => [__NAMESPACE__ . '\ArenaTeamList',   '',            '',                    0x0], // x
         self::USER        => [__NAMESPACE__ . '\UserList',        'user',        'g_users',             0x0], // x
-        self::EMOTE       => [__NAMESPACE__ . '\EmoteList',       'emote',       'g_emotes',            0x1],
-        self::ENCHANTMENT => [__NAMESPACE__ . '\EnchantmentList', 'enchantment', 'g_enchantments',      0x1],
-        self::AREATRIGGER => [__NAMESPACE__ . '\AreatriggerList', 'areatrigger', '',                    0x0],
-        self::MAIL        => [__NAMESPACE__ . '\MailList',        'mail',        '',                    0x1]
+        self::EMOTE       => [__NAMESPACE__ . '\EmoteList',       'emote',       'g_emotes',            0x5],
+        self::ENCHANTMENT => [__NAMESPACE__ . '\EnchantmentList', 'enchantment', 'g_enchantments',      0x5],
+        self::AREATRIGGER => [__NAMESPACE__ . '\AreatriggerList', 'areatrigger', '',                    0x4],
+        self::MAIL        => [__NAMESPACE__ . '\MailList',        'mail',        '',                    0x5]
     );
 
 
@@ -131,6 +132,17 @@ abstract class Type
             return null;
 
         return new (self::$data[$type][self::IDX_LIST_OBJ])($conditions);
+    }
+
+    public static function validateIds(int $type, int|array $ids) : array
+    {
+        if (!self::exists($type))
+            return [];
+
+        if (!(self::$data[$type][self::IDX_FLAGS] & self::FLAG_DB_TYPE))
+            return [];
+
+        return DB::Aowow()->selectCol('SELECT `id` FROM ?# WHERE `id` IN (?a)', self::$data[$type][self::IDX_LIST_OBJ]::$dataTable, (array)$ids);
     }
 
     public static function getFileString(int $type) : string
