@@ -4245,6 +4245,7 @@ var LANG = {
         totemspell:                 "Totem",
         bandagespell:               "Hechizo de Venda",
         onGlobalCooldown:           "Sujeto al tiempo de relanzamiento global",
+        onlyaffectsingletarget:     "El aura solo puede afectar a un solo objetivo",
 
         sepcommunity:               "Comunidad",
         hascomments:                "Tiene comentarios",

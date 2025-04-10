@@ -424,7 +424,7 @@ abstract class Util
         return Lang::unescapeUISequences($text, $markdown ? Lang::FMT_MARKUP : Lang::FMT_HTML);
     }
 
-    public static function asHex($val) : string
+    public static function asHex(int $val) : string
     {
         $_ = decHex($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
@@ -433,13 +433,13 @@ abstract class Util
         return '0x'.strToUpper($_);
     }
 
-    public static function asBin($val) : string
+    public static function asBin(int $val) : string
     {
         $_ = decBin($val);
         while (fMod(strLen($_), 4))                         // in 4-blocks
             $_ = '0'.$_;
 
-        return 'b'.strToUpper($_);
+        return 'b'.$_;
     }
 
     public static function htmlEscape($data)

@@ -4275,7 +4275,7 @@ var LANG = {
         targetownitem:              "Target must be own item",
         doesntreqshapeshift:        "Does not require shapeshift",
         foodbuff:                   "Food/Drink buff",
-        targetonlyplayer:           "Can only target the player",
+        targetonlyplayer:           "Can only target players",
         reqmainhand:                "Requires main hand weapon",
         doesntengagetarget:         "Does not engage target",
         reqwand:                    "Requires a wand",
@@ -4291,6 +4291,7 @@ var LANG = {
         totemspell:                 "Totem",
         bandagespell:               "Bandage spell",
         onGlobalCooldown:           "On global cooldown",
+        onlyaffectsingletarget:     "The aura can only affect one target",
 
         sepcommunity:               "Community",
         hascomments:                "Has comments",

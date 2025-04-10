@@ -281,17 +281,20 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
                     </tr>
 <?php
 endforeach;
+
+if ($this->attributes):
 ?>
                     <tr>
                         <th><?=Lang::game('flags');?></th>
                             <td colspan="3" style="line-height:17px">
                                 <ul style="margin:0"><?php
-foreach ($this->attributes as $cr):
-    echo '<li><a href="?spells&filter=cr='.$cr.';crs=1;crv=0">'.Lang::spell('attributes', $cr).'</a></li>';
-endforeach;
+    foreach ($this->attributes as $a):
+        echo '<li>'.$a.'</li>';
+    endforeach;
 ?></ul>
                         </td>
                     </tr>
+<?php endif; ?>
                 </table>
 
                 <h2 class="clear"><?=Lang::main('related');?></h2>

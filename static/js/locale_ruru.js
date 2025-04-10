@@ -4247,6 +4247,7 @@ var LANG = {
         totemspell:                 "Тотем",
         bandagespell:               "Исцеление бинтами",
         onGlobalCooldown:           "Подвержен действию GCD",
+        onlyaffectsingletarget:     "Этот эффект может воздействовать только на одну цель",
 
         sepcommunity:               "Сообщество",
         hascomments:                "Есть комментарии",

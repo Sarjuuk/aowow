@@ -894,12 +894,12 @@ class GenericPage
         return str_repeat(' ', $pad) . sprintf($createIconString, $element, $iconIdx, $jsg, implode(', ', $params));
     }
 
-    protected function fmtStaffTip(string $text, string $tip) : string
+    protected function fmtStaffTip(?string $text, string $tip) : string
     {
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-            return sprintf(Util::$dfnString, $tip, $text);
+        if (!$text || !User::isInGroup(U_GROUP_EMPLOYEE))
+            return $text ?? '';
         else
-            return $text;
+            return sprintf(Util::$dfnString, $tip, $text);
     }
 
     // load brick

@@ -330,7 +330,7 @@ var fi_filters = {
         { id: 20,   name: 'hasreagents',            type: 'yn'                             },
         { id: 14,   name: 'id',                     type: 'num',            before: 'name' },
         { id: 12,   name: 'lastrank',               type: 'yn'                             },
-     // { id: 22,   name: 'proficiencytype',        type: 'proficiencytype'                }, // aowow - not used, pointless in wotlk
+        { id: 22,   name: 'proficiencytype',        type: 'proficiencytype'                },
         { id: 13,   name: 'rankno',                 type: 'num'                            },
         { id: 3,    name: 'requiresnearbyobject',   type: 'yn'                             },
         { id: 5,    name: 'requiresprofspec',       type: 'yn'                             },
@@ -338,13 +338,14 @@ var fi_filters = {
         { id: 1,    name: 'manaenergyragecost',     type: 'num'                            },
         { id: 45,   name: 'resourcetype',           type: 'resourcetype'                   },
         { id: 25,   name: 'rewardsskillups',        type: 'yn'                             },
-     // { id: 110,  name: 'scalingap',              type: 'yn'                             }, // aowow - too complex for now
+     // { id: 110,  name: 'scalingap',              type: 'yn'                             },
         { id: 19,   name: 'scaling',                type: 'yn'                             },
-     // { id: 111,  name: 'scalingsp',              type: 'yn'                             }, // aowow - too complex for now
+     // { id: 111,  name: 'scalingsp',              type: 'yn'                             },
         { id: 9,    name: 'source',                 type: 'spellsource'                    },
         { id: 4,    name: 'trainingcost',           type: 'num'                            },
+        { id: 43,   name: 'usableinbgs',            type: 'yn'                             },
         { id: 44,   name: 'usableinarenas',         type: 'yn'                             },
-     // { id: 31,   name: 'usablewhenshapeshifted', type: 'yn'                             }, // aowow - not used, pointless in wotlk
+        { id: 31,   name: 'usablewhenshapeshifted', type: 'yn'                             },
 
         { id: 9999, name: 'sepattributes' },
         { id: 69,   name: 'harmful',                    type: 'yn' },
@@ -371,7 +372,7 @@ var fi_filters = {
         { id: 68,   name: 'usablestealthed',            type: 'yn' },
         { id: 81,   name: 'doesntengagetarget',         type: 'yn' },
         { id: 77,   name: 'doesntreqshapeshift',        type: 'yn' },
-     // { id: 46,   name: 'disregardimmunity',          type: 'yn' }, // aowow - unsure what to make of it
+        { id: 46,   name: 'disregardimmunity',          type: 'yn' },
         { id: 47,   name: 'disregardschoolimmunity',    type: 'yn' },
         { id: 78,   name: 'foodbuff',                   type: 'yn' },
         { id: 71,   name: 'nothreat',                   type: 'yn' },
@@ -394,9 +395,10 @@ var fi_filters = {
         { id: 58,   name: 'damagedependsonlevel',       type: 'yn' },
         { id: 39,   name: 'spellstealable',             type: 'yn' },
         { id: 63,   name: 'delayedrecoverystarttime',   type: 'yn' },
+        { id: 86,   name: 'onlyaffectsingletarget',     type: 'yn' },
         { id: 87,   name: 'startstickingatapplication', type: 'yn' },
         { id: 59,   name: 'stopsautoattack',            type: 'yn' },
-     // { id: 76,   name: 'targetownitem',              type: 'yn' }, // aowow - e.g. DK weapon enchantments ... this flag for this has to be somewhere....
+        { id: 76,   name: 'targetownitem',              type: 'yn' },
         { id: 70,   name: 'targetnotincombat',          type: 'yn' },
         { id: 93,   name: 'totemspell',                 type: 'yn' },
         { id: 42,   name: 'usablewhenstunned',          type: 'yn' },

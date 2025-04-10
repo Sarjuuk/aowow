@@ -2157,10 +2157,12 @@ class SpellPage extends GenericPage
                                 $_nameMV = Util::ucFirst(Lang::game('npc')).' #'.$effMV;
                             break;
                         case SPELL_AURA_FORCE_REACTION:
-                            $_footer['value'][0] = $this->fmtStaffTip(Lang::game('rep', $_footer['value'][0]), $_footer['value'][0]);
+                            $_footer['value'][1] = $this->fmtStaffTip(Lang::game('rep', $_footer['value'][1]), $_footer['value'][1]);
+                            $_footer['value'][0] = null;    // disable range here as the string replacement will fail the comparison at the end
                             // DO NOT BREAK !
                         case SPELL_AURA_MOD_FACTION_REPUTATION_GAIN:
-                            $valueFmt = '%s%%';
+                            if ($effAura == SPELL_AURA_MOD_FACTION_REPUTATION_GAIN)
+                                $valueFmt = '%s%%';
                             if ($_ = FactionList::getName($effMV))
                                 $_nameMV = '<a href="?faction='.$effMV.'">'.$_.'</a>';
                             else
@@ -2286,57 +2288,30 @@ class SpellPage extends GenericPage
 
     private function createAttributesList() : array
     {
-        $cbBandageSpell = function()
-        {
-            return ($this->subject->getField('attributes1') & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2 | SPELL_ATTR1_CHANNEL_TRACK_TARGET)) && ($this->subject->getField('effect1ImplicitTargetA') == 21);
-        };
-
-        $cbInverseFlag = function($field, $flag)
-        {
-            return !($this->subject->getField($field) & $flag);
-        };
-
-        $cbEquippedWeapon = function($mask, $useInvType)
-        {
-            $field = $useInvType ? 'equippedItemInventoryTypeMask' : 'equippedItemSubClassMask';
-
-            return ($this->subject->getField('equippedItemClass') == ITEM_CLASS_WEAPON) && ($this->subject->getField($field) & $mask);
-        };
-
-        $cbSpellstealable = function($field, $flag)
-        {
-            return !($this->subject->getField($field) & $flag) && ($this->subject->getField('dispelType') == SPELL_DAMAGE_CLASS_MAGIC);
-        };
-
         $list = [];
-        $fi   = new SpellListFilter();
-        foreach (Lang::spell('attributes') as $idx => $_)
+        for ($i = 0; $i < 8; $i++)
         {
-            if ($cr = $fi->getGenericFilter($idx))
+            $attributes = $this->subject->getField('attributes'.$i);
+            for ($j = 1; $j <= (1 << 31); $j <<= 1)
             {
-                if ($cr[0] == Filter::CR_CALLBACK)
-                {
-                    if (!isset($cr[1]))
-                        trigger_error('SpellDetailPage::createAttributesList - callback handler '.$cr[1].' not defined for IDX #'.$idx, E_USER_WARNING);
-                    else if (${$cr[1]}($cr[2] ?? null, $cr[3] ?? null))
-                        $list[] = $idx;
-                }
-                else if ($cr[0] == Filter::CR_FLAG)
-                {
-                    if ($this->subject->getField($cr[1]) & $cr[2])
-                        $list[] = $idx;
-                }
-                else
-                    trigger_error('SpellDetailPage::createAttributesList - unhandled filter case #'.$cr[0].' for IDX #'.$idx, E_USER_WARNING);
+                if (!($attributes & $j))
+                    continue;
+
+                $listItem = Lang::spell('attributes'.$i, $j);
+                if (!$listItem && User::isInGroup(U_GROUP_STAFF))
+                    $listItem = '<span class="q0">Unknown SpellAttribute'.$i.'</span>';
+                else if (!$listItem)
+                    continue;
+
+                if ($crId = (SpellListFilter::$attributesFilter[$i][$j] ?? 0))
+                    $listItem = sprintf('<a href="?spells&filter=cr=%2$d;crs=%3$d;crv=0">%1$s</a>', $listItem, abs($crId), $crId > 0 ? 1 : 2);
+
+                $list[] = $this->fmtStaffTip($listItem, 'Attributes'.$i.': '.Util::asHex($j));
             }
-            else
-                trigger_error('SpellDetailPage::createAttributesList - SpellAttrib IDX #'.$idx.' defined in Lang, but not set as filter', E_USER_WARNING);
         }
 
         return $list;
     }
 }
-
-
 
 ?>

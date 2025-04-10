@@ -4270,6 +4270,7 @@ var LANG = {
         totemspell:                 "图腾",
         bandagespell:               "绷带法术",
         onGlobalCooldown:           "On global cooldown",
+        onlyaffectsingletarget:     "光环只能影响一名目标",
 
         sepcommunity:               "社区",
         hascomments:                "有评论",

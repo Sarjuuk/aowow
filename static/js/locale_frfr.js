@@ -4245,6 +4245,7 @@ var LANG = {
         totemspell:                 "Totem",
         bandagespell:               "Sort de bandage",
         onGlobalCooldown:           "Sur le temps de recharge global",
+        onlyaffectsingletarget:     "Cette aura n'affecte qu'une seule cible",
 
         sepcommunity:               "Communauté",
         hascomments:                "A des commentaires",

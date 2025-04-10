@@ -1444,295 +1444,269 @@ define('SPELL_TRIGGER_LEARN',       6);
 // learn trigger spells on items - 483: learn recipe; 55884: learn mount/pet
 define('LEARN_SPELLS', [483, 55884]);
 
-// Spell Attributes definitions
-define('SPELL_ATTR0_CU_ENCHANT_PROC',                  0x00000001); //
-define('SPELL_ATTR0_CU_CONE_BACK',                     0x00000002); //
-define('SPELL_ATTR0_CU_CONE_LINE',                     0x00000004); //
-define('SPELL_ATTR0_CU_SHARE_DAMAGE',                  0x00000008); //
-define('SPELL_ATTR0_CU_NO_INITIAL_THREAT',             0x00000010); //
-define('SPELL_ATTR0_CU_AURA_CC',                       0x00000020); //
-define('SPELL_ATTR0_CU_DONT_BREAK_STEALTH',            0x00000040); //
-define('SPELL_ATTR0_CU_CAN_CRIT',                      0x00000080); //
-define('SPELL_ATTR0_CU_DIRECT_DAMAGE',                 0x00000100); //
-define('SPELL_ATTR0_CU_CHARGE',                        0x00000200); //
-define('SPELL_ATTR0_CU_PICKPOCKET',                    0x00000400); //
-define('SPELL_ATTR0_CU_ROLLING_PERIODIC',              0x00000800); //
-define('SPELL_ATTR0_CU_NEGATIVE_EFF0',                 0x00001000); //
-define('SPELL_ATTR0_CU_NEGATIVE_EFF1',                 0x00002000); //
-define('SPELL_ATTR0_CU_NEGATIVE_EFF2',                 0x00004000); //
-define('SPELL_ATTR0_CU_IGNORE_ARMOR',                  0x00008000); //
-define('SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER',      0x00010000); //
-define('SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET',      0x00020000); //
-define('SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET',         0x00040000); //
-define('SPELL_ATTR0_CU_NEEDS_AMMO_DATA',               0x00080000); //
-define('SPELL_ATTR0_CU_BINARY_SPELL',                  0x00100000); //
-define('SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC',  0x00200000); //
-define('SPELL_ATTR0_CU_LIQUID_AURA',                   0x00400000); //
-define('SPELL_ATTR0_CU_NEGATIVE',                      SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2); //
+define('SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE',     0x00000001); // [WoWDev Wiki] The spell will consume a charge that is natural or procced even if it fails to apply it's effect.
+define('SPELL_ATTR0_REQ_AMMO',                      0x00000002); // Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
+define('SPELL_ATTR0_ON_NEXT_SWING',                 0x00000004); // On next melee (type 1) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
+define('SPELL_ATTR0_IS_REPLENISHMENT',              0x00000008); // Replenishment (client only)
+define('SPELL_ATTR0_ABILITY',                       0x00000010); // Treat as ability DESCRIPTION Cannot be reflected, not affected by cast speed modifiers, etc.
+define('SPELL_ATTR0_TRADESPELL',                    0x00000020); // Trade skill recipe DESCRIPTION Displayed in recipe list, not affected by cast speed modifiers
+define('SPELL_ATTR0_PASSIVE',                       0x00000040); // Passive spell DESCRIPTION Spell is automatically cast on self by core
+define('SPELL_ATTR0_HIDDEN_CLIENTSIDE',             0x00000080); // Hidden in UI (client only) DESCRIPTION Not visible in spellbook or aura bar
+define('SPELL_ATTR0_HIDE_IN_COMBAT_LOG',            0x00000100); // Hidden in combat log (client only) DESCRIPTION Spell will not appear in combat logs
+define('SPELL_ATTR0_TARGET_MAINHAND_ITEM',          0x00000200); // Auto-target mainhand item (client only) DESCRIPTION Client will automatically select main-hand item as cast target
+define('SPELL_ATTR0_ON_NEXT_SWING_2',               0x00000400); // On next melee (type 2) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
+define('SPELL_ATTR0_WEARER_CASTS_PROC_TRIGGER',     0x00000800); // [WoWDev Wiki] Marker attribute to show auras that trigger another spell (either directly or with a script).
+define('SPELL_ATTR0_DAYTIME_ONLY',                  0x00001000); // Only usable during daytime (unused)
+define('SPELL_ATTR0_NIGHT_ONLY',                    0x00002000); // Only usable during nighttime (unused)
+define('SPELL_ATTR0_INDOORS_ONLY',                  0x00004000); // Only usable indoors
+define('SPELL_ATTR0_OUTDOORS_ONLY',                 0x00008000); // Only usable outdoors
+define('SPELL_ATTR0_NOT_SHAPESHIFT',                0x00010000); // Not usable while shapeshifted
+define('SPELL_ATTR0_ONLY_STEALTHED',                0x00020000); // Only usable in stealth
+define('SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE',      0x00040000); // Don't shealthe weapons (client only)
+define('SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION',      0x00080000); // Scale with caster level DESCRIPTION For non-player casts, scale impact and power cost with caster's level
+define('SPELL_ATTR0_STOP_ATTACK_TARGET',            0x00100000); // Stop attacking after cast DESCRIPTION After casting this, the current auto-attack will be interrupted
+define('SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK',  0x00200000); // Prevent physical avoidance DESCRIPTION Spell cannot be dodged, parried or blocked
+define('SPELL_ATTR0_CAST_TRACK_TARGET',             0x00400000); // Automatically face target during cast (client only)
+define('SPELL_ATTR0_CASTABLE_WHILE_DEAD',           0x00800000); // Can be cast while dead DESCRIPTION Spells without this flag cannot be cast by dead units in non-triggered contexts
+define('SPELL_ATTR0_CASTABLE_WHILE_MOUNTED',        0x01000000); // Can be cast while mounted
+define('SPELL_ATTR0_DISABLED_WHILE_ACTIVE',         0x02000000); // Cooldown starts on expiry DESCRIPTION Spell is unusable while already active, and cooldown does not begin until the effects have worn off
+define('SPELL_ATTR0_NEGATIVE_1',                    0x04000000); // Is negative spell DESCRIPTION Forces the spell to be treated as a negative spell. Ex. Aura is shown in the debuff bar.
+define('SPELL_ATTR0_CASTABLE_WHILE_SITTING',        0x08000000); // Can be cast while sitting
+define('SPELL_ATTR0_CANT_USED_IN_COMBAT',           0x10000000); // Cannot be used in combat
+define('SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY', 0x20000000); // Pierce invulnerability DESCRIPTION Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute
+define('SPELL_ATTR0_HEARTBEAT_RESIST_CHECK',        0x40000000); // Periodic resistance checks DESCRIPTION Periodically re-rolls against resistance to potentially expire aura early
+define('SPELL_ATTR0_CANT_CANCEL',                   0x80000000); // Aura cannot be cancelled DESCRIPTION Prevents the player from voluntarily canceling a positive aura
 
-define('SPELL_ATTR0_UNK0',                             0x00000001); // Unknown attribute 0@Attr0
-define('SPELL_ATTR0_REQ_AMMO',                         0x00000002); // Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
-define('SPELL_ATTR0_ON_NEXT_SWING',                    0x00000004); // On next melee (type 1) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
-define('SPELL_ATTR0_IS_REPLENISHMENT',                 0x00000008); // Replenishment (client only)
-define('SPELL_ATTR0_ABILITY',                          0x00000010); // Treat as ability DESCRIPTION Cannot be reflected, not affected by cast speed modifiers, etc.
-define('SPELL_ATTR0_TRADESPELL',                       0x00000020); // Trade skill recipe DESCRIPTION Displayed in recipe list, not affected by cast speed modifiers
-define('SPELL_ATTR0_PASSIVE',                          0x00000040); // Passive spell DESCRIPTION Spell is automatically cast on self by core
-define('SPELL_ATTR0_HIDDEN_CLIENTSIDE',                0x00000080); // Hidden in UI (client only) DESCRIPTION Not visible in spellbook or aura bar
-define('SPELL_ATTR0_HIDE_IN_COMBAT_LOG',               0x00000100); // Hidden in combat log (client only) DESCRIPTION Spell will not appear in combat logs
-define('SPELL_ATTR0_TARGET_MAINHAND_ITEM',             0x00000200); // Auto-target mainhand item (client only) DESCRIPTION Client will automatically select main-hand item as cast target
-define('SPELL_ATTR0_ON_NEXT_SWING_2',                  0x00000400); // On next melee (type 2) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
-define('SPELL_ATTR0_UNK11',                            0x00000800); // Unknown attribute 11@Attr0
-define('SPELL_ATTR0_DAYTIME_ONLY',                     0x00001000); // Only usable during daytime (unused)
-define('SPELL_ATTR0_NIGHT_ONLY',                       0x00002000); // Only usable during nighttime (unused)
-define('SPELL_ATTR0_INDOORS_ONLY',                     0x00004000); // Only usable indoors
-define('SPELL_ATTR0_OUTDOORS_ONLY',                    0x00008000); // Only usable outdoors
-define('SPELL_ATTR0_NOT_SHAPESHIFT',                   0x00010000); // Not usable while shapeshifted
-define('SPELL_ATTR0_ONLY_STEALTHED',                   0x00020000); // Only usable in stealth
-define('SPELL_ATTR0_DONT_AFFECT_SHEATH_STATE',         0x00040000); // Don't shealthe weapons (client only)
-define('SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION',         0x00080000); // Scale with caster level DESCRIPTION For non-player casts, scale impact and power cost with caster's level
-define('SPELL_ATTR0_STOP_ATTACK_TARGET',               0x00100000); // Stop attacking after cast DESCRIPTION After casting this, the current auto-attack will be interrupted
-define('SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK',     0x00200000); // Prevent physical avoidance DESCRIPTION Spell cannot be dodged, parried or blocked
-define('SPELL_ATTR0_CAST_TRACK_TARGET',                0x00400000); // Automatically face target during cast (client only)
-define('SPELL_ATTR0_CASTABLE_WHILE_DEAD',              0x00800000); // Can be cast while dead DESCRIPTION Spells without this flag cannot be cast by dead units in non-triggered contexts
-define('SPELL_ATTR0_CASTABLE_WHILE_MOUNTED',           0x01000000); // Can be cast while mounted
-define('SPELL_ATTR0_DISABLED_WHILE_ACTIVE',            0x02000000); // Cooldown starts on expiry DESCRIPTION Spell is unusable while already active, and cooldown does not begin until the effects have worn off
-define('SPELL_ATTR0_NEGATIVE_1',                       0x04000000); // Is negative spell DESCRIPTION Forces the spell to be treated as a negative spell
-define('SPELL_ATTR0_CASTABLE_WHILE_SITTING',           0x08000000); // Can be cast while sitting
-define('SPELL_ATTR0_CANT_USED_IN_COMBAT',              0x10000000); // Cannot be used in combat
-define('SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY',    0x20000000); // Pierce invulnerability DESCRIPTION Allows spell to pierce invulnerability, unless the invulnerability spell also has this attribute
-define('SPELL_ATTR0_HEARTBEAT_RESIST_CHECK',           0x40000000); // Periodic resistance checks DESCRIPTION Periodically re-rolls against resistance to potentially expire aura early
-define('SPELL_ATTR0_CANT_CANCEL',                      0x80000000); // Aura cannot be cancelled DESCRIPTION Prevents the player from voluntarily canceling a positive aura
+define('SPELL_ATTR1_DISMISS_PET',                     0x00000001); // Dismiss Pet on cast DESCRIPTION Without this attribute, summoning spells will fail if caster already has a pet
+define('SPELL_ATTR1_DRAIN_ALL_POWER',                 0x00000002); // Drain all power DESCRIPTION Ignores listed power cost and drains entire pool instead
+define('SPELL_ATTR1_CHANNELED_1',                     0x00000004); // Channeled (type 1) DESCRIPTION Both "channeled" attributes have identical handling in server & client
+define('SPELL_ATTR1_CANT_BE_REDIRECTED',              0x00000008); // Ignore redirection effects DESCRIPTION Spell will not be attracted by SPELL_MAGNET auras (Grounding Totem) - NOTE! WH interprets this flag as NO_REFLECTION
+define('SPELL_ATTR1_NO_SKILL_INCREASE',               0x00000010); // [WoWDev Wiki] Does not give a skill up point.
+define('SPELL_ATTR1_NOT_BREAK_STEALTH',               0x00000020); // Does not break stealth
+define('SPELL_ATTR1_CHANNELED_2',                     0x00000040); // Channeled (type 2) DESCRIPTION Both "channeled" attributes have identical handling in server & client
+define('SPELL_ATTR1_CANT_BE_REFLECTED',               0x00000080); // Ignore reflection effects DESCRIPTION Spell will pierce through Spell Reflection and similar - NOTE! WH interprets this flag as ALL_EFFECTS_NEGATIVE
+define('SPELL_ATTR1_CANT_TARGET_IN_COMBAT',           0x00000100); // Target cannot be in combat
+define('SPELL_ATTR1_MELEE_COMBAT_START',              0x00000200); // Starts auto-attack (client only) DESCRIPTION Caster will begin auto-attacking the target on cast
+define('SPELL_ATTR1_NO_THREAT',                       0x00000400); // Does not generate threat DESCRIPTION Also does not cause target to engage
+define('SPELL_ATTR1_DONT_REFRESH_DURATION_ON_RECAST', 0x00000800); // [WoWDev Wiki] Aura will not refresh it's duration when recast
+define('SPELL_ATTR1_IS_PICKPOCKET',                   0x00001000); // Pickpocket (client only)
+define('SPELL_ATTR1_FARSIGHT',                        0x00002000); // Farsight aura (client only)
+define('SPELL_ATTR1_CHANNEL_TRACK_TARGET',            0x00004000); // Track target while channeling DESCRIPTION While channeling, adjust facing to face target
+define('SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY',        0x00008000); // Immunity cancels preapplied auras DESCRIPTION For immunity spells, cancel all auras that this spell would make you immune to when the spell is applied
+define('SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE',     0x00010000); // Unaffected by school immunities DESCRIPTION Will not pierce Divine Shield, Ice Block and other full invulnerabilities
+define('SPELL_ATTR1_UNAUTOCASTABLE_BY_PET',           0x00020000); // Cannot be autocast by pet
+define('SPELL_ATTR1_PREVENTS_ANIM',                   0x00040000); // [WoWDev Wiki] Stun, Polymorph, Daze, Hex, etc. Auras apply "UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT".
+define('SPELL_ATTR1_CANT_TARGET_SELF',                0x00080000); // Cannot be self-cast
+define('SPELL_ATTR1_FINISHING_MOVE_DAMAGE',           0x00100000); // Requires combo points (type 1) - modifies effect amount
+define('SPELL_ATTR1_THREAT_ONLY_ON_MISS',             0x00200000); // [WoWDev Wiki] Untested if this implies all functions listed under SpellMissInfo aside from Miss such as Parry, Dodge, Resist, etc.
+define('SPELL_ATTR1_FINISHING_MOVE_DURATION',         0x00400000); // Requires combo points (type 2) - modifies effect duration
+define('SPELL_ATTR1_IGNORE_OWNERS_DEATH',             0x00800000); // [WoWDev Wiki] Unaffected by death of owner. Possibly works with temporary summons as well?
+define('SPELL_ATTR1_IS_FISHING',                      0x01000000); // Fishing (client only)
+define('SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT',         0x02000000); // [WoWDev Wiki]
+define('SPELL_ATTR1_REQUIRE_ALL_TARGETS',             0x04000000); // [WoWDev Wiki] Related to [target=focus] and [target=mouseover] macros? Used in many vehicle type spells.
+define('SPELL_ATTR1_DISCOUNT_POWER_ON_MISS',          0x08000000); // [WoWDev Wiki] This attribute is almost exclusive with spells that consume combo-point-like secondary resources.
+define('SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR',        0x10000000); // Hide in aura bar (client only)
+define('SPELL_ATTR1_CHANNEL_DISPLAY_SPELL_NAME',      0x20000000); // Show spell name during channel (client only)
+define('SPELL_ATTR1_ENABLE_AT_DODGE',                 0x40000000); // Enable at dodge
+define('SPELL_ATTR1_CAST_WHEN_LEARNED',               0x80000000); // [WoWDev Wiki] Cast the spell when learned.
 
-define('SPELL_ATTR1_DISMISS_PET',                      0x00000001); // Dismiss Pet on cast DESCRIPTION Without this attribute, summoning spells will fail if caster already has a pet
-define('SPELL_ATTR1_DRAIN_ALL_POWER',                  0x00000002); // Drain all power DESCRIPTION Ignores listed power cost and drains entire pool instead
-define('SPELL_ATTR1_CHANNELED_1',                      0x00000004); // Channeled (type 1) DESCRIPTION Both "channeled" attributes have identical handling in server & client
-define('SPELL_ATTR1_CANT_BE_REDIRECTED',               0x00000008); // Ignore redirection effects DESCRIPTION Spell will not be attracted by SPELL_MAGNET auras (Grounding Totem)
-define('SPELL_ATTR1_UNK4',                             0x00000010); // Unknown attribute 4@Attr1
-define('SPELL_ATTR1_NOT_BREAK_STEALTH',                0x00000020); // Does not break stealth
-define('SPELL_ATTR1_CHANNELED_2',                      0x00000040); // Channeled (type 2) DESCRIPTION Both "channeled" attributes have identical handling in server & client
-define('SPELL_ATTR1_CANT_BE_REFLECTED',                0x00000080); // Ignore reflection effects DESCRIPTION Spell will pierce through Spell Reflection and similar
-define('SPELL_ATTR1_CANT_TARGET_IN_COMBAT',            0x00000100); // Target cannot be in combat
-define('SPELL_ATTR1_MELEE_COMBAT_START',               0x00000200); // Starts auto-attack (client only) DESCRIPTION Caster will begin auto-attacking the target on cast
-define('SPELL_ATTR1_NO_THREAT',                        0x00000400); // Does not generate threat DESCRIPTION Also does not cause target to engage
-define('SPELL_ATTR1_UNK11',                            0x00000800); // Unknown attribute 11@Attr1 DESCRIPTION Aura?
-define('SPELL_ATTR1_IS_PICKPOCKET',                    0x00001000); // Pickpocket (client only)
-define('SPELL_ATTR1_FARSIGHT',                         0x00002000); // Farsight aura (client only)
-define('SPELL_ATTR1_CHANNEL_TRACK_TARGET',             0x00004000); // Track target while channeling DESCRIPTION While channeling, adjust facing to face target
-define('SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY',         0x00008000); // Immunity cancels preapplied auras DESCRIPTION For immunity spells, cancel all auras that this spell would make you immune to when the spell is applied
-define('SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE',      0x00010000); // Unaffected by school immunities DESCRIPTION Will not pierce Divine Shield, Ice Block and other full invulnerabilities
-define('SPELL_ATTR1_UNAUTOCASTABLE_BY_PET',            0x00020000); // Cannot be autocast by pet
-define('SPELL_ATTR1_UNK18',                            0x00040000); // Unknown attribute 18@Attr1 DESCRIPTION Stun, Polymorph, Daze, Hex - CC?
-define('SPELL_ATTR1_CANT_TARGET_SELF',                 0x00080000); // Cannot be self-cast
-define('SPELL_ATTR1_REQ_COMBO_POINTS1',                0x00100000); // Requires combo points (type 1)
-define('SPELL_ATTR1_UNK21',                            0x00200000); // Unknown attribute 21@Attr1
-define('SPELL_ATTR1_REQ_COMBO_POINTS2',                0x00400000); // Requires combo points (type 2)
-define('SPELL_ATTR1_UNK23',                            0x00800000); // Unknwon attribute 23@Attr1
-define('SPELL_ATTR1_IS_FISHING',                       0x01000000); // Fishing (client only)
-define('SPELL_ATTR1_UNK25',                            0x02000000); // Unknown attribute 25@Attr1
-define('SPELL_ATTR1_UNK26',                            0x04000000); // Unknown attribute 26@Attr1 DESCRIPTION Related to [target=focus] and [target=mouseover] macros?
-define('SPELL_ATTR1_UNK27',                            0x08000000); // Unknown attribute 27@Attr1 DESCRIPTION Melee spell?
-define('SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR',         0x10000000); // Hide in aura bar (client only)
-define('SPELL_ATTR1_CHANNEL_DISPLAY_SPELL_NAME',       0x20000000); // Show spell name during channel (client only)
-define('SPELL_ATTR1_ENABLE_AT_DODGE',                  0x40000000); // Enable at dodge
-define('SPELL_ATTR1_UNK31',                            0x80000000); // Unknown attribute 31@Attr1
+define('SPELL_ATTR2_CAN_TARGET_DEAD',                               0x00000001); // Can target dead players or corpses
+define('SPELL_ATTR2_NO_SHAPESHIFT_UI',                              0x00000002); // [WoWDev Wiki] No shapeshift UI such as Stealth, Shadowform, Druid shapeshifts, etc. Also certain custom scripted ones for quests or other various gameplay.
+define('SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS',                         0x00000004); // Ignore Line of Sight
+define('SPELL_ATTR2_ALLOW_LOW_LEVEL_BUFF',                          0x00000008); // Allow Low Level Buff
+define('SPELL_ATTR2_DISPLAY_IN_STANCE_BAR',                         0x00000010); // Show in stance bar (client only)
+define('SPELL_ATTR2_AUTOREPEAT_FLAG',                               0x00000020); // Ranged auto-attack spell
+define('SPELL_ATTR2_CANT_TARGET_TAPPED',                            0x00000040); // Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
+define('SPELL_ATTR2_DO_NOT_REPORT_SPELL_FAILURE',                   0x00000080); // [WoWDev Wiki] Do not report spell failure. Combat log or error string related.
+define('SPELL_ATTR2_INCLUDE_IN_ADVANCED_COMBAT_LOG',                0x00000100); // [WoWDev Wiki] Determines whether to include this aura in list of auras in SMSG_ENCOUNTER_START.
+define('SPELL_ATTR2_ALWAYS_CAST_AS_UNIT',                           0x00000200); // [WoWDev Wiki] Unclear what the differences of casting a spell in this way would do.
+define('SPELL_ATTR2_SPECIAL_TAMING_FLAG',                           0x00000400); // [WoWDev Wiki]
+define('SPELL_ATTR2_HEALTH_FUNNEL',                                 0x00000800); // Health Funnel - NOTE! WH and leak data declare this attribute NO_TARGET_PER_SECOND_COSTS, but the per sec cost shows in tooltip and all associated spells have a per sec cost.
+define('SPELL_ATTR2_CHAIN_FROM_CASTER',                             0x00001000); // [WoWDev Wiki] Effectively a point blank AoE with the source as the caster but seems to only apply to melee abilities (Ex. Cleave, Heart Strike)
+define('SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA',                     0x00002000); // Enchant persists when entering arena - NOTE! is ENCHANT_OWN_ITEM_ONLY in Attributes leak. Both names describe mostly the same thing.
+define('SPELL_ATTR2_ALLOW_WHILE_INVISIBLE',                         0x00004000); // [WoWDev Wiki] Allow spell to be used while invisible and the many different types of invisibility as well. - NOTE! Judging by flagged spells this makes no sense for 335.
+define('SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST',          0x00008000); // [WoWDev Wiki] unused
+define('SPELL_ATTR2_TAME_BEAST',                                    0x00010000); // Tame Beast - NOTE! NO_ACTIVE_PET in modern client, but descriptor is close enough
+define('SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS',                        0x00020000); // Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
+define('SPELL_ATTR2_REQ_DEAD_PET',                                  0x00040000); // Requires dead pet - NOTE! both WH and leak data declare this attribute NO_JUMP_WHILE_CAST_PENDING .. whatever that means
+define('SPELL_ATTR2_NOT_NEED_SHAPESHIFT',                           0x00080000); // Also allow outside shapeshift DESCRIPTION Even if Stances are nonzero, allow spell to be cast outside of shapeshift (though not in a different shapeshift)
+define('SPELL_ATTR2_INITIATE_COMBAT_POST_CAST_ENABLES_AUTO_ATTACK', 0x00100000); // [WoWDev Wiki] Enable auto-attacks after the first spell is cast when in combat.
+define('SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE',                    0x00200000); // Fail on all targets immune DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
+define('SPELL_ATTR2_NO_INITIAL_THREAT',                             0x00400000); // [WoWDev Wiki] Can be found on several spells that deal damage and break stealth or are affected by a particular aura.
+define('SPELL_ATTR2_IS_ARCANE_CONCENTRATION',                       0x00800000); // Arcane Concentration - NOTE! both WH and leak data declare this attribute PROC_COOLDOWN_ON_FAILURE, but it only affects Arcane Concentration as set by TC
+define('SPELL_ATTR2_ITEM_CAST_WITH_OWNER_SKILL',                    0x01000000); // [WoWDev Wiki]
+define('SPELL_ATTR2_DONT_BLOCK_MANA_REGEN',                         0x02000000); // [WoWDev Wiki] Mana regeneration is not affected.
+define('SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE',              0x04000000); // Pierce aura application immunities DESCRIPTION Allow aura to be applied despite target being immune to new aura applications
+define('SPELL_ATTR2_IGNORE_WEAPONSKILL',                            0x08000000); // [WoWDev Wiki] Ignore skill level of a weapon.
+define('SPELL_ATTR2_NOT_AN_ACTION',                                 0x10000000); // [WoWDev Wiki] Unsure if anything besides spells and object interactions constitute an "action".
+define('SPELL_ATTR2_CANT_CRIT',                                     0x20000000); // Cannot critically strike
+define('SPELL_ATTR2_ACTIVE_THREAT',                                 0x40000000); // Active Threat
+define('SPELL_ATTR2_FOOD_BUFF',                                     0x80000000); // Food buff (client only) - NOTE! both WH and leak data declare this attribute RETAIN_ITEM_CAST .. unknown what that means
 
-define('SPELL_ATTR2_CAN_TARGET_DEAD',                  0x00000001); // Can target dead players or corpses
-define('SPELL_ATTR2_UNK1',                             0x00000002); // Unknown attribute 1@Attr2
-define('SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS',            0x00000004); // Ignore Line of Sight
-define('SPELL_ATTR2_UNK3',                             0x00000008); // Ignore aura scaling
-define('SPELL_ATTR2_DISPLAY_IN_STANCE_BAR',            0x00000010); // Show in stance bar (client only)
-define('SPELL_ATTR2_AUTOREPEAT_FLAG',                  0x00000020); // Ranged auto-attack spell
-define('SPELL_ATTR2_CANT_TARGET_TAPPED',               0x00000040); // Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
-define('SPELL_ATTR2_UNK7',                             0x00000080); // Unknown attribute 7@Attr2
-define('SPELL_ATTR2_UNK8',                             0x00000100); // Unknown attribute 8@Attr2
-define('SPELL_ATTR2_UNK9',                             0x00000200); // Unknown attribute 9@Attr2
-define('SPELL_ATTR2_UNK10',                            0x00000400); // Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
-define('SPELL_ATTR2_HEALTH_FUNNEL',                    0x00000800); // Health Funnel
-define('SPELL_ATTR2_UNK12',                            0x00001000); // Unknown attribute 12@Attr2
-define('SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA',        0x00002000); // Enchant persists when entering arena
-define('SPELL_ATTR2_UNK14',                            0x00004000); // Unknown attribute 14@Attr2
-define('SPELL_ATTR2_UNK15',                            0x00008000); // Unknown attribute 15@Attr2
-define('SPELL_ATTR2_TAME_BEAST',                       0x00010000); // Tame Beast
-define('SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS',           0x00020000); // Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
-define('SPELL_ATTR2_REQ_DEAD_PET',                     0x00040000); // Requires dead pet
-define('SPELL_ATTR2_NOT_NEED_SHAPESHIFT',              0x00080000); // Also allow outside shapeshift DESCRIPTION Even if Stances are nonzero, allow spell to be cast outside of shapeshift (though not in a different shapeshift)
-define('SPELL_ATTR2_UNK20',                            0x00100000); // Unknown attribute 20@Attr2
-define('SPELL_ATTR2_DAMAGE_REDUCED_SHIELD',            0x00200000); // Damage reduction ability DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
-define('SPELL_ATTR2_UNK22',                            0x00400000); // Unknown attribute 22@Attr2
-define('SPELL_ATTR2_IS_ARCANE_CONCENTRATION',          0x00800000); // Arcane Concentration
-define('SPELL_ATTR2_UNK24',                            0x01000000); // Unknown attribute 24@Attr2
-define('SPELL_ATTR2_UNK25',                            0x02000000); // Unknown attribute 25@Attr2
-define('SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE', 0x04000000); // Pierce aura application immunities DESCRIPTION Allow aura to be applied despite target being immune to new aura applications
-define('SPELL_ATTR2_UNK27',                            0x08000000); // Unknown attribute 27@Attr2
-define('SPELL_ATTR2_UNK28',                            0x10000000); // Unknown attribute 28@Attr2
-define('SPELL_ATTR2_CANT_CRIT',                        0x20000000); // Cannot critically strike
-define('SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC',       0x40000000); // Allow triggered spell to trigger (type 1) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
-define('SPELL_ATTR2_FOOD_BUFF',                        0x80000000); // Food buff (client only)
+define('SPELL_ATTR3_PVP_ENABLING',                          0x00000001); // [WoWDev Wiki] Enables the PvP state when cast.
+define('SPELL_ATTR3_IGNORE_PROC_SUBCLASS_MASK',             0x00000002); // Ignores subclass mask check when checking proc
+define('SPELL_ATTR3_NO_CASTING_BAR_TEXT',                   0x00000004); // [WoWDev Wiki] No casting bar text.
+define('SPELL_ATTR3_COMPLETELY_BLOCKED',                    0x00000008); // Blockable spell
+define('SPELL_ATTR3_IGNORE_RESURRECTION_TIMER',             0x00000010); // Ignore resurrection timer
+define('SPELL_ATTR3_NO_DURABILTIY_LOSS',                    0x00000020); // [WoWDev Wiki]
+define('SPELL_ATTR3_NO_AVOIDANCE',                          0x00000040); // [WoWDev Wiki] Self descriptive. No AoE reduction modifiers will be calculated.
+define('SPELL_ATTR3_STACK_FOR_DIFF_CASTERS',                0x00000080); // Stack separately for each caster
+define('SPELL_ATTR3_ONLY_TARGET_PLAYERS',                   0x00000100); // Can only target players
+define('SPELL_ATTR3_NOT_A_PROC',                            0x00000200); // Not a Proc DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
+define('SPELL_ATTR3_MAIN_HAND',                             0x00000400); // Require main hand weapon
+define('SPELL_ATTR3_BATTLEGROUND',                          0x00000800); // Can only be cast in battleground
+define('SPELL_ATTR3_ONLY_TARGET_GHOSTS',                    0x00001000); // Can only target ghost players
+define('SPELL_ATTR3_DONT_DISPLAY_CHANNEL_BAR',              0x00002000); // Do not display channel bar (client only)
+define('SPELL_ATTR3_IS_HONORLESS_TARGET',                   0x00004000); // Honorless Target - NOTE! HIDE_IN_RAID_FILTER in modern client. Attribute only present on Honorless Target buff.
+define('SPELL_ATTR3_NORMAL_RANGED_ATTACK',                  0x00008000); // [WoWDev Wiki] Auto Shoot, Shoot, Throw (Autoshot flag).
+define('SPELL_ATTR3_CANT_TRIGGER_PROC',                     0x00010000); // Cannot trigger procs
+define('SPELL_ATTR3_NO_INITIAL_AGGRO',                      0x00020000); // No initial aggro - [WoWDev Wiki] SPELL_ATTR3_SUPPRESS_TARGET_PROCS: This will suppress any procs the target could trigger from this spell. Similar to SPELL_ATTR3_SUPPRESS_CASTER_PROCS (0x00010000)
+define('SPELL_ATTR3_IGNORE_HIT_RESULT',                     0x00040000); // Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
+define('SPELL_ATTR3_DISABLE_PROC',                          0x00080000); // Cannot trigger spells during aura proc - NOTE! both WH and the leak data name this INSTANT_TARGET_PROCS .. sooo the opposite? why..?
+define('SPELL_ATTR3_DEATH_PERSISTENT',                      0x00100000); // Persists through death
+define('SPELL_ATTR3_ONLY_PROC_OUTDOORS',                    0x00200000); // [WoWDev Wiki] unused
+define('SPELL_ATTR3_REQ_WAND',                              0x00400000); // Requires equipped Wand
+define('SPELL_ATTR3_NO_DAMAGE_HISTORY',                     0x00800000); // [WoWDev Wiki] Possible combat log or scripting relation.
+define('SPELL_ATTR3_REQ_OFFHAND',                           0x01000000); // Requires offhand weapon
+define('SPELL_ATTR3_TREAT_AS_PERIODIC',                     0x02000000); // Treat as periodic effect
+define('SPELL_ATTR3_CAN_PROC_FROM_PROCS',                   0x04000000); // Can Proc From Procs
+define('SPELL_ATTR3_DRAIN_SOUL',                            0x08000000); // Drain Soul
+define('SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS', 0x10000000); // [WoWDev Wiki] Ignore caster and target restrictions. - NOTE! WH handles this attribute as 'does not appear in log' like SPELL_ATTR0_HIDE_IN_COMBAT_LOG which it handles as 'Cast time is hidden'
+define('SPELL_ATTR3_NO_DONE_BONUS',                         0x20000000); // Damage dealt is unaffected by modifiers
+define('SPELL_ATTR3_DONT_DISPLAY_RANGE',                    0x40000000); // Do not show range in tooltip (client only)
+define('SPELL_ATTR3_NOT_ON_AOE_IMMUNE',                     0x80000000); // [WoWDev Wiki] A descriptor for spells that implement Area of Effect Immunity and can serve as a handler for scripts that call for this.
 
-define('SPELL_ATTR3_UNK0',                             0x00000001); // Unknown attribute 0@Attr3
-define('SPELL_ATTR3_IGNORE_PROC_SUBCLASS_MASK',        0x00000002); // 1 Ignores subclass mask check when checking proc
-define('SPELL_ATTR3_UNK2',                             0x00000004); // Unknown attribute 2@Attr3
-define('SPELL_ATTR3_BLOCKABLE_SPELL',                  0x00000008); // Blockable spell
-define('SPELL_ATTR3_IGNORE_RESURRECTION_TIMER',        0x00000010); // Ignore resurrection timer
-define('SPELL_ATTR3_UNK5',                             0x00000020); // Unknown attribute 5@Attr3
-define('SPELL_ATTR3_UNK6',                             0x00000040); // Unknown attribute 6@Attr3
-define('SPELL_ATTR3_STACK_FOR_DIFF_CASTERS',           0x00000080); // Stack separately for each caster
-define('SPELL_ATTR3_ONLY_TARGET_PLAYERS',              0x00000100); // Can only target players
-define('SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2',     0x00000200); // Allow triggered spell to trigger (type 2) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
-define('SPELL_ATTR3_MAIN_HAND',                        0x00000400); // Require main hand weapon
-define('SPELL_ATTR3_BATTLEGROUND',                     0x00000800); // Can only be cast in battleground
-define('SPELL_ATTR3_ONLY_TARGET_GHOSTS',               0x00001000); // Can only target ghost players
-define('SPELL_ATTR3_DONT_DISPLAY_CHANNEL_BAR',         0x00002000); // Do not display channel bar (client only)
-define('SPELL_ATTR3_IS_HONORLESS_TARGET',              0x00004000); // Honorless Target
-define('SPELL_ATTR3_UNK15',                            0x00008000); // Unknown attribute 15@Attr3 DESCRIPTION Auto Shoot, Shoot, Throw - ranged normal attack attribute?
-define('SPELL_ATTR3_CANT_TRIGGER_PROC',                0x00010000); // Cannot trigger procs
-define('SPELL_ATTR3_NO_INITIAL_AGGRO',                 0x00020000); // No initial aggro
-define('SPELL_ATTR3_IGNORE_HIT_RESULT',                0x00040000); // Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
-define('SPELL_ATTR3_DISABLE_PROC',                     0x00080000); // Cannot trigger spells during aura proc
-define('SPELL_ATTR3_DEATH_PERSISTENT',                 0x00100000); // Persists through death
-define('SPELL_ATTR3_UNK21',                            0x00200000); // Unknown attribute 21@Attr3
-define('SPELL_ATTR3_REQ_WAND',                         0x00400000); // Requires equipped Wand
-define('SPELL_ATTR3_UNK23',                            0x00800000); // Unknown attribute 23@Attr3
-define('SPELL_ATTR3_REQ_OFFHAND',                      0x01000000); // Requires offhand weapon
-define('SPELL_ATTR3_TREAT_AS_PERIODIC',                0x02000000); // Treat as periodic effect
-define('SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED',          0x04000000); // Can trigger from triggered spells
-define('SPELL_ATTR3_DRAIN_SOUL',                       0x08000000); // Drain Soul
-define('SPELL_ATTR3_UNK28',                            0x10000000); // Unknown attribute 28@Attr3
-define('SPELL_ATTR3_NO_DONE_BONUS',                    0x20000000); // Damage dealt is unaffected by modifiers
-define('SPELL_ATTR3_DONT_DISPLAY_RANGE',               0x40000000); // Do not show range in tooltip (client only)
-define('SPELL_ATTR3_UNK31',                            0x80000000); // Unknown attribute 31@Attr3
+define('SPELL_ATTR4_IGNORE_RESISTANCES',        0x00000001); // Cannot be resisted - NOTE! WH correctly handles this as NO_CAST_LOG and spells with this attribute do not show an "[Entity] casts [spell] at [target]" message n combat log
+define('SPELL_ATTR4_PROC_ONLY_ON_CASTER',       0x00000002); // Only proc on self-cast - NOTE! also named CLASS_TRIGGER_ONLY_ON_TARGET
+define('SPELL_ATTR4_FADES_WHILE_LOGGED_OUT',    0x00000004); // Buff expires while offline DESCRIPTION Debuffs (except Resurrection Sickness) will automatically do this
+define('SPELL_ATTR4_NO_HELPFUL_THREAT',         0x00000008); // [WoWDev Wiki]
+define('SPELL_ATTR4_NO_HARMFUL_THREAT',         0x00000010); // [WoWDev Wiki] May influence certain situations in towns with guard aggro in respect to PvP.
+define('SPELL_ATTR4_ALLOW_CLIENT_TARGETING',    0x00000020); // [WoWDev Wiki] Allow client targeting. Applies only to pet spells, if this is not applied then opcode CMSG_PET_ACTION is sent instead of CMSG_PET_CAST_SPELL.
+define('SPELL_ATTR4_NOT_STEALABLE',             0x00000040); // Aura cannot be stolen
+define('SPELL_ATTR4_CAN_CAST_WHILE_CASTING',    0x00000080); // Can be cast while casting DESCRIPTION Ignores already in-progress cast and still casts
+define('SPELL_ATTR4_FIXED_DAMAGE',              0x00000100); // Deals fixed damage
+define('SPELL_ATTR4_TRIGGER_ACTIVATE',          0x00000200); // Spell is initially disabled (client only)
+define('SPELL_ATTR4_SPELL_VS_EXTEND_COST',      0x00000400); // Attack speed modifies cost DESCRIPTION Adds 10 to power cost for each 1s of weapon speed
+define('SPELL_ATTR4_NO_PARTIAL_IMMUNITY',       0x00000800); // [WoWDev Wiki]
+define('SPELL_ATTR4_AURA_IS_BUFF',              0x00001000); // [WoWDev Wiki] Mostly applied to spells that would result in such spell showing as a debuff.
+define('SPELL_ATTR4_DO_NOT_LOG_CASTER',         0x00002000); // [WoWDev Wiki] No caster object is sent to client combat log.
+define('SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS', 0x00004000); // Damage does not break auras - NOTE! also named REACTIVE_DAMAGE_PROC
+define('SPELL_ATTR4_NOT_IN_SPELLBOOK',          0x00008000); // [WoWDev Wiki]
+define('SPELL_ATTR4_NOT_USABLE_IN_ARENA',       0x00010000); // Not usable in arena DESCRIPTION Makes spell unusable despite CD <= 10min
+define('SPELL_ATTR4_USABLE_IN_ARENA',           0x00020000); // Usable in arena DESCRIPTION Makes spell usable despite CD > 10min
+define('SPELL_ATTR4_AREA_TARGET_CHAIN',         0x00040000); // Chain area targets DESCRIPTION [NYI] Hits area targets over time instead of all at once
+define('SPELL_ATTR4_ALLOW_PROC_WHILE_SITTING',  0x00080000); // [WoWDev Wiki]
+define('SPELL_ATTR4_NOT_CHECK_SELFCAST_POWER',  0x00100000); // Allow self-cast to override stronger aura (client only) - NOTE! modern name AURA_NEVER_BOUNCES (similar meaning)
+define('SPELL_ATTR4_DONT_REMOVE_IN_ARENA',      0x00200000); // Keep when entering arena
+define('SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM',  0x00400000); // [WoWDev Wiki] Disables client side weapon swing animation.
+define('SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS',  0x00800000); // Cannot trigger item spells
+define('SPELL_ATTR4_AUTO_RANGED_COMBAT',        0x01000000); // [WoWDev Wiki]
+define('SPELL_ATTR4_IS_PET_SCALING',            0x02000000); // Pet Scaling aura
+define('SPELL_ATTR4_CAST_ONLY_IN_OUTLAND',      0x04000000); // Only in Outland/Northrend - NOTE! modern client name is ONLY_FLYING_AREAS (similar, more correct), WH is "Allow Equip While Casting", (wtf, seriously)
+define('SPELL_ATTR4_FORCE_DISPLAY_CASTBAR',     0x08000000); //
+define('SPELL_ATTR4_IGNORE_COMBAT_TIMER',       0x10000000); // [WoWDev Wiki]
+define('SPELL_ATTR4_AURA_BOUNCE_FAILS_SPELL',   0x20000000); // [WoWDev Wiki]
+define('SPELL_ATTR4_OBSOLETE',                  0x40000000); // [WoWDev Wiki] Deprecates the spell making it greyed out and gives "You can't use that here" error. Still usable with the triggered flag command though.
+define('SPELL_ATTR4_USE_FACING_FROM_SPELL',     0x80000000); // [WoWDev Wiki] Affects orientation. The value used is likely related to FacingCasterFlags in Spell.dbc for 3.3.5.
 
-define('SPELL_ATTR4_IGNORE_RESISTANCES',               0x00000001); // Cannot be resisted
-define('SPELL_ATTR4_PROC_ONLY_ON_CASTER',              0x00000002); // Only proc on self-cast
-define('SPELL_ATTR4_FADES_WHILE_LOGGED_OUT',           0x00000004); // Buff expires while offline DESCRIPTION Debuffs (except Resurrection Sickness) will automatically do this
-define('SPELL_ATTR4_UNK3',                             0x00000008); // Unknown attribute 3@Attr4
-define('SPELL_ATTR4_UNK4',                             0x00000010); // Treat as delayed spell
-define('SPELL_ATTR4_UNK5',                             0x00000020); // Unknown attribute 5@Attr4
-define('SPELL_ATTR4_NOT_STEALABLE',                    0x00000040); // Aura cannot be stolen
-define('SPELL_ATTR4_CAN_CAST_WHILE_CASTING',           0x00000080); // Can be cast while casting DESCRIPTION Ignores already in-progress cast and still casts
-define('SPELL_ATTR4_FIXED_DAMAGE',                     0x00000100); // Deals fixed damage
-define('SPELL_ATTR4_TRIGGER_ACTIVATE',                 0x00000200); // Spell is initially disabled (client only)
-define('SPELL_ATTR4_SPELL_VS_EXTEND_COST',             0x00000400); // Attack speed modifies cost DESCRIPTION Adds 10 to power cost for each 1s of weapon speed
-define('SPELL_ATTR4_UNK11',                            0x00000800); // Unknown attribute 11@Attr4
-define('SPELL_ATTR4_UNK12',                            0x00001000); // Unknown attribute 12@Attr4
-define('SPELL_ATTR4_UNK13',                            0x00002000); // Unknown attribute 13@Attr4
-define('SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS',        0x00004000); // Damage does not break auras
-define('SPELL_ATTR4_UNK15',                            0x00008000); // Unknown attribute 15@Attr4
-define('SPELL_ATTR4_NOT_USABLE_IN_ARENA',              0x00010000); // Not usable in arena DESCRIPTION Makes spell unusable despite CD <= 10min
-define('SPELL_ATTR4_USABLE_IN_ARENA',                  0x00020000); // Usable in arena DESCRIPTION Makes spell usable despite CD > 10min
-define('SPELL_ATTR4_AREA_TARGET_CHAIN',                0x00040000); // Chain area targets DESCRIPTION [NYI] Hits area targets over time instead of all at once
-define('SPELL_ATTR4_UNK19',                            0x00080000); // Unknown attribute 19@Attr4
-define('SPELL_ATTR4_NOT_CHECK_SELFCAST_POWER',         0x00100000); // Allow self-cast to override stronger aura (client only)
-define('SPELL_ATTR4_UNK21',                            0x00200000); // Keep when entering arena
-define('SPELL_ATTR4_UNK22',                            0x00400000); // Unknown attribute 22@Attr4
-define('SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS',         0x00800000); // Cannot trigger item spells
-define('SPELL_ATTR4_UNK24',                            0x01000000); // Unknown attribute 24@Attr4 DESCRIPTION Shoot-type spell?
-define('SPELL_ATTR4_IS_PET_SCALING',                   0x02000000); // Pet Scaling aura
-define('SPELL_ATTR4_CAST_ONLY_IN_OUTLAND',             0x04000000); // Only in Outland/Northrend
-define('SPELL_ATTR4_INHERIT_CRIT_FROM_AURA',           0x08000000); // Inherit critical chance from triggering aura
-define('SPELL_ATTR4_UNK28',                            0x10000000); // Unknown attribute 28@Attr4
-define('SPELL_ATTR4_UNK29',                            0x20000000); // Unknown attribute 29@Attr4
-define('SPELL_ATTR4_UNK30',                            0x40000000); // Unknown attribute 30@Attr4
-define('SPELL_ATTR4_UNK31',                            0x80000000); // Unknown attribute 31@Attr4
+define('SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING',                        0x00000001); // Can be channeled while moving
+define('SPELL_ATTR5_NO_REAGENT_WHILE_PREP',                          0x00000002); // No reagents during arena preparation
+define('SPELL_ATTR5_REMOVE_ON_ARENA_ENTER',                          0x00000004); // Remove when entering arena DESCRIPTION Force this aura to be removed on entering arena, regardless of other properties
+define('SPELL_ATTR5_USABLE_WHILE_STUNNED',                           0x00000008); // Usable while stunned
+define('SPELL_ATTR5_TRIGGERS_CHANNELING',                            0x00000010); // [WoWDev Wiki] Likely more script oriented.
+define('SPELL_ATTR5_SINGLE_TARGET_SPELL',                            0x00000020); // Single-target aura DESCRIPTION Remove previous application to another unit if applied
+define('SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK',                   0x00000040); // [WoWDev Wiki] Possible world PvP flag for objectives such as Spirit Towers?
+define('SPELL_ATTR5_NOT_ON_PLAYER',                                  0x00000080); // [WoWDev Wiki] Opposite of SPELL_ATTR3_ONLY_TARGET_PLAYERS
+define('SPELL_ATTR5_CANT_TARGET_PLAYER_CONTROLLED',                  0x00000100); // Cannot target player controlled units but can target players
+define('SPELL_ATTR5_START_PERIODIC_AT_APPLY',                        0x00000200); // Immediately do periodic tick on apply
+define('SPELL_ATTR5_HIDE_DURATION',                                  0x00000400); // Do not send aura duration to client
+define('SPELL_ATTR5_ALLOW_TARGET_OF_TARGET_AS_TARGET',               0x00000800); // Auto-target target of target (client only)
+define('SPELL_ATTR5_MELEE_CHAIN_TARGETING',                          0x00001000); // [WoWDev Wiki] Cleave related?
+define('SPELL_ATTR5_HASTE_AFFECT_DURATION',                          0x00002000); // Duration scales with Haste Rating
+define('SPELL_ATTR5_NOT_USABLE_WHILE_CHARMED',                       0x00004000); // Charmed units cannot cast this spell
+define('SPELL_ATTR5_TREAT_AS_AREA_EFFECT',                           0x00008000); // [WoWDev Wiki] Related to multi-target spells?
+define('SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM',        0x00010000); // [WoWDev Wiki]
+define('SPELL_ATTR5_USABLE_WHILE_FEARED',                            0x00020000); // Usable while feared
+define('SPELL_ATTR5_USABLE_WHILE_CONFUSED',                          0x00040000); // Usable while confused
+define('SPELL_ATTR5_DONT_TURN_DURING_CAST',                          0x00080000); // Do not auto-turn while casting
+define('SPELL_ATTR5_DO_NOT_ATTEMPT_A_PET_RESUMMON_WHEN_DISMOUNTING', 0x00100000); // [WoWDev Wiki]
+define('SPELL_ATTR5_IGNORE_TARGET_REQUIREMENTS',                     0x00200000); // [WoWDev Wiki]
+define('SPELL_ATTR5_NOT_ON_TRIVIAL',                                 0x00400000); // [WoWDev Wiki]
+define('SPELL_ATTR5_NO_PARTIAL_RESISTS',                             0x00800000); // [WoWDev Wiki] Spell will either be fully resisted or deal the full amount of damage.
+define('SPELL_ATTR5_IGNORE_CASTER_REQUIREMENTS',                     0x01000000); // [WoWDev Wiki]
+define('SPELL_ATTR5_ALWAYS_LINE_OF_SIGHT',                           0x02000000); // [WoWDev Wiki] Constant line of sight required for spell duration.
+define('SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK',                       0x04000000); // Ignore line of sight checks
+define('SPELL_ATTR5_DONT_SHOW_AURA_IF_SELF_CAST',                    0x08000000); // Don't show aura if self-cast (client only)
+define('SPELL_ATTR5_DONT_SHOW_AURA_IF_NOT_SELF_CAST',                0x10000000); // Don't show aura unless self-cast (client only)
+define('SPELL_ATTR5_AURA_UNIQUE_PER_CASTER',                         0x20000000); // [WoWDev Wiki] Could be used for debuff grouping.
+define('SPELL_ATTR5_ALWAYS_SHOW_GROUND_TEXTURE',                     0x40000000); // [WoWDev Wiki] Likely refers to the Projected Texture setting and will cause this spell to ignore its value.
+define('SPELL_ATTR5_ADD_MELEE_HIT_RATING',                           0x80000000); // [WoWDev Wiki] (Forces nearby enemies to attack caster?)
 
-define('SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING',          0x00000001); // Can be channeled while moving
-define('SPELL_ATTR5_NO_REAGENT_WHILE_PREP',            0x00000002); // No reagents during arena preparation
-define('SPELL_ATTR5_REMOVE_ON_ARENA_ENTER',            0x00000004); // Remove when entering arena DESCRIPTION Force this aura to be removed on entering arena, regardless of other properties
-define('SPELL_ATTR5_USABLE_WHILE_STUNNED',             0x00000008); // Usable while stunned
-define('SPELL_ATTR5_UNK4',                             0x00000010); // Unknown attribute 4@Attr5
-define('SPELL_ATTR5_SINGLE_TARGET_SPELL',              0x00000020); // Single-target aura DESCRIPTION Remove previous application to another unit if applied
-define('SPELL_ATTR5_UNK6',                             0x00000040); // Unknown attribute 6@Attr5
-define('SPELL_ATTR5_UNK7',                             0x00000080); // Unknown attribute 7@Attr5
-define('SPELL_ATTR5_UNK8',                             0x00000100); // Unknown attribute 8@Attr5
-define('SPELL_ATTR5_START_PERIODIC_AT_APPLY',          0x00000200); // Immediately do periodic tick on apply
-define('SPELL_ATTR5_HIDE_DURATION',                    0x00000400); // Do not send aura duration to client
-define('SPELL_ATTR5_ALLOW_TARGET_OF_TARGET_AS_TARGET', 0x00000800); // Auto-target target of target (client only)
-define('SPELL_ATTR5_UNK12',                            0x00001000); // Unknown attribute 12@Attr5 DESCRIPTION Cleave related?
-define('SPELL_ATTR5_HASTE_AFFECT_DURATION',            0x00002000); // Duration scales with Haste Rating
-define('SPELL_ATTR5_UNK14',                            0x00004000); // Unknown attribute 14@Attr5
-define('SPELL_ATTR5_UNK15',                            0x00008000); // Unknown attribute 15@Attr5 DESCRIPTION Related to multi-target spells?
-define('SPELL_ATTR5_UNK16',                            0x00010000); // Unknown attribute 16@Attr5
-define('SPELL_ATTR5_USABLE_WHILE_FEARED',              0x00020000); // Usable while feared
-define('SPELL_ATTR5_USABLE_WHILE_CONFUSED',            0x00040000); // Usable while confused
-define('SPELL_ATTR5_DONT_TURN_DURING_CAST',            0x00080000); // Do not auto-turn while casting
-define('SPELL_ATTR5_UNK20',                            0x00100000); // Unknown attribute 20@Attr5
-define('SPELL_ATTR5_UNK21',                            0x00200000); // Unknown attribute 21@Attr5
-define('SPELL_ATTR5_UNK22',                            0x00400000); // Unknown attribute 22@Attr5
-define('SPELL_ATTR5_UNK23',                            0x00800000); // Unknown attribute 23@Attr5
-define('SPELL_ATTR5_UNK24',                            0x01000000); // Unknown attribute 24@Attr5
-define('SPELL_ATTR5_UNK25',                            0x02000000); // Unknown attribute 25@Attr5
-define('SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK',         0x04000000); // Ignore line of sight checks
-define('SPELL_ATTR5_DONT_SHOW_AURA_IF_SELF_CAST',      0x08000000); // Don't show aura if self-cast (client only)
-define('SPELL_ATTR5_DONT_SHOW_AURA_IF_NOT_SELF_CAST',  0x10000000); // Don't show aura unless self-cast (client only)
-define('SPELL_ATTR5_UNK29',                            0x20000000); // Unknown attribute 29@Attr5
-define('SPELL_ATTR5_UNK30',                            0x40000000); // Unknown attribute 30@Attr5
-define('SPELL_ATTR5_UNK31',                            0x80000000); // Unknown attribute 31@Attr5 DESCRIPTION Forces nearby enemies to attack caster?
+define('SPELL_ATTR6_DONT_DISPLAY_COOLDOWN',                           0x00000001); // Don't display cooldown (client only)
+define('SPELL_ATTR6_ONLY_IN_ARENA',                                   0x00000002); // Only usable in arena
+define('SPELL_ATTR6_IGNORE_CASTER_AURAS',                             0x00000004); // Ignore all preventing caster auras - NOTE! leak Data and WH name this NOT_AN_ATTACK
+define('SPELL_ATTR6_ASSIST_IGNORE_IMMUNE_FLAG',                       0x00000008); // Ignore immunity flags when assisting
+define('SPELL_ATTR6_IGNORE_FOR_MOD_TIME_RATE',                        0x00000010); // [WoWDev Wiki]
+define('SPELL_ATTR6_DONT_CONSUME_PROC_CHARGES',                       0x00000020); // Don't consume proc charges
+define('SPELL_ATTR6_USE_SPELL_CAST_EVENT',                            0x00000040); // Generate spell_cast event instead of aura_start (client only) - NOTE! FLOATING_COMBAT_TEXT_ON_CAST in modern client, but visual UI procs are not in 335
+define('SPELL_ATTR6_AURA_IS_WEAPON_PROC',                             0x00000080); // [WoWDev Wiki]
+define('SPELL_ATTR6_CANT_TARGET_CROWD_CONTROLLED',                    0x00000100); // Do not implicitly target in CC DESCRIPTION Implicit targeting (chaining and area targeting) will not impact crowd controlled targets
+define('SPELL_ATTR6_ALLOW_ON_CHARMED_TARGETS',                        0x00000200); // [WoWDev Wiki]
+define('SPELL_ATTR6_CAN_TARGET_POSSESSED_FRIENDS',                    0x00000400); // Can target possessed friends DESCRIPTION [NYI] - NOTE! leak data and WH name this NO_AURA_LOG and it really prevents aura apply/remove messages in combat log
+define('SPELL_ATTR6_NOT_IN_RAID_INSTANCE',                            0x00000800); // Unusable in raid instances
+define('SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE',                       0x00001000); // Castable while caster is on vehicle
+define('SPELL_ATTR6_CAN_TARGET_INVISIBLE',                            0x00002000); // Can target invisible units
+define('SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK',                        0x00004000); // [WoWDev Wiki] Related to Shoot? Needs description.
+define('SPELL_ATTR6_NO_PUSHBACK',                                     0x00008000); // [WoWDev Wiki]
+define('SPELL_ATTR6_NO_JUMP_PATHING',                                 0x00010000); // [WoWDev Wiki]
+define('SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING',                       0x00020000); // [WoWDev Wiki] Mount related?
+define('SPELL_ATTR6_CAST_BY_CHARMER',                                 0x00040000); // Spell is cast by charmer DESCRIPTION Client will prevent casting if not possessed, charmer will be caster for all intents and purposes
+define('SPELL_ATTR6_DELAY_COMBAT_TIMER_DURING_CAST',                  0x00080000); // [WoWDev Wiki]
+define('SPELL_ATTR6_ONLY_VISIBLE_TO_CASTER',                          0x00100000); // Only visible to caster (client only)
+define('SPELL_ATTR6_CLIENT_UI_TARGET_EFFECTS',                        0x00200000); // Client UI target effects (client only) - NOTE! SHOW_MECHANIC_AS_COMBAT_TEXT in modern client .. neither descriptor seems to be true
+define('SPELL_ATTR6_ABSORB_CANNOT_BE_IGNORE',                         0x00400000); // [WoWDev Wiki]
+define('SPELL_ATTR6_TAPS_IMMEDIATELY',                                0x00800000); // [WoWDev Wiki]
+define('SPELL_ATTR6_CAN_TARGET_UNTARGETABLE',                         0x01000000); // Can target untargetable units
+define('SPELL_ATTR6_NOT_RESET_SWING_IF_INSTANT',                      0x02000000); // Do not reset swing timer if cast time is instant
+define('SPELL_ATTR6_VEHICLE_IMMUNITY_CATEGORY',                       0x04000000); // [WoWDev Wiki] immunity to some buffs for some vehicles.
+define('SPELL_ATTR6_LIMIT_PCT_HEALING_MODS',                          0x08000000); // Limit applicable %healing modifiers DESCRIPTION This prevents certain healing modifiers from applying - see implementation if you really care about details
+define('SPELL_ATTR6_DO_NOT_AUTO_SELECT_TARGET_WITH_INITIATES_COMBAT', 0x10000000); // [WoWDev Wiki] Death grip?
+define('SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS',                           0x20000000); // Limit applicable %damage modifiers DESCRIPTION This prevents certain damage modifiers from applying - see implementation if you really care about details
+define('SPELL_ATTR6_DISABLE_TIED_EFFECT_POINTS',                      0x40000000); // [WoWDev Wiki] The value used is likely from the SpellEffect column EffectBasePoints
+define('SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS',                   0x80000000); // Ignore cooldown modifiers for category cooldown
 
-define('SPELL_ATTR6_DONT_DISPLAY_COOLDOWN',            0x00000001); // Don't display cooldown (client only)
-define('SPELL_ATTR6_ONLY_IN_ARENA',                    0x00000002); // Only usable in arena
-define('SPELL_ATTR6_IGNORE_CASTER_AURAS',              0x00000004); // Ignore all preventing caster auras
-define('SPELL_ATTR6_ASSIST_IGNORE_IMMUNE_FLAG',        0x00000008); // Ignore immunity flags when assisting
-define('SPELL_ATTR6_UNK4',                             0x00000010); // Unknown attribute 4@Attr6
-define('SPELL_ATTR6_DONT_CONSUME_PROC_CHARGES',        0x00000020); // Don't consume proc charges
-define('SPELL_ATTR6_USE_SPELL_CAST_EVENT',             0x00000040); // Generate spell_cast event instead of aura_start (client only)
-define('SPELL_ATTR6_UNK7',                             0x00000080); // Unknown attribute 7@Attr6
-define('SPELL_ATTR6_CANT_TARGET_CROWD_CONTROLLED',     0x00000100); // Do not implicitly target in CC DESCRIPTION Implicit targeting (chaining and area targeting) will not impact crowd controlled targets
-define('SPELL_ATTR6_UNK9',                             0x00000200); // Unknown attribute 9@Attr6
-define('SPELL_ATTR6_CAN_TARGET_POSSESSED_FRIENDS',     0x00000400); // Can target possessed friends DESCRIPTION [NYI]
-define('SPELL_ATTR6_NOT_IN_RAID_INSTANCE',             0x00000800); // Unusable in raid instances
-define('SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE',        0x00001000); // Castable while caster is on vehicle
-define('SPELL_ATTR6_CAN_TARGET_INVISIBLE',             0x00002000); // Can target invisible units
-define('SPELL_ATTR6_UNK14',                            0x00004000); // Unknown attribute 14@Attr6
-define('SPELL_ATTR6_UNK15',                            0x00008000); // Unknown attribute 15@Attr6
-define('SPELL_ATTR6_UNK16',                            0x00010000); // Unknown attribute 16@Attr6
-define('SPELL_ATTR6_UNK17',                            0x00020000); // Unknown attribute 17@Attr6 DESCRIPTION Mount related?
-define('SPELL_ATTR6_CAST_BY_CHARMER',                  0x00040000); // Spell is cast by charmer DESCRIPTION Client will prevent casting if not possessed, charmer will be caster for all intents and purposes
-define('SPELL_ATTR6_UNK19',                            0x00080000); // Unknown attribute 19@Attr6
-define('SPELL_ATTR6_ONLY_VISIBLE_TO_CASTER',           0x00100000); // Only visible to caster (client only)
-define('SPELL_ATTR6_CLIENT_UI_TARGET_EFFECTS',         0x00200000); // Client UI target effects (client only)
-define('SPELL_ATTR6_UNK22',                            0x00400000); // Unknown attribute 22@Attr6
-define('SPELL_ATTR6_UNK23',                            0x00800000); // Unknown attribute 23@Attr6
-define('SPELL_ATTR6_CAN_TARGET_UNTARGETABLE',          0x01000000); // Can target untargetable units
-define('SPELL_ATTR6_NOT_RESET_SWING_IF_INSTANT',       0x02000000); // Do not reset swing timer if cast time is instant
-define('SPELL_ATTR6_UNK26',                            0x04000000); // Unknown attribute 26@Attr6 DESCRIPTION Player castable buff?
-define('SPELL_ATTR6_LIMIT_PCT_HEALING_MODS',           0x08000000); // Limit applicable %healing modifiers DESCRIPTION This prevents certain healing modifiers from applying - see implementation if you really care about details
-define('SPELL_ATTR6_UNK28',                            0x10000000); // Unknown attribute 28@Attr6 DESCRIPTION Death grip?
-define('SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS',            0x20000000); // Limit applicable %damage modifiers DESCRIPTION This prevents certain damage modifiers from applying - see implementation if you really care about details
-define('SPELL_ATTR6_UNK30',                            0x40000000); // Unknown attribute 30@Attr6
-define('SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS',    0x80000000); // Ignore cooldown modifiers for category cooldown
-
-define('SPELL_ATTR7_UNK0',                             0x00000001); // Unknown attribute 0@Attr7
-define('SPELL_ATTR7_IGNORE_DURATION_MODS',             0x00000002); // Ignore duration modifiers
-define('SPELL_ATTR7_REACTIVATE_AT_RESURRECT',          0x00000004); // Reactivate at resurrect (client only)
-define('SPELL_ATTR7_IS_CHEAT_SPELL',                   0x00000008); // Is cheat spell DESCRIPTION Cannot cast if caster doesn't have UnitFlag2 & UNIT_FLAG2_ALLOW_CHEAT_SPELLS
-define('SPELL_ATTR7_UNK4',                             0x00000010); // Unknown attribute 4@Attr7 DESCRIPTION Soulstone related?
-define('SPELL_ATTR7_SUMMON_PLAYER_TOTEM',              0x00000020); // Summons player-owned totem
-define('SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE',            0x00000040); // Damage dealt by this does not cause spell pushback
-define('SPELL_ATTR7_UNK7',                             0x00000080); // Unknown attribute 7@Attr7
-define('SPELL_ATTR7_HORDE_ONLY',                       0x00000100); // Horde only
-define('SPELL_ATTR7_ALLIANCE_ONLY',                    0x00000200); // Alliance only
-define('SPELL_ATTR7_DISPEL_CHARGES',                   0x00000400); // Dispel/Spellsteal remove individual charges
-define('SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER',         0x00000800); // Only interrupt non-player casting
-define('SPELL_ATTR7_UNK12',                            0x00001000); // Unknown attribute 12@Attr7
-define('SPELL_ATTR7_UNK13',                            0x00002000); // Unknown attribute 13@Attr7
-define('SPELL_ATTR7_UNK14',                            0x00004000); // Unknown attribute 14@Attr7
-define('SPELL_ATTR7_UNK15',                            0x00008000); // Unknown attribute 15@Attr7 DESCRIPTION Exorcism - guaranteed crit vs families?
-define('SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER',      0x00010000); // Can restore secondary power DESCRIPTION Only spells with this attribute can replenish a non-active power type
-define('SPELL_ATTR7_UNK17',                            0x00020000); // Unknown attribute 17@Attr7
-define('SPELL_ATTR7_HAS_CHARGE_EFFECT',                0x00040000); // Has charge effect
-define('SPELL_ATTR7_ZONE_TELEPORT',                    0x00080000); // Is zone teleport
-define('SPELL_ATTR7_UNK20',                            0x00100000); // Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
-define('SPELL_ATTR7_UNK21',                            0x00200000); // Unknown attribute 21@Attr7
-define('SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING',       0x00400000); // Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
-define('SPELL_ATTR7_UNK23',                            0x00800000); // Unknown attribute 23@Attr7
-define('SPELL_ATTR7_UNK24',                            0x01000000); // Unknown attribute 24@Attr7
-define('SPELL_ATTR7_UNK25',                            0x02000000); // Unknown attribute 25@Attr7
-define('SPELL_ATTR7_UNK26',                            0x04000000); // Unknown attribute 26@Attr7
-define('SPELL_ATTR7_UNK27',                            0x08000000); // Unknown attribute 27@Attr7
-define('SPELL_ATTR7_CONSOLIDATED_RAID_BUFF',           0x10000000); // Consolidate in raid buff frame (client only)
-define('SPELL_ATTR7_UNK29',                            0x20000000); // Unknown attribute 29@Attr7
-define('SPELL_ATTR7_UNK30',                            0x40000000); // Unknown attribute 30@Attr7
-define('SPELL_ATTR7_CLIENT_INDICATOR',                 0x80000000); // Client indicator (client only)
+define('SPELL_ATTR7_ALLOW_SPELL_REFLECTION',                        0x00000001); // [WoWDev Wiki] Allow spell to be reflected. Will likely interfere if used with SPELL_ATTR1_CANT_BE_REFLECTED.
+define('SPELL_ATTR7_IGNORE_DURATION_MODS',                          0x00000002); // Ignore duration modifiers
+define('SPELL_ATTR7_DISABLE_AURA_WHILE_DEAD',                       0x00000004); // Reactivate at resurrect (client only)
+define('SPELL_ATTR7_IS_CHEAT_SPELL',                                0x00000008); // Is cheat spell DESCRIPTION Cannot cast if caster doesn't have UnitFlag2 & UNIT_FLAG2_ALLOW_CHEAT_SPELLS
+define('SPELL_ATTR7_TREAT_AS_RAID_BUFF',                            0x00000010); // [WoWDev Wiki] Spell assumes certain properties that would classify it as a "raid buff". (This is only a guess.)
+define('SPELL_ATTR7_SUMMON_PLAYER_TOTEM',                           0x00000020); // Summons player-owned totem
+define('SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE',                         0x00000040); // Damage dealt by this does not cause spell pushback
+define('SPELL_ATTR7_PREPARE_FOR_VEHICLE_CONTROL_END',               0x00000080); // [WoWDev Wiki] Attribute is most likely server side only.
+define('SPELL_ATTR7_HORDE_ONLY',                                    0x00000100); // Horde only
+define('SPELL_ATTR7_ALLIANCE_ONLY',                                 0x00000200); // Alliance only
+define('SPELL_ATTR7_DISPEL_CHARGES',                                0x00000400); // Dispel/Spellsteal remove individual charges
+define('SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER',                      0x00000800); // Only interrupt non-player casting
+define('SPELL_ATTR7_CAN_CAUSE_SILENCE',                             0x00001000); // [WoWDev Wiki] Will only Silence NPCs/creatures. (Not confirmed.)
+define('SPELL_ATTR7_NO_UI_NOT_INTERRUPTIBLE',                       0x00002000); // [WoWDev Wiki] Can always be interrupted, even if caster is immune.
+define('SPELL_ATTR7_RECAST_ON_RESUMMON',                            0x00004000); // [WoWDev Wiki] only on 52150 Raise Dead.
+define('SPELL_ATTR7_RESET_SWING_TIMER_AT_SPELL_START',              0x00008000); // [WoWDev Wiki] (Exorcism - guaranteed crit vs families?)
+define('SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER',                   0x00010000); // Can restore secondary power DESCRIPTION Only spells with this attribute can replenish a non-active power type - NOTE! replaed with ONLY_IN_SPELLBOOK_UNTIL_LEARNED in modern client
+define('SPELL_ATTR7_DO_NOT_LOG_PVP_KILL',                           0x00020000); // [WoWDev Wiki]
+define('SPELL_ATTR7_HAS_CHARGE_EFFECT',                             0x00040000); // Has charge effect
+define('SPELL_ATTR7_ZONE_TELEPORT',                                 0x00080000); // Is zone teleport - NOTE! REPORT_SPELL_FAILURE_TO_UNIT_TARGET in modern client, but may still serve the same purpose as teleport spell ofter use custom error messages
+define('SPELL_ATTR7_NO_CLIENT_FAIL_WHILE_STUNNED_FLEEING_CONFUSED', 0x00100000); // [WoWDev Wiki] Client will skip or bypass checking for stunned, fleeing, and confused states.
+define('SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD',                  0x00200000); // [WoWDev Wiki]
+define('SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING',                    0x00400000); // Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
+define('SPELL_ATTR7_CANT_DODGE',                                    0x00800000); // Spell cannot be dodged
+define('SPELL_ATTR7_CANT_PARRY',                                    0x01000000); // Spell cannot be parried
+define('SPELL_ATTR7_CANT_MISS',                                     0x02000000); // Spell cannot be missed
+define('SPELL_ATTR7_TREAT_AS_NPC_AOE',                              0x04000000); // [WoWDev Wiki]
+define('SPELL_ATTR7_BYPASS_NO_RESURRECT_AURA',                      0x08000000); // Bypasses the prevent resurrection aura
+define('SPELL_ATTR7_CONSOLIDATED_RAID_BUFF',                        0x10000000); // Consolidate in raid buff frame (client only)
+define('SPELL_ATTR7_REFLECTION_ONLY_DEFENDS',                       0x20000000); // [WoWDev Wiki] This possibly allows for a spell to be reflected but not damage the target and instead act more as a deflect.
+define('SPELL_ATTR7_CAN_PROC_FROM_SUPPRESSED_TARGET_PROCS',         0x40000000); // [WoWDev Wiki]
+define('SPELL_ATTR7_CLIENT_INDICATOR',                              0x80000000); // Client indicator (client only)
 
 
 // (some) Skill ids
