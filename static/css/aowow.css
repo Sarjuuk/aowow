@@ -1519,6 +1519,7 @@ span.icon-instance8 {
 
 .icontab th {
     padding: 0 3px 0 0;
+    vertical-align: middle !important;                      /* aowow: fix valign in spellmod tinyicon list */
 }
 
 .icontab-box {
