@@ -1868,9 +1868,9 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_SKINNING:
                     $_ = match ($effMV)
                     {
-                        0       => $_ = Lang::game('ct', 1).', '.Lang::game('ct', 2), // Skinning > Beast, Dragonkin
-                        1, 2    => $_ = Lang::game('ct', 4),                          // Gathering, Mining > Elemental
-                        3       => $_ = Lang::game('ct', 9),                          // Dismantling > Mechanic
+                        0       => Lang::game('ct', 1).', '.Lang::game('ct', 2), // Skinning > Beast, Dragonkin
+                        1, 2    => Lang::game('ct', 4),                          // Gathering, Mining > Elemental
+                        3       => Lang::game('ct', 9),                          // Dismantling > Mechanic
                         default => ''
                     };
                     if ($_)
