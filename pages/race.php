@@ -139,12 +139,17 @@ class RacePage extends GenericPage
         if (!$racials->error)
         {
             $this->extendGlobalData($racials->getJSGlobals());
-            $this->lvTabs[] = [SpellList::$brickFile, array(
+            $tabData = array(
                 'data'       => array_values($racials->getListviewData()),
                 'id'         => 'racial-traits',
                 'name'       => '$LANG.tab_racialtraits',
                 'hiddenCols' => ['reagents']
-            )];
+            );
+
+            if ($racials->hasDiffFields('reqClassMask'))
+                $tabData['visibleCols'] = ['classes'];
+
+            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
         }
 
         // Quests

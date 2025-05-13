@@ -455,9 +455,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[spell] - misc fixups & icons');
 
         // FU [FixUps]
-        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::DRAENEI->value,  760); // Draenei Racials
-        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::BLOODELF->value, 756); // Bloodelf Racials
-        DB::Aowow()->query('UPDATE ?_spell SET `reqClassMask` = ?d WHERE `id`         = ?d', ChrClass::MAGE->value,  30449); // Mage - Spellsteal
+        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::DRAENEI->toMask(),  760); // Draenei Racials
+        DB::Aowow()->query('UPDATE ?_spell SET `reqRaceMask`  = ?d WHERE `skillLine1` = ?d', ChrRace::BLOODELF->toMask(), 756); // Bloodelf Racials
+        DB::Aowow()->query('UPDATE ?_spell SET `reqClassMask` = ?d WHERE `id`         = ?d', ChrClass::MAGE->toMask(),  30449); // Mage - Spellsteal
 
         // triggered by spell
         DB::Aowow()->query(
