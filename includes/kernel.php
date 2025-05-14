@@ -48,7 +48,7 @@ spl_autoload_register(function ($class)
     if (preg_match('/[^\w]/i', $class))
         return;
 
-    if ($class == 'Stats' || $class == 'StatsContainer')    // entity statistics conversion
+    if ($class == 'Stat' || $class == 'StatsContainer')     // entity statistics conversion
         require_once 'includes/game/chrstatistics.php';
     else if (file_exists('includes/game/'.strtolower($class).'.class.php'))
         require_once 'includes/game/'.strtolower($class).'.class.php';
