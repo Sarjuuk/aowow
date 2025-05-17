@@ -82,16 +82,19 @@ class SpellPage extends GenericPage
         );
 
         // returns self or firstRank
-        $this->firstRank = DB::Aowow()->selectCell(
-           'SELECT      IF(s1.RankNo <> 1 AND s2.id, s2.id, s1.id)
-            FROM        ?_spell s1
-            LEFT JOIN   ?_spell s2
-                ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND     s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
-                        s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
-                        s1.name_loc0 = s2.name_loc0                 AND s2.RankNo = 1
-            WHERE       s1.id = ?d',
-            $this->typeId
-        );
+        if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = ?d', $this->typeId))
+            $this->firstRank = $fr;
+        else
+            $this->firstRank = DB::Aowow()->selectCell(
+               'SELECT      IF(s1.RankNo <> 1 AND s2.id, s2.id, s1.id)
+                FROM        ?_spell s1
+                LEFT JOIN   ?_spell s2
+                    ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND     s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
+                            s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
+                            s1.name_loc0 = s2.name_loc0                 AND s2.RankNo = 1
+                WHERE       s1.id = ?d',
+                $this->typeId
+            );
     }
 
     protected function generatePath()
@@ -805,67 +808,67 @@ class SpellPage extends GenericPage
         }
 
         // tab: exclusive with
-        if ($this->firstRank) {
-            $linkedSpells = DB::World()->selectCol(         // dont look too closely ..... please..?
-               'SELECT      IF(sg2.spell_id < 0, sg2.id, sg2.spell_id) AS ARRAY_KEY, IF(sg2.spell_id < 0, sg2.spell_id, sr.stack_rule)
-                FROM        spell_group sg1
-                JOIN        spell_group sg2
-                    ON      (sg1.id = sg2.id OR sg1.id = -sg2.spell_id) AND sg1.spell_id != sg2.spell_id
-                LEFT JOIN   spell_group_stack_rules sr
-                    ON      sg1.id = sr.group_id
-                WHERE       sg1.spell_id = ?d',
-                $this->firstRank
-            );
-
-            if ($linkedSpells)
+        if ($this->firstRank && DB::World()->selectCell('SELECT 1 FROM spell_group WHERE `spell_id` = ?d', $this->firstRank))
+        {
+            $groups = DB::World()->selectCol('SELECT `id` AS ARRAY_KEY, `spell_id` AS ARRAY_KEY2, `spell_id` FROM spell_group');
+            // unpack recursion
+            foreach ($groups as $i => $group)
             {
-                $extraSpells = [];
-                foreach ($linkedSpells as $k => $v)
+                foreach ($group as $j => $g)
                 {
-                    if ($v > 0)
+                    if ($g > 0)
                         continue;
 
-                    $extraSpells += DB::World()->selectCol( // recursive case (recursive and regular ids are not mixed in a group)
-                       'SELECT      sg2.spell_id AS ARRAY_KEY, sr.stack_rule
-                        FROM        spell_group sg1
-                        JOIN        spell_group sg2
-                            ON      sg2.id = -sg1.spell_id AND sg2.spell_id != ?d
-                        LEFT JOIN   spell_group_stack_rules sr
-                            ON      sg1.id = sr.group_id
-                        WHERE       sg1.id = ?d',
-                        $this->firstRank,
-                        $k
-                    );
+                    foreach ($groups[-$g] ?? [] as $new)
+                        $groups[$i][] = $new;
 
-                    unset($linkedSpells[$k]);
+                    unset($group[$j]);
                 }
+            }
 
-                // todo (high): fixme - querys have erronous edge-cases (see spell: 13218)
-                if ($groups = $linkedSpells + $extraSpells)
+            // find ourselves
+            if ($filtered = array_filter($groups, fn($x) => in_array($this->firstRank, $x)))
+            {
+                // get rule set
+                $rules = DB::World()->selectCol('SELECT `group_id` AS ARRAY_KEY, `stack_rule` FROM spell_group_stack_rules WHERE `group_id` IN (?a)', array_keys($filtered));
+
+                // only use groups that have rules set
+                if ($filtered = array_intersect_key($filtered, $rules))
                 {
-                    $stacks = new SpellList(array(['s.id', array_keys($groups)]));
+                    $cnd = ['OR'];
+                    foreach ($filtered as $gr)
+                        $cnd[] = ['s.id', $gr];
+
+                    $stacks = new SpellList($cnd);
                     if (!$stacks->error)
                     {
-                        $data = $stacks->getListviewData();
-                        foreach ($data as $k => $d)
-                            $data[$k]['stackRule'] = $groups[$k];
-
+                        $lvData = $stacks->getListviewData();
+                        $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
                         if (!$stacks->hasSetFields('skillLines'))
                             $sH = ['skill'];
 
-                        $tabData = array(
-                            'data'        => array_values($data),
-                            'id'          => 'spell-group-stack',
-                            'name'        => Lang::spell('stackGroup'),
-                            'visibleCols' => ['stackRules']
-                        );
+                        foreach ($filtered as $gId => $spellIds)
+                        {
+                            $data = [];
+                            foreach ($spellIds as $id)
+                                if (isset($lvData[$id]) && $id != $this->firstRank)
+                                    $data[] = array_merge($lvData[$id], ['stackRule' => $rules[$gId]]);
 
-                        if (isset($sH))
-                            $tabData['hiddenCols'] = $sH;
+                            if (!$data)
+                                continue;
 
-                        $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                            $tabData = array(
+                                'data'        => $data,
+                                'id'          => 'spell-group-stack-'.$rules[$gId],
+                                'name'        => Lang::spell('stackGroup'),
+                                'visibleCols' => ['stackRules']
+                            );
 
-                        $this->extendGlobalData($stacks->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
+                            if (isset($sH))
+                                $tabData['hiddenCols'] = $sH;
+
+                            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                        }
                     }
                 }
             }
