@@ -599,18 +599,19 @@ trait spawnHelper
         }
     }
 
-    private function createFullSpawns()                     // for display on map (object/npc detail page)
+    // for display on map (object/npc detail page)
+    private function createFullSpawns(bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false)
     {
         $data     = [];
         $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
-        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `posX` > 0 AND `posY` > 0", self::$type, $this->id);
+        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0", self::$type, $this->getFoundIDs());
 
         if (!$spawns)
             return;
 
-        if (User::isInGroup(U_GROUP_MODERATOR))
+        if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
             if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))
                 $worldPos = WorldPosition::getForGUID(self::$type, ...$guids);
 
@@ -620,7 +621,7 @@ trait spawnHelper
 
             // check, if we can attach waypoints to creature
             // we will get a nice clusterfuck of dots if we do this for more GUIDs, than we have colors though
-            if (count($spawns) < 6 && $s['type'] == Type::NPC)
+            if (!$skipWPs && count($spawns) < 6 && $s['type'] == Type::NPC)
             {
                 if ($wPoints = DB::Aowow()->select('SELECT * FROM ?_creature_waypoints WHERE creatureOrPath = ?d AND floor = ?d', $s['pathId'] ? -$s['pathId'] : $this->id, $s['floor']))
                 {
@@ -661,7 +662,7 @@ trait spawnHelper
                 $opts['type'] = 4;                          // make pip purple
             }
 
-            if (User::isInGroup(U_GROUP_STAFF))
+            if (!$skipAdmin && User::isInGroup(U_GROUP_STAFF))
             {
                 if ($isAccessory)
                     $info[0] = 'Vehicle Accessory';
@@ -706,14 +707,28 @@ trait spawnHelper
                     $footer = '<br /><span class="q2">Click to move pin</span>';
             }
 
+            /* recognized opts
+             * url:     string - makes pin clickable
+             * tooltip: array  - title => [info: <arr>lines, footer: <string>line]
+             * label:   string - single line tooltip (skipped if 'tooltip' is set)
+             * menu:    array  - menu definiton (conflicts with url)
+             * type:    int    - colors the pip [default, green, red, blue, purple]
+             * lines:   array  - [[destX, destY]] - draws line from point to dest
+             */
+
             if ($info)
                 $tt['info'] = $info;
 
             if ($footer)
                 $tt['footer'] = $footer;
 
-            if ($tt)
+            if ($tt && $this->getEntry($s['typeId']))
                 $opts['tooltip'] = [$this->getField('name', true) => $tt];
+            else if ($hasLabel && $this->getEntry($s['typeId']))
+                $opts['label'] = $this->getField('name', true);
+
+            if ($hasLink)
+                $opts['url'] = '?' . Type::getFileString(self::$type) . '=' . $s['typeId'];
 
             if ($menu)
                 $opts['menu'] = $menu;
@@ -722,9 +737,9 @@ trait spawnHelper
         }
         foreach ($data as $a => &$areas)
             foreach ($areas as $f => &$floor)
-                $floor['count'] = count($floor['coords']) - (!empty($wpSum[$a][$f]) ? $wpSum[$a][$f] : 0);
+                $floor['count'] = count($floor['coords']) - ($wpSum[$a][$f] ?? 0);
 
-        uasort($data, array($this, 'sortBySpawnCount'));
+        uasort($data, [$this, 'sortBySpawnCount']);
         $this->spawnResult[SPAWNINFO_FULL] = $data;
     }
 
@@ -733,11 +748,7 @@ trait spawnHelper
         $aCount = current($a)['count'];
         $bCount = current($b)['count'];
 
-        if ($aCount == $bCount) {
-            return 0;
-        }
-
-        return ($aCount < $bCount) ? 1 : -1;
+        return $bCount <=> $aCount;                         // sort descending
     }
 
     private function createZoneSpawns()                     // [zoneId1, zoneId2, ..]             for locations-column in listview
@@ -785,7 +796,7 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_QUEST] = $spawns;
     }
 
-    public function getSpawns($mode)
+    public function getSpawns(int $mode, bool ...$info)
     {
         // only Creatures, GOs and SoundEmitters can be spawned
         if (!self::$type || !$this->getfoundIDs() || (self::$type != Type::NPC && self::$type != Type::OBJECT && self::$type != Type::SOUND && self::$type != Type::AREATRIGGER))
@@ -800,7 +811,7 @@ trait spawnHelper
                 return $this->spawnResult[SPAWNINFO_SHORT];
             case SPAWNINFO_FULL:
                 if (empty($this->spawnResult[SPAWNINFO_FULL]))
-                    $this->createFullSpawns();
+                    $this->createFullSpawns(...$info);
 
                 return $this->spawnResult[SPAWNINFO_FULL];
             case SPAWNINFO_ZONES:

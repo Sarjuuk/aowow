@@ -6,26 +6,15 @@ if (isset($this->map) && empty($this->map)):
 elseif (!empty($this->map['data'])):
     if ($this->type == Type::QUEST) :
         echo "            <div id=\"mapper-zone-generic\"></div>\n";
-    elseif ($this->type != Type::ZONE):
+    elseif ($this->map['mapperData']):
         echo '            <div>';
 
-        if ($this->type == Type::OBJECT):
-            echo Lang::gameObject('foundIn');
-        elseif ($this->type == Type::SOUND):
-            echo Lang::sound('foundIn');
-        elseif ($this->type == Type::NPC):
-            echo Lang::npc('foundIn');
-        elseif ($this->type == Type::AREATRIGGER):
-            echo Lang::areatrigger('foundIn');
-        else:
-            echo "UNKNOWN TYPE";
-        endif;
+        echo $this->map['foundIn'];
 
         echo ' <span id="mapper-zone-generic">';
 
-        $extra = $this->map['extra'];
-        echo Lang::concat($this->map['mapperData'], true, function ($areaData, $areaId) use ($extra) {
-            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$extra[$areaId].'</a>&nbsp;('.array_sum(array_column($areaData, 'count')).')';
+        echo Lang::concat($this->map['mapperData'], true, function ($areaData, $areaId) {
+            return '<a href="javascript:;" onclick="myMapper.update({zone: '.$areaId.'}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">'.$this->map['extra'][$areaId].'</a>&nbsp;('.array_sum(array_column($areaData, 'count')).')';
         });
 
         echo ".</span></div>\n";

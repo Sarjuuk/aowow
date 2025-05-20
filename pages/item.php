@@ -783,6 +783,14 @@ class ItemPage extends genericPage
             $soldBy  = new CreatureList(array(['id', array_keys($vendors)]));
             if (!$soldBy->error)
             {
+                // show mapper for vendors
+                if ($vendorSpawns = $soldBy->getSpawns(SPAWNINFO_FULL, true, true, true, true))
+                {
+                    $this->map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$vendorSpawns, 'foundIn' => Lang::item('purchasedIn')];
+                    foreach ($vendorSpawns as $areaId => $_)
+                        $this->map['extra'][$areaId] = ZoneList::getName($areaId);
+                }
+
                 $sbData = $soldBy->getListviewData();
                 $this->extendGlobalData($soldBy->getJSGlobals(GLOBALINFO_SELF));
 

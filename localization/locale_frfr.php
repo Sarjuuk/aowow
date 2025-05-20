@@ -2081,6 +2081,8 @@ $lang = array(
         'uniqueEquipped'=> ["Unique - Equipé", null,          "Unique - Equipé: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Vitesse",
         'dps'           => "(%.1f dégâts par seconde)",
+        'vendorIn'      => "Lieux de vente",
+        'purchasedIn'   => "Cet objet peut être acheté dans",
         'duration'      => array(
             '',
             "Durée : %d sec",

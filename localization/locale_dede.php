@@ -2081,6 +2081,8 @@ $lang = array(
         'uniqueEquipped'=> ["Einzigartig anlegbar", null,             "Einzigartig angelegt: %s (%d)"],
         'speed'         => "Tempo",
         'dps'           => "(%.1f Schaden pro Sekunde)",
+        'vendorIn'      => "Händlerstandpunkte",
+        'purchasedIn'   => "Dieser Gegenstand kann gekauft werden in",
         'duration'      => array(                           // ITEM_DURATION_*
             '',
             "Dauer: %d Sek.",

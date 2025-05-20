@@ -2081,6 +2081,8 @@ $lang = array(
         'uniqueEquipped'=> ["Único-Equipado", null,         "Único-Equipado: %s (%d)"],
         'speed'         => "Veloc.",
         'dps'           => "(%.1f daño por segundo)",
+        'vendorIn'      => "Ubicación de Vendedores",
+        'purchasedIn'   => "[This item can be purchased in]",
         'duration'      => array(
             '',
             "Duración: %d s",

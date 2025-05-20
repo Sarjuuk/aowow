@@ -31,6 +31,11 @@ endif;
 
     $this->brick('article');
 
+if (isset($this->map)):
+    echo "            <h3>".Lang::item('vendorIn')."</h3>\n";
+    $this->brick('mapper');
+endif;
+
 if (!empty($this->transfer)):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;

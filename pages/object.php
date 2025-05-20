@@ -222,7 +222,7 @@ class ObjectPage extends GenericPage
         $map = null;
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
         {
-            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns];
+            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns, 'foundIn' => Lang::gameObject('foundIn')];
             foreach ($spawns as $areaId => &$areaData)
                 $map['extra'][$areaId] = ZoneList::getName($areaId);
         }
