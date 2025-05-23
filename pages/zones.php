@@ -158,7 +158,7 @@ class ZonesPage extends GenericPage
                     'parent'   => 'mapper-generic'
                 ),
                 'som' => $somData,
-                'mapperData' => [$mapFile => new \StdClass()]
+                'mapperData' => null
             );
         }
     }
