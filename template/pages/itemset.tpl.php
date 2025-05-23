@@ -1,4 +1,4 @@
-﻿<?php namespace Aowow; ?>
+<?php namespace Aowow; ?>
 
 <?php $this->brick('header'); ?>
 
