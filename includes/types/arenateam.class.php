@@ -324,10 +324,33 @@ class RemoteArenaTeamList extends ArenaTeamList
 
 class LocalArenaTeamList extends ArenaTeamList
 {
-    protected       $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
+    protected   $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
+    protected   $queryOpts = array(
+                    'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
+                    'atm' => ['j' => '?_profiler_arena_team_member atm ON atm.arenaTeamId = at.id'],
+                    'c'   => ['j' => '?_profiler_profiles c ON c.id = atm.profileId', 's' => ', BIT_OR(IF(c.race IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS faction']
+                );
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
+        $realms = Profiler::getRealms();
+
+        // graft realm selection from miscData onto conditions
+        $realmIds = [];
+        if (isset($miscData['sv']))
+            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => Profiler::urlize($x['name']) == Profiler::urlize($miscData['sv']))));
+
+        if (isset($miscData['rg']))
+            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => $x['region'] == $miscData['rg'])));
+
+        if ($realmIds && $conditions)
+        {
+            array_unshift($conditions, 'AND');
+            $conditions = ['AND', ['realm', $realmIds], $conditions];
+        }
+        else if ($realmIds)
+            $conditions = [['realm', $realmIds]];
+
         parent::__construct($conditions, $miscData);
 
         if ($this->error)
@@ -336,7 +359,13 @@ class LocalArenaTeamList extends ArenaTeamList
         $realms = Profiler::getRealms();
 
         // post processing
-        $members = DB::Aowow()->selectCol('SELECT *, arenaTeamId AS ARRAY_KEY, profileId AS ARRAY_KEY2 FROM ?_profiler_arena_team_member WHERE arenaTeamId IN (?a)', $this->getFoundIDs());
+        $members = DB::Aowow()->select(
+           'SELECT `arenaTeamId` AS ARRAY_KEY, p.`id` AS ARRAY_KEY2, p.`name` AS "0", p.`class` AS "1", atm.`captain` AS "2"
+            FROM   ?_profiler_arena_team_member atm
+            JOIN   ?_profiler_profiles p ON p.`id` = atm.`profileId`
+            WHERE  `arenaTeamId` IN (?a)',
+            $this->getFoundIDs()
+        );
 
         foreach ($this->iterate() as $id => &$curTpl)
         {
@@ -352,7 +381,7 @@ class LocalArenaTeamList extends ArenaTeamList
             // battlegroup
             $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
 
-            $curTpl['members'] = $members[$id];
+            $curTpl['members'] = array_values($members[$id]);
         }
     }
 
