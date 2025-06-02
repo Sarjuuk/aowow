@@ -386,6 +386,7 @@ class Profiler
         $ra = ChrRace::from($char['race']);
         $cl = ChrClass::from($char['class']);
 
+
         /*************/
         /* equipment */
         /*************/
@@ -499,6 +500,7 @@ class Profiler
             $ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ?', $realmId, $char['name']);
             $data['renameItr'] = $ri ? ++$ri : 1;
         }
+
 
         /********************/
         /* talents + glyphs */
@@ -841,9 +843,8 @@ class Profiler
                'DELETE atm
                 FROM   ?_profiler_arena_team_member atm
                 JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
-                WHERE  atm.`profileId` = ?d',
-                $t['type'],
-                $profileId
+                WHERE  atm.`profileId` = ?d AND atm.`arenaTeamId` <> ?d',
+                $t['type'], $profileId, $teamId
             );
 
             DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES (?a) ON DUPLICATE KEY UPDATE ?a', array_keys($member), array_values($member), array_slice($member, 2));
@@ -986,39 +987,38 @@ class Profiler
         );
 
         $mProfiles = new RemoteProfileList($conditions, ['sv' => $realmId]);
-        if (!$mProfiles->error)
-        {
-            $mProfiles->initializeLocalEntries();
-            foreach ($mProfiles->iterate() as $__)
-            {
-
-                $mGuid = $mProfiles->getField('guid');
-
-                $members[$mGuid]['arenaTeamId'] = $teamId;
-                $members[$mGuid]['captain']     = (int)($mGuid == $captain);
-                $members[$mGuid]['profileId']   = $mProfiles->getField('id');
-            }
-
-            // Delete members from other teams of the same type...
-            DB::Aowow()->query(
-               'DELETE atm
-                FROM   ?_profiler_arena_team_member atm
-                JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
-                WHERE  atm.`profileId` IN (?a)',
-                $team['type'],
-                array_column($members, 'profileId')
-            );
-
-            // ...and purge this teams member
-            DB::Aowow()->query('DELETE FROM ?_profiler_arena_team_member WHERE `arenaTeamId` = ?d', $teamId);
-
-            foreach (Util::createSqlBatchInsert($members) as $m)
-                DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$m, array_keys(reset($members)));
-        }
-        else
+        if ($mProfiles->error)
             return false;
 
+        $mProfiles->initializeLocalEntries();
+        foreach ($mProfiles->iterate() as $__)
+        {
+
+            $mGuid = $mProfiles->getField('guid');
+
+            $members[$mGuid]['arenaTeamId'] = $teamId;
+            $members[$mGuid]['captain']     = (int)($mGuid == $captain);
+            $members[$mGuid]['profileId']   = $mProfiles->getField('id');
+        }
+
+        // Delete members from other teams of the same type...
+        DB::Aowow()->query(
+           'DELETE atm
+            FROM   ?_profiler_arena_team_member atm
+            JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
+            WHERE  atm.`profileId` IN (?a)',
+            $team['type'],
+            array_column($members, 'profileId')
+        );
+
+        // ...and purge this teams member
+        DB::Aowow()->query('DELETE FROM ?_profiler_arena_team_member WHERE `arenaTeamId` = ?d', $teamId);
+
+        foreach (Util::createSqlBatchInsert($members) as $m)
+            DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$m, array_keys(reset($members)));
+
         CLI::write(' ..team members');
+
 
         /*********************/
         /* mark team as done */
