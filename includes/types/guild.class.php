@@ -217,10 +217,13 @@ class RemoteGuildList extends GuildList
                 $distrib[$curTpl['realm']]++;
         }
 
-        $limit = Cfg::get('SQL_LIMIT_DEFAULT');
         foreach ($conditions as $c)
             if (is_int($c))
                 $limit = $c;
+
+        $limit ??= Cfg::get('SQL_LIMIT_DEFAULT');
+        if (!$limit)                                        // int:0 means unlimited, so skip early
+            return;
 
         $total = array_sum($distrib);
         foreach ($distrib as &$d)

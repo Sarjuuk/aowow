@@ -212,10 +212,13 @@ class RemoteArenaTeamList extends ArenaTeamList
             );
 
         // equalize subject distribution across realms
-        $limit = Cfg::get('SQL_LIMIT_DEFAULT');
         foreach ($conditions as $c)
             if (is_int($c))
                 $limit = $c;
+
+        $limit ??= Cfg::get('SQL_LIMIT_DEFAULT');
+        if (!$limit)                                        // int:0 means unlimited, so skip early
+            return;
 
         $total = array_sum($distrib);
         foreach ($distrib as &$d)
@@ -238,8 +241,11 @@ class RemoteArenaTeamList extends ArenaTeamList
         }
     }
 
-    public function initializeLocalEntries()
+    public function initializeLocalEntries() : void
     {
+        if (!$this->templates)
+            return;
+
         $profiles = [];
         // init members for tooltips
         foreach ($this->members as $realmId => $teams)
@@ -355,8 +361,6 @@ class LocalArenaTeamList extends ArenaTeamList
 
         if ($this->error)
             return;
-
-        $realms = Profiler::getRealms();
 
         // post processing
         $members = DB::Aowow()->select(

@@ -534,12 +534,7 @@ class RemoteProfileList extends ProfileList
         $realms       = Profiler::getRealms();
         $talentSpells = [];
         $talentLookup = [];
-        $distrib      = null;
-        $limit        = Cfg::get('SQL_LIMIT_DEFAULT');
-
-        foreach ($conditions as $c)
-            if (is_int($c))
-                $limit = $c;
+        $distrib      = [];
 
         // post processing
         foreach ($this->iterate() as $guid => &$curTpl)
@@ -579,13 +574,10 @@ class RemoteProfileList extends ProfileList
             $curTpl['activespec'] = $curTpl['activeTalentGroup'];
 
             // equalize distribution
-            if ($limit != Cfg::get('SQL_LIMIT_NONE'))
-            {
-                if (empty($distrib[$curTpl['realm']]))
-                    $distrib[$curTpl['realm']] = 1;
-                else
-                    $distrib[$curTpl['realm']]++;
-            }
+            if (empty($distrib[$curTpl['realm']]))
+                $distrib[$curTpl['realm']] = 1;
+            else
+                $distrib[$curTpl['realm']]++;
 
             // char is pending rename
             if ($curTpl['at_login'] & 0x1)
@@ -611,16 +603,21 @@ class RemoteProfileList extends ProfileList
 
         $talentSpells = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, `rank` FROM ?_talents WHERE class IN (?a)', array_unique($talentSpells));
 
-        if ($distrib !== null)
-        {
-            $total = array_sum($distrib);
-            foreach ($distrib as &$d)
-                $d = ceil($limit * $d / $total);
-        }
+        foreach ($conditions as $c)
+            if (is_int($c))
+                $limit = $c;
+
+        $limit ??= Cfg::get('SQL_LIMIT_DEFAULT');
+        if (!$limit)                                        // int:0 means unlimited, so skip process
+            $distrib = [];
+
+        $total = array_sum($distrib);
+        foreach ($distrib as &$d)
+            $d = ceil($limit * $d / $total);
 
         foreach ($this->iterate() as $guid => &$curTpl)
         {
-            if ($distrib !== null)
+            if ($distrib)
             {
                 if ($limit <= 0 || $distrib[$curTpl['realm']] <= 0)
                 {

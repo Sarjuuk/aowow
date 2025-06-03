@@ -829,13 +829,13 @@ abstract class Util
 
     public static function createSqlBatchInsert(array $data) : array
     {
+        if (!count($data) || !is_array(reset($data)))
+            return [];
+
         $nRows  = 100;
         $nItems = count(reset($data));
         $result = [];
         $buff   = [];
-
-        if (!count($data))
-            return [];
 
         foreach ($data as $d)
         {
