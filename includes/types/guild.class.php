@@ -168,7 +168,7 @@ class RemoteGuildList extends GuildList
         // select DB by realm
         if (!$this->selectRealms($miscData))
         {
-            trigger_error('no access to auth-db or table realmlist is empty', E_USER_WARNING);
+            trigger_error('RemoteGuildList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
@@ -280,12 +280,33 @@ class LocalGuildList extends GuildList
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
+        $realms = Profiler::getRealms();
+
+        // graft realm selection from miscData onto conditions
+        if (isset($miscData['sv']))
+            $realms = array_filter($realms, fn($x) => Profiler::urlize($x['name']) == Profiler::urlize($miscData['sv']));
+
+        if (isset($miscData['rg']))
+            $realms = array_filter($realms, fn($x) => $x['region'] == $miscData['rg']);
+
+        if (!$realms)
+        {
+            trigger_error('LocalGuildList::__construct - cannot access any realm.', E_USER_WARNING);
+            return;
+        }
+
+        if ($conditions)
+        {
+            array_unshift($conditions, 'AND');
+            $conditions = ['AND', ['realm', array_keys($realms)], $conditions];
+        }
+        else
+            $conditions = [['realm', array_keys($realms)]];
+
         parent::__construct($conditions, $miscData);
 
         if ($this->error)
             return;
-
-        $realms = Profiler::getRealms();
 
         foreach ($this->iterate() as $id => &$curTpl)
         {

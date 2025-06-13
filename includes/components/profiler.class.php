@@ -189,57 +189,57 @@ class Profiler
         return $str;
     }
 
-    public static function getRealms()
+    public static function getRealms() : array
     {
-        if (DB::isConnectable(DB_AUTH) && !self::$realms)
+        if (!DB::isConnectable(DB_AUTH) || self::$realms)
+            return self::$realms;
+
+        self::$realms = DB::Auth()->select(
+           'SELECT `id` AS ARRAY_KEY,
+                   `name`,
+                   CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
+                        WHEN `timezone` BETWEEN  6 AND  7 THEN "kr" # KR, KR-Tournament
+                        WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
+                        WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
+                        WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
+                        ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 27: Test Tournament, 28: QA, 30: Test2, 31+: misc
+                   `allowedSecurityLevel` AS "access"
+            FROM   `realmlist`
+            WHERE  `gamebuild` = ?d',
+            WOW_BUILD
+        );
+
+        foreach (self::$realms as $rId => &$rData)
         {
-            self::$realms = DB::Auth()->select(
-               'SELECT `id` AS ARRAY_KEY,
-                       `name`,
-                       CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
-                            WHEN `timezone` BETWEEN  6 AND  7 THEN "kr" # KR, KR-Tournament
-                            WHEN `timezone` BETWEEN  8 AND 13 THEN "eu" # GB, DE, FR, ES, RU, EU-Tournament
-                            WHEN `timezone` BETWEEN 14 AND 15 THEN "tw" # TW, TW-Tournament
-                            WHEN `timezone` BETWEEN 16 AND 25 THEN "cn" # CN, CN1-8, CN-Tournament
-                            ELSE "dev" END AS "region",                 # 1: Dev, 26: Test, 27: Test Tournament, 28: QA, 30: Test2, 31+: misc
-                       `allowedSecurityLevel` AS "access"
-                FROM   `realmlist`
-                WHERE  `gamebuild` = ?d',
-                WOW_BUILD
-            );
-
-            foreach (self::$realms as $rId => &$rData)
+            // realm in db but no connection info set
+            if (!DB::isConnectable(DB_CHARACTERS . $rId))
             {
-                // realm in db but no connection info set
-                if (!DB::isConnectable(DB_CHARACTERS . $rId))
-                {
-                    unset(self::$realms[$rId]);
-                    continue;
-                }
+                unset(self::$realms[$rId]);
+                continue;
+            }
 
-                // filter by access level
-                if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
+            // filter by access level
+            if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
+                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
+            else if ($rData['access'] == SEC_GAMEMASTER && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD)))
+                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD;
+            else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
+                $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
+            else if ($rData['access'] > SEC_PLAYER && !CLI)
+            {
+                unset(self::$realms[$rId]);
+                continue;
+            }
+
+            // filter dev realms
+            if ($rData['region'] === 'dev')
+            {
+                if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
                     $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
-                else if ($rData['access'] == SEC_GAMEMASTER && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD)))
-                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD;
-                else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
-                    $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
-                else if ($rData['access'] > SEC_PLAYER && !CLI)
+                else
                 {
                     unset(self::$realms[$rId]);
                     continue;
-                }
-
-                // filter dev realms
-                if ($rData['region'] === 'dev')
-                {
-                    if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
-                        $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
-                    else
-                    {
-                        unset(self::$realms[$rId]);
-                        continue;
-                    }
                 }
             }
         }

@@ -520,7 +520,7 @@ class RemoteProfileList extends ProfileList
         // select DB by realm
         if (!$this->selectRealms($miscData))
         {
-            trigger_error('no access to auth-db or table realmlist is empty', E_USER_WARNING);
+            trigger_error('RemoteProfileList::__construct - cannot access any realm.', E_USER_WARNING);
             return;
         }
 
@@ -738,25 +738,42 @@ class LocalProfileList extends ProfileList
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
+        $realms = Profiler::getRealms();
+
+        // graft realm selection from miscData onto conditions
+        $realmIds = [];
+        if (isset($miscData['sv']))
+            $realmIds = array_keys(array_filter($realms, fn($x) => Profiler::urlize($x['name']) == Profiler::urlize($miscData['sv'])));
+
+        if (isset($miscData['rg']))
+            $realmIds = array_merge($realmIds, array_keys(array_filter($realms, fn($x) => $x['region'] == $miscData['rg'])));
+
+        if ($conditions && $realmIds)
+        {
+            array_unshift($conditions, 'AND');
+            $conditions = ['AND', ['realm', $realmIds], $conditions];
+        }
+        else if ($realmIds)
+            $conditions = [['realm', $realmIds]];
+
         parent::__construct($conditions, $miscData);
 
         if ($this->error)
             return;
 
-        $realms = Profiler::getRealms();
-
         foreach ($this->iterate() as $id => &$curTpl)
         {
-            if ($curTpl['realm'] && !isset($realms[$curTpl['realm']]))
+            if (!$curTpl['realm'])                          // custom profile w/o realminfo
                 continue;
 
-            if (isset($realms[$curTpl['realm']]))
+            if (!isset($realms[$curTpl['realm']]))
             {
-                $curTpl['realmName'] = $realms[$curTpl['realm']]['name'];
-                $curTpl['region']    = $realms[$curTpl['realm']]['region'];
+                unset($this->templates[$id]);
+                continue;
             }
 
-            // battlegroup
+            $curTpl['realmName']   = $realms[$curTpl['realm']]['name'];
+            $curTpl['region']      = $realms[$curTpl['realm']]['region'];
             $curTpl['battlegroup'] = Cfg::get('BATTLEGROUP');
         }
     }
