@@ -29,17 +29,16 @@ CLI::write('profiler queue started', CLI::LOG_OK);
 set_time_limit(0);
 $tCycle = microtime(true);
 
-$error = function ($type, $realmGUID, $realmId)
+$error = function (int $type, int $realmGUID, int $realmId) : void
 {
-    $what = '';
-    if ($type == Type::PROFILE)
-        $what = 'char';
-    if ($type == Type::GUILD)
-        $what = 'guild';
-    if ($type == Type::ARENA_TEAM)
-        $what = 'arena team';
+    $what = match ($type)
+    {
+        Type::PROFILE    => 'char',
+        Type::GUILD      => 'guild',
+        Type::ARENA_TEAM => 'arena team'
+    };
 
-    DB::Aowow()->query('UPDATE ?_profiler_sync SET status = ?d, errorCode = ?d WHERE realm = ?d AND realmGUID = ?d AND type = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_CHAR, $realmId, $realmGUID, $type);
+    DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = ?d WHERE `realm` = ?d AND `realmGUID` = ?d AND `type` = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_CHAR, $realmId, $realmGUID, $type);
     trigger_error('prQueue - '.$what.' #'.$realmGUID.' on realm #'.$realmId.' not found. Truncating local placeholder.', E_USER_WARNING);
 };
 
@@ -54,7 +53,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
         usleep($wait * 1000 * 1000);
     }
 
-    $row = DB::Aowow()->selectRow('SELECT * FROM ?_profiler_sync WHERE status = ?d ORDER BY requestTime ASC', PR_QUEUE_STATUS_WAITING);
+    $row = DB::Aowow()->selectRow('SELECT * FROM ?_profiler_sync WHERE `status` = ?d ORDER BY `requestTime` ASC', PR_QUEUE_STATUS_WAITING);
     if (!$row)
     {
         // nothing more to do
@@ -68,12 +67,12 @@ while (Cfg::get('PROFILER_ENABLE', true))
 
     if (empty(Profiler::getRealms()[$row['realm']]))
     {
-        DB::Aowow()->query('UPDATE ?_profiler_sync SET status = ?d, errorCode = ?d WHERE realm = ?d AND type = ?d AND typeId = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_ARMORY, $row['realm'], $row['type'], $row['typeId']);
+        DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = ?d WHERE `realm` = ?d AND `type` = ?d AND `typeId` = ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_ARMORY, $row['realm'], $row['type'], $row['typeId']);
         CLI::write('realm #'.$row['realm'].' for subject guid '.$row['realmGUID'].' is undefined', CLI::LOG_WARN);
         continue;
     }
     else
-        DB::Aowow()->query('UPDATE ?_profiler_sync SET status = ?d WHERE realm = ?d AND type = ?d AND typeId = ?d', PR_QUEUE_STATUS_WORKING, $row['realm'], $row['type'], $row['typeId']);
+        DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d WHERE `realm` = ?d AND `type` = ?d AND `typeId` = ?d', PR_QUEUE_STATUS_WORKING, $row['realm'], $row['type'], $row['typeId']);
 
     switch ($row['type'])
     {
@@ -81,7 +80,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
             if (!Profiler::getCharFromRealm($row['realm'], $row['realmGUID']))
             {
                 $error(Type::PROFILE, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
+                DB::Aowow()->query('DELETE FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }
 
@@ -90,7 +89,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
             if (!Profiler::getGuildFromRealm($row['realm'], $row['realmGUID']))
             {
                 $error(Type::GUILD, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
+                DB::Aowow()->query('DELETE FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }
 
@@ -99,7 +98,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
             if (!Profiler::getArenaTeamFromRealm($row['realm'], $row['realmGUID']))
             {
                 $error(Type::ARENA_TEAM, $row['realmGUID'], $row['realm']);
-                DB::Aowow()->query('DELETE FROM ?_profiler_arena_team WHERE realm = ?d AND realmGUID = ?d', $row['realm'], $row['realmGUID']);
+                DB::Aowow()->query('DELETE FROM ?_profiler_arena_team WHERE `realm` = ?d AND `realmGUID` = ?d', $row['realm'], $row['realmGUID']);
                 continue 2;
             }
 
@@ -112,7 +111,7 @@ while (Cfg::get('PROFILER_ENABLE', true))
     $tCycle = microtime(true);
 
     // mark as ready
-    DB::Aowow()->query('UPDATE ?_profiler_sync SET status = ?d, errorCode = 0 WHERE realm = ?d AND type = ?d AND typeId = ?d', PR_QUEUE_STATUS_READY, $row['realm'], $row['type'], $row['typeId']);
+    DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = 0 WHERE `realm` = ?d AND `type` = ?d AND `typeId` = ?d', PR_QUEUE_STATUS_READY, $row['realm'], $row['type'], $row['typeId']);
 }
 
 Profiler::queueFree();

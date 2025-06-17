@@ -239,6 +239,8 @@ class ProfileList extends BaseType
 
 class ProfileListFilter extends Filter
 {
+    use TrProfilerFilter;
+
     public    $useLocalList = false;
     public    $extraOpts    = [];
 
@@ -357,33 +359,6 @@ class ProfileListFilter extends Filter
             $parts[] = [$k.'.level', $_v['maxle'], '<='];
 
         return $parts;
-    }
-
-    protected function cbRegionCheck(string &$v) : bool
-    {
-        if (in_array($v, Util::$regions))
-        {
-            $this->parentCats[0] = $v;                      // directly redirect onto this region
-            $v = '';                                        // remove from filter
-
-            return true;
-        }
-
-        return false;
-    }
-
-    protected function cbServerCheck(string &$v) : bool
-    {
-        foreach (Profiler::getRealms() as $realm)
-            if ($realm['name'] == $v)
-            {
-                $this->parentCats[1] = Profiler::urlize($v);// directly redirect onto this server
-                $v = '';                                    // remove from filter
-
-                return true;
-            }
-
-        return false;
     }
 
     protected function cbProfession(int $cr, int $crs, string $crv, $skillId) : ?array
