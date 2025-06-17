@@ -73,7 +73,7 @@ class ArenaTeamsPage extends GenericPage
 
         $conditions = [];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
-            $conditions[] = ['at.rating', 1000, '>'];
+            $conditions[] = ['at.seasonGames', 0, '>'];
 
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
