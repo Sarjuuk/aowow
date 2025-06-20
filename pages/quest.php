@@ -271,69 +271,45 @@ class QuestPage extends GenericPage
 
         $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
 
+
         /**********/
         /* Series */
         /**********/
 
-        // Quest Chain (are there cases where quests go in parallel?)
-        $chain = array(
-            array(
-                array(
-                    'side'    => $_side,
+        // Assumption
+        // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
+        // so we fast forward to the last quest and go backwards from there.
+
+        $lastQuestId = $this->subject->getField('nextQuestIdChain');
+        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ?_quests WHERE `id` = ?d AND `id` <> `nextQuestIdChain`', $lastQuestId))
+            $lastQuestId = $newLast;
+
+        $end = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `id` = ?d', $lastQuestId ?: $this->typeId);
+        $chain = array(array(array(                         // series / step / quest
+            'side'    => ChrRace::sideFromMask($end['reqRaceMask']),
+            'typeStr' => Type::getFileString(Type::QUEST),
+            'typeId'  => $end['id'],
+            'name'    => Util::htmlEscape(Lang::trimTextClean(Util::localizedString($end, 'name'), 40)),
+        )));
+
+        $prevStepIds = [$lastQuestId ?: $this->typeId];
+        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`', $prevStepIds))
+        {
+            $step = [];
+            foreach ($prevQuests as $pQuest)
+                $step[$pQuest['id']] = array(
+                    'side'    => ChrRace::sideFromMask($pQuest['reqRaceMask']),
                     'typeStr' => Type::getFileString(Type::QUEST),
-                    'typeId'  => $this->typeId,
-                    'name'    => Util::htmlEscape($this->subject->getField('name', true)),
-                    '_next'   => $this->subject->getField('nextQuestIdChain')
-                )
-            )
-        );
+                    'typeId'  => $pQuest['id'],
+                    'name'    => Util::htmlEscape(Lang::trimTextClean(Util::localizedString($pQuest, 'name'), 40)),
+                );
 
-        $_ = $chain[0][0];
-        while ($_)
-        {
-            if ($_ = DB::Aowow()->selectRow('SELECT `id` AS `typeId`, IF(`id` = `nextQuestIdChain`, 1, 0) AS `error`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` = ?d', $_['typeId']))
-            {
-                if ($_['error'])
-                {
-                    trigger_error('Quest '.$_['typeId'].' is in a chain with itself');
-                    break;
-                }
-
-                $n = Util::localizedString($_, 'name');
-                array_unshift($chain, array(
-                    array(
-                        'side'    => ChrRace::sideFromMask($_['reqRaceMask']),
-                        'typeStr' => Type::getFileString(Type::QUEST),
-                        'typeId'  => $_['typeId'],
-                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
-                    )
-                ));
-            }
-        }
-
-        $_ = end($chain)[0];
-        while ($_)
-        {
-            if ($_ = DB::Aowow()->selectRow('SELECT `id` AS `typeId`, IF(`id` = `nextQuestIdChain`, 1, 0) AS `error`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask`, `nextQuestIdChain` AS `_next` FROM ?_quests WHERE `id` = ?d', $_['_next']))
-            {
-                if ($_['error'])                                // error already triggered
-                    break;
-
-                $n = Util::localizedString($_, 'name');
-                array_push($chain, array(
-                    array(
-                        'side'    => ChrRace::sideFromMask($_['reqRaceMask']),
-                        'typeStr' => Type::getFileString(Type::QUEST),
-                        'typeId'  => $_['typeId'],
-                        'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40)),
-                        '_next'   => $_['_next'],
-                    )
-                ));
-            }
+            $prevStepIds = array_keys($step);
+            $chain[]     = $step;
         }
 
         if (count($chain) > 1)
-            $this->series[] = [$chain, null];
+            $this->series[] = [array_reverse($chain), null];
 
 
         // todo (low): sensibly merge the following lists into 'series'
