@@ -126,6 +126,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 DB::Aowow()->query('INSERT INTO ?_quests VALUES (?a)', array_values($quest));
         }
 
+
         /*
             just some random thoughts here ..
             quest-custom-flags are derived from flags and specialFlags
@@ -134,36 +135,69 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             same with QUEST_FLAG_UNAVAILABLE => CUSTOM_EXCLUDE_FOR_LISTVIEW
         */
 
+
+        CLI::write(' * unpacking XP rewards (1/4)', CLI::LOG_BLANK, true, true);
+
         // unpack XP-reward
         DB::Aowow()->query(
            'UPDATE ?_quests q, dbc_questxp xp
-            SET    rewardXP = (CASE rewardXP
-                       WHEN 0 THEN xp.Field1 WHEN 1 THEN xp.Field2 WHEN 2 THEN xp.Field3 WHEN 3 THEN xp.Field4 WHEN 4 THEN xp.Field5
-                       WHEN 5 THEN xp.Field6 WHEN 6 THEN xp.Field7 WHEN 7 THEN xp.Field8 WHEN 8 THEN xp.Field9 WHEN 9 THEN xp.Field10
+            SET    `rewardXP` = (CASE `rewardXP`
+                       WHEN 0 THEN xp.`Field1` WHEN 1 THEN xp.`Field2` WHEN 2 THEN xp.`Field3` WHEN 3 THEN xp.`Field4` WHEN 4 THEN xp.`Field5`
+                       WHEN 5 THEN xp.`Field6` WHEN 6 THEN xp.`Field7` WHEN 7 THEN xp.`Field8` WHEN 8 THEN xp.`Field9` WHEN 9 THEN xp.`Field10`
                        ELSE 0 END)
-            WHERE  xp.id = q.level { AND q.id IN (?a) }',
+            WHERE  xp.`id` = q.`level` { AND q.`id` IN (?a) }',
             $ids ?: DBSIMPLE_SKIP
         );
+
+
+        CLI::write(' * unpacking reputation gains (2/4)', CLI::LOG_BLANK, true, true);
 
         // unpack Rep-rewards
         for ($i = 1; $i < 6; $i++)
             DB::Aowow()->query(
                'UPDATE    ?_quests q
-                LEFT JOIN dbc_questfactionreward rep ON rep.id = IF(rewardFactionValue?d > 0, 1, 2)
+                LEFT JOIN dbc_questfactionreward rep ON rep.`id` = IF(rewardFactionValue?d > 0, 1, 2)
                 SET       rewardFactionValue?d = (CASE ABS(rewardFactionValue?d)
-                              WHEN 0 THEN rep.Field1 WHEN 1 THEN rep.Field2 WHEN 2 THEN rep.Field3 WHEN 3 THEN rep.Field4 WHEN 4 THEN rep.Field5
-                              WHEN 5 THEN rep.Field6 WHEN 6 THEN rep.Field7 WHEN 7 THEN rep.Field8 WHEN 8 THEN rep.Field9 WHEN 9 THEN rep.Field10
+                              WHEN 0 THEN rep.`Field1` WHEN 1 THEN rep.`Field2` WHEN 2 THEN rep.`Field3` WHEN 3 THEN rep.`Field4` WHEN 4 THEN rep.`Field5`
+                              WHEN 5 THEN rep.`Field6` WHEN 6 THEN rep.`Field7` WHEN 7 THEN rep.`Field8` WHEN 8 THEN rep.`Field9` WHEN 9 THEN rep.`Field10`
                               ELSE 0 END)
-                WHERE     ABS(rewardFactionValue?d) BETWEEN 1 AND 10 { AND q.id IN (?a) }',
+                WHERE     ABS(rewardFactionValue?d) BETWEEN 1 AND 10 { AND q.`id` IN (?a) }',
                 $i, $i, $i, $i,
                 $ids ?: DBSIMPLE_SKIP
             );
 
-        foreach (Game::$questSortFix as $child => $parent)
-            DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE zoneOrSortBak = ?d', $parent, $child);
 
-         // move quests linked to holidays into appropirate quests-sorts. create dummy sorts as needed
-        $eventSet = DB::World()->selectCol('SELECT holiday AS ARRAY_KEY, eventEntry FROM game_event WHERE holiday <> 0');
+        CLI::write(' * flagging quests series (3/4)', CLI::LOG_BLANK, true, true);
+
+        // set series flags
+        DB::Aowow()->query(
+           'UPDATE    ?_quests q
+            LEFT JOIN ?_quests q2 ON q2.`NextQuestIdChain` = q.id
+            SET       q.`cuFlags` = q.`cuFlags` | ?d
+            WHERE     q.`NextQuestIdChain` > 0 AND q2.`id` IS NULL',
+            QUEST_CU_FIRST_SERIES | QUEST_CU_PART_OF_SERIES
+        );
+
+        DB::Aowow()->query(
+           'UPDATE ?_quests q
+            JOIN   ?_quests q2 ON q2.`NextQuestIdChain` = q.id
+            SET    q.`cuFlags` = q.`cuFlags` | ?d
+            WHERE  q.`NextQuestIdChain` = 0',
+            QUEST_CU_LAST_SERIES | QUEST_CU_PART_OF_SERIES
+        );
+
+        DB::Aowow()->query('UPDATE ?_quests SET `cuFlags` = `cuFlags` | ?d WHERE `NextQuestIdChain` > 0', QUEST_CU_PART_OF_SERIES);
+
+
+        CLI::write(' * applying fixes (4/4)', CLI::LOG_BLANK, true, true);
+
+        // fix questSorts for instance quests
+        foreach (Game::$questSortFix as $child => $parent)
+            DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `zoneOrSortBak` = ?d', $parent, $child);
+
+
+        // move quests linked to holidays into appropirate quests-sorts. create dummy sorts as needed
+        $eventSet = DB::World()->selectCol('SELECT `holiday` AS ARRAY_KEY, `eventEntry` FROM game_event WHERE `holiday` <> 0');
         $holidaySorts = array(
             141 => -1001,   181 => -374,    201 => -1002,   // Winter Veil      Noblegarden     Childrens Week
             321 => -1005,   324 => -1003,   404 => -375,    // Harvest Fest.    Hallows End     Pilgrims Bounty
@@ -173,14 +207,17 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         foreach ($holidaySorts as $hId => $sort)
             if (!empty($eventSet[$hId]))
-                DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE eventId = ?d{ AND id IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
+                DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `eventId` = ?d{ AND `id` IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
+
 
         // 'special' special cases
         // fishing quests to stranglethorn extravaganza
-        DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE id IN (?a){ AND id IN (?a)}',  -101, [8228, 8229], $ids ?: DBSIMPLE_SKIP);
+        DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `id` IN (?a){ AND `id` IN (?a)}',  -101, [8228, 8229], $ids ?: DBSIMPLE_SKIP);
         // dungeon quests to Misc/Dungeon Finder
-        DB::Aowow()->query('UPDATE ?_quests SET zoneOrSort = ?d WHERE (specialFlags & ?d OR id IN (?a)){ AND id IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
+        DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE (`specialFlags` & ?d OR `id` IN (?a)){ AND `id` IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
 
+
+        // flag internal/unsued quests as unsearchable
         DB::Aowow()->query(
            'UPDATE ?_quests
             SET    `cuFlags` = `cuFlags` | ?d

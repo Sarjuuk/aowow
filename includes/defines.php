@@ -345,13 +345,16 @@ define('ITEM_CU_OT_OBJECTLOOT',             0x02);
 define('EMOTE_CU_MISSING_CMD',              0x01);          // no alias in Globalstrings.lua and thus unusable
 
 // as seen in wFlags
-define('QUEST_CU_REPEATABLE',               0x01);
-define('QUEST_CU_DAILY',                    0x02);
-define('QUEST_CU_WEEKLY',                   0x04);
-define('QUEST_CU_SEASONAL',                 0x08);
-define('QUEST_CU_SKIP_LOG',                 0x10);
-define('QUEST_CU_AUTO_ACCEPT',              0x20);
-define('QUEST_CU_PVP_ENABLED',              0x40);
+define('QUEST_CU_REPEATABLE',               0x0001);
+define('QUEST_CU_DAILY',                    0x0002);
+define('QUEST_CU_WEEKLY',                   0x0004);
+define('QUEST_CU_SEASONAL',                 0x0008);
+define('QUEST_CU_SKIP_LOG',                 0x0010);
+define('QUEST_CU_AUTO_ACCEPT',              0x0020);
+define('QUEST_CU_PVP_ENABLED',              0x0040);
+define('QUEST_CU_FIRST_SERIES',             0x0080);
+define('QUEST_CU_LAST_SERIES',              0x0100);
+define('QUEST_CU_PART_OF_SERIES',           0x0200);
 
 define('PROFILER_CU_PUBLISHED',             0x01);
 define('PROFILER_CU_PINNED',                0x02);

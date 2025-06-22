@@ -447,12 +447,12 @@ class QuestListFilter extends Filter
          4 => [parent::CR_CALLBACK,  'cbSpellRewards',   null,                 null], // spellrewarded [yn]
          5 => [parent::CR_FLAG,      'flags',            QUEST_FLAG_SHARABLE       ], // sharable
          6 => [parent::CR_NUMERIC,   'timeLimit',        NUM_CAST_INT              ], // timer
-         7 => [parent::CR_NYI_PH,    null,               1                         ], // firstquestseries
+         7 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_FIRST_SERIES     ], // firstquestseries
          9 => [parent::CR_CALLBACK,  'cbEarnReputation', null,                 null], // objectiveearnrepwith [enum]
         10 => [parent::CR_CALLBACK,  'cbReputation',     '<',                  null], // decreasesrepwith
         11 => [parent::CR_NUMERIC,   'suggestedPlayers', NUM_CAST_INT              ], // suggestedplayers
-        15 => [parent::CR_NYI_PH,    null,               1                         ], // lastquestseries
-        16 => [parent::CR_NYI_PH,    null,               1                         ], // partseries
+        15 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_LAST_SERIES      ], // lastquestseries
+        16 => [parent::CR_FLAG,      'cuFlags',          QUEST_CU_PART_OF_SERIES   ], // partseries
         18 => [parent::CR_FLAG,      'cuFlags',          CUSTOM_HAS_SCREENSHOT     ], // hasscreenshots
         19 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x1,                  null], // startsfrom [enum]
         21 => [parent::CR_CALLBACK,  'cbQuestRelation',  0x2,                  null], // endsat [enum]
