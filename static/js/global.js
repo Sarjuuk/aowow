@@ -207,12 +207,7 @@ function g_getTextContent(el) {
             txt += el.childNodes[i].nodeValue;
         }
         else if (el.childNodes[i].nodeName == 'BR') {
-            if ($WH.Browser.ie67) {
-                txt += '\r';
-            }
-            else {
-                txt += '\n';
-            }
+            txt += '\n';
         }
         txt += g_getTextContent(el.childNodes[i]);
     }
@@ -487,9 +482,6 @@ var PageTemplate = new function()
     function addBrowserClasses()
     {
         // This is done before the <body> tag is loaded, so class names are added to the <html> tag instead
-        if($WH.Browser.ie6) $(document.documentElement).addClass('ie6 ie67 ie678');
-        if($WH.Browser.ie7) $(document.documentElement).addClass('ie7 ie67 ie678');
-        if($WH.Browser.ie8) $(document.documentElement).addClass('ie8 ie678');
     }
 
     function initFavorites()
@@ -1675,10 +1667,6 @@ function g_addPages(d, opt) {
         pageIcon.href = 'javascript:;';
         $WH.ns(pageIcon);
 
-        if ($WH.Browser.ie) {
-            $WH.ae(pageIcon, $WH.ct(' '));
-        }
-
         pageIcon.onclick = function() {
             var n = prompt($WH.sprintf(LANG.prompt_gotopage, 1, opt.nPages), opt.page);
             if (n != null) {
@@ -1728,11 +1716,6 @@ function g_disclose(el, _this) {
  */
 
 function g_setupChangeWarning(form, elements, warningMessage) {
-    /* Still skip IE since it triggers this when anchor links are clicked. */
-    if ($WH.Browser.ie) {
-        return;
-    }
-
     if (!form) {
         return;
     }
@@ -2379,14 +2362,6 @@ var ScreenshotViewer = new function() {
 
         Lightbox.setSize(lbWidth + 20, imgHeight + 52 + captionExtraHeight);
 
-        if ($WH.Browser.ie6) {
-            screen.style.width = lbWidth + 'px';
-            if (screenshots.length > 1) {
-                aPrev.style.height = aNext.style.height = imgHeight + 'px'
-            } else {
-                aCover.style.height = imgHeight + 'px'
-            }
-        }
         if (captionExtraHeight) {
             imgDiv.firstChild.width = imgWidth;
             imgDiv.firstChild.height = imgHeight;
@@ -2424,9 +2399,6 @@ var ScreenshotViewer = new function() {
             '<img src="' + url + '"'
         + ' width="' + imgWidth + '"'
         + ' height="' + imgHeight + '"';
-        if ($WH.Browser.ie6) {
-            html += ' galleryimg="no"';
-        }
         html += '>';
 
         imgDiv.innerHTML = html;
@@ -2674,17 +2646,7 @@ var ScreenshotViewer = new function() {
             // $WH.ae(b, $WH.ct(LANG.close));
             // $WH.ae(foo, b);
             $WH.ae(aCover, foo);
-            if ($WH.Browser.ie6) {
-                $WH.ns(aPrev);
-                $WH.ns(aNext);
-                aPrev.onmouseover = aNext.onmouseover = aCover.onmouseover = function() {
-                    this.firstChild.style.display = 'block';
-                };
-                aPrev.onmouseout = aNext.onmouseout = aCover.onmouseout = function() {
-                    this.firstChild.style.display = '';
-                };
 
-            }
             $WH.ae(screen, aPrev);
             $WH.ae(screen, aNext);
             $WH.ae(screen, aCover);
@@ -3640,21 +3602,13 @@ var
                         if (j > 0 && !field.noInputBr) {
                             $WH.ae(td, $WH.ce('br'));
                         }
-                        if ($WH.Browser.ie6 && field.type == 'radio') {
-                            l = $WH.ce("<label for='' + uniqueId + '' onselectstart='return false' />");
-                            f = $WH.ce("<input type='' + field.type + '' name='' + field.id + '' />");
-                        }
-                        else {
-                            l = $WH.ce('label');
-                            l.setAttribute('for', uniqueId);
-                            l.onmousedown = $WH.rf;
 
-                            f = $WH.ce('input');
-                            f.setAttribute('type', field.type);
-                            f.name = field.id;
-                        }
-                        f.value = options[j];
-                        f.id = uniqueId;
+                        l = $WH.ce('label');
+                        l.setAttribute('for', uniqueId);
+                        l.onmousedown = $WH.rf;
+
+                        f = $WH.ce('input', { name: field.id, value: options[j], id: uniqueId });
+                        f.setAttribute('type', field.type);
 
                         if (field.disabled) {
                             f.disabled = true;
@@ -4495,7 +4449,7 @@ var Favorites = new function() {
 
         g_favorites.push({ id: type, entities: [] });
 
-        g_favorites.sort(function(a, b) { return $WH.stringCompare(LANG.types[a.id], LANG.types[b.id]) });
+        g_favorites.sort(function(a, b) { return $WH.strcmp(LANG.types[a.id], LANG.types[b.id]) });
 
         for (i = 0; j = g_favorites[i]; i++)
             if (j.id == type)
@@ -6527,46 +6481,22 @@ Listview.prototype = {
 
         // Numerical
         var filterFuncs = {
-            1: function(x, y) {
-                return x > y;
-            },
-            2: function(x, y) {
-                return x == y;
-            },
-            3: function(x, y) {
-                return x < y;
-            },
-            4: function(x, y) {
-                return x >= y;
-            },
-            5: function(x, y) {
-                return x <= y;
-            },
-            6: function(x, y, z) {
-                return y <= x && x <= z;
-            }
+            1: function(x, y)    { return x > y;            },
+            2: function(x, y)    { return x == y;           },
+            3: function(x, y)    { return x < y;            },
+            4: function(x, y)    { return x >= y;           },
+            5: function(x, y)    { return x <= y;           },
+            6: function(x, y, z) { return y <= x && x <= z; }
         };
 
         // Range
         var filterFuncs2 = {
-            1: function(min, max, y) {
-                return max > y;
-            },
-            2: function(min, max, y) {
-                return min <= y && y <= max;
-            },
-            3: function(min, max, y) {
-                return min < y;
-            },
-            4: function(min, max, y) {
-                return max >= y;
-            },
-            5: function(min, max, y) {
-                return min <= y;
-            },
-            6: function(min, max, y, z) {
-                return y <= max && min <= z;
-            }
+            1: function(min, max, y)    { return max > y;              },
+            2: function(min, max, y)    { return min <= y && y <= max; },
+            3: function(min, max, y)    { return min < y;              },
+            4: function(min, max, y)    { return max >= y;             },
+            5: function(min, max, y)    { return min <= y;             },
+            6: function(min, max, y, z) { return y <= max && min <= z; }
         };
 
         var nRowsVisible = 0;
@@ -7538,7 +7468,7 @@ Listview.headerOver = function(a, col, e) {
 
     buffer += '<br /><span class="q2">' + LANG.tooltip_lvheader1 + '</span>';
     if (this.filtrable && (col.filtrable == null || col.filtrable)) {
-        buffer += '<br /><span class="q2">' + ($WH.Browser.opera ? LANG.tooltip_lvheader3 : LANG.tooltip_lvheader2) + '</span>';
+        buffer += '<br /><span class="q2">' + LANG.tooltip_lvheader2 + '</span>';
     }
 
     $WH.Tooltip.show(a, buffer, 0, 0, 'q');
@@ -12077,13 +12007,18 @@ Listview.templates = {
         nItemsPerPage: 150,
         cellMinWidth: 85,
         poundable: 1,
-        sortOptions: [{
-            id: 'name',
-            name: LANG.name,
-            sortFunc: function(f, c) {
-                return $WH.stringCompare(f.name, c.name)
+        sortOptions: [
+            {
+                id: 'id',
+                name: "ID",
+                sortFunc: function(a, b) { return $WH.strcmp(a.id, b.id); }
+            },
+            {
+                id: 'name',
+                name: LANG.name,
+                sortFunc: function(a, b) { return $WH.strcmp(a.name, b.name); }
             }
-        }],
+        ],
         columns: [],
         value: 'name',
         compute: function(_icon, td, tr) {
@@ -12212,7 +12147,7 @@ Listview.templates = {
             $WH.ae(td, cell);
         },
         sortFunc: function(a, b) {
-            return $WH.stringCompare(a.name, b.name);
+            return $WH.strcmp(a.name, b.name);
         },
         getItemLink: function(icon) {
             return "?icon=" + icon.id;
@@ -12248,7 +12183,7 @@ Listview.templates = {
                     return user.username;
                 },
                 sortFunc: function(a, b) {
-                    return $WH.stringCompare(a.username, b.username);
+                    return $WH.strcmp(a.username, b.username);
                 },
                 getItemLink: function(user) {
                     return '?user=' + user.username;
@@ -18278,8 +18213,7 @@ function GetStars(stars, ratable, userRating, guideId)
     /* This is kinda lame but oh well */
     var contents = '<span>';
 
-    // var wbr = $.browser.msie ? '' : '&#8203;';           // aowow - jQuery v1.9 deprecated
-    var wbr = $WH.Browser.ie ? '' : '&#8203;';
+    var wbr = '&#8203;';
     var tmp = stars;
     for(var i = 1; i <= STARS_MAX; ++i)
     {
@@ -19225,9 +19159,7 @@ var Lightbox = new function() {
     }
 
     this.setSize = function(w, h, auto) {
-        if (!$WH.Browser.ie) {
-            inner.style.visibility = 'hidden';
-        }
+        inner.style.visibility = 'hidden';
 
         if (!auto) {
             inner.style.width = w + 'px';

@@ -70,16 +70,12 @@ img.content-image.content-image-shadowed {
 }
 
 a:hover img.content-image {
-    -webkit-filter:brightness(1.35);
     filter:brightness(1.35);
 }
 
 img.border {
     border: 2px solid #404040;
     background-color: #080808;
-
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
 }
 
@@ -137,8 +133,6 @@ h5 a.icontiny span { text-decoration:none !important; }
     padding: 15px;
     margin:15px 0;
     font-style: normal;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     display:table;
     border-collapse:separate;
@@ -249,8 +243,6 @@ div.audiomarkup
 .quote-body
 {
     padding:10px 15px 0 15px;
-    -moz-border-radius:0 0 10px 0;
-    -webkit-border-radius:0 0 10px 0;
     border-radius:0 0 10px 0;
 }
 
@@ -310,8 +302,6 @@ div.audiomarkup
     /* background:#1e1e1e url(../images/blog/whpost-bg.png) left top no-repeat; */
     position:relative;
     color:#ccc;
-    -moz-border-radius:10px;
-    -webkit-border-radius:10px;
     border-radius:10px;
     border:solid 2px #bbb;
     margin:15px;
@@ -382,7 +372,7 @@ div.secheader
     margin:15px 0;
     padding:5px 0 6px 8px;
     clear:both;
-    -moz-box-shadow:0 1px 13px #000,0 0 3px #000 inset;
+    box-shadow:0 1px 13px #000,0 0 3px #000 inset;
     font-size:22px;
 }
 
@@ -509,9 +499,6 @@ a.premium-user-badge {
     text-align: center;
     background: #141414;
     border: 1px solid #101010;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -527,9 +514,6 @@ div.announcement-pagetop div.announcement-inner {
 div.announcement-pagetop div.announcement-inner, div.announcement-contenttop div.announcement-inner {
     background-color: #141414;
     border: 1px solid #101010;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -566,10 +550,6 @@ div.announcement li {
 
 /* jQuery replacement */
 .announcement {
-    -webkit-transition: .5s ease;
-    -moz-transition: .5s ease;
-    -o-transition: .5s ease;
-    -ms-transition: .5s ease;
     transition: .5s ease;
 }
 
@@ -581,9 +561,6 @@ div.announcement li {
     color: #dddddd;
     line-height: 1.5em !important;
     padding: 0 10px 10px 0;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -928,9 +905,6 @@ a.dialog-right {
     border: 1px solid #363636;
     background-color: #1A2924;
     width: 300px;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -939,9 +913,6 @@ a.dialog-right {
     background-color: #141414;
     float: left;
     border: 1px solid #363636;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 #statweight-help { position: relative }
@@ -1535,9 +1506,6 @@ span.icon-instance8 {
 .icontab-box td {
     background-color: #141414;
     padding: 0 6px;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -1835,20 +1803,10 @@ span.icon-instance8 {
     display:-ms-flexbox;
     display:-webkit-flex;
     display:flex;
-    -webkit-flex-direction:row;
-    -ms-flex-direction:row;
     flex-direction:row;
-    -webkit-flex-wrap:wrap;
-    -ms-flex-wrap:wrap;
     flex-wrap:wrap;
-    -webkit-justify-content:flex-start;
-    -ms-flex-pack:start;
     justify-content:flex-start;
-    -webkit-align-content:flex-start;
-    -ms-flex-line-pack:start;
     align-content:flex-start;
-    -webkit-align-items:stretch;
-    -ms-flex-align:stretch;
     align-items:stretch;
 }
 
@@ -1993,30 +1951,6 @@ td.checked .listview-cb:hover {
     padding-right:10px !important;
 }
 
-.listview-sort-options .sortasc:after, .listview-sort-options .sortdesc:after {
-    display:inline-block;
-    font:normal normal normal 14px/1 FontAwesome;
-    font-size:inherit;
-    text-rendering:auto;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-}
-
-.listview-sort-options .sortasc:after, .listview-sort-options .sortdesc:after {
-    color:#9d9d9d;
-    margin-left:5px;
-}
-
-.listview-sort-options .sortasc:after {
-    content:"\f0d8";
-    position:relative;
-    top:-2px;
-}
-
-.listview-sort-options .sortdesc:after {
-    content:"\f0d7";
-}
-
 .icon-cell {
     padding:10px 0;
     position:relative;
@@ -2142,9 +2076,6 @@ td.checked .listview-cb:hover {
     white-space: nowrap;
     color: #FFD100;
     font-size: 12px;
-
-    -webkit-box-shadow: 1px 1px 5px black;
-    -moz-box-shadow: 1px 1px 5px black;
     box-shadow: 1px 1px 5px black;
 }
 
@@ -2331,9 +2262,6 @@ div.live-search-icon-quest-horde {
     font-size: 11px;
     margin: -4px 0 0 15px;
     white-space: nowrap;
-
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
 }
 
@@ -2419,9 +2347,6 @@ z-index: 100000002;
 .menu .menu-outer {
     float: left;
     border: 1px solid #181818;
-
-    -webkit-box-shadow: 1px 1px 5px black;
-    -moz-box-shadow: 1px 1px 5px black;
     box-shadow: 1px 1px 5px black;
 }
 
@@ -2778,9 +2703,6 @@ a.modelviewer-close {
     border: 1px solid #484848;
     height: 30px;
     overflow: hidden;
-
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
 }
 
@@ -2812,9 +2734,6 @@ a.modelviewer-close {
     padding-left: 3px;
     margin: 0;
     width: 250px;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -2853,9 +2772,6 @@ a.modelviewer-close {
     background-color: #242424;
     padding: 10px;
     min-height: 550px;
-
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
 }
 
@@ -2915,9 +2831,6 @@ td.screenshot-cell img {
     border: 2px solid #404040;
     background-color: #080808;
     margin-bottom: 3px;
-
-    -webkit-border-radius: 2px;
-    -moz-border-radius: 2px;
     border-radius: 2px;
 }
 
@@ -3363,8 +3276,6 @@ td.screenshot-cell:hover img {
     word-break: break-all;
     word-wrap: break-word;
     white-space:pre-wrap;
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -3399,9 +3310,6 @@ td.screenshot-cell:hover img {
     border: 1px solid #080808;
     border-collapse: separate;
     line-height: normal;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -3425,9 +3333,6 @@ td.screenshot-cell:hover img {
     padding: 8px;
     font-size: 11px;
     text-align: center;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -3718,9 +3623,6 @@ a.button-bigblue b {
     padding: 6px 10px;
     margin: 0 5px 10px 0;
     white-space: nowrap;
-
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
 }
 
@@ -3777,9 +3679,6 @@ a.button-bigblue b {
     margin: 0 0 10px 10px;
     background-color: #141414;
     border: 1px solid #404040;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
     padding-bottom: 12px;
 }
@@ -3941,9 +3840,6 @@ a.button-bigblue b {
     text-decoration: none !important;
     position: relative;
     margin: 2px 1px 4px 1px;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -3989,9 +3885,6 @@ a.progressbar:hover del {
     border-top: 1px solid #b82e21;
     border-bottom: 1px solid #9c2319;
     background-color: #861c10;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -3999,9 +3892,6 @@ a.progressbar:hover del {
     border-top: 1px solid #c9662b;
     border-bottom: 1px solid #b05421;
     background-color: #994515;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4009,9 +3899,6 @@ a.progressbar:hover del {
     border-top: 1px solid #d59b31;
     border-bottom: 1px solid #bf8626;
     background-color: #aa7419;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4019,9 +3906,6 @@ a.progressbar:hover del {
     border-top: 1px solid #d2b130;
     border-bottom: 1px solid #bb9b25;
     background-color: #a68818;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4029,9 +3913,6 @@ a.progressbar:hover del {
     border-top: 1px solid #a4a201;
     border-bottom: 1px solid #8d8b01;
     background-color: #777601;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4039,9 +3920,6 @@ a.progressbar:hover del {
     border-top: 1px solid #74a001;
     border-bottom: 1px solid #638701;
     background-color: #527001;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4049,9 +3927,6 @@ a.progressbar:hover del {
     border-top: 1px solid #30a601;
     border-bottom: 1px solid #288b01;
     background-color: #217201;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4059,9 +3934,6 @@ a.progressbar:hover del {
     border-top: 1px solid #0aa087;
     border-bottom: 1px solid #068870;
     background-color: #007564;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4069,9 +3941,6 @@ a.progressbar:hover del {
     border-top: 1px solid #2b98c9;
     border-bottom: 1px solid #2082af;
     background-color: #157099;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4079,9 +3948,6 @@ a.progressbar:hover del {
     border-top: 1px solid #7a7a7a;
     border-bottom: 1px solid #686868;
     background-color: #575757;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4089,9 +3955,6 @@ a.progressbar:hover del {
     border-top: 1px solid #3aca01;
     border-bottom: 1px solid #2b9401;
     background-color: #207001;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4099,9 +3962,6 @@ a.progressbar:hover del {
     border-top: 1px solid #e6e200;
     border-bottom: 1px solid #b1ae00;
     background-color: #939000;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -4109,9 +3969,6 @@ a.progressbar:hover del {
     border-top: 1px solid #e60f00;
     border-bottom: 1px solid #b10c00;
     background-color: #930900;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 

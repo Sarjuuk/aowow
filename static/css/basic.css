@@ -179,8 +179,6 @@ a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysoc
     font-size: 11px;
     text-align: center;
     padding: 6px 8px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
     border-radius: 3px;
     background: rgba(0, 0, 0, 0.8);
     text-align: left;
@@ -192,8 +190,6 @@ a span.moneyitem, a span.moneysocketmeta, a span.moneysocketred, a span.moneysoc
     z-index: 1000;
     cursor: pointer;
     border: 2px solid #666;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     padding: 15px;
     background:url(../images/ui/blk.png) repeat;

@@ -26,10 +26,6 @@ function tc_init() {
 
         tc_classIcons[classId] = icon;
 
-        if ($WH.Browser.ie6) {
-            link.onfocus = tb;
-        }
-
         link.onclick     = tc_classClick.bind(link, classId);
         link.onmouseover = tc_classOver.bind(link, classId);
         link.onmouseout  = $WH.Tooltip.hide;

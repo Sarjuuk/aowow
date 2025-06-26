@@ -47,10 +47,7 @@
 
 .profiler-home input[type="text"].oops {
     color: #ff0000;
-
-    -moz-box-shadow: 0 0 10px #ff0000;
-    -webkit-box-shadow: 0 0 10px #ff0000;
-    -o-box-shadow: 0 0 10px #ff0000;
+    box-shadow: 0 0 10px #ff0000;
 }
 
 .profiler-home input[type="radio"] {
@@ -65,10 +62,7 @@
     padding: 0 2px 2px 2px;
     position: absolute;
     font-size: 12px;
-
-    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-    -webkit-box-shadow: 0 1px 3px #111;
-    -o-box-shadow: 0 1px 3px #111;
+    box-shadow: 0 1px 3px #111;
 }
 
 .profiler-autocomplete span {
@@ -224,9 +218,6 @@ a.profiler-header-editlink {
     border: 1px solid #101010;
     background: url(../images/icons/ajax.gif) no-repeat 8px #141414;
     position: relative;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -326,25 +317,17 @@ a.profiler-header-editlink {
 .profiler-infobox-gear .progressbar {
     width: 20px;
     margin: 0 auto 1px;
-
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
     border-radius: 0;
 }
 
 .profiler-infobox-gear .progressbar div {
     height: 100%;
     border-top-width: 0;
-
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
     border-radius: 0;
 }
 
 .profiler-infobox-gear .progressbar-first,
 .profiler-infobox-gear .progressbar-first div {
-    -webkit-border-radius: 3px 3px 0 0;
-    -moz-border-radius: 3px 3px 0 0;
     border-radius: 3px 3px 0 0;
 }
 
@@ -355,8 +338,6 @@ a.profiler-header-editlink {
 
 .profiler-infobox-gear .progressbar-last,
 .profiler-infobox-gear .progressbar-last div {
-    -webkit-border-radius: 0 0 3px 3px;
-    -moz-border-radius: 0 0 3px 3px;
     border-radius: 0 0 3px 3px;
 }
 
@@ -409,9 +390,6 @@ a.profiler-header-editlink {
     height: 408px;
     position: relative;
     margin-bottom: 10px;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -474,9 +452,6 @@ a.profiler-header-editlink {
     background-color: #141414;
     border: 1px solid #101010;
     padding: 0 10px 10px 10px;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -538,9 +513,6 @@ a.profiler-header-editlink {
     border-top: 1px solid #3aca01;
     border-bottom: 1px solid #2b9401;
     background-color: #207001;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -548,9 +520,6 @@ a.profiler-header-editlink {
     border-top: 1px solid #3472bf;
     border-bottom: 1px solid #235a9d;
     background-color: #174a89;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -558,9 +527,6 @@ a.profiler-header-editlink {
     border-top: 1px solid #e60f00;
     border-bottom: 1px solid #b10c00;
     background-color: #930900;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -568,9 +534,6 @@ a.profiler-header-editlink {
     border-top: 1px solid #e6e200;
     border-bottom: 1px solid #b1ae00;
     background-color: #939000;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -578,9 +541,6 @@ a.profiler-header-editlink {
     border-top: 1px solid #30cfeb;
     border-bottom: 1px solid #30aac0;
     background-color: #3095a7;
-
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
 }
 
@@ -602,9 +562,6 @@ a.profiler-pets-button {
     border: 1px solid #202020;
     text-decoration: none;
     color: white;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -706,9 +663,6 @@ h2 .disclosure-on,h2 .disclosure-off {
     background-color: #141414;
     border: 1px solid #101010;
     margin-bottom: 10px;
-
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 

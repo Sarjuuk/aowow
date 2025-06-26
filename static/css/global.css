@@ -91,41 +91,29 @@
 
 .vote-column .upvote {
     margin-top: 10px !important;
-    filter:alpha(opacity=60);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
     opacity:.6;
 }
 
 .vote-column .upvote:hover {
-    filter:alpha(opacity=100);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
     opacity:1;
 }
 
 .vote-column .upvote[data-hasvoted=true] {
     background-position: 0 -16px;
-    filter:alpha(opacity=100);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
     opacity:1;
 }
 
 .vote-column .downvote {
     background-position: 0 -48px;
-    filter:alpha(opacity=60);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
     opacity:.6;
 }
 
 .vote-column .downvote:hover {
-    filter:alpha(opacity=100);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
     opacity:1;
 }
 
 .vote-column .downvote[data-hasvoted=true] {
     background-position: 0 -32px;
-    filter:alpha(opacity=100);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
     opacity:1;
 }
 
@@ -192,8 +180,6 @@
     background: #444;
     border: 1px solid #555;
     padding: 4px 8px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
     border-radius: 5px;
     text-transform: capitalize;
 }
@@ -426,13 +412,6 @@
 .stars b.half {background-position:0 -16px !important}
 .stars.rated b.half {background-position:0 -48px !important}
 
-.ie6 .stars {_margin-bottom:-2px;zoom:100%}
-.ie6 .stars * {zoom:100%}
-.ie7 .stars {_margin-bottom:-2px;zoom:100%}
-.ie7 .stars * {zoom:100%}
-.ie8 .stars {_margin-bottom:-2px;zoom:100%}
-.ie8 .stars * {zoom:100%}
-
 .guide-sticky {
     background: url(../images/icons/sticky.gif) left center no-repeat;
     padding-left: 21px;
@@ -512,67 +491,6 @@
     margin-left: 20px !important;
 }
 
-/*
-Note: For IE6, only include things that break/distort the site in a major way, as we're not supposed to support IE6 anymore.
-*/
-
-/*******/
-/* IE6 */
-/*******/
-
-html.ie6 .layout {
-    width: 1240px;
-}
-
-html.ie6 .toptabs dt {
-    width: 1px;
-}
-
-html.ie6 .menu .menu-outer,
-html.ie6 .home-featuredbox-links a {
-    background: url(../images/deprecated/pixel.gif) no-repeat;
-}
-
-html.ie6 .menu a {
-    position: relative;
-}
-
-
-
-/*******/
-/* IE7 */
-/*******/
-
-/* html.ie7 ... */
-
-
-
-/*******/
-/* IE8 */
-/*******/
-
-/* html.ie8 ... */
-
-
-
-/*************/
-/* IE6 + IE7 */
-/*************/
-
-/* html.ie67 ... */
-
-
-
-/*******************/
-/* IE6 + IE7 + IE8 */
-/*******************/
-
-/* html.ie678 ... */
-
-html.ie678 .line var {
-    margin-left: 0;
-}
-
 .line {
     position: absolute;
     display: block;
@@ -588,20 +506,12 @@ html.ie678 .line var {
     border: 1px solid #181818;
     border-left: none;
     border-right: none;
-    -o-transform-origin: 0 0;
-    -moz-transform-origin: 0 0;
-    -webkit-transform-origin: 0 0;
-    -o-box-shadow: 0px 0px 3px black;
-    /*-moz-box-shadow: 0px 0px 3px black;*/
-    -webkit-box-shadow: 0px 0px 3px black;
+    transform-origin: 0 0;
+    box-shadow: 0px 0px 3px black;
 }
 
 .line.flipped {
-    -o-transform: scaleY(-1);
-    -moz-transform: scaleY(-1);
-    -webkit-transform: scaleY(-1);
-    -ms-filter: "FlipV";
-    filter: FlipV;
+    transform: scaleY(-1);
 }
 
 .mapper .line   var { background: #C8B94C; }
@@ -615,8 +525,6 @@ html.ie678 .line var {
     z-index: 1000;
     cursor: pointer;
     border:2px solid #666;
-    -moz-border-radius:5px;
-    -webkit-border-radius:5px;
     border-radius:5px;
     padding:15px 15px 10px 15px;
     background:url(../images/ui/blk.png) repeat;

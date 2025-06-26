@@ -1026,7 +1026,7 @@ Summary.prototype = {
         if (this.autoSave) {
             this.saveComparison(0);
         }
-        else if (this.editable && !$WH.Browser.ie) {
+        else if (this.editable) {
             window.onbeforeunload = function(e) { return LANG.message_savebeforeexit };
         }
     },
@@ -2216,10 +2216,6 @@ Summary.prototype = {
             popups = [$WH.ge('su_weights')],
             links  = [$WH.ge('su_addscale')],
             popup  = null;
-
-        if ($WH.Browser.ie && e && !popupId && $WH.in_array(links, e._target) != -1) {
-            return;
-        }
 
         if (link) {
             link = $WH.ge(link);

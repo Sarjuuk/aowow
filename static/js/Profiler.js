@@ -893,12 +893,9 @@ function Profiler() {
             _divMessage.style.display = '';
             _divMessage.style.backgroundImage = 'none';
         }
-        // can't have javascript:; hrefs all over the place with an onbeforeunload on IE
-        if (!$WH.Browser.ie) {
-            window.onbeforeunload = (saved ? null : function (e) {
-                return LANG.message_savebeforeexit;
-            });
-        }
+        window.onbeforeunload = (saved ? null : function (e) {
+            return LANG.message_savebeforeexit;
+        });
     }
 
     function _updateDefaultIcon() {
@@ -4067,7 +4064,7 @@ function ProfilerInventory(_parent) {
         _gemColor,
 
         _mvInited,
-        _shiftClick = ($WH.Browser.opera),
+        _shiftClick = false,
         _cursorPos = { x: 0, y: 0 },
 
         _container,
@@ -5522,7 +5519,7 @@ function ProfilerInventory(_parent) {
         else {
             Icon.setTexture(icon, 1, g_items[itemId].icon.toLowerCase());
 
-            a.onclick     = ($WH.Browser.opera || $WH.OS.mac ? function (e) {
+            a.onclick     = ($WH.OS.mac ? function (e) {
                 e = $WH.$E(e);
                 if (e.shiftKey || e.ctrlKey) {
                     return false;
@@ -5994,7 +5991,7 @@ function ProfilerInventory(_parent) {
                         var a = Icon.getLink(d.childNodes[i]);
 
                         a.oncontextmenu = $WH.rf;
-                        a.onclick = ($WH.Browser.opera || $WH.OS.mac ? function (e) {
+                        a.onclick = ($WH.OS.mac ? function (e) {
                             e = $WH.$E(e);
                             if (e.shiftKey || e.ctrlKey) {
                                 return false;
@@ -6094,7 +6091,7 @@ function ProfilerInventory(_parent) {
                     buildData = _talents.getTalentBuilds();
 
                     a.oncontextmenu = $WH.rf;
-                    a.onclick = ($WH.Browser.opera || $WH.OS.mac ? function (e) {
+                    a.onclick = ($WH.OS.mac ? function (e) {
                         e = $WH.$E(e);
                         if (e.shiftKey || e.ctrlKey) {
                             return false ;
@@ -8584,7 +8581,7 @@ Listview.templates.inventory = {
                     a      = Icon.getLink(icon);
 
                 a.oncontextmenu = $WH.rf;
-                a.onclick = ($WH.Browser.opera || $WH.OS.mac ? function (e) {
+                a.onclick = ($WH.OS.mac ? function (e) {
                     e = $WH.$E(e);
                     if (e.shiftKey || e.ctrlKey) {
                         return false;
@@ -8608,7 +8605,7 @@ Listview.templates.inventory = {
 
                 a = $WH.ce('a');
                 a.oncontextmenu = $WH.rf;
-                a.onclick = ($WH.Browser.opera || $WH.OS.mac ? function(e) {
+                a.onclick = ($WH.OS.mac ? function(e) {
                     e = $WH.$E(e);
                     if (e.shiftKey || e.ctrlKey) {
                         return false;

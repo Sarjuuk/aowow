@@ -45,8 +45,6 @@
     outline:0;
     border:1px solid #adadad;
     background:white url(../images/ui/form/input-textbox-bg.gif) repeat-x;
-    -webkit-border-radius:3px;
-    -moz-border-radius:3px;
     border-radius:3px;
 }
 
@@ -96,8 +94,6 @@
     background-color:white!important;
     opacity:.075!important;
     filter:alpha(opacity=7.5)!important;
-    -webkit-border-radius:6px;
-    -moz-border-radius:6px;
     border-radius:6px;
 }
 

@@ -29,10 +29,6 @@ function pc_init() {
 
         pc_classIcons[classId] = icon;
 
-        if ($WH.Browser.ie6) {
-            link.onfocus = tb;
-        }
-
         link.onclick     = pc_classClick.bind(link, classId);
         link.onmouseover = pc_classOver.bind(link, classId);
         link.onmouseout  = $WH.Tooltip.hide;

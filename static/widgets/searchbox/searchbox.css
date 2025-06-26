@@ -51,8 +51,6 @@ form.search input {
     background:white url(../../images/ui/form/input-textbox-bg.gif) repeat-x;
     outline:0;
     height: 18px;
-    -webkit-border-radius:3px;
-    -moz-border-radius:3px;
     border-radius:3px;
 }
 
@@ -95,4 +93,3 @@ form.search a:hover {
     color:#F6E6B3;
     text-decoration:underline;
 }
-

@@ -17,20 +17,7 @@ $WH.$E = function (e) {
         e._button = e.which;
     }
     else {
-        e._button = e.button;
-        // IE8 doesnt have a button set, so add 1 to at least register as a left click
-        if ($WH.Browser.ie6789 && e._button) { // 5.0
-        // if ($WH.Browser.ie) { // 3.x
-            if (e._button & 4) {
-                e._button = 2; // Middle
-            }
-            else if (e._button & 2) {
-                e._button = 3; // Right
-            }
-        }
-        else {
-            e._button = e.button + 1;
-        }
+        e._button = e.button + 1;
     }
 
     e._target = e.target ? e.target : e.srcElement;
@@ -85,37 +72,8 @@ if (!String.prototype.removeAllWhitespace) {
     String.prototype.removeAllWhitespace = function () { return this.replace("/s+/g", ""); }
 }
 
+// aowow - note: will be WH.stringCompare in newer versions
 $WH.strcmp = function(a, b) {
-    if (a == b) {
-        return 0;
-    }
-
-    if (a == null) {
-        return -1;
-    }
-
-    if (b == null) {
-        return 1;
-    }
-
-    // Natural sorting for strings starting with a number
-    var
-        _a = parseFloat(a),
-        _b = parseFloat(b);
-    if (!isNaN(_a) && !isNaN(_b) && _a != _b) {
-        return _a < _b ? -1 : 1;
-    }
-
-    // String comparison done with a native JS function that supports accents and non-latin characters
-    if (typeof a == 'string' && typeof b == 'string') {
-        return a.localeCompare(b);
-    }
-
-    // Other
-    return a < b ? -1 : 1;
-}
-
-$WH.stringCompare = function (a, b) {
     if (a == b)
         return 0;
     if (a == null)
@@ -123,16 +81,20 @@ $WH.stringCompare = function (a, b) {
     if (b == null)
         return 1;
 
-    var fa = parseFloat(a);
-    var fb = parseFloat(b);
-    if (!isNaN(fa) && !isNaN(fb) && fa != fb)
-        return fa < fb ? -1 : 1;
+    // Natural sorting for strings starting with a number
+    var
+        _a = parseFloat(a),
+        _b = parseFloat(b);
+    if (!isNaN(_a) && !isNaN(_b) && _a != _b)
+        return _a < _b ? -1 : 1;
 
+    // String comparison done with a native JS function that supports accents and non-latin characters
     if (typeof a == 'string' && typeof b == 'string')
         return a.localeCompare(b);
 
+    // Other
     return a < b ? -1 : 1;
-};
+}
 
 $WH.trim = function(str) {
     return str.replace(/(^\s*|\s*$)/g, '');
@@ -505,12 +467,7 @@ $WH.sp = function(z) {
         z = event;
     }
 
-    if ($WH.Browser.ie6789) {
-        z.cancelBubble = true
-    }
-    else {
-        z.stopPropagation();
-    }
+    z.stopPropagation();
 }
 
 // Set cookie
@@ -579,10 +536,8 @@ $WH.gc = function(z) {
 
 // Prevent element from being selected/dragged (IE only)
 $WH.ns = function(a) {
-    if ($WH.Browser.ie6789) {
-        a.onfocus = $WH.tb;
-        a.onmousedown = a.onselectstart = a.ondragstart = $WH.rf;
-    }
+    // a.onfocus = $WH.tb;
+    // a.onmousedown = a.onselectstart = a.ondragstart = $WH.rf;
 }
 
 // Empty object
@@ -643,14 +598,6 @@ $WH.Browser = {
     firefox: navigator.userAgent.indexOf('Firefox') != -1,
     chrome:  navigator.userAgent.indexOf('Chrome') != -1
 };
-$WH.Browser.ie9   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 9.0') != -1;
-$WH.Browser.ie8   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 8.0') != -1 && !$WH.Browser.ie9;
-$WH.Browser.ie7   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 7.0') != -1 && !$WH.Browser.ie8;
-$WH.Browser.ie6   = $WH.Browser.ie && navigator.userAgent.indexOf('MSIE 6.0') != -1 && !$WH.Browser.ie7;
-
-$WH.Browser.ie67   = $WH.Browser.ie6   || $WH.Browser.ie7;
-$WH.Browser.ie678  = $WH.Browser.ie67  || $WH.Browser.ie8;
-$WH.Browser.ie6789 = $WH.Browser.ie678 || $WH.Browser.ie9;
 
 navigator.userAgent.match(/Gecko\/([0-9]+)/);
 $WH.Browser.geckoVersion = parseInt(RegExp.$1) | 0;
