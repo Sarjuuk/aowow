@@ -466,6 +466,7 @@ abstract class Util
         }
 
         return strtr($data, array(
+            '/'  => '\/',
             '\\' => '\\\\',
             "'"  => "\\'",
             '"'  => '\\"',
