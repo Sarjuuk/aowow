@@ -636,7 +636,12 @@ class NpcPage extends GenericPage
         }
 
         // tab: sells
-        if ($sells = DB::World()->selectCol('SELECT item FROM npc_vendor nv WHERE entry = ?d UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id = ?d', $this->typeId, $this->typeId))
+        if ($sells = DB::World()->selectCol(
+           'SELECT   nv.`item` FROM npc_vendor nv                                                               WHERE   nv.`entry` = ?d UNION
+            SELECT  nv1.`item` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE  nv2.`entry` = ?d UNION
+            SELECT genv.`item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE    c.`id`    = ?d',
+            $this->typeId, $this->typeId, $this->typeId)
+        )
         {
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)

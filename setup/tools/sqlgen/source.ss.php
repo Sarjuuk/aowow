@@ -236,7 +236,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             array_merge(SKILLS_TRADE_PRIMARY, [SKILL_FIRST_AID, SKILL_COOKING, SKILL_FISHING])
         );
         // assume unique craft spells per item
-        $perfectItems = DB::World()->selectCol('SELECT `perfectItemType` AS ARRAY_KEY, `spellId` AS `spell` FROM skill_perfect_item_template');
+        $perfectItems = DB::World()->selectCol('SELECT `perfectItemType` AS ARRAY_KEY, `spellId` AS "spell" FROM skill_perfect_item_template');
         foreach ($perfectItems AS $item => $spell)
             $itemSpells[$item] = $spell;
 
@@ -258,7 +258,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #2  Drop [NPC]', CLI::LOG_BLANK, true, true);
 
         $creatureLoot = DB::World()->select(
-           'SELECT    IF(clt.`Reference` > 0, -clt.`Reference`, clt.`Item`) AS `refOrItem`, ct.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(clt.`Reference` > 0, -clt.`Reference`, clt.`Item`) AS "refOrItem", ct.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      creature_loot_template clt
             JOIN      creature_template ct ON clt.`entry` = ct.`lootid`
             LEFT JOIN item_template it ON it.`entry` = clt.`Item` AND clt.`Reference` <= 0
@@ -266,7 +266,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             GROUP BY  `refOrItem`, ct.`entry`'
         );
 
-        $spawns = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS `areaId`, z.`type` FROM ?_spawns s JOIN ?_zones z ON z.`id` = s.`areaId` WHERE s.`type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC, array_filter(array_column($creatureLoot, 'entry')));
+        $spawns = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ?_spawns s JOIN ?_zones z ON z.`id` = s.`areaId` WHERE s.`type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC, array_filter(array_column($creatureLoot, 'entry')));
         $bosses = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, IF(`cuFlags` & ?d, 1, IF(`typeFlags` & 0x4 AND `rank` > 0, 1, 0)) FROM ?_creature WHERE `id` IN (?a)', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
 
         foreach ($creatureLoot as $l)
@@ -323,7 +323,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #2  Drop [Object]', CLI::LOG_BLANK, true, true);
 
         $objectLoot = DB::World()->select(
-           'SELECT    IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS `refOrItem`, gt.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS "refOrItem", gt.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      gameobject_loot_template glt
             JOIN      gameobject_template gt ON glt.`entry` = gt.`data1`
             LEFT JOIN item_template it ON it.`entry` = glt.`Item` AND glt.`Reference` <= 0
@@ -366,7 +366,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #2  Drop [Item]', CLI::LOG_BLANK, true, true);
 
         $itemLoot = DB::World()->select(
-           'SELECT    IF(ilt.`Reference` > 0, -ilt.`Reference`, ilt.`Item`) AS ARRAY_KEY, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(ilt.`Reference` > 0, -ilt.`Reference`, ilt.`Item`) AS ARRAY_KEY, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      item_loot_template ilt
             JOIN      item_template itA ON ilt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = ilt.`Item` AND ilt.`Reference` <= 0
@@ -412,15 +412,16 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             SRC_SUB_PVP_WORLD => DB::Aowow()->selectCol('SELECT `id` FROM dbc_itemextendedcost WHERE `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)', self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY)
         );
         $vendorQuery =
-           'SELECT   n.`item`, SUM(n.`qty`) AS `qty`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
-            FROM     (SELECT `item`, COUNT(1) AS `qty` FROM npc_vendor                                                           WHERE `ExtendedCost` IN (?a) GROUP BY `item` UNION
-                      SELECT `item`, COUNT(1) AS `qty` FROM game_event_npc_vendor genv JOIN creature c ON c.`guid` = genv.`guid` WHERE `ExtendedCost` IN (?a) GROUP BY `item`) n
+           'SELECT   n.`item`, SUM(n.`qty`) AS "qty", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
+            FROM     (SELECT     `item`, COUNT(1) AS "qty" FROM npc_vendor                                                                                     WHERE     `ExtendedCost` NOT IN (?a) AND       `item` > 0 GROUP BY `item` UNION
+                      SELECT nv2.`item`, COUNT(1) AS "qty" FROM npc_vendor nv1             JOIN npc_vendor nv2 ON nv2.`entry` = -nv1.`item` AND nv1.`item` < 0 WHERE nv1.`ExtendedCost` NOT IN (?a) AND `nv1`.`item` < 0 GROUP BY `item` UNION
+                      SELECT     `item`, COUNT(1) AS "qty" FROM game_event_npc_vendor genv JOIN creature c     ON   c.`guid`  = genv.`guid`                    WHERE     `ExtendedCost` NOT IN (?a)                      GROUP BY `item`) n
             JOIN     item_template it ON it.`entry` = n.`item`
             GROUP BY `item`';
 
         foreach ($subSrcByXCost as $subSrc => $xCost)
         {
-            foreach (DB::World()->select($vendorQuery, $xCost, $xCost) as $v)
+            foreach (DB::World()->select($vendorQuery, $xCost, $xCost, $xCost) as $v)
             {
                 if ($_ = $this->taughtSpell($v))
                     $this->pushBuffer(Type::SPELL, $_, SRC_PVP, $subSrc);
@@ -435,18 +436,18 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #4  Quest', CLI::LOG_BLANK, true, true);
 
         $quests = DB::World()->select(
-           'SELECT   n.`item` AS ARRAY_KEY, n.`Id` AS `quest`, SUM(n.`qty`) AS `qty`, BIT_OR(n.`side`) AS `side`, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS `zone`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
-            FROM    (SELECT `RewardChoiceItemID1` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID1` > 0 GROUP BY `item` UNION
-                     SELECT `RewardChoiceItemID2` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID2` > 0 GROUP BY `item` UNION
-                     SELECT `RewardChoiceItemID3` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID3` > 0 GROUP BY `item` UNION
-                     SELECT `RewardChoiceItemID4` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID4` > 0 GROUP BY `item` UNION
-                     SELECT `RewardChoiceItemID5` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID5` > 0 GROUP BY `item` UNION
-                     SELECT `RewardChoiceItemID6` AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardChoiceItemID6` > 0 GROUP BY `item` UNION
-                     SELECT `RewardItem1`         AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardItem1`         > 0 GROUP BY `item` UNION
-                     SELECT `RewardItem2`         AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardItem2`         > 0 GROUP BY `item` UNION
-                     SELECT `RewardItem3`         AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardItem3`         > 0 GROUP BY `item` UNION
-                     SELECT `RewardItem4`         AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `RewardItem4`         > 0 GROUP BY `item` UNION
-                     SELECT `StartItem`           AS `item`, `ID`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone` FROM quest_template WHERE `StartItem`           > 0 GROUP BY `item`) n
+           'SELECT   n.`item` AS ARRAY_KEY, n.`Id` AS "quest", SUM(n.`qty`) AS "qty", BIT_OR(n.`side`) AS "side", IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS "zone", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
+            FROM    (SELECT `RewardChoiceItemID1` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID1` > 0 GROUP BY `item` UNION
+                     SELECT `RewardChoiceItemID2` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID2` > 0 GROUP BY `item` UNION
+                     SELECT `RewardChoiceItemID3` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID3` > 0 GROUP BY `item` UNION
+                     SELECT `RewardChoiceItemID4` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID4` > 0 GROUP BY `item` UNION
+                     SELECT `RewardChoiceItemID5` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID5` > 0 GROUP BY `item` UNION
+                     SELECT `RewardChoiceItemID6` AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardChoiceItemID6` > 0 GROUP BY `item` UNION
+                     SELECT `RewardItem1`         AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardItem1`         > 0 GROUP BY `item` UNION
+                     SELECT `RewardItem2`         AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardItem2`         > 0 GROUP BY `item` UNION
+                     SELECT `RewardItem3`         AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardItem3`         > 0 GROUP BY `item` UNION
+                     SELECT `RewardItem4`         AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `RewardItem4`         > 0 GROUP BY `item` UNION
+                     SELECT `StartItem`           AS "item", `ID`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone" FROM quest_template WHERE `StartItem`           > 0 GROUP BY `item`) n
             JOIN     item_template it ON it.`entry` = n.`item`
             GROUP BY `item`',
             ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
@@ -475,7 +476,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         }
 
         $mailLoot = DB::World()->select(
-           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS ARRAY_KEY, qt.`Id` AS `entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`, IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS `zone`, BIT_OR(IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, ?d))) AS `side`
+           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS ARRAY_KEY, qt.`Id` AS "entry", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone", BIT_OR(IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, ?d))) AS "side"
             FROM      mail_loot_template mlt
             JOIN      quest_template_addon qta ON qta.`RewardMailTemplateId` = mlt.`entry`
             JOIN      quest_template qt ON qt.`ID` = qta.`ID`
@@ -520,12 +521,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $xCostIds = DB::Aowow()->selectCol('SELECT `id` FROM dbc_itemextendedcost WHERE `reqHonorPoints` <> 0 OR `reqArenaPoints` <> 0 OR `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)', self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY, self::PVP_MONEY);
         $vendors  = DB::World()->select(
-           'SELECT   n.`item`, n.`npc`, SUM(n.`qty`) AS `qty`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
-            FROM     (SELECT `item`, `entry` AS `npc`, COUNT(1) AS `qty` FROM npc_vendor                                                           WHERE `ExtendedCost` NOT IN (?a) GROUP BY `item`, `npc` UNION
-                      SELECT `item`,  c.`id` AS `npc`, COUNT(1) AS `qty` FROM game_event_npc_vendor genv JOIN creature c ON c.`guid` = genv.`guid` WHERE `ExtendedCost` NOT IN (?a) GROUP BY `item`, `npc`) n
+           'SELECT   n.`item`, n.`npc`, SUM(n.`qty`) AS "qty", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
+            FROM     (SELECT     `item`,     `entry` AS "npc", COUNT(1) AS "qty" FROM npc_vendor                                                                                      WHERE     `ExtendedCost` NOT IN (?a) AND       `item` > 0 GROUP BY `item`, `npc` UNION
+                      SELECT nv2.`item`, nv1.`entry` AS "npc", COUNT(1) AS "qty" FROM npc_vendor nv1              JOIN npc_vendor nv2 ON nv2.`entry` = -nv1.`item` AND nv1.`item` < 0 WHERE nv1.`ExtendedCost` NOT IN (?a) AND `nv1`.`item` < 0 GROUP BY `item`, `npc` UNION
+                      SELECT     `item`,   c.`id`    AS "npc", COUNT(1) AS "qty" FROM game_event_npc_vendor genv  JOIN creature c     ON c.`guid` = genv.`guid`                       WHERE     `ExtendedCost` NOT IN (?a)                      GROUP BY `item`, `npc`) n
             JOIN     item_template it ON it.`entry` = n.`item`
             GROUP BY `item`, `npc`',
-            $xCostIds, $xCostIds
+            $xCostIds, $xCostIds, $xCostIds
         );
 
         $spawns = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC, array_column($vendors, 'npc'));
@@ -557,10 +559,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     {
         CLI::write('[source] * #12 Achievement', CLI::LOG_BLANK, true, true);
 
-        $xItems   = DB::Aowow()->select('SELECT `id` AS `entry`, `itemExtra` AS ARRAY_KEY, COUNT(1) AS `qty` FROM ?_achievement WHERE `itemExtra` > 0 GROUP BY `itemExtra`');
+        $xItems   = DB::Aowow()->select('SELECT `id` AS "entry", `itemExtra` AS ARRAY_KEY, COUNT(1) AS "qty" FROM ?_achievement WHERE `itemExtra` > 0 GROUP BY `itemExtra`');
         $rewItems = DB::World()->select(
-           'SELECT    src.`item` AS ARRAY_KEY, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
-            FROM      (SELECT    IFNULL(IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`), ar.`ItemID`) AS `item`, ar.`ID` AS `entry`
+           'SELECT    src.`item` AS ARRAY_KEY, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+            FROM      (SELECT    IFNULL(IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`), ar.`ItemID`) AS "item", ar.`ID` AS "entry"
                        FROM      achievement_reward ar
                        LEFT JOIN mail_loot_template mlt ON mlt.`entry` = ar.`MailTemplateID`
                        WHERE     ar.`MailTemplateID` > 0 OR ar.`ItemID` > 0) src
@@ -596,7 +598,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #15 Disenchanted', CLI::LOG_BLANK, true, true);
 
         $deLoot = DB::World()->select(
-           'SELECT    IF(dlt.`Reference` > 0, -dlt.`Reference`, dlt.`Item`) AS `refOrItem`, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(dlt.`Reference` > 0, -dlt.`Reference`, dlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      disenchant_loot_template dlt
             JOIN      item_template itA ON dlt.`entry` = itA.`DisenchantId`
             LEFT JOIN item_template itB ON itB.`entry` = dlt.`Item` AND dlt.`Reference` <= 0
@@ -633,9 +635,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #16 Fished', CLI::LOG_BLANK, true, true);
 
         $fishLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`, IF(COUNT(DISTINCT `zone`) > 2, 0, MAX(`zone`)) AS `zone`
-            FROM      (SELECT 0 AS `entry`, IF(flt.`Reference` > 0, -flt.`Reference`, flt.`Item`) AS `itemOrRef`, `entry` AS `zone` FROM fishing_loot_template flt UNION
-                       SELECT   gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS `itemOrRef`,       0 AS `zone` FROM gameobject_template   gt  JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1` WHERE `type` = ?d AND gt.`data1` > 0) src
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", IF(COUNT(DISTINCT `zone`) > 2, 0, MAX(`zone`)) AS "zone"
+            FROM      (SELECT 0 AS "entry", IF(flt.`Reference` > 0, -flt.`Reference`, flt.`Item`) AS "itemOrRef", `entry` AS "zone" FROM fishing_loot_template flt UNION
+                       SELECT   gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS "itemOrRef",       0 AS "zone" FROM gameobject_template   gt  JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1` WHERE `type` = ?d AND gt.`data1` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
             OBJECT_FISHINGHOLE
@@ -683,9 +685,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #17 Gathered', CLI::LOG_BLANK, true, true);
 
         $herbLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`, src.`srcType`
-            FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS `srcType` FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
-                       SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS `srcType` FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", src.`srcType`
+            FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS "srcType" FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
+                       SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
             Type::NPC, NPC_TYPEFLAG_HERBLOOT,
@@ -736,7 +738,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #18 Milled', CLI::LOG_BLANK, true, true);
 
         $millLoot  = DB::World()->select(
-           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS `refOrItem`, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      milling_loot_template mlt
             JOIN      item_template itA ON mlt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = mlt.`Item` AND mlt.`Reference` <= 0
@@ -772,9 +774,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #19 Mined', CLI::LOG_BLANK, true, true);
 
         $mineLoot = DB::World()->select(
-           'SELECT      src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`, src.`srcType`
-            FROM        (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS `srcType` FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
-                         SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS `srcType` FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
+           'SELECT      src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", src.`srcType`
+            FROM        (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS "srcType" FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
+                         SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN   item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY    `refOrItem`, src.`entry`',
             Type::NPC, NPC_TYPEFLAG_MININGLOOT,
@@ -825,7 +827,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #20 Prospected', CLI::LOG_BLANK, true, true);
 
         $prospectLoot = DB::World()->select(
-           'SELECT    IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) AS `refOrItem`, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      prospecting_loot_template plt
             JOIN      item_template itA ON plt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = plt.`Item` AND plt.`Reference` <= 0
@@ -861,7 +863,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #21 Pickpocket', CLI::LOG_BLANK, true, true);
 
         $theftLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      (SELECT ct.`entry`, IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) `itemOrRef` FROM creature_template ct JOIN pickpocketing_loot_template plt ON plt.`entry` = ct.`pickpocketloot` WHERE ct.`pickpocketloot` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`'
@@ -910,7 +912,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #22 Salvaged', CLI::LOG_BLANK, true, true);
 
         $salvageLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef` FROM creature_template ct JOIN skinning_loot_template slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
@@ -960,7 +962,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #23 Skinned', CLI::LOG_BLANK, true, true);
 
         $skinLoot  = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS `refOrItem`, src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS `qty`
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef` FROM creature_template ct JOIN skinning_loot_template slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) = 0 AND ct.`skinloot` > 0 AND ct.`type` <> 13) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
@@ -1010,9 +1012,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #4  Quest', CLI::LOG_BLANK, true, true);
 
         $quests = DB::World()->select(
-           'SELECT   `spell` AS ARRAY_KEY, `id`, SUM(`qty`) AS `qty`, BIT_OR(`side`) AS `side`, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS `zone`
-            FROM     (SELECT IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) AS `spell`,    `Id`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template                                                    WHERE IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) > 0 GROUP BY `spell` UNION
-                      SELECT                                        qta.`SourceSpellId` AS `spell`, qt.`Id`, COUNT(1) AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template qt JOIN quest_template_addon qta ON qta.ID = qt.ID WHERE qta.`SourceSpellId` > 0                                        GROUP BY `spell`) t
+           'SELECT   `spell` AS ARRAY_KEY, `id`, SUM(`qty`) AS "qty", BIT_OR(`side`) AS "side", IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS "zone"
+            FROM     (SELECT IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) AS "spell",    `Id`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", GREATEST(`QuestSortID`, 0) AS "zone" FROM quest_template                                                    WHERE IF(`RewardSpell` = 0, `RewardDisplaySpell`, `RewardSpell`) > 0 GROUP BY `spell` UNION
+                      SELECT                                        qta.`SourceSpellId` AS "spell", qt.`Id`, COUNT(1) AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", GREATEST(`QuestSortID`, 0) AS "zone" FROM quest_template qt JOIN quest_template_addon qta ON qta.ID = qt.ID WHERE qta.`SourceSpellId` > 0                                        GROUP BY `spell`) t
             GROUP BY `spell`',
             ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH,
             ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
@@ -1039,7 +1041,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     {
         CLI::write('[source] * #6  Trainer', CLI::LOG_BLANK, true, true);
 
-        $tNpcs = DB::World()->select('SELECT `SpellID` AS ARRAY_KEY, cdt.`CreatureId` AS `entry`, COUNT(1) AS `qty` FROM trainer_spell ts JOIN creature_default_trainer cdt ON cdt.`TrainerId` = ts.`TrainerId` GROUP BY ARRAY_KEY');
+        $tNpcs = DB::World()->select('SELECT `SpellID` AS ARRAY_KEY, cdt.`CreatureId` AS "entry", COUNT(1) AS "qty" FROM trainer_spell ts JOIN creature_default_trainer cdt ON cdt.`TrainerId` = ts.`TrainerId` GROUP BY ARRAY_KEY');
         if (!$tNpcs)
         {
             CLI::write('[source] spelltrainer() - trainer_spell contained no spell or creature_default_trainer no trainer.', CLI::LOG_WARN);
@@ -1141,8 +1143,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #4  Quest', CLI::LOG_BLANK, true, true);
 
         $quests = DB::World()->select(
-           'SELECT   `RewardTitle` AS ARRAY_KEY, `ID` AS `id`, SUM(`qty`) AS `qty`, BIT_OR(`side`) AS `side`, IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS `zone`
-            FROM     (SELECT `RewardTitle`, `ID`, 1 AS `qty`, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS `side`, GREATEST(`QuestSortID`, 0) AS `zone` FROM quest_template WHERE `RewardTitle` > 0) q
+           'SELECT   `RewardTitle` AS ARRAY_KEY, `ID` AS "id", SUM(`qty`) AS "qty", BIT_OR(`side`) AS "side", IF(COUNT(DISTINCT `zone`) > 1, 0, `zone`) AS "zone"
+            FROM     (SELECT `RewardTitle`, `ID`, 1 AS "qty", IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, IF(`AllowableRaces` & ?d AND NOT (`AllowableRaces` & ?d), ?d, ?d)) AS "side", GREATEST(`QuestSortID`, 0) AS "zone" FROM quest_template WHERE `RewardTitle` > 0) q
             GROUP BY `RewardTitle`',
             ChrRace::MASK_HORDE, ChrRace::MASK_ALLIANCE, SIDE_HORDE, ChrRace::MASK_ALLIANCE, ChrRace::MASK_HORDE, SIDE_ALLIANCE, SIDE_BOTH
         );
@@ -1164,9 +1166,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #12 Achievement', CLI::LOG_BLANK, true, true);
 
         $sets = DB::World()->select(
-           'SELECT   `titleId` AS ARRAY_KEY, MIN(`ID`) AS `srcId`, NULLIF(MAX(`ID`), MIN(`ID`)) AS `altSrcId`
-            FROM     (SELECT `TitleA` AS `titleId`, `ID` FROM achievement_reward WHERE `TitleA` <> 0 UNION
-                      SELECT `TitleH` AS `titleId`, `ID` FROM achievement_reward WHERE `TitleH` <> 0) AS x
+           'SELECT   `titleId` AS ARRAY_KEY, MIN(`ID`) AS "srcId", NULLIF(MAX(`ID`), MIN(`ID`)) AS "altSrcId"
+            FROM     (SELECT `TitleA` AS "titleId", `ID` FROM achievement_reward WHERE `TitleA` <> 0 UNION
+                      SELECT `TitleH` AS "titleId", `ID` FROM achievement_reward WHERE `TitleH` <> 0) AS x
             GROUP BY `titleId`'
         );
 

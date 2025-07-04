@@ -210,7 +210,12 @@ class EventPage extends GenericPage
         {
             // vendor
             $cIds = $creatures->getFoundIDs();
-            if ($sells = DB::World()->selectCol('SELECT item FROM npc_vendor nv WHERE entry IN (?a) UNION SELECT item FROM game_event_npc_vendor genv JOIN creature c ON genv.guid = c.guid WHERE c.id IN (?a)', $cIds, $cIds))
+            if ($sells = DB::World()->selectCol(
+               'SELECT     `item` FROM npc_vendor nv                                                               WHERE     `entry` IN (?a) UNION
+                SELECT nv1.`item` FROM npc_vendor nv1             JOIN npc_Vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE nv2.`entry` IN (?a) UNION
+                SELECT     `item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE   c.`id`    IN (?a)',
+                $cIds, $cIds, $cIds
+            ))
                 $itemCnd[] = ['id', $sells];
         }
 

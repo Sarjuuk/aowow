@@ -109,10 +109,23 @@ class ItemList extends BaseType
         {
             $itemz      = [];
             $xCostData  = [];
-            $rawEntries = DB::World()->select('
-                SELECT   nv.item,       nv.entry,             0  AS eventId,   nv.maxcount,   nv.extendedCost,   nv.incrtime FROM            npc_vendor   nv                                                                                                  WHERE {nv.entry IN (?a) AND} nv.item IN (?a)
-                UNION
-                SELECT genv.item, c.id AS `entry`, ge.eventEntry AS eventId, genv.maxcount, genv.extendedCost, genv.incrtime FROM game_event_npc_vendor genv LEFT JOIN game_event ge ON genv.eventEntry = ge.eventEntry JOIN creature c ON c.guid = genv.guid WHERE {c.id IN (?a) AND}   genv.item IN (?a)',
+            $rawEntries = DB::World()->select(
+               'SELECT   nv.`item`,        nv.`entry`,              0  AS "eventId",    nv.`maxcount`,   nv.`extendedCost`,   nv.`incrtime`
+                FROM    npc_vendor nv
+                WHERE { nv.`entry` IN (?a) AND } nv.`item` IN (?a)
+                  UNION
+                SELECT   nv2.`item`,      nv1.`entry`,              0  AS "eventId",   nv2.`maxcount`,  nv2.`extendedCost`,  nv2.`incrtime`
+                FROM    npc_vendor   nv1
+                JOIN    npc_vendor   nv2 ON -nv1.`item` = nv2.`entry` { AND nv1.`entry` IN (?a) }
+                WHERE   nv2.`item` IN (?a)
+                  UNION
+                SELECT genv.`item`, c.`id` AS "entry", ge.`eventEntry` AS "eventId",  genv.`maxcount`, genv.`extendedCost`, genv.`incrtime`
+                FROM      game_event_npc_vendor genv
+                LEFT JOIN game_event ge ON genv.`eventEntry` = ge.`eventEntry`
+                JOIN      creature c ON c.`guid` = genv.`guid`
+                WHERE   { c.`id` IN (?a) AND } genv.`item` IN (?a)',
+                empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
+                array_keys($this->templates),
                 empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
                 array_keys($this->templates),
                 empty($filter[Type::NPC]) || !is_array($filter[Type::NPC]) ? DBSIMPLE_SKIP : $filter[Type::NPC],
@@ -1765,8 +1778,8 @@ class ItemList extends BaseType
 class ItemListFilter extends Filter
 {
     private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private   $extCostQuery  = 'SELECT item FROM npc_vendor            WHERE extendedCost IN (?a) UNION
-                                SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)';
+    private   $extCostQuery  = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN (?a) UNION
+                                SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)';
 
     public    $extraOpts     = [];                          // score for statWeights
     public    $wtCnd         = [];

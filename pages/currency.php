@@ -191,21 +191,21 @@ class CurrencyPage extends GenericPage
         if ($this->typeId == 103)
         {
             $n = '?items&filter=cr=145;crs=1;crv=0';
-            $w = 'reqArenaPoints > 0';
+            $w = '`reqArenaPoints` > 0';
         }
         else if ($this->typeId == 104)
         {
             $n = '?items&filter=cr=144;crs=1;crv=0';
-            $w = 'reqHonorPoints > 0';
+            $w = '`reqHonorPoints` > 0';
         }
         else
-            $w = 'reqItemId1 = '.$_itemId.' OR reqItemId2 = '.$_itemId.' OR reqItemId3 = '.$_itemId.' OR reqItemId4 = '.$_itemId.' OR reqItemId5 = '.$_itemId;
+            $w = '`reqItemId1` = '.$_itemId.' OR `reqItemId2` = '.$_itemId.' OR `reqItemId3` = '.$_itemId.' OR `reqItemId4` = '.$_itemId.' OR `reqItemId5` = '.$_itemId;
 
         if (!$n && (new ItemListFilter())->isCurrencyFor($_itemId))
             $n = '?items&filter=cr=158;crs='.$_itemId.';crv=0';
 
-        $xCosts   = DB::Aowow()->selectCol('SELECT id FROM ?_itemextendedcost WHERE '.$w);
-        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT item FROM npc_vendor WHERE extendedCost IN (?a) UNION SELECT item FROM game_event_npc_vendor WHERE extendedCost IN (?a)', $xCosts, $xCosts) : [];
+        $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE '.$w);
+        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN (?a) UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)', $xCosts, $xCosts) : [];
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));
