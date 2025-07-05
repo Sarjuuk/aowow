@@ -13,7 +13,7 @@ While the first releases can be found as early as 2008, today it is impossible t
 This is a complete rewrite of the serverside php code and update to the clientside javascripts from 2008 to something 2013ish.
 
 I myself take no credit for the clientside scripting, design and layout that these php-scripts cater to.
-Also, this project is not meant to be used for commercial puposes of any kind!
+Also, this project is not meant to be used for commercial purposes of any kind!
 
 
 ## Requirements
@@ -39,7 +39,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 #### Highly Recommended
 + setting the following configuration values on your TrinityCore server will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
-  > Calculate.Gameoject.Zone.Area.Data = 1
+  > Calculate.Gameobject.Zone.Area.Data = 1
 
 
 ## Install
@@ -82,7 +82,7 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/Calendar/Holidays/  
    > \<localeCode>/Sound/  
    
-   .. optionaly (not used in AoWoW):
+   .. optionally (not used in AoWoW):
    > \<localeCode>/Interface/Glues/Loadingscreens/  
    > \<localeCode>/Interface/Glues/Credits/  
 
@@ -100,24 +100,24 @@ When you've created your admin account you are done.
 ## Troubleshooting
 
 Q: The Page appears white, without any styles.  
-A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined poperly. Either way this can be fixed via config `php aowow --siteconfig`
+A: The static content is not being displayed. You are either using SSL and AoWoW is unable to detect it or STATIC_HOST is not defined properly. Either way this can be fixed via config `php aowow --siteconfig`
 
 Q: Fatal error: Can't inherit abstract function \<functionName> (previously declared abstract in \<className>) in \<path>  
-A: You are using cache optimization modules for php, that are in confict with each other. (Zend OPcache, XCache, ..) Disable all but one.
+A: You are using cache optimization modules for php, that are in conflict with each other. (Zend OPcache, XCache, ..) Disable all but one.
 
 Q: Some generated images appear distorted or have alpha-channel issues.  
 A: Image compression is beyond my understanding, so i am unable to fix these issues within the blpReader.
  BUT you can convert the affected blp file into a png file in the same directory, using the provided BLPConverter.
- AoWoW will priorize png files over blp files.
+ AoWoW will prioritize png files over blp files.
 
 Q: How can i get the modelviewer to work?  
 A: You can't anymore. Wowhead switched from Flash to WebGL (as they should) and moved or deleted the old files in the process.
 
 Q: I'm getting random javascript errors!  
-A: Some server configurations or external services (like Cloudflare) come with modules, that automaticly minify js and css files. Sometimes they break in the process. Disable the module in this case.
+A: Some server configurations or external services (like Cloudflare) come with modules, that automatically minify js and css files. Sometimes they break in the process. Disable the module in this case.
 
 Q: Some search results within the profiler act rather strange. How does it work?  
-A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run agains the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
+A: Whenever you try to view a new character, AoWoW needs to fetch it first. Since the data is structured for the needs of TrinityCore and not for easy viewing, AoWoW needs to save and restructure it locally. To this end, every char request is placed in a queue. While the queue is not empty, a single instance of `prQueue` is run in the background as not to overwhelm the characters database with requests. This also means, some more exotic search queries can't be run against the characters database and have to use the incomplete/outdated cached profiles of AoWoW.
 
 Q: Screenshot upload fails, because the file size is too large and/or the subdirectories are visible from the web!  
 A: That's a web server configuration issue. If you are using Apache you may need to [enable the use of .htaccess](http://httpd.apache.org/docs/2.4/de/mod/core.html#allowoverride). Other servers require individual configuration.  
@@ -134,7 +134,7 @@ A: A search is only conducted against the currently used locale. You may have on
 
 
 ## Special Thanks
-Said website with the red smiling rocket, for providing this beautifull website!
+Said website with the red smiling rocket, for providing this beautiful website!
 Please do not regard this project as blatant rip-off, rather as "We do really liked your presentation, but since time and content progresses, you are sadly no longer supplying the data we need".
 
 ![uses badges](http://forthebadge.com/images/badges/uses-badges.svg)
