@@ -4923,6 +4923,12 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // click to copy fn
+    copied:            '已复制',
+    clickToCopy:       '点击复制',
+    nothingToCopy_tip: '[Nothing to copy!]',
+
+    // TC conditions display
     tab_conditions:    '[Conditions]',
     tab_condition_for: '[Condition for]',
     cnd_either:        '[Either]',

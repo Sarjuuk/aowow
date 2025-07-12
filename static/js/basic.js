@@ -2077,6 +2077,12 @@ $WH.Tooltip = {
         $WH.Tooltip.move(x, y, 0, 0, paddX, paddY);
     },
 
+    showFadingTooltipAtCursor: function (text, ev, className, noWrap, maxWidth) {
+        text = $WH.Tooltip.prepareTooltipHtml(text, noWrap, maxWidth, ev);
+        $WH.Tooltip.showAtCursor(ev, text, undefined, undefined, className);
+        requestAnimationFrame(function () { $WH.Tooltip.tooltip.classList.add('fade-out'); });
+    },
+
     cursorUpdate: function(e, x, y) { // Used along with showAtCursor
         if ($WH.Tooltip.disabled || !$WH.Tooltip.tooltip) {
             return;
@@ -2126,12 +2132,42 @@ $WH.Tooltip = {
         $WH.Tooltip.iconVisible = icon ? 1 : 0;
     },
 
-    simple: function(element, text, className, fixed) {
+    prepareTooltipHtml: function (textOrFn, noWrap, maxWidth, ev) {
+        textOrFn = typeof textOrFn === "function" ? textOrFn.call(ev.target, ev) : textOrFn;
+        if (typeof textOrFn === "string") {
+            if (noWrap === undefined && textOrFn.length < 30)
+                noWrap = true;
+
+            let attr = [];
+            if (noWrap)
+                attr.push(' class="no-wrap"');
+
+            if (maxWidth && !isNaN(maxWidth))
+                attr.push(' style="max-width:' + maxWidth + 'px"');
+
+            if (attr.length)
+                textOrFn = "<div" + attr.join("") + ">" + textOrFn + "</div>";
+        }
+
+        return textOrFn;
+    },
+
+    simple: function(element, textOrFn, className, fixed) {
         if (fixed)
-            element.onmouseover = function(x) { $WH.Tooltip.show(element, text, false, false, className) };
+        {
+            element.onmouseover = function(ev)
+            {
+                let text = $WH.Tooltip.prepareTooltipHtml(textOrFn, null, null, ev);
+                $WH.Tooltip.show(element, text, false, false, className);
+            };
+        }
         else
         {
-            element.onmouseover = function(x) { $WH.Tooltip.showAtCursor(x, text, false, false, className) };
+            element.onmouseover = function(ev)
+            {
+                let text = $WH.Tooltip.prepareTooltipHtml(textOrFn, null, null, ev);
+                $WH.Tooltip.showAtCursor(ev, text, false, false, className);
+            };
             element.onmousemove = $WH.Tooltip.cursorUpdate;
         }
 

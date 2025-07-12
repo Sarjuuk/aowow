@@ -4900,6 +4900,12 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // click to copy fn
+    copied:            'Скопировано',
+    clickToCopy:       'Нажмите, чтобы скопировать',
+    nothingToCopy_tip: 'Нет данных для копирования!',
+
+    // TC conditions display
     tab_conditions:    '[Conditions]',
     tab_condition_for: '[Condition for]',
     cnd_either:        '[Either]',

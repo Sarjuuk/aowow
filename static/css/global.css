@@ -802,3 +802,24 @@ div.screenshotviewer-caption {
 .options-menu-widget.open {
     color:#fff;
 }
+
+.click-to-copy {
+    cursor: pointer;
+}
+
+.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s;
+    transition-timing-function: ease-in;
+}
+
+.hidden-element {
+    height: 0;
+    left: 0;
+    opacity: 0;
+    padding: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 1px;
+}

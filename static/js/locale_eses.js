@@ -4898,6 +4898,12 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // click to copy fn
+    copied:            'Copiado',
+    clickToCopy:       'Click para copiar',
+    nothingToCopy_tip: '[Nothing to copy!]',
+
+    // TC conditions display
     tab_conditions:    'Condiciones',
     tab_condition_for: 'Condición para',
     cnd_either:        'Cualquiera',
