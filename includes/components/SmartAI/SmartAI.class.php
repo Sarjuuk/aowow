@@ -480,7 +480,6 @@ class SmartAI
     {
         // action => paramIdx with spellIds
         $lookup = array(
-            self::SRC_TYPE_CREATURE   => [1],
             SmartAction::ACTION_CAST         => [1],
             SmartAction::ACTION_ADD_AURA     => [1],
             SmartAction::ACTION_INVOKER_CAST => [1],

@@ -2486,7 +2486,7 @@ var g_conditions = {
     15: 'Der Spieler ist $Nein:kein; $1',
     16: 'Der Spieler ist $Nein:kein; $1',
     17: 'Der Spieler hat$N: nicht; [achievement=$1] erlangt',
-    17: 'Der Spieler hat$N: nicht; [title=$1] erhalten',
+    18: 'Der Spieler hat$N: nicht; [title=$1] erhalten',
     19: 'Die Spawnmaske der Entität is $Ngleich:ungleich; "$1"',
     20: 'Des Spielers Geschlecht is$N: nicht; $1',
     21: 'Der Zustand der Kreatur ist$N: nicht; $1',
