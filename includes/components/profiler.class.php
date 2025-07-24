@@ -528,8 +528,19 @@ class Profiler
                         $gProps[$j] = $g[$i]['g'.$j];
 
                 if ($gProps)
-                    if ($gItems = DB::Aowow()->selectCol('SELECT i.`id` FROM ?_glyphproperties gp JOIN ?_spell s ON s.`effect1MiscValue` = gp.`id` AND s.`effect1Id` = ?d JOIN ?_items i ON i.`class` = ?d AND i.`spellId1` = s.`id` WHERE gp.`id` IN (?a)', SPELL_EFFECT_APPLY_GLYPH, ITEM_CLASS_GLYPH, $gProps))
+                {
+                    $gItems = DB::Aowow()->selectCol(
+                       'SELECT i.`id`
+                        FROM ?_glyphproperties gp
+                        JOIN ?_spell s ON s.`effect1MiscValue` = gp.`id` AND s.`effect1Id` = ?d
+                        JOIN ?_items i ON i.`class` = ?d AND i.`spellId1` = s.`id` AND (i.`cuFlags` & ?d) = 0
+                        WHERE gp.`id` IN (?a)',
+                        SPELL_EFFECT_APPLY_GLYPH, ITEM_CLASS_GLYPH, CUSTOM_DISABLED | CUSTOM_UNAVAILABLE | CUSTOM_EXCLUDE_FOR_LISTVIEW, $gProps
+                    );
+
+                    if ($gItems)
                         $data['glyphs'.($i + 1)] = implode(':', $gItems);
+                }
             }
         }
 
