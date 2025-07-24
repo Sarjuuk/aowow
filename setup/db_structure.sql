@@ -208,6 +208,7 @@ CREATE TABLE `aowow_account_weightscales` (
   `userId` int unsigned NOT NULL,
   `name` varchar(32) NOT NULL,
   `class` tinyint unsigned NOT NULL DEFAULT 0,
+  `orderIdx` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'check how Profiler handles classes with more than 3 specs before modifying',
   `icon` varchar(51) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `FK_acc_weights` (`userId`),
@@ -3271,7 +3272,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_account_weightscales` WRITE;
 /*!40000 ALTER TABLE `aowow_account_weightscales` DISABLE KEYS */;
-INSERT INTO `aowow_account_weightscales` VALUES (1,0,'arms',1,'ability_rogue_eviscerate'),(2,0,'fury',1,'ability_warrior_innerrage'),(3,0,'prot',1,'ability_warrior_defensivestance'),(4,0,'holy',2,'spell_holy_holybolt'),(5,0,'prot',2,'ability_paladin_shieldofthetemplar'),(6,0,'retrib',2,'spell_holy_auraoflight'),(7,0,'beast',3,'ability_hunter_beasttaming'),(8,0,'marks',3,'ability_marksmanship'),(9,0,'surv',3,'ability_hunter_swiftstrike'),(10,0,'assas',4,'ability_rogue_eviscerate'),(11,0,'combat',4,'ability_backstab'),(12,0,'subtle',4,'ability_stealth'),(13,0,'disc',5,'spell_holy_wordfortitude'),(14,0,'holy',5,'spell_holy_guardianspirit'),(15,0,'shadow',5,'spell_shadow_shadowwordpain'),(16,0,'blooddps',6,'spell_deathknight_bloodpresence'),(17,0,'frostdps',6,'spell_deathknight_frostpresence'),(18,0,'frosttank',6,'spell_deathknight_frostpresence'),(19,0,'unholydps',6,'spell_deathknight_unholypresence'),(20,0,'elem',7,'spell_nature_lightning'),(21,0,'enhance',7,'spell_nature_lightningshield'),(22,0,'resto',7,'spell_nature_magicimmunity'),(23,0,'arcane',8,'spell_holy_magicalsentry'),(24,0,'fire',8,'spell_fire_firebolt02'),(25,0,'frost',8,'spell_frost_frostbolt02'),(26,0,'afflic',9,'spell_shadow_deathcoil'),(27,0,'demo',9,'spell_shadow_metamorphosis'),(28,0,'destro',9,'spell_shadow_rainoffire'),(29,0,'balance',11,'spell_nature_starfall'),(30,0,'feraltank',11,'ability_racial_bearform'),(31,0,'resto',11,'spell_nature_healingtouch'),(32,0,'feraldps',11,'ability_druid_catform');
+INSERT INTO `aowow_account_weightscales` VALUES (1,0,'arms',1,0,'ability_rogue_eviscerate'),(2,0,'fury',1,1,'ability_warrior_innerrage'),(3,0,'prot',1,2,'ability_warrior_defensivestance'),(4,0,'holy',2,0,'spell_holy_holybolt'),(5,0,'prot',2,1,'ability_paladin_shieldofthetemplar'),(6,0,'retrib',2,2,'spell_holy_auraoflight'),(7,0,'beast',3,0,'ability_hunter_beasttaming'),(8,0,'marks',3,1,'ability_marksmanship'),(9,0,'surv',3,2,'ability_hunter_swiftstrike'),(10,0,'assas',4,0,'ability_rogue_eviscerate'),(11,0,'combat',4,1,'ability_backstab'),(12,0,'subtle',4,2,'ability_stealth'),(13,0,'disc',5,0,'spell_holy_wordfortitude'),(14,0,'holy',5,1,'spell_holy_guardianspirit'),(15,0,'shadow',5,2,'spell_shadow_shadowwordpain'),(16,0,'blooddps',6,0,'spell_deathknight_bloodpresence'),(17,0,'frostdps',6,1,'spell_deathknight_frostpresence'),(18,0,'frosttank',6,2,'spell_deathknight_frostpresence'),(19,0,'unholydps',6,3,'spell_deathknight_unholypresence'),(20,0,'elem',7,0,'spell_nature_lightning'),(21,0,'enhance',7,1,'spell_nature_lightningshield'),(22,0,'resto',7,2,'spell_nature_magicimmunity'),(23,0,'arcane',8,0,'spell_holy_magicalsentry'),(24,0,'fire',8,1,'spell_fire_firebolt02'),(25,0,'frost',8,2,'spell_frost_frostbolt02'),(26,0,'afflic',9,0,'spell_shadow_deathcoil'),(27,0,'demo',9,1,'spell_shadow_metamorphosis'),(28,0,'destro',9,2,'spell_shadow_rainoffire'),(29,0,'balance',11,0,'spell_nature_starfall'),(30,0,'feraltank',11,2,'ability_racial_bearform'),(31,0,'resto',11,3,'spell_nature_healingtouch'),(32,0,'feraldps',11,1,'ability_druid_catform');
 /*!40000 ALTER TABLE `aowow_account_weightscales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3321,7 +3322,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1724095917,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1753369289,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

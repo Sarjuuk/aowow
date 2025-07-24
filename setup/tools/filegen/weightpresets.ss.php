@@ -21,11 +21,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
     public function generate() : bool
     {
         $wtPresets = [];
-        $scales    = DB::Aowow()->select('SELECT id, name, icon, class FROM ?_account_weightscales WHERE userId = 0 ORDER BY class, id ASC');
+        $scales    = DB::Aowow()->select('SELECT `id`, `name`, `icon`, `class` FROM ?_account_weightscales WHERE `userId` = 0 ORDER BY `class`, `orderIdx` ASC');
 
         foreach ($scales as $s)
         {
-            if ($weights = DB::Aowow()->selectCol('SELECT field AS ARRAY_KEY, val FROM ?_account_weightscale_data WHERE id = ?d', $s['id']))
+            if ($weights = DB::Aowow()->selectCol('SELECT `field` AS ARRAY_KEY, `val` FROM ?_account_weightscale_data WHERE `id` = ?d', $s['id']))
                 $wtPresets[$s['class']]['pve'][$s['name']] = array_merge(['__icon' => $s['icon']], $weights);
             else
             {

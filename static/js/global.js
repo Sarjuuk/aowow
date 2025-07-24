@@ -16342,7 +16342,8 @@ Listview.templates = {
                     var a = $WH.ce('a');
 
                     a.className = 'icontiny tinyspecial tip q1';
-                    a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                    // aowow - a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                    a.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + (g_file_specs[profile.classs][specData.id - 1] ?? g_file_specs[specData.id]) + '.gif)';
                     a.rel = 'np';
                     a.href = this.getItemLink(profile) + '#talents';
                     g_addTooltip(a, specData.name);
@@ -23253,7 +23254,7 @@ var g_file_classes = {
 };
 
 var g_file_specs = {
-    "-1":  'inv_misc_questionmark',
+    "-1":  'spell_shadow_sacrificialshield',
        0:  'spell_nature_elementalabsorption',
        6: ['spell_deathknight_bloodpresence', 'spell_deathknight_frostpresence', 'spell_deathknight_unholypresence' ],
       11: ['spell_nature_starfall',           'ability_racial_bearform',         'spell_nature_healingtouch'        ],

@@ -1622,7 +1622,8 @@ function Profiler() {
             specData  = pr_getSpecFromTalents(_profile.classs, buildData.spent),
             spSpec    = _divSpec.childNodes[1];
 
-        spSpec.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+        // aowow - spSpec.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+        spSpec.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + (g_file_specs[_profile.classs][specData.id - 1] ?? g_file_specs[specData.id]) + '.gif)';
         $WH.st(spSpec, (buildData.spent ? buildData.spent.join('/') : '0/0/0'));
 
         spSpec.onmouseover = function (e) {
@@ -2315,7 +2316,8 @@ function ProfilerTalents(_parent) {
             var specData = pr_getSpecFromTalents(_profile.classs, _builds[build].spent);
 
             if (sp) {
-                sp.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                // aowow - sp.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + specData.icon.toLowerCase() + '.gif)';
+                sp.style.backgroundImage = 'url(' + g_staticUrl + '/images/wow/icons/tiny/' + (g_file_specs[_profile.classs][specData.id - 1] ?? g_file_specs[specData.id]) + '.gif)';
 
                 $WH.ae(sp, $WH.ct(specData.name + ' '));
                 $WH.st(sm, '(' + _builds[build].spent.join('/') + ')');
@@ -2461,17 +2463,42 @@ function ProfilerTalents(_parent) {
             pve      = wt_presets[_profile.classs].pve,
             t        = spec - 1;
 
-        if (_profile.classs == 11 && spec == 2) { // Feral Druid (2 specs)
-            // Protector of the Pack, Natural Reaction
-            var tankTalents = [2241, 2242];
-            t += 2;
-            for (var i = 0, len = tankTalents.length; i < len; ++i) {
-                if (!_self.getTalentRanks(tankTalents[i])) {
-                    continue;
+        if (_profile.classs == 11 && spec > 1) { // Feral Druid (2 specs)
+            if (spec > 2)
+                t++;
+            else {
+                // Protector of the Pack, Natural Reaction
+                var tankTalents = [2241, 2242];
+                for (var i = 0, len = tankTalents.length; i < len; ++i) {
+                    if (_self.getTalentRanks(tankTalents[i])) {
+                        t++;
+                        break;
+                    }
                 }
+            }
+        }
 
-                t -= 2;
-                break;
+        // aowow - DKs also have 2 specs in Frost .. why wasn't that handled, what did i miss..?
+        if (_profile.classs == 6 && spec > 1) { // Frost Deathknight (2 specs)
+            if (spec > 2)
+                t++;
+            else {
+                // Dark Command
+                var tankGlyphs = [43538];
+                var usedGlyphs = _builds[_active].glyphs.split(':');
+                if (usedGlyphs.filter(x => tankGlyphs.includes(x)).length)
+                    t++;
+                else
+                {
+                    // Toughness, Frigid Dreadplate, Improved Frost Presence
+                    var tankTalents = [1968, 1990, 2029];
+                    for (var i = 0, len = tankTalents.length; i < len; ++i) {
+                        if (_self.getTalentRanks(tankTalents[i])) {
+                            t++;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
