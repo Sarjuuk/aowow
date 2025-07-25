@@ -2427,6 +2427,7 @@ class SpellListFilter extends Filter
         19  => [parent::CR_FLAG,      'attributes0',      SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION                                    ], // scaling
         20  => [parent::CR_CALLBACK,  'cbReagents',                                                                               ], // has Reagents [yn]
         22  => [parent::CR_CALLBACK,  'cbProficiency',   null,                                     null                           ], // proficiencytype [proficiencytype]
+     // 26  => [parent::CR_NUMERIC,   'startRecoveryCategory', NUM_CAST_INT,                       false                          ], // gcd-cat
         25  => [parent::CR_BOOLEAN,   'skillLevelYellow'                                                                          ], // rewardsskillups
         27  => [parent::CR_FLAG,      'attributes1',      SPELL_ATTR1_CHANNELED_1,                 true                           ], // channeled [yn]
         28  => [parent::CR_NUMERIC,   'castTime',         NUM_CAST_FLOAT                                                          ], // casttime [num]

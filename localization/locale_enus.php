@@ -46,7 +46,6 @@ $lang = array(
         'gains'         => "Gains",
         'login'         => "Login",
         'forum'         => "Forum",
-        'n_a'           => "n/a",
         'siteRep'       => "Reputation",
         'yourRepHistory'=> "Your Reputation History",
         'aboutUs'       => "About us & contact",
@@ -1490,6 +1489,11 @@ $lang = array(
         '_seeMore'      => "See more",
         '_rankRange'    => "Rank:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Show %d More",
+
+        'n_a'           => "n/a",
+        'normal'        => "Normal",
+        'special'       => "Special",
+
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
         'ppm'           => "(%s procs per minute)",

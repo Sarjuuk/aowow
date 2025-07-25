@@ -88,23 +88,23 @@ endif;
                             </tr>
                             <tr>
                                 <th style="border-left: 0; border-top: 0"><?=Lang::game('duration');?></th>
-                                <td width="100%" style="border-top: 0"><?=($this->duration ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->duration ?: '<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('school'); ?></th>
-                                <td width="100%" style="border-top: 0"><?=($this->school ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->school ?: '<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('mechanic');?></th>
-                                <td width="100%" style="border-top: 0"><?=($this->mechanic ?:'<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->mechanic ?:'<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-left: 0"><?=Lang::game('dispelType');?></th>
-                                <td width="100%" style="border-top: 0"><?=($this->dispel ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td width="100%" style="border-top: 0"><?=($this->dispel ?: '<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                             </tr>
                             <tr>
                                 <th style="border-bottom: 0; border-left: 0"><?=Lang::spell('_gcdCategory');?></th>
-                                <td style="border-bottom: 0"><?=($this->gcdCat ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                                <td style="border-bottom: 0"><?=($this->gcdCat ?: '<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                             </tr>
                             </table>
                         </td>
@@ -123,7 +123,7 @@ endif;
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_cooldown');?></th>
-                        <td><?=($this->cooldown ?: '<span class="q0">'.Lang::main('n_a').'</span>');?></td>
+                        <td><?=($this->cooldown ?: '<span class="q0">'.Lang::spell('n_a').'</span>');?></td>
                     </tr>
                     <tr>
                         <th><dfn title="<?=Lang::spell('_globCD').'">'.Lang::spell('_gcd');?></dfn></th>

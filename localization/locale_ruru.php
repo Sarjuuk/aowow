@@ -46,7 +46,6 @@ $lang = array(
         'gains'         => "Бонус",
         'login'         => "[Login]",
         'forum'         => "Форум",
-        'n_a'           => "нет",
         'siteRep'       => "Репутация",
         'yourRepHistory'=> "История вашей репутации",
         'aboutUs'       => "О Aowow",
@@ -1490,6 +1489,11 @@ $lang = array(
         '_seeMore'      => "[See more]",
         '_rankRange'    => "Ранг:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Показать на %d больше",
+
+        'n_a'           => "нет",
+        'normal'        => "Обычный",
+        'special'       => "Особый",
+
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Изучается путём освоения местности",
         'ppm'           => "(Срабатывает %s раз в минуту)",

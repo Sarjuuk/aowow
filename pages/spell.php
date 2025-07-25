@@ -24,7 +24,7 @@ class SpellPage extends GenericPage
     protected $rangeName     = '';
     protected $range         = '';
     protected $gcd           = '';
-    protected $gcdCat        = '';                          // todo (low): nyi; find out how this works [n/a; normal; ..]
+    protected $gcdCat        = '';
     protected $school        = '';
     protected $dispel        = '';
     protected $mechanic      = '';
@@ -352,6 +352,18 @@ class SpellPage extends GenericPage
         $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : '')];
         $this->redButtons  = $redButtons;
         $this->infobox     = $infobox;
+        $this->gcdCat      = match((int)$this->subject->getField('startRecoveryCategory'))
+        {
+            133     => Lang::spell('normal'),
+            330,                                            // Mounts
+            1156,                                           // Heart of the Phoenix
+            1159,                                           // Ignis Grab and Slag Pot
+            1164,                                           // Kessel Run Elek
+            1173,                                           // Birmingham Test Spells
+            1178,                                           // Stealth (Druid Cat, Rogue, Hunter Cat Pets) + Charge (Warrior)
+            1244    => Lang::spell('special'),              // Argent Tournament Vehicle Jousting Abilities
+            default => ''                                   // n/a
+        };
 
         // minRange exists..  prepend
         if ($_ = $this->subject->getField('rangeMinHostile'))

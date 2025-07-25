@@ -46,7 +46,6 @@ $lang = array(
         'gains'         => "Belohnungen",
         'login'         => "Login",
         'forum'         => "Forum",
-        'n_a'           => "n. v.",
         'siteRep'       => "Ruf",
         'yourRepHistory'=> "Dein Ruf-Verlauf",
         'aboutUs'       => "Über Aowow",
@@ -1490,6 +1489,11 @@ $lang = array(
         '_seeMore'      => "Mehr anzeigen",
         '_rankRange'    => "Rang:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Zeige %d weitere",
+
+        'n_a'           => "n. v.",
+        'normal'        => "Normal",
+        'special'       => "Besonders",
+
         'currentArea'   => '&lt;Momentanes Gebiet&gt;',
         'discovered'    => "Durch Geistesblitz erlernt",
         'ppm'           => "(%s Auslösungen pro Minute)",

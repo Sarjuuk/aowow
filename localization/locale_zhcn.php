@@ -47,7 +47,6 @@ $lang = array(
         'gains'         => "获得",
         'login'         => "登录",
         'forum'         => "论坛",
-        'n_a'           => "n/a",
         'siteRep'       => "站点声望",
         'yourRepHistory'=> "您的声望历史",
         'aboutUs'       => "关于我们 & 联系我们",
@@ -1490,6 +1489,11 @@ $lang = array(
         '_seeMore'      => "[See more]",
         '_rankRange'    => "排名:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "[Show %d More]",
+
+        'n_a'           => "n/a",
+        'normal'        => "普通",
+        'special'       => "特殊",
+
         'currentArea'   => '&lt;当前区域&gt;',
         'discovered'    => "通过发现学习",
         'ppm'           => "%s每分钟触发几率",
