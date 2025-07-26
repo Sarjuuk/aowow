@@ -29,10 +29,32 @@ class LocString
             return $str;
 
         foreach (Locale::cases() as $l)                // desired loc not set, use any other
-            if ($str = $this->store[$l])
-                return Cfg::get('DEBUG') ? '['.$str.']' : $str;
+            if (isset($this->store[$l]))
+                return Cfg::get('DEBUG') ? '['.$this->store[$l].']' : $this->store[$l];
 
         return Cfg::get('DEBUG') ? '[LOCSTRING]' : '';
+    }
+
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach (Locale::cases() as $l)
+            if (isset($this->store[$l]))
+                $data[$l->value] = $this->store[$l];
+
+        return ['store' => $data];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->store = new \WeakMap();
+
+        if (empty($data['store']))
+            return;
+
+        foreach ($data['store'] as $locId => $str)
+            if (($l = Locale::tryFrom($locId))?->validate())
+                $this->store[$l] = (string)$str;
     }
 }
 
