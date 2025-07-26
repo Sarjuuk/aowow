@@ -195,7 +195,7 @@ class GuidePage extends GenericPage
                 'specId'      => $this->_post['specId'],
                 'title'       => $this->_post['title'],
                 'name'        => $this->_post['name'],
-                'description' => $this->_post['description'] ?: Lang::trimTextClean((new Markup($this->_post['body']))->stripTags(), 120),
+                'description' => $this->_post['description'] ?: Lang::trimTextClean(Markup::stripTags($this->_post['body']), 120),
                 'locale'      => $this->_post['locale'],
                 'roles'       => User::$groups,
                 'status'      => GUIDE_STATUS_DRAFT

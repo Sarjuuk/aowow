@@ -65,6 +65,8 @@ spl_autoload_register(function ($class)
 
     if (file_exists('includes/components/'.strtolower($class).'.class.php'))
         require_once 'includes/components/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/components/frontend/'.strtolower($class).'.class.php'))
+        require_once 'includes/components/frontend/'.strtolower($class).'.class.php';
 });
 
 // TC systems in components

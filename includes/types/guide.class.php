@@ -72,7 +72,7 @@ class GuideList extends BaseType
             $this->article[$a['rev']] = $a['article'];
             if ($this->article[$a['rev']])
             {
-                (new Markup($this->article[$a['rev']]))->parseGlobalsFromText($this->jsGlobals);
+                Markup::parseTags($this->article[$a['rev']], $this->jsGlobals);
                 return $this->article[$a['rev']];
             }
             else

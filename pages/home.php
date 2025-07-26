@@ -39,7 +39,7 @@ class HomePage extends GenericPage
 
         $this->featuredBox['text'] = Util::localizedString($this->featuredBox, 'text', true);
 
-        if ($_ = (new Markup($this->featuredBox['text']))->parseGlobalsFromText())
+        if ($_ = Markup::parseTags($this->featuredBox['text']))
             $this->extendGlobalData($_);
 
         if (empty($this->featuredBox['boxBG']))

@@ -28,7 +28,7 @@ class AjaxGetdescription extends AjaxHandler
         if (!User::canWriteGuide())
             return '';
 
-        $desc = (new Markup($this->_post['description']))->stripTags();
+        $desc = Markup::stripTags($this->_post['description']);
 
         return Lang::trimTextClean($desc, 120);
     }

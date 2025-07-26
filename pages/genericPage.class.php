@@ -559,9 +559,9 @@ class GenericPage
         if ($article)
         {
             if ($article['article'])
-                (new Markup($article['article']))->parseGlobalsFromText($this->jsgBuffer);
+                Markup::parseTags($article['article'], $this->jsgBuffer);
             if ($article['quickInfo'])
-                (new Markup($article['quickInfo']))->parseGlobalsFromText($this->jsgBuffer);
+                Markup::parseTags($article['quickInfo'], $this->jsgBuffer);
 
             $this->article = array(
                 'text'   => Util::jsEscape(Util::defStatic($article['article'])),
