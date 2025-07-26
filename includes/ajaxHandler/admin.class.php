@@ -123,7 +123,7 @@ class AjaxAdmin extends AjaxHandler
         if ($this->_get['type'] && $this->_get['type'] && $this->_get['typeid'] && $this->_get['typeid'])
             $res = CommunityContent::getScreenshotsForManager($this->_get['type'], $this->_get['typeid']);
         else if ($this->_get['user'])
-            if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', $this->_get['user']))
+            if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']))
                 $res = CommunityContent::getScreenshotsForManager(0, 0, $uId);
 
         return 'ssm_screenshotData = '.Util::toJSON($res);

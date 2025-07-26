@@ -31,13 +31,13 @@ class CommunityContent
 
     private static string $coQuery =
        'SELECT    c.*,
-                  a1.`displayName` AS `user`,
-                  a2.`displayName` AS `editUser`,
-                  a3.`displayName` AS `deleteUser`,
-                  a4.`displayName` AS `responseUser`,
-                  IFNULL(SUM(ur.`value`), 0) AS `rating`,
-                  SUM(IF(ur.`userId` > 0 AND ur.`userId` = ?d, ur.`value`, 0)) AS `userRating`,
-                  IF(r.`id` IS NULL, 0, 1) AS `userReported`
+                  a1.`username` AS "user",
+                  a2.`username` AS "editUser",
+                  a3.`username` AS "deleteUser",
+                  a4.`username` AS "responseUser",
+                  IFNULL(SUM(ur.`value`), 0) AS "rating",
+                  SUM(IF(ur.`userId` > 0 AND ur.`userId` = ?d, ur.`value`, 0)) AS "userRating",
+                  IF(r.`id` IS NULL, 0, 1) AS "userReported"
         FROM      ?_comments c
         JOIN      ?_account a1 ON c.`userId` = a1.`id`
         LEFT JOIN ?_account a2 ON c.`editUserId` = a2.`id`
@@ -51,7 +51,7 @@ class CommunityContent
         ORDER BY  c.`date` ASC';
 
     private static string $ssQuery =
-       'SELECT    s.`id` AS ARRAY_KEY, s.`id`, a.`displayName` AS `user`, s.`date`, s.`width`, s.`height`, s.`caption`, IF(s.`status` & ?d, 1, 0) AS "sticky", s.`type`, s.`typeId`
+       'SELECT    s.`id` AS ARRAY_KEY, s.`id`, a.`username` AS "user", s.`date`, s.`width`, s.`height`, s.`caption`, IF(s.`status` & ?d, 1, 0) AS "sticky", s.`type`, s.`typeId`
         FROM      ?_screenshots s
         LEFT JOIN ?_account a ON s.`userIdOwner` = a.`id`
         WHERE   { s.`userIdOwner` = ?d AND }{ s.`type` = ? AND }{ s.`typeId` = ? AND } s.`status` & ?d AND (s.`status` & ?d) = 0
@@ -59,7 +59,7 @@ class CommunityContent
       { LIMIT     ?d }';
 
     private static string $viQuery =
-       'SELECT    v.`id` AS ARRAY_KEY, v.`id`, a.`displayName` AS `user`, v.`date`, v.`videoId`, v.`caption`, IF(v.`status` & ?d, 1, 0) AS "sticky", v.`type`, v.`typeId`
+       'SELECT    v.`id` AS ARRAY_KEY, v.`id`, a.`username` AS "user", v.`date`, v.`videoId`, v.`caption`, IF(v.`status` & ?d, 1, 0) AS "sticky", v.`type`, v.`typeId`
         FROM      ?_videos v
         LEFT JOIN ?_account a ON v.`userIdOwner` = a.`id`
         WHERE   { v.`userIdOwner` = ?d AND }{ v.`type` = ? AND }{ v.`typeId` = ? AND } v.`status` & ?d AND (v.`status` & ?d) = 0
@@ -68,14 +68,14 @@ class CommunityContent
 
     private static string $previewQuery =
        'SELECT    c.`id`,
-                  c.`body` AS `preview`,
+                  c.`body` AS "preview",
                   c.`date`,
-                  c.`replyTo` AS `commentid`,
-                  IF(c.`flags` & ?d, 1, 0) AS `deleted`,
-                  IF(c.`type` <> 0, c.`type`, c2.`type`) AS `type`,
-                  IF(c.`typeId` <> 0, c.`typeId`, c2.`typeId`) AS `typeId`,
-                  IFNULL(SUM(ur.`value`), 0) AS `rating`,
-                  a.`displayName` AS `user`
+                  c.`replyTo` AS "commentid",
+                  IF(c.`flags` & ?d, 1, 0) AS "deleted",
+                  IF(c.`type` <> 0, c.`type`, c2.`type`) AS "type",
+                  IF(c.`typeId` <> 0, c.`typeId`, c2.`typeId`) AS "typeId",
+                  IFNULL(SUM(ur.`value`), 0) AS "rating",
+                  a.`username` AS "user"
         FROM      ?_comments c
         JOIN      ?_account a ON c.`userId` = a.`id`
         LEFT JOIN ?_user_ratings ur ON ur.`entry` = c.`id` AND ur.`userId` <> 0 AND ur.`type` = 1
@@ -228,14 +228,14 @@ class CommunityContent
 
     public static function getScreenshotsForManager($type, $typeId, $userId = 0)
     {
-        $screenshots = DB::Aowow()->select('
-            SELECT    s.id, a.displayName AS user, s.date, s.width, s.height, s.type, s.typeId, s.caption, s.status, s.status AS "flags"
+        $screenshots = DB::Aowow()->select(
+           'SELECT    s.`id`, a.`username` AS "user", s.`date`, s.`width`, s.`height`, s.`type`, s.`typeId`, s.`caption`, s.`status`, s.`status` AS "flags"
             FROM      ?_screenshots s
-            LEFT JOIN ?_account a ON s.userIdOwner = a.id
+            LEFT JOIN ?_account a ON s.`userIdOwner` = a.`id`
             WHERE
-                    { s.type = ?d}
-                    { AND s.typeId = ?d}
-                    { s.userIdOwner = ?d}
+                    { s.`type` = ?d}
+                    { AND s.`typeId` = ?d}
+                    { s.`userIdOwner` = ?d}
             LIMIT     100',
             $userId ? DBSIMPLE_SKIP : $type,
             $userId ? DBSIMPLE_SKIP : $typeId,
@@ -300,11 +300,11 @@ class CommunityContent
     {
         // i GUESS .. ss_getALL ? everything : pending
         $nFound = 0;
-        $pages  = DB::Aowow()->select('
-             SELECT   s.`type`, s.`typeId`, count(1) AS "count", MIN(s.`date`) AS "date"
-             FROM     ?_screenshots s
-            {WHERE    (s.status & ?d) = 0}
-             GROUP BY s.`type`, s.`typeId`',
+        $pages  = DB::Aowow()->select(
+           'SELECT   s.`type`, s.`typeId`, COUNT(1) AS "count", MIN(s.`date`) AS "date"
+            FROM     ?_screenshots s
+          { WHERE    (s.`status` & ?d) = 0 }
+            GROUP BY s.`type`, s.`typeId`',
             $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED | CC_FLAG_DELETED
         );
 

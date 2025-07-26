@@ -224,7 +224,7 @@ class AdminPage extends GenericPage
         {
             if (mb_strlen($this->_get['user']) >= 3)
             {
-                if ($uId = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE displayName = ?', ucFirst($this->_get['user'])))
+                if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']))
                 {
                     $ssData   = CommunityContent::getScreenshotsForManager(0, 0, $uId);
                     $nMatches = count($ssData);

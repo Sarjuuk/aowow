@@ -378,7 +378,7 @@ class GuidePage extends GenericPage
         $buff = '<ul>';
         $inp  = fn($rev) => User::isInGroup(U_GROUP_STAFF) ? ($rev !== null ? '<input name="a" value="'.$rev.'" type="radio"/><input name="b" value="'.$rev.'" type="radio"/><b>' : '<b style="margin-left:28px;">') : '';
 
-        $logEntries = DB::Aowow()->select('SELECT a.`displayName` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ?_guides_changelog gcl JOIN ?_account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = ?d ORDER BY gcl.`date` DESC', $this->typeId);
+        $logEntries = DB::Aowow()->select('SELECT a.`username` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ?_guides_changelog gcl JOIN ?_account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = ?d ORDER BY gcl.`date` DESC', $this->typeId);
         foreach ($logEntries as $log)
         {
             if ($log['status'] != GUIDE_STATUS_NONE)

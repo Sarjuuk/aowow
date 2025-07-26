@@ -8,23 +8,22 @@ if (!defined('AOWOW_REVISION'))
 
 class User
 {
-    public static int    $id           = 0;
-    public static string $displayName  = '';
-    public static int    $banStatus    = 0x0;               // see ACC_BAN_* defines
-    public static int    $groups       = 0x0;
-    public static int    $perms        = 0;
-    public static string $avatar       = 'inv_misc_questionmark';
-    public static int    $dailyVotes   = 0;
-    public static $ip           = null;
+    public static  int    $id         = 0;
+    public static  string $username   = '';
+    public static  int    $banStatus  = 0x0;               // see ACC_BAN_* defines
+    public static  int    $groups     = 0x0;
+    public static  int    $perms      = 0;
+    public static ?string $email      = null;
+    public static  int    $dailyVotes = 0;
+    public static ?string $ip         = null;
+    public static  Locale $preferedLoc;
 
-    private static int    $reputation    = 0;
-    private static string $dataKey       = '';
-    private static bool   $expires       = false;
-    private static string $passHash      = '';
-    private static int    $excludeGroups = 1;
-
-    public  static Locale $preferedLoc;
-    private static ?LocalProfileList $profiles = null;
+    private static  int              $reputation    = 0;
+    private static  string           $dataKey       = '';
+    private static  bool             $expires       = false;
+    private static  string           $passHash      = '';
+    private static  int              $excludeGroups = 1;
+    private static ?LocalProfileList $profiles      = null;
 
     public static function init()
     {
@@ -64,7 +63,7 @@ class User
             return false;
 
         $uData = DB::Aowow()->SelectRow(
-           'SELECT    a.`id`, a.`passHash`, a.`displayName`, a.`locale`, a.`userGroups`, a.`userPerms`, a.`allowExpire`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`avatar`, a.`dailyVotes`, a.`excludeGroups`
+           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, a.`allowExpire`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
             LEFT JOIN ?_account_reputation r ON a.`id` = r.`userId`
@@ -87,7 +86,7 @@ class User
         }
 
         self::$id            = intVal($uData['id']);
-        self::$displayName   = $uData['displayName'];
+        self::$username      = $uData['username'];
         self::$passHash      = $uData['passHash'];
         self::$expires       = (bool)$uData['allowExpire'];
         self::$reputation    = $uData['reputation'];
@@ -102,9 +101,6 @@ class User
             $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
 
         self::$profiles = (new LocalProfileList($conditions));
-
-        if ($uData['avatar'])
-            self::$avatar = $uData['avatar'];
 
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
@@ -190,10 +186,10 @@ class User
         $_SESSION['locale']  = self::$preferedLoc;          // keep locale
         $_SESSION['dataKey'] = self::$dataKey;              // keep dataKey
 
-        self::$id           = 0;
-        self::$displayName  = '';
-        self::$perms        = 0;
-        self::$groups       = U_GROUP_NONE;
+        self::$id       = 0;
+        self::$username = '';
+        self::$perms    = 0;
+        self::$groups   = U_GROUP_NONE;
     }
 
 
@@ -201,16 +197,16 @@ class User
     /* auth mechanisms */
     /*******************/
 
-    public static function authenticate(string $name, string $password) : int
+    public static function authenticate(string $login, string $password) : int
     {
         $userId = 0;
         $hash   = '';
 
         $result = match (Cfg::get('ACC_AUTH_MODE'))
         {
-            AUTH_MODE_SELF     => self::authSelf($name, $password, $userId, $hash),
-            AUTH_MODE_REALM    => self::authRealm($name, $password, $userId, $hash),
-            AUTH_MODE_EXTERNAL => self::authExtern($name, $password, $userId, $hash),
+            AUTH_MODE_SELF     => self::authSelf($login, $password, $userId, $hash),
+            AUTH_MODE_REALM    => self::authRealm($login, $password, $userId, $hash),
+            AUTH_MODE_EXTERNAL => self::authExtern($login, $password, $userId, $hash),
             default            => AUTH_INTERNAL_ERR
         };
 
@@ -224,7 +220,7 @@ class User
         return $result;
     }
 
-    private static function authSelf(string $name, string $password, int &$userId, string &$hash) : int
+    private static function authSelf(string $nameOrEmail, string $password, int &$userId, string &$hash) : int
     {
         if (!self::$ip)
             return AUTH_INTERNAL_ERR;
@@ -239,13 +235,16 @@ class User
         if ($ipBan && $ipBan['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
             return AUTH_IPBANNED;
 
+        $email = filter_var($nameOrEmail, FILTER_VALIDATE_EMAIL);
+
         $query = DB::Aowow()->SelectRow(
            'SELECT    a.`id`, a.`passHash`, BIT_OR(ab.`typeMask`) AS "bans", a.`status`
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-            WHERE     a.`user` = ?
+            WHERE     { a.`email` = ? } { a.`login` = ? }
             GROUP BY  a.`id`',
-            $name
+             $email ?: DBSIMPLE_SKIP,
+            !$email ? $nameOrEmail : DBSIMPLE_SKIP
         );
 
         if (!$query)
@@ -290,7 +289,7 @@ class User
         return AUTH_OK;
     }
 
-    private static function authExtern(string $name, string $password, int &$userId, string &$hash) : int
+    private static function authExtern(string $nameOrEmail, string $password, int &$userId, string &$hash) : int
     {
         if (!file_exists('config/extAuth.php'))
         {
@@ -308,11 +307,15 @@ class User
 
         $extGroup = -1;
         $extId    = 0;
-        $result   = \extAuth($name, $password, $extId, $extGroup);
+        $result   = \extAuth($nameOrEmail, $password, $extId, $extGroup);
+
+        // assert we don't have an email passed back from extAuth
+        if (filter_var($nameOrEmail, FILTER_VALIDATE_EMAIL))
+            return AUTH_WRONGUSER;
 
         if ($result == AUTH_OK && $extId)
         {
-            if ($_ = self::checkOrCreateInDB($extId, $name, $extGroup))
+            if ($_ = self::checkOrCreateInDB($extId, $nameOrEmail, $extGroup))
                 $userId = $_;
             else
                 return AUTH_INTERNAL_ERR;
@@ -331,10 +334,9 @@ class User
             return $_;
         }
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `user`, `passHash`, `displayName`, `email`, `joinDate`, `allowExpire`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, ?, "", ?, "", UNIX_TIMESTAMP(), 0, ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `login`, `passHash`, `username`, `email`, `joinDate`, `allowExpire`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, "", "", ?, "", UNIX_TIMESTAMP(), 0, ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
             $extId,
             $name,
-            Util::ucFirst($name),
             $_SERVER["REMOTE_ADDR"] ?? '',
             self::$preferedLoc->value,
             ACC_STATUS_OK,
@@ -555,7 +557,7 @@ class User
     {
         $gUser = array(
             'id'          => self::$id,
-            'name'        => self::$displayName,
+            'name'        => self::$username,
             'roles'       => self::$groups,
             'permissions' => self::$perms,
             'cookies'     => []
@@ -573,10 +575,17 @@ class User
         $gUser['upvoteRep']         = Cfg::get('REP_REQ_UPVOTE');
         $gUser['characters']        = self::getCharacters();
         $gUser['excludegroups']     = self::$excludeGroups;
-        $gUser['settings']          = (new \StdClass);      // existence is checked in Profiler.js before g_user.excludegroups is applied; has property premiumborder (NYI)
 
         if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
             $gUser['debug'] = true;                         // csv id-list output option on listviews; todo - set on per user basis
+
+        if (self::getPremiumBorder())
+            $gUser['settings'] = ['premiumborder' => 1];
+        else
+            $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied
+
+        if (self::isPremium())
+            $gUser['premium'] = 1;
 
         if ($_ = self::getProfilerExclusions())
             $gUser = array_merge($gUser, $_);
@@ -715,6 +724,12 @@ class User
         }
 
         return $data;
+    }
+
+    // not sure what to set .. user selected?
+    public static function getPremiumBorder() : bool
+    {
+        return self::isInGroup(U_GROUP_PREMIUM);
     }
 }
 

@@ -41,7 +41,7 @@ class AjaxEdit extends AjaxHandler
 
         $targetPath = 'static/uploads/guide/images/';
         $tmpPath    = 'static/uploads/temp/';
-        $tmpFile    = User::$displayName.'-'.Type::GUIDE.'-0-'.Util::createHash(16);
+        $tmpFile    = User::$username.'-'.Type::GUIDE.'-0-'.Util::createHash(16);
 
         $uploader = new \qqFileUploader(['jpg', 'jpeg', 'png'], 10 * 1024 * 1024);
         $result   = $uploader->handleUpload($tmpPath, $tmpFile, true);

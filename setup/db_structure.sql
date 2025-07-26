@@ -25,10 +25,10 @@ DROP TABLE IF EXISTS `aowow_account`;
 CREATE TABLE `aowow_account` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `extId` int unsigned DEFAULT NULL COMMENT 'external user id',
-  `user` varchar(64) NOT NULL COMMENT 'login',
+  `login` varchar(64) NOT NULL DEFAULT '' COMMENT 'only used for login',
   `passHash` varchar(128) NOT NULL,
-  `displayName` varchar(64) NOT NULL COMMENT 'nickname',
-  `email` varchar(64) NOT NULL,
+  `username` varchar(64) NOT NULL COMMENT 'unique; used for for links and display',
+  `email` varchar(64) DEFAULT NULL COMMENT 'unique; can be used for login if AUTH_SELF and can be NULL if not',
   `joinDate` int unsigned NOT NULL COMMENT 'unixtime',
   `allowExpire` tinyint unsigned NOT NULL,
   `dailyVotes` smallint unsigned NOT NULL DEFAULT 0,
@@ -48,7 +48,8 @@ CREATE TABLE `aowow_account` (
   `statusTimer` int unsigned NOT NULL DEFAULT 0,
   `token` varchar(40) DEFAULT NULL COMMENT 'creation & recovery',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user` (`user`)
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -3322,7 +3323,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1753563162,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1753572320,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 

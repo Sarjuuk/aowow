@@ -188,23 +188,17 @@ class MorePage extends GenericPage
         foreach ($tabs as [$t, $tabId, $tabName])
         {
             // stuff received
-            $res = DB::Aowow()->select('
-                SELECT
-                    a.id AS ARRAY_KEY,
-                    a.displayName AS username,
-                    a.userGroups AS `groups`,
-                    a.joinDate AS creation,
-                    SUM(r.amount) AS reputation,
-                    SUM(IF(r.`action` = 3, 1, 0)) AS comments,
-                    SUM(IF(r.`action` = 6, 1, 0)) AS screenshots,
-                    SUM(IF(r.`action` = 9, 1, 0)) AS reports
-                FROM ?_account_reputation r
-                JOIN ?_account a ON a.id = r.userId
-                {WHERE r.date > ?d}
-                GROUP BY a.id
-                ORDER BY reputation DESC
-                LIMIT ?d
-            ', $t ?: DBSIMPLE_SKIP, Cfg::get('SQL_LIMIT_SEARCH'));
+            $res = DB::Aowow()->select(
+               'SELECT   a.`id` AS ARRAY_KEY, a.`username`, a.`userGroups` AS "groups", a.`joinDate` AS "creation",
+                         SUM(r.`amount`) AS "reputation", SUM(IF(r.`action` = 3, 1, 0)) AS "comments", SUM(IF(r.`action` = 6, 1, 0)) AS "screenshots", SUM(IF(r.`action` = 9, 1, 0)) AS "reports"
+                FROM     ?_account_reputation r
+                JOIN     ?_account a ON a.`id` = r.`userId`
+              { WHERE    r.`date` > ?d }
+                GROUP BY a.`id`
+                ORDER BY `reputation` DESC
+                LIMIT    ?d',
+                $t ?: DBSIMPLE_SKIP, Cfg::get('SQL_LIMIT_SEARCH')
+            );
 
             $data = [];
             if ($res)

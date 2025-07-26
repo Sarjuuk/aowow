@@ -14,7 +14,7 @@
     $this->brick('infobox');
 ?>
 
-            <script type="text/javascript">var g_pageInfo = { username: '<?=Util::jsEscape($this->user['displayName']); ?>' }</script>
+            <script type="text/javascript">var g_pageInfo = { username: '<?=Util::jsEscape($this->user['username']); ?>' }</script>
 
             <div class="text">
                 <div id="h1-icon-generic" class="h1-icon"></div>

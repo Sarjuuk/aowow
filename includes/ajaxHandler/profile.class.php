@@ -112,7 +112,7 @@ class AjaxProfile extends AjaxHandler
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
         {
-            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            if (!($uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user'])))
             {
                 trigger_error('AjaxProfile::handleLink - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
                 return;
@@ -120,12 +120,12 @@ class AjaxProfile extends AjaxHandler
         }
 
         if ($this->undo)
-            DB::Aowow()->query('DELETE FROM ?_account_profiles WHERE accountId = ?d AND profileId IN (?a)', $uid, $this->_get['id']);
+            DB::Aowow()->query('DELETE FROM ?_account_profiles WHERE `accountId` = ?d AND `profileId` IN (?a)', $uid, $this->_get['id']);
         else
         {
             foreach ($this->_get['id'] as $prId)            // only link characters, not custom profiles
             {
-                if ($prId = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_profiles WHERE id = ?d AND realm IS NOT NULL', $prId))
+                if ($prId = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_profiles WHERE `id` = ?d AND `realm` IS NOT NULL', $prId))
                     DB::Aowow()->query('INSERT IGNORE INTO ?_account_profiles VALUES (?d, ?d, 0)', $uid, $prId);
                 else
                 {
@@ -152,7 +152,7 @@ class AjaxProfile extends AjaxHandler
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
         {
-            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            if (!($uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user'])))
             {
                 trigger_error('AjaxProfile::handlePin - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
                 return;
@@ -160,10 +160,10 @@ class AjaxProfile extends AjaxHandler
         }
 
         // since only one character can be pinned at a time we can reset everything
-        DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags & ?d WHERE accountId = ?d', ~PROFILER_CU_PINNED, $uid);
+        DB::Aowow()->query('UPDATE ?_account_profiles  SET `extraFlags` = `extraFlags` & ?d WHERE `accountId` = ?d', ~PROFILER_CU_PINNED, $uid);
         // and set a single char if necessary
         if (!$this->undo)
-            DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags | ?d WHERE profileId = ?d AND accountId = ?d',  PROFILER_CU_PINNED, $this->_get['id'][0], $uid);
+            DB::Aowow()->query('UPDATE ?_account_profiles  SET `extraFlags` = `extraFlags` | ?d WHERE `profileId` = ?d AND `accountId` = ?d',  PROFILER_CU_PINNED, $this->_get['id'][0], $uid);
     }
 
     /*  params
@@ -182,7 +182,7 @@ class AjaxProfile extends AjaxHandler
         $uid = User::$id;
         if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
         {
-            if (!($uid = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE user = ?', $this->_get['user'])))
+            if (!($uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user'])))
             {
                 trigger_error('AjaxProfile::handlePrivacy - user "'.$this->_get['user'].'" does not exist', E_USER_ERROR);
                 return;
@@ -191,13 +191,13 @@ class AjaxProfile extends AjaxHandler
 
         if ($this->undo)
         {
-            DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags & ?d WHERE profileId IN (?a) AND accountId = ?d', ~PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
-            DB::Aowow()->query('UPDATE ?_profiler_profiles SET cuFlags    = cuFlags    & ?d WHERE id        IN (?a) AND user      = ?d', ~PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+            DB::Aowow()->query('UPDATE ?_account_profiles  SET `extraFlags` = `extraFlags` & ?d WHERE `profileId` IN (?a) AND `accountId` = ?d', ~PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+            DB::Aowow()->query('UPDATE ?_profiler_profiles SET `cuFlags`    = `cuFlags`    & ?d WHERE `id`        IN (?a) AND `user`      = ?d', ~PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
         }
         else
         {
-            DB::Aowow()->query('UPDATE ?_account_profiles  SET extraFlags = extraFlags | ?d WHERE profileId IN (?a) AND accountId = ?d',  PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
-            DB::Aowow()->query('UPDATE ?_profiler_profiles SET cuFlags    = cuFlags    | ?d WHERE id        IN (?a) AND user      = ?d',  PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+            DB::Aowow()->query('UPDATE ?_account_profiles  SET `extraFlags` = `extraFlags` | ?d WHERE `profileId` IN (?a) AND `accountId` = ?d',  PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+            DB::Aowow()->query('UPDATE ?_profiler_profiles SET `cuFlags`    = `cuFlags`    | ?d WHERE `id`        IN (?a) AND `user`      = ?d',  PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
         }
     }
 
@@ -323,7 +323,7 @@ class AjaxProfile extends AjaxHandler
         // todo (med): detail check this post-data
         $cuProfile = array(
             'user'         => User::$id,
-         // 'userName'     => User::$displayName,
+         // 'userName'     => User::$username,
             'name'         => $this->_post['name'],
             'level'        => $this->_post['level'],
             'class'        => $this->_post['class'],
@@ -557,7 +557,7 @@ class AjaxProfile extends AjaxHandler
             $profile['sourcename']  = $pBase['sourceName'];
             $profile['description'] = $pBase['description'];
             $profile['user']        = $pBase['user'];
-            $profile['username']    = DB::Aowow()->selectCell('SELECT displayName FROM ?_account WHERE id = ?d', $pBase['user']);
+            $profile['username']    = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE `id` = ?d', $pBase['user']);
         }
 
         // custom profiles inherit this when copied from real char :(
@@ -572,7 +572,7 @@ class AjaxProfile extends AjaxHandler
         if ($_ = DB::Aowow()->selectCol('SELECT accountId FROM ?_account_profiles WHERE profileId = ?d', $pBase['id']))
             $profile['bookmarks'] = $_;
 
-        // arena teams - [size(2|3|5) => DisplayName]; DisplayName gets urlized to use as link
+        // arena teams - [size(2|3|5) => name]; name gets urlized to use as link
         if ($at = DB::Aowow()->selectCol('SELECT type AS ARRAY_KEY, name FROM ?_profiler_arena_team at JOIN ?_profiler_arena_team_member atm ON atm.arenaTeamId = at.id WHERE atm.profileId = ?d', $pBase['id']))
             $profile['arenateams'] = $at;
 

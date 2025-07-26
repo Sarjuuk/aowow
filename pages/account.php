@@ -142,7 +142,7 @@ class AccountPage extends GenericPage
                         header('Location: '.$this->getNext(true), true, 302);
                     }
                 }
-                else if ($this->_get['token'] && ($_ = DB::Aowow()->selectCell('SELECT user FROM ?_account WHERE status IN (?a) AND token = ? AND statusTimer >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $this->_get['token'])))
+                else if ($this->_get['token'] && ($_ = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE `status` IN (?a) AND `token` = ? AND `statusTimer` >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $this->_get['token'])))
                     $this->user = $_;
 
                 break;
@@ -203,8 +203,8 @@ class AccountPage extends GenericPage
         if (!User::isLoggedIn())
             $this->forwardToSignIn('account');
 
-        $user = DB::Aowow()->selectRow('SELECT * FROM ?_account WHERE id = ?d', User::$id);
-        $bans = DB::Aowow()->select('SELECT ab.*, a.displayName, ab.id AS ARRAY_KEY FROM ?_account_banned ab LEFT JOIN ?_account a ON a.id = ab.staffId WHERE ab.userId = ?d', User::$id);
+        $user = DB::Aowow()->selectRow('SELECT * FROM ?_account WHERE `id` = ?d', User::$id);
+        $bans = DB::Aowow()->select('SELECT ab.*, a.`username`, ab.`id` AS ARRAY_KEY FROM ?_account_banned ab LEFT JOIN ?_account a ON a.`id` = ab.`staffId` WHERE ab.`userId` = ?d', User::$id);
 
         /***********/
         /* Infobox */
@@ -236,7 +236,7 @@ class AccountPage extends GenericPage
                 continue;
 
             $this->banned = array(
-                'by'     => [$b['staffId'], $b['displayName']],
+                'by'     => [$b['staffId'], $b['username']],
                 'end'    => $b['end'],
                 'reason' => $b['reason']
             );
@@ -365,7 +365,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
                     return Lang::main('intError');
 
                 // reset account status, update expiration
-                DB::Aowow()->query('UPDATE ?_account SET prevIP = IF(curIp = ?, prevIP, curIP), curIP = IF(curIp = ?, curIP, ?), allowExpire = ?d, status = IF(status = ?d, status, 0), statusTimer = IF(status = ?d, statusTimer, 0), token = IF(status = ?d, token, "") WHERE user = ?',
+                DB::Aowow()->query('UPDATE ?_account SET `prevIP` = IF(`curIp` = ?, `prevIP`, `curIP`), `curIP` = IF(`curIp` = ?, `curIP`, ?), `allowExpire` = ?d, `status` = IF(`status` = ?d, `status`, 0), `statusTimer` = IF(`status` = ?d, `statusTimer`, 0), `token` = IF(`status` = ?d, `token`, "") WHERE LOWER(`username`) = LOWER(?)',
                     User::$ip, User::$ip, User::$ip,
                     $this->_post['remember_me'] != 'yes',
                     ACC_STATUS_NEW, ACC_STATUS_NEW, ACC_STATUS_NEW,
@@ -419,23 +419,23 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return Lang::main('intError');
 
         // limit account creation
-        $ip = DB::Aowow()->selectRow('SELECT ip, count, unbanDate FROM ?_account_bannedips WHERE type = 1 AND ip = ?', User::$ip);
+        $ip = DB::Aowow()->selectRow('SELECT `ip`, `count`, `unbanDate` FROM ?_account_bannedips WHERE `type` = 1 AND `ip` = ?', User::$ip);
         if ($ip && $ip['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ip['unbanDate'] >= time())
         {
-            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip);
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ? AND `type` = 1', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip);
             return sprintf(Lang::account('signupExceeded'), Util::formatTime(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000));
         }
 
         // username taken
-        if ($_ = DB::Aowow()->SelectCell('SELECT user FROM ?_account WHERE (user = ? OR email = ?) AND (status <> ?d OR (status = ?d AND statusTimer > UNIX_TIMESTAMP()))', $this->_post['username'], $this->_post['email'], ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if ($_ = DB::Aowow()->SelectCell('SELECT `username` FROM ?_account WHERE (`username` = ? OR `email` = ?) AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $this->_post['username'], $this->_post['email'], ACC_STATUS_NEW, ACC_STATUS_NEW))
             return $_ == $this->_post['username'] ? Lang::account('nameInUse') : Lang::account('mailInUse');
 
         // create..
         $token = Util::createHash();
-        $ok = DB::Aowow()->query('REPLACE INTO ?_account (user, passHash, displayName, email, joindate, curIP, allowExpire, locale, userGroups, status, statusTimer, token) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
+        $ok = DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `email`, `joindate`, `curIP`, `allowExpire`, `locale`, `userGroups`, `status`, `statusTimer`, `token`) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
             $this->_post['username'],
             User::hashCrypt($this->_post['password']),
-            Util::ucFirst($this->_post['username']),
+            $this->_post['username'],
             $this->_post['email'],
             User::$ip,
             $this->_post['remember_me'] != 'yes',

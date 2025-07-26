@@ -29,8 +29,8 @@ class GuideList extends BaseType
     protected       $queryBase = 'SELECT g.*, g.id AS ARRAY_KEY FROM ?_guides g';
     protected       $queryOpts = array(
                         'g' => [['a', 'c'], 'g' => 'g.`id`'],
-                        'a' => ['j' => ['?_account a ON a.id = g.userId', true], 's' => ', IFNULL(a.displayName, "") AS author'],
-                        'c' => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS `comments`']
+                        'a' => ['j' => ['?_account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
+                        'c' => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

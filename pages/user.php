@@ -31,14 +31,14 @@ class UserPage extends GenericPage
         if ($pageParam)
         {
             // todo: check if account is disabled or something
-            if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`user`, a.`displayName`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep" FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`displayName`) = LOWER(?) GROUP BY a.`id`', $pageParam))
+            if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep" FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $pageParam))
                 $this->user = $user;
             else
                 $this->notFound(sprintf(Lang::user('notFound'), $pageParam));
         }
         else if (User::isLoggedIn())
         {
-            header('Location: ?user='.User::$displayName, true, 302);
+            header('Location: ?user='.User::$username, true, 302);
             die();
         }
         else
@@ -136,7 +136,7 @@ class UserPage extends GenericPage
         /* Main Content */
         /****************/
 
-        $this->name = $this->user['title'] ? $this->user['displayName'].'&nbsp;&lt;'.$this->user['title'].'&gt;' : sprintf(Lang::user('profileTitle'), $this->user['displayName']);
+        $this->name = $this->user['title'] ? $this->user['username'].'&nbsp;&lt;'.$this->user['title'].'&gt;' : Lang::user('profileTitle', [$this->user['username']]);
 
         /**************/
         /* Extra Tabs */
@@ -260,7 +260,7 @@ class UserPage extends GenericPage
         if (!$this->user)                                   // shouldn't happen .. but did
             return;
 
-        array_unshift($this->title, sprintf(Lang::user('profileTitle'), $this->user['displayName']));
+        array_unshift($this->title, Lang::user('profileTitle', [$this->user['username']]));
     }
 
     protected function generatePath() { }

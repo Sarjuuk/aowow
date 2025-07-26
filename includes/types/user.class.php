@@ -18,7 +18,7 @@ class UserList extends BaseType
     protected       $queryBase  = 'SELECT *, a.id AS ARRAY_KEY FROM ?_account a';
     protected       $queryOpts  = array(
                         'a' => [['r']],
-                        'r' => ['j' => ['?_account_reputation r ON r.userId = a.id', true], 's' => ', IFNULL(SUM(r.amount), 0) AS reputation', 'g' => 'a.id']
+                        'r' => ['j' => ['?_account_reputation r ON r.`userId` = a.`id`', true], 's' => ', IFNULL(SUM(r.`amount`), 0) AS "reputation"', 'g' => 'a.`id`']
                     );
 
     public function getListviewData() { }
@@ -29,7 +29,7 @@ class UserList extends BaseType
 
         foreach ($this->iterate() as $__)
         {
-            $data[$this->curTpl['displayName']] = array(
+            $data[$this->curTpl['username']] = array(
                 'border'     => 0,                          // border around avatar (rarityColors)
                 'roles'      => $this->curTpl['userGroups'],
                 'joined'     => date(Util::$dateFormatInternal, $this->curTpl['joinDate']),
@@ -40,14 +40,14 @@ class UserList extends BaseType
                 'reputation' => $this->curTpl['reputation']
             );
 
-            // custom titles (only ssen on user page..?)
+            // custom titles (only seen on user page..?)
             if ($_ = $this->curTpl['title'])
-                $data[$this->curTpl['displayName']]['title'] = $_;
+                $data[$this->curTpl['username']]['title'] = $_;
 
             if ($_ = $this->curTpl['avatar'])
             {
-                $data[$this->curTpl['displayName']]['avatar']     = is_numeric($_) ? 2 : 1;
-                $data[$this->curTpl['displayName']]['avatarmore'] = $_;
+                $data[$this->curTpl['username']]['avatar']     = is_numeric($_) ? 2 : 1;
+                $data[$this->curTpl['username']]['avatarmore'] = $_;
             }
 
             // more optional data

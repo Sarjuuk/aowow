@@ -375,7 +375,7 @@ class ScreenshotPage extends GenericPage
 
     private function ssName() : string
     {
-        return $this->imgHash ? User::$displayName.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash : '';
+        return $this->imgHash ? User::$username.'-'.$this->destType.'-'.$this->destTypeId.'-'.$this->imgHash : '';
     }
 
     protected static function checkCoords(string $val) : array
