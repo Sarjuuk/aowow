@@ -47,11 +47,11 @@ class User
             return false;
 
         // check IP bans
-        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, `unbanDate` FROM ?_account_bannedips WHERE `ip` = ? AND `type` = 0', self::$ip))
+        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `ip` = ? AND `type` = 0', self::$ip))
         {
-            if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['unbanDate'] > time())
+            if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
                 return false;
-            else if ($ipBan['unbanDate'] <= time())
+            else if (!$ipBan['active'])
                 DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `ip` = ?', self::$ip);
         }
 
@@ -97,18 +97,15 @@ class User
         self::$dailyVotes    = $uData['dailyVotes'];
         self::$excludeGroups = $uData['excludeGroups'];
 
-        $conditions = array(
-            [['cuFlags', PROFILER_CU_DELETED, '&'], 0],
-            ['OR', ['user', self::$id], ['ap.accountId', self::$id]]
-        );
-
-        if (self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            array_shift($conditions);
+        $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
+        if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+            $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
 
         self::$profiles = (new LocalProfileList($conditions));
 
         if ($uData['avatar'])
             self::$avatar = $uData['avatar'];
+
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
         // - conscutive visits
@@ -116,7 +113,7 @@ class User
         // - reputation for daily visit
         if (self::isLoggedIn())
         {
-            $lastLogin = DB::Aowow()->selectCell('SELECT curLogin FROM ?_account WHERE id = ?d', self::$id);
+            $lastLogin = DB::Aowow()->selectCell('SELECT `curLogin` FROM ?_account WHERE `id` = ?d', self::$id);
             // either the day changed or the last visit was >24h ago
             if (date('j', $lastLogin) != date('j') || (time() - $lastLogin) > 1 * DAY)
             {
@@ -204,116 +201,124 @@ class User
     /* auth mechanisms */
     /*******************/
 
-    public static function Auth($name, $pass)
+    public static function authenticate(string $name, string $password) : int
     {
-        $user = 0;
-        $hash = '';
+        $userId = 0;
+        $hash   = '';
 
-        switch (Cfg::get('ACC_AUTH_MODE'))
+        $result = match (Cfg::get('ACC_AUTH_MODE'))
         {
-            case AUTH_MODE_SELF:
-            {
-                if (!self::$ip)
-                    return AUTH_INTERNAL_ERR;
+            AUTH_MODE_SELF     => self::authSelf($name, $password, $userId, $hash),
+            AUTH_MODE_REALM    => self::authRealm($name, $password, $userId, $hash),
+            AUTH_MODE_EXTERNAL => self::authExtern($name, $password, $userId, $hash),
+            default            => AUTH_INTERNAL_ERR
+        };
 
-                // handle login try limitation
-                $ip = DB::Aowow()->selectRow('SELECT `ip`, `count`, `unbanDate` FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
-                if (!$ip || $ip['unbanDate'] < time())      // no entry exists or time expired; set count to 1
-                    DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
-                else                                        // entry already exists; increment count
-                    DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ?', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
+        if ($result == AUTH_OK)
+        {
+            session_unset();
+            $_SESSION['user'] = $userId;
+            $_SESSION['hash'] = self::hashCrypt($hash);
+        }
 
-                if ($ip && $ip['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ip['unbanDate'] >= time())
-                    return AUTH_IPBANNED;
+        return $result;
+    }
 
-                $query = DB::Aowow()->SelectRow(
-                   'SELECT    a.`id`, a.`passHash`, BIT_OR(ab.`typeMask`) AS "bans", a.`status`
-                    FROM      ?_account a
-                    LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-                    WHERE     a.`user` = ?
-                    GROUP BY  a.`id`',
-                    $name
-                );
-                if (!$query)
-                    return AUTH_WRONGUSER;
+    private static function authSelf(string $name, string $password, int &$userId, string &$hash) : int
+    {
+        if (!self::$ip)
+            return AUTH_INTERNAL_ERR;
 
-                self::$passHash = $query['passHash'];
-                if (!self::verifyCrypt($pass))
-                    return AUTH_WRONGPASS;
+        // handle login try limitation
+        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
+        if (!$ipBan || !$ipBan['active'])                   // no entry exists or time expired; set count to 1
+            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+        else                                                // entry already exists; increment count
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ?', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
 
-                // successfull auth; clear bans for this IP
-                DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
+        if ($ipBan && $ipBan['count'] >= Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
+            return AUTH_IPBANNED;
 
-                if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
-                    return AUTH_BANNED;
+        $query = DB::Aowow()->SelectRow(
+           'SELECT    a.`id`, a.`passHash`, BIT_OR(ab.`typeMask`) AS "bans", a.`status`
+            FROM      ?_account a
+            LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
+            WHERE     a.`user` = ?
+            GROUP BY  a.`id`',
+            $name
+        );
 
-                $user = $query['id'];
-                $hash = $query['passHash'];
-                break;
-            }
-            case AUTH_MODE_REALM:
-            {
-                if (!DB::isConnectable(DB_AUTH))
-                    return AUTH_INTERNAL_ERR;
+        if (!$query)
+            return AUTH_WRONGUSER;
 
-                $wow = DB::Auth()->selectRow('SELECT a.id, a.salt, a.verifier, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? LIMIT 1', $name);
-                if (!$wow)
-                    return AUTH_WRONGUSER;
+        self::$passHash = $query['passHash'];
+        if (!self::verifyCrypt($password))
+            return AUTH_WRONGPASS;
 
-                if (!self::verifySRP6($name, $pass, $wow['salt'], $wow['verifier']))
-                    return AUTH_WRONGPASS;
+        // successfull auth; clear bans for this IP
+        DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
 
-                if ($wow['hasBan'])
-                    return AUTH_BANNED;
+        if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
+            return AUTH_BANNED;
 
-                if ($_ = self::checkOrCreateInDB($wow['id'], $name))
-                    $user = $_;
-                else
-                    return AUTH_INTERNAL_ERR;
+        $userId = $query['id'];
+        $hash   = $query['passHash'];
 
-                break;
-            }
-            case AUTH_MODE_EXTERNAL:
-            {
-                if (!file_exists('config/extAuth.php'))
-                {
-                    trigger_error('config/extAuth.php not found');
-                    return AUTH_INTERNAL_ERR;
-                }
+        return AUTH_OK;
+    }
 
-                require 'config/extAuth.php';
+    private static function authRealm(string $name, string $password, int &$userId, string &$hash) : int
+    {
+        if (!DB::isConnectable(DB_AUTH))
+            return AUTH_INTERNAL_ERR;
 
-                if (!function_exists('\extAuth'))
-                {
-                    trigger_error('external auth function extAuth() not defined in config/extAuth.php');
-                    return AUTH_INTERNAL_ERR;
-                }
+        $wow = DB::Auth()->selectRow('SELECT a.id, a.salt, a.verifier, ab.active AS hasBan FROM account a LEFT JOIN account_banned ab ON ab.id = a.id AND active <> 0 WHERE username = ? LIMIT 1', $name);
+        if (!$wow)
+            return AUTH_WRONGUSER;
 
-                $extGroup = -1;
-                $result   = \extAuth($name, $pass, $extId, $extGroup);
+        if (!self::verifySRP6($name, $password, $wow['salt'], $wow['verifier']))
+            return AUTH_WRONGPASS;
 
-                if ($result == AUTH_OK && $extId)
-                {
-                    if ($_ = self::checkOrCreateInDB($extId, $name, $extGroup))
-                        $user = $_;
-                    else
-                        return AUTH_INTERNAL_ERR;
+        if ($wow['hasBan'])
+            return AUTH_BANNED;
 
-                    break;
-                }
+        if ($_ = self::checkOrCreateInDB($wow['id'], $name))
+            $userId = $_;
+        else
+            return AUTH_INTERNAL_ERR;
 
-                return $result;
-            }
-            default:
+        return AUTH_OK;
+    }
+
+    private static function authExtern(string $name, string $password, int &$userId, string &$hash) : int
+    {
+        if (!file_exists('config/extAuth.php'))
+        {
+            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but config/extAuth.php does not exist!', E_USER_ERROR);
+            return AUTH_INTERNAL_ERR;
+        }
+
+        require 'config/extAuth.php';
+
+        if (!function_exists('\extAuth'))
+        {
+            trigger_error('User::authExtern - AUTH_MODE_EXTERNAL is selected but function extAuth() is not defined!', E_USER_ERROR);
+            return AUTH_INTERNAL_ERR;
+        }
+
+        $extGroup = -1;
+        $extId    = 0;
+        $result   = \extAuth($name, $password, $extId, $extGroup);
+
+        if ($result == AUTH_OK && $extId)
+        {
+            if ($_ = self::checkOrCreateInDB($extId, $name, $extGroup))
+                $userId = $_;
+            else
                 return AUTH_INTERNAL_ERR;
         }
 
-        // kickstart session
-        session_unset();
-        $_SESSION['user'] = $user;
-        $_SESSION['hash'] = $hash;
-
-        return AUTH_OK;
+        return $result;
     }
 
     // create a linked account for our settings if necessary
@@ -339,10 +344,10 @@ class User
         if ($newId)
             Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
-        return $newId;
+        return $newId ?: 0;
     }
 
-    private static function createSalt()
+    private static function createSalt() : string
     {
         $algo     = '$2a';
         $strength = '$09';
@@ -352,18 +357,18 @@ class User
     }
 
     // crypt used by aowow
-    public static function hashCrypt($pass)
+    public static function hashCrypt(string $pass) : string
     {
         return crypt($pass, self::createSalt());
     }
 
-    public static function verifyCrypt($pass, $hash = '')
+    public static function verifyCrypt(string $pass, string $hash = '') : string
     {
         $_ = $hash ?: self::$passHash;
         return $_ === crypt($pass, $_);
     }
 
-    private static function verifySRP6($user, $pass, $salt, $verifier)
+    private static function verifySRP6(string $user, string $pass, string $salt, string $verifier) : bool
     {
         $g = gmp_init(7);
         $N = gmp_init('894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7', 16);
@@ -376,7 +381,7 @@ class User
         return ($verifier === str_pad(gmp_export($v, 1, GMP_LSW_FIRST), 32, chr(0), STR_PAD_RIGHT));
     }
 
-    public static function isValidName($name, &$errCode = 0)
+    public static function isValidName(string $name, int &$errCode = 0) : bool
     {
         $errCode = 0;
 
@@ -402,7 +407,7 @@ class User
         return $errCode == 0;
     }
 
-    public static function isValidPass($pass, &$errCode = 0)
+    public static function isValidPass(string $pass, int &$errCode = 0) : bool
     {
         $errCode = 0;
 
@@ -420,9 +425,9 @@ class User
     /* access management */
     /*********************/
 
-    public static function isInGroup($group) : bool
+    public static function isInGroup(int $group) : bool
     {
-        return (self::$groups & $group) != 0;
+        return $group == U_GROUP_NONE || (self::$groups & $group) != U_GROUP_NONE;
     }
 
     public static function canComment() : bool
@@ -511,25 +516,38 @@ class User
 
     public static function decrementDailyVotes() : void
     {
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_RATE))
+            return;
+
         self::$dailyVotes--;
         DB::Aowow()->query('UPDATE ?_account SET `dailyVotes` = ?d WHERE `id` = ?d', self::$dailyVotes, self::$id);
     }
 
     public static function getCurrentDailyVotes() : int
     {
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_RATE) || self::$dailyVotes < 0)
+            return 0;
+
         return self::$dailyVotes;
     }
 
     public static function getMaxDailyVotes() : int
     {
-        if (!self::isLoggedIn() || self::isBanned())
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_RATE))
             return 0;
 
-        return Cfg::get('USER_MAX_VOTES') + (self::$reputation >= Cfg::get('REP_REQ_VOTEMORE_BASE') ? 1 + intVal((self::$reputation - Cfg::get('REP_REQ_VOTEMORE_BASE')) / Cfg::get('REP_REQ_VOTEMORE_ADD')) : 0);
+        $threshold = Cfg::get('REP_REQ_VOTEMORE_BASE');
+        $extra     = Cfg::get('REP_REQ_VOTEMORE_ADD');
+        $base      = Cfg::get('USER_MAX_VOTES');
+
+        return $base + max(0, intVal((self::$reputation - $threshold + $extra) / $extra));
     }
 
     public static function getReputation() : int
     {
+        if (!self::isLoggedIn() || self::$reputation < 0)
+            return 0;
+
         return self::$reputation;
     }
 
@@ -555,10 +573,10 @@ class User
         $gUser['upvoteRep']         = Cfg::get('REP_REQ_UPVOTE');
         $gUser['characters']        = self::getCharacters();
         $gUser['excludegroups']     = self::$excludeGroups;
-        $gUser['settings']          = (new \StdClass);      // profiler requires this to be set; has property premiumborder (NYI)
+        $gUser['settings']          = (new \StdClass);      // existence is checked in Profiler.js before g_user.excludegroups is applied; has property premiumborder (NYI)
 
         if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
-            $gUser['debug'] = true;                         // csv id-list output option on listviews
+            $gUser['debug'] = true;                         // csv id-list output option on listviews; todo - set on per user basis
 
         if ($_ = self::getProfilerExclusions())
             $gUser = array_merge($gUser, $_);
@@ -582,6 +600,9 @@ class User
     {
         $result = [];
 
+        if (!self::isLoggedIn() || self::isBanned())
+            return $result;
+
         $res = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `name` FROM ?_account_weightscales WHERE `userId` = ?d', self::$id);
         if (!$res)
             return $result;
@@ -596,6 +617,10 @@ class User
     public static function getProfilerExclusions() : array
     {
         $result = [];
+
+        if (!self::isLoggedIn() || self::isBanned())
+            return $result;
+
         $modes  = [1 => 'excludes', 2 => 'includes'];
         foreach ($modes as $mode => $field)
             if ($ex = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_excludes WHERE `mode` = ?d AND `userId` = ?d', $mode, self::$id))
@@ -644,10 +669,13 @@ class User
     {
         $result = [];
 
+        if (!self::isLoggedIn() || self::isBanned(ACC_BAN_GUIDE))
+            return $result;
+
         if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GUIDE_STATUS_ARCHIVED))
         {
             // fix url
-            array_walk($guides, fn(&$x) => $x['url'] = '?guide='.($x['url'] ?? $x['id']));
+            array_walk($guides, fn(&$x) => $x['url'] = '?guide='.($x['url'] ?: $x['id']));
             $result = $guides;
         }
 
@@ -664,7 +692,7 @@ class User
 
     public static function getFavorites() : array
     {
-        if (!self::isLoggedIn())
+        if (!self::isLoggedIn() || self::isBanned())
             return [];
 
         $res = DB::Aowow()->selectCol('SELECT `type` AS ARRAY_KEY, `typeId` AS ARRAY_KEY2, `typeId` FROM ?_account_favorites WHERE `userId` = ?d', self::$id);

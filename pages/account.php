@@ -358,7 +358,7 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         if (!User::isValidPass($this->_post['password']))
             return Lang::account('wrongPass');
 
-        switch (User::Auth($this->_post['username'], $this->_post['password']))
+        switch (User::authenticate($this->_post['username'], $this->_post['password']))
         {
             case AUTH_OK:
                 if (!User::$ip)
