@@ -23,6 +23,12 @@ class CommunityContent
     private static array $jsGlobals = [];
     private static array $subjCache = [];
 
+    private static string $coCountQuery =
+       'SELECT    COUNT(1)
+        FROM      ?_comments c
+        WHERE     c.`replyTo` = ?d AND c.`type` = ?d AND c.`typeId` = ?d AND
+                  ((c.`flags` & ?d) = 0 OR c.`userId` = ?d OR ?d)';
+
     private static string $coQuery =
        'SELECT    c.*,
                   a1.`displayName` AS `user`,
@@ -188,10 +194,7 @@ class CommunityContent
         // get replies
         if ($results = DB::Aowow()->select($query, User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR)))
         {
-            $nFound = DB::Aowow()->selectCell(
-                substr_replace(self::$coQuery, 'SELECT COUNT(*) ', 0, strpos(self::$coQuery, 'FROM')),
-                User::$id, RATING_COMMENT, Report::MODE_COMMENT, User::$id, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR)
-            );
+            $nFound = DB::Aowow()->selectCell(self::$coCountQuery, $commentId, 0, 0, CC_FLAG_DELETED, User::$id, User::isInGroup(U_GROUP_COMMENTS_MODERATOR));
 
             foreach ($results as $r)
             {
@@ -370,6 +373,7 @@ class CommunityContent
                 'rating'     => $r['rating'],
                 'userRating' => $r['userRating'],
                 'user'       => $r['user'],
+                'nreplies'   => 0
             );
 
             $c['replies'] = self::getCommentReplies($r['id'], 5, $c['nreplies']);
