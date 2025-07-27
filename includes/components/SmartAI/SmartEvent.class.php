@@ -282,7 +282,7 @@ class SmartEvent
                 break;
             case self::EVENT_LINK:                          // 61  -  Used to link together multiple events as a chain of events.
                 if ($links = DB::World()->selectCol('SELECT `id` FROM smart_scripts WHERE `link` = ?d AND `entryorguid` = ?d AND `source_type` = ?d', $this->id, $this->smartAI->entry, $this->smartAI->srcType))
-                    $this->param[10] = LANG::concat($links, false, fn($x) => "#[b]".$x."[/b]");
+                    $this->param[10] = Lang::concat($links, Lang::CONCAT_OR, fn($x) => "#[b]".$x."[/b]");
                 break;
             case self::EVENT_GOSSIP_SELECT:                 // 62  -  On gossip clicked (gossip_menu_option335).
                 $gmo = DB::World()->selectRow(
@@ -323,7 +323,7 @@ class SmartEvent
                     trigger_error('SmartAI::event - entity for event #'.$this->type.' not defined');
                 break;
             case self::EVENT_EVENT_PHASE_CHANGE:            // 66  -  On event phase mask set
-                $this->param[10] = Lang::concat(Util::mask2bits($this->param[0]), false);
+                $this->param[10] = Lang::concat(Util::mask2bits($this->param[0]), Lang::CONCAT_OR);
                 break;
         }
 

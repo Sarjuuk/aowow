@@ -547,21 +547,19 @@ class GenericPage
 
         $article = [];
         if (isset($this->guideRevision))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
                 Type::GUIDE, $this->typeId, $this->guideRevision);
         else if (!empty($this->articleUrl))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->articleUrl, [Lang::getLocale()->value, Locale::EN->value]);
         else if (!empty($this->type) && isset($this->typeId))
-            $article = DB::Aowow()->selectRow('SELECT `article`, `quickInfo`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
+            $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->type, $this->typeId, [Lang::getLocale()->value, Locale::EN->value]);
 
         if ($article)
         {
             if ($article['article'])
                 Markup::parseTags($article['article'], $this->jsgBuffer);
-            if ($article['quickInfo'])
-                Markup::parseTags($article['quickInfo'], $this->jsgBuffer);
 
             $this->article = array(
                 'text'   => Util::jsEscape(Util::defStatic($article['article'])),
@@ -584,9 +582,6 @@ class GenericPage
                 $this->article['params']['allow'] = '$Markup.CLASS_USER';
 
             $this->editAccess = $article['editAccess'];
-
-            if (empty($this->infobox) && !empty($article['quickInfo']))
-                $this->infobox = $article['quickInfo'];
 
             if ($article['locale'] != Lang::getLocale()->value)
                 $this->article['params']['prepend'] = '<div class="notice-box"><span class="icon-bubble">'.Lang::main('langOnly', [Lang::lang($article['locale'])]).'</span></div>';

@@ -45,7 +45,22 @@ class ZonePage extends GenericPage
         /* Infobox */
         /***********/
 
+        $quickFactsRows = DB::Aowow()->selectCol('SELECT `orderIdx` AS  ARRAY_KEY, `row` FROM ?_quickfacts WHERE `type` = ?d AND `typeId` = ?d ORDER BY `orderIdx` ASC', $this->type, $this->typeId);
+        $quickFactsRows = preg_replace_callback('/\|L:(\w+)((:\w+)+)\|/i', function ($m)
+        {
+            [, $grp, $args] = $m;
+            $args = array_filter(explode(':', $args), fn($x) => $x != '');
+
+            return Lang::$grp(...$args);
+        }, $quickFactsRows);
+
+        foreach ($quickFactsRows as $er)
+            $this->extendGlobalData(Markup::parseTags($er));
+
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+
+        if ($topRows = array_filter($quickFactsRows, fn($x) => $x < 0, ARRAY_FILTER_USE_KEY))
+            $infobox = array_merge($infobox, $topRows);
 
         // City
         if ($this->subject->getField('flags') & 0x8 && !$parentArea)
@@ -76,27 +91,55 @@ class ZonePage extends GenericPage
         }
 
         // Territory
-        $_  = $this->subject->getField('faction');
-        $__ = '%s';
-        if ($_ == 0)
-            $__ = '[span class=icon-alliance]%s[/span]';
-        else if ($_ == 1)
-            $__ = '[span class=icon-horde]%s[/span]';
-        else if ($_ == 4)
-            $__ = '[span class=icon-ffa]%s[/span]';
+        $faction = $this->subject->getField('faction');
+        $wrap    = match ((int)$faction)
+        {
+            0       => '[span class=icon-alliance]%s[/span]',
+            1       => '[span class=icon-horde]%s[/span]',
+            4, 5    => '[span class=icon-ffa]%s[/span]',
+            default => '%s'
+        };
 
-        $infobox[] = Lang::zone('territory').Lang::main('colon').sprintf($__, Lang::zone('territories', $_));
+        $infobox[] = Lang::zone('territory').sprintf($wrap, Lang::zone('territories', $faction));
 
         // Instance Type
-        $infobox[] = Lang::zone('instanceType').Lang::main('colon').'[span class=icon-instance'.$this->subject->getField('type').']'.Lang::zone('instanceTypes', $this->subject->getField('type')).'[/span]';
+        $infobox[] = Lang::zone('instanceType').'[span class=icon-instance'.$this->subject->getField('type').']'.Lang::zone('instanceTypes', $this->subject->getField('type')).'[/span]';
 
         // Heroic mode
         if ($_ = $this->subject->getField('levelHeroic'))
-            $infobox[] = '[icon preset=heroic]'.sprintf(Lang::zone('hcAvailable'), $_).'[/icon]';
+            $infobox[] = '[icon preset=heroic]'.Lang::zone('hcAvailable', [$_]).'[/icon]';
 
         // number of players
         if ($_ = $this->subject->getField('maxPlayer'))
-            $infobox[] = Lang::zone('numPlayers').Lang::main('colon').($_ == -2 ? '10/25' : $_);
+        {
+            if (in_array($this->subject->getField('category'), [6, 9]))
+                $infobox[] = Lang::zone('numPlayersVs', [$_]);
+            else
+                $infobox[] = Lang::zone('numPlayers', [$_ == -2 ? '10/25' : $_]);
+        }
+
+        // Instances
+        if ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_spawns WHERE `type`= ?d AND `areaId` = ?d ', Type::ZONE, $this->typeId))
+        {
+            $this->extendGlobalIds(Type::ZONE, ...$_);
+            $infobox[] = Lang::maps('Instances').Lang::main('colon').Lang::concat($_, Lang::CONCAT_NONE, fn($x) => "\n[zone=".$x."]");
+        }
+
+        // start area
+        if ($_ = DB::Aowow()->selectCol('SELECT `id` FROM ?_races WHERE `startAreaId` = ?d', $this->typeId))
+        {
+            $this->extendGlobalIds(Type::CHR_RACE, ...$_);
+            $infobox[] = Lang::concat($_, Lang::CONCAT_NONE, fn($x) => '[race='.$x.']').' '.Lang::race('startZone');
+        }
+
+        // location (if instance)
+        if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ?_spawns WHERE `type`= ?d AND `typeId` = ?d ', Type::ZONE, $this->typeId))
+        {
+            $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
+
+            $pins = str_pad($pa['posX'] * 10, 3, '0', STR_PAD_LEFT) . str_pad($pa['posY'] * 10, 3, '0', STR_PAD_LEFT);
+            $infobox[] = Lang::zone('location').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneList::getName($pa['areaId']).'[/lightbox]';
+        }
 
         // Attunement Quest/Achievements & Keys
         if ($attmnt = $this->subject->getField('attunes'))
@@ -107,37 +150,16 @@ class ZonePage extends GenericPage
                 foreach ($ids as $id)
                 {
                     if ($type == Type::ITEM)
-                        $infobox[] = Lang::zone('key', (int)($id < 0)).Lang::main('colon').'[item='.abs($id).']';
+                        $infobox[] = Lang::zone('key', (int)($id < 0)).'[item='.abs($id).']';
                     else
-                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).Lang::main('colon').'['.Type::getFileString($type).'='.abs($id).']';
+                        $infobox[] = Lang::zone('attunement', (int)($id < 0)).'['.Type::getFileString($type).'='.abs($id).']';
                 }
             }
         }
 
-        // Instances
-        if ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_spawns WHERE `type`= ?d AND `areaId` = ?d ', Type::ZONE, $this->typeId))
-        {
-            $this->extendGlobalIds(Type::ZONE, ...$_);
-            $infobox[] = Lang::maps('Instances').Lang::main('colon')."\n[zone=".implode("], \n[zone=", $_).']';
-        }
+        if ($botRows = array_filter($quickFactsRows, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY))
+            $infobox = array_merge($infobox, $botRows);
 
-        // location (if instance)
-        if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ?_spawns WHERE `type`= ?d AND `typeId` = ?d ', Type::ZONE, $this->typeId))
-        {
-            $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
-
-            $pins = str_pad($pa['posX'] * 10, 3, '0', STR_PAD_LEFT) . str_pad($pa['posY'] * 10, 3, '0', STR_PAD_LEFT);
-            $infobox[] = Lang::zone('location').Lang::main('colon').'[lightbox=map zone='.$pa['areaId'].' '.($pa['floor'] > 1 ? 'floor='.--$pa['floor'] : '').' pins='.$pins.']'.ZoneList::getName($pa['areaId']).'[/lightbox]';
-        }
-
-/*  has to be defined in an article, i think
-
-    // faction(s) / Reputation Hub / Raid Faction
-    // [li]Raid faction: [faction=1156][/li] || [li]Factions: [faction=1156]/[faction=1156][/li]
-
-    // final boss
-    // [li]Final boss: [icon preset=boss][npc=37226][/icon][/li]
-*/
 
         /****************/
         /* Main Content */

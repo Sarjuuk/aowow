@@ -52,6 +52,10 @@ class Lang
     public const FMT_HTML   = 1;
     public const FMT_MARKUP = 2;
 
+    public const CONCAT_NONE = 0;
+    public const CONCAT_AND  = 1;
+    public const CONCAT_OR   = 2;
+
     public static function load(Locale $loc) : void
     {
         if (self::$locale == $loc)
@@ -117,27 +121,28 @@ class Lang
         return $ref;
     }
 
-    public static function concat(array $args, bool $useAnd = true, ?callable $callback = null) : string
+    public static function concat(array $args, int $concat = self::CONCAT_AND, ?callable $callback = null) : string
     {
-        $b = '';
-        $i = 0;
-        $n = count($args);
-
+        $buff       = '';
         $callback ??= fn($x) => $x;
 
-        foreach ($args as $k => $arg)
+        reset($args);
+
+        do
         {
-            $b .= $callback($arg, $k);
+            $item = $callback(current($args), key($args));
+            $arg  = next($args);
 
-            if ($n > 1 && $i < ($n - 2))
-                $b .= ', ';
-            else if ($n > 1 && $i == $n - 2)
-                $b .= self::main($useAnd ? 'and' : 'or');
-
-            $i++;
+            if ($arg !== false || $concat == self::CONCAT_NONE)
+                $buff .= ', '.$item;
+            else if ($concat == self::CONCAT_AND)
+                $buff .= self::main('and').' '.$item;
+            else
+                $buff .= self::main('or').' '.$item;
         }
+        while ($arg !== false);
 
-        return $b;
+        return substr($buff, 2);
     }
 
     // truncate string after X chars. If X is inside a word truncate behind it.

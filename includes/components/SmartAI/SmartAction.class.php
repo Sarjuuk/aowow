@@ -411,7 +411,7 @@ class SmartAction
                     $buff[] = '[emote='.$this->param[$i].']';
                     $this->jsGlobals[Type::EMOTE][$this->param[$i]] = $this->param[$i];
                 }
-                $this->param[10] = Lang::concat($buff, false);
+                $this->param[10] = Lang::concat($buff, Lang::CONCAT_OR);
                 break;
             case self::ACTION_SET_FACTION:                  // 2 -> any target
                 if ($this->param[0])
@@ -592,7 +592,7 @@ class SmartAction
                     foreach ($tal->getTabs() as $guid => $tt)
                         $this->smartAI->addTab($guid, $tt);
                 }
-                $this->param[10] = Lang::concat($talBuff, false);
+                $this->param[10] = Lang::concat($talBuff, Lang::CONCAT_OR);
                 break;
             case self::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST:// 88 -> self
                 $talBuff = [];
@@ -608,7 +608,7 @@ class SmartAction
                     foreach ($tal->getTabs() as $guid => $tt)
                         $this->smartAI->addTab($guid, $tt);
                 }
-                $this->param[10] = Lang::concat($talBuff, false);
+                $this->param[10] = Lang::concat($talBuff, Lang::CONCAT_OR);
                 break;
             case self::ACTION_SET_HOME_POS:                 // 101 -> self
                 if ($this->smartAI->getTarget()?->type == Smarttarget::TARGET_SELF)
@@ -636,7 +636,7 @@ class SmartAction
                     $this->param[10] = Lang::concat($buff);
                 break;
             case self::ACTION_START_CLOSEST_WAYPOINT:       // 113 -> any target
-                $this->param[10] = Lang::concat(array_filter($this->param), false, fn($x) => '#[b]'.$x.'[/b]');
+                $this->param[10] = Lang::concat(array_filter($this->param), Lang::CONCAT_OR, fn($x) => '#[b]'.$x.'[/b]');
                 break;
             case self::ACTION_RANDOM_SOUND:                 // 115 -> self
                 for ($i = 0; $i < 4; $i++)
