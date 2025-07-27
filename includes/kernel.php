@@ -3,6 +3,7 @@
 namespace Aowow;
 
 mb_internal_encoding('UTF-8');
+error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 
 define('AOWOW_REVISION', 40);
@@ -40,7 +41,7 @@ require_once 'includes/user.class.php';                     // Session handling 
 require_once 'includes/game/misc.php';                      // Misc game related data & functions
 
 // game client data interfaces
-spl_autoload_register(function ($class)
+spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
         $class = substr($class, $i + 1);
@@ -55,7 +56,7 @@ spl_autoload_register(function ($class)
 });
 
 // our site components
-spl_autoload_register(function ($class)
+spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
         $class = substr($class, $i + 1);
@@ -70,7 +71,7 @@ spl_autoload_register(function ($class)
 });
 
 // TC systems in components
-spl_autoload_register(function ($class)
+spl_autoload_register(function (string $class) : void
 {
     switch ($class)
     {
@@ -90,7 +91,7 @@ spl_autoload_register(function ($class)
 });
 
 // autoload List-classes, associated filters
-spl_autoload_register(function ($class)
+spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
         $class = substr($class, $i + 1);
@@ -124,7 +125,7 @@ spl_autoload_register(function ($class)
 });
 
 // endpoint loader
-spl_autoload_register(function ($class)
+spl_autoload_register(function (string $class) : void
 {
     if ($i = strrpos($class, '\\'))
         $class = substr($class, $i + 1);
@@ -158,7 +159,7 @@ spl_autoload_register(function ($class)
     }
 });
 
-set_error_handler(function($errNo, $errStr, $errFile, $errLine)
+set_error_handler(function(int $errNo, string $errStr, string $errFile, int $errLine) : bool
 {
     // either from test function or handled separately
     if (strstr($errStr, 'mysqli_connect') && $errNo == E_WARNING)
@@ -186,7 +187,7 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
+            AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
         );
 
     if (CLI)
@@ -198,11 +199,11 @@ set_error_handler(function($errNo, $errStr, $errFile, $errLine)
 }, E_ALL);
 
 // handle exceptions
-set_exception_handler(function ($e)
+set_exception_handler(function (\Throwable $e) : void
 {
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-            AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e->getMessage()
+            AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e->getMessage()
         );
 
     if (CLI)
@@ -215,13 +216,13 @@ set_exception_handler(function ($e)
 });
 
 // handle fatal errors
-register_shutdown_function(function()
+register_shutdown_function(function() : void
 {
     if ($e = error_get_last())
     {
         if (DB::isConnected(DB_AOWOW))
             DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
-                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : ($_SERVER['QUERY_STRING'] ?? ''), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
+                AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
             );
 
         if (CLI)
@@ -254,22 +255,18 @@ if (!empty($AoWoWconf['characters']))
 $AoWoWconf = null;                                          // empty auths
 
 
+// for CLI and early errors in erb context
+Lang::load(Locale::EN);
+
 // load config from DB
 Cfg::load();
-
-
-// handle non-fatal errors and notices
-error_reporting(E_ALL);
 
 
 if (!CLI)
 {
     // not displaying the brb gnomes as static_host is missing, but eh...
     if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !Cfg::get('HOST_URL') || !Cfg::get('STATIC_URL'))
-    {
-        Lang::load(Locale::EN);
         (new GenericPage())->maintenance();
-    }
 
     // Setup Session
     $cacheDir = Cfg::get('SESSION_CACHE_DIR');
@@ -293,7 +290,7 @@ if (!CLI)
     else
         Lang::load(User::$preferedLoc);
 
-    // set up some logging (~10 queries will execute before we init the user and load the config)
+    // set up some logging (some queries will execute before we init the user and load the config)
     if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
     {
         DB::Aowow()->setLogger(DB::profiler(...));
@@ -313,7 +310,5 @@ if (!CLI)
     $pageCall  = mb_strtolower($_[0]);
     $pageParam = $_[1] ?? '';
 }
-else if (DB::isConnected(DB_AOWOW))
-    Lang::load(Locale::EN);
 
 ?>

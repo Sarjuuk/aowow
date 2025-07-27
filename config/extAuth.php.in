@@ -4,13 +4,16 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-    function extAuth($user, $pass, &$userId = 0, &$userGroup = -1)
+    function extAuth(string &$usernameOrEmail, string $password, int &$userId = 0, int &$userGroup = -1) : int
     {
         /*
             insert some auth mechanism here
 
-            see defines for usable return values
-            set userId for identification
+            set usernameOrEmail to a valid username, do not pass back the email if used for login
+            set userId to uid from external auth provider for identification
+            (optional) set userGroup to a valid userGroup (see U_GROUP_* defines)
+
+            return an AUTH_* result (see defines)
         */
 
         return AUTH_INTERNAL_ERR;
