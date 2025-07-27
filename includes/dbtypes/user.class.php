@@ -56,6 +56,8 @@ class UserList extends DBTypeList
 
     public function getListviewData() : array { return []; }
     public function renderTooltip() : ?string { return null; }
+
+    public static function getName($id) : ?LocString { return null; }
 }
 
 ?>

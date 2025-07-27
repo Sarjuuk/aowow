@@ -43,7 +43,7 @@ class Announcement implements \JsonSerializable
     public function jsonSerialize() : array
     {
         $json = array(
-            'parent' => 'announcement-' . abs($this->id),
+            'parent' => 'announcement-' . $this->id,
             'id'     => $this->editable ? -$this->id : $this->id,
             'mode'   => $this->mode,
             'status' => $this->status,

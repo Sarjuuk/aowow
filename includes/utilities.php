@@ -18,104 +18,6 @@ class SimpleXML extends \SimpleXMLElement
     }
 }
 
-trait TrRequestData
-{
-    // const in trait supported in php8.2+
-    public const PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
-    public const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
-
-    protected $_get    = [];                                // fill with variables you that are going to be used; eg:
-    protected $_post   = [];                                // 'id' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdList']
-    protected $_cookie = [];
-
-    private $filtered = false;
-
-    private function initRequestData() : void
-    {
-        if ($this->filtered)
-            return;
-
-        // php bug? If INPUT_X is empty, filter_input_array returns null/fails
-        // only really relevant for INPUT_POST
-        // manuall set everything null in this case
-
-        if ($this->_post)
-        {
-            if ($_POST)
-                $this->_post = filter_input_array(INPUT_POST, $this->_post);
-            else
-                $this->_post = array_fill_keys(array_keys($this->_post), null);
-        }
-
-        if ($this->_get)
-        {
-            if ($_GET)
-                $this->_get = filter_input_array(INPUT_GET, $this->_get);
-            else
-                $this->_get = array_fill_keys(array_keys($this->_get), null);
-        }
-
-        if ($this->_cookie)
-        {
-            if ($_COOKIE)
-                $this->_cookie = filter_input_array(INPUT_COOKIE, $this->_cookie);
-            else
-                $this->_cookie = array_fill_keys(array_keys($this->_cookie), null);
-        }
-
-        $this->filtered = true;
-    }
-
-    private static function checkEmptySet(string $val) : bool
-    {
-        return $val === '';                                 // parameter is expected to be empty
-    }
-
-    private static function checkInt(string $val) : int
-    {
-        if (preg_match('/^-?\d+$/', $val))
-            return intVal($val);
-
-        return 0;
-    }
-
-    private static function checkIdList(string $val) : array
-    {
-        if (preg_match('/^-?\d+(,-?\d+)*$/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return [];
-    }
-
-    private static function checkIntArray(string $val) : array
-    {
-        if (preg_match('/^-?\d+(:-?\d+)*$/', $val))
-            return array_map('intVal', explode(':', $val));
-
-        return [];
-    }
-
-    private static function checkIdListUnsigned(string $val) : array
-    {
-        if (preg_match('/^\d+(,\d+)*$/', $val))
-            return array_map('intVal', explode(',', $val));
-
-        return [];
-    }
-
-    private static function checkTextLine(string $val) : string
-    {
-        // trim non-printable chars
-        return preg_replace(self::PATTERN_TEXT_LINE, '', $val);
-    }
-
-    private static function checkTextBlob(string $val) : string
-    {
-        // trim non-printable chars
-        return preg_replace(self::PATTERN_TEXT_BLOB, '', $val);
-    }
-}
-
 
 abstract class Util
 {
@@ -175,9 +77,7 @@ abstract class Util
 
     public static $guideratingString        = "        $(document).ready(function() {\n        $('#guiderating').append(GetStars(%.10F, %s, %u, %u));\n    });";
 
-    public static $expansionString          = array(        // 3 & 4 unused .. obviously
-        null,           'bc',           'wotlk',            'cata',                'mop'
-    );
+    public static $expansionString          = [null, 'bc', 'wotlk'];
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';
     private static $notes                   = [];
@@ -191,7 +91,7 @@ abstract class Util
     {
         $notes = [];
         $severity = LOG_LEVEL_INFO;
-        foreach (self::$notes as [$note, $uGroup, $level])
+        foreach (self::$notes as $k => [$note, $uGroup, $level])
         {
             if ($uGroup && !User::isInGroup($uGroup))
                 continue;
@@ -200,6 +100,7 @@ abstract class Util
                 $severity = $level;
 
             $notes[] = $note;
+            unset(self::$notes[$k]);
         }
 
         return [$notes, $severity];
@@ -309,14 +210,14 @@ abstract class Util
             if ($ms)
                 return $ms."\u{00A0}".Lang::timeUnits('ab', 7);
 
-            return '0 '.Lang::timeUnits('ab', 6);
+            return "0\u{00A0}".Lang::timeUnits('ab', 6);
         }
         else
         {
             $_ = $d + $h / 24;
             if ($_ > 1 && !($_ % 365))                      // whole years
-                return round(($d + $h / 24) / 364, 2)."\u{00A0}".Lang::timeUnits($d / 364 == 1 && !$h ? 'sg' : 'pl', 0);
-            if ($_ > 1 && !($_ % 30))                       // whole month
+                return round(($d + $h / 24) / 365, 2)."\u{00A0}".Lang::timeUnits($d / 365 == 1 && !$h ? 'sg' : 'pl', 0);
+            if ($_ > 1 && !($_ % 30))                       // whole months
                 return round(($d + $h / 24) /  30, 2)."\u{00A0}".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
             if ($_ > 1 && !($_ % 7))                        // whole weeks
                 return round(($d + $h / 24) /   7, 2)."\u{00A0}".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
@@ -329,15 +230,15 @@ abstract class Util
             if ($s)
                 return round($s + $ms / 1000, 2)."\u{00A0}".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
             if ($ms)
-                return $ms." ".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
+                return $ms."\u{00A0}".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
 
-            return '0 '.Lang::timeUnits('pl', 6);
+            return "0\u{00A0}".Lang::timeUnits('pl', 6);
         }
     }
 
     public static function formatTimeDiff(int $sec) : string
     {
-        $delta = time() - $sec;
+        $delta = abs(time() - $sec);
 
         [, $s, $m, $h, $d] = self::parseTime($delta * 1000);
 
@@ -476,21 +377,23 @@ abstract class Util
         ));
     }
 
-    public static function defStatic($data)
+    public static function defStatic(array|string $data) : array|string
     {
         if (is_array($data))
         {
             foreach ($data as &$v)
-                $v = self::defStatic($v);
+                if ($v)
+                    $v = self::defStatic($v);
 
             return $data;
         }
 
         return strtr($data, array(
-            '<script'    => '<scr"+"ipt',
-            'script>'    => 'scr"+"ipt>',
-            'HOST_URL'   => Cfg::get('HOST_URL'),
-            'STATIC_URL' => Cfg::get('STATIC_URL')
+            'HOST_URL'      => Cfg::get('HOST_URL'),
+            'STATIC_URL'    => Cfg::get('STATIC_URL'),
+            'NAME'          => Cfg::get('NAME'),
+            'NAME_SHORT'    => Cfg::get('NAME_SHORT'),
+            'CONTACT_EMAIL' => Cfg::get('CONTACT_EMAIL')
         ));
     }
 
@@ -558,7 +461,7 @@ abstract class Util
         $first = mb_substr($str, 0, 1);
         $rest  = mb_substr($str, 1);
 
-        return mb_strtoupper($first).mb_strtolower($rest);
+        return mb_strtoupper($first).$rest;
     }
 
     public static function ucWords(string $str) : string
@@ -864,15 +767,6 @@ abstract class Util
         return DB::Aowow()->query('INSERT IGNORE INTO ?_account_reputation (?#) VALUES (?a)', array_keys($x), array_values($x));
     }
 
-    public static function sendNoCacheHeader()
-    {
-        header('Expires: Sat, 01 Jan 2000 01:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: no-store, no-cache, must-revalidate');
-        header('Cache-Control: post-check=0, pre-check=0', false);
-        header('Pragma: no-cache');
-    }
-
     public static function toJSON($data, $forceFlags = 0)
     {
         $flags = $forceFlags ?: (JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
@@ -884,7 +778,7 @@ abstract class Util
 
         // handle strings prefixed with $ as js-variables
         // literal: match everything (lazy) between first pair of unescaped double quotes. First character must be $.
-        $json = preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', function($m) { return str_replace('\"', '"', $m[1]); }, $json);
+        $json = preg_replace_callback('/(?<!\\\\)"\$(.+?)(?<!\\\\)"/i', fn($m) => str_replace('\"', '"', $m[1]), $json);
 
         return $json;
     }
@@ -1330,9 +1224,9 @@ abstract class Util
                    'Reply-To: '     . Cfg::get('CONTACT_EMAIL') . "\n" .
                    'X-Mailer: PHP/' . phpversion();
 
-        if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+        if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO)
         {
-            $_SESSION['debug-mail'] = $email . "\n\n" . $subject . "\n\n" . $body;
+            Util::addNote("Redirected from Util::sendMail:\n\nTo: " . $email . "\n\nSubject: " . $subject . "\n\n" . $body, U_GROUP_DEV | U_GROUP_ADMIN, LOG_LEVEL_INFO);
             return true;
         }
 

@@ -632,10 +632,7 @@ trait spawnHelper
         $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
-        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0", self::$type, $this->getFoundIDs());
-
-        if (!$spawns)
-            return;
+        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0", self::$type, $this->getFoundIDs()) ?: [];
 
         if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
             if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))

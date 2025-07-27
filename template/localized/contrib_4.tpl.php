@@ -1,4 +1,6 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+?>
 
         <div id="tab-add-your-comment" style="display: none">
             发表评论时请记住以下几点：
@@ -9,15 +11,15 @@
             <li><div>你在发表前最好先预览下你的评论。</div></li>
             </ul>
 <?php
-    echo $this->coError ? '            <div class="msg-failure">'.$this->coError."</div>\n            <div class=\"pad\"></div>\n" : '';
+    echo $coError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$coError."</div>\n" : '';
 
-    if (User::canComment()):
+    if ($this->user::canComment()):
 ?>
             <form name="addcomment" action="?comment=add&amp;type=<?=$this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">
                 <div id="funcbox-generic"></div>
                 <script type="text/javascript">Listview.funcBox.coEditAppend($('#funcbox-generic'), {body: ''}, 1)</script>
                 <div class="pad"></div>
-                <input type="submit" value="Submit"></input>
+                <input type="submit" value="提交"></input>
 <?php
     else:
 ?>
@@ -25,7 +27,7 @@
             <div class="comment-edit-body"><textarea class="comment-editbox" rows="10" cols="40" name="commentbody" disabled="disabled"></textarea></div>
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
             <small>你尚未登录，请先<a href="?account=signin">登录</a>或<a href="?account=signup">注册一个账号</a> 以发表你的评论。</small>
 <?php
@@ -41,14 +43,14 @@
             <li><div>请阅读我们的<a href="?help=screenshots-tips-tricks" target="_blank">提示和技巧</a>假如你还没看过的话。</div></li>
             </ul>
 <?php
-    echo $this->ssError ? '            <div class="msg-failure">'.$this->ssError."</div>\n            <div class=\"pad\"></div>\n" : '';
+    echo $ssError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$ssError."</div>\n" : '';
 
-    if (User::canUploadScreenshot()):
+    if ($this->user::canUploadScreenshot()):
 ?>
             <form action="?screenshot=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
             <input type="file" name="screenshotfile" style="width: 35%"/><br />
             <div class="pad2"></div>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="提交" />
             <div class="pad3"></div>
             <small class="q0">注意：你的截图将在审查后才会出现在站点上。</small>
 <?php
@@ -58,7 +60,7 @@
             <input type="file" name="screenshotfile" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
             <small>你尚未登录，请先<a href="?account=signin">登录</a>以提交截图。</small>
 <?php
@@ -67,17 +69,19 @@
             </form>
         </div>
         <div id="tab-suggest-a-video" style="display: none">
-            Simply type the URL of the video in the form below.
+            将视频URL输入下列表格即可。
 <?php
-    if (User::canSuggestVideo()):
+    echo $viError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$viError."</div>\n" : '';
+
+    if ($this->user::canSuggestVideo()):
 ?>
             <div class="pad2"></div>
             <form action="?video=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
-            <input type="text" name="videourl" style="width: 35%" /> <small>Supported: YouTube only</small>
+            <input type="text" name="videourl" style="width: 35%" /> <small>支持：仅限 YouTube</small>
             <div class="pad2"></div>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="提交" />
             <div class="pad3"></div>
-            <small class="q0">Note: Your video will need to be approved before appearing on the site.</small>
+            <small class="q0">说明：您的视频需通过审核才能在站点上显示。</small>
 <?php
     else:
 ?>
@@ -85,9 +89,9 @@
             <input type="text" name="videourl" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
-            <small>You are not signed in. Please <a href="?account=signin">sign in</a> to submit a video.</small>
+            <small>你尚未登录，请先<a href="?account=signin">登录</a>以提交视频。</small>
 <?php
     endif;
 ?>

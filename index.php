@@ -8,160 +8,75 @@ if (CLI)
     die("this script must not be run from CLI.\nto setup aowow use 'php aowow'\n");
 
 
-$altClass = '';
-switch ($pageCall)
+$pageCall  = 'home';                                        // default to Homepage unless specified otherwise
+$pageParam = '';
+parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
+foreach ($query as $page => $param)
 {
-    /* called by user */
-    case '':                                                // no parameter given -> MainPage
-        $altClass = 'home';
-    case 'home':
-    case 'admin':
-    case 'account':                                         // account management [nyi]
-    case 'achievement':
-    case 'achievements':
-    case 'areatrigger':
-    case 'areatriggers':
-    case 'arena-team':
-    case 'arena-teams':
-    case 'class':
-    case 'classes':
-    case 'currency':
-    case 'currencies':
-    case 'compare':                                         // tool: item comparison
-    case 'emote':
-    case 'emotes':
-    case 'enchantment':
-    case 'enchantments':
-    case 'event':
-    case 'events':
-    case 'faction':
-    case 'factions':
-    case 'guide':
-    case 'guides':
-    case 'guild':
-    case 'guilds':
-    case 'icon':
-    case 'icons':
-    case 'item':
-    case 'items':
-    case 'itemset':
-    case 'itemsets':
-    case 'maps':                                            // tool: map listing
-    case 'mail':
-    case 'mails':
-    case 'my-guides':
-        if ($pageCall == 'my-guides')
-            $altClass = 'guides';
-    case 'npc':
-    case 'npcs':
-    case 'object':
-    case 'objects':
-    case 'pet':
-    case 'pets':
-    case 'petcalc':                                         // tool: pet talent calculator
-        if ($pageCall == 'petcalc')
-            $altClass = 'talent';
-    case 'profile':                                         // character profiler [nyi]
-    case 'profiles':                                        // character profile listing [nyi]
-    case 'profiler':                                        // character profiler main page
-    case 'quest':
-    case 'quests':
-    case 'race':
-    case 'races':
-    case 'screenshot':                                      // prepare uploaded screenshots
-    case 'search':                                          // tool: searches
-    case 'skill':
-    case 'skills':
-    case 'sound':
-    case 'sounds':
-    case 'spell':
-    case 'spells':
-    case 'talent':                                          // tool: talent calculator
-    case 'title':
-    case 'titles':
-    case 'user':
-    case 'video':
-    case 'zone':
-    case 'zones':
-    /* called by script */
-    case 'data':                                            // tool: dataset-loader
-    case 'cookie':                                          // lossless cookies and user settings
-    case 'contactus':
-    case 'comment':
-    case 'edit':                                            // guide editor: targeted by QQ fileuploader, detail-page article editor
-    case 'get-description':                                 // guide editor: shorten fulltext into description
-    case 'filter':                                          // pre-evaluate filter POST-data; sanitize and forward as GET-data
-    case 'go-to-reply':                                     // find page the reply is on and forward
-        if ($pageCall == 'go-to-reply')
-            $altClass = 'go-to-comment';
-    case 'go-to-comment':                                   // find page the comment is on and forward
-    case 'locale':                                          // subdomain-workaround, change the language
-        $cleanName = str_replace(['-', '_'], '', ucFirst($altClass ?: $pageCall));
-        try                                                 // can it be handled as ajax?
-        {
-            $out   = '';
-            $class = __NAMESPACE__.'\\'.'Ajax'.$cleanName;
-            $ajax  = new $class(explode('.', $pageParam));
+    $page = preg_replace('/[^\w\-]/i', '', $page);
 
-            if ($ajax->handle($out))
-            {
-                Util::sendNoCacheHeader();
+    $pageCall  = Util::lower($page);
+    $pageParam = $param ?? '';
+    break;                                                  // only use first k/v-pair to determine page
+}
 
-                if ($ajax->doRedirect)
-                    header('Location: '.$out, true, 302);
-                else
-                {
-                    header($ajax->getContentType());
-                    die($out);
-                }
-            }
-            else
-                throw new \Exception('not handled as ajax');
-        }
-        catch (\Exception $e)                               // no, apparently not..
-        {
-            $class = __NAMESPACE__.'\\'.$cleanName.'Page';
-            $classInstance = new $class($pageCall, $pageParam);
+[$classMod, $file] = match (true)
+{
+    // is search ajax
+    isset($_GET['json'])                          => ['Json',     $pageCall . '_json'    ],
+    isset($_GET['opensearch'])                    => ['Open',     $pageCall . '_open'    ],
+    // is powered tooltip
+    isset($_GET['power'])                         => ['Power',    $pageCall . '_power'   ],
+    // is item data xml dump
+    isset($_GET['xml'])                           => ['Xml',      $pageCall . '_xml'     ],
+    // is community content feed
+    isset($_GET['rss'])                           => ['Rss',      $pageCall . '_rss'     ],
+    // is sounds playlist
+    isset($_GET['playlist'])                      => ['Playlist', $pageCall . '_playlist'],
+    // pageParam can be sub page
+    (bool)preg_match('/^[a-z\-]+$/i', $pageParam) => [Util::ucFirst(strtr($pageParam, ['-' => ''])), Util::lower($pageParam)],
+    // no pageParam or PageParam is param for BasePage
+    default                                       => ['Base',     $pageCall              ]
+};
 
-            if (is_callable([$classInstance, 'display']))
-                $classInstance->display();
-            else if (isset($_GET['power']))
-                die('$WowheadPower.register(0, '.Lang::getLocale()->value.', {})');
-            else                                            // in conjunction with a proper rewriteRule in .htaccess...
-                (new GenericPage($pageCall))->error();
-        }
+// admin=X pages are mixed html and ajax on the same endpoint .. meh
+if ($pageCall == 'admin' && isset($_GET['action']) && preg_match('/^[a-z]+$/', $_GET['action']))
+{
+    $classMod .= 'Action' . Util::ucFirst($_GET['action']);
+    $file     .= '_' . Util::lower($_GET['action']);
+}
 
-        break;
-    /* other pages */
-    case 'whats-new':
-    case 'searchplugins':
-    case 'searchbox':
-    case 'tooltips':
-    case 'help':
-    case 'faq':
-    case 'aboutus':
-    case 'reputation':
-    case 'privilege':
-    case 'privileges':
-    case 'top-users':
-        (new MorePage($pageCall, $pageParam))->display();
-        break;
-    case 'latest-additions':
-    case 'latest-comments':
-    case 'latest-screenshots':
-    case 'latest-videos':
-    case 'unrated-comments':
-    case 'missing-screenshots':
-    case 'most-comments':
-    case 'random':
-        (new UtilityPage($pageCall, $pageParam))->display();
-        break;
-    default:                                                // unk parameter given -> ErrorPage
-        if (isset($_GET['power']))
-            die('$WowheadPower.register(0, '.Lang::getLocale()->value.', {})');
-        else                                                // in conjunction with a proper rewriteRule in .htaccess...
-            (new GenericPage($pageCall))->error();
-        break;
+try {
+    $responder = new \StdClass;
+
+    // 1. try specialized response
+    if (file_exists('endpoints/'.$pageCall.'/'.$file.'.php'))
+    {
+        require_once 'endpoints/'.$pageCall.'/'.$file.'.php';
+
+        $class     = __NAMESPACE__.'\\' . Util::ucFirst(strtr($pageCall, ['-' => ''])).$classMod.'Response';
+        $responder = new $class($pageParam);
+    }
+    // 2. try generalized response
+    else if (file_exists('endpoints/'.$pageCall.'/'.$pageCall.'.php'))
+    {
+        require_once 'endpoints/'.$pageCall.'/'.$pageCall.'.php';
+
+        $class     = __NAMESPACE__.'\\' . Util::ucFirst(strtr($pageCall, ['-' => ''])).'BaseResponse';
+        $responder = new $class($pageParam);
+    }
+    // 3. throw .. your hands in the air and give up
+    if (!is_callable([$responder, 'process']))
+        throw new \Exception('request handler '.$pageCall.'::'.$classMod.'('.$pageParam.') not found');
+
+    $responder->process();
+}
+catch (\Exception $e)
+{
+    if (isset($_GET['json']) || isset($_GET['opensearch']) || isset($_GET['power']) || isset($_GET['xml']) || isset($_GET['rss']))
+        (new TextResponse($pageParam))->generate404();
+    else
+        (new TemplateResponse($pageParam))->generateError($pageCall);
 }
 
 ?>

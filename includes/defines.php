@@ -17,7 +17,7 @@ define('TDB_WORLD_EXPECTED_VER', 24041);
 
 // as of 01.01.2024     https://www.wowhead.com/wotlk/de/spell=40120/{seo}
 //                      https://www.wowhead.com/wotlk/es/search=vuelo
-define('WOWHEAD_LINK', 'https://www.wowhead.com/wotlk/%s/%s=%s');
+define('WOWHEAD_LINK', 'https://www.wowhead.com/wotlk/%s/%s%s');
 
 define('LOG_LEVEL_ERROR', 1);
 define('LOG_LEVEL_WARN',  2);
@@ -25,7 +25,8 @@ define('LOG_LEVEL_INFO',  3);
 
 define('MIME_TYPE_TEXT',       'Content-Type: text/plain; charset=utf-8');
 define('MIME_TYPE_XML',        'Content-Type: text/xml; charset=utf-8');
-define('MIME_TYPE_JSON',       'Content-Type: application/x-javascript; charset=utf-8');
+define('MIME_TYPE_JAVASCRIPT', 'Content-Type: application/x-javascript; charset=utf-8');
+define('MIME_TYPE_JSON',       'Content-Type: application/json; charset=utf-8');
 define('MIME_TYPE_OPENSEARCH', 'Content-Type: application/x-suggestions+json; charset=utf-8');
 define('MIME_TYPE_RSS',        'Content-Type: application/rss+xml; charset=utf-8');
 define('MIME_TYPE_JPEG',       'Content-Type: image/jpeg');

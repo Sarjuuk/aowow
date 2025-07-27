@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -19,83 +22,39 @@
     $this->brick('headIcons');
 
     $this->brick('redButtons');
-?>
 
-                <h1<?=(isset($this->expansion) ? ' class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name.'</span>' : '>'.$this->name); ?></h1>
+    if ($this->expansion && $this->h1):
+        echo '                <h1 class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->h1."</span></h1>\n";
+    elseif ($this->h1):
+        echo '                <h1>'.$this->h1."</h1>\n";
+    endif;
 
-<?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
-if (isset($this->extraText)):
-?>
-    <div id="text-generic" class="left"></div>
-    <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("<?=$this->extraText; ?>", "text-generic", {
-            allow: Markup.CLASS_ADMIN,
-            dbpage: true
-        });
-    //]]></script>
-
-    <div class="pad2"></div>
-<?php
-endif;
+    $this->brick('markup', ['markup' => $this->extraText]);
 
     $this->brick('mapper');
 
-if (!empty($this->transfer)):
-    echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
-endif;
+    if ($this->transfer):
+        echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
+    endif;
 
-if (isset($this->smartAI)):
-?>
-    <div id="text-generic" class="left"></div>
-    <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
-            allow: Markup.CLASS_ADMIN,
-            dbpage: true
-        });
-    //]]></script>
+    $this->brick('markup', ['markup' => $this->smartAI]);
 
-    <div class="pad2"></div>
-<?php
-endif;
-
-if (!empty($this->zoneMusic)):
+if ($this->zoneMusic):
 ?>
                 <div class="clear">
 <?php
-    if (!empty($this->zoneMusic['music'])):
+    foreach ($this->zoneMusic as [$h3, $data, $divId, $opts]):
 ?>
-                <div id="zonemusicdiv-zonemusic" style="float: left">
-                    <h3><?=Lang::sound('music'); ?></h3>
+                <div id="zonemusicdiv-<?=$divId; ?>" style="float: left">
+                    <h3><?=$h3; ?></h3>
                 </div>
                 <script type="text/javascript">//<![CDATA[
-                    (new AudioControls()).init(<?=Util::toJSON($this->zoneMusic['music']); ?>, $WH.ge('zonemusicdiv-zonemusic'), {loop: true});
+                    (new AudioControls()).init(<?=$this->json($data); ?>, $WH.ge('zonemusicdiv-<?=$divId; ?>'), <?=$this->json($opts); ?>);
                 //]]></script>
 <?php
-    endif;
-    if (!empty($this->zoneMusic['intro'])):
-?>
-                <div id="zonemusicdiv-zonemusicintro" style="float: left">
-                <h3><?=Lang::sound('intro'); ?></h3>
-
-                </div>
-                <script type="text/javascript">//<![CDATA[
-                    (new AudioControls()).init(<?=Util::toJSON($this->zoneMusic['intro']); ?>, $WH.ge('zonemusicdiv-zonemusicintro'), {});
-                //]]></script>
-<?php
-    endif;
-    if (!empty($this->zoneMusic['ambience'])):
-?>
-                <div id="zonemusicdiv-soundambience" style="float: left">
-                <h3><?=Lang::sound('ambience'); ?></h3>
-
-                </div>
-                <script type="text/javascript">//<![CDATA[
-                    (new AudioControls()).init(<?=Util::toJSON($this->zoneMusic['ambience']); ?>, $WH.ge('zonemusicdiv-soundambience'), {loop: true});
-                //]]></script>
-<?php
-    endif;
+    endforeach;
 ?>
                 <br clear="all"/></div>
 <?php
@@ -104,7 +63,7 @@ endif;
                 <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 <?php
-    $this->brick('lvTabs', ['relTabs' => true]);
+    $this->brick('lvTabs');
 
     $this->brick('contribute');
 ?>

@@ -5,6 +5,6 @@ Hey!
 Thanks a lot for your interest in contributing to the site.
 
 Just click this link to activate your account:
-HOST_URL?account=signup&token=%s
+HOST_URL?account=activate&key=%s
 
 The NAME_SHORT team

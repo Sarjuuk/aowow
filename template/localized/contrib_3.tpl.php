@@ -1,4 +1,6 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+?>
 
         <div id="tab-add-your-comment" style="display: none">
             Denkt bitte an Folgendes, wenn Ihr einen Kommentar schreibt:
@@ -9,9 +11,9 @@
             <li><div>Stellt Eure Fragen bitte in unseren <a href="?forums">Foren</a>, wenn Ihr eine schnellere Antwort wünscht.</div></li>
             </ul>
 <?php
-    echo $this->coError ? '            <div class="msg-failure">'.$this->coError."</div>\n            <div class=\"pad\"></div>\n" : '';
+    echo $coError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$coError."</div>\n" : '';
 
-    if (User::canComment()):
+    if ($this->user::canComment()):
 ?>
             <form name="addcomment" action="?comment=add&amp;type=<?=$this->type.'&amp;typeid='.$this->typeId; ?>" method="post" onsubmit="return co_validateForm(this)">
                 <div id="funcbox-generic"></div>
@@ -25,7 +27,7 @@
             <div class="comment-edit-body"><textarea class="comment-editbox" rows="10" cols="40" name="commentbody" disabled="disabled"></textarea></div>
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, oder <a href="?account=signup">registriert Euch</a>, um einen Kommentar einzusenden.</small>
 <?php
@@ -41,9 +43,9 @@
             <li><div>Lest Euch unbedingt die <a href="?help=screenshots-tips-tricks" target="_blank">Tipps &amp; Tricks</a> durch, wenn nicht bereits geschehen.</div></li>
             </ul>
 <?php
-        echo $this->ssError ? '            <div class="msg-failure">'.$this->ssError."</div>\n            <div class=\"pad\"></div>\n" : '';
+    echo $ssError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$ssError."</div>\n" : '';
 
-    if (User::canUploadScreenshot()):
+    if ($this->user::canUploadScreenshot()):
 ?>
             <form action="?screenshot=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return ss_validateForm(this)">
             <input type="file" name="screenshotfile" style="width: 35%"/><br />
@@ -58,7 +60,7 @@
             <input type="file" name="screenshotfile" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, um einen Screenshot einzusenden.</small>
 <?php
@@ -69,7 +71,9 @@
         <div id="tab-suggest-a-video" style="display: none">
             Gebt einfach die URL des Videos im folgenden Formular ein.
 <?php
-    if (User::canSuggestVideo()):
+    echo $viError ? "            <div class=\"pad\"></div>\n            <div class=\"msg-failure\">".$viError."</div>\n" : '';
+
+    if ($this->user::canSuggestVideo()):
 ?>
             <div class="pad2"></div>
             <form action="?video=add&<?=$this->type.'.'.$this->typeId; ?>" method="post" enctype="multipart/form-data" onsubmit="return vi_validateForm(this)">
@@ -85,7 +89,7 @@
             <input type="text" name="videourl" disabled="disabled" /><br />
 <?php
     endif;
-    if (!User::isLoggedIn()):
+    if (!$this->user::isLoggedIn()):
 ?>
             <small>Ihr seid nicht angemeldet. Bitte <a href="?account=signin">meldet Euch an</a>, um ein Video vorzuschlagen.</small>
 <?php
