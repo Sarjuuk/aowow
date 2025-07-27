@@ -1,7 +1,7 @@
 <?php namespace Aowow; ?>
 
 <?php
-if (!empty($this->contribute)):
+if ($this->contribute):
 ?>
 <div class="clear"></div>
 <div class="text">
@@ -11,7 +11,7 @@ if (!empty($this->contribute)):
 <div class="text" style="margin-right: 310px">
     <div class="tabbed-contents" style="clear: none">
 <?php
-    $this->localizedBrick('contrib');
+    $this->localizedBrick('contrib', ['coError' => $this->community['coError'], 'ssError' => $this->community['ssError'], 'viError' => $this->community['viError']]);
 ?>
     </div>
 </div>

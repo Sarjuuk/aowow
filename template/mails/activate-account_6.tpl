@@ -5,6 +5,6 @@ Creación de cuenta
 Muchas gracias por tu interés en contribuir al sitio.
 
 Simplemente haz clic en este enlace para activar tu cuenta:
-HOST_URL?account=signup&token=%s
+HOST_URL?account=activate&key=%s
 
 El equipo de NAME_SHORT
