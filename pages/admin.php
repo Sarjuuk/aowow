@@ -17,7 +17,7 @@ class AdminPage extends GenericPage
     protected $extraHTML = '';
 
     protected $tpl       = null;                            // depends on the subject
-    protected $reqUGroup = U_GROUP_NONE;                    // actual group dependant on the subPage
+    protected $reqUGroup = U_GROUP_NONE;                    // actual group dependent on the subPage
     protected $reqAuth   = true;
     protected $path      = [4];
     protected $tabId     = 4;

@@ -625,9 +625,9 @@ class Lang
                 {
                     case -1:                                // default Lang::vspf case
                     case self::FMT_HTML:
-                        return sprintf('<span style="color: #%1s%2s;">%3s</span>', $rgb, $a, $text);
+                        return sprintf('<span style="color: #%1$s%2$s;">%3$s</span>', $rgb, $a, $text);
                     case self::FMT_MARKUP:
-                        return sprintf('[span color=#%1s]%3s[/span]', $rgb, $text); // doesn't support alpha
+                        return sprintf('[span color=#%1$s]%3$s[/span]', $rgb, $a, $text); // doesn't support alpha
                     case self::FMT_RAW:
                     default:
                         return $text;

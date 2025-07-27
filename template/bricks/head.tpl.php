@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="SHORTCUT ICON" href="<?=Cfg::get('STATIC_URL'); ?>/images/logos/favicon.ico" />
     <link rel="search" type="application/opensearchdescription+xml" href="<?=Cfg::get('STATIC_URL'); ?>/download/searchplugins/aowow.xml" title="Aowow" />
-<?php
+<?php if (isset($this->rss)): ?>
+    <link rel="alternate" type="application/rss+xml" title="<?=Util::htmlEscape(implode(' - ', $this->title)); ?>" href="<?=$this->rss; ?>"/>
+<?php endif;
 foreach ($this->css as [$type, $css]):
     if ($type == SC_CSS_FILE):
         echo '    <link rel="stylesheet" type="text/css" href="'.$css."\" />\n";

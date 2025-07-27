@@ -406,7 +406,7 @@ abstract class SetupScript
     protected $worldDependency    = [];                     // query when this table changed (--sync command)
 
     protected $info               = [];                     // arr: 0 => self, n => genSteps        cmd => [[arr<str>:optionalArgs], int:argFlags, str:description]
-    protected $setupAfter         = [[], []];               // [[sqlgen], [filegen]]                used to sort scripts that rely on each other being executed in the right order (script names are not nessecarily the same as their table names)
+    protected $setupAfter         = [[], []];               // [[sqlgen], [filegen]]                used to sort scripts that rely on each other being executed in the right order (script names are not necessarily the same as their table names)
 
     protected $success            = true;
     protected $localized          = false;                  // push locale directories onto $requiredDirs?

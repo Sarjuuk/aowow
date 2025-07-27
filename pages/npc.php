@@ -258,7 +258,7 @@ class NpcPage extends GenericPage
         // > Stats
         $stats   = [];
         $modes   = [];                                      // get difficulty versions if set
-        $hint    = '[tooltip name=%3$s][table cellspacing=10][tr]%1s[/tr][/table][/tooltip][span class=tip tooltip=%3$s]%2s[/span]';
+        $hint    = '[tooltip name=%3$s][table cellspacing=10][tr]%1$s[/tr][/table][/tooltip][span class=tip tooltip=%3$s]%2$s[/span]';
         $modeRow = '[tr][td]%s&nbsp;&nbsp;[/td][td]%s[/td][/tr]';
         // Health
         $health = $this->subject->getBaseStats('health');
@@ -438,7 +438,7 @@ class NpcPage extends GenericPage
 
         if ($auras = DB::World()->selectCell('SELECT auras FROM creature_template_addon WHERE entry = ?d', $this->typeId))
         {
-            $auras = preg_replace('/[^\d ]/', ' ', $auras);  // remove erronous chars from string
+            $auras = preg_replace('/[^\d ]/', ' ', $auras);  // remove erroneous chars from string
             $genSpells = array_merge($genSpells, array_filter(explode(' ', $auras)));
         }
 

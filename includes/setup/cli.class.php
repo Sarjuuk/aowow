@@ -205,7 +205,7 @@ abstract class CLI
 
         $path .= ($path ? DIRECTORY_SEPARATOR : '').trim($fileOrPath);
 
-        // remove double quotes (from erronous user input), single quotes are
+        // remove double quotes (from erroneous user input), single quotes are
         // valid chars for filenames and removing those mutilates several wow icons
         $path = str_replace('"', '', $path);
 

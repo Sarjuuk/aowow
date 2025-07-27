@@ -592,7 +592,7 @@ var PageTemplate = new function()
             {
                 className: (character.pinned ? 'icon-star-right ' : '') + 'c' + character.classs,
              // tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, character.id, 'tiny')
-             // aowow: profileId should not be nessecary here
+             // aowow: profileId should not be necessary here
                 tinyIcon: $WH.g_getProfileIcon(character.race, character.classs, character.gender, character.level, 0, 'tiny')
             }];
 

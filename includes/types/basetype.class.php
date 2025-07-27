@@ -50,7 +50,7 @@ abstract class BaseType
     *               ['flags2', 0xF, '&'],
     *           ]
     *           [['mask', 0x3, '&'], 0],
-    *           ['joinedTbl.field', NULL]                   // NULL must be explicitly specified "['joinedTbl.field']" would be skipped as erronous definition (only really usefull when left-joining)
+    *           ['joinedTbl.field', NULL]                   // NULL must be explicitly specified "['joinedTbl.field']" would be skipped as erroneous definition (only really usefull when left-joining)
     *           'OR',
     *           5
     *       )
@@ -1002,7 +1002,7 @@ abstract class Filter
     protected const ENUM_RACE          = array( null,     1,     2,     3,     4,     5,     6,     7,     8,  null,    10,    11,  true, false);
     protected const ENUM_PROFESSION    = array( null,   171,   164,   185,   333,   202,   129,   755,   165,   186,   197,  true, false,   356,   182,   773);
 
-    public          $error  = false;                        // erronous search fields
+    public          $error  = false;                        // erroneous search fields
 
     private         $cndSet = [];
 

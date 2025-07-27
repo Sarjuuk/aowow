@@ -119,7 +119,7 @@ class ProfilePage extends GenericPage
 
                 if ($char['guildGUID'])
                 {
-                    // create empty guild if nessecary to satisfy foreign keys
+                    // create empty guild if necessary to satisfy foreign keys
                     $char['guild'] = DB::Aowow()->selectCell('SELECT id FROM ?_profiler_guild WHERE realm = ?d AND realmGUID = ?d', $this->realmId, $char['guildGUID']);
                     if (!$char['guild'])
                         $char['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (realm, realmGUID, cuFlags, name) VALUES (?d, ?d, ?d, ?)', $this->realmId, $char['guildGUID'], PROFILER_CU_NEEDS_RESYNC, $char['guildName']);

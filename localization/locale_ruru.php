@@ -53,7 +53,7 @@ $lang = array(
         'or'            => " или ",
         'back'          => "Назад",
         'reputationTip' => "Очки репутации",
-        'byUser'        => 'От <a href="HOST_URL/?user=%1$s"%2$s>%1s</a> ',
+        'byUser'        => 'От <a href="HOST_URL/?user=%1$s"%2$s>%1$s</a> ',
         'help'          => "Справка",
         'status'        => "Статус",
         'yes'           => "Да",

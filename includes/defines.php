@@ -846,16 +846,16 @@ define('ITEM_CLASS_CONTAINER',              1);
 define('ITEM_CLASS_WEAPON',                 2);
 define('ITEM_CLASS_GEM',                    3);
 define('ITEM_CLASS_ARMOR',                  4);
-define('ITEM_CLASS_REAGENT',                5);
+define('ITEM_CLASS_REAGENT',                5);             // OBSOLETE (reagents are in Class:Misc; SubClass:Reagent)
 define('ITEM_CLASS_AMMUNITION',             6);
 define('ITEM_CLASS_TRADEGOOD',              7);
-define('ITEM_CLASS_GENERIC',                8);
+define('ITEM_CLASS_GENERIC',                8);             // OBSOLETE
 define('ITEM_CLASS_RECIPE',                 9);
 define('ITEM_CLASS_MONEY',                  10);
 define('ITEM_CLASS_QUIVER',                 11);
 define('ITEM_CLASS_QUEST',                  12);
 define('ITEM_CLASS_KEY',                    13);
-define('ITEM_CLASS_PERMANENT',              14);
+define('ITEM_CLASS_PERMANENT',              14);            // OBSOLETE
 define('ITEM_CLASS_MISC',                   15);
 define('ITEM_CLASS_GLYPH',                  16);
 
@@ -918,7 +918,7 @@ define('ITEM_SUBCLASS_PRISMATIC_GEM',       8);
 // ItemSubClass - Armor (4)
 define('ITEM_SUBCLASS_MISC_ARMOR',          0);
 define('ITEM_SUBCLASS_CLOTH_ARMOR',         1);
-define('ITEM_SUBCLASS_LETHER_ARMOR',        2);
+define('ITEM_SUBCLASS_LEATHER_ARMOR',       2);
 define('ITEM_SUBCLASS_MAIL_ARMOR',          3);
 define('ITEM_SUBCLASS_PLATE_ARMOR',         4);
 define('ITEM_SUBCLASS_BUCKLER',             5);
@@ -1735,6 +1735,8 @@ define('SKILL_LOCKPICKING',    633);
 define('SKILL_JEWELCRAFTING',  755);
 define('SKILL_RIDING',         762);
 define('SKILL_INSCRIPTION',    773);
+define('SKILL_MOUNTS',         777);
+define('SKILL_COMPANIONS',     778);
 
 define('SKILLS_TRADE_PRIMARY',   [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_ALCHEMY, SKILL_HERBALISM, SKILL_MINING, SKILL_TAILORING, SKILL_ENGINEERING, SKILL_ENCHANTING, SKILL_SKINNING, SKILL_JEWELCRAFTING, SKILL_INSCRIPTION]);
 define('SKILLS_TRADE_SECONDARY', [SKILL_FIRST_AID, SKILL_COOKING, SKILL_FISHING, SKILL_RIDING]);

@@ -59,35 +59,35 @@ class SpellsPage extends GenericPage
             9  => [355, 354, 593],
             11 => [574, 134, 573]
         ),
-        9   => [129, 185, 356, 762],                        // Secondary Skills
+        9   => SKILLS_TRADE_SECONDARY,                      // Secondary Skills
         11  => array(                                       // Professions: Skill => Spell
-            171 => true,
-            164 => [9788, 9787, 17041, 17040, 17039],
-            333 => true,
-            202 => [20219, 20222],
-            182 => true,
-            773 => true,
-            755 => true,
-            165 => [10656, 10658, 10660],
-            186 => true,
-            393 => true,
-            197 => [26798, 26801, 26797],
+            SKILL_ALCHEMY        => true,
+            SKILL_BLACKSMITHING  => [9788, 9787, 17041, 17040, 17039],
+            SKILL_ENCHANTING     => true,
+            SKILL_ENGINEERING    => [20219, 20222],
+            SKILL_HERBALISM      => true,
+            SKILL_INSCRIPTION    => true,
+            SKILL_JEWELCRAFTING  => true,
+            SKILL_LEATHERWORKING => [10656, 10658, 10660],
+            SKILL_MINING         => true,
+            SKILL_SKINNING       => true,
+            SKILL_TAILORING      => [26798, 26801, 26797],
         )
     );
 
     private   $shortFilter   = array(
-        129 => [ 6,  7],                                    // First Aid
-        164 => [ 2,  4],                                    // Blacksmithing
-        165 => [ 8,  1],                                    // Leatherworking
-        171 => [ 1,  6],                                    // Alchemy
-        185 => [ 3,  5],                                    // Cooking
-        186 => [ 9,  0],                                    // Mining
-        197 => [10,  2],                                    // Tailoring
-        202 => [ 5,  3],                                    // Engineering
-        333 => [ 4,  8],                                    // Enchanting
-        356 => [ 0,  9],                                    // Fishing
-        755 => [ 7, 10],                                    // Jewelcrafting
-        773 => [15,  0],                                    // Inscription
+        SKILL_FIRST_AID      => [ 6,  7],
+        SKILL_BLACKSMITHING  => [ 2,  4],
+        SKILL_LEATHERWORKING => [ 8,  1],
+        SKILL_ALCHEMY        => [ 1,  6],
+        SKILL_COOKING        => [ 3,  5],
+        SKILL_MINING         => [ 9,  0],
+        SKILL_TAILORING      => [10,  2],
+        SKILL_ENGINEERING    => [ 5,  3],
+        SKILL_ENCHANTING     => [ 4,  8],
+        SKILL_FISHING        => [ 0,  9],
+        SKILL_JEWELCRAFTING  => [ 7, 10],
+        SKILL_INSCRIPTION    => [15,  0],
     );
 
 

@@ -288,45 +288,46 @@ abstract class Util
     public static function formatTime(int $msec, bool $short = false) : string
     {
         [$ms, $s, $m, $h, $d] = self::parseTime(abs($msec));
+        // \u00A0 is &nbsp, but also usable by js
 
         if ($short)
         {
-            if ($_ = round($d / 364))
-                return $_."&nbsp;".Lang::timeUnits('ab', 0);
+            if ($_ = round($d / 365))
+                return $_."\u{00A0}".Lang::timeUnits('ab', 0);
             if ($_ = round($d / 30))
-                return $_."&nbsp;".Lang::timeUnits('ab', 1);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 1);
             if ($_ = round($d / 7))
-                return $_."&nbsp;".Lang::timeUnits('ab', 2);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 2);
             if ($_ = round($d))
-                return $_."&nbsp;".Lang::timeUnits('ab', 3);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 3);
             if ($_ = round($h))
-                return $_."&nbsp;".Lang::timeUnits('ab', 4);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 4);
             if ($_ = round($m))
-                return $_."&nbsp;".Lang::timeUnits('ab', 5);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 5);
             if ($_ = round($s + $ms / 1000, 2))
-                return $_."&nbsp;".Lang::timeUnits('ab', 6);
+                return $_."\u{00A0}".Lang::timeUnits('ab', 6);
             if ($ms)
-                return $ms."&nbsp;".Lang::timeUnits('ab', 7);
+                return $ms."\u{00A0}".Lang::timeUnits('ab', 7);
 
             return '0 '.Lang::timeUnits('ab', 6);
         }
         else
         {
             $_ = $d + $h / 24;
-            if ($_ > 1 && !($_ % 364))                      // whole years
-                return round(($d + $h / 24) / 364, 2)."&nbsp;".Lang::timeUnits($d / 364 == 1 && !$h ? 'sg' : 'pl', 0);
+            if ($_ > 1 && !($_ % 365))                      // whole years
+                return round(($d + $h / 24) / 364, 2)."\u{00A0}".Lang::timeUnits($d / 364 == 1 && !$h ? 'sg' : 'pl', 0);
             if ($_ > 1 && !($_ % 30))                       // whole month
-                return round(($d + $h / 24) /  30, 2)."&nbsp;".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
+                return round(($d + $h / 24) /  30, 2)."\u{00A0}".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
             if ($_ > 1 && !($_ % 7))                        // whole weeks
-                return round(($d + $h / 24) /   7, 2)."&nbsp;".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
+                return round(($d + $h / 24) /   7, 2)."\u{00A0}".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
             if ($d)
-                return round($d + $h  /   24, 2)."&nbsp;".Lang::timeUnits($d == 1 && !$h  ? 'sg' : 'pl', 3);
+                return round($d + $h  /   24, 2)."\u{00A0}".Lang::timeUnits($d == 1 && !$h  ? 'sg' : 'pl', 3);
             if ($h)
-                return round($h + $m  /   60, 2)."&nbsp;".Lang::timeUnits($h == 1 && !$m  ? 'sg' : 'pl', 4);
+                return round($h + $m  /   60, 2)."\u{00A0}".Lang::timeUnits($h == 1 && !$m  ? 'sg' : 'pl', 4);
             if ($m)
-                return round($m + $s  /   60, 2)."&nbsp;".Lang::timeUnits($m == 1 && !$s  ? 'sg' : 'pl', 5);
+                return round($m + $s  /   60, 2)."\u{00A0}".Lang::timeUnits($m == 1 && !$s  ? 'sg' : 'pl', 5);
             if ($s)
-                return round($s + $ms / 1000, 2)."&nbsp;".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
+                return round($s + $ms / 1000, 2)."\u{00A0}".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
             if ($ms)
                 return $ms." ".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
 

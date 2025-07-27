@@ -55,10 +55,10 @@ class AjaxData extends AjaxHandler
                     $result .= $this->loadProfilerData($set);
                     break;
                 case 'companions':
-                    $result .= $this->loadProfilerData($set, '778');
+                    $result .= $this->loadProfilerData($set, SKILL_COMPANIONS);
                     break;
                 case 'mounts':
-                    $result .= $this->loadProfilerData($set, '777');
+                    $result .= $this->loadProfilerData($set, SKILL_MOUNTS);
                     break;
                 case 'quests':
                     $catg = isset($this->_get['catg']) ? $this->_get['catg'] : 'null';
@@ -81,7 +81,7 @@ class AjaxData extends AjaxHandler
                     $result .= "\n\$WowheadProfiler.loadOnDemand('recipes', null);\n";
 
                     break;
-                // locale independant
+                // locale independent
                 case 'quick-excludes':
                 case 'weight-presets':
                 case 'item-scaling':

@@ -60,7 +60,7 @@ class EnchantmentList extends BaseType
             // issue with scaling stats enchantments
             // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
             // so filter the stats container and if it is empty, rebuild from self. .. there are no mixed scaling/static enchantments, right!?
-            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true)->filter();
+            $this->jsonStats[$this->id] = (new StatsContainer())->fromJson($curTpl, true)->filter();
             if (!count($this->jsonStats[$this->id]))
                 $this->jsonStats[$this->id]->fromEnchantment($curTpl);
         }

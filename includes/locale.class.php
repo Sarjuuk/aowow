@@ -28,7 +28,7 @@ enum Locale : int
         return match ($this)
         {
             self::EN => 'en',
-            self::KR => 'kt',
+            self::KR => 'ko',
             self::FR => 'fr',
             self::DE => 'de',
             self::CN => 'cn',
