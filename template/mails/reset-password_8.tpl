@@ -2,6 +2,6 @@
 Сброс пароля
 Перейдите по этой ссылке, чтобы сбросить свой пароль.
 
-HOST_URL?account=forgotpassword&token=%s
+HOST_URL?account=forgotpassword&key=%s
 
 Если вы не запрашивали это письмо, просто проигнорируйте его.

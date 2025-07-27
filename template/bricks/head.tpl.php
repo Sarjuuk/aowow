@@ -1,61 +1,49 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-    <title><?=Util::htmlEscape(implode(' - ', $this->title)); ?></title>
+    use \Aowow\Lang;
+?>
+
+    <title><?=$this->concat('title', ' - '); ?></title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="SHORTCUT ICON" href="<?=Cfg::get('STATIC_URL'); ?>/images/logos/favicon.ico" />
-    <link rel="search" type="application/opensearchdescription+xml" href="<?=Cfg::get('STATIC_URL'); ?>/download/searchplugins/aowow.xml" title="Aowow" />
-<?php if (isset($this->rss)): ?>
-    <link rel="alternate" type="application/rss+xml" title="<?=Util::htmlEscape(implode(' - ', $this->title)); ?>" href="<?=$this->rss; ?>"/>
-<?php endif;
-foreach ($this->css as [$type, $css]):
-    if ($type == SC_CSS_FILE):
-        echo '    <link rel="stylesheet" type="text/css" href="'.$css."\" />\n";
-    elseif ($type == SC_CSS_STRING):
-        echo '    <style type="text/css">'.$css."</style>\n";
-    endif;
-endforeach;
-?>
+    <link rel="SHORTCUT ICON" href="<?=$this->gStaticUrl; ?>/images/logos/favicon.ico" />
+    <link rel="search" type="application/opensearchdescription+xml" href="<?=$this->gStaticUrl; ?>/download/searchplugins/aowow.xml" title="<?=Lang::main('search');?>" />
+<?=$this->renderArray('css', 4); ?>
     <script type="text/javascript">
-        var g_serverTime = new Date('<?=date(Util::$dateFormatInternal); ?>');
-        var g_staticUrl = "<?=Cfg::get('STATIC_URL'); ?>";
-        var g_host = "<?=Cfg::get('HOST_URL'); ?>";
+        var g_serverTime = <?=$this->gServerTime; ?>;
+        var g_staticUrl = "<?=$this->gStaticUrl; ?>";
+        var g_host = "<?=$this->gHost; ?>";
 <?php
 if ($this->gDataKey):
         echo "        var g_dataKey = '".$_SESSION['dataKey']."'\n";
 endif;
 ?>
     </script>
+<?=$this->renderArray('js', 4); ?>
+<script type="text/javascript">
+        var g_user = <?=$this->json($this->user::getUserGlobal()); ?>;
 <?php
-foreach ($this->js as [$type, $js]):
-    if ($type == SC_JS_FILE):
-        echo '    <script type="text/javascript" src="'.$js."\"></script>\n";
-    elseif ($type == SC_JS_STRING):
-        echo '    <script type="text/javascript">'.$js."</script>\n";
-    endif;
-endforeach;
-?>
-    <script type="text/javascript">
-        var g_user = <?=Util::toJSON($this->gUser, JSON_UNESCAPED_UNICODE); ?>;
-<?php
-if ($this->gFavorites):
-    echo "        g_favorites = ".Util::toJSON($this->gFavorites).";\n";
+if ($fav = $this->user::getFavorites()):
+    echo "        g_favorites = ".$this->json($fav).";\n";
 endif;
 ?>
     </script>
 
-<?php
-if (Cfg::get('ANALYTICS_USER')):
-?>
+<?php if ($this->analyticsTag): ?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?=$this->analyticsTag; ?>"></script>
     <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-        ga('create', '<?=Cfg::get('ANALYTICS_USER'); ?>', 'auto');
-        ga('send', 'pageview');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '<?=$this->analyticsTag; ?>');
     </script>
+<?php
+endif;
+
+if ($this->rss):
+?>
+    <link rel="alternate" type="application/rss+xml" title="<?=$this->concat('title', ' - '); ?>" href="<?=$this->rss; ?>"/>
 <?php
 endif;
 ?>

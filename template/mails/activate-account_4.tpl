@@ -5,6 +5,6 @@
 非常感谢你有兴趣为本站做出贡献。
 
 只需点击此链接激活你的账户：
-HOST_URL?account=signup&token=%s
+HOST_URL?account=activate&key=%s
 
 NAME_SHORT 团队敬上

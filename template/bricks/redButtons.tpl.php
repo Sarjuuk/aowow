@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php
 // link to wowhead
@@ -18,7 +22,7 @@ endif;
 // ingame-links/markdown/ect
 if (isset($this->redButtons[BUTTON_LINKS])):
     if ($b = $this->redButtons[BUTTON_LINKS]):
-        echo '<a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).');"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
+        echo '<a href="javascript:;" id="open-links-button" class="button-red" onclick="this.blur(); Links.show('.strtr($this->json($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).');"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
     else:
         echo '<a href="javascript:;" id="open-links-button" class="button-red button-red-disabled"><em><b><i>'.Lang::main('links').'</i></b><span>'.Lang::main('links').'</span></em></a>';
     endif;
@@ -27,7 +31,7 @@ endif;
 // view in 3D
 if (isset($this->redButtons[BUTTON_VIEW3D])):
     if ($b = $this->redButtons[BUTTON_VIEW3D]):             // json_encode puts property names in brackets wich is not cool with inline javascript
-        echo '<a href="javascript:;" id="view3D-button" class="button-red" onclick="this.blur(); ModelViewer.show('.strtr(Util::toJSON($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).')"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
+        echo '<a href="javascript:;" id="view3D-button" class="button-red" onclick="this.blur(); ModelViewer.show('.strtr($this->json($b, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE | JSON_HEX_APOS), ['"' => "'"]).')"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
     else:
         echo '<a href="javascript:;" id="view3D-button" class="button-red button-red-disabled"><em><b><i>'.Lang::main('view3D').'</i></b><span>'.Lang::main('view3D').'</span></em></a>';
     endif;
@@ -36,7 +40,7 @@ endif;
 // item comparison tool
 if (isset($this->redButtons[BUTTON_COMPARE])):
     if ($b = $this->redButtons[BUTTON_COMPARE]):
-        echo '<a href="javascript:;" class="button-red" onclick="this.blur(); su_addToSaved(\''.(isset($b['eqList']) ? $b['eqList'] : $this->typeId).'\', '.(isset($b['qty']) ? $b['qty'] : 1).')"><em><b><i>'.Lang::main('compare').'</i></b><span>'.Lang::main('compare').'</span></em></a>';
+        echo '<a href="javascript:;" class="button-red" onclick="this.blur(); su_addToSaved(\''.($b['eqList'] ?? $this->typeId).'\', '.($b['qty'] ?? 1).')"><em><b><i>'.Lang::main('compare').'</i></b><span>'.Lang::main('compare').'</span></em></a>';
     else:
         echo '<a href="javascript:;" class="button-red button-red-disabled"><em><b><i>'.Lang::main('compare').'</i></b><span>'.Lang::main('compare').'</span></em></a>';
     endif;

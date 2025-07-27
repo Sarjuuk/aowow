@@ -68,6 +68,8 @@ spl_autoload_register(function (string $class) : void
         require_once 'includes/components/'.strtolower($class).'.class.php';
     else if (file_exists('includes/components/frontend/'.strtolower($class).'.class.php'))
         require_once 'includes/components/frontend/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/components/response/'.strtolower($class).'.class.php'))
+        require_once 'includes/components/response/'.strtolower($class).'.class.php';
 });
 
 // TC systems in components
@@ -119,41 +121,6 @@ spl_autoload_register(function (string $class) : void
         require_once 'includes/dbtypes/'.$cl.'.class.php';
     else
         throw new \Exception('could not register type class: '.$cl);
-});
-
-// endpoint loader
-spl_autoload_register(function (string $class) : void
-{
-    if ($i = strrpos($class, '\\'))
-        $class = substr($class, $i + 1);
-
-    if (preg_match('/[^\w]/i', $class))
-        return;
-
-    $class = strtolower($class);
-
-    if (stripos($class, 'ajax') === 0)                      // handles ajax and jsonp requests
-    {
-        if (file_exists('includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php'))
-        {
-            require_once 'includes/ajaxHandler/ajaxHandler.class.php';
-            require_once 'includes/ajaxHandler/'.strtr($class, ['ajax' => '']).'.class.php';
-        }
-        else
-            throw new \Exception('could not register ajaxHandler class: '.$class);
-
-        return;
-    }
-    else if (stripos($class, 'page'))                       // handles templated pages
-    {
-        if (file_exists('pages/'.strtr($class, ['page' => '']).'.php'))
-        {
-            require_once 'pages/genericPage.class.php';
-            require_once 'pages/'.strtr($class, ['page' => '']).'.php';
-        }
-        else if ($class == 'genericpage')                   // may be called directly in fatal error case
-            require_once 'pages/genericPage.class.php';
-    }
 });
 
 set_error_handler(function(int $errNo, string $errStr, string $errFile, int $errLine) : bool
@@ -208,13 +175,17 @@ set_exception_handler(function (\Throwable $e) : void
     else
     {
         Util::addNote('Exception - '.$e->getMessage().' @ '.$e->getFile(). ':'.$e->getLine()."\n".$e->getTraceAsString(), U_GROUP_EMPLOYEE, LOG_LEVEL_ERROR);
-        (new GenericPage())->error();
+        (new TemplateResponse())->generateError();
     }
 });
 
 // handle fatal errors
 register_shutdown_function(function() : void
 {
+    // defer undisplayed error/exception notes
+    if (!CLI && ($n = Util::getNotes()))
+        $_SESSION['notes'][] = [$n[0], $n[1], 'Defered issues from previous request'];
+
     if ($e = error_get_last())
     {
         if (DB::isConnected(DB_AOWOW))
@@ -263,7 +234,7 @@ if (!CLI)
 {
     // not displaying the brb gnomes as static_host is missing, but eh...
     if (!DB::isConnected(DB_AOWOW) || !DB::isConnected(DB_WORLD) || !Cfg::get('HOST_URL') || !Cfg::get('STATIC_URL'))
-        (new GenericPage())->maintenance();
+        (new TemplateResponse())->generateMaintenance();
 
     // Setup Session
     $cacheDir = Cfg::get('SESSION_CACHE_DIR');
@@ -275,7 +246,7 @@ if (!CLI)
     if (!session_start())
     {
         trigger_error('failed to start session', E_USER_ERROR);
-        (new GenericPage())->error();
+        (new TemplateResponse())->generateError();
     }
 
     if (User::init())
@@ -300,12 +271,6 @@ if (!CLI)
                 if (DB::isConnected(DB_CHARACTERS . $idx))
                     DB::Characters($idx)->setLogger(DB::profiler(...));
     }
-
-    // parse page-parameters .. sanitize before use!
-    $str = explode('&', $_SERVER['QUERY_STRING'] ?? '', 2)[0];
-    $_   = explode('=', $str, 2);
-    $pageCall  = mb_strtolower($_[0]);
-    $pageParam = $_[1] ?? '';
 }
 
 ?>
