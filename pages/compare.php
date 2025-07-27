@@ -86,7 +86,10 @@ class ComparePage extends GenericPage
 
             if (!empty($data[$itemId]['subitems']))
                 foreach ($data[$itemId]['subitems'] as &$si)
+                {
                     $si['enchantment'] = implode(', ', $si['enchantment']);
+                    unset($si['chance']);
+                }
 
             $this->cmpItems[$itemId] = [
                 'name_'.Lang::getLocale()->json() => $iList->getField('name', true),

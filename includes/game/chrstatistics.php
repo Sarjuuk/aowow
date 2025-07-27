@@ -325,7 +325,7 @@ abstract class Stat                                         // based on g_statTo
     }
 }
 
-class StatsContainer
+class StatsContainer implements \Countable
 {
     private $store = [];
 
@@ -502,6 +502,16 @@ class StatsContainer
         return $this->store;
     }
 
+    public function filter(?callable $filterFn = null) : self
+    {
+        $this->store = array_filter($this->store, $filterFn, ARRAY_FILTER_USE_BOTH);
+        return $this;
+    }
+
+    public function count() : int
+    {
+        return count($this->store);
+    }
 
     /****************/
     /* internal use */

@@ -1578,11 +1578,11 @@ class ItemList extends BaseType
             return;
 
         // remember: id < 0: randomSuffix; id > 0: randomProperty
-        $subItemTpls = DB::World()->select('
-            SELECT CAST( entry as SIGNED) AS ARRAY_KEY, CAST( ench as SIGNED) AS ARRAY_KEY2, chance FROM item_enchantment_template WHERE entry IN (?a) UNION
-            SELECT CAST(-entry as SIGNED) AS ARRAY_KEY, CAST(-ench as SIGNED) AS ARRAY_KEY2, chance FROM item_enchantment_template WHERE entry IN (?a)',
-            array_keys(array_filter($subItemIds, function ($v) { return $v > 0; })) ?: [0],
-            array_keys(array_filter($subItemIds, function ($v) { return $v < 0; })) ?: [0]
+        $subItemTpls = DB::World()->select(
+           'SELECT CAST( `entry` as SIGNED) AS ARRAY_KEY, CAST( `ench` as SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN (?a) UNION
+            SELECT CAST(-`entry` as SIGNED) AS ARRAY_KEY, CAST(-`ench` as SIGNED) AS ARRAY_KEY2, `chance` FROM item_enchantment_template WHERE `entry` IN (?a)',
+            array_keys(array_filter($subItemIds, fn($v) => $v > 0)) ?: [0],
+            array_keys(array_filter($subItemIds, fn($v) => $v < 0)) ?: [0]
         );
 
         $randIds = [];

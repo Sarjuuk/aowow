@@ -57,7 +57,12 @@ class EnchantmentList extends BaseType
                 }
             }
 
-            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true);
+            // issue with scaling stats enchantments
+            // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
+            // so filter the stats container and if it is empty, rebuild from self. .. there are no mixed scaling/static enchantments, right!?
+            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true)->filter();
+            if (!count($this->jsonStats[$this->id]))
+                $this->jsonStats[$this->id]->fromEnchantment($curTpl);
         }
 
         if ($relSpells)
@@ -67,7 +72,7 @@ class EnchantmentList extends BaseType
     // use if you JUST need the name
     public static function getName($id)
     {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_itemenchantment WHERE id = ?d', $id );
+        $n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_itemenchantment WHERE `id` = ?d', $id );
         return Util::localizedString($n, 'name');
     }
     // end static use
