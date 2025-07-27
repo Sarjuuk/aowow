@@ -68,6 +68,12 @@ define('ACC_STATUS_NEW',                    1);             // just created, awa
 define('ACC_STATUS_RECOVER_USER',           2);             // currently recovering username
 define('ACC_STATUS_RECOVER_PASS',           3);             // currently recovering password
 
+// Session Status
+define('SESSION_ACTIVE',                    1);
+define('SESSION_LOGOUT',                    2);
+define('SESSION_FORCED_LOGOUT',             3);
+define('SESSION_EXPIRED',                   4);
+
 define('ACC_BAN_NONE',                      0x00);          // all clear
 define('ACC_BAN_TEMP',                      0x01);
 define('ACC_BAN_PERM',                      0x02);

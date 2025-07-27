@@ -103,7 +103,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         if (!$name || !$passw)
             return false;
 
-        if (DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `joindate`, `email`, `allowExpire`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, 0, ?d, 1)',
+        if (DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `joindate`, `email`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, 1)',
             $name, User::hashCrypt($passw), $name, $email ?: Cfg::get('CONTACT_EMAIL'), U_GROUP_ADMIN))
         {
             $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `username` = ?', $name);

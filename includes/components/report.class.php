@@ -204,7 +204,7 @@ class Report
             'subject'     => $this->subject,
             'ip'          => User::$ip,
             'description' => $desc,
-            'userAgent'   => $userAgent ?: $_SERVER['HTTP_USER_AGENT'],
+            'userAgent'   => $userAgent ?: User::$agent,
             'appName'     => $appName ?: (get_browser(null, true)['browser'] ?: '')
         );
 

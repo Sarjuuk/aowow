@@ -10,18 +10,19 @@ class User
 {
     public static  int    $id         = 0;
     public static  string $username   = '';
-    public static  int    $banStatus  = 0x0;               // see ACC_BAN_* defines
+    public static  int    $banStatus  = 0x0;                // see ACC_BAN_* defines
+    public static  int    $status     = 0x0;
     public static  int    $groups     = 0x0;
     public static  int    $perms      = 0;
     public static ?string $email      = null;
     public static  int    $dailyVotes = 0;
+    public static  bool   $debug      = false;              // show ids in lists (used to be debug, is now user setting)
     public static ?string $ip         = null;
+    public static ?string $agent      = null;
     public static  Locale $preferedLoc;
 
     private static  int              $reputation    = 0;
     private static  string           $dataKey       = '';
-    private static  bool             $expires       = false;
-    private static  string           $passHash      = '';
     private static  int              $excludeGroups = 1;
     private static ?LocalProfileList $profiles      = null;
 
@@ -38,9 +39,10 @@ class User
 
         // session have a dataKey to access the JScripts (yes, also the anons)
         if (empty($_SESSION['dataKey']))
-            $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identifictaion purpose
+            $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identification purpose
 
         self::$dataKey = $_SESSION['dataKey'];
+        self::$agent   = $_SERVER['HTTP_USER_AGENT'];
 
         if (!self::$ip)
             return false;
@@ -58,43 +60,65 @@ class User
         if (empty($_SESSION['user']))
             return false;
 
-        // timed out...
-        if (!empty($_SESSION['timeout']) && $_SESSION['timeout'] <= time())
-            return false;
-
-        $uData = DB::Aowow()->SelectRow(
-           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, a.`allowExpire`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`
+        $session  = DB::Aowow()->selectRow('SELECT `userId`, `expires` FROM ?_account_sessions WHERE `status` = ?d AND `sessionId` = ?', SESSION_ACTIVE, session_id());
+        $userData = DB::Aowow()->selectRow(
+           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`
             FROM      ?_account a
-            LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-            LEFT JOIN ?_account_reputation r ON a.`id` = r.`userId`
+            LEFT JOIN ?_account_banned ab    ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
+            LEFT JOIN ?_account_reputation r ON a.`id` =  r.`userId`
             WHERE     a.`id` = ?d
             GROUP BY  a.`id`',
             $_SESSION['user']
         );
 
-        if (!$uData)
-            return false;
-
-        if ($loc = Locale::tryFrom($uData['locale']))
-            self::$preferedLoc = $loc;
-
-        // password changed, terminate session
-        if (AUTH_MODE_SELF && $uData['passHash'] != $_SESSION['hash'])
+        if (!$session || !$userData)
         {
             self::destroy();
             return false;
         }
+        else if ($session['expires'] && $session['expires'] < time())
+        {
+            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `sessionId` = ?', time(), SESSION_EXPIRED, session_id());
+            self::destroy();
+            return false;
+        }
+        else if ($session['userId'] != $userData['id'])        // what in the name of fuck..?
+        {
+            // Don't know why, don't know how .. doesn't matter, both parties are out.
+            DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `userId` IN (?a) AND `status` = ?d', time(), SESSION_FORCED_LOGOUT, [$userData['id'], $session['userId']], SESSION_ACTIVE);
+            trigger_error('User::init - tried to resume session "'.session_id().'" of user #'.$_SESSION['user'].' linked to session data for user #'.$session['userId'].' Kicked both!', E_USER_ERROR);
+            self::destroy();
+            return false;
+        }
 
-        self::$id            = intVal($uData['id']);
-        self::$username      = $uData['username'];
-        self::$passHash      = $uData['passHash'];
-        self::$expires       = (bool)$uData['allowExpire'];
-        self::$reputation    = $uData['reputation'];
-        self::$banStatus     = $uData['bans'];
-        self::$groups        = self::isBanned() ? 0 : intval($uData['userGroups']);
-        self::$perms         = self::isBanned() ? 0 : intval($uData['userPerms']);
-        self::$dailyVotes    = $uData['dailyVotes'];
-        self::$excludeGroups = $uData['excludeGroups'];
+        DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `expires` = IF(`expires`, ?d, 0) WHERE `sessionId` = ?', time(), time() + Cfg::get('SESSION_TIMEOUT_DELAY'), session_id());
+
+        if ($loc = Locale::tryFrom($userData['locale']))
+            self::$preferedLoc = $loc;
+
+        // reset expired account statuses
+        if ($userData['statusTimer'] < time() && $userData['status'] > ACC_STATUS_NEW)
+        {
+            DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `id` = ?d', ACC_STATUS_OK, User::$id);
+            $userData['status'] = ACC_STATUS_OK;
+        }
+
+
+        /*******************************/
+        /* past here we are logged in */
+        /*******************************/
+
+        self::$id            = intVal($userData['id']);
+        self::$username      = $userData['username'];
+        self::$reputation    = $userData['reputation'];
+        self::$banStatus     = $userData['bans'];
+        self::$groups        = self::isBanned() ? 0 : intval($userData['userGroups']);
+        self::$perms         = self::isBanned() ? 0 : intval($userData['userPerms']);
+        self::$dailyVotes    = $userData['dailyVotes'];
+        self::$excludeGroups = $userData['excludeGroups'];
+        self::$status        = $userData['status'];
+    //  self::$debug         = $userData['debug']; // TBD
+        self::$email         = $userData['email'];
 
         $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
         if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
@@ -104,10 +128,10 @@ class User
 
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
-        // - conscutive visits
+        // - consecutive visits
         // - votes per day
         // - reputation for daily visit
-        if (self::isLoggedIn())
+        if (!self::isBanned())
         {
             $lastLogin = DB::Aowow()->selectCell('SELECT `curLogin` FROM ?_account WHERE `id` = ?d', self::$id);
             // either the day changed or the last visit was >24h ago
@@ -130,7 +154,7 @@ class User
                     Util::gainSiteReputation(self::$id, SITEREP_ACTION_DAILYVISIT);
 
                 // increment consecutive visits (next day or first of new month and not more than 48h)
-                // i bet my ass i forgott a corner case
+                // i bet my ass i forgot a corner case
                 if ((date('j', $lastLogin) + 1 == date('j') || (date('j') == 1 && date('n', $lastLogin) != date('n'))) && (time() - $lastLogin) < 2 * DAY)
                     DB::Aowow()->query('UPDATE ?_account SET `consecutiveVisits` = `consecutiveVisits` + 1 WHERE `id` = ?d', self::$id);
                 else
@@ -169,9 +193,7 @@ class User
     public static function save(bool $toDB = false)
     {
         $_SESSION['user']    = self::$id;
-        $_SESSION['hash']    = self::$passHash;
         $_SESSION['locale']  = self::$preferedLoc;
-        $_SESSION['timeout'] = self::$expires ? time() + Cfg::get('SESSION_TIMEOUT_DELAY') : 0;
         // $_SESSION['dataKey'] does not depend on user login status and is set in User::init()
 
         if (self::isLoggedIn() && $toDB)
@@ -200,27 +222,27 @@ class User
     public static function authenticate(string $login, string $password) : int
     {
         $userId = 0;
-        $hash   = '';
 
         $result = match (Cfg::get('ACC_AUTH_MODE'))
         {
-            AUTH_MODE_SELF     => self::authSelf($login, $password, $userId, $hash),
-            AUTH_MODE_REALM    => self::authRealm($login, $password, $userId, $hash),
-            AUTH_MODE_EXTERNAL => self::authExtern($login, $password, $userId, $hash),
+            AUTH_MODE_SELF     => self::authSelf($login, $password, $userId),
+            AUTH_MODE_REALM    => self::authRealm($login, $password, $userId),
+            AUTH_MODE_EXTERNAL => self::authExtern($login, $password, $userId),
             default            => AUTH_INTERNAL_ERR
         };
 
-        if ($result == AUTH_OK)
+        // also banned? its a feature block, not login block..
+        if ($result == AUTH_OK || $result == AUTH_BANNED)
         {
             session_unset();
             $_SESSION['user'] = $userId;
-            $_SESSION['hash'] = self::hashCrypt($hash);
+            self::$id = $userId;
         }
 
         return $result;
     }
 
-    private static function authSelf(string $nameOrEmail, string $password, int &$userId, string &$hash) : int
+    private static function authSelf(string $nameOrEmail, string $password, int &$userId) : int
     {
         if (!self::$ip)
             return AUTH_INTERNAL_ERR;
@@ -250,8 +272,7 @@ class User
         if (!$query)
             return AUTH_WRONGUSER;
 
-        self::$passHash = $query['passHash'];
-        if (!self::verifyCrypt($password))
+        if (!self::verifyCrypt($password, $query['passHash']))
             return AUTH_WRONGPASS;
 
         // successfull auth; clear bans for this IP
@@ -261,12 +282,11 @@ class User
             return AUTH_BANNED;
 
         $userId = $query['id'];
-        $hash   = $query['passHash'];
 
         return AUTH_OK;
     }
 
-    private static function authRealm(string $name, string $password, int &$userId, string &$hash) : int
+    private static function authRealm(string $name, string $password, int &$userId) : int
     {
         if (!DB::isConnectable(DB_AUTH))
             return AUTH_INTERNAL_ERR;
@@ -289,7 +309,7 @@ class User
         return AUTH_OK;
     }
 
-    private static function authExtern(string $nameOrEmail, string $password, int &$userId, string &$hash) : int
+    private static function authExtern(string $nameOrEmail, string $password, int &$userId) : int
     {
         if (!file_exists('config/extAuth.php'))
         {
@@ -334,7 +354,7 @@ class User
             return $_;
         }
 
-        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `login`, `passHash`, `username`, `email`, `joinDate`, `allowExpire`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, "", "", ?, "", UNIX_TIMESTAMP(), 0, ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
+        $newId = DB::Aowow()->query('INSERT IGNORE INTO ?_account (`extId`, `passHash`, `username`, `joinDate`, `prevIP`, `prevLogin`, `locale`, `status`, `userGroups`) VALUES (?d, "", ?, UNIX_TIMESTAMP(), ?, UNIX_TIMESTAMP(), ?d, ?d, ?d)',
             $extId,
             $name,
             $_SERVER["REMOTE_ADDR"] ?? '',
@@ -364,12 +384,12 @@ class User
         return crypt($pass, self::createSalt());
     }
 
-    public static function verifyCrypt(string $pass, string $hash = '') : string
+    public static function verifyCrypt(string $pass, string $hash) : bool
     {
-        $_ = $hash ?: self::$passHash;
-        return $_ === crypt($pass, $_);
+        return $hash === crypt($pass, $hash);
     }
 
+    // SRP6 used by TC
     private static function verifySRP6(string $user, string $pass, string $salt, string $verifier) : bool
     {
         $g = gmp_init(7);
@@ -409,7 +429,7 @@ class User
         return $errCode == 0;
     }
 
-    public static function isValidPass(string $pass, int &$errCode = 0) : bool
+    public static function isValidPass(string $pass, ?int &$errCode = 0) : bool
     {
         $errCode = 0;
 
@@ -511,6 +531,11 @@ class User
         return self::$banStatus & (ACC_BAN_TEMP | ACC_BAN_PERM | $addBanMask);
     }
 
+    public static function isRecovering() : bool
+    {
+        return self::$status == ACC_STATUS_RECOVER_USER || self::$status == ACC_STATUS_RECOVER_PASS;
+    }
+
 
     /**************/
     /* js-related */
@@ -553,7 +578,7 @@ class User
         return self::$reputation;
     }
 
-    public static function getUserGlobals() : array
+    public static function getUserGlobal() : array
     {
         $gUser = array(
             'id'          => self::$id,
@@ -577,7 +602,15 @@ class User
         $gUser['excludegroups']     = self::$excludeGroups;
 
         if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
-            $gUser['debug'] = true;                         // csv id-list output option on listviews; todo - set on per user basis
+            $gUser['debug'] = true;                         // csv id-list output option on listviews
+
+        if (self::getPremiumBorder())
+            $gUser['settings'] = ['premiumborder' => 1];
+        else
+            $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied
+
+        if (self::isPremium())
+            $gUser['premium'] = 1;
 
         if (self::getPremiumBorder())
             $gUser['settings'] = ['premiumborder' => 1];

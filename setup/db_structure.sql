@@ -30,14 +30,13 @@ CREATE TABLE `aowow_account` (
   `username` varchar(64) NOT NULL COMMENT 'unique; used for for links and display',
   `email` varchar(64) DEFAULT NULL COMMENT 'unique; can be used for login if AUTH_SELF and can be NULL if not',
   `joinDate` int unsigned NOT NULL COMMENT 'unixtime',
-  `allowExpire` tinyint unsigned NOT NULL,
   `dailyVotes` smallint unsigned NOT NULL DEFAULT 0,
   `consecutiveVisits` smallint unsigned NOT NULL DEFAULT 0,
   `curIP` varchar(45) NOT NULL DEFAULT '',
   `prevIP` varchar(45) NOT NULL DEFAULT '',
   `curLogin` int unsigned NOT NULL DEFAULT 0 COMMENT 'unixtime',
   `prevLogin` int unsigned NOT NULL DEFAULT 0,
-  `locale` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0,2,3,6,8',
+  `locale` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0,2,3,4,6,8',
   `userGroups` smallint unsigned NOT NULL DEFAULT 0 COMMENT 'bitmask',
   `avatar` varchar(50) NOT NULL DEFAULT '' COMMENT 'icon-string for internal or id for upload',
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT 'user can obtain custom titles',
@@ -180,6 +179,25 @@ CREATE TABLE `aowow_account_reputation` (
   CONSTRAINT `FK_acc_rep` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT COMMENT='reputation log';
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `aowow_account_sessions`
+--
+
+DROP TABLE IF EXISTS `aowow_account_sessions`;
+CREATE TABLE `aowow_account_sessions` (
+  `userId` int unsigned NOT NULL,
+  `sessionId` varchar(190) NOT NULL COMMENT 'PHPSESSID',
+  `created` int unsigned NOT NULL,
+  `expires` int unsigned NOT NULL COMMENT 'timestamp or 0 (never expires)',
+  `touched` int unsigned NOT NULL COMMENT 'timestamp - last used',
+  `deviceInfo` varchar(256) NOT NULL,
+  `ip` varchar(45) NOT NULL COMMENT 'can change; just last used ip',
+  `status` enum('ACTIVE', 'LOGOUT', 'FORCEDLOGOUT', 'EXPIRED') NOT NULL,
+  UNIQUE KEY `sessionId` (`sessionId`) USING BTREE,
+  KEY `userId` (`userId`) USING BTREE,
+  CONSTRAINT `FK_acc_sessions` FOREIGN KEY (`userId`) REFERENCES `aowow_account` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 --
 -- Table structure for table `aowow_account_weightscale_data`
@@ -3323,7 +3341,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `aowow_dbversion` WRITE;
 /*!40000 ALTER TABLE `aowow_dbversion` DISABLE KEYS */;
-INSERT INTO `aowow_dbversion` VALUES (1753572320,0,NULL,NULL);
+INSERT INTO `aowow_dbversion` VALUES (1753574970,0,NULL,NULL);
 /*!40000 ALTER TABLE `aowow_dbversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
