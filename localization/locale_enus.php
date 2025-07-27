@@ -898,6 +898,7 @@ $lang = array(
         'recoverUser'   => "Username Request",
         'recoverPass'   => "Password Reset: Step %s of 2",
         'newPass'       => "New Password",
+        'tokenExpires'  => "This token expires in %s.",
 
         // creation
         'register'      => "Registration - Step %s of 2",
@@ -954,12 +955,7 @@ $lang = array(
         'comments'      => "Comments",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'posts'         => "Forum posts",
-        // user mail
-        'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Account Confirmation", "Welcome to CFG_NAME_SHORT!\r\n\r\nClick the Link below to activate your account.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'recoverUser'   => ["User Recovery",        "Follow this link to log in.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nIf you did not request this mail simply ignore it."],
-        'resetPass'     => ["Password Reset",       "Follow this link to reset your password.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nIf you did not request this mail simply ignore it."]
+        'posts'         => "Forum posts"
     ),
     'emote' => array(
         'notFound'      => "This Emote doesn't exist.",

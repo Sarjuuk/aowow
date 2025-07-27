@@ -898,6 +898,7 @@ $lang = array(
         'recoverUser'   => "Demande de nom d'utilisateur",
         'recoverPass'   => "Changement de mot de passe : Étape %s de 2",
         'newPass'       => "Nouveau mot de passe",
+        'tokenExpires'  => "This token expires in %s.",
 
         // creation
         'register'      => "Enregistrement : Étape %s de 2",
@@ -954,12 +955,7 @@ $lang = array(
         'comments'      => "Commentaires",
         'screenshots'   => "Captures d'écran",
         'videos'        => "Vidéos",
-        'posts'         => "Messages sur le forum",
-        // user mail
-        'tokenExpires'  => "This token expires in %s.",
-        'accConfirm'    => ["Activation de compte",             "Bienvenue sur CFG_NAME_SHORT!\r\n\r\nCliquez sur le lien ci-dessous pour activer votre compte.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
-        'recoverUser'   => ["Récupération d'utilisateur",       "Suivez ce lien pour vous connecter.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nSi vous n'avez pas demandé cet email, ignorez le."],
-        'resetPass'     => ["Réinitialisation du mot de passe", "Suivez ce lien pour réinitialiser votre mot de passe.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nSi vous n'avez pas fait de demande de réinitialisation, ignorez cet email."]
+        'posts'         => "Messages sur le forum"
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",

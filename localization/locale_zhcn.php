@@ -898,6 +898,7 @@ $lang = array(
         'recoverUser'   => "用户名需求",
         'recoverPass'   => "密码重置：步骤 %s / 2",
         'newPass'       => "新密码",
+        'tokenExpires'  => "此令牌将在%s过期。",
 
         // creation
         'register'      => "注册 - 步骤 %s / 2",
@@ -954,12 +955,7 @@ $lang = array(
         'comments'      => "评论",
         'screenshots'   => "截图",
         'videos'        => "视频",
-        'posts'         => "论坛帖子",
-        // user mail
-        'tokenExpires'  => "此令牌将在%s过期。",
-        'accConfirm'    => ["账户确认", "欢迎来到CFG_NAME_SHORT!\r\n\r\n点击下方链接以激活您的账户。\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
-        'recoverUser'   => ["用户恢复",        "点击此链接登录\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"],
-        'resetPass'     => ["重置密码",       "点击此链接以重置您的密码。\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\n如果您没有请求此邮件，请忽略它。"]
+        'posts'         => "论坛帖子"
     ),
     'emote' => array(
         'notFound'      => "这个表情不存在。",

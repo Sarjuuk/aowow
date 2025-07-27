@@ -898,6 +898,7 @@ $lang = array(
         'recoverUser'   => "Benutzernamenanfrage",
         'recoverPass'   => "Kennwort zurücksetzen: Schritt %s von 2",
         'newPass'       => "Neues Kennwort",
+        'tokenExpires'  => "Das Token wird in %s verfallen.",
 
         // creation
         'register'      => "Registrierung: Schritt %s von 2",
@@ -954,12 +955,7 @@ $lang = array(
         'comments'      => "Kommentare",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'posts'         => "Forenbeiträge",
-        // user mail
-        'tokenExpires'  => "Das Token wird in %s verfallen.",
-        'accConfirm'    => ["Kontobestätigung",     "Willkommen bei CFG_NAME_SHORT!\r\n\r\nKlicke auf den Link um euren Account zu aktivieren.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
-        'recoverUser'   => ["Benutzernamenanfrage", "Folgt diesem Link um euch anzumelden.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."],
-        'resetPass'     => ["Kennwortreset",        "Folgt diesem Link um euer Kennwort zurückzusetzen.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nFalls Ihr diese Mail nicht angefordert habt kann sie einfach ignoriert werden."]
+        'posts'         => "Forenbeiträge"
     ),
     'emote' => array(
         'notFound'      => "Dieses Emote existiert nicht.",

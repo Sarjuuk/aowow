@@ -450,19 +450,18 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         );
         if (!$ok)
             return Lang::main('intError');
-        else if ($_ = $this->sendMail(Lang::user('accConfirm', 0), sprintf(Lang::user('accConfirm', 1), $token), Cfg::get('ACC_CREATE_SAVE_DECAY')))
-        {
-            if ($id = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ?', $token))
-                Util::gainSiteReputation($id, SITEREP_ACTION_REGISTER);
 
-            // success:: update ip-bans
-            if (!$ip || $ip['unbanDate'] < time())
-                DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
-            else
-                DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip);
+        if (!Util::sendMail($this->_post['email'], 'activate-account', [$token], Cfg::get('ACC_RECOVERY_DECAY')))
+            return Lang::main('intError2', ['send mail']);
 
-            return $_;
-        }
+        if ($id = DB::Aowow()->selectCell('SELECT id FROM ?_account WHERE token = ?', $token))
+            Util::gainSiteReputation($id, SITEREP_ACTION_REGISTER);
+
+        // success:: update ip-bans
+        if (!$ip || $ip['unbanDate'] < time())
+            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (ip, type, count, unbanDate) VALUES (?, 1, 1, UNIX_TIMESTAMP() + ?d)', User::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+        else
+            DB::Aowow()->query('UPDATE ?_account_bannedips SET count = count + 1, unbanDate = UNIX_TIMESTAMP() + ?d WHERE ip = ? AND type = 1', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip);
     }
 
     private function doRecoverPass()
@@ -471,7 +470,8 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
             return $_;
 
         // send recovery mail
-        return $this->sendMail(Lang::user('resetPass', 0), sprintf(Lang::user('resetPass', 1), $token), Cfg::get('ACC_RECOVERY_DECAY'));
+        if (!Util::sendMail($this->_post['email'], 'reset-password', [$token], Cfg::get('ACC_RECOVERY_DECAY')))
+            return Lang::main('intError2', ['send mail']);
     }
 
     private function doResetPass()
@@ -502,8 +502,8 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         if ($_ = $this->initRecovery(ACC_STATUS_RECOVER_USER, Cfg::get('ACC_RECOVERY_DECAY'), $token))
             return $_;
 
-        // send recovery mail
-        return $this->sendMail(Lang::user('recoverUser', 0), sprintf(Lang::user('recoverUser', 1), $token), Cfg::get('ACC_RECOVERY_DECAY'));
+        if (!Util::sendMail($this->_post['email'], 'recover-user', [$token], Cfg::get('ACC_RECOVERY_DECAY')))
+            return Lang::main('intError2', ['send mail']);
     }
 
     private function initRecovery($type, $delay, &$token)
@@ -519,19 +519,6 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         $token = Util::createHash();
         if (!DB::Aowow()->query('UPDATE ?_account SET token = ?, status = ?d, statusTimer =  UNIX_TIMESTAMP() + ?d WHERE email = ?', $token, $type, $delay, $this->_post['email']))
             return Lang::main('intError');
-    }
-
-    private function sendMail($subj, $msg, $delay = 300)
-    {
-        // send recovery mail
-        $subj   = Cfg::get('NAME_SHORT').Lang::main('colon') . $subj;
-        $msg   .= "\r\n\r\n".sprintf(Lang::user('tokenExpires'), Util::formatTime($delay * 1000))."\r\n";
-        $header = 'From: '.Cfg::get('CONTACT_EMAIL') . "\r\n" .
-                  'Reply-To: '.Cfg::get('CONTACT_EMAIL') . "\r\n" .
-                  'X-Mailer: PHP/' . phpversion();
-
-        if (!mail($this->_post['email'], $subj, $msg, $header))
-            return sprintf(Lang::main('intError2'), 'send mail');
     }
 
     private function getNext($forHeader = false)

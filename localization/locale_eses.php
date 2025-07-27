@@ -898,6 +898,7 @@ $lang = array(
         'recoverUser'   => "Pedir nombre de usuario",
         'recoverPass'   => "Reiniciar contraseña: Paso %s de 2",
         'newPass'       => "Nueva Contraseña",
+        'tokenExpires'  => "Este token expira en %s",
 
         // creation
         'register'      => "Inscripción: Paso %s de 2",
@@ -954,12 +955,7 @@ $lang = array(
         'comments'      => "Comentarios",
         'screenshots'   => "Capturas de pantalla",
         'videos'        => "Vídeos",
-        'posts'         => "Mensajes en los foros",
-        // user mail
-        'tokenExpires'  => "Este token expira en %s",
-        'accConfirm'    => ["Confirmación de Cuenta", "Bienvenido a CFG_NAME_SHORT!\r\n\r\nHaga click en el enlace siguiente para activar su cuenta.\r\n\r\nHOST_URL?account=signup&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'recoverUser'   => ["Recuperacion de Usuario", "Siga a este enlace para ingresar.\r\n\r\nHOST_URL?account=signin&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."],
-        'resetPass'     => ["Reinicio de Contraseña", "Siga este enlace para reiniciar su contraseña.\r\n\r\nHOST_URL?account=forgotpassword&token=%s\r\n\r\nSi usted no solicitó este correo, por favor ignorelo."]
+        'posts'         => "Mensajes en los foros"
     ),
     'emote' => array(
         'notFound'      => "Este emoticón no existe.",

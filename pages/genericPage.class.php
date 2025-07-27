@@ -623,6 +623,22 @@ class GenericPage
             );
         }
 
+        // debug output from Util::sendMail
+        if (isset($_SESSION['debug-mail']))
+        {
+            if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+                $announcements[65535] = array(
+                'parent' => 'announcement-65535',
+                'id'     => 0,
+                'mode'   => 0,
+                'status' => 1,
+                'name'   => 'Debug sendmail',
+                'style'  => 'color: #'.$colors[LOG_LEVEL_INFO].'; font-weight: bold; font-size: 14px; padding-left: 40px; background-image: url('.Cfg::get('STATIC_URL').'/images/announcements/warn-small.png); background-size: 15px 15px; background-position: 12px center; border: dashed 2px #'.$colors[LOG_LEVEL_INFO].';',
+                'text'   => '[span]'.$_SESSION['debug-mail'].'[/span]'
+            );
+            unset($_SESSION['debug-mail']);
+        }
+
         // fetch announcements
         if ($this->pageTemplate['pageName'])
         {

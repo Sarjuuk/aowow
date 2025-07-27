@@ -1228,6 +1228,56 @@ abstract class Util
 
         return array_values($menu);
     }
+
+    public static function sendMail(string $email, string $tplFile, array $vars = [], int $expiration = 0) : bool
+    {
+        if (!self::isValidEmail($email))
+            return false;
+
+        $template = '';
+        if (file_exists('template/mails/'.$tplFile.'_'.User::$preferedLoc->value.'.tpl'))
+            $template = file_get_contents('template/mails/'.$tplFile.'_'.User::$preferedLoc->value.'.tpl');
+        else
+        {
+            foreach (Locale::cases() as $l)
+            {
+                if (!$l->validate() || !file_exists('template/mails/'.$tplFile.'_'.$l->value.'.tpl'))
+                    continue;
+
+                $template = file_get_contents('template/mails/'.$tplFile.'_'.$l->value.'.tpl');
+                break;
+            }
+        }
+
+        if (!$template)
+        {
+            trigger_error('Util::SendMail() - mail template not found: '.$tplFile, E_USER_ERROR);
+            return false;
+        }
+
+        [, $subject, $body] = explode("\n", $template, 3);
+
+        $body = Util::defStatic($body);
+
+        if ($vars)
+            $body = vsprintf($body, $vars);
+
+        if ($expiration)
+            $body .= "\n\n".Lang::account('tokenExpires', [Util::formatTime($expiration * 1000)])."\n";
+
+        $subject = Cfg::get('NAME_SHORT').Lang::main('colon') . $subject;
+        $header  = 'From: '         . Cfg::get('CONTACT_EMAIL') . "\n" .
+                   'Reply-To: '     . Cfg::get('CONTACT_EMAIL') . "\n" .
+                   'X-Mailer: PHP/' . phpversion();
+
+        if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
+        {
+            $_SESSION['debug-mail'] = $email . "\n\n" . $subject . "\n\n" . $body;
+            return true;
+        }
+
+        return mail($email, $subject, $body, $header);
+    }
 }
 
 ?>
