@@ -644,11 +644,11 @@ class Loot
 
                         foreach ($srcObj->iterate() as $curTpl)
                         {
-                            if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_HERBLOOT)
+                            if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_HERBALISM)
                                 $tabId = 9;
-                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_ENGINEERLOOT)
+                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_ENGINEERING)
                                 $tabId = 8;
-                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_MININGLOOT)
+                            else if ($tabId < 0 && $curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_MINING)
                                 $tabId = 7;
                             else if ($tabId < 0)
                                 $tabId = abs($tabId);       // general case (skinning)

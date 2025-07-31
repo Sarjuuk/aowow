@@ -573,15 +573,14 @@ class SearchPage extends GenericPage
             if ($_ = array_filter($this->_get['slots'] ?? []))
                 $cnd[] = ['slot', $_];
 
-            // trick ItemListFilter into evaluating weights
-            if ($this->statWeights)
-                $_GET['filter'] = 'wt='.implode(':', $this->statWeights[0]).';wtv='.implode(':', $this->statWeights[1]);
-
-            $itemFilter = new ItemListFilter();
-            if ($_ = $itemFilter->createConditionsForWeights())
+            if ($this->_get['wt'] && $this->_get['wtv'])
             {
-                $miscData['extraOpts'] = $itemFilter->extraOpts;
-                $cnd = array_merge($cnd, [$_]);
+                $itemFilter = new ItemListFilter($this->_get);
+                if ($_ = $itemFilter->createConditionsForWeights())
+                {
+                    $miscData['extraOpts'] = $itemFilter->extraOpts;
+                    $cnd = array_merge($cnd, [$_]);
+                }
             }
         }
         else

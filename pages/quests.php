@@ -26,9 +26,10 @@ class QuestsPage extends GenericPage
         $this->validCats = Game::$questClasses;             // not allowed to set this as default
 
         $this->getCategoryFromUrl($pageParam);
-        $this->filterObj = new QuestListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new QuestListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name   = Util::ucFirst(Lang::game('quests'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
@@ -46,6 +47,8 @@ class QuestsPage extends GenericPage
         else if (isset($this->category[0]))
             $conditions[] = ['zoneOrSort', $this->validCats[$this->category[0]]];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
@@ -53,27 +56,11 @@ class QuestsPage extends GenericPage
 
         $this->extendGlobalData($quests->getJSGlobals());
 
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'quests'];
-
-        $rCols = $this->filterObj->getReputationCols();
-        $xCols = $this->filterObj->getExtraCols();
-        if ($rCols)
-            $this->filter['initData']['rc'] = $rCols;
-
-        if ($xCols)
-            $this->filter['initData']['ec'] = $xCols;
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
-
         $tabData = ['data' => array_values($quests->getListviewData())];
 
-        if ($rCols)
-            $tabData['extraCols'] = '$fi_getReputationCols('.json_encode($rCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')';
-        else if ($xCols)
+        if ($rCols = $this->filterObj->fiReputationCols)    // never use pretty-print
+            $tabData['extraCols'] = '$fi_getReputationCols('.Util::toJSON($rCols, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE).')';
+        else if ($this->filterObj->fiExtraCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded

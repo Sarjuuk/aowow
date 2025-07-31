@@ -29,22 +29,16 @@ class AreaTriggersPage extends GenericPage
         if (isset($this->category[0]))
             header('Location: ?areatriggers&filter=ty='.$this->category[0], true, 302);
 
-        $this->filterObj = new AreaTriggerListFilter();
-
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new AreaTriggerListFilter($this->_get['filter'] ?? '');
 
         $this->name = Util::ucFirst(Lang::game('areatriggers'));
     }
 
     protected function generateContent()
     {
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'areatrigger'];
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
+        $this->filterObj->evalCriteria();
 
         $conditions = [];
         if ($_ = $this->filterObj->getConditions())
@@ -75,15 +69,15 @@ class AreaTriggersPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
 
-        $form = $this->filterObj->getForm();
-        if (isset($form['ty']) && count($form['ty']) == 1)
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
             array_unshift($this->title, Lang::areatrigger('types', $form['ty'][0]));
     }
 
     protected function generatePath()
     {
-        $form = $this->filterObj->getForm();
-        if (isset($form['ty']) && count($form['ty']) == 1)
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
             $this->path[] = $form['ty'];
     }
 }

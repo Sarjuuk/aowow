@@ -690,7 +690,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                        SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
-            Type::NPC, NPC_TYPEFLAG_HERBLOOT,
+            Type::NPC, NPC_TYPEFLAG_SKIN_WITH_HERBALISM,
             Type::OBJECT, OBJECT_CHEST, DB::Aowow()->selectCol('SELECT `id` FROM dbc_lock WHERE `properties1` = ?d', LOCK_PROPERTY_HERBALISM)
         );
 
@@ -779,7 +779,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                          SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN   item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY    `refOrItem`, src.`entry`',
-            Type::NPC, NPC_TYPEFLAG_MININGLOOT,
+            Type::NPC, NPC_TYPEFLAG_SKIN_WITH_MINING,
             Type::OBJECT, OBJECT_CHEST, DB::Aowow()->selectCol('SELECT `id` FROM dbc_lock WHERE `properties1` = ?d', LOCK_PROPERTY_MINING)
         );
 
@@ -916,7 +916,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef` FROM creature_template ct JOIN skinning_loot_template slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
-            NPC_TYPEFLAG_ENGINEERLOOT
+            NPC_TYPEFLAG_SKIN_WITH_ENGINEERING
         );
 
         if (!$salvageLoot)

@@ -145,14 +145,14 @@ class GameObjectList extends BaseType
 
 class GameObjectListFilter extends Filter
 {
-    public    $extraOpts     = [];
-    protected $enums         = array(
+    protected string $type  = 'objects';
+    protected array  $enums = array(
          1 => parent::ENUM_ZONE,
         16 => parent::ENUM_EVENT,
         50 => [1, 2, 3, 4, 663, 883]
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
          1 => [parent::CR_ENUM,     's.areaId',        false,                true], // foundin
          2 => [parent::CR_CALLBACK, 'cbQuestRelation', 'startsQuests',       0x1 ], // startsquest [side]
          3 => [parent::CR_CALLBACK, 'cbQuestRelation', 'endsQuests',         0x2 ], // endsquest [side]
@@ -167,7 +167,7 @@ class GameObjectListFilter extends Filter
         50 => [parent::CR_ENUM,     'spellFocusId',    true,                 true], // spellfocus
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'  => [parent::V_LIST,  [[1, 5], 7, 11, 13, 15, 16, 18, 50],              true ], // criteria ids
         'crs' => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,                              true ], // criteria values - only numeric input values expected
@@ -175,14 +175,16 @@ class GameObjectListFilter extends Filter
         'ma'  => [parent::V_EQUAL, 1,                                                false]  // match any / all filter
     );
 
-    protected function createSQLForValues()
+    public array $extraOpts = [];
+
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = $this->fiData['v'];
+        $_v    = $this->values;
 
         // name
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         return $parts;

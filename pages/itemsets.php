@@ -24,9 +24,10 @@ class ItemsetsPage extends GenericPage
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
-        $this->filterObj = new ItemsetListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new ItemsetListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name = Util::ucFirst(Lang::game('itemsets'));
     }
@@ -40,21 +41,15 @@ class ItemsetsPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
         $itemsets = new ItemsetList($conditions, ['calcTotal' => true]);
         $this->extendGlobalData($itemsets->getJSGlobals());
 
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'itemsets'];
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
-
-        $xCols = $this->filterObj->getExtraCols();
+        $xCols = $this->filterObj->fiExtraCols;
         if ($xCols)
             $this->filter['initData']['ec'] = $xCols;
 
@@ -87,15 +82,15 @@ class ItemsetsPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
 
-        $form = $this->filterObj->getForm('form');
-        if (isset($form['cl']))
+        $form = $this->filterObj->values;
+        if ($form['cl'])
             array_unshift($this->title, Lang::game('cl', $form['cl']));
     }
 
     protected function generatePath()
     {
-        $form = $this->filterObj->getForm('form');
-        if (isset($form['cl']))
+        $form = $this->filterObj->values;
+        if ($form['cl'])
             $this->path[] = $form['cl'];
     }
 }

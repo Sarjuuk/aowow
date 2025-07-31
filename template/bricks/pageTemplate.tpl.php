@@ -31,9 +31,10 @@ if (!empty($this->pageTemplate)):
     echo "                PageTemplate.init();\n";
 endif;
 
-if (!empty($fi)):
-    echo "                Menu.modifyUrl(Menu.findItem(mn_database, [".$fi['menuItem']."]), { filter: '+=".Util::jsEscape($fi['query'])."' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, [".$fi['menuItem']."])) });\n";
-        // $(document).ready(function(){ Menu.modifyUrl(Menu.findItem(mn_path, [1,5]), { filter: 'na=Malgayne'}, { onAppendCollision: fi_mergeFilterParams }) });
+if (isset($fiQuery) && count($fiMenuItem) > 1 && array_slice($fiMenuItem, 0, 2) == [1, 5]):
+    echo "                \$(document).ready(function(){ Menu.modifyUrl(Menu.findItem(mn_path, ".Util::toJSON($fiMenuItem)."), { filter: '".$this->jsEscape($fiQuery)."'}, { onAppendCollision: fi_mergeFilterParams }) });\n";
+elseif (isset($fiQuery)):
+    echo "                Menu.modifyUrl(Menu.findItem(mn_database, ".Util::toJSON($fiMenuItem)."), { filter: '+=".Util::jsEscape($fiQuery)."' }, { onAppendCollision: fi_mergeFilterParams, onAppendEmpty: fi_setFilterParams, menuUrl: Menu.getItemUrl(Menu.findItem(mn_database, ".Util::toJSON($fiMenuItem).")) });\n";
 endif;
 ?>
             //]]></script>

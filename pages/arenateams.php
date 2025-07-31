@@ -12,10 +12,9 @@ class ArenaTeamsPage extends GenericPage
 {
     use TrProfiler;
 
-    private $filterObj  = null;
+    protected $filterObj  = null;
 
     protected $subCat   = '';
-    protected $filter   = [];
     protected $lvTabs   = [];
 
     protected $type     = Type::ARENA_TEAM;
@@ -38,9 +37,9 @@ class ArenaTeamsPage extends GenericPage
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->error();
 
-        $this->getSubjectFromUrl($pageParam);
+        $this->filterObj = new ArenaTeamListFilter($this->_get['filter'] ?? '');
 
-        $this->filterObj = new ArenaTeamListFilter();
+        $this->getSubjectFromUrl($pageParam);
 
         foreach (Profiler::getRealms() as $idx => $r)
         {
@@ -75,13 +74,10 @@ class ArenaTeamsPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = ['at.seasonGames', 0, '>'];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
-
-        // recreate form selection
-        $this->filter = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['type' => 'arenateams'];
 
         $tabData = array(
             'id'          => 'arena-teams',
@@ -92,7 +88,7 @@ class ArenaTeamsPage extends GenericPage
             'hiddenCols'  => ['arenateam', 'guild'],
         );
 
-        if (empty($this->filter['sz']))
+        if (!$this->filterObj->values['sz'])
             $tabData['visibleCols'][] = 'size';
 
         $miscParams = ['calcTotal' => true];
@@ -113,7 +109,7 @@ class ArenaTeamsPage extends GenericPage
             $tabData['data'] = array_values($teams->getListviewData());
 
             // create note if search limit was exceeded
-            if ($this->filter['query'] && $teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filterObj->query && $teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound2', $this->sumSubjects, $teams->getMatches());
                 $tabData['_truncated'] = 1;

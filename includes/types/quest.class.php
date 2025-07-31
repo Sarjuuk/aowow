@@ -429,8 +429,8 @@ class QuestList extends BaseType
 
 class QuestListFilter extends Filter
 {
-    public    $extraOpts     = [];
-    protected $enums         = array(
+    protected string $type  = 'quests';
+    protected array  $enums = array(
         37 => parent::ENUM_CLASSS,                          // classspecific
         38 => parent::ENUM_RACE,                            // racespecific
          9 => parent::ENUM_FACTION,                         // objectiveearnrepwith
@@ -440,7 +440,7 @@ class QuestListFilter extends Filter
         10 => parent::ENUM_FACTION                          // decreasesrepwith
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
          1 => [parent::CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
          2 => [parent::CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
          3 => [parent::CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT              ], // moneyrewarded
@@ -475,7 +475,7 @@ class QuestListFilter extends Filter
         45 => [parent::CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'    => [parent::V_RANGE, [1, 45],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_INT,                                                 true ], // criteria values - only numerals
@@ -490,68 +490,60 @@ class QuestListFilter extends Filter
         'ty'    => [parent::V_LIST,  [0, 1, 21, 41, 62, [81, 85], 88, 89],                                true ]  // type
     );
 
-    protected function createSQLForValues()
+    public array $extraOpts = [];
+
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = $this->fiData['v'];
+        $_v    = $this->values;
 
         // name
-        if (isset($_v['na']))
+        if ($_v['na'])
         {
             $_ = [];
-            if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value, 'objectives_loc'.Lang::getLocale()->value, 'details_loc'.Lang::getLocale()->value]);
+            if ($_v['ex'] == 'on')
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'objectives_loc'.Lang::getLocale()->value, 'details_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]);
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;
         }
 
         // level min
-        if (isset($_v['minle']))
+        if ($_v['minle'])
             $parts[] = ['level', $_v['minle'], '>='];       // not considering quests that are always at player level (-1)
 
         // level max
-        if (isset($_v['maxle']))
+        if ($_v['maxle'])
             $parts[] = ['level', $_v['maxle'], '<='];
 
         // reqLevel min
-        if (isset($_v['minrl']))
+        if ($_v['minrl'])
             $parts[] = ['minLevel', $_v['minrl'], '>='];    // ignoring maxLevel
 
         // reqLevel max
-        if (isset($_v['maxrl']))
+        if ($_v['maxrl'])
             $parts[] = ['minLevel', $_v['maxrl'], '<='];    // ignoring maxLevel
 
         // side
-        if (isset($_v['si']))
+        if ($_v['si'])
         {
-            $ex    = [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
-            $notEx = ['OR', ['reqRaceMask', 0], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
+            $excl = [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
+            $incl = ['OR', ['reqRaceMask', 0], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
 
-            switch ($_v['si'])
+            $parts[] = match ($_v['si'])
             {
-                case  SIDE_BOTH:
-                    $parts[] = $notEx;
-                    break;
-                case  SIDE_HORDE:
-                    $parts[] = ['OR', $notEx, ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
-                    break;
-                case -SIDE_HORDE:
-                    $parts[] = ['AND', $ex,   ['reqRaceMask', ChrRace::MASK_HORDE, '&']];
-                    break;
-                case  SIDE_ALLIANCE:
-                    $parts[] = ['OR', $notEx, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
-                    break;
-                case -SIDE_ALLIANCE:
-                    $parts[] = ['AND', $ex,   ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']];
-                    break;
-            }
+                 SIDE_BOTH     => $incl,
+                 SIDE_HORDE    => ['OR',  $incl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+                -SIDE_HORDE    => ['AND', $excl, ['reqRaceMask', ChrRace::MASK_HORDE, '&']],
+                 SIDE_ALLIANCE => ['OR',  $incl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']],
+                -SIDE_ALLIANCE => ['AND', $excl, ['reqRaceMask', ChrRace::MASK_ALLIANCE, '&']]
+            };
         }
 
         // type [list]
-        if (isset($_v['ty']))
+        if ($_v['ty'] !== null)
             $parts[] = ['type', $_v['ty']];
 
         return $parts;
@@ -566,7 +558,7 @@ class QuestListFilter extends Filter
             return null;
 
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
-            $this->formData['reputationCols'][] = [$crs, Util::localizedString($_, 'name')];
+            $this->fiReputationCols[] = [$crs, Util::localizedString($_, 'name')];
 
         return [
             'OR',

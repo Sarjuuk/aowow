@@ -61,11 +61,10 @@ trait TrListPage
 {
     protected $category   = null;
     protected $subCat     = '';
-    protected $filter     = [];
     protected $lvTabs     = [];                             // most pages have this
     protected $redButtons = [];                             // see template/redButtons.tpl.php
 
-    private   $filterObj = null;
+    protected ?Filter $filterObj = null;
 
     protected function generateCacheKey(bool $withStaff = true) : string
     {
@@ -447,8 +446,8 @@ class GenericPage
         if (!empty($this->path))
             $this->pageTemplate['breadcrumb'] = $this->path;
 
-        if (!empty($this->filter))
-            $this->pageTemplate['filter'] = empty($this->filter['query']) ? 0 : 1;
+        if (!empty($this->filterObj))
+            $this->pageTemplate['filter'] = empty($this->filterObj->query) ? 0 : 1;
 
         if (method_exists($this, 'postCache'))              // e.g. update dates for events and such
             $this->postCache();

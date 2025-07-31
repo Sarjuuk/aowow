@@ -167,11 +167,12 @@ class ItemsetList extends BaseType
 // missing filter: "Available to Players"
 class ItemsetListFilter extends Filter
 {
-    protected $enums         = array(
+    protected string $type  = 'itemsets';
+    protected array  $enums = array(
          6 => parent::ENUM_EVENT
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
          2 => [parent::CR_NUMERIC,  'id',          NUM_CAST_INT,         true], // id
          3 => [parent::CR_NUMERIC,  'npieces',     NUM_CAST_INT              ], // pieces
          4 => [parent::CR_STRING,   'bonusText',   STR_LOCALIZED             ], // bonustext
@@ -183,7 +184,7 @@ class ItemsetListFilter extends Filter
         12 => [parent::CR_CALLBACK, 'cbAvaliable',                           ]  // available to players [yn]
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'    => [parent::V_RANGE, [2, 12],                                         true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 424]], true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
@@ -199,46 +200,46 @@ class ItemsetListFilter extends Filter
         'ta'    => [parent::V_RANGE, [1, 30],                                         false]  // tag / content group
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         // name [str]
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // quality [enum]
-        if (isset($_v['qu']))
+        if ($_v['qu'])
             $parts[] = ['quality', $_v['qu']];
 
         // type [enum]
-        if (isset($_v['ty']))
+        if ($_v['ty'])
             $parts[] = ['type', $_v['ty']];
 
         // itemLevel min [int]
-        if (isset($_v['minle']))
+        if ($_v['minle'])
             $parts[] = ['minLevel', $_v['minle'], '>='];
 
         // itemLevel max [int]
-        if (isset($_v['maxle']))
+        if ($_v['maxle'])
             $parts[] = ['maxLevel', $_v['maxle'], '<='];
 
         // reqLevel min [int]
-        if (isset($_v['minrl']))
+        if ($_v['minrl'])
             $parts[] = ['reqLevel', $_v['minrl'], '>='];
 
         // reqLevel max [int]
-        if (isset($_v['maxrl']))
+        if ($_v['maxrl'])
             $parts[] = ['reqLevel', $_v['maxrl'], '<='];
 
         // class [enum]
-        if (isset($_v['cl']))
+        if ($_v['cl'])
             $parts[] = ['classMask', $this->list2Mask([$_v['cl']]), '&'];
 
         // tag [enum]
-        if (isset($_v['ta']))
+        if ($_v['ta'])
             $parts[] = ['contentGroup', intVal($_v['ta'])];
 
         return $parts;

@@ -103,9 +103,8 @@ class IconList extends BaseType
 
 class IconListFilter extends Filter
 {
-    public $extraOpts = null;
-
-    private $criterion2field = array(
+    private array $totalUses       = [];
+    private array $criterion2field = array(
           1 => '?_items',                                   // items [num]
           2 => '?_spell',                                   // spells [num]
           3 => '?_achievement',                             // achievements [num]
@@ -119,9 +118,9 @@ class IconListFilter extends Filter
          11 => '',                                          // classes [num]
          13 => ''                                           // used [num]
     );
-    private $totalUses       = [];
 
-    protected $genericFilter = array(
+    protected string $type          = 'icons';
+    protected array  $genericFilter = array(
          1 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // items [num]
          2 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // spells [num]
          3 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // achievements [num]
@@ -131,13 +130,15 @@ class IconListFilter extends Filter
         13 => [parent::CR_CALLBACK, 'cbUseAll'  ]           // used [num]
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'  => [parent::V_LIST,  [1, 2, 3, 6, 9, 11, 13], true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 6],                  true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,     true ], // criteria values - all criteria are numeric here
         'na'  => [parent::V_REGEX, parent::PATTERN_NAME,    false], // name - only printable chars, no delimiter
         'ma'  => [parent::V_EQUAL, 1,                       false]  // match any / all filter
     );
+
+    public array $extraOpts = [];
 
     private function _getCnd(string $op, int $val, string $tbl) : ?array
     {
@@ -168,14 +169,14 @@ class IconListFilter extends Filter
         return $ids ? ['id', array_keys($ids), '!'] : [1];
     }
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         //string
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name']))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name']))
                 $parts[] = $_;
 
         return $parts;

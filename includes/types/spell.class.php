@@ -2359,7 +2359,8 @@ class SpellListFilter extends Filter
         )
     );
 
-    protected $enums = array(
+    protected string $type  = 'spells';
+    protected array  $enums = array(
         9 => array(                                         // sources index
             1  => true,                                     // Any
             2  => false,                                    // None
@@ -2409,7 +2410,7 @@ class SpellListFilter extends Filter
         )
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
          1  => [parent::CR_CALLBACK,  'cbCost',                                                                                   ], // costAbs [op] [int]
          2  => [parent::CR_NUMERIC,   'powerCostPercent', NUM_CAST_INT                                                            ], // prcntbasemanarequired
          3  => [parent::CR_BOOLEAN,   'spellFocusObject'                                                                          ], // requiresnearbyobject
@@ -2513,7 +2514,7 @@ class SpellListFilter extends Filter
         116 => [parent::CR_BOOLEAN,   'startRecoveryTime'                                                                         ]  // onGlobalCooldown [yn]
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'    => [parent::V_RANGE,    [1, 116],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                               true ], // criteria values - only printable chars, no delimiters
@@ -2532,62 +2533,62 @@ class SpellListFilter extends Filter
         'me'    => [parent::V_RANGE,    [1, 31],                                           false]  // mechanics
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         //string (extended)
-        if (isset($_v['na']))
+        if ($_v['na'])
         {
             $_ = [];
-            if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value, 'buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
+            if ($_v['ex'] == 'on')
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'buff_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]);
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;
         }
 
         // spellLevel min                                   todo (low): talentSpells (typeCat -2) commonly have spellLevel 1 (and talentLevel >1) -> query is inaccurate
-        if (isset($_v['minle']))
+        if ($_v['minle'])
             $parts[] = ['spellLevel', $_v['minle'], '>='];
 
         // spellLevel max
-        if (isset($_v['maxle']))
+        if ($_v['maxle'])
             $parts[] = ['spellLevel', $_v['maxle'], '<='];
 
         // skillLevel min
-        if (isset($_v['minrs']))
+        if ($_v['minrs'])
             $parts[] = ['learnedAt', $_v['minrs'], '>='];
 
         // skillLevel max
-        if (isset($_v['maxrs']))
+        if ($_v['maxrs'])
             $parts[] = ['learnedAt', $_v['maxrs'], '<='];
 
         // race
-        if (isset($_v['ra']))
+        if ($_v['ra'])
             $parts[] = ['AND', [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], ['reqRaceMask', $this->list2Mask([$_v['ra']]), '&']];
 
         // class [list]
-        if (isset($_v['cl']))
+        if ($_v['cl'])
             $parts[] = ['reqClassMask', $this->list2Mask($_v['cl']), '&'];
 
         // school [list]
-        if (isset($_v['sc']))
+        if ($_v['sc'])
             $parts[] = ['schoolMask', $this->list2Mask($_v['sc'], true), '&'];
 
         // glyph type [list]                                wonky, admittedly, but consult SPELL_CU_* in defines and it makes sense
-        if (isset($_v['gl']))
+        if ($_v['gl'])
             $parts[] = ['cuFlags', ($this->list2Mask($_v['gl']) << 6), '&'];
 
         // dispel type
-        if (isset($_v['dt']))
+        if ($_v['dt'])
             $parts[] = ['dispelType', $_v['dt']];
 
         // mechanic
-        if (isset($_v['me']))
+        if ($_v['me'])
             $parts[] = ['OR', ['mechanic', $_v['me']], ['effect1Mechanic', $_v['me']], ['effect2Mechanic', $_v['me']], ['effect3Mechanic', $_v['me']]];
 
         return $parts;

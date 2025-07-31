@@ -12,10 +12,9 @@ class GuildsPage extends GenericPage
 {
     use TrProfiler;
 
-    private $filterObj  = null;
+    protected $filterObj  = null;
 
     protected $subCat   = '';
-    protected $filter   = [];
     protected $lvTabs   = [];
 
     protected $type     = Type::GUILD;
@@ -36,7 +35,7 @@ class GuildsPage extends GenericPage
 
         $this->getSubjectFromUrl($pageParam);
 
-        $this->filterObj = new GuildListFilter();
+        $this->filterObj = new GuildListFilter($this->_get['filter'] ?? '');
 
         foreach (Profiler::getRealms() as $idx => $r)
         {
@@ -72,13 +71,11 @@ class GuildsPage extends GenericPage
             ['c.level', MAX_LEVEL, '<='],                   // prevents JS errors
             [['c.extra_flags', Profiler::CHAR_GMFLAGS, '&'], 0]
         );
+
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
-
-        // recreate form selection
-        $this->filter = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['type' => 'guilds'];
 
         $tabData = array(
             'id'          => 'guilds',
@@ -109,7 +106,7 @@ class GuildsPage extends GenericPage
             $tabData['data'] = array_values($guilds->getListviewData());
 
             // create note if search limit was exceeded
-            if ($this->filter['query'] && $guilds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filterObj->query && $guilds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound2', $this->sumSubjects, $guilds->getMatches());
                 $tabData['_truncated'] = 1;

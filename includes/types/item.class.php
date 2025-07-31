@@ -1777,13 +1777,12 @@ class ItemList extends BaseType
 
 class ItemListFilter extends Filter
 {
-    private   $ubFilter      = [];                          // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
-    private   $extCostQuery  = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN (?a) UNION
-                                SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)';
+    private array  $ubFilter     = [];                      // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
+    private string $extCostQuery = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN (?a) UNION
+                                    SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)';
 
-    public    $extraOpts     = [];                          // score for statWeights
-    public    $wtCnd         = [];
-    protected $enums         = array(
+    protected string $type  = 'items';
+    protected array  $enums = array(
          16 => parent::ENUM_ZONE,                           // drops in zone
          17 => parent::ENUM_FACTION,                        // requiresrepwith
          99 => parent::ENUM_PROFESSION,                     // requiresprof
@@ -1851,7 +1850,7 @@ class ItemListFilter extends Filter
         )
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
           2 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               1                 ], // bindonpickup [yn]
           3 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               2                 ], // bindonequip [yn]
           4 => [parent::CR_CALLBACK,  'cbFieldHasVal',          'bonding',               3                 ], // bindonuse [yn]
@@ -2010,64 +2009,47 @@ class ItemListFilter extends Filter
         177 => [parent::CR_STAFFFLAG, 'flagsExtra'                                                         ], // flags2
     );
 
-    protected $inputFields   = array(
-        'wt'    => [parent::V_CALLBACK, 'cbWeightKeyCheck',                              true ], // weight keys
-        'wtv'   => [parent::V_RANGE,    [1, 999],                                        true ], // weight values
-        'jc'    => [parent::V_LIST,     [1],                                             false], // use jewelcrafter gems for weight calculation
-        'gm'    => [parent::V_LIST,     [2, 3, 4],                                       false], // gem rarity for weight calculation
-        'cr'    => [parent::V_RANGE,    [1, 177],                                        true ], // criteria ids
-        'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]], true ], // criteria operators
-        'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters
-        'upg'   => [parent::V_REGEX,    '/[^\d:]/ui',                                    false], // upgrade item ids
-        'gb'    => [parent::V_LIST,     [0, 1, 2, 3],                                    false], // search result grouping
-        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                            false], // name - only printable chars, no delimiter
-        'ma'    => [parent::V_EQUAL,    1,                                               false], // match any / all filter
-        'ub'    => [parent::V_LIST,     [[1, 9], 11],                                    false], // usable by classId
-        'qu'    => [parent::V_RANGE,    [0, 7],                                          true ], // quality ids
-        'ty'    => [parent::V_CALLBACK, 'cbTypeCheck',                                   true ], // item type - dynamic by current group
-        'sl'    => [parent::V_CALLBACK, 'cbSlotCheck',                                   true ], // item slot - dynamic by current group
-        'si'    => [parent::V_LIST,     [1, 2, 3, -1, -2],                               false], // side
-        'minle' => [parent::V_RANGE,    [1, 999],                                        false], // item level min
-        'maxle' => [parent::V_RANGE,    [1, 999],                                        false], // item level max
-        'minrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                  false], // required level min
-        'maxrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                  false]  // required level max
+    protected array $inputFields   = array(
+        'wt'    => [parent::V_CALLBACK, 'cbWeightKeyCheck',                                                  true ], // weight keys
+        'wtv'   => [parent::V_RANGE,    [1, 999],                                                            true ], // weight values
+        'jc'    => [parent::V_LIST,     [1],                                                                 false], // use jewelcrafter gems for weight calculation
+        'gm'    => [parent::V_LIST,     [2, 3, 4],                                                           false], // gem rarity for weight calculation
+        'cr'    => [parent::V_RANGE,    [1, 177],                                                            true ], // criteria ids
+        'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
+        'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
+        'upg'   => [parent::V_REGEX,    '/[^\d:]/ui',                                                        true ], // upgrade item ids
+        'gb'    => [parent::V_LIST,     [0, 1, 2, 3],                                                        false], // search result grouping
+        'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                                                false], // name - only printable chars, no delimiter
+        'ma'    => [parent::V_EQUAL,    1,                                                                   false], // match any / all filter
+        'ub'    => [parent::V_LIST,     [[1, 9], 11],                                                        false], // usable by classId
+        'qu'    => [parent::V_RANGE,    [0, 7],                                                              true ], // quality ids
+        'ty'    => [parent::V_CALLBACK, 'cbTypeCheck',                                                       true ], // item type - dynamic by current group
+        'sl'    => [parent::V_CALLBACK, 'cbSlotCheck',                                                       true ], // item slot - dynamic by current group
+        'si'    => [parent::V_LIST,     [-SIDE_HORDE, -SIDE_ALLIANCE, SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH], false], // side
+        'minle' => [parent::V_RANGE,    [1, 999],                                                            false], // item level min
+        'maxle' => [parent::V_RANGE,    [1, 999],                                                            false], // item level max
+        'minrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                                      false], // required level min
+        'maxrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                                      false]  // required level max
     );
 
-    public function __construct($fromPOST = false, $opts = [])
-    {
-        $classes = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `weaponTypeMask` AS "0", `armorTypeMask` AS "1" FROM ?_classes');
-        foreach ($classes as $cId => [$weaponTypeMask, $armorTypeMask])
-        {
-            // preselect misc subclasses
-            $this->ubFilter[$cId] = [ITEM_CLASS_WEAPON => [ITEM_SUBCLASS_MISC_WEAPON], ITEM_CLASS_ARMOR => [ITEM_SUBCLASS_MISC_ARMOR]];
-
-            for ($i = 0; $i < 21; $i++)
-                if ($weaponTypeMask & (1 << $i))
-                    $this->ubFilter[$cId][ITEM_CLASS_WEAPON][] = $i;
-
-            for ($i = 0; $i < 11; $i++)
-                if ($armorTypeMask & (1 << $i))
-                    $this->ubFilter[$cId][ITEM_CLASS_ARMOR][] = $i;
-        }
-
-        parent::__construct($fromPOST, $opts);
-    }
+    public array $extraOpts = [];                           // score for statWeights
+    public array $wtCnd     = [];
 
     public function createConditionsForWeights() : array
     {
-        if (empty($this->fiData['v']['wt']))
+        if (empty($this->values['wt']))
             return [];
 
         $this->wtCnd = [];
         $select = [];
         $wtSum  = 0;
 
-        foreach ($this->fiData['v']['wt'] as $k => $v)
+        foreach ($this->values['wt'] as $k => $v)
         {
             if ($idx = Stat::getIndexFrom(Stat::IDX_FILTER_CR_ID, $v))
             {
                 $str = Stat::getJsonString($idx);
-                $qty = intVal($this->fiData['v']['wtv'][$k]);
+                $qty = intVal($this->values['wtv'][$k]);
 
                 $select[]      = '(IFNULL(`is`.`'.$str.'`, 0) * '.$qty.')';
                 $this->wtCnd[] = ['is.'.$str, 0, '>'];
@@ -2082,28 +2064,51 @@ class ItemListFilter extends Filter
 
         if ($select)
         {
-            $this->extraOpts['is']['s'][] = ', IF(is.typeId IS NULL, 0, ('.implode(' + ', $select).') / '.$wtSum.') AS score';
+            $this->extraOpts['is']['s'][] = ', IF(`is`.`typeId` IS NULL, 0, ('.implode(' + ', $select).') / '.$wtSum.') AS "score"';
             $this->extraOpts['is']['o'][] = 'score DESC';
             $this->extraOpts['i']['o'][]  = null;           // remove default ordering
         }
         else
-            $this->extraOpts['is']['s'][] = ', 0 AS score'; // prevent errors
+            $this->extraOpts['is']['s'][] = ', 0 AS "score"'; // prevent errors
 
         return $this->wtCnd;
     }
 
-    public function isCurrencyFor(int $itemId) : bool
+    public static function isCurrencyFor(int $itemId) : bool
     {
         return in_array($itemId, self::ENUM_CURRENCY);
+    }
+
+    public function getConditions() : array
+    {
+        if (!$this->ubFilter)
+        {
+            $classes = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `weaponTypeMask` AS "0", `armorTypeMask` AS "1" FROM ?_classes');
+            foreach ($classes as $cId => [$weaponTypeMask, $armorTypeMask])
+            {
+                // preselect misc subclasses
+                $this->ubFilter[$cId] = [ITEM_CLASS_WEAPON => [ITEM_SUBCLASS_MISC_WEAPON], ITEM_CLASS_ARMOR => [ITEM_SUBCLASS_MISC_ARMOR]];
+
+                for ($i = 0; $i < 21; $i++)
+                    if ($weaponTypeMask & (1 << $i))
+                        $this->ubFilter[$cId][ITEM_CLASS_WEAPON][] = $i;
+
+                for ($i = 0; $i < 11; $i++)
+                    if ($armorTypeMask & (1 << $i))
+                        $this->ubFilter[$cId][ITEM_CLASS_ARMOR][] = $i;
+            }
+        }
+
+        return parent::getConditions();
     }
 
     protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = $this->fiData['v'];
+        $_v    = $this->values;
 
         // weights
-        if (!empty($_v['wt']) && !empty($_v['wtv']))
+        if ($_v['wt'] && $_v['wtv'])
         {
             // gm - gem quality (qualityId)
             // jc - jc-gems included (bool)
@@ -2112,37 +2117,25 @@ class ItemListFilter extends Filter
                 $parts[] = $_;
 
             foreach ($_v['wt'] as $_)
-                $this->formData['extraCols'][] = $_;
+                $this->fiExtraCols[] = $_;
         }
 
         // upgrade for [form only]
-        if (isset($_v['upg']))
+        if ($_v['upg'])
         {
-            $_ = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `slot` FROM ?_items WHERE `class` IN (?a) AND `id` IN (?a)', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR], explode(':', $_v['upg']));
-            if ($_ === null)
-            {
-                unset($_v['upg']);
-                unset($this->formData['form']['upg']);
-            }
+            if ($this->upgrades = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `slot` FROM ?_items WHERE `class` IN (?a) AND `id` IN (?a)', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR], $_v['upg']))
+                $parts[] = ['slot', $this->upgrades];
             else
-            {
-                $this->formData['form']['upg'] = $_;
-                if ($_)
-                    $parts[] = ['slot', $_];
-            }
+                $_v['upg'] = null;
         }
 
-        // group by [form only]
-        if (isset($_v['gb']))
-            $this->formData['form']['gb'] = $_v['gb'];
-
         // name
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // usable-by (not excluded by requiredClass && armor or weapons match mask from ?_classes)
-        if (isset($_v['ub']))
+        if ($_v['ub'])
         {
             $parts[] = array(
                 'AND',
@@ -2157,57 +2150,48 @@ class ItemListFilter extends Filter
         }
 
         // quality [list]
-        if (isset($_v['qu']))
+        if ($_v['qu'] !== null)
             $parts[] = ['quality', $_v['qu']];
 
         // type
-        if (isset($_v['ty']))
+        if ($_v['ty'] !== null)
             $parts[] = ['subclass', $_v['ty']];
 
         // slot
-        if (isset($_v['sl']))
+        if ($_v['sl'])
             $parts[] = ['slot', $_v['sl']];
 
         // side
-        if (isset($_v['si']))
+        if ($_v['si'])
         {
-            $ex    = [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
-            $notEx = ['OR', ['requiredRace', 0], [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
+            $excl = [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'];
+            $incl = ['OR', ['requiredRace', 0], [['requiredRace', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL]];
 
-            switch ($_v['si'])
+            // we sanitized v['si'] earlier .. right?
+            $parts[] = match ($_v['si'])
             {
-                case  SIDE_BOTH:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', ChrRace::MASK_ALL], ['requiredRace', 0]];
-                    break;
-                case  SIDE_HORDE:
-                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 1]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_HORDE, '&']]];
-                    break;
-                case -SIDE_HORDE:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 1],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_HORDE, '&']]];
-                    break;
-                case  SIDE_ALLIANCE:
-                    $parts[] = ['AND', [['flagsExtra', 0x3, '&'], [0, 2]],  ['OR', $notEx, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
-                    break;
-                case -SIDE_ALLIANCE:
-                    $parts[] = ['OR',  [['flagsExtra', 0x3, '&'], 2],       ['AND', $ex,   ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]];
-                    break;
-            }
+                 SIDE_BOTH     => ['OR',  [['flagsExtra', 0x3, '&'], [0, 3]], ['requiredRace', ChrRace::MASK_ALL], ['requiredRace', 0]],
+                 SIDE_HORDE    => ['AND', [['flagsExtra', 0x3, '&'], [0, 1]], ['OR',  $incl, ['requiredRace', ChrRace::MASK_HORDE, '&']]],
+                -SIDE_HORDE    => ['OR',  [['flagsExtra', 0x3, '&'], 1],      ['AND', $excl, ['requiredRace', ChrRace::MASK_HORDE, '&']]],
+                 SIDE_ALLIANCE => ['AND', [['flagsExtra', 0x3, '&'], [0, 2]], ['OR',  $incl, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
+                -SIDE_ALLIANCE => ['OR',  [['flagsExtra', 0x3, '&'], 2],      ['AND', $excl, ['requiredRace', ChrRace::MASK_ALLIANCE, '&']]],
+            };
         }
 
         // itemLevel min
-        if (isset($_v['minle']))
+        if ($_v['minle'])
             $parts[] = ['itemLevel', $_v['minle'], '>='];
 
         // itemLevel max
-        if (isset($_v['maxle']))
+        if ($_v['maxle'])
             $parts[] = ['itemLevel', $_v['maxle'], '<='];
 
         // reqLevel min
-        if (isset($_v['minrl']))
+        if ($_v['minrl'])
             $parts[] = ['requiredLevel', $_v['minrl'], '>='];
 
         // reqLevel max
-        if (isset($_v['maxrl']))
+        if ($_v['maxrl'])
             $parts[] = ['requiredLevel', $_v['maxrl'], '<='];
 
         return $parts;
@@ -2271,7 +2255,7 @@ class ItemListFilter extends Filter
     protected function cbHasRandEnchant(int $cr, int $crs, string $crv) : ?array
     {
         $n = preg_replace(parent::PATTERN_NAME, '', $crv);
-        $n = $this->transformString($n, false);
+        $n = $this->transformToken($n, false);
 
         $randIds = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, ABS(`id`) AS `id`, name_loc?d, `name_loc0` FROM ?_itemrandomenchant WHERE name_loc?d LIKE ?', Lang::getLocale()->value, Lang::getLocale()->value, $n);
         $tplIds  = $randIds ? DB::World()->select('SELECT `entry`, `ench` FROM item_enchantment_template WHERE `ench` IN (?a)', array_column($randIds, 'id')) : [];
@@ -2303,7 +2287,7 @@ class ItemListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
             return null;
 
-        $this->formData['extraCols'][] = $cr;
+        $this->fiExtraCols[] = $cr;
 
         $items = [0];
         if ($costs = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE `reqPersonalrating` '.$crs.' '.$crv))
@@ -2339,7 +2323,7 @@ class ItemListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_FLOAT) || !$this->int2Op($crs))
             return null;
 
-        $this->formData['extraCols'][] = $cr;
+        $this->fiExtraCols[] = $cr;
         return ['AND', ['armordamagemodifier', $crv, $crs], ['class', ITEM_CLASS_ARMOR]];
     }
 
@@ -2441,7 +2425,7 @@ class ItemListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
             return null;
 
-        $this->formData['extraCols'][] = $cr;
+        $this->fiExtraCols[] = $cr;
         return ['AND', ['flags', ITEM_FLAG_OPENABLE, '&'], ['((minMoneyLoot + maxMoneyLoot) / 2)', $crv, $crs]];
     }
 
@@ -2452,8 +2436,8 @@ class ItemListFilter extends Filter
 
         $crv *= 1000;                                       // field supplied in milliseconds
 
-        $this->formData['extraCols'][] = $cr;
-        $this->extraOpts['is']['s'][]  = ', GREATEST(`spellCooldown1`, `spellCooldown2`, `spellCooldown3`, `spellCooldown4`, `spellCooldown5`) AS "cooldown"';
+        $this->fiExtraCols[] = $cr;
+        $this->extraOpts['is']['s'][] = ', GREATEST(`spellCooldown1`, `spellCooldown2`, `spellCooldown3`, `spellCooldown4`, `spellCooldown5`) AS "cooldown"';
 
         return [
             'OR',
@@ -2534,25 +2518,14 @@ class ItemListFilter extends Filter
 
     protected function cbObjectiveOfQuest(int $cr, int $crs, string $crv) : ?array
     {
-        $w = '';
-        switch ($crs)
+        $w = match ($crs)
         {
-            case 1:                                         // Yes
-            case 5:                                         // No
-                $w = 1;
-                break;
-            case 2:                                         // Alliance
-                $w = '`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND (`reqRaceMask` & '.ChrRace::MASK_HORDE.') = 0';
-                break;
-            case 3:                                         // Horde
-                $w = '`reqRaceMask` & '.ChrRace::MASK_HORDE.' AND (`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.') = 0';
-                break;
-            case 4:                                         // Both
-                $w = '(`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND `reqRaceMask` & '.ChrRace::MASK_HORDE.') OR `reqRaceMask` = 0';
-                break;
-            default:
-                return null;
-        }
+            1, 5    => 1,                                                                                                                // Yes / No
+            2       =>  '`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND (`reqRaceMask` & '.ChrRace::MASK_HORDE.') = 0',                  // Alliance
+            3       =>  '`reqRaceMask` & '.ChrRace::MASK_HORDE.'    AND (`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.') = 0',               // Horde
+            4       => '(`reqRaceMask` & '.ChrRace::MASK_ALLIANCE.' AND  `reqRaceMask` & '.ChrRace::MASK_HORDE.') OR `reqRaceMask` = 0', // Both
+            default => null
+        };
 
         $itemIds = DB::Aowow()->selectCol(sprintf(
            'SELECT `reqItemId1` FROM ?_quests WHERE %1$s UNION SELECT `reqItemId2` FROM ?_quests WHERE %1$s UNION
@@ -2577,8 +2550,8 @@ class ItemListFilter extends Filter
             return null;
 
         $ids    = [];
-        $spells = DB::Aowow()->select(          // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
-           'SELECT `reagent1`, `reagent2`, `reagent3`, `reagent4`, `reagent5`, `reagent6`, `reagent7`, `reagent8`,
+        $spells = DB::Aowow()->select(                      // todo (med): hmm, selecting all using SpellList would exhaust 128MB of memory :x .. see, that we only select the fields that are really needed
+           'SELECT `reagent1`,      `reagent2`,      `reagent3`,      `reagent4`,      `reagent5`,      `reagent6`,      `reagent7`,      `reagent8`,
                    `reagentCount1`, `reagentCount2`, `reagentCount3`, `reagentCount4`, `reagentCount5`, `reagentCount6`, `reagentCount7`, `reagentCount8`
             FROM   ?_spell
             WHERE  `skillLine1` IN (?a)',

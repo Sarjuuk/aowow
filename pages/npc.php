@@ -680,11 +680,11 @@ class NpcPage extends GenericPage
 
         // tabs: this creature contains..
         $skinTab = ['tab_skinning', 'skinning', SKILL_SKINNING];
-        if ($_typeFlags & NPC_TYPEFLAG_HERBLOOT)
+        if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_HERBALISM)
             $skinTab = ['tab_herbalism', 'herbalism', SKILL_HERBALISM];
-        else if ($_typeFlags & NPC_TYPEFLAG_MININGLOOT)
+        else if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_MINING)
             $skinTab = ['tab_mining', 'mining', SKILL_MINING];
-        else if ($_typeFlags & NPC_TYPEFLAG_ENGINEERLOOT)
+        else if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_ENGINEERING)
             $skinTab = ['tab_engineering', 'engineering', SKILL_ENGINEERING];
 
     /*

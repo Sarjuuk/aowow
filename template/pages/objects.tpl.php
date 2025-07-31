@@ -2,7 +2,7 @@
 
 <?php
 $this->brick('header');
-$f = $this->filter;                                         // shorthand
+$f = $this->filterObj->values                               // shorthand
 ?>
 
     <div class="main" id="main">
@@ -12,10 +12,10 @@ $f = $this->filter;                                         // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 5]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [5]]);
 ?>
 
-            <div id="fi" style="display: <?=(empty($f['query']) ? 'none' : 'block'); ?>;">
+            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=objects<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <table>
                         <tr><td><?=Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td><td>&nbsp;<input type="text" name="na" size="30" <?=(isset($f['na']) ? 'value="'.Util::htmlEscape($f['na']).'" ' : null); ?>/></td></tr>
@@ -39,7 +39,7 @@ $this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f
                 <div class="pad"></div>
             </div>
 
-<?php $this->brick('filter', ['fi' => $f['initData']]); ?>
+<?php $this->brick('filter'); ?>
 
 <?php $this->brick('lvTabs'); ?>
 

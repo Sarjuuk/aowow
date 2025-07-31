@@ -48,9 +48,10 @@ class AchievementsPage extends GenericPage
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
-        $this->filterObj = new AchievementListFilter(false, $this->category);
 
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new AchievementListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name   = Util::ucFirst(Lang::game('achievements'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
@@ -67,13 +68,7 @@ class AchievementsPage extends GenericPage
         if ($this->category)
             $conditions[] = ['category', (int)end($this->category)];
 
-        // recreate form selection
-        $this->filter = $this->filterObj->getForm();
-        $this->filter['query'] = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'achievements'];
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
+        $this->filterObj->evalCriteria();
 
         if ($fiCnd = $this->filterObj->getConditions())
             $conditions[] = $fiCnd;
@@ -103,7 +98,7 @@ class AchievementsPage extends GenericPage
             if ($acvList->hasDiffFields('category'))
                 $tabData['visibleCols'] = ['category'];
 
-            if (!empty($this->filter['fi']['extraCols']))
+            if ($this->filterObj->fiExtraCols)
                 $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
             // create note if search limit was exceeded

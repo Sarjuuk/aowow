@@ -28,9 +28,9 @@ class SoundsPage extends GenericPage
         if (isset($this->category[0]))
             header('Location: ?sounds&filter=ty='.$this->category[0], true, 302);
 
-        $this->filterObj = new SoundListFilter();
-
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new SoundListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name = Util::ucFirst(Lang::game('sounds'));
     }
@@ -42,12 +42,11 @@ class SoundsPage extends GenericPage
             BUTTON_PLAYLIST => true
         );
 
+        $this->filterObj->evalCriteria();
+
         $conditions = [];
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
-
-        $this->filter          = $this->filterObj->getForm();
-        $this->filter['query'] = $this->_get['filter'];
 
         $tabData = [];
         $sounds  = new SoundList($conditions, ['calcTotal' => true]);
@@ -78,15 +77,15 @@ class SoundsPage extends GenericPage
     {
         array_unshift($this->title, $this->name);
 
-        $form = $this->filterObj->getForm();
-        if (isset($form['ty']) && count($form['ty']) == 1)
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
             array_unshift($this->title, Lang::sound('cat', $form['ty'][0]));
     }
 
     protected function generatePath()
     {
-        $form = $this->filterObj->getForm();
-        if (isset($form['ty']) && count($form['ty']) == 1)
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
             $this->path[] = $form['ty'][0];
     }
 }

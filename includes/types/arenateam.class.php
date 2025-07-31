@@ -48,10 +48,9 @@ class ArenaTeamListFilter extends Filter
 {
     use TrProfilerFilter;
 
-    public    $extraOpts     = [];
-    protected $genericFilter = [];
-
-    protected $inputFields = array(
+    protected string $type          = 'arenateams';
+    protected array  $genericFilter = [];
+    protected array  $inputFields   = array(
         'na' => [parent::V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
         'ma' => [parent::V_EQUAL,    1,                    false], // match any / all filter
         'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact
@@ -61,29 +60,28 @@ class ArenaTeamListFilter extends Filter
         'sv' => [parent::V_CALLBACK, 'cbServerCheck',      false], // server
     );
 
-    protected function createSQLForValues()
+    public array $extraOpts = [];
+
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = $this->fiData['v'];
+        $_v    = $this->values;
 
         // region (rg), battlegroup (bg) and server (sv) are passed to ArenaTeamList as miscData and handled there
 
         // name [str]
-        if (!empty($_v['na']))
-            if ($_ = $this->modularizeString(['at.name'], $_v['na'], !empty($_v['ex']) && $_v['ex'] == 'on'))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['at.name'], $_v['na'], $_v['ex'] == 'on'))
                 $parts[] = $_;
 
         // side [list]
-        if (!empty($_v['si']))
-        {
-            if ($_v['si'] == SIDE_ALLIANCE)
-                $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
-            else if ($_v['si'] == SIDE_HORDE)
-                $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
-        }
+        if ($_v['si'] == SIDE_ALLIANCE)
+            $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
+        else if ($_v['si'] == SIDE_HORDE)
+            $parts[] = ['c.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
 
         // size [int]
-        if (!empty($_v['sz']))
+        if ($_v['sz'])
             $parts[] = ['at.type', $_v['sz']];
 
         return $parts;

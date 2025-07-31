@@ -2,7 +2,7 @@
 
 <?php
 $this->brick('header');
-$f = $this->filter;                                         // shorthand
+$f = $this->filterObj->values                               // shorthand
 ?>
 
     <div class="main" id="main">
@@ -12,11 +12,11 @@ $f = $this->filter;                                         // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 2]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [2]]);
 
 # for some arcane reason a newline (\n) means, the first childNode is a text instead of the form for the following div
 ?>
-            <div id="fi" style="display: <?=(empty($f['query']) ? 'none' : 'block'); ?>;"><form
+            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;"><form
                 action="?filter=profiles<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">
                         <div style="float: left"><?=Util::ucFirst(Lang::game('class')).Lang::main('colon'); ?></div>
@@ -112,7 +112,7 @@ endforeach;
 ?>
             </div>
 
-<?php $this->brick('filter', ['fi' => $f['initData']]); ?>
+<?php $this->brick('filter'); ?>
 
 <?php $this->brick('lvTabs'); ?>
 

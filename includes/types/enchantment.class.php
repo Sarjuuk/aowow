@@ -168,11 +168,12 @@ class EnchantmentList extends BaseType
 
 class EnchantmentListFilter extends Filter
 {
-    protected $enums         = array(
+    protected string $type  = 'enchantments';
+    protected array  $enums = array(
         3 => parent::ENUM_PROFESSION                        // requiresprof
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
           2 => [parent::CR_NUMERIC, 'id',                 NUM_CAST_INT,         true], // id
           3 => [parent::CR_ENUM,    'skillLine'                                     ], // requiresprof
           4 => [parent::CR_NUMERIC, 'skillLevel',         NUM_CAST_INT              ], // reqskillrank
@@ -234,7 +235,7 @@ class EnchantmentListFilter extends Filter
         123 => [parent::CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true]  // splpwr
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'  => [parent::V_RANGE, [2, 123],             true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 15],              true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - only numerals
@@ -243,18 +244,18 @@ class EnchantmentListFilter extends Filter
         'ty'  => [parent::V_RANGE, [1, 8],               true ]  // types
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         //string
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]))
                 $parts[] = $_;
 
         // type
-        if (isset($_v['ty']))
+        if ($_v['ty'])
             $parts[] = ['OR', ['type1', $_v['ty']], ['type2', $_v['ty']], ['type3', $_v['ty']]];
 
         return $parts;

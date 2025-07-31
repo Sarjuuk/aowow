@@ -201,7 +201,7 @@ class CurrencyPage extends GenericPage
         else
             $w = '`reqItemId1` = '.$_itemId.' OR `reqItemId2` = '.$_itemId.' OR `reqItemId3` = '.$_itemId.' OR `reqItemId4` = '.$_itemId.' OR `reqItemId5` = '.$_itemId;
 
-        if (!$n && (new ItemListFilter())->isCurrencyFor($_itemId))
+        if (!$n && ItemListFilter::isCurrencyFor($_itemId))
             $n = '?items&filter=cr=158;crs='.$_itemId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE '.$w);

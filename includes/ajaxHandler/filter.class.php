@@ -19,6 +19,8 @@ class AjaxFilter extends AjaxHandler
         if (!$params)
             return;
 
+        parent::__construct($params);
+
         $p = explode('=', $params[0]);
 
         $this->page = $p[0];
@@ -32,55 +34,15 @@ class AjaxFilter extends AjaxHandler
 
         $opts = ['parentCats' => $this->cat];
 
-        switch ($p[0])
+        // so usually the page call is just the DBTypes file string with a plural 's' .. but then there are currencies
+        $fileStr = match ($this->page)
         {
-            case 'achievements':
-                $this->filter = (new AchievementListFilter(true, $opts));
-                break;
-            case 'areatriggers':
-                $this->filter = (new AreaTriggerListFilter(true, $opts));
-                break;
-            case 'enchantments':
-                $this->filter = (new EnchantmentListFilter(true, $opts));
-                break;
-            case 'icons':
-                $this->filter = (new IconListFilter(true, $opts));
-                break;
-            case 'items':
-                $this->filter = (new ItemListFilter(true, $opts));
-                break;
-            case 'itemsets':
-                $this->filter = (new ItemsetListFilter(true, $opts));
-                break;
-            case 'npcs':
-                $this->filter = (new CreatureListFilter(true, $opts));
-                break;
-            case 'objects':
-                $this->filter = (new GameObjectListFilter(true, $opts));
-                break;
-            case 'quests':
-                $this->filter = (new QuestListFilter(true, $opts));
-                break;
-            case 'sounds':
-                $this->filter = (new SoundListFilter(true, $opts));
-                break;
-            case 'spells':
-                $this->filter = (new SpellListFilter(true, $opts));
-                break;
-            case 'profiles':
-                $this->filter = (new ProfileListFilter(true, $opts));
-                break;
-            case 'guilds':
-                $this->filter = (new GuildListFilter(true, $opts));
-                break;
-            case 'arena-teams':
-                $this->filter = (new ArenaTeamListFilter(true, $opts));
-                break;
-            default:
-                return;
-        }
+            'currencies' => 'currency',
+            default      => substr($this->page, 0, -1)
+        };
 
-        parent::__construct($params);
+        // yes, the whole _POST! .. should the input fields be exposed and static so they can be evaluated via BaseResponse::initRequestData() ?
+        $this->filter = Type::newFilter($fileStr, $_POST, $opts);
 
         // always this one
         $this->handler = 'handleFilter';
@@ -90,20 +52,16 @@ class AjaxFilter extends AjaxHandler
     {
         $url = '?'.$this->page;
 
-        $this->filter->mergeCat($this->cat);
+        $this->filter?->mergeCat($this->cat);
 
         if ($this->cat)
             $url .= '='.implode('.', $this->cat);
 
-        $fi = [];
-        if ($x = $this->filter->getFilterString())
+        if ($x = $this->filter?->buildGETParam())
             $url .= '&filter='.$x;
 
-        if ($this->filter->error)
-            $_SESSION['fiError'] = get_class($this->filter);
-
-        if ($fi)
-            $url .= '&filter='.implode(';', $fi);
+        if ($this->filter?->error)
+            $_SESSION['error']['fi'] = get_class($this->filter);
 
         // do get request
         return $url;

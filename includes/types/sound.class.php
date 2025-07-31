@@ -98,23 +98,24 @@ class SoundList extends BaseType
 
 class SoundListFilter extends Filter
 {
-    protected $inputFields = array(
-        'na' => [parent::V_REGEX, parent::PATTERN_NAME,                                                   false], // name - only printable chars, no delimiter
-        'ty' => [parent::V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 23], [25, 31], 50, 52, 53], true ]  // type
+    protected string $type        = 'sounds';
+    protected array  $inputFields = array(
+        'na' => [parent::V_REGEX, parent::PATTERN_NAME,                                         false], // name - only printable chars, no delimiter
+        'ty' => [parent::V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 31], 50, 52, 53], true ]  // type
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         // name [str]
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name']))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name']))
                 $parts[] = $_;
 
         // type [list]
-        if (isset($_v['ty']))
+        if ($_v['ty'])
             $parts[] = ['cat', $_v['ty']];
 
         return $parts;

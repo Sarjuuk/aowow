@@ -866,7 +866,7 @@ class ItemPage extends genericPage
         else
             $w = '`reqItemId1` = '.$this->typeId.' OR `reqItemId2` = '.$this->typeId.' OR `reqItemId3` = '.$this->typeId.' OR `reqItemId4` = '.$this->typeId.' OR `reqItemId5` = '.$this->typeId;
 
-        if (!$n && (new ItemListFilter())->isCurrencyFor($this->typeId))
+        if (!$n && ItemListFilter::isCurrencyFor($this->typeId))
             $n = '?items&filter=cr=158;crs='.$this->typeId.';crv=0';
 
         $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE '.$w);

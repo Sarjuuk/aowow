@@ -12,10 +12,9 @@ class ProfilesPage extends GenericPage
 {
     use TrProfiler;
 
-    private $filterObj  = null;
+    protected $filterObj  = null;
 
     protected $subCat   = '';
-    protected $filter   = [];
     protected $lvTabs   = [];
     protected $roster   = 0;                                // $_GET['roster'] = 1|2|3|4 .. 2,3,4 arenateam-size (4 => 5-man), 1 guild .. it puts a resync button on the lv...
 
@@ -55,7 +54,7 @@ class ProfilesPage extends GenericPage
             $realms[] = $idx;
         }
 
-        $this->filterObj = new ProfileListFilter(false, ['realms' => $realms]);
+        $this->filterObj = new ProfileListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
 
         $this->name   = Util::ucFirst(Lang::game('profiles'));
         $this->subCat = $pageParam ? '='.$pageParam : '';
@@ -77,6 +76,8 @@ class ProfilesPage extends GenericPage
 
         $conditions = [];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
@@ -87,15 +88,8 @@ class ProfilesPage extends GenericPage
             $conditions[] = [['extra_flags', Profiler::CHAR_GMFLAGS, '&'], 0];
         }
 
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'profiles'];
-
-        if ($x = $this->filterObj->getSetCriteria())
+        if ($x = $this->filterObj->fiSetCriteria)
         {
-            $this->filter['initData']['sc'] = $x;
-
             if ($r = array_intersect([9, 12, 15, 18], $x['cr']))
                 if (count($r) == 1)
                     $this->roster = (reset($r) - 6) / 3;        // 1, 2, 3, or 4
@@ -108,13 +102,13 @@ class ProfilesPage extends GenericPage
             'onBeforeCreate' => '$pr_initRosterListview'        // puts a resync button on the lv
         );
 
-        $extraCols = $this->filterObj->getExtraCols();
+        $extraCols = $this->filterObj->fiExtraCols;
         if ($extraCols)
         {
             $xc = [];
             foreach ($extraCols as $idx => $col)
                 if ($idx > 0)
-                    $xc[] = "\$Listview.funcBox.createSimpleCol('Skill' + ".$idx.", g_spell_skills[".$idx."], '7%', 'skill' + ".$idx.")";
+                    $xc[] = "\$Listview.funcBox.createSimpleCol('Skill' + ".$idx.", g_spell_skills[".$idx."], '7%', 'skill-' + ".$idx.")";
 
             $tabData['extraCols'] = $xc;
         }
@@ -161,14 +155,14 @@ class ProfilesPage extends GenericPage
             else
                 $this->roster = 0;
 
-            $tabData['data'] = array_values($profiles->getListviewData($addInfoMask, array_filter($extraCols, function ($x) { return $x > 0; }, ARRAY_FILTER_USE_KEY)));
+            $tabData['data'] = array_values($profiles->getListviewData($addInfoMask, array_filter($extraCols, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY)));
 
-            if ($sc = $this->filterObj->getSetCriteria())
+            if ($sc = $this->filterObj->fiSetCriteria)
                 if (in_array(10, $sc['cr']) && !in_array('guildrank', $tabData['visibleCols']))
                     $tabData['visibleCols'][] = 'guildrank';
 
             // create note if search limit was exceeded
-            if ($this->filter['query'] && $profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filterObj->query && $profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound2', $this->sumSubjects, $profiles->getMatches());
                 $tabData['_truncated'] = 1;

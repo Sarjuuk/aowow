@@ -283,8 +283,8 @@ class AchievementList extends BaseType
 
 class AchievementListFilter extends Filter
 {
-
-    protected $enums         = array(
+    protected string $type  = 'achievements';
+    protected array  $enums = array(
          4 => parent::ENUM_ZONE,                            // location
         11 => array(
               327 => 160,                                   // Lunar Festival
@@ -307,7 +307,7 @@ class AchievementListFilter extends Filter
         )
     );
 
-    protected $genericFilter = array(
+    protected array $genericFilter = array(
          2 => [parent::CR_BOOLEAN,   'reward_loc0', true                             ], // givesreward
          3 => [parent::CR_STRING,    'reward',      STR_LOCALIZED                    ], // rewardtext
          4 => [parent::CR_NYI_PH,    null,          1,                               ], // location [enum]
@@ -323,7 +323,7 @@ class AchievementListFilter extends Filter
         18 => [parent::CR_STAFFFLAG, 'flags',                                        ]  // flags
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'    => [parent::V_RANGE, [2, 18],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                                                 true ], // criteria values - only printable chars, no delimiters
@@ -335,47 +335,43 @@ class AchievementListFilter extends Filter
         'maxpt' => [parent::V_RANGE, [1, 99],                                                             false]  // required level max
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         // name ex: +description, +rewards
-        if (isset($_v['na']))
+        if ($_v['na'])
         {
             $_ = [];
-            if (isset($_v['ex']) && $_v['ex'] == 'on')
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value, 'reward_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
+            if ($_v['ex'] == 'on')
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value, 'reward_loc'.Lang::getLocale()->value, 'description_loc'.Lang::getLocale()->value]);
             else
-                $_ = $this->modularizeString(['name_loc'.Lang::getLocale()->value]);
+                $_ = $this->tokenizeString(['name_loc'.Lang::getLocale()->value]);
 
             if ($_)
                 $parts[] = $_;
         }
 
         // points min
-        if (isset($_v['minpt']))
+        if ($_v['minpt'])
             $parts[] = ['points', $_v['minpt'],  '>='];
 
         // points max
-        if (isset($_v['maxpt']))
+        if ($_v['maxpt'])
             $parts[] = ['points', $_v['maxpt'],  '<='];
 
         // faction (side)
-        if (isset($_v['si']))
+        if ($_v['si'])
         {
-            switch ($_v['si'])
+            $parts[] = match ($_v['si'])
             {
-                case -SIDE_ALLIANCE:                        // equals faction
-                case -SIDE_HORDE:
-                    $parts[] = ['faction', -$_v['si']];
-                    break;
-                case SIDE_ALLIANCE:                         // includes faction
-                case SIDE_HORDE:
-                case SIDE_BOTH:
-                    $parts[] = ['faction', $_v['si'], '&'];
-                    break;
-            }
+                -SIDE_ALLIANCE,                             // equals faction
+                -SIDE_HORDE     => ['faction', -$_v['si']],
+                 SIDE_ALLIANCE,                             // includes faction
+                 SIDE_HORDE,
+                 SIDE_BOTH      => ['faction', $_v['si'], '&']
+            };
         }
 
         return $parts;

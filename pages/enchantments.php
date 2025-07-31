@@ -24,9 +24,10 @@ class EnchantmentsPage extends GenericPage
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
-        $this->filterObj = new EnchantmentListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new EnchantmentListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name   = Util::ucFirst(Lang::game('enchantments'));
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
@@ -44,6 +45,8 @@ class EnchantmentsPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
@@ -52,26 +55,19 @@ class EnchantmentsPage extends GenericPage
         $tabData['data'] = array_values($ench->getListviewData());
         $this->extendGlobalData($ench->getJSGlobals());
 
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'enchantments'];
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
-
-        $xCols = $this->filterObj->getExtraCols();
+        $xCols = [];
         foreach (Stat::getFilterCriteriumIdFor() as $idx => $fiId)
-            if (array_column($tabData['data'], Stat::getJsonString($idx)))
+            if (array_filter(array_column($tabData['data'], Stat::getJsonString($idx))))
                 $xCols[] = $fiId;
 
-        if (array_column($tabData['data'], 'dmg'))
-            $xCols[] = 34;
+        // some kind of declaration conflict going on here..., expects colId for WEAPON_DAMAGE_MAX but jsonString is WEAPON_DAMAGE
+        if (array_filter(array_column($tabData['data'], 'dmg')))
+            $xCols[] = Stat::getFilterCriteriumId(Stat::WEAPON_DAMAGE_MAX);
 
         if ($xCols)
-            $this->filter['initData']['ec'] = array_values(array_unique($xCols));
+            $this->filterObj->fiExtraCols = array_merge($this->filterObj->fiExtraCols, $xCols);
 
-        if ($xCols)
+        if ($this->filterObj->fiExtraCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         if ($ench->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
@@ -94,17 +90,17 @@ class EnchantmentsPage extends GenericPage
 
     protected function generateTitle()
     {
-        $form = $this->filterObj->getForm('form');
-        if (!empty($form['ty']) && intVal($form['ty']) && $form['ty'] > 0 && $form['ty'] < 9)
-            array_unshift($this->title, Lang::enchantment('types', $form['ty']));
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
+            array_unshift($this->title, Lang::enchantment('types', $form['ty'][0]));
 
         array_unshift($this->title, $this->name);
     }
 
     protected function generatePath()
     {
-        $form = $this->filterObj->getForm('form');
-        if (isset($form['ty']) && count($form['ty']) == 1)
+        $form = $this->filterObj->values;
+        if (count($form['ty']) == 1)
             $this->path[] = $form['ty'][0];
     }
 }

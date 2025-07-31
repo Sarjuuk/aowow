@@ -23,9 +23,9 @@ class IconsPage extends GenericPage
 
     public function __construct($pageCall)
     {
-        $this->filterObj = new IconListFilter();
-
         parent::__construct($pageCall);
+
+        $this->filterObj = new IconListFilter($this->_get['filter'] ?? '');
 
         $this->name   = Util::ucFirst(Lang::game('icons'));
     }
@@ -43,6 +43,8 @@ class IconsPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
@@ -50,14 +52,6 @@ class IconsPage extends GenericPage
 
         $tabData['data'] = array_values($icons->getListviewData());
         $this->extendGlobalData($icons->getJSGlobals());
-
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'icons'];
-
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
 
         if ($icons->getMatches() > $sqlLimit)
         {
@@ -73,31 +67,20 @@ class IconsPage extends GenericPage
 
     protected function generateTitle()
     {
-        $setCrt = $this->filterObj->getSetCriteria();
+        $setCrt = $this->filterObj->fiSetCriteria;
         $title  = $this->name;
-        if (isset($setCrt['cr']) && count($setCrt['cr']) == 1)
+        if (count($setCrt['cr']) == 1)
         {
-            switch ($setCrt['cr'][0])
+            $title = match($setCrt['cr'][0])
             {
-                case 1:
-                    $title = Util::ucFirst(Lang::game('item')).' '.$title;
-                    break;
-                case 2:
-                    $title = Util::ucFirst(Lang::game('spell')).' '.$title;
-                    break;
-                case 3:
-                    $title = Util::ucFirst(Lang::game('achievement')).' '.$title;
-                    break;
-                case 6:
-                    $title = Util::ucFirst(Lang::game('currency')).' '.$title;
-                    break;
-                case 9:
-                    $title = Util::ucFirst(Lang::game('pet')).' '.$title;
-                    break;
-                case 11:
-                    $title = Util::ucFirst(Lang::game('class')).' '.$title;
-                    break;
-            }
+                1       => Util::ucFirst(Lang::game('item')),
+                2       => Util::ucFirst(Lang::game('spell')),
+                3       => Util::ucFirst(Lang::game('achievement')),
+                6       => Util::ucFirst(Lang::game('currency')),
+                9       => Util::ucFirst(Lang::game('pet')),
+                11      => Util::ucFirst(Lang::game('class')),
+                default => ''
+            } . ' ' . $title;
         }
 
         array_unshift($this->title, $title);
@@ -105,8 +88,8 @@ class IconsPage extends GenericPage
 
     protected function generatePath()
     {
-        $setCrt = $this->filterObj->getSetCriteria();
-        if (isset($setCrt['cr']) && count($setCrt['cr']) == 1)
+        $setCrt = $this->filterObj->fiSetCriteria;
+        if (count($setCrt['cr']) == 1)
             $this->path[] = $setCrt['cr'][0];
     }
 }

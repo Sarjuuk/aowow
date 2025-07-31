@@ -709,11 +709,11 @@ function fi_reset(_this) {
     fi_resetCriterion($WH.ge('fi_criteria'));
     fi_resetCriterion($WH.ge('fi_weight'));
 
-    // custom start (originally a click on reset would reload the page with empty filters)
+    // aowow - custom start (originally a click on reset would reload the page with empty filters)
     var bc = PageTemplate.get('breadcrumb');
     if (typeof bc[1] !== 'undefined')
         Menu.modifyUrl(Menu.findItem(mn_database, [bc[1]]), {}, {});
-    // custom end
+    // aowow - custom end
 
     var _ = $WH.ge('sdkgnsdkn436');
     if (_) {

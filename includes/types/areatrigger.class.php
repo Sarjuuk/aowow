@@ -59,12 +59,13 @@ class AreaTriggerList extends BaseType
 
 class AreaTriggerListFilter extends Filter
 {
-    protected $genericFilter = array(
+    protected string $type          = 'areatrigger';
+    protected array  $genericFilter = array(
         2 => [parent::CR_NUMERIC, 'id', NUM_CAST_INT]       // id
     );
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'  => [parent::V_LIST,  [2],                  true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 6],               true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - all criteria are numeric here
@@ -73,18 +74,18 @@ class AreaTriggerListFilter extends Filter
         'ty'  => [parent::V_RANGE, [0, 5],               true ]  // types
     );
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = &$this->fiData['v'];
+        $_v    = &$this->values;
 
         // name [str]
-        if (isset($_v['na']))
-            if ($_ = $this->modularizeString(['name']))
+        if ($_v['na'])
+            if ($_ = $this->tokenizeString(['name']))
                 $parts[] = $_;
 
         // type [list]
-        if (isset($_v['ty']))
+        if ($_v['ty'])
             $parts[] = ['type', $_v['ty']];
 
         return $parts;

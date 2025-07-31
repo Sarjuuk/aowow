@@ -2,7 +2,7 @@
 
 <?php
 $this->brick('header');
-$f = $this->filter;                                         // shorthand
+$f = $this->filterObj->values                               // shorthand
 ?>
 
     <div class="main" id="main">
@@ -12,10 +12,10 @@ $f = $this->filter;                                         // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fi' => empty($f['query']) ? null : ['query' => $f['query'], 'menuItem' => 0]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [0]]);
 ?>
 
-            <div id="fi" style="display: <?=(empty($f['query']) ? 'none' : 'block'); ?>;">
+            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=items<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
                     <div class="rightpanel">
                         <div style="float: left"><?=Lang::item('_quality').Lang::main('colon'); ?></div>
@@ -31,15 +31,15 @@ endforeach;
                     </div>
 
 <?php
-if (!empty($f['slot'])):
+if ($this->slotList):
 ?>
                     <div class="rightpanel2">
                         <div style="float: left"><?=Lang::item('slot').Lang::main('colon'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['sl[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
-                        <select name="sl[]" size="<?=min(count($f['slot']), 7); ?>" multiple="multiple" class="rightselect">
+                        <select name="sl[]" size="<?=min(count($this->slotList), 7); ?>" multiple="multiple" class="rightselect">
 <?php
-    foreach ($f['slot'] as $k => $str):
+    foreach ($this->slotList as $k => $str):
         echo '                            <option value="'.$k.'" '.(isset($f['sl']) && in_array($k, (array)$f['sl']) ? ' selected' : null).'>'.$str."</option>\n";
     endforeach;
 ?>
@@ -48,15 +48,15 @@ if (!empty($f['slot'])):
 <?php
 endif;
 
-if (!empty($f['type'])):
+if ($this->typeList):
 ?>
                     <div class="rightpanel2">
                         <div style="float: left"><?=Lang::game('type').Lang::main('colon'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
-                        <select name="ty[]" size="<?=min(count($f['type']), 7); ?>" multiple="multiple" class="rightselect">
+                        <select name="ty[]" size="<?=min(count($this->typeList), 7); ?>" multiple="multiple" class="rightselect">
 <?php
-    foreach ($f['type'] as $k => $str):
+    foreach ($fthis->typeList as $k => $str):
         $selected = false;
         if (isset($f['ty']) && in_array($k, (array)$f['ty'])):
             $selected = true;
@@ -186,7 +186,7 @@ endforeach;
                 <div class="pad"></div>
             </div>
 
-<?php $this->brick('filter', ['fi' => $f['initData']]); ?>
+<?php $this->brick('filter'); ?>
 
 <?php $this->brick('lvTabs'); ?>
 

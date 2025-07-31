@@ -15,6 +15,9 @@ class ItemsPage extends GenericPage
     protected $forceTabs     = false;
     protected $gemScores     = [];
 
+    protected $typeList      = [];                          // rightPanel - content by context
+    protected $slotList      = [];                          // rightPanel - INV_TYPE_Xs
+
     protected $type          = Type::ITEM;
     protected $tpl           = 'items';
     protected $path          = [0, 0];
@@ -92,9 +95,9 @@ class ItemsPage extends GenericPage
     {
         $this->getCategoryFromUrl($pageParam);
 
-        $this->filterObj = new ItemListFilter(false, ['parentCats' => $this->category]);
-
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new ItemListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name   = Util::ucFirst(Lang::game('items'));
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
@@ -114,42 +117,25 @@ class ItemsPage extends GenericPage
         /* evaluate filter */
         /*******************/
 
-        // recreate form selection (must be evaluated first via getConditions())
+        $this->filterObj->evalCriteria();
+        $this->filterObj->evalWeights();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'items'];
+        // recreate form selection (must be evaluated first via getConditions())
+        $fiForm = $this->filterObj->values;
 
-        if ($x = $this->filterObj->getSetCriteria())
-            $this->filter['initData']['sc'] = $x;
+        $xCols = $this->filterObj->fiExtraCols;
 
-        $xCols = $this->filterObj->getExtraCols();
-        if ($xCols)
-            $this->filter['initData']['ec'] = $xCols;
-
-        if ($x = $this->filterObj->getSetWeights())
-            $this->filter['initData']['sw'] = $x;
-
-        $menu = $this->createExtraMenus();
-        foreach ($menu['type'][0] as $k => $str)
-            if ($str && (!$menu['type'][1] || ($menu['type'][1] & (1 << $k))))
-                $this->filter['type'][$k] = $str;
-
-        foreach ($menu['slot'][0] as $k => $str)
-            if ($str && (!$menu['slot'][1] || ($menu['slot'][1] & (1 << $k))))
-                $this->filter['slot'][$k] = $str;
-
-        if (isset($this->filter['slot'][INVTYPE_SHIELD]))   // "Off Hand" => "Shield"
-            $this->filter['slot'][INVTYPE_SHIELD] = Lang::item('armorSubClass', 6);
+        $this->createExtraMenus();
 
         $infoMask = ITEMINFO_JSON;
         if (array_intersect([63, 64, 125], $xCols))         // 63:buyPrice; 64:sellPrice; 125:reqarenartng
             $infoMask |= ITEMINFO_VENDOR;
 
         if ($xCols)
-            $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($this->filter['gm'] ?? 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
+            $this->sharedLV['extraCols'] = '$fi_getExtraCols(fi_extraCols, '.($fiForm['gm'] ?? 0).', '.(array_intersect([63], $xCols) ? 1 : 0).')';
 
         if ($this->filterObj->error)
             $this->sharedLV['_errors'] = '$1';
@@ -171,7 +157,7 @@ class ItemsPage extends GenericPage
         /* handle auto-gemming */
         /***********************/
 
-        $this->gemScores = $this->createGemScores();
+        $this->gemScores = $this->createGemScores($fiForm['gm'] ?? 0);
 
 
         /*************************/
@@ -179,9 +165,9 @@ class ItemsPage extends GenericPage
         /*************************/
 
         $upgItemData = [];
-        if (!empty($this->filter['upg']) && !empty($this->filterObj->getSetWeights()))
+        if ($this->filterObj->upgrades && $this->filterObj->fiSetWeights)
         {
-            $upgItems = new ItemList(array(['id', array_keys($this->filter['upg'])]), ['extraOpts' => $this->filterObj->extraOpts]);
+            $upgItems = new ItemList(array(['id', array_keys($this->filterObj->upgrades)]), ['extraOpts' => $this->filterObj->extraOpts]);
             if (!$upgItems->error)
             {
                 $upgItemData = $upgItems->getListviewData($infoMask);
@@ -192,8 +178,8 @@ class ItemsPage extends GenericPage
         if ($upgItemData)                                   // check if upItems cover multiple slots
         {
             $singleSlot = true;
-            $ref = reset($this->filter['upg']);
-            foreach ($this->filter['upg'] as $slot)
+            $ref = reset($this->filterObj->upgrades);
+            foreach ($this->filterObj->upgrades as $slot)
             {
                 if ($slot == $ref)
                     continue;
@@ -252,10 +238,10 @@ class ItemsPage extends GenericPage
                     $groups = array_merge($availableSlots[ITEM_CLASS_ARMOR], $availableSlots[ITEM_CLASS_WEAPON]);
 
                 if (isset($this->filter['sl']))             // skip lookups for unselected slots
-                    $groups = array_intersect($groups, (array)$this->filter['sl']);
+                    $groups = array_intersect($groups, $this->filter['sl']);
 
-                if (!empty($this->filter['upg']))           // skip lookups for slots we dont have items to upgrade for
-                    $groups = array_intersect($groups, (array)$this->filter['upg']);
+                if (!empty($this->filterObj->upgrades))           // skip lookups for slots we dont have items to upgrade for
+                    $groups = array_intersect($groups, $this->filterObj->upgrades);
 
                 if ($groups)
                 {
@@ -338,7 +324,7 @@ class ItemsPage extends GenericPage
             {
                 if ($grouping == 1)                         // slot: match upgradeItem to slot
                 {
-                    $upg = array_keys(array_filter($this->filter['upg'], function ($v) use ($group) {
+                    $upg = array_keys(array_filter($this->filterObj->upgrades, function ($v) use ($group) {
                         return $v == $group;
                     }));
 
@@ -350,7 +336,7 @@ class ItemsPage extends GenericPage
                 }
                 else if ($grouping)
                 {
-                    $upg = array_keys($this->filter['upg']);
+                    $upg = array_keys($this->filterObj->upgrades);
                     $tabData['_upgradeIds'] = $upg;
                     foreach ($upgItemData as $uId => $data) // using numeric keys => cant use array_merge
                         $tabData['data'][$uId] = $data;
@@ -376,8 +362,8 @@ class ItemsPage extends GenericPage
                 $tabData['tabs'] = '$tabsGroups';
             }
 
-            if (!empty($this->filterObj->getSetWeights()))
-                if ($items->hasSetFields('armor'))
+            if ($this->filterObj->fiSetWeights)
+                if ($items->hasSetFields('tplArmor'))
                     $tabData['visibleCols'][] = 'armor';
 
             // create note if search limit was exceeded; overwriting 'note' is intentional
@@ -394,7 +380,7 @@ class ItemsPage extends GenericPage
                 {
                     case 1:
                         $override['sl'] = $group;
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$cls.'\', \''.$this->filterObj->getFilterString($override).'\')';
+                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoreslot, \''.$cls.'\', \''.$this->filterObj->buildGETParam($override).'\')';
                         break;
                     case 2:
                         if ($group > 0)
@@ -405,11 +391,11 @@ class ItemsPage extends GenericPage
                         else
                             $override['maxle'] = abs($group) - 1;
 
-                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$cls.'\', \''.$this->filterObj->getFilterString($override).'\')';
+                        $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmorelevel, \''.$cls.'\', \''.$this->filterObj->buildGETParam($override).'\')';
                         break;
                     case 3:
                         if ($_ = [null, 3, 4, 5, 6, 7, 9, 10, 11][$group])
-                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$cls.'\', \''.$this->filterObj->getFilterString($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
+                            $tabData['note'] = '$$WH.sprintf(LANG.lvnote_viewmoresource, \''.$cls.'\', \''.$this->filterObj->buildGETParam($override, ['cr' => 128, 'crs' => $_, 'crv' => 0]).'\')';
 
                         break;
                 }
@@ -431,10 +417,6 @@ class ItemsPage extends GenericPage
 
             $this->lvTabs[] = [ItemList::$brickFile, $tabData];
         }
-
-        // reformat for use in template
-        if (!empty($this->filter['upg']))
-            $this->filter['upg'] = implode(':', array_keys($this->filter['upg']));
 
         // whoops, we have no data? create emergency content
         if (empty($this->lvTabs))
@@ -476,51 +458,51 @@ class ItemsPage extends GenericPage
             $this->path[] = $c;
 
         // if slot-dropdown is available && Armor && $path points to Armor-Class
-        $form = $this->filterObj->getForm();
-        if (count($this->path) == 4 && $this->category[0] == 4 && isset($form['sl']) && count($form['sl']) == 1)
+        $form = $this->filterObj->values;
+        if (count($this->path) == 4 && $this->category[0] == 4 && count($form['sl']) == 1)
             $this->path[] = $form['sl'][0];
-        else if (isset($this->category[0]) && $this->category[0] == 0 && isset($form['ty']) && count($form['ty']) == 1)
+        else if (isset($this->category[0]) && $this->category[0] == 0 && count($form['ty']) == 1)
             $this->path[] = $form['ty'][0];
     }
 
     // fetch best possible gems for chosen weights
-    private function createGemScores()
+    private function createGemScores(int $gemQuality) : array
     {
         $gemScores = [];
 
-        if (empty($this->filterObj->getSetWeights()))
+        if (!$this->filterObj->fiSetWeights)
             return [];
 
-        if (!empty($this->filter['gm']))
+        if (!$gemQuality)
+            return [];
+
+        $this->sharedLV['computeDataFunc'] = '$fi_scoreSockets';
+
+        $q    = intVal($this->filterObj->values['gm']);
+        $mask = 0xE;
+        $cnd  = [10, ['class', ITEM_CLASS_GEM], ['gemColorMask', &$mask, '&'], ['quality', &$q]];
+        if (!$this->filterObj->values['jc'])
+            $cnd[] = ['itemLimitCategory', 0];          // Jeweler's Gems
+
+        If ($this->filterObj->wtCnd)
+            $cnd[] = $this->filterObj->wtCnd;
+
+        $anyColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
+        if (!$anyColor->error)
         {
-            $this->sharedLV['computeDataFunc'] = '$fi_scoreSockets';
+            $this->extendGlobalData($anyColor->getJSGlobals());
+            $gemScores[0] = array_values($anyColor->getListviewData(ITEMINFO_GEM));
+        }
 
-            $q    = intVal($this->filter['gm']);
-            $mask = 0xE;
-            $cnd  = [10, ['class', ITEM_CLASS_GEM], ['gemColorMask', &$mask, '&'], ['quality', &$q]];
-            if (!isset($this->filter['jc']))
-                $cnd[] = ['itemLimitCategory', 0];          // Jeweler's Gems
-
-            If ($this->filterObj->wtCnd)
-                $cnd[] = $this->filterObj->wtCnd;
-
-            $anyColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
-            if (!$anyColor->error)
+        for ($i = 0; $i < 4; $i++)
+        {
+            $mask = 1 << $i;
+            $q    = !$i ? ITEM_QUALITY_RARE : intVal($gemQuality);    // meta gems are always included.. ($q is backReferenced)
+            $byColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
+            if (!$byColor->error)
             {
-                $this->extendGlobalData($anyColor->getJSGlobals());
-                $gemScores[0] = array_values($anyColor->getListviewData(ITEMINFO_GEM));
-            }
-
-            for ($i = 0; $i < 4; $i++)
-            {
-                $mask = 1 << $i;
-                $q    = !$i ? ITEM_QUALITY_RARE : intVal($this->filter['gm']);    // meta gems are always included.. ($q is backReferenced)
-                $byColor = new ItemList($cnd, ['extraOpts' => $this->filterObj->extraOpts]);
-                if (!$byColor->error)
-                {
-                    $this->extendGlobalData($byColor->getJSGlobals());
-                    $gemScores[$mask] = array_values($byColor->getListviewData(ITEMINFO_GEM));
-                }
+                $this->extendGlobalData($byColor->getJSGlobals());
+                $gemScores[$mask] = array_values($byColor->getListviewData(ITEMINFO_GEM));
             }
         }
 
@@ -534,17 +516,15 @@ class ItemsPage extends GenericPage
     }
 
     // display available submenus 'type' and 'slot', if applicable
-    private function createExtraMenus()
+    private function createExtraMenus() : void
     {
-        $menu = array(
-            'type' => [[], null],
-            'slot' => [[], null]
-        );
+        $typeData = $slotData = [];
+        $typeMask = $slotMask = 0x0;
 
         if (!$this->category)
         {
-            $menu['slot'] = [Lang::item('inventoryType'), null];
-            asort($menu['slot'][0]);
+            $slotData = [Lang::item('inventoryType'), null];
+            asort($slotData);
         }
         else
         {
@@ -558,31 +538,37 @@ class ItemsPage extends GenericPage
             switch ($this->category[0])
             {
                 case 0:
-                    $menu['type'] = [Lang::item('cat', 0, 1), null];
+                    $typeData = Lang::item('cat', 0, 1);
 
                     if (!isset($this->category[1]) || in_array($this->category[1], [6, -3]))
                     {
-                        $menu['slot'] = [Lang::item('inventoryType'), 0x63EFEA];
-                        asort($menu['slot'][0]);
+                        $slotData = Lang::item('inventoryType');
+                        $slotMask = 0x63EFEA;
+                        asort($slotData);
                     }
                     break;
                 case 2:
                     if (!isset($this->category[1]))
-                        $menu['type'] = [Lang::spell('weaponSubClass'), null];
+                        $typeData = Lang::spell('weaponSubClass');
 
-                    $menu['slot'] = [Lang::item('inventoryType'), 0x262A000];
-                    asort($menu['slot'][0]);
+                    $slotData = Lang::item('inventoryType');
+                    $slotMask = 0x262A000;
+                    asort($slotData);
                     break;
                 case 4:
                     if (!isset($this->category[1]))
                     {
-                        $menu['slot'] = [Lang::item('inventoryType'), 0x10895FFE];
-                        $menu['type'] = [Lang::item('cat', 4, 1), null];
+                        $slotData = Lang::item('inventoryType');
+                        $slotMask = 0x10895FFE;
+                        $typeData = Lang::item('cat', 4, 1);
                     }
                     else if (in_array($this->category[1], [1, 2, 3, 4]))
-                        $menu['slot'] = [Lang::item('inventoryType'), 0x7EA];
+                    {
+                        $slotData = Lang::item('inventoryType');
+                        $slotMask = 0x7EA;
+                    }
 
-                    asort($menu['slot'][0]);
+                    asort($slotData);
                     break;
                 case 16:
                     if (!isset($this->category[2]))
@@ -598,13 +584,19 @@ class ItemsPage extends GenericPage
                     $this->sharedLV['hiddenCols'][] = 'slot';
                 case 15:
                     if (!isset($this->category[1]))
-                        $menu['type'] = [$catList[1], null];
+                        $typeData = $catList[1];
 
                     break;
             }
         }
 
-        return $menu;
+        foreach ($typeData as $k => $str)
+            if ($str && (!$typeMask || ($typeMask & (1 << $k))))
+                $this->typeList[$k] = $str;
+
+        foreach ($slotData as $k => $str)                   // "Off Hand" => "Shield"
+            if ($str && (!$slotMask || ($slotMask & (1 << $k))))
+                $this->slotList[$k] = $k == INVTYPE_SHIELD ? Lang::item('armorSubClass', 6) : $str;
     }
 }
 

@@ -241,12 +241,8 @@ class ProfileListFilter extends Filter
 {
     use TrProfilerFilter;
 
-    public    $useLocalList = false;
-    public    $extraOpts    = [];
-
-    private   $realms       = [];
-
-    protected $genericFilter = array(
+    protected string $type          = 'profiles';
+    protected array  $genericFilter = array(
          2 => [parent::CR_NUMERIC,  'gearscore',         NUM_CAST_INT              ], // gearscore [num]
          3 => [parent::CR_CALLBACK, 'cbAchievs',         null,                 null], // achievementpoints [num]
          5 => [parent::CR_NUMERIC,  'talenttree1',       NUM_CAST_INT              ], // talenttree1 [num]
@@ -279,7 +275,7 @@ class ProfileListFilter extends Filter
         36 => [parent::CR_CALLBACK, 'cbHasGuild',        null,                 null]  // hasguild [yn]
     );
 
-    protected $inputFields = array(
+    protected array $inputFields = array(
         'cr'    => [parent::V_RANGE,    [1, 36],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                              true ], // criteria values
@@ -295,29 +291,27 @@ class ProfileListFilter extends Filter
         'sv'    => [parent::V_CALLBACK, 'cbServerCheck',                                  false], // server
     );
 
+    public bool  $useLocalList = false;
+    public array $extraOpts    = [];
+
     /*  heads up!
         a couple of filters are too complex to be run against the characters database
         if they are selected, force useage of LocalProfileList
     */
 
-    public function __construct($fromPOST = false, $opts = [])
+    public function __construct(string|array $data, array $opts = [])
     {
-        if (!empty($opts['realms']))
-            $this->realms = $opts['realms'];
-        else
-            $this->realms = array_keys(Profiler::getRealms());
+        parent::__construct($data, $opts);
 
-        parent::__construct($fromPOST, $opts);
-
-        if (!empty($this->fiData['c']['cr']))
-            if (array_intersect($this->fiData['c']['cr'], [2, 5, 6, 7, 21]))
+        if (!empty($this->criteria['cr']))
+            if (array_intersect($this->criteria['cr'], [2, 5, 6, 7, 21]))
                 $this->useLocalList = true;
     }
 
-    protected function createSQLForValues()
+    protected function createSQLForValues() : array
     {
         $parts = [];
-        $_v    = $this->fiData['v'];
+        $_v    = $this->values;
 
         // region (rg), battlegroup (bg) and server (sv) are passed to ProflieList as miscData and handled there
 
@@ -325,37 +319,34 @@ class ProfileListFilter extends Filter
         $k = $this->useLocalList ? 'p' : 'c';
 
         // name [str] - the table is case sensitive. Since i don't want to destroy indizes, lets alter the search terms
-        if (!empty($_v['na']))
+        if ($_v['na'])
         {
-            $lower  = $this->modularizeString([$k.'.name'], Util::lower($_v['na']),   !empty($_v['ex']) && $_v['ex'] == 'on', true);
-            $proper = $this->modularizeString([$k.'.name'], Util::ucWords($_v['na']), !empty($_v['ex']) && $_v['ex'] == 'on', true);
+            $lower  = $this->tokenizeString([$k.'.name'], Util::lower($_v['na']),   $_v['ex'] == 'on', true);
+            $proper = $this->tokenizeString([$k.'.name'], Util::ucWords($_v['na']), $_v['ex'] == 'on', true);
 
             $parts[] = ['OR', $lower, $proper];
         }
 
         // side [list]
-        if (!empty($_v['si']))
-        {
-            if ($_v['si'] == SIDE_ALLIANCE)
-                $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
-            else if ($_v['si'] == SIDE_HORDE)
-                $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
-        }
+        if ($_v['si'] == SIDE_ALLIANCE)
+            $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_ALLIANCE)];
+        else if ($_v['si'] == SIDE_HORDE)
+            $parts[] = [$k.'.race', ChrRace::fromMask(ChrRace::MASK_HORDE)];
 
         // race [list]
-        if (!empty($_v['ra']))
+        if ($_v['ra'])
             $parts[] = [$k.'.race', $_v['ra']];
 
         // class [list]
-        if (!empty($_v['cl']))
+        if ($_v['cl'])
             $parts[] = [$k.'.class', $_v['cl']];
 
         // min level [int]
-        if (isset($_v['minle']))
+        if ($_v['minle'])
             $parts[] = [$k.'.level', $_v['minle'], '>='];
 
         // max level [int]
-        if (isset($_v['maxle']))
+        if ($_v['maxle'])
             $parts[] = [$k.'.level', $_v['maxle'], '<='];
 
         return $parts;
@@ -367,15 +358,15 @@ class ProfileListFilter extends Filter
             return null;
 
         $k   = 'sk_'.Util::createHash(12);
-        $col = 'skill'.$skillId;
+        $col = 'skill-'.$skillId;
 
-        $this->formData['extraCols'][$skillId] = $col;
+        $this->fiExtraCols[$skillId] = $col;
 
         if ($this->useLocalList)
         {
             $this->extraOpts[$k] = array(
                 'j' => [sprintf('?_profiler_completion_skills %1$s ON `%1$s`.`id` = p.`id` AND `%1$s`.`skillId` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
-                's' => [', '.$k.'.`value` AS '.$col]
+                's' => [', '.$k.'.`value` AS "'.$col.'"']
             );
             return [$k.'.skillId', null, '!'];
         }
@@ -383,7 +374,7 @@ class ProfileListFilter extends Filter
         {
             $this->extraOpts[$k] = array(
                 'j' => [sprintf('character_skills %1$s ON `%1$s`.`guid` = c.`guid` AND `%1$s`.`skill` = %2$d AND `%1$s`.`value` %3$s %4$d', $k, $skillId, $crs, $crv), true],
-                's' => [', '.$k.'.`value` AS '.$col]
+                's' => [', '.$k.'.`value` AS "'.$col.'"']
             );
             return [$k.'.skill', null, '!'];
         }
@@ -394,7 +385,7 @@ class ProfileListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT))
             return null;
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_achievement WHERE `id` = ?d', $crv))
+        if (!Type::validateIds(Type::ACHIEVEMENT, $crv))
             return null;
 
         $k = 'acv_'.Util::createHash(12);
@@ -416,7 +407,7 @@ class ProfileListFilter extends Filter
         if (!Util::checkNumeric($crv, NUM_CAST_INT))
             return null;
 
-        if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_items WHERE `id` = ?d', $crv))
+        if (!Type::validateIds(Type::ITEM, $crv))
             return null;
 
         $k = 'i_'.Util::createHash(12);
@@ -449,7 +440,7 @@ class ProfileListFilter extends Filter
 
     protected function cbTeamName(int $cr, int $crs, string $crv, $size) : ?array
     {
-        if ($_ = $this->modularizeString(['at.name'], $crv))
+        if ($_ = $this->tokenizeString(['at.name'], $crv))
             return ['AND', ['at.type', $size], $_];
 
         return null;
