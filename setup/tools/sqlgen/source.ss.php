@@ -413,9 +413,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
         $vendorQuery =
            'SELECT   n.`item`, SUM(n.`qty`) AS "qty", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`
-            FROM     (SELECT     `item`, COUNT(1) AS "qty" FROM npc_vendor                                                                                     WHERE     `ExtendedCost` NOT IN (?a) AND       `item` > 0 GROUP BY `item` UNION
-                      SELECT nv2.`item`, COUNT(1) AS "qty" FROM npc_vendor nv1             JOIN npc_vendor nv2 ON nv2.`entry` = -nv1.`item` AND nv1.`item` < 0 WHERE nv1.`ExtendedCost` NOT IN (?a) AND `nv1`.`item` < 0 GROUP BY `item` UNION
-                      SELECT     `item`, COUNT(1) AS "qty" FROM game_event_npc_vendor genv JOIN creature c     ON   c.`guid`  = genv.`guid`                    WHERE     `ExtendedCost` NOT IN (?a)                      GROUP BY `item`) n
+            FROM     (SELECT     `item`, COUNT(1) AS "qty" FROM npc_vendor                                                                                     WHERE     `ExtendedCost` IN (?a) AND       `item` > 0 GROUP BY `item` UNION
+                      SELECT nv2.`item`, COUNT(1) AS "qty" FROM npc_vendor nv1             JOIN npc_vendor nv2 ON nv2.`entry` = -nv1.`item` AND nv1.`item` < 0 WHERE nv1.`ExtendedCost` IN (?a) AND `nv1`.`item` < 0 GROUP BY `item` UNION
+                      SELECT     `item`, COUNT(1) AS "qty" FROM game_event_npc_vendor genv JOIN creature c     ON   c.`guid`  = genv.`guid`                    WHERE     `ExtendedCost` IN (?a)                      GROUP BY `item`) n
             JOIN     item_template it ON it.`entry` = n.`item`
             GROUP BY `item`';
 
