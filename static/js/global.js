@@ -5341,7 +5341,7 @@ function Listview(opt) {
         this.sort = [];
     }
 
-    if (this.debug || g_user.debug) {
+    if (this.debug) {
         this.columns.splice(0, 0, {
             id: 'debug-id',
             compute: function(data, td) {

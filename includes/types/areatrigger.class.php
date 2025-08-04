@@ -17,8 +17,8 @@ class AreaTriggerList extends BaseType
 
     protected       $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ?_areatrigger a';
     protected       $queryOpts = array(
-                        'a'      => [['s']],
-                        's'      => ['j' => ['?_spawns s ON s.type = 503 AND s.typeId = a.id', true], 's' => ', s.areaId']
+                        'a'      => [['s']],                // guid < 0 are teleporter targets, so exclude them here
+                        's'      => ['j' => ['?_spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -43,7 +43,7 @@ class AreaTriggerList extends BaseType
             );
 
             if ($_ = $this->curTpl['areaId'])
-                $data[$this->id]['location'] = [$_];
+                $data[$this->id]['location'] = explode(',', $_);
         }
 
         return $data;

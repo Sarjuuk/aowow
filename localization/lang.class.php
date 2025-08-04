@@ -128,6 +128,9 @@ class Lang
 
         reset($args);
 
+        if (count($args) < 2)
+            return $callback(current($args), key($args));
+
         do
         {
             $item = $callback(current($args), key($args));

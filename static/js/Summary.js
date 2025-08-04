@@ -2425,7 +2425,7 @@ Summary.prototype = {
             this.currentScale = $('option:selected', this.sortWeighted)[0].scale;
         }
 
-        lv.setSort([1], true, false);
+        lv.setSort(this.currentScale ? [4] : [1], true, false);
         lv.setData(this.calcScores(lv.data, this.currentScale));
 
         if (this.currentScale) {
