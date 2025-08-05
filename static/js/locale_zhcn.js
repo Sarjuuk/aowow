@@ -1041,23 +1041,25 @@ var mn_tools = [
         [4,"随机页面","?random"]
     ]]
 ];
+
 var mn_reputation = [
-    [0, "显示全部特权", "?privileges"],
-    [, "特权"],
-    [1, "发表评论", "?privilege=1"],
-    // [2, "发表外部链接", "?privilege=2"],
-    // [4, "无验证码", "?privilege=4"],
-    [5, "名旺言重，投票更有价值", "?privilege=5"],
-    [9, "每天更多投票次数", "?privilege=9"],
-    [10, "顶评论", "?privilege=10"],
-    [11, "踩评论", "?privilege=11"],
-    [12, "发布评论回复", "?privilege=12"],
-    // [13, "边界：罕见", "?privilege=13"],
-    // [14, "边界：稀有", "?privilege=14"],
-    // [15, "边界：史诗", "?privilege=15"],
-    // [16, "边界：传奇", "?privilege=16"],
-    [17, "Aowow会员", "?privilege=17"]
+    [0,  "显示全部特权",           "?privileges"  ],
+    [,   "特权"                                   ],
+    [1,  "发表评论",               "?privilege=1" ],
+    [2,  "发表外部链接",           "?privilege=2" ],
+ // [4,  "无验证码",               "?privilege=4" ],
+    [5,  "名旺言重，投票更有价值", "?privilege=5" ],
+    [9,  "每天更多投票次数",       "?privilege=9" ],
+    [10, "顶评论",                 "?privilege=10"],
+    [11, "踩评论",                 "?privilege=11"],
+    [12, "发布评论回复",           "?privilege=12"],
+    [13, "边界：罕见",             "?privilege=13"],
+    [14, "边界：稀有",             "?privilege=14"],
+    [15, "边界：史诗",             "?privilege=15"],
+    [16, "边界：传奇",             "?privilege=16"],
+    [17, "Aowow会员",              "?privilege=17"]
 ];
+
 var mn_community = [
     [3,"论坛","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"博客","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],

@@ -995,23 +995,25 @@ var mn_tools = [
         [4,"Página aleatoria","?random"]
     ]]
 ];
+
 var mn_reputation = [
-    [0, "Mostrar todos los privilegios", "?privileges"],
-    [, "Privilegios"],
-    [1, "Escribir comentarios", "?privilege=1"],
-    // [2, "Escribir enlaces externos", "?privilege=2"],
-    // [4, "Sin CAPTCHAs", "?privilege=4"],
-    [5, "Los votos de comentario valen más", "?privilege=5"],
-    [9, "Más votos por día", "?privilege=9"],
+    [0,  "Mostrar todos los privilegios",             "?privileges"  ],
+    [,   "Privilegios"                                               ],
+    [1,  "Escribir comentarios",                      "?privilege=1" ],
+    [2,  "Escribir enlaces externos",                 "?privilege=2" ],
+ // [4,  "Sin CAPTCHAs",                              "?privilege=4" ],
+    [5,  "Los votos de comentario valen más",         "?privilege=5" ],
+    [9,  "Más votos por día",                         "?privilege=9" ],
     [10, "Dar una valoración positiva a comentarios", "?privilege=10"],
     [11, "Dar una valoración negativa a comentarios", "?privilege=11"],
-    [12, "Escribir respuestas a comentarios", "?privilege=12"],
-    // [13, "Borde: Poco Común", "?privilege=13"],
-    // [14, "Borde: Raro", "?privilege=14"],
-    // [15, "Borde: Épica", "?privilege=15"],
-    // [16, "Borde: Legendaria", "?privilege=16"],
-    [17, "AoWoW Premium", "?privilege=17"]
+    [12, "Escribir respuestas a comentarios",         "?privilege=12"],
+    [13, "Borde: Poco Común",                         "?privilege=13"],
+    [14, "Borde: Raro",                               "?privilege=14"],
+    [15, "Borde: Épica",                              "?privilege=15"],
+    [16, "Borde: Legendaria",                         "?privilege=16"],
+    [17, "AoWoW Premium",                             "?privilege=17"]
 ];
+
 var mn_community = [
     [3,"Foros","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],

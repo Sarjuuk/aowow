@@ -995,23 +995,25 @@ var mn_tools = [
         [4,"Page au hasard","?random"]
     ]]
 ];
+
 var mn_reputation = [
-    [0, "Montrer tous les privilèges", "?privileges"],
-    [, "Privilèges"],
-    [1, "Poster des commentaires", "?privilege=1"],
-    // [2, "Poster des liens externes", "?privilege=2"],
-    // [4, "Pas de CAPTCHA", "?privilege=4"],
-    [5, "Les votes des commentaires ont plus de valeur", "?privilege=5"],
-    [9, "Plus de votes par jour", "?privilege=9"],
+    [0,  "Montrer tous les privilèges",                      "?privileges"  ],
+    [,   "Privilèges"                                                       ],
+    [1,  "Poster des commentaires",                          "?privilege=1" ],
+    [2,  "Poster des liens externes",                        "?privilege=2" ],
+ // [4,  "Pas de CAPTCHA",                                   "?privilege=4" ],
+    [5,  "Les votes des commentaires ont plus de valeur",    "?privilege=5" ],
+    [9,  "Plus de votes par jour",                           "?privilege=9" ],
     [10, "Emettre des votes positifs pour les commentaires", "?privilege=10"],
-    [11, "Donner des votes négatifs aux commentaires", "?privilege=11"],
-    [12, "Envoyer des réponses aux commentaires", "?privilege=12"],
-    // [13, "Bordure : Bonne", "?privilege=13"],
-    // [14, "Bordure : Rare", "?privilege=14"],
-    // [15, "Bordure : Épique", "?privilege=15"],
-    // [16, "Bordure : Légendaire", "?privilege=16"],
-    [17, "AoWoW Premium", "?privilege=17"]
+    [11, "Donner des votes négatifs aux commentaires",       "?privilege=11"],
+    [12, "Envoyer des réponses aux commentaires",            "?privilege=12"],
+    [13, "Bordure : Bonne",                                  "?privilege=13"],
+    [14, "Bordure : Rare",                                   "?privilege=14"],
+    [15, "Bordure : Épique",                                 "?privilege=15"],
+    [16, "Bordure : Légendaire",                             "?privilege=16"],
+    [17, "AoWoW Premium",                                    "?privilege=17"]
 ];
+
 var mn_community = [
     [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],

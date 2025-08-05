@@ -1041,23 +1041,25 @@ var mn_tools = [
         [4,"Random Page","?random"]
     ]]
 ];
+
 var mn_reputation = [
-    [0, "Show All Privileges", "?privileges"],
-    [, "Privileges"],
-    [1, "Post comments", "?privilege=1"],
-    // [2, "Post external links", "?privilege=2"],
-    // [4, "No CAPTCHAs", "?privilege=4"],
-    [5, "Comment votes worth more", "?privilege=5"],
-    [9, "More votes per day", "?privilege=9"],
-    [10, "Upvote comments", "?privilege=10"],
-    [11, "Downvote comments", "?privilege=11"],
-    [12, "Post comment replies", "?privilege=12"],
-    // [13, "Border: Uncommon", "?privilege=13"],
-    // [14, "Border: Rare", "?privilege=14"],
-    // [15, "Border: Epic", "?privilege=15"],
-    // [16, "Border: Legendary", "?privilege=16"],
-    [17, "AoWoW Premium", "?privilege=17"]
+    [0,  "Show All Privileges",      "?privileges"  ],
+    [,   "Privileges"                               ],
+    [1,  "Post comments",            "?privilege=1" ],
+    [2,  "Post external links",      "?privilege=2" ],
+ // [4,  "No CAPTCHAs",              "?privilege=4" ],
+    [5,  "Comment votes worth more", "?privilege=5" ],
+    [9,  "More votes per day",       "?privilege=9" ],
+    [10, "Upvote comments",          "?privilege=10"],
+    [11, "Downvote comments",        "?privilege=11"],
+    [12, "Post comment replies",     "?privilege=12"],
+    [13, "Border: Uncommon",         "?privilege=13"],
+    [14, "Border: Rare",             "?privilege=14"],
+    [15, "Border: Epic",             "?privilege=15"],
+    [16, "Border: Legendary",        "?privilege=16"],
+    [17, "AoWoW Premium",            "?privilege=17"]
 ];
+
 var mn_community = [
     [3,"Forum","http://forums.battle.net",null,{tinyIcon: g_staticUrl + "/images/icons/forum.png"}],
     [7,"Blog","http://worldpress.com",null,{tinyIcon: g_staticUrl + "/images/icons/blog.png"}],
