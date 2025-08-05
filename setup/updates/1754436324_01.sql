@@ -1,0 +1,1 @@
+UPDATE `aowow_articles` SET `url` = CONCAT('help=', `url`) WHERE `url` IN ('commenting-and-you', 'item-comparison', 'modelviewer', 'profiler', 'screenshots-tips-tricks', 'stat-weighting', 'talent-calculator', 'markup-guide');
