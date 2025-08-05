@@ -1,4 +1,4 @@
-<?php namespace Aowow; ?>
+<?php namespace Aowow\Template; ?>
 
 <?php $this->brick('header'); ?>
 
@@ -13,10 +13,10 @@
 ?>
 
             <div class="text">
-                <h1><?=$this->name;?></h1>
-                <p><?=$this->privReqPoints;?></p><br>
+                <h1><?=$this->h1;?></h1>
+                <p><?=$this->privReqPoints;?></p><br />
 <?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 ?>
             </div>
             <div class="clear"></div>

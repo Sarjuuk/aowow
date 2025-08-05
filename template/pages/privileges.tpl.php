@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -14,9 +18,9 @@
 
             <div class="text">
                 <h1><?=Lang::privileges('privileges');?></h1>
-                <div style="float:right;line-height:1.2;max-width:410px;overflow:hidden;text-align:center"><img class="border" alt="" src="<?=Cfg::get('STATIC_URL');?>/images/help/privileges/example.jpg" /></div>
+                <div style="float:right;line-height:1.2;max-width:410px;overflow:hidden;text-align:center"><img class="border" alt="" src="<?=$this->gStaticUrl;?>/images/help/privileges/example.jpg" /></div>
                 <p><?=Lang::privileges('main');?></p>
-                <br><br>
+                <br /><br />
                 <table class="wsa-list wsa-tbl">
                     <thead><th><?=Lang::privileges('privilege');?></th><th><?=Lang::privileges('requiredRep');?></th></thead>
                     <tbody>
