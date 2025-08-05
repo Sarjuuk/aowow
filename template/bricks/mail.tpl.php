@@ -1,11 +1,12 @@
-<?php namespace Aowow; ?>
-
 <?php
-if ($m = $this->mail):
-    if (!isset($offset))                                        // in case we have multiple icons on the page (prominently quest-rewards)
-        $offset = 0;
+    namespace Aowow\Template;
 
-    echo '                        <h3>'.sprintf(Lang::mail('mailDelivery'), $m['id'], $m['sender'], $m['delay'])."</h3>\n";
+    use \Aowow\Lang;
+
+if ($m = $this->mail):
+    $offset ??= 0;                                          // in case we have multiple icons on the page (prominently quest-rewards)
+
+    echo '                        <h3>'.Lang::mail('mailDelivery', $m['header'])."</h3>\n";
 
     if ($m['subject']):
         echo '                        <div class="book"><div class="page">'.$m['subject']."</div></div>\n";
@@ -19,16 +20,16 @@ if ($m = $this->mail):
 ?>
                 <table class="icontab icontab-box" style="padding-left:10px;">
 <?php
-        foreach ($m['attachments'] as $k => $i):
-            echo '<tr><th id="icontab-icon'.($k + 1 + $offset).'"></th><td><span class="q'.(isset($i['quality']) ? $i['quality'] : null).'"><a href="?'.$i['typeStr'].'='.$i['id'].'">'.$i['name']."</a></span></td></tr>\n";
+        foreach ($m['attachments'] as $icon):
+            echo $icon->renderContainer(20, $offset, true);
         endforeach;
 ?>
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-        foreach ($m['attachments'] as $k => $i):
-            echo '                    $WH.ge(\'icontab-icon'.($k + 1 + $offset).'\').appendChild('.$i['globalStr'].'.createIcon('.$i['id'].', 1, '.(empty($i['qty']) ? 0 : $i['qty'])."));\n";
+        foreach ($m['attachments'] as $icon):
+            echo $icon->renderJS();
         endforeach;
 ?>
                 //]]></script>

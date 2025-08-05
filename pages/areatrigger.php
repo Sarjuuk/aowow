@@ -74,7 +74,7 @@ class AreaTriggerPage extends GenericPage
 
         $this->map        = $map;
         $this->infobox    = false;
-        $this->smartAI    = $sai?->getMarkdown();
+        $this->smartAI    = $sai?->getMarkup();
         $this->redButtons = array(
             BUTTON_LINKS   => false,
             BUTTON_WOWHEAD => false

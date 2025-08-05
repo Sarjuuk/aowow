@@ -406,7 +406,7 @@ class NpcPage extends GenericPage
         $this->accessory    = $accessory;
         $this->quotes       = $this->getQuotes();
         $this->reputation   = $this->getOnKillRep($_altIds, $mapType);
-        $this->smartAI      = $sai ? $sai->getMarkdown() : null;
+        $this->smartAI      = $sai ? $sai->getMarkup() : null;
         $this->redButtons   = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],

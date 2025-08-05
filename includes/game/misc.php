@@ -191,24 +191,23 @@ class Game
         return $data;
     }
 
-    public static function getPageText($ptId)
+    public static function getBook(int $ptId, ?int $startPage = null) : ?Book
     {
         $pages = [];
         while ($ptId)
         {
-            if ($row = DB::World()->selectRow('SELECT ptl.Text AS Text_loc?d, pt.* FROM page_text pt LEFT JOIN page_text_locale ptl ON pt.ID = ptl.ID AND locale = ? WHERE pt.ID = ?d', Lang::getLocale()->value, Lang::getLocale()->json(), $ptId))
+            if ($row = DB::World()->selectRow('SELECT ptl.`Text` AS Text_loc?d, pt.* FROM page_text pt LEFT JOIN page_text_locale ptl ON pt.`ID` = ptl.`ID` AND locale = ? WHERE pt.`ID` = ?d', Lang::getLocale()->value, Lang::getLocale()->json(), $ptId))
             {
                 $ptId = $row['NextPageID'];
-                $pages[] = Util::parseHtmlText(Util::localizedString($row, 'Text'));
+                $pages[] = Util::localizedString($row, 'Text');
+                continue;
             }
-            else
-            {
-                trigger_error('Referenced PageTextId #'.$ptId.' is not in DB', E_USER_WARNING);
-                break;
-            }
+
+            trigger_error('Referenced PageTextId #'.$ptId.' is not in DB', E_USER_WARNING);
+            break;
         }
 
-        return $pages;
+        return $pages ? new Book($pages, page: $startPage) : null;
     }
 
     public static function getQuotesForCreature(int $creatureId, bool $asHTML = false, string $talkSource = '') : array
@@ -256,39 +255,32 @@ class Game
                 if ($talkSource)
                     $msg = sprintf($msg, $talkSource);
 
-                // make type css compatible
-                switch ($t['talkType'])
+                // convert [old, new] talkType to css compatible
+                $t['talkType'] = match ((int)$t['talkType'])
                 {
-                    case  1:                                // yell:
-                    case 14: $t['talkType'] = 1; break;     // - dark red
-                    case  2:                                // emote:
-                    case 16:                                // "
-                    case  3:                                // boss emote:
-                    case 41: $t['talkType'] = 4; break;     // - orange
-                    case  4:                                // whisper:
-                    case 15:                                // "
-                    case  5:                                // boss whisper:
-                    case 42: $t['talkType'] = 3; break;     // - pink-ish
-                    default: $t['talkType'] = 2;            // [type: 0, 12] say: yellow-ish
-
-                }
+                    0, 12   => 2,                           // say - yellow-ish
+                    1, 14   => 1,                           // yell - dark red
+                    2, 16,                                  // emote
+                    3, 41   => 4,                           // boss emote - orange
+                    4, 15,                                  // whisper
+                    5, 42   => 3,                           // boss whisper - pink-ish
+                    default => 2
+                };
 
                 // prefix
-                $pre = '';
+                $prefix = '%s ';
                 if ($t['talkType'] != 4)
-                    $pre = ($talkSource ?: '%s').' '.Lang::npc('textTypes', $t['talkType']).Lang::main('colon').($t['lang'] ? '['.Lang::game('languages', $t['lang']).'] ' : null);
+                    $prefix = ($talkSource ?: '%s').' '.Lang::npc('textTypes', $t['talkType']).Lang::main('colon').($t['lang'] ? '['.Lang::game('languages', $t['lang']).'] ' : ' ');
 
                 if ($asHTML)
-                    $msg = '<div><span class="s'.$t['talkType'].'">%s'.($t['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $t['range']), $msg) : $msg).'</span></div>';
+                    $msg = '<div><span class="s'.$t['talkType'].'">'.$prefix.($t['range'] ? sprintf(Util::$dfnString, Lang::npc('textRanges', $t['range']), $msg) : $msg).'</span></div>';
                 else
-                    $msg = '[div][span class=s'.$t['talkType'].']%s'.html_entity_decode($msg).'[/span][/div]';
+                    $msg = '[div][span class=s'.$t['talkType'].']'.$prefix.html_entity_decode($msg).'[/span][/div]';
 
                 $line = array(
                     'range'  => $t['range'],
-                    'text'   => $msg,
-                    'prefix' => $pre
+                    'text'   => $msg
                 );
-
 
                 $nQuotes++;
                 $group[] = $line;
