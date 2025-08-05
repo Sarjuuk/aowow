@@ -13,17 +13,16 @@ if (!defined('AOWOW_REVISION'))
 
 class DB
 {
-    private static $interfaceCache  = [];
-    private static $optionsCache    = [];
+    private static array $interfaceCache = [];
+    private static array $optionsCache   = [];
+    private static array $logs           = [];
 
-    private static $logs            = [];
-
-    private static function createConnectSyntax(&$options)
+    private static function createConnectSyntax(array &$options) : string
     {
         return 'mysqli://'.$options['user'].':'.$options['pass'].'@'.$options['host'].'/'.$options['db'];
     }
 
-    public static function connect($idx)
+    public static function connect(int $idx) : void
     {
         if (self::isConnected($idx))
         {
@@ -73,7 +72,7 @@ class DB
         return false;
     }
 
-    public static function errorHandler($message, $data)
+    public static function errorHandler(string $message, array $data) : void
     {
         if (!error_reporting())
             return;
@@ -94,7 +93,7 @@ class DB
         trigger_error($message, $isError ? E_USER_ERROR : E_USER_WARNING);
     }
 
-    public static function profiler($self, $query, $trace)
+    public static function profiler(mixed $self, string $query, mixed $trace) : void
     {
         if ($trace)                                         // actual query
             self::$logs[] = [str_replace("\n", ' ', $query)];
@@ -105,7 +104,7 @@ class DB
         }
     }
 
-    public static function getProfiles()
+    public static function getProfiles() : string
     {
         $out = '<pre><table style="font-size:12;"><tr><th></th><th>Time</th><th>Query</th></tr>';
         foreach (self::$logs as $i => [$l, $t])
@@ -123,61 +122,61 @@ class DB
         return Util::jsEscape($out).'</table></pre>';
     }
 
-    public static function getDB($idx)
+    public static function getDB(int $idx) : ?\DbSimple_Mysqli
     {
         return self::$interfaceCache[$idx];
     }
 
-    public static function isConnected($idx)
+    public static function isConnected(int $idx) : bool
     {
         return isset(self::$interfaceCache[$idx]) && self::$interfaceCache[$idx]->link;
     }
 
-    public static function isConnectable($idx)
+    public static function isConnectable(int $idx) : bool
     {
         return isset(self::$optionsCache[$idx]);
     }
 
     /**
      * @static
-     * @return DbSimple_Mysql
+     * @return DbSimple_Mysqli
      */
-    public static function Characters($realm)
+    public static function Characters(int $realmId) : ?\DbSimple_Mysqli
     {
-        if (!isset(self::$optionsCache[DB_CHARACTERS.$realm]))
-            die('Connection info not found for live database of realm #'.$realm.'. Aborted.');
+        if (!isset(self::$optionsCache[DB_CHARACTERS.$realmId]))
+            die('Connection info not found for live database of realm #'.$realmId.'. Aborted.');
 
-        return self::getDB(DB_CHARACTERS.$realm);
+        return self::getDB(DB_CHARACTERS.$realmId);
     }
 
     /**
      * @static
-     * @return DbSimple_Mysql
+     * @return DbSimple_Mysqli
      */
-    public static function Auth()
+    public static function Auth() : ?\DbSimple_Mysqli
     {
         return self::getDB(DB_AUTH);
     }
 
     /**
      * @static
-     * @return DbSimple_Mysql
+     * @return DbSimple_Mysqli
      */
-    public static function World()
+    public static function World() : ?\DbSimple_Mysqli
     {
         return self::getDB(DB_WORLD);
     }
 
     /**
      * @static
-     * @return DbSimple_Mysql
+     * @return DbSimple_Mysqli
      */
-    public static function Aowow()
+    public static function Aowow() : ?\DbSimple_Mysqli
     {
         return self::getDB(DB_AOWOW);
     }
 
-    public static function load($idx, $config)
+    public static function load(int $idx, array $config) : void
     {
         self::$optionsCache[$idx] = $config;
         self::connect($idx);
