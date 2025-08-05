@@ -1,12 +1,9 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php
-foreach ($this->announcements as $id => $data):
-?>
-            <div id="announcement-<?=$id; ?>"></div>
+foreach ($this->announcements as $a): ?>
+            <div id="announcement-<?=$a->id;?>"></div>
             <script type="text/javascript">
-                new Announcement(<?=Util::toJSON($data); ?>);
+                <?=$a;?>
             </script>
-<?php
-endforeach;
-?>
+<?php endforeach; ?>

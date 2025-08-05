@@ -345,7 +345,7 @@ class Conditions
             'name' => ($name ?: '$LANG.tab_conditions') . '+" ('.$nCnd.')"'
         );
 
-        return [null, $tab];
+        return $tab;
     }
 
     // $keyX params are string(ref to lv column) or int(fixed value)

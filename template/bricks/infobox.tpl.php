@@ -1,38 +1,42 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php
-if (!empty($this->infobox) || !empty($this->contributions) || !empty($this->series) || $this->contribute & (CONTRIBUTE_SS | CONTRIBUTE_VI)):
+if ($this->infobox || $this->contributions || $this->series || $this->contribute & (CONTRIBUTE_SS | CONTRIBUTE_VI)):
 echo "    <table class=\"infobox\">\n";
 
-    if (!empty($this->infobox)):
+    if ($this->infobox):
 ?>
         <tr><th id="infobox-quick-facts"><?=Lang::main('quickFacts'); ?></th></tr>
         <tr><td>
             <div class="infobox-spacer"></div>
             <div id="infobox-contents0"></div>
             <script type="text/javascript">
-                Markup.printHtml("<?=Util::jsEscape($this->infobox); ?>", "infobox-contents0", { allow: Markup.CLASS_STAFF, dbpage: true });
+                <?=$this->infobox; ?>
             </script>
         </td></tr>
 <?php
     endif;
 
-    if (!empty($this->contributions)):
+    if ($this->contributions):
 ?>
         <tr><th id="infobox-contributions"><?=Lang::user('contributions'); ?></th></tr>
         <tr><td>
             <div class="infobox-spacer"></div>
             <div id="infobox-contents1"></div>
             <script type="text/javascript">
-                Markup.printHtml('<?=Util::jsEscape($this->contributions); ?>', 'infobox-contents1', { allow: Markup.CLASS_STAFF });
+                <?=$this->contributions; ?>
             </script>
         </td></tr>
 <?php
     endif;
 
-    if (!empty($this->series)):
-        foreach ($this->series as $s):
-            $this->brick('series', ['list' => $s[0], 'listTitle' => $s[1]]);
+    if ($this->series):
+        foreach ($this->series as [$list, $title]):
+            $this->brick('series', ['list' => $list, 'listTitle' => $title]);
         endforeach;
     endif;
 
@@ -43,7 +47,7 @@ echo "    <table class=\"infobox\">\n";
 <?php
     endif;
 
-    if ($this->contribute & CONTRIBUTE_VI && (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
+    if ($this->contribute & CONTRIBUTE_VI && ($this->user::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
 ?>
         <tr><th id="infobox-videos"><?=Lang::main('videos'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
@@ -56,7 +60,7 @@ echo "    <table class=\"infobox\">\n";
 <?php
     endif;
 
-    if ($this->contribute & CONTRIBUTE_VI && (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
+    if ($this->contribute & CONTRIBUTE_VI && ($this->user::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_VIDEO) || !empty($this->community['vi']))):
 ?>
     <script type="text/javascript">vi_appendSticky()</script>
 <?php

@@ -20,7 +20,8 @@ class LocString
             trigger_error('LocString - is entrirely empty', E_USER_WARNING);
 
         foreach (Locale::cases() as $l)
-            $this->store[$l] = (string)$callback($data[$key.'_loc'.$l->value] ?? '');
+            if ($l->validate())
+                $this->store[$l] = (string)$callback($data[$key.'_loc'.$l->value] ?? '');
     }
 
     public function __toString() : string

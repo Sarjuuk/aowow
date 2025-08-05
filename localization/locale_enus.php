@@ -33,6 +33,7 @@ $lang = array(
         'gender'        => "Gender",
         'sex'           => [null, "Male", "Female"],
         'players'       => "Players",
+        'thePlayer'     => "The Player",
         'quickFacts'    => "Quick Facts",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",

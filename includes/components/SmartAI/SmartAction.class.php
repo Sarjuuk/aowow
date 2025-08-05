@@ -713,12 +713,12 @@ class SmartAction
                 break;
             case self::ACTION_TALK:                         // 1 -> any target
             case self::ACTION_SIMPLE_TALK:                  // 84 -> any target
-                $noSrc = false;
-                if ($npcId = $this->smartAI->getTarget()->getTalkSource($noSrc))
+                $playerSrc = false;
+                if ($npcId = $this->smartAI->getTarget()->getTalkSource($playerSrc))
                 {
                     if ($quotes = $this->smartAI->getQuote($npcId, $this->param[0], $npcSrc))
-                        foreach ($quotes as ['text' => $text, 'prefix' => $prefix])
-                            $this->param[10] .= sprintf($text, $noSrc ? '' : sprintf($prefix, $npcSrc), $npcSrc);
+                        foreach ($quotes as ['text' => $text])
+                            $this->param[10] .= sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc);
                 }
                 else
                     trigger_error('SmartAI::action - could not determine talk source for action #'.$this->type);

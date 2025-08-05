@@ -651,32 +651,31 @@ class SmartAI
         return true;
     }
 
-    public function getMarkdown() : string
+    public function getMarkup() : ?Markup
     {
         # id | event (footer phase) | chance | action + target
 
         if (!$this->rawData)
-            return '';
+            return null;
 
-        $return = '[style]#text-generic .grid { clear:left; } #text-generic .tabbed-contents { padding:0px; clear:left; }[/style][pad][h3][toggler id=sai]SmartAI'.$this->title.'[/toggler][/h3][div id=sai clear=left]%s[/div]';
+        $wrapper = '[table class=grid width=940px]%s[/table]';
+        $return  = '[style]#smartai-generic .grid { clear:left; } #smartai-generic .tabbed-contents { padding:0px; clear:left; }[/style][pad][h3][toggler id=sai]SmartAI'.$this->title.'[/toggler][/h3][div id=sai clear=left]%s[/div]';
+        $tabs    = '';
         if (count($this->tabs) > 1)
         {
             $wrapper = '[tabs name=sai width=942px]%s[/tabs]';
-            $return  = '[script]function TalTabClick(id) { $(\'#dsf67g4d-sai\').find(\\\'[href=\\\\\'#sai-actionlist-\' + id + \'\\\\\']\\\').click(); }[/script]' . $return;
-            $tabs    = '';
+            $return  = "[script]function TalTabClick(id) { $('#dsf67g4d-sai').find('[href=\'#sai-actionlist-' + id + '\']').click(); }[/script]" . $return;
             foreach ($this->tabs as $guid => $data)
             {
-                $buff = '[tab name=\"'.($guid ? 'ActionList #'.$guid : 'Main').'\"][table class=grid width=940px]'.$data.'[/table][/tab]';
+                $buff = '[tab name="'.($guid ? 'ActionList #'.$guid : 'Main').'"][table class=grid width=940px]'.$data.'[/table][/tab]';
                 if ($guid)
                     $tabs .= $buff;
                 else
                     $tabs = $buff . $tabs;
             }
-
-            return sprintf($return, sprintf($wrapper, $tabs));
         }
-        else
-            return sprintf($return, '[table class=grid width=940px]'.$this->tabs[0].'[/table]');
+
+        return new Markup(sprintf($return, sprintf($wrapper, $tabs ?: $this->tabs[0])), ['allow' => Markup::CLASS_ADMIN], 'smartai-generic');
     }
 
     public function addJsGlobals(array $jsg) : void
