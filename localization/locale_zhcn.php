@@ -34,6 +34,7 @@ $lang = array(
         'gender'        => "性别",
         'sex'           => [null, "男性", "女性"],
         'players'       => "玩家",
+        'thePlayer'     => "玩家",
         'quickFacts'    => "相关信息",
         'screenshots'   => "屏幕截图",
         'videos'        => "视频",

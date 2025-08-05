@@ -212,7 +212,7 @@ class ObjectPage extends GenericPage
         /****************/
 
         // pageText
-        if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
+        if ($this->pageText = Game::getBook($this->subject->getField('pageTextId')))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']
@@ -271,7 +271,7 @@ class ObjectPage extends GenericPage
         $this->map         = $map;
         $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->relBoss     = $relBoss;
-        $this->smartAI     = $sai ? $sai->getMarkdown() : null;
+        $this->smartAI     = $sai ? $sai->getMarkup() : null;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],

@@ -382,8 +382,7 @@ class ItemPage extends genericPage
         $_cu = in_array($_class, [ITEM_CLASS_WEAPON, ITEM_CLASS_ARMOR]) || $this->subject->getField('gemEnchantmentId');
 
         // pageText
-        $pageText = [];
-        if ($this->pageText = Game::getPageText($this->subject->getField('pageTextId')))
+        if ($this->pageText = Game::getBook($this->subject->getField('pageTextId')))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']
