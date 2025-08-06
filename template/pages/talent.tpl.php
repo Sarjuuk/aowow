@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -14,7 +18,7 @@
 
         <div id="<?=$this->tcType; ?>-classes">
                 <div id="<?=$this->tcType; ?>-classes-outer">
-                    <div id="<?=$this->tcType; ?>-classes-inner"><p><?=($this->tcType == 'tc' ? Lang::main('chooseClass') : Lang::main('chooseFamily')) . Lang::main('colon'); ?></p></div>
+                    <div id="<?=$this->tcType; ?>-classes-inner"><p><?=$this->chooseType; ?></p></div>
                 </div>
             </div>
             <div id="<?=$this->tcType; ?>-itself"></div>
