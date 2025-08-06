@@ -6,16 +6,16 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class WorldEventList extends BaseType
+class WorldEventList extends DBTypeList
 {
-    public static   $type      = Type::WORLDEVENT;
-    public static   $brickFile = 'event';
-    public static   $dataTable = '?_events';
+    public static int    $type      = Type::WORLDEVENT;
+    public static string $brickFile = 'event';
+    public static string $dataTable = '?_events';
 
-    protected       $queryBase = 'SELECT e.holidayId, e.cuFlags, e.startTime, e.endTime, e.occurence, e.length, e.requires, e.description AS nameINT, e.id AS eventId, e.id AS ARRAY_KEY, h.* FROM ?_events e';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT e.`holidayId`, e.`cuFlags`, e.`startTime`, e.`endTime`, e.`occurence`, e.`length`, e.`requires`, e.`description` AS "nameINT", e.`id` AS "eventId", e.`id` AS "ARRAY_KEY", h.* FROM ?_events e';
+    protected array  $queryOpts = array(
                         'e' => [['h']],
-                        'h' => ['j' => ['?_holidays h ON e.holidayId = h.id', true], 'o' => '-e.id ASC']
+                        'h' => ['j' => ['?_holidays h ON e.`holidayId` = h.`id`', true], 'o' => '-e.`id` ASC']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -66,26 +66,17 @@ class WorldEventList extends BaseType
         }
     }
 
-    public static function getName($id)
+    public static function getName(int $id) : ?LocString
     {
-        $row = DB::Aowow()->SelectRow('
-            SELECT
-                IFNULL(h.name_loc0, e.description) AS name_loc0,
-                h.name_loc2,
-                h.name_loc3,
-                h.name_loc4,
-                h.name_loc6,
-                h.name_loc8
-            FROM
-                ?_events e
-            LEFT JOIN
-                ?_holidays h ON e.holidayId = h.id
-            WHERE
-                e.id = ?d',
+        $row = DB::Aowow()->SelectRow(
+           'SELECT    IFNULL(h.`name_loc0`, e.`description`) AS "name_loc0", h.`name_loc2`, h.`name_loc3`, h.`name_loc4`, h.`name_loc6`, h.`name_loc8`
+            FROM      ?_events e
+            LEFT JOIN ?_holidays h ON e.`holidayId` = h.`id`
+            WHERE     e.`id` = ?d',
             $id
         );
 
-        return Util::localizedString($row, 'name');
+        return $row ? new LocString($row) : null;
     }
 
     public static function updateDates($date = null)
@@ -125,7 +116,7 @@ class WorldEventList extends BaseType
         );
     }
 
-    public function getListviewData($forNow = false)
+    public function getListviewData(bool $forNow = false) : array
     {
         $data = [];
 
@@ -159,7 +150,7 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -169,7 +160,7 @@ class WorldEventList extends BaseType
         return $data;
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
             return null;
@@ -181,7 +172,7 @@ class WorldEventList extends BaseType
 
         // use string-placeholder for dates
         // start
-        $x .= Lang::event('start').Lang::main('colon').'%s<br>';
+        $x .= Lang::event('start').Lang::main('colon').'%s<br />';
         // end
         $x .= Lang::event('end').Lang::main('colon').'%s';
 

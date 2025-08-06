@@ -6,16 +6,16 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class SkillList extends BaseType
+class SkillList extends DBTypeList
 {
-    public static   $type      = Type::SKILL;
-    public static   $brickFile = 'skill';
-    public static   $dataTable = '?_skillline';
+    public static int    $type      = Type::SKILL;
+    public static string $brickFile = 'skill';
+    public static string $dataTable = '?_skillline';
 
-    protected       $queryBase = 'SELECT sl.*, sl.id AS ARRAY_KEY FROM ?_skillline sl';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT sl.*, sl.`id` AS ARRAY_KEY FROM ?_skillline sl';
+    protected array  $queryOpts = array(
                         'sl' => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.id = sl.iconId', true], 's' => ', ic.name AS iconString'],
+                        'ic' => ['j' => ['?_icons ic ON ic.`id` = sl.`iconId`', true], 's' => ', ic.`name` AS "iconString"'],
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -40,13 +40,7 @@ class SkillList extends BaseType
         }
     }
 
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_skillline WHERE id = ?d', $id);
-        return Util::localizedString($n, 'name');
-    }
-
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -67,7 +61,7 @@ class SkillList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -77,7 +71,7 @@ class SkillList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>

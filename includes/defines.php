@@ -30,6 +30,10 @@ define('MIME_TYPE_OPENSEARCH', 'Content-Type: application/x-suggestions+json; ch
 define('MIME_TYPE_RSS',        'Content-Type: application/rss+xml; charset=utf-8');
 define('MIME_TYPE_JPEG',       'Content-Type: image/jpeg');
 define('MIME_TYPE_PNG',        'Content-Type: image/png');
+define('MIME_TYPE_GIF',        'Content-Type: image/gif');
+// not send via header()
+define('MIME_TYPE_OGG',        'audio/ogg; codecs="vorbis"');
+define('MIME_TYPE_MP3',        'audio/mpeg');
 
 define('CACHE_TYPE_NONE',                   0);             // page will not be cached
 define('CACHE_TYPE_PAGE',                   1);
@@ -171,7 +175,7 @@ define('BUTTON_GUIDE_LOG',                 13);
 define('GLOBALINFO_SELF',                   0x1);           // id, name, icon
 define('GLOBALINFO_RELATED',                0x2);           // spells used by pet, classes/races required by spell, ect
 define('GLOBALINFO_REWARDS',                0x4);           // items rewarded by achievement/quest, ect
-define('GLOBALINFO_EXTRA',                  0x8);           // items / spells .. sends exra tooltip info to template for js-manipulation
+define('GLOBALINFO_EXTRA',                  0x8);           // items / spells .. sends extra tooltip info to template for js-manipulation
 define('GLOBALINFO_ANY',                    0xF);
 
 define('ITEMINFO_JSON',                     0x01);
@@ -597,9 +601,38 @@ define('LOCK_PROPERTY_HERBALISM',           2);
 define('LOCK_PROPERTY_MINING',              3);
 
 // Creature
-define('NPC_TYPEFLAG_SKIN_WITH_HERBALISM',   0x0100);
-define('NPC_TYPEFLAG_SKIN_WITH_MINING',      0x0200);
-define('NPC_TYPEFLAG_SKIN_WITH_ENGINEERING', 0x8000);
+define('NPC_TYPEFLAG_TAMEABLE',                          0x00000001);
+define('NPC_TYPEFLAG_VISIBLE_TO_GHOSTS',                 0x00000002);
+define('NPC_TYPEFLAG_BOSS_MOB',                          0x00000004);
+define('NPC_TYPEFLAG_DO_NOT_PLAY_WOUND_ANIM',            0x00000008);
+define('NPC_TYPEFLAG_NO_FACTION_TOOLTIP',                0x00000010);
+define('NPC_TYPEFLAG_MORE_AUDIBLE',                      0x00000020);
+define('NPC_TYPEFLAG_SPELL_ATTACKABLE',                  0x00000040);
+define('NPC_TYPEFLAG_INTERACT_WHILE_DEAD',               0x00000080);
+define('NPC_TYPEFLAG_SKIN_WITH_HERBALISM',               0x00000100);
+define('NPC_TYPEFLAG_SKIN_WITH_MINING',                  0x00000200);
+define('NPC_TYPEFLAG_NO_DEATH_MESSAGE',                  0x00000400);
+define('NPC_TYPEFLAG_ALLOW_MOUNTED_COMBAT',              0x00000800);
+define('NPC_TYPEFLAG_CAN_ASSIST',                        0x00001000);
+define('NPC_TYPEFLAG_NO_PET_BAR',                        0x00002000);
+define('NPC_TYPEFLAG_MASK_UID',                          0x00004000);
+define('NPC_TYPEFLAG_SKIN_WITH_ENGINEERING',             0x00008000);
+define('NPC_TYPEFLAG_EXOTIC_PET',                        0x00010000);
+define('NPC_TYPEFLAG_USE_MODEL_COLLISION_SIZE',          0x00020000);
+define('NPC_TYPEFLAG_ALLOW_INTERACTION_WHILE_IN_COMBAT', 0x00040000);
+define('NPC_TYPEFLAG_COLLIDE_WITH_MISSILES',             0x00080000);
+define('NPC_TYPEFLAG_NO_NAME_PLATE',                     0x00100000);
+define('NPC_TYPEFLAG_DO_NOT_PLAY_MOUNTED_ANIMATIONS',    0x00200000);
+define('NPC_TYPEFLAG_LINK_ALL',                          0x00400000);
+define('NPC_TYPEFLAG_INTERACT_ONLY_WITH_CREATOR',        0x00800000);
+define('NPC_TYPEFLAG_DO_NOT_PLAY_UNIT_EVENT_SOUNDS',     0x01000000);
+define('NPC_TYPEFLAG_HAS_NO_SHADOW_BLOB',                0x02000000);
+define('NPC_TYPEFLAG_TREAT_AS_RAID_UNIT',                0x04000000);
+define('NPC_TYPEFLAG_FORCE_GOSSIP',                      0x08000000);
+define('NPC_TYPEFLAG_DO_NOT_SHEATHE',                    0x10000000);
+define('NPC_TYPEFLAG_DO_NOT_TARGET_ON_INTERACTION',      0x20000000);
+define('NPC_TYPEFLAG_DO_NOT_RENDER_OBJECT_NAME',         0x40000000);
+define('NPC_TYPEFLAG_QUEST_BOSS',                        0x80000000);
 define('NPC_TYPEFLAG_SPECIALLOOT',           NPC_TYPEFLAG_SKIN_WITH_ENGINEERING | NPC_TYPEFLAG_SKIN_WITH_MINING | NPC_TYPEFLAG_SKIN_WITH_HERBALISM);
 
 define('NPC_RANK_NORMAL',                   0);
@@ -632,6 +665,32 @@ define('NPC_FLAG_STABLE_MASTER',            0x00400000);
 define('NPC_FLAG_GUILD_BANK',               0x00800000);
 define('NPC_FLAG_SPELLCLICK',               0x01000000);
 define('NPC_FLAG_MAILBOX',                  0x04000000);
+
+define('CREATURE_FLAG_EXTRA_INSTANCE_BIND',                   0x00000001);    // creature kill binds instance to killer and killer's group
+define('CREATURE_FLAG_EXTRA_CIVILIAN',                        0x00000002);    // creature does not aggro (ignore faction/reputation hostility)
+define('CREATURE_FLAG_EXTRA_NO_PARRY',                        0x00000004);    // creature does not parry
+define('CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN',                 0x00000008);    // creature does not counter-attack at parry
+define('CREATURE_FLAG_EXTRA_NO_BLOCK',                        0x00000010);    // creature does not block
+define('CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS',               0x00000020);    // creature can't do crush attacks
+define('CREATURE_FLAG_EXTRA_NO_XP',                           0x00000040);    // creature kill does not provide XP
+define('CREATURE_FLAG_EXTRA_TRIGGER',                         0x00000080);    // creature is trigger-NPC (invisible to players only)
+define('CREATURE_FLAG_EXTRA_NO_TAUNT',                        0x00000100);    // creature is immune to taunt auras and 'attack me' effects
+define('CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE',            0x00000200);    // creature won't update movement flags
+define('CREATURE_FLAG_EXTRA_GHOST_VISIBILITY',                0x00000400);    // creature will only be visible to dead players
+define('CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK',              0x00000800);    // creature will use offhand attacks
+define('CREATURE_FLAG_EXTRA_NO_SELL_VENDOR',                  0x00001000);    // players can't sell items to this vendor
+define('CREATURE_FLAG_EXTRA_IGNORE_COMBAT',                   0x00002000);    // creature is not allowed to enter combat
+define('CREATURE_FLAG_EXTRA_WORLDEVENT',                      0x00004000);    // custom flag for world events (left room for merging)
+define('CREATURE_FLAG_EXTRA_GUARD',                           0x00008000);    // creature is a guard
+define('CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH',              0x00010000);    // creature ignores feign death
+define('CREATURE_FLAG_EXTRA_NO_CRIT',                         0x00020000);    // creature does not do critical strikes
+define('CREATURE_FLAG_EXTRA_NO_SKILL_GAINS',                  0x00040000);    // creature won't increase weapon skills
+define('CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS', 0x00080000);    // Taunt is subject to diminishing returns on this creature
+define('CREATURE_FLAG_EXTRA_ALL_DIMINISH',                    0x00100000);    // creature is subject to all diminishing returns as players are
+define('CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ',            0x00200000);    // NPCs can help with killing this creature and player will still be credited if he tags the creature
+define('CREATURE_FLAG_EXTRA_DUNGEON_BOSS',                    0x10000000);    // Creature is a dungeon boss. This flag is generically set by core during runtime. Setting this in database will give you startup error.
+define('CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING',              0x20000000);    // Creature will ignore pathfinding. This is like disabling Mmaps, only for one creature.
+define('CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK',              0x40000000);    // creature will immune all knockback effects
 
 define('UNIT_FLAG_SERVER_CONTROLLED',       0x00000001);    //
 define('UNIT_FLAG_NON_ATTACKABLE',          0x00000002);    //
@@ -720,6 +779,10 @@ define('UNIT_DYNFLAG_DEAD',                      0x20);     // Makes the creatur
 define('UNIT_DYNFLAG_REFER_A_FRIEND',            0x40);     //
 define('UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST', 0x80);     // Lua_UnitIsTappedByAllThreatList
 
+define('PET_TALENT_TYPE_FEROCITY', 0);
+define('PET_TALENT_TYPE_TENACITY', 1);
+define('PET_TALENT_TYPE_CUNNING',  2);
+
 // quest
 define('QUEST_FLAG_STAY_ALIVE',             0x00001);
 define('QUEST_FLAG_PARTY_ACCEPT',           0x00002);
@@ -791,6 +854,36 @@ define('GO_FLAG_DESTROYED',       0x0400);                  // Gameobject has be
 define('GO_STATE_ACTIVE',             0);                   // show in world as used and not reset (closed door open)
 define('GO_STATE_READY',              1);                   // show in world as ready (closed door close)
 define('GO_STATE_ACTIVE_ALTERNATIVE', 2);                   // show in world as used in alt way and not reset (closed door open by cannon fire)
+
+define('AREA_FLAG_UNK0',               0x00000001);         // Unknown
+define('AREA_FLAG_UNK1',               0x00000002);         // Razorfen Downs, Naxxramas and Acherus: The Ebon Hold (3.3.5a)
+define('AREA_FLAG_UNK2',               0x00000004);         // Only used for areas on map 571 (development before)
+define('AREA_FLAG_SLAVE_CAPITAL',      0x00000008);         // city and city subzones
+define('AREA_FLAG_UNK3',               0x00000010);         // can't find common meaning
+define('AREA_FLAG_SLAVE_CAPITAL2',     0x00000020);         // slave capital city flag?
+define('AREA_FLAG_ALLOW_DUELS',        0x00000040);         // allow to duel here
+define('AREA_FLAG_ARENA',              0x00000080);         // arena, both instanced and world arenas
+define('AREA_FLAG_CAPITAL',            0x00000100);         // main capital city flag
+define('AREA_FLAG_CITY',               0x00000200);         // only for one zone named "City" (where it located?)
+define('AREA_FLAG_OUTLAND',            0x00000400);         // expansion zones? (only Eye of the Storm not have this flag, but have 0x00004000 flag)
+define('AREA_FLAG_SANCTUARY',          0x00000800);         // sanctuary area (PvP disabled)
+define('AREA_FLAG_NEED_FLY',           0x00001000);         // Respawn alive at the graveyard without corpse
+define('AREA_FLAG_UNUSED1',            0x00002000);         // Unused in 3.3.5a
+define('AREA_FLAG_OUTLAND2',           0x00004000);         // expansion zones? (only Circle of Blood Arena not have this flag, but have 0x00000400 flag)
+define('AREA_FLAG_OUTDOOR_PVP',        0x00008000);         // pvp objective area? (Death's Door also has this flag although it's no pvp object area)
+define('AREA_FLAG_ARENA_INSTANCE',     0x00010000);         // used by instanced arenas only
+define('AREA_FLAG_UNUSED2',            0x00020000);         // Unused in 3.3.5a
+define('AREA_FLAG_CONTESTED_AREA',     0x00040000);         // On PvP servers these areas are considered contested, even though the zone it is contained in is a Horde/Alliance territory.
+define('AREA_FLAG_UNK4',               0x00080000);         // Valgarde and Acherus: The Ebon Hold
+define('AREA_FLAG_LOWLEVEL',           0x00100000);         // used for some starting areas with ExplorationLevel <= 15
+define('AREA_FLAG_TOWN',               0x00200000);         // small towns with Inn
+define('AREA_FLAG_REST_ZONE_HORDE',    0x00400000);         // Instead of using areatriggers, the zone will act as one for Horde players (Warsong Hold, Acherus: The Ebon Hold, New Agamand Inn, Vengeance Landing Inn, Sunreaver Pavilion, etc)
+define('AREA_FLAG_REST_ZONE_ALLIANCE', 0x00800000);         // Instead of using areatriggers, the zone will act as one for Alliance players (Valgarde, Acherus: The Ebon Hold, Westguard Inn, Silver Covenant Pavilion, etc)
+define('AREA_FLAG_WINTERGRASP',        0x01000000);         // Wintergrasp and it's subzones
+define('AREA_FLAG_INSIDE',             0x02000000);         // used for determinating spell related inside/outside questions in Map::IsOutdoors
+define('AREA_FLAG_OUTSIDE',            0x04000000);         // used for determinating spell related inside/outside questions in Map::IsOutdoors
+define('AREA_FLAG_WINTERGRASP_2',      0x08000000);         // Can Hearth And Resurrect From Area
+define('AREA_FLAG_NO_FLY_ZONE',        0x20000000);         // Marks zones where you cannot fly
 
 // InventoryType
 define('INVTYPE_NON_EQUIP',                 0);
@@ -1741,6 +1834,9 @@ define('SKILL_COMPANIONS',     778);
 define('SKILLS_TRADE_PRIMARY',   [SKILL_BLACKSMITHING, SKILL_LEATHERWORKING, SKILL_ALCHEMY, SKILL_HERBALISM, SKILL_MINING, SKILL_TAILORING, SKILL_ENGINEERING, SKILL_ENCHANTING, SKILL_SKINNING, SKILL_JEWELCRAFTING, SKILL_INSCRIPTION]);
 define('SKILLS_TRADE_SECONDARY', [SKILL_FIRST_AID, SKILL_COOKING, SKILL_FISHING, SKILL_RIDING]);
 
+// (some) key currencies
+define('CURRENCY_ARENA_POINTS', 103);
+define('CURRENCY_HONOR_POINTS', 104);
 
 // AchievementCriteriaCondition
 define('ACHIEVEMENT_CRITERIA_CONDITION_NO_DEATH',                       1);         // reset progress on death
@@ -1827,7 +1923,7 @@ define('ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT',                      68);
 define('ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2',                    69);
 // define('ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL',                 70);
 define('ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT',                  72);
-define('ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE',                    74);
+define('ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN',                            74);
 define('ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS',              75);
 // define('ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL',                         76);
 // define('ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL',                        77);
@@ -1866,6 +1962,34 @@ define('ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE',                    112);
 // define('ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS',              114);
 // define('ACHIEVEMENT_CRITERIA_TYPE_DISENCHANT_ROLLS',                 117);
 // define('ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS',    119);
+
+// TrinityCore - Achievement Criteria Data
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE',                 0);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE',           1);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE',  2);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH', 3);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD',        4);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA',               5);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA',               6);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA',               7);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE',                8);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL',              9);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_GENDER',             10);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT',               11);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY',       12);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT',     13);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM',               14);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK',              15);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY',              16);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE',   17);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT',      18);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM',       19);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID',               20);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE',  21);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY',         22);
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE',        23);
+// define('ACHIEVEMENT_CRITERIA_DATA_TYPE_GAME_EVENT',        24);       // not in 3.3.5a
+define('ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY',       25);
 
 // TrinityCore - Account Security
 define('SEC_PLAYER',        0);

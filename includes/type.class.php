@@ -127,7 +127,7 @@ abstract class Type
     /* Field Operations */
     /********************/
 
-    public static function newList(int $type, array $conditions = []) : ?BaseType
+    public static function newList(int $type, array $conditions = []) : ?DBTypeList
     {
         if (!self::exists($type))
             return null;

@@ -6,14 +6,14 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class MailList extends BaseType
+class MailList extends DBTypeList
 {
-    public static   $type      = Type::MAIL;
-    public static   $brickFile = 'mail';
-    public static   $dataTable = '?_mails';
+    public static int    $type      = Type::MAIL;
+    public static string $brickFile = 'mail';
+    public static string $dataTable = '?_mails';
 
-    protected       $queryBase = 'SELECT m.*, m.id AS ARRAY_KEY FROM ?_mails m';
-    protected       $queryOpts = [];
+    protected string $queryBase = 'SELECT m.*, m.`id` AS ARRAY_KEY FROM ?_mails m';
+    protected array  $queryOpts = [];
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -34,13 +34,14 @@ class MailList extends BaseType
         }
     }
 
-    public static function getName($id)
+    public static function getName(int $id) : ?LocString
     {
-        $n = DB::Aowow()->SelectRow('SELECT subject_loc0, subject_loc2, subject_loc3, subject_loc4, subject_loc6, subject_loc8 FROM ?_mails WHERE id = ?d', $id);
-        return Util::localizedString($n, 'subject');
+        if ($n = DB::Aowow()->SelectRow('SELECT `subject_loc0`, `subject_loc2`, `subject_loc3`, `subject_loc4`, `subject_loc6`, `subject_loc8` FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n, 'subject');
+        return null;
     }
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -59,7 +60,7 @@ class MailList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -70,7 +71,7 @@ class MailList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>

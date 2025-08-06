@@ -2167,7 +2167,7 @@ $lang = array(
         ),
         'elixirType'    => [null, "De bataille", "De gardien"],
         'cat'           => array(
-             2 => "Armes",                                  // self::$spell['weaponSubClass']
+             2 => array("Armes", []),                       // filled with self::$spell['weaponSubClass'] on load
              4 => array("Armure", array(
                  1 => "Armures en tissu",            2 => "Armures en cuir",         3 => "Armures en mailles",      4 => "Armures en plaques",      6 => "Boucliers",               7 => "Librams",
                  8 => "Idoles",                      9 => "Totems",                 10 => "Cachets",                -6 => "Capes",                  -5 => "Accessoires pour main gauche", -8 => "Chemises",

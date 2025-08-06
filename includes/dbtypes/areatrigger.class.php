@@ -6,19 +6,19 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AreaTriggerList extends BaseType
+class AreaTriggerList extends DBTypeList
 {
     use spawnHelper;
 
-    public static   $type       = Type::AREATRIGGER;
-    public static   $brickFile  = 'areatrigger';
-    public static   $dataTable  = '?_areatrigger';
-    public static   $contribute = CONTRIBUTE_CO;
+    public static int    $type       = Type::AREATRIGGER;
+    public static string $brickFile  = 'areatrigger';
+    public static string $dataTable  = '?_areatrigger';
+    public static int    $contribute = CONTRIBUTE_CO;
 
-    protected       $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ?_areatrigger a';
-    protected       $queryOpts = array(
-                        'a'      => [['s']],                // guid < 0 are teleporter targets, so exclude them here
-                        's'      => ['j' => ['?_spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
+    protected string $queryBase = 'SELECT a.*, a.id AS ARRAY_KEY FROM ?_areatrigger a';
+    protected array  $queryOpts = array(
+                        'a' => [['s']],                     // guid < 0 are teleporter targets, so exclude them here
+                        's' => ['j' => ['?_spawns s ON s.`type` = 503 AND s.`typeId` = a.`id` AND s.`guid` > 0', true], 's' => ', GROUP_CONCAT(s.`areaId`) AS "areaId"', 'g' => 'a.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -28,6 +28,13 @@ class AreaTriggerList extends BaseType
         foreach ($this->iterate() as $id => &$_curTpl)
             if (!$_curTpl['name'])
                 $_curTpl['name'] = 'Unnamed Areatrigger #' . $id;
+    }
+
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT IF(`name`, `name`, CONCAT("Unnamed Areatrigger #", `id`) AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n);
+        return null;
     }
 
     public function getListviewData() : array
@@ -49,23 +56,20 @@ class AreaTriggerList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
-    {
-        return [];
-    }
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array { return []; }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 class AreaTriggerListFilter extends Filter
 {
     protected string $type          = 'areatrigger';
-    protected array  $genericFilter = array(
+    protected static array $genericFilter = array(
         2 => [parent::CR_NUMERIC, 'id', NUM_CAST_INT]       // id
     );
 
     // fieldId => [checkType, checkValue[, fieldIsArray]]
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'  => [parent::V_LIST,  [2],                  true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 6],               true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - all criteria are numeric here

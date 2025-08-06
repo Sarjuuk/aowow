@@ -25,8 +25,8 @@ $lang = array(
         'jsError'       => "Por favor, asegúrese de que ha habilitado javascript.",
         'language'      => "lengua",
         'feedback'      => "Feedback",
-        'numSQL'        => "Número de consultas de MySQL",
-        'timeSQL'       => "El tiempo para las consultas de MySQL",
+        'numSQL'        => "Número de consultas de SQL",
+        'timeSQL'       => "El tiempo para las consultas de SQL",
         'noJScript'     => '<b>Este sitio hace uso intenso de JavaScript.</b><br />Por favor <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">habilita JavaScript</a> en tu navegador.',
         'userProfiles'  => "Tus personajes",
         'pageNotFound'  => "Este %s no existe.",
@@ -2167,7 +2167,7 @@ $lang = array(
         ),
         'elixirType'    => [null, "Batalla", "Guardián"],
         'cat'           => array(
-             2 => "Armas",                                  // self::$spell['weaponSubClass']
+             2 => array("Armas", []),                       // filled with self::$spell['weaponSubClass'] on load
              4 => array("Armadura", array(
                  1 => "Armaduras de tela",           2 => "Armaduras de cuero",      3 => "Armaduras de malla",      4 => "Armaduras de placas",     6 => "Escudos",                 7 => "Tratados",
                  8 => "Ídolos",                      9 => "Tótems",                 10 => "Sigilos",                -6 => "Capas",                  -5 => "Cosillas de la mano izquierda",-8 => "Camisas",

@@ -6,16 +6,16 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CurrencyList extends BaseType
+class CurrencyList extends DBTypeList
 {
-    public static   $type      = Type::CURRENCY;
-    public static   $brickFile = 'currency';
-    public static   $dataTable = '?_currencies';
+    public static int    $type      = Type::CURRENCY;
+    public static string $brickFile = 'currency';
+    public static string $dataTable = '?_currencies';
 
-    protected       $queryBase = 'SELECT c.*, c.id AS ARRAY_KEY FROM ?_currencies c';
-    protected       $queryOpts = array(
-                        'c' => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.id = c.iconId', true], 's' => ', ic.name AS iconString']
+    protected string $queryBase = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ?_currencies c';
+    protected array  $queryOpts = array(
+                        'c'  => [['ic']],
+                        'ic' => ['j' => ['?_icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -27,7 +27,7 @@ class CurrencyList extends BaseType
     }
 
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -44,19 +44,19 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
         foreach ($this->iterate() as $__)
         {
-            // todo (low): find out, why i did this in the first place
-            if ($this->id == 104)                           // in case of honor commit sebbuku
-                $icon = ['pvp-currency-alliance', 'pvp-currency-horde'];
-            else if ($this->id == 103)                      // also arena-icon diffs from item-icon
-                $icon = ['pvp-arenapoints-icon', 'pvp-arenapoints-icon'];
-            else
-                $icon = [$this->curTpl['iconString'], $this->curTpl['iconString']];
+            // todo (low): un-hardcode icon strings
+            $icon = match ($this->id)
+            {
+                CURRENCY_HONOR_POINTS => ['pvp-currency-alliance',    'pvp-currency-horde'        ],
+                CURRENCY_ARENA_POINTS => ['pvp-arenapoints-icon',     'pvp-arenapoints-icon'      ],
+                default               => [$this->curTpl['iconString'], $this->curTpl['iconString']]
+            };
 
             $data[Type::CURRENCY][$this->id] = ['name' => $this->getField('name', true), 'icon' => $icon];
         }
@@ -64,20 +64,20 @@ class CurrencyList extends BaseType
         return $data;
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
-            return array();
+            return null;
 
         $x  = '<table><tr><td>';
-        $x .= '<b>'.$this->getField('name', true).'</b><br>';
+        $x .= '<b>'.$this->getField('name', true).'</b><br />';
 
         // cata+ (or go fill it by hand)
         if ($_ = $this->getField('description', true))
             $x .= '<div style="max-width: 300px" class="q">'.$_.'</div>';
 
         if ($_ = $this->getField('cap'))
-            $x .= '<br><span class="q">'.Lang::currency('cap').Lang::main('colon').'</span>'.Lang::nf($_).'<br>';
+            $x .= '<br /><span class="q">'.Lang::currency('cap').Lang::main('colon').'</span>'.Lang::nf($_).'<br />';
 
         $x .= '</td></tr></table>';
 

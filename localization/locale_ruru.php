@@ -25,8 +25,8 @@ $lang = array(
         'jsError'       => "Для работы этого сайта необходим JavaScript.",
         'language'      => "Язык",
         'feedback'      => "Отзыв",
-        'numSQL'        => "Количество MySQL запросов",
-        'timeSQL'       => "Время выполнения MySQL запросов",
+        'numSQL'        => "Количество SQL запросов",
+        'timeSQL'       => "Время выполнения SQL запросов",
         'noJScript'     => '<b>Данный сайт активно использует технологию JavaScript.</b><br />Пожалуйста, <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">Включите JavaScript</a> в вашем браузере.',
         'userProfiles'  => "Ваши персонажи",    // translate.google :x
         'pageNotFound'  => "Такое %s не существует.",
@@ -2167,8 +2167,8 @@ $lang = array(
             null,                   null,               "Стрелы",               "Пули",                         null
         ),
         'elixirType'    => [null, "Бой", "Охранный"],
-        'cat'           => array(                           // should be ordered by content firts, then alphabeticaly
-             2 => "Оружие",                                 // self::$spell['weaponSubClass']
+        'cat'           => array(                           // should be ordered by content first, then alphabeticaly
+             2 => array("Оружие", []),                      // filled with self::$spell['weaponSubClass'] on load
              4 => array("Броня", array(
                  1 => "Тканевые",                    2 => "Кожаные",                 3 => "Кольчужные",              4 => "Латные",                  7 => "Манускрипты",             8 => "Идолы",
                  9 => "Тотемы",                     10 => "Печати",                 -6 => "Плащи",                  -5 => "Левая рука",              6 => "Щиты",                   -8 => "Рубашки",

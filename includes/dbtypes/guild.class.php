@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class GuildList extends BaseType
+class GuildList extends DBTypeList
 {
     use profilerHelper, listviewHelper;
 
-    public static $contribute = CONTRIBUTE_NONE;
+    public static int $contribute = CONTRIBUTE_NONE;
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $this->getGuildScores();
 
@@ -33,10 +33,10 @@ class GuildList extends BaseType
             );
         }
 
-        return array_values($data);
+        return $data;
     }
 
-    private function getGuildScores()
+    private function getGuildScores() : void
     {
         /*
             Guild gear scores and achievement points are derived using a weighted average of all of the known characters in that guild.
@@ -82,8 +82,10 @@ class GuildList extends BaseType
         }
     }
 
-    public function renderTooltip() {}
-    public function getJSGlobals($addMask = 0) {}
+    public static function getName(int $id) : ?LocString { return null; }
+
+    public function renderTooltip() : ?string { return null; }
+    public function getJSGlobals(int $addMask = 0) : array { return []; }
 }
 
 
@@ -92,8 +94,8 @@ class GuildListFilter extends Filter
     use TrProfilerFilter;
 
     protected string $type          = 'guilds';
-    protected array  $genericFilter = [];
-    protected array  $inputFields   = array(
+    protected static array $genericFilter = [];
+    protected static array $inputFields   = array(
         'na' => [parent::V_REGEX,    parent::PATTERN_NAME,        false], // name - only printable chars, no delimiter
         'ma' => [parent::V_EQUAL,    1,                           false], // match any / all filter
         'ex' => [parent::V_EQUAL,    'on',                        false], // only match exact
@@ -129,11 +131,11 @@ class GuildListFilter extends Filter
 
 class RemoteGuildList extends GuildList
 {
-    protected   $queryBase = 'SELECT `g`.*, `g`.`guildid` AS ARRAY_KEY FROM guild g';
-    protected   $queryOpts = array(
+    protected string $queryBase = 'SELECT `g`.*, `g`.`guildid` AS ARRAY_KEY FROM guild g';
+    protected array  $queryOpts = array(
                     'g'  => [['gm', 'c'], 'g' => 'ARRAY_KEY'],
-                    'gm' => ['j' => 'guild_member gm ON gm.guildid = g.guildid', 's' => ', COUNT(1) AS members'],
-                    'c'  => ['j' => 'characters c ON c.guid = gm.guid', 's' => ', BIT_OR(IF(c.race IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS faction']
+                    'gm' => ['j' => 'guild_member gm ON gm.`guildid` = g.`guildid`', 's' => ', COUNT(1) AS "members"'],
+                    'c'  => ['j' => 'characters c ON c.`guid` = gm.`guid`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
                 );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -151,9 +153,8 @@ class RemoteGuildList extends GuildList
             return;
 
         reset($this->dbNames);                              // only use when querying single realm
-        $realmId     = key($this->dbNames);
-        $realms      = Profiler::getRealms();
-        $distrib     = [];
+        $realms  = Profiler::getRealms();
+        $distrib = [];
 
         // post processing
         foreach ($this->iterate() as $guid => &$curTpl)
@@ -170,7 +171,7 @@ class RemoteGuildList extends GuildList
             }
             else
             {
-                trigger_error('guild #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('guild #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
@@ -215,7 +216,7 @@ class RemoteGuildList extends GuildList
         }
     }
 
-    public function initializeLocalEntries()
+    public function initializeLocalEntries() : void
     {
         $data = [];
         foreach ($this->iterate() as $guid => $__)
@@ -235,7 +236,7 @@ class RemoteGuildList extends GuildList
 
         // merge back local ids
         $localIds = DB::Aowow()->selectCol(
-            'SELECT CONCAT(realm, ":", realmGUID) AS ARRAY_KEY, id FROM ?_profiler_guild WHERE realm IN (?a) AND realmGUID IN (?a)',
+           'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ?_profiler_guild WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
             array_column($data, 'realm'),
             array_column($data, 'realmGUID')
         );
@@ -249,7 +250,7 @@ class RemoteGuildList extends GuildList
 
 class LocalGuildList extends GuildList
 {
-    protected       $queryBase = 'SELECT g.*, g.id AS ARRAY_KEY FROM ?_profiler_guild g';
+    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ?_profiler_guild g';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -297,13 +298,13 @@ class LocalGuildList extends GuildList
         }
     }
 
-    public function getProfileUrl()
+    public function getProfileUrl() : string
     {
         $url = '?guild=';
 
         return $url.implode('.', array(
-            Profiler::urlize($this->getField('region')),
-            Profiler::urlize($this->getField('realmName')),
+            $this->getField('region'),
+            Profiler::urlize($this->getField('realmName'), true),
             Profiler::urlize($this->getField('name'))
         ));
     }

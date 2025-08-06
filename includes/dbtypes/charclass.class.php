@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharClassList extends BaseType
+class CharClassList extends DBTypeList
 {
-    public static   $type      = Type::CHR_CLASS;
-    public static   $brickFile = 'class';
-    public static   $dataTable = '?_classes';
+    public static int    $type      = Type::CHR_CLASS;
+    public static string $brickFile = 'class';
+    public static string $dataTable = '?_classes';
 
-    protected       $queryBase = 'SELECT c.*, id AS ARRAY_KEY FROM ?_classes c';
+    protected string $queryBase = 'SELECT c.*, id AS ARRAY_KEY FROM ?_classes c';
 
     public function __construct($conditions = [], array $miscData = [])
     {
@@ -22,7 +22,7 @@ class CharClassList extends BaseType
             $_curTpl['skills'] = explode(' ', $_curTpl['skills']);
     }
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -48,7 +48,7 @@ class CharClassList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -58,7 +58,7 @@ class CharClassList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>
