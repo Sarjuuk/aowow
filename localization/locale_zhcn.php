@@ -894,6 +894,8 @@ $lang = array(
         'forgotUser'    => "用户名",
         'forgotPass'    => "密码",
         'accCreate'     => '没有账号？<a href="?account=signup">现在创建一个！</a>',
+        'resendMail'    => "重新发送验证邮件",
+        'resendHint'    => "[If you registered but did not receive a verification email, enter your email address below and submit the form. (Please be sure to check your spam or trash folders to make sure the email didn't accidentally get put in the wrong place!)]",
 
         // recovery
         'recoverUser'   => "用户名需求",

@@ -25,9 +25,7 @@ class AccountPage extends GenericPage
     protected $mode      = CACHE_TYPE_NONE;
     protected $category  = null;
     protected $validCats = array(
-        'signin'         => [false],
         'signup'         => [false],
-        'signout'        => [true],
         'forgotpassword' => [false],
         'forgotusername' => [false]
     );
@@ -129,20 +127,6 @@ class AccountPage extends GenericPage
 
                 $this->head = Lang::account('recoverUser');
                 break;
-            case 'signin':
-                $this->tpl = 'acc-signIn';
-                $this->next = $this->getNext();
-                if ($this->_post['username'] || $this->_post['password'])
-                {
-                    if ($err = $this->doSignIn())
-                        $this->error = $err;
-                    else
-                        header('Location: '.$this->getNext(true), true, 302);
-                }
-                else if ($this->_get['token'] && ($_ = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE `status` IN (?a) AND `token` = ? AND `statusTimer` >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $this->_get['token'])))
-                    $this->user = $_;
-
-                break;
             case 'signup':
                 if (!Cfg::get('ACC_ALLOW_REGISTER'))
                     $this->error();
@@ -180,10 +164,6 @@ class AccountPage extends GenericPage
 
                 $this->head = sprintf(Lang::account('register'), $nStep);
                 break;
-            case 'signout':
-                DB::Aowow()->query('UPDATE ?_account_sessions SET `touched` = ?d, `status` = ?d WHERE `sessionId` = ?', time(), SESSION_LOGOUT, session_id());
-
-                User::destroy();
             default:
                 header('Location: '.$this->getNext(true), true, 302);
                 break;
@@ -345,60 +325,6 @@ Markup.printHtml("description text here", "description-generic", { allow: Markup
         }
 
         return false;
-    }
-
-    private function doSignIn()
-    {
-        // check username
-        if (!User::isValidName($this->_post['username']))
-            return Lang::account('userNotFound');
-
-        // check password
-        if (!User::isValidPass($this->_post['password']))
-            return Lang::account('wrongPass');
-
-        switch (User::authenticate($this->_post['username'], $this->_post['password']))
-        {
-            case AUTH_OK:
-                if (!User::$ip)
-                    return Lang::main('intError');
-
-                // reset account status, update expiration
-                DB::Aowow()->query('UPDATE ?_account SET `prevIP` = IF(`curIp` = ?, `prevIP`, `curIP`), `curIP` = IF(`curIp` = ?, `curIP`, ?), `status` = IF(`status` = ?d, `status`, 0), `statusTimer` = IF(`status` = ?d, `statusTimer`, 0), `token` = IF(`status` = ?d, `token`, "") WHERE LOWER(`username`) = LOWER(?)',
-                    User::$ip, User::$ip, User::$ip,
-                    ACC_STATUS_NEW, ACC_STATUS_NEW, ACC_STATUS_NEW,
-                    $this->_post['username']
-                );
-
-                session_regenerate_id(true);                // user status changed => regenerate id
-
-                // create new session entry
-                DB::Aowow()->query('INSERT INTO ?_account_sessions (`userId`, `sessionId`, `created`, `expires`, `touched`, `deviceInfo`, `ip`, `status`) VALUES (?d, ?, ?d, ?d, ?d, ?, ?, ?d)',
-                    User::$id, session_id(), time(), $this->_post['remember_me'] ? 0 : time() + Cfg::get('SESSION_TIMEOUT_DELAY'), time(), User::$agent, User::$ip, SESSION_ACTIVE);
-
-                if (User::init())                           // reinitialize the user
-                    User::save();
-
-                return;
-            case AUTH_BANNED:
-                if (User::init())
-                    User::save();
-               return Lang::account('accBanned');
-            case AUTH_WRONGUSER:
-                User::destroy();
-                return Lang::account('userNotFound');
-            case AUTH_WRONGPASS:
-                User::destroy();
-                return Lang::account('wrongPass');
-            case AUTH_IPBANNED:
-                User::destroy();
-                return sprintf(Lang::account('loginExceeded'), Util::formatTime(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000));
-            case AUTH_INTERNAL_ERR:
-                User::destroy();
-                return Lang::main('intError');
-            default:
-                return;
-        }
     }
 
     private function doSignUp()
