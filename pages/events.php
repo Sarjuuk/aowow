@@ -96,11 +96,11 @@ class EventsPage extends GenericPage
                     continue;
                 }
 
-                $updated = WorldEventList::updateDates($data['_date']);
+                WorldEventList::updateDates($data['_date'], $start, $end, $rec);
                 unset($data['_date']);
-                $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
-                $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
-                $data['rec']       = $updated['rec'];
+                $data['startDate'] = $start ? date(Util::$dateFormatInternal, $start) : false;
+                $data['endDate']   = $end   ? date(Util::$dateFormatInternal, $end)   : false;
+                $data['rec']       = $rec;
             }
         }
     }

@@ -79,41 +79,38 @@ class WorldEventList extends DBTypeList
         return $row ? new LocString($row) : null;
     }
 
-    public static function updateDates($date = null)
+    public static function updateDates(?array $date = null, ?int &$start = null, ?int &$end = null, ?int &$rec = null) : bool
     {
         if (!$date || empty($date['firstDate']) || empty($date['length']))
+            return false;
+
+        $start = $date['firstDate'];
+        $end   = $date['firstDate'] + $date['length'];
+        $rec   = $date['rec'] ?: -1;                        // interval
+
+        if ($rec < 0 || $date['lastDate'] < time())
+            return true;
+
+        $nIntervals = ceil((time() - $start) / $rec);
+
+        $start += $nIntervals * $rec;
+        $end   += $nIntervals * $rec;
+
+        return true;
+    }
+
+    public static function updateListview(Listview &$listview) : void
+    {
+        foreach ($listview->iterate() as &$row)
         {
-            return array(
-                'start' => 0,
-                'end'   => 0,
-                'rec'   => 0
-            );
+            WorldEventList::updateDates($row['_date'] ?? null, $start, $end, $rec);
+
+            $row['startDate'] = $start ? date(Util::$dateFormatInternal, $start) : null;
+            $row['endDate']   = $end   ? date(Util::$dateFormatInternal, $end)   : null;
+            $row['rec']       = $rec;
+
+            unset($row['_date']);
         }
-
-        // Convert everything to seconds
-        $firstDate = intVal($date['firstDate']);
-        $lastDate  = !empty($date['lastDate']) ? intVal($date['lastDate']) : 5000000000;    // in the far far FAR future..;
-        $interval  = !empty($date['rec']) ? intVal($date['rec']) : -1;
-        $length    = intVal($date['length']);
-
-        $curStart  = $firstDate;
-        $curEnd    = $firstDate + $length;
-        $nextStart = $curStart  + $interval;
-        $nextEnd   = $curEnd    + $interval;
-
-        while ($interval > 0 && $nextEnd <= $lastDate && $curEnd < time())
-        {
-            $curStart  = $nextStart;
-            $curEnd    = $nextEnd;
-            $nextStart = $curStart + $interval;
-            $nextEnd   = $curEnd   + $interval;
-        }
-
-        return array(
-            'start' => $curStart,
-            'end'   => $curEnd,
-            'rec'   => $interval
-        );
     }
 
     public function getListviewData(bool $forNow = false) : array
@@ -139,11 +136,8 @@ class WorldEventList extends DBTypeList
         {
             foreach ($data as &$d)
             {
-               $u = self::updateDates($d['_date']);
+               self::updateDates($d['_date'], $d['startDate'], $d['endDate'], $d['rec']);
                unset($d['_date']);
-               $d['startDate'] = $u['start'];
-               $d['endDate']   = $u['end'];
-               $d['rec']       = $u['rec'];
             }
         }
 
