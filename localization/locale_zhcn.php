@@ -119,8 +119,8 @@ $lang = array(
         'compareTool'   => "物品比较工具",
         'talentCalc'    => "天赋模拟器",
         'petCalc'       => "猎人宠物模拟器",
-        'chooseClass'   => "选择一个职业",
-        'chooseFamily'  => "选择一个宠物家族",
+        'chooseClass'   => "选择一个职业：",
+        'chooseFamily'  => "选择一个宠物家族：",
 
         // search
         'search'        => "搜索",

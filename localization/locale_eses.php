@@ -118,8 +118,8 @@ $lang = array(
         'compareTool'   => "Herramienta de comparación de objetos",
         'talentCalc'    => "Calculadora de talentos",
         'petCalc'       => "Calculadora de mascotas",
-        'chooseClass'   => "Escoge una clase",
-        'chooseFamily'  => "Escoge una familia de mascota",
+        'chooseClass'   => "Escoge una clase:",
+        'chooseFamily'  => "Escoge una familia de mascota:",
 
         // search
         'search'        => "Búsqueda",
