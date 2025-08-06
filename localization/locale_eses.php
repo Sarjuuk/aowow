@@ -885,7 +885,7 @@ $lang = array(
             "Gestor de Capturas de pantalla","Gestor de vídeos",            "Partner de API",               "Pendiente"
         ),
         // signIn
-        'doSignIn'      => "Iniciar sesión con tu cuenta de Aowow",
+        'doSignIn'      => "Iniciar sesión con tu cuenta",
         'signIn'        => "Iniciar sesión",
         'user'          => "Nombre de usuario",
         'pass'          => "Contraseña",
@@ -894,6 +894,8 @@ $lang = array(
         'forgotUser'    => "Nombre de usuario",
         'forgotPass'    => "Contraseña",
         'accCreate '    => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
+        'resendMail'    => "Reenviar correo de verificación",
+        'resendHint'    => "Si te has registrado pero no recibiste un correo de verificación, introduce tu dirección de correo más abajo y completa el formulario. (¡Por favor, asegúrate de comprobar tus directorios de correo no deseado o papelera por si el correo acabara en el lugar equivocado!)",
 
         // recovery
         'recoverUser'   => "Pedir nombre de usuario",

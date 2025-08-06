@@ -2603,6 +2603,7 @@ var LANG = {
     lastbluepost:           "Letzter Blizzard-Forenbeitrag",
     level:                  "Stufe",
     location:               "Standort",
+    logOutEverywhere:       "Alle Geräte abmelden",
     losses:                 "Niederlagen",
     members:                "Mitglieder",
     model:                  "Modell",

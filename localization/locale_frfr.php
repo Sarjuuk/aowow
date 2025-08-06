@@ -885,7 +885,7 @@ $lang = array(
             "Gestionnaire de capture d'écran","Gestionnaire de vidéos",     "Partenaire API",               "En attente"
         ),
         // signIn
-        'doSignIn'      => "Connexion à votre compte Aowow",
+        'doSignIn'      => "Connexion à votre compte",
         'signIn'        => "Connexion",
         'user'          => "Nom d'utilisateur",
         'pass'          => "Mot de passe",
@@ -894,6 +894,8 @@ $lang = array(
         'forgotUser'    => "Nom d'utilisateur",
         'forgotPass'    => "Mot de passe",
         'accCreate'     => 'Vous n\'avez pas encore de compte ? <a href="/?account=signup">Créez-en un maintenant !</a>',
+        'resendMail'    => "Renvoyer le courriel de vérification",
+        'resendHint'    => "Si vous vous êtes enregistré mais n'avez pas reçu de courriel de vérification, entrez votre adresse électronique ci-dessous et validez le formulaire. (Assurez-vous de vérifier vos dossiers de courrier indésirable et votre corbeille pour vous assurer que le courriel ne s'y soit pas perdu !)",
 
         // recovery
         'recoverUser'   => "Demande de nom d'utilisateur",
