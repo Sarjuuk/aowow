@@ -8,10 +8,10 @@ if (!defined('AOWOW_REVISION'))
 
 class SearchboxBaseResponse extends TemplateResponse
 {
-    protected string $template   = 'text-page-generic';
-    protected string $pageName   = 'searchbox';
-    protected ?int   $activeTab  = parent::TAB_MORE;
-    protected array  $breadcrumb = [2, 16];
+    protected  string $template   = 'text-page-generic';
+    protected  string $pageName   = 'searchbox';
+    protected ?int    $activeTab  = parent::TAB_MORE;
+    protected  array  $breadcrumb = [2, 16];
 
     public function __construct(string $pageParam)
     {

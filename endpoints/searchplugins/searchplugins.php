@@ -8,10 +8,10 @@ if (!defined('AOWOW_REVISION'))
 
 class SearchpluginsBaseResponse extends TemplateResponse
 {
-    protected string $template   = 'text-page-generic';
-    protected string $pageName   = 'searchplugins';
-    protected ?int   $activeTab  = parent::TAB_MORE;
-    protected array  $breadcrumb = [2, 8];
+    protected  string $template   = 'text-page-generic';
+    protected  string $pageName   = 'searchplugins';
+    protected ?int    $activeTab  = parent::TAB_MORE;
+    protected  array  $breadcrumb = [2, 8];
 
     public function __construct(string $pageParam)
     {

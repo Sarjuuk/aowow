@@ -304,13 +304,13 @@ class EventPage extends GenericPage
     protected function postCache()
     {
         // update dates to now()
-        $updated = WorldEventList::updateDates($this->dates);
+        WorldEventList::updateDates($this->dates, $start, $end, $rec);
 
         if ($this->mode == CACHE_TYPE_TOOLTIP)
         {
             return array(
-                date(Lang::main('dateFmtLong'), $updated['start']),
-                date(Lang::main('dateFmtLong'), $updated['end'])
+                date(Lang::main('dateFmtLong'), $start),
+                date(Lang::main('dateFmtLong'), $end)
             );
         }
         else
@@ -323,19 +323,19 @@ class EventPage extends GenericPage
             /********************/
 
             // start
-            if ($updated['start'])
-                array_push($this->infobox, Lang::event('start').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['start']));
+            if ($start)
+                array_push($this->infobox, Lang::event('start').Lang::main('colon').date(Lang::main('dateFmtLong'), $start));
 
             // end
-            if ($updated['end'])
-                array_push($this->infobox, Lang::event('end').Lang::main('colon').date(Lang::main('dateFmtLong'), $updated['end']));
+            if ($end)
+                array_push($this->infobox, Lang::event('end').Lang::main('colon').date(Lang::main('dateFmtLong'), $end));
 
             // occurence
-            if ($updated['rec'] > 0)
-                array_push($this->infobox, Lang::event('interval').Lang::main('colon').Util::formatTime($updated['rec'] * 1000));
+            if ($rec > 0)
+                array_push($this->infobox, Lang::event('interval').Lang::main('colon').Util::formatTime($rec * 1000));
 
             // in progress
-            if ($updated['start'] < time() && $updated['end'] > time())
+            if ($start < time() && $end > time())
                 array_push($this->infobox, '[span class=q2]'.Lang::event('inProgress').'[/span]');
 
             $this->infobox = '[ul][li]'.implode('[/li][li]', $this->infobox).'[/li][/ul]';
@@ -351,11 +351,11 @@ class EventPage extends GenericPage
 
                 foreach ($view[1]['data'] as &$data)
                 {
-                    $updated = WorldEventList::updateDates($data['_date']);
+                    WorldEventList::updateDates($data['_date'], $start, $end, $rec);
                     unset($data['_date']);
-                    $data['startDate'] = $updated['start'] ? date(Util::$dateFormatInternal, $updated['start']) : false;
-                    $data['endDate']   = $updated['end']   ? date(Util::$dateFormatInternal, $updated['end'])   : false;
-                    $data['rec']       = $updated['rec'];
+                    $data['startDate'] = $start ? date(Util::$dateFormatInternal, $start) : false;
+                    $data['endDate']   = $end   ? date(Util::$dateFormatInternal, $end)   : false;
+                    $data['rec']       = $rec;
                 }
             }
         }

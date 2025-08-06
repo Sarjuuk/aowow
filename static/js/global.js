@@ -18804,7 +18804,9 @@ var LiveSearch = new function() {
 
     function highlight(match, $1) {
         // $1 containts % in matches with %s, which we don't want to replace
-        return ($1 ? match : '<b><u>' + match + '</u></b>');
+        return ($1 ? '<b><u>' + match + '</u></b>' : match);
+        // aowow - why was the ternary reversed? Also how can it not match .. we explicitly searched for it.
+        // return ($1 ? match : '<b><u>' + match + '</u></b>');
     }
 
     function display(textbox, search, suggz, dataz) {
