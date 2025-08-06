@@ -120,11 +120,14 @@ class User
     //  self::$debug         = $userData['debug']; // TBD
         self::$email         = $userData['email'];
 
-        $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
-        if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
+        if (Cfg::get('PROFILER_ENABLE'))
+        {
+            $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
+            if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+                $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
 
-        self::$profiles = (new LocalProfileList($conditions));
+            self::$profiles = (new LocalProfileList($conditions));
+        }
 
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
@@ -403,45 +406,6 @@ class User
         return ($verifier === str_pad(gmp_export($v, 1, GMP_LSW_FIRST), 32, chr(0), STR_PAD_RIGHT));
     }
 
-    public static function isValidName(string $name, int &$errCode = 0) : bool
-    {
-        $errCode = 0;
-
-        // different auth modes require different usernames
-        $min = 0;                                           // external case
-        $max = 0;
-        if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF)
-        {
-            $min = 4;
-            $max = 16;
-        }
-        else if (Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_REALM)
-        {
-            $min = 3;
-            $max = 32;
-        }
-
-        if (($min && mb_strlen($name) < $min) || ($max && mb_strlen($name) > $max))
-            $errCode = 1;
-        else if (preg_match('/[^\w\d\-]/i', $name))
-            $errCode = 2;
-
-        return $errCode == 0;
-    }
-
-    public static function isValidPass(string $pass, ?int &$errCode = 0) : bool
-    {
-        $errCode = 0;
-
-        // only enforce for own passwords
-        if (mb_strlen($pass) < 6 && Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF)
-            $errCode = 1;
-     // else if (preg_match('/[^\w\d!"#\$%]/', $pass))    // such things exist..? :o
-         // $errCode = 2;
-
-        return $errCode == 0;
-    }
-
 
     /*********************/
     /* access management */
@@ -661,6 +625,9 @@ class User
         $result = [];
 
         if (!self::isLoggedIn() || self::isBanned())
+            return $result;
+
+        if (!Cfg::get('PROFILER_ENABLE'))
             return $result;
 
         $modes  = [1 => 'excludes', 2 => 'includes'];

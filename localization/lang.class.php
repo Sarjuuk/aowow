@@ -70,7 +70,7 @@ class Lang
             self::$$k = $v;
 
         // *cough* .. reuse-hacks (because copy-pastaing text for 5 locales sucks)
-        self::$item['cat'][2] = [self::$item['cat'][2], self::$spell['weaponSubClass']];
+        self::$item['cat'][2][1] = self::$spell['weaponSubClass'];
         self::$item['cat'][2][1][14] .= ' ('.self::$item['cat'][2][0].')';
         self::$main['moreTitles']['privilege'] = self::$privileges['_privileges'];
 
@@ -434,7 +434,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
+    public static function getClassString(int $classMask, ?array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $classMask &= ChrClass::MASK_ALL;                   // clamp to available classes..
 
@@ -451,14 +451,14 @@ class Lang
 
         $tmp = [];
         foreach (ChrClass::fromMask($classMask) as $c)
-            $tmp[$c] = (!fMod(count($tmp) + 1, 3) ? $br : null).sprintf($base, $c, self::game('cl', $c));
+            $tmp[$c] = (!fMod(count($tmp) + 1, 3) ? $br : '').sprintf($base, $c, self::game('cl', $c));
 
         $ids = array_keys($tmp);
 
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
+    public static function getRaceString(int $raceMask, ?array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $raceMask &= ChrRace::MASK_ALL;                     // clamp to available races..
 
@@ -603,8 +603,11 @@ class Lang
            Will choose a form based on the number preceding it. More than two forms (separated by colons) may be required by locale 8 (ruRU).
     **/
 
-    public static function unescapeUISequences(string $var, int $fmt = -1) : string
+    public static function unescapeUISequences(?string $var, int $fmt = -1) : string
     {
+        if (!$var)
+            return '';
+
         if (strpos($var, '|') === false)
             return $var;
 

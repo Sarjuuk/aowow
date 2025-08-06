@@ -6,22 +6,22 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ItemsetList extends BaseType
+class ItemsetList extends DBTypeList
 {
     use ListviewHelper;
 
-    public static   $type       = Type::ITEMSET;
-    public static   $brickFile  = 'itemset';
-    public static   $dataTable  = '?_itemset';
+    public static int    $type       = Type::ITEMSET;
+    public static string $brickFile  = 'itemset';
+    public static string $dataTable  = '?_itemset';
+    public        array  $pieceToSet = [];                  // used to build g_items and search
 
-    public          $pieceToSet = [];                       // used to build g_items and search
-    private         $classes    = [];                       // used to build g_classes
+    private array $classes = [];                            // used to build g_classes
 
-    protected       $queryBase  = 'SELECT `set`.*, `set`.id AS ARRAY_KEY FROM ?_itemset `set`';
-    protected       $queryOpts  = array(
+    protected string $queryBase  = 'SELECT `set`.*, `set`.`id` AS ARRAY_KEY FROM ?_itemset `set`';
+    protected array  $queryOpts  = array(
                         'set' => ['o' => 'maxlevel DESC'],
-                        'e'   => ['j' => ['?_events e ON `e`.`id` = `set`.`eventId`', true], 's' => ', e.holidayId'],
-                        'src' => ['j' => ['?_source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', src1, src2, src3, src4, src5, src6, src7, src8, src9, src10, src11, src12, src13, src14, src15, src16, src17, src18, src19, src20, src21, src22, src23, src24']
+                        'e'   => ['j' => ['?_events e ON `e`.`id` = `set`.`eventId`', true], 's' => ', e.`holidayId`'],
+                        'src' => ['j' => ['?_source src ON `src`.`typeId` = `set`.`id` AND `src`.`type` = 4', true], 's' => ', `src1`, `src2`, `src3`, `src4`, `src5`, `src6`, `src7`, `src8`, `src9`, `src10`, `src11`, `src12`, `src13`, `src14`, `src15`, `src16`, `src17`, `src18`, `src19`, `src20`, `src21`, `src22`, `src23`, `src24`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -47,7 +47,7 @@ class ItemsetList extends BaseType
         $this->classes = array_unique($this->classes);
     }
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -71,7 +71,7 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -88,10 +88,10 @@ class ItemsetList extends BaseType
         return $data;
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
-            return array();
+            return null;
 
         $x  = '<table><tr><td>';
         $x .= '<span class="q'.$this->getField('quality').'">'.$this->getField('name', true).'</span><br />';
@@ -124,10 +124,10 @@ class ItemsetList extends BaseType
         $x .= '</td></tr></table>';
 
         return $x;
-   }
+    }
 
-   public function getBonuses()
-   {
+    public function getBonuses() : array
+    {
         $spells = [];
         for ($i = 1; $i < 9; $i++)
         {
@@ -140,12 +140,7 @@ class ItemsetList extends BaseType
         }
 
         // sort by required pieces ASC
-        usort($spells, function($a, $b) {
-            if ($a['bonus'] == $b['bonus'])
-                return 0;
-
-            return ($a['bonus'] > $b['bonus']) ? 1 : -1;
-        });
+        usort($spells, fn(array $a, array $b) => $a['bonus'] <=> $b['bonus']);
 
         $setSpells = new SpellList(array(['s.id', array_column($spells, 'id')]));
         foreach ($setSpells->iterate() as $spellId => $__)
@@ -160,7 +155,7 @@ class ItemsetList extends BaseType
         }
 
         return $spells;
-   }
+    }
 }
 
 
@@ -168,11 +163,11 @@ class ItemsetList extends BaseType
 class ItemsetListFilter extends Filter
 {
     protected string $type  = 'itemsets';
-    protected array  $enums = array(
+    protected static array $enums = array(
          6 => parent::ENUM_EVENT
     );
 
-    protected array $genericFilter = array(
+    protected static array $genericFilter = array(
          2 => [parent::CR_NUMERIC,  'id',          NUM_CAST_INT,         true], // id
          3 => [parent::CR_NUMERIC,  'npieces',     NUM_CAST_INT              ], // pieces
          4 => [parent::CR_STRING,   'bonusText',   STR_LOCALIZED             ], // bonustext
@@ -184,7 +179,7 @@ class ItemsetListFilter extends Filter
         12 => [parent::CR_CALLBACK, 'cbAvaliable',                           ]  // available to players [yn]
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'    => [parent::V_RANGE, [2, 12],                                         true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 424]], true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_CRV,                             true ], // criteria values - only printable chars, no delimiters

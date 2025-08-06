@@ -6,22 +6,19 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class SoundList extends BaseType
+class SoundList extends DBTypeList
 {
     use spawnHelper;
 
-    public static   $type       = Type::SOUND;
-    public static   $brickFile  = 'sound';
-    public static   $dataTable  = '?_sounds';
-    public static   $contribute = CONTRIBUTE_CO;
+    public static int    $type       = Type::SOUND;
+    public static string $brickFile  = 'sound';
+    public static string $dataTable  = '?_sounds';
+    public static int    $contribute = CONTRIBUTE_CO;
 
-    protected       $queryBase  = 'SELECT s.*, s.id AS ARRAY_KEY FROM ?_sounds s';
+    protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ?_sounds s';
 
-    private         $fileBuffer = [];
-    private static  $fileTypes  = array(
-                        SOUND_TYPE_OGG => 'audio/ogg; codecs="vorbis"',
-                        SOUND_TYPE_MP3 => 'audio/mpeg'
-                    );
+    private        array $fileBuffer = [];
+    private static array $fileTypes  = [SOUND_TYPE_OGG => MIME_TYPE_OGG, SOUND_TYPE_MP3 => MIME_TYPE_MP3];
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -62,7 +59,14 @@ class SoundList extends BaseType
         }
     }
 
-    public function getListviewData()
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT `name` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n);
+        return null;
+    }
+
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -79,7 +83,7 @@ class SoundList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -93,13 +97,13 @@ class SoundList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 class SoundListFilter extends Filter
 {
     protected string $type        = 'sounds';
-    protected array  $inputFields = array(
+    protected static array $inputFields = array(
         'na' => [parent::V_REGEX, parent::PATTERN_NAME,                                         false], // name - only printable chars, no delimiter
         'ty' => [parent::V_LIST,  [[1, 4], 6, 9, 10, 12, 13, 14, 16, 17, [19, 31], 50, 52, 53], true ]  // type
     );

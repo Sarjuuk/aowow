@@ -653,9 +653,69 @@ abstract class Util
         }
     }
 
-    public static function isValidEmail($email)
+    public static function validateLogin(?string $val) : string
     {
-        return preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', $email);
+        if ($_ = self::validateEmail($val))
+            return $_;
+        if ($_ = self::validateUsername($val))
+            return $_;
+
+        return '';
+    }
+
+    public static function validateUsername(?string $name, ?int &$errCode = 0) : string
+    {
+        if (is_null($name) || $name === '')
+            return '';
+
+        $errCode   = 0;
+        $nameMatch = [];
+        [$min, $max, $pattern] = match(Cfg::get('ACC_AUTH_MODE'))
+        {
+            AUTH_MODE_SELF  => [4, 16, '/^[a-z0-9]{4,16}$/i'],
+            AUTH_MODE_REALM => [3, 32, '/^[^[:cntrl:]]+$/'],// i don't think TC has character requirements on the login..?
+            default         => [0,  0, '/^[^[:cntrl:]]+$/'] // external case with unknown requirements
+        };
+
+        if (($min && mb_strlen($name) < $min) || ($max && mb_strlen($name) > $max))
+            $errCode = 1;
+        else if ($pattern && !preg_match($pattern, trim(urldecode($name)), $nameMatch))
+            $errCode = 2;
+
+        return $errCode ? '' : ($nameMatch[0] ?: $name);
+    }
+
+    public static function validatePassword(?string $pass, ?int &$errCode = 0) : string
+    {
+        if (is_null($pass) || $pass === '')
+            return '';
+
+        $errCode   = 0;
+        $passMatch = '';
+        [$min, $max, $pattern] = match(Cfg::get('ACC_AUTH_MODE'))
+        {
+            AUTH_MODE_SELF  => [6, 0, '/^[^[:cntrl:]]+$/'],
+            AUTH_MODE_REALM => [0, 0, '/^[^[:cntrl:]]+$/'],
+            default         => [0, 0, '/^[^[:cntrl:]]+$/']
+        };
+
+        if (($min && mb_strlen($pass) < $min) || ($max && mb_strlen($pass) > $max))
+            $errCode = 1;
+        else if ($pattern && !preg_match($pattern, $pass, $passMatch))
+            $errCode = 2;
+
+        return $errCode ? '' : ($passMatch[0] ?: $pass);
+    }
+
+    public static function validateEmail(?string $email) : string
+    {
+        if (is_null($email) || $email === '')
+            return '';
+
+        if (preg_match('/^([a-z0-9._-]+)(\+[a-z0-9._-]+)?(@[a-z0-9.-]+\.[a-z]{2,4})$/i', urldecode(trim($email)), $m))
+            return $m[0];
+
+        return '';
     }
 
     public static function loadStaticFile($file, &$result, $localized = false)
@@ -1089,7 +1149,7 @@ abstract class Util
         return round($score, 4);
     }
 
-    public static function fixWeaponScores($class, $talents, $mainHand, $offHand)
+    public static function fixWeaponScores(int $class, array $talents, array $mainHand, array $offHand) : array
     {
         $mh = 1;
         $oh = 1;
@@ -1231,7 +1291,7 @@ abstract class Util
 
     public static function sendMail(string $email, string $tplFile, array $vars = [], int $expiration = 0) : bool
     {
-        if (!self::isValidEmail($email))
+        if (!self::validateEmail($email))
             return false;
 
         $template = '';

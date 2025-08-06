@@ -6,15 +6,15 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ZoneList extends BaseType
+class ZoneList extends DBTypeList
 {
     use listviewHelper;
 
-    public static   $type      = Type::ZONE;
-    public static   $brickFile = 'zone';
-    public static   $dataTable = '?_zones';
+    public static int    $type      = Type::ZONE;
+    public static string $brickFile = 'zone';
+    public static string $dataTable = '?_zones';
 
-    protected       $queryBase = 'SELECT z.*, z.id AS ARRAY_KEY FROM ?_zones z';
+    protected string $queryBase = 'SELECT z.*, z.`id` AS ARRAY_KEY FROM ?_zones z';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -53,14 +53,7 @@ class ZoneList extends BaseType
         }
     }
 
-    // use if you JUST need the name
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->selectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_zones WHERE id = ?d', $id );
-        return Util::localizedString($n, 'name');
-    }
-
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -97,7 +90,7 @@ class ZoneList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -107,7 +100,7 @@ class ZoneList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>

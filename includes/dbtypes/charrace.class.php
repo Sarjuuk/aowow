@@ -6,15 +6,15 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CharRaceList extends BaseType
+class CharRaceList extends DBTypeList
 {
-    public static   $type      = Type::CHR_RACE;
-    public static   $brickFile = 'race';
-    public static   $dataTable = '?_races';
+    public static int    $type      = Type::CHR_RACE;
+    public static string $brickFile = 'race';
+    public static string $dataTable = '?_races';
 
-    protected       $queryBase = 'SELECT r.*, id AS ARRAY_KEY FROM ?_races r';
+    protected string $queryBase = 'SELECT r.*, id AS ARRAY_KEY FROM ?_races r';
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -37,7 +37,7 @@ class CharRaceList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -47,7 +47,7 @@ class CharRaceList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>

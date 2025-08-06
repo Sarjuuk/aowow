@@ -111,11 +111,12 @@ abstract class Filter
         [self::CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
         [self::CR_NYI_PH,    null,             <int:returnVal>, param2]                # mostly 1: to ignore this criterium; 0: to fail the whole query
     */
-    protected array  $genericFilter = [];
-    protected array  $inputFields   = [];                   // list of input fields defined per page - fieldName => [checkType, checkValue[, fieldIsArray]]
-    protected array  $enums         = [];                   // validation for opt lists per page - criteriumID => [validOptionList]
     protected string $type          = '';                   // set by child
     protected array  $parentCats    = [];                   // used to validate ty-filter
+
+    protected static array $genericFilter = [];
+    protected static array $inputFields   = [];             // list of input fields defined per page - fieldName => [checkType, checkValue[, fieldIsArray]]
+    protected static array $enums         = [];             // validation for opt lists per page - criteriumID => [validOptionList]
 
     // express Filters in template
     public string $fiInit           = '';                   // str: filter template (and init html form)
@@ -134,7 +135,7 @@ abstract class Filter
         $this->parentCats = $opts['parentCats'] ?? [];
 
         // use fn fi_init() if we have a criteria selector, else use var fi_type
-        if ($this->genericFilter)
+        if (static::$genericFilter)
             $this->fiInit = $this->type;
         else
             $this->fiType = $this->type;
@@ -175,6 +176,15 @@ abstract class Filter
             $v = [&$this->criteria['cr'][$i], &$this->criteria['crs'][$i], &$this->criteria['crv'][$i]];
             yield $i => $v;
         }
+    }
+
+    public static function getCriteriaIndex(int $cr, int|bool $lookup) : ?int
+    {
+        // can't use array_search() as bools are valid enum content
+        foreach (static::$enums[$cr] ?? [] as $k => $v)
+            if ($v === $lookup)
+                return $k;
+        return null;
     }
 
 
@@ -234,7 +244,7 @@ abstract class Filter
         if (!$cr || !$this->fiSetCriteria)
             return $this->fiSetCriteria;
 
-        return array_intersect($this->fiSetCriteria['cr'], $cr);
+        return array_values(array_intersect($this->fiSetCriteria['cr'], $cr));
     }
 
 
@@ -259,14 +269,14 @@ abstract class Filter
 
             [$k, $v] = explode('=', $field);
 
-            if (!isset($this->inputFields[$k]))
+            if (!isset(static::$inputFields[$k]))
             {
                 trigger_error('Filter::transformGET - GET param not in filter: '.$k, E_USER_NOTICE);
                 $this->error = true;
                 continue;
             }
 
-            $asArray = $this->inputFields[$k][2];
+            $asArray = static::$inputFields[$k][2];
 
             $data[$k] = $asArray ? explode(':', $v) : $v;
         }
@@ -276,7 +286,7 @@ abstract class Filter
 
     private function initFields() : void
     {
-        foreach ($this->inputFields as $inp => [$type, $valid, $asArray])
+        foreach (static::$inputFields as $inp => [$type, $valid, $asArray])
         {
             $var = in_array($inp, ['cr', 'crs', 'crv']) ? 'criteria' : 'values';
 
@@ -343,9 +353,9 @@ abstract class Filter
         {
             // conduct filter specific checks & casts here
             $unsetme = false;
-            if (isset($this->genericFilter[$_cr[$i]]))
+            if (isset(static::$genericFilter[$_cr[$i]]))
             {
-                $gf = $this->genericFilter[$_cr[$i]];
+                $gf = static::$genericFilter[$_cr[$i]];
                 switch ($gf[0])
                 {
                     case self::CR_NUMERIC:
@@ -643,7 +653,7 @@ abstract class Filter
 
     private function genericCriterion(int $cr, int $crs, string $crv) : ?array
     {
-        [$crType, $colOrFn, $param1, $param2] = array_pad($this->genericFilter[$cr], 4, null);
+        [$crType, $colOrFn, $param1, $param2] = array_pad(static::$genericFilter[$cr], 4, null);
         $result = null;
 
         switch ($crType)
@@ -665,9 +675,9 @@ abstract class Filter
                 $result = $this->genericString($colOrFn, $crv, $param1);
                 break;
             case self::CR_ENUM:
-                if (!$param2 && isset($this->enums[$cr][$crs]))
-                    $result = $this->genericEnum($colOrFn, $this->enums[$cr][$crs]);
-                if ($param2 && in_array($crs, $this->enums[$cr]))
+                if (!$param2 && isset(static::$enums[$cr][$crs]))
+                    $result = $this->genericEnum($colOrFn, static::$enums[$cr][$crs]);
+                if ($param2 && in_array($crs, static::$enums[$cr]))
                     $result = $this->genericEnum($colOrFn, $crs);
                 else if ($param1 && ($crs == self::ENUM_ANY || $crs == self::ENUM_NONE))
                     $result = $this->genericEnum($colOrFn, $crs);
@@ -705,10 +715,10 @@ abstract class Filter
 
     protected function createSQLForCriterium(int &$cr, int &$crs, string &$crv) : array
     {
-        if (!$this->genericFilter)                          // criteria not in use - no error
+        if (!static::$genericFilter)                        // criteria not in use - no error
             return [];
 
-        if (isset($this->genericFilter[$cr]))
+        if (isset(static::$genericFilter[$cr]))
             if ($genCr = $this->genericCriterion($cr, $crs, $crv))
                 return $genCr;
 

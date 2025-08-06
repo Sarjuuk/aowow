@@ -115,11 +115,8 @@ spl_autoload_register(function (string $class) : void
         default               => strtr($class, ['list' => ''])
     };
 
-    if (file_exists('includes/types/'.$cl.'.class.php'))
-    {
-        require_once 'includes/types/basetype.class.php';
-        require_once 'includes/types/'.$cl.'.class.php';
-    }
+    if (file_exists('includes/dbtypes/'.$cl.'.class.php'))
+        require_once 'includes/dbtypes/'.$cl.'.class.php';
     else
         throw new \Exception('could not register type class: '.$cl);
 });

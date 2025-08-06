@@ -151,7 +151,7 @@ class CLISetup
 
         // link SubScipts back to UtilityScript after all UtilityScripts have been loaded
         foreach (self::$utilScriptRefs as $name => $us)
-            if (in_array(__NAMESPACE__.'\TrSubScripts', class_uses($us)))
+            if (in_array(TrSubScripts::class, class_uses($us)))
                 $us->assignGenerators($name);
 
         self::evalOpts();

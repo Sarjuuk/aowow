@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class EnchantmentList extends BaseType
+class EnchantmentList extends DBTypeList
 {
     use listviewHelper;
 
@@ -69,15 +69,7 @@ class EnchantmentList extends BaseType
             $this->relSpells = new SpellList(array(['id', $relSpells]));
     }
 
-    // use if you JUST need the name
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_itemenchantment WHERE `id` = ?d', $id );
-        return Util::localizedString($n, 'name');
-    }
-    // end static use
-
-    public function getListviewData($addInfoMask = 0x0)
+    public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
 
@@ -133,7 +125,7 @@ class EnchantmentList extends BaseType
         return $this->jsonStats[$this->id]->toJson();
     }
 
-    public function getRelSpell($id)
+    public function getRelSpell(int $id) : ?array
     {
         if ($this->relSpells)
             return $this->relSpells->getEntry($id);
@@ -141,7 +133,7 @@ class EnchantmentList extends BaseType
         return null;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -162,18 +154,18 @@ class EnchantmentList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 
 class EnchantmentListFilter extends Filter
 {
     protected string $type  = 'enchantments';
-    protected array  $enums = array(
+    protected static array $enums = array(
         3 => parent::ENUM_PROFESSION                        // requiresprof
     );
 
-    protected array $genericFilter = array(
+    protected static array $genericFilter = array(
           2 => [parent::CR_NUMERIC, 'id',                 NUM_CAST_INT,         true], // id
           3 => [parent::CR_ENUM,    'skillLine'                                     ], // requiresprof
           4 => [parent::CR_NUMERIC, 'skillLevel',         NUM_CAST_INT              ], // reqskillrank
@@ -235,7 +227,7 @@ class EnchantmentListFilter extends Filter
         123 => [parent::CR_NUMERIC, 'is.splpwr',          NUM_CAST_INT,         true]  // splpwr
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'  => [parent::V_RANGE, [2, 123],             true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 15],              true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,  true ], // criteria values - only numerals

@@ -10,6 +10,7 @@ class Tooltip implements \JsonSerializable
 {
     private ?string    $name       = null;
     private ?string    $tooltip    = null;
+    private ?string    $tooltip2   = null;
     private ?\StdClass $map        = null;                  // secondary tooltip
     private ?string    $icon       = null;
     private ?int       $quality    = null;                  // icon border color coded

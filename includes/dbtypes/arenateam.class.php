@@ -6,15 +6,13 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ArenaTeamList extends BaseType
+class ArenaTeamList extends DBTypeList
 {
     use profilerHelper, listviewHelper;
 
-    private $rankOrder = [];
+    public static int $contribute = CONTRIBUTE_NONE;
 
-    public static $contribute = CONTRIBUTE_NONE;
-
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
         foreach ($this->iterate() as $__)
@@ -36,11 +34,14 @@ class ArenaTeamList extends BaseType
             );
         }
 
-        return array_values($data);
+        return $data;
     }
 
-    public function renderTooltip() {}
-    public function getJSGlobals($addMask = 0) {}
+    // plz dont..
+    public static function getName(int|string $id) : ?LocString { return null; }
+
+    public function renderTooltip() : ?string { return null; }
+    public function getJSGlobals(int $addMask = 0) : array { return []; }
 }
 
 
@@ -49,8 +50,8 @@ class ArenaTeamListFilter extends Filter
     use TrProfilerFilter;
 
     protected string $type          = 'arenateams';
-    protected array  $genericFilter = [];
-    protected array  $inputFields   = array(
+    protected static array $genericFilter = [];
+    protected static array $inputFields   = array(
         'na' => [parent::V_REGEX,    parent::PATTERN_NAME, false], // name - only printable chars, no delimiter
         'ma' => [parent::V_EQUAL,    1,                    false], // match any / all filter
         'ex' => [parent::V_EQUAL,    'on',                 false], // only match exact
@@ -91,15 +92,15 @@ class ArenaTeamListFilter extends Filter
 
 class RemoteArenaTeamList extends ArenaTeamList
 {
-    protected   $queryBase = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
-    protected   $queryOpts = array(
+    protected string $queryBase = 'SELECT `at`.*, `at`.`arenaTeamId` AS ARRAY_KEY FROM arena_team at';
+    protected array  $queryOpts = array(
                     'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
-                    'atm' => ['j' => 'arena_team_member atm ON atm.arenaTeamId = at.arenaTeamId'],
-                    'c'   => ['j' => 'characters c ON c.guid = atm.guid AND c.deleteInfos_Account IS NULL AND c.level <= 80 AND (c.extra_flags & '.Profiler::CHAR_GMFLAGS.') = 0', 's' => ', BIT_OR(IF(c.race IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS faction']
+                    'atm' => ['j' => 'arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId`'],
+                    'c'   => ['j' => 'characters c ON c.`guid` = atm.`guid` AND c.`deleteInfos_Account` IS NULL AND c.`level` <= 80 AND (c.`extra_flags` & '.Profiler::CHAR_GMFLAGS.') = 0', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
                 );
 
-    private     $members   = [];
-    private     $rankOrder = [];
+    private array $members   = [];
+    private array $rankOrder = [];
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -118,12 +119,11 @@ class RemoteArenaTeamList extends ArenaTeamList
         // ranks in DB are inaccurate. recalculate from rating (fetched as DESC from DB)
         foreach ($this->dbNames as $rId => $__)
             foreach ([2, 3, 5] as $type)
-                $this->rankOrder[$rId][$type] = DB::Characters($rId)->selectCol('SELECT arenaTeamId FROM arena_team WHERE `type` = ?d ORDER BY rating DESC', $type);
+                $this->rankOrder[$rId][$type] = DB::Characters($rId)->selectCol('SELECT `arenaTeamId` FROM arena_team WHERE `type` = ?d ORDER BY `rating` DESC', $type);
 
         reset($this->dbNames);                              // only use when querying single realm
-        $realmId     = key($this->dbNames);
-        $realms      = Profiler::getRealms();
-        $distrib     = [];
+        $realms  = Profiler::getRealms();
+        $distrib = [];
 
         // post processing
         foreach ($this->iterate() as $guid => &$curTpl)
@@ -142,7 +142,7 @@ class RemoteArenaTeamList extends ArenaTeamList
             }
             else
             {
-                trigger_error('arena team #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('arena team #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
@@ -167,21 +167,12 @@ class RemoteArenaTeamList extends ArenaTeamList
 
         // get team members
         foreach ($this->members as $realmId => &$teams)
-            $teams = DB::Characters($realmId)->select('
-                SELECT
-                    at.arenaTeamId AS ARRAY_KEY, c.guid AS ARRAY_KEY2, c.name AS "0", c.class AS "1", IF(at.captainguid = c.guid, 1, 0) AS "2"
-                FROM
-                    arena_team at
-                JOIN
-                    arena_team_member atm ON atm.arenaTeamId = at.arenaTeamId JOIN characters c ON c.guid = atm.guid
-                WHERE
-                    at.arenaTeamId IN (?a) AND
-                    c.deleteInfos_Account IS NULL AND
-                    c.level <= ?d AND
-                    (c.extra_flags & ?d) = 0',
-                $teams,
-                MAX_LEVEL,
-                Profiler::CHAR_GMFLAGS
+            $teams = DB::Characters($realmId)->select(
+               'SELECT at.`arenaTeamId` AS ARRAY_KEY, c.`guid` AS ARRAY_KEY2, c.`name` AS "0", c.`class` AS "1", IF(at.`captainguid` = c.`guid`, 1, 0) AS "2"
+                FROM   arena_team at
+                JOIN   arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId` JOIN characters c ON c.`guid` = atm.`guid`
+                WHERE  at.`arenaTeamId` IN (?a) AND c.`deleteInfos_Account` IS NULL AND c.`level` <= ?d AND (c.`extra_flags` & ?d) = 0',
+                $teams, MAX_LEVEL, Profiler::CHAR_GMFLAGS
             );
 
         // equalize subject distribution across realms
@@ -253,7 +244,7 @@ class RemoteArenaTeamList extends ArenaTeamList
 
         // merge back local ids
         $localIds = DB::Aowow()->selectCol(
-            'SELECT CONCAT(realm, ":", realmGUID) AS ARRAY_KEY, id FROM ?_profiler_arena_team WHERE realm IN (?a) AND realmGUID IN (?a)',
+           'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ?_profiler_arena_team WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
             array_column($data, 'realm'),
             array_column($data, 'realmGUID')
         );
@@ -303,11 +294,11 @@ class RemoteArenaTeamList extends ArenaTeamList
 
 class LocalArenaTeamList extends ArenaTeamList
 {
-    protected   $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
-    protected   $queryOpts = array(
+    protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
+    protected array  $queryOpts = array(
                     'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
-                    'atm' => ['j' => '?_profiler_arena_team_member atm ON atm.arenaTeamId = at.id'],
-                    'c'   => ['j' => '?_profiler_profiles c ON c.id = atm.profileId', 's' => ', BIT_OR(IF(c.race IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS faction']
+                    'atm' => ['j' => '?_profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id`'],
+                    'c'   => ['j' => '?_profiler_profiles c ON c.`id` = atm.`profileId`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
                 );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -367,13 +358,13 @@ class LocalArenaTeamList extends ArenaTeamList
         }
     }
 
-    public function getProfileUrl()
+    public function getProfileUrl() : string
     {
         $url = '?arena-team=';
 
         return $url.implode('.', array(
-            Profiler::urlize($this->getField('region')),
-            Profiler::urlize($this->getField('realmName')),
+            $this->getField('region'),
+            Profiler::urlize($this->getField('realmName'), true),
             Profiler::urlize($this->getField('name'))
         ));
     }

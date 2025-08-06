@@ -92,34 +92,34 @@ abstract class Type
     public const IDX_FLAGS    = 3;
 
     private static array $data = array(
-        self::NPC         => [__NAMESPACE__ . '\CreatureList',    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::OBJECT      => [__NAMESPACE__ . '\GameObjectList',  'object',      'g_objects',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::ITEM        => [__NAMESPACE__ . '\ItemList',        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ITEMSET     => [__NAMESPACE__ . '\ItemsetList',     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::QUEST       => [__NAMESPACE__ . '\QuestList',       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::SPELL       => [__NAMESPACE__ . '\SpellList',       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ZONE        => [__NAMESPACE__ . '\ZoneList',        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::FACTION     => [__NAMESPACE__ . '\FactionList',     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::PET         => [__NAMESPACE__ . '\PetList',         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::ACHIEVEMENT => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::TITLE       => [__NAMESPACE__ . '\TitleList',       'title',       'g_titles',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::WORLDEVENT  => [__NAMESPACE__ . '\WorldEventList',  'event',       'g_holidays',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::CHR_CLASS   => [__NAMESPACE__ . '\CharClassList',   'class',       'g_classes',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::CHR_RACE    => [__NAMESPACE__ . '\CharRaceList',    'race',        'g_races',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::SKILL       => [__NAMESPACE__ . '\SkillList',       'skill',       'g_skills',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::STATISTIC   => [__NAMESPACE__ . '\AchievementList', 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
-        self::CURRENCY    => [__NAMESPACE__ . '\CurrencyList',    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::SOUND       => [__NAMESPACE__ . '\SoundList',       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::ICON        => [__NAMESPACE__ . '\IconList',        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::GUIDE       => [__NAMESPACE__ . '\GuideList',       'guide',       '',                     self::FLAG_NONE],
-        self::PROFILE     => [__NAMESPACE__ . '\ProfileList',     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
-        self::GUILD       => [__NAMESPACE__ . '\GuildList',       'guild',       '',                     self::FLAG_FILTRABLE], // x
-        self::ARENA_TEAM  => [__NAMESPACE__ . '\ArenaTeamList',   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
-        self::USER        => [__NAMESPACE__ . '\UserList',        'user',        'g_users',              self::FLAG_NONE],      // x
-        self::EMOTE       => [__NAMESPACE__ . '\EmoteList',       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
-        self::ENCHANTMENT => [__NAMESPACE__ . '\EnchantmentList', 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::AREATRIGGER => [__NAMESPACE__ . '\AreatriggerList', 'areatrigger', '',                     self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
-        self::MAIL        => [__NAMESPACE__ . '\MailList',        'mail',        '',                     self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE]
+        self::NPC         => [CreatureList::class,    'npc',         'g_npcs',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::OBJECT      => [GameObjectList::class,  'object',      'g_objects',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::ITEM        => [ItemList::class,        'item',        'g_items',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ITEMSET     => [ItemsetList::class,     'itemset',     'g_itemsets',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::QUEST       => [QuestList::class,       'quest',       'g_quests',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::SPELL       => [SpellList::class,       'spell',       'g_spells',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ZONE        => [ZoneList::class,        'zone',        'g_gatheredzones',      self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::FACTION     => [FactionList::class,     'faction',     'g_factions',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::PET         => [PetList::class,         'pet',         'g_pets',               self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::ACHIEVEMENT => [AchievementList::class, 'achievement', 'g_achievements',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::TITLE       => [TitleList::class,       'title',       'g_titles',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::WORLDEVENT  => [WorldEventList::class,  'event',       'g_holidays',           self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::CHR_CLASS   => [CharClassList::class,   'class',       'g_classes',            self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::CHR_RACE    => [CharRaceList::class,    'race',        'g_races',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::SKILL       => [SkillList::class,       'skill',       'g_skills',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::STATISTIC   => [AchievementList::class, 'achievement', 'g_achievements',       self::FLAG_NONE], // alias for achievements; exists only for Markup
+        self::CURRENCY    => [CurrencyList::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::SOUND       => [SoundList::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::ICON        => [IconList::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
+        self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_NONE],
+        self::PROFILE     => [ProfileList::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
+        self::GUILD       => [GuildList::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x
+        self::ARENA_TEAM  => [ArenaTeamList::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x
+        self::USER        => [UserList::class,        'user',        'g_users',              self::FLAG_NONE],      // x
+        self::EMOTE       => [EmoteList::class,       'emote',       'g_emotes',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE],
+        self::ENCHANTMENT => [EnchantmentList::class, 'enchantment', 'g_enchantments',       self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::AREATRIGGER => [AreatriggerList::class, 'areatrigger', '',                     self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
+        self::MAIL        => [MailList::class,        'mail',        '',                     self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE]
     );
 
 
@@ -127,7 +127,7 @@ abstract class Type
     /* Field Operations */
     /********************/
 
-    public static function newList(int $type, array $conditions = []) : ?BaseType
+    public static function newList(int $type, array $conditions = []) : ?DBTypeList
     {
         if (!self::exists($type))
             return null;

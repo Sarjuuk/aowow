@@ -6,24 +6,24 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class CreatureList extends BaseType
+class CreatureList extends DBTypeList
 {
     use spawnHelper;
 
-    public static   $type      = Type::NPC;
-    public static   $brickFile = 'npc';
-    public static   $dataTable = '?_creature';
+    public static int    $type      = Type::NPC;
+    public static string $brickFile = 'npc';
+    public static string $dataTable = '?_creature';
 
-    protected       $queryBase = 'SELECT ct.*, ct.id AS ARRAY_KEY FROM ?_creature ct';
-    public          $queryOpts = array(
-                        'ct'     => [['ft', 'qse', 'dct1', 'dct2', 'dct3'], 's' => ', IFNULL(dct1.id, IFNULL(dct2.id, IFNULL(dct3.id, 0))) AS parentId, IFNULL(dct1.name_loc0, IFNULL(dct2.name_loc0, IFNULL(dct3.name_loc0, ""))) AS parent_loc0, IFNULL(dct1.name_loc2, IFNULL(dct2.name_loc2, IFNULL(dct3.name_loc2, ""))) AS parent_loc2, IFNULL(dct1.name_loc3, IFNULL(dct2.name_loc3, IFNULL(dct3.name_loc3, ""))) AS parent_loc3, IFNULL(dct1.name_loc4, IFNULL(dct2.name_loc4, IFNULL(dct3.name_loc4, ""))) AS parent_loc4, IFNULL(dct1.name_loc6, IFNULL(dct2.name_loc6, IFNULL(dct3.name_loc6, ""))) AS parent_loc6, IFNULL(dct1.name_loc8, IFNULL(dct2.name_loc8, IFNULL(dct3.name_loc8, ""))) AS parent_loc8, IF(dct1.difficultyEntry1 = ct.id, 1, IF(dct2.difficultyEntry2 = ct.id, 2, IF(dct3.difficultyEntry3 = ct.id, 3, 0))) AS difficultyMode'],
-                        'dct1'   => ['j' => ['?_creature dct1 ON ct.cuFlags & 0x02 AND dct1.difficultyEntry1 = ct.id', true]],
-                        'dct2'   => ['j' => ['?_creature dct2 ON ct.cuFlags & 0x02 AND dct2.difficultyEntry2 = ct.id', true]],
-                        'dct3'   => ['j' => ['?_creature dct3 ON ct.cuFlags & 0x02 AND dct3.difficultyEntry3 = ct.id', true]],
-                        'ft'     => ['j' => '?_factiontemplate ft ON ft.id = ct.faction', 's' => ', ft.A, ft.H, ft.factionId'],
-                        'qse'    => ['j' => ['?_quests_startend qse ON qse.type = 1 AND qse.typeId = ct.id', true], 's' => ', IF(min(qse.method) = 1 OR max(qse.method) = 3, 1, 0) AS startsQuests, IF(min(qse.method) = 2 OR max(qse.method) = 3, 1, 0) AS endsQuests', 'g' => 'ct.id'],
-                        'qt'     => ['j' => '?_quests qt ON qse.questId = qt.id'],
-                        's'      => ['j' => ['?_spawns s ON s.type = 1 AND s.typeId = ct.id', true]]
+    protected string $queryBase = 'SELECT ct.*, ct.`id` AS ARRAY_KEY FROM ?_creature ct';
+    public    array  $queryOpts = array(
+                        'ct'   => [['ft', 'qse', 'dct1', 'dct2', 'dct3'], 's' => ', IFNULL(dct1.`id`, IFNULL(dct2.`id`, IFNULL(dct3.`id`, 0))) AS "parentId", IFNULL(dct1.`name_loc0`, IFNULL(dct2.`name_loc0`, IFNULL(dct3.`name_loc0`, ""))) AS "parent_loc0", IFNULL(dct1.`name_loc2`, IFNULL(dct2.`name_loc2`, IFNULL(dct3.`name_loc2`, ""))) AS "parent_loc2", IFNULL(dct1.`name_loc3`, IFNULL(dct2.`name_loc3`, IFNULL(dct3.`name_loc3`, ""))) AS "parent_loc3", IFNULL(dct1.`name_loc4`, IFNULL(dct2.`name_loc4`, IFNULL(dct3.`name_loc4`, ""))) AS "`parent_loc4`", IFNULL(dct1.`name_loc6`, IFNULL(dct2.`name_loc6`, IFNULL(dct3.`name_loc6`, ""))) AS "`parent_loc6`", IFNULL(dct1.name_loc8, IFNULL(dct2.`name_loc8`, IFNULL(dct3.`name_loc8`, ""))) AS "parent_loc8", IF(dct1.`difficultyEntry1` = ct.`id`, 1, IF(dct2.`difficultyEntry2` = ct.`id`, 2, IF(dct3.`difficultyEntry3` = ct.`id`, 3, 0))) AS "difficultyMode"'],
+                        'dct1' => ['j' => ['?_creature dct1 ON ct.`cuFlags` & 0x02 AND dct1.`difficultyEntry1` = ct.`id`', true]],
+                        'dct2' => ['j' => ['?_creature dct2 ON ct.`cuFlags` & 0x02 AND dct2.`difficultyEntry2` = ct.`id`', true]],
+                        'dct3' => ['j' => ['?_creature dct3 ON ct.`cuFlags` & 0x02 AND dct3.`difficultyEntry3` = ct.`id`', true]],
+                        'ft'   => ['j' => '?_factiontemplate ft ON ft.`id` = ct.`faction`', 's' => ', ft.`factionId`, IFNULL(ft.`A`, 0) AS "A", IFNULL(ft.`H`, 0) AS "H"'],
+                        'qse'  => ['j' => ['?_quests_startend qse ON qse.`type` = 1 AND qse.`typeId` = ct.id', true], 's' => ', IF(MIN(qse.`method`) = 1 OR MAX(qse.`method`) = 3, 1, 0) AS "startsQuests", IF(MIN(qse.`method`) = 2 OR MAX(qse.`method`) = 3, 1, 0) AS "endsQuests"', 'g' => 'ct.`id`'],
+                        'qt'   => ['j' => '?_quests qt ON qse.`questId` = qt.`id`'],
+                        's'    => ['j' => ['?_spawns s ON s.`type` = 1 AND s.`typeId` = ct.`id`', true]]
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -49,13 +49,7 @@ class CreatureList extends BaseType
         }
     }
 
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_creature WHERE id = ?d', $id);
-        return Util::localizedString($n, 'name');
-    }
-
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
             return null;
@@ -102,7 +96,7 @@ class CreatureList extends BaseType
         return $x;
     }
 
-    public function getRandomModelId()
+    public function getRandomModelId() : int
     {
         // dwarf?? [null, 30754, 30753, 30755, 30736]
         // totems use hardcoded models, tauren model is base
@@ -114,7 +108,7 @@ class CreatureList extends BaseType
                 $data[] = $_;
 
         if (count($data) == 1 && ($slotId = array_search($data[0], $totems)))
-            $data = DB::World()->selectCol('SELECT DisplayId FROM player_totem_model WHERE TotemSlot = ?d', $slotId);
+            $data = DB::World()->selectCol('SELECT `DisplayId` FROM player_totem_model WHERE `TotemSlot` = ?d', $slotId);
 
         return !$data ? 0 : $data[array_rand($data)];
     }
@@ -155,12 +149,12 @@ class CreatureList extends BaseType
         }
     }
 
-    public function isBoss()
+    public function isBoss() : bool
     {
-        return ($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS) || ($this->curTpl['typeFlags'] & 0x4 && $this->curTpl['rank']);
+        return ($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS) || ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB && $this->curTpl['rank']);
     }
 
-    public function getListviewData($addInfoMask = 0x0)
+    public function getListviewData(int $addInfoMask = 0x0) : array
     {
         /* looks like this data differs per occasion
         *
@@ -174,9 +168,9 @@ class CreatureList extends BaseType
 
         if ($addInfoMask & NPCINFO_REP && $this->getFoundIDs())
         {
-            $rewRep = DB::World()->selectCol('
-                SELECT creature_id AS ARRAY_KEY, RewOnKillRepFaction1 AS ARRAY_KEY2, RewOnKillRepValue1 FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction1 > 0 UNION
-                SELECT creature_id AS ARRAY_KEY, RewOnKillRepFaction2 AS ARRAY_KEY2, RewOnKillRepValue2 FROM creature_onkill_reputation WHERE creature_id IN (?a) AND RewOnKillRepFaction2 > 0',
+            $rewRep = DB::World()->selectCol(
+               'SELECT `creature_id` AS ARRAY_KEY, `RewOnKillRepFaction1` AS ARRAY_KEY2, `RewOnKillRepValue1` FROM creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction1` > 0 UNION
+                SELECT `creature_id` AS ARRAY_KEY, `RewOnKillRepFaction2` AS ARRAY_KEY2, `RewOnKillRepValue2` FROM creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction2` > 0',
                 $this->getFoundIDs(),
                 $this->getFoundIDs()
             );
@@ -249,7 +243,7 @@ class CreatureList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -283,7 +277,7 @@ class CreatureList extends BaseType
 class CreatureListFilter extends Filter
 {
     protected string $type  = 'npcs';
-    protected array  $enums = array(
+    protected static array $enums = array(
          3 => parent::ENUM_FACTION,                         // faction
          6 => parent::ENUM_ZONE,                            // foundin
         42 => parent::ENUM_FACTION,                         // increasesrepwith
@@ -291,7 +285,7 @@ class CreatureListFilter extends Filter
         38 => parent::ENUM_EVENT                            // relatedevent
     );
 
-    protected array $genericFilter = array(
+    protected static array $genericFilter = array(
          1 => [parent::CR_CALLBACK, 'cbHealthMana',      'healthMax',                       'healthMin'], // health [num]
          2 => [parent::CR_CALLBACK, 'cbHealthMana',      'manaMin',                         'manaMax'  ], // mana [num]
          3 => [parent::CR_CALLBACK, 'cbFaction',         null,                               null      ], // faction [enum]
@@ -330,7 +324,7 @@ class CreatureListFilter extends Filter
         44 => [parent::CR_CALLBACK, 'cbSpecialSkinLoot', NPC_TYPEFLAG_SKIN_WITH_ENGINEERING, null      ]  // salvageable [yn]
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'    => [parent::V_LIST,     [[1, 3],[5, 12], 15, 16, [18, 25], [27, 29], [31, 35], 37, 38, [40, 44]], true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 9999]],                         true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                                                      true ], // criteria values - only printable chars, no delimiter
@@ -424,7 +418,7 @@ class CreatureListFilter extends Filter
 
             return [0];
         }
-        else if (in_array($crs, $this->enums[$cr]))
+        else if (in_array($crs, self::$enums[$cr]))
         {
             if ($eventIds = DB::Aowow()->selectCol('SELECT `id` FROM ?_events WHERE `holidayId` = ?d', $crs))
                 if ($cGuids   = DB::World()->selectCol('SELECT DISTINCT `guid` FROM `game_event_creature` WHERE `eventEntry` IN (?a)', $eventIds))
@@ -512,7 +506,7 @@ class CreatureListFilter extends Filter
 
     protected function cbReputation(int $cr, int $crs, string $crv, $op) : ?array
     {
-        if (!in_array($crs, $this->enums[$cr]))
+        if (!in_array($crs, self::$enums[$cr]))
             return null;
 
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
@@ -529,7 +523,7 @@ class CreatureListFilter extends Filter
         if (!Util::checkNumeric($crs, NUM_CAST_INT))
             return null;
 
-        if (!in_array($crs, $this->enums[$cr]))
+        if (!in_array($crs, self::$enums[$cr]))
             return null;
 
         $facTpls = [];

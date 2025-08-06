@@ -6,21 +6,21 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class PetList extends BaseType
+class PetList extends DBTypeList
 {
     use ListviewHelper;
 
-    public static   $type      = Type::PET;
-    public static   $brickFile = 'pet';
-    public static   $dataTable = '?_pet';
+    public static int    $type      = Type::PET;
+    public static string $brickFile = 'pet';
+    public static string $dataTable = '?_pet';
 
-    protected       $queryBase = 'SELECT p.*, p.id AS ARRAY_KEY FROM ?_pet p';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ?_pet p';
+    protected array  $queryOpts = array(
                         'p'  => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON p.iconId = ic.id', true], 's' => ', ic.name AS iconString'],
+                        'ic' => ['j' => ['?_icons ic ON p.`iconId` = ic.`id`', true], 's' => ', ic.`name` AS "iconString"'],
                     );
 
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -52,7 +52,7 @@ class PetList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -70,7 +70,7 @@ class PetList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 ?>

@@ -6,17 +6,17 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class FactionList extends BaseType
+class FactionList extends DBTypeList
 {
-    public static   $type      = Type::FACTION;
-    public static   $brickFile = 'faction';
-    public static   $dataTable = '?_factions';
+    public static int    $type      = Type::FACTION;
+    public static string $brickFile = 'faction';
+    public static string $dataTable = '?_factions';
 
-    protected       $queryBase = 'SELECT f.*, f.parentFactionId AS cat, f.id AS ARRAY_KEY FROM ?_factions f';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT f.*, f.`parentFactionId` AS "cat", f.`id` AS ARRAY_KEY FROM ?_factions f';
+    protected array  $queryOpts = array(
                         'f'  => [['f2']],
-                        'f2' => ['j' => ['?_factions f2 ON f.parentFactionId = f2.id', true], 's' => ', IFNULL(f2.parentFactionId, 0) AS cat2'],
-                        'ft' => ['j' => '?_factiontemplate ft ON ft.factionId = f.id']
+                        'f2' => ['j' => ['?_factions f2 ON f.`parentFactionId` = f2.`id`', true], 's' => ', IFNULL(f2.`parentFactionId`, 0) AS "cat2"'],
+                        'ft' => ['j' => '?_factiontemplate ft ON ft.`factionId` = f.`id`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -37,13 +37,7 @@ class FactionList extends BaseType
         }
     }
 
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_factions WHERE id = ?d', $id);
-        return Util::localizedString($n, 'name');
-    }
-
-    public function getListviewData()
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -72,7 +66,7 @@ class FactionList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -82,7 +76,7 @@ class FactionList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 
 }
 

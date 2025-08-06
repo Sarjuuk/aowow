@@ -6,22 +6,21 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class QuestList extends BaseType
+class QuestList extends DBTypeList
 {
-    public static   $type      = Type::QUEST;
-    public static   $brickFile = 'quest';
-    public static   $dataTable = '?_quests';
+    public static int    $type      = Type::QUEST;
+    public static string $brickFile = 'quest';
+    public static string $dataTable = '?_quests';
+    public        array  $requires  = [];
+    public        array  $rewards   = [];
+    public        array  $choices   = [];
 
-    public          $requires  = [];
-    public          $rewards   = [];
-    public          $choices   = [];
-
-    protected       $queryBase = 'SELECT q.*, q.id AS ARRAY_KEY FROM ?_quests q';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT q.*, q.`id` AS ARRAY_KEY FROM ?_quests q';
+    protected array  $queryOpts = array(
                         'q'   => [],
-                        'rsc' => ['j' => '?_spell rsc ON q.rewardSpellCast = rsc.id'],      // limit rewardSpellCasts
-                        'qse' => ['j' => '?_quests_startend qse ON q.id = qse.questId', 's' => ', qse.method'],    // groupConcat..?
-                        'e'   => ['j' => ['?_events e ON e.id = `q`.eventId', true], 's' => ', e.holidayId']
+                        'rsc' => ['j' => '?_spell rsc ON q.`rewardSpellCast` = rsc.`id`'], // limit rewardSpellCasts
+                        'qse' => ['j' => '?_quests_startend qse ON q.`id` = qse.`questId`', 's' => ', qse.`method`'], // groupConcat..?
+                        'e'   => ['j' => ['?_events e ON e.`id` = q.`eventId`', true], 's' => ', e.`holidayId`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -29,7 +28,7 @@ class QuestList extends BaseType
         parent::__construct($conditions, $miscData);
 
         // i don't like this very much
-        $currencies = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, itemId FROM ?_currencies');
+        $currencies = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `itemId` FROM ?_currencies');
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
@@ -75,10 +74,10 @@ class QuestList extends BaseType
                 $rewards[Type::TITLE][] = $_;
 
             if ($_ = $_curTpl['rewardHonorPoints'])
-                $rewards[Type::CURRENCY][104] = $_;
+                $rewards[Type::CURRENCY][CURRENCY_HONOR_POINTS] = $_;
 
             if ($_ = $_curTpl['rewardArenaPoints'])
-                $rewards[Type::CURRENCY][103] = $_;
+                $rewards[Type::CURRENCY][CURRENCY_ARENA_POINTS] = $_;
 
             for ($i = 1; $i < 7; $i++)
             {
@@ -111,20 +110,12 @@ class QuestList extends BaseType
         }
     }
 
-    // static use START
-    public static function getName($id)
-    {
-        $n = DB::Aowow()->SelectRow('SELECT name_loc0, name_loc2, name_loc3, name_loc4, name_loc6, name_loc8 FROM ?_quests WHERE id = ?d', $id);
-        return Util::localizedString($n, 'name');
-    }
-    // static use END
-
-    public function isRepeatable()
+    public function isRepeatable() : bool
     {
         return $this->curTpl['flags'] & QUEST_FLAG_REPEATABLE || $this->curTpl['specialFlags'] & QUEST_FLAG_SPECIAL_REPEATABLE;
     }
 
-    public function isDaily()
+    public function isDaily() : int
     {
         if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
             return 1;
@@ -139,13 +130,13 @@ class QuestList extends BaseType
     }
 
     // using reqPlayerKills and rewardHonor as a crutch .. has TC this even implemented..?
-    public function isPvPEnabled()
+    public function isPvPEnabled() : bool
     {
         return $this->curTpl['reqPlayerKills'] || $this->curTpl['rewardHonorPoints'] || $this->curTpl['rewardArenaPoints'];
     }
 
     // by TC definition
-    public function isSeasonal()
+    public function isSeasonal() : bool
     {
         return in_array($this->getField('zoneOrSortBak'), [-22, -284, -366, -369, -370, -376, -374]) && !$this->isRepeatable();
     }
@@ -171,7 +162,7 @@ class QuestList extends BaseType
         return $data;
     }
 
-    public function getSOMData($side = SIDE_BOTH)
+    public function getSOMData(int $side = SIDE_BOTH) : array
     {
         $data = [];
 
@@ -181,7 +172,7 @@ class QuestList extends BaseType
                 continue;
 
             [$series, $first] = DB::Aowow()->SelectRow(
-                'SELECT IF(prev.id OR cur.nextQuestIdChain, 1, 0) AS "0", IF(prev.id IS NULL AND cur.nextQuestIdChain, 1, 0) AS "1" FROM ?_quests cur LEFT JOIN ?_quests prev ON prev.nextQuestIdChain = cur.id WHERE cur.id = ?d',
+               'SELECT IF(prev.`id` OR cur.`nextQuestIdChain`, 1, 0) AS "0", IF(prev.`id` IS NULL AND cur.`nextQuestIdChain`, 1, 0) AS "1" FROM ?_quests cur LEFT JOIN ?_quests prev ON prev.`nextQuestIdChain` = cur.`id` WHERE cur.`id` = ?d',
                 $this->id
             );
 
@@ -201,7 +192,7 @@ class QuestList extends BaseType
         return $data;
     }
 
-    public function getListviewData($extraFactionId = 0)    // i should formulate a propper parameter..
+    public function getListviewData(int $extraFactionId = 0) : array
     {
         $data = [];
 
@@ -299,7 +290,7 @@ class QuestList extends BaseType
         return $data;
     }
 
-    public function parseText($type = 'objectives', $jsEscaped = true)
+    public function parseText(string $type = 'objectives', bool $jsEscaped = true) : string
     {
         $text = $this->getField($type, true);
         if (!$text)
@@ -313,7 +304,7 @@ class QuestList extends BaseType
         return $text;
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
             return null;
@@ -355,7 +346,10 @@ class QuestList extends BaseType
             else
                 $name = $rng > 0 ? CreatureList::getName($rng) : Lang::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
 
-            $xReq .= '<br /> - '.$name.($rngQty > 1 ? ' x '.$rngQty : null);
+            if (!$name)
+                $name = Util::ucFirst(Lang::game($rng > 0 ? 'npc' : 'object')).' #'.abs($rng);
+
+            $xReq .= '<br /> - '.$name.($rngQty > 1 ? ' x '.$rngQty : '');
         }
 
         for ($i = 1; $i < 7; $i++)
@@ -366,7 +360,9 @@ class QuestList extends BaseType
             if (!$ri || $riQty < 1)
                 continue;
 
-            $xReq .= '<br /> - '.Lang::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML).($riQty > 1 ? ' x '.$riQty : null);
+            $name = Lang::unescapeUISequences(ItemList::getName($ri), Lang::FMT_HTML) ?: Util::ucFirst(Lang::game('item')).' #'.$ri;
+
+            $xReq .= '<br /> - '.$name.($riQty > 1 ? ' x '.$riQty : '');
         }
 
         if ($et = $this->getField('end', true))
@@ -384,7 +380,7 @@ class QuestList extends BaseType
         return $x;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -430,7 +426,7 @@ class QuestList extends BaseType
 class QuestListFilter extends Filter
 {
     protected string $type  = 'quests';
-    protected array  $enums = array(
+    protected static array $enums = array(
         37 => parent::ENUM_CLASSS,                          // classspecific
         38 => parent::ENUM_RACE,                            // racespecific
          9 => parent::ENUM_FACTION,                         // objectiveearnrepwith
@@ -440,7 +436,7 @@ class QuestListFilter extends Filter
         10 => parent::ENUM_FACTION                          // decreasesrepwith
     );
 
-    protected array $genericFilter = array(
+    protected static array $genericFilter = array(
          1 => [parent::CR_CALLBACK,  'cbReputation',     '>',                  null], // increasesrepwith
          2 => [parent::CR_NUMERIC,   'rewardXP',         NUM_CAST_INT              ], // experiencegained
          3 => [parent::CR_NUMERIC,   'rewardOrReqMoney', NUM_CAST_INT              ], // moneyrewarded
@@ -475,7 +471,7 @@ class QuestListFilter extends Filter
         45 => [parent::CR_BOOLEAN,   'rewardTitleId'                               ]  // titlerewarded
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'    => [parent::V_RANGE, [1, 45],                                                             true ], // criteria ids
         'crs'   => [parent::V_LIST,  [parent::ENUM_NONE, parent::ENUM_ANY, [0, 99999]],                   true ], // criteria operators
         'crv'   => [parent::V_REGEX, parent::PATTERN_INT,                                                 true ], // criteria values - only numerals
@@ -554,7 +550,7 @@ class QuestListFilter extends Filter
         if (!Util::checkNumeric($crs, NUM_CAST_INT))
             return null;
 
-        if (!in_array($crs, $this->enums[$cr]))
+        if (!in_array($crs, self::$enums[$cr]))
             return null;
 
         if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_factions WHERE `id` = ?d', $crs))
@@ -586,7 +582,7 @@ class QuestListFilter extends Filter
         if (!Util::checkNumeric($crs, NUM_CAST_INT))
             return null;
 
-        if (!in_array($crs, $this->enums[$cr]))
+        if (!in_array($crs, self::$enums[$cr]))
             return null;
 
         return [
@@ -669,7 +665,7 @@ class QuestListFilter extends Filter
             return ['OR', ['reqFactionId1', 0, '>'], ['reqFactionId2', 0, '>']];
         else if ($crs == parent::ENUM_NONE)
             return ['AND', ['reqFactionId1', 0], ['reqFactionId2', 0]];
-        else if (in_array($crs, $this->enums[$cr]))
+        else if (in_array($crs, self::$enums[$cr]))
             return ['OR', ['reqFactionId1', $crs], ['reqFactionId2', $crs]];
 
         return null;
@@ -677,10 +673,10 @@ class QuestListFilter extends Filter
 
     protected function cbClassSpec(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr][$crs]))
+        if (!isset(self::$enums[$cr][$crs]))
             return null;
 
-        $_ = $this->enums[$cr][$crs];
+        $_ = self::$enums[$cr][$crs];
         if ($_ === true)
             return ['AND', ['reqClassMask', 0, '!'], [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']];
         else if ($_ === false)
@@ -693,10 +689,10 @@ class QuestListFilter extends Filter
 
     protected function cbRaceSpec(int $cr, int $crs, string $crv) : ?array
     {
-        if (!isset($this->enums[$cr][$crs]))
+        if (!isset(self::$enums[$cr][$crs]))
             return null;
 
-        $_ = $this->enums[$cr][$crs];
+        $_ = self::$enums[$cr][$crs];
         if ($_ === true)
             return ['AND', ['reqRaceMask', 0, '!'], [['reqRaceMask', ChrRace::MASK_ALL, '&'], ChrRace::MASK_ALL, '!'], [['reqRaceMask', ChrRace::MASK_ALLIANCE, '&'], ChrRace::MASK_ALLIANCE, '!'], [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!']];
         else if ($_ === false)

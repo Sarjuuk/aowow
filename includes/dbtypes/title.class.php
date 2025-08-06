@@ -6,20 +6,19 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class TitleList extends BaseType
+class TitleList extends DBTypeList
 {
     use listviewHelper;
 
-    public static   $type      = Type::TITLE;
-    public static   $brickFile = 'title';
-    public static   $dataTable = '?_titles';
+    public static int    $type      = Type::TITLE;
+    public static string $brickFile = 'title';
+    public static string $dataTable = '?_titles';
+    public        array  $sources   = [];
 
-    public          $sources   = [];
-
-    protected       $queryBase = 'SELECT t.*, t.id AS ARRAY_KEY FROM ?_titles t';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT t.*, t.`id` AS ARRAY_KEY FROM ?_titles t';
+    protected array  $queryOpts = array(
                         't'   => [['src']],                 //    11: Type::TITLE
-                        'src' => ['j' => ['?_source src ON type = 11 AND typeId = t.id', true], 's' => ', src13, moreType, moreTypeId']
+                        'src' => ['j' => ['?_source src ON `type` = 11 AND `typeId` = t.`id`', true], 's' => ', `src13`, `moreType`, `moreTypeId`']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -27,7 +26,7 @@ class TitleList extends BaseType
         parent::__construct($conditions, $miscData);
 
         // post processing
-        foreach ($this->iterate() as $id => &$_curTpl)
+        foreach ($this->iterate() as &$_curTpl)
         {
             // preparse sources - notice: under this system titles can't have more than one source (or two for achivements), which is enough for standard TC cases but may break custom cases
             if ($_curTpl['moreType'] == Type::ACHIEVEMENT)
@@ -54,7 +53,14 @@ class TitleList extends BaseType
         }
     }
 
-    public function getListviewData()
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT `male_loc0`, `male_loc2`, `male_loc3`, `male_loc4`, `male_loc6`, `male_loc8` FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n, 'male', fn($x) => trim(str_replace('%s', '', $x)));
+        return null;
+    }
+
+    public function getListviewData() : array
     {
         $data = [];
         $this->createSource();
@@ -78,7 +84,7 @@ class TitleList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data = [];
 
@@ -93,7 +99,7 @@ class TitleList extends BaseType
         return $data;
     }
 
-    private function createSource()
+    private function createSource() : void
     {
         $sources = array(
             SRC_QUEST         => [],
@@ -154,15 +160,15 @@ class TitleList extends BaseType
         }
     }
 
-    public function getHtmlizedName($gender = GENDER_MALE)
+    public function getHtmlizedName(int $gender = GENDER_MALE) : string
     {
         $field = $gender == GENDER_FEMALE ? 'female' : 'male';
         return str_replace('%s', '<span class="q0">&lt;'.Util::ucFirst(Lang::main('name')).'&gt;</span>', $this->getField($field, true));
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 
-    private function faction2Side(&$faction)                // thats weird.. and hopefully unique to titles
+    private function faction2Side(int &$faction) : void     // thats weird.. and hopefully unique to titles
     {
         if ($faction == 2)                                  // Horde
             $faction = 0;

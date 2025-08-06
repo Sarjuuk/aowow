@@ -6,13 +6,13 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class ProfileList extends BaseType
+class ProfileList extends DBTypeList
 {
     use profilerHelper, listviewHelper;
 
-    public static $contribute = CONTRIBUTE_NONE;
+    public static int $contribute = CONTRIBUTE_NONE;
 
-    public function getListviewData($addInfo = 0, array $reqCols = [])
+    public function getListviewData(int $addInfoMask = 0, array $reqCols = []) : array
     {
         $data = [];
         foreach ($this->iterate() as $__)
@@ -20,10 +20,10 @@ class ProfileList extends BaseType
             if (!$this->isVisibleToUser())
                 continue;
 
-            if (($addInfo & PROFILEINFO_PROFILE) && !$this->isCustom())
+            if (($addInfoMask & PROFILEINFO_PROFILE) && !$this->isCustom())
                 continue;
 
-            if (($addInfo & PROFILEINFO_CHARACTER) && $this->isCustom())
+            if (($addInfoMask & PROFILEINFO_CHARACTER) && $this->isCustom())
                 continue;
 
             $data[$this->id] = array(
@@ -48,14 +48,14 @@ class ProfileList extends BaseType
                 'gearscore'         => $this->getField('gearscore')
             );
 
-            if ($addInfo & PROFILEINFO_USER)
+            if ($addInfoMask & PROFILEINFO_USER)
                 $data[$this->id]['published'] = (int)!!($this->getField('cuFlags') & PROFILER_CU_PUBLISHED);
 
             // for the lv this determins if the link is profile=<id> or profile=<region>.<realm>.<name>
             if (!$this->isCustom())
                 $data[$this->id]['region']    = Profiler::urlize($this->getField('region'));
 
-            if ($addInfo & PROFILEINFO_ARENA)
+            if ($addInfoMask & PROFILEINFO_ARENA)
             {
                 $data[$this->id]['rating']  = $this->getField('rating');
                 $data[$this->id]['captain'] = $this->getField('captain');
@@ -67,7 +67,7 @@ class ProfileList extends BaseType
             foreach ($reqCols as $col)
                 $data[$this->id][$col] = $this->getField($col);
 
-            if ($addInfo & PROFILEINFO_PROFILE)
+            if ($addInfoMask & PROFILEINFO_PROFILE)
             {
                 if ($_ = $this->getField('description'))
                     $data[$this->id]['description'] = $_;
@@ -76,7 +76,7 @@ class ProfileList extends BaseType
                     $data[$this->id]['icon'] = $_;
             }
 
-            if ($addInfo & PROFILEINFO_CHARACTER)
+            if ($addInfoMask & PROFILEINFO_CHARACTER)
                 if ($_ = $this->getField('renameItr'))
                     $data[$this->id]['renameItr'] = $_;
 
@@ -87,13 +87,13 @@ class ProfileList extends BaseType
                 $data[$this->id]['deleted'] = 1;
         }
 
-        return array_values($data);
+        return $data;
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         if (!$this->curTpl)
-            return [];
+            return null;
 
         $title = '';
         $name  = $this->getField('name');
@@ -117,7 +117,7 @@ class ProfileList extends BaseType
         return $x;
     }
 
-    public function getJSGlobals($addMask = 0)
+    public function getJSGlobals(int $addMask = 0) : array
     {
         $data   = [];
         $realms = Profiler::getRealms();
@@ -166,12 +166,12 @@ class ProfileList extends BaseType
         return $data;
     }
 
-    public function isCustom()
+    public function isCustom() : bool
     {
         return $this->getField('cuFlags') & PROFILER_CU_PROFILE;
     }
 
-    public function isVisibleToUser()
+    public function isVisibleToUser() : bool
     {
         if (!$this->isCustom() || User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
             return true;
@@ -185,55 +185,20 @@ class ProfileList extends BaseType
         return (bool)($this->getField('cuFlags') & PROFILER_CU_PUBLISHED);
     }
 
-    public function getIcon()
+    public function getIcon() : string
     {
         if ($_ = $this->getField('icon'))
             return $_;
 
-        $str = 'chr_';
-
-        switch ($this->getField('race'))
-        {
-            case  1: $str .= 'human_';    break;
-            case  2: $str .= 'orc_';      break;
-            case  3: $str .= 'dwarf_';    break;
-            case  4: $str .= 'nightelf_'; break;
-            case  5: $str .= 'scourge_';  break;
-            case  6: $str .= 'tauren_';   break;
-            case  7: $str .= 'gnome_';    break;
-            case  8: $str .= 'troll_';    break;
-            case 10: $str .= 'bloodelf_'; break;
-            case 11: $str .= 'draenei_';  break;
-        }
-
-        switch ($this->getField('gender'))
-        {
-            case  0: $str .= 'male_';   break;
-            case  1: $str .= 'female_'; break;
-        }
-
-        switch ($this->getField('class'))
-        {
-            case  1: $str .= 'warrior0';     break;
-            case  2: $str .= 'paladin0';     break;
-            case  3: $str .= 'hunter0';      break;
-            case  4: $str .= 'rogue0';       break;
-            case  5: $str .= 'priest0';      break;
-            case  6: $str .= 'deathknight0'; break;
-            case  7: $str .= 'shaman0';      break;
-            case  8: $str .= 'mage0';        break;
-            case  9: $str .= 'warlock0';     break;
-            case 11: $str .= 'druid0';       break;
-        }
-
-        $level = $this->getField('level');
-        if ($level > 59)
-            $str .= floor(($level - 60) / 10) + 2;
-        else
-            $str .= 1;
-
-        return $str;
+        return sprintf('chr_%s_%s_%s%02d',
+            ChrRace::from($this->getField('race'))->json(),
+            $this->getField('gender') ? 'female' : 'male',
+            ChrClass::from($this->getField('class'))->json(),
+            max(1, floor(($this->getField('level') - 60) / 10) + 2)
+        );
     }
+
+    public static function getName(int $id) : ?LocString { return null; }
 }
 
 
@@ -242,7 +207,7 @@ class ProfileListFilter extends Filter
     use TrProfilerFilter;
 
     protected string $type          = 'profiles';
-    protected array  $genericFilter = array(
+    protected static array $genericFilter = array(
          2 => [parent::CR_NUMERIC,  'gearscore',         NUM_CAST_INT              ], // gearscore [num]
          3 => [parent::CR_CALLBACK, 'cbAchievs',         null,                 null], // achievementpoints [num]
          5 => [parent::CR_NUMERIC,  'talenttree1',       NUM_CAST_INT              ], // talenttree1 [num]
@@ -275,7 +240,7 @@ class ProfileListFilter extends Filter
         36 => [parent::CR_CALLBACK, 'cbHasGuild',        null,                 null]  // hasguild [yn]
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'    => [parent::V_RANGE,    [1, 36],                                          true ], // criteria ids
         'crs'   => [parent::V_LIST,     [parent::ENUM_NONE, parent::ENUM_ANY, [0, 5000]], true ], // criteria operators
         'crv'   => [parent::V_REGEX,    parent::PATTERN_CRV,                              true ], // criteria values
@@ -469,17 +434,17 @@ class ProfileListFilter extends Filter
 
 class RemoteProfileList extends ProfileList
 {
-    protected   $queryBase = 'SELECT `c`.*, `c`.`guid` AS ARRAY_KEY FROM characters c';
-    protected   $queryOpts = array(
+    protected string $queryBase = 'SELECT `c`.*, `c`.`guid` AS ARRAY_KEY FROM characters c';
+    protected array  $queryOpts = array(
                     'c'   => [['gm', 'g', 'cap']],                                                             // 12698: use criteria of Achievement 4496 as shortcut to get total achievement points
-                    'cap' => ['j' => ['character_achievement_progress cap ON cap.guid = c.guid AND cap.criteria = 12698', true], 's' => ', IFNULL(cap.counter, 0) AS achievementpoints'],
-                    'gm'  => ['j' => ['guild_member gm ON gm.guid = c.guid', true], 's' => ', gm.rank AS guildrank'],
-                    'g'   => ['j' => ['guild g ON g.guildid = gm.guildid', true], 's' => ', g.guildid AS guild, g.name AS guildname'],
-                    'atm' => ['j' => ['arena_team_member atm ON atm.guid = c.guid', true], 's' => ', atm.personalRating AS rating'],
-                    'at'  => [['atm'], 'j' => 'arena_team at ON atm.arenaTeamId = at.arenaTeamId', 's' => ', at.name AS arenateam, IF(at.captainGuid = c.guid, 1, 0) AS captain']
+                    'cap' => ['j' => ['character_achievement_progress cap ON cap.`guid` = c.`guid` AND cap.`criteria` = 12698', true], 's' => ', IFNULL(cap.`counter`, 0) AS "achievementpoints"'],
+                    'gm'  => ['j' => ['guild_member gm ON gm.`guid` = c.`guid`', true], 's' => ', gm.`rank` AS "guildrank"'],
+                    'g'   => ['j' => ['guild g ON g.`guildid` = gm.`guildid`', true], 's' => ', g.`guildid` AS "guild", g.`name` AS "guildname"'],
+                    'atm' => ['j' => ['arena_team_member atm ON atm.`guid` = c.`guid`', true], 's' => ', atm.`personalRating` AS "rating"'],
+                    'at'  => [['atm'], 'j' => 'arena_team at ON atm.`arenaTeamId` = at.`arenaTeamId`', 's' => ', at.`name` AS "arenateam", IF(at.`captainGuid` = c.`guid`, 1, 0) AS "captain"']
                 );
 
-    private     $rnItr     = [];                            // rename iterator [name => nCharsWithThisName]
+    private array $rnItr = [];                              // rename iterator [name => nCharsWithThisName]
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -518,7 +483,7 @@ class RemoteProfileList extends ProfileList
             }
             else
             {
-                trigger_error('char #'.$guid.' belongs to nonexistant realm #'.$r, E_USER_WARNING);
+                trigger_error('char #'.$guid.' belongs to nonexistent realm #'.$r, E_USER_WARNING);
                 unset($this->templates[$guid]);
                 continue;
             }
@@ -549,10 +514,10 @@ class RemoteProfileList extends ProfileList
             if ($curTpl['at_login'] & 0x1)
             {
                 if (!isset($this->rnItr[$curTpl['name']]))
-                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(renameItr) FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID IS NOT NULL AND name = ?', $r, $curTpl['name']) ?: 0;
+                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ?', $r, $curTpl['name']) ?: 0;
 
                 // already saved as "pending rename"
-                if ($rnItr = DB::Aowow()->selectCell('SELECT renameItr FROM ?_profiler_profiles WHERE realm = ?d AND realmGUID = ?d', $r, $g))
+                if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $r, $g))
                     $curTpl['renameItr'] = $rnItr;
                 // not yet recognized: get max itr
                 else
@@ -565,9 +530,9 @@ class RemoteProfileList extends ProfileList
         }
 
         foreach ($talentLookup as $realm => $chars)
-            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT guid AS ARRAY_KEY, spell AS ARRAY_KEY2, talentGroup FROM character_talent ct WHERE guid IN (?a)', array_keys($chars));
+            $talentLookup[$realm] = DB::Characters($realm)->selectCol('SELECT `guid` AS ARRAY_KEY, `spell` AS ARRAY_KEY2, `talentGroup` FROM character_talent ct WHERE `guid` IN (?a)', array_keys($chars));
 
-        $talentSpells = DB::Aowow()->select('SELECT spell AS ARRAY_KEY, tab, `rank` FROM ?_talents WHERE class IN (?a)', array_unique($talentSpells));
+        $talentSpells = DB::Aowow()->select('SELECT `spell` AS ARRAY_KEY, `tab`, `rank` FROM ?_talents WHERE `class` IN (?a)', array_unique($talentSpells));
 
         foreach ($conditions as $c)
             if (is_int($c))
@@ -610,7 +575,7 @@ class RemoteProfileList extends ProfileList
         }
     }
 
-    public function getListviewData($addInfoMask = 0, array $reqCols = [])
+    public function getListviewData(int $addInfoMask = 0, array $reqCols = []) : array
     {
         $data = parent::getListviewData($addInfoMask, $reqCols);
 
@@ -621,7 +586,7 @@ class RemoteProfileList extends ProfileList
         return $data;
     }
 
-    public function initializeLocalEntries()
+    public function initializeLocalEntries() : void
     {
         $baseData = $guildData = [];
         foreach ($this->iterate() as $guid => $__)
@@ -660,7 +625,7 @@ class RemoteProfileList extends ProfileList
                 DB::Aowow()->query('INSERT INTO ?_profiler_guild (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($guildData)));
 
             // merge back local ids
-            $localGuilds = DB::Aowow()->selectCol('SELECT realm AS ARRAY_KEY, realmGUID AS ARRAY_KEY2, id FROM ?_profiler_guild WHERE realm IN (?a) AND realmGUID IN (?a)',
+            $localGuilds = DB::Aowow()->selectCol('SELECT `realm` AS ARRAY_KEY, `realmGUID` AS ARRAY_KEY2, `id` FROM ?_profiler_guild WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
                 array_column($guildData, 'realm'), array_column($guildData, 'realmGUID')
             );
 
@@ -677,7 +642,7 @@ class RemoteProfileList extends ProfileList
 
             // merge back local ids
             $localIds = DB::Aowow()->select(
-                'SELECT CONCAT(realm, ":", realmGUID) AS ARRAY_KEY, id, gearscore FROM ?_profiler_profiles WHERE (cuFlags & ?d) = 0 AND realm IN (?a) AND realmGUID IN (?a)',
+               'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id`, `gearscore` FROM ?_profiler_profiles WHERE (`cuFlags` & ?d) = 0 AND `realm` IN (?a) AND `realmGUID` IN (?a)',
                 PROFILER_CU_PROFILE,
                 array_column($baseData, 'realm'),
                 array_column($baseData, 'realmGUID')
@@ -693,13 +658,13 @@ class RemoteProfileList extends ProfileList
 
 class LocalProfileList extends ProfileList
 {
-    protected       $queryBase = 'SELECT p.*, p.id AS ARRAY_KEY FROM ?_profiler_profiles p';
-    protected       $queryOpts = array(
-                        'p'   => [['g'], 'g' => 'p.id'],
-                        'ap'  => ['j' => ['?_account_profiles ap ON ap.profileId = p.id', true], 's' => ', (IFNULL(ap.ExtraFlags, 0) | p.cuFlags) AS cuFlags'],
-                        'atm' => ['j' => ['?_profiler_arena_team_member atm ON atm.profileId = p.id', true], 's' => ', atm.captain, atm.personalRating AS rating, atm.seasonGames, atm.seasonWins'],
-                        'at'  => [['atm'], 'j' => ['?_profiler_arena_team at ON at.id = atm.arenaTeamId', true], 's' => ', at.type'],
-                        'g'   => ['j' => ['?_profiler_guild g ON g.id = p.guild', true], 's' => ', g.name AS guildname']
+    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ?_profiler_profiles p';
+    protected array  $queryOpts = array(
+                        'p'   => [['g'], 'g' => 'p.`id`'],
+                        'ap'  => ['j' => ['?_account_profiles ap ON ap.`profileId` = p.`id`', true], 's' => ', (IFNULL(ap.`ExtraFlags`, 0) | p.`cuFlags`) AS "cuFlags"'],
+                        'atm' => ['j' => ['?_profiler_arena_team_member atm ON atm.`profileId` = p.`id`', true], 's' => ', atm.`captain`, atm.`personalRating` AS "rating", atm.`seasonGames`, atm.`seasonWins`'],
+                        'at'  => [['atm'], 'j' => ['?_profiler_arena_team at ON at.`id` = atm.`arenaTeamId`', true], 's' => ', at.`type`'],
+                        'g'   => ['j' => ['?_profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -744,7 +709,7 @@ class LocalProfileList extends ProfileList
         }
     }
 
-    public function getProfileUrl()
+    public function getProfileUrl() : string
     {
         $url = '?profile=';
 
@@ -752,8 +717,8 @@ class LocalProfileList extends ProfileList
             return $url.$this->getField('id');
 
         return $url.implode('.', array(
-            Profiler::urlize($this->getField('region')),
-            Profiler::urlize($this->getField('realmName')),
+            $this->getField('region'),
+            Profiler::urlize($this->getField('realmName'), true),
             urlencode($this->getField('name'))
         ));
     }

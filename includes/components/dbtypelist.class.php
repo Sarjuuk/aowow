@@ -6,23 +6,23 @@ if (!defined('AOWOW_REVISION'))
     die("illegal access");
 
 
-abstract class BaseType
+abstract class DBTypeList
 {
-    public    $id        = 0;
-    public    $error     = true;
+    protected array  $templates = [];
+    protected array  $curTpl    = [];
+    protected int    $matches   = 0;                        // total matches unaffected by sqlLimit in config
 
-    protected $templates = [];
-    protected $curTpl    = [];
-    protected $matches   = 0;                               // total matches unaffected by sqlLimit in config
+    protected array  $dbNames   = ['Aowow'];                // multiple DBs in profiler
+    protected string $queryBase = '';
+    protected array  $queryOpts = [];
 
-    protected $dbNames   = ['Aowow'];                       // multiple DBs in profiler
-    protected $queryBase = '';
-    protected $queryOpts = [];
+    private array $itrStack = [];
 
-    private   $itrStack  = [];
-
-    public static $dataTable  = '';
-    public static $contribute = CONTRIBUTE_ANY;
+    public static int        $type;
+    public static int        $contribute = CONTRIBUTE_ANY;
+    public static string     $dataTable;
+    public        string|int $id         = 0;               // sooo .. everything is int, except profiler related stuff, whose keys are <realmId>:<subjectGUID>
+    public        bool       $error      = true;
 
     /*
     *   condition as array [expression, value, operator]
@@ -81,7 +81,7 @@ abstract class BaseType
         if (!empty($miscData['calcTotal']))
             $calcTotal = true;
 
-        $resolveCondition = function ($c, $supLink) use (&$resolveCondition, &$prefixes)
+        $resolveCondition = function (array $c, string $supLink) use (&$resolveCondition, &$prefixes) : ?string
         {
             $subLink = '';
 
@@ -118,7 +118,7 @@ abstract class BaseType
                     $field = $resolveCondition($c[0], $supLink);
                 else if ($c[0])
                 {
-                    $setPrefix = function($f) use(&$prefixes)
+                    $setPrefix = function(mixed $f) use(&$prefixes) : ?string
                     {
                         if (is_array($f))
                             $f = $f[0];
@@ -167,9 +167,7 @@ abstract class BaseType
 
                 if (is_array($c[1]) && !empty($c[1]))
                 {
-                    array_walk($c[1], function(&$item, $key) {
-                        $item = Util::checkNumeric($item) ? $item : DB::Aowow()->escape($item);
-                    });
+                    array_walk($c[1], fn(&$x) => $x = Util::checkNumeric($x) ? $x : DB::Aowow()->escape($x));
 
                     $op  = (isset($c[2]) && $c[2] == '!') ? 'NOT IN' : 'IN';
                     $val = '('.implode(', ', $c[1]).')';
@@ -282,8 +280,8 @@ abstract class BaseType
                     // hackfix the inner items query to not contain duplicate column names
                     // yes i know the real solution would be to not have items and item_stats share column names
                     // soon™....
-                    if (get_class($this) == __NAMESPACE__.'\ItemList')
-                        $totalQuery = str_replace([', `is`.*', ', i.id AS id'], '', $totalQuery);
+                    if (get_class($this) == ItemList::class)
+                        $totalQuery = str_replace([', `is`.*', ', i.`id` AS "id"'], '', $totalQuery);
 
                     $this->matches += DB::{$n}($dbIdx)->selectCell('SELECT COUNT(*) FROM ('.$totalQuery.') x');
                 }
@@ -308,8 +306,11 @@ abstract class BaseType
         $this->error = false;
     }
 
-    public function &iterate()
+    public function &iterate() : \Generator
     {
+        if (!$this->templates)
+            return;
+
         $this->itrStack[] = $this->id;
 
         // reset on __construct
@@ -341,15 +342,18 @@ abstract class BaseType
         while (next($this->templates));
     }
 
-    protected function reset()
+    protected function reset() : void
     {
         unset($this->curTpl);                               // kill reference or strange stuff will happen
+        if (!$this->templates)
+            return;
+
         $this->curTpl = reset($this->templates);
         $this->id     = key($this->templates);
     }
 
     // read-access to templates
-    public function getEntry($id)
+    public function getEntry(string|int $id) : ?array
     {
         if (isset($this->templates[$id]))
         {
@@ -362,7 +366,7 @@ abstract class BaseType
         return null;
     }
 
-    public function getField($field, $localized = false, $silent = false)
+    public function getField(string $field, bool $localized = false, bool $silent = false) : mixed
     {
         if (!$this->curTpl || (!$localized && !isset($this->curTpl[$field])))
             return '';
@@ -376,7 +380,7 @@ abstract class BaseType
         return $value;
     }
 
-    public function getAllFields($field, $localized = false, $silent = false)
+    public function getAllFields(string $field, bool $localized = false, bool $silent = false) : array
     {
         $data = [];
 
@@ -397,17 +401,17 @@ abstract class BaseType
         return 0;
     }
 
-    public function getFoundIDs()
+    public function getFoundIDs() : array
     {
         return array_keys($this->templates);
     }
 
-    public function getMatches()
+    public function getMatches() : int
     {
         return $this->matches;
     }
 
-    protected function extendQueryOpts($extra)              // needs to be called from __construct
+    protected function extendQueryOpts(array $extra) : void // needs to be called from __construct
     {
         foreach ($extra as $tbl => $sets)
         {
@@ -452,6 +456,28 @@ abstract class BaseType
         }
     }
 
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?# WHERE `id` = ?d', static::$dataTable, $id))
+            return new LocString($n);
+        return null;
+    }
+
+    public static function makeLink(int $id, int $fmt = Lang::FMT_HTML) : string
+    {
+        if ($n = static::getName($id))
+        {
+            return match ($fmt)
+            {
+                Lang::FMT_HTML   => '<a href="?'.Type::getFileString(static::$type).'='.$id.'">'.$n.'</a>',
+                Lang::FMT_MARKUP => '[url=?'.Type::getFileString(static::$type).'='.$id.']'.$n.'[/url]',
+                default          => $n
+            };
+        }
+
+        return '';
+    }
+
     /* source More .. keys seen used
          'n':   name [always set]
          't':   type [always set]
@@ -470,13 +496,13 @@ abstract class BaseType
 
     // should return data required to display a listview of any kind
     // this is a rudimentary example, that will not suffice for most Types
-    abstract public function getListviewData();
+    abstract public function getListviewData() : array;
 
     // should return data to extend global js variables for a certain type (e.g. g_items)
-    abstract public function getJSGlobals($addMask = GLOBALINFO_ANY);
+    abstract public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array;
 
     // NPC, GO, Item, Quest, Spell, Achievement, Profile would require this
-    abstract public function renderTooltip();
+    abstract public function renderTooltip() : ?string;
 }
 
 trait listviewHelper
@@ -547,7 +573,7 @@ trait listviewHelper
         return $result;
     }
 
-    public function hasAnySource()
+    public function hasAnySource() : bool
     {
         if (!isset($this->sources))
             return false;
@@ -581,7 +607,7 @@ trait spawnHelper
         SPAWNINFO_QUEST => null
     );
 
-    private function createShortSpawns()                    // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
+    private function createShortSpawns() : void             // [zoneId, floor, [[x1, y1], [x2, y2], ..]] as tooltip2 if enabled by <a rel="map" ...> or anchor #map (one area, one floor, one creature, no survivors)
     {
         $this->spawnResult[SPAWNINFO_SHORT] = new \StdClass;
 
@@ -600,7 +626,7 @@ trait spawnHelper
     }
 
     // for display on map (object/npc detail page)
-    private function createFullSpawns(bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false)
+    private function createFullSpawns(bool $skipWPs = false, bool $skipAdmin = false, bool $hasLabel = false, bool $hasLink = false) : void
     {
         $data     = [];
         $wpSum    = [];
@@ -633,7 +659,7 @@ trait spawnHelper
                             $label[] = Lang::npc('wait').Lang::main('colon').Util::formatTime($p['wait'], false);
 
                         $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
-                            'label' => "\0$<br><span class=\"q0\">".implode('<br>', $label).'</span>',
+                            'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',
                             'type'  => $wpIdx
                         );
 
@@ -743,7 +769,7 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_FULL] = $data;
     }
 
-    private function sortBySpawnCount($a, $b)
+    private function sortBySpawnCount(array $a, array $b) : int
     {
         $aCount = current($a)['count'];
         $bCount = current($b)['count'];
@@ -751,7 +777,7 @@ trait spawnHelper
         return $bCount <=> $aCount;                         // sort descending
     }
 
-    private function createZoneSpawns()                     // [zoneId1, zoneId2, ..]             for locations-column in listview
+    private function createZoneSpawns() : void              // [zoneId1, zoneId2, ..]             for locations-column in listview
     {
         $res = DB::Aowow()->selectCol("SELECT `typeId` AS ARRAY_KEY, GROUP_CONCAT(DISTINCT `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0 GROUP BY `typeId`", self::$type, $this->getfoundIDs());
         foreach ($res as &$r)
@@ -764,7 +790,7 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_ZONES] = $res;
     }
 
-    private function createQuestSpawns()                    // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
+    private function createQuestSpawns() :void              // [zoneId => [floor => [[x1, y1], [x2, y2], ..]]]      mapper on quest detail page
     {
         if (self::$type == Type::SOUND)
             return;
@@ -796,7 +822,7 @@ trait spawnHelper
         $this->spawnResult[SPAWNINFO_QUEST] = $spawns;
     }
 
-    public function getSpawns(int $mode, bool ...$info)
+    public function getSpawns(int $mode, bool ...$info) : array|\StdClass
     {
         // only Creatures, GOs and SoundEmitters can be spawned
         if (!self::$type || !$this->getfoundIDs() || (self::$type != Type::NPC && self::$type != Type::OBJECT && self::$type != Type::SOUND && self::$type != Type::AREATRIGGER))
@@ -832,12 +858,11 @@ trait spawnHelper
 
 trait profilerHelper
 {
-    public  static $type        = 0;                        // arena teams dont actually have one
-    public  static $brickFile   = 'profile';                // profile is multipurpose
+    public static $brickFile = 'profile';                   // profile is multipurpose
 
     private static $subjectGUID = 0;
 
-    public function selectRealms($fi)
+    public function selectRealms(?array $fi) : bool
     {
         $this->dbNames = [];
 

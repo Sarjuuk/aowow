@@ -160,7 +160,7 @@ class Game
         switch (gettype($spell))
         {
             case 'object':
-                if (get_class($spell) != __NAMESPACE__.'\SpellList')
+                if (get_class($spell) != SpellList::class)
                     return [];
 
                 $lookup[] = $spell->id;

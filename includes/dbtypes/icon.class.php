@@ -6,17 +6,17 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class IconList extends BaseType
+class IconList extends DBTypeList
 {
     use listviewHelper;
 
-    public static   $type       = Type::ICON;
-    public static   $brickFile  = 'icongallery';
-    public static   $dataTable  = '?_icons';
-    public static   $contribute = CONTRIBUTE_CO;
+    public static int    $type       = Type::ICON;
+    public static string $brickFile  = 'icongallery';
+    public static string $dataTable  = '?_icons';
+    public static int    $contribute = CONTRIBUTE_CO;
 
-    private         $pseudoQry  = 'SELECT `iconId` AS ARRAY_KEY, COUNT(*) FROM ?# WHERE `iconId` IN (?a) GROUP BY `iconId`';
-    private         $pseudoJoin = array(
+    private string $pseudoQry  = 'SELECT `iconId` AS ARRAY_KEY, COUNT(*) FROM ?# WHERE `iconId` IN (?a) GROUP BY `iconId`';
+    private array  $pseudoJoin = array(
         'nItems'        => '?_items',
         'nSpells'       => '?_spell',
         'nAchievements' => '?_achievement',
@@ -24,15 +24,15 @@ class IconList extends BaseType
         'nPets'         => '?_pet'
     );
 
-    protected       $queryBase  = 'SELECT ic.*, ic.id AS ARRAY_KEY FROM ?_icons ic';
+    protected string $queryBase  = 'SELECT ic.*, ic.`id` AS ARRAY_KEY FROM ?_icons ic';
     /* this works, but takes ~100x more time than i'm comfortable with .. kept as reference
-    protected       $queryOpts  = array(                    // 29 => Type::ICON
-                        'ic'  => [['s', 'i', 'a', 'c', 'p'], 'g' => 'ic.id'],
-                        'i'   => ['j' => ['?_items `i`  ON `i`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `i`.`id`) AS nItems'],
-                        's'   => ['j' => ['?_spell `s`  ON `s`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `s`.`id`) AS nSpells'],
-                        'a'   => ['j' => ['?_achievement `a`  ON `a`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `a`.`id`) AS nAchievements'],
-                        'c'   => ['j' => ['?_currencies `c`  ON `c`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `c`.`id`) AS nCurrencies'],
-                        'p'   => ['j' => ['?_pet `p`  ON `p`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `p`.`id`) AS nPets']
+    protected array  $queryOpts  = array(                   // 29 => Type::ICON
+                        'ic' => [['s', 'i', 'a', 'c', 'p'], 'g' => 'ic.id'],
+                        'i'  => ['j' => ['?_items `i`  ON `i`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `i`.`id`) AS "nItems"'],
+                        's'  => ['j' => ['?_spell `s`  ON `s`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `s`.`id`) AS "nSpells"'],
+                        'a'  => ['j' => ['?_achievement `a`  ON `a`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `a`.`id`) AS "nAchievements"'],
+                        'c'  => ['j' => ['?_currencies `c`  ON `c`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `c`.`id`) AS "nCurrencies"'],
+                        'p'  => ['j' => ['?_pet `p`  ON `p`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `p`.`id`) AS "nPets"']
                     );
     */
 
@@ -51,16 +51,14 @@ class IconList extends BaseType
         }
     }
 
-
-    // use if you JUST need the name
-    public static function getName($id)
+    public static function getName(int $id) : ?LocString
     {
-        $n = DB::Aowow()->SelectRow('SELECT `name` FROM ?_icons WHERE `id` = ?d', $id );
-        return Util::localizedString($n, 'name');
+        if ($n = DB::Aowow()->selectRow('SELECT `name` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n);
+        return null;
     }
-    // end static use
 
-    public function getListviewData($addInfoMask = 0x0)
+    public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
 
@@ -87,7 +85,7 @@ class IconList extends BaseType
         return $data;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -97,7 +95,7 @@ class IconList extends BaseType
         return $data;
     }
 
-    public function renderTooltip() { }
+    public function renderTooltip() : ?string { return null; }
 }
 
 
@@ -120,7 +118,7 @@ class IconListFilter extends Filter
     );
 
     protected string $type          = 'icons';
-    protected array  $genericFilter = array(
+    protected static array $genericFilter = array(
          1 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // items [num]
          2 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // spells [num]
          3 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // achievements [num]
@@ -130,7 +128,7 @@ class IconListFilter extends Filter
         13 => [parent::CR_CALLBACK, 'cbUseAll'  ]           // used [num]
     );
 
-    protected array $inputFields = array(
+    protected static array $inputFields = array(
         'cr'  => [parent::V_LIST,  [1, 2, 3, 6, 9, 11, 13], true ], // criteria ids
         'crs' => [parent::V_RANGE, [1, 6],                  true ], // criteria operators
         'crv' => [parent::V_REGEX, parent::PATTERN_INT,     true ], // criteria values - all criteria are numeric here

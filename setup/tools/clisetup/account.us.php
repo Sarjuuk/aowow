@@ -46,12 +46,12 @@ CLISetup::registerUtility(new class extends UtilityScript
         $passw = $args[1] ?? '';
         $email = $args[2];
 
-        if ($name && User::isValidName($name))
+        if (Util::validateUsername($name))
             unset($this->fields['name']);
         else
             $name = '';
 
-        if ($passw && User::isValidPass($passw))
+        if (Util::validatePassword($passw))
         {
             unset($this->fields['pass1']);
             unset($this->fields['pass2']);
@@ -59,7 +59,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         else
             $passw = '';
 
-        if (is_string($email) && (!strlen($email) || Util::isValidEmail($email)))
+        if (Util::validateEmail($email))
             unset($this->fields['email']);
         else
             $email = '';
@@ -68,19 +68,19 @@ CLISetup::registerUtility(new class extends UtilityScript
         {
             CLI::write();
 
-            if (!$name && !User::isValidName($uiAccount['name'] ?? '', $e))
+            if (!$name && !Util::validateUsername($uiAccount['name'], $e))
                 CLI::write(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLI::LOG_ERROR);
             else if (!$name)
                 $name = $uiAccount['name'];
 
-            if (!$passw && !User::isValidPass($uiAccount['pass1'] ?? '', $e))
+            if (!$passw && !Util::validatePassword($uiAccount['pass1'], $e))
                 CLI::write(Lang::account($e == 1 ? 'errPassLength' : 'errPassChars'), CLI::LOG_ERROR);
             else if (!$passw && $uiAccount['pass1'] != $uiAccount['pass2'])
                 CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
             else if (!$passw)
                 $passw = $uiAccount['pass1'];
 
-            if (!$email && Util::isValidEmail($uiAccount['email'] ?? ''))
+            if (!$email && Util::validateEmail($uiAccount['email']))
                 $email = $uiAccount['email'];
             else if (!$email && $uiAccount && $uiAccount['email'])
                 CLI::write('[account] email invalid ... using default: ' . Cfg::get('CONTACT_EMAIL'), CLI::LOG_INFO);

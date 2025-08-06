@@ -489,7 +489,7 @@ abstract class SetupScript
             CLI::write('[build] created '.$newDirs.' extra paths');
 
         // load DBC files
-        if (!in_array(__NAMESPACE__.'\TrDBCcopy', class_uses($this)))
+        if (!in_array(TrDBCcopy::class, class_uses($this)))
         {
             foreach ($this->getRequiredDBCs() as $req)
             {

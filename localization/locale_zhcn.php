@@ -1611,7 +1611,7 @@ $lang = array(
             null,                                   "盾牌",                              "圣契",                              "神像",                                "图腾",
             "魔印"
         ),
-        'weaponSubClass' => array(                          // ordered by content firts, then alphabeticaly
+        'weaponSubClass' => array(                          // ordered by content first, then alphabeticaly
             15 => "匕首",                        13 => "拳套",                    0 => "单手斧",                 4 => "单手杖",                7 => "单手剑",
              6 => "长柄武器",                       10 => "法杖",                          1 => "双手斧",                 5 => "双手锤",                8 => "双手剑",
              2 => "弓",                           18 => "弩",                       3 => "枪",                           16 => "投掷",                         19 => "魔杖",
@@ -2167,7 +2167,7 @@ $lang = array(
         ),
         'elixirType'    => [null, "战斗", "守护"],
         'cat'           => array(                           // ordered by content first, then alphabeticaly
-             2 => "武器",                                     // self::$spell['weaponSubClass']
+             2 => array("武器", []),                          // filled with self::$spell['weaponSubClass'] on load
              4 => array("护甲", array(
                  1 => "布甲", 2 => "皮甲", 3 => "锁甲", 4 => "板甲", 6 => "盾", 7 => "圣契",
                  8 => "神像", 9 => "图腾", 10 => "魔印", -6 => "斗篷", -5 => "副手", -8 => "衬衫",

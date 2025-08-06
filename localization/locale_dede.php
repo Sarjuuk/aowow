@@ -25,8 +25,8 @@ $lang = array(
         'jsError'       => "Stelle bitte sicher, dass JavaScript aktiviert ist.",
         'language'      => "Sprache",
         'feedback'      => "Rückmeldung",
-        'numSQL'        => "Anzahl an MySQL-Queries",
-        'timeSQL'       => "Zeit für MySQL-Queries",
+        'numSQL'        => "Anzahl an SQL-Queries",
+        'timeSQL'       => "Zeit für SQL-Queries",
         'noJScript'     => '<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">aktiviert JavaScript</a> in Eurem Browser.',
         'userProfiles'  => "Deine Charaktere",
         'pageNotFound'  => "Dies %s existiert nicht.",
@@ -2167,7 +2167,7 @@ $lang = array(
         ),
         'elixirType'    => [null, "Kampf", "Wächter"],
         'cat'           => array(
-             2 => "Waffen",                                 // self::$spell['weaponSubClass']
+             2 => array("Waffen", []),                      // filled with self::$spell['weaponSubClass'] on load
              4 => array("Rüstung", array(
                  1 => "Stoffrüstung",                2 => "Lederrüstung",            3 => "Schwere Rüstung",         4 => "Plattenrüstung",          6 => "Schilde",                 7 => "Buchbände",
                  8 => "Götzen",                      9 => "Totems",                 10 => "Siegel",                 -6 => "Umhänge",                -5 => "Nebenhandgegenstände",   -8 => "Hemden",
