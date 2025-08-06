@@ -65,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "Расширенный поиск",
         'addFilter'     => "Добавить другой фильтр",
-        'match'         => "Совпадение",
+        'match'         => "Совпадение: ",
         'allFilter'     => "Все фильтры",
         'oneFilter'     => "Любое совпадение",
         'applyFilter'   => "Применить фильтр",
@@ -2119,10 +2119,11 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "Особый",               "Красный",          "Желтый",               "Синий"
         ),
+        'gemRequires'   => "Требуется ",                    // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => "меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета",
-            3 => "больше |3-7(%s), чем |3-7(%s) камней",
-            5 => "хотя бы %d |4камень:камня:камней; |3-1(%s) цвета"
+            ENCHANT_CONDITION_LESS_VALUE   => "меньше, чем %d |4камень:камня:камней; |3-1(%s) цвета",
+            ENCHANT_CONDITION_MORE_COMPARE => "больше |3-7(%s), чем |3-7(%s) камней",
+            ENCHANT_CONDITION_MORE_VALUE   => "хотя бы %d |4камень:камня:камней; |3-1(%s) цвета"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Требуется личный и командный рейтинг на арене не ниже %d",

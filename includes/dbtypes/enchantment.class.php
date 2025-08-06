@@ -10,18 +10,18 @@ class EnchantmentList extends DBTypeList
 {
     use listviewHelper;
 
-    public static      $type       = Type::ENCHANTMENT;
-    public static      $brickFile  = 'enchantment';
-    public static      $dataTable  = '?_itemenchantment';
+    public static int    $type      = Type::ENCHANTMENT;
+    public static string $brickFile = 'enchantment';
+    public static string $dataTable = '?_itemenchantment';
 
-    private array      $jsonStats  = [];
+    private  array     $jsonStats  = [];
     private ?SpellList $relSpells  = null;
-    private array      $triggerIds = [];
+    private  array     $triggerIds = [];
 
-    protected          $queryBase  = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
-    protected          $queryOpts  = array(                    // 502 => Type::ENCHANTMENT
-                        'ie'  => [['is']],
-                        'is'  => ['j' => ['?_item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
+    protected string $queryBase = 'SELECT ie.*, ie.id AS ARRAY_KEY FROM ?_itemenchantment ie';
+    protected array  $queryOpts = array(                    // 502 => Type::ENCHANTMENT
+                        'ie' => [['is']],
+                        'is' => ['j' => ['?_item_stats `is`  ON `is`.`type` = 502 AND `is`.`typeId` = `ie`.`id`', true], 's' => ', `is`.*'],
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -60,7 +60,7 @@ class EnchantmentList extends DBTypeList
             // issue with scaling stats enchantments
             // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
             // so filter the stats container and if it is empty, rebuild from self. .. there are no mixed scaling/static enchantments, right!?
-            $this->jsonStats[$this->id] = (new StatsContainer())->fromJson($curTpl, true)->filter();
+            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true)->filter();
             if (!count($this->jsonStats[$this->id]))
                 $this->jsonStats[$this->id]->fromEnchantment($curTpl);
         }

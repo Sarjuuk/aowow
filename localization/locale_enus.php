@@ -65,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "Extended search",
         'addFilter'     => "Add another Filter",
-        'match'         => "Match",
+        'match'         => "Match: ",
         'allFilter'     => "All filters",
         'oneFilter'     => "At least one",
         'applyFilter'   => "Apply filter",
@@ -2118,10 +2118,11 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "meta",                 "red",              "yellow",               "blue"
         ),
+        'gemRequires'   => "Requires ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua
-            2 => "less than %d %s |4gem:gems;",
-            3 => "more %s gems than %s gems",
-            5 => "at least %d %s |4gem:gems;"
+            ENCHANT_CONDITION_LESS_VALUE   => "less than %d %s |4gem:gems;",
+            ENCHANT_CONDITION_MORE_COMPARE => "more %s gems than %s gems",
+            ENCHANT_CONDITION_MORE_VALUE   => "at least %d %s |4gem:gems;"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requires personal and team arena rating of %d",

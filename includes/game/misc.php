@@ -335,6 +335,47 @@ class Game
                 return [$reqLevel];
         }
     }
+
+    public static function getEnchantmentCondition(int $conditionId, bool $interactive = false) : string
+    {
+        $gemCnd = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantmentcondition WHERE `id` = ?d', $conditionId);
+        if (!$gemCnd)
+            return '';
+
+        $x = '';
+        for ($i = 1; $i < 6; $i++)
+        {
+            if (!$gemCnd['color'.$i])
+                continue;
+
+            $fiColors = function (int $idx)
+            {
+                return match ($idx)
+                {
+                    2 => '0:3:5',                           // red
+                    3 => '2:4:5',                           // yellow
+                    4 => '1:3:4',                           // blue
+                    default => ''                           // uhhh....
+                };
+            };
+
+            $bLink = $gemCnd['color'.$i]    ? ($interactive ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['color'.$i]).'">'.   Lang::item('gemColors', $gemCnd['color'.$i] - 1).'</a>'    : Lang::item('gemColors', $gemCnd['color'.$i] - 1))    : '';
+            $cLink = $gemCnd['cmpColor'.$i] ? ($interactive ? '<a class="tip" href="?items=3&filter=ty='.$fiColors($gemCnd['cmpColor'.$i]).'">'.Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1).'</a>' : Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)) : '';
+
+            switch ($gemCnd['comparator'.$i])
+            {
+                case ENCHANT_CONDITION_LESS_VALUE:          // requires less than N <color> gems
+                case ENCHANT_CONDITION_MORE_VALUE:          // requires at least N <color> gems
+                    $x .= '<span class="q0">'.Lang::item('gemRequires').Lang::item('gemConditions', $gemCnd['comparator'.$i], [$gemCnd['value'.$i], $bLink]).'</span><br />';
+                    break;
+                case ENCHANT_CONDITION_MORE_COMPARE:        // requires more <color> gems than <comparecolor> gems
+                    $x .= '<span class="q0">'.Lang::item('gemRequires').Lang::item('gemConditions', $gemCnd['comparator'.$i], [$bLink, $cLink]).'</span><br />';
+                    break;
+            }
+        }
+
+        return $x;
+    }
 }
 
 ?>

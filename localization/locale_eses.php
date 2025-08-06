@@ -65,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "Extender búsqueda",
         'addFilter'     => "Añadir otro filtro",
-        'match'         => "Aplicar",
+        'match'         => "Aplicar: ",
         'allFilter'     => "Todos los filtros",
         'oneFilter'     => "Por lo menos uno",
         'applyFilter'   => "Aplicar filtro",
@@ -2118,10 +2118,11 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "meta",                 "roja(s)",          "amarilla(s)",              "azul(es)"
         ),
+        'gemRequires'   => "Requiere ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => "menos de %d |4gema:gemas; %s",
-            3 => "más gemas %s que gemas %s",
-            5 => "al menos %d |4gema:gemas; %s"
+            ENCHANT_CONDITION_LESS_VALUE   => "menos de %d |4gema:gemas; %s",
+            ENCHANT_CONDITION_MORE_COMPARE => "más gemas %s que gemas %s",
+            ENCHANT_CONDITION_MORE_VALUE   => "al menos %d |4gema:gemas; %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Requiere un índice de arena personal y de equipo de %d",
