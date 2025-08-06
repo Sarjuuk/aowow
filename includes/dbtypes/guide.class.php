@@ -6,11 +6,11 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class GuideList extends BaseType
+class GuideList extends DBTypeList
 {
     use ListviewHelper;
 
-    public const STATUS_COLORS = array(
+    public const /* array */ STATUS_COLORS = array(
         GUIDE_STATUS_DRAFT    => '#71D5FF',
         GUIDE_STATUS_REVIEW   => '#FFFF00',
         GUIDE_STATUS_APPROVED => '#1EFF00',
@@ -18,16 +18,16 @@ class GuideList extends BaseType
         GUIDE_STATUS_ARCHIVED => '#FFD100'
     );
 
-    public static   $type       = Type::GUIDE;
-    public static   $brickFile  = 'guide';
-    public static   $dataTable  = '?_guides';
-    public static   $contribute = CONTRIBUTE_CO;
+    public static int    $type       = Type::GUIDE;
+    public static string $brickFile  = 'guide';
+    public static string $dataTable  = '?_guides';
+    public static int    $contribute = CONTRIBUTE_CO;
 
-    private         $article   = [];
-    private         $jsGlobals = [];
+    private array $article   = [];
+    private array $jsGlobals = [];
 
-    protected       $queryBase = 'SELECT g.*, g.id AS ARRAY_KEY FROM ?_guides g';
-    protected       $queryOpts = array(
+    protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ?_guides g';
+    protected array  $queryOpts = array(
                         'g' => [['a', 'c'], 'g' => 'g.`id`'],
                         'a' => ['j' => ['?_account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
                         'c' => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"']
@@ -57,6 +57,13 @@ class GuideList extends BaseType
                 $_curTpl['rating'] = -1;
             }
         }
+    }
+
+    public static function getName(int $id) : ?LocString
+    {
+        if ($n = DB::Aowow()->SelectRow('SELECT `title` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+            return new LocString($n);
+        return null;
     }
 
     public function getArticle(int $rev = -1) : string
@@ -135,12 +142,12 @@ class GuideList extends BaseType
         return $this->getField('userId') != User::$id && $this->getField('status') != GUIDE_STATUS_ARCHIVED;
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY) : array
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         return $this->jsGlobals;
     }
 
-    public function renderTooltip() : string
+    public function renderTooltip() : ?string
     {
         $specStr = '';
 
@@ -162,7 +169,7 @@ class GuideList extends BaseType
             }
         }
 
-        $tt  = '<table><tr><td><div style="max-width: 320px"><b class="q">'.$this->getField('title').'</b><br>';
+        $tt  = '<table><tr><td><div style="max-width: 320px"><b class="q">'.$this->getField('title').'</b><br />';
         $tt .= '<table width="100%"><tr><td>'.Lang::game('guide').'</td><th>'.Lang::guide('byAuthor', [$this->getField('author')]).'</th></tr></table>';
         $tt .= '<table width="100%"><tr><td>'.Lang::guide('category', $this->getField('category')).$specStr.'</td><th>'.Lang::guide('patch').' 3.3.5</th></tr></table>';
         $tt .= '<div class="q" style="margin: 0.25em 0">'.$this->getField('description').'</div>';

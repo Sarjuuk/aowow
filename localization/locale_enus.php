@@ -25,8 +25,8 @@ $lang = array(
         'jsError'       => "Please make sure you have javascript enabled.",
         'language'      => "Language",
         'feedback'      => "Feedback",
-        'numSQL'        => "Number of MySQL queries",
-        'timeSQL'       => "Time of MySQL queries",
+        'numSQL'        => "Number of SQL queries",
+        'timeSQL'       => "Time of SQL queries",
         'noJScript'     => '<b>This site makes extensive use of JavaScript.</b><br />Please <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">enable JavaScript</a> in your browser.',
         'userProfiles'  => "My Profiles",
         'pageNotFound'  => "This %s doesn't exist.",
@@ -1611,7 +1611,7 @@ $lang = array(
             null,                                   "Shields",                              "Librams",                              "Idols",                                "Totems",
             "Sigils"
         ),
-        'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content firts, then alphabeticaly
+        'weaponSubClass' => array(                          // ItemSubClass.dbc/4; ordered by content first, then alphabeticaly
             15 => "Daggers",                        13 => "Fist Weapons",                    0 => "One-Handed Axes",                 4 => "One-Handed Maces",                7 => "One-Handed Swords",
              6 => "Polearms",                       10 => "Staves",                          1 => "Two-Handed Axes",                 5 => "Two-Handed Maces",                8 => "Two-Handed Swords",
              2 => "Bows",                           18 => "Crossbows",                       3 => "Guns",                           16 => "Thrown",                         19 => "Wands",
@@ -2167,7 +2167,7 @@ $lang = array(
         ),
         'elixirType'    => [null, "Battle", "Guardian"],
         'cat'           => array(                           // ordered by content first, then alphabeticaly; item menu from locale_enus.js
-             2 => "Weapons",                                // self::$spell['weaponSubClass']
+             2 => array("Weapons", []),                     // filled with self::$spell['weaponSubClass'] on load
              4 => array("Armor", array(
                  1 => "Cloth Armor",                 2 => "Leather Armor",           3 => "Mail Armor",              4 => "Plate Armor",             6 => "Shields",                 7 => "Librams",
                  8 => "Idols",                       9 => "Totems",                 10 => "Sigils",                 -6 => "Cloaks",                 -5 => "Off-hand Frills",        -8 => "Shirts",

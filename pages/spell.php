@@ -1307,8 +1307,8 @@ class SpellPage extends GenericPage
         $power = new \StdClass();
         if (!$this->subject->error)
         {
-            [$tooltip, $ttSpells] = $this->subject->renderTooltip();
-            [$buff,    $bfSpells] = $this->subject->renderBuff();
+            $tooltip = $this->subject->renderTooltip(ttSpells: $ttSpells);
+            $buff    = $this->subject->renderBuff(buffSpells: $bfSpells);
 
             $power->{'name_'.Lang::getLocale()->json()}       = $this->subject->getField('name', true);
             $power->icon                                = rawurlencode($this->subject->getField('iconString', true, true));

@@ -1089,7 +1089,7 @@ abstract class Util
         return round($score, 4);
     }
 
-    public static function fixWeaponScores($class, $talents, $mainHand, $offHand)
+    public static function fixWeaponScores(int $class, array $talents, array $mainHand, array $offHand) : array
     {
         $mh = 1;
         $oh = 1;

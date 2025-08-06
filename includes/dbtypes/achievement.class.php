@@ -6,26 +6,21 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class AchievementList extends BaseType
+class AchievementList extends DBTypeList
 {
     use listviewHelper;
 
-    public static   $type      = Type::ACHIEVEMENT;
-    public static   $brickFile = 'achievement';
-    public static   $dataTable = '?_achievement';
+    public static int    $type      = Type::ACHIEVEMENT;
+    public static string $brickFile = 'achievement';
+    public static string $dataTable = '?_achievement';
+    public        array  $criteria  = [];
 
-    public          $criteria  = [];
-
-    protected       $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
-    protected       $queryOpts = array(
-                        'a' => [['ic'], 'o' => 'orderInGroup ASC'],
+    protected string $queryBase = 'SELECT `a`.*, `a`.`id` AS ARRAY_KEY FROM ?_achievement a';
+    protected array  $queryOpts = array(
+                        'a'  => [['ic'], 'o' => 'orderInGroup ASC'],
                         'ic' => ['j' => ['?_icons ic ON ic.id = a.iconId', true], 's' => ', ic.name AS iconString'],
                         'ac' => ['j' => ['?_achievementcriteria AS `ac` ON `ac`.`refAchievementId` = `a`.`id`', true], 'g' => '`a`.`id`']
                     );
-
-    /*
-        todo: evaluate TC custom-data-tables: a*_criteria_data should be merged on installation
-    */
 
     public function __construct(array $conditions = [], array $miscData = [])
     {
@@ -35,25 +30,17 @@ class AchievementList extends BaseType
             return;
 
         // post processing
-        $rewards = DB::World()->select('
-            SELECT
-                ar.ID AS ARRAY_KEY, ar.TitleA, ar.TitleH, ar.ItemID, ar.Sender AS sender, ar.MailTemplateID,
-                ar.Subject AS subject_loc0, IFNULL(arl2.Subject, "") AS subject_loc2, IFNULL(arl3.Subject, "") AS subject_loc3, IFNULL(arl4.Subject, "") AS subject_loc4, IFNULL(arl6.Subject, "") AS subject_loc6, IFNULL(arl8.Subject, "") AS subject_loc8,
-                ar.Body    AS text_loc0,    IFNULL(arl2.Body,    "") AS text_loc2,    IFNULL(arl3.Body,    "") AS text_loc3,    IFNULL(arl4.Body,    "") AS text_loc4,    IFNULL(arl6.Body,    "") AS text_loc6,    IFNULL(arl8.Body,    "") AS text_loc8
-            FROM
-                achievement_reward ar
-            LEFT JOIN
-                achievement_reward_locale arl2 ON arl2.ID = ar.ID AND arl2.Locale = "frFR"
-            LEFT JOIN
-                achievement_reward_locale arl3 ON arl3.ID = ar.ID AND arl3.Locale = "deDE"
-            LEFT JOIN
-                achievement_reward_locale arl4 ON arl4.ID = ar.ID AND arl4.Locale = "zhCN"
-            LEFT JOIN
-                achievement_reward_locale arl6 ON arl6.ID = ar.ID AND arl6.Locale = "esES"
-            LEFT JOIN
-                achievement_reward_locale arl8 ON arl8.ID = ar.ID AND arl8.Locale = "ruRU"
-            WHERE
-                ar.ID IN (?a)',
+        $rewards = DB::World()->select(
+           'SELECT    ar.`ID` AS ARRAY_KEY, ar.`TitleA`, ar.`TitleH`, ar.`ItemID`, ar.`Sender` AS "sender", ar.`MailTemplateID`,
+                      ar.`Subject` AS "subject_loc0", IFNULL(arl2.`Subject`, "") AS "subject_loc2", IFNULL(arl3.`Subject`, "") AS "subject_loc3", IFNULL(arl4.`Subject`, "") AS "subject_loc4", IFNULL(arl6.`Subject`, "") AS "subject_loc6", IFNULL(arl8.`Subject`, "") AS "subject_loc8",
+                      ar.`Body`    AS "text_loc0",    IFNULL(arl2.`Body`,    "") AS "text_loc2",    IFNULL(arl3.`Body`,    "") AS "text_loc3",    IFNULL(arl4.`Body`,    "") AS "text_loc4",    IFNULL(arl6.`Body`,    "") AS "text_loc6",    IFNULL(arl8.`Body`,    "") AS "text_loc8"
+            FROM      achievement_reward ar
+            LEFT JOIN achievement_reward_locale arl2 ON arl2.`ID` = ar.`ID` AND arl2.`Locale` = "frFR"
+            LEFT JOIN achievement_reward_locale arl3 ON arl3.`ID` = ar.`ID` AND arl3.`Locale` = "deDE"
+            LEFT JOIN achievement_reward_locale arl4 ON arl4.`ID` = ar.`ID` AND arl4.`Locale` = "zhCN"
+            LEFT JOIN achievement_reward_locale arl6 ON arl6.`ID` = ar.`ID` AND arl6.`Locale` = "esES"
+            LEFT JOIN achievement_reward_locale arl8 ON arl8.`ID` = ar.`ID` AND arl8.`Locale` = "ruRU"
+            WHERE     ar.`ID` IN (?a)',
             $this->getFoundIDs()
         );
 
@@ -76,7 +63,7 @@ class AchievementList extends BaseType
                         // $_curTpl['rewards'][] = [Type::ITEM, $loot['id']];
 
                     // lets just assume for now, that mailRewards for achievements do not contain references
-                    $mailRew = DB::World()->selectCol('SELECT Item FROM mail_loot_template WHERE Reference <= 0 AND entry = ?d', $rewards[$_id]['MailTemplateID']);
+                    $mailRew = DB::World()->selectCol('SELECT `Item` FROM mail_loot_template WHERE `Reference` <= 0 AND `entry` = ?d', $rewards[$_id]['MailTemplateID']);
                     foreach ($mailRew AS $mr)
                         $_curTpl['rewards'][] = [Type::ITEM, $mr];
                 }
@@ -98,7 +85,7 @@ class AchievementList extends BaseType
         }
     }
 
-    public function getJSGlobals($addMask = GLOBALINFO_ANY)
+    public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array
     {
         $data = [];
 
@@ -115,7 +102,7 @@ class AchievementList extends BaseType
         return $data;
     }
 
-    public function getListviewData($addInfoMask = 0x0)
+    public function getListviewData(int $addInfoMask = 0x0) : array
     {
         $data = [];
 
@@ -148,7 +135,7 @@ class AchievementList extends BaseType
     }
 
     // only for current template
-    public function getCriteria()
+    public function getCriteria() : array
     {
         if (isset($this->criteria[$this->id]))
             return $this->criteria[$this->id];
@@ -162,7 +149,7 @@ class AchievementList extends BaseType
         return $this->criteria[$this->id];
     }
 
-    public function renderTooltip()
+    public function renderTooltip() : ?string
     {
         $criteria = $this->getCriteria();
         $tmp  = [];
@@ -189,16 +176,12 @@ class AchievementList extends BaseType
             $qty = (int)$crt['value2'];
 
             // we could show them, but the tooltips are cluttered
-            if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::$perms <= 0)
+            if (($crt['completionFlags'] & ACHIEVEMENT_CRITERIA_FLAG_HIDDEN) && User::isInGroup(U_GROUP_STAFF))
                 continue;
 
             $crtName = Util::localizedString($crt, 'name');
             switch ($crt['type'])
             {
-                // link to title - todo (low): crosslink
-                case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
-                    $crtName = Util::ucFirst(Lang::game('title')).Lang::main('colon').$crtName;
-                    break;
                 // link to quest
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
                     if (!$crtName)
