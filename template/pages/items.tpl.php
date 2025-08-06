@@ -56,7 +56,7 @@ if ($this->typeList):
                         <div class="clear"></div>
                         <select name="ty[]" size="<?=min(count($this->typeList), 7); ?>" multiple="multiple" class="rightselect">
 <?php
-    foreach ($fthis->typeList as $k => $str):
+    foreach ($this->typeList as $k => $str):
         $selected = false;
         if (isset($f['ty']) && in_array($k, (array)$f['ty'])):
             $selected = true;
@@ -178,7 +178,7 @@ endforeach;
                         <input type="reset" value="<?=Lang::main('resetForm'); ?>" />
                     </div>
 
-                    <input type="hidden" name="upg"<?=(!empty($f['upg']) ? ' value="'.$f['upg'].'"' : null); ?>/>
+                    <input type="hidden" name="upg"<?=($f['upg'] ? ' value="'.implode(':', $f['upg']).'"' : ''); ?>/>
 
                     <div class="pad"></div>
 

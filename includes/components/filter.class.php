@@ -292,7 +292,7 @@ abstract class Filter
             {
                 // quirk: in the POST step criteria can be [[''], null, null] if not selected.
                 $buff = [];
-                foreach ($val as $v)
+                foreach ((array)$val as $v)                 // can be string|int in POST step if only one value present
                     if ($v !== '' && $this->checkInput($type, $valid, $v))
                        $buff[] = $v;
 

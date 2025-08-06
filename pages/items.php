@@ -188,11 +188,11 @@ class ItemsPage extends GenericPage
                 break;
             }
 
-            if ($singleSlot && empty($this->filter['gb']))  // enforce group by slot
-                $this->filter['gb'] = 1;
+            if ($singleSlot && empty($fiForm['gb']))        // enforce group by slot
+                $fiForm['gb'] = 1;
             else if (!$singleSlot)                          // multiples can only be grouped by slot
             {
-                $this->filter['gb'] = 1;
+                $fiForm['gb'] = 1;
                 $maxResults = 25;
                 $this->sharedLV['customFilter'] = '$fi_filterUpgradeListview';
             }
@@ -221,7 +221,7 @@ class ItemsPage extends GenericPage
         );
         $groups     = [];
         $nameSource = [];
-        $grouping   = $this->filter['gb'] ?? 0;
+        $grouping   = $fiForm['gb'] ?? 0;
         $extraOpts  = [];
         $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
 
@@ -237,10 +237,10 @@ class ItemsPage extends GenericPage
                 else
                     $groups = array_merge($availableSlots[ITEM_CLASS_ARMOR], $availableSlots[ITEM_CLASS_WEAPON]);
 
-                if (isset($this->filter['sl']))             // skip lookups for unselected slots
-                    $groups = array_intersect($groups, $this->filter['sl']);
+                if ($fiForm['sl'])                          // skip lookups for unselected slots
+                    $groups = array_intersect($groups, $fiForm['sl']);
 
-                if (!empty($this->filterObj->upgrades))           // skip lookups for slots we dont have items to upgrade for
+                if (!empty($this->filterObj->upgrades))     // skip lookups for slots we dont have items to upgrade for
                     $groups = array_intersect($groups, $this->filterObj->upgrades);
 
                 if ($groups)
@@ -285,6 +285,10 @@ class ItemsPage extends GenericPage
                 $grouping  = 0;
                 $groups[0] = null;
         }
+
+        // write back 'gb' to filter
+        if ($grouping)
+            $this->filterObj->values['gb'] = $grouping;
 
 
         /*****************************/
@@ -444,8 +448,8 @@ class ItemsPage extends GenericPage
             $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1], 1, $this->category[2]);
         else if (isset($this->category[1]) && is_array(Lang::item('cat', $this->category[0])))
             $tPart = Lang::item('cat', $this->category[0], 1, $this->category[1]);
-        else if ($this->category[0] == 0 && isset($this->filter['ty']) && !is_array($this->filter['ty']))
-            $tPart = Lang::item('cat', 0, 1, $this->filter['ty']);
+        else if ($this->category[0] == 0 && count($this->filterObj->values['ty']) == 1)
+            $tPart = Lang::item('cat', 0, 1, $this->filterObj->values['ty'][0]);
         else
             $tPart = Lang::item('cat', $this->category[0]);
 
