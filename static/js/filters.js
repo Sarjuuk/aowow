@@ -601,14 +601,14 @@ function fi_toggle() {
         // Set focus on first textbox
         d.firstChild.nodeValue = LANG.fihide;
         c = (c.parentNode.tagName == 'FORM' ? c.parentNode : $WH.gE(c, 'form')[0]);
-        c = c.elements.na ? c.elements.na: c.elements.ti;
+        c = c.elements.na ? c.elements.na : c.elements.ti;
         c.focus();
         c.select();
     }
     else {
         d.firstChild.nodeValue = LANG.fishow;
     }
-    d.className = 'disclosure-' + (b ? 'on': 'off');
+    d.className = 'disclosure-' + (b ? 'on' : 'off');
 
     return false;
 }
