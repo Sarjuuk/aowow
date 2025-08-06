@@ -10,7 +10,6 @@ if (!defined('AOWOW_REVISION'))
 
 
 
-
 $lang = array(
     // page variables
     'timeUnits' => array(
@@ -66,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "扩展搜索",
         'addFilter'     => "添加一个过滤器",
-        'match'         => "匹配",
+        'match'         => "匹配：",
         'allFilter'     => "所有过滤器",
         'oneFilter'     => "至少一个",
         'applyFilter'   => "应用过滤",
@@ -2118,10 +2117,11 @@ $lang = array(
         'gemColors'     => array(
             "多彩",                   "红色",               "黄色",                   "蓝色"
         ),
+        'gemRequires'   => "需要 ",
         'gemConditions' => array(
-            2 => "少于%d颗%s宝石",
-            3 => "%s宝石的数量多于%s宝石",
-            5 => "至少%d颗%s宝石"
+            ENCHANT_CONDITION_LESS_VALUE   => "少于%d颗%s宝石",
+            ENCHANT_CONDITION_MORE_COMPARE => "%s宝石的数量多于%s宝石",
+            ENCHANT_CONDITION_MORE_VALUE   => "至少%d颗%s宝石"
         ),
         'reqRating'     => array(
             "需要个人竞技场等级和战队竞技场等级达到%d",

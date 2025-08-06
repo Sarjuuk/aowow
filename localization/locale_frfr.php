@@ -65,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "Recherche avancée",
         'addFilter'     => "Ajouter un autre filtre",
-        'match'         => "Critère",
+        'match'         => "Critère : ",
         'allFilter'     => "Tous les filtres",
         'oneFilter'     => "Au moins un",
         'applyFilter'   => "Appliquer le filtre",
@@ -2118,10 +2118,11 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "Méta",                 "rouge(s)",         "jaune(s)",             "bleue(s)"
         ),
+        'gemRequires'   => "Nécessite ",                    // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_*
-            2 => "moins de %d |4gemme:gemmes; %s",
-            3 => "plus de gemmes %s que |2 %s",
-            5 => "au moins %d |4gemme:gemmes; %s"
+            ENCHANT_CONDITION_LESS_VALUE   => "moins de %d |4gemme:gemmes; %s",
+            ENCHANT_CONDITION_MORE_COMPARE => "plus de gemmes %s que |2 %s",
+            ENCHANT_CONDITION_MORE_VALUE   => "au moins %d |4gemme:gemmes; %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Nécessite une cote d'arène personnelle et en équipe de %d",

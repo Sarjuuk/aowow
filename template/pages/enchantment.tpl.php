@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -18,11 +21,11 @@
 
 <?php $this->brick('redButtons'); ?>
 
-                <h1 class="h1-icon"><?=$this->name; ?></h1>
+                <h1 class="h1-icon"><?=$this->h1; ?></h1>
 
                 <div class="clear"></div>
 
-<?php $this->brick('article'); ?>
+<?php $this->brick('markup', ['markup' => $this->article]); ?>
 
 
                 <h3><?=Lang::enchantment('details'); ?></h3>
@@ -34,7 +37,7 @@
                         <col width="50%" />
                     </colgroup>
 <?php
-if (!empty($this->activation)):
+if ($this->activation):
 ?>
                     <tr>
                         <th><?=Lang::enchantment('activation'); ?></th>
@@ -49,17 +52,17 @@ foreach ($this->effects as $i => $e):
                         <th><?=Lang::spell('_effect').' #'.$i; ?></th>
                         <td colspan="3" style="line-height: 17px">
 <?php
-    echo '                            '.$e['name'].(!empty($e['tip']) ? Lang::main('colon').'(<span '.(User::isInGroup(U_GROUP_EMPLOYEE) ? 'class="tip" ' : '').'id="efftip-'.$i.'"></span>)' : '').'<small>';
+    echo '                            '.$e['name'].($e['tip'] ? Lang::main('colon').'(<span '.($e['tip'][0] ? 'class="tip" ' : '').'id="efftip-'.$i.'"></span>)' : '').'<small>';
 
-    if (isset($e['value'])):
-        echo '<br>'.Lang::spell('_value').Lang::main('colon').$e['value'];
+    if ($e['value']):
+        echo '<br />'.Lang::spell('_value').Lang::main('colon').$e['value'];
     endif;
 
-    if (!empty($e['proc'])):
-        echo '<br>';
+    if ($e['proc']):
+        echo '<br />';
 
         if ($e['proc'] < 0):
-            echo sprintf(Lang::spell('ppm'), Lang::nf(-$e['proc'], 1));
+            echo Lang::spell('ppm', [Lang::nf(-$e['proc'], 1)]);
         elseif ($e['proc'] < 100.0):
             echo Lang::spell('procChance').Lang::main('colon').$e['proc'].'%';
         endif;
@@ -67,12 +70,12 @@ foreach ($this->effects as $i => $e):
 
     echo "</small>\n";
 
-    if (!empty($e['tip'])):
+    if ($e['tip']):
 ?>
                             <script type="text/javascript">
 <?php
         echo "                                \$WH.ae(\$WH.ge('efftip-".$i."'), \$WH.ct(LANG.traits['".$e['tip'][1]."'][0]));\n";
-        if (User::isInGroup(U_GROUP_EMPLOYEE)):
+        if ($e['tip'][0]):
             echo "                                g_addTooltip(\$WH.ge('efftip-".$i."'), 'Object: ".$e['tip'][0]."', 'q');\n";
         endif;
 ?>
@@ -81,19 +84,16 @@ foreach ($this->effects as $i => $e):
     endif;
 
 
-    if (isset($e['icon'])):
+    if ($e['icon']):
 ?>
                             <table class="icontab">
                                 <tr>
-                                    <th id="icontab-icon<?=$i; ?>"></th>
-<?php
-        echo '                                    <td>'.(strpos($e['icon']['name'], '#') ? $e['icon']['name'] : sprintf('<a href="?spell=%d">%s</a>', $e['icon']['id'], $e['icon']['name']))."</td>\n";
-?>
+                                    <?=$e['icon']->renderContainer(0, $i); ?>
                                     <th></th><td></td>
                                 </tr>
                             </table>
                             <script type="text/javascript">
-                                <?='$WH.ge(\'icontab-icon'.$i.'\').appendChild(g_spells.createIcon('.$e['icon']['id'].', 1, '.$e['icon']['count']."));\n"; ?>
+                                <?=$e['icon']->renderJS(); ?>
                             </script>
 <?php
     endif;
@@ -109,7 +109,7 @@ endforeach;
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>

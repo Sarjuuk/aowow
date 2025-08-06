@@ -1,10 +1,11 @@
-<?php namespace Aowow; ?>
-
 <?php
-$this->brick('header');
-$f = $this->filterObj->values                               // shorthand
-?>
+    namespace Aowow\Template;
 
+    use \Aowow\Lang;
+
+$this->brick('header');
+$f = $this->filter->values;                                 // shorthand
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -12,31 +13,32 @@ $f = $this->filterObj->values                               // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [101]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [101]]);
 ?>
-
-            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;">
+            <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=enchantments" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                    <div class="text">
+<?php
+$this->brick('headIcons');
+
+$this->brick('redButtons');
+?>
+                        <h1><?=$this->h1; ?></h1>
+                    </div>
                     <div class="rightpanel">
-                        <div style="float: left"><?=Util::ucFirst(Lang::game('type')).Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::game('type'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="ty[]" size="8" multiple="multiple" class="rightselect">
-<?php
-foreach (Lang::enchantment('types') as $i => $str):
-    if ($str):
-        echo '                                <option value="'.$i.'"'.(isset($f['ty']) && in_array($i, (array)$f['ty']) ? ' selected' : null).' >'.$str."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::enchantment('types'), $f['ty'], 28); ?>
                         </select>
                     </div>
                     <table>
                         <tr>
-                            <td><?=Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
+                            <td><?=$this->ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
                             <td colspan="2">
                                 <table><tr>
-                                    <td>&nbsp;<input type="text" name="na" size="30" <?=(isset($f['na']) ? 'value="'.Util::htmlEscape($f['na']).'" ' : null); ?>/></td>
+                                    <td>&nbsp;<input type="text" name="na" size="30" <?=($f['na'] ? 'value="'.$this->escHTML($f['na']).'" ' : ''); ?>/></td>
                                 </tr></table>
                             </td>
                         </tr><tr>
@@ -45,7 +47,7 @@ endforeach;
                     <div id="fi_criteria" class="padded criteria"><div></div></div><div><a href="javascript:;" id="fi_addcriteria" onclick="fi_addCriterion(this); return false"><?=Lang::main('addFilter'); ?></a></div>
 
                     <div class="padded2">
-                        <?=Lang::main('match').Lang::main('colon'); ?><input type="radio" name="ma" value="" id="ma-0" <?=(!isset($f['ma']) ? 'checked="checked" ' : null); ?>/><label for="ma-0"><?=Lang::main('allFilter'); ?></label><input type="radio" name="ma" value="1" id="ma-1" <?=(isset($f['ma']) ? 'checked="checked" ' : null); ?> /><label for="ma-1"><?=Lang::main('oneFilter'); ?></label>
+                        <?=Lang::main('match'); ?><input type="radio" name="ma" value="" id="ma-0" <?=(!$f['ma'] ? 'checked="checked" ' : ''); ?>/><label for="ma-0"><?=Lang::main('allFilter'); ?></label><input type="radio" name="ma" value="1" id="ma-1" <?=($f['ma'] ? 'checked="checked" ' : ''); ?> /><label for="ma-1"><?=Lang::main('oneFilter'); ?></label>
                     </div>
 
                     <div class="clear"></div>
@@ -59,7 +61,7 @@ endforeach;
                 <div class="pad"></div>
             </div>
 
-<?php $this->brick('filter'); ?>
+<?=$this->renderFilter(12); ?>
 
 <?php $this->brick('lvTabs'); ?>
 

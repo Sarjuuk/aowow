@@ -65,7 +65,7 @@ $lang = array(
         // filter
         'extSearch'     => "Erweiterte Suche",
         'addFilter'     => "Weiteren Filter hinzufügen",
-        'match'         => "Verwendete Filter",
+        'match'         => "Verwendete Filter: ",
         'allFilter'     => "Alle Filter",
         'oneFilter'     => "Mindestens einer",
         'applyFilter'   => "Filter anwenden",
@@ -2118,10 +2118,11 @@ $lang = array(
         'gemColors'     => array(                           // *_GEM
             "Meta",                 "Rot",              "Gelb",                 "Blau"
         ),
+        'gemRequires'   => "Benötigt ",                     // ENCHANT_CONDITION_REQUIRES
         'gemConditions' => array(                           // ENCHANT_CONDITION_* in GlobalStrings.lua; 2 not in use (use as PH)
-            2 => "weniger als %d |4Edelstein:Edelsteine; der Kategorie %s",
-            3 => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
-            5 => "mindestens %d |4Edelstein:Edelsteine; der Kategorie %s"
+            ENCHANT_CONDITION_LESS_VALUE   => "weniger als %d |4Edelstein:Edelsteine; der Kategorie %s",
+            ENCHANT_CONDITION_MORE_COMPARE => "mehr Edelsteine der Kategorie %s als Edelsteine der Kategorie %s",
+            ENCHANT_CONDITION_MORE_VALUE   => "mindestens %d |4Edelstein:Edelsteine; der Kategorie %s"
         ),
         'reqRating'     => array(                           // ITEM_REQ_ARENA_RATING*
             "Benötigt eine persönliche Arenawertung und Teamwertung von %d.",

@@ -1034,7 +1034,7 @@ define('ITEM_FLAG_SMARTLOOT',               0x02000000);
 define('ITEM_FLAG_ACCOUNTBOUND',            0x08000000);
 define('ITEM_FLAG_MILLABLE',                0x20000000);
 
-// ItemEnchantment types
+// SpellItemEnchantmentCondition types
 define('ENCHANTMENT_TYPE_NONE',             0);
 define('ENCHANTMENT_TYPE_COMBAT_SPELL',     1);
 define('ENCHANTMENT_TYPE_DAMAGE',           2);
@@ -1044,6 +1044,16 @@ define('ENCHANTMENT_TYPE_STAT',             5);
 define('ENCHANTMENT_TYPE_TOTEM',            6);
 define('ENCHANTMENT_TYPE_USE_SPELL',        7);
 define('ENCHANTMENT_TYPE_PRISMATIC_SOCKET', 8);
+
+// SpellItemEnchantmentCondition operators - only 2, 3, 5 in use
+// define('ENCHANT_CONDITION_EQUAL_COMPARE',      ?);
+// define('ENCHANT_CONDITION_EQUAL_VALUE',        ?);
+define('ENCHANT_CONDITION_LESS_VALUE',            2);
+define('ENCHANT_CONDITION_MORE_COMPARE',          3);
+// define('ENCHANT_CONDITION_MORE_EQUAL_COMPARE', ?);
+define('ENCHANT_CONDITION_MORE_VALUE',            5);
+// define('ENCHANT_CONDITION_NOT_EQUAL_COMPARE',  ?);
+// define('ENCHANT_CONDITION_NOT_EQUAL_VALUE',    ?);
 
 // Spell Effects and Auras
 define('SPELL_EFFECT_NONE',                             0);
