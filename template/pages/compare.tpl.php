@@ -1,4 +1,4 @@
-<?php namespace Aowow; ?>
+<?php namespace Aowow\Template; ?>
 
 <?php $this->brick('header'); ?>
 
@@ -17,10 +17,10 @@
                 <script type="text/javascript">//<![CDATA[
 <?php
 foreach ($this->cmpItems as $iId => $iData):
-    echo '                        g_items.add('.$iId.', '.Util::toJSON($iData).");\n";
+    echo '                        g_items.add('.$iId.', '.$this->json($iData).");\n";
 endforeach;
 ?>
-                    new Summary(<?=Util::toJSON($this->summary); ?>);
+                    <?=$this->summary; ?>
                 //]]></script>
             </div>
 
