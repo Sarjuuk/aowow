@@ -2605,6 +2605,7 @@ var LANG = {
     lastbluepost:           "Последний блю-пост",
     level:                  "Уровень",
     location:               "Местонахождение",
+    logOutEverywhere:       "Выйти на всех устройствах",
     losses:                 "Поражения",
     members:                "Участники",
     model:                  "Модель",

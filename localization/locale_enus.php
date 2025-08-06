@@ -885,7 +885,7 @@ $lang = array(
             "Screenshot manager",           "Video manager",                "API partner",                  "Pending"
         ),
         // signIn
-        'doSignIn'      => "Log in to your AoWoW Account",
+        'doSignIn'      => "Log in to your Account",
         'signIn'        => "Log In",
         'user'          => "Username",
         'pass'          => "Password",
@@ -894,6 +894,8 @@ $lang = array(
         'forgotUser'    => "Username",
         'forgotPass'    => "Password",
         'accCreate'     => 'Don\'t have an account? <a href="?account=signup">Create one now!</a>',
+        'resendMail'    => "Re-Send Verification Email",
+        'resendHint'    => "If you registered but did not receive a verification email, enter your email address below and submit the form. (Please be sure to check your spam or trash folders to make sure the email didn't accidentally get put in the wrong place!)",
 
         // recovery
         'recoverUser'   => "Username Request",

@@ -2605,6 +2605,7 @@ var LANG = {
     lastbluepost:           "Dernier sujet de Blizzard",
     level:                  "Niveau",
     location:               "Lieu",
+    logOutEverywhere:       "Se déconnecter de tous les appareils",
     losses:                 "Pertes",
     members:                "Membres",
     model:                  "Modèle",

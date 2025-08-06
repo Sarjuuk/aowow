@@ -2652,6 +2652,7 @@ var LANG = {
     lastbluepost:           "最新蓝贴",
     level:                  "等级",
     location:               "地点",
+    logOutEverywhere:       "全局登出",
     losses:                 "损失",
     members:                "成员",
     model:                  "模型",

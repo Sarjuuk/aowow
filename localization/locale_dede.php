@@ -885,7 +885,7 @@ $lang = array(
             "Screenshot-Verwalter",         "Video-Verwalter",              "API-Partner",                  "Ausstehend"
         ),
         // signIn
-        'doSignIn'      => "Mit Eurem AoWoW-Konto anmelden",
+        'doSignIn'      => "Mit Eurem Konto anmelden",
         'signIn'        => "Anmelden",
         'user'          => "Benutzername",
         'pass'          => "Kennwort",
@@ -894,6 +894,8 @@ $lang = array(
         'forgotUser'    => "Benutzername",
         'forgotPass'    => "Kennwort",
         'accCreate'     => 'Noch kein Konto? <a href="?account=signup">Jetzt eins erstellen!</a>',
+        'resendMail'    => "Bestätigungsmail erneut senden",
+        'resendHint'    => "Wenn Sie sich registriert haben, aber keine Bestätigungs-E-Mail erhalten haben, geben Sie Ihre E-Mail-Adresse unten ein und senden Sie das Formular ab. (Bitte überprüfen Sie Ihre Spam- oder Papierkorb-Ordner, um sicherzustellen, dass die E-Mail nicht versehentlich an der falschen Stelle abgelegt wurde!)",
 
         // recovery
         'recoverUser'   => "Benutzernamenanfrage",

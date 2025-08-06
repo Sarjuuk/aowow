@@ -535,7 +535,8 @@ var PageTemplate = new function()
         }
 
         // Sign Out
-        menu.push(['sign-out', LANG.signout,  '?account=signout']);
+        menu.push(['sign-out', LANG.signout, '?account=signout']);
+        menu.push(['sign-out-global', LANG.logOutEverywhere, '?account=signout&global']);
 
         Menu.add($link, menu);
         $link.addClass('hassubmenu');

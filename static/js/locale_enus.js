@@ -2653,6 +2653,7 @@ var LANG = {
     lastbluepost:           "Last blue post",
     level:                  "Level",
     location:               "Location",
+    logOutEverywhere:       "Log Out All Devices",
     losses:                 "Losses",
     members:                "Members",
     model:                  "Model",
