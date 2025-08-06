@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -13,12 +17,12 @@ $this->brick('pageTemplate');
 ?>
 
             <div class="text">
-                <a href="<?=$this->wowheadLink; ?>" class="button-red"><em><b><i>Wowhead</i></b><span>Wowhead</span></em></a>
 <?php
-if ($this->lvTabs):
-    echo '                <h1>'.Lang::main('foundResult').' <i>'.Util::htmlEscape($this->search).'</i>';
-    if ($this->invalid):
-        echo '<span class="sub">'.sprintf(Lang::main('ignoredTerms'), implode(', ', $this->invalid)).'</span>';
+$this->brick('redButtons');
+if (count($this->lvTabs)):
+    echo '                <h1>'.Lang::main('foundResult').' <i>'.$this->search.'</i>';
+    if ($this->invalidTerms):
+        echo '<span class="sub">'.Lang::main('ignoredTerms', [$this->invalidTerms]).'</span>';
     endif;
     echo "</h1>\n";
 ?>
@@ -27,9 +31,9 @@ if ($this->lvTabs):
 $this->brick('lvTabs');
 
 else:
-    echo '            <h1>'.Lang::main('noResult').' <i>'.Util::htmlEscape($this->search).'</i>';
-    if ($this->invalid):
-        echo '<span class="sub">'.sprintf(Lang::main('ignoredTerms'), implode(', ', $this->invalid)).'</span>';
+    echo '            <h1>'.Lang::main('noResult').' <i>'.$this->search.'</i>';
+    if ($this->invalidTerms):
+        echo '<span class="sub">'.Lang::main('ignoredTerms', [$this->invalidTerms]).'</span>';
     endif;
     echo "</h1>\n";
 ?>
