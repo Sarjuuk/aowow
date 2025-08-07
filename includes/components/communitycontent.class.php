@@ -20,6 +20,14 @@ if (!defined('AOWOW_REVISION'))
 
 class CommunityContent
 {
+    public const /* int */ COMMENT_LENGTH_MIN = 10;
+    public const /* int */ COMMENT_LENGTH_MAX = 7500;
+    public const /* int */ REPLY_LENGTH_MIN   = 15;
+    public const /* int */ REPLY_LENGTH_MAX   = 600;
+
+    public const /* int */ REPORT_THRESHOLD_AUTO_DELETE      = 10;
+    public const /* int */ REPORT_THRESHOLD_AUTO_OUT_OF_DATE = 5;
+
     private static array $jsGlobals = [];
     private static array $subjCache = [];
 
@@ -63,7 +71,7 @@ class CommunityContent
         FROM      ?_videos v
         LEFT JOIN ?_account a ON v.`userIdOwner` = a.`id`
         WHERE   { v.`userIdOwner` = ?d AND }{ v.`type` = ? AND }{ v.`typeId` = ? AND } v.`status` & ?d AND (v.`status` & ?d) = 0
-      { ORDER BY  ?# DESC }
+      { ORDER BY  ?# ASC }
       { LIMIT     ?d }';
 
     private static string $previewQuery =
@@ -178,7 +186,7 @@ class CommunityContent
             }
             else
             {
-                trigger_error('Comment '.$c['id'].' belongs to nonexistant subject.', E_USER_NOTICE);
+                trigger_error('Comment '.$c['id'].' belongs to nonexistent subject.', E_USER_NOTICE);
                 unset($comments[$idx]);
             }
         }
@@ -335,7 +343,7 @@ class CommunityContent
             {
                 if (empty($p['name']))
                 {
-                    trigger_error('Screenshot linked to nonexistant type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
+                    trigger_error('Screenshot linked to nonexistent type/typeId combination: '.$p['type'].'/'.$p['typeId'], E_USER_NOTICE);
                     unset($p);
                 }
                 else
@@ -417,7 +425,7 @@ class CommunityContent
             $typeOrUser > 0 ?  $typeId                     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
+            !$typeOrUser    ? 'date'                       : 'pos',
             !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
         );
 
@@ -431,7 +439,7 @@ class CommunityContent
             $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
+            !$typeOrUser    ? 'date'       : 'pos',
             DBSIMPLE_SKIP
         );
 
