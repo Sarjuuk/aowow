@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -14,23 +18,28 @@
     $this->brick('infobox');
 ?>
 
-            <script type="text/javascript">var g_pageInfo = { username: '<?=Util::jsEscape($this->user['username']); ?>' }</script>
+            <script type="text/javascript">var g_pageInfo = { username: '<?=$this->escJS($this->username); ?>' }</script>
 
             <div class="text">
+<?php
+    if ($this->userIcon):
+?>
                 <div id="h1-icon-generic" class="h1-icon"></div>
                 <script type="text/javascript">
-                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=(is_numeric($this->user['avatar']) ? 2 : 1).', \''.($this->user['avatar'] ?: 'inv_misc_questionmark').'\''?>, 1, null, <?=User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2; ?>, false, Icon.getPrivilegeBorder(<?=$this->user['sumRep']; ?>)));
+                    $WH.ge('h1-icon-generic').appendChild(Icon.createUser(<?=substr($this->json('userIcon'), 1, -1); ?>));
                 </script>
-                <h1 class="h1-icon"><?=$this->name; ?></h1>
+                <h1 class="h1-icon"><?=$this->h1; ?></h1>
+<?php else: ?>
+                <h1><?=$this->h1; ?></h1>
+<?php endif; ?>
             </div>
-
             <h3 class="first"><?=Lang::user('publicDesc'); ?></h3>
             <div id="description" class="left"><?php #  must follow directly, no whitespaces allowed
-if (!empty($this->user['description'])):
+if ($this->description):
 ?>
                 <div id="description-generic"></div>
                 <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml('<?=$this->user['description']; ?>', "description-generic", { allow: Markup.CLASS_USER, roles: "<?=$this->user['userGroups']; ?>" });
+                    <?=$this->description; ?>
                 //]]></script>
 <?php
 endif;
@@ -39,7 +48,7 @@ endif;
 
             <div id="roster-status" class="profiler-message clear" style="display: none"></div>
 
-<?php $this->brick('lvTabs', ['relTabs' => true]); ?>
+<?php $this->brick('lvTabs'); ?>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

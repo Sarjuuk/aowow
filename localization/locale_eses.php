@@ -47,7 +47,7 @@ $lang = array(
         'gains'         => "Ganancias",
         'login'         => "Ingresar",
         'forum'         => "Foro",
-        'siteRep'       => "Reputación",
+        'siteRep'       => "Reputación: ",
         'yourRepHistory'=> "Tu Historial de Reputación",
         'aboutUs'       => "Sobre Aowow",
         'and'           => " y ",
@@ -908,18 +908,18 @@ $lang = array(
         'passConfirm'   => "Confirmar contraseña",
 
         // dashboard
-        'ipAddress'     => "Dirección IP",
-        'lastIP'        => "Última IP usada",
-        'myAccount'     => "Mi cuenta",
-        'editAccount'   => "Use el formulario siguienta para actualizar la información de la cuenta.",
-        'viewPubDesc'   => 'Mira tu descripción pública en tu <a href="?user=%s">Página de perfil</a>',
+        'ipAddress'     => "Dirección IP: ",
+        'lastIP'        => "Última IP usada: ",
+    //  'myAccount'     => "Mi cuenta",
+    //  'editAccount'   => "Use el formulario siguienta para actualizar la información de la cuenta.",
+    //  'viewPubDesc'   => 'Mira tu descripción pública en tu <a href="?user=%s">Página de perfil</a>',
 
         // bans
         'accBanned'     => "Esta cuenta fue cerrada.",
-        'bannedBy'      => "Suspendida por",
-        'ends'          => "Finaliza en",
+        'bannedBy'      => "Suspendida por: ",
+        'reason'        => "Razón: ",
+        'ends'          => "Finaliza en: ",
         'permanent'     => "La restricción es permanente",
-        'reason'        => "Razón",
         'noReason'      => "Ningúna razón fue escrita.",
 
         // form-text
@@ -947,18 +947,18 @@ $lang = array(
     'user' => array(
         'notFound'      => "¡No se encontró el usuario \"%s\"!",
         'removed'       => "(Removido)",
-        'joinDate'      => "Se unió",
-        'lastLogin'     => "Última visita",
-        'userGroups'    => "Rol",
-        'consecVisits'  => "Visitas consecutivas",
+        'joinDate'      => "Se unió: ",
+        'lastLogin'     => "Última visita: ",
+        'userGroups'    => "Rol: ",
+        'consecVisits'  => "Visitas consecutivas: ",
         'publicDesc'    => "Descripción pública",
         'profileTitle'  => "Perfíl de %s",
         'contributions' => "Contribuciones",
-        'uploads'       => "Datos enviados",
-        'comments'      => "Comentarios",
-        'screenshots'   => "Capturas de pantalla",
-        'videos'        => "Vídeos",
-        'posts'         => "Mensajes en los foros"
+        'uploads'       => "Datos enviados: ",
+        'comments'      => "Comentarios: ",
+        'screenshots'   => "Capturas de pantalla: ",
+        'videos'        => "Vídeos: ",
+        'posts'         => "Mensajes en los foros: "
     ),
     'emote' => array(
         'notFound'      => "Este emoticón no existe.",
