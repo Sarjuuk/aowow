@@ -47,7 +47,7 @@ $lang = array(
         'gains'         => "Gains",
         'login'         => "[Login]",
         'forum'         => "Forum",
-        'siteRep'       => "Réputation",
+        'siteRep'       => "Réputation : ",
         'yourRepHistory'=> "Votre historique de réputation",
         'aboutUs'       => "À propos de Aowow",
         'and'           => " et ",
@@ -908,18 +908,18 @@ $lang = array(
         'passConfirm'   => "Confirmez",
 
         // dashboard
-        'ipAddress'     => "Addresse IP",
-        'lastIP'        => "Dernière IP utilisée",
-        'myAccount'     => "Mon compte",
-        'editAccount'   => "Utilisez les formulaires ci-dessous pour mettre à jour vos informations.",
-        'viewPubDesc'   => 'Voyez vos informations publiques dans votre <a href="?user=%s">Profile  Page</a>',
+        'ipAddress'     => "Addresse IP : ",
+        'lastIP'        => "Dernière IP utilisée : ",
+    //  'myAccount'     => "Mon compte",
+    //  'editAccount'   => "Utilisez les formulaires ci-dessous pour mettre à jour vos informations.",
+    //  'viewPubDesc'   => 'Voyez vos informations publiques dans votre <a href="?user=%s">Profile  Page</a>',
 
         // bans
         'accBanned'     => "Ce compte a été fermé.",
-        'bannedBy'      => "Banni par",
-        'ends'          => "Termine le",
+        'bannedBy'      => "Banni par : ",
+        'reason'        => "Raison : ",
+        'ends'          => "Termine le : ",
         'permanent'     => "Ce bannissement est permanent",
-        'reason'        => "Raison",
         'noReason'      => "Aucune raison donnée.",
 
         // form-text
@@ -947,18 +947,18 @@ $lang = array(
     'user' => array(
         'notFound'      => "Utilisateur \"%s\" non trouvé!",
         'removed'       => "(Supprimé)",
-        'joinDate'      => "Inscription",
-        'lastLogin'     => "Dernière visite",
-        'userGroups'    => "Role",
-        'consecVisits'  => "Visites consécutives",
+        'joinDate'      => "Inscription : ",
+        'lastLogin'     => "Dernière visite : ",
+        'userGroups'    => "Role : ",
+        'consecVisits'  => "Visites consécutives : ",
         'publicDesc'    => "Description publique",
         'profileTitle'  => "Profil de %s",
         'contributions' => "Contributions",
-        'uploads'       => "Envois de données",
-        'comments'      => "Commentaires",
-        'screenshots'   => "Captures d'écran",
-        'videos'        => "Vidéos",
-        'posts'         => "Messages sur le forum"
+        'uploads'       => "Envois de données : ",
+        'comments'      => "Commentaires : ",
+        'screenshots'   => "Captures d'écran : ",
+        'videos'        => "Vidéos : ",
+        'posts'         => "Messages sur le forum : "
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",

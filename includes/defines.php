@@ -73,15 +73,16 @@ define('SESSION_LOGOUT',                    2);
 define('SESSION_FORCED_LOGOUT',             3);
 define('SESSION_EXPIRED',                   4);
 
-define('ACC_BAN_NONE',                      0x00);          // all clear
-define('ACC_BAN_TEMP',                      0x01);
-define('ACC_BAN_PERM',                      0x02);
-define('ACC_BAN_RATE',                      0x04);          // cannot rate community items (overrides site reputation)
-define('ACC_BAN_COMMENT',                   0x08);          // cannot comment and reply
-define('ACC_BAN_UPLOAD',                    0x10);          // cannot upload avatar / signature files [originally: ban from data upload]
-define('ACC_BAN_SCREENSHOT',                0x20);          // cannot upload screenshots
-define('ACC_BAN_VIDEO',                     0x40);          // cannot suggest videos
-define('ACC_BAN_GUIDE',                     0x80);          // cannot write a guide
+define('ACC_BAN_NONE',                      0x0000);        // all clear
+define('ACC_BAN_TEMP',                      0x0001);
+define('ACC_BAN_PERM',                      0x0002);
+define('ACC_BAN_RATE',                      0x0004);        // cannot rate community items (overrides site reputation)
+define('ACC_BAN_COMMENT',                   0x0008);        // cannot comment and reply
+define('ACC_BAN_UPLOAD',                    0x0010);        // cannot upload avatar / signature files [originally: ban from data upload]
+define('ACC_BAN_SCREENSHOT',                0x0020);        // cannot upload screenshots
+define('ACC_BAN_VIDEO',                     0x0040);        // cannot suggest videos
+define('ACC_BAN_GUIDE',                     0x0080);        // cannot write a guide
+define('ACC_BAN_FORUM',                     0x0100);        // cannot post on forums [not used here]
 
 // Site Reputation/Privileges
 define('SITEREP_ACTION_REGISTER',           1);             // Registered account

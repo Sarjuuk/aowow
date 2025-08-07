@@ -47,7 +47,7 @@ $lang = array(
         'gains'         => "Gains",
         'login'         => "Login",
         'forum'         => "Forum",
-        'siteRep'       => "Reputation",
+        'siteRep'       => "Reputation: ",
         'yourRepHistory'=> "Your Reputation History",
         'aboutUs'       => "About us & contact",
         'and'           => " and ",
@@ -908,18 +908,18 @@ $lang = array(
         'passConfirm'   => "Confirm password",
 
         // dashboard
-        'ipAddress'     => "IP address",
-        'lastIP'        => "last used IP",
-        'myAccount'     => "My Account",
-        'editAccount'   => "Simply use the forms below to update your account information",
-        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+        'ipAddress'     => "IP address: ",
+        'lastIP'        => "last used IP: ",
+    //  'myAccount'     => "My Account",
+    //  'editAccount'   => "Simply use the forms below to update your account information",
+    //  'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
 
         // bans
-        'accBanned'     => "This Account was closed",
-        'bannedBy'      => "Banned by",
-        'ends'          => "Ends on",
+        'accBanned'     => "This account was closed",
+        'bannedBy'      => "Banned by: ",
+        'reason'        => "Reason: ",
+        'ends'          => "Ends on: ",
         'permanent'     => "The ban is permanent",
-        'reason'        => "Reason",
         'noReason'      => "No reason was given.",
 
         // form-text
@@ -947,18 +947,18 @@ $lang = array(
     'user' => array(
         'notFound'      => "User \"%s\" not found!",
         'removed'       => "(Removed)",
-        'joinDate'      => "Joined",
-        'lastLogin'     => "Last visit",
-        'userGroups'    => "Role",
-        'consecVisits'  => "Consecutive visits",
+        'joinDate'      => "Joined: ",
+        'lastLogin'     => "Last visit: ",
+        'userGroups'    => "Role: ",
+        'consecVisits'  => "Consecutive visits: ",
         'publicDesc'    => "Public Description",
         'profileTitle'  => "%s's Profile",
         'contributions' => "Contributions",
-        'uploads'       => "Data uploads",
-        'comments'      => "Comments",
-        'screenshots'   => "Screenshots",
-        'videos'        => "Videos",
-        'posts'         => "Forum posts"
+        'uploads'       => "Data uploads: ",
+        'comments'      => "Comments: ",
+        'screenshots'   => "Screenshots: ",
+        'videos'        => "Videos: ",
+        'posts'         => "Forum posts: "
     ),
     'emote' => array(
         'notFound'      => "This Emote doesn't exist.",

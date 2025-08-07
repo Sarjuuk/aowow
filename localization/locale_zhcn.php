@@ -48,7 +48,7 @@ $lang = array(
         'gains'         => "获得",
         'login'         => "登录",
         'forum'         => "论坛",
-        'siteRep'       => "站点声望",
+        'siteRep'       => "站点声望：",
         'yourRepHistory'=> "您的声望历史",
         'aboutUs'       => "关于我们 & 联系我们",
         'and'           => "和",
@@ -71,7 +71,7 @@ $lang = array(
         'oneFilter'     => "至少一个",
         'applyFilter'   => "应用过滤",
         'resetForm'     => "清除表单",
-        'refineSearch'  => '提示: 通过浏览 <a href="javascript:;" id="fi_subcat">子类别</a>搜索。',
+        'refineSearch'  => '提示：通过浏览 <a href="javascript:;" id="fi_subcat">子类别</a>搜索。',
         'clear'         => "清除",
         'exactMatch'    => "精确匹配",
         '_reqLevel'     => "要求等级",
@@ -111,7 +111,7 @@ $lang = array(
         'addWeight'     => "添加另一个权重",
         'createWS'      => "创建一个权重比例",
         'jcGemsOnly'    => "包含<span%s>JC-only</span>宝石",
-        'cappedHint'    => '提示: <a href="javascript:;" onclick="fi_presetDetails();">移除</a> 命中等级等上限属性的权重。',
+        'cappedHint'    => '提示：<a href="javascript:;" onclick="fi_presetDetails();">移除</a> 命中等级等上限属性的权重。',
         'groupBy'       => "按组",
         'gb'            => array(
             ["无", "none"],         ["插槽", "slot"],       ["等级", "level"],     ["来源", "source"]
@@ -270,7 +270,7 @@ $lang = array(
         'thanks'        => array(
             'contrib' => "非常感谢你的贡献！",
             'goBack'  => '<a href="?%s=%d">点击这里</a>返回上一页。',
-            'note'    => "注意: 你的截图显示在网站前需要审核。这需要最多72小时。"
+            'note'    => "注意：你的截图显示在网站前需要审核。这需要最多72小时。"
         ),
         'error'         => array(
             'unkFormat'   => "未知图像格式。",
@@ -908,18 +908,18 @@ $lang = array(
         'passConfirm'   => "确认密码",
 
         // dashboard
-        'ipAddress'     => "IP地址",
-        'lastIP'        => "上次使用IP地址",
-        'myAccount'     => "我的账号",
-        'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
-        'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
+        'ipAddress'     => "IP地址：",
+        'lastIP'        => "上次使用IP地址：",
+    //  'myAccount'     => "我的账号",
+    //  'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
+    //  'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
 
         // bans
         'accBanned'     => "这个账号已被关闭",
-        'bannedBy'      => "冻结操作者",
-        'ends'          => "结束于",
+        'bannedBy'      => "冻结操作者：",
+        'reason'        => "理由：",
+        'ends'          => "结束于：",
         'permanent'     => "永久冻结",
-        'reason'        => "理由",
         'noReason'      => "没有理由提供。",
 
         // form-text
@@ -947,18 +947,18 @@ $lang = array(
     'user' => array(
         'notFound'      => "用户 \"%s\" 未找到",
         'removed'       => "(已移除)",
-        'joinDate'      => "加入",
-        'lastLogin'     => "上次访问",
-        'userGroups'    => "角色",
-        'consecVisits'  => "连续访问",
+        'joinDate'      => "加入：",
+        'lastLogin'     => "上次访问：",
+        'userGroups'    => "角色：",
+        'consecVisits'  => "连续访问：",
         'publicDesc'    => "公共描述",
         'profileTitle'  => "%s的简介",
         'contributions' => "贡献",
-        'uploads'       => "数据上传",
-        'comments'      => "评论",
-        'screenshots'   => "截图",
-        'videos'        => "视频",
-        'posts'         => "论坛帖子"
+        'uploads'       => "数据上传：",
+        'comments'      => "评论：",
+        'screenshots'   => "截图：",
+        'videos'        => "视频：",
+        'posts'         => "论坛帖子："
     ),
     'emote' => array(
         'notFound'      => "这个表情不存在。",
