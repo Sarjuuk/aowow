@@ -23,7 +23,7 @@ class UserList extends DBTypeList
     {
         $data = [];
 
-        foreach ($this->iterate() as $__)
+        foreach ($this->iterate() as $userId => $__)
         {
             $data[$this->curTpl['username']] = array(
                 'border'     => 0,                          // border around avatar (rarityColors)
@@ -40,10 +40,19 @@ class UserList extends DBTypeList
             if ($_ = $this->curTpl['title'])
                 $data[$this->curTpl['username']]['title'] = $_;
 
-            if ($_ = $this->curTpl['avatar'])
+            switch ($this->curTpl['avatar'])
             {
-                $data[$this->curTpl['username']]['avatar']     = is_numeric($_) ? 2 : 1;
-                $data[$this->curTpl['username']]['avatarmore'] = $_;
+                case 1:
+                    $data[$this->curTpl['username']]['avatar']     = $this->curTpl['avatar'];
+                    $data[$this->curTpl['username']]['avatarmore'] = $this->curTpl['wowicon'];
+                    break;
+                case 2:
+                    if ($av = DB::Aowow()->selectCell('SELECT `id` FROM ?_account_avatars WHERE `userId` = ?d AND `current` = 1 AND `status` <> 2', $userId))
+                    {
+                        $data[$this->curTpl['username']]['avatar']     = $this->curTpl['avatar'];
+                        $data[$this->curTpl['username']]['avatarmore'] = $av;
+                    }
+                    break;
             }
 
             // more optional data

@@ -47,7 +47,7 @@ $lang = array(
         'gains'         => "Бонус",
         'login'         => "[Login]",
         'forum'         => "Форум",
-        'siteRep'       => "Репутация",
+        'siteRep'       => "Репутация: ",
         'yourRepHistory'=> "История вашей репутации",
         'aboutUs'       => "О Aowow",
         'and'           => " и ",
@@ -908,19 +908,19 @@ $lang = array(
         'passConfirm'   => "Повторите пароль",
 
         // dashboard
-        'ipAddress'     => "IP-Adress",
-        'lastIP'        => "last used IP",
-        'myAccount'     => "My Account",
-        'editAccount'   => "Simply use the forms below to update your account information",
-        'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+        'ipAddress'     => "[IP-Adress]: ",
+        'lastIP'        => "[last used IP]: ",
+    //  'myAccount'     => "[My Account]",
+    //  'editAccount'   => "[Simply use the forms below to update your account information]",
+    //  'viewPubDesc'   => '[View your Public Description in your <a href="?user=%s">Profile  Page</a>]',
 
         // bans
-        'accBanned'     => "This Account was closed",
-        'bannedBy'      => "Banned by",
-        'ends'          => "Ends on",
-        'permanent'     => "The ban is permanent",
-        'reason'        => "Reason",
-        'noReason'      => "No reason was given.",
+        'accBanned'     => "[This Account was closed]",
+        'bannedBy'      => "[Banned by]: ",
+        'reason'        => "[Reason]: ",
+        'ends'          => "[Ends on]: ",
+        'permanent'     => "[The ban is permanent]",
+        'noReason'      => "[No reason was given.]",
 
         // form-text
         'emailInvalid'  => "Недопустимый адрес email.", // message_emailnotvalid
@@ -947,18 +947,18 @@ $lang = array(
     'user' => array(
         'notFound'      => "Пользователь \"%s\" не найден!",
         'removed'       => "(Удалено)",
-        'joinDate'      => "Зарегистрировался",
-        'lastLogin'     => "Последняя активность",
-        'userGroups'    => "Роль",
-        'consecVisits'  => "Регулярные посещения",
+        'joinDate'      => "Зарегистрировался:",
+        'lastLogin'     => "Последняя активность:",
+        'userGroups'    => "Роль:",
+        'consecVisits'  => "Регулярные посещения:",
         'publicDesc'    => "Описание",
         'profileTitle'  => "Профиль %s",
         'contributions' => "Вклад",
-        'uploads'       => "Данных загружено",
-        'comments'      => "Комментарии",
-        'screenshots'   => "Скриншоты",
-        'videos'        => "Видео",
-        'posts'         => "Сообщений на форумах"
+        'uploads'       => "Данных загружено: ",
+        'comments'      => "Комментарии: ",
+        'screenshots'   => "Скриншоты: ",
+        'videos'        => "Видео: ",
+        'posts'         => "Сообщений на форумах: "
     ),
     'emote' => array(
         'notFound'      => "[This Emote doesn't exist.]",
