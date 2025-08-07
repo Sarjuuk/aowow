@@ -3244,7 +3244,6 @@ var LANG = {
     upvote_tip:                  "Dieser Kommentat ist hilfreich (klickt, um rückgängig zu machen)",
     upvoted_tip:                 "Ihr habt diesen Kommentar positiv bewertet; klickt, um dies rückgängig zu machen",
     downvote_tip:                "Dieser Kommentar ist nicht hilfreich (klickt, um rückgängig zu machen)",
-    downvote_tip:                "Dieser Kommentar ist nicht hilfreich (klickt, um rückgängig zu machen)",
     commentdeleted_tip:          "Dieser Kommentar wurde gelöscht; er kann nur noch von Euch und Morderatoren gesehen werden.",
     addreply:                    "Antwort hinzufügen",
     replylength1_format:         "Gebt mindestens $1 Zeichen ein",

@@ -3245,7 +3245,6 @@ var LANG = {
     upvote_tip:                  "Ce commentaire est utile (cliquez à nouveau pour annuler)",
     upvoted_tip:                 "Vous avez émis un vote positif pour ce commentaire ; cliquez à nouveau pour annuler",
     downvote_tip:                "Ce commentaire n'est pas utile (cliquez à nouveau pour annuler)",
-    downvote_tip:                "Ce commentaire n'est pas utile (cliquez à nouveau pour annuler)",
     commentdeleted_tip:          "Ce commentaire a été effacé ; il n'est plus visible que par vous et par les modérateurs.",
     addreply:                    "Ajouter une réponse",
     replylength1_format:         "Entrez au moins $1 caractères",

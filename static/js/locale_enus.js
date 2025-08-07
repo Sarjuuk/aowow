@@ -3293,7 +3293,6 @@ var LANG = {
     upvote_tip:                  "This comment is helpful (click again to undo)",
     upvoted_tip:                 "You have upvoted this comment; click again to undo",
     downvote_tip:                "This comment is not helpful (click again to undo)",
-    downvote_tip:                "This comment is not helpful (click again to undo)",
     commentdeleted_tip:          "This comment has been deleted; it is now visible only to you and to moderators.",
     addreply:                    "Add reply",
     replylength1_format:         "Enter at least $1 characters",

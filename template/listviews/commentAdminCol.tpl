@@ -27,7 +27,9 @@ var _ = [
                 return true;
             };
 
-            let a = $WH.ce('a');
+            td.onclick = $WH.sp;
+
+            let a = $WH.ce('span');
             a.style.fontFamily = 'Verdana, sans-serif';
             a.style.marginLeft = '10px';
             a.href = '#';

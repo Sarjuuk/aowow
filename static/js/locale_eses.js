@@ -3244,7 +3244,6 @@ var LANG = {
     upvote_tip:                  "Este comentario es útil (haz clic de nuevo para deshacer)",
     upvoted_tip:                 "Has dado este comentario una valoración positiva; haz clic de nuevo para deshacerla.",
     downvote_tip:                "Este comentario no es útil (haz clic de nuevo para deshacer)",
-    downvote_tip:                "Este comentario no es útil (haz clic de nuevo para deshacer)",
     commentdeleted_tip:          "Este comentario ha sido borrado; ahora sólo les es visible a ti y a los moderadores.",
     addreply:                    "Añadir respuesta",
     replylength1_format:         "Introduce al menos $1 caracteres",
