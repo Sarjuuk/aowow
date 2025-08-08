@@ -639,7 +639,7 @@ abstract class Util
                 {
                     if (is_array($v))
                         $ref[$k] = [];
-                    else if (Util::checkNumeric($v))
+                    else if (is_numeric($v))
                         $ref[$k] = 0;
                     else
                         continue;
@@ -647,7 +647,7 @@ abstract class Util
 
                 if (is_array($ref[$k]) && is_array($v))
                     Util::arraySumByKey($ref[$k], $v);
-                else if (Util::checkNumeric($ref[$k]) && Util::checkNumeric($v))
+                else if (is_numeric($ref[$k]) && is_numeric($v))
                     $ref[$k] += $v;
             }
         }

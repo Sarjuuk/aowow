@@ -1696,7 +1696,6 @@ class ItemList extends BaseType
 
         $json = array(
             'id'          => $this->id,
-            'name'        => $this->getField('name', true),
             'quality'     => ITEM_QUALITY_HEIRLOOM - $this->curTpl['quality'],
             'icon'        => $this->curTpl['iconString'],
             'classs'      => $class,
@@ -1709,7 +1708,7 @@ class ItemList extends BaseType
             'level'       => $this->curTpl['itemLevel'],
             'reqlevel'    => $this->curTpl['requiredLevel'],
             'displayid'   => $this->curTpl['displayId'],
-            // 'commondrop'  => 'true' / null               // set if the item is a loot-filler-item .. check common ref-templates..?
+         // 'commondrop'  => 'true' / null                  // set if the item is a loot-filler-item .. check common ref-templates..?
             'holres'      => $this->curTpl['resHoly'],
             'firres'      => $this->curTpl['resFire'],
             'natres'      => $this->curTpl['resNature'],
@@ -1729,15 +1728,19 @@ class ItemList extends BaseType
             'scaflags'    => $this->curTpl['scalingStatValue']
         );
 
+        $json = array_map('intval', $json);
+
+        $json['name'] = $this->getField('name', true);
+
         if ($class == ITEM_CLASS_AMMUNITION)
             $json['dps'] = round(($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']) / 2, 2);
         else if ($class == ITEM_CLASS_WEAPON)
         {
-            $json['dmgtype1'] = $this->curTpl['dmgType1'];
-            $json['dmgmin1']  = $this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'];
-            $json['dmgmax1']  = $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2'];
+            $json['dmgtype1'] = (int)$this->curTpl['dmgType1'];
+            $json['dmgmin1']  = (int)($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2']);
+            $json['dmgmax1']  = (int)($this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']);
             $json['speed']    = round($this->curTpl['delay'] / 1000, 2);
-            $json['dps']      = $json['speed'] ? round(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1) : 0;
+            $json['dps']      = $json['speed'] ? round(($json['dmgmin1'] + $json['dmgmax1']) / (2 * $json['speed']), 1) : 0.0;
 
             if ($this->isRangedWeapon())
             {
@@ -1767,8 +1770,6 @@ class ItemList extends BaseType
         foreach ($json as $k => $v)
             if (!$v && !in_array($k, ['classs', 'subclass', 'quality', 'side', 'gearscore']))
                 unset($json[$k]);
-
-        Util::checkNumeric($json);
 
         $this->json[$json['id']] = $json;
     }
