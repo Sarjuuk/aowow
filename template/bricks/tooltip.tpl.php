@@ -1,5 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
+    use \Aowow\Lang;
+
+    [$icName, $icStack, $hasBuff] = $this->tooltip;
+?>
     <div id="ic<?=$this->typeId; ?>" style="float: left"></div>
     <div id="tt<?=$this->typeId; ?>" class="wowhead-tooltip" style="float: left; padding-top: 1px"></div>
     <div style="clear: left"></div>
@@ -7,8 +12,6 @@
     <div id="ks<?=$this->typeId; ?>" style="margin-left: 70px; margin-top: 4px;"></div>
 
 <?php
-$hasBuff = !empty($this->jsGlobals[Type::SPELL][2][$this->typeId]['buff']); // not set with items
-
 if ($hasBuff):
 ?>
     <h3><?=Lang::spell('_aura'); ?></h3>
@@ -25,7 +28,7 @@ endif;
 ?>
 
 <script type="text/javascript">//<![CDATA[
-    $WH.ge('ic<?=$this->typeId; ?>').appendChild(Icon.create('<?=$this->headIcons[0]; ?>', 2, null, 0, <?=$this->headIcons[1]; ?>));
+    $WH.ge('ic<?=$this->typeId; ?>').appendChild(Icon.create('<?=$icName; ?>', 2, null, 0, <?=$icStack; ?>));
     var
         tt  = $WH.ge('tt<?=$this->typeId; ?>'),
 <?php if ($hasBuff): ?>

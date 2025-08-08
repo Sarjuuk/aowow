@@ -37,7 +37,7 @@ $lang = array(
         'quickFacts'    => "Quick Facts",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'side'          => "Side",
+        'side'          => "Side: ",
         'related'       => "Related",
         'contribute'    => "Contribute",
         // 'replyingTo'    => "The answer to a comment from",
@@ -73,7 +73,7 @@ $lang = array(
         'refineSearch'  => 'Tip: Refine your search by browsing a <a href="javascript:;" id="fi_subcat">subcategory</a>.',
         'clear'         => "clear",
         'exactMatch'    => "Exact match",
-        '_reqLevel'     => "Required level",
+        '_reqLevel'     => "Required level: ",
 
         // infobox
         'unavailable'   => "Not available to players",      // alternative wording found: "No longer available to players" ... aw screw it <_<
@@ -106,12 +106,12 @@ $lang = array(
         'langOnly'   => "This page is only available in <b>%s</b>.",
 
         // calculators
-        'preset'        => "Preset",
+        'preset'        => "Preset: ",
         'addWeight'     => "Add another weight",
         'createWS'      => "Create a weight scale",
         'jcGemsOnly'    => "Include <span%s>JC-only</span> gems",
         'cappedHint'    => 'Tip: <a href="javascript:;" onclick="fi_presetDetails();">Remove</a> weights for capped statistics such as Hit rating.',
-        'groupBy'       => "Group By",
+        'groupBy'       => "Group By: ",
         'gb'            => array(
             ["None", "none"],         ["Slot", "slot"],       ["Level", "level"],     ["Source", "source"]
         ),
@@ -345,7 +345,7 @@ $lang = array(
         'reqLevel'      => "Requires Level %s",
         'reqSkillLevel' => "Required skill level",
         'school'        => "School",
-        'type'          => "Type",
+        'type'          => "Type: ",
         'valueDelim'    => " to ",
 
         'pvp'           => "PvP",                           // PVP
@@ -2059,7 +2059,7 @@ $lang = array(
         'refundable'    => "Refundable",
         'noNeedRoll'    => "Cannot roll Need",
         'atKeyring'     => "Can be placed in the keyring",
-        'worth'         => "Worth",
+        'worth'         => "Worth: ",
         'consumable'    => "Consumable",
         'nonConsumable' => "Non-consumable",
         'accountWide'   => "Account-wide",
@@ -2068,17 +2068,17 @@ $lang = array(
         'prospectable'  => "Prospectable",                  // ITEM_PROSPECTABLE
         'disenchantable'=> "Disenchantable",                // ITEM_DISENCHANT_ANY_SKILL
         'cantDisenchant'=> "Cannot be disenchanted",        // ITEM_DISENCHANT_NOT_DISENCHANTABLE
-        'repairCost'    => "Repair cost",                   // REPAIR_COST
-        'tool'          => "Tool",
+        'repairCost'    => "Repair cost: ",                 // REPAIR_COST
+        'tool'          => "Tool: ",
         'cost'          => "Cost",                          // COSTS_LABEL
         'content'       => "Content",
         '_transfer'     => 'This item will be converted to <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         '_unavailable'  => "This item is not available to players.",
         '_rndEnchants'  => "Random Enchantments",
         '_chance'       => "(%s%% chance)",
-        'slot'          => "Slot",
-        '_quality'      => "Quality",                       // QUALITY
-        'usableBy'      => "Usable by",
+        'slot'          => "Slot: ",
+        '_quality'      => "Quality: ",                     // QUALITY
+        'usableBy'      => "Usable by: ",
         'buyout'        => "Buyout price",                  // BUYOUT_PRICE
         'each'          => "each",
         'tabOther'      => "Other",
@@ -2110,7 +2110,7 @@ $lang = array(
             'range'     => ["%d - %d Damage",               "%d - %d %s Damage",            "+ %d - %d Damage",         "+%d - %d %s Damage"        ],
             'ammo'      => ["Adds %g damage per second",    "Adds %g %s damage per second", "+ %g damage per second",   "+ %g %s damage per second" ]
         ),
-        'gems'          => "Gems",
+        'gems'          => "Gems: ",
         'socketBonus'   => "Socket Bonus: %s",              // ITEM_SOCKET_BONUS
         'socket'        => array(                           // EMPTY_SOCKET_*
             "Meta Socket",          "Red Socket",       "Yellow Socket",        "Blue Socket",          -1 => "Prismatic Socket"

@@ -49,7 +49,7 @@ class ItemList extends DBTypeList
 
             // from json to json .. the gentle fuckups of legacy code integration
             $this->initJsonStats();
-            $this->jsonStats[$this->id] = (new StatsContainer())->fromJson($_curTpl, true)->toJson(Stat::FLAG_ITEM /* | Stat::FLAG_SERVERSIDE */);
+            $this->jsonStats[$this->id] = (new StatsContainer())->fromJson($_curTpl, true)->toJson(Stat::FLAG_ITEM /* | Stat::FLAG_SERVERSIDE */, false);
 
             if ($miscData)
             {
@@ -723,32 +723,7 @@ class ItemList extends DBTypeList
 
             // activation conditions for meta gems
             if (!empty($gemEnch['conditionId']))
-            {
-                if ($gemCnd = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantmentcondition WHERE `id` = ?d', $gemEnch['conditionId']))
-                {
-                    for ($i = 1; $i < 6; $i++)
-                    {
-                        if (!$gemCnd['color'.$i])
-                            continue;
-
-                        $vspfArgs = [];
-                        switch ($gemCnd['comparator'.$i])
-                        {
-                            case 2:                         // requires less <color> than (<value> || <comparecolor>) gems
-                            case 5:                         // requires at least <color> than (<value> || <comparecolor>) gems
-                                $vspfArgs = [$gemCnd['value'.$i], Lang::item('gemColors', $gemCnd['color'.$i] - 1)];
-                                break;
-                            case 3:                         // requires more <color> than (<value> || <comparecolor>) gems
-                                $vspfArgs = [Lang::item('gemColors', $gemCnd['color'.$i] - 1), Lang::item('gemColors', $gemCnd['cmpColor'.$i] - 1)];
-                                break;
-                            default:
-                                continue 2;
-                        }
-
-                        $x .= '<span class="q0">'.Lang::achievement('reqNumCrt').' '.Lang::item('gemConditions', $gemCnd['comparator'.$i], $vspfArgs).'</span><br />';
-                    }
-                }
-            }
+                $x .= Game::getEnchantmentCondition($gemEnch['conditionId'], $interactive);
         }
 
         // Random Enchantment - if random enchantment is set, prepend stats from it
@@ -1461,6 +1436,25 @@ class ItemList extends DBTypeList
         return in_array($this->curTpl['subClassBak'], [ITEM_SUBCLASS_BOW, ITEM_SUBCLASS_GUN, ITEM_SUBCLASS_THROWN, ITEM_SUBCLASS_CROSSBOW, ITEM_SUBCLASS_WAND]);
     }
 
+    public function isBodyArmor() : bool
+    {
+        if ($this->curTpl['class'] != ITEM_CLASS_ARMOR)
+            return false;
+
+        return in_array($this->curTpl['subClassBak'], [ITEM_SUBCLASS_CLOTH_ARMOR, ITEM_SUBCLASS_LEATHER_ARMOR, ITEM_SUBCLASS_MAIL_ARMOR, ITEM_SUBCLASS_PLATE_ARMOR]);
+    }
+
+    public function isDisplayable() : bool
+    {
+        if (!$this->curTpl['displayId'])
+            return false;
+
+        return in_array($this->curTpl['slot'], array(
+            INVTYPE_HEAD,           INVTYPE_SHOULDERS,      INVTYPE_BODY,           INVTYPE_CHEST,          INVTYPE_WAIST,          INVTYPE_LEGS,           INVTYPE_FEET,           INVTYPE_WRISTS,
+            INVTYPE_HANDS,          INVTYPE_WEAPON,         INVTYPE_SHIELD,         INVTYPE_RANGED,         INVTYPE_CLOAK,          INVTYPE_2HWEAPON,       INVTYPE_TABARD,         INVTYPE_ROBE,
+            INVTYPE_WEAPONMAINHAND, INVTYPE_WEAPONOFFHAND,  INVTYPE_HOLDABLE,       INVTYPE_THROWN,         INVTYPE_RANGEDRIGHT));
+    }
+
     private function formatRating(int $statId, int $itemMod, int $qty, bool $interactive = false, bool &$scaling = false) : string
     {
         // clamp level range
@@ -1773,6 +1767,11 @@ class ItemList extends DBTypeList
 
 class ItemListFilter extends Filter
 {
+    public const /* int */ GROUP_BY_NONE   = 0;
+    public const /* int */ GROUP_BY_SLOT   = 1;
+    public const /* int */ GROUP_BY_LEVEL  = 2;
+    public const /* int */ GROUP_BY_SOURCE = 3;
+
     private array  $ubFilter     = [];                      // usable-by - limit weapon/armor selection per CharClass - itemClass => available itemsubclasses
     private string $extCostQuery = 'SELECT `item` FROM npc_vendor            WHERE `extendedCost` IN (?a) UNION
                                     SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)';
@@ -2372,7 +2371,7 @@ class ItemListFilter extends Filter
             return null;
 
         $costs = DB::Aowow()->selectCol(
-            'SELECT `id` FROM ?_itemextendedcost WHERE `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)',
+           'SELECT `id` FROM ?_itemextendedcost WHERE `reqItemId1` IN (?a) OR `reqItemId2` IN (?a) OR `reqItemId3` IN (?a) OR `reqItemId4` IN (?a) OR `reqItemId5` IN (?a)',
             $_, $_, $_, $_, $_
         );
         if ($items = DB::World()->selectCol($this->extCostQuery, $costs, $costs))

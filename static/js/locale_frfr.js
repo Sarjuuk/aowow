@@ -1281,7 +1281,8 @@ var g_item_subclasses = {
            8: 'Formule d\'enchantement',
            9: 'Livre de pêche',
           10: 'Dessin de joaillerie',
-          11: 'Technique de calligraphie'
+          11: 'Technique de calligraphie',
+          12: 'Guides de Minage'
     },
     11: {
            2: 'Carquois',

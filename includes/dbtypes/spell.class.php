@@ -210,7 +210,7 @@ class SpellList extends DBTypeList
         $data = [];                       // flat gains
         foreach ($this->getStatGain() as $id => $spellData)
         {
-            $data[$id] = $spellData->toJson(STAT::FLAG_ITEM | STAT::FLAG_PROFILER);
+            $data[$id] = $spellData->toJson(STAT::FLAG_ITEM | STAT::FLAG_PROFILER, false);
 
             // apply weapon restrictions
             $this->getEntry($id);

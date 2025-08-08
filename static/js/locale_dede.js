@@ -1281,7 +1281,8 @@ var g_item_subclasses = {
            8: 'Verzauberkunstformel',
            9: 'Angelbuch',
           10: 'Juwelenschleifer-Vorlage',
-          11: 'Inschriften-Technik'
+          11: 'Inschriften-Technik',
+          12: 'Bergbauleitfäden'
     },
     11: {
            2: 'Köcher',

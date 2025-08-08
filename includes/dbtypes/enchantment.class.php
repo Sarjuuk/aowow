@@ -114,7 +114,7 @@ class EnchantmentList extends DBTypeList
             if (!$data[$this->id]['spells'])
                 unset($data[$this->id]['spells']);
 
-            Util::arraySumByKey($data[$this->id], $this->jsonStats[$this->id]->toJson());
+            Util::arraySumByKey($data[$this->id], $this->jsonStats[$this->id]->toJson(includeEmpty: false));
         }
 
         return $data;
@@ -122,7 +122,7 @@ class EnchantmentList extends DBTypeList
 
     public function getStatGainForCurrent() : array
     {
-        return $this->jsonStats[$this->id]->toJson();
+        return $this->jsonStats[$this->id]->toJson(includeEmpty: false);
     }
 
     public function getRelSpell(int $id) : ?array
