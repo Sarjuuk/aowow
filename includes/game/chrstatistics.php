@@ -444,10 +444,10 @@ class StatsContainer implements \Countable
         {
             if (isset($json[$key]))                         // 0 is a valid amount!
             {
-                $float = Stat::getFlags($idx) & Stat::FLAG_FLOAT_VALUE;
-
-                if (Util::checkNumeric($json[$key], $float ? NUM_CAST_FLOAT : NUM_CAST_INT))
-                    Util::arraySumByKey($this->store, [$idx => $json[$key]]);
+                if (Stat::getFlags($idx) & Stat::FLAG_FLOAT_VALUE)
+                    Util::arraySumByKey($this->store, [$idx => (float)$json[$key]]);
+                else
+                    Util::arraySumByKey($this->store, [$idx => (int)$json[$key]]);
             }
 
             if ($pruneFromSrc)
