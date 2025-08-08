@@ -527,7 +527,7 @@ class ItemsPage extends GenericPage
 
         if (!$this->category)
         {
-            $slotData = [Lang::item('inventoryType'), null];
+            $slotData = Lang::item('inventoryType');
             asort($slotData);
         }
         else
