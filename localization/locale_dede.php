@@ -37,7 +37,7 @@ $lang = array(
         'quickFacts'    => "Kurzübersicht",
         'screenshots'   => "Screenshots",
         'videos'        => "Videos",
-        'side'          => "Seite",
+        'side'          => "Seite: ",
         'related'       => "Weiterführende Informationen",
         'contribute'    => "Beitragen",
         // 'replyingTo'    => "Antwort zu einem Kommentar von",
@@ -73,7 +73,7 @@ $lang = array(
         'refineSearch'  => 'Tipp: Präzisiere deine Suche mit Durchsuchen einer <a href="javascript:;" id="fi_subcat">Unterkategorie</a>.',
         'clear'         => "leeren",
         'exactMatch'    => "Exakt passend",
-        '_reqLevel'     => "Mindeststufe",
+        '_reqLevel'     => "Mindeststufe: ",
 
         // infobox
         'unavailable'   => "Nicht für Spieler verfügbar",
@@ -106,12 +106,12 @@ $lang = array(
         'langOnly'   => "Diese Seite ist nur in <b>%s</b> verfügbar.",
 
         // calculators
-        'preset'        => "Vorlage",
+        'preset'        => "Vorlage: ",
         'addWeight'     => "Weitere Gewichtung hinzufügen",
         'createWS'      => "Gewichtungsverteilung erstellen",
         'jcGemsOnly'    => "<span%s>JS-exklusive</span> Edelsteine einschließen",
         'cappedHint'    => 'Tipp: <a href="javascript:;" onclick="fi_presetDetails();">Entfernt</a> Gewichtungen für gedeckte Werte wie Trefferwertung.',
-        'groupBy'       => "Ordnen nach",
+        'groupBy'       => "Ordnen nach: ",
         'gb'            => array(
             ["Nichts", "none"],         ["Platz", "slot"],      ["Stufe", "level"],         ["Quelle", "source"]
         ),
@@ -345,7 +345,7 @@ $lang = array(
         'reqLevel'      => "Benötigt Stufe %s",
         'reqSkillLevel' => "Benötigte Fertigkeitsstufe",
         'school'        => "Magieart",
-        'type'          => "Art",
+        'type'          => "Art: ",
         'valueDelim'    => " - ",                           // " bis "
 
         'pvp'           => "PvP",
@@ -2059,7 +2059,7 @@ $lang = array(
         'refundable'    => "Rückzahlbar",
         'noNeedRoll'    => "Kann nicht für Bedarf werfen",
         'atKeyring'     => "Passt in den Schlüsselbund",
-        'worth'         => "Wert",
+        'worth'         => "Wert: ",
         'consumable'    => "Verbrauchbar",
         'nonConsumable' => "Nicht verbrauchbar",
         'accountWide'   => "Accountweit",
@@ -2068,17 +2068,17 @@ $lang = array(
         'prospectable'  => "Sondierbar",
         'disenchantable'=> "Kann entzaubert werden",
         'cantDisenchant'=> "Kann nicht entzaubert werden",
-        'repairCost'    => "Reparaturkosten",
-        'tool'          => "Werkzeug",
+        'repairCost'    => "Reparaturkosten: ",
+        'tool'          => "Werkzeug: ",
         'cost'          => "Preis",
         'content'       => "Inhalt",
         '_transfer'     => 'Dieser Gegenstand wird mit <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         '_unavailable'  => "Dieser Gegenstand ist nicht für Spieler verfügbar.",
         '_rndEnchants'  => "Zufällige Verzauberungen",
         '_chance'       => "(Chance von %s%%)",
-        'slot'          => "Platz",
-        '_quality'      => "Qualität",
-        'usableBy'      => "Benutzbar von",
+        'slot'          => "Platz: ",
+        '_quality'      => "Qualität: ",
+        'usableBy'      => "Benutzbar von: ",
         'buyout'        => "Sofortkaufpreis",
         'each'          => "Stück",
         'tabOther'      => "Anderes",
@@ -2110,7 +2110,7 @@ $lang = array(
             'range'     => ['%1$d - %2$d Schaden',                              '%1$d - %2$d %3$sschaden',                          '+ %1$d - %2$d Schaden',    '+ %1$d - %2$d %3$sschaden' ],
             'ammo'      => ["Verursacht %g zusätzlichen Schaden pro Sekunde.",  "Verursacht %g zusätzlichen %sschaden pro Sekunde", "+ %g Schaden pro Sekunde", "+ %g %sschaden pro Sekunde"]
         ),
-        'gems'          => "Edelsteine",
+        'gems'          => "Edelsteine: ",
         'socketBonus'   => "Sockelbonus: %s",
         'socket'        => array(
             "Metasockel",           "Roter Sockel",     "Gelber Sockel",        "Blauer Sockel",          -1 => "Prismatischer Sockel"

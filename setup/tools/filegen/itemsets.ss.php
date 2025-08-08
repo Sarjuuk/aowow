@@ -101,7 +101,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     if (!$itemQty || !$itemSpl || !isset($jsonBonus[$itemSpl]))
                         continue;
 
-                    if ($x = $jsonBonus[$itemSpl]->toJson(Stat::FLAG_ITEM))
+                    if ($x = $jsonBonus[$itemSpl]->toJson(Stat::FLAG_ITEM, false))
                     {
                         if (!isset($setbonus[$itemQty]))
                             $setbonus[$itemQty] = [];

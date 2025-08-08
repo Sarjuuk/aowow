@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -17,7 +21,7 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 <?php
 if ($this->unavailable):
 ?>
@@ -29,18 +33,18 @@ endif;
 
     $this->brick('tooltip');
 
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
 if (isset($this->map)):
     echo "            <h3>".Lang::item('vendorIn')."</h3>\n";
     $this->brick('mapper');
 endif;
 
-if (!empty($this->transfer)):
+if ($this->transfer):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
 
-if (!empty($this->subItems)):
+if ($this->subItems):
 ?>
                 <div class="clear"></div>
                 <h3><?=Lang::item('_rndEnchants'); ?></h3>
@@ -56,7 +60,7 @@ if (!empty($this->subItems)):
                 endforeach;
 
                 echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="tip q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
+                echo '                        <small class="q0">'.Lang::item('_chance', [$i['chance']]).'</small><br />'.implode(', ', $eText).'</div></li>';
             endif;
         endforeach;
 ?>
@@ -93,7 +97,7 @@ $this->brick('book');
             </div>
 
 <?php
-    $this->brick('lvTabs', ['relTabs' => true]);
+    $this->brick('lvTabs');
 
     $this->brick('contribute');
 ?>

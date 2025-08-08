@@ -37,7 +37,7 @@ $lang = array(
         'quickFacts'    => "相关信息",
         'screenshots'   => "屏幕截图",
         'videos'        => "视频",
-        'side'          => "阵营",
+        'side'          => "阵营：",
         'related'       => "相关",
         'contribute'    => "贡献",
         // 'replyingTo'    => "The answer to a comment from",
@@ -73,7 +73,7 @@ $lang = array(
         'refineSearch'  => '提示：通过浏览 <a href="javascript:;" id="fi_subcat">子类别</a>搜索。',
         'clear'         => "清除",
         'exactMatch'    => "精确匹配",
-        '_reqLevel'     => "要求等级",
+        '_reqLevel'     => "要求等级：",
 
         // infobox
         'unavailable'   => "对玩家不可用",                        // alternative wording found: "No longer available to players" ... aw screw it <_<
@@ -106,12 +106,12 @@ $lang = array(
         'langOnly'   => "该页面仅以<b>%s</b>提供。",
 
         // calculators
-        'preset'        => "预设",
+        'preset'        => "预设：",
         'addWeight'     => "添加另一个权重",
         'createWS'      => "创建一个权重比例",
         'jcGemsOnly'    => "包含<span%s>JC-only</span>宝石",
         'cappedHint'    => '提示：<a href="javascript:;" onclick="fi_presetDetails();">移除</a> 命中等级等上限属性的权重。',
-        'groupBy'       => "按组",
+        'groupBy'       => "按组：",
         'gb'            => array(
             ["无", "none"],         ["插槽", "slot"],       ["等级", "level"],     ["来源", "source"]
         ),
@@ -344,7 +344,7 @@ $lang = array(
         'reqLevel'      => "需要等级%s",
         'reqSkillLevel' => "需要技能等级",
         'school'        => "类型",
-        'type'          => "类型",
+        'type'          => "类型：",
         'valueDelim'    => "到",
 
         'pvp'           => "PvP",
@@ -2058,7 +2058,7 @@ $lang = array(
         'refundable'    => "可退还的",
         'noNeedRoll'    => "无法需求掷骰",
         'atKeyring'     => "可以放在钥匙链",
-        'worth'         => "价值",
+        'worth'         => "价值：",
         'consumable'    => "消耗品",
         'nonConsumable' => "非消耗品",
         'accountWide'   => "账号共享",
@@ -2067,17 +2067,17 @@ $lang = array(
         'prospectable'  => "可选矿",
         'disenchantable'=> "可分解",
         'cantDisenchant'=> "无法分解",
-        'repairCost'    => "修理费用",
-        'tool'          => "工具",
+        'repairCost'    => "修理费用：",
+        'tool'          => "工具：",
         'cost'          => "花费",
         'content'       => "内容",
         '_transfer'     => '这个物品将被转换到<a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         '_unavailable'  => "这个物品对玩家不可用。",
         '_rndEnchants'  => "随机附魔",
         '_chance'       => "（%s%%几率）",
-        'slot'          => "装备部位",
-        '_quality'      => "品质",
-        'usableBy'      => "可用职业",
+        'slot'          => "装备部位：",
+        '_quality'      => "品质：",
+        'usableBy'      => "可用职业：",
         'buyout'        => "一口价",
         'each'          => "每个",
         'tabOther'      => "其他",
@@ -2109,7 +2109,7 @@ $lang = array(
             'range'     => ["%d - %d伤害",    "%d - %d 点%s伤害",    "+ %d - %d伤害",  "+%d - %d 点%s伤害"    ],
             'ammo'      => ["每秒伤害提高%g",     "每秒增加%g点%s系伤害",     "每秒伤害+%g",      "每秒+%g点%s伤害"        ]
         ),
-        'gems'          => "宝石",
+        'gems'          => "宝石：",
         'socketBonus'   => "镶孔奖励：%s",
         'socket'        => array(
             "多彩插槽",                 "红色插槽",             "黄色插槽",                 "蓝色插槽",                 -1 => "棱彩插槽"
