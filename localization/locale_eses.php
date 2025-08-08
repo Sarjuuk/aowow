@@ -333,7 +333,7 @@ $lang = array(
         'difficulty'    => "Dificultad",
         'dispelType'    => "Tipo de disipación",
         'duration'      => "Duración",
-        'eventShort'    => "Evento",
+        'eventShort'    => "Evento: %s",
         'flags'         => "Banderas",
         'glyphType'     => "Tipo de glifo",
         'level'         => "Nivel",
@@ -1449,7 +1449,7 @@ $lang = array(
         '_conveyBonus'  => "Tener puestos mas objetos de este conjunto le aplicará una bonificación a tu personaje.",
         '_pieces'       => "piezas",
         '_unavailable'  => "Este conjunto de objetos no está disponible para jugadores.",
-        '_tag'          => "Etiqueta",
+        '_tag'          => "Etiqueta: ",
         'summary'       => "Resúmen",
         'notes'         => array(
             null,                                   "Set de mazmorra 1",                    "Set de mazmorra 2",                        "Set de banda tier 1",

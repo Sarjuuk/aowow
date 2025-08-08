@@ -333,7 +333,7 @@ $lang = array(
         'difficulty'    => "Difficulty",
         'dispelType'    => "Dispel type",
         'duration'      => "Duration",
-        'eventShort'    => "Event",
+        'eventShort'    => "Event: %s",
         'flags'         => "Flags",
         'glyphType'     => "Glyph type",
         'level'         => "Level",
@@ -1449,7 +1449,7 @@ $lang = array(
         '_conveyBonus'  => "Wearing more pieces of this set will convey bonuses to your character.",
         '_pieces'       => "pieces",
         '_unavailable'  => "This item set is not available to players.",
-        '_tag'          => "Tag",
+        '_tag'          => "Tag: ",
         'summary'       => "Summary",
         'notes'         => array(
             null,                                   "Dungeon Set 1",                        "Dungeon Set 2",                        "Tier 1 Raid Set",
