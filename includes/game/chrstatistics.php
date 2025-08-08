@@ -487,11 +487,11 @@ class StatsContainer implements \Countable
     /* Output */
     /**********/
 
-    public function toJson(int $outFlags = Stat::FLAG_NONE) : array
+    public function toJson(int $outFlags = Stat::FLAG_NONE, bool $includeEmpty = true) : array
     {
         $out = [];
         foreach ($this->store as $stat => $amt)
-            if (!$outFlags || (Stat::getFlags($stat) & $outFlags))
+            if ((!$outFlags || (Stat::getFlags($stat) & $outFlags)) && ($amt || $includeEmpty))
                 $out[Stat::getJsonString($stat)] = $amt;
 
         return $out;

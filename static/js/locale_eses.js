@@ -1283,7 +1283,8 @@ var g_item_subclasses = {
            8: 'Fórmula de encantamiento',
            9: 'Libro de pesca',
           10: 'Boceto de joyería',
-          11: 'Técnica de Inscripción'
+          11: 'Técnica de Inscripción',
+          12: 'Guías de minería'
     },
     11: {
            2: 'Carcaj',

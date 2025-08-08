@@ -1330,7 +1330,8 @@ var g_item_subclasses = {
            8: 'Enchanting Formula',
            9: 'Fishing Book',
           10: 'Jewelcrafting Design',
-          11: 'Inscription Technique'
+          11: 'Inscription Technique',
+          12: 'Mining Guides'
     },
     11: {
             2: 'Quiver',

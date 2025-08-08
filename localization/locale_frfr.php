@@ -37,7 +37,7 @@ $lang = array(
         'quickFacts'    => "En bref",
         'screenshots'   => "Captures d'écran",
         'videos'        => "Vidéos",
-        'side'          => "Coté",
+        'side'          => "Coté : ",
         'related'       => "Informations connexes",
         'contribute'    => "Contribuer",
         // 'replyingTo'    => "En réponse au commentaire de",
@@ -73,7 +73,7 @@ $lang = array(
         'refineSearch'  => "Astuce : Affinez votre recherche en utilisant une <a href=\"javascript:;\" id=\"fi_subcat\">sous-catégorie</a>.",
         'clear'         => "effacer",
         'exactMatch'    => "Concordance exacte",
-        '_reqLevel'     => "Niveau requis",
+        '_reqLevel'     => "Niveau requis : ",
 
         // infobox
         'unavailable'   => "Non disponible aux joueurs",
@@ -106,12 +106,12 @@ $lang = array(
         'langOnly'   => "Cette page n'est disponible qu'en <b>%s</b> pour le moment.",
 
         // calculators
-        'preset'        => "Prédéterminée",
+        'preset'        => "Prédéterminée : ",
         'addWeight'     => "Ajouter un autre facteur",
         'createWS'      => "Créer une échelle de valeurs",
         'jcGemsOnly'    => "Inclure les gemmes de <span%s>joaillier</span>",
         'cappedHint'    => 'Conseil: <a href="javascript:;" onclick="fi_presetDetails();">Enlever</a> un facteur pour les statistiques au maximum tel que le score de touche.',
-        'groupBy'       => "Groupé par",
+        'groupBy'       => "Groupé par : ",
         'gb'            => array(
             ["Aucun", "none"],         ["Emplacement", "slot"],       ["Niveau", "level"],     ["Source", "source"]
         ),
@@ -345,7 +345,7 @@ $lang = array(
         'reqLevel'      => "Niveau %s requis",
         'reqSkillLevel' => "Niveau de compétence requis",
         'school'        => "École",
-        'type'          => "Type",
+        'type'          => "Type : ",
         'valueDelim'    => " - ",
 
         'pvp'           => "JcJ",
@@ -2059,7 +2059,7 @@ $lang = array(
         'refundable'    => "Remboursable",
         'noNeedRoll'    => "Ne peut pas faire un jet de Besoin",
         'atKeyring'     => "Va dans le trousseau de clés",
-        'worth'         => "Vaut",
+        'worth'         => "Vaut : ",
         'consumable'    => "Consommable",
         'nonConsumable' => "Non-consommable",
         'accountWide'   => "Portant sur le compte",
@@ -2068,17 +2068,17 @@ $lang = array(
         'prospectable'  => "Prospectable",
         'disenchantable'=> "Desencantable",
         'cantDisenchant'=> "Ne peut pas être désenchanté",
-        'repairCost'    => "Cout de réparation",
-        'tool'          => "Outil",
+        'repairCost'    => "Cout de réparation : ",
+        'tool'          => "Outil : ",
         'cost'          => "Coût",
         'content'       => "Contenu",
         '_transfer'     => 'Cet objet sera converti en <a href="?item=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         '_unavailable'  => "Cet objet n'est pas disponible pour les joueurs.",
         '_rndEnchants'  => "Enchantements aléatoires",
         '_chance'       => "(%s%% de chance)",
-        'slot'          => "Emplacement",
-        '_quality'      => "Qualité",
-        'usableBy'      => "Utilisable par",
+        'slot'          => "Emplacement : ",
+        '_quality'      => "Qualité : ",
+        'usableBy'      => "Utilisable par : ",
         'buyout'        => "Vente immédiate",
         'each'          => "chacun",
         'tabOther'      => "Autre",
@@ -2110,7 +2110,7 @@ $lang = array(
             'range'     => ["Dégâts : %d - %d",             "%d - %d points de dégâts (%s)",                "+ %d - %d points de dégâts",           "+%d - %d points de dégâts (%s)"         ],
             'ammo'      => ["Ajoute %g dégâts par seconde", "Ajoute %g points de dégâts (%s) par seconde",  "+ %g points de dégâts par seconde",    "+ %g points de dégâts (%s) par seconde" ]
         ),
-        'gems'          => "Gemmes",
+        'gems'          => "Gemmes : ",
         'socketBonus'   => "Bonus de châsse: %s",
         'socket'        => array(
             "Méta-châsse",          "Châsse rouge",     "Châsse jaune",         "Châsse bleue",           -1 => "Châsse prismatique"

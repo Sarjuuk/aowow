@@ -1,10 +1,11 @@
-<?php namespace Aowow; ?>
-
 <?php
-$this->brick('header');
-$f = $this->filterObj->values                               // shorthand
-?>
+    namespace Aowow\Template;
 
+    use Aowow\Lang;
+
+$this->brick('header');
+$f = $this->filter->values;                                 // shorthand
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -12,21 +13,24 @@ $f = $this->filterObj->values                               // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [0]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [0]]);
 ?>
-
-            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;">
+            <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=items<?=$this->subCat; ?>" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                    <div class="text">
+<?php
+$this->brick('headIcons');
+
+$this->brick('redButtons');
+?>
+                        <h1><?=$this->h1; ?></h1>
+                    </div>
                     <div class="rightpanel">
-                        <div style="float: left"><?=Lang::item('_quality').Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::item('_quality'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['qu[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="qu[]" size="7" multiple="multiple" class="rightselect" style="background-color: #181818">
-<?php
-foreach (Lang::item('quality') as $k => $str):
-    echo '                            <option value="'.$k.'" class="q'.$k.'"'.(isset($f['qu']) && in_array($k, (array)$f['qu']) ? ' selected' : null).'>'.$str."</option>\n";
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::item('quality'), $f['qu'], 28, fn($v, $k, &$e) => $e = ['class' => 'q'.$k]); ?>
                         </select>
                     </div>
 
@@ -34,15 +38,11 @@ endforeach;
 if ($this->slotList):
 ?>
                     <div class="rightpanel2">
-                        <div style="float: left"><?=Lang::item('slot').Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::item('slot'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['sl[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="sl[]" size="<?=min(count($this->slotList), 7); ?>" multiple="multiple" class="rightselect">
-<?php
-    foreach ($this->slotList as $k => $str):
-        echo '                            <option value="'.$k.'" '.(isset($f['sl']) && in_array($k, (array)$f['sl']) ? ' selected' : null).'>'.$str."</option>\n";
-    endforeach;
-?>
+<?=$this->makeOptionsList($this->slotList, $f['sl'], 28); ?>
                         </select>
                     </div>
 <?php
@@ -51,63 +51,46 @@ endif;
 if ($this->typeList):
 ?>
                     <div class="rightpanel2">
-                        <div style="float: left"><?=Lang::game('type').Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::game('type'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="ty[]" size="<?=min(count($this->typeList), 7); ?>" multiple="multiple" class="rightselect">
-<?php
-    foreach ($this->typeList as $k => $str):
-        $selected = false;
-        if (isset($f['ty']) && in_array($k, (array)$f['ty'])):
-            $selected = true;
-        elseif (isset($this->category[1]) && $this->category[0] == 0 && $this->category[1] == $k):
-            $selected = true;
-        endif;
-
-        echo '                            <option value="'.$k.'" '.( $selected ? ' selected' : null).'>'.(is_array($str) ? $str[0] : $str)."</option>\n";
-    endforeach;
-?>
+<?=$this->makeOptionsList($this->typeList, $f['ty'], 28, function($v, $k, &$e) {
+    if (($this->pageTemplate['breadcrumb'][2] ?? null) === 0 && ($this->pageTemplate['breadcrumb'][3] ?? null) === $k)
+        $e = ['selected' => 'selected'];                    // preselect type for consumables .. blegh >:(
+    return true;
+}); ?>
                         </select>
                     </div>
 <?php endif; ?>
 
                     <table>
                         <tr>
-                            <td><?=Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
-                            <td colspan="2">&nbsp;<input type="text" name="na" size="30" <?=(isset($f['na']) ? 'value="'.Util::htmlEscape($f['na']).'" ' : null); ?>/></td>
+                            <td><?=$this->ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
+                            <td colspan="2">&nbsp;<input type="text" name="na" size="30" <?=($f['na'] ? 'value="'.$this->escHTML($f['na']).'" ' : ''); ?>/></td>
                             <td></td>
                         </tr><tr>
                             <td class="padded"><?=Lang::game('level').Lang::main('colon'); ?></td>
-                            <td class="padded">&nbsp;<input type="text" name="minle" maxlength="3" class="smalltextbox2" <?=(isset($f['minle']) ? 'value="'.$f['minle'].'" ' : null); ?>/> - <input type="text" name="maxle" maxlength="3" class="smalltextbox2" <?=(isset($f['maxle']) ? 'value="'.$f['maxle'].'" ' : null); ?>/></td>
+                            <td class="padded">&nbsp;<input type="text" name="minle" maxlength="3" class="smalltextbox2" <?=($f['minle'] ? 'value="'.$f['minle'].'" ' : ''); ?>/> - <input type="text" name="maxle" maxlength="3" class="smalltextbox2" <?=($f['maxle'] ? 'value="'.$f['maxle'].'" ' : ''); ?>/></td>
                             <td class="padded">
                                 <table>
                                     <tr>
-                                        <td>&nbsp;&nbsp;&nbsp;<?=Lang::main('_reqLevel').Lang::main('colon'); ?></td>
-                                        <td>&nbsp;<input type="text" name="minrl" maxlength="2" class="smalltextbox" <?=(isset($f['minrl']) ? 'value="'.$f['minrl'].'" ' : null); ?>/> - <input type="text" name="maxrl" maxlength="2" class="smalltextbox" <?=(isset($f['maxrl']) ? 'value="'.$f['maxrl'].'" ' : null); ?>/></td>
+                                        <td>&nbsp;&nbsp;&nbsp;<?=Lang::main('_reqLevel'); ?></td>
+                                        <td>&nbsp;<input type="text" name="minrl" maxlength="2" class="smalltextbox" <?=($f['minrl'] ? 'value="'.$f['minrl'].'" ' : ''); ?>/> - <input type="text" name="maxrl" maxlength="2" class="smalltextbox" <?=($f['maxrl'] ? 'value="'.$f['maxrl'].'" ' : ''); ?>/></td>
                                     </tr>
                                 </table>
                             </td>
                             <td></td>
                         </tr><tr>
-                            <td class="padded"><?=Lang::item('usableBy').Lang::main('colon'); ?></td>
+                            <td class="padded"><?=Lang::item('usableBy'); ?></td>
                             <td class="padded">&nbsp;<select name="si" style="margin-right: 0.5em">
                                 <option></option>
-<?php
-foreach (Lang::game('si') as $k => $str):
-    echo '                            <option value="'.$k.'"'.(isset($f['si']) && $k == $f['si'] ? ' selected' : null).'>'.$str."</option>\n";
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::game('si'), $f['si'], 28); ?>
                             </select></td>
                             <td class="padded">
                                 &nbsp;<select name="ub">
                                     <option></option>
-<?php
-foreach (Lang::game('cl') as $k => $str):
-    if ($str):
-        echo '                            <option value="'.$k.'"'.(isset($f['ub']) && $k == $f['ub'] ? ' selected' : null).'>'.$str."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::game('cl'), $f['ub'], 28); ?>
                                 </select></td>
                             </td>
                         </tr>
@@ -117,7 +100,8 @@ endforeach;
 
                     <div class="padded2">
                         <div style="float: right"><?=Lang::main('refineSearch'); ?></div>
-                        <?=Lang::main('match').Lang::main('colon'); ?><input type="radio" name="ma" value="" id="ma-0" <?=(!isset($f['ma']) ? 'checked="checked" ' : null); ?>/><label for="ma-0"><?=Lang::main('allFilter'); ?></label><input type="radio" name="ma" value="1" id="ma-1" <?=(isset($f['ma']) ? 'checked="checked" ' : null); ?>/><label for="ma-1"><?=Lang::main('oneFilter'); ?></label>
+                        <?=Lang::main('match'); ?>
+                        <input type="radio" name="ma" value="" id="ma-0" <?=(!$f['ma'] ? 'checked="checked" ' : ''); ?>/><label for="ma-0"><?=Lang::main('allFilter'); ?></label><input type="radio" name="ma" value="1" id="ma-1" <?=($f['ma'] ? 'checked="checked" ' : ''); ?>/><label for="ma-1"><?=Lang::main('oneFilter'); ?></label>
                     </div>
 
                     <div class="pad3"></div>
@@ -133,19 +117,17 @@ endforeach;
 
                         <table>
                             <tr>
-                                <td><?=Lang::main('preset').Lang::main('colon'); ?></td>
+                                <td><?=Lang::main('preset'); ?></td>
                                 <td id="fi_presets"></td>
                             </tr>
                             <tr>
-                                <td class="padded"><?=Lang::item('gems').Lang::main('colon'); ?></td>
+                                <td class="padded"><?=Lang::item('gems'); ?></td>
                                 <td class="padded">
                                     <select name="gm">
-                                        <option<?=(!isset($f['gm']) ? ' selected' : null); ?>></option>
-                                        <option value="2"<?=(isset($f['gm']) && $f['gm'] == 2 ? ' selected' : null).'>'.Lang::item('quality', 2); ?></option>
-                                        <option value="3"<?=(isset($f['gm']) && $f['gm'] == 3 ? ' selected' : null).'>'.Lang::item('quality', 3); ?></option>
-                                        <option value="4"<?=(isset($f['gm']) && $f['gm'] == 4 ? ' selected' : null).'>'.Lang::item('quality', 4); ?></option>
+                                        <option<?=(!$f['gm'] ? ' selected' : ''); ?>></option>
+<?=$this->makeOptionsList(Lang::item('quality'), $f['gm'], 40, fn($v, $k) => in_array($k, [ITEM_QUALITY_UNCOMMON, ITEM_QUALITY_RARE, ITEM_QUALITY_EPIC])); ?>
                                     </select>
-                                    &nbsp; <input type="checkbox" name="jc" value="1" id="jc" <?=(isset($f['jc']) && $f['jc'] == 1 ? 'checked="checked" ' : null); ?>/><label for="jc"><?=sprintf(Lang::main('jcGemsOnly'), ' class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_jconlygems, 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"'); ?></label>
+                                    &nbsp; <input type="checkbox" name="jc" value="1" id="jc" <?=($f['jc'] && $f['jc'] == 1 ? 'checked="checked" ' : ''); ?>/><label for="jc"><?=sprintf(Lang::main('jcGemsOnly'), ' class="tip" onmouseover="$WH.Tooltip.showAtCursor(event, LANG.tooltip_jconlygems, 0, 0, \'q\')" onmousemove="$WH.Tooltip.cursorUpdate(event)" onmouseout="$WH.Tooltip.hide()"'); ?></label>
                                 </td>
                             </tr>
                         </table>
@@ -159,16 +141,8 @@ endforeach;
 
                     <div class="clear"></div>
                     <div class="padded">
-<?php
-echo Lang::main('groupBy').Lang::main('colon')."\n";
-foreach (Lang::main('gb') as $k => $str):
-    if ($k):
-        echo '                        <input type="radio" name="gb" value="'.$k.'" id="gb-'.$str[1].'"'.(!empty($f['gb']) && $f['gb'] == $k ? ' checked="checked"' : null).'/><label for="gb-'.$str[1].'">'.$str[0]."</label>\n";
-    else:
-        echo '                        <input type="radio" name="gb" value="" id="gb-'.$str[1].'"'.(empty($f['gb']) ? ' checked="checked"' : null).'/><label for="gb-'.$str[1].'">'.$str[0]."</label>\n";
-    endif;
-endforeach;
-?>
+                        <?=Lang::main('groupBy')."\n"; ?>
+<?=$this->makeRadiosList('gb', Lang::main('gb'), $f['gb'] ?? '', 24, fn($v, &$k) => ($k = $k ?: '') || 1); ?>
                     </div>
 
                     <div class="clear"></div>
@@ -178,7 +152,7 @@ endforeach;
                         <input type="reset" value="<?=Lang::main('resetForm'); ?>" />
                     </div>
 
-                    <input type="hidden" name="upg"<?=($f['upg'] ? ' value="'.implode(':', $f['upg']).'"' : ''); ?>/>
+                    <input type="hidden" name="upg" value ="<?=($f['upg'] ? implode(':', $f['upg']) : ''); ?>" />
 
                     <div class="pad"></div>
 
@@ -186,7 +160,7 @@ endforeach;
                 <div class="pad"></div>
             </div>
 
-<?php $this->brick('filter'); ?>
+<?=$this->renderFilter(12); ?>
 
 <?php $this->brick('lvTabs'); ?>
 
