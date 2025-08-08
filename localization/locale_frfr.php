@@ -333,7 +333,7 @@ $lang = array(
         'difficulty'    => "Difficulté",
         'dispelType'    => "Type de dissipation",
         'duration'      => "Durée",
-        'eventShort'    => "Évènement",
+        'eventShort'    => "Évènement : %s",
         'flags'         => "Marqueurs",
         'glyphType'     => "Type de glyphe",
         'level'         => "Niveau",
@@ -1449,7 +1449,7 @@ $lang = array(
         '_conveyBonus'  => "Plus d'objets de cet ensemble sont équipés, plus votre personnage aura des bonus de caractéristiques.",
         '_pieces'       => "pièces",
         '_unavailable'  => "Cet objet n'est plus disponible aux joueurs.",
-        '_tag'          => "Étiquette",
+        '_tag'          => "Étiquette : ",
         'summary'       => "Résumé",
         'notes'         => array(
             null,                                   "Ensemble de donjon 1",                 "Ensemble de donjon 2",                         "Ensemble de raid palier 1",

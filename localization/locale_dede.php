@@ -333,7 +333,7 @@ $lang = array(
         'difficulty'    => "Modus",
         'dispelType'    => "Bannart",
         'duration'      => "Dauer",
-        'eventShort'    => "Ereignis",
+        'eventShort'    => "Ereignis: %s",
         'flags'         => "Flags",
         'glyphType'     => "Glyphenart",
         'level'         => "Stufe",
@@ -1449,7 +1449,7 @@ $lang = array(
         '_conveyBonus'  => "Das Tragen mehrerer Gegenstände aus diesem Set gewährt Eurem Charakter Boni.",
         '_pieces'       => "Teile",
         '_unavailable'  => "Dieses Ausrüstungsset ist nicht für Spieler verfügbar.",
-        '_tag'          => "Tag",
+        '_tag'          => "Tag: ",
         'summary'       => "Zusammenfassung",
         'notes'         => array(
             null,                                   "Dungeon-Set 1",                            "Dungeon-Set 2",                                "Tier 1 Raid-Set",

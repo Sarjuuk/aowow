@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -19,9 +22,9 @@
 $this->brick('redButtons');
 
 if ($this->expansion):
-    echo '                <h1 class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->name."</span></h1>\n";
+    echo '                <h1 class="h1-icon"><span class="icon-'.$this->expansion.'-right">'.$this->h1."</span></h1>\n";
 else:
-    echo '                <h1>'.$this->name."</h1>\n";
+    echo '                <h1>'.$this->h1."</h1>\n";
 endif;
 if ($this->unavailable):
 ?>
@@ -30,32 +33,31 @@ if ($this->unavailable):
                 <div class="pad"></div>
 <?php
 endif;
-$this->brick('article');
+$this->brick('markup', ['markup' => $this->article]);
 
 echo $this->description;
 ?>
                 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->pieces as $iId => $piece):
-    echo "                    g_items.add(".$iId.", ".Util::toJSON($piece).");\n";
+foreach ($this->pieces as $iId => [$piece, ]):
+    echo "                    g_items.add(".$iId.", ".$this->json($piece).");\n";
 endforeach;
 ?>
                 //]]></script>
 
                 <table class="iconlist">
 <?php
-$idx = 0;
-foreach ($this->pieces as $iId => $piece):
-    echo '                    <tr><th align="right" id="iconlist-icon'.(++$idx).'"></th><td><span class="q'.$piece['quality'].'"><a href="?item='.$iId.'">'.$piece['name_'.Lang::getLocale()->json()]."</a></span></td></tr>\n";
+$iconIdx = 0;
+foreach ($this->pieces as [, $icon]):
+    echo $icon->renderContainer(20, $iconIdx, true);
 endforeach;
 ?>
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-$idx = 0;
-foreach ($this->pieces as $iId => $__):
-    echo "                    \$WH.ge('iconlist-icon".(++$idx)."').appendChild(g_items.createIcon(".$iId.", 0, 0));\n";
+foreach ($this->pieces as [, $icon]):
+    echo $icon->renderJS(20);
 endforeach;
 ?>
                 //]]></script>
@@ -78,7 +80,7 @@ if ($this->summary):
 
                 <div id="summary-generic"></div>
                 <script type="text/javascript">//<![CDATA[
-                    new Summary(<?=Util::toJSON($this->summary); ?>);
+                    <?=$this->summary; ?>
                 //]]></script>
 <?php
 endif;
@@ -88,7 +90,7 @@ endif;
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>

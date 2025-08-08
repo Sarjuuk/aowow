@@ -332,7 +332,7 @@ $lang = array(
         'difficulty'    => "难度",
         'dispelType'    => "驱散类型",
         'duration'      => "持续时间",
-        'eventShort'    => "事件",
+        'eventShort'    => "事件：%s",
         'flags'         => "标记",
         'glyphType'     => "雕文类型",
         'level'         => "等级",
@@ -1448,7 +1448,7 @@ $lang = array(
         '_conveyBonus'  => "穿更多这个套装的部分将会提供给你角色奖励。",
         '_pieces'       => "件",
         '_unavailable'  => "这个物品套装对玩家不可用。",
-        '_tag'          => "标签",
+        '_tag'          => "标签：",
         'summary'       => "摘要",
         'notes'         => array(
             null,                                   "地下城套装1",                        "地下城套装2",                        "T1副本套装",
