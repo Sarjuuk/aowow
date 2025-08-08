@@ -113,7 +113,7 @@ class CommunityContent
                 continue;
 
             foreach ($obj->iterate() as $id => $__)
-                self::$subjCache[$type][$id] = $obj->getField('name', true);
+                self::$subjCache[$type][$id] = $obj->getField('name', true, true);
         }
     }
 
