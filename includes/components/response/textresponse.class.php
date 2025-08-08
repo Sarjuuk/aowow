@@ -62,6 +62,15 @@ trait TrRss
             }
         }
 
+        // pretty print for debug
+        if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO)
+        {
+            $dom = new \DOMDocument('1.0');
+            $dom->formatOutput = true;
+            $dom->loadXML($root->asXML());
+            return $dom->saveXML();
+        }
+
         return $root->asXML();
     }
 }
