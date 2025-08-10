@@ -1117,12 +1117,11 @@ $lang = array(
         'criteria'      => "Kriterien",
         'points'        => "Punkte",
         'series'        => "Reihe",
-        'outOf'         => "von",
         'criteriaType'  => "Criterium Typ-Id:",
         'itemReward'    => "Ihr bekommt",
         'titleReward'   => 'Euch wird der Titel "<a href="?title=%d">%s</a>" verliehen',
         'slain'         => "getötet",
-        'reqNumCrt'     => "Benötigt",
+        'reqNumCrt'     => 'Benötigt %1$d von %2$d',
         'rfAvailable'   => "Verfügbar auf Realm: ",
         '_transfer'     => 'Dieser Erfolg wird mit <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(

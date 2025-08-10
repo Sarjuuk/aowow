@@ -1117,12 +1117,11 @@ $lang = array(
         'criteria'      => "Critères",
         'points'        => "Points",
         'series'        => "Série",
-        'outOf'         => "sur",
         'criteriaType'  => "Criterium Type ID : ",
         'itemReward'    => "Vous recevrez",
         'titleReward'   => "Vous devriez recevoir le titre \"<a href=\"?title=%d\">%s</a>\"",
         'slain'         => "tué",
-        'reqNumCrt'     => "Nécessite",
+        'reqNumCrt'     => 'Nécessite %1$d sur %2$d',
         'rfAvailable'   => "Disponibles sur les royaumes : ",
         '_transfer'     => 'Cet haut fait sera converti en <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'cat'           => array(

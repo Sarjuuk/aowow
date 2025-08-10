@@ -1117,12 +1117,11 @@ $lang = array(
         'criteria'      => "Requisitos",
         'points'        => "Puntos",
         'series'        => "Serie",
-        'outOf'         => "de",
         'criteriaType'  => "Criterium Type ID:",
         'itemReward'    => "Recibirás",
         'titleReward'   => 'Deberías obtener el título "<a href="?title=%d">%s</a>"',
         'slain'         => "matado",
-        'reqNumCrt'     => "Requiere",
+        'reqNumCrt'     => 'Requiere %1$d de %2$d',
         'rfAvailable'   => "Disponible en reino: ",
         '_transfer'     => 'Este logro será convertido a <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'cat'           => array(

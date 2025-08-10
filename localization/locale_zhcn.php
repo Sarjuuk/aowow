@@ -1116,12 +1116,11 @@ $lang = array(
         'criteria'      => "达成条件",
         'points'        => "点数",
         'series'        => "系列",
-        'outOf'         => "/",
         'criteriaType'  => "条件类型ID：",
         'itemReward'    => "你将得到",
         'titleReward'   => '你将被授予头衔"<a href="?title=%d">%s</a>"',
         'slain'         => "杀死",
-        'reqNumCrt'     => "要求",
+        'reqNumCrt'     => '要求 %1$d/%2$d',
         'rfAvailable'   => "在服务器上可用：",
         '_transfer'     => '这个成就将被转换到<a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(

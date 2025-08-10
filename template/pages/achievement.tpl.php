@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -20,75 +23,29 @@ $this->brick('headIcons');
 
 $this->brick('redButtons');
 ?>
-               <h1><?=$this->name; ?></h1>
 
+                <h1><?=$this->h1; ?></h1>
+                <?=$this->description.PHP_EOL; ?>
+                <h3><?=Lang::achievement('criteria').($this->reqCrtQty ? ' &ndash; <small><b>'.Lang::achievement('reqNumCrt', [$this->reqCrtQty, count($this->criteria)]).'</b></small>' : ''); ?></h3>
 <?php
-    echo $this->description;
-
-    echo '<h3>'.Lang::achievement('criteria').($this->criteria['reqQty'] ? ' &ndash; <small><b>'.Lang::achievement('reqNumCrt').' '.$this->criteria['reqQty'].' '.Lang::achievement('outOf').' '.count($this->criteria['data']).'</b></small>' : null)."</h3>\n";
-?>
-
-
-<?php
-    $tbl1  = '<div style="float: left;"><table class="iconlist">%s</table></div>';
-    $tbl2  = '<div style="float: left; margin-right: 25px"><table class="iconlist">%s</table></div>';
-    $rows1 = '';
-    $rows2 = '';
-
-foreach ($this->criteria['data'] as $i => $cr):
-    if (isset($cr['icon'])):
-        $row = '<tr><th align="right" id="iconlist-icon'.$cr['icon'].'"></th>';
-    else:
-        $row = '<tr><th><ul><li><var>&nbsp;</var></li></ul></th>';
-    endif;
-
-    $row .= '<td><span class="tip" title="ID'.Lang::main('colon').$cr['id'].'">';
-
-    if (!empty($cr['link'])):
-        $row .= '<a href="'.$cr['link']['href'].'"'.(isset($cr['link']['quality']) ? ' class="q'.$cr['link']['quality'].'"' : null).'>'.Util::htmlEscape($cr['link']['text']).'</a>';
-    endif;
-
-    if (!empty($cr['link']['count']) && $cr['link']['count'] > 1):
-        $row .= '&nbsp;('.$cr['link']['count'].')';
-    endif;
-
-    if (isset($cr['extraText'])):
-        $row .= ' '.$cr['extraText'];
-    endif;
-
-    $row .= '</span>';
-
-    if (!empty($cr['extraData'])):
-        $buff = [];
-        foreach ($cr['extraData'] as $xd):
-            $buff[] = $xd[0] ? '<a href="'.$xd[0].'">'.$xd[1].'</a>' : '<span>'.$xd[1].'</span>';
-        endforeach;
-
-        $row .= '<br /><sup style="margin-left:8px;">('.implode(', ', $buff).')</sup>';
-    endif;
-
-    $row .= '</td></tr>';
-
+$rows0 = $rows1 = '';
+foreach ($this->criteria as $i => $icon):
     // every odd number of elements
-    if ($i + 1 > round(count($this->criteria['data']) / 2)):
-        $rows2 .= $row;
-    else:
-        $rows1 .= $row;
-    endif;
+    ${'rows' . ($i % 2)} .= $icon->renderContainer(20, $i, true);
 endforeach;
 
-if ($rows2):
-    echo sprintf($tbl2, $rows2);
+if ($rows0):
+    echo "                <div style=\"float: left; margin-right: 25px\"><table class=\"iconlist\">\n".$rows0."                </table></div>\n";
 endif;
 if ($rows1):
-    echo sprintf($tbl1, $rows1);
+    echo "                <div style=\"float: left;\"><table class=\"iconlist\">\n".$rows1."                </table></div>\n";
 endif;
 ?>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-foreach ($this->criteria['icons'] as $k => $ic):
-    echo '                    $WH.ge(\'iconlist-icon'.$ic['itr'].'\').appendChild('.$ic['type'].'.createIcon('.$ic['id'].', 0, '.(!empty($ic['count']) ? $ic['count'] : 0)."));\n";
+foreach ($this->criteria as $crt):
+    echo $crt->renderJS(24);
 endforeach;
 ?>
                 //]]></script>
@@ -96,29 +53,28 @@ endforeach;
                 <div style="clear: left"></div>
 
 <?php
-if ($r = $this->rewards):
-    if (!empty($r['item'])):
+if ([$rewItems, $rewTitle, $rewText] = $this->rewards):
+    if ($rewItems):
         echo '<h3>'.Lang::main('rewards')."</h3>\n";
-        $this->brick('rewards', ['rewards' => $r['item'], 'rewTitle' => null]);
+        $this->brick('rewards', ['rewards' => $rewItems, 'rewTitle' => null]);
     endif;
 
-    if (!empty($r['title'])):
+    if ($rewTitle):
         echo '<h3>'.Lang::main('gains')."</h3>\n<ul>";
-        foreach ($r['title'] as $i):
+        foreach ($rewTitle as $i):
             echo '    <li><div>'.$i."</div></li>\n";
         endforeach;
         echo "</ul>\n";
     endif;
 
-    if (empty($r['title']) && empty($r['item']) && $r['text']):
-        echo '<h3>'.Lang::main('rewards')."</h3>\n" .
-             '<ul><li><div>'.$r['text']."</div></li></ul>\n";
+    if (!$rewTitle && !$rewItems && $rewText):
+        echo '<h3>'.Lang::main('rewards')."</h3>\n<ul><li><div>".$rewText."</div></li></ul>\n";
     endif;
 endif;
 
-$this->brick('mail');
+$this->brickIf($this->mail, 'mail');
 
-if (!empty($this->transfer)):
+if ($this->transfer):
     echo "    <div style=\"clear: left\"></div>";
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
@@ -129,7 +85,7 @@ endif;
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>
