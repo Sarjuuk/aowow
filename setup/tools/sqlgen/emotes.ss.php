@@ -42,15 +42,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /*********************/
 
         /*  EmotesText Data offsets
-                gender  seenBy      hasTarget   mergedWith      example
-            0   male    others      yes         8               %s raises <his/her> fist in anger at %s.
-            1   male    self        yes         9               %s raises <his/her> fist in anger at you.
-            2   self    self        yes                         You raise your fist in anger at %s.
-            4   male    others      no          12              %s raises <his/her> fist in anger.
-            6   self    self        no                          You raise your fist in anger.
-            8   female  others      yes         0               -
-            9   female  self        yes         1               -
-            12  female  others      no          4               -
+                gender  seenBy      hasTarget   effective       mergedWith      example
+            0   male    others      yes         ext -> ext      8               %s raises <his/her> fist in anger at %s.
+            1   male    self        yes         ext -> me       9               %s raises <his/her> fist in anger at you.
+            2   self    self        yes         me  -> ext                      You raise your fist in anger at %s.
+            4   male    others      no          ext -> none     12              %s raises <his/her> fist in anger.
+            6   self    self        no          me  -> none                     You raise your fist in anger.
+            8   female  others      yes         ext -> ext      0               -
+            9   female  self        yes         ext -> me       1               -
+            12  female  others      no          ext -> none     4               -
         */
 
         $this->textData = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `text_loc0` AS "0", `text_loc2` AS "2", `text_loc3` AS "3", `text_loc4` AS "4", `text_loc6` AS "6", `text_loc8` AS "8" FROM dbc_emotestextdata');
@@ -70,38 +70,44 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 VALUES
                     (?d, ?, ?d, ?d, ?d, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 $id, $t['cmd'], $t['anim'], $t['parent'], $t['soundId'],
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::EN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::EN), $this->textData[$t['etd2']][Locale::EN->value] ?? '', $this->textData[$t['etd6']][Locale::EN->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::FR), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::FR), $this->textData[$t['etd2']][Locale::FR->value] ?? '', $this->textData[$t['etd6']][Locale::FR->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::DE), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::DE), $this->textData[$t['etd2']][Locale::DE->value] ?? '', $this->textData[$t['etd6']][Locale::DE->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::CN), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::CN), $this->textData[$t['etd2']][Locale::CN->value] ?? '', $this->textData[$t['etd6']][Locale::CN->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::ES), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::ES), $this->textData[$t['etd2']][Locale::ES->value] ?? '', $this->textData[$t['etd6']][Locale::ES->value] ?? '',
-                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::RU), $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::RU), $this->textData[$t['etd2']][Locale::RU->value] ?? '', $this->textData[$t['etd6']][Locale::RU->value] ?? ''
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::EN), $this->textData[$t['etd2']][Locale::EN->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::EN), $this->textData[$t['etd6']][Locale::EN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::FR), $this->textData[$t['etd2']][Locale::FR->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::FR), $this->textData[$t['etd6']][Locale::FR->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::DE), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::DE), $this->textData[$t['etd2']][Locale::DE->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::DE), $this->textData[$t['etd6']][Locale::DE->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::CN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::CN), $this->textData[$t['etd2']][Locale::CN->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::CN), $this->textData[$t['etd6']][Locale::CN->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::ES), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::ES), $this->textData[$t['etd2']][Locale::ES->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::ES), $this->textData[$t['etd6']][Locale::ES->value] ?? '',
+                $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::RU), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::RU), $this->textData[$t['etd2']][Locale::RU->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::RU), $this->textData[$t['etd6']][Locale::RU->value] ?? ''
             );
         }
 
         // i have no idea, how the indexing in this file works.
         // sometimes the \d+ after EMOTE is the emoteTextId, but not nearly often enough
-        $aliasses = [];
-        foreach (CLISetup::searchGlobalStrings('/^EMOTE(\d+)_CMD\d+\s=\s\"\/([^"]+)\";$/') as $lId => $match)
-            $aliasses[$match[1]][] = [$lId, $match[2]];
+        $aliasses = $voiceAliases = [];
+        foreach (CLISetup::searchGlobalStrings('/^EMOTE(\d+)_CMD\d+ = \"\/([^"]+)\";$/') as $locId => [, $etID, $cmd])
+            $aliasses[$etID][] = [$locId, $cmd];
+
+        foreach (CLISetup::searchGlobalStrings('/^VOICEMACRO_LABEL_([A-Z]+)\d+ = \"([^"]+)\";$/') as $locId => [, $cmd, $alias])
+            $voiceAliases[$cmd][] = [$locId, $alias];
 
         $emotes = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, cmd FROM ?_emotes');
 
         foreach($emotes as $eId => $cmd)
         {
+            foreach ($voiceAliases[strtoupper($cmd)] ?? [] as [$locId, $alias])
+                DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_aliasses VALUES (?d, ?d, ?) ON DUPLICATE KEY UPDATE `locales` = `locales` | ?d', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
+
             foreach ($aliasses as $data)
             {
                 if (!in_array($cmd, array_column($data, 1)))
                     continue;
 
-                foreach ($data as $d)
-                    DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_aliasses VALUES (?d, ?d, ?) ON DUPLICATE KEY UPDATE locales = locales | ?d', $eId, (1 << $d[0]), strtolower($d[1]), (1 << $d[0]));
+                foreach ($data as [$locId, $alias])
+                    DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_aliasses VALUES (?d, ?d, ?) ON DUPLICATE KEY UPDATE `locales` = `locales` | ?d', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
 
-                continue 2;
+                break;
             }
-
-            DB::Aowow()->query('UPDATE ?_emotes SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', CUSTOM_EXCLUDE_FOR_LISTVIEW | EMOTE_CU_MISSING_CMD, $eId);
         }
+
+        DB::Aowow()->query('UPDATE ?_emotes e LEFT JOIN ?_emotes_aliasses ea ON ea.`id` = e.`id` SET e.`cuFlags` = e.`cuFlags` | ?d WHERE ea.`id` IS NULL', CUSTOM_EXCLUDE_FOR_LISTVIEW | EMOTE_CU_MISSING_CMD);
 
 
         /*********************/

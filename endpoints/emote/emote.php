@@ -6,46 +6,57 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 100: Emotes   g_initPath()
-//  tabid   0: Database g_initHeader()
-class EmotePage extends GenericPage
+class EmoteBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $type          = Type::EMOTE;
-    protected $typeId        = 0;
-    protected $tpl           = 'detail-page-generic';
-    protected $path          = [0, 100];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    public function __construct($pageCall, $id)
+    protected  string $template   = 'detail-page-generic';
+    protected  string $pageName   = 'emote';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 100];
+
+    public int $type   = Type::EMOTE;
+    public int $typeId = 0;
+
+    private EmoteList $subject;
+
+    public function __construct(string $id)
     {
+        parent::__construct($id);
+
         /*
          * id > 0: player text emote
          * id < 0: creature emote
         */
 
-        parent::__construct($pageCall, $id);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
-        $this->typeId = intVal($id);
-
+    protected function generate() : void
+    {
         $this->subject = new EmoteList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('emote'), Lang::emote('notFound'));
+            $this->generateNotFound(Lang::game('emote'), Lang::emote('notFound'));
 
-        $this->name = Util::ucFirst($this->subject->getField('cmd'));
-    }
+        $this->h1 = Util::ucFirst($this->subject->getField('cmd'));
 
-    protected function generatePath() { }
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
 
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('emote')));
-    }
 
-    protected function generateContent()
-    {
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->h1, Util::ucFirst(Lang::game('emote')));
+
+
         /***********/
         /* Infobox */
         /***********/
@@ -83,6 +94,10 @@ class EmotePage extends GenericPage
             }
         }
 
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+
+
         /****************/
         /* Main Content */
         /****************/
@@ -110,7 +125,7 @@ class EmotePage extends GenericPage
         if ($_ = $this->subject->getField('extToNone', true))
             $noTarget[] = $this->prepare($_);
         if ($_ = $this->subject->getField('meToNone', true))
-            $noTarget[] =$this->prepare($_);
+            $noTarget[] = $this->prepare($_);
 
         if (!$target && !$noTarget)
             $text .= '[div][i class=q0]'.Lang::emote('noText').'[/i][/div]';
@@ -138,16 +153,20 @@ class EmotePage extends GenericPage
             $text .= '[h3]'.Lang::emote('eventSound').'[/h3][sound='.$_.']';
         }
 
-        $this->extraText = $text;
-        $this->infobox   = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
+        if ($text)
+            $this->extraText = new Markup($text, ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+
         $this->redButtons = array(
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => false
         );
 
+
         /**************/
         /* Extra Tabs */
         /**************/
+
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: achievement
         $condition = array(
@@ -157,32 +176,42 @@ class EmotePage extends GenericPage
         $acv = new AchievementList($condition);
         if (!$acv->error)
         {
-            $this->lvTabs[] = [AchievementList::$brickFile, ['data' => array_values($acv->getListviewData())]];
-
             $this->extendGlobalData($acv->getJsGlobals());
+            $this->lvTabs->addListviewTab(new Listview(['data' => $acv->getListviewData()], AchievementList::$brickFile));
         }
 
         // tab: sound
-        if ($em = DB::Aowow()->select('SELECT `soundId` AS ARRAY_KEY, BIT_OR(1 << (`raceId` - 1)) AS "raceMask", BIT_OR(1 << (`gender` - 1)) AS "gender" FROM ?_emotes_sounds WHERE -`emoteId` = ?d GROUP BY `soundId`', $this->typeId > 0 ? $this->subject->getField('parentEmote') : $this->typeId))
+        $ems = DB::Aowow()->select(
+           'SELECT   `soundId` AS ARRAY_KEY, BIT_OR(1 << (`raceId` - 1)) AS "raceMask", BIT_OR(1 << (`gender` - 1)) AS "gender"
+            FROM     ?_emotes_sounds
+            WHERE    `emoteId` = ?d { OR -`emoteId` = ?d }
+            GROUP BY `soundId`',
+            $this->typeId,
+            $this->typeId < 0 ? $this->subject->getField('parentEmote') : DBSIMPLE_SKIP
+        );
+
+        if ($ems)
         {
-            $sounds = new SoundList(array(['id', array_keys($em)]));
+            $sounds = new SoundList(array(['id', array_keys($ems)]));
             if (!$sounds->error)
             {
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
                 $data = $sounds->getListviewData();
-                foreach($data as $id => &$d)
+                foreach ($data as $id => &$d)
                 {
-                    $d['races']  = $em[$id]['raceMask'];
-                    $d['gender'] = $em[$id]['gender'];
+                    $d['races']  = $ems[$id]['raceMask'];
+                    $d['gender'] = $ems[$id]['gender'];
                 }
 
-                $this->lvTabs[] = [SoundList::$brickFile, array(
-                    'data'      => array_values($data),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'      => $data,
                     //               gender                                  races
                     'extraCols' => ['$Listview.templates.title.columns[1]', '$Listview.templates.classs.columns[1]']
-                )];
+                ), SoundList::$brickFile));
             }
         }
+
+        parent::generate();
     }
 
     private function prepare(string $emote) : string
