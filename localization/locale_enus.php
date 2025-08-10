@@ -1117,12 +1117,11 @@ $lang = array(
         'criteria'      => "Criteria",
         'points'        => "Points",
         'series'        => "Series",
-        'outOf'         => "out of",
         'criteriaType'  => "Criterium Type ID:",
         'itemReward'    => "You will receive",
         'titleReward'   => 'You shall be granted the title "<a href="?title=%d">%s</a>"',
         'slain'         => "slain",
-        'reqNumCrt'     => "Requires",
+        'reqNumCrt'     => 'Requires %1$d out of %2$d',
         'rfAvailable'   => "Available on realm: ",
         '_transfer'     => 'This achievement will be converted to <a href="?achievement=%d" class="q%d icontiny tinyspecial" style="background-image: url(STATIC_URL/images/wow/icons/tiny/%s.gif)">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'cat'           => array(
