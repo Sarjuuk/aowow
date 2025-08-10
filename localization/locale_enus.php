@@ -352,11 +352,11 @@ $lang = array(
         'honorPoints'   => "Honor Points",                  // HONOR_POINTS
         'arenaPoints'   => "Arena Points",                  // ARENA_POINTS
         'heroClass'     => "Hero class",
-        'resource'      => "Resource",
-        'resources'     => "Resources",
-        'role'          => "Role",                          // ROLE
-        'roles'         => "Roles",                         // LFG_TOOLTIP_ROLES
-        'specs'         => "Specs",
+        'resource'      => "Resource: ",
+        'resources'     => "Resources: ",
+        'role'          => "Role: ",                        // ROLE
+        'roles'         => "Roles: ",                       // LFG_TOOLTIP_ROLES
+        'specs'         => "Specs: ",
         '_roles'        => ["Healer", "Melee DPS", "Ranged DPS", "Tank"],
 
         'phases'        => "Phases",

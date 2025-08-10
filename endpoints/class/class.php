@@ -6,55 +6,71 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 12: Class    g_initPath()
-//  tabId  0: Database g_initHeader()
-class ClassPage extends GenericPage
+class ClassBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $type          = Type::CHR_CLASS;
-    protected $typeId        = 0;
-    protected $tpl           = 'detail-page-generic';
-    protected $path          = [0, 12];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
+    private const TC_CLASS_IDS = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
 
-    public function __construct($pageCall, $id)
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+
+    protected  string $template   = 'detail-page-generic';
+    protected  string $pageName   = 'class';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 12];
+
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js']];
+
+    public  int     $type      = Type::CHR_CLASS;
+    public  int     $typeId    = 0;
+    public ?string  $expansion = null;
+
+    private CharClassList $subject;
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        $this->typeId = intVal($id);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
+    protected function generate() : void
+    {
         $this->subject = new CharClassList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('class'), Lang::chrClass('notFound'));
+            $this->generateNotFound(Lang::game('class'), Lang::chrClass('notFound'));
 
-        $this->name = $this->subject->getField('name', true);
-    }
+        $this->h1 = $this->subject->getField('name', true);
 
-    protected function generatePath()
-    {
-        $this->path[] = $this->typeId;
-    }
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
 
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('class')));
-    }
 
-    protected function generateContent()
-    {
-        $this->addScript([SC_JS_FILE, '?data=zones']);
+        /*************/
+        /* Menu Path */
+        /*************/
 
-        $infobox   = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
-        $cl        = ChrClass::from($this->typeId);
-        $tcClassId = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
+        $this->breadcrumb[] = $this->typeId;
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->h1, Util::ucFirst(Lang::game('class')));
 
 
         /***********/
         /* Infobox */
         /***********/
+
+        $cl = ChrClass::from($this->typeId);
+
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // hero class
         if ($this->subject->getField('flags') & 0x40)
@@ -62,23 +78,23 @@ class ClassPage extends GenericPage
 
         // resource
         if ($cl == ChrClass::DRUID)                         // special Druid case
-            $infobox[] = Lang::game('resources').Lang::main('colon').
-            '[tooltip name=powertype1]'.Lang::game('st', 0).', '.Lang::game('st', 31).', '.Lang::game('st', 2).'[/tooltip][span class=tip tooltip=powertype1]'.Util::ucFirst(Lang::spell('powerTypes', 0)).'[/span], '.
-            '[tooltip name=powertype2]'.Lang::game('st', 5).', '.Lang::game('st', 8).'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::spell('powerTypes', 1)).'[/span], '.
-            '[tooltip name=powertype8]'.Lang::game('st', 1).'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::spell('powerTypes', 3)).'[/span]';
+            $infobox[] = Lang::game('resources').
+            '[tooltip name=powertype1]'.Lang::game('st', 0).', '.Lang::game('st', 31).', '.Lang::game('st', 2).'[/tooltip][span class=tip tooltip=powertype1]'.Util::ucFirst(Lang::spell('powerTypes', POWER_MANA)).'[/span], '.
+            '[tooltip name=powertype2]'.Lang::game('st', 5).', '.Lang::game('st', 8).'[/tooltip][span class=tip tooltip=powertype2]'.Util::ucFirst(Lang::spell('powerTypes', POWER_RAGE)).'[/span], '.
+            '[tooltip name=powertype8]'.Lang::game('st', 1).'[/tooltip][span class=tip tooltip=powertype8]'.Util::ucFirst(Lang::spell('powerTypes', POWER_ENERGY)).'[/span]';
         else if ($cl == ChrClass::DEATHKNIGHT)              // special DK case
-            $infobox[] = Lang::game('resources').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', 5)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
+            $infobox[] = Lang::game('resources').'[span]'.Util::ucFirst(Lang::spell('powerTypes', POWER_RUNE)).', '.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
         else                                                // regular case
-            $infobox[] = Lang::game('resource').Lang::main('colon').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
+            $infobox[] = Lang::game('resource').'[span]'.Util::ucFirst(Lang::spell('powerTypes', $this->subject->getField('powerType'))).'[/span]';
 
         // roles
         $roles = [];
         for ($i = 0; $i < 4; $i++)
             if ($this->subject->getField('roles') & (1 << $i))
-                $roles[] = (count($roles) == 2 ? "\n" : '').Lang::game('_roles', $i);
+                $roles[] = (count($roles) == 2 ? "[br]" : '').Lang::game('_roles', $i);
 
         if ($roles)
-            $infobox[] = (count($roles) > 1 ? Lang::game('roles') : Lang::game('role')).Lang::main('colon').implode(', ', $roles);
+            $infobox[] = (count($roles) > 1 ? Lang::game('roles') : Lang::game('role')).implode(', ', $roles);
 
         // specs
         $specList = [];
@@ -87,20 +103,22 @@ class ClassPage extends GenericPage
             $specList[$k] = '[icon name='.$skills->getField('iconString').'][url=?spells=7.'.$this->typeId.'.'.$k.']'.$skills->getField('name', true).'[/url][/icon]';
 
         if ($specList)
-            $infobox[] = Lang::game('specs').Lang::main('colon').'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
+            $infobox[] = Lang::game('specs').'[ul][li]'.implode('[/li][li]', $specList).'[/li][/ul]';
+
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 
 
         /****************/
         /* Main Content */
         /****************/
 
-        $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
-        $this->expansion = Util::$expansionString[$this->subject->getField('expansion')];
-        $this->headIcons = ['class_'.strtolower($this->subject->getField('fileString'))];
+        $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
+        $this->headIcons  = ['class_'.$cl->json()];
         $this->redButtons = array(
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => true,
-            BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[$tcClassId[$this->typeId] * 3], 'pet' => false],
+            BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[self::TC_CLASS_IDS[$this->typeId] * 3], 'pet' => false],
             BUTTON_FORUM   => false                         // todo (low): Cfg::get('BOARD_URL') + X
         );
 
@@ -108,6 +126,8 @@ class ClassPage extends GenericPage
         /**************/
         /* Extra Tabs */
         /**************/
+
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // Tab: Spells (grouped)
         //     '$LANG.tab_armorproficiencies',
@@ -120,8 +140,10 @@ class ClassPage extends GenericPage
             [['s.cuFlags', (SPELL_CU_TRIGGERED | CUSTOM_EXCLUDE_FOR_LISTVIEW), '&'], 0],
             [
                 'OR',
-                ['s.reqClassMask', $cl->toMask(), '&'],     // Glyphs, Proficiencies
-                ['s.skillLine1', $this->subject->getField('skills')],      // Abilities / Talents
+                // Glyphs, Proficiencies
+                ['s.reqClassMask', $cl->toMask(), '&'],
+                // Abilities / Talents
+                ['s.skillLine1', $this->subject->getField('skills')],
                 ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->subject->getField('skills')]]
             ],
             [                                               // last rank or unranked
@@ -137,8 +159,8 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($genSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = [SpellList::$brickFile, array(
-                'data'            => array_values($genSpells->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'            => $genSpells->getListviewData(),
                 'id'              => 'spells',
                 'name'            => '$LANG.tab_spells',
                 'visibleCols'     => ['level', 'schools', 'type', 'classes'],
@@ -146,7 +168,7 @@ class ClassPage extends GenericPage
                 'sort'            => ['-level', 'type', 'name'],
                 'computeDataFunc' => '$Listview.funcBox.initSpellFilter',
                 'onAfterCreate'   => '$Listview.funcBox.addSpellIndicator'
-            )];
+            ), SpellList::$brickFile));
         }
 
         // Tab: Items (grouped)
@@ -154,7 +176,7 @@ class ClassPage extends GenericPage
             ['requiredClass', 0, '>'],
             ['requiredClass', $cl->toMask(), '&'],
             [['requiredClass', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!'],
-            ['itemset', 0],                                 // hmm, do or dont..?
+            ['itemset', 0],
             Cfg::get('SQL_LIMIT_NONE')
         );
 
@@ -167,8 +189,8 @@ class ClassPage extends GenericPage
             if ($items->hasDiffFields('requiredRace'))
                 $hiddenCols = ['side'];
 
-            $this->lvTabs[] = [ItemList::$brickFile, array(
-                'data'            => array_values($items->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'            => $items->getListviewData(),
                 'id'              => 'items',
                 'name'            => '$LANG.tab_items',
                 'visibleCols'     => ['dps', 'armor', 'slot'],
@@ -177,7 +199,7 @@ class ClassPage extends GenericPage
                 'onAfterCreate'   => '$Listview.funcBox.addSubclassIndicator',
                 'note'            => sprintf(Util::$filterResultString, '?items&filter=cr=152;crs='.$this->typeId.';crv=0'),
                 '_truncated'      => 1
-            )];
+            ), ItemList::$brickFile));
         }
 
         // Tab: Quests
@@ -191,10 +213,10 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($quests->getJSGlobals());
 
-            $this->lvTabs[] = [QuestList::$brickFile, array(
-                'data' => array_values($quests->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $quests->getListviewData(),
                 'sort' => ['reqlevel', 'name']
-            )];
+            ), QuestList::$brickFile));
         }
 
         // Tab: Itemsets
@@ -203,17 +225,17 @@ class ClassPage extends GenericPage
         {
             $this->extendGlobalData($sets->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = [ItemsetList::$brickFile, array(
-                'data'       => array_values($sets->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'       => $sets->getListviewData(),
                 'note'       => sprintf(Util::$filterResultString, '?itemsets&filter=cl='.$this->typeId),
                 'hiddenCols' => ['classes'],
                 'sort'       => ['-level', 'name']
-            )];
+            ), ItemsetList::$brickFile));
         }
 
         // Tab: Trainer
         $conditions = array(
-            ['npcflag', 0x30, '&'],                         // is trainer
+            ['npcflag', NPC_FLAG_TRAINER | NPC_FLAG_CLASS_TRAINER, '&'],
             ['trainerType', 0],                             // trains class spells
             ['trainerRequirement', $this->typeId]
         );
@@ -221,17 +243,18 @@ class ClassPage extends GenericPage
         $trainer = new CreatureList($conditions);
         if (!$trainer->error)
         {
-            $this->lvTabs[] = [CreatureList::$brickFile, array(
-                'data' => array_values($trainer->getListviewData()),
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $trainer->getListviewData(),
                 'id'   => 'trainers',
                 'name' => '$LANG.tab_trainers'
-            )];
+            ), CreatureList::$brickFile));
         }
 
         // Tab: Races
         $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
-            $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
+            $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
 
         // tab: condition-for
         $cnd = new Conditions();
@@ -239,8 +262,10 @@ class ClassPage extends GenericPage
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $tab;
+            $this->lvTabs->addDataTab(...$tab);
         }
+
+        parent::generate();
     }
 }
 
