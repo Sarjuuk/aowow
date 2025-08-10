@@ -6,46 +6,61 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 8: Pets     g_initPath()
-//  tabid 0: Database g_initHeader()
-class PetPage extends GenericPage
+class PetBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $type          = Type::PET;
-    protected $typeId        = 0;
-    protected $tpl           = 'detail-page-generic';
-    protected $path          = [0, 8];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    public function __construct($pageCall, $id)
+    protected  string $template   = 'detail-page-generic';
+    protected  string $pageName   = 'pet';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 8];
+
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js']];
+
+    public  int    $type       = Type::PET;
+    public  int    $typeId     = 0;
+    public ?string $expansion  = null;
+
+    private PetList $subject;
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        $this->typeId = intVal($id);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
+    protected function generate() : void
+    {
         $this->subject = new PetList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('pet'), Lang::pet('notFound'));
+            $this->generateNotFound(Lang::game('pet'), Lang::pet('notFound'));
 
-        $this->name = $this->subject->getField('name', true);
-    }
+        $this->h1 = $this->subject->getField('name', true);
 
-    protected function generatePath()
-    {
-        $this->path[] = $this->subject->getField('type');
-    }
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
 
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('pet')));
-    }
 
-    protected function generateContent()
-    {
-        $this->addScript([SC_JS_FILE, '?data=zones']);
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->breadcrumb[] = $this->subject->getField('type');
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->h1, Util::ucFirst(Lang::game('pet')));
+
 
         /***********/
         /* Infobox */
@@ -67,11 +82,14 @@ class PetPage extends GenericPage
             $this->extendGlobalIds(Type::ICON, $_);
         }
 
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+
+
         /****************/
         /* Main Content */
         /****************/
 
-        $this->infobox    = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
         $this->headIcons  = [$this->subject->getField('iconString')];
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
@@ -80,14 +98,17 @@ class PetPage extends GenericPage
             BUTTON_TALENT  => ['href' => '?petcalc#'.Util::$tcEncoding[(int)($this->typeId / 10)] . Util::$tcEncoding[(2 * ($this->typeId % 10) + ($this->subject->getField('exotic') ? 1 : 0))], 'pet' => true]
         );
 
+
         /**************/
         /* Extra Tabs */
         /**************/
 
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+
         // tab: tameable & gallery
         $condition = array(
             ['ct.type', 1],                                 // Beast
-            ['ct.typeFlags', 0x1, '&'],                     // tameable
+            ['ct.typeFlags', NPC_TYPEFLAG_TAMEABLE, '&'],
             ['ct.family', $this->typeId],                   // displayed petType
             [
                 'OR',                                       // at least neutral to at least one faction
@@ -97,17 +118,17 @@ class PetPage extends GenericPage
         );
         $tng = new CreatureList($condition);
 
-        $this->lvTabs[] = [CreatureList::$brickFile, array(
-            'data'        => array_values($tng->getListviewData(NPCINFO_TAMEABLE)),
+        $this->addDataLoader('zones');
+        $this->lvTabs->addListviewTab(new Listview(array(
+            'data'        => $tng->getListviewData(NPCINFO_TAMEABLE),
             'name'        => '$LANG.tab_tameable',
             'hiddenCols'  => ['type'],
             'visibleCols' => ['skin'],
             'note'        => sprintf(Util::$filterResultString, '?npcs=1&filter=fa=38'),
             'id'          => 'tameable'
-        )];
-        $this->lvTabs[] = ['model', array(
-            'data'        => array_values($tng->getListviewData(NPCINFO_MODEL))
-        )];
+        ), CreatureList::$brickFile));
+
+        $this->lvTabs->addListviewTab(new Listview(['data' => $tng->getListviewData(NPCINFO_MODEL)], 'model'));
 
         // tab: diet
         $list = [];
@@ -116,22 +137,22 @@ class PetPage extends GenericPage
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
-        $food = new ItemList(array(['i.subClass', [5, 8]], ['i.FoodType', $list], Cfg::get('SQL_LIMIT_NONE')));
+        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $list], Cfg::get('SQL_LIMIT_NONE')));
         $this->extendGlobalData($food->getJSGlobals());
 
-        $this->lvTabs[] = [ItemList::$brickFile, array(
-            'data'       => array_values($food->getListviewData()),
+        $this->lvTabs->addListviewTab(new Listview(array(
+            'data'       => $food->getListviewData(),
             'name'       => '$LANG.diet',
             'hiddenCols' => ['source', 'slot', 'side'],
             'sort'       => ['level'],
             'id'         => 'diet'
-        )];
+        ), ItemList::$brickFile));
 
         // tab: spells
         $mask = 0x0;
-        foreach (Game::$skillLineMask[-1] as $idx => $pair)
+        foreach (Game::$skillLineMask[-1] as $idx => [$familyId,])
         {
-            if ($pair[0] == $this->typeId)
+            if ($familyId == $this->typeId)
             {
                 $mask = 1 << $idx;
                 break;
@@ -153,12 +174,12 @@ class PetPage extends GenericPage
         $spells = new SpellList($conditions);
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
 
-        $this->lvTabs[] = [SpellList::$brickFile, array(
-            'data'        => array_values($spells->getListviewData()),
+        $this->lvTabs->addListviewTab(new Listview(array(
+            'data'        => $spells->getListviewData(),
             'name'        => '$LANG.tab_abilities',
             'visibleCols' => ['schools', 'level'],
             'id'          => 'abilities'
-        )];
+        ), SpellList::$brickFile));
 
         // tab: talents
         $conditions = array(
@@ -170,24 +191,26 @@ class PetPage extends GenericPage
             ]
         );
 
-        switch ($this->subject->getField('type'))
+        $conditions[] = match($this->subject->getField('type'))
         {
-            case 0: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&']; break;
-            case 1: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&']; break;
-            case 2: $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&']; break;
-        }
+            PET_TALENT_TYPE_FEROCITY => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'],
+            PET_TALENT_TYPE_TENACITY => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'],
+            PET_TALENT_TYPE_CUNNING  => ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&']
+        };
 
         $talents = new SpellList($conditions);
         $this->extendGlobalData($talents->getJSGlobals(GLOBALINFO_SELF));
 
-        $this->lvTabs[] = [SpellList::$brickFile, array(
-            'data'        => array_values($talents->getListviewData()),
+        $this->lvTabs->addListviewTab(new Listview(array(
+            'data'        => $talents->getListviewData(),
             'visibleCols' => ['tier', 'level'],
             'name'        => '$LANG.tab_talents',
             'id'          => 'talents',
             'sort'        => ['tier', 'name'],
             '_petTalents' => 1
-        )];
+        ), SpellList::$brickFile));
+
+        parent::generate();
     }
 }
 
