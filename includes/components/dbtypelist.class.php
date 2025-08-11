@@ -463,13 +463,13 @@ abstract class DBTypeList
         return null;
     }
 
-    public static function makeLink(int $id, int $fmt = Lang::FMT_HTML) : string
+    public static function makeLink(int $id, int $fmt = Lang::FMT_HTML, string $cssClass = '') : string
     {
         if ($n = static::getName($id))
         {
             return match ($fmt)
             {
-                Lang::FMT_HTML   => '<a href="?'.Type::getFileString(static::$type).'='.$id.'">'.$n.'</a>',
+                Lang::FMT_HTML   => '<a href="?'.Type::getFileString(static::$type).'='.$id.'"'.($cssClass ? ' class="'.$cssClass.'"' : '').'>'.$n.'</a>',
                 Lang::FMT_MARKUP => '[url=?'.Type::getFileString(static::$type).'='.$id.']'.$n.'[/url]',
                 default          => $n
             };
@@ -696,7 +696,7 @@ trait spawnHelper
                     $info[2] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
 
                 if ($s['spawnMask'] == 15)
-                    $info[3] = Lang::game('mode').Lang::main('colon').Lang::game('modes', -1);
+                    $info[3] = Lang::game('mode').Lang::game('modes', -1);
                 else if ($s['spawnMask'])
                 {
                     $_ = [];
@@ -704,7 +704,7 @@ trait spawnHelper
                         if ($s['spawnMask'] & 1 << $i)
                             $_[] = Lang::game('modes', $i);
 
-                    $info[4] = Lang::game('mode').Lang::main('colon').implode(', ', $_);
+                    $info[4] = Lang::game('mode').implode(', ', $_);
                 }
 
                 if ($s['type'] == Type::AREATRIGGER)

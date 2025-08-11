@@ -891,8 +891,11 @@ class SpellList extends DBTypeList
                 $max   = $MAX   = !$this->interactive ? 'MAX'   : sprintf(Util::$dfnString, 'MAX(<span class=\'q1\'>a</span>, <span class=\'q1\'>b</span>)', 'MAX');
                 $pl    = $PL    = !$this->interactive ? 'PL'    : sprintf(Util::$dfnString, 'LANG.level', 'PL');
 
+                // space out operators for better readability
+                $formula = preg_replace('/(\+|-|\*|\/)/', ' \1 ', $formula);
+
                 // note the " !
-                return eval('return "'.$formula.'";');
+                return eval('return "('.$formula.')";');
             }
             else
                 return eval('return '.$formula.';');
@@ -2363,13 +2366,13 @@ class SpellListFilter extends Filter
         9 => array(                                         // sources index
             1  => true,                                     // Any
             2  => false,                                    // None
-            3  =>  1,                                       // Crafted
-            4  =>  2,                                       // Drop
-            6  =>  4,                                       // Quest
-            7  =>  5,                                       // Vendor
-            8  =>  6,                                       // Trainer
-            9  =>  7,                                       // Discovery
-            10 =>  9                                        // Talent
+            3  =>  SRC_CRAFTED,
+            4  =>  SRC_DROP,
+            6  =>  SRC_QUEST,
+            7  =>  SRC_VENDOR,
+            8  =>  SRC_TRAINER,
+            9  =>  SRC_DISCOVERY,
+            10 =>  SRC_TALENT
         ),
         22 => array(
             1 => true,                                      // Weapons

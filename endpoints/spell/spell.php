@@ -6,78 +6,77 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 1: Spell    g_initPath()
-//  tabId 0: Database g_initHeader()
-class SpellPage extends GenericPage
+class SpellBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $reagents      = [];
-    protected $scaling       = [];
-    protected $items         = [];
-    protected $tools         = [];
-    protected $effects       = [];
-    protected $attributes    = [];
-    protected $powerCost     = '';
-    protected $castTime      = [];
-    protected $level         = [];
-    protected $rangeName     = '';
-    protected $range         = '';
-    protected $gcd           = '';
-    protected $gcdCat        = '';
-    protected $school        = '';
-    protected $dispel        = '';
-    protected $mechanic      = '';
-    protected $stances       = '';
-    protected $cooldown      = '';
-    protected $duration      = '';
+    private const MOD_AURAS = [SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
+                               SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
+                               SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
+                               SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
+                               SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,            /* SPELL_AURA_DUMMY ? */];
 
-    protected $type          = Type::SPELL;
-    protected $typeId        = 0;
-    protected $tpl           = 'spell';
-    protected $path          = [0, 1];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
+    protected  int    $cacheType   = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
+    protected  string $template    = 'spell';
+    protected  string $pageName    = 'spell';
+    protected ?int    $activeTab   = parent::TAB_DATABASE;
+    protected  array  $breadcrumb  = [0, 1];
 
-    private   $difficulties  = [];
-    private   $firstRank     = 0;
-    private   $powerTpl      = '$WowheadPower.registerSpell(%d, %d, %s);';
+    protected  array  $scripts     = [[SC_JS_FILE, 'js/swfobject.js']];
 
-    private static $modAuras = [SPELL_AURA_ADD_FLAT_MODIFIER,      SPELL_AURA_ADD_PCT_MODIFIER,                 SPELL_AURA_NO_REAGENT_USE,
-                                SPELL_AURA_ABILITY_PERIODIC_CRIT,  SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, SPELL_AURA_ABILITY_IGNORE_AURASTATE,
-                                SPELL_AURA_ALLOW_ONLY_ABILITY,     SPELL_AURA_IGNORE_MELEE_RESET,               SPELL_AURA_ABILITY_CONSUME_NO_AMMO,
-                                SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
-                                SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,            /* SPELL_AURA_DUMMY ? */];
+    public  int    $type       = Type::SPELL;
+    public  int    $typeId     = 0;
+    public  array  $reagents   = [false, null];
+    public  array  $scaling    = [];
+    public  string $items      = '';
+    public  array  $tools      = [];
+    public  array  $effects    = [];
+    public  array  $attributes = [];
+    public  string $powerCost  = '';
+    public  string $castTime   = '';
+    public  string $level      = '';
+    public  string $rangeName  = '';
+    public  string $range      = '';
+    public  string $gcd        = '';
+    public  string $gcdCat     = '';
+    public  string $school     = '';
+    public ?string $dispel     = null;
+    public ?string $mechanic   = null;
+    public  string $stances    = '';
+    public  string $cooldown   = '';
+    public  string $duration   = '';
+    public  array  $tooltip    = [];
 
-    public function __construct($pageCall, $id)
+    private SpellList $subject;
+    private int       $firstRank    = 0;
+    private array     $modelInfo    = [];
+    private array     $difficulties = [];
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Lang::load($this->_get['domain']);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
-        $this->typeId = intVal($id);
-
+    protected function generate() : void
+    {
         $this->subject = new SpellList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('spell'), Lang::spell('notFound'));
+            $this->generateNotFound(Lang::game('spell'), Lang::spell('notFound'));
 
-        $jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra);
-        $this->extendGlobalData($jsg, $extra);
+        if ($jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra))
+            $this->extendGlobalData($jsg, $extra);
 
-        $this->name = $this->subject->getField('name', true);
-
-        // has difficulty versions of itself
-        $this->difficulties = DB::Aowow()->selectRow(
-            'SELECT normal10 AS "0", normal25 AS "1",
-                    heroic10 AS "2", heroic25 AS "3"
+        $this->modelInfo    = $this->subject->getModelInfo($this->typeId);
+        $this->difficulties = DB::Aowow()->selectRow(       // has difficulty versions of itself
+            'SELECT `normal10` AS "0", `normal25` AS "1",
+                    `heroic10` AS "2", `heroic25` AS "3"
              FROM   ?_spelldifficulty
-             WHERE  normal10 = ?d OR normal25 = ?d OR
-                    heroic10 = ?d OR heroic25 = ?d',
+             WHERE  `normal10` = ?d OR `normal25` = ?d OR
+                    `heroic10` = ?d OR `heroic25` = ?d',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId
         );
 
@@ -86,273 +85,169 @@ class SpellPage extends GenericPage
             $this->firstRank = $fr;
         else
             $this->firstRank = DB::Aowow()->selectCell(
-               'SELECT      IF(s1.RankNo <> 1 AND s2.id, s2.id, s1.id)
+               'SELECT      IF(s1.`RankNo` <> 1 AND s2.`id`, s2.`id`, s1.`id`)
                 FROM        ?_spell s1
                 LEFT JOIN   ?_spell s2
-                    ON      s1.SpellFamilyId     = s2.SpelLFamilyId AND     s1.SpellFamilyFlags1 = s2.SpelLFamilyFlags1 AND
-                            s1.SpellFamilyFlags2 = s2.SpellFamilyFlags2 AND s1.SpellFamilyFlags3 = s2.SpellFamilyFlags3 AND
-                            s1.name_loc0 = s2.name_loc0                 AND s2.RankNo = 1
-                WHERE       s1.id = ?d',
+                    ON      s1.`SpellFamilyId`     = s2.`SpelLFamilyId`     AND s1.`SpellFamilyFlags1` = s2.`SpelLFamilyFlags1` AND
+                            s1.`SpellFamilyFlags2` = s2.`SpellFamilyFlags2` AND s1.`SpellFamilyFlags3` = s2.`SpellFamilyFlags3` AND
+                            s1.`name_loc0` = s2.`name_loc0`                 AND s2.`RankNo` = 1
+                WHERE       s1.`id` = ?d',
                 $this->typeId
             );
-    }
 
-    protected function generatePath()
-    {
-        $cat = $this->subject->getField('typeCat');
-        $cf  = $this->subject->getField('cuFlags');
+        $this->h1 = Util::htmlEscape($this->subject->getField('name', true));
 
-        $this->path[] = $cat;
-
-        // reconstruct path
-        switch ($cat)
-        {
-            case  -2:
-            case   7:
-            case -13:
-                if ($cl = $this->subject->getField('reqClassMask'))
-                    $this->path[] = log($cl, 2) + 1;
-                else if ($sf = $this->subject->getField('spellFamilyId'))
-                    foreach (ChrClass::cases() as $cl)
-                        if ($cl->spellFamily() == $sf)
-                        {
-                            $this->path[] = $cl->value;
-                            break;
-                        }
-
-                if ($cat == -13)
-                    $this->path[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
-                else
-                    $this->path[] = $this->subject->getField('skillLines')[0];
-
-                break;
-            case   9:
-            case  -3:
-            case  11:
-                $this->path[] = $this->subject->getField('skillLines')[0];
-
-                if ($cat == 11)
-                    if ($_ = $this->subject->getField('reqSpellId'))
-                        $this->path[] = $_;
-
-                break;
-            case -11:
-                foreach (SpellList::$skillLines as $line => $skills)
-                    if (in_array($this->subject->getField('skillLines')[0], $skills))
-                        $this->path[] = $line;
-                break;
-            case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
-                if ($cf & SPELL_CU_PET_TALENT_TYPE0)
-                    $this->path[] = 411;                    // Ferocity
-                else if ($cf & SPELL_CU_PET_TALENT_TYPE1)
-                    $this->path[] = 409;                    // Tenacity
-                else if ($cf & SPELL_CU_PET_TALENT_TYPE2)
-                    $this->path[] = 410;                    // Cunning
-                break;
-            case -5:
-                if ($this->subject->getField('effect2AuraId') == 207 || $this->subject->getField('effect3AuraId') == 207)
-                    $this->path[] = 2;                      // flying (also contains 32, so checked first)
-                else if ($this->subject->getField('effect2AuraId') == 32 || $this->subject->getField('effect3AuraId') == 32)
-                    $this->path[] = 1;                      // ground
-                else
-                    $this->path[] = 3;                      // misc
-        }
-    }
-
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('spell')));
-    }
-
-    protected function generateContent()
-    {
-        $this->addScript([SC_JS_FILE, '?data=zones']);
-
-        $_cat = $this->subject->getField('typeCat');
-
-        $modelInfo = $this->subject->getModelInfo($this->typeId);
-
-        $redButtons = array(
-            BUTTON_VIEW3D  => false,
-            BUTTON_WOWHEAD => true,
-            BUTTON_LINKS   => array(
-                'linkColor' => 'ff71d5ff',
-                'linkId'    => Type::getFileString(Type::SPELL).':'.$this->typeId,
-                'linkName'  => $this->name,
-                'type'      => $this->type,
-                'typeId'    => $this->typeId
-            )
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->subject->getField('name', true)
         );
 
-        // could have multiple models set, one per effect
-        foreach ($modelInfo as $mI)
-        {
-            $redButtons[BUTTON_VIEW3D] = ['type' => $mI['type'], 'displayId' => $mI['displayId']];
 
-            if (isset($mI['humanoid']))
-            {
-                $redButtons[BUTTON_VIEW3D]['typeId']   = $mI['typeId'];
-                $redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
-            }
+        /*************/
+        /* Menu Path */
+        /*************/
 
-            break;
-        }
+        $this->generatePath();
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->subject->getField('name', true), Util::ucFirst(Lang::game('spell')));
 
 
         /***********/
         /* Infobox */
         /***********/
 
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $this->createInfobox();
 
-        // level
-        if (!in_array($_cat, [-5, -6]))                     // not mount or vanity pet
-        {
-            if ($_ = $this->subject->getField('talentLevel'))
-                $infobox[] = (in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_);
-            else if ($_ = $this->subject->getField('spellLevel'))
-                $infobox[] = (in_array($_cat, [-2, 7, -13]) ? sprintf(Lang::game('reqLevel'), $_) : Lang::game('level').Lang::main('colon').$_);
-        }
 
-        $jsg = [];
-        // races
-        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP))
-        {
-            $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
-            $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
-            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
-        }
+        /***************/
+        /* Red Buttons */
+        /***************/
 
-        // classes
-        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, Lang::FMT_MARKUP))
-        {
-            $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
-            $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
-            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
-        }
+        $this->redButtons = array(
+            BUTTON_VIEW3D  => false,
+            BUTTON_WOWHEAD => true,
+            BUTTON_LINKS   => array(
+                'linkColor' => 'ff71d5ff',
+                'linkId'    => Type::getFileString(Type::SPELL).':'.$this->typeId,
+                'linkName'  => $this->subject->getField('name', true),
+                'type'      => $this->type,
+                'typeId'    => $this->typeId
+            )
+        );
 
-        // spell focus
-        if ($_ = $this->subject->getField('spellFocusObject'))
+        // could have multiple models set, one per effect
+        foreach ($this->modelInfo as $mI)
         {
-            $bar = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_);
-            $focus = new GameObjectList(array(['spellFocusId', $_], 1));
-            $infobox[] = Lang::game('requires2').' '.($focus->error ? Util::localizedString($bar, 'name') : '[url=?object='.$focus->id.']'.Util::localizedString($bar, 'name').'[/url]');
-        }
+            $this->redButtons[BUTTON_VIEW3D] = ['type' => $mI['type'], 'displayId' => $mI['displayId']];
 
-        // primary & secondary trades
-        if (in_array($_cat, [9, 11]))
-        {
-            // skill
-            if ($_ = $this->subject->getField('skillLines')[0])
+            if (isset($mI['humanoid']))
             {
-                $rSkill = new SkillList(array(['id', $_]));
-                if (!$rSkill->error)
-                {
-                    $this->extendGlobalData($rSkill->getJSGlobals());
-
-                    $bar = sprintf(Lang::game('requires'), '&nbsp;[skill='.$rSkill->id.']');
-                    if ($_ = $this->subject->getField('learnedAt'))
-                        $bar .= ' ('.$_.')';
-
-                    $infobox[] = $bar;
-                }
+                $this->redButtons[BUTTON_VIEW3D]['typeId']   = $mI['typeId'];
+                $this->redButtons[BUTTON_VIEW3D]['humanoid'] = 1;
             }
-
-            // specialization
-            if ($_ = $this->subject->getField('reqSpellId'))
-            {
-                $rSpell = new SpellList(array(['id', $_]));
-                if (!$rSpell->error)
-                {
-                    $this->extendGlobalData($rSpell->getJSGlobals());
-                    $infobox[] = Lang::game('requires2').' [spell='.$rSpell->id.']';
-                }
-            }
-
-            // difficulty
-            if ($_ = $this->subject->getColorsForCurrent())
-                $infobox[] = Lang::formatSkillBreakpoints($_);
-        }
-
-        // accquisition..   10: starter spell; 7: discovery
-        if ($this->subject->getSources($s))
-        {
-            if (in_array(SRC_STARTER, $s))
-                $infobox[] = Lang::spell('starter');
-            else if (in_array(SRC_DISCOVERY, $s))
-                $infobox[] = Lang::spell('discovered');
-        }
-
-        // training cost
-        if ($cost = $this->subject->getField('trainingCost'))
-            $infobox[] = Lang::spell('trainingCost').Lang::main('colon').'[money='.$cost.']';
-
-        // icon
-        if ($_ = $this->subject->getField('iconId'))
-        {
-            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
-            $this->extendGlobalIds(Type::ICON, $_);
-        }
-
-        // used in mode
-        foreach ($this->difficulties as $n => $id)
-            if ($id == $this->typeId)                       // "Mode" seems to be multilingual acceptable
-                $infobox[] = 'Mode'.Lang::main('colon').Lang::game('modes', $n);
-
-        // Creature Type from Aura: Shapeshift
-        foreach ($modelInfo as $mI)
-        {
-            if (!isset($mI['creatureType']))
-                continue;
-
-            if ($mI['creatureType'] > 0)
-                $infobox[] = Lang::game('type').Lang::main('colon').Lang::game('ct', $mI['creatureType']);
 
             break;
         }
 
-        // spell script
-        if (User::isInGroup(U_GROUP_STAFF))
-            if ($_ = DB::World()->selectCell('SELECT ScriptName FROM spell_script_names WHERE ABS(spell_id) = ?d', $this->firstRank))
-                $infobox[] = 'Script'.Lang::main('colon').$_;
 
-        $infobox = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : '';
+        /*******************/
+        /* Reagent Listing */
+        /*******************/
 
-        // append glyph symbol if available
-        $glyphId = 0;
-        for ($i = 1; $i < 4; $i++)
-            if ($this->subject->getField('effect'.$i.'Id') == SPELL_EFFECT_APPLY_GLYPH)
-                $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
+        $this->createReagentList();
 
-        if ($_ = DB::Aowow()->selectCell('SELECT ic.name FROM ?_glyphproperties gp JOIN ?_icons ic ON gp.iconId = ic.id WHERE gp.spellId = ?d { OR gp.id = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
-            if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
-                $infobox .= '[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]';
+
+        /**********************/
+        /* Spell Scaling Info */
+        /**********************/
+
+        $this->createScalingData();
+
+
+        /******************/
+        /* Required Items */
+        /******************/
+
+        $this->createRequiredItems();
+
+
+        /*************************/
+        /* Required Tools/Totems */
+        /*************************/
+
+        // prepare Tools
+        foreach ($this->subject->getToolsForCurrent() as $tool)
+            $this->tools[] = new IconElement(
+                Type::ITEM,
+                $tool['itemId'] ?? 0,
+                $tool['name'],
+                quality: ITEM_QUALITY_NORMAL,
+                size: IconElement::SIZE_SMALL,
+                url: !isset($tool['itemId']) ? '?items&filter=cr=91;crs='.$tool['id'].';crv=0' : '',
+                element: 'iconlist-icon'
+            );
+
+
+        /**********************/
+        /* Spell Effect Block */
+        /**********************/
+
+        $this->createEffects();
+
+
+        /**************************************************/
+        /* Spell Attributes listing and SpellFilter links */
+        /**************************************************/
+
+        $this->createAttributesList();
+
+
+        /*************************/
+        /* Factionchange pendant */
+        /*************************/
+
+        // factionchange-equivalent
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_spells WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        {
+            $altSpell = new SpellList(array(['id', abs($pendant)]));
+            if (!$altSpell->error)
+            {
+                $this->transfer = Lang::spell('_transfer', array(
+                    $altSpell->id,
+                    ITEM_QUALITY_NORMAL,
+                    $altSpell->getField('iconString'),
+                    $altSpell->getField('name', true),
+                    $pendant > 0 ? 'alliance' : 'horde',
+                    $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
+                ));
+            }
+        }
 
 
         /****************/
         /* Main Content */
         /****************/
 
-        $this->reagents    = $this->createReagentList();
-        $this->scaling     = $this->createScalingData();
-        $this->items       = $this->createRequiredItems();
-        $this->tools       = $this->createTools();
-        $this->effects     = $this->createEffects();
-        $this->attributes  = $this->createAttributesList();
-        $this->powerCost   = $this->subject->createPowerCostForCurrent();
-        $this->castTime    = $this->subject->createCastTimeForCurrent(false, false);
-        $this->level       = $this->subject->getField('spellLevel');
-        $this->rangeName   = $this->subject->getField('rangeText', true);
-        $this->range       = $this->subject->getField('rangeMaxHostile');
-        $this->gcd         = Util::formatTime($this->subject->getField('startRecoveryTime'));
-        $this->school      = $this->fmtStaffTip(Lang::getMagicSchools($this->subject->getField('schoolMask')), Util::asHex($this->subject->getField('schoolMask')));
-        $this->dispel      = $this->subject->getField('dispelType') ? Lang::game('dt', $this->subject->getField('dispelType')) : null;
-        $this->mechanic    = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
-        $this->name        = $this->subject->getField('name', true);
-        $this->headIcons   = [$this->subject->getField('iconString'), $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : '')];
-        $this->redButtons  = $redButtons;
-        $this->infobox     = $infobox;
-        $this->gcdCat      = match((int)$this->subject->getField('startRecoveryCategory'))
+        $this->powerCost = $this->subject->createPowerCostForCurrent();
+        $this->castTime  = $this->subject->createCastTimeForCurrent(false, false);
+        $this->level     = $this->subject->getField('spellLevel');
+        $this->rangeName = $this->subject->getField('rangeText', true);
+        $this->gcd       = Util::formatTime($this->subject->getField('startRecoveryTime'));
+        $this->school    = $this->fmtStaffTip(Lang::getMagicSchools($this->subject->getField('schoolMask')), Util::asHex($this->subject->getField('schoolMask')));
+        $this->dispel    = $this->subject->getField('dispelType') ? Lang::game('dt', $this->subject->getField('dispelType')) : null;
+        $this->mechanic  = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
+        $this->tooltip   = array(
+            $this->subject->getField('iconString'),
+            $this->subject->getField('stackAmount') ?: ($this->subject->getField('procCharges') > 1 ? $this->subject->getField('procCharges') : 0),
+            $this->subject->getField('buff', true, true) ? 1 : 0
+        );
+        $this->gcdCat    = match((int)$this->subject->getField('startRecoveryCategory'))
         {
             133     => Lang::spell('normal'),
             330,                                            // Mounts
@@ -361,15 +256,15 @@ class SpellPage extends GenericPage
             1164,                                           // Kessel Run Elek
             1173,                                           // Birmingham Test Spells
             1178,                                           // Stealth (Druid Cat, Rogue, Hunter Cat Pets) + Charge (Warrior)
-            1244    => Lang::spell('special'),              // Argent Tournament Vehicle Jousting Abilities
+            1244    => Lang::spell('special'),              // Argent Tournament Vehcile Jousting Abilities
             default => ''                                   // n/a
         };
 
-        // minRange exists..  prepend
+        $this->range = $this->subject->getField('rangeMaxHostile');
         if ($_ = $this->subject->getField('rangeMinHostile'))
             $this->range = $_.' - '.$this->range;
 
-        if (!($this->subject->getField('attributes2') & 0x80000))
+        if (!($this->subject->getField('attributes2') & SPELL_ATTR2_NOT_NEED_SHAPESHIFT))
             $this->stances = Lang::getStances($this->subject->getField('stanceMask'));
 
         if (($_ = $this->subject->getField('recoveryTime')) && $_ > 0)
@@ -380,45 +275,29 @@ class SpellPage extends GenericPage
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
             $this->duration = Util::formatTime($_);
 
-        // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_spells WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
-        {
-            $altSpell = new SpellList(array(['id', abs($pendant)]));
-            if (!$altSpell->error)
-            {
-                $this->transfer = sprintf(
-                    Lang::spell('_transfer'),
-                    $altSpell->id,
-                    1,                                      // quality
-                    $altSpell->getField('iconString'),
-                    $altSpell->getField('name', true),
-                    $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
-                );
-            }
-        }
 
         /**************/
         /* Extra Tabs */
         /**************/
 
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+
         $ubSAI = SmartAI::getOwnerOfSpellCast($this->typeId);
 
         // tab: abilities [of shapeshift form]
+        $formSpells = [];
         for ($i = 1; $i < 4; $i++)
+            if ($this->subject->getField('effect'.$i.'AuraId') == SPELL_AURA_MOD_SHAPESHIFT)
+                if ($_ = DB::Aowow()->selectRow('SELECT `spellId1`, `spellId2`, `spellId3`, `spellId4`, `spellId5`, `spellId6`, `spellId7`, `spellId8` FROM ?_shapeshiftforms WHERE `id` = ?d', $this->subject->getField('effect'.$i.'MiscValue')))
+                    $formSpells = array_merge($formSpells, $_);
+
+        if ($formSpells)
         {
-            if ($this->subject->getField('effect'.$i.'AuraId') != 36)
-                continue;
-
-            $formSpells = DB::Aowow()->selectRow('SELECT spellId1, spellId2, spellId3, spellId4, spellId5, spellId6, spellId7, spellId8 FROM ?_shapeshiftforms WHERE id = ?d', $this->subject->getField('effect'.$i.'MiscValue'));
-            if (!$formSpells)
-                continue;
-
             $abilities = new SpellList(array(['id', $formSpells]));
             if (!$abilities->error)
             {
                 $tabData = array(
-                    'data'        => array_values($abilities->getListviewData()),
+                    'data'        => $abilities->getListviewData(),
                     'id'          => 'controlledabilities',
                     'name'        => '$LANG.tab_controlledabilities',
                     'visibleCols' => ['level'],
@@ -427,7 +306,7 @@ class SpellPage extends GenericPage
                 if (!$abilities->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
 
                 $this->extendGlobalData($abilities->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -445,7 +324,7 @@ class SpellPage extends GenericPage
 
         for ($i = 1; $i < 4; $i++)
         {
-            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), self::$modAuras))
+            if (!in_array($this->subject->getField('effect'.$i.'AuraId'), self::MOD_AURAS))
                 continue;
 
             $m1 = $this->subject->getField('effect'.$i.'SpellClassMaskA');
@@ -466,20 +345,27 @@ class SpellPage extends GenericPage
                 foreach ($modSpells->iterate() as $id => $__)
                 {
                     if (in_array($modSpells->getField('typeCat'), [-2, 7]))
-                        $classSpells[$id] = [$id, $modSpells->getField('name', true), 0, 0];
+                        $classSpells[$id] = [new IconElement(Type::SPELL, $id, $modSpells->getField('name', true), size: IconElement::SIZE_SMALL), []];
                     else
-                        $miscSpells[$id]  = [$id, $modSpells->getField('name', true), 0, 0];
+                        $miscSpells[$id]  = [new IconElement(Type::SPELL, $id, $modSpells->getField('name', true), size: IconElement::SIZE_SMALL), []];
                 }
 
                 if ($classSpells)
-                    foreach (DB::World()->select('SELECT spell_id AS ARRAY_KEY, first_spell_id AS "0", `rank` AS "1" FROM spell_ranks WHERE spell_id IN (?a)', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
+                {
+                    foreach (DB::World()->select('SELECT `spell_id` AS ARRAY_KEY, `first_spell_id` AS "0", `rank` AS "1" FROM spell_ranks WHERE `spell_id` IN (?a)', array_keys($classSpells)) as $spellId => [$firstSpellId, $rank])
                     {
-                        $classSpells[$firstSpellId][2] = min($classSpells[$firstSpellId][2] ?: $rank, $rank);
-                        $classSpells[$firstSpellId][3] = max($classSpells[$firstSpellId][3], $rank);
+                        $classSpells[$firstSpellId][1][0] = min($classSpells[$firstSpellId][1][0] ?? $rank, $rank);
+                        $classSpells[$firstSpellId][1][1] = max($classSpells[$firstSpellId][1][1] ?? $rank, $rank);
 
                         if ($spellId != $firstSpellId)
                             unset($classSpells[$spellId]);
                     }
+
+                    array_walk($classSpells, function(&$x) {
+                        if ($x[1] && $x[1][0] == $x[1][1])  // only one rank => unset
+                            $x[1] = null;
+                    });
+                }
 
                 $modifiesData += $modSpells->getListviewData();
                 if ($modSpells->hasSetFields('skillLines'))
@@ -497,7 +383,7 @@ class SpellPage extends GenericPage
         if ($modifiesData)
         {
             $tabData = array(
-                'data'        => array_values($modifiesData),
+                'data'        => $modifiesData,
                 'id'          => 'modifies',
                 'name'        => '$LANG.tab_modifies',
                 'visibleCols' => ['level'],
@@ -506,7 +392,7 @@ class SpellPage extends GenericPage
             if ($hideSkillCol)
                 $tabData['hiddenCols'] = ['skill'];
 
-            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
         }
 
         // tab: [$this is] modified by
@@ -528,7 +414,7 @@ class SpellPage extends GenericPage
 
             $sub[] = array(
                 'AND',
-                ['s.effect'.$i.'AuraId', self::$modAuras],
+                ['s.effect'.$i.'AuraId', self::MOD_AURAS],
                 [
                     'OR',
                     ['s.effect'.$i.'SpellClassMaskA', $m1, '&'],
@@ -544,7 +430,7 @@ class SpellPage extends GenericPage
             if (!$modsSpell->error)
             {
                 $tabData = array(
-                    'data'        => array_values($modsSpell->getListviewData()),
+                    'data'        => $modsSpell->getListviewData(),
                     'id'          => 'modified-by',
                     'name'        => '$LANG.tab_modifiedby',
                     'visibleCols' => ['level'],
@@ -553,7 +439,7 @@ class SpellPage extends GenericPage
                 if (!$modsSpell->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
 
                 $this->extendGlobalData($modsSpell->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
@@ -606,7 +492,7 @@ class SpellPage extends GenericPage
             }
 
             $tabData = array(
-                'data'        => array_values($data),
+                'data'        => $data,
                 'id'          => 'see-also',
                 'name'        => '$LANG.tab_seealso',
                 'visibleCols' => ['level'],
@@ -618,7 +504,7 @@ class SpellPage extends GenericPage
             if (isset($saE))
                 $tabData['extraCols'] = $saE;
 
-            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
 
             $this->extendGlobalData($saSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -639,18 +525,18 @@ class SpellPage extends GenericPage
             $cdSpells = new SpellList($conditions);
             if (!$cdSpells->error)
             {
-                $this->lvTabs[] = [SpellList::$brickFile, array(
-                    'data' => array_values($cdSpells->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $cdSpells->getListviewData(),
                     'name' => '$LANG.tab_sharedcooldown',
                     'id'   => 'shared-cooldown'
-                )];
+                ), SpellList::$brickFile));
 
                 $this->extendGlobalData($cdSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             }
         }
 
         // tab: used by - spell
-        if ($so = DB::Aowow()->selectCell('SELECT id FROM ?_spelloverride WHERE spellId1 = ?d OR spellId2 = ?d OR spellId3 = ?d OR spellId4 = ?d OR spellId5 = ?d', $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id))
+        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ?_spelloverride WHERE `spellId1` = ?d OR `spellId2` = ?d OR `spellId3` = ?d OR `spellId4` = ?d OR `spellId5` = ?d', $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id))
         {
             $conditions = array(
                 'OR',
@@ -661,11 +547,11 @@ class SpellPage extends GenericPage
             $ubSpells = new SpellList($conditions);
             if (!$ubSpells->error)
             {
-                $this->lvTabs[] = [SpellList::$brickFile, array(
-                    'data' => array_values($ubSpells->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $ubSpells->getListviewData(),
                     'id'   => 'used-by-spell',
                     'name' => '$LANG.tab_usedby'
-                )];
+                ), SpellList::$brickFile));
 
                 $this->extendGlobalData($ubSpells->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -682,11 +568,11 @@ class SpellPage extends GenericPage
         $ubSets = new ItemsetList($conditions);
         if (!$ubSets->error)
         {
-            $this->lvTabs[] = [ItemsetList::$brickFile, array(
-                'data' => array_values($ubSets->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubSets->getListviewData(),
                 'id'   => 'used-by-itemset',
                 'name' => '$LANG.tab_usedby'
-            )];
+            ), ItemsetList::$brickFile));
 
             $this->extendGlobalData($ubSets->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -704,11 +590,11 @@ class SpellPage extends GenericPage
         $ubItems = new ItemList($conditions);
         if (!$ubItems->error)
         {
-            $this->lvTabs[] = [ItemList::$brickFile, array(
-                'data' => array_values($ubItems->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubItems->getListviewData(),
                 'id'   => 'used-by-item',
                 'name' => '$LANG.tab_usedby'
-            )];
+            ), ItemList::$brickFile));
 
             $this->extendGlobalData($ubItems->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -725,11 +611,12 @@ class SpellPage extends GenericPage
         $ubObjects = new GameObjectList($conditions);
         if (!$ubObjects->error)
         {
-            $this->lvTabs[] = [GameObjectList::$brickFile, array(
-                'data' => array_values($ubObjects->getListviewData()),
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubObjects->getListviewData(),
                 'id'   => 'used-by-object',
                 'name' => '$LANG.tab_usedby'
-            )];
+            ), GameObjectList::$brickFile));
 
             $this->extendGlobalData($ubObjects->getJSGlobals());
         }
@@ -742,11 +629,11 @@ class SpellPage extends GenericPage
                 $ubTriggers = new AreaTriggerList(array(['id', $ubSAI[Type::AREATRIGGER]]));
                 if (!$ubTriggers->error)
                 {
-                    $this->lvTabs[] = [AreaTriggerList::$brickFile, array(
-                        'data' => array_values($ubTriggers->getListviewData()),
+                    $this->lvTabs->addListviewTab(new Listview(array(
+                        'data' => $ubTriggers->getListviewData(),
                         'id'   => 'used-by-areatrigger',
                         'name' => '$LANG.tab_usedby'
-                    ), 'areatrigger'];
+                    ), AreaTriggerList::$brickFile, 'areatrigger'));
                 }
             }
         }
@@ -761,18 +648,18 @@ class SpellPage extends GenericPage
         $coAchievemnts = new AchievementList($conditions);
         if (!$coAchievemnts->error)
         {
-            $this->lvTabs[] = [AchievementList::$brickFile, array(
-                'data' => array_values($coAchievemnts->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $coAchievemnts->getListviewData(),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
-            )];
+            ), AchievementList::$brickFile));
 
             $this->extendGlobalData($coAchievemnts->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
 
         // tab: contains
         // spell_loot_template & skill_extra_item_template
-        $extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE spellid = ?d', $this->subject->id);
+        $extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = ?d', $this->subject->id);
         $spellLoot = new Loot();
 
         if ($spellLoot->getByContainer(LOOT_SPELL, $this->subject->id) || $extraItem)
@@ -810,13 +697,13 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvTabs[] = [ItemList::$brickFile, array(
-                'data'       => array_values($lv),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'       => $lv,
                 'name'       => $lvName,
                 'id'         => 'contains',
                 'hiddenCols' => ['side', 'slot', 'source', 'reqlevel'],
                 'extraCols'  => array_unique($extraCols)
-            )];
+            ), ItemList::$brickFile));
         }
 
         // tab: exclusive with
@@ -879,7 +766,7 @@ class SpellPage extends GenericPage
                             if (isset($sH))
                                 $tabData['hiddenCols'] = $sH;
 
-                            $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                            $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
                         }
                     }
                 }
@@ -887,13 +774,10 @@ class SpellPage extends GenericPage
         }
 
         // tab: linked with
-        $rows = DB::World()->select('
-            SELECT  spell_trigger AS `trigger`,
-                    spell_effect AS effect,
-                    type,
-                    IF(ABS(spell_effect) = ?d, ABS(spell_trigger), ABS(spell_effect)) AS related
+        $rows = DB::World()->select(
+           'SELECT  `spell_trigger` AS "trigger", `spell_effect` AS "effect", `type`, IF(ABS(`spell_effect`) = ?d, ABS(`spell_trigger`), ABS(`spell_effect`)) AS "related"
             FROM    spell_linked_spell
-            WHERE   ABS(spell_effect) = ?d OR ABS(spell_trigger) = ?d',
+            WHERE   ABS(`spell_effect`) = ?d OR ABS(`spell_trigger`) = ?d',
             $this->typeId, $this->typeId, $this->typeId
         );
 
@@ -922,13 +806,13 @@ class SpellPage extends GenericPage
                 }
             }
 
-            $this->lvTabs[] = [SpellList::$brickFile, array(
-                'data'        => array_values($data),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'        => $data,
                 'id'          => 'spell-link',
                 'name'        => Lang::spell('linkedWith'),
                 'hiddenCols'  => ['skill', 'name'],
                 'visibleCols' => ['linkedTrigger', 'linkedEffect']
-            )];
+            ), SpellList::$brickFile));
 
             $this->extendGlobalData($linked->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
         }
@@ -945,11 +829,11 @@ class SpellPage extends GenericPage
         $trigger = new SpellList($conditions);
         if (!$trigger->error)
         {
-            $this->lvTabs[] = [SpellList::$brickFile, array(
-                'data' => array_values($trigger->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $trigger->getListviewData(),
                 'id'   => 'triggered-by',
                 'name' => '$LANG.tab_triggeredby'
-            )];
+            ), SpellList::$brickFile));
 
             $this->extendGlobalData($trigger->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -969,17 +853,18 @@ class SpellPage extends GenericPage
         $ubCreature = new CreatureList($conditions);
         if (!$ubCreature->error)
         {
-            $this->lvTabs[] = [CreatureList::$brickFile, array(
-                'data' => array_values($ubCreature->getListviewData()),
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $ubCreature->getListviewData(),
                 'id'   => 'used-by-npc',
                 'name' => '$LANG.tab_usedby'
-            )];
+            ), CreatureList::$brickFile));
 
             $this->extendGlobalData($ubCreature->getJSGlobals(GLOBALINFO_SELF));
         }
 
         // tab: zone
-        if ($areaSpells = DB::World()->select('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE spell = ?d', $this->typeId))
+        if ($areaSpells = DB::World()->select('SELECT `area` AS ARRAY_KEY, `aura_spell` AS "0", `quest_start` AS "1", `quest_end` AS "2", `quest_start_status` AS "3", `quest_end_status` AS "4", `racemask` AS "5", `gender` AS "6" FROM spell_area WHERE `spell` = ?d', $this->typeId))
         {
             $zones = new ZoneList(array(['id', array_keys($areaSpells)]));
             if (!$zones->error)
@@ -1072,7 +957,7 @@ class SpellPage extends GenericPage
                 if ($cnd->toListviewColumn($resultLv, $extraCols))
                     $this->extendGlobalData($cnd->getJsGlobals());
 
-                $tabData = ['data' => array_values($resultLv)];
+                $tabData = ['data' => $resultLv];
 
                 if ($extraCols)
                 {
@@ -1080,7 +965,7 @@ class SpellPage extends GenericPage
                     $tabData['hiddenCols'] = ['instancetype'];
                 }
 
-                $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneList::$brickFile));
             }
         }
 
@@ -1103,7 +988,7 @@ class SpellPage extends GenericPage
                 }
 
                 $tabData = array(
-                    'data'        => array_values($teaches->getListviewData()),
+                    'data'        => $teaches->getListviewData(),
                     'id'          => 'teaches-spell',
                     'name'        => '$LANG.tab_teaches',
                     'visibleCols' => $vis,
@@ -1112,18 +997,18 @@ class SpellPage extends GenericPage
                 if (!$teaches->hasSetFields('skillLines'))
                     $tabData['hiddenCols'] = ['skill'];
 
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
             }
         }
 
         // tab: taught by npc
         if ($this->subject->getSources($s) && in_array(SRC_TRAINER, $s))
         {
-            $trainers = DB::World()->select('
-                SELECT  cdt.CreatureId AS ARRAY_KEY, ts.ReqSkillLine AS reqSkillId, ts.ReqSkillRank AS reqSkillValue, ts.ReqLevel AS reqLevel, ts.ReqAbility1 AS reqSpellId1, ts.reqAbility2 AS reqSpellId2
+            $trainers = DB::World()->select(
+               'SELECT  cdt.`CreatureId` AS ARRAY_KEY, ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
                 FROM    creature_default_trainer cdt
-                JOIN    trainer_spell ts ON ts.TrainerId = cdt.TrainerId
-                WHERE   ts.SpellId = ?d',
+                JOIN    trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId`
+                WHERE   ts.`SpellId` = ?d',
                 $this->typeId
             );
 
@@ -1156,16 +1041,17 @@ class SpellPage extends GenericPage
                     if ($cnd->toListviewColumn($lvData, $extraCols))
                         $this->extendGlobalData($cnd->getJsGlobals());
 
-                    $lvTab = array(
-                        'data' => array_values($lvData),
+                    $tabData = array(
+                        'data' => $lvData,
                         'id'   => 'taught-by-npc',
                         'name' => '$LANG.tab_taughtby',
                     );
 
                     if ($extraCols)
-                        $lvTab['extraCols'] = $extraCols;
+                        $tabData['extraCols'] = $extraCols;
 
-                    $this->lvTabs[] = [CreatureList::$brickFile, $lvTab];
+                    $this->addDataLoader('zones');
+                    $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
                 }
             }
         }
@@ -1182,12 +1068,11 @@ class SpellPage extends GenericPage
         $tbsData = [];
         if (!$tbSpell->error)
         {
-            $tbsData = $tbSpell->getListviewData();
-            $this->lvTabs[] = [SpellList::$brickFile, array(
-                'data' => array_values($tbsData),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $tbSpell->getListviewData(),
                 'id'   => 'taught-by-spell',
                 'name' => '$LANG.tab_taughtby'
-            )];
+            ), SpellList::$brickFile));
 
             $this->extendGlobalData($tbSpell->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -1206,11 +1091,11 @@ class SpellPage extends GenericPage
         $tbQuest = new QuestList($conditions);
         if (!$tbQuest->error)
         {
-            $this->lvTabs[] = [QuestList::$brickFile, array(
-                'data' => array_values($tbQuest->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $tbQuest->getListviewData(),
                 'id'   => 'reward-from-quest',
                 'name' => '$LANG.tab_rewardfrom'
-            )];
+            ), QuestList::$brickFile));
 
             $this->extendGlobalData($tbQuest->getJSGlobals());
         }
@@ -1228,11 +1113,11 @@ class SpellPage extends GenericPage
         $tbItem = new ItemList($conditions);
         if (!$tbItem->error)
         {
-            $this->lvTabs[] = [ItemList::$brickFile, array(
-                'data' => array_values($tbItem->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $tbItem->getListviewData(),
                 'id'   => 'taught-by-item',
                 'name' => '$LANG.tab_taughtby'
-            )];
+            ), ItemList::$brickFile));
 
             $this->extendGlobalData($tbItem->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -1240,17 +1125,17 @@ class SpellPage extends GenericPage
         // tab: enchantments
         $conditions = array(
             'OR',
-            ['AND', ['type1', [1, 3, 7]], ['object1', $this->typeId]],
-            ['AND', ['type2', [1, 3, 7]], ['object2', $this->typeId]],
-            ['AND', ['type3', [1, 3, 7]], ['object3', $this->typeId]]
+            ['AND', ['type1', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object1', $this->typeId]],
+            ['AND', ['type2', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object2', $this->typeId]],
+            ['AND', ['type3', [ENCHANTMENT_TYPE_COMBAT_SPELL, ENCHANTMENT_TYPE_EQUIP_SPELL, ENCHANTMENT_TYPE_USE_SPELL]], ['object3', $this->typeId]]
         );
         $enchList = new EnchantmentList($conditions);
         if (!$enchList->error)
         {
-            $this->lvTabs[] = [EnchantmentList::$brickFile, array(
-                'data' => array_values($enchList->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $enchList->getListviewData(),
                 'name' => Util::ucFirst(Lang::game('enchantments'))
-            ), 'enchantment'];
+            ), EnchantmentList::$brickFile, 'enchantment'));
 
             $this->extendGlobalData($enchList->getJSGlobals());
         }
@@ -1262,7 +1147,7 @@ class SpellPage extends GenericPage
             if ($this->subject->getField('effect'.$i.'AuraId') == SPELL_AURA_SCREEN_EFFECT)
                $seSounds = DB::Aowow()->selectRow('SELECT `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight` FROM ?_screeneffect_sounds WHERE `id` = ?d', $this->subject->getField('effect'.$i.'MiscValue'));
 
-        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE id = ?d', $this->subject->getField('spellVisualId'));
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE `id` = ?d', $this->subject->getField('spellVisualId'));
         array_shift($activitySounds);                       // remove id-column
         if ($soundIDs = $activitySounds + $seSounds)
         {
@@ -1274,15 +1159,14 @@ class SpellPage extends GenericPage
                     if (isset($data[$id]))
                         $data[$id]['activity'] = $activity; // no index, js wants a string :(
 
-                $tabData = ['data' => array_values($data)];
+                $tabData = ['data' => $data];
                 if ($activitySounds)
                     $tabData['visibleCols'] = ['activity'];
 
                 $this->extendGlobalData($sounds->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = [SoundList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
             }
         }
-
 
         // find associated NPC, Item and merge results
         // taughtbypets (unused..?)
@@ -1298,28 +1182,16 @@ class SpellPage extends GenericPage
         if ($tab = $cnd->toListviewTab())
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $tab;
-        }
-    }
-
-    protected function generateTooltip()
-    {
-        $power = new \StdClass();
-        if (!$this->subject->error)
-        {
-            $tooltip = $this->subject->renderTooltip(ttSpells: $ttSpells);
-            $buff    = $this->subject->renderBuff(buffSpells: $bfSpells);
-
-            $power->{'name_'.Lang::getLocale()->json()}       = $this->subject->getField('name', true);
-            $power->icon                                = rawurlencode($this->subject->getField('iconString', true, true));
-            $power->{'tooltip_'.Lang::getLocale()->json()}    = $tooltip;
-            $power->{'spells_'.Lang::getLocale()->json()}     = $ttSpells;
-            $power->{'buff_'.Lang::getLocale()->json()}       = $buff;
-            $power->{'buffspells_'.Lang::getLocale()->json()} = $bfSpells;
+            $this->lvTabs->addDataTab(...$tab);
         }
 
-        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
+        parent::generate();
     }
+
+
+    /******************************************/
+    /* SpellLoot recursive dropchance builder */
+    /******************************************/
 
     private function buildPctStack(float $baseChance, int $maxStack) : string
     {
@@ -1336,23 +1208,31 @@ class SpellPage extends GenericPage
                 $pctStack[$i-1] -= $pctStack[$i];
         }
 
-        // cleanup tiny fractions
-        $pctStack = array_filter($pctStack, function($x) use ($baseChance) { return $x * $baseChance >= 0.01; });
+        // cleanup rounding errors
+        $pctStack = array_map(fn($x) => round($x, 3), $pctStack);
 
-        return json_encode($pctStack, JSON_NUMERIC_CHECK);
+        // cleanup tiny fractions
+        $pctStack = array_filter($pctStack, fn($x) => ($x * $baseChance) >= 0.01);
+
+        return json_encode($pctStack, JSON_NUMERIC_CHECK);  // do not replace with Util::toJSON !
     }
 
-    private function appendReagentItem(&$reagentResult, $_iId, $_qty, $_mult, $_level, $_path, $alreadyUsed)
+
+    /**********************************/
+    /* recursive reagent list builder */
+    /**********************************/
+
+    private function appendReagentItem(array &$reagentResult, int $itemId, int $qty, int $mult, int $level, string $path, array $alreadyUsed, int $fromSpell = 0) : bool
     {
-        if (in_array($_iId, $alreadyUsed))
+        if (in_array($itemId, $alreadyUsed))
             return false;
 
         $item = DB::Aowow()->selectRow(
-           'SELECT    `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, i.`id`, ic.`name` AS `iconString`, `quality`
+           'SELECT    `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, i.`id`, ic.`name` AS `iconString`, `quality`, `spellId1`, `spellCharges1`
             FROM      ?_items i
             LEFT JOIN ?_icons ic ON ic.`id` = i.`iconId`
             WHERE     i.`id` = ?d',
-            $_iId
+            $itemId
         );
 
         if (!$item)
@@ -1360,34 +1240,35 @@ class SpellPage extends GenericPage
 
         $this->extendGlobalIds(Type::ITEM, $item['id']);
 
-        $_level++;
+        // the spell calling this is also on the item and triggering it destroys the item
+        // so effectively we need one more. (see elemental particles and enchantment essences)
+        if ($fromSpell && $fromSpell == $item['spellId1'] && $item['spellCharges1'] == -1)
+            $qty++;
+
+        $level++;
 
         $data = array(
-            'type'    => Type::ITEM,
-            'typeId'  => $item['id'],
+            'path'    => $path.'.'.Type::ITEM.'-'.$item['id'],
+            'level'   => $level,
+            'final'   => false,
             'typeStr' => Type::getFileString(Type::ITEM),
-            'quality' => $item['quality'],
-            'name'    => Util::localizedString($item, 'name'),
-            'icon'    => $item['iconString'],
-            'qty'     => $_qty * $_mult,
-            'path'    => $_path.'.'.Type::ITEM.'-'.$item['id'],
-            'level'   => $_level
+            'icon'    => new IconElement(Type::ITEM, $item['id'], Util::localizedString($item, 'name'), $qty * $mult, '', $item['quality'], IconElement::SIZE_SMALL, align: 'right', element: 'iconlist-icon')
         );
 
         $idx = count($reagentResult);
         $reagentResult[] = $data;
         $alreadyUsed[]   = $item['id'];
 
-        if (!$this->appendReagentSpell($reagentResult, $item['id'], $data['qty'], $data['level'], $data['path'], $alreadyUsed))
+        if (!$this->appendReagentSpell($reagentResult, $item['id'], $qty * $mult, $data['level'], $data['path'], $alreadyUsed))
             $reagentResult[$idx]['final'] = true;
 
         return true;
     }
 
-    private function appendReagentSpell(&$reagentResult, $_iId, $_qty, $_level, $_path, $alreadyUsed)
+    private function appendReagentSpell(array &$reagentResult, int $itemId, int $qty, int $level, string $path, array $alreadyUsed) : bool
     {
-        $_level++;
-        // assume that tradeSpells only use the first index  to create items, so this runs somewhat efficiently >.<
+        $level++;
+        // assume that tradeSpells only use the first index to create items, so this runs somewhat efficiently >.<
         $spells = DB::Aowow()->select(
            'SELECT `reagent1`,      `reagent2`,      `reagent3`,      `reagent4`,      `reagent5`,      `reagent6`,      `reagent7`,      `reagent8`,
                    `reagentCount1`, `reagentCount2`, `reagentCount3`, `reagentCount4`, `reagentCount5`, `reagentCount6`, `reagentCount7`, `reagentCount8`,
@@ -1399,7 +1280,7 @@ class SpellPage extends GenericPage
             WHERE  (`effect1CreateItemId` = ?d AND `effect1Id` = ?d)',// OR
                 // (`effect2CreateItemId` = ?d AND `effect2Id` = ?d) OR
                 // (`effect3CreateItemId` = ?d AND `effect3Id` = ?d)',
-            $_iId, SPELL_EFFECT_CREATE_ITEM //, $_iId, SPELL_EFFECT_CREATE_ITEM, $_iId, SPELL_EFFECT_CREATE_ITEM
+            $itemId, SPELL_EFFECT_CREATE_ITEM //, $itemId, SPELL_EFFECT_CREATE_ITEM, $itemId, SPELL_EFFECT_CREATE_ITEM
         );
 
         if (!$spells)
@@ -1414,14 +1295,11 @@ class SpellPage extends GenericPage
             $this->extendGlobalIds(Type::SPELL, $sId);
 
             $data = array(
-                'type'    => Type::SPELL,
-                'typeId'  => $sId,
+                'path'    => $path.'.'.Type::SPELL.'-'.$sId,
+                'level'   => $level,
+                'final'   => false,
                 'typeStr' => Type::getFileString(Type::SPELL),
-                'name'    => Util::localizedString($row, 'name'),
-                'icon'    => $row['iconString'],
-                'qty'     => $_qty,
-                'path'    => $_path.'.'.Type::SPELL.'-'.$sId,
-                'level'   => $_level,
+                'icon'    => new IconElement(Type::SPELL, $sId, Util::localizedString($row, 'name'), $qty, size: IconElement::SIZE_SMALL, align: 'right', element: 'iconlist-icon')
             );
 
             $reagentResult[] = $data;
@@ -1434,12 +1312,7 @@ class SpellPage extends GenericPage
                 if ($row['reagent'.$i] <= 0 || $row['reagentCount'.$i] <= 0)
                     continue;
 
-                // handle edge case elemental crafting material: Mote of X + Crystalized X
-                // on use items, that has require more reagents of itself
-                if ($row['reagentCount'.$i] == 9 && ($row['iconIdBak'] == 140 || $row['iconIdBak'] == 1921))
-                    $row['reagentCount'.$i]++;
-
-                if ($this->appendReagentItem($reagentResult, $row['reagent'.$i], $row['reagentCount'.$i], $data['qty'], $data['level'], $data['path'], $_aU))
+                if ($this->appendReagentItem($reagentResult, $row['reagent'.$i], $row['reagentCount'.$i], $qty, $data['level'], $data['path'], $_aU, $sId))
                 {
                     $hasUnusedReagents  = true;
                     $didAppendSomething = true;
@@ -1453,49 +1326,55 @@ class SpellPage extends GenericPage
         return $didAppendSomething;
     }
 
-    private function createReagentList() : array
+    private function createReagentList() : void
     {
         $reagentResult = [];
         $enhanced      = false;
+        $reagents      = $this->subject->getReagentsForCurrent();
 
-        if ($reagents = $this->subject->getReagentsForCurrent())
+        if (!$reagents)
+            return;
+
+        foreach ($this->subject->relItems->iterate() as $iId => $__)
         {
-            foreach ($this->subject->relItems->iterate() as $iId => $__)
-            {
-                if (!in_array($iId, array_keys($reagents)))
-                    continue;
+            if (!in_array($iId, array_keys($reagents)))
+                continue;
 
-                $data = array(
-                    'type'    => Type::ITEM,
-                    'typeId'  => $iId,
-                    'typeStr' => Type::getFileString(Type::ITEM),
-                    'quality' => $this->subject->relItems->getField('quality'),
-                    'name'    => $this->subject->relItems->getField('name', true),
-                    'icon'    => $this->subject->relItems->getField('iconString'),
-                    'qty'     => $reagents[$iId][1],
-                    'path'    => Type::ITEM.'-'.$iId,       // id of the html-element
-                    'level'   => 0                          // depths in array, used for indentation
-                );
+            $data = array(
+                'path'    => Type::ITEM.'-'.$iId,           // id of the html-element
+                'level'   => 0,                             // depths in array, used for indentation
+                'final'   => false,
+                'typeStr' => Type::getFileString(Type::ITEM),
+                'icon'    => new IconElement(
+                    Type::ITEM,
+                    $iId,
+                    $this->subject->relItems->getField('name', true),
+                    $reagents[$iId][1],
+                    quality: $this->subject->relItems->getField('quality'),
+                    size: IconElement::SIZE_SMALL,
+                    align: 'right',
+                    element: 'iconlist-icon'
+                )
+            );
 
-                $idx = count($reagentResult);
-                $reagentResult[] = $data;
+            $idx = count($reagentResult);
+            $reagentResult[] = $data;
 
-                // start with self and current original item in usedEntries (spell < 0; item > 0)
-                if ($this->appendReagentSpell($reagentResult, $iId, $data['qty'], 0, $data['path'], [-$this->typeId, $iId]))
-                    $enhanced = true;
-                else
-                    $reagentResult[$idx]['final'] = true;
-            }
+            // start with self and current original item in usedEntries (spell < 0; item > 0)
+            if ($this->appendReagentSpell($reagentResult, $iId, $reagents[$iId][1], 0, $data['path'], [-$this->typeId, $iId]))
+                $enhanced = true;
+            else
+                $reagentResult[$idx]['final'] = true;
         }
 
         // increment all indizes (by prepending null and removing it again)
         array_unshift($reagentResult, null);
         unset($reagentResult[0]);
 
-        return [$enhanced, $reagentResult];
+        $this->reagents = [$enhanced, $reagentResult];
     }
 
-    private function createScalingData() : array            // calculation mostly like seen in TC
+    private function createScalingData() : void            // calculation mostly like seen in TC
     {
         $scaling = ['directSP' => 0, 'dotSP' => 0, 'directAP' => 0, 'dotAP' =>  0];
         $pMask   = $this->subject->periodicEffectsMask();
@@ -1517,18 +1396,16 @@ class SpellPage extends GenericPage
             $allDoTs = false;
         }
 
-        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS `directSP`, `dot_bonus` AS `dotSP`, `ap_bonus` AS `directAP`, `ap_dot_bonus` AS `dotAP` FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
+        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "directSP", `dot_bonus` AS "dotSP", `ap_bonus` AS "directAP", `ap_dot_bonus` AS "dotAP" FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
             $scaling = $s;
 
-        if (!$this->subject->isDamagingSpell() && !$this->subject->isHealingSpell())
-            return array_filter($scaling, fn($x) => $x > 0);
-
-        // only calculate for class/pet spells
-        if (!in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]))
-            return array_filter($scaling, fn($x) => $x > 0);
-
-        if ($this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
-            return array_filter($scaling, fn($x) => $x > 0);
+        if ((!$this->subject->isDamagingSpell() && !$this->subject->isHealingSpell()) ||
+            !in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]) ||
+            $this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
+        {
+            $this->scaling = array_filter($scaling, fn($x) => $x > 0);
+            return;
+        }
 
         foreach ($scaling as $k => $v)
         {
@@ -1555,7 +1432,7 @@ class SpellPage extends GenericPage
             else if ($allDoTs)                              // if all used effects are periodic, dont calculate direct component
                 continue;
 
-            // Damage over Time spells bonus calculation
+            // damage over time spells bonus calculation
             $dotFactor = 1.0;
             if ($isDOT)
             {
@@ -1570,7 +1447,7 @@ class SpellPage extends GenericPage
                 }
             }
 
-            // Distribute Damage over multiple effects, reduce by AoE
+            // distribute damage over multiple effects, reduce by AoE
             $castingTime = $this->subject->getCastingTimeForBonus($isDOT);
 
             // 50% for damage and healing spells for leech spells from damage bonus and 0% from healing
@@ -1593,10 +1470,10 @@ class SpellPage extends GenericPage
                 $scaling[$k] = 0;                           // would be 1 ($dotFactor), but we dont want it to be displayed
         }
 
-        return array_filter($scaling, fn($x) => $x > 0);
+        $this->scaling = array_filter($scaling, fn($x) => $x > 0);
     }
 
-    private function createRequiredItems() : string
+    private function createRequiredItems() : void
     {
         // parse itemClass & itemSubClassMask
         $class    = $this->subject->getField('equippedItemClass');
@@ -1604,7 +1481,7 @@ class SpellPage extends GenericPage
         $invType  = $this->subject->getField('equippedItemInventoryTypeMask');
 
         if ($class <= 0)
-            return '';
+            return;
 
         $tip  = 'Class: '.$class.'<br />SubClass: '.Util::asHex($subClass);
         $text = Lang::getRequiredItems($class, $subClass, false);
@@ -1631,24 +1508,13 @@ class SpellPage extends GenericPage
                     $_[] = $str;
 
             $tip  .= '<br />'.Lang::item('slot').Lang::main('colon').Util::asHex($invType);
-            $text .= ' '.Lang::spell('_inSlot').Lang::main('colon').implode(', ', $_);
+            $text .= ' '.Lang::spell('_inSlot').implode(', ', $_);
         }
 
-        return $this->fmtStaffTip($text, $tip);
+        $this->items = $this->fmtStaffTip($text, $tip);
     }
 
-    private function createTools() : array
-    {
-        $tools = $this->subject->getToolsForCurrent();
-
-        // prepare Tools
-        foreach ($tools as &$tool)
-            $tool['url'] = isset($tool['itemId']) ? '?item='.$tool['itemId'] : '?items&filter=cr=91;crs='.$tool['id'].';crv=0';
-
-        return $tools;
-    }
-
-    private function createEffects() : array
+    private function createEffects() : void
     {
         // proc data .. maybe use more information..?
         $procData = array(
@@ -1656,7 +1522,7 @@ class SpellPage extends GenericPage
             'cooldown' => 0
         );
 
-        if ($sp = DB::World()->selectRow('SELECT IF(`ProcsPerMinute` > 0, -`ProcsPerMinute`, `Chance`) AS `chance`, `Cooldown` AS `cooldown` FROM `spell_proc` WHERE ABS(`SpellId`) = ?d', $this->firstRank))
+        if ($sp = DB::World()->selectRow('SELECT IF(`ProcsPerMinute` > 0, -`ProcsPerMinute`, `Chance`) AS "chance", `Cooldown` AS "cooldown" FROM `spell_proc` WHERE ABS(`SpellId`) = ?d', $this->firstRank))
         {
             $procData['chance']   = $sp['chance']   ?: $procData['chance'];
             $procData['cooldown'] = $sp['cooldown'] ?: $procData['cooldown'];
@@ -1665,7 +1531,7 @@ class SpellPage extends GenericPage
         $effects  = [];
         $spellIdx = array_unique(array_merge($this->subject->canTriggerSpell(), $this->subject->canTeachSpell()));
         $itemIdx  = $this->subject->canCreateItem();
-        $perfItem = DB::World()->selectRow('SELECT `perfectItemType` AS `itemId`, `requiredSpecialization` AS `reqSpellId`, `perfectCreateChance` AS `chance` FROM skill_perfect_item_template WHERE `spellId` = ?d', $this->typeId);
+        $perfItem = DB::World()->selectRow('SELECT `perfectItemType` AS "itemId", `requiredSpecialization` AS "reqSpellId", `perfectCreateChance` AS "chance" FROM skill_perfect_item_template WHERE `spellId` = ?d', $this->typeId);
 
         // Iterate through all effects:
         for ($i = 1; $i < 4; $i++)
@@ -1710,12 +1576,13 @@ class SpellPage extends GenericPage
                 {
                     $itemEntry = $this->subject->relItems->getEntry($itemId);
 
-                    $_icon = array(
-                        'type'    => Type::ITEM,
-                        'typeId'  => $itemId,
-                        'name'    => $itemEntry ? $this->subject->relItems->getField('name', true) : '',
-                        'quality' => $itemEntry ? $this->subject->relItems->getField('quality') : '',
-                        'count'   => ($effBP + 1) . ($effDS > 1 ? '-' . ($effBP + $effDS) : '')
+                    $_icon = new IconElement(
+                        Type::ITEM,
+                        $itemId,
+                        $itemEntry ? $this->subject->relItems->getField('name', true) : Util::ucFirst(Lang::game('item')).' #'.$itemId,
+                        ($effBP + 1) . ($effDS > 1 ? '-' . ($effBP + $effDS) : ''),
+                        quality: $itemEntry ? $this->subject->relItems->getField('quality') : '',
+                        link: !empty($itemEntry)
                     );
                 }
 
@@ -1728,11 +1595,14 @@ class SpellPage extends GenericPage
                         $_perfItem = array(
                             'spellId'   => $perfItem['reqSpellId'],
                             'spellName' => $cndSpell->getField('name', true),
-                            'itemId'    => $perfItem['itemId'],
-                            'itemName'  => $this->subject->relItems->getField('name', true),
-                            'quality'   => $this->subject->relItems->getField('quality'),
                             'icon'      => $cndSpell->getField('iconString'),
-                            'chance'    => $perfItem['chance']
+                            'chance'    => $perfItem['chance'],
+                            'item'      => new IconElement(
+                                Type::ITEM,
+                                $perfItem['itemId'],
+                                $this->subject->relItems->getField('name', true),
+                                quality: $this->subject->relItems->getField('quality')
+                            )
                         );
                     }
                 }
@@ -1749,12 +1619,11 @@ class SpellPage extends GenericPage
                 {
                     $trig = new SpellList(array(['s.id', (int)$triggeredSpell]));
 
-                    $_icon = array(
-                        'type'    => Type::SPELL,
-                        'typeId'  => $triggeredSpell,
-                        'name'    => $trig->error ? '' : $trig->getField('name', true),
-                        'quality' => 0,
-                        'count'   => 0
+                    $_icon = new IconElement(
+                        Type::SPELL,
+                        $triggeredSpell,
+                        $trig->error ? Util::ucFirst(Lang::game('spell')).' #'.$triggeredSpell : $trig->getField('name', true),
+                        link: !$trig->error
                     );
 
                     $this->extendGlobalData($trig->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -1768,24 +1637,24 @@ class SpellPage extends GenericPage
                 $_footer['value'] = [$effBP + ($effDS ? 1 : 0), $effBP + $effDS];
 
             if ($this->subject->getField('effect'.$i.'RadiusMax') > 0)
-                $_footer['radius'] = Lang::spell('_radius').Lang::main('colon').$this->subject->getField('effect'.$i.'RadiusMax').' '.Lang::spell('_distUnit');;
+                $_footer['radius'] = Lang::spell('_radius').$this->subject->getField('effect'.$i.'RadiusMax').' '.Lang::spell('_distUnit');
 
             if ($this->subject->getField('effect'.$i.'Periode') > 0)
-                $_footer['interval'] = Lang::spell('_interval').Lang::main('colon').Util::formatTime($this->subject->getField('effect'.$i.'Periode'));
+                $_footer['interval'] = Lang::spell('_interval').Util::formatTime($this->subject->getField('effect'.$i.'Periode'));
 
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $_footer['mechanic'] = Lang::game('mechanic').Lang::main('colon').Lang::game('me', $_);
 
             if (in_array($i, $this->subject->canTriggerSpell()) && $procData['chance'] && $procData['chance'] < 100)
             {
-                $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [Lang::nf(-$procData['chance'], 1)]) : Lang::spell('procChance') . Lang::main('colon') . $procData['chance'] . '%';
+                $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [Lang::nf(-$procData['chance'], 1)]) : Lang::spell('procChance') . $procData['chance'] . '%';
                 if ($procData['cooldown'])
                     $_footer['procCD'] = Lang::game('cooldown', [Util::formatTime($procData['cooldown'], true)]);
             }
 
             // Effect Name
             if ($_ = Lang::spell('effects', $effId))
-                $_nameEffect = $this->fmtStaffTip($_, 'EffectId: '.$effId);
+                $_nameEffect = '<a href="?spells&filter=cr=109;crs='.$effId.';crv=0">'.$this->fmtStaffTip($_, 'EffectId: '.$effId).'</a>';
             else
                 $_nameEffect = Lang::spell('unkEffect', [$effId]);
 
@@ -1806,16 +1675,16 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_BIND:
                     if ($effMV <= 0)
                         $_nameMV = $this->fmtStaffTip(Lang::spell('currentArea'), 'MiscValue: '.$effMV);
-                    else if ($_ = ZoneList::getName($effMV))
-                        $_nameMV = '<a href="?zone='.$effMV.'">'.$_.'</a>';
+                    else if ($a = ZoneList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('zone')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_QUEST_COMPLETE:
                 case SPELL_EFFECT_CLEAR_QUEST:
                 case SPELL_EFFECT_QUEST_FAIL:
-                    if ($_ = QuestList::getName($effMV))
-                        $_nameMV = '<a href="?quest='.$effMV.'">'.$_.'</a>';
+                    if ($a = QuestList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('quest')).' #'.$effMV;
                     break;
@@ -1829,8 +1698,8 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_SUMMON_DEMON:
                 case SPELL_EFFECT_KILL_CREDIT:
                 case SPELL_EFFECT_KILL_CREDIT2:
-                    if ($_ = CreatureList::getName($effMV))
-                        $_nameMV = '<a href="?npc='.$effMV.'">'.$_.'</a>';
+                    if ($a = CreatureList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('npc')).' #'.$effMV;
                     break;
@@ -1842,8 +1711,8 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
                 case SPELL_EFFECT_ENCHANT_HELD_ITEM:
                 case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
-                    if ($_ = DB::Aowow()->selectRow('SELECT * FROM ?_itemenchantment WHERE id = ?d', $effMV))
-                        $_nameMV = '<a href="?enchantment='.$effMV.'" class="q2">'.Util::localizedString($_, 'name').'</a>';
+                    if ($a = EnchantmentList::makeLink($effMV, cssClass: 'q2'))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('enchantment')).' #'.$effMV;
                     break;
@@ -1862,8 +1731,8 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
-                    if ($_ = GameobjectList::getName($effMV))
-                        $_nameMV = '<a href="?object='.$effMV.'">'.$_.'</a>';
+                    if ($a = GameobjectList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('object')).' #'.$effMV;
                     break;
@@ -1874,8 +1743,8 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_APPLY_GLYPH:
                     if ($_ = DB::Aowow()->selectCell('SELECT `spellId` FROM ?_glyphproperties WHERE `id` = ?d', $effMV))
                     {
-                        if ($n = SpellList::getName($_))
-                            $_nameMV = '<a href="?spell='.$_.'">'.$n.'</a>';
+                        if ($a = SpellList::makeLink($_))
+                            $_nameMV = $a;
                         else
                             $_nameMV = Util::ucFirst(Lang::game('spell')).' #'.$_;
                     }
@@ -1897,8 +1766,8 @@ class SpellPage extends GenericPage
                     break;
                 case SPELL_EFFECT_SKILL_STEP:
                 case SPELL_EFFECT_SKILL:
-                    if ($_ = SkillList::getName($effMV))
-                        $_nameMV = '<a href="?skill='.$effMV.'">'.$_.'</a>';
+                    if ($a = SkillList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                     break;
@@ -1917,8 +1786,8 @@ class SpellPage extends GenericPage
                         $_nameMV = Util::ucFirst(Lang::game('sound')).' #'.$effMV;
                     break;
                 case SPELL_EFFECT_REPUTATION:
-                    if ($_ = FactionList::getName($effMV))
-                        $_nameMV = '<a href="?faction='.$effMV.'">'.$_.'</a>';
+                    if ($a = FactionList::makeLink($effMV))
+                        $_nameMV = $a;
                     else
                         $_nameMV = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
 
@@ -1955,7 +1824,7 @@ class SpellPage extends GenericPage
                 case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
                 {
                     if ($effAura > 0 && ($_ = Lang::spell('auras', $effAura)))
-                        $_nameAura = $this->fmtStaffTip($_, 'AuraId: '.$effAura);
+                        $_nameAura = '<a href="?spells&filter=cr=29;crs='.$effAura.';crv=0">'.$this->fmtStaffTip($_, 'AuraId: '.$effAura).'</a>';
                     else if ($effAura > 0)
                         $_nameAura = Lang::spell('unkAura', [$effAura]);
 
@@ -2102,8 +1971,8 @@ class SpellPage extends GenericPage
                             break;
                         case SPELL_AURA_MOD_SKILL:
                         case SPELL_AURA_MOD_SKILL_TALENT:
-                            if ($_ = SkillList::getName($effMV))
-                                $_nameMV = '<a href="?skill='.$effMV.'">'.$_.'</a>';
+                            if ($a = SkillList::makeLink($effMV))
+                                $_nameMV = $a;
                             else
                                 $_nameMV = Util::ucFirst(Lang::game('skill')).' #'.$effMV;
                             break;
@@ -2166,8 +2035,8 @@ class SpellPage extends GenericPage
                         case SPELL_AURA_CHANGE_MODEL_FOR_ALL_HUMANOIDS:
                         case SPELL_AURA_X_RAY:
                         case SPELL_AURA_MOD_FAKE_INEBRIATE:
-                            if ($effMV && $_ = CreatureList::getName($effMV))
-                                $_nameMV = '<a href="?npc='.$effMV.'">'.$_.'</a>';
+                            if ($effMV && $a = CreatureList::makeLink($effMV))
+                                $_nameMV = $a;
                             else
                                 $_nameMV = Util::ucFirst(Lang::game('npc')).' #'.$effMV;
                             break;
@@ -2178,8 +2047,8 @@ class SpellPage extends GenericPage
                         case SPELL_AURA_MOD_FACTION_REPUTATION_GAIN:
                             if ($effAura == SPELL_AURA_MOD_FACTION_REPUTATION_GAIN)
                                 $valueFmt = '%s%%';
-                            if ($_ = FactionList::getName($effMV))
-                                $_nameMV = '<a href="?faction='.$effMV.'">'.$_.'</a>';
+                            if ($a = FactionList::makeLink($effMV))
+                                $_nameMV = $a;
                             else
                                 $_nameMV = Util::ucFirst(Lang::game('faction')).' #'.$effMV;
                             break;                          // also breaks for SPELL_AURA_FORCE_REACTION
@@ -2221,6 +2090,7 @@ class SpellPage extends GenericPage
                             break;
                         case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:
                         case SPELL_AURA_OBS_MOD_HEALTH:
+                        case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
                         case SPELL_AURA_MOD_ARMOR_PENETRATION_PCT:
                         case SPELL_AURA_MOD_SCALE:
                         case SPELL_AURA_MOD_SCALE_2:
@@ -2263,9 +2133,9 @@ class SpellPage extends GenericPage
                 if ($_footer['value'][0] != $_footer['value'][1])
                     $buffer .= Lang::game('valueDelim').sprintf($valueFmt, $_footer['value'][1]);
                 if ($effRPPL != 0)
-                    $buffer .= sprintf(Lang::spell('costPerLevel'), sprintf($valueFmt, $effRPPL));
+                    $buffer .= Lang::spell('costPerLevel', [sprintf($valueFmt, $effRPPL)]);
                 if ($effPPCP != 0)
-                    $buffer .= sprintf(Lang::spell('pointsPerCP'), sprintf($valueFmt, $effPPCP));
+                    $buffer .= Lang::spell('pointsPerCP', [sprintf($valueFmt, $effPPCP)]);
                 if (isset($_footer['value'][2]))
                     $buffer .= $_footer['value'][2];
 
@@ -2294,14 +2164,15 @@ class SpellPage extends GenericPage
                 'perfectItem' => $_perfItem,
                 'name'        => $_header,
                 'footer'      => $_footer,
-                'markup'      => $_markup
+                'markup'      => $_markup,
+                'modifies'    => []                         // may be set later
             );
         }
 
-        return $effects;
+        $this->effects = $effects;
     }
 
-    private function createAttributesList() : array
+    private function createAttributesList() : void
     {
         $list = [];
         for ($i = 0; $i < 8; $i++)
@@ -2325,7 +2196,198 @@ class SpellPage extends GenericPage
             }
         }
 
-        return $list;
+        $this->attributes = $list;
+    }
+
+    private function generatePath()
+    {
+        $cat = $this->subject->getField('typeCat');
+        $cf  = $this->subject->getField('cuFlags');
+
+        $this->breadcrumb[] = $cat;
+
+        // reconstruct path
+        switch ($cat)
+        {
+            case  -2:
+            case   7:
+            case -13:
+                if ($cl = $this->subject->getField('reqClassMask'))
+                    $this->breadcrumb[] = ChrClass::fromMask($cl)[0];
+                else if ($sf = $this->subject->getField('spellFamilyId'))
+                    foreach (ChrClass::cases() as $cl)
+                        if ($cl->spellFamily() == $sf)
+                        {
+                            $this->breadcrumb[] = $cl->value;
+                            break;
+                        }
+
+                if ($cat == -13)
+                    $this->breadcrumb[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
+                else
+                    $this->breadcrumb[] = $this->subject->getField('skillLines')[0];
+
+                break;
+            case   9:
+            case  -3:
+            case  11:
+                $this->breadcrumb[] = $this->subject->getField('skillLines')[0];
+
+                if ($cat == 11)
+                    if ($_ = $this->subject->getField('reqSpellId'))
+                        $this->breadcrumb[] = $_;
+
+                break;
+            case -11:
+                foreach (SpellList::$skillLines as $line => $skills)
+                    if (in_array($this->subject->getField('skillLines')[0], $skills))
+                        $this->breadcrumb[] = $line;
+                break;
+            case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
+                if ($cf & SPELL_CU_PET_TALENT_TYPE0)
+                    $this->breadcrumb[] = 411;              // Ferocity
+                else if ($cf & SPELL_CU_PET_TALENT_TYPE1)
+                    $this->breadcrumb[] = 409;              // Tenacity
+                else if ($cf & SPELL_CU_PET_TALENT_TYPE2)
+                    $this->breadcrumb[] = 410;              // Cunning
+                break;
+            case -5:
+                if ($this->subject->getField('effect2AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED ||
+                    $this->subject->getField('effect3AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
+                    $this->breadcrumb[] = 2;                // flying (also contains SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, so checked first)
+                else if ($this->subject->getField('effect2AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED ||
+                         $this->subject->getField('effect3AuraId') == SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
+                    $this->breadcrumb[] = 1;                // ground
+                else
+                    $this->breadcrumb[] = 3;                // misc
+        }
+    }
+
+    private function createInfobox() : void
+    {
+        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $typeCat = $this->subject->getField('typeCat');
+
+        // level
+        if (!in_array($typeCat, [-5, -6]))                  // not mount or vanity pet
+        {
+            if ($_ = $this->subject->getField('talentLevel'))
+                $infobox[] = (in_array($typeCat, [-2, 7, -13]) ? Lang::game('reqLevel', [$_]) : Lang::game('level').Lang::main('colon').$_);
+            else if ($_ = $this->subject->getField('spellLevel'))
+                $infobox[] = (in_array($typeCat, [-2, 7, -13]) ? Lang::game('reqLevel', [$_]) : Lang::game('level').Lang::main('colon').$_);
+        }
+
+        $jsg = [];
+        // races
+        if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP))
+        {
+            $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
+            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
+        }
+
+        // classes
+        if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, Lang::FMT_MARKUP))
+        {
+            $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);
+            $t = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
+            $infobox[] = Util::ucFirst($t).Lang::main('colon').$_;
+        }
+
+        // spell focus
+        if ($_ = $this->subject->getField('spellFocusObject'))
+        {
+            if ($sfObj = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = ?d', $_))
+            {
+                $n = Util::localizedString($sfObj, 'name');
+                if ($objId = DB::Aowow()->selectCell('SELECT `id` FROM ?_objects WHERE `spellFocusId` = ?d', $_))
+                    $n = '[url=?object='.$objId.']'.$n.'[/url]';
+
+                $infobox[] =  Lang::game('requires2').' '.$n;
+            }
+        }
+
+        // primary & secondary trades
+        if (in_array($typeCat, [9, 11]))
+        {
+            // skill
+            if ($_ = $this->subject->getField('skillLines')[0])
+            {
+                $this->extendGlobalIds(Type::SKILL, $_);
+
+                $bar = Lang::game('requires', ['&nbsp;[skill='.$_.']']);
+                if ($_ = $this->subject->getField('learnedAt'))
+                    $bar .= ' ('.$_.')';
+
+                $infobox[] = $bar;
+            }
+
+            // specialization
+            if ($_ = $this->subject->getField('reqSpellId'))
+            {
+                $this->extendGlobalIds(Type::SPELL, $_);
+                $infobox[] = Lang::game('requires2').' [spell='.$_.']';
+            }
+
+            // difficulty
+            if ($_ = $this->subject->getColorsForCurrent())
+                $infobox[] = Lang::formatSkillBreakpoints($_);
+        }
+
+        // accquisition..   10: starter spell; 7: discovery
+        if ($this->subject->getSources($s))
+        {
+            if (in_array(SRC_STARTER, $s))
+                $infobox[] = Lang::spell('starter');
+            else if (in_array(SRC_DISCOVERY, $s))
+                $infobox[] = Lang::spell('discovered');
+        }
+
+        // training cost
+        if ($cost = $this->subject->getField('trainingCost'))
+            $infobox[] = Lang::spell('trainingCost').'[money='.$cost.']';
+
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $this->extendGlobalIds(Type::ICON, $_);
+            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+        }
+
+        // used in mode
+        foreach ($this->difficulties as $n => $id)
+            if ($id == $this->typeId)
+                $infobox[] = Lang::game('mode').Lang::game('modes', $n);
+
+        // Creature Type from Aura: Shapeshift
+        foreach ($this->modelInfo as $mI)
+        {
+            if (!isset($mI['creatureType']))
+                continue;
+
+            if ($mI['creatureType'] > 0)
+                $infobox[] = Lang::game('type').Lang::game('ct', $mI['creatureType']);
+
+            break;
+        }
+
+        // spell script
+        if (User::isInGroup(U_GROUP_STAFF))
+            if ($_ = DB::World()->selectCell('SELECT `ScriptName` FROM spell_script_names WHERE ABS(`spell_id`) = ?d', $this->firstRank))
+                $infobox[] = 'Script'.Lang::main('colon').$_;
+
+
+        $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+
+        // append glyph symbol if available
+        $glyphId = 0;
+        for ($i = 1; $i < 4; $i++)
+            if ($this->subject->getField('effect'.$i.'Id') == SPELL_EFFECT_APPLY_GLYPH)
+                $glyphId = $this->subject->getField('effect'.$i.'MiscValue');
+
+        if ($_ = DB::Aowow()->selectCell('SELECT ic.`name` FROM ?_glyphproperties gp JOIN ?_icons ic ON gp.`iconId` = ic.`id` WHERE gp.`spellId` = ?d { OR gp.`id` = ?d }', $this->typeId, $glyphId ?: DBSIMPLE_SKIP))
+            if (file_exists('static/images/wow/Interface/Spellbook/'.$_.'.png'))
+                $this->infobox->append('[img src='.Cfg::get('STATIC_URL').'/images/wow/Interface/Spellbook/'.$_.'.png border=0 float=center margin=15]');
     }
 }
 

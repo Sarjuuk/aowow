@@ -332,9 +332,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 default:
                     for ($i = -count(Game::$skillLineMask); $i < 0; $i++)
                     {
-                        foreach (Game::$skillLineMask[$i] as $k => $pair)
+                        foreach (Game::$skillLineMask[$i] as $k => [, $skillLineId])
                         {
-                            if (in_array($pair[1], $lines))
+                            if (in_array($skillLineId, $lines))
                             {
                                 $update['skillLine1']        = $i;
                                 $update['skillLine2OrMask'] |= 1 << $k;

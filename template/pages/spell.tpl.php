@@ -1,7 +1,12 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+
+    $iconOffset = 0;
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -18,7 +23,7 @@
 
 <?php $this->brick('redButtons'); ?>
 
-                <h1 class="h1-icon"><?=$this->name; ?></h1>
+                <h1 class="h1-icon"><?=$this->h1; ?></h1>
 
 <?php
 $this->brick('tooltip');
@@ -28,6 +33,7 @@ if ($this->tools):
 endif;
 
 if ($this->reagents[1]):
+    $iconOffset += count($this->reagents[1]);
     $this->brick('reagentList', ['reagents' => $this->reagents[1], 'enhanced' => $this->reagents[0]]);
 endif;
 
@@ -41,17 +47,15 @@ if ($this->tools):
                 <h3><?=Lang::spell('tools'); ?></h3>
                 <table class="iconlist">
 <?php
-    foreach ($this->tools as $i => $t):
-        echo '                    <tr><th align="right" id="iconlist-icon'.($i + 1).'"></th><td><span class="q1"><a href="'.$t['url'].'">'.$t['name']."</a></span></td></tr>\n";
+    foreach ($this->tools as $icon):
+        echo $icon->renderContainer(20, $iconOffset, true);
     endforeach;
 ?>
                 </table>
                 <script type="text/javascript">
 <?php
-    foreach ($this->tools as $i => $t):
-        if (isset($t['itemId'])):
-            echo $this->fmtCreateIcon($i + 1, Type::ITEM, $t['itemId'], 20, 'iconlist-icon', size: 0);
-        endif;
+    foreach ($this->tools as $icon):
+        echo $icon->renderJS(20);
     endforeach;
 ?>
                 </script>
@@ -63,10 +67,10 @@ endif;
 ?>
                 <div class="clear"></div>
 
-<?php $this->brick('article'); ?>
-
 <?php
-if (!empty($this->transfer)):
+$this->brick('markup', ['markup' => $this->article]);
+
+if ($this->transfer):
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
 ?>
@@ -111,7 +115,7 @@ endif;
                     </tr>
                     <tr>
                         <th style="border-top: 0"><?=Lang::spell('_cost');?></th>
-                        <td style="border-top: 0"><?=(!empty($this->powerCost) ? $this->powerCost : Lang::spell('_none'));?></td>
+                        <td style="border-top: 0"><?=($this->powerCost ?: Lang::spell('_none'));?></td>
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_range');?></th>
@@ -139,7 +143,7 @@ if ($this->scaling):
 
 <?php
     foreach ($this->scaling as $k => $v):
-        echo '                            '.Lang::spell('scaling', $k, [$v * 100])."<br>\n";
+        echo '                            '.Lang::spell('scaling', $k, [$v * 100])."<br />\n";
     endforeach;
 ?>
                         </td>
@@ -175,7 +179,7 @@ foreach ($this->effects as $i => $e):
     echo '                            '.$e['name'];
 
     if ($e['footer']):
-        echo "<small><br>".implode("<br>", $e['footer'])."</small>\n";
+        echo "<small><br />".implode("<br />", $e['footer'])."</small>\n";
     endif;
 
     if ($e['markup']):
@@ -185,63 +189,54 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
     endif;
 
     if ($e['icon']):
-        ['type' => $ty, 'typeId' => $ti, 'name' => $na, 'quality' => $qu, 'count' => $co] = $e['icon'];
 ?>
                             <table class="icontab">
                                 <tr>
-                                    <th id="icontab-icon<?=++$iconTabIdx;?>"></th>
-<?php
-        if ($qu):
-            echo '                                    <td><span class="q'.$qu.'">'.($na ? sprintf('<a href="?item=%d">%s</a>', $ti, $na) : Util::ucFirst(Lang::game('item')).' #'.$ti)."</span></td>\n";
-        else:
-            echo '                                    <td>'.($na ? sprintf('<a href="?spell=%d">%s</a>', $ti, $na) : Util::ucFirst(Lang::game('spell')).' #'.$ti)."</td>\n";
-        endif;
-?>
+                                    <?=$e['icon']->renderContainer(iconIdxOffset: $iconTabIdx); ?>
                                     <th></th><td></td>
                                 </tr>
                             </table>
                             <script type="text/javascript">
-                                <?=$this->fmtCreateIcon($iconTabIdx, $ty, $ti, num: $co);?>
+                                <?=$e['icon']->renderJS(); ?>
                             </script>
 <?php
     endif;
 
     if ($e['perfectItem']):
-        ['spellId' => $si, 'spellName' => $sn, 'itemId' => $ii, 'itemName' => $in, 'quality' => $qu, 'icon' => $ic, 'chance' => $ch] = $e['perfectItem'];
+        ['spellId' => $si, 'spellName' => $sn, 'item' => $it, 'icon' => $ic, 'chance' => $ch] = $e['perfectItem'];
 ?>
-                            <small><a href="?spell=<?=$si;?>" class="icontiny"><img src="<?=Cfg::get('STATIC_URL');?>/images/wow/icons/tiny/<?=$ic;?>.gif" align="absmiddle">
+                            <small><a href="?spell=<?=$si;?>" class="icontiny"><img src="<?=$this->gStaticUrl;?>/images/wow/icons/tiny/<?=$ic;?>.gif" align="absmiddle">
                                 <span class="tinyicontxt"><?=$sn;?></span></a><?=Lang::main('colon').' '.$ch.'%';?></small><table class="icontab">
-                            <tr><th id="icontab-icon<?=++$iconTabIdx;?>"></th><td><small><a href="?item=<?=$ii;?>" class="q<?=$qu;?>"><?=$in;?></a></small></td></tr></table>
+                            <?=$it->renderContainer(0, $iconTabIdx, true); ?></table>
 
                             <script type="text/javascript">//<![CDATA[
-                                <?=$this->fmtCreateIcon($iconTabIdx, Type::ITEM, $ii);?>
+                                <?=$it->renderJS(); ?>
                             //]]></script>
 
 <?php
     endif;
 
-    if (isset($e['modifies'])):
+    if ($e['modifies']):
 ?>
-                            <br><small><?=Lang::spell('_affected').Lang::main('colon');?></small>
+                            <br /><small><?=Lang::spell('_affected');?></small>
 <?php
-        for ($type = 0; $type < 2; $type++):
+        for ($type = 0; $type < 2; $type++):                // [classSpells, miscSpells]
             if (!$e['modifies'][$type])
                 continue;
 
             $folded   = false;
-            $iconData = [];
 
             if ($type && count($e['modifies'][0]))          // #effectspells-856451 < the number is ID from SpellEffect.db2 (not available in 3.3.5a, use effectIdx instead)
                 echo '<a href="javascript:" class="disclosure-off" onclick="return g_disclose($(\'#effectspells-'.$i.'\')[0], this);">'.Lang::spell('_seeMore').'</a><div id="effectspells-'.$i.'" style="display: none">';
 
             echo '<table class="icontab">';
 
-            foreach ($e['modifies'][$type] as $idx => [$id, $name, $minRank, $maxRank]):
+            foreach ($e['modifies'][$type] as $idx => [$icon, $ranks]):
                 if (!$idx || !($idx % 3))
                     echo "<tr".($folded ? ' style="display:none;"' : '').">";
 
-                $iconData[] = [++$iconTabIdx, $id];
-                echo "<th id=\"icontab-icon".$iconTabIdx."\"></th><td><a href=\"?spell=".$id."\">".($type ? $name : "<b>".$name."</b>")."</a>".($minRank != $maxRank ? "<br><small>(".Lang::spell('_rankRange', [$minRank, $maxRank]).")</small>" : '')."</td>\n";
+                $icon->renderContainer(iconIdxOffset: $iconTabIdx); // just to assign iconOffset
+                echo "<th id=\"icontab-icon".$iconTabIdx."\"></th><td><a href=\"?spell=".$icon->typeId."\">".($type ? $icon->text : "<b>".$icon->text."</b>")."</a>".($ranks ? "<br /><small>(".Lang::spell('_rankRange', $ranks).")</small>" : '')."</td>\n";
 
                 if ($idx == count($e['modifies'][$type]) - 1 || !(($idx + 1) % 3))
                     echo "</tr>";
@@ -265,8 +260,8 @@ $WH.aE(window,\'load\',function(){$WH.ge(\'spelleffectmarkup-'.$i.'\').innerHTML
 
                             <script type="text/javascript">//<![CDATA[
 <?php
-            foreach ($iconData as [$idx, $spell])
-                echo $this->fmtCreateIcon($idx, Type::SPELL, $spell, 32, size: 0);
+            foreach ($e['modifies'][$type] as [$icon, ])
+                echo $icon->renderJS(32);
 ?>
                             //]]></script>
 
@@ -301,7 +296,7 @@ if ($this->attributes):
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>

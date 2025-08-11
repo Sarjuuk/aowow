@@ -6,25 +6,38 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 1: Spell    g_initPath()
-//  tabId 0: Database g_initHeader()
-class SpellsPage extends GenericPage
+class SpellsBaseResponse extends TemplateResponse implements ICache
 {
-    use TrListPage;
+    use TrListPage, TrCache;
 
-    protected $classPanel    = false;
-    protected $glyphPanel    = false;
+    private const SHORT_FILTER = array(
+        SKILL_FIRST_AID      => [ 6,  7],
+        SKILL_BLACKSMITHING  => [ 2,  4],
+        SKILL_LEATHERWORKING => [ 8,  1],
+        SKILL_ALCHEMY        => [ 1,  6],
+        SKILL_COOKING        => [ 3,  5],
+        SKILL_MINING         => [ 9,  0],
+        SKILL_TAILORING      => [10,  2],
+        SKILL_ENGINEERING    => [ 5,  3],
+        SKILL_ENCHANTING     => [ 4,  8],
+        SKILL_FISHING        => [ 0,  9],
+        SKILL_JEWELCRAFTING  => [ 7, 10],
+        SKILL_INSCRIPTION    => [15,  0],
+    );
 
-    protected $type          = Type::SPELL;
-    protected $tpl           = 'spells';
-    protected $path          = [0, 1];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/filters.js']];
+    protected  int    $type        = Type::SPELL;
+    protected  int    $cacheType   = CACHE_TYPE_PAGE;
 
-    protected $_get          = ['filter' => ['filter' => FILTER_UNSAFE_RAW]];
+    protected  string $template    = 'spells';
+    protected  string $pageName    = 'spells';
+    protected ?int    $activeTab   = parent::TAB_DATABASE;
+    protected  array  $breadcrumb  = [0, 1];
 
-    protected $validCats     = array(
+    protected  array  $scripts     = [[SC_JS_FILE, 'js/filters.js']];
+    protected  array  $expectedGET = array(
+        'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]
+    );
+    protected  array  $validCats   = array(
         -2  => array(                                       // Talents: Class => Skill
             1  => [ 26, 256, 257],
             2  => [594, 267, 184],
@@ -59,7 +72,7 @@ class SpellsPage extends GenericPage
             9  => [355, 354, 593],
             11 => [574, 134, 573]
         ),
-        9   => SKILLS_TRADE_SECONDARY,                      // Secondary Skills
+        9   => [129, 185, 356, 762],                        // Secondary Skills
         11  => array(                                       // Professions: Skill => Spell
             SKILL_ALCHEMY        => true,
             SKILL_BLACKSMITHING  => [9788, 9787, 17041, 17040, 17039],
@@ -75,41 +88,87 @@ class SpellsPage extends GenericPage
         )
     );
 
-    private   $shortFilter   = array(
-        SKILL_FIRST_AID      => [ 6,  7],
-        SKILL_BLACKSMITHING  => [ 2,  4],
-        SKILL_LEATHERWORKING => [ 8,  1],
-        SKILL_ALCHEMY        => [ 1,  6],
-        SKILL_COOKING        => [ 3,  5],
-        SKILL_MINING         => [ 9,  0],
-        SKILL_TAILORING      => [10,  2],
-        SKILL_ENGINEERING    => [ 5,  3],
-        SKILL_ENCHANTING     => [ 4,  8],
-        SKILL_FISHING        => [ 0,  9],
-        SKILL_JEWELCRAFTING  => [ 7, 10],
-        SKILL_INSCRIPTION    => [15,  0],
-    );
+    public bool $classPanel = false;
+    public bool $glyphPanel = false;
 
-
-    public function __construct($pageCall, $pageParam)
+    public function __construct(string $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
 
-        parent::__construct($pageCall, $pageParam);
+        parent::__construct($pageParam);
 
-        $this->filterObj = new SpellListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
-
-        $this->name   = Util::ucFirst(Lang::game('spells'));
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        $this->filter = new SpellListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        $this->filterError = $this->filter->error;
     }
 
-    protected function generateContent()
+    protected function generate() : void
     {
-        $conditions   = [];
-        $visibleCols  = [];
-        $hiddenCols   = [];
-        $extraCols    = [];
-        $tabData      = ['data' => []];
+        $this->h1 = Util::ucFirst(Lang::game('spells'));
+
+        $conditions  = [];
+        if (!User::isInGroup(U_GROUP_EMPLOYEE))
+            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
+
+        $this->filter->evalCriteria();
+
+        if ($_ = $this->filter->getConditions())
+            $conditions[] = $_;
+
+        $this->filterError = $this->filter->error;          // maybe the evalX() caused something
+
+
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        foreach ($this->category as $c)
+            $this->breadcrumb[] = $c;
+
+        $fiForm = $this->filter->values;
+        if (count($this->breadcrumb) == 4 && $this->category[0] == -13 && count($fiForm['gl']) == 1)
+            $this->breadcrumb[] = $fiForm['gl'];
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        $foo = [];
+        $c = $this->category;                               // shothand
+        if (isset($c[2]) && $c[0] == 11)
+            array_unshift($foo, Lang::spell('cat', $c[0], $c[1], $c[2]));
+        else if (isset($c[1]))
+        {
+            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::game('cl') : Lang::spell('cat', $c[0]);
+            array_unshift($foo, is_array($_[$c[1]]) ? $_[$c[1]][0] : $_[$c[1]]);
+        }
+
+        if (isset($c[0]) && count($foo) < 2)
+        {
+            $_ = Lang::spell('cat', $c[0]);
+            array_unshift($foo, is_array($_) ? $_[0] : $_);
+        }
+
+        if (count($foo) < 2)
+            array_unshift($foo, $this->h1);
+
+        foreach ($foo as $bar)
+            array_unshift($this->title, $bar);
+
+
+        /****************/
+        /* Main Content */
+        /****************/
+
+        $visibleCols = [];
+        $hiddenCols  = [];
+        $extraCols   = [];
+        $tabData     = ['data' => []];
+
+        $this->redButtons[BUTTON_WOWHEAD] = true;
+        if ($fiQuery = $this->filter->buildGETParam())
+            $this->wowheadLink .= '&filter='.$fiQuery;
 
         // the next lengthy ~250 lines determine $conditions and lvParams
         if ($this->category)
@@ -140,9 +199,9 @@ class SpellsPage extends GenericPage
                         $xCond = null;
                         for ($i = -2; $i < 0; $i++)
                         {
-                            foreach (Game::$skillLineMask[$i] as $idx => $pair)
+                            foreach (Game::$skillLineMask[$i] as $idx => [, $skillLineId])
                             {
-                                if ($pair[1] == $this->category[1])
+                                if ($skillLineId == $this->category[1])
                                 {
                                     $xCond = ['AND', ['s.skillLine1', $i], ['s.skillLine2OrMask', 1 << $idx, '&']];
                                     break;
@@ -186,15 +245,18 @@ class SpellsPage extends GenericPage
                         {
                             case 1:
                                 $conditions[] = ['OR',
-                                    ['AND', ['effect2AuraId', 32], ['effect3AuraId', 207, '!']],
-                                    ['AND', ['effect3AuraId', 32], ['effect2AuraId', 207, '!']]
+                                    ['AND', ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']],
+                                    ['AND', ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']]
                                 ];
                                 break;
                             case 2:
-                                $conditions[] = ['OR', ['effect2AuraId', 207], ['effect3AuraId', 207]];
+                                $conditions[] = ['OR', ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED]];
                                 break;
                             case 3:
-                                $conditions[] = ['AND', ['effect2AuraId', 32, '!'], ['effect2AuraId', 207, '!'], ['effect3AuraId', 32, '!'],['effect3AuraId', 207, '!']];
+                                $conditions[] = ['AND',
+                                    ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, '!'], ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!'],
+                                    ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, '!'], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']
+                                ];
                                 break;
                         }
                     }
@@ -211,15 +273,15 @@ class SpellsPage extends GenericPage
                     {
                         switch ($this->category[1])         // Spells can be used by multiple specs
                         {
-                            case 409:                       // Tenacity
+                            case 409:                       // TalentTab - Tenacity
                                 $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE1, '&'];
                                 $url          = '?pets=1';
                                 break;
-                            case 410:                       // Cunning
+                            case 410:                       // TalentTab - Cunning
                                 $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE2, '&'];
                                 $url          = '?pets=2';
                                break;
-                            case 411:                       // Ferocity
+                            case 411:                       // TalentTab - Ferocity
                                 $conditions[] = ['s.cuFlags', SPELL_CU_PET_TALENT_TYPE0, '&'];
                                 $url          = '?pets=0';
                                 break;
@@ -228,7 +290,7 @@ class SpellsPage extends GenericPage
                         $tabData['note'] = '$$WH.sprintf(LANG.lvnote_pettalents, "'.$url.'")';
                     }
 
-                    $tabData['_petTalents'] = 1;            // not conviced, this is correct, but .. it works
+                    $tabData['_petTalents'] = 1;
 
                     break;
                 case -11:                                   // Proficiencies ... the subIds are actually SkillLineCategories
@@ -309,22 +371,22 @@ class SpellsPage extends GenericPage
                             ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
                         ];
 
-                        if (!empty($this->shortFilter[$this->category[1]]))
+                        if (!empty(self::SHORT_FILTER[$this->category[1]]))
                         {
-                            $sf  = $this->shortFilter[$this->category[1]];
+                            [$crafted, $relItems] = self::SHORT_FILTER[$this->category[1]];
                             $txt = '';
-                            if ($sf[0] && $sf[1])
-                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]) . Lang::spell('relItems', 'link') . sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
-                            else if ($sf[0])
-                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]);
-                            else if ($sf[1])
-                                $txt = sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
+                            if ($crafted && $relItems)
+                                $txt = Lang::spell('relItems', 'crafted', [$crafted]) . Lang::spell('relItems', 'link') . Lang::spell('relItems', 'recipes', [$relItems]);
+                            else if ($crafted)
+                                $txt = Lang::spell('relItems', 'crafted', [$crafted]);
+                            else if ($relItems)
+                                $txt = Lang::spell('relItems', 'recipes', [$relItems]);
 
                             $note = Lang::spell('cat', $this->category[0], $this->category[1]);
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $tabData['note'] = sprintf(Lang::spell('relItems', 'base'), $txt, $note);
+                            $tabData['note'] = Lang::spell('relItems', 'base', [$txt, $note]);
                             $tabData['sort'] = ['skill', 'name'];
                         }
                     }
@@ -349,22 +411,22 @@ class SpellsPage extends GenericPage
                     {
                         $conditions[] = ['s.skillLine1', $this->category[1]];
 
-                        if (!empty($this->shortFilter[$this->category[1]]))
+                        if (!empty(self::SHORT_FILTER[$this->category[1]]))
                         {
-                            $sf  = $this->shortFilter[$this->category[1]];
+                            [$crafted, $relItems] = self::SHORT_FILTER[$this->category[1]];
                             $txt = '';
-                            if ($sf[0] && $sf[1])
-                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]) . Lang::spell('relItems', 'link') . sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
-                            else if ($sf[0])
-                                $txt = sprintf(Lang::spell('relItems', 'crafted'), $sf[0]);
-                            else if ($sf[1])
-                                $txt = sprintf(Lang::spell('relItems', 'recipes'), $sf[1]);
+                            if ($crafted && $relItems)
+                                $txt = Lang::spell('relItems', 'crafted', [$crafted]) . Lang::spell('relItems', 'link') . Lang::spell('relItems', 'recipes', [$relItems]);
+                            else if ($crafted)
+                                $txt = Lang::spell('relItems', 'crafted', [$crafted]);
+                            else if ($relItems)
+                                $txt = Lang::spell('relItems', 'recipes', [$relItems]);
 
                             $note = Lang::spell('cat', $this->category[0], $this->category[1]);
                             if (is_array($note))
                                 $note = $note[0];
 
-                            $tabData['note'] = sprintf(Lang::spell('relItems', 'base'), $txt, $note);
+                            $tabData['note'] = Lang::spell('relItems', 'base', [$txt, $note]);
                             $tabData['sort'] = ['skill', 'name'];
                         }
                     }
@@ -383,14 +445,6 @@ class SpellsPage extends GenericPage
             }
         }
 
-        if (!User::isInGroup(U_GROUP_EMPLOYEE))
-            $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
-
-        $this->filterObj->evalCriteria();
-
-        if ($_ = $this->filterObj->getConditions())
-            $conditions[] = $_;
-
         $spells = new SpellList($conditions, ['calcTotal' => true]);
 
         $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
@@ -404,27 +458,27 @@ class SpellsPage extends GenericPage
             {
                 $lvData[$spellId]['speed'] = 0;
 
-                if (in_array($spells->getField('effect2AuraId'), [32, 207, 58]))
+                if (in_array($spells->getField('effect2AuraId'), [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
                     $lvData[$spellId]['speed'] = $spells->getField('effect2BasePoints') + 1;
-                if (in_array($spells->getField('effect3AuraId'), [32, 207, 58]))
+                if (in_array($spells->getField('effect3AuraId'), [SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, SPELL_AURA_MOD_INCREASE_SWIM_SPEED]))
                     $lvData[$spellId]['speed'] = max($lvData[$spellId]['speed'], $spells->getField('effect3BasePoints') + 1);
 
-                if (!$lvData[$spellId]['speed'] && ($spells->getField('effect2AuraId') == 4 || $spells->getField('effect3AuraId') == 4))
+                if (!$lvData[$spellId]['speed'] && ($spells->getField('effect2AuraId') == SPELL_AURA_DUMMY || $spells->getField('effect3AuraId') == SPELL_AURA_DUMMY))
                     $lvData[$spellId]['speed'] = '?';
                 else
                     $lvData[$spellId]['speed'] = '+'.$lvData[$spellId]['speed'].'%';
             }
         }
 
-        $tabData['data'] = array_values($lvData);
+        $tabData['data'] = $lvData;
 
-        if ($this->filterObj->fiExtraCols)
+        if ($this->filter->fiExtraCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
         else if ($extraCols)
             $tabData['extraCols'] = $extraCols;
 
         // add source to cols if explicitly searching for it
-        if ($this->filterObj->getSetCriteria(9) && !in_array('source', $visibleCols))
+        if ($this->filter->getSetCriteria(9) && !in_array('source', $visibleCols))
             $visibleCols[] = 'source';
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
@@ -433,10 +487,6 @@ class SpellsPage extends GenericPage
             $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
             $tabData['_truncated'] = 1;
         }
-
-        if ($this->filterObj->error)
-            $tabData['_errors'] = 1;
-
 
         $mask = $spells->hasSetFields('skillLines', 'trainingCost', 'reqClassMask', null, 'reagent1', 'reagent2', 'reagent3', 'reagent4', 'reagent5', 'reagent6', 'reagent7', 'reagent8');
         if (!($mask & 0x1) && $this->category && !in_array($this->category[0], [9, 11]))
@@ -455,51 +505,21 @@ class SpellsPage extends GenericPage
         if ($hiddenCols)
             $tabData['hiddenCols'] = array_unique($hiddenCols);
 
-        $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
+        $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
+
+        parent::generate();
+
+        $this->setOnCacheLoaded([self::class, 'onBeforeDisplay']);
     }
 
-    protected function postCache()
+    protected static function onBeforeDisplay() : void
     {
         // sort for dropdown-menus
         Lang::sort('game', 'ra');
         Lang::sort('game', 'cl');
         Lang::sort('game', 'sc');
         Lang::sort('game', 'me');
-    }
-
-    protected function generateTitle()
-    {
-        $foo = [];
-        $c = $this->category;                               // shothand
-        if (isset($c[2]) && $c[0] == 11)
-            array_unshift($foo, Lang::spell('cat', $c[0], $c[1], $c[2]));
-        else if (isset($c[1]))
-        {
-            $_ = in_array($c[0], [-2, -13, 7]) ? Lang::game('cl') : Lang::spell('cat', $c[0]);
-            array_unshift($foo, is_array($_[$c[1]]) ? $_[$c[1]][0] : $_[$c[1]]);
-        }
-
-        if (isset($c[0]) && count($foo) < 2)
-        {
-            $_ = Lang::spell('cat', $c[0]);
-            array_unshift($foo, is_array($_) ? $_[0] : $_);
-        }
-
-        if (count($foo) < 2)
-            array_unshift($foo, $this->name);
-
-        foreach ($foo as $bar)
-            array_unshift($this->title, $bar);
-    }
-
-    protected function generatePath()
-    {
-        foreach ($this->category as $c)
-            $this->path[] = $c;
-
-        $form = $this->filterObj->values;
-        if (count($this->path) == 4 && $this->category[0] == -13 && count($form['gl']) == 1)
-            $this->path[] = $form['gl'][0];
     }
 }
 
