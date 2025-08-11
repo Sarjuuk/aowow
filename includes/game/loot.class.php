@@ -47,8 +47,9 @@ class Loot
     {
         reset($this->results);
 
-        foreach ($this->results as $k => $__)
-            yield $k => $this->results[$k];
+        foreach ($this->results as $k => [, $tabData])
+            if ($tabData['data'])                           // only yield tabs with content
+                yield $k => $this->results[$k];
     }
 
     public function getResult() : array

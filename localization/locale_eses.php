@@ -1390,7 +1390,7 @@ $lang = array(
     ),
     'currency' => array(
         'notFound'      => "Esta moneda no existe.",
-        'cap'           => "Límite total",
+        'cap'           => "Límite total: ",
         'cat'           => array(
             1 => "Miscelánea", 2 => "Jugador contra Jugador", 4 => "Clásico", 21 => "Wrath of the Lich King", 22 => "Mazmorra y banda", 23 => "Burning Crusade", 41 => "Prueba", 3 => "No las uso"
         )

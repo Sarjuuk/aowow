@@ -1390,7 +1390,7 @@ $lang = array(
     ),
     'currency' => array(
         'notFound'      => "Cette monnaie n'existe pas.",
-        'cap'           => "Maximum total",
+        'cap'           => "Maximum total : ",
         'cat'           => array(
             1 => "Divers", 2 => "JcJ", 4 => "Classique", 21 => "Wrath of the Lich King", 22 => "Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Inutilisées"
         )

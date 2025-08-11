@@ -1390,7 +1390,7 @@ $lang = array(
     ),
     'currency' => array(
         'notFound'      => "Такая валюта не существует.",
-        'cap'           => "Максимум всего",
+        'cap'           => "Максимум всего: ",
         'cat'           => array(
             1 => "Разное", 2 => "PvP", 4 => "World of Warcraft", 21 => "Wrath of the Lich King", 22 => "Подземелья и рейды", 23 => "Burning Crusade", 41 => "Test", 3 => "Неактивно"
         )

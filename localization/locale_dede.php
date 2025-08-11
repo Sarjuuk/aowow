@@ -1390,7 +1390,7 @@ $lang = array(
     ),
     'currency' => array(
         'notFound'      => "Diese Währung existiert nicht.",
-        'cap'           => "Obergrenze",
+        'cap'           => "Obergrenze: ",
         'cat'           => array(
             1 => "Verschiedenes", 2 => "Spieler gegen Spieler", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon und Schlachtzug", 23 => "Burning Crusade", 41 => "Test", 3 => "Unbenutzt"
         )
