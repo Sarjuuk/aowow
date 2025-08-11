@@ -1429,7 +1429,7 @@ $lang = array(
         'spillover'     => "声望额外效果",
         'spilloverDesc' => "获得这个阵营的声望也将按比例获得下列阵营的声望。",
         'maxStanding'   => "最大关系",
-        'quartermaster' => "军需官",
+        'quartermaster' => "军需官：",
         'customRewRate' => "自定义奖励率",
         '_transfer'     => '这个阵营的声望将被转换到<a href="?faction=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
