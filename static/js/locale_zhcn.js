@@ -2871,7 +2871,7 @@ var LANG = {
     lvnote_entitiesfound:     "找到$1$2 (显示$3)",
     lvnote_itemsfound:        "找到$1件物品 (显示$2件)",
     lvnote_itemsetsfound:     "找到$1个物品组合 (显示$2个)",
-    lvnote_npcsfound:         "找到$1个NPC (显示$2个)	",
+    lvnote_npcsfound:         "找到$1个NPC (显示$2个)",
     lvnote_objectsfound:      "找到$1件物品 (显示$2件)",
     lvnote_questsfound:       "找到$1个任务 (显示$2个)",
     lvnote_questsind:         '任务位于分类 <a href="?quests=$1.$2" target="_blank">$3</a>。',

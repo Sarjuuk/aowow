@@ -23,8 +23,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab   = parent::TAB_DATABASE;
     protected  array  $breadcrumb  = [0, 1];
 
-    protected  array  $scripts     = [[SC_JS_FILE, 'js/swfobject.js']];
-
     public  int    $type       = Type::SPELL;
     public  int    $typeId     = 0;
     public  array  $reagents   = [false, null];

@@ -9,8 +9,6 @@ if (!CLI)
     die('not in cli mode');
 
 
-// Create 'locale.js'-file in static/js
-
 /*
         0: { // English
             id: LOCALE_ENUS,
@@ -55,11 +53,13 @@ CLISetup::registerSetup("build", new class extends SetupScript
     use TrTemplateFile;
 
     protected $info = array(
-        'locales' => [[], CLISetup::ARGV_PARAM, 'Compiles the Locale Object (static/js/locale.js) with available languages.']
+        'globaljs' => [[], CLISetup::ARGV_PARAM, 'Compiles the global javascript file (static/js/global.js).']
     );
 
-    protected $fileTemplateDest = ['static/js/locale.js'];
-    protected $fileTemplateSrc  = ['locale.js.in'];
+    protected $fileTemplateDest = ['static/js/global.js'];
+    protected $fileTemplateSrc  = ['global.js'];
+
+    private bool $numFmt = false;
 
     private function locales() : string
     {

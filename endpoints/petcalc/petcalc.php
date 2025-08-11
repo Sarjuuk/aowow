@@ -19,7 +19,6 @@ class PetcalcBaseResponse extends TemplateResponse
         [SC_CSS_FILE, 'css/talentcalc.css'],
         [SC_CSS_FILE, 'css/talent.css'],
         [SC_JS_FILE,  'js/petcalc.js'],
-        [SC_JS_FILE,  'js/swfobject.js'],
         [SC_CSS_FILE, 'css/petcalc.css']
     );
 

@@ -17,7 +17,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab  = parent::TAB_DATABASE;
     protected  array  $breadcrumb = [0, 2];
 
-    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js'], [SC_JS_FILE, 'js/Summary.js']];
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/Summary.js']];
 
     public  int     $type        = Type::ITEMSET;
     public  int     $typeId      = 0;

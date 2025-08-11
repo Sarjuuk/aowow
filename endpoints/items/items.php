@@ -19,7 +19,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
     protected  array  $breadcrumb  = [0, 0];
 
     protected  array  $dataLoader  = ['weight-presets'];
-    protected  array  $scripts     = [[SC_JS_FILE, 'js/filters.js'], [SC_JS_FILE, 'js/swfobject.js']];
+    protected  array  $scripts     = [[SC_JS_FILE, 'js/filters.js']];
     protected  array  $expectedGET = array(
         'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]
     );

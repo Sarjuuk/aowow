@@ -111,8 +111,6 @@ class TemplateResponse extends BaseResponse
         [SC_JS_FILE,  'widgets/power.js',       SC_FLAG_NO_TIMESTAMP | SC_FLAG_APPEND_LOCALE],
         [SC_JS_FILE,  'js/locale_%s.js',        SC_FLAG_LOCALIZED                           ],
         [SC_JS_FILE,  'js/global.js'                                                        ],
-        [SC_JS_FILE,  'js/locale.js'                                                        ],
-        [SC_JS_FILE,  'js/Markup.js'                                                        ],
         [SC_CSS_FILE, 'css/basic.css'                                                       ],
         [SC_CSS_FILE, 'css/global.css'                                                      ],
         [SC_CSS_FILE, 'css/aowow.css'                                                       ],

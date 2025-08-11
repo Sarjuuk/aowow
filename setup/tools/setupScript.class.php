@@ -89,20 +89,36 @@ trait TrTemplateFile
                 return;
             }
 
-            $content = file_get_contents($file);
-            if (!$content)
+            $result = '';
+
+            if (is_dir($file))
             {
-                CLI::write('[build] template file is not readable - '.CLI::bold($file), CLI::LOG_ERROR);
-                $this->success = false;
-                return;
+                $i = 0;
+                foreach (glob($file.'/[A-Za-z0-9-_]*.*') as $f)
+                {
+                    $i++;
+                    if (($content = $this->applyCfg($f)) === null)
+                        return;
+
+                    yield $content;
+
+                    $result .= $content . "\n";
+                }
+
+                if (!$i)
+                    CLI::write('[build] template dir is empty - '.CLI::bold($file), CLI::LOG_WARN);
+            }
+            else /* if (is_file($file)) */
+            {
+                if (($content = $this->applyCfg($file)) === null)
+                    return;
+
+                yield $content;
+
+                $result .= $content . "\n";
             }
 
-            // replace constants
-            $content = Cfg::applyToString($content);
-
-            yield $content;
-
-            if (CLISetup::writeFile($this->fileTemplateDest[$idx], $content))
+            if (CLISetup::writeFile($this->fileTemplateDest[$idx], $result))
                 continue;
 
             $this->success = false;
@@ -133,6 +149,17 @@ trait TrTemplateFile
                 }
             }
         }
+    }
+
+    private function applyCfg($file) : ?string
+    {
+        // replace constants
+        if ($content = file_get_contents($file))
+            return Cfg::applyToString($content, $this->numFmt ?? true);
+
+        CLI::write('[build] template file is not readable - '.CLI::bold($file), CLI::LOG_ERROR);
+        $this->success = false;
+        return null;
     }
 }
 

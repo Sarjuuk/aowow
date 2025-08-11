@@ -17,8 +17,6 @@ class PetBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab  = parent::TAB_DATABASE;
     protected  array  $breadcrumb = [0, 8];
 
-    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js']];
-
     public  int    $type       = Type::PET;
     public  int    $typeId     = 0;
     public ?string $expansion  = null;

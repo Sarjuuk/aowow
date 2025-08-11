@@ -17,7 +17,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab  = parent::TAB_DATABASE;
     protected  array  $breadcrumb = [0, 4];
 
-    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js'], [SC_CSS_FILE, 'css/Profiler.css']];
+    protected  array  $scripts    = [[SC_CSS_FILE, 'css/Profiler.css']];
 
     public  int    $type        = Type::NPC;
     public  int    $typeId      = 0;

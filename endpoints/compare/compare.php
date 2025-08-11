@@ -20,7 +20,6 @@ class CompareBaseResponse extends TemplateResponse
         [SC_JS_FILE,  'js/Draggable.js'],
         [SC_JS_FILE,  'js/filters.js'],
         [SC_JS_FILE,  'js/Summary.js'],
-        [SC_JS_FILE,  'js/swfobject.js'],
         [SC_CSS_FILE, 'css/Summary.css']
     );
     protected  array $expectedGET    = array(

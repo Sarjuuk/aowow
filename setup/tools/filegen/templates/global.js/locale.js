@@ -16,43 +16,51 @@ var Locale = {
     // All
     locales: /*setup:locales*/,
 
-    getAll: function() {
+    getAll: function()
+    {
         var result = [];
 
-        for (var id in Locale.locales) {
+        for (var id in Locale.locales)
+        {
             result.push(Locale.locales[id]);
         }
 
         return result;
     },
 
-    getAllByName: function() {
+    getAllByName: function()
+    {
         var result = Locale.getAll();
 
-        result.sort(function(a, b) {
+        result.sort(function(a, b)
+        {
             return $WH.strcmp(a.description, b.description);
         });
 
         return result;
     },
 
-    getId: function() {
+    getId: function()
+    {
         return Locale.current.id;
     },
 
-    getName: function() {
+    getName: function()
+    {
         var localeId = Locale.getId();
 
         return Locale.locales[localeId].name;
     },
 
-    get: function() {
+    get: function()
+    {
         var localeId = Locale.getId();
 
         return Locale.locales[localeId];
     },
 
-    set: function(localeId) {
+    set: function(localeId)
+    {
         $.extend(Locale.current, Locale.locales[localeId]);
     }
 

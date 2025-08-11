@@ -19,7 +19,6 @@ class ProfileBaseResponse extends TemplateResponse
     protected  array  $scripts    = array(
         [SC_JS_FILE,  'js/filters.js'],
         [SC_JS_FILE,  'js/TalentCalc.js'],
-        [SC_JS_FILE,  'js/swfobject.js'],
         [SC_JS_FILE,  'js/profile_all.js'],
         [SC_JS_FILE,  'js/profile.js'],
         [SC_JS_FILE,  'js/Profiler.js'],

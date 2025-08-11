@@ -48,17 +48,17 @@ class Cfg
     private static $isLoaded = false;
 
     private static $rebuildScripts = array(
-    //  'rep_req_border_unco' => ['global'],                // currently not a template or buildScript
-    //  'rep_req_border_rare' => ['global'],
-    //  'rep_req_border_epic' => ['global'],
-    //  'rep_req_border_lege' => ['global'],
-        'profiler_enable'     => ['realms', 'realmMenu'],
-        'battlegroup'         => ['realms', 'realmMenu'],
-        'name_short'          => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo'],
-        'site_host'           => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo', 'power'],
-        'static_host'         => ['searchplugin', 'searchboxBody', 'searchboxScript', 'power'],
-        'contact_email'       => ['markup'],
-        'locales'             => ['locales']
+        'rep_req_border_uncommon'  => ['globaljs'],
+        'rep_req_border_rare'      => ['globaljs'],
+        'rep_req_border_epic'      => ['globaljs'],
+        'rep_req_border_legendary' => ['globaljs'],
+        'profiler_enable'          => ['realms', 'realmMenu'],
+        'battlegroup'              => ['realms', 'realmMenu'],
+        'name_short'               => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo'],
+        'site_host'                => ['searchplugin', 'searchboxBody', 'searchboxScript', 'demo', 'power'],
+        'static_host'              => ['searchplugin', 'searchboxBody', 'searchboxScript', 'power'],
+        'contact_email'            => ['globaljs'],
+        'locales'                  => ['globaljs']
     );
 
     public static function load() : void
@@ -294,16 +294,16 @@ class Cfg
                 yield $k => self::$store[$k];
     }
 
-    public static function applyToString(string $string) : string
+    public static function applyToString(string $string, bool $nf = true) : string
     {
         return preg_replace_callback(
             ['/CFG_([A-Z_]+)/', '/((HOST|STATIC)_URL)/'],
-            function ($m) {
+            function ($m) use ($nf) {
                 if (!isset(self::$store[strtolower($m[1])]))
                     return $m[1];
 
                 [$val, $flags, , , ] = self::$store[strtolower($m[1])];
-                return $flags & (self::FLAG_TYPE_FLOAT | self::FLAG_TYPE_INT) ? Lang::nf($val) : $val;
+                return ($flags & (self::FLAG_TYPE_FLOAT | self::FLAG_TYPE_INT)) && $nf ? Lang::nf($val) : $val;
             },
             $string
         );

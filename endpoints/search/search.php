@@ -23,7 +23,6 @@ class SearchBaseResponse extends TemplateResponse implements ICache
     protected  string $pageName    = 'search';
     protected ?int    $activeTab   = parent::TAB_DATABASE;
 
-    protected  array  $scripts     = [[SC_JS_FILE, 'js/swfobject.js']];
     protected  array  $expectedGET = array(
         'search' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']]
     );

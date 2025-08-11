@@ -19,8 +19,6 @@ class ClassBaseResponse extends TemplateResponse implements ICache
     protected ?int    $activeTab  = parent::TAB_DATABASE;
     protected  array  $breadcrumb = [0, 12];
 
-    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js']];
-
     public  int     $type      = Type::CHR_CLASS;
     public  int     $typeId    = 0;
     public ?string  $expansion = null;

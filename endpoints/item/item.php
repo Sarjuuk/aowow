@@ -18,7 +18,6 @@ class ItemBaseResponse extends TemplateResponse implements ICache
     protected  array  $breadcrumb  = [0, 0];
 
     protected  array  $scripts     = array(
-        [SC_JS_FILE, 'js/swfobject.js'],
         [SC_JS_FILE, 'js/profile.js'],
         [SC_JS_FILE, 'js/filters.js']
     );
