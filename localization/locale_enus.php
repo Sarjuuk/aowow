@@ -1175,7 +1175,7 @@ $lang = array(
     ),
     'race' => array(
         'notFound'      => "This race doesn't exist.",
-        'racialLeader'  => "Racial leader",
+        'racialLeader'  => "Racial leader: ",
         'startZone'     => "Starting zone",
     ),
     'maps' => array(

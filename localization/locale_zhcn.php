@@ -1174,7 +1174,7 @@ $lang = array(
     ),
     'race' => array(
         'notFound'      => "这个种族不存在。",
-        'racialLeader'  => "种族领袖",
+        'racialLeader'  => "种族领袖：",
         'startZone'     => "起始区域"
     ),
     'maps' => array(
