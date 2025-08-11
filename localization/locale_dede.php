@@ -1175,7 +1175,7 @@ $lang = array(
     ),
     'race' => array(
         'notFound'      => "Dieses Volk existiert nicht.",
-        'racialLeader'  => "Volksanführer",
+        'racialLeader'  => "Volksanführer: ",
         'startZone'     => "Startgebiet",
     ),
     'maps' => array(
