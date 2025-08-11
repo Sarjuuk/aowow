@@ -94,9 +94,10 @@ class SpellsPage extends GenericPage
     public function __construct($pageCall, $pageParam)
     {
         $this->getCategoryFromUrl($pageParam);
-        $this->filterObj = new SpellListFilter(false, ['parentCats' => $this->category]);
 
         parent::__construct($pageCall, $pageParam);
+
+        $this->filterObj = new SpellListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
 
         $this->name   = Util::ucFirst(Lang::game('spells'));
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
@@ -385,6 +386,8 @@ class SpellsPage extends GenericPage
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
+        $this->filterObj->evalCriteria();
+
         if ($_ = $this->filterObj->getConditions())
             $conditions[] = $_;
 
@@ -415,27 +418,14 @@ class SpellsPage extends GenericPage
 
         $tabData['data'] = array_values($lvData);
 
-        // recreate form selection
-        $this->filter             = $this->filterObj->getForm();
-        $this->filter['query']    = $this->_get['filter'];
-        $this->filter['initData'] = ['init' => 'spells'];
-
-        if ($ec = $this->filterObj->getExtraCols())
-        {
-            $this->filter['initData']['ec'] = $ec;
+        if ($this->filterObj->fiExtraCols)
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
-        }
         else if ($extraCols)
             $tabData['extraCols'] = $extraCols;
 
-        if ($sc = $this->filterObj->getSetCriteria())
-        {
-            $this->filter['initData']['sc'] = $sc;
-
-            // add source to cols if explicitly searching for it
-            if (in_array(9, $sc['cr']) && !in_array('source', $visibleCols))
-                $visibleCols[] = 'source';
-        }
+        // add source to cols if explicitly searching for it
+        if ($this->filterObj->getSetCriteria(9) && !in_array('source', $visibleCols))
+            $visibleCols[] = 'source';
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
         if ($spells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
@@ -507,9 +497,9 @@ class SpellsPage extends GenericPage
         foreach ($this->category as $c)
             $this->path[] = $c;
 
-        $form = $this->filterObj->getForm();
-        if (count($this->path) == 4 && $this->category[0] == -13 && isset($form['gl']) && count($form['gl']) == 1)
-            $this->path[] = $form['gl'];
+        $form = $this->filterObj->values;
+        if (count($this->path) == 4 && $this->category[0] == -13 && count($form['gl']) == 1)
+            $this->path[] = $form['gl'][0];
     }
 }
 

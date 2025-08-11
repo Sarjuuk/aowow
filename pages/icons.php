@@ -67,19 +67,18 @@ class IconsPage extends GenericPage
 
     protected function generateTitle()
     {
-        $setCrt = $this->filterObj->fiSetCriteria;
-        $title  = $this->name;
-        if (count($setCrt['cr']) == 1)
+        $title = $this->name;
+        $setCr = $this->filterObj->getSetCriteria(1, 2, 3, 6, 9, 11);
+        if (count($setCr) == 1)
         {
-            $title = match($setCrt['cr'][0])
+            $title = match($setCr[0])
             {
-                1       => Util::ucFirst(Lang::game('item')),
-                2       => Util::ucFirst(Lang::game('spell')),
-                3       => Util::ucFirst(Lang::game('achievement')),
-                6       => Util::ucFirst(Lang::game('currency')),
-                9       => Util::ucFirst(Lang::game('pet')),
-                11      => Util::ucFirst(Lang::game('class')),
-                default => ''
+                1  => Util::ucFirst(Lang::game('item')),
+                2  => Util::ucFirst(Lang::game('spell')),
+                3  => Util::ucFirst(Lang::game('achievement')),
+                6  => Util::ucFirst(Lang::game('currency')),
+                9  => Util::ucFirst(Lang::game('pet')),
+                11 => Util::ucFirst(Lang::game('class'))
             } . ' ' . $title;
         }
 
@@ -88,9 +87,9 @@ class IconsPage extends GenericPage
 
     protected function generatePath()
     {
-        $setCrt = $this->filterObj->fiSetCriteria;
-        if (count($setCrt['cr']) == 1)
-            $this->path[] = $setCrt['cr'][0];
+        $setCr = $this->filterObj->getSetCriteria(1, 2, 3, 6, 9, 11);
+        if (count($setCr) == 1)
+            $this->path[] = $setCr[0];
     }
 }
 
