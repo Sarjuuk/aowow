@@ -1430,7 +1430,7 @@ $lang = array(
         'spillover'     => "Partage de réputations",
         'spilloverDesc' => "Gagner de la réputation avec cette faction fourni une réputation proportionnelle avec les factions ci-dessous.",
         'maxStanding'   => "Niveau maximum",
-        'quartermaster' => "Intendant",
+        'quartermaster' => "Intendant : ",
         'customRewRate' => "Taux de récompense personnalisé",
         '_transfer'     => 'La réputation de cette faction sera convertie en <a href="?faction=%d" class="q1">%s</a> si vous transférez vers <span class="icon-%s">%s</span>.',
         'cat'           => array(
