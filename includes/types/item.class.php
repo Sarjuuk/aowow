@@ -1697,7 +1697,6 @@ class ItemList extends BaseType
         $json = array(
             'id'          => $this->id,
             'quality'     => ITEM_QUALITY_HEIRLOOM - $this->curTpl['quality'],
-            'icon'        => $this->curTpl['iconString'],
             'classs'      => $class,
             'subclass'    => $subclass,
             'subsubclass' => $this->curTpl['subSubClass'],
@@ -1731,6 +1730,7 @@ class ItemList extends BaseType
         $json = array_map('intval', $json);
 
         $json['name'] = $this->getField('name', true);
+        $json['icon'] = $this->curTpl['iconString'];
 
         if ($class == ITEM_CLASS_AMMUNITION)
             $json['dps'] = round(($this->curTpl['tplDmgMin1'] + $this->curTpl['dmgMin2'] + $this->curTpl['tplDmgMax1'] + $this->curTpl['dmgMax2']) / 2, 2);
