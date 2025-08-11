@@ -1390,7 +1390,7 @@ $lang = array(
     ),
     'currency' => array(
         'notFound'      => "This currency doesn't exist.",
-        'cap'           => "Total cap",
+        'cap'           => "Total cap: ",
         'cat'           => array(
             1 => "Miscellaneous", 2 => "Player vs. Player", 4 => "Classic", 21 => "Wrath of the Lich King", 22 => "Dungeon and Raid", 23 => "Burning Crusade", 41 => "Test", 3 => "Unused"
         )

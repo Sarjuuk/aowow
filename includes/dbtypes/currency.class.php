@@ -77,7 +77,7 @@ class CurrencyList extends DBTypeList
             $x .= '<div style="max-width: 300px" class="q">'.$_.'</div>';
 
         if ($_ = $this->getField('cap'))
-            $x .= '<br /><span class="q">'.Lang::currency('cap').Lang::main('colon').'</span>'.Lang::nf($_).'<br />';
+            $x .= '<br /><span class="q">'.Lang::currency('cap').'</span>'.Lang::nf($_).'<br />';
 
         $x .= '</td></tr></table>';
 
