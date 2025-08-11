@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -17,49 +20,43 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?=$this->name.($this->subname ? ' &lt;'.$this->subname.'&gt;' : null); ?></h1>
+                <h1><?=$this->h1.($this->subname ? ' &lt;'.$this->subname.'&gt;' : ''); ?></h1>
 
 <?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
 if ($this->accessory):
     echo '                <div>'.Lang::npc('accessoryFor').' ';
-    echo Lang::concat($this->accessory, true, function ($v, $k) { return '<a href="?npc='.$v[0].'">'.$v[1].'</a>'; });
+    echo Lang::concat($this->accessory, true, fn ($v) => '<a href="?npc='.$v[0].'">'.$v[1].'</a>');
     echo ".</div>\n";
 endif;
 
 if ($this->placeholder):
-    echo '                <div>'.Lang::npc('difficultyPH', $this->placeholder)."</div>\n";
 ?>
+                <div><?=Lang::npc('difficultyPH', $this->placeholder);?></div>
                 <div class="pad"></div>
 <?php
-elseif (!empty($this->map)):
+elseif ($this->map):
     $this->brick('mapper');
 else:
     echo '                '.Lang::npc('unkPosition')."\n";
 endif;
 
-if ($this->quotes[0]):
+if ([$quoteGroups, $count] = $this->quotes):
 ?>
-                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?=Lang::npc('quotes').'&nbsp;('.$this->quotes[1]; ?>)</a></h3>
+                <h3><a class="disclosure-off" onclick="return g_disclose($WH.ge('quotes-generic'), this)"><?=Lang::npc('quotes', [$count]); ?></a></h3>
                 <div id="quotes-generic" style="display: none"><ul>
 <?php
-    foreach ($this->quotes[0] as $group):
-        if (count($group) > 1 && count($this->quotes[0]) > 1):
+    foreach ($quoteGroups as $group):
+        if (count($group) > 1 && count($quoteGroups) > 1):
             echo "<ul>\n";
         endif;
 
-        echo '<li>';
-
-        $last = end($group);
         foreach ($group as $itr):
-            echo sprintf(sprintf($itr['text'], $itr['prefix']), $this->name);
-            echo ($itr == $last) ? null : "</li>\n<li>";
+            echo '<li>'.sprintf($itr['text'], $this->h1)."</li>\n";
         endforeach;
 
-        echo "</li>\n";
-
-        if (count($group) > 1 && count($this->quotes[0]) > 1):
+        if (count($group) > 1 && count($quoteGroups) > 1):
             echo "</ul>\n";
         endif;
 
@@ -75,21 +72,16 @@ if ($this->reputation):
 <?php
     echo Lang::npc('gainsDesc').Lang::main('colon');
 
-    foreach ($this->reputation as $set):
+    foreach ($this->reputation as [$mode, $data]):
         if (count($this->reputation) > 1):
-            echo '<ul><li><span class="rep-difficulty">'.$set[0].'</span></li>';
+            echo '<ul><li><span class="rep-difficulty">'.$mode.'</span></li>';
         endif;
 
         echo '<ul>';
 
-        foreach ($set[1] as $itr):
-            if ($itr['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
-                $qty = intVal($itr['qty'][0]) . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($itr['qty'][1] > 0 ? '+' : '').intVal($itr['qty'][1]));
-            else
-                $qty = intVal(array_sum($itr['qty']));
-
-            echo '<li><div'.($itr['qty'][0] < 0 ? ' class="reputation-negative-amount"' : null).'><span>'.$qty.'</span> '.Lang::npc('repWith') .
-                ' <a href="?faction='.$itr['id'].'">'.$itr['name'].'</a>'.($itr['cap'] && $itr['qty'][0] > 0 ? '&nbsp;('.sprintf(Lang::npc('stopsAt'), $itr['cap']).')' : null).'</div></li>';
+        foreach ($data as [$id, $qty, $name, $cap]):
+            echo '<li><div'.($qty[0] < 0 ? ' class="reputation-negative-amount"' : '').'><span>'.($qty[1] ?: $qty[0]).'</span> '.Lang::npc('repWith') .
+                ' <a href="?faction='.$id.'">'.$name.'</a>'.($cap && $qty[0] > 0 ? '&nbsp;('.Lang::npc('stopsAt', [$cap]).')' : '').'</div></li>';
         endforeach;
 
         echo '</ul>';
@@ -100,25 +92,14 @@ if ($this->reputation):
     endforeach;
 endif;
 
-if (isset($this->smartAI)):
-?>
-    <div id="text-generic" class="left"></div>
-    <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
-            allow: Markup.CLASS_ADMIN,
-            dbpage: true
-        });
-    //]]></script>
+$this->brick('markup', ['markup' => $this->smartAI]);
 
-    <div class="pad2"></div>
-<?php
-endif;
 ?>
                 <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>
