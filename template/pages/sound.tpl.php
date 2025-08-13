@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -17,68 +20,19 @@
     $this->brick('redButtons');
 ?>
 
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 
 <?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
-    if ($this->special):
-?>
-<div id="playlistcontrols" style="margin: 20px"></div><div id="playlisttracks"></div>
-<script type="text/javascript">//<![CDATA[
-g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
-(function(){
-    var delline = function()
-    {
-        var li = this.parentNode;
-        var siblings = li.parentNode.childNodes;
-
-        for (var id = 0; id < siblings.length; id++)
-            if (siblings[id] === li)
-                break;
-
-        g_audioplaylist.deleteSound(id);
-        li.parentNode.removeChild(li);
-    }
-
-    var l = g_audioplaylist.getList();
-    var ol = $WH.ce('ol');
-    var s, li;
-    for (var x in l)
-    {
-        li = $WH.ce('li');
-
-        s = $WH.ce('span');
-        s.className = 'icon-delete';
-        s.style.cursor = 'pointer';
-        $WH.Tooltip.simple(s, LANG.delete, 'q2');
-        $WH.aE(s, 'click', delline);
-        $WH.ae(li, s);
-
-        s = $WH.ce('span');
-        $WH.st(s, l[x]);
-        $WH.ae(li, s);
-
-        $WH.ae(ol, li);
-    }
-    $WH.ae($WH.ge('playlisttracks'),ol);
-})();
-//]]></script></div>
-
-<div class="clear"></div>
-
-<?php
-    else:
-
-    if (!empty($this->map)):
-        $this->brick('mapper');
-    endif;
+    $this->brickIf($this->map, 'mapper');
 ?>
                 <ol id="soundfilelist"></ol>
                 <div id="mainsound"></div>
                 <script type="text/javascript">//<![CDATA[
                     var soundpaths = g_sounds[<?=$this->typeId; ?>].files;
-                    soundpaths.sort(function(a, b) { return $WH.stringCompare(a.title, b.title) || $WH.stringCompare(a.id, b.id); });
+                    soundpaths.sort(function(a, b) { return $WH.strcmp(a.title, b.title) || $WH.strcmp(a.id, b.id); });
+                    // aowow - see $WH.strcmp - soundpaths.sort(function(a, b) { return $WH.stringCompare(a.title, b.title) || $WH.stringCompare(a.id, b.id); });
                     var sounddialog = new Dialog();
 
                     Dialog.templates.sound = {
@@ -113,7 +67,7 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
                         sounddialog.show('sound', { data: data, onSubmit: $WH.rf });
                     }
 
-                    (new AudioControls()).init(soundpaths,$WH.ge('mainsound'));
+                    (new AudioControls()).init(soundpaths, $WH.ge('mainsound'));
 
                     (function(){
                         var ol = $WH.ge('soundfilelist');
@@ -135,10 +89,9 @@ g_audioplaylist.setAudioControls($WH.ge('playlistcontrols'));
             </div>
 
 <?php
-        $this->brick('lvTabs', ['relTabs' => true]);
+        $this->brick('lvTabs');
 
         $this->brick('contribute');
-    endif;
 ?>
 
             <div class="clear"></div>

@@ -1,10 +1,11 @@
-<?php namespace Aowow; ?>
-
 <?php
-$this->brick('header');
-$f = $this->filterObj->values                               // shorthand
-?>
+    namespace Aowow\Template;
 
+    use \Aowow\Lang;
+
+$this->brick('header');
+$f = $this->filter->values;                                 // shorthand
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -12,31 +13,32 @@ $f = $this->filterObj->values                               // shorthand
 <?php
 $this->brick('announcement');
 
-$this->brick('pageTemplate', ['fiQuery' => $this->filterObj->query, 'fiMenuItem' => [101]]);
+$this->brick('pageTemplate', ['fiQuery' => $this->filter->query, 'fiMenuItem' => [19]]);
 ?>
-            <div class="text"><h1><?=$this->name; ?>&nbsp;<?=$this->brick('redButtons'); ?></h1></div>
-            <div id="fi" style="display: <?=($this->filterObj->query ? 'block' : 'none'); ?>;">
+            <div id="fi" style="display: <?=($this->filter->query ? 'block' : 'none'); ?>;">
                 <form action="?filter=sounds" method="post" name="fi" onsubmit="return fi_submit(this)" onreset="return fi_reset(this)">
+                    <div class="text">
+<?php
+$this->brick('headIcons');
+
+$this->brick('redButtons');
+?>
+                        <h1><?=$this->h1; ?></h1>
+                    </div>
                     <div class="rightpanel">
-                        <div style="float: left"><?=Util::ucFirst(Lang::game('type')).Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::game('type').Lang::main('colon'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="ty[]" size="6" multiple="multiple" class="rightselect">
-<?php
-foreach (Lang::sound('cat') as $i => $str):
-    if ($str && $i < 1000):
-        echo '                                <option value="'.$i.'"'.(isset($f['ty']) && in_array($i, (array)$f['ty']) ? ' selected' : null).' >'.$str."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::sound('cat'), $f['ty'], 28, fn($v, $k) => $v && $k < 1000); ?>
                         </select>
                     </div>
                     <table>
                         <tr>
-                            <td><?=Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
+                            <td><?=$this->ucFirst(Lang::main('name')).Lang::main('colon'); ?></td>
                             <td colspan="2">
                                 <table><tr>
-                                    <td>&nbsp;<input type="text" name="na" size="30" <?=(isset($f['na']) ? 'value="'.Util::htmlEscape($f['na']).'" ' : null); ?>/></td>
+                                    <td>&nbsp;<input type="text" name="na" size="30" <?=($f['na'] ? 'value="'.$this->escHTML($f['na']).'" ' : ''); ?>/></td>
                                 </tr></table>
                             </td>
                         </tr><tr>

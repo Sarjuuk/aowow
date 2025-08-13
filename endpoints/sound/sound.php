@@ -6,97 +6,82 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 19: Sound    g_initPath()
-//  tabId  0: Database g_initHeader()
-class SoundPage extends GenericPage
+class SoundBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $type          = Type::SOUND;
-    protected $typeId        = 0;
-    protected $tpl           = 'sound';
-    protected $path          = [0, 19];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    protected $special       = false;
-    protected $_get          = ['playlist' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\GenericPage::checkEmptySet']];
+    protected  string $template   = 'sound';
+    protected  string $pageName   = 'sound';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 19];
 
-    private   $cat           = 0;
+    public int $type   = Type::SOUND;
+    public int $typeId = 0;
 
-    public function __construct($pageCall, $id)
+    private SoundList $subject;
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        // special case
-        if (!$id && $this->_get['playlist'])
-        {
-            $this->special    = true;
-            $this->name       = Lang::sound('cat', 1000);
-            $this->cat        = 1000;
-            $this->articleUrl = 'sound&playlist';
-            $this->contribute = CONTRIBUTE_NONE;
-            $this->mode       = CACHE_TYPE_NONE;
-        }
-        // regular case
-        else
-        {
-            $this->typeId = intVal($id);
-
-            $this->subject = new SoundList(array(['id', $this->typeId]));
-            if ($this->subject->error)
-                $this->notFound(Lang::game('sound'), Lang::sound('notFound'));
-
-            $this->name = $this->subject->getField('name');
-            $this->cat  = $this->subject->getField('cat');
-        }
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
     }
 
-    protected function generatePath()
+    protected function generate() : void
     {
-        $this->path[] = $this->cat;
-    }
+        $this->subject = new SoundList(array(['id', $this->typeId]));
+        if ($this->subject->error)
+            $this->generateNotFound(Lang::game('sound'), Lang::sound('notFound'));
 
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('sound')));
-    }
+        $this->h1 = $this->subject->getField('name');
 
-    protected function generateContent()
-    {
-        if ($this->special)
-            $this->generatePlaylistContent();
-        else
-            $this->generateDefaultContent();
-    }
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
 
-    private function generatePlaylistContent()
-    {
+        $_cat  = $this->subject->getField('cat');
 
-    }
 
-    private function generateDefaultContent()
-    {
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->breadcrumb[] = $_cat;
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->h1, Util::ucFirst(Lang::game('sound')));
+
+
         /****************/
         /* Main Content */
         /****************/
 
-        $this->addScript([SC_JS_FILE, '?data=zones']);
-
         // get spawns
-        $map = null;
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
         {
-            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns, 'foundIn' => Lang::sound('foundIn')];
-            foreach ($spawns as $areaId => &$areaData)
-                $map['extra'][$areaId] = ZoneList::getName($areaId);
+            $this->addDataLoader('zones');
+            $this->map = array(
+                ['parent' => 'mapper-generic'],             // Mapper
+                $spawns,                                    // mapperData
+                null,                                       // ShowOnMap
+                [Lang::sound('foundIn')]                    // foundIn
+            );
+            foreach ($spawns as $areaId => $__)
+                $this->map[3][$areaId] = ZoneList::getName($areaId);
         }
 
-        // get full path ingame for sound (workaround for missing PlaySoundKit())
+        // get full path in-game for sound (workaround for missing PlaySoundKit())
         $fullpath = DB::Aowow()->selectCell('SELECT IF(sf.`path` <> "", CONCAT(sf.`path`, "\\\\", sf.`file`), sf.`file`) FROM ?_sounds_files sf JOIN ?_sounds s ON s.`soundFile1` = sf.`id` WHERE s.`id` = ?d', $this->typeId);
 
-        $this->map          = $map;
-        $this->headIcons  = [$this->subject->getField('iconString')];
         $this->redButtons = array(
             BUTTON_WOWHEAD  => true,
             BUTTON_PLAYLIST => true,
@@ -109,10 +94,14 @@ class SoundPage extends GenericPage
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
+        parent::generate();
+
 
         /**************/
         /* Extra Tabs */
         /**************/
+
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: Spells
         // skipping (always empty): ready, castertargeting, casterstate, targetstate
@@ -134,9 +123,9 @@ class SoundPage extends GenericPage
 
         $cnd = array(
             'OR',
-            ['AND', ['effect1Id', 132], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', 132], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', 132], ['effect3MiscValue', $this->typeId]]
+            ['AND', ['effect1Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', [SPELL_EFFECT_PLAY_MUSIC, SPELL_EFFECT_PLAY_SOUND]], ['effect3MiscValue', $this->typeId]]
         );
 
         if ($displayIds)
@@ -145,18 +134,17 @@ class SoundPage extends GenericPage
         if ($seMiscValues)
             $cnd[] = array(
                 'OR',
-                ['AND', ['effect1AuraId', 260], ['effect1MiscValue', $seMiscValues]],
-                ['AND', ['effect2AuraId', 260], ['effect2MiscValue', $seMiscValues]],
-                ['AND', ['effect3AuraId', 260], ['effect3MiscValue', $seMiscValues]]
+                ['AND', ['effect1AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect1MiscValue', $seMiscValues]],
+                ['AND', ['effect2AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect2MiscValue', $seMiscValues]],
+                ['AND', ['effect3AuraId', SPELL_AURA_SCREEN_EFFECT], ['effect3MiscValue', $seMiscValues]]
             );
 
         $spells = new SpellList($cnd);
         if (!$spells->error)
         {
             $this->extendGlobalData($spells->getJSGlobals(GLOBALINFO_SELF));
-            $this->lvTabs[] = [SpellList::$brickFile, ['data' => array_values($spells->getListviewData())]];
+            $this->lvTabs->addListviewTab(new Listview(['data' => $spells->getListviewData()], SpellList::$brickFile));
         }
-
 
         // tab: Items
         $subClasses = [];
@@ -179,10 +167,9 @@ class SoundPage extends GenericPage
             if (!$items->error)
             {
                 $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = [ItemList::$brickFile, ['data' => array_values($items->getListviewData())]];
+                $this->lvTabs->addListviewTab(new Listview(['data' => $items->getListviewData()], ItemList::$brickFile));
             }
         }
-
 
         // tab: Zones
         if ($zoneIds = DB::Aowow()->select('SELECT `id`, `worldStateId`, `worldStateValue` FROM ?_zones_sounds WHERE `ambienceDay` = ?d OR `ambienceNight` = ?d OR `musicDay` = ?d OR `musicNight` = ?d OR `intro` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
@@ -240,13 +227,12 @@ class SoundPage extends GenericPage
                     }
                 }
 
-                $tabData['data'] = array_values($zoneData);
+                $tabData['data'] = $zoneData;
                 $tabData['hiddenCols'] = ['territory'];
 
-                $this->lvTabs[] = [ZoneList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, ZoneList::$brickFile));
             }
         }
-
 
         // tab: Races (VocalUISounds (containing error voice overs))
         if ($vo = DB::Aowow()->selectCol('SELECT `raceId` FROM ?_races_sounds WHERE `soundId` = ?d GROUP BY `raceId`', $this->typeId))
@@ -255,10 +241,9 @@ class SoundPage extends GenericPage
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = [CharRaceList::$brickFile, ['data' => array_values($races->getListviewData())]];
+                $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
             }
         }
-
 
         // tab: Emotes (EmotesTextSound (containing emote audio))
         if ($em = DB::Aowow()->selectCol('SELECT `emoteId` FROM ?_emotes_sounds WHERE `soundId` = ?d GROUP BY `emoteId` UNION SELECT `id` FROM ?_emotes WHERE `soundId` = ?d', $this->typeId, $this->typeId))
@@ -267,10 +252,10 @@ class SoundPage extends GenericPage
             if (!$races->error)
             {
                 $this->extendGlobalData($races->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = [EmoteList::$brickFile, array(
-                    'data' => array_values($races->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $races->getListviewData(),
                     'name' => Util::ucFirst(Lang::game('emotes'))
-                ), 'emote'];
+                ), EmoteList::$brickFile, 'emote'));
             }
         }
 
@@ -289,7 +274,7 @@ class SoundPage extends GenericPage
                    `injury`       = ?d OR `injurycritical` = ?d OR `death`     = ?d OR `stun`      = ?d OR `stand`            = ?d OR
                    `aggro`        = ?d OR `wingflap`       = ?d OR `wingglide` = ?d OR `alert`     = ?d OR `fidget`           = ?d OR
                    `customattack` = ?d OR `loop`           = ?d OR `jumpstart` = ?d OR `jumpend`   = ?d OR `petattack`        = ?d OR
-                   `petorder`     = ?d OR `petdismiss`     = ?d OR `birth`     = ?d OR `spellcast` = ?d OR `submerge`         = ?d OR `submerged`    = ?d',
+                   `petorder`     = ?d OR `petdismiss`     = ?d OR `birth`     = ?d OR `spellcast` = ?d OR `submerge`         = ?d OR `submerged` = ?d',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId,
@@ -319,10 +304,10 @@ class SoundPage extends GenericPage
             $npcs = new CreatureList($cnds);
             if (!$npcs->error)
             {
-                $this->addScript([SC_JS_FILE, '?data=zones']);
-
                 $this->extendGlobalData($npcs->getJSGlobals(GLOBALINFO_SELF));
-                $this->lvTabs[] = [CreatureList::$brickFile, ['data' => array_values($npcs->getListviewData())]];
+
+                $this->addDataLoader('zones');
+                $this->lvTabs->addListviewTab(new Listview(['data' => $npcs->getListviewData()], CreatureList::$brickFile));
             }
         }
     }
