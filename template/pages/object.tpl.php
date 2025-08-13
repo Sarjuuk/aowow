@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -17,17 +20,17 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 
 <?php
-$this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
 if ($this->relBoss):
-    echo "                <div>".sprintf(Lang::gameObject('npcLootPH'), $this->name, $this->relBoss[0], $this->relBoss[1])."</div>\n";
+    echo "                <div>".sprintf(Lang::gameObject('npcLootPH'), $this->h1, $this->relBoss[0], $this->relBoss[1])."</div>\n";
     echo '                <div class="pad"></div>';
 endif;
 
-if (!empty($this->map)):
+if ($this->map):
     $this->brick('mapper');
 else:
     echo Lang::gameObject('unkPosition');
@@ -35,26 +38,15 @@ endif;
 
 $this->brick('book');
 
-if (isset($this->smartAI)):
-?>
-    <div id="text-generic" class="left"></div>
-    <script type="text/javascript">//<![CDATA[
-        Markup.printHtml("<?=$this->smartAI; ?>", "text-generic", {
-            allow: Markup.CLASS_ADMIN,
-            dbpage: true
-        });
-    //]]></script>
+$this->brick('markup', ['markup' => $this->smartAI]);
 
-    <div class="pad2"></div>
-<?php
-endif;
 ?>
 
                 <h2 class="clear"><?=Lang::main('related'); ?></h2>
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>

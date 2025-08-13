@@ -6,57 +6,62 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 5: Object   g_initPath()
-//  tabId 0: Database g_initHeader()
-class ObjectPage extends GenericPage
+class ObjectBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $pageText      = [];
-    protected $relBoss       = null;
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    protected $type          = Type::OBJECT;
-    protected $typeId        = 0;
-    protected $tpl           = 'object';
-    protected $path          = [0, 5];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/swfobject.js']];
+    protected  string $template   = 'object';
+    protected  string $pageName   = 'object';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 5];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/swfobject.js']];
 
-    private   $powerTpl      = '$WowheadPower.registerObject(%d, %d, %s);';
+    public  int   $type    = Type::OBJECT;
+    public  int   $typeId  = 0;
+    public ?Book  $book    = null;
+    public ?array $relBoss = null;
 
-    public function __construct($pageCall, $id)
+    private GameObjectList $subject;
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Lang::load($this->_get['domain']);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
-        $this->typeId = intVal($id);
-
+    protected function generate() : void
+    {
         $this->subject = new GameObjectList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('object'), Lang::gameObject('notFound'));
+            $this->generateNotFound(Lang::game('object'), Lang::gameObject('notFound'));
 
-        $this->name = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
-    }
+        $this->h1 = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML);
 
-    protected function generatePath()
-    {
-        $this->path[] = $this->subject->getField('typeCat');
-    }
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
 
-    protected function generateTitle()
-    {
+
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->breadcrumb[] = $this->subject->getField('typeCat');
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
         array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
-    }
 
-    protected function generateContent()
-    {
-        $this->addScript([SC_JS_FILE, '?data=zones']);
 
         /***********/
         /* Infobox */
@@ -65,48 +70,48 @@ class ObjectPage extends GenericPage
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event (ignore events, where the object only gets removed)
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.eventEntry FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.eventEntry = geg.eventEntry AND g.guid = geg.guid AND g.id = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_gameobject geg, gameobject g WHERE ge.`eventEntry` = geg.`eventEntry` AND g.`guid` = geg.`guid` AND g.`id` = ?d', $this->typeId))
         {
             $this->extendGlobalIds(Type::WORLDEVENT, ...$_);
             $ev = [];
             foreach ($_ as $i => $e)
                 $ev[] = ($i % 2 ? '[br]' : ' ') . '[event='.$e.']';
 
-            $infobox[] = Util::ucFirst(Lang::game('eventShort')).Lang::main('colon').implode(',', $ev);
+            $infobox[] = Lang::game('eventShort', [implode(',', $ev)]);
         }
 
         // Faction
-        if ($_ = DB::Aowow()->selectCell('SELECT factionId FROM ?_factiontemplate WHERE id = ?d', $this->subject->getField('faction')))
+        if ($_ = DB::Aowow()->selectCell('SELECT `factionId` FROM ?_factiontemplate WHERE `id` = ?d', $this->subject->getField('faction')))
         {
             $this->extendGlobalIds(Type::FACTION, $_);
             $infobox[] = Util::ucFirst(Lang::game('faction')).Lang::main('colon').'[faction='.$_.']';
         }
 
         // Reaction
-        $_ = function ($r)
+        $color = fn (int $r) : string => match($r)
         {
-            if ($r == 1)  return 2;                         // q2  green
-            if ($r == -1) return 10;                        // q10 red
-            return;                                         // q   yellow
+             1      => 'q2',                                // q2  green
+            -1      => 'q10',                               // q10 red
+            default => 'q'                                  // q   yellow
         };
-        $infobox[] = Lang::npc('react').Lang::main('colon').'[color=q'.$_($this->subject->getField('A')).']A[/color] [color=q'.$_($this->subject->getField('H')).']H[/color]';
+        $infobox[] = Lang::npc('react', ['[color='.$color($this->subject->getField('A')).']A[/color] [color='.$color($this->subject->getField('H')).']H[/color]']);
 
         // reqSkill +  difficulty
         switch ($this->subject->getField('typeCat'))
         {
-            case -3:                                            // Herbalism
-                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 2).' ('.$this->subject->getField('reqSkill').')');
+            case -3:                                        // Herbalism
+                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 2).' ('.$this->subject->getField('reqSkill').')']);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_HERBALISM, $this->subject->getField('reqSkill')));
                 break;
-            case -4:                                            // Mining
-                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 3).' ('.$this->subject->getField('reqSkill').')');
+            case -4:                                        // Mining
+                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 3).' ('.$this->subject->getField('reqSkill').')']);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_MINING, $this->subject->getField('reqSkill')));
                 break;
-            case -5:                                            // Lockpicking
-                $infobox[] = sprintf(Lang::game('requires'), Lang::spell('lockType', 1).' ('.$this->subject->getField('reqSkill').')');
+            case -5:                                        // Lockpicking
+                $infobox[] = Lang::game('requires', [Lang::spell('lockType', 1).' ('.$this->subject->getField('reqSkill').')']);
                 $infobox[] = Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_LOCKPICKING, $this->subject->getField('reqSkill')));
                 break;
-            default:                                            // requires key .. maybe
+            default:                                        // requires key .. maybe
             {
                 $locks = Lang::getLocks($this->subject->getField('lockId'), $ids, true, Lang::FMT_MARKUP);
                 $l = [];
@@ -119,7 +124,7 @@ class ObjectPage extends GenericPage
                     if ($idx > 0)
                         $l[] = Lang::gameObject('key').Lang::main('colon').$str;
                     else if ($idx < 0)
-                        $l[] = sprintf(Lang::game('requires'), $str);
+                        $l[] = Lang::game('requires', [$str]);
                 }
 
                 if ($l)
@@ -138,114 +143,113 @@ class ObjectPage extends GenericPage
 
         // SpellFocus
         if ($_ = $this->subject->getField('spellFocusId'))
-            if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE id = ?d', $_))
+            if ($sfo = DB::Aowow()->selectRow('SELECT * FROM ?_spellfocusobject WHERE `id` = ?d', $_))
                 $infobox[] = '[tooltip name=focus]'.Lang::gameObject('focusDesc').'[/tooltip][span class=tip tooltip=focus]'.Lang::gameObject('focus').Lang::main('colon').Util::localizedString($sfo, 'name').'[/span]';
 
         // lootinfo: [min, max, restock]
-        if (($_ = $this->subject->getField('lootStack')) && $_[0])
+        if ($this->subject->getField('lootStack'))
         {
-            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').$_[0];
-            if ($_[0] < $_[1])
-                $buff .= Lang::game('valueDelim').$_[1];
+            [$min, $max, $restock] = $this->subject->getField('lootStack');
+            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').$min;
+            if ($min < $max)
+                $buff .= Lang::game('valueDelim').$max;
 
             // since Veins don't have charges anymore, the timer is questionable
-            $infobox[] = $_[2] > 1 ? '[tooltip name=restock]'.sprintf(Lang::gameObject('restock'), Util::formatTime($_[2] * 1000)).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
+            $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [Util::formatTime($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
         }
 
         // meeting stone [minLevel, maxLevel, zone]
-        if ($this->subject->getField('type') == OBJECT_MEETINGSTONE)
+        if ($this->subject->getField('type') == OBJECT_MEETINGSTONE && $this->subject->getField('mStone'))
         {
-            if ($_ = $this->subject->getField('mStone'))
-            {
-                $this->extendGlobalIds(Type::ZONE, $_[2]);
-                $m = Lang::game('meetingStone').Lang::main('colon').'[zone='.$_[2].']';
+            [$minLevel, $maxLevel, $zone] = $this->subject->getField('mStone');
 
-                $l = $_[0];
-                if ($_[0] > 1 && $_[1] > $_[0])
-                    $l .= Lang::game('valueDelim').min($_[1], MAX_LEVEL);
+            $this->extendGlobalIds(Type::ZONE, $zone);
+            $m = Lang::game('meetingStone').'[zone='.$zone.']';
 
-                $infobox[] = $l ? '[tooltip name=meetingstone]'.sprintf(Lang::game('reqLevel'), $l).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
-            }
+            $l = $minLevel;
+            if ($minLevel > 1 && $maxLevel > $minLevel)
+                $l .= Lang::game('valueDelim').min($maxLevel, MAX_LEVEL);
+
+            $infobox[] = $l ? '[tooltip name=meetingstone]'.Lang::game('reqLevel', [$l]).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
         }
 
-        // capture area [minPlayer, maxPlayer, minTime, maxTime, radius]
-        if ($this->subject->getField('type') == OBJECT_CAPTURE_POINT)
+        // capture area
+        if ($this->subject->getField('type') == OBJECT_CAPTURE_POINT && $this->subject->getField('capture'))
         {
-            if ($_ = $this->subject->getField('capture'))
-            {
-                $buff = Lang::gameObject('capturePoint');
+            [$minPlayer, $maxPlayer, $minTime, $maxTime, $radius] = $this->subject->getField('capture');
 
-                if ($_[2] > 1 || $_[0])
-                    $buff .= Lang::main('colon').'[ul]';
+            $buff = Lang::gameObject('capturePoint');
 
-                if ($_[2] > 1)
-                    $buff .= '[li]'.Lang::game('duration').Lang::main('colon').($_[3] > $_[2] ? Util::FormatTime($_[3] * 1000, true).' - ' : null).Util::FormatTime($_[2] * 1000, true).'[/li]';
+            if ($minTime > 1 || $minPlayer || $radius)
+                $buff .= Lang::main('colon').'[ul]';
 
-                if ($_[1])
-                    $buff .= '[li]'.Lang::main('players').Lang::main('colon').$_[0].($_[1] > $_[0] ? ' - '.$_[1] : null).'[/li]';
+            if ($minTime > 1)
+                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').($maxTime > $minTime ? Util::FormatTime($maxTime * 1000, true).' - ' : '').Util::FormatTime($minTime * 1000, true).'[/li]';
 
-                if ($_[4])
-                    $buff .= '[li]'.sprintf(Lang::spell('range'), $_[4]).'[/li]';
+            if ($minPlayer)
+                $buff .= '[li]'.Lang::main('players').Lang::main('colon').$minPlayer.($maxPlayer > $minPlayer ? ' - '.$maxPlayer : '').'[/li]';
 
-                if ($_[2] > 1 || $_[0])
-                    $buff .= '[/ul]';
-            }
+            if ($radius)
+                $buff .= '[li]'.Lang::spell('range', [$radius]).'[/li]';
+
+            if ($minTime > 1 || $minPlayer || $radius)
+                $buff .= '[/ul]';
 
             $infobox[] = $buff;
         }
 
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
-        {
             if ($_ = $this->subject->getField('ScriptOrAI'))
-            {
-                if ($_ == 'SmartGameObjectAI')
-                    $infobox[] = 'AI'.Lang::main('colon').$_;
-                else
-                    $infobox[] = 'Script'.Lang::main('colon').$_;
-            }
-        }
+                $infobox[] = ($_ == 'SmartGameObjectAI' ? 'AI' :  'Script').Lang::main('colon').$_;
+
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 
 
         /****************/
         /* Main Content */
         /****************/
 
-        // pageText
-        if ($this->pageText = Game::getBook($this->subject->getField('pageTextId')))
+        // pageText / book
+        if ($this->book = Game::getBook($this->subject->getField('pageTextId')))
             $this->addScript(
                 [SC_JS_FILE,  'js/Book.js'],
                 [SC_CSS_FILE, 'css/Book.css']
             );
 
         // get spawns and path
-        $map = null;
         if ($spawns = $this->subject->getSpawns(SPAWNINFO_FULL))
         {
-            $map = ['data' => ['parent' => 'mapper-generic'], 'mapperData' => &$spawns, 'foundIn' => Lang::gameObject('foundIn')];
-            foreach ($spawns as $areaId => &$areaData)
-                $map['extra'][$areaId] = ZoneList::getName($areaId);
+            $this->addDataLoader('zones');
+            $this->map = array(
+                ['parent' => 'mapper-generic'],             // Mapper
+                $spawns,                                    // mapperData
+                null,                                       // ShowOnMap
+                [Lang::gameObject('foundIn')]               // foundIn
+            );
+            foreach ($spawns as $areaId => $_)
+                $this->map[3][$areaId] = ZoneList::getName($areaId);
         }
 
 
         // todo (low): consider pooled spawns
 
 
-        $relBoss = null;
         if ($ll = DB::Aowow()->selectRow('SELECT * FROM ?_loot_link WHERE `objectId` = ?d ORDER BY `priority` DESC LIMIT 1', $this->typeId))
         {
             // group encounter
             if ($ll['encounterId'])
-                $relBoss = [$ll['npcId'], Lang::profiler('encounterNames', $ll['encounterId'])];
+                $this->relBoss = [$ll['npcId'], Lang::profiler('encounterNames', $ll['encounterId'])];
             // difficulty dummy
             else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $ll['npcId'], $ll['npcId'], $ll['npcId']))
-                $relBoss = [$c['id'], Util::localizedString($c, 'name')];
+                $this->relBoss = [$c['id'], Util::localizedString($c, 'name')];
             // base creature
             else if ($c = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8` FROM ?_creature WHERE `id` = ?d', $ll['npcId']))
-                $relBoss = [$c['id'], Util::localizedString($c, 'name')];
+                $this->relBoss = [$c['id'], Util::localizedString($c, 'name')];
         }
 
-        // smart AI
+        // Smart AI
         $sai = null;
         if ($this->subject->getField('ScriptOrAI') == 'SmartGameObjectAI')
         {
@@ -263,15 +267,14 @@ class ObjectPage extends GenericPage
             }
 
             if ($sai->prepare())
+            {
                 $this->extendGlobalData($sai->getJSGlobals());
+                $this->smartAI = $sai->getMarkup();
+            }
             else
                 trigger_error('Gameobject has AIName set in template but no SmartAI defined.');
         }
 
-        $this->map         = $map;
-        $this->infobox     = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
-        $this->relBoss     = $relBoss;
-        $this->smartAI     = $sai ? $sai->getMarkup() : null;
         $this->redButtons  = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
@@ -283,12 +286,22 @@ class ObjectPage extends GenericPage
         /* Extra Tabs */
         /**************/
 
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+
         // tab: summoned by
+        $summonEffects = array(
+            SPELL_EFFECT_TRANS_DOOR,
+            SPELL_EFFECT_SUMMON_OBJECT_WILD,
+            SPELL_EFFECT_SUMMON_OBJECT_SLOT1,
+            SPELL_EFFECT_SUMMON_OBJECT_SLOT2,
+            SPELL_EFFECT_SUMMON_OBJECT_SLOT3,
+            SPELL_EFFECT_SUMMON_OBJECT_SLOT4
+        );
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', [50, 76, 104, 105, 106, 107]], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', [50, 76, 104, 105, 106, 107]], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', [50, 76, 104, 105, 106, 107]], ['effect3MiscValue', $this->typeId]]
+            ['AND', ['effect1Id', $summonEffects], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2Id', $summonEffects], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3Id', $summonEffects], ['effect3MiscValue', $this->typeId]]
         );
 
         $summons = new SpellList($conditions);
@@ -296,11 +309,11 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($summons->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = [SpellList::$brickFile, array(
-                'data' => array_values($summons->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $summons->getListviewData(),
                 'id'   => 'summoned-by',
                 'name' => '$LANG.tab_summonedby'
-            )];
+            ), SpellList::$brickFile));
         }
 
         // tab: related spells
@@ -315,13 +328,13 @@ class ObjectPage extends GenericPage
                 foreach ($data as $relId => $d)
                     $data[$relId]['trigger'] = array_search($relId, $_);
 
-                $this->lvTabs[] = [SpellList::$brickFile, array(
-                    'data'       => array_values($data),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'       => $data,
                     'id'         => 'spells',
                     'name'       => '$LANG.tab_spells',
                     'hiddenCols' => ['skill'],
                     'extraCols'  => ["\$Listview.funcBox.createSimpleCol('trigger', 'Condition', '10%', 'trigger')"]
-                )];
+                ), SpellList::$brickFile));
             }
         }
 
@@ -331,11 +344,11 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($acvs->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
-            $this->lvTabs[] = [AchievementList::$brickFile, array(
-                'data' => array_values($acvs->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $acvs->getListviewData(),
                 'id'   => 'criteria-of',
                 'name' => '$LANG.tab_criteriaof'
-            )];
+            ), AchievementList::$brickFile));
         }
 
         // tab: starts quest
@@ -345,30 +358,29 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($startEnd->getJSGlobals());
             $lvData = $startEnd->getListviewData();
-            $_ = [[], []];
+            $start  = $end = [];
 
             foreach ($startEnd->iterate() as $id => $__)
             {
-                $m = $startEnd->getField('method');
-                if ($m & 0x1)
-                    $_[0][] = $lvData[$id];
-                if ($m & 0x2)
-                    $_[1][] = $lvData[$id];
+                if ($startEnd->getField('method') & 0x1)
+                    $start[] = $lvData[$id];
+                if ($startEnd->getField('method') & 0x2)
+                    $end[]   = $lvData[$id];
             }
 
-            if ($_[0])
-                $this->lvTabs[] = [QuestList::$brickFile, array(
-                    'data' => array_values($_[0]),
+            if ($start)
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $start,
                     'name' => '$LANG.tab_starts',
                     'id'   => 'starts'
-                )];
+                ), QuestList::$brickFile));
 
-            if ($_[1])
-                $this->lvTabs[] = [QuestList::$brickFile, array(
-                    'data' => array_values($_[1]),
+            if ($end)
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $end,
                     'name' => '$LANG.tab_ends',
                     'id'   => 'ends'
-                )];
+                ), QuestList::$brickFile));
         }
 
         // tab: related quests
@@ -379,11 +391,11 @@ class ObjectPage extends GenericPage
             {
                 $this->extendGlobalData($relQuest->getJSGlobals());
 
-                $this->lvTabs[] = [QuestList::$brickFile, array(
-                    'data' => array_values($relQuest->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $relQuest->getListviewData(),
                     'name' => '$LANG.tab_quests',
                     'id'   => 'quests'
-                )];
+                ), QuestList::$brickFile));
             }
         }
 
@@ -402,24 +414,20 @@ class ObjectPage extends GenericPage
 
                 foreach ($hiddenCols as $k => $str)
                 {
-                    if ($k == 1 && array_filter(array_column($lootResult, $str), function ($x) { return $x != SIDE_BOTH; }))
+                    if ($k == 1 && array_filter(array_column($lootResult, $str), fn ($x) => $x != SIDE_BOTH))
                         unset($hiddenCols[$k]);
-                    else if ($k != 1 && array_column($lootResult, $str))
+                    else if ($k != 1 && !array_filter(array_column($lootResult, $str)))
                         unset($hiddenCols[$k]);
                 }
 
-                $tabData = array(
-                    'data'      => array_values($lootResult),
-                    'id'        => 'contains',
-                    'name'      => '$LANG.tab_contains',
-                    'sort'      => ['-percent', 'name'],
-                    'extraCols' => array_unique($extraCols)
-                );
-
-                if ($hiddenCols)
-                    $tabData['hiddenCols'] = array_values($hiddenCols);
-
-                $this->lvTabs[] = [ItemList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'       => $lootResult,
+                    'id'         => 'contains',
+                    'name'       => '$LANG.tab_contains',
+                    'sort'       => ['-percent', 'name'],
+                    'extraCols'  => array_unique($extraCols),
+                    'hiddenCols' => $hiddenCols ?: null
+                ), ItemList::$brickFile));
             }
         }
 
@@ -430,7 +438,7 @@ class ObjectPage extends GenericPage
             if (!$focusSpells->error)
             {
                 $tabData = array(
-                    'data' => array_values($focusSpells->getListviewData()),
+                    'data' => $focusSpells->getListviewData(),
                     'name' => Lang::gameObject('focus'),
                     'id'   => 'focus-for'
                 );
@@ -440,11 +448,11 @@ class ObjectPage extends GenericPage
                 // create note if search limit was exceeded
                 if ($focusSpells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 {
-                    $tabData['note']  = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                    $tabData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
                     $tabData['_truncated'] = 1;
                 }
 
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
             }
         }
 
@@ -454,25 +462,27 @@ class ObjectPage extends GenericPage
         {
             $this->extendGlobalData($trigger->getJSGlobals());
 
-            $this->lvTabs[] = [GameObjectList::$brickFile, array(
-                'data' => array_values($trigger->getListviewData()),
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $trigger->getListviewData(),
                 'name' => Lang::gameObject('triggeredBy'),
                 'id'   => 'triggerd-by',
                 'note' => sprintf(Util::$filterResultString, '?objects=6')
-            )];
+            ), GameObjectList::$brickFile));
         }
 
-        // tab: Same model as .. whats the fucking point..?
+        // tab: Same model as
         $sameModel = new GameObjectList(array(['displayId', $this->subject->getField('displayId')], ['id', $this->typeId, '!']));
         if (!$sameModel->error)
         {
             $this->extendGlobalData($sameModel->getJSGlobals());
 
-            $this->lvTabs[] = [GameObjectList::$brickFile, array(
-                'data' => array_values($sameModel->getListviewData()),
+            $this->addDataLoader('zones');
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $sameModel->getListviewData(),
                 'name' => '$LANG.tab_samemodelas',
                 'id'   => 'same-model-as'
-            )];
+            ), GameObjectList::$brickFile));
         }
 
         // tab: condition-for
@@ -481,21 +491,10 @@ class ObjectPage extends GenericPage
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $tab;
-        }
-    }
-
-    protected function generateTooltip()
-    {
-        $power = new \StdClass();
-        if (!$this->subject->error)
-        {
-            $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
-            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
-            $power->map                              = $this->subject->getSpawns(SPAWNINFO_SHORT);
+            $this->lvTabs->addDataTab(...$tab);
         }
 
-        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
+        parent::generate();
     }
 }
 
