@@ -727,12 +727,12 @@ abstract class Util
                 $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? Cfg::get('REP_REWARD_UPVOTED') : Cfg::get('REP_REWARD_DOWNVOTED');
                 break;
             case SITEREP_ACTION_SUBMIT_SCREENSHOT:
+            case SITEREP_ACTION_SUGGEST_VIDEO:
                 if (empty($miscData['id']) || empty($miscData['what']))
                     return false;
 
                 $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
-                $x['sourceB'] = $miscData['what'];          // screenshot:1
-                $x['amount']  = Cfg::get('REP_REWARD_UPLOAD');
+                $x['amount']  = $action == SITEREP_ACTION_SUBMIT_SCREENSHOT ? Cfg::get('REP_REWARD_SUBMIT_SCREENSHOT') : Cfg::get('REP_REWARD_SUGGEST_VIDEO');
                 break;
             case SITEREP_ACTION_GOOD_REPORT:                // NYI
             case SITEREP_ACTION_BAD_REPORT:

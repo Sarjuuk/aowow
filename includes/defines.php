@@ -90,7 +90,7 @@ define('SITEREP_ACTION_DAILYVISIT',         2);             // Daily visit
 define('SITEREP_ACTION_COMMENT',            3);             // Posted comment
 define('SITEREP_ACTION_UPVOTED',            4);             // Your comment was upvoted
 define('SITEREP_ACTION_DOWNVOTED',          5);             // Your comment was downvoted
-define('SITEREP_ACTION_SUBMIT_SCREENSHOT',  6);             // Submitted screenshot (suggested video)
+define('SITEREP_ACTION_SUBMIT_SCREENSHOT',  6);             // Submitted screenshot
                                                             // Cast vote
                                                             // Uploaded data
 define('SITEREP_ACTION_GOOD_REPORT',        9);             // Report accepted
@@ -98,7 +98,7 @@ define('SITEREP_ACTION_BAD_REPORT',         10);            // Report declined
                                                             // Copper Achievement
                                                             // Silver Achievement
                                                             // Gold Achievement
-                                                            // Test 1
+define('SITEREP_ACTION_SUGGEST_VIDEO',      14);            // repurposed, originally: Test 1
                                                             // Test 2
 define('SITEREP_ACTION_ARTICLE',            16);            // Guide approved (article approved)
 define('SITEREP_ACTION_USER_WARNED',        17);            // Moderator Warning

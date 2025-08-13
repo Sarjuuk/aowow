@@ -278,6 +278,20 @@ $lang = array(
             'notAllowed'  => "Es ist euch nicht erlaubt einen Screenshot hochzuladen!",
         )
     ),
+    'video' => array(
+        'submission'    => "Video-Einsendung",
+        'thanks'        => array(
+            'contrib' => "Vielen Dank für Euren Beitrag!",
+            'goBack'  => '<a href="?%s=%d">Klickt hier</a>, um zu der vorherigen Seite zurückzukehren.',
+            'note'    => "Hinweis: Euer Video muss zunächst zugelassen werden, bevor es auf der Seite erscheint. Dies kann bis zu 72 Stunden dauern."
+        ),
+        'error'         => array(
+            'isPrivate'   => "Das vorgeschlagene Video ist privat.",
+            'noExist'     => "An der eingereichten Url existiert kein Video.",
+            'selectVI'    => "Bitte gebt gültige Videoinformationen ein.",
+            'notAllowed'  => "Es ist euch nicht erlaubt Videos vorzuschlagen!"
+        )
+    ),
     'game' => array(
         // type strings
         'npc'           => "NPC",                           // 1

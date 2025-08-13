@@ -2831,9 +2831,10 @@ var vi_siteurls = {
     1: 'https://www.youtube.com/watch?v=$1' // YouTube
 };
 
-var vi_sitevalidation = {
-    1: /^https?:\/\/www\.youtube\.com\/watch\?v=([^& ]{11})/ // YouTube
-};
+var vi_sitevalidation = [
+    /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([^& ]{11})/i,
+    /https?:\/\/(?:www\.)?youtu\.be\/([^& ]{11})/i
+];
 
 function vi_submitAVideo() {
     tabsContribute.focus(2);
@@ -2882,7 +2883,7 @@ function vi_appendSticky() {
         };
 
         var img = $WH.ce('img');
-        img.src = $WH.sprintf(vi_thumbnails[video.videoType], video.videoId);
+        img.src = $WH.sprintf(vi_thumbnails[video.videoType].replace(/\/default\.jpg/, '/mqdefault.jpg'), video.videoId);
         img.className = 'border';
         $WH.ae(a, img);
 
@@ -3227,7 +3228,7 @@ var VideoViewer = new function() {
             aCover.onclick = Lightbox.hide;
             var foo = $WH.ce('span');
             var b = $WH.ce('b');
-            $WH.ae(b, $WH.ct(LANG.close));
+            // $WH.ae(b, $WH.ct(LANG.close));
             $WH.ae(foo, b);
             $WH.ae(aCover, foo);
 
@@ -3312,7 +3313,7 @@ var VideoViewer = new function() {
             onShow: onShow,
             onHide: onHide,
             onResize: onResize
-        },opt);
+        }, opt);
         return false;
     }
 

@@ -13,7 +13,7 @@ var l_reputation_names = [
     "Copper Achievement",
     "Silver Achievement",
     "Gold Achievement",
-    'Test 1',
+    'Video suggested',                                  // aowow - originally: Test 1
     'Test 2',
     "Guide approved",
     "Moderator Warning",

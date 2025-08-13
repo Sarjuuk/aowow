@@ -278,6 +278,20 @@ $lang = array(
             'notAllowed'  => "You are not allowed to upload screenshots!",
         )
     ),
+    'video' => array(
+        'submission'    => "Video Suggestion",
+        'thanks'        => array(
+            'contrib' => "Thanks a lot for your contribution!",
+            'goBack'  => '<a href="?%s=%d">Click here</a> to go back to the page you came from.',
+            'note'    => "Note: Your video will need to be approved before appearing on the site. This can take up to 72 hours."
+        ),
+        'error'         => array(
+            'isPrivate'   => "The suggested video is private.",
+            'noExist'     => "No video found at the provided Url.",
+            'selectVI'    => "Please enter valid video information.", // message_novideo
+            'notAllowed'  => "You are not allowed to suggest videos!",
+        )
+    ),
     'game' => array(
         // type strings
         'npc'           => "NPC",

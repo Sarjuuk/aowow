@@ -16,6 +16,7 @@ class Lang
     private static $maps;
     private static $profiler;
     private static $screenshot;
+    private static $video;
     private static $privileges;
     private static $smartAI;
     private static $unit;

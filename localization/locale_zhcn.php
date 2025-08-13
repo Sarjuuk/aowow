@@ -278,7 +278,22 @@ $lang = array(
             'notAllowed'  => "你不允许上传截图！",
         )
     ),
+    'video' => array(
+        'submission'    => "视频建议",
+        'thanks'        => array(
+            'contrib' => "非常感谢你的贡献！",
+            'goBack'  => '<a href="?%s=%d">点击这里</a>返回上一页。',
+            'note'    => "注意：您的视频需要经过审核后才能显示在网站上。这需要最多72小时。"
+        ),
+        'error'         => array(
+            'isPrivate'   => "建议的视频为私有。",
+            'noExist'     => "在提供的链接中未找到视频。",
+            'selectVI'    => "请输入有效的视频信息。", // message_novideo
+            'notAllowed'  => "您没有权限建议视频！",
+        )
+    ),
     'game' => array(
+        // type strings
         'npc'           => "NPC",
         'npcs'          => "NPC",
         'object'        => "对象",

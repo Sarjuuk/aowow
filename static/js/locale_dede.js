@@ -13,7 +13,7 @@ var l_reputation_names = [
     "Bronzeerfolg",
     "Silbererfolg",
     "Golderfolg",
-    'Test 1',
+    'Video vorgeschlagen',                                  // aowow - originally: Test 1
     'Test 2',
     "Leitfaden zugelassen",
     "Warnung durch Moderator",

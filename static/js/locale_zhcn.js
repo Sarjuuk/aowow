@@ -13,7 +13,7 @@ var l_reputation_names = [
     "铜牌成就",
     "银牌成就",
     "金牌成就",
-    'Test 1',
+    '建议视频',                                  // aowow - originally: Test 1
     'Test 2',
     "指南通过审核",
     "管理员警告",

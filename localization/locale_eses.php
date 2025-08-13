@@ -278,6 +278,20 @@ $lang = array(
             'notAllowed'  => "¡No estás permitido para subir capturas de pantalla!",
         )
     ),
+    'video' => array(
+        'submission'    => "Sugerencia de video",
+        'thanks'        => array(
+            'contrib' => "¡Muchísimas gracias por tu aportación!",
+            'goBack'  => '<a href="?%s=%d">aquí vuelve</a> a la página de la que viniste.',
+            'note'    => "Nota: Tu video tiene que ser aprobado antes de que pueda aparecer en el sitio. Esto puede tomar hasta 72 horas."
+        ),
+        'error'         => array(
+            'isPrivate'   => "El video sugerido es privado.",
+            'noExist'     => "No se encontró ningún video en la URL proporcionada.",
+            'selectVI'    => "Por favor, introduce información válida del vídeo.", // message_novideo
+            'notAllowed'  => "¡No tienes permiso para sugerir videos!",
+        )
+    ),
     'game' => array(
         // type strings
         'npc'           => "PNJ",

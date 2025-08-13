@@ -13,7 +13,7 @@ var l_reputation_names = [
     "Logro de Cobre",
     "Logro de Plata",
     "Logro de Oro",
-    'Test 1',
+    "Vídeo sugerido",                                       // aowow - originally: Test 1
     'Test 2',
     "Guía aprobada",
     "Aviso de moderador",

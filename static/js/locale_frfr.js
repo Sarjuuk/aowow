@@ -13,7 +13,7 @@ var l_reputation_names = [
     "Haut-fait de bronze",
     "Haut-fait d'argent",
     "Haut-fait d'or",
-    'Test 1',
+    "Vidéo suggérée",                                       // aowow - originally: Test 1
     'Test 2',
     "Guide approuvé",
     "Avertissement d'un modérateur",
