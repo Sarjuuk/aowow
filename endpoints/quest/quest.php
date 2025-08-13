@@ -6,84 +6,87 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 3: Quest    g_initPath()
-//  tabId 0: Database g_initHeader()
-class QuestPage extends GenericPage
+class QuestBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $objectiveList = [];
-    protected $providedItem  = [];
-    protected $series        = [];
-    protected $gains         = [];
-    protected $mail          = [];
-    protected $rewards       = [];
-    protected $objectives    = '';
-    protected $details       = '';
-    protected $offerReward   = '';
-    protected $requestItems  = '';
-    protected $completed     = '';
-    protected $end           = '';
-    protected $suggestedPl   = 1;
-    protected $unavailable   = false;
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    protected $type          = Type::QUEST;
-    protected $typeId        = 0;
-    protected $tpl           = 'quest';
-    protected $path          = [0, 3];
-    protected $tabId         = 0;
-    protected $mode          = CACHE_TYPE_PAGE;
-    protected $scripts       = [[SC_JS_FILE, 'js/ShowOnMap.js'], [SC_CSS_FILE, 'css/Book.css']];
+    protected  string $template   = 'quest';
+    protected  string $pageName   = 'quest';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 3];
 
-    protected $_get          = ['domain' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\Locale::tryFromDomain']];
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/ShowOnMap.js']];
 
-    private   $powerTpl      = '$WowheadPower.registerQuest(%d, %d, %s);';
+    public  int         $type          = Type::QUEST;
+    public  int         $typeId        = 0;
+    public  array       $objectiveList = [];
+    public ?IconElement $providedItem  = null;
+    public  array       $mail          = [];
+    public ?array       $gains         = null;              // why array|null ? because destructuring an array with less elements than expected is an error, destructuring null just returns false
+    public ?array       $rewards       = null;              // so  " if ([$spells, $items, $choice, $money] = $this->rewards): " will either work or cleanly branch to else
+    public  string      $objectives    = '';
+    public  string      $details       = '';
+    public  string      $offerReward   = '';
+    public  string      $requestItems  = '';
+    public  string      $completed     = '';
+    public  string      $end           = '';
+    public  int         $suggestedPl   = 1;
+    public  bool        $unavailable   = false;
 
-    public function __construct($pageCall, $id)
+    private QuestList $subject;
+
+    public function __construct(string $id)
     {
-        parent::__construct($pageCall, $id);
+        parent::__construct($id);
 
-        // temp locale
-        if ($this->mode == CACHE_TYPE_TOOLTIP && $this->_get['domain'])
-            Lang::load($this->_get['domain']);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
+    }
 
-        $this->typeId = intVal($id);
-
+    protected function generate() : void
+    {
         $this->subject = new QuestList(array(['id', $this->typeId]));
         if ($this->subject->error)
-            $this->notFound(Lang::game('quest'), Lang::quest('notFound'));
+            $this->generateNotFound(Lang::game('quest'), Lang::quest('notFound'));
 
-        // may contain htmlesque tags
-        $this->name = Lang::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
-    }
+        $this->h1 = Lang::unescapeUISequences(Util::htmlEscape($this->subject->getField('name', true)), Lang::FMT_HTML);
 
-    protected function generatePath()
-    {
-        // recreate path
-        $this->path[] = $this->subject->getField('cat2');
-        if ($cat = $this->subject->getField('cat1'))
-        {
-            foreach (Game::$questSubCats as $parent => $children)
-                if (in_array($cat, $children))
-                    $this->path[] = $parent;
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_HTML)
+        );
 
-            $this->path[] = $cat;
-        }
-    }
-
-    protected function generateTitle()
-    {
-        // page title already escaped
-        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
-    }
-
-    protected function generateContent()
-    {
         $_level        = $this->subject->getField('level');
         $_minLevel     = $this->subject->getField('minLevel');
         $_flags        = $this->subject->getField('flags');
         $_specialFlags = $this->subject->getField('specialFlags');
         $_side         = ChrRace::sideFromMask($this->subject->getField('reqRaceMask'));
+
+
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->breadcrumb[] = $this->subject->getField('cat2');
+        if ($cat = $this->subject->getField('cat1'))
+        {
+            foreach (Game::$questSubCats as $parent => $children)
+                if (in_array($cat, $children))
+                    $this->breadcrumb[] = $parent;
+
+            $this->breadcrumb[] = $cat;
+        }
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('quest')));
+
 
         /***********/
         /* Infobox */
@@ -95,7 +98,7 @@ class QuestPage extends GenericPage
         if ($_ = $this->subject->getField('eventId'))
         {
             $this->extendGlobalIds(Type::WORLDEVENT, $_);
-            $infobox[] = Lang::game('eventShort').Lang::main('colon').'[event='.$_.']';
+            $infobox[] = Lang::game('eventShort', ['[event='.$_.']']);
         }
 
         // level
@@ -109,7 +112,7 @@ class QuestPage extends GenericPage
             if ($_ = $this->subject->getField('maxLevel'))
                 $lvl .= ' - '.$_;
 
-            $infobox[] = sprintf(Lang::game('reqLevel'), $lvl);
+            $infobox[] = Lang::game('reqLevel', [$lvl]);
         }
 
         // loremaster (i dearly hope those flags cover every case...)
@@ -128,10 +131,10 @@ class QuestPage extends GenericPage
                 case 0:
                     break;
                 case 1:
-                    $infobox[] = Lang::quest('loremaster').Lang::main('colon').'[achievement='.$loremaster->id.']';
+                    $infobox[] = Lang::quest('loremaster').'[achievement='.$loremaster->id.']';
                     break;
                 default:
-                    $lm = Lang::quest('loremaster').Lang::main('colon').'[ul]';
+                    $lm = Lang::quest('loremaster').'[ul]';
                     foreach ($loremaster->iterate() as $id => $__)
                         $lm .= '[li][achievement='.$id.'][/li]';
 
@@ -153,16 +156,15 @@ class QuestPage extends GenericPage
             $_[] = Lang::quest('questInfo', $t);
 
         if ($_)
-            $infobox[] = Lang::game('type').Lang::main('colon').implode(' ', $_);
+            $infobox[] = Lang::game('type').implode(' ', $_);
 
         // side
-        $_ = Lang::main('side').Lang::main('colon');
-        switch ($_side)
+        $infobox[] = Lang::main('side') . match ($this->subject->getField('faction'))
         {
-            case 3: $infobox[] = $_.Lang::game('si', 3);                                        break;
-            case 2: $infobox[] = $_.'[span class=icon-horde]'.Lang::game('si', 2).'[/span]';    break;
-            case 1: $infobox[] = $_.'[span class=icon-alliance]'.Lang::game('si', 1).'[/span]'; break;
-        }
+            SIDE_ALLIANCE => '[span class=icon-alliance]'.Lang::game('si', SIDE_ALLIANCE).'[/span]',
+            SIDE_HORDE    => '[span class=icon-horde]'.Lang::game('si', SIDE_HORDE).'[/span]',
+            default       => Lang::game('si', SIDE_BOTH)    // 0, 3
+        };
 
         $jsg = [];
         // races
@@ -189,17 +191,17 @@ class QuestPage extends GenericPage
             if ($_ = $this->subject->getField('reqSkillPoints'))
                 $sk .= ' ('.$_.')';
 
-            $infobox[] = Lang::quest('profession').Lang::main('colon').$sk;
+            $infobox[] = Lang::quest('profession').$sk;
         }
 
         // timer
         if ($_ = $this->subject->getField('timeLimit'))
-            $infobox[] = Lang::quest('timer').Lang::main('colon').Util::formatTime($_ * 1000);
+            $infobox[] = Lang::quest('timer').Util::formatTime($_ * 1000);
 
-        $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE questId = ?d', $this->typeId);
+        $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE `questId` = ?d', $this->typeId);
 
         // start
-        $start = '[icon name=quest_start'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('start').Lang::main('colon').'[/icon]';
+        $start = '[icon name=quest_start'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('start').'[/icon]';
         $s     = [];
         foreach ($startEnd as $se)
         {
@@ -214,7 +216,7 @@ class QuestPage extends GenericPage
             $infobox[] = implode('[br]', $s);
 
         // end
-        $end = '[icon name=quest_end'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('end').Lang::main('colon').'[/icon]';
+        $end = '[icon name=quest_end'.($this->subject->isRepeatable() ? '_daily' : '').']'.Lang::event('end').'[/icon]';
         $e   = [];
         foreach ($startEnd as $se)
         {
@@ -266,97 +268,12 @@ class QuestPage extends GenericPage
             $_[] = '[color=r4]'.($_level + 3 + ceil(12 * $_level / MAX_LEVEL)).'[/color]';
 
             if ($_)
-                $infobox[] = Lang::game('difficulty').Lang::main('colon').implode('[small] &nbsp;[/small]', $_);
+                $infobox[] = Lang::game('difficulty').implode('[small] &nbsp;[/small]', $_);
         }
 
-        $this->infobox = '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]';
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 
-
-        /**********/
-        /* Series */
-        /**********/
-
-        // Assumption
-        // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
-        // so we fast forward to the last quest and go backwards from there.
-
-        $lastQuestId = $this->subject->getField('nextQuestIdChain');
-        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ?_quests WHERE `id` = ?d AND `id` <> `nextQuestIdChain`', $lastQuestId))
-            $lastQuestId = $newLast;
-
-        $end = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `id` = ?d', $lastQuestId ?: $this->typeId);
-        $chain = array(array(array(                         // series / step / quest
-            'side'    => ChrRace::sideFromMask($end['reqRaceMask']),
-            'typeStr' => Type::getFileString(Type::QUEST),
-            'typeId'  => $end['id'],
-            'name'    => Util::htmlEscape(Lang::trimTextClean(Util::localizedString($end, 'name'), 40)),
-        )));
-
-        $prevStepIds = [$lastQuestId ?: $this->typeId];
-        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`', $prevStepIds))
-        {
-            $step = [];
-            foreach ($prevQuests as $pQuest)
-                $step[$pQuest['id']] = array(
-                    'side'    => ChrRace::sideFromMask($pQuest['reqRaceMask']),
-                    'typeStr' => Type::getFileString(Type::QUEST),
-                    'typeId'  => $pQuest['id'],
-                    'name'    => Util::htmlEscape(Lang::trimTextClean(Util::localizedString($pQuest, 'name'), 40)),
-                );
-
-            $prevStepIds = array_keys($step);
-            $chain[]     = $step;
-        }
-
-        if (count($chain) > 1)
-            $this->series[] = [array_reverse($chain), null];
-
-
-        // todo (low): sensibly merge the following lists into 'series'
-        $listGen = function($cnd)
-        {
-            $chain = [];
-            $list  = new QuestList($cnd);
-            if ($list->error)
-                return null;
-
-            foreach ($list->iterate() as $id => $__)
-            {
-                $n = $list->getField('name', true);
-                $chain[] = array(array(
-                    'side'    => ChrRace::sideFromMask($list->getField('reqRaceMask')),
-                    'typeStr' => Type::getFileString(Type::QUEST),
-                    'typeId'  => $id,
-                    'name'    => Util::htmlEscape(Lang::trimTextClean($n, 40))
-                ));
-            }
-
-            return $chain;
-        };
-
-        $extraLists = array(
-            // Requires all of these quests (Quests that you must follow to get this quest)
-            ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
-
-            // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
-
-            // Opens Quests (Quests that become available only after complete this quest (optionally only one))
-            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
-
-            // Closes Quests (Quests that become inaccessible after completing this quest)
-            ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
-
-            // During the quest available these quests (Quests that are available only at run time this quest)
-            ['enablesQ',   array(['prevQuestId', -$this->typeId])],
-
-            // Requires an active quest (Quests during the execution of which is available on the quest)
-            ['enabledByQ', array(['id', -$this->subject->getField('prevQuestId')])]
-        );
-
-        foreach ($extraLists as $el)
-            if ($_ = $listGen($el[1]))
-                $this->series[] = [$_, sprintf(Util::$dfnString, Lang::quest($el[0].'Desc'), Lang::quest($el[0]))];
 
         /*******************/
         /* Objectives List */
@@ -391,31 +308,45 @@ class QuestPage extends GenericPage
             $providedRequired = false;
             foreach ($olItems as $i => [$itemId, $qty, $provided])
             {
-                if (!$i || !$itemId || !in_array($itemId, $olItemData->getFoundIDs()))
+                if (!$i || !$itemId)
                     continue;
 
                 if ($provided)
                     $providedRequired = true;
 
-                $this->objectiveList[] = array(
-                    'typeStr'   => Type::getFileString(Type::ITEM),
-                    'id'        => $itemId,
-                    'name'      => Lang::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
-                    'qty'       => $qty > 1 ? $qty : 0,
-                    'quality'   => 7 - $olItemData->json[$itemId]['quality'],
-                    'extraText' => $provided ? '&nbsp;('.Lang::quest('provided').')' : ''
-                );
+                if (!$olItemData->getEntry($itemId))
+                {
+                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', extraText: $provided ? Lang::quest('provided') : null)];
+                    continue;
+                }
+
+                $this->objectiveList[] = [0, new IconElement(
+                    Type::ITEM,
+                    $itemId,
+                    Lang::unescapeUISequences($olItemData->json[$itemId]['name'], Lang::FMT_HTML),
+                    num: $qty > 1 ? $qty : '',
+                    quality: 7 - $olItemData->json[$itemId]['quality'],
+                    size: IconElement::SIZE_SMALL,
+                    element: 'iconlist-icon',
+                    extraText: $provided ? Lang::quest('provided') : null
+                )];
             }
 
             // if providd item is not required by quest, list it below other requirements
-            if (!$providedRequired && $olItems[0][0] && in_array($olItems[0][0], $olItemData->getFoundIDs()))
+            if (!$providedRequired && $olItems[0][0])
             {
-                $this->providedItem = array(
-                    'id'        => $olItems[0][0],
-                    'name'      => Lang::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
-                    'qty'       => $olItems[0][1] > 1 ? $olItems[0][1] : 0,
-                    'quality'   => 7 - $olItemData->json[$olItems[0][0]]['quality']
-                );
+                if (!$olItemData->getEntry($olItems[0][0]))
+                    $this->providedItem = new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $olItems[0][1] > 1 ? $olItems[0][1] : '');
+                else
+                    $this->providedItem = new IconElement(
+                        Type::ITEM,
+                        $olItems[0][0],
+                        Lang::unescapeUISequences($olItemData->json[$olItems[0][0]]['name'], Lang::FMT_HTML),
+                        num: $olItems[0][1] > 1 ? $olItems[0][1] : '',
+                        quality: 7 - $olItemData->json[$olItems[0][0]]['quality'],
+                        size: IconElement::SIZE_SMALL,
+                        element: 'iconlist-icon'
+                    );
             }
         }
 
@@ -449,24 +380,40 @@ class QuestPage extends GenericPage
                         $olNPCs[$p][2][$id] = $olNPCData->getField('name', true);
             }
 
-            foreach ($olNPCs as $i => $pair)
+            foreach ($olNPCs as $i => [$qty, $altText, $proxies])
             {
-                if (!$i || !in_array($i, $olNPCData->getFoundIDs()))
+                if (!$i)
                     continue;
 
-                $ol = array(
-                    'typeStr'   => Type::getFileString(Type::NPC),
-                    'id'        => $i,
-                    'name'      => $pair[1] ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
-                    'qty'       => $pair[0] > 1 ? $pair[0] : 0,
-                    'extraText' => (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $pair[1]) ? '' : ' '.Lang::achievement('slain'),
-                    'proxy'     => $pair[2]
-                );
+                if ($proxies)                               // has proxies assigned, add yourself as another proxy
+                {
+                    $proxies[$i] = Util::localizedString($olNPCData->getEntry($i), 'name');
 
-                if ($pair[2])                               // has proxies assigned, add yourself as another proxy
-                    $ol['proxy'][$i] = Util::localizedString($olNPCData->getEntry($i), 'name');
+                    // split in two blocks for display
+                    $proxies = array(
+                        array_slice($proxies, 0,    ceil(count($proxies) / 2), true),
+                        array_slice($proxies, ceil(count($proxies) / 2), null, true)
+                    );
 
-                $this->objectiveList[] = $ol;
+                    $this->objectiveList[] = [2, array(
+                        'id'    => $i,
+                        'text'  => ($altText ?: Util::localizedString($olNPCData->getEntry($i), 'name')) . ((($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : ' '.Lang::achievement('slain')),
+                        'qty'   => $qty > 1 ? $qty : 0,
+                        'proxy' => array_filter($proxies)
+                    )];
+                }
+                else if (!$olNPCData->getEntry($i))
+                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('npc')).' #'.$i, $qty > 1 ? $qty : '')];
+                else
+                    $this->objectiveList[] = [0, new IconElement(
+                        Type::NPC,
+                        $i,
+                        $altText ?: Util::localizedString($olNPCData->getEntry($i), 'name'),
+                        $qty > 1 ? $qty : '',
+                        size: IconElement::SIZE_SMALL,
+                        element: 'iconlist-icon',
+                        extraText: (($_specialFlags & QUEST_FLAG_SPECIAL_SPELLCAST) || $altText) ? '' : Lang::achievement('slain'),
+                    )];
             }
         }
 
@@ -476,18 +423,22 @@ class QuestPage extends GenericPage
             $olGOData = new GameObjectList(array(['id', $ids]));
             $this->extendGlobalData($olGOData->getJSGlobals(GLOBALINFO_SELF));
 
-            foreach ($olGOs as $i => $pair)
+            foreach ($olGOs as $i => [$qty, $altText])
             {
-                if (!$i || !in_array($i, $olGOData->getFoundIDs()))
+                if (!$i)
                     continue;
 
-                $this->objectiveList[] = array(
-                    'typeStr'   => Type::getFileString(Type::OBJECT),
-                    'id'        => $i,
-                    'name'      => $pair[1] ?: Lang::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
-                    'qty'       => $pair[0] > 1 ? $pair[0] : 0,
-                    'extraText' => ''
-                );
+                if (!$olGOData->getEntry($i))
+                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '')];
+                else
+                    $this->objectiveList[] = [0, new IconElement(
+                        Type::OBJECT,
+                        $i,
+                        $altText ?: Lang::unescapeUISequences(Util::localizedString($olGOData->getEntry($i), 'name'), Lang::FMT_HTML),
+                        $qty > 1 ? $qty : '',
+                        size: IconElement::SIZE_SMALL,
+                        element: 'iconlist-icon',
+                    )];
             }
         }
 
@@ -512,13 +463,14 @@ class QuestPage extends GenericPage
                 if (!$i || !in_array($i, $olFactionsData->getFoundIDs()))
                     continue;
 
-                $this->objectiveList[] = array(
-                    'typeStr'   => Type::getFileString(Type::FACTION),
-                    'id'        => $i,
-                    'name'      => Util::localizedString($olFactionsData->getEntry($i), 'name'),
-                    'qty'       => sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), Lang::getReputationLevelForPoints($val)),
-                    'extraText' => ''
-                );
+                $this->objectiveList[] = [0, new IconElement(
+                    Type::FACTION,
+                    $i,
+                    Util::localizedString($olFactionsData->getEntry($i), 'name'),
+                    size: IconElement::SIZE_SMALL,
+                    element: 'iconlist-icon',
+                    extraText: sprintf(Util::$dfnString, $val.' '.Lang::achievement('points'), '('.Lang::getReputationLevelForPoints($val).')')
+                )];
             }
         }
 
@@ -526,28 +478,21 @@ class QuestPage extends GenericPage
         if ($_ = $this->subject->getField('sourceSpellId'))
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = array(
-                'typeStr'   => Type::getFileString(Type::SPELL),
-                'id'        => $_,
-                'name'      => SpellList::getName($_),
-                'qty'       => 0,
-                'extraText' => '&nbsp;('.Lang::quest('provided').')'
-            );
+            $this->objectiveList[] = [0, new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon')];
         }
 
         // required money
         if ($this->subject->getField('rewardOrReqMoney') < 0)
-            $this->objectiveList[] = ['text' => Lang::quest('reqMoney').Lang::main('colon').Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))];
+            $this->objectiveList[] = [1, Lang::quest('reqMoney', [Util::formatMoney(abs($this->subject->getField('rewardOrReqMoney')))])];
 
         // required pvp kills
         if ($_ = $this->subject->getField('reqPlayerKills'))
-            $this->objectiveList[] = ['text' => Lang::quest('playerSlain').'&nbsp;('.$_.')'];
+            $this->objectiveList[] = [1, Lang::quest('playerSlain', [$_])];
+
 
         /**********/
         /* Mapper */
         /**********/
-
-        $this->addScript([SC_JS_FILE, '?data=zones']);
 
         // gather points of interest
         $mapNPCs = $mapGOs = [];                            // [typeId, start|end|objective, startItemId]
@@ -560,7 +505,7 @@ class QuestPage extends GenericPage
             {
                 /*
                     todo (med): sanity check:
-                        there are loot templates that are absolute tosh, containing hundrets of random items (e.g. Peacebloom for Quest "The Horde Needs Peacebloom!")
+                        there are loot templates that are absolute tosh, containing hundreds of random items (e.g. Peacebloom for Quest "The Horde Needs Peacebloom!")
                         even without these .. consider quests like "A Donation of Runecloth" .. oh my .....
                         should we...
                         .. display only a maximum of sources?
@@ -637,7 +582,7 @@ class QuestPage extends GenericPage
                         $mObjectives[$zoneId]['levels'][$floor][] = $processing($objId, $objData);
                 }
             }
-       };
+        };
 
 
         // POI: start + end
@@ -674,10 +619,13 @@ class QuestPage extends GenericPage
         if ($_specialFlags & QUEST_FLAG_SPECIAL_EXT_COMPLETE)
         {
             // areatrigger
-            if ($atir = DB::Aowow()->selectCol('SELECT id FROM ?_areatrigger WHERE type = ?d AND quest = ?d', AT_TYPE_OBJECTIVE, $this->typeId))
+            if ($atir = DB::Aowow()->selectCol('SELECT `id` FROM ?_areatrigger WHERE `type` = ?d AND `quest` = ?d', AT_TYPE_OBJECTIVE, $this->typeId))
             {
-                if ($atSpawns = DB::AoWoW()->select('SELECT typeId AS ARRAY_KEY, posX, posY, floor, areaId FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', Type::AREATRIGGER, $atir))
+                if ($atSpawns = DB::AoWoW()->select('SELECT `typeId` AS ARRAY_KEY, `posX`, `posY`, `floor`, `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a)', Type::AREATRIGGER, $atir))
                 {
+                    if (User::isInGroup(U_GROUP_STAFF))
+                        $endTextWrapper = '<a href="?areatrigger='.$atir[0].'">%s</a>';
+
                     foreach ($atSpawns as $atId => $atsp)
                     {
                         $atSpawn = array (
@@ -705,7 +653,7 @@ class QuestPage extends GenericPage
                 }
             }
             // complete-spell
-            else if ($endSpell = new SpellList(array('OR', ['AND', ['effect1Id', 16], ['effect1MiscValue', $this->typeId]], ['AND', ['effect2Id', 16], ['effect2MiscValue', $this->typeId]], ['AND', ['effect3Id', 16], ['effect3MiscValue', $this->typeId]])))
+            else if ($endSpell = new SpellList(array('OR', ['AND', ['effect1Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect1MiscValue', $this->typeId]], ['AND', ['effect2Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect2MiscValue', $this->typeId]], ['AND', ['effect3Id', SPELL_EFFECT_QUEST_COMPLETE], ['effect3MiscValue', $this->typeId]])))
                 if (!$endSpell->error)
                     $endTextWrapper = '<a href="?spell='.$endSpell->id.'">%s</a>';
         }
@@ -901,24 +849,30 @@ class QuestPage extends GenericPage
             }
         }
 
-        $this->map = $mObjectives ? array(
-            'mapperData' => [],                             // always empty
-            'data'       => array(
-                'parent'     => 'mapper-generic',
-                'objectives' => $mObjectives,
-                'zoneparent' => 'mapper-zone-generic',
-                'zones'      => $mZones,
-                'missing'    => count($mZones) > 1 || $hasStartEnd != 0x3 ? 1 : 0  // 0 if everything happens in one zone, else 1
-            )
-        ) : null;
+        if ($mObjectives)
+        {
+            $this->addDataLoader('zones');
+            $this->map = array(
+                array(                                      // Mapper
+                    'parent'     => 'mapper-generic',
+                    'objectives' => $mObjectives,
+                    'zoneparent' => 'mapper-zone-generic',
+                    'zones'      => $mZones,
+                    'missing'    => count($mZones) > 1 || $hasStartEnd != 0x3 ? 1 : 0  // 0 if everything happens in one zone, else 1
+                ),
+                new \StdClass(),                            // mapperData
+                null,                                       // ShowOnMap
+                null                                        // foundIn
+            );
+        }
 
 
         /****************/
         /* Main Content */
         /****************/
 
+        $this->series        = $this->createSeries($_side);
         $this->gains         = $this->createGains();
-        $this->mail          = $this->createMail($startEnd);
         $this->rewards       = $this->createRewards($_side);
         $this->objectives    = $this->subject->parseText('objectives', false);
         $this->details       = $this->subject->parseText('details', false);
@@ -939,36 +893,41 @@ class QuestPage extends GenericPage
             )
         );
 
+        if ($this->createMail($startEnd))
+            $this->addScript([SC_CSS_FILE, 'css/Book.css']);
+
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(horde_id = ?d, alliance_id, -horde_id) FROM player_factionchange_quests WHERE alliance_id = ?d OR horde_id = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_quests WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
         {
             $altQuest = new QuestList(array(['id', abs($pendant)]));
             if (!$altQuest->error)
             {
-                $this->transfer = sprintf(
-                    Lang::quest('_transfer'),
+                $this->transfer = Lang::quest('_transfer', array(
                     $altQuest->id,
                     $altQuest->getField('name', true),
                     $pendant > 0 ? 'alliance' : 'horde',
-                    $pendant > 0 ? Lang::game('si', 1) : Lang::game('si', 2)
-                );
+                    $pendant > 0 ? Lang::game('si', SIDE_ALLIANCE) : Lang::game('si', SIDE_HORDE)
+                ));
             }
         }
+
 
         /**************/
         /* Extra Tabs */
         /**************/
+
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: see also
         $seeAlso = new QuestList(array(['name_loc'.Lang::getLocale()->value, '%'.Util::htmlEscape($this->subject->getField('name', true)).'%'], ['id', $this->typeId, '!']));
         if (!$seeAlso->error)
         {
             $this->extendGlobalData($seeAlso->getJSGlobals());
-            $this->lvTabs[] = [QuestList::$brickFile, array(
-                'data' => array_values($seeAlso->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $seeAlso->getListviewData(),
                 'name' => '$LANG.tab_seealso',
                 'id'   => 'see-also'
-            )];
+            ), QuestList::$brickFile));
         }
 
         // tab: criteria of
@@ -976,27 +935,27 @@ class QuestPage extends GenericPage
         if (!$criteriaOf->error)
         {
             $this->extendGlobalData($criteriaOf->getJSGlobals());
-            $this->lvTabs[] = [AchievementList::$brickFile, array(
-                'data' => array_values($criteriaOf->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $criteriaOf->getListviewData(),
                 'name' => '$LANG.tab_criteriaof',
                 'id'   => 'criteria-of'
-            )];
+            ), AchievementList::$brickFile));
         }
 
         // tab: spawning pool (for the swarm)
-        if ($qp = DB::World()->selectCol('SELECT qpm2.questId FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.poolId = qpm2.poolId WHERE qpm1.questId = ?d', $this->typeId))
+        if ($qp = DB::World()->selectCol('SELECT qpm2.`questId` FROM quest_pool_members qpm1 JOIN quest_pool_members qpm2 ON qpm1.`poolId` = qpm2.`poolId` WHERE qpm1.`questId` = ?d', $this->typeId))
         {
-            $max = DB::World()->selectCell('SELECT numActive FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.poolId = qpt.poolId WHERE qpm.questId = ?d', $this->typeId);
+            $max = DB::World()->selectCell('SELECT `numActive` FROM quest_pool_template qpt JOIN quest_pool_members qpm ON qpm.`poolId` = qpt.`poolId` WHERE qpm.`questId` = ?d', $this->typeId);
             $pooledQuests = new QuestList(array(['id', $qp]));
             if (!$pooledQuests->error)
             {
                 $this->extendGlobalData($pooledQuests->getJSGlobals());
-                $this->lvTabs[] = [QuestList::$brickFile, array(
-                    'data' => array_values($pooledQuests->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $pooledQuests->getListviewData(),
                     'name' => 'Quest Pool',
                     'id'   => 'quest-pool',
                     'note' => Lang::quest('questPoolDesc', [$max])
-                )];
+                ), QuestList::$brickFile));
             }
         }
 
@@ -1015,27 +974,15 @@ class QuestPage extends GenericPage
         if ($tab = $cnd->toListviewTab())
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $tab;
-        }
-    }
-
-    protected function generateTooltip()
-    {
-        $power = new \StdClass();
-        if (!$this->subject->error)
-        {
-            $power->{'name_'.Lang::getLocale()->json()}    = Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW);
-            $power->{'tooltip_'.Lang::getLocale()->json()} = $this->subject->renderTooltip();
-            if ($this->subject->isDaily())
-                $power->daily = 1;
+            $this->lvTabs->addDataTab(...$tab);
         }
 
-        return sprintf($this->powerTpl, $this->typeId, Lang::getLocale()->value, Util::toJSON($power, JSON_AOWOW_POWER));
+        parent::generate();
     }
 
-    private function createRewards($side)
+    private function createRewards(int $side) : ?array
     {
-        $rewards = [];
+        $rewards = [[], [], [], ''];                        // [spells, items, choice, money]
 
         // moneyReward / maxLevelCompensation
         $comp       = $this->subject->getField('rewardMoneyMaxLevel');
@@ -1043,75 +990,68 @@ class QuestPage extends GenericPage
         $realComp   = max($comp, $questMoney);
         if ($questMoney > 0)
         {
-            $rewards['money'] = Util::formatMoney($questMoney);
+            $rewards[3] = Util::formatMoney($questMoney);
             if ($realComp > $questMoney)
-                $rewards['money'] .= '&nbsp;' . sprintf(Lang::quest('expConvert'), Util::formatMoney($realComp), MAX_LEVEL);
+                $rewards[3] .= '&nbsp;' . Lang::quest('expConvert', [Util::formatMoney($realComp), MAX_LEVEL]);
         }
         else if ($questMoney <= 0 && $realComp > 0)
-            $rewards['money'] = sprintf(Lang::quest('expConvert2'), Util::formatMoney($realComp), MAX_LEVEL);
+            $rewards[3] = Lang::quest('expConvert2', [Util::formatMoney($realComp), MAX_LEVEL]);
 
         // itemChoices
         if (!empty($this->subject->choices[$this->typeId][Type::ITEM]))
         {
-            $c           = $this->subject->choices[$this->typeId][Type::ITEM];
-            $choiceItems = new ItemList(array(['id', array_keys($c)]));
+            $choices     = $this->subject->choices[$this->typeId][Type::ITEM];
+            $choiceItems = new ItemList(array(['id', array_keys($choices)]));
             if (!$choiceItems->error)
             {
                 $this->extendGlobalData($choiceItems->getJSGlobals());
-                foreach ($choiceItems->Iterate() as $id => $__)
-                {
-                    $rewards['choice'][] = array(
-                        'typeStr'   => Type::getFileString(Type::ITEM),
-                        'id'        => $id,
-                        'name'      => $choiceItems->getField('name', true),
-                        'quality'   => $choiceItems->getField('quality'),
-                        'qty'       => $c[$id],
-                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
-                    );
-                }
+                foreach ($choices as $id => $num)           // itr over $choices to preserve display order
+                    if ($choiceItems->getEntry($id))
+                        $rewards[2][] = new IconElement(
+                            Type::ITEM,
+                            $id,
+                            Lang::unescapeUISequences($choiceItems->getField('name', true), Lang::FMT_HTML),
+                            quality: $choiceItems->getField('quality'),
+                            num: $num
+                        );
             }
         }
 
         // itemRewards
         if (!empty($this->subject->rewards[$this->typeId][Type::ITEM]))
         {
-            $ri       = $this->subject->rewards[$this->typeId][Type::ITEM];
-            $rewItems = new ItemList(array(['id', array_keys($ri)]));
+            $reward   = $this->subject->rewards[$this->typeId][Type::ITEM];
+            $rewItems = new ItemList(array(['id', array_keys($reward)]));
             if (!$rewItems->error)
             {
                 $this->extendGlobalData($rewItems->getJSGlobals());
-                foreach ($rewItems->Iterate() as $id => $__)
-                {
-                    $rewards['items'][] = array(
-                        'typeStr'   => Type::getFileString(Type::ITEM),
-                        'id'        => $id,
-                        'name'      => Lang::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
-                        'quality'   => $rewItems->getField('quality'),
-                        'qty'       => $ri[$id],
-                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
-                    );
-                }
+                foreach ($reward as $id => $num)            // itr over $reward to preserve display order
+                    if ($rewItems->getEntry($id))
+                        $rewards[1][] = new IconElement(
+                            Type::ITEM,
+                            $id,
+                            Lang::unescapeUISequences($rewItems->getField('name', true), Lang::FMT_HTML),
+                            quality: $rewItems->getField('quality'),
+                            num: $num
+                        );
             }
         }
 
         if (!empty($this->subject->rewards[$this->typeId][Type::CURRENCY]))
         {
-            $rc      = $this->subject->rewards[$this->typeId][Type::CURRENCY];
-            $rewCurr = new CurrencyList(array(['id', array_keys($rc)]));
+            $currency = $this->subject->rewards[$this->typeId][Type::CURRENCY];
+            $rewCurr  = new CurrencyList(array(['id', array_keys($currency)]));
             if (!$rewCurr->error)
             {
                 $this->extendGlobalData($rewCurr->getJSGlobals());
-                foreach ($rewCurr->Iterate() as $id => $__)
-                {
-                    $rewards['items'][] = array(
-                        'typeStr'   => Type::getFileString(Type::CURRENCY),
-                        'id'        => $id,
-                        'name'      => $rewCurr->getField('name', true),
-                        'quality'   => 1,
-                        'qty'       => $rc[$id] * ($side == 2 ? -1 : 1), // toggles the icon
-                        'globalStr' => Type::getJSGlobalString(Type::CURRENCY)
+                foreach ($rewCurr->iterate() as $id => $__)
+                    $rewards[1][] = new IconElement(
+                        Type::CURRENCY,
+                        $id,
+                        $rewCurr->getField('name', true),
+                        quality: ITEM_QUALITY_NORMAL,
+                        num: $currency[$id] * ($side == SIDE_HORDE ? -1 : 1), // toggles the icon
                     );
-                }
             }
         }
 
@@ -1133,18 +1073,14 @@ class QuestPage extends GenericPage
             {
                 $extra = null;
                 if ($_ = $rewSpells->getEntry($displ))
-                    $extra = sprintf(Lang::quest('spellDisplayed'), $displ, Util::localizedString($_, 'name'));
+                    $extra = Lang::quest('spellDisplayed', [$displ, Util::localizedString($_, 'name')]);
 
                 if ($_ = $rewSpells->getEntry($cast))
-                {
-                    $rewards['spells']['extra']  = $extra;
-                    $rewards['spells']['cast'][] = array(
-                        'typeStr'   => Type::getFileString(Type::SPELL),
-                        'id'        => $cast,
-                        'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
+                    $rewards[0] = array(
+                        'title' => Lang::quest('rewardAura'),
+                        'cast'  => [new IconElement(Type::SPELL, $cast, Util::localizedString($_, 'name'))],
+                        'extra' => $extra
                     );
-                }
             }
             else                                            // if it has effect:learnSpell display the taught spell instead
             {
@@ -1154,114 +1090,102 @@ class QuestPage extends GenericPage
                         foreach ($_ as $idx)
                             $teach[$rewSpells->getField('effect'.$idx.'TriggerSpell')] = $id;
 
-                if ($_ = $rewSpells->getEntry($displ))
-                {
-                    $rewards['spells']['extra'] = null;
-                    $rewards['spells'][$teach ? 'learn' : 'cast'][] = array(
-                        'typeStr'   => Type::getFileString(Type::SPELL),
-                        'id'        => $displ,
-                        'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
-                    );
-                }
-                else if (($_ = $rewSpells->getEntry($cast)) && !$teach)
-                {
-                    $rewards['spells']['extra']  = null;
-                    $rewards['spells']['cast'][] = array(
-                        'typeStr'   => Type::getFileString(Type::SPELL),
-                        'id'        => $cast,
-                        'name'      => Util::localizedString($_, 'name'),
-                        'globalStr' => Type::getJSGlobalString(Type::SPELL)
-                    );
-                }
-                else
+                if ($teach)
                 {
                     $taught = new SpellList(array(['id', array_keys($teach)]));
                     if (!$taught->error)
                     {
                         $this->extendGlobalData($taught->getJSGlobals());
-                        $rewards['spells']['extra']  = null;
+                        $rewards[0] = ['cast' => [], 'extra' => null];
+
+                        $isTradeSkill = 0;
                         foreach ($taught->iterate() as $id => $__)
                         {
-                            $rewards['spells']['learn'][] = array(
-                                'typeStr'   => Type::getFileString(Type::SPELL),
-                                'id'        => $id,
-                                'name'      => $taught->getField('name', true),
-                                'globalStr' => Type::getJSGlobalString(Type::SPELL)
-                            );
+                            $isTradeSkill |= array_intersect($taught->getField('skillLines'), array_merge(SKILLS_TRADE_PRIMARY, SKILLS_TRADE_SECONDARY)) ? 1 : 0;
+                            $rewards[0]['cast'][] = new IconElement(Type::SPELL, $id, $taught->getField('name', true));
                         }
+
+                        $rewards[0]['title'] = $isTradeSkill ? Lang::quest('rewardTradeSkill') : Lang::quest('rewardSpell');
                     }
                 }
-            }
-        }
-
-        return $rewards;
-    }
-
-    private function createMail($startEnd)
-    {
-        $mail = [];
-
-        if ($rmtId = $this->subject->getField('rewardMailTemplateId'))
-        {
-            $delay  = $this->subject->getField('rewardMailDelay');
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE id = ?d', $rmtId);
-
-            $mail = array(
-                'id'          => $rmtId,
-                'delay'       => $delay  ? sprintf(Lang::mail('mailIn'), Util::formatTime($delay * 1000)) : null,
-                'sender'      => null,
-                'attachments' => [],
-                'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text'))     : null,
-                'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject'))
-            );
-
-            $senderTypeId = 0;
-            if ($_= DB::World()->selectCell('SELECT RewardMailSenderEntry FROM quest_mail_sender WHERE QuestId = ?d', $this->typeId))
-                $senderTypeId = $_;
-            else
-                foreach ($startEnd as $se)
-                    if (($se['method'] & 0x2) && $se['type'] == Type::NPC)
-                        $senderTypeId = $se['typeId'];
-
-            if ($ti = CreatureList::getName($senderTypeId))
-                $mail['sender'] = sprintf(Lang::mail('mailBy'), $senderTypeId, $ti);
-
-            // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
-            $mailLoot = new Loot();
-            if ($mailLoot->getByContainer(LOOT_MAIL, $rmtId))
-            {
-                $this->extendGlobalData($mailLoot->jsGlobals);
-                foreach ($mailLoot->getResult() as $loot)
+                else if (($_ = $rewSpells->getEntry($displ)) || ($_ = $rewSpells->getEntry($cast)))
                 {
-                    $mail['attachments'][] = array(
-                        'typeStr'   => Type::getFileString(Type::ITEM),
-                        'id'        => $loot['id'],
-                        'name'      => substr($loot['name'], 1),
-                        'quality'   => 7 - $loot['name'][0],
-                        'qty'       => $loot['stack'][0],
-                        'globalStr' => Type::getJSGlobalString(Type::ITEM)
+                    $rewards[0] = array(
+                        'title' => Lang::quest('rewardAura'),
+                        'cast'  => [new IconElement(Type::SPELL, $cast, Util::localizedString($_, 'name'))],
+                        'extra' => null
                     );
                 }
             }
         }
 
-        return $mail;
+        if (!array_filter($rewards))
+            return null;
+
+        return $rewards;
     }
 
-    private function createGains()
+    private function createMail(array $startEnd) : bool
+    {
+        $rmtId = $this->subject->getField('rewardMailTemplateId');
+        if (!$rmtId)
+            return false;
+
+        $delay  = $this->subject->getField('rewardMailDelay');
+        $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE `id` = ?d', $rmtId);
+
+        $this->mail = array(
+            'attachments' => [],
+            'text'        => $letter ? Util::parseHtmlText(Util::localizedString($letter, 'text')) : null,
+            'subject'     => Util::parseHtmlText(Util::localizedString($letter, 'subject')),
+            'header'      => array(
+                $rmtId,
+                null,
+                $delay  ? Lang::mail('mailIn', [Util::formatTime($delay * 1000)]) : null,
+            )
+        );
+
+        $senderTypeId = 0;
+        if ($_= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = ?d', $this->typeId))
+            $senderTypeId = $_;
+        else
+            foreach ($startEnd as $se)
+                if (($se['method'] & 0x2) && $se['type'] == Type::NPC)
+                    $senderTypeId = $se['typeId'];
+
+        if ($ti = CreatureList::getName($senderTypeId))
+            $this->mail['header'][1] = Lang::mail('mailBy', [$senderTypeId, $ti]);
+
+        // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
+        $mailLoot = new Loot();
+        if ($mailLoot->getByContainer(LOOT_MAIL, $rmtId))
+        {
+            $this->extendGlobalData($mailLoot->jsGlobals);
+            foreach ($mailLoot->getResult() as $loot)
+                $this->mail['attachments'][] = new IconElement(Type::ITEM, $loot['id'], substr($loot['name'], 1), $loot['stack'][0], quality: 7 - $loot['name'][0]);
+        }
+
+        return true;
+    }
+
+    private function createGains() : ?array
     {
         $gains = [];
 
         // xp
-        if ($_ = $this->subject->getField('rewardXP'))
-            $gains['xp'] = $_;
+        $gains[0] = $this->subject->getField('rewardXP');
 
         // talent points
-        if ($_ = $this->subject->getField('rewardTalents'))
-            $gains['tp'] = $_;
+        $gains[3] = $this->subject->getField('rewardTalents');
+
+        // title
+        if ($tId = $this->subject->getField('rewardTitleId'))
+            $gains[2] = [$tId, (new TitleList(array(['id', $tId])))->getHtmlizedName()];
+        else
+            $gains[2] = null;
 
         // reputation
+        $repGains = [];
         for ($i = 1; $i < 6; $i++)
         {
             $fac = $this->subject->getField('rewardFactionId'.$i);
@@ -1275,31 +1199,113 @@ class QuestPage extends GenericPage
                 'name' => FactionList::getName($fac)
             );
 
-            if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE faction = ?d', $fac))
+            if ($cuRates = DB::World()->selectRow('SELECT * FROM reputation_reward_rate WHERE `faction` = ?d', $fac))
             {
-                if ($dailyType = $this->subject->isDaily())
-                {
-                    if ($dailyType == 1 && $cuRates['quest_daily_rate'] != 1.0)
-                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_daily_rate'] - 1);
-                    else if ($dailyType == 2 && $cuRates['quest_weekly_rate'] != 1.0)
-                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_weekly_rate'] - 1);
-                    else if ($dailyType == 3 && $cuRates['quest_monthly_rate'] != 1.0)
-                        $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_monthly_rate'] - 1);
-                }
-                else if ($this->subject->isRepeatable() && $cuRates['quest_repeatable_rate'] != 1.0)
+                if ($this->subject->isRepeatable())
                     $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_repeatable_rate'] - 1);
-                else if ($cuRates['quest_rate'] != 1.0)
-                    $rep['qty'][1] = $rep['qty'][0] * ($cuRates['quest_rate'] - 1);
+                else
+                    $rep['qty'][1] = $rep['qty'][0] * match ($this->subject->isDaily())
+                    {
+                        1       => $cuRates['quest_daily_rate'] - 1,
+                        2       => $cuRates['quest_weekly_rate'] - 1,
+                        3       => $cuRates['quest_monthly_rate'] - 1,
+                        default => $cuRates['quest_rate'] - 1
+                    };
             }
 
-            $gains['rep'][] = $rep;
-        }
+            if (User::isInGroup(U_GROUP_STAFF))
+                $rep['qty'][1]  = $rep['qty'][0] . ($rep['qty'][1] ? $this->fmtStaffTip(($rep['qty'][1] > 0 ? '+' : '').$rep['qty'][1], Lang::faction('customRewRate')) : '');
+            else
+                $rep['qty'][1] += $rep['qty'][0];
 
-        // title
-        if ($_ = (new TitleList(array(['id', $this->subject->getField('rewardTitleId')])))->getHtmlizedName())
-            $gains['title'] = $_;
+            $repGains[] = $rep;
+        }
+        $gains[1] = $repGains;
+
+        if (!array_filter($gains))
+            return null;
 
         return $gains;
+    }
+
+    private function createSeries() : array
+    {
+        $series = [];
+
+        $makeSeriesItem = function (array $questData) : array
+        {
+            return array(
+                'side'    => ChrRace::sideFromMask($questData['reqRaceMask']),
+                'typeStr' => Type::getFileString(Type::QUEST),
+                'typeId'  => $questData['id'],
+                'name'    => Util::htmlEscape(Lang::trimTextClean(Util::localizedString($questData, 'name'), 40)),
+            );
+        };
+
+        // Assumption
+        // a chain always ends in a single quest, but can have an arbitrary amount of quests leading into it.
+        // so we fast forward to the last quest and go backwards from there.
+
+        $lastQuestId = $this->subject->getField('nextQuestIdChain');
+        while ($newLast = DB::Aowow()->selectCell('SELECT `nextQuestIdChain` FROM ?_quests WHERE `id` = ?d AND `id` <> `nextQuestIdChain`', $lastQuestId))
+            $lastQuestId = $newLast;
+
+        $end   = DB::Aowow()->selectRow('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `id` = ?d', $lastQuestId ?: $this->typeId);
+        $chain = array(array($makeSeriesItem($end)));       // series / step / quest
+
+        $prevStepIds = [$lastQuestId ?: $this->typeId];
+        while ($prevQuests = DB::Aowow()->select('SELECT `id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `reqRaceMask` FROM ?_quests WHERE `nextQuestIdChain` IN (?a) AND `id` <> `nextQuestIdChain`', $prevStepIds))
+        {
+            $step = [];
+            foreach ($prevQuests as $pQuest)
+                $step[$pQuest['id']] = $makeSeriesItem($pQuest);
+
+            $prevStepIds = array_keys($step);
+            $chain[]     = $step;
+        }
+
+        if (count($chain) > 1)
+            $series[] = [array_reverse($chain), null];
+
+        // todo (low): sensibly merge the following lists into 'series'
+        $listGen = function($cnd) use ($makeSeriesItem)
+        {
+            $chain = [];
+            $list  = new QuestList($cnd);
+            if ($list->error)
+                return null;
+
+            foreach ($list->iterate() as $tpl)
+                $chain[] = [$makeSeriesItem($tpl)];
+
+            return $chain;
+        };
+
+        $extraLists = array(
+            // Requires all of these quests (Quests that you must follow to get this quest)
+            ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
+
+            // Requires one of these quests (Requires one of the quests to choose from)
+            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
+
+            // Opens Quests (Quests that become available only after complete this quest (optionally only one))
+            ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
+
+            // Closes Quests (Quests that become inaccessible after completing this quest)
+            ['closesQ',    array(['exclusiveGroup', 0, '>'], ['exclusiveGroup', $this->subject->getField('exclusiveGroup')], ['id', $this->typeId, '!'])],
+
+            // During the quest available these quests (Quests that are available only at run time this quest)
+            ['enablesQ',   array(['prevQuestId', -$this->typeId])],
+
+            // Requires an active quest (Quests during the execution of which is available on the quest)
+            ['enabledByQ', array(['id', -$this->subject->getField('prevQuestId')])]
+        );
+
+        foreach ($extraLists as [$section, $condition])
+            if ($_ = $listGen($condition))
+                $series[] = [$_, sprintf(Util::$dfnString, Lang::quest($section.'Desc'), Lang::quest($section))];
+
+        return $series;
     }
 }
 

@@ -36,7 +36,7 @@ class QuestList extends DBTypeList
             $_curTpl['cat1'] = $_curTpl['zoneOrSort'];      // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
-            foreach (Game::$questClasses as $k => $arr)
+            foreach (Game::QUEST_CLASSES as $k => $arr)
             {
                 if (in_array($_curTpl['cat1'], $arr))
                 {

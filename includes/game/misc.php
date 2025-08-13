@@ -31,7 +31,7 @@ class Game
          1 => ['ability_rogue_eviscerate',        'ability_warrior_innerrage',       'ability_warrior_defensivestance'  ]
     );
 
-    public static $questClasses             = array(
+    public const /* array */ QUEST_CLASSES  = array(
         -2 =>  [    0],
          0 =>  [    1,     3,     4,     8,     9,    10,    11,    12,    25,    28,    33,    36,    38,    40,    41,    44,    45,    46,    47,    51,    85,   130,   132,   139,   154,   267,  1497,  1519,  1537,  2257,  3430,  3431,  3433,  3487,  4080,  4298],
          1 =>  [   14,    15,    16,    17,   141,   148,   188,   215,   220,   331,   357,   361,   363,   400,   405,   406,   440,   490,   493,   618,  1377,  1637,  1638,  1657,  1769,  3524,  3525,  3526,  3557],

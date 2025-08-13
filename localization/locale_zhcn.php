@@ -329,7 +329,7 @@ $lang = array(
         'mails'         => "邮件",
 
         'cooldown'      => "%s冷却时间",
-        'difficulty'    => "难度",
+        'difficulty'    => "难度：",
         'dispelType'    => "驱散类型",
         'duration'      => "持续时间",
         'eventShort'    => "事件：%s",
@@ -1134,8 +1134,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "这个世界事件不存在。",
-        'start'         => "开始",
-        'end'           => "结束",
+        'start'         => "开始：",
+        'end'           => "结束：",
         'interval'      => "间隔",
         'inProgress'    => "事件正在进行中",
         'category'      => ["未分类", "节日", "循环", "PvP"]
@@ -1271,22 +1271,22 @@ $lang = array(
         '_transfer'     => '这个任务将被转换到<a href="?quest=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'questLevel'    => "等级%s",
         'requirements'  => "要求",
-        'reqMoney'      => "需要金钱",
+        'reqMoney'      => "需要金钱：%s",
         'money'         => "金钱",
         'additionalReq' => "获得这个任务的额外要求",
         'reqRepWith'    => '你<a href="?faction=%d">%s</a>的声望需要%s %s',
         'reqRepMin'     => "至少",
         'reqRepMax'     => "低于",
         'progress'      => "进行",
-        'provided'      => "提供的",
+        'provided'      => "（提供的）",
         'providedItem'  => "提供的物品",
         'completion'    => "完成",
         'description'   => "描述",
-        'playerSlain'   => "玩家被杀",
-        'profession'    => "专业",
-        'timer'         => "计时器",
-        'loremaster'    => "博学者",
-        'suggestedPl'   => "建议玩家数",
+        'playerSlain'   => "玩家被杀（%d）",
+        'profession'    => "专业：",
+        'timer'         => "计时器：",
+        'loremaster'    => "博学者：",
+        'suggestedPl'   => "建议玩家数：%d",
         'keepsPvpFlag'  => "保持你的PvP标记",
         'daily'         => "每日",
         'weekly'        => "每周",
@@ -1307,16 +1307,17 @@ $lang = array(
         'enabledByQ'    => "启用自",
         'enabledByQDesc'=> "只有当这些任务中的一个活跃时，这个任务才可用",
         'gainsDesc'     => "完成这个任务后，你将获得",
-        'theTitle'      => '头衔 "%s"',
         'unavailable'   => "这项任务已被标记为过时，无法获得或完成。",
         'experience'    => "经验",
         'expConvert'    => "（或%s如果在等级%d完成）",
         'expConvert2'   => "%s如果在等级%d完成",
-        'chooseItems'   => "你可以从这些奖励品中选择一件",
-        'receiveItems'  => "你将得到",
-        'receiveAlso'   => "你还将得到",
-        'spellCast'     => "该法术将被施放在你身上",
-        'spellLearn'    => "你将学会",
+        'rewardChoices' => "你可以从这些奖励品中选择一件：",               // REWARD_CHOICES
+        'rewardItems'   => "你将得到：",                                 // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "你还将得到：",                               // REWARD_ITEMS
+        'rewardSpell'   => "你将学会：",                                 // REWARD_SPELL
+        'rewardAura'    => "该法术将被施放在你身上：",                    // REWARD_AURA
+        'rewardTradeSkill'=>"你将学会如何制造：",                        // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => '你将获得头衔："<a href="?title=%d">%s</a>"', // REWARD_TITLE
         'bonusTalents'  => "%d天赋|4点数:点数;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> 已显示)',
         'questPoolDesc' => '每次只能同时提供 %d 个任务',
@@ -1443,8 +1444,8 @@ $lang = array(
         'mailDelivery'  => '你将收到 <a href="?mail=%d">这封信</a>%s%s', // "你会收到这封信%s%s",
         'mailBy'        => '发件人：<a href="?npc=%d">%s</a>',
         'mailIn'        => "在 %s 后",
-        'delay'         => "延迟",
-        'sender'        => "寄件人",
+        'delay'         => "延迟：%s",
+        'sender'        => "寄件人：%s",
         'untitled'      => "无标题邮件 #%d"
     ),
     'pet'      => array(

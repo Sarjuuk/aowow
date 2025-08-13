@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -17,7 +20,7 @@
             <div class="text">
 <?php $this->brick('redButtons'); ?>
 
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 <?php if ($this->unavailable): ?>
                 <div class="pad"></div>
                 <b style="color: red"><?=Lang::quest('unavailable'); ?></b>
@@ -35,80 +38,61 @@ elseif ($this->offerReward):
     echo $this->offerReward."\n";
 endif;
 
+$iconOffset = 0;
 if ($this->end || $this->objectiveList):
 ?>
                 <table class="iconlist">
 <?php
+    foreach ($this->objectiveList as [$type, $data]):
+        switch ($type):
+            case 1:                                         // just text line
+                echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$data."</td></tr>\n";
+                break;
+            case 2:                                         // proxy npc data
+                ['id' => $id, 'text' => $text, 'qty' => $qty, 'proxy' => $proxies] = $data;
+                echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$id.'\'), this)" class="disclosure-off">'.$text.'</a>'.($qty ? '&nbsp;('.$qty.')' : '').'<div id="npcgroup-'.$id."\" style=\"display: none\">\n";
+                foreach ($proxies as $block):
+                    echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
+                    foreach ($block as $pId => $pName):
+                        echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$pName."</a></td></tr>\n";
+                    endforeach;
+                    echo "                        </table></div>\n";
+                endforeach;
+                echo "                    </div></td></tr>\n";
+                break;
+            default:                                        // has icon set (spell / item / ...) or unordered linked list
+                echo $data->renderContainer(20, $iconOffset, true);
+        endswitch;
+    endforeach;
+
     if ($this->end):
         echo "                    <tr><th><p style=\"height: 26px; width: 30px;\">&nbsp;</p></th><td>".$this->end."</td></tr>\n";
     endif;
 
-    if ($o = $this->objectiveList):
-        foreach ($o as $i => $ol):
-            if (isset($ol['text'])):
-                echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.$ol['text']."</td></tr>\n";
-            elseif (!empty($ol['proxy'])):                      // this implies creatures
-                echo '                    <tr><th><p style="height: 26px">&nbsp;</p></th><td><a href="javascript:;" onclick="g_disclose($WH.ge(\'npcgroup-'.$ol['id'].'\'), this)" class="disclosure-off">'.$ol['name'].$ol['extraText'].'</a>'.($ol['qty'] > 1 ? '&nbsp;('.$ol['qty'].')' : null).'<div id="npcgroup-'.$ol['id']."\" style=\"display: none\">\n";
-
-                $block1 = array_slice($ol['proxy'], 0, ceil(count($ol['proxy']) / 2), true);
-                $block2 = array_slice($ol['proxy'], ceil(count($ol['proxy']) / 2), null, true);
-
-                echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
-                foreach ($block1 as $pId => $name):
-                                echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$name."</a></td></tr>\n";
-                endforeach;
-                echo "                        </table></div>\n";
-
-                if ($block2):                                   // may be empty
-                    echo "                        <div style=\"float: left\"><table class=\"iconlist\">\n";
-                    foreach ($block2 as $pId => $name):
-                                    echo '                            <tr><th><ul><li><var>&nbsp;</var></li></ul></th><td><a href="?npc='.$pId.'">'.$name."</a></td></tr>\n";
-                    endforeach;
-                    echo "                        </table></div>\n";
-                endif;
-
-                echo "                    </div></td></tr>\n";
-            elseif (isset($ol['typeStr'])):
-                if (in_array($ol['typeStr'], ['item', 'spell'])):
-                    echo '                    <tr><th align="right" id="iconlist-icon-'.$i.'"></th>';
-                else /* if (in_array($ol['typeStr'], ['npc', 'object', 'faction'])) */:
-                    echo '                    <tr><th><ul><li><var>&nbsp;</var></li></ul></th>';
-                endif;
-
-                echo '<td><span class="q'.(isset($ol['quality']) ? $ol['quality'] : null).'"><a href="?'.$ol['typeStr'].'='.$ol['id'].'">'.$ol['name'].'</a></span>'.($ol['extraText']).(!empty($ol['qty']) ? '&nbsp;('.$ol['qty'].')' : null)."</td></tr>\n";
-            endif;
-        endforeach;
-    endif;
-
     if ($this->suggestedPl):
-        echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::quest('suggestedPl').Lang::main('colon').$this->suggestedPl."</td></tr>\n";
+        echo '                    <tr><th><p style="height: 26px; width: 30px;">&nbsp;</p></th><td>'.Lang::quest('suggestedPl', [$this->suggestedPl])."</td></tr>\n";
     endif;
 ?>
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
 <?php
-    foreach ($o as $k => $i):
-        if (isset($i['typeStr']) && ($i['typeStr'] == 'item' || $i['typeStr'] == 'spell')):
-            echo "                    \$WH.ge('iconlist-icon-".$k."').appendChild(g_".$i['typeStr']."s.createIcon(".$i['id'].", 0, ".$i['qty']."));\n";
-        endif;
+    foreach (array_filter($this->objectiveList, fn($x) => $x[0] === 0) as $k => [, $data]):
+        echo $data->renderJS();
     endforeach;
 ?>
                 //]]></script>
 <?php
-    if ($p = $this->providedItem):
-        echo "                <div class=\"pad\"></div>\n";
-        echo '                '.Lang::quest('providedItem').Lang::main('colon')."\n";
-        echo "                <table class=\"iconlist\">\n";
-        echo '                    <tr><th align="right" id="iconlist-icon-'.count($this->objectiveList).'"></th>';
-        echo '<td><span class="q'.$p['quality'].'"><a href="?item='.$p['id'].'">'.$p['name'].'</a></span>'.($p['qty'] ? '&nbsp;('.$ol['qty'].')' : null)."</td></tr>\n";
+    if ($this->providedItem):
 ?>
+                <div class="pad"></div>
+                <?=Lang::quest('providedItem').Lang::main('colon'); ?>
+                <table class="iconlist">
+                    <?=$this->providedItem->renderContainer(20, $iconOffset, true); ?>
                 </table>
 
                 <script type="text/javascript">//<![CDATA[
-<?php
-        echo "                    \$WH.ge('iconlist-icon-".count($this->objectiveList)."').appendChild(g_items.createIcon(".$p['id'].", 0, ".$p['qty']."));\n";
-?>
+                    <?=$this->providedItem->renderJS(); ?>
                 //]]></script>
 <?php
     endif;
@@ -134,76 +118,68 @@ if ($this->offerReward && ($this->requestItems || $this->objectives)):
 <?php
 endif;
 
-$offset = 0;
-if ($r = $this->rewards):
+if ([$spells, $items, $choice, $money] = $this->rewards):
     echo '                <h3>'.Lang::main('rewards')."</h3>\n";
 
-    if (!empty($r['choice'])):
-        $this->brick('rewards', ['rewTitle' => Lang::quest('chooseItems'), 'rewards' => $r['choice'], 'offset' => $offset]);
-        $offset += count($r['choice']);
+    if ($choice):
+        $this->brick('rewards', ['rewTitle' => Lang::quest('rewardChoices'), 'rewards' => $choice, 'offset' => $iconOffset]);
+        $iconOffset += count($choice);
     endif;
 
-    if (!empty($r['spells'])):
-        if (!empty($r['choice'])):
+    if ($spells):
+        if ($choice):
             echo "                        <div class=\"pad\"></div>\n";
         endif;
 
-        if (!empty($r['spells']['learn'])):
-            $this->brick('rewards', ['rewTitle' => Lang::quest('spellLearn'), 'rewards' => $r['spells']['learn'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
-            $offset += count($r['spells']['learn']);
-        elseif (!empty($r['spells']['cast'])):
-            $this->brick('rewards', ['rewTitle' => Lang::quest('spellCast'), 'rewards' => $r['spells']['cast'], 'offset' => $offset, 'extra' => $r['spells']['extra']]);
-            $offset += count($r['spells']['cast']);
-        endif;
+        $this->brick('rewards', ['rewTitle' => $spells['title'], 'rewards' => $spells['cast'], 'offset' => $iconOffset, 'extra' => $spells['extra']]);
+        $iconOffset += count($spells['cast']);
     endif;
 
-    if (!empty($r['items']) || !empty($r['money'])):
-        if (!empty($r['choice']) || !empty($r['spells'])):
+    if ($items || $money):
+        if ($choice || $spells):
             echo "                        <div class=\"pad\"></div>\n";
         endif;
 
-        $addData = ['rewards' => !empty($r['items']) ? $r['items'] : null, 'offset' => $offset, 'extra' => !empty($r['money']) ? $r['money'] : null];
-        $addData['rewTitle'] = empty($r['choice']) ? Lang::quest('receiveItems') : Lang::quest('receiveAlso');
-
-        $this->brick('rewards', $addData);
+        $this->brick('rewards', array(
+            'rewTitle' => $choice ? Lang::quest('rewardAlso') : Lang::quest('rewardItems'),
+            'rewards'  => $items ?: null,
+            'offset'   => $iconOffset,
+            'extra'    => $money ?: null
+        ));
     endif;
 
 endif;
 
-if ($g = $this->gains):
-    echo '                    <h3>'.Lang::main('gains')."</h3>\n";
-    echo '                    '.Lang::quest('gainsDesc').Lang::main('colon')."\n";
-    echo "                    <ul>\n";
-
-    if (!empty($g['xp'])):
-        echo '                        <li><div>'.Lang::nf($g['xp']).' '.Lang::quest('experience')."</div></li>\n";
+if ([$xp, $rep, $title, $tp] = $this->gains):
+?>
+                    <h3><?=Lang::main('gains'); ?></h3>
+                    <?=Lang::quest('gainsDesc').Lang::main('colon'); ?>
+                    <ul>
+<?php
+    if ($xp):
+        echo '                        <li><div>'.Lang::nf($xp).' '.Lang::quest('experience')."</div></li>\n";
     endif;
 
-    if (!empty($g['rep'])):
-        foreach ($g['rep'] as $r):
-            if ($r['qty'][1] && User::isInGroup(U_GROUP_EMPLOYEE))
-                $qty = $r['qty'][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($r['qty'][1] > 0 ? '+' : '').$r['qty'][1]);
-            else
-                $qty = array_sum($r['qty']);
-
-            echo '                        <li><div>'.($r['qty'][0] < 0 ? '<b class="q10">'.$qty.'</b>' : $qty).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
+    if ($rep):
+        foreach ($rep as $r):
+            echo '                        <li><div>'.sprintf($r['qty'][0] < 0 ? '<b class="q10">%s</b>' : '%s', $r['qty'][1]).' '.Lang::npc('repWith').' <a href="?faction='.$r['id'].'">'.$r['name']."</a></div></li>\n";
         endforeach;
     endif;
 
-    if (!empty($g['title'])):
-        echo '                        <li><div>'.Lang::quest('theTitle', [$g['title']])."</div></li>\n";
+    if ($title):
+        echo '                        <li><div>'.Lang::quest('rewardTitle', $title)."</div></li>\n";
     endif;
 
-    if (!empty($g['tp'])):
-        echo '                        <li><div>'.Lang::quest('bonusTalents', [$g['tp']])."</div></li>\n";
+    if ($tp):
+        echo '                        <li><div>'.Lang::quest('bonusTalents', [$tp])."</div></li>\n";
     endif;
 
     echo "                    </ul>\n";
 endif;
 
-$this->brick('mail', ['offset' => ++$offset]);
+$this->brickIf($this->mail, 'mail', ['offset' => ++$iconOffset]);
 
-if (!empty($this->transfer)):
+if ($this->transfer):
     echo "    <div style=\"clear: left\"></div>";
     echo "    <div class=\"pad\"></div>\n    ".$this->transfer."\n";
 endif;
@@ -213,7 +189,7 @@ endif;
             </div>
 
 <?php
-$this->brick('lvTabs', ['relTabs' => true]);
+$this->brick('lvTabs');
 
 $this->brick('contribute');
 ?>

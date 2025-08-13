@@ -330,7 +330,7 @@ $lang = array(
         'mails'         => "Mails",
 
         'cooldown'      => "%s de recharge",
-        'difficulty'    => "Difficulté",
+        'difficulty'    => "Difficulté : ",
         'dispelType'    => "Type de dissipation",
         'duration'      => "Durée",
         'eventShort'    => "Évènement : %s",
@@ -1135,8 +1135,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "Cet évènement mondial n'existe pas.",
-        'start'         => "Début",
-        'end'           => "Fin",
+        'start'         => "Début : ",
+        'end'           => "Fin : ",
         'interval'      => "Intervalle",
         'inProgress'    => "L'évènement est présentement en cours",
         'category'      => ["Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur"]
@@ -1272,22 +1272,22 @@ $lang = array(
         '_transfer'     => 'Cette quête sera converti en <a href="?quest=%d" class="q1">%s</a> si vous transférez en <span class="icon-%s">%s</span>.',
         'questLevel'    => "Niveau %s",
         'requirements'  => "Conditions",
-        'reqMoney'      => "Argent requis",
+        'reqMoney'      => "Argent requis : %s",
         'money'         => "Argent",
         'additionalReq' => "Conditions additionnelles requises pour obtenir cette quête",
         'reqRepWith'    => 'Votre reputation avec <a href="?faction=%d">%s</a> doît être %s %s',
         'reqRepMin'     => "d'au moins",
         'reqRepMax'     => "moins que",
         'progress'      => "Progrès",
-        'provided'      => "Fourni",
+        'provided'      => "(Fourni)",
         'providedItem'  => "Objet fourni",
         'completion'    => "Achèvement",
         'description'   => "Description",
-        'playerSlain'   => "Joueurs tués",
-        'profession'    => "Métier",
-        'timer'         => "Temps",
-        'loremaster'    => "Maitre des traditions",
-        'suggestedPl'   => "Joueurs suggérés",
+        'playerSlain'   => "Joueurs tués&nbsp;(%d)",
+        'profession'    => "Métier : ",
+        'timer'         => "Temps : ",
+        'loremaster'    => "Maitre des traditions : ",
+        'suggestedPl'   => "Joueurs suggérés : %d",
         'keepsPvpFlag'  => "Vous garde en mode JvJ",
         'daily'         => "Journalière",
         'weekly'        => "Chaque semaine",
@@ -1308,16 +1308,17 @@ $lang = array(
         'enabledByQ'    => "Autorisée par",
         'enabledByQDesc'=> "Vous pouvez faire cette quête seulement quand cette quête est active",
         'gainsDesc'     => "Lors de l'achèvement de cette quête vous gagnerez",
-        'theTitle'      => '"%s"',                          // empty on purpose!
         'unavailable'   => "Cette quête est marquée comme obsolète et ne peut être obtenue ou accomplie.",
         'experience'    => "points d'expérience",
         'expConvert'    => "(ou %s si completé au niveau %d)",
         'expConvert2'   => "%s si completé au niveau %d",
-        'chooseItems'   => "Vous pourrez choisir une de ces récompenses",
-        'receiveItems'  => "Vous recevrez",
-        'receiveAlso'   => "Vous recevrez également",
-        'spellCast'     => "Vous allez être la cible du sort suivant",
-        'spellLearn'    => "Vous apprendrez",
+        'rewardChoices' => "Vous pourrez choisir une de ces récompenses :",                       // REWARD_CHOICES
+        'rewardItems'   => "Vous recevrez :",                                                     // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "Vous recevrez également :",                                           // REWARD_ITEMS (Ainsi que :)
+        'rewardSpell'   => "Vous apprendrez :",                                                   // REWARD_SPELL
+        'rewardAura'    => "Vous allez être la cible du sort suivant :",                          // REWARD_AURA
+        'rewardTradeSkill'=>"Vous apprendrez comment créer :",                                    // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => 'Vous allez recevoir le titre suivant : "<a href="?title=%d">%s</a>"', // REWARD_TITLE
         'bonusTalents'  => "%d |4point:points; de talent",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> affichés)',
         'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
@@ -1444,8 +1445,8 @@ $lang = array(
         'mailDelivery'  => "Vous recevrez cette lettre%s%s",
         'mailBy'        => ' de <a href="?npc=%d">%s</a>',
         'mailIn'        => " après %s",
-        'delay'         => "Delay",
-        'sender'        => "Sender",
+        'delay'         => "Delay : %s",
+        'sender'        => "Sender : %s",
         'untitled'      => "Untitled Mail #%d"
     ),
     'pet'      => array(
