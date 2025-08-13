@@ -1137,7 +1137,7 @@ $lang = array(
         'notFound'      => "Это игровое событие не существует.",
         'start'         => "Начало: ",
         'end'           => "Конец: ",
-        'interval'      => "[Interval]",
+        'interval'      => "[Interval]: ",
         'inProgress'    => "Событие активно в данный момент",
         'category'      => array("Разное", "Праздники", "Периодические", "PvP")
     ),

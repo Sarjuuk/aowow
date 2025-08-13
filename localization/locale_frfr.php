@@ -1137,7 +1137,7 @@ $lang = array(
         'notFound'      => "Cet évènement mondial n'existe pas.",
         'start'         => "Début : ",
         'end'           => "Fin : ",
-        'interval'      => "Intervalle",
+        'interval'      => "Intervalle : ",
         'inProgress'    => "L'évènement est présentement en cours",
         'category'      => ["Non classés", "Vacances", "Récurrent", "Joueur ctr. Joueur"]
     ),

@@ -1137,7 +1137,7 @@ $lang = array(
         'notFound'      => "This world event doesn't exist.",
         'start'         => "Start: ",
         'end'           => "End: ",
-        'interval'      => "Interval",
+        'interval'      => "Interval: ",
         'inProgress'    => "Event is currently in progress",
         'category'      => ["Uncategorized", "Holidays", "Recurring", "Player vs. Player"]
     ),

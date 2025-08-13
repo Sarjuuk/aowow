@@ -113,7 +113,7 @@ class WorldEventList extends DBTypeList
         }
     }
 
-    public function getListviewData(bool $forNow = false) : array
+    public function getListviewData() : array
     {
         $data = [];
 
@@ -130,15 +130,6 @@ class WorldEventList extends DBTypeList
                     'lastDate'  => $this->curTpl['endTime']
                 )
             );
-        }
-
-        if ($forNow)
-        {
-            foreach ($data as &$d)
-            {
-               self::updateDates($d['_date'], $d['startDate'], $d['endDate'], $d['rec']);
-               unset($d['_date']);
-            }
         }
 
         return $data;

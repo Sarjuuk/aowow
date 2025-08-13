@@ -1136,7 +1136,7 @@ $lang = array(
         'notFound'      => "这个世界事件不存在。",
         'start'         => "开始：",
         'end'           => "结束：",
-        'interval'      => "间隔",
+        'interval'      => "间隔：",
         'inProgress'    => "事件正在进行中",
         'category'      => ["未分类", "节日", "循环", "PvP"]
     ),
