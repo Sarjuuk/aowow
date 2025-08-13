@@ -6,39 +6,68 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-// menuId 6: Zone     g_initPath()
-//  tabId 0: Database g_initHeader()
-class ZonePage extends GenericPage
+class ZoneBaseResponse extends TemplateResponse implements ICache
 {
-    use TrDetailPage;
+    use TrDetailPage, TrCache;
 
-    protected $path      = [0, 6];
-    protected $tabId     = 0;
-    protected $type      = Type::ZONE;
-    protected $typeId    = 0;
-    protected $tpl       = 'detail-page-generic';
-    protected $scripts   = [[SC_JS_FILE, 'js/ShowOnMap.js']];
+    protected  int    $cacheType  = CACHE_TYPE_PAGE;
 
-    protected $zoneMusic = [];
+    protected  string $template   = 'detail-page-generic';
+    protected  string $pageName   = 'zone';
+    protected ?int    $activeTab  = parent::TAB_DATABASE;
+    protected  array  $breadcrumb = [0, 6];
 
-    public function __construct($pageCall, $id)
+    protected  array  $dataLoader = ['zones'];
+    protected  array  $scripts    = [[SC_JS_FILE, 'js/ShowOnMap.js']];
+
+    public  int    $type      = Type::ZONE;
+    public  int    $typeId    = 0;
+    public  array  $zoneMusic = [];
+    public ?string $expansion = null;
+
+    private ZoneList $subject;
+
+    public function __construct(string $id)
     {
-        $this->typeId = intVal($id);
+        parent::__construct($id);
 
-        parent::__construct($pageCall, $id);
-
-        $this->subject = new ZoneList(array(['id', $this->typeId]));
-        if ($this->subject->error)
-            $this->notFound(Lang::game('zone'), Lang::zone('notFound'));
-
-        $this->name = $this->subject->getField('name', true);
+        $this->typeId     = intVal($id);
+        $this->contribute = Type::getClassAttrib($this->type, 'contribute') ?? CONTRIBUTE_NONE;
     }
 
-    protected function generateContent()
+    protected function generate() : void
     {
-        $this->addScript([SC_JS_FILE, '?data=zones']);
+        $this->subject = new ZoneList(array(['id', $this->typeId]));
+        if ($this->subject->error)
+            $this->generateNotFound(Lang::game('zone'), Lang::zone('notFound'));
 
-        $parentArea = $this->subject->getField('parentArea');
+        $this->h1 = $this->subject->getField('name', true);
+
+        $this->gPageInfo += array(
+            'type'   => $this->type,
+            'typeId' => $this->typeId,
+            'name'   => $this->h1
+        );
+
+        $_parentArea = $this->subject->getField('parentArea');
+        $_type       = $this->subject->getField('type');
+
+
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->breadcrumb[] = $this->subject->getField('category');
+
+        if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
+            $this->breadcrumb[] = $this->subject->getField('expansion');
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift($this->title, $this->h1, Util::ucFirst(Lang::game('zone')));
 
 
         /***********/
@@ -63,11 +92,11 @@ class ZonePage extends GenericPage
             $infobox = array_merge($infobox, $topRows);
 
         // City
-        if ($this->subject->getField('flags') & 0x8 && !$parentArea)
+        if ($this->subject->getField('flags') & AREA_FLAG_SLAVE_CAPITAL && !$_parentArea)
             $infobox[] = Lang::zone('city');
 
         // Auto repop
-        if ($this->subject->getField('flags') & 0x1000 && !$parentArea)
+        if ($this->subject->getField('flags') & AREA_FLAG_NEED_FLY && !$_parentArea)
             $infobox[] = Lang::zone('autoRez');
 
         // Level
@@ -83,7 +112,7 @@ class ZonePage extends GenericPage
         if ($_ = $this->subject->getField('levelReq'))
         {
             if ($__ = $this->subject->getField('levelReqLFG'))
-                $buff = sprintf(Lang::zone('reqLevels'), $_, $__);
+                $buff = Lang::zone('reqLevels', [$_, $__]);
             else
                 $buff = Lang::main('_reqLevel').Lang::main('colon').$_;
 
@@ -92,12 +121,12 @@ class ZonePage extends GenericPage
 
         // Territory
         $faction = $this->subject->getField('faction');
-        $wrap    = match ((int)$faction)
+        $wrap    = match ($faction)
         {
-            0       => '[span class=icon-alliance]%s[/span]',
-            1       => '[span class=icon-horde]%s[/span]',
-            4, 5    => '[span class=icon-ffa]%s[/span]',
-            default => '%s'
+            TEAM_ALLIANCE => '[span class=icon-alliance]%s[/span]',
+            TEAM_HORDE    => '[span class=icon-horde]%s[/span]',
+            4, 5          => '[span class=icon-ffa]%s[/span]',
+            default       => '%s'
         };
 
         $infobox[] = Lang::zone('territory').sprintf($wrap, Lang::zone('territories', $faction));
@@ -132,6 +161,8 @@ class ZonePage extends GenericPage
             $infobox[] = Lang::concat($_, Lang::CONCAT_NONE, fn($x) => '[race='.$x.']').' '.Lang::race('startZone');
         }
 
+        parent::generate(); // calls applyGlobals .. probably too early here, but addMoveLocationMenu requires PageTemplate to be initialized
+
         // location (if instance)
         if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ?_spawns WHERE `type`= ?d AND `typeId` = ?d ', Type::ZONE, $this->typeId))
         {
@@ -160,12 +191,15 @@ class ZonePage extends GenericPage
         if ($botRows = array_filter($quickFactsRows, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY))
             $infobox = array_merge($infobox, $botRows);
 
+        if ($infobox)
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+
 
         /****************/
         /* Main Content */
         /****************/
 
-        $addToSOM = function ($what, $entry) use (&$som)
+        $addToSOM = function (string $what, array $entry) use (&$som) : void
         {
             // entry always contains: type, id, name, level, coords[]
             if (!isset($som[$what][$entry['name']]))        // not found yet
@@ -188,10 +222,10 @@ class ZonePage extends GenericPage
             }
         };
 
-        if ($parentArea)
+        if ($_parentArea)
         {
-            $this->extraText = sprintf(Lang::zone('zonePartOf'), $parentArea);
-            $this->extendGlobalIds(Type::ZONE, $parentArea);
+            $this->extraText = new Markup(Lang::zone('zonePartOf', [$_parentArea]), ['dbpage' => true, 'allow' => Markup::CLASS_ADMIN], 'text-generic');
+            $this->extendGlobalIds(Type::ZONE, $_parentArea);
         }
 
         // we cannot fetch spawns via lists. lists are grouped by entry
@@ -219,13 +253,22 @@ class ZonePage extends GenericPage
         }
 
         // see if we can actually display a map
-        $hasMap = file_exists('static/images/wow/maps/'.Lang::getLocale()->json().'/normal/'.$this->typeId.'.jpg');
-        if (!$hasMap)                                       // try multilayered
-            $hasMap = file_exists('static/images/wow/maps/'.Lang::getLocale()->json().'/normal/'.$this->typeId.'-1.jpg');
-        if (!$hasMap)                                       // try english fallback
-            $hasMap = file_exists('static/images/wow/maps/enus/normal/'.$this->typeId.'.jpg');
-        if (!$hasMap)                                       // try english fallback, multilayered
-            $hasMap = file_exists('static/images/wow/maps/enus/normal/'.$this->typeId.'-1.jpg');
+        $mapFilePath = 'static/images/wow/maps/%s/normal/%d%s.jpg';
+        $options     = array(
+            [Lang::getLocale()->json(), ''],                // default case
+            [Lang::getLocale()->json(), '-1'],              // try multifloor
+            ['enus', ''],                                   // try english fallback
+            ['enus', '-1']                                  // try english fallback, multifloor
+        );
+        $hasMap = false;
+        foreach ($options as [$lang, $floor])
+        {
+            if (!file_exists(sprintf($mapFilePath, $lang, $this->typeId, $floor)))
+                continue;
+
+            $hasMap = true;
+            break;
+        }
 
         if ($hasMap)
         {
@@ -238,33 +281,16 @@ class ZonePage extends GenericPage
 
                 $n = Util::localizedString($tpl, 'name');
 
-                $what = '';
-                switch ($tpl['typeCat'])
+                $what = match ((int)$tpl['typeCat'])
                 {
-                    case -3:
-                        $what = 'herb';
-                        break;
-                    case -4:
-                        $what = 'vein';
-                        break;
-                    case  9:
-                        $what = 'book';
-                        break;
-                    case 25:
-                        $what = 'pool';
-                        break;
-                    case 0:
-                        if ($tpl['type'] == 19)
-                            $what = 'mail';
-                        break;
-                    case -6:
-                        if ($tpl['spellFocusId'] == 1)
-                            $what = 'anvil';
-                        else if ($tpl['spellFocusId'] == 3)
-                            $what = 'forge';
-
-                        break;
-                }
+                    -3      => 'herb',
+                    -4      => 'vein',
+                     9      => 'book',
+                    25      => 'pool',
+                     0      => $tpl['type'] == 19 ? 'mail' : '',
+                    -6      => $tpl['spellFocusId'] == 1 ? 'anvil' : ($tpl['spellFocusId'] == 3 ? 'forge' : ''),
+                    default => ''
+                };
 
                 if ($what)
                 {
@@ -339,36 +365,33 @@ class ZonePage extends GenericPage
                 $n  = Util::localizedString($tpl, 'name');
                 $sn = Util::localizedString($tpl, 'subname');
 
-                $what = '';
-                if ($tpl['npcflag'] & NPC_FLAG_REPAIRER)
-                    $what = 'repair';
-                else if ($tpl['npcflag'] & NPC_FLAG_AUCTIONEER)
-                    $what = 'auctioneer';
-                else if ($tpl['npcflag'] & NPC_FLAG_BANKER)
-                    $what = 'banker';
-                else if ($tpl['npcflag'] & NPC_FLAG_BATTLEMASTER)
-                    $what = 'battlemaster';
-                else if ($tpl['npcflag'] & NPC_FLAG_INNKEEPER)
-                    $what = 'innkeeper';
-                else if ($tpl['npcflag'] & NPC_FLAG_TRAINER)
-                    $what = 'trainer';
-                else if ($tpl['npcflag'] & NPC_FLAG_VENDOR)
-                    $what = 'vendor';
-                else if ($tpl['npcflag'] & NPC_FLAG_FLIGHT_MASTER)
-                {
-                    $flightNodes[$tpl['id']] = [$spawn['posX'], $spawn['posY']];
-                    $what = 'flightmaster';
-                }
-                else if ($tpl['npcflag'] & NPC_FLAG_STABLE_MASTER)
-                    $what = 'stablemaster';
-                else if ($tpl['npcflag'] & NPC_FLAG_GUILD_MASTER)
-                    $what = 'guildmaster';
-                else if ($tpl['npcflag'] & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
-                    $what = 'spirithealer';
-                else if ($creatureSpawns->isBoss())
+                $flagsMap = array(
+                    NPC_FLAG_REPAIRER        => 'repair',
+                    NPC_FLAG_AUCTIONEER      => 'auctioneer',
+                    NPC_FLAG_BANKER          => 'banker',
+                    NPC_FLAG_BATTLEMASTER    => 'battlemaster',
+                    NPC_FLAG_INNKEEPER       => 'innkeeper',
+                    NPC_FLAG_TRAINER         => 'trainer',
+                    NPC_FLAG_VENDOR          => 'vendor',
+                    NPC_FLAG_FLIGHT_MASTER   => 'flightmaster',
+                    NPC_FLAG_STABLE_MASTER   => 'stablemaster',
+                    NPC_FLAG_GUILD_MASTER    => 'guildmaster',
+                    NPC_FLAG_SPIRIT_HEALER |
+                    NPC_FLAG_SPIRIT_GUIDE    => 'spirithealer',
+                    0                        => ''          // set 'unused' if no match
+                );
+
+                if ($creatureSpawns->isBoss())
                     $what = 'boss';
                 else if ($tpl['rank'] == 2 || $tpl['rank'] == 4)
                     $what = 'rare';
+                else
+                    foreach ($flagsMap as $flag => $what)
+                        if ($tpl['npcflag'] & $flag)
+                            break;
+
+                if ($what == 'flightmaster')
+                    $flightNodes[$tpl['id']] = [$spawn['posX'], $spawn['posY']];
 
                 if ($what)
                     $addToSOM($what, array(
@@ -448,7 +471,7 @@ class ZonePage extends GenericPage
                     'name'          => Util::localizedString($tpl, 'name', true, true),
                     'type'          => Type::AREATRIGGER,
                     'id'            => $spawn['typeId'],
-                    'description'   => Lang::game('type').Lang::main('colon').Lang::areatrigger('types', $tpl['type'])
+                    'description'   => Lang::game('type').Lang::areatrigger('types', $tpl['type'])
                 ));
             }
 
@@ -479,19 +502,13 @@ class ZonePage extends GenericPage
             {
                 // neutral nodes come last as the line is colored by the node it's attached to
                 usort($som['flightmaster'], function($a, $b) {
-                    $n1 = $a['reactalliance'] == $a['reacthorde'];
-                    $n2 = $b['reactalliance'] == $b['reacthorde'];
+                    $n1 = (int)$a['reactalliance'] == $a['reacthorde'];
+                    $n2 = (int)$b['reactalliance'] == $b['reacthorde'];
 
-                    if ($n1 && !$n2)
-                        return 1;
-
-                    if (!$n1 && $n2)
-                        return -1;
-
-                    return 0;
+                    return $n1 <=> $n2;
                 });
 
-                $paths = DB::Aowow()->select('SELECT n1.typeId AS "0", n2.typeId AS "1" FROM ?_taxipath p JOIN ?_taxinodes n1 ON n1.id = p.startNodeId JOIN ?_taxinodes n2 ON n2.id = p.endNodeId WHERE n1.typeId IN (?a) AND n2.typeId IN (?a)', array_keys($flightNodes), array_keys($flightNodes));
+                $paths = DB::Aowow()->select('SELECT n1.`typeId` AS "0", n2.`typeId` AS "1" FROM ?_taxipath p JOIN ?_taxinodes n1 ON n1.`id` = p.`startNodeId` JOIN ?_taxinodes n2 ON n2.`id` = p.`endNodeId` WHERE n1.`typeId` IN (?a) AND n2.`typeId` IN (?a)', array_keys($flightNodes), array_keys($flightNodes));
 
                 foreach ($paths as $k => $path)
                 {
@@ -513,37 +530,39 @@ class ZonePage extends GenericPage
             }
 
             // preselect bosses for raids/dungeons
-            if (in_array($this->subject->getField('type'), [2, 3, 4, 5, 7, 8]))
+            if (in_array($_type, [MAP_TYPE_DUNGEON, MAP_TYPE_RAID, MAP_TYPE_BATTLEGROUND, MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC]))
                 $som['instance'] = true;
 
             $this->map = array(
-                'data' => ['parent' => 'mapper-generic', 'zone' => $this->typeId, 'zoneLink' => false],
-                'som'  => $som
+                array(                                      // Mapper
+                    'parent'   => 'mapper-generic',
+                    'zone'     => $this->typeId,
+                    'zoneLink' => false
+                ),
+                null,                                       // mapperData
+                $som,                                       // ShowOnMap
+                null                                        // foundIn
             );
         }
-        else
-            $this->map = false;
 
-        $this->infobox    = $infobox ? '[ul][li]'.implode('[/li][li]', $infobox).'[/li][/ul]' : null;
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
         $this->redButtons = array(
             BUTTON_WOWHEAD => true,
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
-    /*
-        - associated with holiday?
-     */
 
         /**************/
         /* Extra Tabs */
         /**************/
 
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
+
         // tab: NPCs
         if ($cSpawns && !$creatureSpawns->error)
         {
             $tabData = array(
-                'data' => array_values($creatureSpawns->getListviewData()),
+                'data' => $creatureSpawns->getListviewData(),
                 'note' => sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0')
             );
 
@@ -552,14 +571,14 @@ class ZonePage extends GenericPage
 
             $this->extendGlobalData($creatureSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = [CreatureList::$brickFile, $tabData];
+            $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
         }
 
         // tab: Objects
         if ($oSpawns && !$objectSpawns->error)
         {
             $tabData = array(
-                'data' => array_values($objectSpawns->getListviewData()),
+                'data' => $objectSpawns->getListviewData(),
                 'note' => sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0')
             );
 
@@ -568,7 +587,7 @@ class ZonePage extends GenericPage
 
             $this->extendGlobalData($objectSpawns->getJSGlobals(GLOBALINFO_SELF));
 
-            $this->lvTabs[] = [GameObjectList::$brickFile, $tabData];
+            $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
         }
 
         $quests = new QuestList(array(['zoneOrSort', $this->typeId]));
@@ -590,7 +609,7 @@ class ZonePage extends GenericPage
         // tab: Quests [including data collected by SOM-routine]
         if ($questsLV)
         {
-            $tabData = ['data' => array_values($questsLV)];
+            $tabData = ['data' => $questsLV];
 
             foreach (Game::QUEST_CLASSES as $parent => $children)
             {
@@ -601,15 +620,15 @@ class ZonePage extends GenericPage
                 break;
             }
 
-            $this->lvTabs[] = [QuestList::$brickFile, $tabData];
+            $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
         }
 
         // tab: item-quest starter
         // select every quest starter, that is a drop
-        $questStartItem = DB::Aowow()->select('
-            SELECT qse.typeId AS ARRAY_KEY, moreType, moreTypeId, moreZoneId
-            FROM   ?_quests_startend qse JOIN ?_source src ON src.type = qse.type AND src.typeId = qse.typeId
-            WHERE  src.src2 IS NOT NULL AND qse.type = ?d AND (moreZoneId = ?d OR (moreType = ?d AND moreTypeId IN (?a)) OR (moreType = ?d AND moreTypeId IN (?a)))',
+        $questStartItem = DB::Aowow()->select(
+           'SELECT qse.`typeId` AS ARRAY_KEY, `moreType`, `moreTypeId`, `moreZoneId`
+            FROM   ?_quests_startend qse JOIN ?_source src ON src.`type` = qse.`type` AND src.`typeId` = qse.`typeId`
+            WHERE  src.`src2` IS NOT NULL AND qse.`type` = ?d AND (`moreZoneId` = ?d OR (`moreType` = ?d AND `moreTypeId` IN (?a)) OR (`moreType` = ?d AND `moreTypeId` IN (?a)))',
             Type::ITEM,   $this->typeId,
             Type::NPC,    array_unique(array_column($cSpawns, 'typeId')) ?: [0],
             Type::OBJECT, array_unique(array_column($oSpawns, 'typeId')) ?: [0]
@@ -620,11 +639,11 @@ class ZonePage extends GenericPage
             $qsiList = new ItemList(array(['id', array_keys($questStartItem)]));
             if (!$qsiList->error)
             {
-                $this->lvTabs[] = [ItemList::$brickFile, array(
-                    'data' => array_values($qsiList->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $qsiList->getListviewData(),
                     'name' => '$LANG.tab_startsquest',
                     'id'   => 'starts-quest'
-                )];
+                ), ItemList::$brickFile));
 
                 $this->extendGlobalData($qsiList->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -636,12 +655,12 @@ class ZonePage extends GenericPage
             $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
             if (!$rewards->error)
             {
-                $this->lvTabs[] = [ItemList::$brickFile, array(
-                    'data' => array_values($rewards->getListviewData()),
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $rewards->getListviewData(),
                     'name' => '$LANG.tab_questrewards',
                     'id'   => 'quest-rewards',
                     'note' => sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0')
-                )];
+                ), ItemList::$brickFile));
 
                 $this->extendGlobalData($rewards->getJSGlobals(GLOBALINFO_SELF));
             }
@@ -656,28 +675,24 @@ class ZonePage extends GenericPage
             $this->extendGlobalData($fish->jsGlobals);
             $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
 
-            $note = '';
+            $note = null;
             if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $this->typeId))
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
-            else if ($parentArea && ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $parentArea)))
+            else if ($_parentArea && ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $_parentArea)))
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
 
-            $tabData = array(
-                'data'       => array_values($fish->getResult()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'       => $fish->getResult(),
                 'name'       => '$LANG.tab_fishing',
                 'id'         => 'fishing',
                 'extraCols'  => array_unique($xCols),
-                'hiddenCols' => ['side']
-            );
-
-            if ($note)
-                $tabData['note'] = $note;
-
-            $this->lvTabs[] = [ItemList::$brickFile, $tabData];
+                'hiddenCols' => ['side'],
+                'note'       => $note
+            ), ItemList::$brickFile));
         }
 
         // tab: spells
-        if ($saData = DB::World()->select('SELECT * FROM spell_area WHERE area = ?d', $this->typeId))
+        if ($saData = DB::World()->select('SELECT * FROM spell_area WHERE `area` = ?d', $this->typeId))
         {
             $spells = new SpellList(array(['id', array_column($saData, 'spell')]));
             if (!$spells->error)
@@ -710,15 +725,11 @@ class ZonePage extends GenericPage
                 if ($cnd->toListviewColumn($lvSpells, $extraCols))
                     $this->extendGlobalData($cnd->getJsGlobals());
 
-                $tabData = array(
-                    'data'       => array_values($lvSpells),
-                    'hiddenCols' => ['skill']
-                );
-
-                if ($extraCols)
-                    $tabData['extraCols'] = $extraCols;
-
-                $this->lvTabs[] = [SpellList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'       => $lvSpells,
+                    'hiddenCols' => ['skill'],
+                    'extraCols'  => $extraCols ?: null
+                ), SpellList::$brickFile));
             }
         }
 
@@ -726,12 +737,12 @@ class ZonePage extends GenericPage
         $subZones = new ZoneList(array(['parentArea', $this->typeId]));
         if (!$subZones->error)
         {
-            $this->lvTabs[] = [ZoneList::$brickFile, array(
-                'data'       => array_values($subZones->getListviewData()),
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'       => $subZones->getListviewData(),
                 'name'       => '$LANG.tab_zones',
                 'id'         => 'subzones',
                 'hiddenCols' => ['territory', 'instancetype']
-            )];
+            ), ZoneList::$brickFile));
 
             $this->extendGlobalData($subZones->getJSGlobals(GLOBALINFO_SELF));
         }
@@ -745,12 +756,12 @@ class ZonePage extends GenericPage
 
         $soundIds  = [];
         $zoneMusic = DB::Aowow()->select(
-           'SELECT   x.soundId AS ARRAY_KEY, x.soundId, x.worldStateId, x.worldStateValue, x.type
-            FROM    (SELECT `ambienceDay`   AS soundId, `worldStateId`, `worldStateValue`, 1 AS `type` FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceDay`   > 0 UNION
-                     SELECT `ambienceNight` AS soundId, `worldStateId`, `worldStateValue`, 1 AS `type` FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceNight` > 0 UNION
-                     SELECT `musicDay`      AS soundId, `worldStateId`, `worldStateValue`, 2 AS `type` FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicDay`      > 0 UNION
-                     SELECT `musicNight`    AS soundId, `worldStateId`, `worldStateValue`, 2 AS `type` FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicNight`    > 0 UNION
-                     SELECT `intro`         AS soundId, `worldStateId`, `worldStateValue`, 3 AS `type` FROM ?_zones_sounds WHERE `id` IN (?a) AND `intro`         > 0) x
+           'SELECT   x.`soundId` AS ARRAY_KEY, x.`soundId`, x.`worldStateId`, x.`worldStateValue`, x.`type`
+            FROM    (SELECT `ambienceDay`   AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceDay`   > 0 UNION
+                     SELECT `ambienceNight` AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceNight` > 0 UNION
+                     SELECT `musicDay`      AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicDay`      > 0 UNION
+                     SELECT `musicNight`    AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicNight`    > 0 UNION
+                     SELECT `intro`         AS "soundId", `worldStateId`, `worldStateValue`, 3 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `intro`         > 0) x
             GROUP BY x.soundId, x.worldStateId, x.worldStateValue',
             $areaIds, $areaIds, $areaIds, $areaIds, $areaIds
         );
@@ -772,40 +783,38 @@ class ZonePage extends GenericPage
 
                 if (array_filter(array_column($zoneMusic, 'worldStateId')))
                 {
-                    $tabData['extraCols']  = ['$Listview.extraCols.condition'];
+                    $tabData['extraCols'] = ['$Listview.extraCols.condition'];
 
                     foreach ($soundIds as $sId)
                         if (!empty($zoneMusic[$sId]['worldStateId']))
                             Conditions::extendListviewRow($data[$sId], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $zoneMusic[$sId]['worldStateId'], $zoneMusic[$sId]['worldStateValue']]);
                 }
 
-                $tabData['data'] = array_values($data);
+                $tabData['data'] = $data;
 
-                $this->lvTabs[] = [SoundList::$brickFile, $tabData];
+                $this->lvTabs->addListviewTab(new Listview($tabData, SoundList::$brickFile));
 
                 $this->extendGlobalData($music->getJSGlobals(GLOBALINFO_SELF));
 
                 $typeFilter = function(array $music, int $type) use ($data) : array
                 {
                     $result = [];
-                    foreach (array_filter($music, function ($x) use ($type) { return $x['type'] == $type; } ) as $sId => $_)
+                    foreach (array_filter($music, fn ($x) => $x['type'] == $type) as $sId => $_)
                         $result = array_merge($result, $data[$sId]['files'] ?? []);
 
                     return $result;
                 };
 
-                // audio controls
-                // ambience
-                if ($_ = $typeFilter($zoneMusic, 1))
-                    $this->zoneMusic['ambience'] = $_;
-
-                // music
+                // audio controls (order how it appears on page)
+                // [title, data, divID, options]
                 if ($_ = $typeFilter($zoneMusic, 2))
-                    $this->zoneMusic['music'] = $_;
+                    $this->zoneMusic[] = [Lang::sound('music'), $_, 'zonemusic', (object)['loop' => true]];
 
-                // intro
                 if ($_ = $typeFilter($zoneMusic, 3))
-                    $this->zoneMusic['intro'] = $_;
+                    $this->zoneMusic[] = [Lang::sound('intro'), $_, 'zonemusicintro', (object)[]];
+
+                if ($_ = $typeFilter($zoneMusic, 1))
+                    $this->zoneMusic[] = [Lang::sound('ambience'), $_, 'soundambience', (object)['loop' => true]];
             }
         }
 
@@ -815,11 +824,11 @@ class ZonePage extends GenericPage
         if ($tab = $cnd->toListviewTab('condition-for', '$LANG.tab_condition_for'))
         {
             $this->extendGlobalData($cnd->getJsGlobals());
-            $this->lvTabs[] = $tab;
+            $this->lvTabs->addDataTab(...$tab);
         }
     }
 
-    private function addMoveLocationMenu($parentArea, $parentFloor)
+    private function addMoveLocationMenu(int $_parentArea, int $parentFloor) : void
     {
         // hide for non-staff
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
@@ -829,7 +838,7 @@ class ZonePage extends GenericPage
         if (!$worldPos)
             return;
 
-        $menu = Util::buildPosFixMenu($worldPos[-$this->typeId]['mapId'], $worldPos[-$this->typeId]['posX'], $worldPos[-$this->typeId]['posY'], Type::ZONE, -$this->typeId, $parentArea, $parentFloor);
+        $menu = Util::buildPosFixMenu($worldPos[-$this->typeId]['mapId'], $worldPos[-$this->typeId]['posX'], $worldPos[-$this->typeId]['posY'], Type::ZONE, -$this->typeId, $_parentArea, $parentFloor);
         if (!$menu)
             return;
 
@@ -837,20 +846,6 @@ class ZonePage extends GenericPage
 
         $this->addScript([SC_JS_STRING, '$(document).ready(function () { mn_staff.push('.Util::toJSON(array_values($menu)).'); });']);
     }
-
-    protected function generatePath()
-    {
-        $this->path[] = $this->subject->getField('category');
-
-        if (in_array($this->subject->getField('category'), [2, 3]))
-            $this->path[] = $this->subject->getField('expansion');
-    }
-
-    protected function generateTitle()
-    {
-        array_unshift($this->title, $this->name, Util::ucFirst(Lang::game('zone')));
-    }
-
 }
 
 ?>
