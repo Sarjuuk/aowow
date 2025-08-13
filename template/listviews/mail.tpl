@@ -11,7 +11,9 @@ Listview.templates.mail = {
             value: 'id',
             compute: function(data, td) {
                 if (data.id) {
-                    $WH.ae(td, $WH.ct(data.id));
+                    let pre = $WH.ce('pre', { style: { display: 'inline', margin: '0' }}, $WH.ct(data.id));
+                    $WH.clickToCopy(pre);
+                    $WH.ae(td, pre);
                 }
             }
         },
@@ -89,5 +91,12 @@ Listview.templates.mail = {
     ],
     getItemLink: function(mail) {
         return '?mail=' + mail.id;
+    },
+    onBeforeCreate : function() {
+        // hide duplicate id col
+        if (this.debug || g_user?.debug) {
+            let colId = this.columns.findIndex(x => x.id == 'id');
+            this.visibility = this.visibility.filter(x => x != colId);
+        }
     }
 }
