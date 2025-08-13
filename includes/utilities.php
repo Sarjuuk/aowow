@@ -644,7 +644,8 @@ abstract class Util
         return $success;
     }
 
-    public static function createHash($length = 40)         // just some random numbers for unsafe identification purpose
+    // just some random numbers for unsafe identification purpose
+    public static function createHash(int $length = 40) : string
     {
         static $seed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         $hash = '';
@@ -725,12 +726,12 @@ abstract class Util
                 $x['sourceB'] = $miscData['voterId'];
                 $x['amount']  = $action == SITEREP_ACTION_UPVOTED ? Cfg::get('REP_REWARD_UPVOTED') : Cfg::get('REP_REWARD_DOWNVOTED');
                 break;
-            case SITEREP_ACTION_UPLOAD:
+            case SITEREP_ACTION_SUBMIT_SCREENSHOT:
                 if (empty($miscData['id']) || empty($miscData['what']))
                     return false;
 
                 $x['sourceA'] = $miscData['id'];            // screenshotId or videoId
-                $x['sourceB'] = $miscData['what'];          // screenshot:1 or video:NYD
+                $x['sourceB'] = $miscData['what'];          // screenshot:1
                 $x['amount']  = Cfg::get('REP_REWARD_UPLOAD');
                 break;
             case SITEREP_ACTION_GOOD_REPORT:                // NYI

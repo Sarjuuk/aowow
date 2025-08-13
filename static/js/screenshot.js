@@ -47,19 +47,16 @@ function ss_Refresh(openNext, type, typeId) {
 
                 ssm_UpdatePages();
 
-                if (openNext) {
+                if (openNext)
                     ss_Manage($WH.ge('pages-container').firstChild.firstChild, ssm_screenshotPages[0].type, ssm_screenshotPages[0].typeId, true);
-                }
-                else if (type && typeId) {
+                else if (type && typeId)
                     ss_Manage(null, type, typeId, true);
-                }
             }
             else {
                 $WH.ee($WH.ge('show-all-pages'));
                 $WH.ge('pages-container').innerHTML = 'NO SCREENZSHOT NEEDS 2 BE APPRVED NOW KTHX. :)';
-                if (type && typeId) {
+                if (type && typeId)
                     ss_Manage(null, type, typeId, true);
-                }
             }
         }
     });
@@ -73,11 +70,9 @@ function ss_Manage(_this, type, typeId, openNext) {
             eval(xhr.responseText);
             ssm_numPending = 0;
 
-            for (var i in ssm_screenshotData) {
-                if (ssm_screenshotData[i].pending) {
+            for (var i in ssm_screenshotData)
+                if (ssm_screenshotData[i].pending)
                     ssm_numPending++;
-                }
-            }
 
             var nRows = ssm_screenshotData.length;
             $WH.ge('screenshotTotal').innerHTML = nRows + ' total' + (nRows == 100 ? ' (limit reached)' : '');
@@ -85,15 +80,13 @@ function ss_Manage(_this, type, typeId, openNext) {
             ssm_UpdateList(openNext);
             ssm_UpdateMassLinks();
 
-            if (ss_managedRow != null) {
+            if (ss_managedRow != null)
                 ss_ColorizeRow('transparent');
-            }
 
             ss_managedRow = _this;
 
-            if (ss_managedRow != null) {
+            if (ss_managedRow != null)
                 ss_ColorizeRow('#282828');
-            }
         }
     });
 }
@@ -120,13 +113,15 @@ function ss_ManageUser() {
         method: 'get',
         onSuccess: function (xhr) {
             eval(xhr.responseText);
+
             var nRows = ssm_screenshotData.length;
             $WH.ge('screenshotTotal').innerHTML = nRows + ' total' + (nRows == 100 ? ' (limit reached)' : '');
+
             ssm_UpdateList();
             ssm_UpdateMassLinks();
-            if (ss_managedRow != null) {
+
+            if (ss_managedRow != null)
                 ss_ColorizeRow('transparent');
-            }
         }
     });
 
@@ -134,33 +129,28 @@ function ss_ManageUser() {
 }
 
 function ss_ColorizeRow(color) {
-    for (var i = 0; i < ss_managedRow.childNodes.length; ++i) {
+    for (var i = 0; i < ss_managedRow.childNodes.length; ++i)
         ss_managedRow.childNodes[i].style.backgroundColor = color;
-    }
 }
 
 function ssm_GetScreenshot(id) {
-    for (var i in ssm_screenshotData) {
-        if (ssm_screenshotData[i].id == id) {
+    for (var i in ssm_screenshotData)
+        if (ssm_screenshotData[i].id == id)
             return ssm_screenshotData[i];
-        }
-    }
 
     return null;
 }
 
 function ssm_View(row, id) {
-    if (ssm_ViewedRow != null) {
+    if (ssm_ViewedRow != null)
         ssm_ColorizeRow('transparent');
-    }
 
     ssm_ViewedRow = row;
     ssm_ColorizeRow('#282828');
 
     var screenshot = ssm_GetScreenshot(id);
-    if (screenshot != null) {
+    if (screenshot != null)
         ScreenshotManager.show(screenshot);
-    }
 }
 
 function ssm_ColorizeRow(color) {
@@ -248,23 +238,20 @@ function ssm_UpdatePages(UNUSED) {
 }
 
 function ssm_UpdateList(openNext) {
-    var tsl   = $WH.ge('theScreenshotsList');
+    var tbl   = $WH.ge('theScreenshotsList');
     var tBody = false;
     var i     = 1;
 
-    while (tsl.childNodes.length > i) {
-        if (tsl.childNodes[i].nodeName == 'TR' && tBody) {
-            $WH.de(tsl.childNodes[i]);
-        }
-        else if (tsl.childNodes[i].nodeName == 'TR') {
+    while (tbl.childNodes.length > i) {
+        if (tbl.childNodes[i].nodeName == 'TR' && tBody)
+            $WH.de(tbl.childNodes[i]);
+        else if (tbl.childNodes[i].nodeName == 'TR')
             tBody = true;
-        }
-        else {
+        else
             i++;
-        }
     }
 
-    var now = new Date();
+    var now  = new Date();
     var ssId = 0;
     for (var i in ssm_screenshotData) {
         var screenshot = ssm_screenshotData[i];
@@ -299,15 +286,13 @@ function ssm_UpdateList(openNext) {
             var a = $WH.ce('a');
             a.href = '?' + g_types[screenshot.type] + '=' + screenshot.typeId + '#screenshots:id=' + screenshot.id;
             a.target = '_blank';
-            a.onclick = function (e) {
-                $WH.sp(e);
-            };
+            a.onclick = function (e) { $WH.sp(e); };
             $WH.ae(a, $WH.ct(screenshot.id));
             $WH.ae(td, a);
         }
-        else {
+        else
             $WH.ae(td, $WH.ct(screenshot.id));
-        }
+
         $WH.ae(tr, td);
 
         td = $WH.ce('td');
@@ -336,9 +321,9 @@ function ssm_UpdateList(openNext) {
 
         var a = $WH.ce('a');
         a.href = 'javascript:;';
-        a.onclick = function (id, e) {
+        a.onclick = function (ss, e) {
             $WH.sp(e);
-            (ssm_ShowEdit.bind(this, id))()
+            (ssm_ShowEdit.bind(this, ss))();
         }.bind(a, screenshot);
         $WH.ae(a, $WH.ct('Edit'));
         $WH.ae(sp, a);
@@ -346,9 +331,9 @@ function ssm_UpdateList(openNext) {
 
         a = $WH.ce('a');
         a.href = 'javascript:;';
-        a.onclick = function (id, e) {
+        a.onclick = function (ss, e) {
             $WH.sp(e);
-            (ssm_Clear.bind(this, id))()
+            (ssm_Clear.bind(this, ss))();
         }.bind(a, screenshot);
         $WH.ae(a, $WH.ct('Clear'));
         $WH.ae(sp, a);
@@ -364,9 +349,7 @@ function ssm_UpdateList(openNext) {
         a = $WH.ce('a');
         a.href = '?user=' + screenshot.user;
         a.target = '_blank';
-        a.onclick = function (e) {
-            $WH.sp(e);
-        };
+        a.onclick = function (e) { $WH.sp(e); };
         $WH.ae(a, $WH.ct(screenshot.user));
         $WH.ae(td, a);
         $WH.ae(tr, td);
@@ -384,6 +367,7 @@ function ssm_UpdateList(openNext) {
             (ssm_UpdateMassLinks.bind(this))();
         }.bind(cb);
         $WH.ae(td, cb);
+
         $WH.ae(td, $WH.ct(' '));
 
         if (screenshot.status != 999) {
@@ -392,23 +376,21 @@ function ssm_UpdateList(openNext) {
                 return false;
             }.bind(tr, screenshot.id);
 
-            if (screenshot.id == ssId && openNext) {
+            if (screenshot.id == ssId && openNext)
                 ssm_View(tr, screenshot.id);
-            }
 
             if (screenshot.pending) {
                 a = $WH.ce('a');
                 a.href = 'javascript:;';
                 a.onclick = function (e) {
                     $WH.sp(e);
-                    (ssm_Approve.bind(this, false))()
+                    (ssm_Approve.bind(this, false))();
                 }.bind(screenshot);
                 $WH.ae(a, $WH.ct('Approve'));
                 $WH.ae(td, a);
             }
-            else {
+            else
                 $WH.ae(td, $WH.ct('Approve'));
-            }
 
             $WH.ae(td, makePipe());
 
@@ -422,9 +404,9 @@ function ssm_UpdateList(openNext) {
                 $WH.ae(a, $WH.ct('Make sticky'));
                 $WH.ae(td, a);
             }
-            else {
+            else
                 $WH.ae(td, $WH.ct('Make sticky'));
-            }
+
             $WH.ae(td, makePipe());
 
             a = $WH.ce('a');
@@ -435,6 +417,7 @@ function ssm_UpdateList(openNext) {
             }.bind(screenshot);
             $WH.ae(a, $WH.ct('Delete'));
             $WH.ae(td, a);
+
             $WH.ae(td, makePipe());
 
             a = $WH.ce('a');
@@ -449,24 +432,24 @@ function ssm_UpdateList(openNext) {
         }
 
         $WH.ae(tr, td);
-        $WH.ae(tsl, tr);
+        $WH.ae(tbl, tr);
     }
 }
 
 function ssm_UpdateMassLinks() {
-    var buff = '';
+    var idBuff = '';
     var i = 0;
     var tSL = $WH.ge('theScreenshotsList');
     var inp = $WH.gE(tSL, 'input');
 
     $WH.array_walk(inp, function (x) {
         if (x.checked) {
-            buff += x.value + ',';
+            idBuff += x.value + ',';
             ++i;
         }
     });
 
-    buff = $WH.rtrim(buff, ',');
+    idBuff = $WH.rtrim(idBuff, ',');
 
     var selCnt = $WH.ge('withselected');
     if (i > 0) {
@@ -477,23 +460,22 @@ function ssm_UpdateMassLinks() {
         var b = $WH.ge('massdelete');
         var a = $WH.ge('masssticky');
 
-        c.href    = '?admin=screenshots&action=approve&id=' + buff;
+        c.href    = '?admin=screenshots&action=approve&id=' + idBuff;
         c.onclick = ssm_ConfirmMassApprove;
 
-        b.href    = '?admin=screenshots&action=delete&id=' + buff;
+        b.href    = '?admin=screenshots&action=delete&id=' + idBuff;
         b.onclick = ssm_ConfirmMassDelete;
 
-        a.href    = '?admin=screenshots&action=sticky&id=' + buff;
+        a.href    = '?admin=screenshots&action=sticky&id=' + idBuff;
         a.onclick = ssm_ConfirmMassSticky;
     }
-    else {
+    else
         selCnt.style.display = 'none';
-    }
 }
 
 function ssm_MassSelect(action) {
-    var tSL = $WH.ge('theScreenshotsList');
-    var inp = $WH.gE(tSL, 'input');
+    var tbl = $WH.ge('theScreenshotsList');
+    var inp = $WH.gE(tbl, 'input');
 
     switch (parseInt(action)) {
         case 1:
@@ -527,12 +509,10 @@ function ssm_MassSelect(action) {
 function ssm_ShowEdit(screenshot, isAlt) {
     var node;
 
-    if (isAlt) {
-        node = $WH.ge('alt2-' + screenshot.id)
-    }
-    else {
-        node = $WH.ge('alt-' + screenshot.id)
-    }
+    if (isAlt)
+        node = $WH.ge('alt2-' + screenshot.id);
+    else
+        node = $WH.ge('alt-' + screenshot.id);
 
     var sp = $WH.gE(node, 'span')[0];
     var div = $WH.ce('div');
@@ -548,28 +528,27 @@ function ssm_ShowEdit(screenshot, isAlt) {
     var btn = $WH.ce('input');
     btn.type = 'button';
     btn.value = 'Update';
-    btn.onclick = function (i, j, k) {
-        if (!j) {
-            $WH.sp(k);
-        }
+    btn.onclick = function (ss, isAlt, e) {
+        if (!isAlt)
+            $WH.sp(e);
 
-        (ssm_Edit.bind(this, i, j))();
+        (ssm_Edit.bind(this, ss, isAlt))();
     }.bind(btn, screenshot, isAlt);
     div.appendChild(btn);
 
-    var c = $WH.ce('span');
-    c.appendChild($WH.ct(' '));
-    div.appendChild(c);
+    var sp2 = $WH.ce('span');
+    sp2.appendChild($WH.ct(' '));
+    div.appendChild(sp2);
 
     btn = $WH.ce('input');
     btn.type = 'button';
     btn.value = 'Cancel';
-    btn.onclick = function (i, j, k) {
-        if (!j) {
-            $WH.sp(k);
+    btn.onclick = function (ss, isAlt, e) {
+        if (!isAlt) {
+            $WH.sp(e);
         }
 
-        (ssm_CancelEdit.bind(this, i, j))();
+        (ssm_CancelEdit.bind(this, ss, isAlt))();
     }.bind(btn, screenshot, isAlt);
     div.appendChild(btn);
 
@@ -583,12 +562,10 @@ function ssm_ShowEdit(screenshot, isAlt) {
 function ssm_CancelEdit(screenshot, isAlt) {
     var node;
 
-    if (isAlt) {
+    if (isAlt)
         node = $WH.ge('alt2-' + screenshot.id);
-    }
-    else {
+    else
         node = $WH.ge('alt-' + screenshot.id);
-    }
 
     var sp = $WH.gE(node, 'span')[1];
     sp.style.display = '';
@@ -610,41 +587,39 @@ function ssm_Edit(screenshot, isAlt) {
     var desc = node.firstChild.childNodes;
     if (desc[0].value == screenshot.caption) {
         ssm_CancelEdit(screenshot, isAlt);
-        return
+        return;
     }
+
     screenshot.caption = desc[0].value;
 
     ssm_CancelEdit(screenshot, isAlt);
 
     node = node.firstChild;
-    while (node.childNodes.length > 0) {
+    while (node.childNodes.length > 0)
         node.removeChild(node.firstChild);
-    }
+
     $WH.ae(node, $WH.ct(screenshot.caption));
 
     new Ajax('?admin=screenshots&action=editalt&id=' + screenshot.id, {
         method: 'POST',
         params: 'alt=' + $WH.urlencode(screenshot.caption)
-    })
+    });
 }
 
 function ssm_Clear(screenshot, isAlt) {
     var node;
 
-    if (isAlt) {
+    if (isAlt)
         node = $WH.ge('alt2-' + screenshot.id);
-    }
-    else {
+    else
         node = $WH.ge('alt-' + screenshot.id);
-    }
 
     var sp = $WH.gE(node, 'span');
     var a  = $WH.gE(sp[1], 'a');
     sp = sp[0];
 
-    if (screenshot.caption == '') {
+    if (screenshot.caption == '')
         return;
-    }
 
     screenshot.caption = '';
     sp.innerHTML = '<i class="q0">NULL</i>';
@@ -652,67 +627,64 @@ function ssm_Clear(screenshot, isAlt) {
     new Ajax('?admin=screenshots&action=editalt&id=' + screenshot.id, {
         method: 'POST',
         params: 'alt=' + $WH.urlencode('')
-    })
+    });
 }
 
 function ssm_Approve(openNext) {
-    var _self = this;
-    new Ajax('?admin=screenshots&action=approve&id=' + _self.id, {
+    var ss = this;
+    new Ajax('?admin=screenshots&action=approve&id=' + ss.id, {
         method: 'get',
         onSuccess: function (x) {
             Lightbox.hide();
-            if (ssm_numPending == 1 && _self.pending) {
+            if (ssm_numPending == 1 && ss.pending)
                 ss_Refresh(true);
-            }
             else {
                 ss_Refresh();
-                ss_Manage(ss_managedRow, _self.type, _self.typeId, openNext, 0);
+                ss_Manage(ss_managedRow, ss.type, ss.typeId, openNext, 0);
             }
         }
-    })
+    });
 }
 
 function ssm_Sticky(openNext) {
-    var _self = this;
-    new Ajax('?admin=screenshots&action=sticky&id=' + _self.id, {
+    var ss = this;
+    new Ajax('?admin=screenshots&action=sticky&id=' + ss.id, {
         method: 'get',
         onSuccess: function (x) {
             Lightbox.hide();
-            if (ssm_numPending == 1 && _self.pending) {
+            if (ssm_numPending == 1 && ss.pending)
                 ss_Refresh(true);
-            }
             else {
                 ss_Refresh();
-                ss_Manage(ss_managedRow, _self.type, _self.typeId, openNext, 0);
+                ss_Manage(ss_managedRow, ss.type, ss.typeId, openNext, 0);
             }
         }
-    })
+    });
 }
 
 function ssm_Delete(openNext) {
-    var _self = this;
-    new Ajax('?admin=screenshots&action=delete&id=' + _self.id, {
+    var ss = this;
+    new Ajax('?admin=screenshots&action=delete&id=' + ss.id, {
         method: 'get',
         onSuccess: function (x) {
             Lightbox.hide();
-            if (ssm_numPending == 1 && _self.pending) {
+            if (ssm_numPending == 1 && ss.pending)
                 ss_Refresh(true);
-            }
             else {
                 ss_Refresh();
-                ss_Manage(ss_managedRow, _self.type, _self.typeId, openNext, 0);
+                ss_Manage(ss_managedRow, ss.type, ss.typeId, openNext, 0);
             }
         }
     });
 }
 
 function ssm_Relocate(typeId) {
-    var _self = this;
-    new Ajax('?admin=screenshots&action=relocate&id=' + _self.id + '&typeid=' + typeId, {
+    var ss = this;
+    new Ajax('?admin=screenshots&action=relocate&id=' + ss.id + '&typeid=' + typeId, {
         method: 'get',
         onSuccess: function (x) {
             ss_Refresh();
-            ss_Manage(ss_managedRow, _self.type, typeId);
+            ss_Manage(ss_managedRow, ss.type, typeId);
         }
     });
 }
@@ -733,10 +705,10 @@ var ScreenshotManager = new function () {
         aCover,
         aOriginal,
         divFrom,
+        spCaption,
         divCaption,
-        __div,
         h2Name,
-        u,
+        controlsCOPY,
         aEdit,
         aClear,
         spApprove,
@@ -753,17 +725,14 @@ var ScreenshotManager = new function () {
             desiredScale = Math.min(772 / screenshot.width, 618 / screenshot.height);
             scale = Math.min(772 / screenshot.width, availHeight / screenshot.height);
         }
-        else {
+        else
             desiredScale = scale = 1;
-        }
 
-        if (desiredScale > 1) {
+        if (desiredScale > 1)
             desiredScale = 1;
-        }
 
-        if (scale > 1) {
+        if (scale > 1)
             scale = 1;
-        }
 
         imgWidth  = Math.round(scale * screenshot.width);
         imgHeight = Math.round(scale * screenshot.height);
@@ -778,14 +747,12 @@ var ScreenshotManager = new function () {
     }
 
     function render(resizing) {
-        if (resizing && (scale == desiredScale) && $WH.g_getWindowSize().h > container.offsetHeight) {
+        if (resizing && (scale == desiredScale) && $WH.g_getWindowSize().h > container.offsetHeight)
             return;
-        }
 
         container.style.visibility = 'hidden';
 
-        var
-            resized = (screenshot.width > 772 || screenshot.height > 618);
+        var resized = (screenshot.width > 772 || screenshot.height > 618);
 
         computeDimensions(0);
 
@@ -798,43 +765,39 @@ var ScreenshotManager = new function () {
 
         if (!resizing) {
             aOriginal.href = g_staticUrl + '/uploads/screenshots/' + (screenshot.pending ? 'pending' : 'normal') + '/' + screenshot.id + '.jpg';
-            var hasFrom1 = screenshot.date && screenshot.user;
-            if (hasFrom1) {
+            var hasFrom = screenshot.date && screenshot.user;
+            if (hasFrom) {
                 var
                     postedOn = new Date(screenshot.date),
-                    elapsed = (g_serverTime - postedOn) / 1000;
+                    elapsed  = (g_serverTime - postedOn) / 1000;
 
                 var a = divFrom.firstChild.childNodes[1];
                 a.href = '?user=' + screenshot.user;
                 a.innerHTML = screenshot.user;
 
                 var s = divFrom.firstChild.childNodes[3];
-
                 $WH.ee(s);
                 g_formatDate(s, elapsed, postedOn);
 
                 divFrom.firstChild.style.display = '';
             }
-            else {
+            else
                 divFrom.firstChild.style.display = 'none';
-            }
 
-            divFrom.style.display = (hasFrom1 ? '' : 'none');
+            divFrom.style.display = (hasFrom ? '' : 'none');
 
             var hasCaption = (screenshot.caption != null && screenshot.caption.length);
             if (hasCaption) {
                 var html = '';
-                if (hasCaption) {
+                if (hasCaption)
                     html += '<span class="screenshotviewer-caption"><b>' + Markup.toHtml(screenshot.caption, { mode: Markup.MODE_SIGNATURE }) + '</b></span>';
-                }
 
-                divCaption.innerHTML = html;
+                spCaption.innerHTML = html;
             }
-            else {
-                divCaption.innerHTML = '<i class="q0">NULL</i>';
-            }
+            else
+                spCaption.innerHTML = '<i class="q0">NULL</i>';
 
-            __div.id = 'alt2-' + screenshot.id;
+            divCaption.id = 'alt2-' + screenshot.id;
 
             aEdit.onclick  = ssm_ShowEdit.bind(aEdit, screenshot, true);
             aClear.onclick = ssm_Clear.bind(aClear, screenshot, true);
@@ -851,24 +814,22 @@ var ScreenshotManager = new function () {
 
         Lightbox.reveal();
 
-        if (divCaption.offsetHeight > 18) {
-            computeDimensions(divCaption.offsetHeight - 18);
-        }
+        if (spCaption.offsetHeight > 18)
+            computeDimensions(spCaption.offsetHeight - 18);
+
         container.style.visibility = 'visible';
     }
 
     function nextScreenshot() {
-        if (screenshot.next !== undefined) {
+        if (screenshot.next !== undefined)
             screenshot = ssm_screenshotData[screenshot.next];
-        }
 
         onRender();
     }
 
     function prevScreenshot() {
-        if (screenshot.prev !== undefined) {
+        if (screenshot.prev !== undefined)
             screenshot = ssm_screenshotData[screenshot.prev];
-        }
 
         onRender();
     }
@@ -890,7 +851,6 @@ var ScreenshotManager = new function () {
             dest.className = 'screenshotviewer';
 
             screen = $WH.ce('div');
-
             screen.className = 'screenshotviewer-screen';
 
             aPrev = $WH.ce('a');
@@ -914,12 +874,14 @@ var ScreenshotManager = new function () {
             aCover.className = 'screenshotviewer-cover';
             aCover.href = 'javascript:;';
             aCover.onclick = Lightbox.hide;
+
             var foo = $WH.ce('span');
             $WH.ae(foo, $WH.ce('b'));
             $WH.ae(aCover, foo);
             $WH.ae(screen, aPrev);
             $WH.ae(screen, aNext);
             $WH.ae(screen, aCover);
+
             var _div = $WH.ce('div');
             _div.className = 'text';
             h2Name = $WH.ce('h2');
@@ -937,28 +899,38 @@ var ScreenshotManager = new function () {
             _div.style.paddingTop = '6px';
             _div.style.cssFloat = _div.style.styleFloat = 'right';
             _div.className = 'bigger-links';
+
             aApprove = $WH.ce('a');
             aApprove.href = 'javascript:;';
             $WH.ae(aApprove, $WH.ct('Approve'));
             $WH.ae(_div, aApprove);
+
             spApprove = $WH.ce('span');
             spApprove.style.display = 'none';
             $WH.ae(spApprove, $WH.ct('Approve'));
             $WH.ae(_div, spApprove);
+
             $WH.ae(_div, makePipe());
+
             aMakeSticky = $WH.ce('a');
             aMakeSticky.href = 'javascript:;';
             $WH.ae(aMakeSticky, $WH.ct('Make sticky'));
             $WH.ae(_div, aMakeSticky);
+
             $WH.ae(_div, makePipe());
+
             aDelete = $WH.ce('a');
             aDelete.href = 'javascript:;';
             $WH.ae(aDelete, $WH.ct('Delete'));
             $WH.ae(_div, aDelete);
-            u = _div;
+
+            controlsCOPY = _div;
+
             $WH.ae(dest, _div);
+
             divFrom = $WH.ce('div');
             divFrom.className = 'screenshotviewer-from';
+
             var sp = $WH.ce('span');
             $WH.ae(sp, $WH.ct(LANG.lvscreenshot_from));
             $WH.ae(sp, $WH.ce('a'));
@@ -966,9 +938,11 @@ var ScreenshotManager = new function () {
             $WH.ae(sp, $WH.ce('span'));
             $WH.ae(divFrom, sp);
             $WH.ae(dest, divFrom);
+
             _div = $WH.ce('div');
             _div.className = 'clear';
             $WH.ae(dest, _div);
+
             var aClose = $WH.ce('a');
             aClose.className = 'screenshotviewer-close';
             aClose.href = 'javascript:;';
@@ -983,23 +957,27 @@ var ScreenshotManager = new function () {
             $WH.ae(aOriginal, $WH.ce('span'));
             $WH.ae(dest, aOriginal);
 
-            __div = $WH.ce('div');
-            divCaption = $WH.ce('span');
-            divCaption.style.paddingRight = '8px';
-            $WH.ae(__div, divCaption);
+            divCaption = $WH.ce('div');
+            spCaption = $WH.ce('span');
+            spCaption.style.paddingRight = '8px';
+            $WH.ae(divCaption, spCaption);
+
             var sp = $WH.ce('span');
             sp.style.whiteSpace = 'nowrap';
             aEdit = $WH.ce('a');
             aEdit.href = 'javascript:;';
             $WH.ae(aEdit, $WH.ct('Edit'));
             $WH.ae(sp, aEdit);
+
             $WH.ae(sp, makePipe());
+
             aClear = $WH.ce('a');
             aClear.href = 'javascript:;';
             $WH.ae(aClear, $WH.ct('Clear'));
             $WH.ae(sp, aClear);
-            $WH.ae(__div, sp);
-            $WH.ae(dest, __div);
+            $WH.ae(divCaption, sp);
+            $WH.ae(dest, divCaption);
+
             _div = $WH.ce('div');
             _div.className = 'clear';
             $WH.ae(dest, _div);
@@ -1033,7 +1011,7 @@ var ScreenshotManager = new function () {
             }
             else {
                 container.className = '';
-                lightboxComponents = [];
+                lightboxComponents  = [];
 
                 while (container.firstChild) {
                     lightboxComponents.push(container.firstChild);
@@ -1056,7 +1034,7 @@ var ScreenshotManager = new function () {
 
                 var img = $WH.ce('img');
                 img.src = g_staticUrl + '/images/ui/misc/progress-anim.gif';
-                img.width = 126;
+                img.width  = 126;
                 img.height = 22;
 
                 $WH.ae(div, img);
@@ -1067,25 +1045,26 @@ var ScreenshotManager = new function () {
             }, 150);
 
             loadingImage = new Image();
-            loadingImage.onload = (function (screen, timer) {
+            loadingImage.onload = (function (ss, timer) {
                 clearTimeout(timer);
-                screen.width = this.width;
-                screen.height = this.height;
-                loadingImage = null;
+                ss.width  = this.width;
+                ss.height = this.height;
+                loadingImage  = null;
                 restoreLightbox();
                 render();
             }).bind(loadingImage, screenshot, lightboxTimer);
+
             loadingImage.onerror = (function (timer) {
                 clearTimeout(timer);
                 loadingImage = null;
                 Lightbox.hide();
                 restoreLightbox();
             }).bind(loadingImage, lightboxTimer);
+
             loadingImage.src = (screenshot.url ? screenshot.url : g_staticUrl + '/uploads/screenshots/' + (screenshot.pending ? 'pending' : 'normal') + '/' + screenshot.id + '.jpg');
         }
-        else {
+        else
             render();
-        }
     }
 
     function cancelImageLoading() {
@@ -1101,15 +1080,13 @@ var ScreenshotManager = new function () {
     }
 
     function restoreLightbox() {
-        if (!lightboxComponents) {
+        if (!lightboxComponents)
             return;
-        }
 
         $WH.ee(container);
         container.className = 'screenshotviewer';
-        for (var i = 0; i < lightboxComponents.length; ++i) {
+        for (var i = 0; i < lightboxComponents.length; ++i)
             $WH.ae(container, lightboxComponents[i]);
-        }
 
         lightboxComponents = null;
     }

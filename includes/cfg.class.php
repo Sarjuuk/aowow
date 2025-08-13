@@ -206,7 +206,6 @@ class Cfg
             return 'empty value given for required config';
 
         DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $value, $key);
-
         self::$store[$key][self::IDX_VALUE] = $value;
 
         // validate change
@@ -251,6 +250,7 @@ class Cfg
             return 'configuration option not found';
 
         [$oldValue, $flags, , $default, ] = self::$store[$key];
+
         if ($flags & self::FLAG_INTERNAL)
             return 'can\'t set an internal option directly';
 
@@ -445,6 +445,17 @@ class Cfg
     private static function useSSL() : bool
     {
         return (($_SERVER['HTTPS'] ?? 'off') != 'off') || (self::$store['force_ssl'][self::IDX_VALUE] ?? 0);
+    }
+
+    private static function screenshot_min_size(int|string $value, ?string &$msg = '') : bool
+    {
+        if ($value < 200)
+        {
+            $msg .= 'Value must be at least 200 (px).';
+            return false;
+        }
+
+        return true;
     }
 }
 

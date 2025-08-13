@@ -1,12 +1,12 @@
-<?php namespace Aowow; ?>
+<?php namespace Aowow\Template; ?>
 
-                    <h2><img src="<?=Cfg::get('STATIC_URL'); ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">提醒</h2>
-                    你的截图将<b class="q10">不会</b> 通过审查假设不符合下列准则。
+                    <h2><img src="<?=$this->gStaticUrl; ?>/images/icons/bubble-big.gif" width="32" height="29" alt="" style="vertical-align:middle;margin-right:8px">提醒</h2>
+                    如果您的截图不符合以下指南，将<b class="q10">不会</b>被通过审核。
 
                     <ul>
-                        <li><div>Be sure to turn up your <u><b>graphics settings</b></u> to make sure the shot looks good!</div></li>
-                        <li><div><u><b>Model viewer</b></u> shots are deleted on sight (this also includes character select, typically).</div></li>
-                        <li><div>Don't include the <u><b>onscreen text</b></u> and the <u><b>selection circle</b></u> of a NPC.</div></li>
-                        <li><div>Don't include any <u><b>UI</b></u> in the shot if you can help it.</div></li>
-                        <li><div>Use the screenshot <u><b>cropping tool</b></u> to focus on the item as much as possible and reduce any unnecessary surrounding, as to better show off the item in question when reduced to the thumbnail that will be present on the item's page.</div></li>
+                        <li><div>请确保将您的<u><b>图形设置</b></u>调高，以保证截图质量！</div></li>
+                        <li><div>使用<u><b>模型查看器</b></u>的截图会被直接删除（包括角色选择界面）。</div></li>
+                        <li><div>请勿包含NPC的<u><b>屏幕文字</b></u>和<u><b>选择圈</b></u>。</div></li>
+                        <li><div>如有可能，请勿在截图中包含任何<u><b>用户界面</b></u>元素。</div></li>
+                        <li><div>请使用<u><b>截图裁剪工具</b></u>尽量聚焦于物品本身，减少不必要的背景，以便在物品页面的缩略图中更好地展示该物品。</div></li>
                     </ul>

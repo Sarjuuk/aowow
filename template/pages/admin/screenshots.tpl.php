@@ -1,7 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
-
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -12,7 +13,7 @@ $this->brick('announcement');
 $this->brick('pageTemplate');
 ?>
             <div class="text">
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 
                   <table>
                     <tr>
@@ -24,13 +25,7 @@ $this->brick('pageTemplate');
                         <td>Page: </td>
                         <td>
                             <select id="pagetype">
-<?php
-foreach (Type::getFileStringsFor() as $i => $str):
-    if (Lang::game($str) && Type::checkClassAttrib($i, 'contribute', CONTRIBUTE_SS)):
-        echo "                                <option value=\"".$i."\">".Util::ucFirst(Lang::game($str))."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList($this->pageTypes, null, 32); ?>
                             </select>
                         </td>
                         <td>#<input type="number" size="6" id="pagetypeid"></td>
@@ -42,20 +37,20 @@ endforeach;
                 <thead><tr><th style="width:135px;"><div>Menu</div></th><th style="width:400px;">Pages</th><th>Screenshots: <span id="screenshotTotal"></span></th></tr></thead>
                 <tbody><tr>
                     <td id="menu-container" style="vertical-align: top;">
-                        <div id="show-all-pages"><?=($this->ssNFound ? ' &ndash; <a href="?admin=screenshots&all">Show All</a> ('.$this->ssNFound.')' : null); ?></div>
+                        <div id="show-all-pages"><?=($this->ssNFound ? ' &ndash; <a href="?admin=screenshots&all">Show All</a> ('.$this->ssNFound.')' : ''); ?></div>
                         <h4>Mass Select</h4>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(1);">Select All</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(0);">Deselect All</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(-1);">Toggle Selection</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(2);">Select All Pending</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(5);">Select All Unique</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(3);">Select All Approved</a><br>
-                             &ndash; <a href="#" onClick="ssm_MassSelect(4);">Select All Sticky</a><br>
+                             &ndash; <a href="#" onClick="ssm_MassSelect(1);">Select All</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(0);">Deselect All</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(-1);">Toggle Selection</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(2);">Select All Pending</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(5);">Select All Unique</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(3);">Select All Approved</a><br />
+                             &ndash; <a href="#" onClick="ssm_MassSelect(4);">Select All Sticky</a><br />
                         <div id="withselected" style="display:none;">
                             <h4>Mass Action <b>(0)</b></h4>
-                             &ndash; <a href="#" id="massapprove">Approve All</a><br>
-                             &ndash; <a href="#" id="massdelete">Delete All</a><br>
-                             &ndash; <a href="#" id="masssticky">Sticky All</a><br>
+                             &ndash; <a href="#" id="massapprove">Approve All</a><br />
+                             &ndash; <a href="#" id="massdelete">Delete All</a><br />
+                             &ndash; <a href="#" id="masssticky">Sticky All</a><br />
                         </div>
                     </td>
                     <td id="pages-container" style="vertical-align: top;"></td>
@@ -124,10 +119,10 @@ if ($this->getAll):
     echo "                    var ss_getAll = true;\n";
 endif;
 if ($this->ssPages):
-    echo "                    var ssm_screenshotPages = ".Util::toJSON($this->ssPages).";\n";
+    echo "                    var ssm_screenshotPages = ".$this->json($this->ssPages).";\n";
     echo "                    ssm_UpdatePages();\n";
 elseif ($this->ssData):
-    echo "                    var ssm_screenshotData = ".Util::toJSON($this->ssData).";\n";
+    echo "                    var ssm_screenshotData = ".$this->json($this->ssData).";\n";
     echo "                    ssm_UpdateList();\n";
 endif;
 ?>

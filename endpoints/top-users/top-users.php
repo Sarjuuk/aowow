@@ -56,7 +56,7 @@ class TopusersBaseResponse extends TemplateResponse
                 GROUP BY a.`id`
                 ORDER BY reputation DESC
                 LIMIT    ?d',
-                SITEREP_ACTION_COMMENT, SITEREP_ACTION_UPLOAD, SITEREP_ACTION_GOOD_REPORT,
+                SITEREP_ACTION_COMMENT, SITEREP_ACTION_SUBMIT_SCREENSHOT, SITEREP_ACTION_GOOD_REPORT,
                 $time ?: DBSIMPLE_SKIP, Cfg::get('SQL_LIMIT_SEARCH')
             );
 

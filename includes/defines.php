@@ -90,7 +90,7 @@ define('SITEREP_ACTION_DAILYVISIT',         2);             // Daily visit
 define('SITEREP_ACTION_COMMENT',            3);             // Posted comment
 define('SITEREP_ACTION_UPVOTED',            4);             // Your comment was upvoted
 define('SITEREP_ACTION_DOWNVOTED',          5);             // Your comment was downvoted
-define('SITEREP_ACTION_UPLOAD',             6);             // Submitted screenshot (suggested video)
+define('SITEREP_ACTION_SUBMIT_SCREENSHOT',  6);             // Submitted screenshot (suggested video)
                                                             // Cast vote
                                                             // Uploaded data
 define('SITEREP_ACTION_GOOD_REPORT',        9);             // Report accepted
