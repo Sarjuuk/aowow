@@ -1,4 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
+
+    use \Aowow\Lang;
+?>
 
 <?php $this->brick('header'); ?>
 
@@ -15,12 +19,12 @@ $this->brick('infobox');
 
 ?>
             <div class="text">
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 
                 <span><?=Lang::screenshot('cropHint'); ?></span>
                 <div class="pad"></div>
                 <div id="ss-container"></div><script type="text/javascript">//<![CDATA[
-                    var myCropper = new Cropper(<?=Util::toJSON($this->cropper); ?>);
+                    var myCropper = new Cropper(<?=$this->json($this->cropper); ?>);
                 //]]></script>
 
                 <div class="pad"></div>

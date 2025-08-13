@@ -35,14 +35,6 @@ class AdminPage extends GenericPage
     {
         switch ($pageParam)
         {
-            case 'screenshots':
-                $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT;
-                $this->generator = 'handleScreenshots';
-                $this->tpl       = 'admin/screenshots';
-
-                array_push($this->path, 1, 5);
-                $this->name = 'Screenshot Manager';
-                break;
             case 'phpinfo':
                 $this->reqUGroup = U_GROUP_ADMIN | U_GROUP_DEV;
                 $this->generator = 'handlePhpInfo';
@@ -200,44 +192,6 @@ class AdminPage extends GenericPage
                 )];
             }
         }
-    }
-
-    private function handleScreenshots() : void
-    {
-        $this->addScript(
-            [SC_JS_FILE,    'js/screenshot.js'],
-            [SC_CSS_STRING, '.layout {margin: 0px 25px; max-width: inherit; min-width: 1200px; }'],
-            [SC_CSS_STRING, '#highlightedRow { background-color: #322C1C; }']
-        );
-
-        $ssGetAll = $this->_get['all'];
-        $ssPages  = [];
-        $ssData   = [];
-        $nMatches = 0;
-
-        if ($this->_get['type'] && $this->_get['typeid'])
-        {
-            $ssData   = CommunityContent::getScreenshotsForManager($this->_get['type'], $this->_get['typeid']);
-            $nMatches = count($ssData);
-        }
-        else if ($this->_get['user'])
-        {
-            if (mb_strlen($this->_get['user']) >= 3)
-            {
-                if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']))
-                {
-                    $ssData   = CommunityContent::getScreenshotsForManager(0, 0, $uId);
-                    $nMatches = count($ssData);
-                }
-            }
-        }
-        else
-            $ssPages = CommunityContent::getScreenshotPagesForManager($ssGetAll, $nMatches);
-
-        $this->getAll   = $ssGetAll;
-        $this->ssPages  = $ssPages;
-        $this->ssData   = $ssData;
-        $this->ssNFound = $nMatches;                        // ssm_numPagesFound
     }
 
     private function handleWeightPresets() : void

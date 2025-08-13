@@ -1,0 +1,33 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class AdminScreenshotsActionEditaltResponse extends TextResponse
+{
+    use TrCommunityHelper;
+
+    protected array $expectedGET  = array(
+        'id'  => ['filter' => FILTER_VALIDATE_INT],
+    );
+
+    protected array $expectedPOST = array(
+        'alt' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
+    );
+
+    protected int $requiredUserGroup = U_GROUP_ADMIN | U_GROUP_BUREAU | U_GROUP_SCREENSHOT;
+
+    protected function generate() : void
+    {
+        if (!$this->assertGET('id'))
+            return;
+
+        DB::Aowow()->query('UPDATE ?_screenshots SET `caption` = ? WHERE `id` = ?d',
+            $this->handleCaption($this->_post['alt']),
+            $this->_get['id']
+        );
+    }
+}
