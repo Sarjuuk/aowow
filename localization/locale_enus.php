@@ -330,7 +330,7 @@ $lang = array(
         'mails'         => "Mails",
 
         'cooldown'      => "%s cooldown",
-        'difficulty'    => "Difficulty",
+        'difficulty'    => "Difficulty: ",
         'dispelType'    => "Dispel type",
         'duration'      => "Duration",
         'eventShort'    => "Event: %s",
@@ -1135,8 +1135,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "This world event doesn't exist.",
-        'start'         => "Start",
-        'end'           => "End",
+        'start'         => "Start: ",
+        'end'           => "End: ",
         'interval'      => "Interval",
         'inProgress'    => "Event is currently in progress",
         'category'      => ["Uncategorized", "Holidays", "Recurring", "Player vs. Player"]
@@ -1272,22 +1272,22 @@ $lang = array(
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'questLevel'    => "Level %s",
         'requirements'  => "Requirements",
-        'reqMoney'      => "Required money",                // REQUIRED_MONEY
+        'reqMoney'      => "Required money: %s",            // REQUIRED_MONEY
         'money'         => "Money",
         'additionalReq' => "Additional requirements to obtain this quest",
         'reqRepWith'    => 'Your reputation with <a href="?faction=%d">%s</a> must be %s %s',
         'reqRepMin'     => "at least",
         'reqRepMax'     => "lower than",
         'progress'      => "Progress",
-        'provided'      => "Provided",
+        'provided'      => "(Provided)",
         'providedItem'  => "Provided item",
         'completion'    => "Completion",
         'description'   => "Description",
-        'playerSlain'   => "Players slain",
-        'profession'    => "Profession",
-        'timer'         => "Timer",
-        'loremaster'    => "Loremaster",
-        'suggestedPl'   => "Suggested players",
+        'playerSlain'   => "Players slain&nbsp;(%d)",
+        'profession'    => "Profession: ",
+        'timer'         => "Timer: ",
+        'loremaster'    => "Loremaster: ",
+        'suggestedPl'   => "Suggested players: %d",
         'keepsPvpFlag'  => "Keeps you PvP flagged",
         'daily'         => "Daily",
         'weekly'        => "Weekly",
@@ -1308,17 +1308,18 @@ $lang = array(
         'enabledByQ'    => "Enabled by",
         'enabledByQDesc'=> "This quest is available only, when one of these quests are active",
         'gainsDesc'     => "Upon completion of this quest you will gain",
-        'theTitle'      => 'the title "%s"',                                        // partly REWARD_TITLE
         'unavailable'   => "This quest was marked obsolete and cannot be obtained or completed.",
         'experience'    => "experience",
         'expConvert'    => "(or %s if completed at level %d)",
         'expConvert2'   => "%s if completed at level %d",
-        'chooseItems'   => "You will be able to choose one of these rewards",       // REWARD_CHOICES
-        'receiveItems'  => "You will receive",                                      // REWARD_ITEMS_ONLY
-        'receiveAlso'   => "You will also receive",                                 // REWARD_ITEMS
-        'spellCast'     => "The following spell will be cast on you",               // REWARD_AURA
-        'spellLearn'    => "You will learn",                                        // REWARD_SPELL
-        'bonusTalents'  => "%d talent |4point:points;",                             // partly LEVEL_UP_CHAR_POINTS
+        'rewardChoices' => "You will be able to choose one of these rewards:",             // REWARD_CHOICES
+        'rewardItems'   => "You will receive:",                                            // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "You will also receive:",                                       // REWARD_ITEMS
+        'rewardSpell'   => "You will learn:",                                              // REWARD_SPELL
+        'rewardAura'    => "The following spell will be cast on you:",                     // REWARD_AURA
+        'rewardTradeSkill'=>"You will learn how to create:",                               // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => 'You shall be granted the title: "<a href="?title=%d">%s</a>"', // REWARD_TITLE
+        'bonusTalents'  => "%d talent |4point:points;",                                    // partly LEVEL_UP_CHAR_POINTS
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> is displayed)',
         'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
         'autoaccept'    => 'Auto Accept',
@@ -1444,8 +1445,8 @@ $lang = array(
         'mailDelivery'  => 'You will receive <a href="?mail=%d">this letter</a>%s%s',
         'mailBy'        => ' by <a href="?npc=%d">%s</a>',
         'mailIn'        => " after %s",
-        'delay'         => "Delay",
-        'sender'        => "Sender",
+        'delay'         => "Delay: %s",
+        'sender'        => "Sender: %s",
         'untitled'      => "Untitled Mail #%d"
     ),
     'pet'      => array(

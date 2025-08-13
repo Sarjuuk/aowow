@@ -330,7 +330,7 @@ $lang = array(
         'mails'         => "Mails",
 
         'cooldown'      => "%s de reutilización",
-        'difficulty'    => "Dificultad",
+        'difficulty'    => "Dificultad: ",
         'dispelType'    => "Tipo de disipación",
         'duration'      => "Duración",
         'eventShort'    => "Evento: %s",
@@ -1135,8 +1135,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "Este evento del mundo no existe.",
-        'start'         => "Empieza",
-        'end'           => "Termina",
+        'start'         => "Empieza: ",
+        'end'           => "Termina: ",
         'interval'      => "Intervalo",
         'inProgress'    => "El evento está en progreso actualmente",
         'category'      => ["Sin categoría", "Vacacionales", "Periódicos", "Jugador contra Jugador"]
@@ -1272,22 +1272,22 @@ $lang = array(
         '_transfer'     => 'Esta misión será convertido a <a href="?quest=%d" class="q1">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'questLevel'    => 'Nivel %s',
         'requirements'  => 'Requisitos',
-        'reqMoney'      => 'Dinero necesario',
+        'reqMoney'      => 'Dinero necesario: %s',
         'money'         => 'Dinero',
         'additionalReq' => "Requerimientos adicionales para obtener esta misión",
         'reqRepWith'    => 'Tu reputación con <a href="?faction=%d">%s</a> debe ser %s %s',
         'reqRepMin'     => "de al menos",
         'reqRepMax'     => "menor que",
         'progress'      => "Progreso",
-        'provided'      => "Provisto",
+        'provided'      => "(Provisto)",
         'providedItem'  => "Objeto provisto",
         'completion'    => "Terminación",
         'description'   => "Descripción",
-        'playerSlain'   => "Jugadores derrotados",
-        'profession'    => "Profesión",
-        'timer'         => "Tiempo",
-        'loremaster'    => "Maestro cultural",
-        'suggestedPl'   => "Jugadores sugeridos",
+        'playerSlain'   => "Jugadores derrotados&nbsp;(%d)",
+        'profession'    => "Profesión: ",
+        'timer'         => "Tiempo: ",
+        'loremaster'    => "Maestro cultural: ",
+        'suggestedPl'   => "Jugadores sugeridos: %d",
         'keepsPvpFlag'  => "Mantiene el JcJ activado",
         'daily'         => 'Diaria',
         'weekly'        => "Semanal",
@@ -1308,16 +1308,17 @@ $lang = array(
         'enabledByQ'    => "Activada por",
         'enabledByQDesc'=> "Para aceptar esta misión debes haber tener activa alguna de estas misiones",
         'gainsDesc'     => "Cuando completes esta misión ganarás",
-        'theTitle'      => 'el título "%s"',
         'unavailable'   => "Esta misión fue marcada como obsoleta y no puede ser obtenida o completada.",
         'experience'    => "experiencia",
         'expConvert'    => "(o %s si se completa al nivel %d)",
         'expConvert2'   => "%s si se completa al nivel %d",
-        'chooseItems'   => "Podrás elegir una de estas recompensas",
-        'receiveItems'  => "Recibirás",
-        'receiveAlso'   => "También recibirás",
-        'spellCast'     => "Te van a lanzar el siguiente hechizo",
-        'spellLearn'    => "Aprenderás",
+        'rewardChoices' => "Podrás elegir una de estas recompensas:",                 // REWARD_CHOICES
+        'rewardItems'   => "Recibirás:",                                              // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "También recibirás:",                                      // REWARD_ITEMS
+        'rewardSpell'   => "Aprenderás:",                                             // REWARD_SPELL
+        'rewardAura'    => "Te van a lanzar el siguiente hechizo:",                   // REWARD_AURA
+        'rewardTradeSkill'=>"Aprenderás a crear:",                                    // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => 'Se te otorga el título de: "<a href="?title=%d">%s</a>"', // REWARD_TITLE
         'bonusTalents'  => "%d |4punto:puntos; de talento",
         'spellDisplayed'=> ' (mostrando <a href="?spell=%d">%s</a>)',
         'questPoolDesc' => 'Solo %d |4misión:misiones; de esta pestaña estarán disponibles a la vez',
@@ -1444,8 +1445,8 @@ $lang = array(
         'mailDelivery'  => "Usted recibirá esta carta%s%s",
         'mailBy'        => ' del <a href="?npc=%d">%s</a>',
         'mailIn'        => " después de %s",
-        'delay'         => "Retraso",
-        'sender'        => "Remitente",
+        'delay'         => "Retraso: %s",
+        'sender'        => "Remitente: %s",
         'untitled'      => "Correo sin título #%d"
     ),
     'pet'      => array(

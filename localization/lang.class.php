@@ -490,7 +490,7 @@ class Lang
 
     public static function formatSkillBreakpoints(array $bp, int $fmt = self::FMT_MARKUP) : string
     {
-        $tmp = self::game('difficulty').self::main('colon');
+        $tmp = self::game('difficulty');
 
         $base = match ($fmt)
         {

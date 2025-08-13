@@ -330,7 +330,7 @@ $lang = array(
         'mails'         => "Briefe",
 
         'cooldown'      => "%s Abklingzeit",
-        'difficulty'    => "Modus",
+        'difficulty'    => "Modus: ",
         'dispelType'    => "Bannart",
         'duration'      => "Dauer",
         'eventShort'    => "Ereignis: %s",
@@ -1135,8 +1135,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "Dieses Weltereignis existiert nicht.",
-        'start'         => "Anfang",
-        'end'           => "Ende",
+        'start'         => "Anfang: ",
+        'end'           => "Ende: ",
         'interval'      => "Intervall",
         'inProgress'    => "Ereignis findet gerade statt",
         'category'      => ["Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler"]
@@ -1272,22 +1272,22 @@ $lang = array(
         '_transfer'     => 'Dieses Quest wird mit <a href="?quest=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'questLevel'    => "Stufe %s",
         'requirements'  => "Anforderungen",
-        'reqMoney'      => "Benötigtes Geld",
+        'reqMoney'      => "Benötigtes Geld: %s",
         'money'         => "Geld",
         'additionalReq' => "Zusätzliche Anforderungen um das Quest zu erhalten",
         'reqRepWith'    => 'Eure Reputation mit <a href="?faction=%d">%s</a> %s %s sein',
         'reqRepMin'     => "muss mindestens",
         'reqRepMax'     => "darf höchstens",
         'progress'      => "Fortschritt",
-        'provided'      => "Bereitgestellt",
+        'provided'      => "(Bereitgestellt)",
         'providedItem'  => "Bereitgestellter Gegenstand",
         'completion'    => "Abschluss",
         'description'   => "Beschreibung",
-        'playerSlain'   => "Spieler getötet",
-        'profession'    => "Beruf",
-        'timer'         => "Zeitbegrenzung",
-        'loremaster'    => "Meister der Lehren",
-        'suggestedPl'   => "Empfohlene Spielerzahl",
+        'playerSlain'   => "Spieler getötet&nbsp;(%d)",
+        'profession'    => "Beruf: ",
+        'timer'         => "Zeitbegrenzung: ",
+        'loremaster'    => "Meister der Lehren: ",
+        'suggestedPl'   => "Empfohlene Spielerzahl: %d",
         'keepsPvpFlag'  => "Hält Euch im PvP",
         'daily'         => 'Täglich',
         'weekly'        => "Wöchentlich",
@@ -1308,16 +1308,17 @@ $lang = array(
         'enabledByQ'    => "Aktiviert durch",
         'enabledByQDesc'=> "Ihr könnt diese Quest nur annehmen, wenn eins der nachfolgenden Quests aktiv ist",
         'gainsDesc'     => "Bei Abschluss dieser Quest erhaltet Ihr",
-        'theTitle'      => 'den Titel "%s"',
         'unavailable'   => "Diese Quest wurde als nicht genutzt markiert und kann weder erhalten noch vollendet werden.",
         'experience'    => "Erfahrung",
         'expConvert'    => "(oder %s, wenn auf Stufe %d vollendet)",
         'expConvert2'   => "%s, wenn auf Stufe %d vollendet",
-        'chooseItems'   => "Auf Euch wartet eine dieser Belohnungen",
-        'receiveItems'  => "Ihr bekommt",
-        'receiveAlso'   => "Ihr bekommt außerdem",
-        'spellCast'     => "Der folgende Zauber wird auf Euch gewirkt",
-        'spellLearn'    => "Ihr erlernt",
+        'rewardChoices' => "Auf Euch wartet eine dieser Belohnungen:",                          // REWARD_CHOICES
+        'rewardItems'   => "Ihr bekommt:",                                                      // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "Ihr bekommt außerdem:",                                             // REWARD_ITEMS
+        'rewardSpell'   => "Ihr erlernt:",                                                      // REWARD_SPELL
+        'rewardAura'    => "Der folgende Zauber wird auf Euch gewirkt:",                        // REWARD_AURA
+        'rewardTradeSkill'=>"Ihr erlernt die Herstellung von:",                                 // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => 'Euch wird folgender Titel verliehen: "<a href="?title=%d">%s</a>"', // REWARD_TITLE
         'bonusTalents'  => "%d |4Talentpunkt:Talentpunkte;",
         'spellDisplayed'=> ' (<a href="?spell=%d">%s</a> wird angezeigt)',
         'questPoolDesc' => 'Nur %d |4Quest kann:Quests können; aus diesem Tab gleichzeitig aktiv sein',
@@ -1444,8 +1445,8 @@ $lang = array(
         'mailDelivery'  => 'Ihr werdet <a href="?mail=%d">diesen Brief</a>%s%s erhalten',
         'mailBy'        => ' von <a href="?npc=%d">%s</a>',
         'mailIn'        => " nach %s",
-        'delay'         => "Verzögerung",
-        'sender'        => "Absender",
+        'delay'         => "Verzögerung: %s",
+        'sender'        => "Absender: %s",
         'untitled'      => "Unbetitelter Brief #%d"
     ),
     'pet'      => array(

@@ -330,7 +330,7 @@ $lang = array(
         'mails'         => "Mails",
 
         'cooldown'      => "Восстановление: %s",
-        'difficulty'    => "Сложность",
+        'difficulty'    => "Сложность: ",
         'dispelType'    => "Тип рассеивания",
         'duration'      => "Длительность",
         'eventShort'    => "Игровое событие: %s",
@@ -1135,8 +1135,8 @@ $lang = array(
     ),
     'event' => array(
         'notFound'      => "Это игровое событие не существует.",
-        'start'         => "Начало",
-        'end'           => "Конец",
+        'start'         => "Начало: ",
+        'end'           => "Конец: ",
         'interval'      => "[Interval]",
         'inProgress'    => "Событие активно в данный момент",
         'category'      => array("Разное", "Праздники", "Периодические", "PvP")
@@ -1272,22 +1272,22 @@ $lang = array(
         '_transfer'     => 'Этот предмет превратится в <a href="?quest=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'questLevel'    => "%s-го уровня",
         'requirements'  => "Требования",
-        'reqMoney'      => "Требуется денег",
+        'reqMoney'      => "Требуется денег: %s",
         'money'         => "Деньги",
         'additionalReq' => "Дополнительные условия для получения данного задания",
         'reqRepWith'    => 'Ваша репутация с <a href="?faction=%d">%s</a> должна быть %s %s',
         'reqRepMin'     => "не менее",
         'reqRepMax'     => "меньше чем",
         'progress'      => "Прогресс",
-        'provided'      => "Прилагается",
+        'provided'      => "(Прилагается)",
         'providedItem'  => "Прилагается предмет",
         'completion'    => "Завершение",
         'description'   => "Описание",
-        'playerSlain'   => "Убито игроков",
-        'profession'    => "Профессия",
-        'timer'         => "Таймер",
-        'loremaster'    => "Хранитель мудрости",
-        'suggestedPl'   => "Рекомендуемое количество игроков",
+        'playerSlain'   => "Убито игроков&nbsp;(%d)",
+        'profession'    => "Профессия: ",
+        'timer'         => "Таймер: ",
+        'loremaster'    => "Хранитель мудрости: ",
+        'suggestedPl'   => "Рекомендуемое количество игроков: %d",
         'keepsPvpFlag'  => "Включает доступность PvP",
         'daily'         => "Ежедневно",
         'weekly'        => "Раз в неделю",
@@ -1308,16 +1308,17 @@ $lang = array(
         'enabledByQ'    => "Включена по",
         'enabledByQDesc'=> "Вы можете получить это задание, только когда эти задания доступны",
         'gainsDesc'     => "По завершении этого задания, вы получите",
-        'theTitle'      => '"%s"',                          // empty on purpose!
         'unavailable'   => "пометили это задание как устаревшее — его нельзя получить или выполнить.",
         'experience'    => "опыта",
         'expConvert'    => "(или %s на %d-м уровне)",
         'expConvert2'   => "%s на %d-м уровне",
-        'chooseItems'   => "Вам дадут возможность выбрать одну из следующих наград",
-        'receiveItems'  => "Вы получите",
-        'receiveAlso'   => "Вы также получите",
-        'spellCast'     => "Следующее заклинание будет наложено на вас",
-        'spellLearn'    => "Вы изучите",
+        'rewardChoices' => "Вы сможете выбрать одну из наград:",                       // REWARD_CHOICES
+        'rewardItems'   => "Вы получите:",                                             // REWARD_ITEMS_ONLY
+        'rewardAlso'    => "Вы также получите:",                                       // REWARD_ITEMS
+        'rewardSpell'   => "Вы узнаете:",                                              // REWARD_SPELL
+        'rewardAura'    => "На вас будет наложено заклинание:",                        // REWARD_AURA
+        'rewardTradeSkill'=>"Вы узнаете, как создавать:",                              // REWARD_TRADESKILL_SPELL
+        'rewardTitle'   => 'Вам будет присвоено звание: "<a href="?title=%d">%s</a>"', // REWARD_TITLE
         'bonusTalents'  => "%d |4очко талантов:очка талантов:очков талантов;",
         'spellDisplayed'=> ' (показано: <a href="?spell=%d">%s</a>)',
         'questPoolDesc' => 'Only %d |4Quest:Quests; from this tab will be available at a time',
@@ -1439,14 +1440,14 @@ $lang = array(
         )
     ),
     'mail' => array(
-        'notFound'      => "This mail doesn't exist.",
+        'notFound'      => "[This mail doesn't exist].",
         'attachment'    => "[Attachment]",
         'mailDelivery'  => "Вы получите это письмо%s%s",
         'mailBy'        => ' от <a href="?npc=%d">%s</a>',
         'mailIn'        => " через %s",
-        'delay'         => "Delay",
-        'sender'        => "Sender",
-        'untitled'      => "Untitled Mail #%d"
+        'delay'         => "[Delay]: %s",
+        'sender'        => "[Sender]: %s",
+        'untitled'      => "[Untitled Mail] #%d"
     ),
     'pet'      => array(
         'notFound'      => "Такой породы питомцев не существует.",

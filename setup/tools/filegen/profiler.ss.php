@@ -63,7 +63,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_DUNGEON_FINDER | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]
         ];
 
-        foreach (Game::$questClasses as $cat2 => $cat)
+        foreach (Game::QUEST_CLASSES as $cat2 => $cat)
         {
             if ($cat2 < 0)
                 continue;
