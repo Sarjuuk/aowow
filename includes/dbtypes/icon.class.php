@@ -101,7 +101,7 @@ class IconList extends DBTypeList
 
 class IconListFilter extends Filter
 {
-    private array $totalUses       = [];
+    private array $iconTotals      = [];
     private array $criterion2field = array(
           1 => '?_items',                                   // items [num]
           2 => '?_spell',                                   // spells [num]
@@ -119,13 +119,13 @@ class IconListFilter extends Filter
 
     protected string $type          = 'icons';
     protected static array $genericFilter = array(
-         1 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // items [num]
-         2 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // spells [num]
-         3 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // achievements [num]
-         6 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // currencies [num]
-         9 => [parent::CR_CALLBACK, 'cbUseAny'  ],          // hunterpets [num]
-        11 => [parent::CR_NYI_PH,   null,      0],          // classes [num]
-        13 => [parent::CR_CALLBACK, 'cbUseAll'  ]           // used [num]
+         1 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // items [num]
+         2 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // spells [num]
+         3 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // achievements [num]
+         6 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // currencies [num]
+         9 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // hunterpets [num]
+        11 => [parent::CR_NYI_PH,   null,       0   ],      // classes [num]
+        13 => [parent::CR_CALLBACK, 'cbUsedBy', true]       // used [num]
     );
 
     protected static array $inputFields = array(
@@ -137,35 +137,6 @@ class IconListFilter extends Filter
     );
 
     public array $extraOpts = [];
-
-    private function _getCnd(string $op, int $val, string $tbl) : ?array
-    {
-        switch ($op)
-        {
-            case '>':
-            case '>=':
-            case '=':
-                $ids = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId` HAVING n '.$op.' '.$val, $tbl);
-                return $ids ? ['id', array_keys($ids)] : [1];
-            case '<=':
-                if ($val)
-                    $op = '>';
-                break;
-            case '<':
-                if ($val)
-                    $op = '>=';
-                break;
-            case '!=':
-                if ($val)
-                    $op = '=';
-                break;
-            default:
-                return null;
-        }
-
-        $ids = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId` HAVING n '.$op.' '.$val, $tbl);
-        return $ids ? ['id', array_keys($ids), '!'] : [1];
-    }
 
     protected function createSQLForValues() : array
     {
@@ -180,47 +151,54 @@ class IconListFilter extends Filter
         return $parts;
     }
 
-    protected function cbUseAny(int $cr, int $crs, string $crv) : ?array
+    protected function cbUsedBy(int $cr, int $crs, string $crv, ?bool $all = false) : ?array
     {
-        if (Util::checkNumeric($crv, NUM_CAST_INT) && $this->int2Op($crs))
-            return $this->_getCnd($crs, $crv, $this->criterion2field[$cr]);
-
-        return null;
-    }
-
-    protected function cbUseAll(int $cr, int $crs, string $crv) : ?array
-    {
-        if (!Util::checkNumeric($crv, NUM_CAST_INT) || !$this->int2Op($crs))
+        if (!Util::checkNumeric($crv, NUM_CAST_INT) || ![$filter, $negate] = $this->int2Filter($crs, $crv))
             return null;
 
-        if (!$this->totalUses)
-        {
-            foreach ($this->criterion2field as $tbl)
-            {
-                if (!$tbl)
-                    continue;
+        $total = $this->prepareIconTotals($all ? 0 : $cr);
 
-                $res = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId`', $tbl);
-                Util::arraySumByKey($this->totalUses, $res);
-            }
-        }
+        $ids = array_filter($total, $filter);
 
-        if ($crs == '=')
-            $crs = '==';
-
-        $op = $crs;
-        if ($crs == '<=' && $crv)
-            $op = '>';
-        else if ($crs == '<' && $crv)
-            $op = '>=';
-        else if ($crs == '!=' && $crv)
-            $op = '==';
-        $ids = array_filter($this->totalUses, fn($x) => eval('return '.$x.' '.$op.' '.$crv.';'));
-
-        if ($crs != $op)
+        if ($negate)
             return $ids ? ['id', array_keys($ids), '!'] : [1];
         else
-            return $ids ? ['id', array_keys($ids)] : ['id', array_keys($this->totalUses), '!'];
+            return $ids ? ['id', array_keys($ids)] : ['id', array_keys($total), '!'];
+    }
+
+    private function int2Filter(mixed $op, int $y) : ?array
+    {
+        return match ($op) {
+            1       => [fn($x) => $x >  $y, false],
+            2       => [fn($x) => $x >= $y, false],
+            3       => [fn($x) => $x == $y, false],
+            4       => [fn($x) => $x >  $y, true],
+            5       => [fn($x) => $x >= $y, true],
+            6       => [fn($x) => $x == $y, true],
+            default => null
+        };
+    }
+
+    private function prepareIconTotals(int $forCr = 0) : array
+    {
+        foreach ($this->criterion2field as $cr => $tbl)
+        {
+            if (!$tbl || isset($this->iconTotals[$cr]) || ($forCr && $forCr != $cr))
+                continue;
+
+            $this->iconTotals[$cr] = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId`', $tbl);
+        }
+
+        if ($forCr)
+            return $this->iconTotals[$forCr];
+
+        if (!isset($this->iconTotals['all']))
+        {
+            $this->iconTotals['all'] = [];
+            Util::arraySumByKey($this->iconTotals['all'], ...$this->iconTotals);
+        }
+
+        return $this->iconTotals['all'];
     }
 }
 
