@@ -27,7 +27,6 @@ class PageTemplate
     private array $pageData = [];                           // processed by display hooks
 
     // template data that needs further processing .. ! WARNING ! they will not get aut fetched from $context as they are already defined here
-    protected  array  $guideRating = [];
     private    string $gStaticUrl;
     private    string $gHost;
     private    string $gServerTime;

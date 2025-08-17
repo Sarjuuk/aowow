@@ -22987,17 +22987,14 @@ function g_modifyUrl(url, params, opt) {
 }
 
 function g_enhanceTextarea (ta, opt) {
-    if (!(ta instanceof jQuery)) {
+    if (!(ta instanceof jQuery))
         ta = $(ta);
-    }
 
-    if (ta.data("wh-enhanced") || ta.prop("tagName") != "TEXTAREA") {
+    if (ta.data("wh-enhanced") || ta.prop("tagName") != "TEXTAREA")
         return;
-    }
 
-    if (typeof opt != "object") {
+    if (typeof opt != "object")
         opt = {};
-    }
 
     var canResize = (function(el) {
         if (!el.dynamicResizeOption)
@@ -23016,63 +23013,66 @@ function g_enhanceTextarea (ta, opt) {
     var wrapper = $("<div/>", { "class": "enhanced-textarea-wrapper" }).insertBefore(ta).append(ta);
 
     if (!opt.hasOwnProperty("color"))
-        wrapper.addClass("enhanced-textarea-dark")
+        wrapper.addClass("enhanced-textarea-dark");
     else if (opt.color)
-        wrapper.addClass("enhanced-textarea-" + opt.color)
+        wrapper.addClass("enhanced-textarea-" + opt.color);
 
     if (!opt.hasOwnProperty("dynamicSizing") || opt.dynamicSizing || opt.dynamicResizeOption) {
         var expander = $("<div/>", { "class": "enhanced-textarea-expander" }).prependTo(wrapper);
-        var n = function(E, D, F) {
-            if (!F())
+        var dynamicResize = function(textarea, exactHeight, canResizeFn) {
+            if (!canResizeFn())
                 return;
 
-            // E.css("height", E.siblings(".enhanced-textarea-expander").html($WH.htmlentities(E.val()).replace(/\n/g, "<br>") + "<br>").height() + (D ? 14 : 34) + "px")
-            E.css("height", E.siblings(".enhanced-textarea-expander").html($WH.htmlentities(E.val()) + "<br>").height() + (D ? 14 : 34) + "px")
+            // E.css("height", E.siblings(".enhanced-textarea-expander").html($WH.htmlentities(E.val()).replace(/\n/g, "<br>") + "<br>").height() + (D ? 14 : 34) + "px");
+            textarea.css("height", textarea.siblings(".enhanced-textarea-expander").html($WH.htmlentities(textarea.val()) + "<br>").height() + (exactHeight ? 14 : 34) + "px");
         };
 
-        ta.bind("keydown keyup change", n.bind(this, ta, opt.exactLineHeights, canResize));
-        n(ta, opt.exactLineHeights, canResize);
-        var setWidth = function(D) {
-            D.css("width", D.parent().width() + "px")
-        };
+        ta.bind("keydown keyup change", dynamicResize.bind(this, ta, opt.exactLineHeights, canResize));
+        dynamicResize(ta, opt.exactLineHeights, canResize);
+
+        var setWidth = function(el) { el.css("width", el.parent().width() + "px"); };
+
         setWidth(expander);
         setTimeout(setWidth.bind(null, expander), 1);
-        if (!opt.dynamicResizeOption || (opt.dynamicResizeOption && canResize())) {
-            wrapper.addClass("enhanced-textarea-dynamic-sizing")
-        }
+
+        if (!opt.dynamicResizeOption || (opt.dynamicResizeOption && canResize()))
+            wrapper.addClass("enhanced-textarea-dynamic-sizing");
     }
-    if (!opt.hasOwnProperty("focusChanges") || opt.focusChanges) {
-        wrapper.addClass("enhanced-textarea-focus-changes")
-    }
+
+    if (!opt.hasOwnProperty("focusChanges") || opt.focusChanges)
+        wrapper.addClass("enhanced-textarea-focus-changes");
+
     if (opt.markup) {
-        var w = $("<div/>", { "class": "enhanced-textarea-markup-wrapper" }).prependTo(wrapper);
-        var y = $("<div/>", { "class": "enhanced-textarea-markup" }).appendTo(w);
-        var z = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
-        var k = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
+        var _markupMenu = $("<div/>", { "class": "enhanced-textarea-markup-wrapper" }).prependTo(wrapper);
+        var _segments   = $("<div/>", { "class": "enhanced-textarea-markup" }).appendTo(_markupMenu);
+        var _toolbar    = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(_segments);
+        var _menu       = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(_segments);
 
         if (opt.markup == "inline")
-            ar_AddInlineToolbar(ta.get(0), z.get(0), k.get(0));
+            ar_AddInlineToolbar(ta.get(0), _toolbar.get(0), _menu.get(0));
         else
-            ar_AddToolbar(ta.get(0), z.get(0), k.get(0));
+            ar_AddToolbar(ta.get(0), _toolbar.get(0), _menu.get(0));
 
         if (opt.dynamicResizeOption) {
-            var t = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(y);
-            var C = $("<label/>").appendTo(t);
-            var A = $("<input/>", { type: "checkbox", checked: canResize() }).appendTo(C);
-            A.change((function(E, D, H, J, F, G) {
-                var I = this.is(":checked");
-                $WH.localStorage.set("dynamic-textarea-resizing", JSON.stringify(I));
-                if (I) {
-                    D.addClass("enhanced-textarea-dynamic-sizing");
-                    G(H, E.exactLineHeights, J);
+            var _dynResize    = $("<div/>", { "class": "enhanced-textarea-markup-segment" }).appendTo(_segments);
+            var _lblDynResize = $("<label/>").appendTo(_dynResize);
+            var _iDynResize   = $("<input/>", { type: "checkbox", checked: canResize() }).appendTo(_lblDynResize);
+
+            _iDynResize.change((function(_opt, taWrapper, textarea, resizable, areaHeight, dynResizeFn) {
+                var isChecked = this.is(":checked");
+
+                $WH.localStorage.set("dynamic-textarea-resizing", JSON.stringify(isChecked));
+                if (isChecked) {
+                    taWrapper.addClass("enhanced-textarea-dynamic-sizing");
+                    dynResizeFn(textarea, _opt.exactLineHeights, resizable);
                 }
                 else {
-                    D.removeClass("enhanced-textarea-dynamic-sizing");
-                    H.css("height", F + "px");
+                    taWrapper.removeClass("enhanced-textarea-dynamic-sizing");
+                    textarea.css("height", areaHeight + "px");
                 }
-            }).bind(A, opt, wrapper, ta, canResize, height, n));
+            }).bind(_iDynResize, opt, wrapper, ta, canResize, height, dynamicResize));
 
-            $("<span/>", { text: LANG.autoresizetextbox }).appendTo(C);
+            $("<span/>", { text: LANG.autoresizetextbox }).appendTo(_lblDynResize);
         }
 
         if (opt.scrollingMarkup) {
@@ -23081,40 +23081,47 @@ function g_enhanceTextarea (ta, opt) {
             else
                 g_enhanceTextarea.scrollerCount = 1;
 
-            var B = "fixable-markup-controls-" + g_enhanceTextarea.scrollerCount;
-            var o = "fixed-markup-controls-"   + g_enhanceTextarea.scrollerCount;
-            var setBGColor = function(el) {
+            var cssClassA = "fixable-markup-controls-" + g_enhanceTextarea.scrollerCount;
+            var cssClassB = "fixed-markup-controls-"   + g_enhanceTextarea.scrollerCount;
+
+            var getBGColor = function(el) {
                 var color = el.css("backgroundColor");
                 if (color == "rgba(0, 0, 0, 0)" || color == "transparent")
-                    return setBGColor(el.parent());
+                    return getBGColor(el.parent());
                 else
                     return color;
             };
-            var r = setBGColor(y);
-            for (var m, l = 0;
-                (m = window.document.styleSheets[l]) && m.href; l++) {}
-            if (!m) {
+
+            var bgColor = getBGColor(_segments);
+
+            for (var css, i = 0; (css = window.document.styleSheets[i]) && css.href; i++) {}
+            if (!css) {
                 window.document.head.appendChild(document.createElement("style"));
-                m = window.document.styleSheets[l];
+                css = window.document.styleSheets[i];
             }
-            m.insertRule("." + o + " ." + B + " .enhanced-textarea-markup {background:" + r + ";padding-bottom:5px;padding-top:10px;position:fixed;top:0;z-index:3}", m.cssRules.length);
-            m.insertRule(".touch-device ." + o + " ." + B + " .enhanced-textarea-markup {padding-top:50px}", m.cssRules.length);
-            w.addClass(B);
-            var s = function(F, D, cssClass, offset) {
-                var H = this.scrollY || this.pageYOffset || 0;
-                if (H > F.offset().top - 10 - offset && H < D.offset().top + D.height() - 100 - offset)
+            css.insertRule("." + cssClassB + " ." + cssClassA + " .enhanced-textarea-markup {background:" + bgColor + ";padding-bottom:5px;padding-top:10px;position:fixed;top:0;z-index:3}", css.cssRules.length);
+            css.insertRule(".touch-device ." + cssClassB + " ." + cssClassA + " .enhanced-textarea-markup {padding-top:50px}", css.cssRules.length);
+
+            _markupMenu.addClass(cssClassA);
+
+            var toggleFixedStyles = function(menuContainer, taContainer, cssClass, offset) {
+                var pageY = this.scrollY || this.pageYOffset || 0;
+                if (pageY > menuContainer.offset().top - 10 - offset && pageY < taContainer.offset().top + taContainer.height() - 100 - offset)
                     $("body").addClass(cssClass);
                 else
                     $("body").removeClass(cssClass);
             };
 
-            $(window).scroll(s.bind(window, w, wrapper, o, 0));
-            s.call(window, w, wrapper, o, 0);
+            $(window).scroll(toggleFixedStyles.bind(window, _markupMenu, wrapper, cssClassB, 0));
+            toggleFixedStyles.call(window, _markupMenu, wrapper, cssClassB, 0);
+
             var setSize = (function(D, E) {
                 E.css("width",  D.width()  + "px");
                 D.css("height", E.height() + "px");
-            }).bind(null, w, y);
+            }).bind(null, _markupMenu, _segments);
+
             setSize();
+
             $(window).on("resize", setSize);
             $(function() { setTimeout(setSize, 2000) })
         }
@@ -23139,119 +23146,123 @@ $WH.createOptionsMenuWidget = function (id, txt, opt) {
     if (opt.className)
         container.className += ' ' + opt.className;
 
-  if (opt.options instanceof Array) {
-        var c = [];
-        for (var itr = 0, d; d = opt.options[itr]; itr++) {
-            var menu = [itr, d[MENU_IDX_NAME]];
-            if ((typeof opt.selected == 'number' || typeof opt.selected == 'string') && opt.selected == d[MENU_IDX_ID]) {
-                container.innerHTML = d[MENU_IDX_NAME] + chevron;
-                if (d[MENU_IDX_SUB]) {
-                    switch (typeof d[MENU_IDX_SUB].className) {
+    if (opt.options instanceof Array) {
+        var widgetmenu = [];
+        for (var itr = 0, submenu; submenu = opt.options[itr]; itr++) {
+            var menu = [itr, submenu[MENU_IDX_NAME]];
+
+            if ((typeof opt.selected == 'number' || typeof opt.selected == 'string') && opt.selected == submenu[MENU_IDX_ID]) {
+                container.innerHTML = submenu[MENU_IDX_NAME] + chevron;
+                if (submenu[MENU_IDX_SUB]) {
+                    switch (typeof submenu[MENU_IDX_SUB].className) {
                         case 'string':
-                            $.data(container, 'options-menu-widget-class', d[MENU_IDX_SUB].className);
-                            container.className += ' ' + d[MENU_IDX_SUB].className;
+                            $.data(container, 'options-menu-widget-class', submenu[MENU_IDX_SUB].className);
+                            container.className += ' ' + submenu[MENU_IDX_SUB].className;
                             break;
                         case 'function':
-                            $.data(container, 'options-menu-widget-class', d[MENU_IDX_SUB].className(d, true));
-                            container.className += ' ' + d[MENU_IDX_SUB].className(d, true);
-                            break
+                            $.data(container, 'options-menu-widget-class', submenu[MENU_IDX_SUB].className(submenu, true));
+                            container.className += ' ' + submenu[MENU_IDX_SUB].className(submenu, true);
+                            break;
                     }
                 }
             }
-            if (d[MENU_IDX_URL]) {
-                menu.push(function (chevron, container, i, opt) {
-                    switch (typeof i[MENU_IDX_URL]) {
+
+            if (submenu[MENU_IDX_URL]) {
+                menu.push(function (chevron, container, submenu, opt) {
+                    switch (typeof submenu[MENU_IDX_URL]) {
                         case 'string':
-                            window.location = i[MENU_IDX_URL];
+                            window.location = submenu[MENU_IDX_URL];
                             break;
                         case 'function':
                             if (typeof opt.updateWidgetText == 'undefined' || opt.updateWidgetText) {
-                                container.innerHTML = i[MENU_IDX_NAME] + chevron;
+                                container.innerHTML = submenu[MENU_IDX_NAME] + chevron;
+
                                 var o = $.data(container, 'options-menu-widget-class');
                                 if (o)
                                     container.className = container.className.replace(new RegExp(' *\\b' + o + '\\b'), '');
 
-                                if (i[MENU_IDX_SUB]) {
-                                    switch (typeof i[MENU_IDX_SUB].className) {
+                                if (submenu[MENU_IDX_SUB]) {
+                                    switch (typeof submenu[MENU_IDX_SUB].className) {
                                         case 'string':
-                                            $.data(container, 'options-menu-widget-class', i[MENU_IDX_SUB].className);
-                                            container.className += ' ' + i[MENU_IDX_SUB].className;
+                                            $.data(container, 'options-menu-widget-class', submenu[MENU_IDX_SUB].className);
+                                            container.className += ' ' + submenu[MENU_IDX_SUB].className;
                                             break;
                                         case 'function':
-                                            $.data(container, 'options-menu-widget-class', i[MENU_IDX_SUB].className(i, true));
-                                            container.className += ' ' + i[MENU_IDX_SUB].className(i, true);
+                                            $.data(container, 'options-menu-widget-class', submenu[MENU_IDX_SUB].className(submenu, true));
+                                            container.className += ' ' + submenu[MENU_IDX_SUB].className(submenu, true);
                                             break;
                                     }
                                 }
                             }
 
-                            i[MENU_IDX_URL](container, i);
+                            submenu[MENU_IDX_URL](container, submenu);
                             break;
                     }
-                }.bind(null, chevron, Menu.add, d, opt))
+                }.bind(null, chevron, Menu.add, submenu, opt))
             }
-            else if (!d[MENU_IDX_SUB] || !d[MENU_IDX_SUB].menu)
+            else if (!submenu[MENU_IDX_SUB] || !submenu[MENU_IDX_SUB].menu)
                 menu[0] = null;
 
             menu[MENU_IDX_OPT] = {};
-            if (d[MENU_IDX_SUB]) {
-                switch (typeof d[MENU_IDX_SUB].className) {
+            if (submenu[MENU_IDX_SUB]) {
+                switch (typeof submenu[MENU_IDX_SUB].className) {
                     case 'string':
-                        menu[MENU_IDX_OPT].className = d[MENU_IDX_SUB].className;
+                        menu[MENU_IDX_OPT].className = submenu[MENU_IDX_SUB].className;
                         break;
                     case 'function':
-                        menu[MENU_IDX_OPT].className = d[MENU_IDX_SUB].className.bind(null, d, false);
+                        menu[MENU_IDX_OPT].className = submenu[MENU_IDX_SUB].className.bind(null, submenu, false);
                         break;
                 }
-                switch (typeof d[MENU_IDX_SUB].column) {
+                switch (typeof submenu[MENU_IDX_SUB].column) {
                     case 'number':
                     case 'string':
-                        menu[MENU_IDX_OPT].column = d[MENU_IDX_SUB].column;
+                        menu[MENU_IDX_OPT].column = submenu[MENU_IDX_SUB].column;
                         break;
                     case 'function':
-                        menu[MENU_IDX_OPT].column = d[MENU_IDX_SUB].column.bind(null, d);
+                        menu[MENU_IDX_OPT].column = submenu[MENU_IDX_SUB].column.bind(null, submenu);
                         break;
                 }
-                switch (typeof d[MENU_IDX_SUB].tinyIcon) {
+                switch (typeof submenu[MENU_IDX_SUB].tinyIcon) {
                     case 'string':
-                        menu[MENU_IDX_OPT].tinyIcon = d[MENU_IDX_SUB].tinyIcon;
+                        menu[MENU_IDX_OPT].tinyIcon = submenu[MENU_IDX_SUB].tinyIcon;
                         break;
                     case 'function':
-                        menu[MENU_IDX_OPT].tinyIcon = d[MENU_IDX_SUB].tinyIcon.bind(null, d);
+                        menu[MENU_IDX_OPT].tinyIcon = submenu[MENU_IDX_SUB].tinyIcon.bind(null, submenu);
                         break;
                 }
-                switch (typeof d[MENU_IDX_SUB].fontIcon) {
+                switch (typeof submenu[MENU_IDX_SUB].fontIcon) {
                     case 'string':
-                        menu[MENU_IDX_OPT].fontIcon = d[MENU_IDX_SUB].fontIcon;
+                        menu[MENU_IDX_OPT].fontIcon = submenu[MENU_IDX_SUB].fontIcon;
                         break;
                     case 'function':
-                        menu[MENU_IDX_OPT].fontIcon = d[MENU_IDX_SUB].fontIcon.bind(null, d);
+                        menu[MENU_IDX_OPT].fontIcon = submenu[MENU_IDX_SUB].fontIcon.bind(null, submenu);
                         break;
                 }
 
-                if (typeof d[MENU_IDX_SUB].isChecked == 'function')
-                    menu[MENU_IDX_OPT].checkedFunc = d[MENU_IDX_SUB].isChecked.bind(null, d);
+                if (typeof submenu[MENU_IDX_SUB].isChecked == 'function')
+                    menu[MENU_IDX_OPT].checkedFunc = submenu[MENU_IDX_SUB].isChecked.bind(null, submenu);
 
-                if (typeof d[MENU_IDX_SUB].menu == 'object' && d[MENU_IDX_SUB].menu instanceof Array)
-                    Menu.setSubmenu(menu, d[MENU_IDX_SUB].menu); // <-- n.d. !
+                if (typeof submenu[MENU_IDX_SUB].menu == 'object' && submenu[MENU_IDX_SUB].menu instanceof Array)
+                    Menu.setSubmenu(menu, submenu[MENU_IDX_SUB].menu); // <-- n.d. !
 
             }
-            c.push(menu);
+
+            widgetmenu.push(menu);
         }
 
-        container.menu = c;
+        container.menu = widgetmenu;
+
         if (opt.menuOnClick) {
             container.onmousedown = $WH.rf;
-            Menu.add(container, c, { showAtElement: true });
+            Menu.add(container, widgetmenu, { showAtElement: true });
         }
         else
-            Menu.add(container, c);
+            Menu.add(container, widgetmenu);
+    }
 
-  }
-
-  if (opt.target)
+    if (opt.target)
         $(opt.target).append(container);
-  else
+    else
         return container;
 };
 $WH.createOptionsMenuWidget.chevron = ' <i class="fa fa-chevron-down fa-color-gray">~</i>';

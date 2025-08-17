@@ -227,13 +227,6 @@ define('STR_ALLOW_SHORT',                   0x4);
 define('RATING_COMMENT',                    1);
 define('RATING_GUIDE',                      2);
 
-define('GUIDE_STATUS_NONE',                 0);
-define('GUIDE_STATUS_DRAFT',                1);
-define('GUIDE_STATUS_REVIEW',               2);
-define('GUIDE_STATUS_APPROVED',             3);
-define('GUIDE_STATUS_REJECTED',             4);
-define('GUIDE_STATUS_ARCHIVED',             5);
-
 define('DEFAULT_ICON',                      'inv_misc_questionmark');
 
 define('MENU_IDX_ID',   0);                                 //      ID: A number or string; null makes the menu item a separator

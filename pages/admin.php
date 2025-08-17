@@ -225,7 +225,7 @@ class AdminPage extends GenericPage
 
     private function handleGuideApprove() : void
     {
-        $pending = new GuideList([['status', GUIDE_STATUS_REVIEW]]);
+        $pending = new GuideList([['status', GuideMgr::STATUS_REVIEW]]);
         if ($pending->error)
             $data = [];
         else

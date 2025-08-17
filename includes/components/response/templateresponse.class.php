@@ -71,13 +71,15 @@ trait TrGuideEditor
     public int    $editClassId     = 0;
     public int    $editSpecId      = 0;
     public int    $editRev         = 0;
-    public int    $editStatus      = GUIDE_STATUS_DRAFT;
-    public string $editStatusColor = GuideMgr::STATUS_COLORS[GUIDE_STATUS_DRAFT];
+    public int    $editStatus      = GuideMgr::STATUS_DRAFT;
+    public string $editStatusColor = GuideMgr::STATUS_COLORS[GuideMgr::STATUS_DRAFT];
     public string $editTitle       = '';
     public string $editName        = '';
     public string $editDescription = '';
     public string $editText        = '';
+    public string $error           = '';
     public Locale $editLocale      = Locale::EN;
+    public bool   $isDraft         = false;
 }
 
 class TemplateResponse extends BaseResponse

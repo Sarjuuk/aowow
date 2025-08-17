@@ -132,7 +132,7 @@ class qqFileUploader
 
     private function toBytes(string $str) : int
     {
-        $val  = trim($str);
+        $val  = substr(trim($str), 0, -1);
         $last = strtolower(substr($str, -1, 1));
         switch ($last)
         {

@@ -10,14 +10,6 @@ class GuideList extends DBTypeList
 {
     use ListviewHelper;
 
-    public const /* array */ STATUS_COLORS = array(
-        GUIDE_STATUS_DRAFT    => '#71D5FF',
-        GUIDE_STATUS_REVIEW   => '#FFFF00',
-        GUIDE_STATUS_APPROVED => '#1EFF00',
-        GUIDE_STATUS_REJECTED => '#FF4040',
-        GUIDE_STATUS_ARCHIVED => '#FFD100'
-    );
-
     public static int    $type       = Type::GUIDE;
     public static string $brickFile  = 'guide';
     public static string $dataTable  = '?_guides';
@@ -28,9 +20,10 @@ class GuideList extends DBTypeList
 
     protected string $queryBase = 'SELECT g.*, g.`id` AS ARRAY_KEY FROM ?_guides g';
     protected array  $queryOpts = array(
-                        'g' => [['a', 'c'], 'g' => 'g.`id`'],
-                        'a' => ['j' => ['?_account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
-                        'c' => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"']
+                        'g'  => [['a', 'c', 'ar'], 'g' => 'g.`id`'],
+                        'a'  => ['j' => ['?_account a ON a.`id` = g.`userId`', true], 's' => ', IFNULL(a.`username`, "") AS "author"'],
+                        'c'  => ['j' => ['?_comments c ON c.`type` = '.Type::GUIDE.' AND c.`typeId` = g.`id` AND (c.`flags` & '.CC_FLAG_DELETED.') = 0', true], 's' => ', COUNT(c.`id`) AS "comments"'],
+                        'ar' => ['j' => ['?_articles ar ON ar.`type` = 300 AND ar.`typeId` = g.`id`'], 's' => ', MAX(ar.`rev`) AS "latest"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -40,23 +33,11 @@ class GuideList extends DBTypeList
         if ($this->error)
             return;
 
-        $ratings = DB::Aowow()->select('SELECT `entry` AS ARRAY_KEY, IFNULL(SUM(`value`), 0) AS `t`, IFNULL(COUNT(*), 0) AS `n`, IFNULL(MAX(IF(`userId` = ?d, `value`, 0)), 0) AS `s` FROM ?_user_ratings WHERE `type` = ?d AND `entry` IN (?a)', User::$id, RATING_GUIDE, $this->getFoundIDs());
+        $ratings = GuideMgr::getRatings($this->getFoundIDs());
 
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
-        {
-            if (isset($ratings[$id]))
-            {
-                $_curTpl['nvotes'] = $ratings[$id]['n'];
-                $_curTpl['rating'] = $ratings[$id]['n'] < 5 ? -1 : $ratings[$id]['t'] / $ratings[$id]['n'];
-                $_curTpl['_self']  = $ratings[$id]['s'];
-            }
-            else
-            {
-                $_curTpl['nvotes'] = 0;
-                $_curTpl['rating'] = -1;
-            }
-        }
+            $_curTpl = array_merge($_curTpl, $ratings[$id]);
     }
 
     public static function getName(int $id) : ?LocString
@@ -133,13 +114,13 @@ class GuideList extends DBTypeList
     public function canBeViewed() : bool
     {
         //                                  currently approved    || has prev. approved version
-        return $this->getField('status') == GUIDE_STATUS_APPROVED || $this->getField('rev') > 0;
+        return $this->getField('status') == GuideMgr::STATUS_APPROVED || $this->getField('rev') > 0;
     }
 
     public function canBeReported() : bool
     {
         //                             not own guide  && is not archived
-        return $this->getField('userId') != User::$id && $this->getField('status') != GUIDE_STATUS_ARCHIVED;
+        return $this->getField('userId') != User::$id && $this->getField('status') != GuideMgr::STATUS_ARCHIVED;
     }
 
     public function getJSGlobals(int $addMask = GLOBALINFO_ANY) : array

@@ -111,7 +111,7 @@ abstract class Type
         self::CURRENCY    => [CurrencyList::class,    'currency',    'g_gatheredcurrencies', self::FLAG_RANDOM_SEARCHABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
         self::SOUND       => [SoundList::class,       'sound',       'g_sounds',             self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE],
         self::ICON        => [IconList::class,        'icon',        'g_icons',              self::FLAG_RANDOM_SEARCHABLE | self::FLAG_FILTRABLE | self::FLAG_DB_TYPE | self::FLAG_HAS_ICON],
-        self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_NONE],
+        self::GUIDE       => [GuideList::class,       'guide',       '',                     self::FLAG_DB_TYPE],
         self::PROFILE     => [ProfileList::class,     'profile',     '',                     self::FLAG_FILTRABLE], // x - not known in javascript
         self::GUILD       => [GuildList::class,       'guild',       '',                     self::FLAG_FILTRABLE], // x
         self::ARENA_TEAM  => [ArenaTeamList::class,   'arena-team',  '',                     self::FLAG_FILTRABLE], // x

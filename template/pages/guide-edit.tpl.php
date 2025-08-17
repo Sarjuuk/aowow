@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -12,9 +15,9 @@ $this->brick('announcement');
 $this->brick('pageTemplate');
 ?>
             <div class="text">
-                <h1><?=$this->name; ?></h1>
+                <h1><?=$this->h1; ?></h1>
 <?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 ?>
             </div>
             <div class="pad"></div>
@@ -24,14 +27,14 @@ $this->brick('pageTemplate');
         <form id="guide-form" method="post" action="?guide=edit&id=<?=$this->typeId;?>" onsubmit="leavePage(1)">
             <table class="responsive-collapse guide-form-main">
                 <tr class="guide-form-guide-link">
-                    <td colspan="2"><h2 style="margin:0" class="heading-size-2"><a href="?guide=<?=$this->typeId;?>" target="_blank"><?=$this->editorFields('title');?></a></h2></td>
+                    <td colspan="2"><h2 style="margin:0" class="heading-size-2"><a href="?guide=<?=$this->typeId;?>" target="_blank"><?=$this->editTitle;?></a></h2></td>
                 </tr>
 
                 <tr>
                     <th><label for="title"><dfn title="<?=Lang::guide('editor', 'fullTitleTip');?>"><?=Lang::guide('editor', 'fullTitle');?></dfn></label></th>
                     <td>
                         <input required="required" type="text" maxlength="100" name="title" id="title"
-                               value="<?=$this->editorFields('title');?>"
+                               value="<?=$this->editTitle;?>"
                                placeholder="<?=Lang::guide('editor', 'fullTitleTip');?>"
                                data-charwarning="title-char-warning">
                         <small id="title-char-warning" class="char-warning"></small>
@@ -43,7 +46,7 @@ $this->brick('pageTemplate');
                     <th><label for="name"><dfn title="<?=Lang::guide('editor', 'nameTip');?>"><?=Lang::guide('editor', 'name');?></dfn></label></th>
                     <td>
                         <input required="required" type="text" maxlength="100" name="name" id="name"
-                               value="<?=$this->editorFields('name');?>"
+                               value="<?=$this->editName;?>"
                                placeholder="<?=Lang::guide('editor', 'nameTip');?>"
                                data-charwarning="name-char-warning">
                         <small id="name-char-warning" class="char-warning"></small>
@@ -54,13 +57,7 @@ $this->brick('pageTemplate');
                 <tr>
                     <th><label for="locale"><?=Lang::main('language');?></label></th>
                     <td><select name="locale" id="locale" required="required" size="1">
-<?php
-foreach (Locale::cases() as $l):
-    if ($l->validate()):
-        echo '                    <option value="'.$l->value.'"'.($this->editorFields('locale', true) == $l->value ? ' selected="selected"' : '').'>'.$l->title()."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::getLocale()::cases(), $this->editLocale, 24, function(&$v, &$k) { $k = $v->value; return $v = $v->validate()?->title(); }); ?>
                     </select></td>
                 </tr>
 
@@ -69,13 +66,7 @@ endforeach;
                     <th><label for="category"><?=Lang::guide('editor', 'category');?></label></th>
                     <td>
                         <select id="category" name="category" required="required"><option></option>
-<?php
-foreach (Lang::guide('category') as $i => $c):
-    if ($c):
-        echo '                            <option value="'.$i.'"'.($this->editorFields('category', true) == $i ? ' selected="selected"' : '').'>'.$c."</option>\n";
-    endif;
-endforeach;
-?>
+<?=$this->makeOptionsList(Lang::guide('category'), $this->editCategory, 24); ?>
                         </select>
                         <script>
                             (function() {
@@ -98,8 +89,8 @@ endforeach;
                 <tr id="class-guide-specialization-options">
                     <th><label for="specId"><?=Lang::guide('editor', 'class-spec');?></label></th>
                     <td>
-                        <input name="specId" id="specId" type="hidden" value="<?=$this->editorFields('specId');?>">
-                        <input name="classId" id="classId" type="hidden" value="<?=$this->editorFields('classId');?>">
+                        <input name="specId" id="specId" type="hidden" value="<?=$this->editSpecId;?>">
+                        <input name="classId" id="classId" type="hidden" value="<?=$this->editClassId;?>">
                         <script>
                             setTimeout(function() {
                                 // const PC = WH.Wow.PlayerClass;
@@ -205,7 +196,7 @@ endforeach;
                     <td colspan="3">
                         <textarea rows="1" name="description" cols="100" id="description" style="height:69px"
                                   placeholder="<?=Lang::guide('editor', 'descriptionTip');?>"
-                                  ><?=$this->editorFields('description');?></textarea>
+                                  ><?=$this->editDescription;?></textarea>
                         <script>g_enhanceTextarea('#description')</script>
                     </td>
                 </tr>
@@ -213,7 +204,6 @@ endforeach;
                     <td></td>
                     <td colspan="3"><span id="desc-info"></span></td>
                 </tr>
-
 <?php
 /*
                 <tr>
@@ -227,13 +217,12 @@ endforeach;
                 </tr>
 */
 ?>
-
                 <tr>
                     <th><?=Lang::main('status');?></th>
-                    <td colspan="3"><dfn title="<?=Lang::guide('editor', 'statusTip', $this->editorFields('status'));?>" style="color:<?=Guidelist::STATUS_COLORS[$this->editorFields('status')];?>"><?=Lang::guide('status', $this->editorFields('status'));?></dfn>
+                    <td colspan="3"><dfn title="<?=Lang::guide('editor', 'statusTip', $this->editStatus);?>" style="color:<?=$this->editStatusColor;?>"><?=Lang::guide('status', $this->editStatus);?></dfn>
 <?php
-if ($this->editorFields('status') == GUIDE_STATUS_DRAFT):
-    echo '<small>(<a href="?guide='.$this->typeId.'&rev='.$this->editorFields('rev').'" target="_blank" class="q1">'.Lang::guide('editor', 'testGuide')."</a>)</small>\n";
+if ($this->isDraft && $this->typeId):
+    echo '                        <small>(<a href="?guide='.$this->typeId.'&rev='.$this->editRev.'" target="_blank" class="q1">'.Lang::guide('editor', 'testGuide')."</a>)</small>\n";
 endif;
 ?>
                     </td>
@@ -263,7 +252,7 @@ endif;
                     onchange="updatePreview(false, this)"
                     rows="8"
                     cols="40"
-                    style="width:95%"><?=$this->editorFields('text');?></textarea>
+                    style="width:95%"><?=$this->editText;?></textarea>
                 <script>
                     g_enhanceTextarea('#editBox', {
                         markup: true,
@@ -274,6 +263,12 @@ endif;
                 </script>
             </div>
 
+<?php if ($this->error): ?>
+            <div class="box msg-failure">
+                <?=$this->error . PHP_EOL;?>
+            </div>
+
+<?php endif; ?>
             <div class="guide-submission">
                 <div class="guide-submission-options">
                     <button type="button" class="btn btn-site" data-type="save" onclick="$('.guide-submission').attr('data-type', 'save'); $('#changelog').focus();"><?=Lang::guide('editor', 'save');?></button>
@@ -288,7 +283,7 @@ endif;
                 </div>
             </div>
 
-            <img src="<?=Cfg::get('STATIC_URL');?>/images/icons/ajax.gif" style="display:none" class="spinning-circle">
+            <img src="<?=$this->gStaticUrl;?>/images/icons/ajax.gif" style="display:none" class="spinning-circle">
             <span id="save-status"></span>
         </form>
     </div>

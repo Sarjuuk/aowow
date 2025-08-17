@@ -44,8 +44,8 @@ var _ = [
                         alert('Operation failed.');
                     },
                     success: function(json) {
-                        if (json != 1)
-                            alert('Operation failed.');
+                        if (json)
+                            alert('Operation failed: ' + json);
                         else
                             $WH.de(el.parentNode);
                     },

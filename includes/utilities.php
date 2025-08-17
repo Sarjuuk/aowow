@@ -75,8 +75,6 @@ abstract class Util
 
     public static $mapSelectorString        = '<a href="javascript:;" onclick="myMapper.update({zone: %d}); g_setSelectedLink(this, \'mapper\'); return false" onmousedown="return false">%s</a>&nbsp;(%d)';
 
-    public static $guideratingString        = "        $(document).ready(function() {\n        $('#guiderating').append(GetStars(%.10F, %s, %u, %u));\n    });";
-
     public static $expansionString          = [null, 'bc', 'wotlk'];
 
     public static $tcEncoding               = '0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevElBCDFHJKOPQSUWXYZ123456789';

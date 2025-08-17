@@ -681,7 +681,7 @@ class User
         if (!self::isLoggedIn() || self::isBanned(ACC_BAN_GUIDE))
             return $result;
 
-        if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GUIDE_STATUS_ARCHIVED))
+        if ($guides = DB::Aowow()->select('SELECT `id`, `title`, `url` FROM ?_guides WHERE `userId` = ?d AND `status` <> ?d', self::$id, GuideMgr::STATUS_ARCHIVED))
         {
             // fix url
             array_walk($guides, fn(&$x) => $x['url'] = '?guide='.($x['url'] ?: $x['id']));

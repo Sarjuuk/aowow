@@ -7,7 +7,7 @@ if (!defined('AOWOW_REVISION'))
 
 class AjaxAdmin extends AjaxHandler
 {
-    protected $validParams = ['siteconfig', 'weight-presets', 'spawn-override', 'guide', 'comment'];
+    protected $validParams = ['siteconfig', 'weight-presets', 'spawn-override', 'comment'];
     protected $_get        = array(
         'action' => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkTextLine'      ],
         'id'     => ['filter' => FILTER_CALLBACK, 'options' => 'Aowow\AjaxHandler::checkIdListUnsigned'],
@@ -63,13 +63,6 @@ class AjaxAdmin extends AjaxHandler
                 return;
 
             $this->handler = 'spawnPosFix';
-        }
-        else if ($this->params[0] == 'guide')
-        {
-            if (!User::isInGroup(U_GROUP_STAFF))
-                return;
-
-            $this->handler = 'guideManage';
         }
         else if ($this->params[0] == 'comment')
         {
@@ -202,57 +195,6 @@ class AjaxAdmin extends AjaxHandler
             }
 
             return '-2';
-        }
-
-        return '-1';
-    }
-
-    protected function guideManage() : string
-    {
-        $update = function (int $id, int $status, ?string $msg = null) : bool
-        {
-            if (!DB::Aowow()->query('UPDATE ?_guides SET `status` = ?d WHERE `id` = ?d', $status, $id))
-                return false;
-
-            // set display rev to latest
-            if ($status == GUIDE_STATUS_APPROVED)
-                DB::Aowow()->query('UPDATE ?_guides SET `rev` = (SELECT `rev` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d ORDER BY `rev` DESC LIMIT 1), `approveUserId` = ?d, `approveDate` = ?d WHERE `id` = ?d', Type::GUIDE, $id, User::$id, time(), $id);
-
-            DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `status`) VALUES (?d, ?d, ?d, ?d)', $id, time(), User::$id, $status);
-            if ($msg)
-                DB::Aowow()->query('INSERT INTO ?_guides_changelog (`id`, `date`, `userId`, `msg`)    VALUES (?d, ?d, ?d, ?)', $id, time(), User::$id, $msg);
-            return true;
-        };
-
-        if (!$this->_post['id'])
-            trigger_error('AjaxHander::guideManage - malformed request: id: '.$this->_post['id'].', status: '.$this->_post['status']);
-        else
-        {
-            $guide = DB::Aowow()->selectRow('SELECT `userId`, `status` FROM ?_guides WHERE `id` = ?d', $this->_post['id']);
-            if (!$guide)
-                trigger_error('AjaxHander::guideManage - guide #'.$this->_post['id'].' not found');
-            else
-            {
-                if ($this->_post['status'] == $guide['status'])
-                    trigger_error('AjaxHander::guideManage - guide #'.$this->_post['id'].' already has status #'.$this->_post['status']);
-                else
-                {
-                    if ($this->_post['status'] == GUIDE_STATUS_APPROVED)
-                    {
-                        if ($update($this->_post['id'], GUIDE_STATUS_APPROVED, $this->_post['msg']))
-                        {
-                            Util::gainSiteReputation($guide['userId'], SITEREP_ACTION_ARTICLE, ['id' => $this->_post['id']]);
-                            return '1';
-                        }
-                        else
-                            return '-2';
-                    }
-                    else if ($this->_post['status'] == GUIDE_STATUS_REJECTED)
-                        return $update($this->_post['id'], GUIDE_STATUS_REJECTED, $this->_post['msg']) ? '1' : '-2';
-                    else
-                        trigger_error('AjaxHander::guideManage - unhandled status change request');
-                }
-            }
         }
 
         return '-1';
