@@ -1,7 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
-
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -15,7 +16,7 @@
             <div id="profilah-generic"></div>
             <script type="text/javascript">//<![CDATA[
                 var profilah = new Profiler();
-                profilah.initialize('profilah-generic', { id: <?=$this->subjectGUID; ?> });
+                profilah.initialize('profilah-generic', { id: <?=$this->typeId; ?> });
                 pr_setRegionRealm($WH.gE($WH.ge('topbar'), 'form')[0], '<?=$this->region; ?>', '<?=$this->realm; ?>');
             //]]></script>
 

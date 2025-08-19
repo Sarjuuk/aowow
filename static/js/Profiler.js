@@ -900,7 +900,7 @@ function Profiler() {
 
     function _updateDefaultIcon() {
         var icon = $WH.g_getProfileIcon(_profile.race, _profile.classs, _profile.gender, _profile.level, 0, 'large');
-        // aowow - and another bugged icon request
+        // aowow - see profile=avatar endpoint for explanation
         // var icon = $WH.g_getProfileIcon(_profile.race, _profile.classs, _profile.gender, _profile.level, _profile.source, 'large');
 
         if (!_profile.icon) {

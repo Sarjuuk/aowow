@@ -253,7 +253,8 @@ class ProfileListFilter extends Filter
         'minle' => [parent::V_RANGE,    [1, MAX_LEVEL],                                   false], // min level
         'maxle' => [parent::V_RANGE,    [1, MAX_LEVEL],                                   false], // max level
         'rg'    => [parent::V_CALLBACK, 'cbRegionCheck',                                  false], // region
-        'sv'    => [parent::V_CALLBACK, 'cbServerCheck',                                  false], // server
+        'bg'    => [parent::V_EQUAL,    null,                                             false], // battlegroup - unsued here, but var expected by template
+        'sv'    => [parent::V_CALLBACK, 'cbServerCheck',                                  false]  // server
     );
 
     public bool  $useLocalList = false;

@@ -1,7 +1,10 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    use \Aowow\Lang;
 
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -23,17 +26,19 @@
 
                 <div class="profiler-home">
                     <div>
-                        <h2><?=Util::ucFirst(Lang::main('name')).Lang::main('colon'); ?></h2>
+                        <h2><?=$this->ucFirst(Lang::main('name')).Lang::main('colon'); ?></h2>
                         <input type="text" name="na" value="" />
                     </div>
 
                     <div>
                         <h2><?=Lang::profiler('region').Lang::main('colon'); ?></h2>
-<?php
-foreach (Util::$regions as $idx => $n):
-    echo '                        <input type="radio" name="rg" value="'.$n.'" id="rg-'.($idx+1).'" '.(!$idx ? 'checked="checked" ' : '').'/><label for="rg-'.($idx+1).'" class="profiler-button profiler-option-left'.(!$idx ? ' selected' : '').'"><em><i>'.Lang::profiler('regions', $n).'</i></em></label>';
-endforeach;
- ?>
+<?=$this->makeRadiosList('rg', $this->regions, $this->rg, 24, function (&$v, $k, &$attribs) {
+    $attribs = ['class' => 'profiler-button profiler-option-left'];
+    $v = '<em><i>'.$v.'</i></em>';
+    if ($k == $this->rg)
+        $attribs['class'] .= ' selected';
+    return true;
+}); ?>
                     </div>
 
                     <div>

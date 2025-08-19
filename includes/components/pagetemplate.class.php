@@ -326,7 +326,7 @@ class PageTemplate
         {
             $result[] = "pr_setRegionRealm(\$WH.ge('fi').firstChild, '".$this->region."', '".$this->realm."');";
 
-            if ($this->filter->values['ra'])
+            if (!empty($this->filter->values['ra']))
                 $result[] = "pr_onChangeRace();";
         }
 

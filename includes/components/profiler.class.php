@@ -247,6 +247,14 @@ class Profiler
         return self::$realms;
     }
 
+    public static function getRegions() : array
+    {
+        self::getRealms();
+
+        // sort depends on encountered order in `logon`.`realmlist`. Is that a problem?
+        return array_unique(array_column(self::$realms, 'region'));
+    }
+
     private static function queueInsert($realmId, $guid, $type, $localId)
     {
         if ($rData = DB::Aowow()->selectRow('SELECT `requestTime` AS "time", `status` FROM ?_profiler_sync WHERE `realm` = ?d AND `realmGUID` = ?d AND `type` = ?d AND `typeId` = ?d AND `status` <> ?d', $realmId, $guid, $type, $localId, PR_QUEUE_STATUS_WORKING))
