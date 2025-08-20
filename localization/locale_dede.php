@@ -234,9 +234,6 @@ $lang = array(
         'atCaptain'     => "Teamkapitän",
 
         'profiler'      => "Charakter-Profiler",
-        'arenaTeams'    => "Arena Teams",
-        'guilds'        => "Gilden",
-
         'notFound'      => array(
             'guild'     => "Diese Gilde existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
             'arenateam' => "Dieses Arena Team existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
@@ -332,6 +329,10 @@ $lang = array(
         'icons'         => "Icons",
         'profile'       => "Profil",                        // 100
         'profiles'      => "Profile",
+        'guild'         => "Gilde",                         // 101
+        'guilds'        => "Gilden",
+        'arenateam'     => "Arena Team",                    // 102
+        'arenateams'    => "Arena Teams",
         'guide'         => "Leitfaden",                     // 300
         'guides'        => "Leitfäden",
         'emote'         => "Emote",                         // 501

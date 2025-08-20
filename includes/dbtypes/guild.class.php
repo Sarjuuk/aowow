@@ -101,7 +101,8 @@ class GuildListFilter extends Filter
         'ex' => [parent::V_EQUAL,    'on',                        false], // only match exact
         'si' => [parent::V_LIST,     [SIDE_ALLIANCE, SIDE_HORDE], false], // side
         'rg' => [parent::V_CALLBACK, 'cbRegionCheck',             false], // region
-        'sv' => [parent::V_CALLBACK, 'cbServerCheck',             false], // server
+        'bg' => [parent::V_EQUAL,    null,                        false], // battlegroup - unsued here, but var expected by template
+        'sv' => [parent::V_CALLBACK, 'cbServerCheck',             false]  // server
     );
 
     public array $extraOpts = [];

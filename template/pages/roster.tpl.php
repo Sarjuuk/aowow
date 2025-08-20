@@ -1,7 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
-
+    $this->brick('header');
+?>
     <div class="main" id="main">
         <div class="main-precontents" id="main-precontents"></div>
         <div class="main-contents" id="main-contents">
@@ -16,13 +17,11 @@ $this->brick('pageTemplate');
 
             <div class="text">
 <?php $this->brick('redButtons'); ?>
-                <h1 class="first"><?=$this->name; ?></h1>
+                <h1 class="first"><?=$this->h1; ?></h1>
 
 <?php
     // subject statistics here
-    if (isset($this->extraHTML)):
-        echo $this->extraHTML;
-    endif;
+    echo $this->extraHTML ?? '';
 ?>
 
             </div>

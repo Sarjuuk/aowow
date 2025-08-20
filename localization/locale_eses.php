@@ -234,9 +234,6 @@ $lang = array(
         'atCaptain'     => "Capitán de equipo de arena",
 
         'profiler'      => "Gestor de Perfiles", // Perfiles de Personaje? (character profiler)
-        'arenaTeams'    => "Equipos de Arena",
-        'guilds'        => "Hermandades",
-
         'notFound'      => array(
             'guild'     => "Esta hermandad no existe o aún no está en la base de datos.",
             'arenateam' => "Este equipo de arena no existe o aún no está en la base de datos.",
@@ -332,6 +329,10 @@ $lang = array(
         'icons'         => "Iconos",
         'profile'       => "Perfile",
         'profiles'      => "Perfiles",
+        'guild'         => "Hermandad",
+        'guilds'        => "Hermandades",
+        'arenateam'     => "Equipo de arena",
+        'arenateams'    => "Equipos de arena",
         'guide'         => "Guía",
         'guides'        => "Guías",
         'emote'         => "emoción",

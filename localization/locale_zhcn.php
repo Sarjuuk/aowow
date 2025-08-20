@@ -234,9 +234,6 @@ $lang = array(
         'atCaptain'     => "竞技场战队队长",
 
         'profiler'      => "角色概况",
-        'arenaTeams'    => "竞技场战队",
-        'guilds'        => "公会",
-
         'notFound'      => array(
             'guild'     => "该公会不存在或尚未被收录到数据库中。",
             'arenateam' => "该竞技场战队不存在或尚未被收录到数据库中。",
@@ -332,6 +329,10 @@ $lang = array(
         'icons'         => "图标",
         'profile'       => "简介",
         'profiles'      => "简介",
+        'guild'         => "公会",
+        'guilds'        => "公会",
+        'arenateam'     => "竞技场战队",
+        'arenateams'    => "竞技场战队",
         'guide'         => "指南",
         'guides'        => "指南",
         'emote'         => "表情",

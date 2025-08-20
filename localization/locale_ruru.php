@@ -234,9 +234,6 @@ $lang = array(
         'atCaptain'     => "Капитан команды арены",
 
         'profiler'      => "Профили персонажей",
-        'arenaTeams'    => "Команды арен",
-        'guilds'        => "Гильдии",
-
         'notFound'      => array(
             'profile'   => "Этот персонаж не существует, либо еще не добавлен в базу данных.",
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
@@ -332,6 +329,10 @@ $lang = array(
         'icons'         => "Иконки",
         'profile'       => "Профиль",
         'profiles'      => "Профили",
+        'guild'         => "Гильдия",
+        'guilds'        => "Гильдии",
+        'arenateam'     => "Команда арены",
+        'arenateams'    => "Команды арен",
         'guide'         => "Руководство",
         'guides'        => "Руководство",
         'emote'         => "Эмоция",
