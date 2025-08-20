@@ -232,7 +232,7 @@ $lang = array(
         'guildRoster'   => "Liste des membres pour la guilde de  &lt;%s&gt",
         'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost
         'atCaptain'     => "Capitaine d'équipe",
-
+        'atSize'        => "Type : ",
         'profiler'      => "Profiler de Personnage",
         'notFound'      => array(
             'guild'     => "[This Guild doesn't exist or is not yet in the database.]",

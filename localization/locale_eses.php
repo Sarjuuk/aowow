@@ -232,7 +232,7 @@ $lang = array(
         'guildRoster'   => "Lista de miembros de hermandad para &lt;%s&gt",
         'arenaRoster'   => "Personajes del Equipo de Arena para &lt;%s&gt",
         'atCaptain'     => "Capitán de equipo de arena",
-
+        'atSize'        => "Tamaño: ",
         'profiler'      => "Gestor de Perfiles", // Perfiles de Personaje? (character profiler)
         'notFound'      => array(
             'guild'     => "Esta hermandad no existe o aún no está en la base de datos.",

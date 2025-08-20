@@ -232,7 +232,7 @@ $lang = array(
         'guildRoster'   => "Gildenliste für &lt;%s&gt;",
         'arenaRoster'   => "Arena-Teamliste für &lt;%s&gt",
         'atCaptain'     => "Teamkapitän",
-
+        'atSize'        => "Größe: ",
         'profiler'      => "Charakter-Profiler",
         'notFound'      => array(
             'guild'     => "Diese Gilde existiert nicht oder wurde noch nicht in die Datenbank übernommen.",

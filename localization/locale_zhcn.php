@@ -232,7 +232,7 @@ $lang = array(
         'guildRoster'   => "公会成员名单 &lt;%s&gt;",
         'arenaRoster'   => "竞技场战队名单 &lt;%s&gt",
         'atCaptain'     => "竞技场战队队长",
-
+        'atSize'        => "团队规模：",
         'profiler'      => "角色概况",
         'notFound'      => array(
             'guild'     => "该公会不存在或尚未被收录到数据库中。",

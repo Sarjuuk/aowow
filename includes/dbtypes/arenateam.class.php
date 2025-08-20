@@ -58,7 +58,8 @@ class ArenaTeamListFilter extends Filter
         'si' => [parent::V_LIST,     [1, 2],               false], // side
         'sz' => [parent::V_LIST,     [2, 3, 5],            false], // tema size
         'rg' => [parent::V_CALLBACK, 'cbRegionCheck',      false], // region
-        'sv' => [parent::V_CALLBACK, 'cbServerCheck',      false], // server
+        'bg' => [parent::V_EQUAL,    null,                 false], // battlegroup - unsued here, but var expected by template
+        'sv' => [parent::V_CALLBACK, 'cbServerCheck',      false]  // server
     );
 
     public array $extraOpts = [];

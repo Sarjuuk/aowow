@@ -1,0 +1,146 @@
+<?php
+
+namespace Aowow;
+
+if (!defined('AOWOW_REVISION'))
+    die('illegal access');
+
+
+class ArenateamBaseResponse extends TemplateResponse
+{
+    use TrProfilerDetail;
+
+    protected  string $template   = 'roster';
+    protected  string $pageName   = 'arena-team';
+    protected ?int    $activeTab  = parent::TAB_TOOLS;
+    protected  array  $breadcrumb = [1, 5, 3];              // Tools > Profiler > Arena Team
+
+    protected  array  $dataLoader = ['realms', 'weight-presets'];
+    protected  array  $scripts    = array(
+        [SC_JS_FILE,  'js/profile_all.js'],
+        [SC_JS_FILE,  'js/profile.js'],
+        [SC_CSS_FILE, 'css/Profiler.css']
+    );
+
+    public int $type = Type::ARENA_TEAM;
+
+    public function __construct(string $idOrProfile)
+    {
+        parent::__construct($idOrProfile);
+
+        if (!Cfg::get('PROFILER_ENABLE'))
+            $this->generateError();
+
+        if (!$idOrProfile)
+            $this->generateError();
+
+        $this->getSubjectFromUrl($idOrProfile);
+
+        // we have an ID > ok
+        if ($this->typeId)
+            return;
+
+        // param was incomplete profile > error
+        if (!$this->subjectName)
+            $this->generateError();
+
+        // 3 possibilities
+        // 1) already synced to aowow
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `cuFlags` FROM ?_profiler_arena_team WHERE `realm` = ?d AND `nameUrl` = ?', $this->realmId, Profiler::urlize($this->subjectName)))
+        {
+            $this->typeId = $subject['id'];
+
+            if ($subject['cuFlags'] & PROFILER_CU_NEEDS_RESYNC)
+                $this->handleIncompleteData(Type::ARENA_TEAM, $subject['realmGUID']);
+
+            return;
+        }
+
+        // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
+        else if ($subject = DB::Characters($this->realmId)->selectRow('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = ?', Util::ucFirst($this->subjectName)))
+        {
+            $subject['realm']   = $this->realmId;
+            $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+
+            // create entry from realm with basic info
+            DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team (?#) VALUES (?a)', array_keys($subject), array_values($subject));
+
+            $this->handleIncompleteData(Type::ARENA_TEAM, $subject['realmGUID']);
+            return;
+        }
+
+        // 3) does not exist at all
+        $this->notFound();
+    }
+
+    protected function generate() : void
+    {
+        if ($this->doResync)
+        {
+            parent::generate();
+            return;
+        }
+
+        $subject = new LocalArenaTeamList(array(['at.id', $this->typeId]));
+        if ($subject->error)
+            $this->notFound();
+
+        // arena team accessed by id
+        if (!$this->subjectName)
+            $this->forward($subject->getProfileUrl());
+
+        $this->h1 = Lang::profiler('arenaRoster', [$subject->getField('name')]);
+
+
+        /*************/
+        /* Menu Path */
+        /*************/
+
+        $this->followBreadcrumbPath();
+
+
+        /**************/
+        /* Page Title */
+        /**************/
+
+        array_unshift(
+            $this->title,
+            $subject->getField('name').' ('.$this->realm.' - '.Lang::profiler('regions', $this->region).')',
+            Util::ucFirst(Lang::profiler('profiler'))
+        );
+
+
+        /****************/
+        /* Main Content */
+        /****************/
+
+        parent::generate();
+
+        $this->redButtons[BUTTON_RESYNC] = [$this->typeId, 'arena-team'];
+
+        // statistic calculations here
+
+
+        /**************/
+        /* Extra Tabs */
+        /**************/
+
+        $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
+
+        // tab: members
+        $member = new LocalProfileList(array(['atm.arenaTeamId', $this->typeId]));
+        $this->lvTabs->addListviewTab(new Listview(array(
+            'data'        => $member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_ARENA),
+            'sort'        => [-15],
+            'visibleCols' => ['race', 'classs', 'level', 'talents', 'gearscore', 'rating', 'wins', 'losses'],
+            'hiddenCols'  => ['guild', 'location']
+        ), ProfileList::$brickFile));
+    }
+
+    private function notFound() : never
+    {
+        parent::generateNotFound(Lang::game('arenateam'), Lang::profiler('notFound', 'arenateam'));
+    }
+}
+
+?>

@@ -232,7 +232,7 @@ $lang = array(
         'guildRoster'   => "Список членов гильдии &lt;%s&gt",
         'arenaRoster'   => "[Arena Team Roster for &lt;%s&gt]",     // string probably lost
         'atCaptain'     => "Капитан команды арены",
-
+        'atSize'        => "Численности: ",
         'profiler'      => "Профили персонажей",
         'notFound'      => array(
             'profile'   => "Этот персонаж не существует, либо еще не добавлен в базу данных.",
