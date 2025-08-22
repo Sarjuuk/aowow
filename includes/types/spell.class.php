@@ -735,8 +735,8 @@ class SpellList extends BaseType
         return [
             $min + $maxBase,
             $max + $maxBase,
-            $rppl ? '<!--ppl'.$baseLvl.':'.$level.':'.$min.':'.($rppl * 100 * $nTicks).'-->' : null,
-            $rppl ? '<!--ppl'.$baseLvl.':'.$level.':'.$max.':'.($rppl * 100 * $nTicks).'-->' : null
+            $rppl ? '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$min.':'.($rppl * 100 * $nTicks).'-->' : null,
+            $rppl ? '<!--ppl'.$baseLvl.':'.($maxLvl ?: $level).':'.$max.':'.($rppl * 100 * $nTicks).'-->' : null
         ];
     }
 
