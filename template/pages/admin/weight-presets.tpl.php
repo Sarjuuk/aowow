@@ -1,6 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    $this->brick('header');
+?>
 
     <script type="text/javascript">
         var SummaryAdmin = {
@@ -553,28 +555,14 @@ $this->brick('announcement');
 $this->brick('pageTemplate');
 ?>
             <div class="text">
-                <h1><?=$this->name;?></h1>
+                <h1><?=$this->h1;?></h1>
 
 <?php
-    $this->brick('article');
+    $this->brick('markup', ['markup' => $this->article]);
 
-    if (isset($this->extraText)):
-?>
-                <div id="text-generic" class="left"></div>
-                <script type="text/javascript">//<![CDATA[
-                    Markup.printHtml("<?=Util::jsEscape($this->extraText);?>", "text-generic", {
-                        allow: Markup.CLASS_ADMIN,
-                        dbpage: true
-                    });
-                //]]></script>
+    $this->brick('markup', ['markup' => $this->extraText]);
 
-                <div class="pad2"></div>
-<?php
-    endif;
-
-    if (isset($this->extraHTML)):
-        echo $this->extraHTML;
-    endif;
+    echo $this->extraHTML ?? '';
 ?>
                 <h2>Edit<span id="wt-name"></span><span id="status-ic" style="float:right;"></span></h2>
                 <div class="wt-edit">
