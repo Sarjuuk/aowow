@@ -1,6 +1,8 @@
-<?php namespace Aowow; ?>
+<?php
+    namespace Aowow\Template;
 
-<?php $this->brick('header'); ?>
+    $this->brick('header');
+?>
 
     <script type="text/javascript">
         function createStatusIcon(errTxt)

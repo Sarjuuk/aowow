@@ -217,6 +217,12 @@ trait TrCache
 
     private function memcached() : ?\Memcached
     {
+        if (!class_exists('\Memcached'))
+        {
+            trigger_error('Memcached is enabled by us but not in php!', E_USER_ERROR);
+            return null;
+        }
+
         if (!$this->memcached && (Cfg::get('CACHE_MODE') & CACHE_MODE_MEMCACHED))
         {
             $this->memcached = new \Memcached();

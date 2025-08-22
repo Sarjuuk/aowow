@@ -7,8 +7,8 @@ if (!defined('AOWOW_REVISION'))
 
 class Cfg
 {
-    public const PATTERN_CONF_KEY      = '/[a-z0-9_\.\-]/i';
-    public const PATTERN_INV_CONF_KEY  = '/[^a-z0-9_\.\-]/i';
+    public const PATTERN_CONF_KEY_CHAR = '/[a-z0-9_\.\-]/i';
+    public const PATTERN_CONF_KEY_FULL = '/^[a-z0-9_\.\-]+$/i';
     public const PATTERN_INVALID_CHARS = '/\p{C}/ui';
 
     // config flags
@@ -116,7 +116,7 @@ class Cfg
 
         $key = strtolower($key);
 
-        if (preg_match(self::PATTERN_INV_CONF_KEY,  $key))
+        if (!preg_match(self::PATTERN_CONF_KEY_FULL, $key))
             return 'invalid chars in option name: [a-z 0-9 _ . -] are allowed';
 
         if (isset(self::$store[$key]))
@@ -129,7 +129,7 @@ class Cfg
             return 'this configuration option cannot be set';
 
         $flags = self::FLAG_TYPE_STRING | self::FLAG_PHP;
-        if (!DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, ?d, ?d)', $key, $value, self::CAT_MISCELLANEOUS, $flags))
+        if (!is_int(DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, ?d, ?d)', $key, $value, self::CAT_MISCELLANEOUS, $flags)))
             return 'internal error';
 
         self::$store[$key] = [$value, $flags, self::CAT_MISCELLANEOUS, null, null];
@@ -349,7 +349,7 @@ class Cfg
         }
 
         if ($flags & self::FLAG_TYPE_BOOL)
-            $value = (bool)$value;
+            $value = $value ? 1 : 0;
 
         return '';
     }
@@ -384,7 +384,17 @@ class Cfg
             trigger_error($msg, E_USER_ERROR);
     }
 
-    private static function locales(/*int|string*/ $value, ?string &$msg = '') : bool
+    private static function useSSL() : bool
+    {
+        return (($_SERVER['HTTPS'] ?? 'off') != 'off') || (self::$store['force_ssl'][self::IDX_VALUE] ?? 0);
+    }
+
+
+    /***************************/
+    /* onSet/onLoad validators */
+    /***************************/
+
+    private static function locales(int|string $value, ?string &$msg = '') : bool
     {
         if (!CLI)
             return true;
@@ -397,7 +407,7 @@ class Cfg
         return false;
     }
 
-    private static function acc_auth_mode(/*int|string*/ $value, ?string &$msg = '') : bool
+    private static function acc_auth_mode(int|string $value, ?string &$msg = '') : bool
     {
         if ($value == 1 && !extension_loaded('gmp'))
         {
@@ -408,7 +418,7 @@ class Cfg
         return true;
     }
 
-    private static function profiler_enable(/*int|string*/ $value, ?string &$msg = '') : bool
+    private static function profiler_enable(int|string $value, ?string &$msg = '') : bool
     {
         if ($value != 1)
             return true;
@@ -416,7 +426,7 @@ class Cfg
         return Profiler::queueStart($msg);
     }
 
-    private static function static_host(/*int|string*/ $value, ?string &$msg = '') : bool
+    private static function static_host(int|string $value, ?string &$msg = '') : bool
     {
         self::$store['static_url'] = array(                 // points js to images & scripts
             (self::useSSL() ? 'https://' : 'http://').$value,
@@ -429,7 +439,7 @@ class Cfg
         return true;
     }
 
-    private static function site_host(/*int|string*/ $value, ?string &$msg = '') : bool
+    private static function site_host(int|string $value, ?string &$msg = '') : bool
     {
         self::$store['host_url'] = array(                   // points js to executable files
             (self::useSSL() ? 'https://' : 'http://').$value,
@@ -442,9 +452,15 @@ class Cfg
         return true;
     }
 
-    private static function useSSL() : bool
+    private static function cache_mode(int|string $value, ?string &$msg = '') : bool
     {
-        return (($_SERVER['HTTPS'] ?? 'off') != 'off') || (self::$store['force_ssl'][self::IDX_VALUE] ?? 0);
+        if ($value & 0x2 && !class_exists('\Memcached'))
+        {
+            $msg .= 'PHP extension Memcached is not enabled.';
+            return false;
+        }
+
+        return true;
     }
 
     private static function screenshot_min_size(int|string $value, ?string &$msg = '') : bool

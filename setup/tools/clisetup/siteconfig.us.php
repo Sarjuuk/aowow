@@ -114,7 +114,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 CLI::write();
             }
 
-            if (CLI::read(['idx' => ['', false, false, Cfg::PATTERN_CONF_KEY]], $uiIndex) && $uiIndex && $uiIndex['idx'] !== '')
+            if (CLI::read(['idx' => ['', false, false, Cfg::PATTERN_CONF_KEY_CHAR]], $uiIndex) && $uiIndex && $uiIndex['idx'] !== '')
             {
                 $idx = array_search(strtolower($uiIndex['idx']), $cfgList);
                 if ($idx === false)
@@ -147,7 +147,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write();
 
         $setting = array(
-            'key' => ['option name', false, false, Cfg::PATTERN_CONF_KEY],
+            'key' => ['option name', false, false, Cfg::PATTERN_CONF_KEY_CHAR],
             'val' => ['value']
         );
         if (CLI::read($setting, $uiSetting) && $uiSetting)
@@ -443,7 +443,13 @@ CLISetup::registerUtility(new class extends UtilityScript
 
     private function testCase(&$protocol, &$host, $testFile, &$status) : bool
     {
-        $res = get_headers($protocol.$host.$testFile, true);
+        // https://stackoverflow.com/questions/14279095/allow-self-signed-certificates-for-https-wrapper
+        $ctx = stream_context_create(array(
+            'ssl' => ['verify_peer'       => false,
+                      'allow_self_signed' => true]
+        ));
+
+        $res = get_headers($protocol.$host.$testFile, true, $ctx);
 
         if (!preg_match('/HTTP\/[0-9\.]+\s+([0-9]+)/', $res[0], $m))
             return false;
