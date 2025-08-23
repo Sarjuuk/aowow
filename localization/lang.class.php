@@ -140,9 +140,9 @@ class Lang
             if ($arg !== false || $concat == self::CONCAT_NONE)
                 $buff .= ', '.$item;
             else if ($concat == self::CONCAT_AND)
-                $buff .= self::main('and').' '.$item;
+                $buff .= self::main('and').$item;
             else
-                $buff .= self::main('or').' '.$item;
+                $buff .= self::main('or').$item;
         }
         while ($arg !== false);
 

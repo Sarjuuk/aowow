@@ -93,7 +93,7 @@ CLISetup::registerUtility(new class extends UtilityScript
             return true;
         }
 
-        if (DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE `username` = ? AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if (DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE LOWER(`username`) = LOWER(?) AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, ACC_STATUS_NEW, ACC_STATUS_NEW))
         {
             CLI::write('[account] ' . Lang::account('nameInUse'), CLI::LOG_ERROR);
             CLI::write();
@@ -106,7 +106,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         if (DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `joindate`, `email`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, 1)',
             $name, User::hashCrypt($passw), $name, $email ?: Cfg::get('CONTACT_EMAIL'), U_GROUP_ADMIN))
         {
-            $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `username` = ?', $name);
+            $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $name);
             Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
             CLI::write("[account] admin ".$name." created successfully", CLI::LOG_OK);

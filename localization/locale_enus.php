@@ -823,7 +823,7 @@ $lang = array(
         'targetUNK'     => '[span class=q10]unknown target #[b class=q1]%d[/b][/span]',
         'targetTT'      => '[b class=q1]TargetType %d[/b][br][table][tr][td]Param1[/td][td=header]%d[/td][/tr][tr][td]Param2[/td][td=header]%d[/td][/tr][tr][td]Param3[/td][td=header]%d[/td][/tr][tr][td]Param4[/td][td=header]%d[/td][/tr][tr][td]X[/td][td=header]%17$.2f[/td][/tr][tr][td]Y[/td][td=header]%18$.2f[/td][/tr][tr][td]Z[/td][td=header]%19$.2f[/td][/tr][tr][td]O[/td][td=header]%20$.2f[/td][/tr][/table]',
         'targets'       => array(
-            SmartTarget::TARGET_NONE                   => '',
+            SmartTarget::TARGET_NONE                   => '[span class=q0]<None>[/span]',
             SmartTarget::TARGET_SELF                   => 'self',
             SmartTarget::TARGET_VICTIM                 => 'Opponent',
             SmartTarget::TARGET_HOSTILE_SECOND_AGGRO   => '2nd (%2$d)?player:unit;(%1$d)? within %1$dm:; in threat list(%11$s)? using %11$s:;',

@@ -54,6 +54,10 @@ define ('SC_FLAG_NO_TIMESTAMP',             0x02);
 define ('SC_FLAG_APPEND_LOCALE',            0x04);
 define ('SC_FLAG_LOCALIZED',                0x08);
 
+define('ICON_SIZE_TINY',                    15);
+define('ICON_SIZE_SMALL',                   18);
+define('ICON_SIZE_MEDIUM',                  36);
+define('ICON_SIZE_LARGE',                   56);
 
 // Databases
 define('DB_AOWOW',                          0);

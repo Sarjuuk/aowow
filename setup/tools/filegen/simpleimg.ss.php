@@ -29,10 +29,10 @@ CLISetup::registerSetup("build", new class extends SetupScript
     protected $setupAfter     = [['icons'], []];
 
     private const ICON_DIRS = array(
-        ['static/images/wow/icons/large/',  'jpg',  0, 56, 4],
-        ['static/images/wow/icons/medium/', 'jpg',  0, 36, 4],
-        ['static/images/wow/icons/small/',  'jpg',  0, 18, 4],
-        ['static/images/wow/icons/tiny/',   'gif',  0, 15, 4]
+        ['static/images/wow/icons/large/',  'jpg',  0, ICON_SIZE_LARGE,  4],
+        ['static/images/wow/icons/medium/', 'jpg',  0, ICON_SIZE_MEDIUM, 4],
+        ['static/images/wow/icons/small/',  'jpg',  0, ICON_SIZE_SMALL,  4],
+        ['static/images/wow/icons/tiny/',   'gif',  0, ICON_SIZE_TINY,   4]
     );
 
     private $genSteps = array(

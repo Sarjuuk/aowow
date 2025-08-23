@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class InfoboxMarkup extends Markup
 {
-    public function __construct(private array $items = [], array $opts, string $parent = '')
+    public function __construct(private array $items, array $opts, string $parent = '')
     {
         parent::__construct('', $opts, $parent);
     }

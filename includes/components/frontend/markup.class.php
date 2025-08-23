@@ -108,6 +108,9 @@ class Markup implements \JsonSerializable
                 else if ($match[1] == 'icondb')
                     $match[1] = 'icon';
 
+                // todo - respecte forced locale
+                // match[0] => [achievement=3579 domain=ru], [spell=40120 site=fr]
+
                 if ($match[1] == 'money')
                 {
                     if (stripos($match[0], 'items'))
