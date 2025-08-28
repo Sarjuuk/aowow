@@ -110,9 +110,9 @@ if ($this->bans):
                         <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
 <?php endif; ?>
 
-                        <div><?=Lang::account('usernameNote');?></div>
-<?php if ($this->renameCD): ?>
-                        <div class="msg-failure pad3"><br /><?=Lang::account('renameCD', [$this->renameCD]);?></div>
+                        <div><?=Lang::account('usernameNote', [$this->renameCD]);?></div>
+<?php if ($this->activeCD): ?>
+                        <div class="msg-failure pad3"><br /><?=Lang::account('activeCD', [$this->activeCD]);?></div>
 <?php endif; ?>
                         <form action="?account=update-username" name="ce" method="post" id="change-username">
                             <table cellspacing="5" cellpadding="0" border="0">

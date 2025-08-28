@@ -24,6 +24,7 @@ Also, this project is not meant to be used for commercial purposes of any kind!
   + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
   + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
   + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
+  + [Internationalization](https://www.php.net/manual/en/book.intl.php)
   + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
 + MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
 + [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101) (no other other providers are supported at this time)

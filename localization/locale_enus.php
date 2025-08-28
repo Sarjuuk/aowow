@@ -133,7 +133,7 @@ $lang = array(
         'colon'         => ': ',
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
-        'dateFmtUntil'  => "F j, Y",
+        'dateFmtIntl'   => "MMMM d, y",
         'timeAgo'       => "%s ago",
         'nfSeparators'  => [',', '.'],
 

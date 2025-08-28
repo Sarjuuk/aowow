@@ -28,6 +28,7 @@ class AccountBaseResponse extends TemplateResponse
     public  string   $curEmail         = '';
     public  string   $curName          = '';
     public  string   $renameCD         = '';
+    public  string   $activeCD         = '';
     public  array    $description      = [];
     public  array    $signature        = [];
     public  int      $avMode           = 0;
@@ -51,7 +52,7 @@ class AccountBaseResponse extends TemplateResponse
     {
         array_unshift($this->title, Lang::account('settings'));
 
-        $user = DB::Aowow()->selectRow('SELECT `debug`, `email`, `description`, `avatar`, `wowicon` FROM ?_account WHERE `id` = ?d', User::$id);
+        $user = DB::Aowow()->selectRow('SELECT `debug`, `email`, `description`, `avatar`, `wowicon`, `renameCooldown` FROM ?_account WHERE `id` = ?d', User::$id);
 
         Lang::sort('game', 'ra');
 
@@ -108,10 +109,13 @@ class AccountBaseResponse extends TemplateResponse
         $this->curEmail = $user['email'] ?? '';
 
         // Username
-        $this->curName = User::$username;
-
-        // todo localize date format; store time
-        // $this->renameCD = date('F j, o', time() + 7 * DAY);
+        $this->curName  = User::$username;
+        $this->renameCD = Util::formatTime(Cfg::get('ACC_RENAME_DECAY') * 1000);
+        if ($user['renameCooldown'] > time())
+        {
+            $locCode = implode('_', str_split(Lang::getLocale()->json(), 2)); // ._.
+            $this->activeCD = (new \IntlDateFormatter($locCode, pattern: Lang::main('dateFmtIntl')))->format($user['renameCooldown']);
+        }
 
         /* COMMUNITY */
 

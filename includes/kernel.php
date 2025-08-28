@@ -13,7 +13,7 @@ define('CLI_HAS_E', CLI &&                                  // WIN10 and later u
     (!OS_WIN || (function_exists('sapi_windows_vt100_support') && sapi_windows_vt100_support(STDOUT))));
 
 
-$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo'/*, 'gmp'*/];
+$reqExt = ['SimpleXML', 'gd', 'mysqli', 'mbstring', 'fileinfo', 'intl'/*, 'gmp'*/];
 $badExt = [];
 $error  = '';
 if ($ext = array_filter($reqExt, fn($x) => !extension_loaded($x)))
