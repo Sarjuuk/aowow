@@ -14,12 +14,13 @@ class AccountBaseResponse extends TemplateResponse
     protected array  $scripts  = [[SC_JS_FILE, 'js/account.js']];
 
     // display status of executed step (forwarding back to this page)
-    public ?array    $generalMessage   = null;
-    public ?array    $emailMessage     = null;
-    public ?array    $usernameMessage  = null;
-    public ?array    $passwordMessage  = null;
-    public ?array    $communityMessage = null;
-    public ?array    $avatarMessage    = null;
+    public ?array    $generalMessage       = null;
+    public ?array    $emailMessage         = null;
+    public ?array    $usernameMessage      = null;
+    public ?array    $passwordMessage      = null;
+    public ?array    $communityMessage     = null;
+    public ?array    $avatarMessage        = null;
+    public ?array    $premiumborderMessage = null;
 
     // form fields
     public  int      $modelrace        = 0;
@@ -36,6 +37,7 @@ class AccountBaseResponse extends TemplateResponse
     public  int      $customicon       = 0;
     public  array    $customicons      = [];
     public  bool     $premium          = false;
+    public  int      $reputation       = 0;
     public ?Listview $avatarManager    = null;
 
     public ?array    $bans;
@@ -130,7 +132,7 @@ class AccountBaseResponse extends TemplateResponse
         $this->avMode  = $user['avatar'];
 
         // status [reviewing, ok, rejected]? (only 2: rejected processed in js)
-        if (User::isPremium() && ($cuAvatars = DB::Aowow()->select('SELECT `id`, `name`, `current`, `size`, `status`, `when` FROM ?_account_avatars WHERE `userId` = ?d AND `status` > 0', User::$id)))
+        if (User::isPremium() && ($cuAvatars = DB::Aowow()->select('SELECT `id`, `name`, `current`, `size`, `status`, `when` FROM ?_account_avatars WHERE `userId` = ?d', User::$id)))
         {
             array_walk($cuAvatars, function (&$x) {
                 $x['when']   *= 1000;                       // uploaded timestamp expected as msec for some reason
@@ -139,7 +141,7 @@ class AccountBaseResponse extends TemplateResponse
             });
 
             foreach ($cuAvatars as $a)
-                if ($a['status'] != 2)
+                if ($a['status'] != AvatarMgr::STATUS_REJECTED)
                     $this->customicons[$a['id']] = $a['name'];
 
             // TODO - replace with array_find in PHP 8.4
@@ -154,6 +156,8 @@ class AccountBaseResponse extends TemplateResponse
         if (!$this->premium)
             return;
 
+        $this->reputation = User::getReputation();
+
         // Avatar Manager
         $this->avatarManager = new Listview([
             'template' => 'avatar',
@@ -161,11 +165,12 @@ class AccountBaseResponse extends TemplateResponse
             'name'     => '$LANG.tab_avatars',
             'parent'   => 'avatar-manage',
             'hideNav'  => 1 | 2,                            // top | bottom
-            'data'     => $cuAvatars ?? []
+            'data'     => $cuAvatars ?? [],
+            'note'     => Lang::account('avatarSlots', [count($this->customicons), Cfg::get('acc_max_avatar_uploads')])
         ]);
 
         // Premium Border Selector
-        // ???
+        // solved by js
     }
 }
 

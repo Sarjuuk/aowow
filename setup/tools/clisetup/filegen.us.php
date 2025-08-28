@@ -39,6 +39,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         'static/uploads/screenshots/thumb/',
         'static/uploads/temp/',
         'static/uploads/guide/images/',
+        'static/uploads/avatars/'
     );
 
     public function __construct()

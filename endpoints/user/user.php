@@ -38,7 +38,7 @@ class UserBaseResponse extends TemplateResponse
         if (!$pageParam)
             $this->forwardToSignIn('user');
 
-        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $pageParam))
+        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $pageParam))
             $this->user = $user;
         else
             $this->generateNotFound(Lang::user('notFound', [$pageParam]));
@@ -115,12 +115,15 @@ class UserBaseResponse extends TemplateResponse
                 default => ''
             };
 
+            if (!($this->user['userGroups'] & U_GROUP_PREMIUM))
+                $this->user['avatarborder'] = 2;
+
             $this->userIcon = array(                        // JS: Icon.createUser()
                 $this->user['avatar'],                      // avatar: 1(iconString), 2(customId)
                 $avatarMore,                                // avatarMore: iconString or customId
                 IconElement::SIZE_MEDIUM,                   // size: (always medium)
                 null,                                       // url: (always null)
-                User::isInGroup(U_GROUP_PREMIUM) ? 0 : 2,   // premiumLevel: affixes css class ['-premium', '-gold', '', '-premiumred', '-red']
+                $this->user['avatarborder'],                // premiumLevel: affixes css class ['-premium', '-gold', '', '-premiumred', '-red']
                 false,                                      // noBorder: always false
                 '$Icon.getPrivilegeBorder('.$this->user['sumRep'].')' // reputationLevel: calculated in js from passed rep points
             );

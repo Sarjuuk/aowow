@@ -1124,6 +1124,25 @@ function g_GetStaffColorFromRoles(roles) {
     return '';
 }
 
+// aowow - stand in for WH.User.getCommentRoleLabel
+function g_GetCommentRoleLabel(roles, title) {
+    if (title) {
+        return title;
+    }
+
+    if (roles & U_GROUP_ADMIN) {
+        return g_user_roles[2];                             // LANG.administrator_abbrev
+    }
+    else if (roles & U_GROUP_MOD) {
+        return g_user_roles[4];                             // LANG.moderator
+    }
+    else if (roles & U_GROUP_PREMIUMISH) {
+        return LANG.premiumuser;
+    }
+
+    return null;
+};
+
 function g_formatDate(sp, elapsed, theDate, time, alone) {
     var today = new Date();
     var event_day = new Date();
@@ -13957,6 +13976,49 @@ Listview.templates = {
                 $(div).show();
         },
 
+        applyAuthorTitle: function (container, title)
+        {
+            if (!title.label)
+                return;
+
+            let cssClass = ['comment-reply-author-label'].concat(title.classes);
+
+            $WH.ae(container, $WH.ct(' '));                   // aowow - LANG.wordspace_punct
+
+            if (title.url)
+                $WH.ae(container, $WH.ce('a', { className: cssClass.join(' '), href: title.url }, $WH.ct(`<${ title.label }>`)));
+            else
+                $WH.ae(container, $WH.ce('span', { className: cssClass.join(' ') }, $WH.ct(`<${ title.label }>`)));
+        },
+
+        getAuthorTitle: function (author)
+        {
+            let title = {
+                classes: [],
+                label:   undefined,
+                url:     undefined
+            };
+
+            if (g_pageInfo.author === author) {
+                title.label = LANG.guideAuthor;
+                return title;
+            }
+
+            let user = g_users[author];
+            if (user) {
+                // aowow - let roleColor = WH.User.getCommentTitleClass(_.roles, _.tierClass, user);
+                let roleColor = g_GetStaffColorFromRoles(user.roles);
+                if (roleColor) {
+                    title.classes.push(roleColor);
+                }
+                // aowow - title.label = WH.User.getCommentRoleLabel(user.roles, user.title, user.tierTitle);
+                title.label = g_GetCommentRoleLabel(user.roles, user.title);
+                title.url = /* user.tierTitle && !user.title ? '/?premium' : */ ''; // aowow - tierTitle being the premium tier ("Rare|Epic|Legendary Premium User")
+            }
+
+            return title;
+        },
+
         updateReplies: function(comment)
         {
             this.updateRepliesCell(comment);
@@ -14063,7 +14125,13 @@ Listview.templates = {
 
                 row.attr('data-replyid', reply.id);
                 row.attr('data-idx', i);
-                row.find('.reply-text').addClass(g_GetStaffColorFromRoles(reply.roles));
+
+                // aowow - let cssClass = WH.User.getCommentRoleClass(reply.roles, reply.username);
+                let cssClass = g_GetStaffColorFromRoles(reply.roles);
+                if (!['comment-blue', 'comment-green'].includes(cssClass) && owner) {
+                    cssClass = 'comment-green';             // comment-guide-author
+                }
+                row.find('.reply-text').addClass(cssClass);
 
                 var replyWhen = $('<a></a>');
                 replyWhen.text(g_formatDate(null, elapsed, creationDate));
@@ -14074,12 +14142,7 @@ Listview.templates = {
                 replyByUserLink.attr('href', '?user=' + reply.username);
                 replyByUserLink.text(reply.username);
                 replyBy.append(replyByUserLink);
-
-                if (owner)
-                {
-                    $WH.ae(replyBy[0], $WH.ct(' '));
-                    $WH.ae(replyBy[0], $WH.ce('span', { className: 'comment-reply-author-label' }, $WH.ct('<' + LANG.guideAuthor + '>')));
-                }
+                this.applyAuthorTitle(replyBy[0], this.getAuthorTitle(reply.username))
 
                 replyBy.append(' ').append(replyWhen).append(' ').append($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(creationDate)));
 
@@ -14170,7 +14233,6 @@ Listview.templates = {
         updateCommentAuthor: function(comment, container)
         {
             var user = g_users[comment.user];
-            let owner = g_pageInfo.author === comment.user;
             var postedOn = new Date(comment.date);
             var elapsed = (g_serverTime - postedOn) / 1000;
 
@@ -14178,12 +14240,18 @@ Listview.templates = {
 
             container.append(LANG.lvcomment_by);
             container.append($WH.sprintf('<a href="?user=$1">$2</a>', comment.user, comment.user));
-            if (owner)
-            {
-                $WH.ae(container[0], $WH.ct(' '));
-                $WH.ae(container[0], $WH.ce('span', { className: 'comment-reply-author-label' }, $WH.ct('<' + LANG.guideAuthor + '>')));
+            // aowow - avatar recovered and transplanted from commentsv1 version
+            if (user != null && user.avatar) {
+                var icon = Icon.createUser(user.avatar, user.avatarmore, 0, null, (user.roles & U_GROUP_PREMIUM) ? user.border : Icon.STANDARD_BORDER, 0, Icon.getPrivilegeBorder(user.reputation));
+                icon.style.marginRight = '3px';
+                icon.style.cssFloat    = 'left';
+
+                container.css('lineHeight', '25px');
+                container.append(icon);
             }
+            // aowow - end recover
             container.append(g_getReputationPlusAchievementText(user.gold, user.silver, user.copper, user.reputation));
+            this.applyAuthorTitle(container[0], this.getAuthorTitle(comment.user));
             container.append($WH.sprintf(' <a class="q0" id="comments:id=$1" href="#comments:id=$2">$3</a>', comment.id, comment.id, g_formatDate(null, elapsed, postedOn)));
             container.append(' ');
             container.append($WH.sprintf(LANG.lvcomment_patch, g_getPatchVersion(postedOn)));

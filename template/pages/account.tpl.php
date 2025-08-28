@@ -146,9 +146,7 @@ if ($this->bans):
                         <div><?=Lang::account('accDeleteNote');?></div>
                     </div>
 
-<?php
-    endif;
-?>
+<?php endif; ?>
                     <div id="tab-community" style="display: none">
                         <h2 class="first"><?=Lang::account('userPage');?></h2>
 
@@ -214,11 +212,11 @@ if ($this->bans):
                             </div>
                             <div class="clear"></div>
 
-<?php if ($this->user::isInGroup(U_GROUP_PREMIUM) && 0): ?>
+<?php if ($this->user::isInGroup(U_GROUP_PREMIUM)): ?>
                             <input type="radio" name="avatar" value="2" id="avaOpt2" onclick="faChange(2)"<?=($this->avMode == 2 ? ' checked="checked"' : '');?> /> <label for="avaOpt2"><?=Lang::account('custom');?></label>&nbsp;&nbsp;<span class="premium-feature-icon-small"></span><table id="avaSel2" style="padding: 6px; margin-top: 4px; margin-left: 16px; border-left: 1px solid #404040; height: 85px">
                                 <tr><td style="padding: 5px; vertical-align: top; position: relative;">
                                     <select name="customicon" id="customicon" style="min-width: 150px; margin-right: 5px;" onchange="spawj()">
-                                        <option>Upload new Avatar</option>
+                                        <option><?=Lang::account('uploadAvatar');?></option>
 <?=$this->makeOptionsList($this->customicons, $this->customicon, 40); ?>
                                     </select>
                                     <div id="avaPre2" style="position: absolute; right: -68px; top: 0px"></div>
@@ -226,7 +224,7 @@ if ($this->bans):
                                     <div id="iconbrowse">
                                         <input type="file" name="iconfile">
                                         <div class="pad"></div>
-                                        Go to <a href="javascript:;" onclick="_.show(3, true);">Avatar Manager</a>
+                                        <a href="javascript:;" onclick="_.show(3, true);"><?=Lang::account('goToManager');?></a>
                                     </div>
                                 </td></tr>
                             </table>
@@ -255,18 +253,46 @@ if ($this->bans):
                         <ul><li><div><?=Lang::account('status').Lang::main('colon').'<b class="q10">'.Lang::account('inactive'); ?></b></div></li></ul>
 <?php else: ?>
                         <ul><li><div><?=Lang::account('status').Lang::main('colon').'<b class="q2">'.Lang::account('active'); ?></b></div></li></ul>
-<?php endif; /*
-                        <h2>Manage Avatars</h2>
+                        <h2><?=Lang::account('manageAvatars');?></h2>
                         <div id="avatar-manage" class="listview" style="margin: 0px 10% 0px 25px;"></div>
                         <script type="text/javascript">//<![CDATA[
                             <?=$this->avatarManager; ?>
                         //]]></script>
 
-                        <h2>Manage Premium Borders</h2>
-                        <span>Todo</span>
-<?php endif; */ ?>
-                    </div>
+                        <h2><?=Lang::account('manageBorders');?></h2>
+    <?php if ([$type, $msg] = $this->premiumborderMessage): ?>
+                            <div class="box"><div class="msg-<?=($type ? 'success' : 'failure');?>"><?=$msg;?></div></div>
+    <?php endif; ?>
+                        <form action="?account=premium-border" method="POST">
+                            <div style="width:500px; padding-left:25px;" class="pad2">
+                                <div style="display:flex; justify-content: space-between;" id="ipb-container"></div>
+                                <div style="display:flex; justify-content: space-between;" id="pb-container"></div>
+                            </div>
+                            <input type="submit" value="<?=Lang::main('submit');?>">
+                            <div class="pad2"></div>
+                        </form>
+                        <script type="text/javascript">
+                            [2, 1, 0, 4, 3].forEach((i, k) => {
+                                let icon  = Icon.createUser(2, <?=$this->customicon;?>, 2, null, i, null, Icon.getPrivilegeBorder(<?=$this->reputation;?>));
+                                let div   = $WH.ce('div', {id: 'pb-' + i, style: 'display:inline-block'}, icon);
+                                let input = $WH.ce('input', {
+                                    type:'radio',
+                                    name:'avatarborder',
+                                    value: i,
+                                    id: 'ipb-' + i,
+                                    style: 'width:68px; margin:10px 0px;'
+                                });
 
+                                $WH.ae($WH.ge('pb-container'), div);
+                                $WH.ae($WH.ge('ipb-container'), input);
+
+                                icon.onclick = ((x, evt) => { $WH.ge('ipb-' + x).click(); }).bind(this, i);
+                                if (g_user?.settings?.premiumborder === i)
+                                    icon.click();
+                            });
+                        </script>
+                    </div>
+<?php endif; ?>
                 </div>
             </div>
 
@@ -280,9 +306,7 @@ if ($this->bans):
                 _.add('<?=Lang::account('tabPremium');?>', {id: 'premium'});
                 _.flush();
             </script>
-<?php
-endif;
-?>
+<?php endif; ?>
 
             <div class="clear"></div>
         </div><!-- main-contents -->

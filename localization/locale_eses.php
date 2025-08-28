@@ -950,6 +950,19 @@ $lang = array(
         'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a su contraseña anterior.",// message_newpassdifferent
         'newMailDiff'   => "Su nueva dirección de correo electrónico tiene que ser diferente a tu dirección de correo electrónico anterior.", // message_newemaildifferent
 
+        // premium avatar manager
+        'uploadAvatar'  => "[Upload new Avatar]",
+        'goToManager'   => "[Go to Avatar Manager]",
+        'manageAvatars' => "[Manage Avatars]",
+        'avatarSlots'   => '[Using <b>%1$d / %2$d</b> avatar slots]',
+        'manageBorders' => "[Manage Premium Borders]",
+        'selectAvatar'  => "[Please select the avatar to upload.]",
+        'errTooSmall'   => "[Your avatar must be at last %dpx in size.]",
+        'cropAvatar'    => "[You may crop your avatar.]",
+        'avatarSubmit'  => "[Avatar Submission]",
+        'reminder'      => "[Reminder]",
+        'avatarCoC'     => "[Using imagery violating out terms of service may result in revocation of your premium privileges.]",
+
         // settings
         'settings'      => "Mi cuenta",
         'settingsNote'  => "Simplemente usa el siguiente formulario para actualizar la información de tu cuenta.",

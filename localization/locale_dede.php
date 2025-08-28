@@ -950,6 +950,19 @@ $lang = array(
         'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden.", // message_newpassdifferent
         'newMailDiff'   => "Eure neue E-Mail-Adresse muss sich von eurer alten E-Mail-Adresse unterscheiden.", // message_newemaildifferent
 
+        // premium avatar manager
+        'uploadAvatar'  => "Neuen Avatar hochladen",
+        'goToManager'   => "Zur Avatarverwaltung gehen",
+        'manageAvatars' => "Avatare verwalten",
+        'avatarSlots'   => '<b>%1$d / %2$d</b> Avatarplätze belegt',
+        'manageBorders' => "Premium Rahmen verwalten",
+        'selectAvatar'  => "Wählt einen Avatar zum hochladen.",
+        'errTooSmall'   => "Euer Avatar muss wenigstens %dpx groß sein.",
+        'cropAvatar'    => "Ihr könnt Euren Avatar zuschneiden.",
+        'avatarSubmit'  => "Avatar-Einsendung",
+        'reminder'      => "Erinnerung",
+        'avatarCoC'     => "Dass Benutzen von Bildern, die gegen die Regeln verstoßen kann zum Verlust Eures Premium-Status führen.",
+
         // settings
         'settings'      => "Kontoeinstellungen",
         'settingsNote'  => "Du kannst einfach die unten stehenden Formulare ausfüllen, um deine Kontodaten zu aktualisieren.",

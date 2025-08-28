@@ -1161,7 +1161,8 @@ span.iconblizzard {
 .iconsmall-premiumred  del { background-image:url(../images/Icon/small/border/premiumred.png);  }
 .iconmedium-premiumred del { background-image:url(../images/Icon/medium/border/premiumred.png); }
 .iconlarge-premiumred  del {
-    background-image:url(../images/logos/special/subscribe/patron-icon.png);
+    background-image:url(../images/Icon/large/border/premiumred.png);
+/*  background-image:url(../images/logos/special/subscribe/patron-icon.png); aowow - yeah, no */
     height:85px;
 }
 

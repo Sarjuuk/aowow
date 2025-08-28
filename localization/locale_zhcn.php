@@ -950,6 +950,19 @@ $lang = array(
         'newPassDiff'   => "你的新密码必须与以前的密码不同。", // message_newpassdifferent
         'newMailDiff'   => "您的新邮箱地址必须不同于旧地址。", // message_newemaildifferent
 
+        // premium avatar manager
+        'uploadAvatar'  => "[Upload new Avatar]",
+        'goToManager'   => "[Go to Avatar Manager]",
+        'manageAvatars' => "[Manage Avatars]",
+        'avatarSlots'   => '[Using <b>%1$d / %2$d</b> avatar slots]',
+        'manageBorders' => "[Manage Premium Borders]",
+        'selectAvatar'  => "[Please select the avatar to upload.]",
+        'errTooSmall'   => "[Your avatar must be at last %dpx in size.]",
+        'cropAvatar'    => "[You may crop your avatar.]",
+        'avatarSubmit'  => "[Avatar Submission]",
+        'reminder'      => "[Reminder]",
+        'avatarCoC'     => "[Using imagery violating out terms of service may result in revocation of your premium privileges.]",
+
         // settings
         'settings'      => "账号设置",
         'settingsNote'  => "使用下列表格就能升级您的账号信息。",

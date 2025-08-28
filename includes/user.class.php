@@ -24,6 +24,7 @@ class User
     private static  int              $reputation    = 0;
     private static  string           $dataKey       = '';
     private static  int              $excludeGroups = 1;
+    private static  int              $avatarborder  = 2;    // 2 is default / reputation colored
     private static ?LocalProfileList $profiles      = null;
 
     public static function init()
@@ -62,7 +63,7 @@ class User
 
         $session  = DB::Aowow()->selectRow('SELECT `userId`, `expires` FROM ?_account_sessions WHERE `status` = ?d AND `sessionId` = ?', SESSION_ACTIVE, session_id());
         $userData = DB::Aowow()->selectRow(
-           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`, a.`debug`
+           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`, a.`debug`, a.`avatar`, a.`avatarborder`
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab    ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
             LEFT JOIN ?_account_reputation r ON a.`id` =  r.`userId`
@@ -119,6 +120,7 @@ class User
         self::$status        = $userData['status'];
         self::$debug         = $userData['debug'];
         self::$email         = $userData['email'];
+        self::$avatarborder  = $userData['avatarborder'];
 
         if (Cfg::get('PROFILER_ENABLE'))
         {
@@ -129,6 +131,18 @@ class User
             self::$profiles = (new LocalProfileList($conditions));
         }
 
+        // reset premium options
+        if (!self::isPremium())
+        {
+            if ($userData['avatar'] == 2)
+            {
+                DB::Aowow()->query('UPDATE ?_account SET `avatar` = 1 WHERE `id` = ?d', self::$id);
+                DB::Aowow()->query('UPDATE ?_account_avatars SET `current` = 0 WHERE `userId` = ?d', self::$id);
+            }
+
+            // avatar borders
+            // do not reset, it's just not sent to the browser
+        }
 
         // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
         // - consecutive visits
@@ -482,7 +496,7 @@ class User
 
     public static function isPremium() : bool
     {
-        return self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= Cfg::get('REP_REQ_PREMIUM');
+        return !self::isBanned() && (self::isInGroup(U_GROUP_PREMIUM) || self::$reputation >= Cfg::get('REP_REQ_PREMIUM'));
     }
 
     public static function isLoggedIn() : bool
@@ -568,13 +582,13 @@ class User
         if (self::$debug)
             $gUser['debug'] = true;                         // csv id-list output option on listviews
 
-        if (self::getPremiumBorder())
-            $gUser['settings'] = ['premiumborder' => 1];
+        if (self::isPremium())
+        {
+            $gUser['premium']  = 1;
+            $gUser['settings'] = ['premiumborder' => self::$avatarborder];
+        }
         else
             $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied; should this contain - "defaultModel":{"gender":2,"race":6} ?
-
-        if (self::isPremium())
-            $gUser['premium'] = 1;
 
         if ($_ = self::getProfilerExclusions())
             $gUser = array_merge($gUser, $_);
@@ -716,12 +730,6 @@ class User
         }
 
         return $data;
-    }
-
-    // not sure what to set .. user selected?
-    public static function getPremiumBorder() : bool
-    {
-        return self::isInGroup(U_GROUP_PREMIUM);
     }
 }
 

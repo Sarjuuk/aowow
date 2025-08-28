@@ -26,7 +26,7 @@ class UserList extends DBTypeList
         foreach ($this->iterate() as $userId => $__)
         {
             $data[$this->curTpl['username']] = array(
-                'border'     => 0,                          // border around avatar (rarityColors)
+                'border'     => $this->getPremiumborder(),
                 'roles'      => $this->curTpl['userGroups'],
                 'joined'     => date(Util::$dateFormatInternal, $this->curTpl['joinDate']),
                 'posts'      => 0,                          // forum posts
@@ -47,20 +47,37 @@ class UserList extends DBTypeList
                     $data[$this->curTpl['username']]['avatarmore'] = $this->curTpl['wowicon'];
                     break;
                 case 2:
-                    if ($av = DB::Aowow()->selectCell('SELECT `id` FROM ?_account_avatars WHERE `userId` = ?d AND `current` = 1 AND `status` <> 2', $userId))
+                    if ($this->isPremium())
                     {
-                        $data[$this->curTpl['username']]['avatar']     = $this->curTpl['avatar'];
-                        $data[$this->curTpl['username']]['avatarmore'] = $av;
+                        if ($av = DB::Aowow()->selectCell('SELECT `id` FROM ?_account_avatars WHERE `userId` = ?d AND `current` = 1 AND `status` <> ?d', $userId, AvatarMgr::STATUS_REJECTED))
+                        {
+                            $data[$this->curTpl['username']]['avatar']     = $this->curTpl['avatar'];
+                            $data[$this->curTpl['username']]['avatarmore'] = $av;
+                        }
                     }
                     break;
             }
 
             // more optional data
             // sig: markdown formated string (only used in forum?)
-            // border: seen as null|1|3 .. changes the border around the avatar (i suspect its meaning changed and got decoupled from premium-status with the introduction of patreon-status)
         }
 
         return [Type::USER => $data];
+    }
+
+    // seen as null|1|3 .. changes the border around the avatar (chosen from account > premium tab?)
+    // changed at the end of MoP. No longer a jsBool but index to Icon.premiumBorderClasses
+    private function getPremiumBorder() : int
+    {
+        if (!$this->isPremium() || !$this->curTpl['avatar'])
+            return 2;                                       // 2 is "none"
+
+        return $this->curTpl['avatarborder'];
+    }
+
+    public function isPremium() : bool
+    {
+        return $this->curTpl['userGroups'] & U_GROUP_PREMIUM || $this->curTpl['reputation'] >= Cfg::get('REP_REQ_PREMIUM');
     }
 
     public function getListviewData() : array { return []; }
