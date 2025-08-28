@@ -1035,6 +1035,7 @@ $lang = array(
                 'passChangeOk'  => "Ihr Kennwort wurde erfolgreich geändert.",
                 'deleteAccSent' => "Eine E-Mail mit einem Bestätigungslink wurde an %s gesendet.",
                 'deleteOk'      => "Ihr Konto wurde erfolgreich entfernt. Wir hoffen, Sie bald wiederzusehen!<br /><br /> Sie können dieses Fenster jetzt schließen.",
+                'deleteCancel'  => "Die Kontolöschung wurde abgebrochen.",
                 'createAccSent' => 'Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um Euer Konto zu erstellen.<br /><br />Falls du keine Bestätigungsnachricht erhalten hast <a href="?account=resend">klicke hier</a> um eine neue zu senden.</div>',
                 'recovUserSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um euren Benutzernamen zu erhalten.",
                 'recovPassSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um euer Kennwort zurückzusetzen.",
@@ -1042,6 +1043,7 @@ $lang = array(
             'error' => array(
                 'mailTokenUsed'  => 'Dieser Schlüssel zur Änderung der E-Mail-Adresse wurde entweder bereits verwendet oder ist ungültig. Besuchen Sie Ihre <a href="?account#personal">Kontoeinstellungen</a>, um es erneut zu versuchen.',
                 'passTokenUsed'  => 'Dieser Schlüssel zur Änderung des Kennworts wurde entweder bereits verwendet oder ist ungültig. Besuchen Sie Ihre <a href="?account#personal">Kontoeinstellungen</a>, um es erneut zu versuchen.',
+                'purgeTokenUsed' => 'Dieser Schlüssel zum Löschen des Kontos wurde entweder bereits verwendet oder ist ungültig. Besuchen Sie Ihre <a href="?account#personal">Kontoeinstellungen</a>, um es erneut zu versuchen.',
                 'passTokenLost'  => "Kein Token wurde bereitgestellt. Wenn Sie in einer E-Mail einen Link zum Zurücksetzen des Kennworts erhalten haben, kopieren Sie die gesamte URL (einschließlich des Tokens am Ende) in die Adressleiste Ihres Browsers.",
                 'isRecovering'   => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
                 'loginExceeded'  => "Die maximale Anzahl an Anmelde-Versuchen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",

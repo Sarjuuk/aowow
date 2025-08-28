@@ -472,14 +472,16 @@ class TemplateResponse extends BaseResponse
             'viError' => $_SESSION['error']['vi'] ?? null
         );
 
+        // we cannot blanket NUMERIC_CHECK the data as usernames of deleted users are their id which does not support String.lower()
+
         if ($this->contribute & CONTRIBUTE_CO)
-            $community['co'] = Util::toJSON(CommunityContent::getComments($this->type, $this->typeId));
+            $community['co'] = Util::toJSON(CommunityContent::getComments($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
 
         if ($this->contribute & CONTRIBUTE_SS)
-            $community['ss'] = Util::toJSON(CommunityContent::getScreenshots($this->type, $this->typeId));
+            $community['ss'] = Util::toJSON(CommunityContent::getScreenshots($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
 
         if ($this->contribute & CONTRIBUTE_VI)
-            $community['vi'] = Util::toJSON(CommunityContent::getVideos($this->type, $this->typeId));
+            $community['vi'] = Util::toJSON(CommunityContent::getVideos($this->type, $this->typeId), JSON_UNESCAPED_UNICODE);
 
         unset($_SESSION['error']);
 

@@ -280,10 +280,11 @@ class User
            'SELECT    a.`id`, a.`passHash`, BIT_OR(ab.`typeMask`) AS "bans", a.`status`
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
-            WHERE     { a.`email` = ? } { a.`login` = ? }
+            WHERE     { a.`email` = ? } { a.`login` = ? } AND `status` <> ?d
             GROUP BY  a.`id`',
              $email ?: DBSIMPLE_SKIP,
-            !$email ? $nameOrEmail : DBSIMPLE_SKIP
+            !$email ? $nameOrEmail : DBSIMPLE_SKIP,
+            ACC_STATUS_DELETED
         );
 
         if (!$query)

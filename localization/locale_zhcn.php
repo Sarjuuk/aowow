@@ -1035,6 +1035,7 @@ $lang = array(
                 'passChangeOk'  => "您的密码已成功更改。",
                 'deleteAccSent' => "已向 %s 发送了一封带有确认链接的邮件。",
                 'deleteOk'      => "您的账户已成功删除。希望不久后能再次见到您！<br /><br />您现在可以关闭此窗口。",
+                'deleteCancel'  => "账户删除已取消。",
                 'createAccSent' => '电子邮件发送到<b>%s</b>。只请按照说明创建您的账户。<br /><br />如果您没有收到验证邮件，<a href="?account=resend">点击这里</a>重新发送。',
                 'recovUserSent' => "电子邮件发送到<b>%s</b>。只请按照说明恢复您的用户名。",
                 'recovPassSent' => "电子邮件发送到<b>%s</b>。只请按照说明重置您的密码。"
@@ -1042,6 +1043,7 @@ $lang = array(
             'error' => array(
                 'mailTokenUsed'  => '该邮箱更改密钥已被使用，或不是有效密钥。请访问您的<a href="?account#personal">账户设置页面</a>重新尝试。',
                 'passTokenUsed'  => '该密码更改密钥已被使用，或不是有效密钥。请访问您的<a href="?account#personal">账户设置页面</a>重新尝试。',
+                'purgeTokenUsed' => '该账户删除密钥已被使用，或不是有效密钥。请访问您的<a href="?account#personal">账户设置页面</a>重新尝试。',
                 'passTokenLost'  => "未提供令牌。如果您在邮件中收到重置密码链接，请将整个网址（包括最后的令牌）复制并粘贴到浏览器地址栏中。",
                 'isRecovering'   => "此帐户已恢复。按照电子邮件中的说明或等待%s后令牌过期。",
                 'loginExceeded'  => "这个IP最大登录次数已超过。请在%s后再次尝试。",

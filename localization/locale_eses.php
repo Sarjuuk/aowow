@@ -1035,6 +1035,7 @@ $lang = array(
                 'passChangeOk'  => "Tu contraseña ha sido cambiada correctamente.",
                 'deleteAccSent' => "Se ha enviado un correo electrónico a %s con el enlace de confirmación adjunto.",
                 'deleteOk'      => "Tu cuenta ha sido eliminada correctamente. ¡Esperamos verte de nuevo pronto!<br /><br /> Ahora puedes cerrar esta ventana.",
+                'deleteCancel'  => "La eliminación de la cuenta fue cancelada.",
                 'createAccSent' => 'Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para crear tu cuenta.<br /><br />Si no recibes el correo de verificación, <a href="?account=resend">haz clic aquí</a> para enviar otro.',
                 'recovUserSent' => "Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para recuperar tu nombre de usuario.",
                 'recovPassSent' => "Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para restablecer tu contraseña."
@@ -1042,6 +1043,7 @@ $lang = array(
             'error' => array(
                 'mailTokenUsed'  => 'Ese código de cambio de correo electrónico ya ha sido usado, o no es válido. Visita tu <a href="?account#personal">página de configuración de cuenta</a> para intentarlo de nuevo.',
                 'passTokenUsed'  => 'Ese código de cambio de contraseña ya ha sido usado, o no es válido. Visita tu <a href="?account#personal">página de configuración de cuenta</a> para intentarlo de nuevo.',
+                'purgeTokenUsed' => 'Esa clave de eliminación de cuenta ya ha sido usada, o no es válida. Visita tu <a href="?account#personal">página de configuración de cuenta</a> para intentarlo de nuevo.',
                 'passTokenLost'  => "No se recibió ningún código de petición. Si recibiste un enlace para restablecer tu contraseña por correo, por favor copia y pega la dirección completa (incluyendo el código del final) en la barra de dirección de tu navegador.",
                 'isRecovering'   => "Esta cuenta ya se encuentra en proceso de recuperación. Sigue las instrucciones en tu correo o espera %s para que el token expire.",
                 'loginExceeded'  => "Has excedido la cantidad de inicios de sesión con esta IP. Por favor intenta en %s.",

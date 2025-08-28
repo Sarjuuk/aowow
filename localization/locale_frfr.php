@@ -1035,6 +1035,7 @@ $lang = array(
                 'passChangeOk'  => "Votre mot de passe a été changé avec succès.",
                 'deleteAccSent' => "Un courriel a été envoyé à %s avec le lien de confirmation.",
                 'deleteOk'      => "Votre compte a été supprimé avec succès. Nous espérons vous revoir bientôt !<br /><br /> Vous pouvez maintenant fermer cette fenêtre.",
+                'deleteCancel'  => "La suppression du compte a été annulée.",
                 'createAccSent' => 'Un courriel vous a été envoyé à <b>%s</b>. Veuillez suivre les instructions qu\'il contient pour créer votre compte.<br /><br />Si vous ne recevez pas l\'email de vérification, <a href="?account=resend">cliquez ici</a> pour en envoyer un autre.</div>',
                 'recovUserSent' => "Un courriel vous a été envoyé à <b>%s</b>. Veuillez suivre les instructions qu'il contient pour récupérer votre nom d'utilisateur.",
                 'recovPassSent' => "Un courriel vous a été envoyé à <b>%s</b>. Veuillez suivre les instructions qu'il contient pour réinitialiser votre mot de passe."
@@ -1042,6 +1043,7 @@ $lang = array(
             'error' => array(
                 'mailTokenUsed'  => "Cette clé de changement d'adresse courriel a déjà été utilisée ou n'est pas valide. Visitez votre <a href=\"?account#personal\">page de paramètres du compte</a> pour réessayer.",
                 'passTokenUsed'  => "Cette clé de changement de mot de passe a déjà été utilisée ou n'est pas valide. Visitez votre <a href=\"?account#personal\">page de paramètres du compte</a> pour réessayer.",
+                'purgeTokenUsed' => "Cette clé de suppression de compte a déjà été utilisée ou n'est pas valide. Visitez votre <a href=\"?account#personal\">page de paramètres du compte</a> pour réessayer.",
                 'passTokenLost'  => "Aucun jeton n'a été fourni. Si vous avez reçu un lien de réinitialisation du mot de passe dans un courriel, merci de copier et coller l'URL entière (y compris le jeton à la fin) dans la barre d'adresse de votre navigateur.",
                 'isRecovering'   => "Ce compte est déjà en train d'être récupéré. Suivez les instruction dans l'email reçu ou attendez %s pour que le token expire.",
                 'loginExceeded'  => "Le nombre maximum de connections depuis cette IP a été dépassé. Essayez de nouevau dans %s.",

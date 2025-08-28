@@ -1,0 +1,42 @@
+.account-delete-box {
+    background: #161616;
+    border-radius: 3px;
+    box-sizing: border-box;
+    line-height: 1.7em;
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 15px;
+    width: 34em;
+}
+
+.account-delete-box [class^="heading-size-"] {
+    margin-top: 0;
+    text-align: center;
+}
+
+.account-delete-box-warning,
+.account-delete-box-alternative {
+    font-size: 175%;
+    line-height: 1.2;
+}
+
+.account-delete-box-warning,
+.account-delete-box-warning * {
+    color: #ff4040 !important
+}
+
+.account-delete-box-warning b {
+    display: block;
+    font-size: 200%;
+    font-weight: 900;
+    text-align: center;
+}
+
+.account-delete-box-confirm {
+    text-align: center;
+}
+
+/* from global.css */
+.text p {
+    margin: 10px 0px;
+}

@@ -69,7 +69,8 @@ define('ACC_STATUS_RECOVER_PASS',           3);             // currently recover
 define('ACC_STATUS_CHANGE_EMAIL',           4);             // currently changing contact email
 define('ACC_STATUS_CHANGE_PASS',            5);             // currently changing password
 define('ACC_STATUS_CHANGE_USERNAME',        6);             // currently changing username
-define('ACC_STATUS_DELETED',                7);             // is deleted - only a stub remains
+define('ACC_STATUS_PURGING',                7);             // deletion is pending
+define('ACC_STATUS_DELETED',               99);             // is deleted - only a stub remains
 
 // Session Status
 define('SESSION_ACTIVE',                    1);

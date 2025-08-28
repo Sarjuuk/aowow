@@ -1035,6 +1035,7 @@ $lang = array(
                 'passChangeOk'  => "Your password has been changed successfully.",
                 'deleteAccSent' => "An email has been sent to %s with confirmation link attached.",
                 'deleteOk'      => "Your account has been successfully removed. We hope to see you again soon!<br /><br /> You may now close this window.",
+                'deleteCancel'  => "Account deletion was canceled.",
                 'createAccSent' => 'An email was sent to <b>%s</b>. Simply follow the instructions to create your account.<br /><br />If you don\'t receive the verification email, <a href="?account=resend">click here</a> to send another one.</div>',
                 'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
                 'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password."
@@ -1042,6 +1043,7 @@ $lang = array(
             'error' => array(
                 'mailTokenUsed'  => 'Either that email change key has already been used, or it\'s not a valid key. Visit your <a href="?account#personal">Account Settings page</a> to try again.',
                 'passTokenUsed'  => 'Either that password change key has already been used, or it\'s not a valid key. Visit your <a href="?account#personal">Account Settings page</a> to try again.',
+                'purgeTokenUsed' => 'Either that account delete key has already been used, or it\'s not a valid key. Visit your <a href="?account#personal">Account Settings page</a> to try again.',
                 'passTokenLost'  => "No token was provided. If you received a reset password link in an email, please copy and paste the entire URL (including the token at the end) into your browser's location bar.",
                 'isRecovering'   => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
                 'loginExceeded'  => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
