@@ -19,6 +19,7 @@ class AccountSigninResponse extends TemplateResponse
     use TrGetNext;
 
     protected string $template     = 'text-page-generic';
+    protected string $pageName     = 'signin';
 
     protected array  $expectedPOST = array(
         'username'    => ['filter' => FILTER_CALLBACK, 'options' => [Util::class, 'validateLogin']   ],
@@ -26,8 +27,8 @@ class AccountSigninResponse extends TemplateResponse
         'remember_me' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkRememberMe'] ]
     );
     protected array  $expectedGET  = array(
-        'token' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{32}$/']],
-        'next'  => ['filter' => FILTER_SANITIZE_URL,    'flags'   => FILTER_FLAG_STRIP_AOWOW            ]
+        'key'  => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[a-zA-Z0-9]{40}$/']],
+        'next' => ['filter' => FILTER_SANITIZE_URL,    'flags'   => FILTER_FLAG_STRIP_AOWOW            ]
     );
 
     private bool $success = false;
@@ -43,46 +44,54 @@ class AccountSigninResponse extends TemplateResponse
 
     protected function generate() : void
     {
-        $username = '';
-        $message  = '';
+        $username   =
+        $error      = '';
+        $rememberMe = !!$this->_post['remember_me'];
 
         $this->title = [Lang::account('title')];
 
-        if ($this->_get['token'])
+        // coming from user recovery or creation, prefill username
+        if ($this->_get['key'])
         {
-            // coming from username recovery, prefill username
-            if ($_ = DB::Aowow()->selectCell('SELECT `login` FROM ?_account WHERE `status` IN (?a) AND `token` = ? AND `statusTimer` >  UNIX_TIMESTAMP()', [ACC_STATUS_RECOVER_USER, ACC_STATUS_OK], $this->_get['token']))
-                $username = $_;
+            if ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ?_account a LEFT JOIN ?_account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN (?a) AND a.`token` = ?',
+                [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key']))
+                [$username, $rememberMe] = $userData;
         }
 
-        $message = $this->doSignIn();
-        if (!$this->success)
-            User::destroy();
-        else
+        if ($this->doSignIn($error))
             $this->forward($this->getNext(true));
+
+        if ($error)
+            User::destroy();
 
         $this->inputbox = ['inputbox-form-signin', array(
             'head'        => Lang::account('inputbox', 'head', 'signin'),
             'action'      => '?account=signin&next='.$this->getNext(),
-            'error'       => $message,
+            'error'       => $error,
             'username'    => $username,
-            'rememberMe'  => !!$this->_post['remember_me'],
+            'rememberMe'  => $rememberMe,
             'hasRecovery' => Cfg::get('ACC_EXT_RECOVER_URL') || Cfg::get('ACC_AUTH_MODE') == AUTH_MODE_SELF,
         )];
 
         parent::generate();
     }
 
-    private function doSignIn() : string
+    private function doSignIn(string &$error) : bool
     {
         if (is_null($this->_post['username']) && is_null($this->_post['password']))
-            return '';
+            return false;
 
         if (!$this->assertPOST('username'))
-            return Lang::account('userNotFound');
+        {
+            $error = Lang::account('userNotFound');
+            return false;
+        }
 
         if (!$this->assertPOST('password'))
-            return Lang::account('wrongPass');
+        {
+            $error = Lang::account('wrongPass');
+            return false;
+        }
 
         $error = match (User::authenticate($this->_post['username'], $this->_post['password']))
         {
@@ -95,10 +104,7 @@ class AccountSigninResponse extends TemplateResponse
             default              => Lang::main('intError')
         };
 
-        if (!$error)
-            $this->success = true;
-
-        return $error;
+        return !$error;
     }
 
     private function onAuthSuccess() : string
@@ -109,14 +115,11 @@ class AccountSigninResponse extends TemplateResponse
             return Lang::main('intError');
         }
 
-        $email = filter_var($this->_post['username'], FILTER_VALIDATE_EMAIL);
-
         // reset account status, update expiration
-        $ok = DB::Aowow()->query('UPDATE ?_account SET `prevIP` = IF(`curIp` = ?, `prevIP`, `curIP`), `curIP` = IF(`curIp` = ?, `curIP`, ?), `status` = IF(`status` = ?d, `status`, 0), `statusTimer` = IF(`status` = ?d, `statusTimer`, 0), `token` = IF(`status` = ?d, `token`, "") WHERE { `email` = ? } { `login` = ? }',
+        $ok = DB::Aowow()->query('UPDATE ?_account SET `prevIP` = IF(`curIp` = ?, `prevIP`, `curIP`), `curIP` = IF(`curIp` = ?, `curIP`, ?), `status` = IF(`status` = ?d, `status`, 0), `statusTimer` = IF(`status` = ?d, `statusTimer`, 0), `token` = IF(`status` = ?d, `token`, "") WHERE `id` = ?d',
             User::$ip, User::$ip, User::$ip,
             ACC_STATUS_NEW, ACC_STATUS_NEW, ACC_STATUS_NEW,
-             $email ?: DBSIMPLE_SKIP,
-            !$email ? $this->_post['username'] : DBSIMPLE_SKIP
+            User::$id                                       // available after successful User:authenticate
         );
 
         if (!is_int($ok))                                   // num updated fields or null on fail
@@ -124,6 +127,10 @@ class AccountSigninResponse extends TemplateResponse
             trigger_error('AccountSigninResponse::onAuthSuccess() - failed to update account status', E_USER_ERROR);
             return Lang::main('intError');
         }
+
+        // DELETE temp session
+        if ($this->_get['key'])
+            DB::Aowow()->query('DELETE FROM ?_account_sessions WHERE `sessionId` = ?', $this->_get['key']);
 
         session_regenerate_id(true);                        // user status changed => regenerate id
 
