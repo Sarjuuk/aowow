@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Anzahl an SQL-Queries",
         'timeSQL'       => "Zeit für SQL-Queries",
         'noJScript'     => '<b>Diese Seite macht ausgiebigen Gebrauch von JavaScript.</b><br />Bitte <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">aktiviert JavaScript</a> in Eurem Browser.',
-        'userProfiles'  => "Deine Charaktere",
+     // 'userProfiles'  => "Deine Charaktere",
         'pageNotFound'  => "Dies %s existiert nicht.",
         'gender'        => "Geschlecht",
         'sex'           => [null, "Mann", "Frau"],
@@ -40,12 +40,13 @@ $lang = array(
         'side'          => "Seite: ",
         'related'       => "Weiterführende Informationen",
         'contribute'    => "Beitragen",
-        // 'replyingTo'    => "Antwort zu einem Kommentar von",
+     // 'replyingTo'    => "Antwort zu einem Kommentar von",
         'submit'        => "Absenden",
+        'save'          => 'Speichern',
         'cancel'        => "Abbrechen",
         'rewards'       => "Belohnungen",
         'gains'         => "Belohnungen",
-        'login'         => "Login",
+     // 'login'         => "Login",
         'forum'         => "Forum",
         'siteRep'       => "Ruf: ",
         'yourRepHistory'=> "Dein Ruf-Verlauf",
@@ -132,6 +133,7 @@ $lang = array(
         'colon'         => ': ',
         'dateFmtShort'  => "d.m.Y",
         'dateFmtLong'   => "d.m.Y \u\m H:i",
+        'dateFmtUntil'  => "j. F Y",
         'timeAgo'       => 'vor %s',
         'nfSeparators'  => ['.', ','],
 
@@ -900,7 +902,6 @@ $lang = array(
             "Screenshot-Verwalter",         "Video-Verwalter",              "API-Partner",                  "Ausstehend"
         ),
         // signIn
-        'doSignIn'      => "Mit Eurem Konto anmelden",
         'signIn'        => "Anmelden",
         'user'          => "Benutzername",
         'pass'          => "Kennwort",
@@ -909,25 +910,22 @@ $lang = array(
         'forgotUser'    => "Benutzername",
         'forgotPass'    => "Kennwort",
         'accCreate'     => 'Noch kein Konto? <a href="?account=signup">Jetzt eins erstellen!</a>',
-        'resendMail'    => "Bestätigungsmail erneut senden",
-        'resendHint'    => "Wenn Sie sich registriert haben, aber keine Bestätigungs-E-Mail erhalten haben, geben Sie Ihre E-Mail-Adresse unten ein und senden Sie das Formular ab. (Bitte überprüfen Sie Ihre Spam- oder Papierkorb-Ordner, um sicherzustellen, dass die E-Mail nicht versehentlich an der falschen Stelle abgelegt wurde!)",
 
         // recovery
-        'recoverUser'   => "Benutzernamenanfrage",
-        'recoverPass'   => "Kennwort zurücksetzen: Schritt %s von 2",
-        'newPass'       => "Neues Kennwort",
-        'tokenExpires'  => "Das Token wird in %s verfallen.",
+        'newPass'       => "Neues Kennwort:",
+        'confNewPass'   => "Neues Kennwort bestätigen:",
+        'passResetHint' => 'Wenn ihr euer Kennwort nicht mehr wisst, könnt ihr es auf <a href="?account=forgot-password">dieser Seite zurücksetzen</a>.',
+     // 'tokenExpires'  => "Das Token wird in %s verfallen.",
 
         // creation
-        'register'      => "Registrierung: Schritt %s von 2",
-        'passConfirm'   => "Kennwort bestätigen",
+        'passConfirm'   => "Kennwort bestätigen:",
 
         // dashboard
         'ipAddress'     => "IP-Adresse: ",
         'lastIP'        => "Letzte bekannte IP: ",
-    //  'myAccount'     => "Mein Account",
-    //  'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
-    //  'viewPubDesc'   => 'Die Beschreibung in deinem <a href="?user=%s">öffentlichen Profil</a> ansehen',
+     // 'myAccount'     => "Mein Account",
+     // 'editAccount'   => "Benutze die folgenden Formulare um deine Account-Informationen zu aktualisieren",
+     // 'viewPubDesc'   => 'Die Beschreibung in deinem <a href="?user=%s">öffentlichen Profil</a> ansehen',
 
         // bans
         'accBanned'     => "Dieses Konto wurde geschlossen",
@@ -939,25 +937,106 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Diese E-Mail-Adresse ist ungültig.", // message_emailnotvalid
-        'emailNotFound' => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br><br>Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte CFG_CONTACT_EMAIL für Hilfestellung.",
-        'createAccSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Konto zu erstellen.",
-        'recovUserSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euren Benutzernamen zu erhalten.",
-        'recovPassSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt den Anweisungen um euer Kennwort zurückzusetzen.",
-        'accActivated'  => 'Euer Konto wurde soeben aktiviert.<br>Ihr könnt euch nun <a href="?account=signin&token=%s">anmelden</a>',
         'userNotFound'  => "Ein Konto mit diesem Namen existiert nicht.",
         'wrongPass'     => "Dieses Kennwort ist ungültig.",
-        // 'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
-        'loginExceeded' => "Die maximale Anzahl an Anmelde-Versuchen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
-        'signupExceeded'=> "Die maximale Anzahl an Regustrierungen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
+     // 'accInactive'   => "Dieses Konto wurde bisher nicht aktiviert.",
         'errNameLength' => "Euer Benutzername muss mindestens 4 Zeichen lang sein.", // message_usernamemin
         'errNameChars'  => "Euer Benutzername kann nur aus Buchstaben und Zahlen bestehen.", // message_usernamenotvalid
         'errPassLength' => "Euer Kennwort muss mindestens 6 Zeichen lang sein.", // message_passwordmin
         'passMismatch'  => "Die eingegebenen Kennworte stimmen nicht überein.",
         'nameInUse'     => "Es existiert bereits ein Konto mit diesem Namen.",
         'mailInUse'     => "Diese E-Mail-Adresse ist bereits mit einem Konto verbunden.",
-        'isRecovering'  => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
         'passCheckFail' => "Die Kennwörter stimmen nicht überein.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden." // message_newpassdifferent
+        'newPassDiff'   => "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden.", // message_newpassdifferent
+        'newMailDiff'   => "Eure neue E-Mail-Adresse muss sich von eurer alten E-Mail-Adresse unterscheiden.", // message_newemaildifferent
+
+        // settings
+        'settings'      => "Kontoeinstellungen",
+        'settingsNote'  => "Du kannst einfach die unten stehenden Formulare ausfüllen, um deine Kontodaten zu aktualisieren.",
+        'tabGeneral'    => "Allgemein",
+        'tabPersonal'   => "Persönliches",
+        'tabCommunity'  => "Community",
+        'tabPremium'    => "Premium",
+        'preferences'   => "Voreinstellungen",
+        'modelviewer'   => "Modellviewer",
+        'mvNote'        => "Vorgegebenes Charaktermodell:",
+        'lists'         => "Listen",
+        'listsNote'     => "Zeigt IDs in unterstützten Listen",
+        'announcements' => "Bekanntmachungen",
+        'annNote'       => "Entfernt die Daten von Bekanntmachungen, die du geschlossen hast, damit sie wieder sichtbar werden.",
+        'purge'         => "Löschen",
+        'curPass'       => "Derzeitiges Kennwort:",
+        'globalLogout'  => "Von allen Browsern/Geräten abmelden",
+        'curEmail'      => "Momentane E-Mail-Adresse:",
+        'newEmail'      => "Neue E-Mail-Adresse:",
+        'userPage'      => "Benutzerseite",
+        'publicDesc'    => "Öffentliche Beschreibung",
+        'publicDescNote'=> 'Erzähl uns etwas über dich und deine WoW-Charaktere. Alles, was du hier eingibst, erscheint auf deiner <a href="?user=%s">Benutzerseite</a>.',
+        'forums'        => "Foren",
+        'signature'     => "Signatur",
+        'signatureNote' => "Deine Signatur erscheint unter all deinen Forenbeiträgen.",
+        'usernameNote'  => "Nutzernamen können nur einmal alle %s geändert werden und müssen 4-16 Zeichen lang sein. Sonderzeichen sind nicht erlaubt.",
+        'curName'       => "Aktueller Nutzername:",
+        'newName'       => "Neuer Nutzername:",
+        'accDelete'     => "Konto löschen",
+        'accDeleteNote' => 'Wenn du dein Konto und alle persönlichen Daten vollständig löschen möchtest, dann geh zu unserer <a href="?account=delete" style="color:inherit; text-decoration:underline">Kontolöschung</a>.',
+        'avatar'        => "Avatar",
+        'avatarNote'    => "Dein Avatar wird neben all deinen Forenbeiträgen angezeigt.",
+        'avWowIcon'     => "World of Warcraft-Icon",
+        'avWowIconNote' => '<span class="q0">z.B. INV_Axe_54</span><br />Tipp: Um den Namen eines Symbols herauszufinden, doppelklickt einfach auf das große Symbol, während ihr auf einer <a href="?item=22632" target="_blank">Gegenstands</a>- oder <a href="?spell=29516" target="_blank">Zauber</a>seite seid. Kopiert den Text anschließend und fügt ihn oben ein.',
+        'avIconName'    => "Symbolname:",
+        'none'          => "Keins",
+        'preview'       => "Vorschau",
+        'custom'        => "Benutzerdefiniert",
+        'premiumStatus' => "Premium Status",
+        'status'        => "Status",
+        'active'        => "Activ",
+        'inactive'      => "Inaktiv",
+        'activeCD'      => "Ihr müsst bis zum %s warten um euren Nutzernamen erneut zu ändern.",
+        'updateMessage' => array(
+            'general'    => "Deine Einstellungen wurden aktualisiert.",
+            'community'  => "Eure öffentliche Beschreibung und Forensignatur wurden erfolgreich aktualisiert.",
+            'personal'   => "Eine Bestätigungsnachricht wurde an %s versandt.",
+            'username'   => 'Nutzername von %1$s zu %2$s geändert.',
+            'avNotFound' => "Symbol nicht gefunden.",
+            'avSuccess'  => "Euer Avatar wurde erfolgreich aktualisiert.",
+            'avNoChange' => "Es wurden keine Änderungen durchgeführt.",
+            'av1stUser'  => "Glückwunsch! Ihr habt eine einzigartige Auswahl getroffen! /jubeln",
+            'avNthUser'  => "Zur Eurer Information, Euer Symbol wird bereits von %d anderen Benutzer(n) benutzt."
+        ),
+        'inputbox' => array(
+            'head' => array(
+                'success'     => "Erfolg",
+                'error'       => "Hoppla!",
+                'register'    => "Registrierung: Schritt %s von 2",
+                'recoverUser' => "Benutzernamenanfrage",
+                'recoverPass' => "Kennwort zurücksetzen: Schritt %s von 2",
+                'resendMail'  => "Bestätigungsmail erneut senden",
+                'signin'      => "Mit Eurem Konto anmelden"
+            ),
+            'message' => array(
+                'accActivated'  => 'Euer Konto wurde soeben aktiviert.<br />Ihr könnt euch nun <a href="?account=signin&key=%s">anmelden</a>',
+                'resendMail'    => "Wenn Sie sich registriert haben, aber keine Bestätigungs-E-Mail erhalten haben, geben Sie Ihre E-Mail-Adresse unten ein und senden Sie das Formular ab. (Bitte überprüfen Sie Ihre Spam- oder Papierkorb-Ordner, um sicherzustellen, dass die E-Mail nicht versehentlich an der falschen Stelle abgelegt wurde!)",
+                'mailChangeOk'  => "Ihre E-Mail-Adresse wurde erfolgreich geändert.",
+                'mailRevertOk'  => "Ihre Anfrage zur Änderung der E-Mail-Adresse wurde storniert/zurückgesetzt.",
+                'passChangeOk'  => "Ihr Kennwort wurde erfolgreich geändert.",
+                'deleteAccSent' => "Eine E-Mail mit einem Bestätigungslink wurde an %s gesendet.",
+                'deleteOk'      => "Ihr Konto wurde erfolgreich entfernt. Wir hoffen, Sie bald wiederzusehen!<br /><br /> Sie können dieses Fenster jetzt schließen.",
+                'createAccSent' => 'Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um Euer Konto zu erstellen.<br /><br />Falls du keine Bestätigungsnachricht erhalten hast <a href="?account=resend">klicke hier</a> um eine neue zu senden.</div>',
+                'recovUserSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um euren Benutzernamen zu erhalten.",
+                'recovPassSent' => "Eine Nachricht wurde soeben an <b>%s</b> versandt. Folgt einfach den darin enthaltenen Anweisungen, um euer Kennwort zurückzusetzen.",
+            ),
+            'error' => array(
+                'mailTokenUsed'  => 'Dieser Schlüssel zur Änderung der E-Mail-Adresse wurde entweder bereits verwendet oder ist ungültig. Besuchen Sie Ihre <a href="?account#personal">Kontoeinstellungen</a>, um es erneut zu versuchen.',
+                'passTokenUsed'  => 'Dieser Schlüssel zur Änderung des Kennworts wurde entweder bereits verwendet oder ist ungültig. Besuchen Sie Ihre <a href="?account#personal">Kontoeinstellungen</a>, um es erneut zu versuchen.',
+                'passTokenLost'  => "Kein Token wurde bereitgestellt. Wenn Sie in einer E-Mail einen Link zum Zurücksetzen des Kennworts erhalten haben, kopieren Sie die gesamte URL (einschließlich des Tokens am Ende) in die Adressleiste Ihres Browsers.",
+                'isRecovering'   => "Dieses Konto wird bereits wiederhergestellt. Folgt den Anweisungen in der Nachricht oder wartet %s bis das Token verfällt.",
+                'loginExceeded'  => "Die maximale Anzahl an Anmelde-Versuchen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
+                'signupExceeded' => "Die maximale Anzahl an Registrierungen von dieser IP wurde überschritten. Bitte versucht es in %s erneut.",
+             // 'emailNotFound'  => "Die E-Mail-Adresse, die Ihr eingegeben habt, ist mit keinem Konto verbunden.<br /><br />Falls Ihr die E-Mail-Adresse vergessen habt, mit der Ihr Euer Konto erstellt habt, kontaktiert Ihr bitte CFG_CONTACT_EMAIL für Hilfestellung.",
+                'emailNotFound'  => "Diese E-Mail-Adresse wurde in unserem System nicht gefunden.",
+            )
+        )
     ),
     'user' => array(
         'notFound'      => "Der Benutzer \"%s\" wurde nicht gefunden!",
@@ -1241,7 +1320,7 @@ $lang = array(
         'floorN'        => "%d. Stockwerk"
     ),
     'privileges' => array(
-        'main'          => "Auf unserer Seite könnt Ihr <a href=\"?reputation\">Ruf</a> erringen. Hauptsächlich erringt man Ruf dadurch, dass Eure Kommentare positiv bewertet werden.<br><br>Das heißt, Euer Ruf hängt in gewissem Maße davon ab, wie sehr Ihr der Community beiträgt.<br><br>Mit dem Sammeln von Ruf verdient Ihr Euch auch das Vertrauen der Gemeinschaft ein, und Ihr erhält Privilegien. Unten könnt Ihr eine vollständige Liste einsehen.",
+        'main'          => "Auf unserer Seite könnt Ihr <a href=\"?reputation\">Ruf</a> erringen. Hauptsächlich erringt man Ruf dadurch, dass Eure Kommentare positiv bewertet werden.<br /><br />Das heißt, Euer Ruf hängt in gewissem Maße davon ab, wie sehr Ihr der Community beiträgt.<br /><br />Mit dem Sammeln von Ruf verdient Ihr Euch auch das Vertrauen der Gemeinschaft ein, und Ihr erhält Privilegien. Unten könnt Ihr eine vollständige Liste einsehen.",
         'privilege'     => "Privileg",
         'privileges'    => "Privilegien",
         'requiredRep'   => "Benötigter Ruf",

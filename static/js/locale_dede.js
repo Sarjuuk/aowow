@@ -2965,6 +2965,7 @@ var LANG = {
     message_invalidname:          "Bildname ist ungültig. Muss alphanumerisch sein, maximal 20 Zeichen haben und mit einem Buchstaben anfangen.",
     message_newemaildifferent:    "Eure neue E-Mail-Adresse muss sich von eurer alten E-Mail-Adresse unterscheiden.",
     message_newpassdifferent:     "Euer neues Kennwort muss sich von eurem alten Kennwort unterscheiden.",
+    message_newnamedifferent:     "Euer neuer Benutzername muss sich von eurem alten Benutzernamen unterscheiden.",
     message_noscreenshot:         "Wählt bitte den Screenshot aus, den Ihr hochladen möchtet.",
     message_novideo:              "Bitte gebt gültige Videoinformationen ein.",
     message_nothingtoviewin3d:    "Es wurden keine Gegenstände ausgewählt, die in 3D angezeigt werden können.",

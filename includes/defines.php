@@ -62,10 +62,14 @@ define('DB_AUTH',                           2);
 define('DB_CHARACTERS',                     3);
 
 // Account Status
-define('ACC_STATUS_OK',                     0);             // nothing special
+define('ACC_STATUS_NONE',                   0);             // nothing special
 define('ACC_STATUS_NEW',                    1);             // just created, awaiting confirmation
 define('ACC_STATUS_RECOVER_USER',           2);             // currently recovering username
 define('ACC_STATUS_RECOVER_PASS',           3);             // currently recovering password
+define('ACC_STATUS_CHANGE_EMAIL',           4);             // currently changing contact email
+define('ACC_STATUS_CHANGE_PASS',            5);             // currently changing password
+define('ACC_STATUS_CHANGE_USERNAME',        6);             // currently changing username
+define('ACC_STATUS_DELETED',                7);             // is deleted - only a stub remains
 
 // Session Status
 define('SESSION_ACTIVE',                    1);
@@ -83,6 +87,12 @@ define('ACC_BAN_SCREENSHOT',                0x0020);        // cannot upload scr
 define('ACC_BAN_VIDEO',                     0x0040);        // cannot suggest videos
 define('ACC_BAN_GUIDE',                     0x0080);        // cannot write a guide
 define('ACC_BAN_FORUM',                     0x0100);        // cannot post on forums [not used here]
+
+define('IP_BAN_TYPE_LOGIN_ATTEMPT',         0);
+define('IP_BAN_TYPE_REGISTRATION_ATTEMPT',  1);
+define('IP_BAN_TYPE_EMAIL_RECOVERY',        2);
+define('IP_BAN_TYPE_PASSWORD_RECOVERY',     3);
+define('IP_BAN_TYPE_USERNAME_RECOVERY',     4);
 
 // Site Reputation/Privileges
 define('SITEREP_ACTION_REGISTER',           1);             // Registered account

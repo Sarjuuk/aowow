@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Количество SQL запросов",
         'timeSQL'       => "Время выполнения SQL запросов",
         'noJScript'     => '<b>Данный сайт активно использует технологию JavaScript.</b><br />Пожалуйста, <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">Включите JavaScript</a> в вашем браузере.',
-        'userProfiles'  => "Ваши персонажи",    // translate.google :x
+     // 'userProfiles'  => "Ваши персонажи",    // translate.google :x
         'pageNotFound'  => "Такое %s не существует.",
         'gender'        => "Пол",
         'sex'           => [null, "Мужчина", "Женщина"],
@@ -40,12 +40,13 @@ $lang = array(
         'side'          => "Сторона: ",
         'related'       => "Дополнительная информация",
         'contribute'    => "Добавить",
-        // 'replyingTo'    => "Ответ на комментарий от",
+     // 'replyingTo'    => "Ответ на комментарий от",
         'submit'        => "Отправить",
+        'save'          => 'Сохранить',
         'cancel'        => "Отмена",
         'rewards'       => "Награды",
         'gains'         => "Бонус",
-        'login'         => "[Login]",
+     // 'login'         => "[Login]",
         'forum'         => "Форум",
         'siteRep'       => "Репутация: ",
         'yourRepHistory'=> "История вашей репутации",
@@ -132,6 +133,7 @@ $lang = array(
         'colon'         => ": ",
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d в g:i A",
+        'dateFmtUntil'  => "j F Y г.",
         'timeAgo'       => '%s назад',
         'nfSeparators'  => [' ', ','],
 
@@ -900,7 +902,6 @@ $lang = array(
             "Менеджер изображений",         "Менеджер видео",               "API партнер",                  "Ожидающее"
         ),
         // signIn
-        'doSignIn'      => "Войти в вашу учетную запись",
         'signIn'        => "Вход",
         'user'          => "Логин",
         'pass'          => "Пароль",
@@ -909,55 +910,133 @@ $lang = array(
         'forgotUser'    => "Имя пользователя",
         'forgotPass'    => "Пароль",
         'accCreate'     => 'У вас еще нет учетной записи? <a href="?account=signup">Зарегистрируйтесь прямо сейчас!</a>',
-        'resendMail'    => "Вновь выслать верификационное письмо",
-        'resendHint'    => "Если вы зарегистрировались, но не получили проверочного письма, пожалуйста, введите ваш email адрес ниже и подтвердите отправку формы. (Пожалуйста, удостоверьтесь, что Вы проверили папку со спамом и/или корзину Вашего почтового сервиса)",
 
         // recovery
-        'recoverUser'   => "Запрос имени пользователя",
-        'recoverPass'   => "Сброс пароля: Шаг %s из 2",
-        'newPass'       => "New Password",
-        'tokenExpires'  => "This token expires in %s.",
+        'newPass'       => "Новый пароль:",
+        'confNewPass'   => "Подтвердите новый пароль:",
+        'passResetHint' => 'Если вы не знаете пароль от своей учетной записи, пожалуйста, посетите <a href="?account=forgot-password">страницу сброса пароля</a>.',
+     // 'tokenExpires'  => "This token expires in %s.",
 
         // creation
-        'register'      => "Регистрация: Шаг %s из 2",
-        'passConfirm'   => "Повторите пароль",
+        'passConfirm'   => "Повторите пароль:",
 
         // dashboard
-        'ipAddress'     => "[IP-Adress]: ",
-        'lastIP'        => "[last used IP]: ",
-    //  'myAccount'     => "[My Account]",
-    //  'editAccount'   => "[Simply use the forms below to update your account information]",
-    //  'viewPubDesc'   => '[View your Public Description in your <a href="?user=%s">Profile  Page</a>]',
+        'ipAddress'     => "IP-Adress: ",
+        'lastIP'        => "last used IP: ",
+     // 'myAccount'     => "My Account",
+     // 'editAccount'   => "Используйте нижеприведённую форму, чтобы обновить информацию о вашей учетной записи.",
+     // 'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
 
         // bans
-        'accBanned'     => "[This Account was closed]",
-        'bannedBy'      => "[Banned by]: ",
-        'reason'        => "[Reason]: ",
-        'ends'          => "[Ends on]: ",
-        'permanent'     => "[The ban is permanent]",
-        'noReason'      => "[No reason was given.]",
+        'accBanned'     => "This Account was closed",
+        'bannedBy'      => "Banned by: ",
+        'reason'        => "Reason: ",
+        'ends'          => "Ends on: ",
+        'permanent'     => "The ban is permanent",
+        'noReason'      => "No reason was given.",
 
         // form-text
         'emailInvalid'  => "Недопустимый адрес email.", // message_emailnotvalid
-        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email CFG_CONTACT_EMAIL for assistance.",
-        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
-        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
-        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
-        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
         'userNotFound'  => "The username you entered does not exists.",
         'wrongPass'     => "That password is not vaild.",
-        // 'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
-        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+     // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Имя пользователя не должно быть короче 4 символов.", // message_usernamemin
         'errNameChars'  => "Имя пользователя может содержать только буквы и цифры.", // message_usernamenotvalid
         'errPassLength' => "Ваш пароль должен состоять минимум из 6 знаков.", // message_passwordmin
         'passMismatch'  => "The passwords you entered do not match.",
-        'nameInUse'     => "That username is already taken.",
+        'nameInUse'     => "That username is already in use.",
         'mailInUse'     => "That email is already registered to an account.",
-        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
         'passCheckFail' => "Пароли не совпадают.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Прежний и новый пароли не должны совпадать." // message_newpassdifferent
+        'newPassDiff'   => "Прежний и новый пароли не должны совпадать.", // message_newpassdifferent
+        'newMailDiff'   => "Прежний и новый e-mail адреса не должны совпадать.", // message_newemaildifferent
+
+        // settings
+        'settings'      => "Параметры учетной записи",
+        'settingsNote'  => "Используйте нижеприведённую форму, чтобы обновить информацию о вашей учетной записи.",
+        'tabGeneral'    => "Общее",
+        'tabPersonal'   => "Персональное",
+        'tabCommunity'  => "Сообщество",
+        'tabPremium'    => "Premium",
+        'preferences'   => "Предпочтения",
+        'modelviewer'   => "3D-просмотр",
+        'mvNote'        => "Модель персонажа по умолчанию:",
+        'lists'         => "Списки",
+        'listsNote'     => "Показывать ID в поддерживаемых списках",
+        'announcements' => "Объявления",
+        'annNote'       => "Удаляет данные о закрытых объявлениях, после чего вы сможете их увидеть снова.",
+        'purge'         => "Сбросить",
+        'curPass'       => "Текущий пароль:",
+        'globalLogout'  => "Выйти на всех устройствах и/или браузерах 	",
+        'curEmail'      => "Текущий адрес email:",
+        'newEmail'      => "Новый адрес email:",
+        'userPage'      => "Профиль пользователя",
+        'publicDesc'    => "Описание",
+        'publicDescNote'=> 'Расскажите нам о себе и ваших персонажах из World of Warcraft. Все, что вы напишите, будет отображаться на <a href="?user=%s">страница пользователя</a>.',
+        'forums'        => "Форум",
+        'signature'     => "Подпись",
+        'signatureNote' => "Этой подписью будут сопровождаться все сообщения, опубликованные вами на форумах сайта.",
+        'usernameNote'  => "Имя пользователя должно включать не менее 4 и не более 16 символов, и может быть изменено один раз в течение %s. Специальные символы не допускаются.",
+        'curName'       => "Текущее имя пользователя:",
+        'newName'       => "Новое имя пользователя:",
+        'accDelete'     => "Удалить учетную запись",
+        'accDeleteNote' => 'Если вы хотите удалить свою учетную запись и все, связанные с ней персональные данные, перейдите на <a href="?account=delete" style="color:inherit; text-decoration:underline">страницу удаления учетной записи</a>.',
+        'avatar'        => "Аватар",
+        'avatarNote'    => "Аватар будет сопровождать все сообщения, опубликованные вами на форумах.",
+        'avWowIcon'     => "Значок из World of Warcraft",
+        'avWowIconNote' => '<span class="q0">например, INV_Axe_54</span><br />Совет: Чтобы найти название значка, дважды щелкните большом значке, когда вы смотрите страницу с описанием <a href="?item=22632" target="_blank">предмета</a> или <a href="?spell=78634" target="_blank">заклинания</a>. Затем вставьте эту строку в документ.',
+        'avIconName'    => "Название иконки:",
+        'none'          => "Нет",
+        'preview'       => "Предварительный просмотр",
+        'custom'        => "Свой",
+        'premiumStatus' => "Premium подписка",
+        'status'        => "Статус",
+        'active'        => "Активно",
+        'inactive'      => "Неактивно",
+        'activeCD'      => "Вы должны подождать до %s, чтобы снова изменить имя пользователя.",
+        'updateMessage' => array(
+            'general'    => "Предпочтения обновлены.",
+            'community'  => "Описание и подпись успешно обновлены.",
+            'personal'   => "Письмо с подтверждением было отправлено на %s.",
+            'username'   => 'Имя пользователя изменено с %1$s на %2$s.',
+            'avNotFound' => "Иконка не найдена.",
+            'avSuccess'  => "Аватар успешно обновлен. Поздравляем Вас!",
+            'avNoChange' => "Не произошло никаких изменений.",
+            'av1stUser'  => "Аватар, выбранный Вами, уникален! /ура",
+            'avNthUser'  => "Примите во внимание, что такой значок уже используется %d пользователями."
+        ),
+        'inputbox' => array(
+            'head' => array(
+                'success'     => "Успешно",
+                'error'       => "Упс!",
+                'register'    => "Регистрация: Шаг %s из 2",
+                'recoverUser' => "Запрос имени пользователя",
+                'recoverPass' => "Сброс пароля: Шаг %s из 2",
+                'resendMail'  => "Вновь выслать верификационное письмо",
+                'signin'      => "Войти в вашу учетную запись"
+            ),
+            'message' => array(
+                'accActivated'  => 'Ваша учетная запись была активирована.<br />Перейдите к <a href="?account=signin&key=%s">входу</a>',
+                'resendMail'    => "Если вы зарегистрировались, но не получили проверочного письма, пожалуйста, введите ваш email адрес ниже и подтвердите отправку формы. (Пожалуйста, удостоверьтесь, что Вы проверили папку со спамом и/или корзину Вашего почтового сервиса)",
+                'mailChangeOk'  => "Ваш адрес электронной почты был успешно изменен.",
+                'mailRevertOk'  => "Запрос на изменение адреса электронной почты был отменен/отозван.",
+                'passChangeOk'  => "Ваш пароль был успешно изменен.",
+                'deleteAccSent' => "Письмо с подтверждением было отправлено на %s.",
+                'deleteOk'      => "Ваша учетная запись была успешно удалена. Надеемся увидеть вас снова!<br /><br /> Теперь вы можете закрыть это окно.",
+                'createAccSent' => 'Письмо с инструкциями для активации учетной записи было отправлено на адрес <b>%s/b>. Следуйте инструкциям, для продолжения регистрации.<br /><br />Если вы не получили письмо для подтверждения, <a href="?account=resend">нажмите здесь</a>, чтобы отправить его повторно.</div>',
+                'recovUserSent' => "Письмо с инструкциями для активации учетной записи было отправлено на адрес <b>%s/b>. Просто следуйте инструкциям для восстановления имени пользователя.",
+                'recovPassSent' => "Письмо с инструкциями для активации учетной записи было отправлено на адрес <b>%s/b>. Просто следуйте инструкциям для сброса пароля."
+            ),
+            'error' => array(
+                'mailTokenUsed'  => 'Этот ключ для смены email уже был использован или недействителен. Посетите вашу <a href="?account#personal">страницу настроек учетной записи</a>, чтобы попробовать снова.',
+                'passTokenUsed'  => 'Этот ключ для смены пароля уже был использован или недействителен. Посетите вашу <a href="?account#personal">страницу настроек учетной записи</a>, чтобы попробовать снова.',
+                'passTokenLost'  => "Ключ не был получен. Если вы сбросили пароль по ссылке из письма, отправленного на email, пожалуйста, скопируйте URL целиком и вставьте в адресную строку (включая ключ, указанный в конце ссылки).",
+                'isRecovering'   => "Эта учетная запись уже восстанавливается. Следуйте инструкциям в письме или дождитесь истечения срока действия токена через %s.",
+                'loginExceeded'  => "Достигнуто максимальное количество попыток входа с этого IP. Пожалуйста, попробуйте снова через %s.",
+                'signupExceeded' => "Достигнуто максимальное количество регистраций с этого IP. Пожалуйста, попробуйте снова через %s.",
+             // 'emailNotFound'  => "The email address you entered is not associated with any account.<br /><br />If you forgot the email you registered your account with email CFG_CONTACT_EMAIL for assistance.",
+                'emailNotFound'  => "Этот адрес электронной почты не найден в нашей системе."
+            )
+        )
     ),
     'user' => array(
         'notFound'      => "Пользователь \"%s\" не найден!",
@@ -1241,7 +1320,7 @@ $lang = array(
         'floorN'        => "Уровень %d"
     ),
     'privileges' => array(
-        'main'          => "Здесь на AoWoW вы можете зарабатывать <a href=\"?reputation\">репутацию</a>. Основной источник получения репутации — увеличение рейтинга ваших комментариев другими пользователями.<br><br>Репутация примерно измеряет количество вашего вклада в сообщество.<br><br>По мере того, как вы зарабатываете репутацию, вы получаете доверие сообщества и особые привилегии. Полный список привилегий расположен ниже.",
+        'main'          => "Здесь на AoWoW вы можете зарабатывать <a href=\"?reputation\">репутацию</a>. Основной источник получения репутации — увеличение рейтинга ваших комментариев другими пользователями.<br /><br />Репутация примерно измеряет количество вашего вклада в сообщество.<br /><br />По мере того, как вы зарабатываете репутацию, вы получаете доверие сообщества и особые привилегии. Полный список привилегий расположен ниже.",
         'privilege'     => "Привилегия",
         'privileges'    => "Привилегии",
         'requiredRep'   => "Необходима репутация",

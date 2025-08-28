@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Número de consultas de SQL",
         'timeSQL'       => "El tiempo para las consultas de SQL",
         'noJScript'     => '<b>Este sitio hace uso intenso de JavaScript.</b><br />Por favor <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">habilita JavaScript</a> en tu navegador.',
-        'userProfiles'  => "Tus personajes",
+     // 'userProfiles'  => "Tus personajes",
         'pageNotFound'  => "Este %s no existe.",
         'gender'        => "Género",
         'sex'           => [null, "Hombre", "Mujer"],
@@ -40,12 +40,13 @@ $lang = array(
         'side'          => "Lado: ",
         'related'       => "Información relacionada",
         'contribute'    => "Contribuir",
-        // 'replyingTo'    => "The answer to a comment from",
+     // 'replyingTo'    => "The answer to a comment from",
         'submit'        => "Enviar",
+        'save'          => 'Guardar',
         'cancel'        => "Cancelar",
         'rewards'       => "Recompensas",
         'gains'         => "Ganancias",
-        'login'         => "Ingresar",
+     // 'login'         => "Ingresar",
         'forum'         => "Foro",
         'siteRep'       => "Reputación: ",
         'yourRepHistory'=> "Tu Historial de Reputación",
@@ -132,6 +133,7 @@ $lang = array(
         'colon'         => ': ',
         'dateFmtShort'  => "d/m/Y",
         'dateFmtLong'   => "d/m/Y \a \l\a\s g:i A",
+        'dateFmtUntil'  => "j \d\\e F \d\\e Y",
         'timeAgo'       => 'hace %s',
         'nfSeparators'  => ['.', ','],
 
@@ -900,7 +902,6 @@ $lang = array(
             "Gestor de Capturas de pantalla","Gestor de vídeos",            "Partner de API",               "Pendiente"
         ),
         // signIn
-        'doSignIn'      => "Iniciar sesión con tu cuenta",
         'signIn'        => "Iniciar sesión",
         'user'          => "Nombre de usuario",
         'pass'          => "Contraseña",
@@ -909,25 +910,22 @@ $lang = array(
         'forgotUser'    => "Nombre de usuario",
         'forgotPass'    => "Contraseña",
         'accCreate '    => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
-        'resendMail'    => "Reenviar correo de verificación",
-        'resendHint'    => "Si te has registrado pero no recibiste un correo de verificación, introduce tu dirección de correo más abajo y completa el formulario. (¡Por favor, asegúrate de comprobar tus directorios de correo no deseado o papelera por si el correo acabara en el lugar equivocado!)",
 
         // recovery
-        'recoverUser'   => "Pedir nombre de usuario",
-        'recoverPass'   => "Reiniciar contraseña: Paso %s de 2",
-        'newPass'       => "Nueva Contraseña",
-        'tokenExpires'  => "Este token expira en %s",
+        'newPass'       => "Nueva Contraseña:",
+        'confNewPass'   => "Confirmar contraseña nueva:",
+        'passResetHint' => 'Si no sabes tu contraseña, visita la <a href="?account=forgot-password">página de restablecimiento de contraseña</a> para restablecerla.',
+     // 'tokenExpires'  => "Este token expira en %s",
 
         // creation
-        'register'      => "Inscripción: Paso %s de 2",
-        'passConfirm'   => "Confirmar contraseña",
+        'passConfirm'   => "Confirmar contraseña:",
 
         // dashboard
         'ipAddress'     => "Dirección IP: ",
         'lastIP'        => "Última IP usada: ",
-    //  'myAccount'     => "Mi cuenta",
-    //  'editAccount'   => "Use el formulario siguienta para actualizar la información de la cuenta.",
-    //  'viewPubDesc'   => 'Mira tu descripción pública en tu <a href="?user=%s">Página de perfil</a>',
+     // 'myAccount'     => "Mi cuenta",
+     // 'editAccount'   => "Use el formulario siguienta para actualizar la información de la cuenta.",
+     // 'viewPubDesc'   => 'Mira tu descripción pública en tu <a href="?user=%s">Página de perfil</a>',
 
         // bans
         'accBanned'     => "Esta cuenta fue cerrada.",
@@ -939,25 +937,106 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "Esa dirección de correo electrónico no es válida.", // message_emailnotvalid
-        'emailNotFound' => "El correo electrónico que ingresaste no está asociado con ninguna cuenta.<br><br>Si olvistaste el correo electronico con el que registraste la cuenta, escribe a CFG_CONTACT_EMAIL para asistencia.",
-        'createAccSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para crear su cuenta.",
-        'recovUserSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para recuperar su nombre de usuario.",
-        'recovPassSent' => "Un correo fue enviado a <b>%s</b>. Siga las instrucciones para reiniciar su contraseña.",
-        'accActivated'  => 'Su cuenta ha sido activada.<br>Ingrese a <a href="?account=signin&token=%s">para ingresar</a>',
         'userNotFound'  => "El usuario que ha ingresado no existe",
         'wrongPass'     => "La contraseña no es valida.",
-        // 'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "Ha excedido la cantidad de inicios de sesion con esta IP. Por favor intente en %s",
-        'signupExceeded'=> "Ha excedido la cantidad de creaciones de cuentas con esta IP. Por favor intente en %s.",
+     // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Tu nombre de usuario tiene que tener por lo menos cuatro caracteres.", // message_usernamemin
         'errNameChars'  => "Tu nombre de usuario solo puede contener números y letras.", // message_usernamenotvalid
         'errPassLength' => "Tu contraseña tiene que tener por lo menos seis caracteres.", // message_passwordmin
         'passMismatch'  => "La contraseña que ingresó no concuerdan.",
         'nameInUse'     => "El nombre de usuario ya se encuentra utilzado",
         'mailInUse'     => "El correo electrónico ya se encuentra registrado a una cuenta",
-        'isRecovering'  => "Esta cuenta ya se encuentra en proceso de recuperación. Siga las intrucciones en su correo o espere %s para que el token expire ",
         'passCheckFail' => "Las contraseñas no son iguales.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a su contraseña anterior." // message_newpassdifferent
+        'newPassDiff'   => "Su nueva contraseña tiene que ser diferente a su contraseña anterior.",// message_newpassdifferent
+        'newMailDiff'   => "Su nueva dirección de correo electrónico tiene que ser diferente a tu dirección de correo electrónico anterior.", // message_newemaildifferent
+
+        // settings
+        'settings'      => "Mi cuenta",
+        'settingsNote'  => "Simplemente usa el siguiente formulario para actualizar la información de tu cuenta.",
+        'tabGeneral'    => "General",
+        'tabPersonal'   => "Personal",
+        'tabCommunity'  => "Comunidad",
+        'tabPremium'    => "Premium",
+        'preferences'   => "Preferencias",
+        'modelviewer'   => "Visualizador de modelos",
+        'mvNote'        => "Modelo de personaje por defecto:",
+        'lists'         => "Listas",
+        'listsNote'     => "Mostrar IDs en listas soportadas",
+        'announcements' => "Anuncios",
+        'annNote'       => "Elimina datos relacionados con anuncios que hayas cerrado para que puedan ser vistos de nuevo.",
+        'purge'         => "Purgar",
+        'curPass'       => "Contraseña actual:",
+        'globalLogout'  => "Cerrar sesión en todos los otros navegadores/dispositivos",
+        'curEmail'      => "Dirección de correo electrónico actual",
+        'newEmail'      => "Dirección de correo electrónico nueva",
+        'userPage'      => "Página de usuario",
+        'publicDesc'    => "Descripción pública",
+        'publicDescNote'=> 'Dinos más sobre ti y tus personajes de WoW. Lo que escribas aquí aparecerá en tu <a href="?user=%s">página de usuario</a>.',
+        'forums'        => "Foros",
+        'signature'     => "Firma",
+        'signatureNote' => "Tu firma aparecerá debajo de todos tus mensajes en los foros.",
+        'usernameNote'  => "Los nombres de usuario solo pueden cambiarse una vez cada %s y deben tener entre 4 y 16 caracteres. No se permiten caracteres especiales.",
+        'curName'       => "Nombre de Usuario Actual:",
+        'newName'       => "Nuevo Nombre de Usuario:",
+        'accDelete'     => "Eliminar Cuenta",
+        'accDeleteNote' => 'Si quieres eliminar completamente tu cuenta y toda tu información personal, visita nuestra <a href="?account=delete" style="color:inherit; text-decoration:underline">página de eliminación de cuenta</a>.',
+        'avatar'        => "Avatar",
+        'avatarNote'    => "Tu avatar aparecerá al lado de todos tus mensajes en los foros.",
+        'avWowIcon'     => "Ícono de World of Warcraft",
+        'avWowIconNote' => '<span class="q0">ej. INV_Axe_54</span><br />Sugerencia: Para encontrar el nombre de un icono, simplemente haz doble-clic en el icono grande mientras estás viendo una página de un <a href="?item=22632" target="_blank">objeto</a> o un <a href="?spell=78634" target="_blank">hechizo</a>. Después cópialo arriba.',
+        'avIconName'    => "Nombre de ícono:",
+        'none'          => "Ninguno",
+        'preview'       => "Visualizar",
+        'custom'        => "Personalizado",
+        'premiumStatus' => "Suscripción Premium",
+        'status'        => "Estado",
+        'active'        => "Activo",
+        'inactive'      => "Inactivo",
+        'activeCD'      => "Debes esperar hasta %s para cambiar tu nombre de usuario nuevamente.",
+        'updateMessage' => array(
+            'general'    => "Preferencias actualizadas.",
+            'community'  => "Tu descripción pública y tu firma en el foro se han actualizado correctamente.",
+            'personal'   => "Se envió un correo electrónico de confirmación a %s.",
+            'username'   => 'Nombre de usuario cambiado de %1$s a %2$s.',
+            'avNotFound' => "No se encontró este avatar.",
+            'avSuccess'  => "Tu avatar ha sido actualizado correctamente.",
+            'avNoChange' => "No se hicieron cambios.",
+            'av1stUser'  => "¡Felicidades, tienes un avatar único! /hurra",
+            'avNthUser'  => "Para tu información, tu avatar también está siendo usado por %d otros usuarios."
+        ),
+        'inputbox' => array(
+            'head' => array(
+                'success'     => "Éxito",
+                'error'       => "¡Ups!",
+                'register'    => "Inscripción: Paso %s de 2",
+                'recoverUser' => "Solicitar nombre de usuario",
+                'recoverPass' => "Restablecer contraseña: Paso %s de 2",
+                'resendMail'  => "Reenviar correo de verificación",
+                'signin'      => "Iniciar sesión con tu cuenta"
+            ),
+            'message' => array(
+                'accActivated'  => 'Su cuenta ha sido activada.<br />Ingrese a <a href="?account=signin&key=%s">para ingresar</a>',
+                'resendMail'    => "Si te has registrado pero no recibiste un correo de verificación, introduce tu dirección de correo más abajo y completa el formulario. (¡Por favor, asegúrate de comprobar tus directorios de correo no deseado o papelera por si el correo acabara en el lugar equivocado!)",
+                'mailChangeOk'  => "Tu dirección de correo electrónico ha sido cambiada correctamente.",
+                'mailRevertOk'  => "Tu solicitud de cambio de correo electrónico ha sido cancelada/revertida.",
+                'passChangeOk'  => "Tu contraseña ha sido cambiada correctamente.",
+                'deleteAccSent' => "Se ha enviado un correo electrónico a %s con el enlace de confirmación adjunto.",
+                'deleteOk'      => "Tu cuenta ha sido eliminada correctamente. ¡Esperamos verte de nuevo pronto!<br /><br /> Ahora puedes cerrar esta ventana.",
+                'createAccSent' => 'Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para crear tu cuenta.<br /><br />Si no recibes el correo de verificación, <a href="?account=resend">haz clic aquí</a> para enviar otro.',
+                'recovUserSent' => "Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para recuperar tu nombre de usuario.",
+                'recovPassSent' => "Un correo fue enviado a <b>%s</b>. Sigue las instrucciones para restablecer tu contraseña."
+            ),
+            'error' => array(
+                'mailTokenUsed'  => 'Ese código de cambio de correo electrónico ya ha sido usado, o no es válido. Visita tu <a href="?account#personal">página de configuración de cuenta</a> para intentarlo de nuevo.',
+                'passTokenUsed'  => 'Ese código de cambio de contraseña ya ha sido usado, o no es válido. Visita tu <a href="?account#personal">página de configuración de cuenta</a> para intentarlo de nuevo.',
+                'passTokenLost'  => "No se recibió ningún código de petición. Si recibiste un enlace para restablecer tu contraseña por correo, por favor copia y pega la dirección completa (incluyendo el código del final) en la barra de dirección de tu navegador.",
+                'isRecovering'   => "Esta cuenta ya se encuentra en proceso de recuperación. Sigue las instrucciones en tu correo o espera %s para que el token expire.",
+                'loginExceeded'  => "Has excedido la cantidad de inicios de sesión con esta IP. Por favor intenta en %s.",
+                'signupExceeded' => "Has excedido la cantidad de creaciones de cuentas con esta IP. Por favor intenta en %s.",
+             // 'emailNotFound'  => "El correo electrónico que ingresaste no está asociado con ninguna cuenta.<br /><br />Si olvistaste el correo electronico con el que registraste la cuenta, escribe a CFG_CONTACT_EMAIL para asistencia.",
+                'emailNotFound'  => "Esa dirección de correo electrónico no fue encontrada en nuestro sistema."
+            )
+        )
     ),
     'user' => array(
         'notFound'      => "¡No se encontró el usuario \"%s\"!",

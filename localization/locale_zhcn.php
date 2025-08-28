@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "数据库查询次数",
         'timeSQL'       => "数据库查询时间",
         'noJScript'     => '<b>本站点基于JavaScript。</b><br />请在你的浏览器里<a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">启用JavaScript</a>。',
-        'userProfiles'  => "我的简介",
+     // 'userProfiles'  => "我的简介",
         'pageNotFound'  => "%s不存在。",
         'gender'        => "性别",
         'sex'           => [null, "男性", "女性"],
@@ -40,12 +40,13 @@ $lang = array(
         'side'          => "阵营：",
         'related'       => "相关",
         'contribute'    => "贡献",
-        // 'replyingTo'    => "The answer to a comment from",
+     // 'replyingTo'    => "The answer to a comment from",
         'submit'        => "提交",
+        'save'          => '保存',
         'cancel'        => "取消",
         'rewards'       => "奖励",
         'gains'         => "获得",
-        'login'         => "登录",
+     // 'login'         => "登录",
         'forum'         => "论坛",
         'siteRep'       => "站点声望：",
         'yourRepHistory'=> "您的声望历史",
@@ -132,6 +133,7 @@ $lang = array(
         'colon'         => '：',
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
+        'dateFmtUntil'  => "Y年n月j日",
         'timeAgo'       => '%s之前',
         'nfSeparators'  => [',', '.'],
 
@@ -892,7 +894,7 @@ $lang = array(
     ),
     'account' => array(
         'title'         => "数据库账号",
-        'email'         => "电子邮箱地址",
+        'email'         => "邮箱地址",
         'continue'      => "继续",
         'groups'        => array(
             -1 => "无", "测试员", "管理员", "编辑器", "管理员", "官僚",
@@ -900,7 +902,6 @@ $lang = array(
             "截屏管理器", "视频管理员", "API伙伴", "等待中"
         ),
         // signIn
-        'doSignIn'      => "登录你的数据库账号",
         'signIn'        => "登录",
         'user'          => "用户名",
         'pass'          => "密码",
@@ -909,25 +910,22 @@ $lang = array(
         'forgotUser'    => "用户名",
         'forgotPass'    => "密码",
         'accCreate'     => '没有账号？<a href="?account=signup">现在创建一个！</a>',
-        'resendMail'    => "重新发送验证邮件",
-        'resendHint'    => "[If you registered but did not receive a verification email, enter your email address below and submit the form. (Please be sure to check your spam or trash folders to make sure the email didn't accidentally get put in the wrong place!)]",
 
         // recovery
-        'recoverUser'   => "用户名需求",
-        'recoverPass'   => "密码重置：步骤 %s / 2",
-        'newPass'       => "新密码",
-        'tokenExpires'  => "此令牌将在%s过期。",
+        'newPass'       => "新密码：",
+        'confNewPass'   => "确认密码：",
+        'passResetHint' => '如果您忘记了当前密码，请访问 <a href="?account=forgot-password">密码重置页面</a> 进行重置。',
+     // 'tokenExpires'  => "此令牌将在%s过期。",
 
         // creation
-        'register'      => "注册 - 步骤 %s / 2",
-        'passConfirm'   => "确认密码",
+        'passConfirm'   => "确认密码：",
 
         // dashboard
         'ipAddress'     => "IP地址：",
         'lastIP'        => "上次使用IP地址：",
-    //  'myAccount'     => "我的账号",
-    //  'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
-    //  'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
+     // 'myAccount'     => "我的账号",
+     // 'editAccount'   => "只需使用以下表格就能更新你的帐户信息",
+     // 'viewPubDesc'   => '在你的<a href="?user=%s">简介页面</a>查看你公共描述',
 
         // bans
         'accBanned'     => "这个账号已被关闭",
@@ -939,25 +937,106 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "该电子邮件地址无效。", // message_emailnotvalid
-        'emailNotFound' => "你输入的电子邮件地址与任何帐户不关联。<br><br>如果您忘记了使用哪个电子邮件注册了您的帐户，请发送电子邮件至CFG_CONTACT_EMAIL寻求帮助。",
-        'createAccSent' => "电子邮件发送到<b>%s</b>。只需按照说明创建你的帐户。",
-        'recovUserSent' => "电子邮件发送到<b>%s</b>。只需按照说明恢复你的用户名。",
-        'recovPassSent' => "电子邮件发送到<b>%s</b>。只需按照说明重置你的密码。",
-        'accActivated'  => '你的帐户已被激活。<br>继续<a href="?account=signin&token=%s">登录</a>',
         'userNotFound'  => "输入的用户名不存在。",
         'wrongPass'     => "密码无效。",
-        // 'accInactive'   => "该帐户尚未确认激活。",
-        'loginExceeded' => "这个IP最大登录次数已超过。请在%s后再次尝试。",
-        'signupExceeded'=> "这个IP最大注册次数已超过。请在%s后再次尝试。",
+     // 'accInactive'   => "该帐户尚未确认激活。",
         'errNameLength' => "你的用户名必须至少4个字符长度。", // message_usernamemin
         'errNameChars'  => "你的用户名只能包含字母和数字。", // message_usernamenotvalid
         'errPassLength' => "你的密码必须至少6个字符长度。", // message_passwordmin
         'passMismatch'  => "你输入的密码不匹配。",
         'nameInUse'     => "用户名已被占用。",
         'mailInUse'     => "该电子邮件已注册到一个帐户。",
-        'isRecovering'  => "此帐户已恢复。按照电子邮件中的说明或等待%s后令牌过期。",
         'passCheckFail' => "密码不匹配。", // message_passwordsdonotmatch
-        'newPassDiff'   => "你的新密码必须与以前的密码不同。" // message_newpassdifferent
+        'newPassDiff'   => "你的新密码必须与以前的密码不同。", // message_newpassdifferent
+        'newMailDiff'   => "您的新邮箱地址必须不同于旧地址。", // message_newemaildifferent
+
+        // settings
+        'settings'      => "账号设置",
+        'settingsNote'  => "使用下列表格就能升级您的账号信息。",
+        'tabGeneral'    => "常规",
+        'tabPersonal'   => "个人",
+        'tabCommunity'  => "社区",
+        'tabPremium'    => "高级会员",
+        'preferences'   => "偏好",
+        'modelviewer'   => "模型查看器",
+        'mvNote'        => "默认角色模型：",
+        'lists'         => "清单",
+        'listsNote'     => "在支持的清单中显示ID",
+        'announcements' => "公告",
+        'annNote'       => "清空您已关闭的公告数据，以便日后再次浏览。",
+        'purge'         => "清除",
+        'curPass'       => "当前密码：",
+        'globalLogout'  => "从所有其他浏览器/设备中登出当前账户",
+        'curEmail'      => "当前邮箱地址：",
+        'newEmail'      => "新邮箱地址：",
+        'userPage'      => "用户页",
+        'publicDesc'    => "公开描述",
+        'publicDescNote'=> '跟我们说说您自己和您的 WoW 角色吧。您输入的信息会显示在您的 <a href="?user=%s">用户页</a> 上。',
+        'forums'        => "论坛",
+        'signature'     => "签名",
+        'signatureNote' => "签名显示在论坛发帖的下方。",
+        'usernameNote'  => "用户名每%s只能更改一次，长度需为4-16个字符，不允许特殊字符。",
+        'curName'       => "当前用户名：",
+        'newName'       => "新用户名：",
+        'accDelete'     => "删除账户",
+        'accDeleteNote' => '如果您想彻底删除您的账户以及所有个人信息，请访问我们的 <a href="?account=delete" style="color:inherit; text-decoration:underline">账户删除页面</a>。',
+        'avatar'        => "人物",
+        'avatarNote'    => "您的头像将显示在您所有论坛帖子的旁边。",
+        'avWowIcon'     => "魔兽世界图标",
+        'avWowIconNote' => '<span class="q0">如INV_Axe_54</span><br />小建议：要找到图标的名字，只要在浏览<a href="?item=22632" target="_blank">图标</a> 或 <a href="?spell=78634" target="_blank">spell</a> 页面时 双击大图标，接着复制粘贴到上面。',
+        'avIconName'    => "图标名：",
+        'none'          => "无",
+        'preview'       => "预览",
+        'custom'        => "自定义",
+        'premiumStatus' => "高级会员订阅",
+        'status'        => "状态",
+        'active'        => "激活",
+        'inactive'      => "未激活",
+        'activeCD'      => "您必须等到%s后才能再次更改用户名。",
+        'updateMessage' => array(
+            'general'   => "已更新您的偏好设置。",
+            'community' => "已成功更新您的公开描述与论坛签名。",
+            'personal'  => "确认邮件已发送到 %s。",
+            'username'  => '用户名已从 %1$s 更改为 %2$s。',
+            'avNotFound' => "图标未找到",
+            'avSuccess'  => "您的头像更新成功。",
+            'avNoChange' => "没有做过改变​",
+            'av1stUser'  => "恭喜选到了最独特的那一个！ /干杯",
+            'avNthUser'  => "​提示，您的图标也被%d其他用户使用。"
+        ),
+        'inputbox' => array(
+            'head' => array(
+                'success'     => "成功",
+                'error'       => "哦嚯！",
+                'register'    => "注册 - 步骤 %s / 2",
+                'recoverUser' => "用户名需求",
+                'recoverPass' => "密码重置：步骤 %s / 2",
+                'resendMail'  => "重新发送验证邮件",
+                'signin'      => "登录你的数据库账号"
+            ),
+            'message' => array(
+                'accActivated'  => '你的帐户已被激活。<br />继续<a href="?account=signin&key=%s">登录</a>',
+                'resendMail'    => "如果您已注册但未收到验证邮件，请在下方输入您的邮箱地址并提交表单。（请务必检查您的垃圾邮件或回收站文件夹，以确保邮件没有被误放到错误的位置！）",
+                'mailChangeOk'  => "您的邮箱地址已成功更改。",
+                'mailRevertOk'  => "您的邮箱更改请求已被取消/撤销。",
+                'passChangeOk'  => "您的密码已成功更改。",
+                'deleteAccSent' => "已向 %s 发送了一封带有确认链接的邮件。",
+                'deleteOk'      => "您的账户已成功删除。希望不久后能再次见到您！<br /><br />您现在可以关闭此窗口。",
+                'createAccSent' => '电子邮件发送到<b>%s</b>。只请按照说明创建您的账户。<br /><br />如果您没有收到验证邮件，<a href="?account=resend">点击这里</a>重新发送。',
+                'recovUserSent' => "电子邮件发送到<b>%s</b>。只请按照说明恢复您的用户名。",
+                'recovPassSent' => "电子邮件发送到<b>%s</b>。只请按照说明重置您的密码。"
+            ),
+            'error' => array(
+                'mailTokenUsed'  => '该邮箱更改密钥已被使用，或不是有效密钥。请访问您的<a href="?account#personal">账户设置页面</a>重新尝试。',
+                'passTokenUsed'  => '该密码更改密钥已被使用，或不是有效密钥。请访问您的<a href="?account#personal">账户设置页面</a>重新尝试。',
+                'passTokenLost'  => "未提供令牌。如果您在邮件中收到重置密码链接，请将整个网址（包括最后的令牌）复制并粘贴到浏览器地址栏中。",
+                'isRecovering'   => "此帐户已恢复。按照电子邮件中的说明或等待%s后令牌过期。",
+                'loginExceeded'  => "这个IP最大登录次数已超过。请在%s后再次尝试。",
+                'signupExceeded' => "这个IP最大注册次数已超过。请在%s后再次尝试。",
+             // 'emailNotFound'  => "你输入的电子邮件地址与任何帐户不关联。<br /><br />如果您忘记了使用哪个电子邮件注册了您的帐户，请发送电子邮件至CFG_CONTACT_EMAIL寻求帮助。",
+                'emailNotFound'  => "未在我们的系统中找到该电子邮件地址。"
+            )
+        )
     ),
     'user' => array(
         'notFound'      => "用户 \"%s\" 未找到",
@@ -1241,7 +1320,7 @@ $lang = array(
         'floorN'        => "[Level %d]"
     ),
     'privileges' => array(
-        'main'          => "在我们的网站上，你可以通过 <a href=\"?reputation\">声望</a>. 来获取特权。获取声望的主要途径是获得评论的赞同。<br><br>因此，声望是衡量你对社区的贡献程度的一个大致指标。<br><br>随着声望的积累，你将获得社区的信任，并被赋予额外的特权。以下是完整的特权列表。",
+        'main'          => "在我们的网站上，你可以通过 <a href=\"?reputation\">声望</a>. 来获取特权。获取声望的主要途径是获得评论的赞同。<br /><br />因此，声望是衡量你对社区的贡献程度的一个大致指标。<br /><br />随着声望的积累，你将获得社区的信任，并被赋予额外的特权。以下是完整的特权列表。",
         'privilege'     => "特权",
         'privileges'    => "特权",
         'requiredRep'   => "需要声望",

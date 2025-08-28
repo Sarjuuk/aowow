@@ -502,6 +502,15 @@ a.premium-user-badge {
     border-radius: 6px;
 }
 
+/* aowow - imported for account page */
+.box {
+    padding: 15px;
+    background: #282828;
+    border-radius: 6px;
+    display: table;
+    margin: 10px 0;
+}
+
 .reputation-negative-amount span { /* The whole text has the class; the number is spanned */
     color: red;
     font-weight: bold;
@@ -3202,7 +3211,7 @@ td.screenshot-cell:hover img {
 
 .text h1 {
     color: white;
-    font-size: 19px;
+    font-size: 19px !important;
     font-weight: normal;
     border-bottom: 1px solid #505050;
     padding: 0 0 5px 0;

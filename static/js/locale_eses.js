@@ -2965,6 +2965,7 @@ var LANG = {
     message_invalidname:          "El nombre de la imagen es inválido. Debe ser alfanumérico con un máx de 20 caracteres y debe empezar por una letra.",
     message_newemaildifferent:    "Su nueva dirección de correo electrónico tiene que ser diferente a tu dirección de correo electrónico anterior.",
     message_newpassdifferent:     "Su nueva contraseña tiene que ser diferente a Su contraseña anterior.",
+    message_newnamedifferent:     "Su nuevo nombre de usuario tiene que ser diferente a su nombre de usuario anterior.",
     message_noscreenshot:         "Por favor seleccione la captura de pantalla para subir.",
     message_novideo:              "Por favor, introduce información válida del vídeo.",
     message_nothingtoviewin3d:    "No se han seleccionado objetos que se puedan ver en 3D.",

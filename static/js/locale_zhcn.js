@@ -3013,6 +3013,7 @@ var LANG = {
     message_invalidname:          "图片名无效。必须使用字母和数字，最多20个字符，以字母开头。",
     message_newemaildifferent:    "您的新邮箱地址必须不同于旧地址。",
     message_newpassdifferent:     "您的新密码必须不同于旧密码。",
+    message_newnamedifferent:     "您的新用户名必须不同于旧用户名。",
     message_noscreenshot:         "请选择要上传的截屏。",
     message_novideo:              "请输入有效的视频信息。",
     message_nothingtoviewin3d:    "没有选中可以3D浏览的物品。",

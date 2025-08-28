@@ -19,7 +19,7 @@ trait TrRecoveryHelper
 
         // check if already processing
         if ($_ = DB::Aowow()->selectCell('SELECT `statusTimer` - UNIX_TIMESTAMP() FROM ?_account WHERE `email` = ? AND `status` > ?d AND `statusTimer` > UNIX_TIMESTAMP()', $email, ACC_STATUS_NEW))
-            return sprintf(Lang::account('isRecovering'), Util::formatTime($_ * 1000));
+            return Lang::account('inputbox', 'error', 'isRecovering', [Util::formatTime($_ * 1000)]);
 
         // create new token and write to db
         $token = Util::createHash();
@@ -28,7 +28,7 @@ trait TrRecoveryHelper
 
         // send recovery mail
         if (!Util::sendMail($email, $mailTemplate, [$token], Cfg::get('ACC_RECOVERY_DECAY')))
-            return sprintf(Lang::main('intError2'), 'send mail');
+            return Lang::main('intError2', ['send mail']);
 
         return '';
     }

@@ -48,7 +48,7 @@ class User
             return false;
 
         // check IP bans
-        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `ip` = ? AND `type` = 0', self::$ip))
+        if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `ip` = ? AND `type` = ?d', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT))
         {
             if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
                 return false;
@@ -62,7 +62,7 @@ class User
 
         $session  = DB::Aowow()->selectRow('SELECT `userId`, `expires` FROM ?_account_sessions WHERE `status` = ?d AND `sessionId` = ?', SESSION_ACTIVE, session_id());
         $userData = DB::Aowow()->selectRow(
-           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`
+           'SELECT    a.`id`, a.`passHash`, a.`username`, a.`locale`, a.`userGroups`, a.`userPerms`, BIT_OR(ab.`typeMask`) AS "bans", IFNULL(SUM(r.`amount`), 0) AS "reputation", a.`dailyVotes`, a.`excludeGroups`, a.`status`, a.`statusTimer`, a.`email`, a.`debug`
             FROM      ?_account a
             LEFT JOIN ?_account_banned ab    ON a.`id` = ab.`userId` AND ab.`end` > UNIX_TIMESTAMP()
             LEFT JOIN ?_account_reputation r ON a.`id` =  r.`userId`
@@ -97,10 +97,10 @@ class User
             self::$preferedLoc = $loc;
 
         // reset expired account statuses
-        if ($userData['statusTimer'] < time() && $userData['status'] > ACC_STATUS_NEW)
+        if ($userData['statusTimer'] && $userData['statusTimer'] < time() && $userData['status'] != ACC_STATUS_NEW)
         {
-            DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `id` = ?d', ACC_STATUS_OK, User::$id);
-            $userData['status'] = ACC_STATUS_OK;
+            DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `token` = "", `updateValue` = "" WHERE `id` = ?d', ACC_STATUS_NONE, User::$id);
+            $userData['status'] = ACC_STATUS_NONE;
         }
 
 
@@ -117,7 +117,7 @@ class User
         self::$dailyVotes    = $userData['dailyVotes'];
         self::$excludeGroups = $userData['excludeGroups'];
         self::$status        = $userData['status'];
-    //  self::$debug         = $userData['debug']; // TBD
+        self::$debug         = $userData['debug'];
         self::$email         = $userData['email'];
 
         if (Cfg::get('PROFILER_ENABLE'))
@@ -251,9 +251,9 @@ class User
             return AUTH_INTERNAL_ERR;
 
         // handle login try limitation
-        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
+        $ipBan = DB::Aowow()->selectRow('SELECT `ip`, `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ?', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
         if (!$ipBan || !$ipBan['active'])                   // no entry exists or time expired; set count to 1
-            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, 0, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
+            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, ?d, 1, UNIX_TIMESTAMP() + ?d)', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'));
         else                                                // entry already exists; increment count
             DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ?', Cfg::get('ACC_FAILED_AUTH_BLOCK'), self::$ip);
 
@@ -279,7 +279,7 @@ class User
             return AUTH_WRONGPASS;
 
         // successfull auth; clear bans for this IP
-        DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `type` = 0 AND `ip` = ?', self::$ip);
+        DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ?', IP_BAN_TYPE_LOGIN_ATTEMPT, self::$ip);
 
         if ($query['bans'] & (ACC_BAN_PERM | ACC_BAN_TEMP))
             return AUTH_BANNED;
@@ -362,7 +362,7 @@ class User
             $name,
             $_SERVER["REMOTE_ADDR"] ?? '',
             self::$preferedLoc->value,
-            ACC_STATUS_OK,
+            ACC_STATUS_NONE,
             $userGroup >= U_GROUP_NONE ? $userGroup : U_GROUP_NONE
         );
 
@@ -497,7 +497,7 @@ class User
 
     public static function isRecovering() : bool
     {
-        return self::$status == ACC_STATUS_RECOVER_USER || self::$status == ACC_STATUS_RECOVER_PASS;
+        return self::$status != ACC_STATUS_NONE && self::$status != ACC_STATUS_NEW;
     }
 
 
@@ -565,21 +565,13 @@ class User
         $gUser['characters']        = self::getCharacters();
         $gUser['excludegroups']     = self::$excludeGroups;
 
-        if (Cfg::get('DEBUG') && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_TESTER))
+        if (self::$debug)
             $gUser['debug'] = true;                         // csv id-list output option on listviews
 
         if (self::getPremiumBorder())
             $gUser['settings'] = ['premiumborder' => 1];
         else
-            $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied
-
-        if (self::isPremium())
-            $gUser['premium'] = 1;
-
-        if (self::getPremiumBorder())
-            $gUser['settings'] = ['premiumborder' => 1];
-        else
-            $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied
+            $gUser['settings'] = (new \StdClass);           // existence is checked in Profiler.js before g_user.excludegroups is applied; should this contain - "defaultModel":{"gender":2,"race":6} ?
 
         if (self::isPremium())
             $gUser['premium'] = 1;

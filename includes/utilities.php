@@ -1212,11 +1212,14 @@ abstract class Util
 
         $body = Util::defStatic($body);
 
+        if ($expiration)
+        {
+            $vars += array_fill(0, 9, null);                // vsprintf requires all unused indizes to also be set...
+            $vars[9] = Util::formatTime($expiration * 1000);
+        }
+
         if ($vars)
             $body = vsprintf($body, $vars);
-
-        if ($expiration)
-            $body .= "\n\n".Lang::account('tokenExpires', [Util::formatTime($expiration * 1000)])."\n";
 
         $subject = Cfg::get('NAME_SHORT').Lang::main('colon') . $subject;
         $header  = 'From: '         . Cfg::get('CONTACT_EMAIL') . "\n" .
@@ -1225,7 +1228,7 @@ abstract class Util
 
         if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO)
         {
-            Util::addNote("Redirected from Util::sendMail:\n\nTo: " . $email . "\n\nSubject: " . $subject . "\n\n" . $body, U_GROUP_DEV | U_GROUP_ADMIN, LOG_LEVEL_INFO);
+            Util::addNote("Redirected from Util::sendMail:\n\nTo: " . $email . "\n\nSubject: " . $subject . "\n\n" . $body, U_GROUP_NONE, LOG_LEVEL_INFO);
             return true;
         }
 

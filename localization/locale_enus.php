@@ -28,7 +28,7 @@ $lang = array(
         'numSQL'        => "Number of SQL queries",
         'timeSQL'       => "Time of SQL queries",
         'noJScript'     => '<b>This site makes extensive use of JavaScript.</b><br />Please <a href="https://www.google.com/support/adsense/bin/answer.py?answer=12654" target="_blank">enable JavaScript</a> in your browser.',
-        'userProfiles'  => "My Profiles",
+     // 'userProfiles'  => "My Profiles",
         'pageNotFound'  => "This %s doesn't exist.",
         'gender'        => "Gender",
         'sex'           => [null, "Male", "Female"],
@@ -40,12 +40,13 @@ $lang = array(
         'side'          => "Side: ",
         'related'       => "Related",
         'contribute'    => "Contribute",
-        // 'replyingTo'    => "The answer to a comment from",
+     // 'replyingTo'    => "The answer to a comment from",
         'submit'        => "Submit",
+        'save'          => 'Save',
         'cancel'        => "Cancel",
         'rewards'       => "Rewards",
         'gains'         => "Gains",
-        'login'         => "Login",
+     // 'login'         => "Login",
         'forum'         => "Forum",
         'siteRep'       => "Reputation: ",
         'yourRepHistory'=> "Your Reputation History",
@@ -132,6 +133,7 @@ $lang = array(
         'colon'         => ': ',
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
+        'dateFmtUntil'  => "F j, Y",
         'timeAgo'       => "%s ago",
         'nfSeparators'  => [',', '.'],
 
@@ -900,7 +902,6 @@ $lang = array(
             "Screenshot manager",           "Video manager",                "API partner",                  "Pending"
         ),
         // signIn
-        'doSignIn'      => "Log in to your Account",
         'signIn'        => "Log In",
         'user'          => "Username",
         'pass'          => "Password",
@@ -909,25 +910,22 @@ $lang = array(
         'forgotUser'    => "Username",
         'forgotPass'    => "Password",
         'accCreate'     => 'Don\'t have an account? <a href="?account=signup">Create one now!</a>',
-        'resendMail'    => "Re-Send Verification Email",
-        'resendHint'    => "If you registered but did not receive a verification email, enter your email address below and submit the form. (Please be sure to check your spam or trash folders to make sure the email didn't accidentally get put in the wrong place!)",
 
         // recovery
-        'recoverUser'   => "Username Request",
-        'recoverPass'   => "Password Reset: Step %s of 2",
-        'newPass'       => "New Password",
-        'tokenExpires'  => "This token expires in %s.",
+        'newPass'       => "New Password:",
+        'confNewPass'   => "Confirm new password:",
+        'passResetHint' => 'If you don\'t know your password, visit the <a href="?account=forgot-password">password reset page</a> to reset it.',
+     // 'tokenExpires'  => "This token expires in %s.",     // previously appended to all emails, now it's part of the mail template
 
         // creation
-        'register'      => "Registration - Step %s of 2",
-        'passConfirm'   => "Confirm password",
+        'passConfirm'   => "Confirm password:",
 
         // dashboard
         'ipAddress'     => "IP address: ",
         'lastIP'        => "last used IP: ",
-    //  'myAccount'     => "My Account",
-    //  'editAccount'   => "Simply use the forms below to update your account information",
-    //  'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
+     // 'myAccount'     => "My Account",
+     // 'editAccount'   => "Simply use the forms below to update your account information.",
+     // 'viewPubDesc'   => 'View your Public Description in your <a href="?user=%s">Profile  Page</a>',
 
         // bans
         'accBanned'     => "This account was closed",
@@ -939,25 +937,106 @@ $lang = array(
 
         // form-text
         'emailInvalid'  => "That email address is not valid.", // message_emailnotvalid
-        'emailNotFound' => "The email address you entered is not associated with any account.<br><br>If you forgot the email you registered your account with email CFG_CONTACT_EMAIL for assistance.",
-        'createAccSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to create your account.",
-        'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
-        'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password.",
-        'accActivated'  => 'Your account has been activated.<br>Proceed to <a href="?account=signin&token=%s">sign in</a>',
         'userNotFound'  => "The username you entered does not exists.",
         'wrongPass'     => "That password is not vaild.",
-        // 'accInactive'   => "That account has not yet been confirmed active.",
-        'loginExceeded' => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
-        'signupExceeded'=> "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+     // 'accInactive'   => "That account has not yet been confirmed active.",
         'errNameLength' => "Your username must be at least 4 characters long.", // message_usernamemin
         'errNameChars'  => "Your username can only contain letters and numbers.", // message_usernamenotvalid
         'errPassLength' => "Your password must be at least 6 characters long.", // message_passwordmin
         'passMismatch'  => "The passwords you entered do not match.",
-        'nameInUse'     => "That username is already taken.",
+        'nameInUse'     => "This username is already in use.",
         'mailInUse'     => "That email is already registered to an account.",
-        'isRecovering'  => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
         'passCheckFail' => "Passwords do not match.", // message_passwordsdonotmatch
-        'newPassDiff'   => "Your new password must be different than your previous one." // message_newpassdifferent
+        'newPassDiff'   => "Your new password must be different than your previous one.", // message_newpassdifferent
+        'newMailDiff'   => "Your new email address must be different than your previous one.", // message_newemaildifferent
+
+        // settings
+        'settings'      => "Account Settings",
+        'settingsNote'  => "Simply use the forms below to update your account information.",
+        'tabGeneral'    => "General",
+        'tabPersonal'   => "Personal",
+        'tabCommunity'  => "Community",
+        'tabPremium'    => "Premium",
+        'preferences'   => "Preferences",
+        'modelviewer'   => "Model Viewer",
+        'mvNote'        => "Default character model:",
+        'lists'         => "Lists",
+        'listsNote'     => "Show IDs in supported lists",
+        'announcements' => "Announcements",
+        'annNote'       => "Removes data related to announcements you have closed so that they may be viewed again.",
+        'purge'         => "Purge",
+        'curPass'       => "Current password:",
+        'globalLogout'  => "Log me out of all other browsers/devices",
+        'curEmail'      => "Current email address:",
+        'newEmail'      => "New email address:",
+        'userPage'      => "User Page",
+        'publicDesc'    => "Public Description",
+        'publicDescNote'=> 'Tell us more about yourself and your WoW characters. Whatever you type here will appear on your <a href="?user=%s">user page</a>.',
+        'forums'        => "Forums",
+        'signature'     => "Signature",
+        'signatureNote' => "Your signature will appear beneath all of your posts in the forums.",
+        'usernameNote'  => "Usernames can only be changed once every %s and must be between 4-16 characters. No special characters are permitted.",
+        'curName'       => "Current Username:",
+        'newName'       => "New Username:",
+        'accDelete'     => "Delete Account",
+        'accDeleteNote' => "If you'd like to completely delete your account and all its personal information, visit our <a href=\"?account=delete\" style=\"color:inherit; text-decoration:underline\">account deletion page</a>.",
+        'avatar'        => "Avatar",
+        'avatarNote'    => "Your avatar will appear next to all of your posts in the forums.",
+        'avWowIcon'     => "Icon from World of Warcraft",
+        'avWowIconNote' => '<span class="q0">e.g. INV_Axe_54</span><br />Tip: To find the name of an icon, simply double-click the big icon while<br />browsing an <a href="?item=22632" target="_blank">item</a> or <a href="?spell=29516" target="_blank">spell</a> page. Then copy and paste it above.',
+        'avIconName'    => "Icon name:",
+        'none'          => "None",
+        'preview'       => "Preview",
+        'custom'        => "Custom",
+        'premiumStatus' => "Premium Status",
+        'status'        => "Status",
+        'active'        => "Active",
+        'inactive'      => "Inactive",
+        'activeCD'      => "You must wait until %s to change your username again.",
+        'updateMessage' => array(
+            'general'    => "Updated your preferences.",
+            'community'  => "Your public description and forum signature have been updated successfully.",
+            'personal'   => "A confirmation email was sent to %s.",
+            'username'   => 'Username changed from %1$s to %2$s.',
+            'avNotFound' => "Icon not found.",
+            'avSuccess'  => "Your avatar has been updated successfully.",
+            'avNoChange' => "No changes were made.",
+            'av1stUser'  => "Congratulations for picking one that is unique! /cheer",
+            'avNthUser'  => "FYI, your icon is also used by %d other user(s)."
+        ),
+        'inputbox' => array(
+            'head' => array(
+                'success'     => "Success",
+                'error'       => "Oops!",
+                'register'    => "Registration - Step %s of 2",
+                'recoverUser' => "Username Request",
+                'recoverPass' => "Password Reset: Step %s of 2",
+                'resendMail'  => "Re-Send Verification Email",
+                'signin'      => "Log in to your Account"
+            ),
+            'message' => array(
+                'accActivated'  => 'Your account has been activated.<br />Proceed to <a href="?account=signin&key=%s">sign in</a>',
+                'resendMail'    => "If you registered but did not receive a verification email, enter your email address below and submit the form. (Please be sure to check your spam or trash folders to make sure the email didn't accidentally get put in the wrong place!)",
+                'mailChangeOk'  => "Your email address has been changed successfully.",
+                'mailRevertOk'  => "Your email change request has been cancelled/reverted.",
+                'passChangeOk'  => "Your password has been changed successfully.",
+                'deleteAccSent' => "An email has been sent to %s with confirmation link attached.",
+                'deleteOk'      => "Your account has been successfully removed. We hope to see you again soon!<br /><br /> You may now close this window.",
+                'createAccSent' => 'An email was sent to <b>%s</b>. Simply follow the instructions to create your account.<br /><br />If you don\'t receive the verification email, <a href="?account=resend">click here</a> to send another one.</div>',
+                'recovUserSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to recover your username.",
+                'recovPassSent' => "An email was sent to <b>%s</b>. Simply follow the instructions to reset your password."
+            ),
+            'error' => array(
+                'mailTokenUsed'  => 'Either that email change key has already been used, or it\'s not a valid key. Visit your <a href="?account#personal">Account Settings page</a> to try again.',
+                'passTokenUsed'  => 'Either that password change key has already been used, or it\'s not a valid key. Visit your <a href="?account#personal">Account Settings page</a> to try again.',
+                'passTokenLost'  => "No token was provided. If you received a reset password link in an email, please copy and paste the entire URL (including the token at the end) into your browser's location bar.",
+                'isRecovering'   => "This account is already recovering. Follow the instructions in your email or wait %s for the token to expire.",
+                'loginExceeded'  => "The maximum number of logins from this IP has been exceeded. Please try again in %s.",
+                'signupExceeded' => "The maximum number of signups from this IP has been exceeded. Please try again in %s.",
+             // 'emailNotFound'  => "The email address you entered is not associated with any account.<br /><br />If you forgot the email you registered your account with email CFG_CONTACT_EMAIL for assistance.",
+                'emailNotFound'  => "That email address wasn't found in our system."
+            )
+        )
     ),
     'user' => array(
         'notFound'      => "User \"%s\" not found!",
@@ -1241,7 +1320,7 @@ $lang = array(
         'floorN'        => "Level %d"
     ),
     'privileges' => array(
-        'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br><br>So, reputation is a rough measure of how much you contributed to the community.<br><br>As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",
+        'main'          => "Here on our Site you can generate <a href=\"?reputation\">reputation</a>. The main way to generate it is to get your comments upvotes.<br /><br />So, reputation is a rough measure of how much you contributed to the community.<br /><br />As you amass reputation you earn the community's trust and you will be granted with additional privileges. You can find a full list below.",
         'privilege'     => "Privilege",
         'privileges'    => "Privileges",
         'requiredRep'   => "Reputation Required",
