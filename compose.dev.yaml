@@ -1,0 +1,93 @@
+services:
+  mysql:
+    build:
+      dockerfile: Dockerfile
+      target: mariadb-dev
+      context: .
+    environment:
+      HISTFILE: /usr/local/share/mysql/.bash_history.mysql
+      HISTCONTROL: ignoreboth
+    volumes:
+      - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - ./docker/mysql/etc/mysql/conf.d:/etc/mysql/conf.d:ro
+      - setup_mysql:/usr/local/share/mysql:rw
+      - data_mysql:/var/lib/mysql
+    env_file:
+      - path: .env.mysql
+        required: true
+    ## For debug purposes only.
+    ## Consider to use ssh tunnel instead.
+    # ports:
+    #   - "127.0.0.1:3310:3306"
+    networks:
+      default:
+        ipv4_address: 172.28.0.11
+
+  mail:
+    image: axllent/mailpit
+    restart: unless-stopped
+    # ports:
+    #   - "1025:1025"
+    #   - "8025:8025"  # Use http://172.28.0.12:8025 instead
+    environment:
+      MP_MAX_MESSAGES: 50
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      default:
+        ipv4_address: 172.28.0.12
+
+  aowow:
+    env_file:
+      - path: .env.aowow
+        required: true
+    build:
+      dockerfile: Dockerfile
+      target: php-dev
+      context: .
+    environment:
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=aowow}
+      PHP_IDE_HOST_IP: ${PHP_IDE_HOST_IP:-172.28.0.1}
+      XDEBUG_MODE: 'off'  # https://xdebug.org/docs/all_settings#mode
+      XDEBUG_CONFIG: "remote_host=${PHP_IDE_HOST_IP:-172.28.0.1} remote_enable=1"
+      HISTFILE: /var/www/html/cache/.bash_history.aowow
+      HISTCONTROL: ignoreboth
+    volumes:
+      - ./docker/aowow/etc/php/conf.d:/usr/local/etc/php/app.conf.d:ro
+      - ./docker/aowow/etc/msmtprc:/etc/msmtprc:ro
+      - ./docker/aowow/src/config/config.php:/var/www/html/config/config.php:ro
+
+      ## Typically, mounted project directory always uses RW mode, especially in development environment.
+      ## To enforce application security and get solution perfect, it's better to
+      ## change mounted directories and rights after the setup process is completed.
+      - .:/var/www/html:rw
+      - ./cache:/var/www/html/cache:rw
+      - ./static/uploads:/var/www/html/static/uploads:rw
+      - ./static/css:/var/www/html/static/css:rw
+
+      ## Remount next directories as read-only after setup:
+      - ./static/download:/var/www/html/static/download:rw
+      - ./static/images:/var/www/html/static/images:rw
+      - ./static/js:/var/www/html/static/js:rw
+      - ./static/widgets:/var/www/html/static/widgets:rw
+      - ./static/wowsounds:/var/www/html/static/wowsounds:rw
+      - ./datasets:/var/www/html/datasets:rw
+      - ./includes/libs:/var/www/html/includes/libs:rw
+
+      ## Remove next directories after setup:
+      - ./docker/aowow/usr/local/bin/initialize.sh:/usr/local/bin/initialize.sh:ro
+      - ./docker/aowow/usr/local/bin/initialize.d:/usr/local/bin/initialize.d:ro
+      - "${EXTRACTED_MPQ_DATA_PATH:-./setup/mpqdata}:/var/www/html/setup/mpqdata:ro"
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mail:
+        condition: service_healthy
+
+volumes:
+  setup_mysql:
+    # Contains database dump file. Required for aowow.
+    # After setup is done, all data could be wiped, e.g. `find /usr/local/share/ -type f -delete`
+  data_mysql:
+    # Let database data live outside the container.
