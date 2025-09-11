@@ -17,8 +17,8 @@
     <div id="layers"></div>
 
 <?php
-if ($this->homeTitle):
-    echo "    <script>document.title = '".$this->homeTitle."';</script>".PHP_EOL;
+if (!empty($this->homeTitle) && is_string($this->homeTitle)):
+    echo "    <script>document.title = " . json_encode($this->homeTitle) . ";</script>".PHP_EOL;
 endif;
 
 if ($this->altHomeLogo):
