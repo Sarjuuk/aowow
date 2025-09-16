@@ -3296,7 +3296,7 @@ CREATE TABLE `aowow_zones_sounds` (
 
 LOCK TABLES `aowow_account` WRITE;
 /*!40000 ALTER TABLE `aowow_account` DISABLE KEYS */;
-INSERT INTO `aowow_account` VALUES (0,0,'<system>','','AoWoW','',0,0,0,0,'','',0,0,0,0,'','','',1,0,0,0,'');
+INSERT INTO `aowow_account` VALUES (0,0,'<system>','','AoWoW','',0,0,0,'','',0,0,0,0,'','','',1,0,0,0,'');
 /*!40000 ALTER TABLE `aowow_account` ENABLE KEYS */;
 UNLOCK TABLES;
 
