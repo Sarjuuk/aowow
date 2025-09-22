@@ -96,6 +96,40 @@ WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themse
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
 
+## Install with Docker
+
+```sh
+cp .env.dist .env  # 
+# ... then edit `.env` according to your environment, or leave as-is for development
+
+# for development
+docker compose up -f compose.yaml -f compose.dev.yaml
+
+# for production 
+docker compose up
+```
+
+> [!NOTE]
+> First launch may take long time (up to 30 minutes and more), application requires initialization
+> (download database dumps, load dumps into database, download game data, extract media/info, etc ...)
+> Please, be patient.
+
+Then web-application should be accessible at <http://localhost:8117>
+
+<details>
+  <summary>Change web-server port:</summary>
+
+Change `HTTP_PORT` environment variable in `.env` or override it on docker launch:
+
+```sh
+HTTP_PORT=8042 docker compose up
+```
+
+</details>
+
+> [!NOTE]
+> First launch may fail for some reason (e.g. fail to download data, slow network & healthcheck fail),
+> it's recommended to rebuild containers for initialization scripts invocation.
 
 ## Troubleshooting
 

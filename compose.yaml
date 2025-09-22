@@ -1,0 +1,21 @@
+services:
+    aowow:
+        build:
+            dockerfile: Dockerfile
+            target: php-prod
+            context: .
+        volumes:
+            # ... assume all infrastructure setup is done,
+            - setup_aowow:/var/www/html/setup/mpqdata:rw  # `w` for assets download case
+        ports:
+            - "${HTTP_PORT:-80}:80"
+        env_file:
+            - path: .env
+              required: true
+
+volumes:
+    setup_aowow:
+        # Contains extracted files from MPQ archives (dbc files). Required for aowow setup on initialization.
+        # After setup is done, all data could be wiped, e.g. `find /usr/local/share/ -type f -delete`
+    data_aowow:
+        # Application data. Reused between application deployments.

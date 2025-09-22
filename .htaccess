@@ -2,6 +2,11 @@ Order Deny,Allow
 <FilesMatch "\.(conf|php|in)$">
     Deny from all
 </FilesMatch>
+
+<FilesMatch "\.(yaml|md|env|.dist)$">
+    Deny from all
+</FilesMatch>
+
 <FilesMatch "^(index)\.php$">
     Allow from all
 </FilesMatch>

@@ -1,0 +1,46 @@
+services:
+    mysql:
+        build:
+            dockerfile: Dockerfile
+            target: mysql-dev
+            context: .
+        volumes:
+            - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+            - setup_mysql:/usr/local/share/mysql:rw
+            - data_aowow:/var/lib/mysql
+        env_file:
+            - path: .env
+              required: true
+        extra_hosts:
+            # ... workaround to reuse services common environment variables, and make it working for service itself
+            - 'mysql:127.0.0.1'
+        healthcheck:  # fixme on first launch
+            test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+            start_period: 1m
+            start_interval: 10s
+            interval: 1m
+            timeout: 5s
+            retries: 5
+
+    aowow:
+        build:
+            dockerfile: Dockerfile
+            target: php-dev
+            context: .
+        volumes:
+            - .:/var/www/html:ro
+            - ./docker/aowow/src/config/config.php:/var/www/html/config/config.php:ro
+            # - ./docker/aowow/(home)/.my.cnf:/root/.my.cnf:ro
+            # - ./docker/aowow/usr/local/bin/entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
+            - ./docker/aowow/usr/local/bin/initialize.sh:/usr/local/bin/initialize.sh:ro
+            - ./docker/aowow/usr/local/bin/initialize.d:/usr/local/bin/initialize.d:ro
+        depends_on:
+            mysql:
+                condition: service_healthy
+
+volumes:
+    setup_mysql:
+        # Contains database dump file. Required for aowow.
+        # After setup is done, all data could be wiped, e.g. `find /usr/local/share/ -type f -delete`
+    data_aowow:
+        # Let database data live outside the container.
