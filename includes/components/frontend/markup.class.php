@@ -164,7 +164,7 @@ class Markup implements \JsonSerializable
                         for ($i = 0; $i < count($sm); $i += 2)
                         {
                             if (!empty($jsgData[Type::ITEM][1][$sm[$i]]))
-                                $moneys[] = $jsgData[Type::ITEM][1][$sm[$i]]['name'];
+                                $moneys[] = $jsgData[Type::ITEM][1][$sm[$i]]['name'] ?? $jsgData[Type::ITEM][1][$match[2]]['name_' . Lang::getLocale()->json()];
                             else
                                 $moneys[] = Util::ucFirst(Lang::game('item')).' #'.$sm[$i];
                         }
@@ -179,7 +179,7 @@ class Markup implements \JsonSerializable
                         for ($i = 0; $i < count($sm); $i += 2)
                         {
                             if (!empty($jsgData[Type::CURRENCY][1][$sm[$i]]))
-                                $moneys[] = $jsgData[Type::CURRENCY][1][$sm[$i]]['name'];
+                                $moneys[] = $jsgData[Type::CURRENCY][1][$sm[$i]]['name'] ?? $jsgData[Type::CURRENCY][1][$match[2]]['name_' . Lang::getLocale()->json()];
                             else
                                 $moneys[] = Util::ucFirst(Lang::game('curency')).' #'.$sm[$i];
                         }
@@ -191,7 +191,7 @@ class Markup implements \JsonSerializable
             if ($type = Type::getIndexFrom(Type::IDX_FILE_STR, $match[1]))
             {
                 if (!empty($jsgData[$type][1][$match[2]]))
-                    return $jsgData[$type][1][$match[2]]['name'];
+                    return $jsgData[$type][1][$match[2]]['name'] ?? $jsgData[$type][1][$match[2]]['name_' . Lang::getLocale()->json()];
                 else
                     return Util::ucFirst(Lang::game($match[1])).' #'.$match[2];
             }
