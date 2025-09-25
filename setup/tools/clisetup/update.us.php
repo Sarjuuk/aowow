@@ -44,7 +44,7 @@ CLISetup::registerUtility(new class extends UtilityScript
         CLI::write('[update] checking for sql updates...');
 
         $nFiles = 0;
-        foreach (glob('setup/updates/*.sql') as $file)
+        foreach (glob('setup/sql/updates/*.sql') as $file)
         {
             $pi = pathinfo($file);
 
@@ -109,7 +109,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     {
         CLI::write('  usage: php aowow --update', -1, false);
         CLI::write();
-        CLI::write('  Checks /setup/updates for new *.sql files and applies them. If required by an applied update, the --sql and --build command are triggered afterwards.', -1, false);
+        CLI::write('  Checks /setup/sql/updates for new *.sql files and applies them. If required by an applied update, the --sql and --build command are triggered afterwards.', -1, false);
         CLI::write('  Use this after fetching the latest rev. from Github.', -1, false);
         CLI::write();
         CLI::write('  Last Update: '.date(Util::$dateFormatInternal, $this->date).' (Part #'.$this->part.')', -1, false);

@@ -51,7 +51,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 #### 2. Prepare the database  
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
-Import `setup/db_structure.sql` into the AoWoW database `mysql -p {your-db-here} < setup/db_structure.sql`  
+Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
 #### 3. Server created files
 See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
