@@ -4952,6 +4952,8 @@ var LANG = {
     copied:            'Copied',
     clickToCopy:       'Click to Copy',
     nothingToCopy_tip: 'Nothing to copy!',
+    copy_clipboard:    'Copy',
+    copy_format:       'Copy %s',
 
     // TC conditions display
     tab_conditions:    'Conditions',

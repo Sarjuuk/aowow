@@ -73,12 +73,19 @@ class PetBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->getField('exotic'))
             $infobox[] = '[url=?spell=53270]'.Lang::pet('exotic').'[/url]';
 
+        // id
+        $infobox[] = Lang::pet('id') . $this->typeId;
+
         // icon
         if ($_ = $this->subject->getField('iconId'))
         {
-            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
         }
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');

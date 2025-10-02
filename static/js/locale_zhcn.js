@@ -4932,6 +4932,8 @@ var LANG = {
     copied:            '已复制',
     clickToCopy:       '点击复制',
     nothingToCopy_tip: '[Nothing to copy!]',
+    copy_clipboard:    '复制',
+    copy_format:       '[Copy %s]',
 
     // TC conditions display
     tab_conditions:    '[Conditions]',

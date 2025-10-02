@@ -2345,12 +2345,32 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($cost = $this->subject->getField('trainingCost'))
             $infobox[] = Lang::spell('trainingCost').'[money='.$cost.']';
 
+        // id
+        $infobox[] = Lang::spell('id') . $this->typeId;
+
         // icon
         if ($_ = $this->subject->getField('iconId'))
         {
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
-            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
         }
+
+        // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
+        if (Cfg::get('PROFILER_ENABLE') && in_array($this->subject->getField('typeCat'), [-5, -6]) && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        {
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_spells WHERE `spellId` = ?d', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL');
+            $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
+
+            // - js component missing;
+            // - can't yet assign styles to li element
+            // if (User::getPinnedCharacter())
+                // $infobox[] = Lang::profiler('completion') . '[span class="compact-completion-display"][/span]'; // [li style="display:none"]...[/li]
+        }
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         // used in mode
         foreach ($this->difficulties as $n => $id)

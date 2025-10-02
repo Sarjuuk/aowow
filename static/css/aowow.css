@@ -4232,6 +4232,17 @@ input.button-copy:hover {
     background-color: #444;
 }
 
+/* clicktocopy fa-replacement on redbutton custom */
+a.button-red.fa-check > em > span {
+    padding-left: 19px;
+    background: url(../images/icons/tick.png) no-repeat left center / 12px;
+}
+
+a.button-red.fa-clipboard > em > span {
+    padding-left: 19px;
+    background: url(../images/icons/pages.gif) no-repeat left center / 12px;
+}
+
 /* favicon fa-replacement custom */
 .fav-star {
     cursor:pointer;

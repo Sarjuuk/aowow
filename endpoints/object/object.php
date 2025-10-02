@@ -196,6 +196,13 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $infobox[] = $buff;
         }
 
+        // id
+        $infobox[] = Lang::gameObject('id') . $this->typeId;
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
             if ($_ = $this->subject->getField('ScriptOrAI'))

@@ -108,6 +108,9 @@ class MailBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // id
+        $infobox[] = Lang::mail('id') . $this->typeId;
+
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 

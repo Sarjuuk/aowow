@@ -236,6 +236,8 @@ $lang = array(
         'atCaptain'     => "竞技场战队队长",
         'atSize'        => "团队规模：",
         'profiler'      => "角色概况",
+        'completion'    => "达成：",
+        'attainedBy'    => "%d%%角色已完成",
         'notFound'      => array(
             'guild'     => "该公会不存在或尚未被收录到数据库中。",
             'arenateam' => "该竞技场战队不存在或尚未被收录到数据库中。",
@@ -1070,6 +1072,7 @@ $lang = array(
         'posts'         => "论坛帖子："
     ),
     'emote' => array(
+        'id'            => "表情ID：",
         'notFound'      => "这个表情不存在。",
 //      'self'          => "对你自己",
 //      'target'        => "对别人并且选择了目标",
@@ -1102,9 +1105,10 @@ $lang = array(
         'state'         => ['[Oneshot]', '[Continuous State]', '[Continuous Emote]']
     ),
     'enchantment' => array(
+        'id'            => "附魔ID：",
+        'notFound'      => "这个附魔不存在。",
         'details'       => "细节",
         'activation'    => "激活",
-        'notFound'      => "这个附魔不存在。",
         'types'         => array(
             1 => "触发法术",              3 => "装备法术",             7 => "使用法术",               8 => "棱形插槽",
             5 => "统计",              2 => "武器伤害",           6 => "DPS",                     4 => "防御"
@@ -1116,6 +1120,7 @@ $lang = array(
         'types'         => ['未使用', '酒馆', '传送门', '任务目标', 'Smart Trigger', '脚本']
     ),
     'gameObject' => array(
+        'id'            => "对象ID：",
         'notFound'      => "这个对象不存在。",
         'cat'           => [0 => "其他",  3 => "容器", 6 => "陷阱", 9 => "书籍", 25 => "钓鱼点", -5 => "宝箱", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => "工具"],
         'type'          => [              3 => "容器", 6 => "",     9 => "书籍", 25 => "",       -5 => "宝箱", -3 => "草药", -4 => "矿脉", -2 => "任务", -6 => ""],
@@ -1148,6 +1153,7 @@ $lang = array(
         )
     ),
     'npc' => array(
+        'id'            => "NPC ID：",
         'notFound'      => "这个NPC不存在。",
         'classification'=> "分类：%s",
         'petFamily'     => "宠物家族：",
@@ -1243,6 +1249,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'id'            => "世界事件ID：",
         'notFound'      => "这个世界事件不存在。",
         'start'         => "开始：",
         'end'           => "结束：",
@@ -1251,6 +1258,7 @@ $lang = array(
         'category'      => ["未分类", "节日", "循环", "PvP"]
     ),
     'achievement' => array(
+        'id'            => "成就ID：",
         'notFound'      => "这个成就不存在。",
         'criteria'      => "达成条件",
         'points'        => "点数",
@@ -1309,9 +1317,11 @@ $lang = array(
         )
     ),
     'chrClass' => array(
+        'id'            => "职业ID：",
         'notFound'      => "这个职业不存在。"
     ),
     'race' => array(
+        'id'            => "种族ID：",
         'notFound'      => "这个种族不存在。",
         'racialLeader'  => "种族领袖：",
         'startZone'     => "起始区域"
@@ -1349,6 +1359,7 @@ $lang = array(
         )
     ),
     'zone' => array(
+        'id'            => "区域ID：",
         'notFound'      => "这个区域不存在。",
         'attunement'    => ["调整：", "英雄调整："],
         'key'           => ["钥匙：", "英雄钥匙："],
@@ -1377,6 +1388,7 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'id'            => "任务ID：",
         'notFound'      => "这个任务不存在。",
         '_transfer'     => '这个任务将被转换到<a href="?quest=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'questLevel'    => "等级%s",
@@ -1514,6 +1526,7 @@ $lang = array(
         'notFound'      => "这个图标不存在。"
     ),
     'title' => array(
+        'id'            => "头衔ID：",
         'notFound'      => "这个头衔不存在。",
         '_transfer'     => '这个头衔将被转换到<a href="?title=%d" class="q1">%s</a>，如果你转移到<span class="icon-%s">%s</span>。',
         'cat'           => array(
@@ -1521,6 +1534,7 @@ $lang = array(
         )
     ),
     'skill' => array(
+        'id'            => "技能ID：",
         'notFound'      => "这个技能不存在。",
         'cat'           => array(
             -6 => "伙伴",         -5 => "坐骑",             -4 => "种族特性",      5 => "属性",          6 => "武器技能",       7 => "职业技能",        8 => "护甲精通",
@@ -1528,6 +1542,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'id'            => "货币ID：",
         'notFound'      => "这个货币不存在。",
         'cap'           => "总共上限：",
         'cat'           => array(
@@ -1549,6 +1564,7 @@ $lang = array(
         )
     ),
     'mail' => array(
+        'id'            => "邮件ID：",
         'notFound'      => "该邮件不存在。",
         'attachment'    => "附件",
         'mailDelivery'  => '你将收到 <a href="?mail=%d">这封信</a>%s%s', // "你会收到这封信%s%s",
@@ -1559,12 +1575,14 @@ $lang = array(
         'untitled'      => "无标题邮件 #%d"
     ),
     'pet'      => array(
+        'id'            => "猎人宠物ID：",
         'notFound'      => "这个宠物家族不存在。",
         'exotic'        => "异域的",
         'cat'           => ["狂野", "坚韧", "狡诈"],
         'food'          => ["肉", "鱼", "奶酪", "面包", "蘑菇", "水果", "生肉", "生鱼"]
     ),
     'faction' => array(
+        'id'            => "阵营ID：",
         'notFound'      => "这个阵营不存在。",
         'spillover'     => "声望额外效果",
         'spilloverDesc' => "获得这个阵营的声望也将按比例获得下列阵营的声望。",
@@ -1580,6 +1598,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'id'            => "套装ID：",
         'notFound'      => "这个物品套装不存在。",
         '_desc'         => "<b>%s</b>是<b>%s</b>。它包含%s件。",
         '_descTagless'  => "<b>%s</b>是物品套装包含%s件。",
@@ -1605,6 +1624,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'id'            => "法术ID：",
         'notFound'      => "这个法术不存在。",
         '_spellDetails' => "法术细节",
         '_cost'         => "花费",
@@ -2168,6 +2188,7 @@ $lang = array(
         )
     ),
     'item' => array(
+        'id'            => "物品ID：",
         'notFound'      => "这个物品不存在。",
         'armor'         => "%d点护甲",
         'block'         => "%d格挡",

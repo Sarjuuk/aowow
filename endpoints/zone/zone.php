@@ -188,6 +188,13 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // id
+        $infobox[] = Lang::zone('id') . $this->typeId;
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
         if ($botRows = array_filter($quickFactsRows, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY))
             $infobox = array_merge($infobox, $botRows);
 

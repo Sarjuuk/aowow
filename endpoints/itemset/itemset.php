@@ -125,6 +125,13 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
         if ($_ta)
             $infobox[] = Lang::itemset('_tag').'[url=?itemsets&filter=ta='.$_ta.']'.Lang::itemset('notes', $_ta).'[/url]';
 
+        // id
+        $infobox[] = Lang::itemset('id') . $this->subject->getField('refSetId');
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 

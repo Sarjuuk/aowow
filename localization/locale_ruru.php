@@ -236,6 +236,8 @@ $lang = array(
         'atCaptain'     => "Капитан команды арены",
         'atSize'        => "Численности: ",
         'profiler'      => "Профили персонажей",
+        'completion'    => "Завершено: ",
+        'attainedBy'    => "Получено %d%% пользователей с профилями",
         'notFound'      => array(
             'profile'   => "Этот персонаж не существует, либо еще не добавлен в базу данных.",
             'arenateam' => "[This Arena Team doesn't exist or is not yet in the database.]",
@@ -1070,6 +1072,7 @@ $lang = array(
         'posts'         => "Сообщений на форумах: "
     ),
     'emote' => array(
+        'id'            => "Эмоция ID: ",
         'notFound'      => "[This Emote doesn't exist.]",
 //      'self'          => "[To Yourself]",
 //      'target'        => "[To others with a target]",
@@ -1102,9 +1105,10 @@ $lang = array(
         'state'         => ['[Oneshot]', '[Continuous State]', '[Continuous Emote]']
     ),
     'enchantment' => array(
+        'id'            => "Улучшение ID: ",
+        'notFound'      => "Такой улучшение не существует.",
         'details'       => "Подробности",
         'activation'    => "Активации",
-        'notFound'      => "Такой улучшение не существует.",
         'types'         => array(
             1 => "[Proc Spell]",            3 => "[Equip Spell]",           7 => "[Use Spell]",             8 => "Бесцветное гнездо",
             5 => "Характеристики",          2 => "Урон оружия",             6 => "УВС",                     4 => "Защита"
@@ -1116,6 +1120,7 @@ $lang = array(
         'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
+        'id'            => "Объект ID: ",
         'notFound'      => "Такой объект не существует.",
         'cat'           => [0 => "Другое", 3 => "Контейнеры", 6 => "Ловушки", 9 => "Книги", 25 => "Рыболовные лунки", -5 => "Сундуки", -3 => "Травы",    -4 => "Полезные ископаемые", -2 => "Задания", -6 => "Инструменты"],
         'type'          => [               3 => "Контейнер",  6 => "",        9 => "Книга", 25 => "",                 -5 => "Сундук",  -3 => "Растение", -4 => "Полезное ископаемое", -2 => "Задание", -6 => ""],
@@ -1148,6 +1153,7 @@ $lang = array(
         )
     ),
     'npc' => array(
+        'id'            => "НИП ID: ",
         'notFound'      => "Такой НИП не существует.",
         'classification'=> "Классификация: %s",
         'petFamily'     => "Семейство питомца: ",
@@ -1243,6 +1249,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'id'            => "Игровое событие ID: ",
         'notFound'      => "Это игровое событие не существует.",
         'start'         => "Начало: ",
         'end'           => "Конец: ",
@@ -1251,6 +1258,7 @@ $lang = array(
         'category'      => array("Разное", "Праздники", "Периодические", "PvP")
     ),
     'achievement' => array(
+        'id'            => "Достижение ID: ",
         'notFound'      => "Такое достижение не существует.",
         'criteria'      => "Критерий",
         'points'        => "Очки",
@@ -1309,9 +1317,11 @@ $lang = array(
         )
     ),
     'chrClass' => array(
+        'id'            => "Класс ID: ",
         'notFound'      => "Такой класс не существует."
     ),
     'race' => array(
+        'id'            => "Раса ID: ",
         'notFound'      => "Такая раса не существует.",
         'racialLeader'  => "Лидер расы: ",
         'startZone'     => "Начальная локация",
@@ -1349,6 +1359,7 @@ $lang = array(
         )
     ),
     'zone' => array(
+        'id'            => "Игровая зона ID: ",
         'notFound'      => "Такая местность не существует.",
         'attunement'    => ["[Attunement]: ", "[Heroic attunement]: "],
         'key'           => ["[Key]: ", "[Heroic key]: "],
@@ -1377,6 +1388,7 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'id'            => "Задание ID: ",
         'notFound'      => "Такое задание не существует.",
         '_transfer'     => 'Этот предмет превратится в <a href="?quest=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'questLevel'    => "%s-го уровня",
@@ -1514,6 +1526,7 @@ $lang = array(
         'notFound'      => "Этой иконки не существует"
     ),
     'title' => array(
+        'id'            => "Звание ID: ",
         'notFound'      => "Такое звание не существует.",
         '_transfer'     => 'Этот предмет превратится в <a href="?title=%d" class="q1">%s</a>, если вы перейдете за <span class="icon-%s">%s</span>.',
         'cat'           => array(
@@ -1521,6 +1534,7 @@ $lang = array(
         )
     ),
     'skill' => array(
+        'id'            => "Навык ID: ",
         'notFound'      => "Этот навык не существует.",
         'cat'           => array(
             -6 => "Спутники",           -5 => "Транспорт",          -4 => "Классовые навыки",   5 => "Характеристики",      6 => "Оружейные навыки",    7 => "Классовые навыки",    8 => "Доспехи",
@@ -1528,6 +1542,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'id'            => "Валюта ID: ",
         'notFound'      => "Такая валюта не существует.",
         'cap'           => "Максимум всего: ",
         'cat'           => array(
@@ -1549,6 +1564,7 @@ $lang = array(
         )
     ),
     'mail' => array(
+        'id'            => "[Mail ID]: ",
         'notFound'      => "[This mail doesn't exist].",
         'attachment'    => "[Attachment]",
         'mailDelivery'  => "Вы получите это письмо%s%s",
@@ -1559,12 +1575,14 @@ $lang = array(
         'untitled'      => "[Untitled Mail] #%d"
     ),
     'pet'      => array(
+        'id'            => "Питомец ID: ",
         'notFound'      => "Такой породы питомцев не существует.",
         'exotic'        => "Экзотический",
         'cat'           => ["Свирепость", "Упорство", "Хитрость"],
         'food'          => ["Мясо", "Рыба", "Сыр", "Хлеб", "Грибы", "Фрукты", "Сырое мясо", "Сырая рыба"]
     ),
     'faction' => array(
+        'id'            => "Фракция ID: ",
         'notFound'      => "Такая фракция не существует.",
         'spillover'     => "Распространение репутации",
         'spilloverDesc' => "Получение репутации у этой фракции также дает пропорциональный выигрыш по отношению к фракциям, перечисленным ниже.",
@@ -1580,6 +1598,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'id'            => "Комплект ID: ",
         'notFound'      => "Такой комплект не существует.",
         '_desc'         => "<b>%s</b> — <b>%s</b>. Он состоит из %s предметов.",
         '_descTagless'  => "<b>%s</b> — набор из %s предметов.",
@@ -1605,6 +1624,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'id'            => "Заклинание ID: ",
         'notFound'      => "Такое заклинание не существует.",
         '_spellDetails' => "Описание заклинания",
         '_cost'         => "Цена",
@@ -2168,6 +2188,7 @@ $lang = array(
         )
     ),
     'item' => array(
+        'id'            => "Предмет ID: ",
         'notFound'      => "Такой предмет не существует.",
         'armor'         => "Броня: %s",
         'block'         => "Блок: %s",

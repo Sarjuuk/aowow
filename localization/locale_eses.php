@@ -236,6 +236,8 @@ $lang = array(
         'atCaptain'     => "Capitán de equipo de arena",
         'atSize'        => "Tamaño: ",
         'profiler'      => "Gestor de Perfiles", // Perfiles de Personaje? (character profiler)
+        'completion'    => "Terminación: ",
+        'attainedBy'    => "Obtenido por %d%% de perfiles",
         'notFound'      => array(
             'guild'     => "Esta hermandad no existe o aún no está en la base de datos.",
             'arenateam' => "Este equipo de arena no existe o aún no está en la base de datos.",
@@ -315,7 +317,7 @@ $lang = array(
         'achievements'  => "Logros",
         'title'         => "título",
         'titles'        => "Títulos",
-        'event'         => "Suceso mundial ",
+        'event'         => "Suceso mundial",
         'events'        => "Eventos del mundo",
         'class'         => "clase",
         'classes'       => "Clases",
@@ -323,7 +325,7 @@ $lang = array(
         'races'         => "Razas",
         'skill'         => "habilidad",
         'skills'        => "Habilidades",
-        'currency'      => "monedas",
+        'currency'      => "moneda",
         'currencies'    => "Monedas",
         'sound'         => "sonido",
         'sounds'        => "Sonidos",
@@ -1070,6 +1072,7 @@ $lang = array(
         'posts'         => "Mensajes en los foros: "
     ),
     'emote' => array(
+        'id'            => "ID de Emoticón: ",
         'notFound'      => "Este emoticón no existe.",
 //      'self'          => "Para Usted",
 //      'target'        => "Para otros con un objetivo",
@@ -1102,9 +1105,10 @@ $lang = array(
         'state'         => ['Oneshot', 'Estado continuo', 'Emoticono continuo']
     ),
     'enchantment' => array(
+        'id'            => "ID de Encantamiento: ",
+        'notFound'      => "Este encantamiento no existe.",
         'details'       => "Detalles",
         'activation'    => "Activación",
-        'notFound'      => "Este encantamiento no existe.",
         'types'         => array(
             1 => "Prob. Hechizo",           3 => "Equipar Hechizo",         7 => "Usar Hechizo",            8 => "Ranura prismática",
             5 => "Atributos",               2 => "Daño de arma",            6 => "DPS",                     4 => "Defensa"
@@ -1116,6 +1120,7 @@ $lang = array(
         'types'         => ['Sin usar', 'Taberna', 'Teletransportador', 'Objetivo de misión', 'Activador inteligente', 'Script']
     ),
     'gameObject' => array(
+        'id'            => "ID de Entidad: ",
         'notFound'      => "Esta entidad no existe.",
         'cat'           => [0 => "Otros", 3 => "Contenedores", 6 => "Trampas", 9 => "Libros", 25 => "Bancos de peces", -5 => "Cofres", -3 => "Hierbas", -4 => "Venas de minerales", -2 => "Misiones", -6 => "Herramientas"],
         'type'          => [              3 => "Contenedore",  6 => "",        9 => "Libro",  25 => "",                -5 => "Cofre",  -3 => "Hierba",  -4 => "Filóne de mineral",  -2 => "Misión",   -6 => ""],
@@ -1148,6 +1153,7 @@ $lang = array(
         )
     ),
     'npc' => array(
+        'id'            => "ID de PNJ: ",
         'notFound'      => "Este PNJ no existe.",
         'classification'=> "Clasificación: %s",
         'petFamily'     => "Familia de mascota: ",
@@ -1243,6 +1249,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'id'            => "ID de Suceso mundial: ",
         'notFound'      => "Este evento del mundo no existe.",
         'start'         => "Empieza: ",
         'end'           => "Termina: ",
@@ -1251,6 +1258,7 @@ $lang = array(
         'category'      => ["Sin categoría", "Vacacionales", "Periódicos", "Jugador contra Jugador"]
     ),
     'achievement' => array(
+        'id'            => "ID de Logro: ",
         'notFound'      => "Este logro no existe.",
         'criteria'      => "Requisitos",
         'points'        => "Puntos",
@@ -1309,9 +1317,11 @@ $lang = array(
         )
     ),
     'chrClass' => array(
+        'id'            => "ID de Clase: ",
         'notFound'      => "Esta clase no existe."
     ),
     'race' => array(
+        'id'            => "ID de Raza: ",
         'notFound'      => "Esta raza no existe.",
         'racialLeader'  => "Lider racial: ",
         'startZone'     => "Zona de inicio",
@@ -1349,6 +1359,7 @@ $lang = array(
         )
     ),
     'zone' => array(
+        'id'            => "ID de Zona: ",
         'notFound'      => "Esta zona no existe.",
         'attunement'    => ["Requisito: ", "Requisito heroica: "],
         'key'           => ["Llave: ", "Llave heroica: "],
@@ -1377,6 +1388,7 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'id'            => "ID de Misión: ",
         'notFound'      => "Esta misión no existe.",
         '_transfer'     => 'Esta misión será convertido a <a href="?quest=%d" class="q1">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'questLevel'    => 'Nivel %s',
@@ -1514,6 +1526,7 @@ $lang = array(
         'notFound'      => "Este icono no existe."
     ),
     'title' => array(
+        'id'            => "ID de Título: ",
         'notFound'      => "Este título no existe.",
         '_transfer'     => 'Este título será convertido a <a href="?title=%d" class="q1">%s</a> si lo transfieres a la <span class="icon-%s">%s</span>.',
         'cat'           => array(
@@ -1521,6 +1534,7 @@ $lang = array(
         )
     ),
     'skill' => array(
+        'id'            => "ID de Habilidad: ",
         'notFound'      => "Esta habilidad no existe.",
         'cat'           => array(
             -6 => "Compañeros",         -5 => "Monturas",           -4 => "Habilidades de raza", 5 => "Atributos",          6 => "Habilidades con armas", 7 => "Habilidades de clase", 8 => "Armaduras disponibles",
@@ -1528,6 +1542,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'id'            => "ID de Moneda: ",
         'notFound'      => "Esta moneda no existe.",
         'cap'           => "Límite total: ",
         'cat'           => array(
@@ -1549,6 +1564,7 @@ $lang = array(
         )
     ),
     'mail' => array(
+        'id'            => "ID de Correo: ",
         'notFound'      => "Este correo no existe.",
         'attachment'    => "Adjunto",
         'mailDelivery'  => "Usted recibirá esta carta%s%s",
@@ -1559,12 +1575,14 @@ $lang = array(
         'untitled'      => "Correo sin título #%d"
     ),
     'pet'      => array(
+        'id'            => "ID de Familia de mascotas: ",
         'notFound'      => "Esta familia de mascotas no existe.",
         'exotic'        => "Exótica",
         'cat'           => ["Ferocidad", "Tenacidad", "Astucia"],
         'food'          => ["Carne", "Pescado", "Queso", "Pan", "Hongo", "Fruta", "Carne cruda", "Pescado crudo"]
     ),
     'faction' => array(
+        'id'            => "ID de Facción: ",
         'notFound'      => "Esta facción no existe.",
         'spillover'     => "Excedente de reputación",
         'spilloverDesc' => "Ganar reputación con esta facción tambien una proporción ganada con las facciones listadas a continuación.",
@@ -1580,6 +1598,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'id'            => "ID de Conjunto de objetos: ",
         'notFound'      => "Este conjunto de objetos no existe.",
         '_desc'         => "<b>%s</b> es el <b>%s</b>. Contiene %s piezas.",
         '_descTagless'  => "<b>%s</b> es un conjunto de objetos que tiene %s piezas.",
@@ -1605,6 +1624,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'id'            => "ID de Hechizo: ",
         'notFound'      => "Este hechizo no existe.",
         '_spellDetails' => "Detalles de hechizos",
         '_cost'         => "Costo",
@@ -2168,6 +2188,7 @@ $lang = array(
         )
     ),
     'item' => array(
+        'id'            => "ID de Objeto: ",
         'notFound'      => "Este objeto no existe.",
         'armor'         => "%s armadura",
         'block'         => "%s bloqueo",

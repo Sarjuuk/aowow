@@ -4908,6 +4908,8 @@ var LANG = {
     copied:            'Скопировано',
     clickToCopy:       'Нажмите, чтобы скопировать',
     nothingToCopy_tip: 'Нет данных для копирования!',
+    copy_clipboard:    'Скопировать',
+    copy_format:       'Скопировать %s',
 
     // TC conditions display
     tab_conditions:    '[Conditions]',

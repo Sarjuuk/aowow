@@ -236,6 +236,8 @@ $lang = array(
         'atCaptain'     => "Arena Team Captain",
         'atSize'        => "Size: ",
         'profiler'      => "Character Profiler",
+        'completion'    => "Completion: ",
+        'attainedBy'    => "Attained by %d%% of profiles",
         'notFound'      => array(
             'guild'     => "This Guild doesn't exist or is not yet in the database.",
             'arenateam' => "This Arena Team doesn't exist or is not yet in the database.",
@@ -1070,6 +1072,7 @@ $lang = array(
         'posts'         => "Forum posts: "
     ),
     'emote' => array(
+        'id'            => "Emote ID: ",
         'notFound'      => "This Emote doesn't exist.",
 //      'self'          => "To Yourself",
 //      'target'        => "To others with a target",
@@ -1102,9 +1105,10 @@ $lang = array(
         'state'         => ['Oneshot', 'Continuous State', 'Continuous Emote']
     ),
     'enchantment' => array(
+        'id'            => "Enchantment ID: ",
+        'notFound'      => "This enchantment doesn't exist.",
         'details'       => "Details",
         'activation'    => "Activation",
-        'notFound'      => "This enchantment doesn't exist.",
         'types'         => array(
             1 => "Proc Spell",              3 => "Equip Spell",             7 => "Use Spell",               8 => "Prismatic Socket",
             5 => "Statistics",              2 => "Weapon Damage",           6 => "DPS",                     4 => "Defense"
@@ -1116,6 +1120,7 @@ $lang = array(
         'types'         => ['Unused', 'Tavern', 'Teleporter', 'Quest Objective', 'Smart Trigger', 'Script']
     ),
     'gameObject' => array(
+        'id'            => "Object ID: ",
         'notFound'      => "This object doesn't exist.",
         'cat'           => [0 => "Other", 3 => "Containers", 6 => "Traps", 9 => "Books", 25 => "Fishing Pools", -5 => "Chests", -3 => "Herbs", -4 => "Mineral Veins", -2 => "Quest", -6 => "Tools"],
         'type'          => [              3 => "Container",  6 => "",      9 => "Book",  25 => "",              -5 => "Chest",  -3 => "Herb",  -4 => "Mineral Vein",  -2 => "Quest", -6 => ""],         // used for tooltip
@@ -1148,6 +1153,7 @@ $lang = array(
         )
     ),
     'npc' => array(
+        'id'            => "NPC ID: ",
         'notFound'      => "This NPC doesn't exist.",
         'classification'=> "Classification: %s",
         'petFamily'     => "Pet familiy: ",
@@ -1243,6 +1249,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'id'            => "World Event ID: ",
         'notFound'      => "This world event doesn't exist.",
         'start'         => "Start: ",
         'end'           => "End: ",
@@ -1251,6 +1258,7 @@ $lang = array(
         'category'      => ["Uncategorized", "Holidays", "Recurring", "Player vs. Player"]
     ),
     'achievement' => array(
+        'id'            => "Achievement ID: ",
         'notFound'      => "This achievement doesn't exist.",
         'criteria'      => "Criteria",
         'points'        => "Points",
@@ -1309,9 +1317,11 @@ $lang = array(
         )
     ),
     'chrClass' => array(
+        'id'            => "Class ID: ",
         'notFound'      => "This class doesn't exist."
     ),
     'race' => array(
+        'id'            => "Race ID: ",
         'notFound'      => "This race doesn't exist.",
         'racialLeader'  => "Racial leader: ",
         'startZone'     => "Starting zone",
@@ -1349,6 +1359,7 @@ $lang = array(
         )
     ),
     'zone' => array(
+        'id'            => "Zone ID: ",
         'notFound'      => "This zone doesn't exist.",
         'attunement'    => ["Attunement: ", "Heroic attunement: "],
         'key'           => ["Key: ", "Heroic key: "],
@@ -1377,6 +1388,7 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'id'            => "Quest ID: ",
         'notFound'      => "This quest doesn't exist.",
         '_transfer'     => 'This quest will be converted to <a href="?quest=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'questLevel'    => "Level %s",
@@ -1514,6 +1526,7 @@ $lang = array(
         'notFound'      => "This icon doesn't exist."
     ),
     'title' => array(
+        'id'            => "Title ID: ",
         'notFound'      => "This title doesn't exist.",
         '_transfer'     => 'This title will be converted to <a href="?title=%d" class="q1">%s</a> if you transfer to <span class="icon-%s">%s</span>.',
         'cat'           => array(
@@ -1521,6 +1534,7 @@ $lang = array(
         )
     ),
     'skill' => array(
+        'id'            => "Skill ID: ",
         'notFound'      => "This skill doesn't exist.",
         'cat'           => array(
             -6 => "Companions",         -5 => "Mounts",             -4 => "Racial Traits",      5 => "Attributes",          6 => "Weapon Skills",       7 => "Class Skills",        8 => "Armor Proficiencies",
@@ -1528,6 +1542,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'id'            => "Currency ID: ",
         'notFound'      => "This currency doesn't exist.",
         'cap'           => "Total cap: ",
         'cat'           => array(
@@ -1549,6 +1564,7 @@ $lang = array(
         )
     ),
     'mail' => array(
+        'id'            => "Mail ID: ",
         'notFound'      => "This mail doesn't exist.",
         'attachment'    => "Attachment",
         'mailDelivery'  => 'You will receive <a href="?mail=%d">this letter</a>%s%s',
@@ -1559,12 +1575,14 @@ $lang = array(
         'untitled'      => "Untitled Mail #%d"
     ),
     'pet'      => array(
+        'id'            => "Pet family ID: ",
         'notFound'      => "This pet family doesn't exist.",
         'exotic'        => "Exotic",
         'cat'           => ["Ferocity", "Tenacity", "Cunning"],
         'food'          => ["Meat", "Fish", "Cheese", "Bread", "Fungus", "Fruit", "Raw Meat", "Raw Fish"] // ItemPetFood.dbc
     ),
     'faction' => array(
+        'id'            => "Faction ID: ",
         'notFound'      => "This faction doesn't exist.",
         'spillover'     => "Reputation Spillover",
         'spilloverDesc' => "Gaining reputation with this faction also yields a proportional gain with the factions listed below.",
@@ -1580,6 +1598,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'id'            => "Item Set ID: ",
         'notFound'      => "This item set doesn't exist.",
         '_desc'         => "<b>%s</b> is the <b>%s</b>. It contains %s pieces.",
         '_descTagless'  => "<b>%s</b> is an item set that contains %s pieces.",
@@ -1605,6 +1624,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'id'            => "Spell ID: ",
         'notFound'      => "This spell doesn't exist.",
         '_spellDetails' => "Spell Details",
         '_cost'         => "Cost",
@@ -2168,6 +2188,7 @@ $lang = array(
         )
     ),
     'item' => array(
+        'id'            => "Item ID: ",
         'notFound'      => "This item doesn't exist.",
         'armor'         => "%s Armor",                      // ARMOR_TEMPLATE
         'block'         => "%s Block",                      // SHIELD_BLOCK_TEMPLATE

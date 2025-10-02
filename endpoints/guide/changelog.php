@@ -33,7 +33,7 @@ class GuideChangelogResponse extends TemplateResponse
         if (!$guide->canBeViewed() && !$guide->userCanView())
             $this->forward('?guides='.$guide->getField('category'));
 
-        $this->h1 = lang::guide('clTitle', [$this->_get['id'], $guide->getField('title')]);
+        $this->h1 = Lang::guide('clTitle', [$this->_get['id'], $guide->getField('title')]);
         if (!$this->h1)
             $this->h1 = $guide->getField('name');
 

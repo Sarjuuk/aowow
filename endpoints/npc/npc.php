@@ -194,6 +194,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->getField('npcflag') & (NPC_FLAG_SPIRIT_HEALER | NPC_FLAG_SPIRIT_GUIDE))
             $infobox[] = Lang::npc('extraFlags', CREATURE_FLAG_EXTRA_GHOST_VISIBILITY);
 
+        // id
+        $infobox[] = Lang::npc('id') . $this->typeId;
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
             // AI

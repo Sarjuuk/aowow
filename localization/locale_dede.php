@@ -236,6 +236,8 @@ $lang = array(
         'atCaptain'     => "Teamkapitän",
         'atSize'        => "Größe: ",
         'profiler'      => "Charakter-Profiler",
+        'completion'    => "Vervollständigung: ",
+        'attainedBy'    => "Erlangt von %d%% der Profile",
         'notFound'      => array(
             'guild'     => "Diese Gilde existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
             'arenateam' => "Dieses Arena Team existiert nicht oder wurde noch nicht in die Datenbank übernommen.",
@@ -1070,6 +1072,7 @@ $lang = array(
         'posts'         => "Forenbeiträge: "
     ),
     'emote' => array(
+        'id'            => "Emote-ID: ",
         'notFound'      => "Dieses Emote existiert nicht.",
 //      'self'          => "An Euch selbst",
 //      'target'        => "An Andere mit Ziel",
@@ -1102,9 +1105,10 @@ $lang = array(
         'state'         => ['Einmalig', 'Stetiger Zustand', 'Stetiges Emote']
     ),
     'enchantment' => array(
+        'id'            => "Verzauberungs-ID: ",
+        'notFound'      => "Diese Verzauberung existiert nicht.",
         'details'       => "Details",
         'activation'    => "Aktivierung",
-        'notFound'      => "Diese Verzauberung existiert nicht.",
         'types'         => array(
             1 => "Zauber (Auslösung)",      3 => "Zauber (Anlegen)",        7 => "Zauber (Benutzen)",       8 => "Prismatischer Sockel",
             5 => "Statistik",               2 => "Waffenschaden",           6 => "DPS",                     4 => "Verteidigung"
@@ -1116,6 +1120,7 @@ $lang = array(
         'types'         => ['Unbenutzt', 'Gasthaus', 'Teleporter', 'Questziel', 'Smarter Trigger', 'Script']
     ),
     'gameObject' => array(
+        'id'            => "Objekt-ID: ",
         'notFound'      => "Dieses Objekt existiert nicht.",
         'cat'           => [0 => "Anderes", 3 => "Behälter", 6 => "Fallen", 9 => "Bücher", 25 => "Fischschwärme", -5 => "Truhen", -3 => "Kräuter", -4 => "Erzadern",     -2 => "Quest", -6 => "Werkzeuge"],
         'type'          => [                3 => "Behälter", 6 => "",       9 => "Buch",   25 => "",              -5 => "Truhe",  -3 => "Kraut",   -4 => "Erzvorkommen", -2 => "Quest", -6 => ""],
@@ -1148,6 +1153,7 @@ $lang = array(
         )
     ),
     'npc' => array(
+        'id'            => "NPC-ID: ",
         'notFound'      => "Dieser NPC existiert nicht.",
         'classification'=> "Einstufung: %s",
         'petFamily'     => "Tierart: ",
@@ -1243,6 +1249,7 @@ $lang = array(
         )
     ),
     'event' => array(
+        'id'            => "Weltereignis-ID: ",
         'notFound'      => "Dieses Weltereignis existiert nicht.",
         'start'         => "Anfang: ",
         'end'           => "Ende: ",
@@ -1251,6 +1258,7 @@ $lang = array(
         'category'      => ["Nicht kategorisiert", "Feiertage", "Wiederkehrend", "Spieler vs. Spieler"]
     ),
     'achievement' => array(
+        'id'            => "Erfolgs-ID: ",
         'notFound'      => "Dieser Erfolg existiert nicht.",
         'criteria'      => "Kriterien",
         'points'        => "Punkte",
@@ -1309,9 +1317,11 @@ $lang = array(
         )
     ),
     'chrClass' => array(
+        'id'            => "Klassen-ID: ",
         'notFound'      => "Diese Klasse existiert nicht."
     ),
     'race' => array(
+        'id'            => "Volks-ID: ",
         'notFound'      => "Dieses Volk existiert nicht.",
         'racialLeader'  => "Volksanführer: ",
         'startZone'     => "Startgebiet",
@@ -1349,6 +1359,7 @@ $lang = array(
         )
     ),
     'zone' => array(
+        'id'            => "Gebiets-ID: ",
         'notFound'      => "Dieses Gebiet existiert nicht.",
         'attunement'    => ["Einstimmung: ", "Heroische Einstimmung: "],
         'key'           => ["Schlüssel: ", "Heroischer Schlüssel: "],
@@ -1377,6 +1388,7 @@ $lang = array(
         )
     ),
     'quest' => array(
+        'id'            => "Quest-ID: ",
         'notFound'      => "Diese Quest existiert nicht.",
         '_transfer'     => 'Dieses Quest wird mit <a href="?quest=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'questLevel'    => "Stufe %s",
@@ -1514,6 +1526,7 @@ $lang = array(
         'notFound'      => "Dieses Icon existiert nicht."
     ),
     'title' => array(
+        'id'            => "Titel-ID: ",
         'notFound'      => "Dieser Titel existiert nicht.",
         '_transfer'     => 'Dieser Titel wird mit <a href="?title=%d" class="q1">%s</a> vertauscht, wenn Ihr zur <span class="icon-%s">%s</span> wechselt.',
         'cat'           => array(
@@ -1521,6 +1534,7 @@ $lang = array(
         )
     ),
     'skill' => array(
+        'id'            => "Fertigkeits-ID: ",
         'notFound'      => "Diese Fertigkeit existiert nicht.",
         'cat'           => array(
             -6 => "Haustiere",          -5 => "Reittiere",          -4 => "Völkerfertigkeiten", 5 => "Attribute",           6 => "Waffenfertigkeiten",  7 => "Klassenfertigkeiten", 8 => "Rüstungssachverstand",
@@ -1528,6 +1542,7 @@ $lang = array(
         )
     ),
     'currency' => array(
+        'id'            => "Währungs-ID: ",
         'notFound'      => "Diese Währung existiert nicht.",
         'cap'           => "Obergrenze: ",
         'cat'           => array(
@@ -1549,6 +1564,7 @@ $lang = array(
         )
     ),
     'mail' => array(
+        'id'            => "Brief-ID: ",
         'notFound'      => "Dieser Brief existiert nicht.",
         'attachment'    => "Anlage",
         'mailDelivery'  => 'Ihr werdet <a href="?mail=%d">diesen Brief</a>%s%s erhalten',
@@ -1559,12 +1575,14 @@ $lang = array(
         'untitled'      => "Unbetitelter Brief #%d"
     ),
     'pet'      => array(
+        'id'            => "Tierart-ID: ",
         'notFound'      => "Diese Tierart existiert nicht.",
         'exotic'        => "Exotisch",
         'cat'           => ["Wildheit", "Hartnäckigkeit", "Gerissenheit"],
         'food'          => ["Fleisch", "Fisch", "Käse", "Brot", "Fungus", "Obst", "Rohes Fleisch", "Roher Fisch"]
     ),
     'faction' => array(
+        'id'            => "Fraktions-ID: ",
         'notFound'      => "Diese Fraktion existiert nicht.",
         'spillover'     => "Reputationsüberlauf",
         'spilloverDesc' => "Für diese Fraktion erhaltener Ruf wird zusätzlich mit den unten aufgeführten Fraktionen anteilig verrechnet.",
@@ -1580,6 +1598,7 @@ $lang = array(
         )
     ),
     'itemset' => array(
+        'id'            => "Ausrüstungsset-ID: ",
         'notFound'      => "Dieses Ausrüstungsset existiert nicht.",
         '_desc'         => "<b>%s</b> ist das <b>%s</b>. Es enthält %s Teile.",
         '_descTagless'  => "<b>%s</b> ist ein Ausrüstungsset, das %s Teile enthält.",
@@ -1605,6 +1624,7 @@ $lang = array(
         )
     ),
     'spell' => array(
+        'id'            => "Zauber-ID: ",
         'notFound'      => "Dieser Zauber existiert nicht.",
         '_spellDetails' => "Zauberdetails",
         '_cost'         => "Kosten",
@@ -2168,6 +2188,7 @@ $lang = array(
         )
     ),
     'item' => array(
+        'id'            => "Gegenstands-ID: ",
         'notFound'      => "Dieser Gegenstand existiert nicht .",
         'armor'         => "%s Rüstung",
         'block'         => "%s Blocken",

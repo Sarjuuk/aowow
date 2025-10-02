@@ -96,6 +96,26 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('side'))
             $infobox[] = Lang::main('side').'[span class=icon-'.($_ == SIDE_ALLIANCE ? 'alliance' : 'horde').']'.Lang::game('si', $_).'[/span]';
 
+        // id
+        $infobox[] = Lang::faction('id') . $this->typeId;
+
+        // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
+        if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        {
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_reputation WHERE `standing` >= ?d AND `factionId` = ?d', 42000, $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL');
+            $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
+
+            // - js component missing;
+            // - can't yet assign styles to li element
+            // if (User::getPinnedCharacter())
+                // $infobox[] = Lang::profiler('completion') . '[span class="compact-completion-display"][/span]'; // [li style="display:none"]...[/li]
+        }
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 

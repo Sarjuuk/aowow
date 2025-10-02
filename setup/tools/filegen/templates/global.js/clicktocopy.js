@@ -23,7 +23,7 @@ $WH.clickToCopy = function (el, textOrFn, opt)
         $WH.clickToCopy.getTooltip.bind(null, false, opt),
         undefined,
         // {
-        /* byCursor: */ !opt.attachToElement,
+        /* byCursor: ! */ opt.attachToElement,
         // stopPropagation: opt.overrideOtherTooltips
         // }
     );

@@ -94,6 +94,9 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // id
+        $infobox[] = Lang::emote('id') . $this->typeId;
+
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
 

@@ -88,9 +88,16 @@ class EventBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Lang::npc('rank', 3).Lang::main('colon').'[npc='.$_.']';
         }
 
-        // display internal id to staff
-        if (User::isInGroup(U_GROUP_STAFF))
-            $infobox[] = 'Event-Id'.Lang::main('colon').$this->typeId;
+        // id
+        $infobox[] = Lang::event('id') . $this->typeId;
+
+        // display holiday id to staff
+        if ($_holidayId && User::isInGroup(U_GROUP_STAFF))
+            $infobox[] = 'Holiday ID'.Lang::main('colon').$_holidayId;
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');

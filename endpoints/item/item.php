@@ -103,10 +103,13 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 SIDE_BOTH     => Lang::game('si', SIDE_BOTH)
             };
 
+        // id
+        $infobox[] = Lang::item('id') . $this->typeId;
+
         // icon
         if ($_ = $this->subject->getField('iconId'))
         {
-            $infobox[] = Util::ucFirst(lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
             $this->extendGlobalIds(Type::ICON, $_);
         }
 
@@ -315,6 +318,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // fits into keyring
         if ($_bagFamily & 0x0100)
             $infobox[] = Lang::item('atKeyring');
+
+        // original name
+        if (Lang::getLocale() != Locale::EN)
+            $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');

@@ -465,6 +465,90 @@ var Markup = {
                 return [str, '</span>'];
             }
         },
+        copy:
+        {
+            empty: false,
+            attr:
+            {
+                unnamed: { req: false },
+                button:  { req: false, valid: /^false$/ },
+                size:    { req: false, valid: /^large$/ }
+            },
+            allowedClass: MARKUP_CLASS_STAFF,
+            allowedChildren: { '<text>': 1 },
+         // invisibleContent: true,
+         // rawText: true,
+            toHtml: function(attr)
+            {
+                let title = attr.unnamed ? LANG.copy_format.replace('%s', attr.unnamed) : LANG.copy_clipboard;
+             // let text  = attr._contents.textContent;
+                let text  = attr._textContents;
+
+             // aowow - can't access dom nodes from here .. hopefully this does not become relevant
+             // while (attr._contents.hasChildNodes())
+             //     attr._contents.removeChild(attr._contents.firstChild);
+
+                if (attr.button === 'false')
+                {
+                 // aowow - must return string, not node
+                 // let span = $WH.ce('span', { className: 'tip' }, $WH.ct(text));
+                 // $WH.clickToCopy(span, text);
+                 // return span;
+
+                    let rand = Math.random().toString().substr(2);
+                    let html = '<span class="tip" id="ctc-' + rand + '">';
+                    setTimeout(() => {
+                        span = $WH.ge('ctc-' + rand);
+                        $WH.clickToCopy(span, span.textContent);
+                    }, 500);
+
+                    return [html, '</span>'];
+                }
+
+             /* aowow - red buttons aren't <input type=button> yet
+              * let btn = $WH.ce('button', { className: 'btn btn-site fa fa-clipboard', type: 'button' }, $WH.ct(title));
+              *
+              * if (attr.size !== 'large')
+              *     btn.classList.add('btn-small');
+              *
+              * $WH.aE(btn, 'click', () => {
+              *     $WH.copyToClipboard(text);
+              *     btn.classList.remove('fa-clipboard');
+              *     btn.classList.add('fa-check');
+              *     setTimeout(() => {
+              *         btn.classList.remove('fa-check');
+              *         btn.classList.add('fa-clipboard');
+              *     }, 3 * 1000);
+              * });
+              *
+              * return btn;
+              */
+
+                let rand = Math.random().toString().substr(2);
+                let btn = RedButton.create(title);
+
+                btn.id = 'ctc-' + rand;
+                btn.classList.add('fa-clipboard');
+
+                btn.style.float   = 'initial';
+                btn.style.display = 'inline-block';
+
+                setTimeout(() => {
+                    btn = $WH.ge('ctc-' + rand);
+                    $WH.aE(btn, 'click', () => {
+                        $WH.copyToClipboard(text);
+                        btn.classList.remove('fa-clipboard');
+                        btn.classList.add('fa-check');
+                        setTimeout(() => {
+                            btn.classList.remove('fa-check');
+                            btn.classList.add('fa-clipboard');
+                        }, 3 * 1000);
+                    }, 500);
+                });
+
+                return [btn.outerHTML];
+            }
+        },
         currency:
         {
             empty: true,
