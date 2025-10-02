@@ -470,7 +470,7 @@ class PageTemplate
     private function update() : void
     {
         // analytics + consent
-        if (!isset($_COOKIE['consent']))
+        if ($this->analyticsTag && !isset($_COOKIE['consent']))
         {
             $this->addScript(SC_CSS_FILE, 'css/consent.css');
             $this->addScript(SC_JS_FILE,  'js/consent.js');
