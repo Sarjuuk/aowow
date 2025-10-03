@@ -227,6 +227,26 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // tab: modified by [spell]
+        $conditions = array(
+            'OR',
+            ['AND', ['effect1AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect1MiscValue', $this->typeId]],
+            ['AND', ['effect2AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect2MiscValue', $this->typeId]],
+            ['AND', ['effect3AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect3MiscValue', $this->typeId]]
+        );
+        $modBy = new SpellList($conditions);
+        if (!$modBy->error)
+        {
+            $this->extendGlobalData($modBy->getJSGlobals());
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data'       => $modBy->getListviewData(),
+                'id'         => 'modified-by',
+                'name'       => '$LANG.tab_modifiedby',
+                'hiddenCols' => ['skill'],
+            ), SpellList::$brickFile));
+        }
+
         // tab: spells [spells] (exclude first tab)
         $reqClass  = 0x0;
         $reqRace   = 0x0;

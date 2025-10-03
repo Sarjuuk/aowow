@@ -1892,6 +1892,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
                         case SPELL_AURA_MOD_LANGUAGE:
+                        case SPELL_AURA_COMPREHEND_LANGUAGE:
                             if ($_ = Lang::game('languages', $effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.$effMV);
                             break;
@@ -1967,8 +1968,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                             if ($_ = Lang::getMagicSchools($effMV))
                                 $_nameMV = $this->fmtStaffTip($_, 'MiscValue: '.Util::asHex($effMV));
                             break;
-                        case SPELL_AURA_MOD_SKILL:
-                        case SPELL_AURA_MOD_SKILL_TALENT:
+                        case SPELL_AURA_MOD_SKILL:                            // temp
+                        case SPELL_AURA_MOD_SKILL_TALENT:                     // perm
+                            $valueFmt = '%+d';
                             if ($a = SkillList::makeLink($effMV))
                                 $_nameMV = $a;
                             else
