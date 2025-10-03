@@ -533,7 +533,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $soldItems = new ItemList(array(['id', $sells]));
             if (!$soldItems->error)
             {
-                $colAddIn  = null;
+                $colAddIn  = '';
                 $extraCols = ["\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
                 $lvData = $soldItems->getListviewData(ITEMINFO_VENDOR, [Type::NPC => [$this->typeId]]);
