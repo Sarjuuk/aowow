@@ -217,7 +217,7 @@ class TemplateResponse extends BaseResponse
         if (!$this->result)
             $this->dataLoader = array_merge($this->dataLoader, $dataFiles);
         else
-            $this->result->addDataLoader($dataFiles);
+            $this->result->addDataLoader(...$dataFiles);
     }
 
     public static function pageStatsHook(Template\PageTemplate &$pt, array &$stats) : void
