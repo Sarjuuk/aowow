@@ -910,7 +910,11 @@ class SpellList extends DBTypeList
         $formula = preg_replace('/(\+|-|\*|\/)(\+|-|\*|\/)/i', '\1 \2', $formula);
 
         // there should not be any letters without a leading $
-        return eval('return '.$formula.';');
+        try { $formula =  eval('return '.$formula.';'); }
+        // but there can be if we are non-interactive
+        catch (\Throwable $e) { }
+
+        return $formula;
     }
 
     // description-, buff-parsing component
