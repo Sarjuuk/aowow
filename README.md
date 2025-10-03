@@ -1,9 +1,8 @@
 ![logo](static/images/logos/home.png)
 
-
 ## Build Status
-![fuck it ship it](http://forthebadge.com/images/badges/fuck-it-ship-it.svg)
 
+![fuck it ship it](http://forthebadge.com/images/badges/fuck-it-ship-it.svg)
 
 ## Introduction
 
@@ -15,57 +14,81 @@ This is a complete rewrite of the serverside php code and update to the clientsi
 I myself take no credit for the clientside scripting, design and layout that these php-scripts cater to.
 Also, this project is not meant to be used for commercial purposes of any kind!
 
-
 ## Requirements
 
-+ Webserver running PHP ≥ 8.2 including extensions:
-  + [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
-  + [GD](https://www.php.net/manual/en/book.image)
-  + [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
-  + [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
-  + [File Information](https://www.php.net/manual/en/book.fileinfo.php)
-  + [Internationalization](https://www.php.net/manual/en/book.intl.php)
-  + [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
-+ MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
-+ [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101) (no other other providers are supported at this time)
-+ WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
-+ Tools require cmake: Please refer to the individual repositories for detailed information
-  + [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
-  + WIN users may find it easier to use these alternatives
-     + [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / (optional: [BLPConverter](https://github.com/PatrickCyr/BLPConverter))
+- Webserver running PHP ≥ 8.2 including extensions:
+  - [SimpleXML](https://www.php.net/manual/en/book.simplexml.php)
+  - [GD](https://www.php.net/manual/en/book.image)
+  - [MySQL Improved](https://www.php.net/manual/en/book.mysqli.php)
+  - [Multibyte String](https://www.php.net/manual/en/book.mbstring.php)
+  - [File Information](https://www.php.net/manual/en/book.fileinfo.php)
+  - [Internationalization](https://www.php.net/manual/en/book.intl.php)
+  - [GNU Multiple Precision](https://www.php.net/manual/en/book.gmp.php) (When using TrinityCore as auth source)
+- MySQL ≥ 5.7.0 OR MariaDB ≥ 10.6.4 OR similar
+- [TDB 335.21101](https://github.com/TrinityCore/TrinityCore/releases/tag/TDB335.21101) (no other other providers are supported at this time)
+- WIN: php.exe needs to be added to the `PATH` system variable, if it isn't already. 
+- Tools require cmake: Please refer to the individual repositories for detailed information
+  - [MPQExtractor](https://github.com/Sarjuuk/MPQExtractor) / [FFmpeg](https://ffmpeg.org/download.html) / (optional: [BLPConverter](https://github.com/Sarjuuk/BLPConverter))
+  - WIN users may find it easier to use these alternatives
+     - [MPQEditor](http://www.zezula.net/en/mpq/download.html) / [FFmpeg](http://ffmpeg.zeranoe.com/builds/) / (optional: [BLPConverter](https://github.com/PatrickCyr/BLPConverter))
 
 audio processing may require [lame](https://sourceforge.net/projects/lame/files/lame/3.99/) or [vorbis-tools](https://www.xiph.org/downloads/) (which may require libvorbis (which may require libogg))
 
-
 #### Highly Recommended
-+ setting the following configuration values on your TrinityCore server will greatly increase the accuracy of spawn points
+
+- setting the following configuration values on your TrinityCore server will greatly increase the accuracy of spawn points
   > Calculate.Creature.Zone.Area.Data = 1  
   > Calculate.Gameobject.Zone.Area.Data = 1
 
-
 ## Install
+### 1. Acquire the required repositories
 
-#### 1. Acquire the required repositories
-`git clone git@github.com:Sarjuuk/aowow.git aowow`  
-`git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor`  
+```sh
+git clone git@github.com:Sarjuuk/aowow.git aowow
+git clone git@github.com:Sarjuuk/MPQExtractor.git MPQExtractor
+```
 
-#### 2. Prepare the database  
+### 2. Prepare the database  
+
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
 Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
-#### 3. Server created files
+### 3. Server created files
+
 See to it, that the web server is able to write the following directories and their children. If they are missing, the setup will create them with appropriate permissions
- * `cache/`
- * `config/`
- * `static/download/`
- * `static/widgets/`
- * `static/js/`
- * `static/uploads/`
- * `static/images/wow/`
- * `datasets/`  
- 
-#### 4. Extract the client archives (MPQs)
-Extract the following directories from the client archives into `setup/mpqdata/`, while maintaining patch order (base mpq -> patch-mpq: 1 -> 9 -> A -> Z). The required paths are scattered across the archives. Overwrite older files if asked to.  
+
+- `cache/`
+- `config/`
+- `static/download/`
+- `static/widgets/`
+- `static/js/`
+- `static/uploads/`
+- `static/images/wow/`
+- `datasets/`
+
+### 4. Extract the client archives (MPQs)
+
+Extract the following directories from the client archives into `setup/mpqdata/`,
+while maintaining patch order (base mpq -> patch-mpq: 1 -> 9 -> A -> Z).
+The required paths are scattered across the archives. Overwrite older files if asked to.  
+
+```sh
+WOW_DIR='/.../World Of Warcraft 3.3.5a'
+OUT_DIR='/.../aowow/setup/mpqdata'
+locale='enUS'
+
+mkdir -p "$OUT_DIR"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/common.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/common-2.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/expansion.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/lichking.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/patch.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/patch-2.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/patch-3.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/$locale/backup-$locale.MPQ" -e "*"
+MPQExtractor -f -c -o "$OUT_DIR" "$WOW_DIR/Data/$locale/base-$locale.MPQ" -e "*"
+```
+
    .. for every locale you are going to use:
    > \<localeCode>/DBFilesClient/  
    > \<localeCode>/Interface/WorldMap/  
@@ -87,16 +110,86 @@ Extract the following directories from the client archives into `setup/mpqdata/`
    > \<localeCode>/Interface/Glues/Loadingscreens/  
    > \<localeCode>/Interface/Glues/Credits/  
 
-#### 5. Reencode the audio files
+### 5. Reencode the audio files
+
 WAV-files need to be reencoded as `ogg/vorbis` and some MP3s may identify themselves as `application/octet-stream` instead of `audio/mpeg`.  
  * [example for WIN](https://gist.github.com/Sarjuuk/d77b203f7b71d191509afddabad5fc9f)  
  * [example for \*nix](https://gist.github.com/Sarjuuk/1f05ef2affe49a7e7ca0fad7b01c081d)
 
-#### 6. Run the initial setup from the CLI
-`php aowow --setup`.  
+### 6. Run the initial setup from the CLI
+
+```sh
+php aowow --setup
+```
+
 This should guide you through with minimal input required from your end, but will take some time though, especially compiling the zone-images. Use it to familiarize yourself with the other functions this setup has. Yes, I'm dead serious: *Go read the code!* It will help you understand how to configure AoWoW and keep it in sync with your world database.  
 When you've created your admin account you are done.
 
+## Run with Docker
+
+Configure settings for first time:
+
+1. Create environment settings files:
+   ```sh
+   cp .env.aowow.dist .env.aowow
+   cp .env.mysql.dist .env.mysql
+   ```
+   Typically, `.env.mysql` is not required for production, because database server is hosted somewhere outside the docker.
+
+   > [!NOTE]
+   > You don't need to change `config/config.php` file, it will be overwritten with a special file, which
+   > takes required credentials from the environment. See `docker/aowow/src/config/config.php` for details.
+2. Edit `.env.*` files according to your environment, or leave as-is if environment is development.
+3. Optionally: setup path to mpqdata for `aowow` service in `compose.dev.yaml` file:
+   Replace this part of code:
+   ```yaml
+   # fixme optionally: change to directory with extracted mpq data
+   - setup_aowow:/var/www/html/setup/mpqdata:rw
+   # - /Users/md/Downloads/aowow-data/setup/mpqdata:/var/www/html/setup/mpqdata:ro
+   ```
+   with this (change `/.../aowow/setup/mpqdata` to path with your actual data):
+   ```yaml
+   - /.../aowow/setup/mpqdata:/var/www/html/setup/mpqdata:ro
+   ```
+
+Run application:
+
+```sh
+## for development:
+docker compose up -f compose.yaml -f compose.dev.yaml
+
+## for production:
+docker compose up
+```
+
+> [!NOTE]
+> First launch starts application initialization (database dumps download, loading dumps into database, downloading game data, extract media/info, etc ...)
+> It may take long time (up to 30 minutes and more). Please, be patient.
+> 
+> If it's required to skip initialization at first launch, then set `SETUP_SKIP` option value to `1`.
+
+Then web-application should be accessible at <http://172.28.0.10>.
+
+> [!NOTE]
+> First launch may fail for some reason (e.g. fail to download data, slow network & healthcheck fail),
+> it's recommended to rebuild containers for initialization scripts invocation.
+
+Rebuild only aowow service (don't wipe database data):
+
+```sh
+docker container rm aowow-aowow-1
+docker volume rm aowow_setup_aowow 
+docker compose -f compose.yaml -f compose.dev.yaml up --build  
+```
+
+Full rebuild (wipe all data):
+
+```sh
+docker container rm aowow-mysql-1 aowow-aowow-1 
+docker volume rm aowow_data_mysql aowow_data_aowow aowow_setup_aowow 
+# docker volume rm aowow_setup_mysql  # ... contains trinitycore SQL dumps, typically it's never required to be removed 
+docker compose -f compose.yaml -f compose.dev.yaml up --build  
+```
 
 ## Troubleshooting
 
