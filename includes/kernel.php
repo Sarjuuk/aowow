@@ -149,6 +149,11 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
         default                   => 'UNKNOWN_ERROR'        // errors not in this list can not be handled by set_error_handler (as per documentation) or are ignored
     };
 
+    if (!empty($_POST['password']))
+        $_POST['password'] = '******';
+    if (!empty($_POST['c_password']))
+        $_POST['c_password'] = '******';
+
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
@@ -165,6 +170,11 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
 // handle exceptions
 set_exception_handler(function (\Throwable $e) : void
 {
+    if (!empty($_POST['password']))
+        $_POST['password'] = '******';
+    if (!empty($_POST['c_password']))
+        $_POST['c_password'] = '******';
+
     if (DB::isConnected(DB_AOWOW))
         DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
             AOWOW_REVISION, $e->getCode(), $e->getFile(), $e->getLine(), CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e->getMessage()
@@ -188,6 +198,11 @@ register_shutdown_function(function() : void
 
     if ($e = error_get_last())
     {
+        if (!empty($_POST['password']))
+            $_POST['password'] = '******';
+        if (!empty($_POST['c_password']))
+            $_POST['c_password'] = '******';
+
         if (DB::isConnected(DB_AOWOW))
             DB::Aowow()->query('INSERT INTO ?_errors (`date`, `version`, `phpError`, `file`, `line`, `query`, `post`, `userGroups`, `message`) VALUES (UNIX_TIMESTAMP(), ?d, ?d, ?, ?d, ?, ?, ?d, ?) ON DUPLICATE KEY UPDATE `date` = UNIX_TIMESTAMP()',
                 AOWOW_REVISION, $e['type'], $e['file'], $e['line'], CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $e['message']
