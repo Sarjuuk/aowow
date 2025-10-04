@@ -625,7 +625,14 @@ class TemplateResponse extends BaseResponse
         // as this may be loaded from cache, it will be unlinked from its response
         if ($ptJSG = $this->result->jsGlobals)
         {
-            Util::mergeJsGlobals($ptJSG, $this->jsGlobals);
+            foreach ($this->jsGlobals as $type => [, $data, ])
+            {
+                if (!isset($ptJSG[$type]) || $type == Type::USER)
+                    $ptJSGs[$type] = $this->jsGlobals[$type];
+                else
+                    Util::mergeJsGlobals($ptJSG[$type][1], $data);
+            }
+
             $this->result->jsGlobals = $ptJSG;
         }
         else if ($this->jsGlobals)
