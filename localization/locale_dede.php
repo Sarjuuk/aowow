@@ -651,10 +651,14 @@ $lang = array(
 /* 80*/     SmartEvent::EVENT_SCENE_CANCEL            => null,
             SmartEvent::EVENT_SCENE_COMPLETE          => null,
             SmartEvent::EVENT_SUMMONED_UNIT_DIES      => ['Durch mich beschworener (%1$d)?[npc=%1$d]:NPC; stirbt', 'Abklingzeit: %s'],
-            SmartEvent::EVENT_ON_SPELL_CAST           => ['Bei \'cast success\' von [spell=%1$d] ', 'Abklingzeit: %s'],
-            SmartEvent::EVENT_ON_SPELL_FAILED         => ['Bei \'cast failed\' von [spell=%1$d] ', 'Abklingzeit: %s'],
-            SmartEvent::EVENT_ON_SPELL_START          => ['Bei \'cast start\' von [spell=%1$d] ', 'Abklingzeit: %s'],
+            SmartEvent::EVENT_ON_SPELL_CAST           => ['Bei \'cast success\' von [spell=%1$d]', 'Abklingzeit: %s'],
+            SmartEvent::EVENT_ON_SPELL_FAILED         => ['Bei \'cast failed\' von [spell=%1$d]', 'Abklingzeit: %s'],
+            SmartEvent::EVENT_ON_SPELL_START          => ['Bei \'cast start\' von [spell=%1$d]', 'Abklingzeit: %s'],
             SmartEvent::EVENT_ON_DESPAWN              => ['Beim Verschwinden', ''],
+            SmartEvent::EVENT_SEND_EVENT_TRIGGER      => null,
+            SmartEvent::EVENT_AREATRIGGER_EXIT        => null,
+            SmartEvent::EVENT_ON_AURA_APPLIED         => ['Wenn Aura [spell=%1$d] angewendet wird', 'Abklingzeit: %s'],
+            SmartEvent::EVENT_ON_AURA_REMOVED         => ['Wenn Aura [spell=%1$d] endet', 'Abklingzeit: %s']
         ),
         'eventFlags'    => array(
             SmartEvent::FLAG_NO_REPEAT     => 'Nicht wiederholbar',

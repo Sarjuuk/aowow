@@ -655,6 +655,10 @@ $lang = array(
             SmartEvent::EVENT_ON_SPELL_FAILED         => ['Al fallar [spell=%1$d]', 'Enfriamiento: %s'],
             SmartEvent::EVENT_ON_SPELL_START          => ['Al comenzar a lanzar [spell=%1$d]', 'Enfriamiento: %s'],
             SmartEvent::EVENT_ON_DESPAWN              => ['Al desaparecer', ''],
+            SmartEvent::EVENT_SEND_EVENT_TRIGGER      => null,
+            SmartEvent::EVENT_AREATRIGGER_EXIT        => null,
+            SmartEvent::EVENT_ON_AURA_APPLIED         => ['Al aplicar el aura [spell=%1$d]', 'Enfriamiento: %s'],
+            SmartEvent::EVENT_ON_AURA_REMOVED         => ['Al eliminar el aura [spell=%1$d]', 'Enfriamiento: %s']
         ),
         'eventFlags'    => array(
             SmartEvent::FLAG_NO_REPEAT     => 'Sin repetir',

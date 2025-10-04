@@ -98,6 +98,10 @@ class SmartEvent
     public const EVENT_ON_SPELL_FAILED         = 84;        // On Unit::InterruptSpell
     public const EVENT_ON_SPELL_START          = 85;        // On Spell::prapare
     public const EVENT_ON_DESPAWN              = 86;        // On before creature removed
+    public const EVENT_SEND_EVENT_TRIGGER      = 87;        // [RESERVED] UNUSED NEEDS CHERRYPICK
+    public const EVENT_AREATRIGGER_EXIT        = 88;        // [RESERVED] don't use on 3.3.5a
+    public const EVENT_ON_AURA_APPLIED         = 89;        //
+    public const EVENT_ON_AURA_REMOVED         = 90;        //
 
     public const FLAG_NO_REPEAT        = 0x0001;
     public const FLAG_DIFFICULTY_0     = 0x0002;
@@ -198,7 +202,11 @@ class SmartEvent
         self::EVENT_ON_SPELL_CAST           => [Type::SPELL,                  ['numRange', -1, true],     null,                   null,                   null, 0], // SpellID, CooldownMin, CooldownMax
         self::EVENT_ON_SPELL_FAILED         => [Type::SPELL,                  ['numRange', -1, true],     null,                   null,                   null, 0], // SpellID, CooldownMin, CooldownMax
         self::EVENT_ON_SPELL_START          => [Type::SPELL,                  ['numRange', -1, true],     null,                   null,                   null, 0], // SpellID, CooldownMin, CooldownMax
-        self::EVENT_ON_DESPAWN              => [null,                         null,                       null,                   null,                   null, 0]  // NONE
+        self::EVENT_ON_DESPAWN              => [null,                         null,                       null,                   null,                   null, 0], // NONE
+        self::EVENT_SEND_EVENT_TRIGGER      => [null,                         null,                       null,                   null,                   null, 2], // UNUSED NEEDS CHERRYPICK
+        self::EVENT_AREATRIGGER_EXIT        => [null,                         null,                       null,                   null,                   null, 2], // don't use on 3.3.5a
+        self::EVENT_ON_AURA_APPLIED         => [Type::SPELL,                  ['numRange', -1, true],     null,                   null,                   null, 0], // SpellID, CooldownMin, CooldownMax
+        self::EVENT_ON_AURA_REMOVED         => [Type::SPELL,                  ['numRange', -1, true],     null,                   null,                   null, 0]  // SpellID, CooldownMin, CooldownMax
     );
 
     private array $jsGlobals = [];

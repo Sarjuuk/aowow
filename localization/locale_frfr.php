@@ -655,6 +655,10 @@ $lang = array(
             SmartEvent::EVENT_ON_SPELL_FAILED         => ['On [spell=%1$d] cast failed', 'Cooldown: %s'],
             SmartEvent::EVENT_ON_SPELL_START          => ['On [spell=%1$d] cast start', 'Cooldown: %s'],
             SmartEvent::EVENT_ON_DESPAWN              => ['On despawn', ''],
+            SmartEvent::EVENT_SEND_EVENT_TRIGGER      => null,
+            SmartEvent::EVENT_AREATRIGGER_EXIT        => null,
+            SmartEvent::EVENT_ON_AURA_APPLIED         => ['On aura [spell=%1$d] applied', 'Cooldown: %s'],
+            SmartEvent::EVENT_ON_AURA_REMOVED         => ['On aura [spell=%1$d] removed', 'Cooldown: %s']
         ),
         'eventFlags'    => array(
             SmartEvent::FLAG_NO_REPEAT     => 'No Repeat',
