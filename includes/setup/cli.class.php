@@ -152,24 +152,14 @@ abstract class CLI
             if ($timestamp)
                 $msg = str_pad(date('H:i:s'), 10);
 
-            switch ($lvl)
+            $msg .= match ($lvl)
             {
-                case self::LOG_ERROR:                       // red      critical error
-                    $msg .= '['.self::red('ERR').']   ';
-                    break;
-                case self::LOG_WARN:                        // yellow   notice
-                    $msg .= '['.self::yellow('WARN').']  ';
-                    break;
-                case self::LOG_OK:                          // green    success
-                    $msg .= '['.self::green('OK').']    ';
-                    break;
-                case self::LOG_INFO:                        // blue     info
-                    $msg .= '['.self::blue('INFO').']  ';
-                    break;
-                case self::LOG_BLANK:
-                    $msg .= '        ';
-                    break;
-            }
+                self::LOG_ERROR => '['.self::red('ERR').']   ',    // red      critical error
+                self::LOG_WARN  => '['.self::yellow('WARN').']  ', // yellow   notice
+                self::LOG_OK    => '['.self::green('OK').']    ',  // green    success
+                self::LOG_INFO  => '['.self::blue('INFO').']  ',   // blue     info
+                default         => '        '
+            };
 
             $msg .= $txt;
         }

@@ -546,22 +546,17 @@ class StatsContainer implements \Countable
             case ENCHANTMENT_TYPE_STAT:                     // ITEM_MOD_*
                 return [Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $object)];
             case ENCHANTMENT_TYPE_RESISTANCE:
-                if ($object == SPELL_SCHOOL_NORMAL)
-                    return [Stat::ARMOR];
-                if ($object == SPELL_SCHOOL_HOLY)
-                    return [Stat::HOLY_RESISTANCE];
-                if ($object == SPELL_SCHOOL_FIRE)
-                    return [Stat::FIRE_RESISTANCE];
-                if ($object == SPELL_SCHOOL_NATURE)
-                    return [Stat::NATURE_RESISTANCE];
-                if ($object == SPELL_SCHOOL_FROST)
-                    return [Stat::FROST_RESISTANCE];
-                if ($object == SPELL_SCHOOL_SHADOW)
-                    return [Stat::SHADOW_RESISTANCE];
-                if ($object == SPELL_SCHOOL_ARCANE)
-                    return [Stat::ARCANE_RESISTANCE];
-
-                return [];
+                return match ($object)
+                {
+                    SPELL_SCHOOL_NORMAL => [Stat::ARMOR],
+                    SPELL_SCHOOL_HOLY   => [Stat::HOLY_RESISTANCE],
+                    SPELL_SCHOOL_FIRE   => [Stat::FIRE_RESISTANCE],
+                    SPELL_SCHOOL_NATURE => [Stat::NATURE_RESISTANCE],
+                    SPELL_SCHOOL_FROST  => [Stat::FROST_RESISTANCE],
+                    SPELL_SCHOOL_SHADOW => [Stat::SHADOW_RESISTANCE],
+                    SPELL_SCHOOL_ARCANE => [Stat::ARCANE_RESISTANCE],
+                    default             => []
+                };
             case ENCHANTMENT_TYPE_EQUIP_SPELL:              // handled one level up
             case ENCHANTMENT_TYPE_COMBAT_SPELL:             // we do not average effects, so skip
             case ENCHANTMENT_TYPE_USE_SPELL:
@@ -602,20 +597,15 @@ class StatsContainer implements \Countable
         switch ($auraId)
         {
             case SPELL_AURA_MOD_STAT:
-                if ($miscValue < 0)                        // all stats
-                    return [Stat::AGILITY, Stat::STRENGTH, Stat::INTELLECT, Stat::SPIRIT, Stat::STAMINA];
-                if ($miscValue == STAT_STRENGTH)           // one stat
-                    return [Stat::STRENGTH];
-                if ($miscValue == STAT_AGILITY)
-                    return [Stat::AGILITY];
-                if ($miscValue == STAT_STAMINA)
-                    return [Stat::STAMINA];
-                if ($miscValue == STAT_INTELLECT)
-                    return [Stat::INTELLECT];
-                if ($miscValue == STAT_SPIRIT)
-                    return [Stat::SPIRIT];
-
-                return [];                                  // one bullshit
+                return match ($miscValue)
+                {
+                    STAT_STRENGTH  => [Stat::STRENGTH],
+                    STAT_AGILITY   => [Stat::AGILITY],
+                    STAT_STAMINA   => [Stat::STAMINA],
+                    STAT_INTELLECT => [Stat::INTELLECT],
+                    STAT_SPIRIT    => [Stat::SPIRIT],
+                    default        => $miscValue < 0 ? [Stat::AGILITY, Stat::STRENGTH, Stat::INTELLECT, Stat::SPIRIT, Stat::STAMINA] : []
+                };
             case SPELL_AURA_MOD_INCREASE_HEALTH:
             case SPELL_AURA_MOD_INCREASE_HEALTH_NONSTACK:
             case SPELL_AURA_MOD_INCREASE_HEALTH_2:
@@ -629,27 +619,16 @@ class StatsContainer implements \Countable
                 if ($miscValue == SPELL_MAGIC_SCHOOLS)
                     return [Stat::DAMAGE_SPELL_POWER];
 
-                // HolySpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_HOLY))
                     $stats[] = Stat::HOLY_SPELL_POWER;
-
-                // FireSpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_FIRE))
                     $stats[] = Stat::FIRE_SPELL_POWER;
-
-                // NatureSpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_NATURE))
                     $stats[] = Stat::NATURE_SPELL_POWER;
-
-                // FrostSpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_FROST))
                     $stats[] = Stat::FROST_SPELL_POWER;
-
-                // ShadowSpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_SHADOW))
                     $stats[] = Stat::SHADOW_SPELL_POWER;
-
-                // ArcaneSpellpower (deprecated; still used in randomproperties)
                 if ($miscValue & (1 << SPELL_SCHOOL_ARCANE))
                     $stats[] = Stat::ARCANE_SPELL_POWER;
 
@@ -657,16 +636,14 @@ class StatsContainer implements \Countable
             case SPELL_AURA_MOD_HEALING_DONE:               // not as a mask..
                 return [Stat::HEALING_SPELL_POWER];
             case SPELL_AURA_MOD_INCREASE_ENERGY:            // MiscVal:type see defined Powers only energy/mana in use
-                if ($miscValue == POWER_ENERGY)
-                    return [Stat::ENERGY];
-                if ($miscValue == POWER_RAGE)
-                    return [Stat::RAGE];
-                if ($miscValue == POWER_MANA)
-                    return [Stat::MANA];
-                if ($miscValue == POWER_RUNIC_POWER)
-                    return [Stat::RUNIC_POWER];
-
-                return [];
+                return match ($miscValue)
+                {
+                    POWER_ENERGY      => [Stat::ENERGY],
+                    POWER_RAGE        => [Stat::RAGE],
+                    POWER_MANA        => [Stat::MANA],
+                    POWER_RUNIC_POWER => [Stat::RUNIC_POWER],
+                    default           => []
+                };
             case SPELL_AURA_MOD_RATING:
             case SPELL_AURA_MOD_RATING_FROM_STAT:
                 if ($stat = self::convertCombatRating($miscValue))

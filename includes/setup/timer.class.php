@@ -8,9 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 class Timer
 {
-    private $t_cur = 0;
-    private $t_new = 0;
-    private $intv  = 0;
+    private float $t_cur = 0;
+    private float $t_new = 0;
+    private float $intv  = 0;
 
     public function __construct(int $intervall)
     {

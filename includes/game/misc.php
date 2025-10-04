@@ -8,15 +8,15 @@ if (!defined('AOWOW_REVISION'))
 
 class Game
 {
-    public static $resistanceFields         = array(
+    public static array $resistanceFields         = array(
         null,           'resHoly',      'resFire',      'resNature',    'resFrost',     'resShadow',    'resArcane'
     );
 
-    public static $rarityColorStings        = array(        // zero-indexed
+    public static array $rarityColorStings        = array(  // zero-indexed
         '9d9d9d',       'ffffff',       '1eff00',       '0070dd',       'a335ee',       'ff8000',       'e5cc80',       'e6cc80'
     );
 
-    public static $specIconStrings          = array(
+    public static array $specIconStrings          = array(
         -1 =>  'inv_misc_questionmark',
          0 =>  'spell_nature_elementalabsorption',
          6 => ['spell_deathknight_bloodpresence', 'spell_deathknight_frostpresence', 'spell_deathknight_unholypresence' ],
@@ -48,7 +48,7 @@ class Game
 
     // zoneorsort for quests need updating
     // partially points non-instanced area with identical name for instance quests
-    public static $questSortFix             = array(
+    public static array $questSortFix             = array(
         -221 => 440,                                        // Treasure Map => Tanaris
         -284 => 0,                                          // Special => Misc (some quests get shuffled into seasonal)
         151  => 0,                                          // Designer Island => Misc
@@ -86,7 +86,7 @@ class Game
         1417 => 1477                                        // Sunken Temple
     );
 
-    public static $questSubCats             = array(
+    public static array $questSubCats             = array(
         1    => [132],                                      // Dun Morogh: Coldridge Valley
         12   => [9],                                        // Elwynn Forest: Northshire Valley
         141  => [188],                                      // Teldrassil: Shadowglen
@@ -113,7 +113,7 @@ class Game
         Because this is more or less the only reaonable way to fit all that information into one database field, so..
         .. the indizes of this array are bits of skillLine2OrMask in ?_spell if skillLineId1 is negative
     */
-    public static $skillLineMask            = array(        // idx => [familyId, skillLineId]
+    public static array $skillLineMask            = array(  // idx => [familyId, skillLineId]
         -1 => array(                                        // Pets (Hunter)
             [ 1, 208],          [ 2, 209],          [ 3, 203],          [ 4, 210],          [ 5, 211],          [ 6, 212],          [ 7, 213],  // Wolf,       Cat,          Spider,       Bear,        Boar,      Crocolisk,    Carrion Bird
             [ 8, 214],          [ 9, 215],          [11, 217],          [12, 218],          [20, 236],          [21, 251],          [24, 653],  // Crab,       Gorilla,      Raptor,       Tallstrider, Scorpid,   Turtle,       Bat
@@ -129,31 +129,31 @@ class Game
         )
     );
 
-    public static $sockets                  = array(        // jsStyle Strings
+    public static array $sockets                  = array(  // jsStyle Strings
         'meta',                         'red',                          'yellow',                       'blue'
     );
 
-    public static function getReputationLevelForPoints($pts)
+    public static function getReputationLevelForPoints(int $pts) : int
     {
         if ($pts >= 41999)
             return REP_EXALTED;
-        else if ($pts >= 20999)
+        if ($pts >= 20999)
             return REP_REVERED;
-        else if ($pts >= 8999)
+        if ($pts >= 8999)
             return REP_HONORED;
-        else if ($pts >= 2999)
+        if ($pts >= 2999)
             return REP_FRIENDLY;
-        else if ($pts >= 0)
+        if ($pts >= 0)
             return REP_NEUTRAL;
-        else if ($pts >= -3000)
+        if ($pts >= -3000)
             return REP_UNFRIENDLY;
-        else if ($pts >= -6000)
+        if ($pts >= -6000)
             return REP_HOSTILE;
-        else
-            return REP_HATED;
+
+        return REP_HATED;
     }
 
-    public static function getTaughtSpells(&$spell)
+    public static function getTaughtSpells(mixed &$spell) : array
     {
         $extraIds = [-1];                                    // init with -1 to prevent empty-array errors
         $lookup   = [-1];
