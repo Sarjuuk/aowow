@@ -47,7 +47,7 @@ class CommentDownvotereplyResponse extends TextResponse
             User::canSupervote() ? -2 : -1
         );
 
-        if (!$ok)
+        if (!is_int($ok))
         {
             trigger_error('CommentDownvotereplyResponse - write to db failed', E_USER_ERROR);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'write to db failed' : '');
