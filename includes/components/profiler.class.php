@@ -8,10 +8,10 @@ if (!defined('AOWOW_REVISION'))
 
 class Profiler
 {
-    public const PID_FILE     = 'config/pr-queue-pid';
-    public const CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20;    // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
+    public const /* string */ PID_FILE     = 'config/pr-queue-pid';
+    public const /* int    */ CHAR_GMFLAGS = 0x1 | 0x8 | 0x10 | 0x20; // PLAYER_EXTRA_ :: GM_ON | TAXICHEAT | GM_INVISIBLE | GM_CHAT
 
-    public const REGIONS = array(                           // see cfg_categories.dbc
+    public const /* array  */ REGIONS      = array(         // see cfg_categories.dbc
         'us' => [2, 3, 4, 5],                               // US (us, oceanic, latin america, americas - tournament)
         'kr' => [6, 7],                                     // KR (kr, tournament)
         'eu' => [8, 9, 10, 11, 12, 13],                     // EU (english, german, french, spanish, russian, eu - tournament)
@@ -20,9 +20,9 @@ class Profiler
        'dev' => [1, 26, 27, 28, 30]                         // Development, Test Server, Test Server - tournament, QA Server, Test Server 2
     );
 
-    private static $realms  = [];
+    private static array $realms  = [];
 
-    public static $slot2InvType = array(
+    public static array $slot2InvType = array(
         1  => [INVTYPE_HEAD],                               // head
         2  => [INVTYPE_NECK],                               // neck
         3  => [INVTYPE_SHOULDERS],                          // shoulder
@@ -44,7 +44,7 @@ class Profiler
         19 => [INVTYPE_TABARD],                             // tabard
     );
 
-    public static $raidProgression = array( // statisticAchievement => relevantCriterium ; don't forget to enable this in /js/Profiler.js as well
+    public static array $raidProgression = array( // statisticAchievement => relevantCriterium ; don't forget to enable this in /js/Profiler.js as well
         1361 => 5100, 1362 => 5101, 1363 => 5102, 1365 => 5104, 1366 => 5108, 1364 => 5110, 1369 => 5112, 1370 => 5113, 1371 => 5114, 1372 => 5117, 1373 => 5119, 1374 => 5120, 1375 => 7805, 1376 => 5122, 1377 => 5123,  // Naxxramas 10
         1367 => 5103, 1368 => 5111, 1378 => 5124, 1379 => 5125, 1380 => 5126, 1381 => 5127, 1382 => 5128, 1383 => 7806, 1384 => 5130, 1385 => 5131, 1386 => 5132, 1387 => 5133, 1388 => 5134, 1389 => 5135, 1390 => 5136, // Naxxramas 25
         2856 => 9938, 2857 => 9939, 2858 => 9940, 2859 => 9941, 2861 => 9943, 2865 => 9947, 2866 => 9948, 2868 => 9950, 2869 => 9951, 2870 => 9952, 2863 => 10558, 2864 => 10559, 2862 => 10560, 2867 => 10565, 2860 => 10580, // Ulduar 10
@@ -65,7 +65,7 @@ class Profiler
         4821 => 13466, // Ruby Sanctum 10 nh
     );
 
-    public static function getBuyoutForItem($itemId)
+    public static function getBuyoutForItem(int $itemId) : int
     {
         if (!$itemId)
             return 0;
@@ -75,7 +75,7 @@ class Profiler
         return 0;
     }
 
-    public static function queueStart(&$msg = '')
+    public static function queueStart(?string &$msg = '') : bool
     {
         $queuePID = self::queueStatus();
 
@@ -100,7 +100,7 @@ class Profiler
         }
     }
 
-    public static function queueStatus()
+    public static function queueStatus() : int
     {
         if (!file_exists(self::PID_FILE))
             return 0;
@@ -117,7 +117,7 @@ class Profiler
         return 0;
     }
 
-    public static function queueLock($pid)
+    public static function queueLock(int $pid) : bool
     {
         $queuePID = self::queueStatus();
         if ($queuePID && $queuePID != $pid)
@@ -139,12 +139,12 @@ class Profiler
         return $ok;
     }
 
-    public static function queueFree()
+    public static function queueFree() : void
     {
         unlink(self::PID_FILE);
     }
 
-    public static function urlize($str, $allowLocales = false, $profile = false)
+    public static function urlize(string $str, bool $allowLocales = false, bool $profile = false) : string
     {
         $search  = ['<',    '>',    ' / ', "'"];
         $replace = ['&lt;', '&gt;', '-',   '' ];
@@ -194,7 +194,7 @@ class Profiler
         if (!DB::isConnectable(DB_AUTH) || self::$realms)
             return self::$realms;
 
-        self::$realms = DB::Auth()->select(
+        $realms = DB::Auth()->select(
            'SELECT `id` AS ARRAY_KEY,
                    `name`,
                    CASE WHEN `timezone` BETWEEN  2 AND  5 THEN "us" # US, Oceanic, Latin America, Americas-Tournament
@@ -209,14 +209,14 @@ class Profiler
             WOW_BUILD
         );
 
-        foreach (self::$realms as $rId => &$rData)
+        if (!$realms)
+            return [];
+
+        foreach ($realms as $rId => $rData)
         {
             // realm in db but no connection info set
             if (!DB::isConnectable(DB_CHARACTERS . $rId))
-            {
-                unset(self::$realms[$rId]);
                 continue;
-            }
 
             // filter by access level
             if ($rData['access'] == SEC_ADMINISTRATOR   && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN)))
@@ -226,10 +226,7 @@ class Profiler
             else if ($rData['access'] == SEC_MODERATOR  && (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU)))
                 $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN | U_GROUP_MOD | U_GROUP_BUREAU;
             else if ($rData['access'] > SEC_PLAYER && !CLI)
-            {
-                unset(self::$realms[$rId]);
                 continue;
-            }
 
             // filter dev realms
             if ($rData['region'] === 'dev')
@@ -237,11 +234,10 @@ class Profiler
                 if (CLI || User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))
                     $rData['access'] = U_GROUP_DEV | U_GROUP_ADMIN;
                 else
-                {
-                    unset(self::$realms[$rId]);
                     continue;
-                }
             }
+
+            self::$realms[$rId] = $rData;
         }
 
         return self::$realms;
@@ -255,7 +251,7 @@ class Profiler
         return array_unique(array_column(self::$realms, 'region'));
     }
 
-    private static function queueInsert($realmId, $guid, $type, $localId)
+    private static function queueInsert(int $realmId, int $guid, int $type, int $localId) : void
     {
         if ($rData = DB::Aowow()->selectRow('SELECT `requestTime` AS "time", `status` FROM ?_profiler_sync WHERE `realm` = ?d AND `realmGUID` = ?d AND `type` = ?d AND `typeId` = ?d AND `status` <> ?d', $realmId, $guid, $type, $localId, PR_QUEUE_STATUS_WORKING))
         {
@@ -270,7 +266,7 @@ class Profiler
             DB::Aowow()->query('REPLACE INTO ?_profiler_sync (`realm`, `realmGUID`, `type`, `typeId`, `requestTime`, `status`, `errorCode`) VALUES (?d, ?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, 0)', $realmId, $guid, $type, $localId, PR_QUEUE_STATUS_WAITING);
     }
 
-    public static function scheduleResync($type, $realmId, $guid)
+    public static function scheduleResync(int $type, int $realmId, int $guid) : int
     {
         $newId = 0;
 
@@ -361,7 +357,7 @@ class Profiler
         return Util::toJSON($response);
     }
 
-    public static function getCharFromRealm($realmId, $charGuid)
+    public static function getCharFromRealm(int $realmId, int $charGuid) : bool
     {
         $char = DB::Characters($realmId)->selectRow('SELECT c.* FROM characters c WHERE c.`guid` = ?d', $charGuid);
         if (!$char)
@@ -881,7 +877,7 @@ class Profiler
         return true;
     }
 
-    public static function getGuildFromRealm($realmId, $guildGuid)
+    public static function getGuildFromRealm(int $realmId, int $guildGuid) : bool
     {
         $guild = DB::Characters($realmId)->selectRow('SELECT `guildId`, `name`, `createDate`, `info`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM guild WHERE `guildId` = ?d', $guildGuid);
         if (!$guild)
@@ -948,7 +944,7 @@ class Profiler
         return true;
     }
 
-    public static function getArenaTeamFromRealm($realmId, $teamGuid)
+    public static function getArenaTeamFromRealm(int $realmId, int $teamGuid) : bool
     {
         $team = DB::Characters($realmId)->selectRow('SELECT `arenaTeamId`, `name`, `type`, `captainGuid`, `rating`, `seasonGames`, `seasonWins`, `weekGames`, `weekWins`, `rank`, `backgroundColor`, `emblemStyle`, `emblemColor`, `borderStyle`, `borderColor` FROM arena_team WHERE `arenaTeamId` = ?d', $teamGuid);
         if (!$team)
