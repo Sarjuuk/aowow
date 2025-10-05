@@ -8,20 +8,31 @@ if (!defined('AOWOW_REVISION'))
 
 enum ChrRace : int
 {
-    case HUMAN         = 1;
-    case ORC           = 2;
-    case DWARF         = 3;
-    case NIGHTELF      = 4;
-    case UNDEAD        = 5;
-    case TAUREN        = 6;
-    case GNOME         = 7;
-    case TROLL         = 8;
-    case BLOODELF      = 10;
-    case DRAENEI       = 11;
+    case HUMAN              = 1;
+    case ORC                = 2;
+    case DWARF              = 3;
+    case NIGHTELF           = 4;
+    case UNDEAD             = 5;
+    case TAUREN             = 6;
+    case GNOME              = 7;
+    case TROLL              = 8;
+    case GOBLIN             = 9;
+    case BLOODELF           = 10;
+    case DRAENEI            = 11;
+    case FEL_ORC            = 12;
+    case NAGA               = 13;
+    case BROKEN             = 14;
+    case SKELETON           = 15;
+    case VRYKUL             = 16;
+    case TUSKARR            = 17;
+    case FOREST_TROLL       = 18;
+    case TAUNKA             = 19;
+    case NORTHREND_SKELETON = 20;
+    case ICE_TROLL          = 21;
 
-    public const MASK_ALLIANCE = 0x44D;
-    public const MASK_HORDE    = 0x2B2;
-    public const MASK_ALL      = 0x6FF;
+    public const MASK_ALLIANCE = 0x44D;                     // HUMAN, DWARF, NIGHTELF, GNOME, DRAENEI
+    public const MASK_HORDE    = 0x2B2;                     // ORC, UNDEAD, TAUREN, TROLL, BLOODELF
+    public const MASK_ALL      = self::MASK_ALLIANCE | self::MASK_HORDE;
 
     public function matches(int $raceMask) : bool
     {
@@ -80,7 +91,8 @@ enum ChrRace : int
             self::GNOME    => 'gnome',
             self::TROLL    => 'troll',
             self::BLOODELF => 'bloodelf',
-            self::DRAENEI  => 'draenei'
+            self::DRAENEI  => 'draenei',
+            default        => ''
         };
     }
 
