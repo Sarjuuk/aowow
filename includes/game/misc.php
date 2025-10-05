@@ -268,7 +268,7 @@ class Game
                 };
 
                 // prefix
-                $prefix = '%s ';
+                $prefix = '';
                 if ($t['talkType'] != 4)
                     $prefix = ($talkSource ?: '%s').' '.Lang::npc('textTypes', $t['talkType']).Lang::main('colon').($t['lang'] ? '['.Lang::game('languages', $t['lang']).'] ' : ' ');
 
