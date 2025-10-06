@@ -108,7 +108,7 @@ class Search
         {
             $clean = str_replace(['\\', '%'], '', $raw);
 
-            if (!$clean === '')
+            if ($clean === '')
                 continue;
 
             if ($clean[0] == '-')
