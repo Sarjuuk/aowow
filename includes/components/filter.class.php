@@ -452,19 +452,17 @@ abstract class Filter
                 if (!Util::checkNumeric($val, NUM_CAST_INT))
                     return false;
 
-                foreach ($valid as $k => $v)
+                if (in_array($val, $valid))
+                    return true;
+
+                foreach ($valid as $v)
                 {
                     if (gettype($v) != 'array')
                         continue;
 
                     if ($this->checkInput(self::V_RANGE, $v, $val, true))
                         return true;
-
-                    unset($valid[$k]);
                 }
-
-                if (in_array($val, $valid))
-                    return true;
 
                 break;
             case self::V_RANGE:
@@ -486,7 +484,7 @@ abstract class Filter
 
         if (!$recursive)
         {
-            trigger_error('Filter::checkInput - check failed [type: '.$type.' valid: '.((string)$valid).' val: '.((string)$val).']', E_USER_NOTICE);
+            trigger_error('Filter::checkInput - check failed [type: '.$type.' valid: '.Util::toString($valid).' val: '.((string)$val).']', E_USER_NOTICE);
             $this->error = true;
         }
 

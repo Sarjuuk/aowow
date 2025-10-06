@@ -2021,10 +2021,10 @@ class ItemListFilter extends Filter
         'ty'    => [parent::V_CALLBACK, 'cbTypeCheck',                                                       true ], // item type - dynamic by current group
         'sl'    => [parent::V_CALLBACK, 'cbSlotCheck',                                                       true ], // item slot - dynamic by current group
         'si'    => [parent::V_LIST,     [-SIDE_HORDE, -SIDE_ALLIANCE, SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH], false], // side
-        'minle' => [parent::V_RANGE,    [1, 999],                                                            false], // item level min
-        'maxle' => [parent::V_RANGE,    [1, 999],                                                            false], // item level max
-        'minrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                                      false], // required level min
-        'maxrl' => [parent::V_RANGE,    [1, MAX_LEVEL],                                                      false]  // required level max
+        'minle' => [parent::V_RANGE,    [0, 999],                                                            false], // item level min
+        'maxle' => [parent::V_RANGE,    [0, 999],                                                            false], // item level max
+        'minrl' => [parent::V_RANGE,    [0, MAX_LEVEL],                                                      false], // required level min
+        'maxrl' => [parent::V_RANGE,    [0, MAX_LEVEL],                                                      false]  // required level max
     );
 
     public array $extraOpts = [];                           // score for statWeights

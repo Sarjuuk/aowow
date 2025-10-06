@@ -1142,6 +1142,27 @@ abstract class Util
         return $bits;
     }
 
+    public static function toString(mixed $var) : string
+    {
+        if (is_array($var))
+            return '[' . implode(', ', array_map(self::toString(...), $var)) . ']';
+
+        if (is_object($var))
+        {
+         // hm, respect object stringability?
+         // if ($var instanceof Stringable)
+         //     return (string)$var;
+
+            $buff = [];
+            foreach ($var as $k => $v)
+                $buff[] = $k.':'.self::toString($v);
+
+            return '{' . implode(', ', $buff) . '}';
+        }
+
+        return (string)$var;
+    }
+
     public static function buildPosFixMenu(int $mapId, float $posX, float $posY, int $type, int $guid, int $parentArea = 0, int $parentFloor = 0) : array
     {
         $points = WorldPosition::toZonePos($mapId, $posX, $posY);

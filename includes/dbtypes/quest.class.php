@@ -478,10 +478,10 @@ class QuestListFilter extends Filter
         'na'    => [parent::V_REGEX, parent::PATTERN_NAME,                                                false], // name / text - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL, 'on',                                                                false], // also match subname
         'ma'    => [parent::V_EQUAL, 1,                                                                   false], // match any / all filter
-        'minle' => [parent::V_RANGE, [1, 99],                                                             false], // min quest level
-        'maxle' => [parent::V_RANGE, [1, 99],                                                             false], // max quest level
-        'minrl' => [parent::V_RANGE, [1, 99],                                                             false], // min required level
-        'maxrl' => [parent::V_RANGE, [1, 99],                                                             false], // max required level
+        'minle' => [parent::V_RANGE, [0, 99],                                                             false], // min quest level
+        'maxle' => [parent::V_RANGE, [0, 99],                                                             false], // max quest level
+        'minrl' => [parent::V_RANGE, [0, 99],                                                             false], // min required level
+        'maxrl' => [parent::V_RANGE, [0, 99],                                                             false], // max required level
         'si'    => [parent::V_LIST,  [-SIDE_HORDE, -SIDE_ALLIANCE, SIDE_ALLIANCE, SIDE_HORDE, SIDE_BOTH], false], // side
         'ty'    => [parent::V_LIST,  [0, 1, 21, 41, 62, [81, 85], 88, 89],                                true ]  // type
     );

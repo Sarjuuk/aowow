@@ -187,10 +187,10 @@ class ItemsetListFilter extends Filter
         'ma'    => [parent::V_EQUAL, 1,                                               false], // match any / all filter
         'qu'    => [parent::V_RANGE, [0, 7],                                          true ], // quality
         'ty'    => [parent::V_RANGE, [1, 12],                                         true ], // set type
-        'minle' => [parent::V_RANGE, [1, 999],                                        false], // min item level
-        'maxle' => [parent::V_RANGE, [1, 999],                                        false], // max itemlevel
-        'minrl' => [parent::V_RANGE, [1, MAX_LEVEL],                                  false], // min required level
-        'maxrl' => [parent::V_RANGE, [1, MAX_LEVEL],                                  false], // max required level
+        'minle' => [parent::V_RANGE, [0, 999],                                        false], // min item level
+        'maxle' => [parent::V_RANGE, [0, 999],                                        false], // max itemlevel
+        'minrl' => [parent::V_RANGE, [0, MAX_LEVEL],                                  false], // min required level
+        'maxrl' => [parent::V_RANGE, [0, MAX_LEVEL],                                  false], // max required level
         'cl'    => [parent::V_LIST,  [[1, 9], 11],                                    false], // class
         'ta'    => [parent::V_RANGE, [1, 30],                                         false]  // tag / content group
     );

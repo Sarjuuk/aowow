@@ -332,8 +332,8 @@ class CreatureListFilter extends Filter
         'ex'    => [parent::V_EQUAL,    'on',                                                                     false], // also match subname
         'ma'    => [parent::V_EQUAL,    1,                                                                        false], // match any / all filter
         'fa'    => [parent::V_CALLBACK, 'cbPetFamily',                                                            true ], // pet family [list]  -  cat[0] == 1
-        'minle' => [parent::V_RANGE,    [1, 99],                                                                  false], // min level [int]
-        'maxle' => [parent::V_RANGE,    [1, 99],                                                                  false], // max level [int]
+        'minle' => [parent::V_RANGE,    [0, 99],                                                                  false], // min level [int]
+        'maxle' => [parent::V_RANGE,    [0, 99],                                                                  false], // max level [int]
         'cl'    => [parent::V_RANGE,    [0, 4],                                                                   true ], // classification [list]
         'ra'    => [parent::V_LIST,     [-1, 0, 1],                                                               false], // react alliance [int]
         'rh'    => [parent::V_LIST,     [-1, 0, 1],                                                               false]  // react horde [int]

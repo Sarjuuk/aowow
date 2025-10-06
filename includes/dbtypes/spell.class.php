@@ -2527,10 +2527,10 @@ class SpellListFilter extends Filter
         'na'    => [parent::V_REGEX,    parent::PATTERN_NAME,                              false], // name / text - only printable chars, no delimiter
         'ex'    => [parent::V_EQUAL,    'on',                                              false], // extended name search
         'ma'    => [parent::V_EQUAL,    1,                                                 false], // match any / all filter
-        'minle' => [parent::V_RANGE,    [1, 99],                                           false], // spell level min
-        'maxle' => [parent::V_RANGE,    [1, 99],                                           false], // spell level max
-        'minrs' => [parent::V_RANGE,    [1, 999],                                          false], // required skill level min
-        'maxrs' => [parent::V_RANGE,    [1, 999],                                          false], // required skill level max
+        'minle' => [parent::V_RANGE,    [0, 99],                                           false], // spell level min
+        'maxle' => [parent::V_RANGE,    [0, 99],                                           false], // spell level max
+        'minrs' => [parent::V_RANGE,    [0, 999],                                          false], // required skill level min
+        'maxrs' => [parent::V_RANGE,    [0, 999],                                          false], // required skill level max
         'ra'    => [parent::V_LIST,     [[1, 8], 10, 11],                                  false], // races
         'cl'    => [parent::V_CALLBACK, 'cbClasses',                                       true ], // classes
         'gl'    => [parent::V_CALLBACK, 'cbGlyphs',                                        true ], // glyph type
