@@ -278,7 +278,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if (Cfg::get('PROFILER_ENABLE') && !($_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_quests WHERE `questId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL');
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // - js component missing;
