@@ -43,7 +43,7 @@ class User
             $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identification purpose
 
         self::$dataKey = $_SESSION['dataKey'];
-        self::$agent   = $_SERVER['HTTP_USER_AGENT'];
+        self::$agent   = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
         if (!self::$ip)
             return false;
