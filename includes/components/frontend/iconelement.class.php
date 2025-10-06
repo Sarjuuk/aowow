@@ -102,7 +102,7 @@ class IconElement
         }
 
         if ($this->href)
-            ($a = $dom->createElement('a', $this->text))->setAttribute('href', $this->href);
+            ($a = $dom->createElement('a', htmlentities($this->text)))->setAttribute('href', $this->href);
         else
             $a = $dom->createTextNode($this->text);
 
