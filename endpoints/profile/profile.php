@@ -122,7 +122,10 @@ class ProfileBaseResponse extends TemplateResponse
     protected function generate() : void
     {
         if ($this->doResync)
+        {
+            parent::generate();
             return;
+        }
 
         if ($this->typeId)
         {
