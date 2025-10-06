@@ -576,7 +576,7 @@ class Profiler
             // enchantId => multiple spells => multiple items with varying itemlevels, quality, whatevs
             // cant reasonably get to the castItem from enchantId and slot
 
-            $profSpec = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `skillLevel` AS "1", `skillLine` AS "0" FROM ?_itemenchantment WHERE `id` IN (?a)', $permEnch);
+            $profSpec = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `skillLevel` AS "1", `skillLine` AS "0" FROM ?_itemenchantment WHERE `id` IN (?a)', $permEnch);
             foreach ($permEnch as $slot => $eId)
             {
                 if (!isset($profSpec[$eId]))
