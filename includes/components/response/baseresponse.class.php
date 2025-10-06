@@ -645,6 +645,13 @@ abstract class BaseResponse
         return preg_replace('/ +/', ' ', trim($str));
     }
 
+    protected static function checkLocale(string $localeId) : ?Locale
+    {
+        if (Util::checkNumeric($localeId, NUM_CAST_INT))
+            return Locale::tryFrom($localeId);
+        return null;
+    }
+
 
     /********************/
     /* child implements */

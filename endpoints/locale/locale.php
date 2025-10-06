@@ -9,7 +9,7 @@ if (!defined('AOWOW_REVISION'))
 class LocaleBaseResponse extends TextResponse
 {
     protected array $expectedGET = array(
-        'locale' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFrom']]
+        'locale' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkLocale']]
     );
 
     protected function generate() : void

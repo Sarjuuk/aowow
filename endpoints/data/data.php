@@ -9,7 +9,7 @@ if (!defined('AOWOW_REVISION'))
 class DataBaseResponse extends TextResponse
 {
     protected array $expectedGET = array(
-        'locale'   => ['filter' => FILTER_CALLBACK,     'options' => [Locale::class, 'tryFrom']           ],
+        'locale'   => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkLocale'         ]],
         't'        => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkTextLine'       ]],
         'catg'     => ['filter' => FILTER_VALIDATE_INT                                                    ],
         'skill'    => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkSkill'          ]],

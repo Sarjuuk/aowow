@@ -45,7 +45,7 @@ class GuideEditResponse extends TemplateResponse
         'description' => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkDescription']                      ],
         'changelog'   => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkTextBlob']                         ],
         'body'        => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkTextBlob']                         ],
-        'locale'      => ['filter' => FILTER_CALLBACK,     'options' => [Locale::class, 'tryFrom']                             ],
+        'locale'      => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkLocale']                           ],
         'category'    => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' =>  1, 'max_value' => 9]                  ],
         'specId'      => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' => -1, 'max_value' => 2,  'default' => -1]],
         'classId'     => ['filter' => FILTER_VALIDATE_INT, 'options' => ['min_value' =>  1, 'max_value' => 11, 'default' =>  0]]
