@@ -2203,6 +2203,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     {
         $cat = $this->subject->getField('typeCat');
         $cf  = $this->subject->getField('cuFlags');
+        $sl  = $this->subject->getField('skillLines');
 
         $this->breadcrumb[] = $cat;
 
@@ -2224,14 +2225,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                 if ($cat == -13)
                     $this->breadcrumb[] = ($cf & (SPELL_CU_GLYPH_MAJOR | SPELL_CU_GLYPH_MINOR)) >> 6;
-                else
-                    $this->breadcrumb[] = $this->subject->getField('skillLines')[0];
+                else if ($sl)
+                    $this->breadcrumb[] = $sl[0];
 
                 break;
             case   9:
             case  -3:
             case  11:
-                $this->breadcrumb[] = $this->subject->getField('skillLines')[0];
+                if ($sl)
+                    $this->breadcrumb[] = $sl[0];
 
                 if ($cat == 11)
                     if ($_ = $this->subject->getField('reqSpellId'))
@@ -2240,7 +2242,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 break;
             case -11:
                 foreach (SpellList::$skillLines as $line => $skills)
-                    if (in_array($this->subject->getField('skillLines')[0], $skills))
+                    if (in_array($sl[0] ?? [], $skills))
                         $this->breadcrumb[] = $line;
                 break;
             case  -7:                                       // only spells unique in skillLineAbility will always point to the right skillLine :/
@@ -2311,11 +2313,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (in_array($typeCat, [9, 11]))
         {
             // skill
-            if ($_ = $this->subject->getField('skillLines')[0])
+            if ($_ = $this->subject->getField('skillLines'))
             {
-                $this->extendGlobalIds(Type::SKILL, $_);
+                $this->extendGlobalIds(Type::SKILL, $_[0]);
 
-                $bar = Lang::game('requires', ['&nbsp;[skill='.$_.']']);
+                $bar = Lang::game('requires', ['&nbsp;[skill='.$_[0].']']);
                 if ($_ = $this->subject->getField('learnedAt'))
                     $bar .= ' ('.$_.')';
 
