@@ -1006,10 +1006,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             $modes['ranged'][] = sprintf($modeRow, $m, Lang::nf($ranged[0]).' - '.Lang::nf($ranged[1]));
         }
 
+        // todo: resistances can be present/missing in either $stats or $modes
+        // should be handled separately..?
+
         if ($modes)
             foreach ($stats as $k => $v)
                 if ($v)
-                    $stats[$k] = sprintf($hint, implode('[/tr][tr]', $modes[$k]), $v, $k);
+                    $stats[$k] = isset($modes[$k]) ? sprintf($hint, implode('[/tr][tr]', $modes[$k]), $v, $k) : $v;
 
         return $stats;
     }
