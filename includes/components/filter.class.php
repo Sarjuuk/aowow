@@ -335,7 +335,7 @@ abstract class Filter
         if (count($_cr) != count($_crv) || count($_cr) != count($_crs) || count($_cr) > 5 || count($_crs) > 5 /*|| count($_crv) > 5*/)
         {
             // use min provided criterion as basis; 5 criteria at most
-            $min = max(5, min(count($_cr), count($_crv), count($_crs)));
+            $min = min(5, count($_cr), count($_crv), count($_crs));
             if (count($_cr) > $min)
                 array_splice($_cr, $min);
 
