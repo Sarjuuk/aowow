@@ -11,7 +11,7 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type        = Type::ENCHANTMENT;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'enchantments';
     protected  string $pageName    = 'enchantments';

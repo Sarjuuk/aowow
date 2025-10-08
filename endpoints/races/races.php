@@ -11,7 +11,7 @@ class RacesBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type        = Type::CHR_RACE;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'list-page-generic';
     protected  string $pageName    = 'races';

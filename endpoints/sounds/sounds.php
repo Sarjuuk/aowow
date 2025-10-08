@@ -11,7 +11,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type        = Type::SOUND;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'sounds';
     protected  string $pageName    = 'sounds';

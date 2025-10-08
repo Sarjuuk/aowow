@@ -10,7 +10,7 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 {
     use TrDetailPage, TrCache;
 
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template   = 'enchantment';
     protected  string $pageName   = 'enchantment';

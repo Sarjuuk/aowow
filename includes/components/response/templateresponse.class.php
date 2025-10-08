@@ -21,8 +21,7 @@ trait TrDetailPage
     {
         return array(
             $this->type,                                    // DBType
-            $this->typeId,                                  // DBTypeId
-            -1,                                             // category
+            $this->typeId,                                  // DBTypeId/category
             User::$groups,                                  // staff mask
             ''                                              // misc (here unused)
         );
@@ -54,8 +53,7 @@ trait TrListPage
 
         return array(
             $this->type,                                    // DBType
-            -1,                                             // DBTypeId
-            $catg ?? -1,                                    // category
+            $catg ?? -1,                                    // DBTypeId/category
             User::$groups,                                  // staff mask
             $misc ?? ''                                     // misc (here filter)
         );

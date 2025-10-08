@@ -10,7 +10,7 @@ class AreatriggerBaseResponse extends TemplateResponse implements ICache
 {
     use TrDetailPage, TrCache;
 
-    protected  int    $cacheType         = CACHE_TYPE_PAGE;
+    protected  int    $cacheType         = CACHE_TYPE_DETAIL_PAGE;
     protected  int    $requiredUserGroup = U_GROUP_STAFF;
 
     protected  string $template          = 'detail-page-generic';

@@ -10,7 +10,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 {
     use TrDetailPage, TrCache;
 
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template   = 'quest';
     protected  string $pageName   = 'quest';

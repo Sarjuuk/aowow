@@ -8,8 +8,6 @@ if (!defined('AOWOW_REVISION'))
 
 class MapsBaseResponse extends TemplateResponse
 {
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
-
     protected  string $template   = 'maps';
     protected  string $pageName   = 'maps';
     protected ?int    $activeTab  = parent::TAB_TOOLS;

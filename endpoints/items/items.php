@@ -11,7 +11,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type        = Type::ITEM;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'items';
     protected  string $pageName    = 'items';

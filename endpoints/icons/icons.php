@@ -11,7 +11,7 @@ class IconsBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type        = Type::ICON;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'icons';
     protected  string $pageName    = 'icons';

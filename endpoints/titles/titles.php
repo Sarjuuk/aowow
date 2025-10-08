@@ -11,7 +11,7 @@ class TitlesBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type       = Type::TITLE;
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template   = 'list-page-generic';
     protected  string $pageName   = 'titles';

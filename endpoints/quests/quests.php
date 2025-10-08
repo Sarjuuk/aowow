@@ -32,7 +32,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
     );
 
     protected  int    $type        = Type::QUEST;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'quests';
     protected  string $pageName    = 'quests';

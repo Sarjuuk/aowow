@@ -11,7 +11,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type       = Type::ZONE;
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template   = 'list-page-generic';
     protected  string $pageName   = 'zones';

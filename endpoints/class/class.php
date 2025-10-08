@@ -12,7 +12,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
     private const TC_CLASS_IDS = [null, 8, 3, 1, 5, 4, 9, 6, 2, 7, null, 0]; // see TalentCalc.js
 
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template   = 'detail-page-generic';
     protected  string $pageName   = 'class';

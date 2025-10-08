@@ -26,7 +26,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
     );
 
     protected  int    $type        = Type::SPELL;
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_LIST_PAGE;
 
     protected  string $template    = 'spells';
     protected  string $pageName    = 'spells';

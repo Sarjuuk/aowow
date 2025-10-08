@@ -10,7 +10,7 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
 {
     use TrListPage/* , TrCache */;
 
- // protected  int    $cacheType  = CACHE_TYPE_PAGE; // really do? cache would need to be destroyed externally with each guide status update
+ // protected  int    $cacheType  = CACHE_TYPE_LIST_PAGE; // really do? cache would need to be destroyed externally with each guide status update
     protected  int    $type       = Type::GUIDE;
 
     protected  string $template   = 'list-page-generic';

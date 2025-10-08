@@ -14,8 +14,7 @@ trait TrTooltip
     {
         $key = array(
             $this->type,                                    // DBType
-            $this->typeId,                                  // DBTypeId
-            -1,                                             // category
+            $this->typeId,                                  // DBTypeId/category
             User::$groups,                                  // staff mask
             ''                                              // misc (here tooltip)
         );

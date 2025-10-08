@@ -11,7 +11,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
     use TrListPage, TrCache;
 
     protected  int    $type              = Type::AREATRIGGER;
-    protected  int    $cacheType         = CACHE_TYPE_PAGE;
+    protected  int    $cacheType         = CACHE_TYPE_LIST_PAGE;
     protected  int    $requiredUserGroup = U_GROUP_STAFF;
 
     protected  string $template          = 'areatriggers';

@@ -10,7 +10,7 @@ class EmotesBaseResponse extends TemplateResponse implements ICache
 {
     use TrListPage, TrCache;
 
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_LIST_PAGE;
     protected  int    $type       = Type::EMOTE;
 
     protected  string $template   = 'list-page-generic';

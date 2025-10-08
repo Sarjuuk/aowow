@@ -201,9 +201,9 @@ trait TrCache
     {
         $this->initCache();
 
-        // type+typeId+catg; 3+6+10
+        // type+typeId/catg+mode; 3+10+1
         $cKey    = $this->formatCacheKey();
-        $cKey[2] = substr($cKey[2], 0, 19);
+        $cKey[2] = substr($cKey[2], 0, 13);
 
         if ($modeMask & CACHE_MODE_MEMCACHED)
             foreach ($this->memcached()?->getAllKeys() ?? [] as $k)
@@ -265,29 +265,27 @@ trait TrCache
     // https://stackoverflow.com/questions/466521
     private function formatCacheKey() : array
     {
-        [$dbType, $dbTypeId, $category, $staffMask, $miscInfo] = $this->getCacheKeyComponents();
+        [$dbType, $dbTypeIdOrCat, $staffMask, $miscInfo] = $this->getCacheKeyComponents();
 
         $fileKey = '';
         // DBType: 3
         $fileKey .= str_pad(dechex($dbType & 0xFFF), 3, 0, STR_PAD_LEFT);
-        // DBTypeId: 6
-        $fileKey .= str_pad(dechex($dbTypeId & 0xFFFFFF), 6, 0, STR_PAD_LEFT);
-        // category: (2+4+4)
-        $fileKey .= str_pad(dechex($category & 0xFFFFFFFFFF), 2+4+4, 0, STR_PAD_LEFT);
+        // DBTypeId: 6 / category: (2+4+4)
+        $fileKey .= str_pad(dechex($dbTypeIdOrCat & 0xFFFFFFFFFF), 2+4+4, 0, STR_PAD_LEFT);
         // cacheType: 1
         $fileKey .= str_pad(dechex($this->_cacheType & 0xF), 1, 0, STR_PAD_LEFT);
         // localeId: 2,
         $fileKey .= str_pad(dechex(Lang::getLocale()->value & 0xFF), 2, 0, STR_PAD_LEFT);
         // staff mask: 4
         $fileKey .= str_pad(dechex($staffMask & 0xFFFFFFFF), 4, 0, STR_PAD_LEFT);
-        // optioal: miscInfo
+        // optional: miscInfo
         if ($miscInfo)
             $fileKey .= '-'.$miscInfo;
 
         // topDir, 2ndDir, file
         return array(
             str_pad(dechex($dbType & 0xFF), 2, 0, STR_PAD_LEFT),
-            str_pad(dechex(($dbTypeId > 0  ? $dbTypeId : $category) & 0xFF), 2, 0, STR_PAD_LEFT),
+            str_pad(dechex(($dbTypeIdOrCat) & 0xFF), 2, 0, STR_PAD_LEFT),
             $fileKey
         );
     }
@@ -327,8 +325,7 @@ trait TrSearch
     {
         return array(
             -1,                                             // DBType
-            -1,                                             // DBTypeId
-            $this->searchMask,                              // category
+            $this->searchMask,                              // DBTypeId/category
             User::$groups,                                  // staff mask
             md5($this->query)                               // misc (here search query)
         );

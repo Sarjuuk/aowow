@@ -16,7 +16,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                SPELL_AURA_MOD_IGNORE_SHAPESHIFT,  SPELL_AURA_PERIODIC_HASTE,                   SPELL_AURA_OVERRIDE_CLASS_SCRIPTS,
                                SPELL_AURA_MOD_DAMAGE_FROM_CASTER, SPELL_AURA_ADD_TARGET_TRIGGER,            /* SPELL_AURA_DUMMY ? */];
 
-    protected  int    $cacheType   = CACHE_TYPE_PAGE;
+    protected  int    $cacheType   = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template    = 'spell';
     protected  string $pageName    = 'spell';

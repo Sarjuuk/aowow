@@ -16,7 +16,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         [7952,  33554], null,           [16264, 33557], [17584, 33657]
     );
 
-    protected  int    $cacheType  = CACHE_TYPE_PAGE;
+    protected  int    $cacheType  = CACHE_TYPE_DETAIL_PAGE;
 
     protected  string $template   = 'detail-page-generic';
     protected  string $pageName   = 'race';

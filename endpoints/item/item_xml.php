@@ -220,8 +220,7 @@ class ItemXmlResponse extends TextResponse implements ICache
     {
         return array(
             $this->type,                                    // DBType
-            $this->typeId,                                  // DBTypeId
-            -1,                                             // category
+            $this->typeId,                                  // DBTypeId/category
             -1,                                             // staff mask (content does not diff)
             ''                                              // misc (unused)
         );

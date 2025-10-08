@@ -41,6 +41,8 @@ define('CACHE_TYPE_PAGE',                   1);
 define('CACHE_TYPE_TOOLTIP',                2);
 define('CACHE_TYPE_SEARCH',                 3);
 define('CACHE_TYPE_XML',                    4);             // only used by items
+define('CACHE_TYPE_LIST_PAGE',              5);
+define('CACHE_TYPE_DETAIL_PAGE',            6);
 
 define('CACHE_MODE_FILECACHE',              0x1);
 define('CACHE_MODE_MEMCACHED',              0x2);
