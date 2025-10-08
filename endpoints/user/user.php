@@ -42,6 +42,10 @@ class UserBaseResponse extends TemplateResponse
             $this->user = $user;
         else
             $this->generateNotFound(Lang::user('notFound', [$pageParam]));
+
+        // do not display system account
+        if (!$this->user['id'])
+            $this->generateNotFound(Lang::user('notFound', [$pageParam]));
    }
 
     protected function generate() : void
