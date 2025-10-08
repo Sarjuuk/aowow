@@ -70,7 +70,7 @@ if ($this->reputation):
 ?>
                 <h3><?=Lang::main('gains'); ?></h3>
 <?php
-    echo Lang::npc('gainsDesc').Lang::main('colon');
+    echo Lang::npc('gainsDesc');
 
     foreach ($this->reputation as [$mode, $data]):
         if (count($this->reputation) > 1):

@@ -832,7 +832,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $spill[0][1] = $set[1][1] / 2;
 
                 $spillover[$factions->getField('cat')] = $spill;
-                $set[6] = $factions->getField('cat');       // set spillover
+                $set[5] = $factions->getField('cat');       // set spillover
             }
 
             $result[] = $set;
@@ -872,7 +872,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             foreach ($reputation as $i => [, $data])
             {
-                foreach ($data as [$factionId, , , , , , $spillover])
+                foreach ($data as [$factionId, , , , , $spillover])
                 {
                     if (!$spillover)
                         continue;
