@@ -13,7 +13,7 @@
     <div id="layers"></div>
 <?php
 if ($this->homeTitle):
-    echo "    <script>document.title = '".$this->homeTitle."';</script>\n";
+    echo "    <script>document.title = '".addslashes($this->homeTitle)."';</script>\n";
 endif;
 
 if ($this->altHomeLogo):

@@ -1,0 +1,60 @@
+services:
+  mysql:
+    build:
+      dockerfile: Dockerfile
+      # target: mysql-dev
+      target: mariadb-dev
+      context: .
+    volumes:
+      - ./docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - setup_mysql:/usr/local/share/mysql:rw
+      - data_mysql:/var/lib/mysql
+    env_file:
+      - path: .env.mysql
+        required: true
+    networks:
+      default:
+        ipv4_address: 172.28.0.11
+
+  aowow:
+    env_file:
+      - path: .env.aowow
+        required: true
+    build:
+      dockerfile: Dockerfile
+      target: php-dev
+      context: .
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/aowow/src/config/config.php:/var/www/html/config/config.php:ro
+      - ./cache:/var/www/html/cache:rw
+
+      # todo remount as read-only after setup:
+      - ./static/download:/var/www/html/static/download:rw
+      - ./static/css:/var/www/html/static/css:ro
+      - ./static/images:/var/www/html/static/images:rw
+      # - ./static/images/wow:/var/www/html/static/images/wow:rw
+      - ./static/js:/var/www/html/static/js:rw
+      - ./static/uploads:/var/www/html/static/uploads:rw
+      - ./static/widgets:/var/www/html/static/widgets:rw
+      - ./static/wowsounds:/var/www/html/static/wowsounds:rw
+      - ./datasets:/var/www/html/datasets:rw
+
+      # todo remove after setup:
+      - ./docker/aowow/usr/local/bin/initialize.sh:/usr/local/bin/initialize.sh:ro
+      - ./docker/aowow/usr/local/bin/initialize.d:/usr/local/bin/initialize.d:ro
+
+      # fixme optionally: change to directory with extracted mpq data
+      - setup_aowow:/var/www/html/setup/mpqdata:rw
+      # - /Users/.../Downloads/aowow-data/setup/mpqdata:/var/www/html/setup/mpqdata:ro
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  setup_aowow:
+  setup_mysql:
+    # Contains database dump file. Required for aowow.
+    # After setup is done, all data could be wiped, e.g. `find /usr/local/share/ -type f -delete`
+  data_mysql:
+    # Let database data live outside the container.
