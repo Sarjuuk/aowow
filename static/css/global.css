@@ -422,10 +422,12 @@
     padding-left: 21px;
 }
 
+/* aowow - clips in the list marker
 .infobox .guide-sticky {
     position: relative;
     left: -6px;
 }
+*/
 
 #guiderating {
     display: block;

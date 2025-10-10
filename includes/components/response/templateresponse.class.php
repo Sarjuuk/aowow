@@ -418,7 +418,7 @@ class TemplateResponse extends BaseResponse
         if (isset($this->guideRevision))
             $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `type` = ?d AND `typeId` = ?d AND `rev` = ?d',
                 Type::GUIDE, $this->typeId, $this->guideRevision);
-        if (!$article && $this->gPageInfo['articleUrl'])
+        if (!$article && !empty($this->gPageInfo['articleUrl']))
             $article = DB::Aowow()->selectRow('SELECT `article`, `locale`, `editAccess` FROM ?_articles WHERE `url` = ? AND `locale` IN (?a) ORDER BY `locale` DESC, `rev` DESC LIMIT 1',
                 $this->gPageInfo['articleUrl'], [Lang::getLocale()->value, Locale::EN->value]);
         if (!$article && !empty($this->type) && isset($this->typeId))

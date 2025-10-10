@@ -68,12 +68,12 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             $this->contribute = CONTRIBUTE_NONE;
         }
 
-        if ($this->articleUrl)
+        // owner or staff and manual rev passed
+        if ($this->subject->userCanView() && $this->_get['rev'])
+            $this->guideRevision = $this->_get['rev'];
+        // has publicly viewable version
+        else if ($this->subject->canBeViewed())
             $this->guideRevision = $this->subject->getField('rev');
-        else if ($this->subject->userCanView())
-            $this->guideRevision = $this->_get['rev'] ?? $this->subject->getField('latest');
-        else
-            $this->subject->getField('rev');
 
         $this->h1 = $this->subject->getField('name');
 
@@ -127,7 +127,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], __forceTabs: true);
 
-        // the article text itself is added by PageTemplate::addArticle()
+        // the article text itself is added by TemplateResponse::addArticle()
         parent::generate();
 
         $this->result->registerDisplayHook('infobox', [self::class, 'infoboxHook']);
