@@ -32,7 +32,7 @@ class ProfileSaveResponse extends TextResponse
         'copy'         => ['filter' => FILTER_VALIDATE_INT                                             ],
         'public'       => ['filter' => FILTER_VALIDATE_INT                                             ],
         'gearscore'    => ['filter' => FILTER_VALIDATE_INT                                             ],
-        'inv'          => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdListUnsigned'], 'flags' => FILTER_REQUIRE_ARRAY]
+        'inv'          => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkIdList'], 'flags' => FILTER_REQUIRE_ARRAY]
     );
 
     public function __construct(string $pageParam)
@@ -139,6 +139,12 @@ class ProfileSaveResponse extends TextResponse
             {
                 foreach ($this->_post['inv'] as $slot => $itemData)
                 {
+                    if (!$itemData)
+                    {
+                        trigger_error('ProfileSaveResponse::generate - skipping malformed inventory definition for slot #'.$slot.': '.Util::toString($itemData), E_USER_NOTICE);
+                        continue;
+                    }
+
                     if ($slot + 1 == array_sum($itemData))  // only slot definition set => empty slot
                     {
                         DB::Aowow()->query('DELETE FROM ?_profiler_items WHERE `id` = ?d AND `slot` = ?d', $charId, $itemData[0]);
