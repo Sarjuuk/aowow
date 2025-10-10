@@ -61,6 +61,7 @@ class ArenateamBaseResponse extends TemplateResponse
         {
             $subject['realm']   = $this->realmId;
             $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+            $subject['nameUrl'] = Profiler::urlize($subject['name']);
 
             // create entry from realm with basic info
             DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team (?#) VALUES (?a)', array_keys($subject), array_values($subject));

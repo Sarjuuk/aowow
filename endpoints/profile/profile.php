@@ -99,10 +99,10 @@ class ProfileBaseResponse extends TemplateResponse
 
             if ($subject['guildGUID'])
             {
-                // create empty guild if nessecary to satisfy foreign keys
+                // create empty guild if necessary to satisfy foreign keys
                 $subject['guild'] = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $this->realmId, $subject['guildGUID']);
                 if (!$subject['guild'])
-                    $subject['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (`realm`, `realmGUID`, `cuFlags`, `name`) VALUES (?d, ?d, ?d, ?)', $this->realmId, $subject['guildGUID'], PROFILER_CU_NEEDS_RESYNC, $subject['guildName']);
+                    $subject['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (`realm`, `realmGUID`, `cuFlags`, `name`, `nameUrl`) VALUES (?d, ?d, ?d, ?, ?)', $this->realmId, $subject['guildGUID'], PROFILER_CU_NEEDS_RESYNC, $subject['guildName'], Profiler::urlize($subject['guildName']));
             }
 
             unset($subject['guildGUID'], $subject['guildName'], $subject['at_login']);
