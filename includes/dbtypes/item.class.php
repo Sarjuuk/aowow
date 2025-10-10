@@ -1664,7 +1664,7 @@ class ItemList extends DBTypeList
                 $mh = $j;
             else if ($j['id'] == $ohItem)
                 $oh = $j;
-            else if ($j['gearscore'])
+            else if (!empty($j['gearscore']))
             {
                 if ($j['slot'] == INVTYPE_RELIC)
                     $score += 20;
