@@ -626,7 +626,7 @@ class TemplateResponse extends BaseResponse
             foreach ($this->jsGlobals as $type => [, $data, ])
             {
                 if (!isset($ptJSG[$type]) || $type == Type::USER)
-                    $ptJSGs[$type] = $this->jsGlobals[$type];
+                    $ptJSG[$type] = $this->jsGlobals[$type];
                 else
                     Util::mergeJsGlobals($ptJSG[$type][1], $data);
             }
