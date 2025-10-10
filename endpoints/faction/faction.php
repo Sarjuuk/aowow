@@ -228,7 +228,8 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             );
 
             if ($items->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
-                $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
+                if (!is_null(ItemListFilter::getCriteriaIndex(17, $this->typeId)))
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
             $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile, 'itemStandingCol'));
         }
@@ -262,7 +263,8 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                     );
 
                     if ($killCreatures->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
-                        $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
+                        if (!is_null(CreatureListFilter::getCriteriaIndex(42, $this->typeId)))
+                            $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
                     $this->addDataLoader('zones');
                     $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile, 'npcRepCol'));
@@ -283,7 +285,8 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 );
 
                 if ($members->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
-                    $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
+                    if (!is_null(CreatureListFilter::getCriteriaIndex(3, $this->typeId)))
+                        $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
                 $this->addDataLoader('zones');
                 $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
@@ -321,7 +324,8 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             );
 
             if ($quests->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
-                $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
+                if (!is_null(QuestListFilter::getCriteriaIndex(1, $this->typeId)))
+                    $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 
             $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile, 'questRepCol'));
         }
