@@ -323,11 +323,17 @@ trait TrSearch
 
     public function getCacheKeyComponents() : array
     {
+        $misc = $this->query .                              // can be empty for upgrade search
+                serialize($this->_get['wt'] ?? null) .      // extra &_GET not expected for normal and opensearch
+                serialize($this->_get['wtv'] ?? null) .
+                serialize($this->_get['type'] ?? null) .
+                serialize($this->_get['slots'] ?? null);
+
         return array(
             -1,                                             // DBType
             $this->searchMask,                              // DBTypeId/category
             User::$groups,                                  // staff mask
-            md5($this->query)                               // misc (here search query)
+            md5($misc)                                      // misc
         );
     }
 }

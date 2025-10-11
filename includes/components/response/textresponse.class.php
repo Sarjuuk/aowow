@@ -20,7 +20,7 @@ trait TrTooltip
         );
 
         if ($this->enhancedTT)
-            $key[4] = md5(serialize($this->enhancedTT));
+            $key[3] = md5(serialize($this->enhancedTT));
 
         return $key;
     }
