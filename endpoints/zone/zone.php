@@ -568,10 +568,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: NPCs
         if ($cSpawns && !$creatureSpawns->error)
         {
-            $tabData = array(
-                'data' => $creatureSpawns->getListviewData(),
-                'note' => sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0')
-            );
+            $tabData = ['data' => $creatureSpawns->getListviewData()];
+
+            if (!is_null(CreatureListFilter::getCriteriaIndex(6, $this->typeId)))
+                $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0');
 
             if ($creatureSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['_truncated'] = 1;
@@ -584,10 +584,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: Objects
         if ($oSpawns && !$objectSpawns->error)
         {
-            $tabData = array(
-                'data' => $objectSpawns->getListviewData(),
-                'note' => sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0')
-            );
+            $tabData = ['data' => $objectSpawns->getListviewData()];
+
+            if (!is_null(GameObjectListFilter::getCriteriaIndex(1, $this->typeId)))
+                $tabData['note'] = sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0');
 
             if ($objectSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
                 $tabData['_truncated'] = 1;
@@ -623,7 +623,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 if (!in_array($this->typeId, $children))
                     continue;
 
-                $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
+                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_zonequests, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'", '.$this->typeId.')';
+                else
+                    $tabData['note'] = '$$WH.sprintf(LANG.lvnote_questsind, '.$parent.', '.$this->typeId.',"'.$this->subject->getField('name', true).'")';
                 break;
             }
 
@@ -662,11 +665,15 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
             if (!$rewards->error)
             {
+                $note = null;
+                if (!is_null(ItemListFilter::getCriteriaIndex(126, $this->typeId)))
+                    $note = sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0');
+
                 $this->lvTabs->addListviewTab(new Listview(array(
                     'data' => $rewards->getListviewData(),
                     'name' => '$LANG.tab_questrewards',
                     'id'   => 'quest-rewards',
-                    'note' => sprintf(Util::$filterResultString, '?items&filter=cr=126;crs='.$this->typeId.';crv=0')
+                    'note' => $note
                 ), ItemList::$brickFile));
 
                 $this->extendGlobalData($rewards->getJSGlobals(GLOBALINFO_SELF));
