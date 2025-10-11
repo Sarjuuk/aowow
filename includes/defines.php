@@ -494,6 +494,15 @@ define('ITEM_MOD_SPELL_POWER',              45);
 define('ITEM_MOD_HEALTH_REGEN',             46);
 define('ITEM_MOD_SPELL_PENETRATION',        47);
 define('ITEM_MOD_BLOCK_VALUE',              48);
+// unknown by 335a client but still used by several item_templates
+// define('ITEM_MOD_MASTERY_RATING',           49);
+// define('ITEM_MOD_EXTRA_ARMOR',              50);
+// define('ITEM_MOD_FIRE_RESISTANCE',          51);
+// define('ITEM_MOD_FROST_RESISTANCE',         52);
+// define('ITEM_MOD_HOLY_RESISTANCE',          53);
+// define('ITEM_MOD_SHADOW_RESISTANCE',        54);
+// define('ITEM_MOD_NATURE_RESISTANCE',        55);
+// define('ITEM_MOD_ARCANE_RESISTANCE',        56);
 
 // Combat Ratings
 define('CR_WEAPON_SKILL',          0);

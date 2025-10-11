@@ -753,6 +753,13 @@ class ItemList extends DBTypeList
                 case Stat::INTELLECT:
                 case Stat::SPIRIT:
                 case Stat::STAMINA:
+             // case Stat::ARMOR:                           // unused by 335a client, still set in item_template
+             // case Stat::FIRE_RESISTANCE:
+             // case Stat::FROST_RESISTANCE:
+             // case Stat::HOLY_RESISTANCE:
+             // case Stat::SHADOW_RESISTANCE:
+             // case Stat::NATURE_RESISTANCE:
+             // case Stat::ARCANE_RESISTANCE:
                     $x .= '<span><!--stat'.$statId.'-->'.Lang::item('statType', $type, [ord($qty > 0 ? '+' : '-'), abs($qty)]).'</span><br />';
                     break;
                 default:                                    // rating with % for reqLevel
