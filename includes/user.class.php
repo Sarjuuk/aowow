@@ -236,7 +236,7 @@ class User
     /* auth mechanisms */
     /*******************/
 
-    public static function authenticate(string $login, string $password) : int
+    public static function authenticate(string $login, #[\SensitiveParameter] string $password) : int
     {
         $userId = 0;
 
@@ -259,7 +259,7 @@ class User
         return $result;
     }
 
-    private static function authSelf(string $nameOrEmail, string $password, int &$userId) : int
+    private static function authSelf(string $nameOrEmail, #[\SensitiveParameter] string $password, int &$userId) : int
     {
         if (!self::$ip)
             return AUTH_INTERNAL_ERR;
@@ -304,7 +304,7 @@ class User
         return AUTH_OK;
     }
 
-    private static function authRealm(string $name, string $password, int &$userId) : int
+    private static function authRealm(string $name, #[\SensitiveParameter] string $password, int &$userId) : int
     {
         if (!DB::isConnectable(DB_AUTH))
             return AUTH_INTERNAL_ERR;
@@ -327,7 +327,7 @@ class User
         return AUTH_OK;
     }
 
-    private static function authExtern(string $nameOrEmail, string $password, int &$userId) : int
+    private static function authExtern(string $nameOrEmail, #[\SensitiveParameter] string $password, int &$userId) : int
     {
         if (!file_exists('config/extAuth.php'))
         {
@@ -387,24 +387,15 @@ class User
         return $newId ?: 0;
     }
 
-    private static function createSalt() : string
+    // crypt used by us
+    public static function hashCrypt(#[\SensitiveParameter] string $pass) : string
     {
-        $algo     = '$2a';
-        $strength = '$09';
-        $salt     = '$'.Util::createHash(22);
-
-        return $algo.$strength.$salt;
+        return password_hash($pass, PASSWORD_BCRYPT, ['cost' => 15]);
     }
 
-    // crypt used by aowow
-    public static function hashCrypt(string $pass) : string
+    public static function verifyCrypt(#[\SensitiveParameter] string $pass, string $hash) : bool
     {
-        return crypt($pass, self::createSalt());
-    }
-
-    public static function verifyCrypt(string $pass, string $hash) : bool
-    {
-        return $hash === crypt($pass, $hash);
+        return password_verify($pass, $hash);
     }
 
     // SRP6 used by TC

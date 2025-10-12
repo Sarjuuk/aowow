@@ -4,7 +4,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-    function extAuth(string &$usernameOrEmail, string $password, int &$userId = 0, int &$userGroup = -1) : int
+    function extAuth(string &$usernameOrEmail, #[\SensitiveParameter] string $password, int &$userId = 0, int &$userGroup = -1) : int
     {
         /*
             insert some auth mechanism here
