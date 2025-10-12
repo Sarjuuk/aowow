@@ -18,11 +18,12 @@ class ItemList extends DBTypeList
     public        array  $rndEnchIds = [];
     public        array  $subItems   = [];
 
-    private array $ssd        = [];
-    private array $vendors    = [];
-    private array $jsGlobals  = [];                         // getExtendedCost creates some and has no access to template
-    private array $enhanceR   = [];
-    private array $relEnchant = [];
+    private array $randPropPoints = [];
+    private array $ssd            = [];
+    private array $vendors        = [];
+    private array $jsGlobals      = [];                     // getExtendedCost creates some and has no access to template
+    private array $enhanceR       = [];
+    private array $relEnchant     = [];
 
     protected string $queryBase  = 'SELECT i.*, i.`block` AS "tplBlock", i.`armor` AS tplArmor, i.`dmgMin1` AS "tplDmgMin1", i.`dmgMax1` AS "tplDmgMax1", i.`id` AS ARRAY_KEY, i.`id` AS "id" FROM ?_items i';
     protected array  $queryOpts  = array(                   // 3 => Type::ITEM
@@ -1228,76 +1229,55 @@ class ItemList extends DBTypeList
     }
 
     // from Trinity
-    public function generateEnchSuffixFactor() : int
+    public function generateEnchSuffixFactor() : float
     {
-        $rpp = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE `id` = ?', $this->curTpl['itemLevel']);
-        if (!$rpp)
-            return 0;
+        if (empty($this->randPropPoints[$this->curTpl['itemLevel']]))
+            $this->randPropPoints[$this->curTpl['itemLevel']] = DB::Aowow()->selectRow('SELECT * FROM ?_itemrandomproppoints WHERE `id` = ?', $this->curTpl['itemLevel']);
 
-        switch ($this->curTpl['slot'])
+        $rpp = &$this->randPropPoints[$this->curTpl['itemLevel']];
+
+        if (!$rpp)
+            return 0.0;
+
+        $fieldIdx = match((int)$this->curTpl['slot'])
         {
-            // Items of that type don`t have points
-            case INVTYPE_NON_EQUIP:
-            case INVTYPE_BAG:
-            case INVTYPE_TABARD:
-            case INVTYPE_AMMO:
-            case INVTYPE_QUIVER:
-            case INVTYPE_RELIC:
-                return 0;
-            // Select point coefficient
-            case INVTYPE_HEAD:
-            case INVTYPE_BODY:
-            case INVTYPE_CHEST:
-            case INVTYPE_LEGS:
-            case INVTYPE_2HWEAPON:
-            case INVTYPE_ROBE:
-                $suffixFactor = 1;
-                break;
-            case INVTYPE_SHOULDERS:
-            case INVTYPE_WAIST:
-            case INVTYPE_FEET:
-            case INVTYPE_HANDS:
-            case INVTYPE_TRINKET:
-                $suffixFactor = 2;
-                break;
-            case INVTYPE_NECK:
-            case INVTYPE_WRISTS:
-            case INVTYPE_FINGER:
-            case INVTYPE_SHIELD:
-            case INVTYPE_CLOAK:
-            case INVTYPE_HOLDABLE:
-                $suffixFactor = 3;
-                break;
-            case INVTYPE_WEAPON:
-            case INVTYPE_WEAPONMAINHAND:
-            case INVTYPE_WEAPONOFFHAND:
-                $suffixFactor = 4;
-                break;
-            case INVTYPE_RANGED:
-            case INVTYPE_THROWN:
-            case INVTYPE_RANGEDRIGHT:
-                $suffixFactor = 5;
-                break;
-            default:
-                return 0;
-        }
+            INVTYPE_HEAD,
+            INVTYPE_BODY,
+            INVTYPE_CHEST,
+            INVTYPE_LEGS,
+            INVTYPE_2HWEAPON,
+            INVTYPE_ROBE            => 1,
+            INVTYPE_SHOULDERS,
+            INVTYPE_WAIST,
+            INVTYPE_FEET,
+            INVTYPE_HANDS,
+            INVTYPE_TRINKET         => 2,
+            INVTYPE_NECK,
+            INVTYPE_WRISTS,
+            INVTYPE_FINGER,
+            INVTYPE_SHIELD,
+            INVTYPE_CLOAK,
+            INVTYPE_HOLDABLE        => 3,
+            INVTYPE_WEAPON,
+            INVTYPE_WEAPONMAINHAND,
+            INVTYPE_WEAPONOFFHAND   => 4,
+            INVTYPE_RANGED,
+            INVTYPE_THROWN,
+            INVTYPE_RANGEDRIGHT     => 5,
+            default                 => 0                    // inv types that don`t have points
+        };
+
+        if (!$fieldIdx)
+            return 0.0;
 
         // Select rare/epic modifier
-        switch ($this->curTpl['quality'])
+        return match((int)$this->curTpl['quality'])
         {
-            case ITEM_QUALITY_UNCOMMON:
-                return $rpp['uncommon'.$suffixFactor] / 10000;
-            case ITEM_QUALITY_RARE:
-                return $rpp['rare'.$suffixFactor] / 10000;
-            case ITEM_QUALITY_EPIC:
-                return $rpp['epic'.$suffixFactor] / 10000;
-            case ITEM_QUALITY_LEGENDARY:
-            case ITEM_QUALITY_ARTIFACT:
-                return 0;                                   // not have random properties
-            default:
-                break;
-        }
-        return 0;
+            ITEM_QUALITY_UNCOMMON => $rpp['uncommon'.$fieldIdx] / 10000,
+            ITEM_QUALITY_RARE     => $rpp['rare'.$fieldIdx]     / 10000,
+            ITEM_QUALITY_EPIC     => $rpp['epic'.$fieldIdx]     / 10000,
+            default               => 0.0                    // qualities that don't have random properties
+        };
     }
 
     public function extendJsonStats() : void
