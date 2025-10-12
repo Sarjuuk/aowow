@@ -80,10 +80,13 @@ CLISetup::registerUtility(new class extends UtilityScript
             else if (!$passw)
                 $passw = $uiAccount['pass1'];
 
-            if (!$email && Util::validateEmail($uiAccount['email']))
+            if (!$email && !empty($uiAccount['email']) && Util::validateEmail($uiAccount['email']))
                 $email = $uiAccount['email'];
-            else if (!$email && $uiAccount && $uiAccount['email'])
-                CLI::write('[account] email invalid ... using default: ' . Cfg::get('CONTACT_EMAIL'), CLI::LOG_INFO);
+            else if (!$email && empty($uiAccount['email']))
+            {
+                $email = Cfg::get('CONTACT_EMAIL');
+                CLI::write('[account] no email given, using default: ' . Cfg::get('CONTACT_EMAIL'), CLI::LOG_INFO);
+            }
         }
         else if ($this->fields)
         {
@@ -93,18 +96,18 @@ CLISetup::registerUtility(new class extends UtilityScript
             return true;
         }
 
-        if (DB::Aowow()->SelectCell('SELECT 1 FROM ?_account WHERE LOWER(`username`) = LOWER(?) AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if (!$name || !$passw || !$email)
+            return false;
+
+        if ($username = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE (LOWER(`username`) = LOWER(?) OR LOWER(`email`) = LOWER(?)) AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
         {
-            CLI::write('[account] ' . Lang::account('nameInUse'), CLI::LOG_ERROR);
+            CLI::write('[account] ' . (Util::lower($name) == Util::lower($username) ? Lang::account('nameInUse') : Lang::account('mailInUse')), CLI::LOG_ERROR);
             CLI::write();
             return false;
         }
 
-        if (!$name || !$passw)
-            return false;
-
         if (DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `joindate`, `email`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, 1)',
-            $name, User::hashCrypt($passw), $name, $email ?: Cfg::get('CONTACT_EMAIL'), U_GROUP_ADMIN))
+            $name, User::hashCrypt($passw), $name, $email, U_GROUP_ADMIN))
         {
             $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $name);
             Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
