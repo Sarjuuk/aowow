@@ -56,17 +56,23 @@ class EnchantmentList extends DBTypeList
                         break;
                 }
             }
-
-            // issue with scaling stats enchantments
-            // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
-            // so filter the stats container and if it is empty, rebuild from self. .. there are no mixed scaling/static enchantments, right!?
-            $this->jsonStats[$this->id] = (new StatsContainer)->fromJson($curTpl, true)->filter();
-            if (!count($this->jsonStats[$this->id]))
-                $this->jsonStats[$this->id]->fromEnchantment($curTpl);
         }
 
         if ($relSpells)
             $this->relSpells = new SpellList(array(['id', $relSpells]));
+
+        // issue with scaling stats enchantments
+        // stats are stored as NOT NULL to be usable by the search filters and such become indistinguishable from scaling enchantments that _actually_ use the value 0
+        // so we can't rely on ?_item_stats and always have to calc stats
+        foreach ($this->iterate() as $ench)
+        {
+            $relSpells = [];
+            foreach ($ench['spells'] as $s)
+                if ($_ = $this->relSpells->getEntry($s[0]))
+                    $relSpells[$s[0]] = $_;
+
+            $this->jsonStats[$this->id] = (new StatsContainer($relSpells))->fromEnchantment($ench);
+        }
     }
 
     public function getListviewData(int $addInfoMask = 0x0) : array
@@ -122,7 +128,7 @@ class EnchantmentList extends DBTypeList
 
     public function getStatGainForCurrent() : array
     {
-        return $this->jsonStats[$this->id]->toJson(includeEmpty: false);
+        return $this->jsonStats[$this->id]->toJson(includeEmpty: true);
     }
 
     public function getRelSpell(int $id) : ?array
