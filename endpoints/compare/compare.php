@@ -106,7 +106,7 @@ class CompareBaseResponse extends TemplateResponse
     protected static function checkCompareString(string $val) : string
     {
         $val = urldecode($val);
-        if (preg_match('/[^\d\.:;]/', $val))
+        if (preg_match('/[^-?\d\.:;]/', $val))
             return '';
 
         return $val;
