@@ -746,28 +746,28 @@ class Lang
             }, $var);
 
         // |2 - frFR preposition: de    |2 <word>
-        $var = preg_replace_callback('/\|2\s?(\w)/i', function ($m)
+        $var = preg_replace_callback('/\|2\s?(.)/i', function ($m)
             {
-                [$_, $word] = $m;
+                [$_, $char] = $m;
 
-                switch (strtolower($word[1]))
+                switch (strtolower($char))
                 {
                     case 'h':
                         if (self::$locale != Locale::FR)
-                            return 'de ' . $word;
+                            return 'de ' . $char;
                     case 'a':
                     case 'e':
                     case 'i':
                     case 'o':
                     case 'u':
-                        return "d'" . $word;
+                        return "d'" . $char;
                     default:
-                        return 'de ' . $word;
+                        return 'de ' . $char;
                 }
             }, $var);
 
         // |3 - ruRU declinations       |3-<caseIdx>(<word>)
-        $var = preg_replace_callback('/\|3-(\d)\(([^\)]+)\)/iu', function ($m)
+        $var = preg_replace_callback('/\|3-(\d+)\(([^\)]+)\)/iu', function ($m)
             {
                 [$_, $caseIdx, $word] = $m;
 
@@ -777,7 +777,7 @@ class Lang
                 if (preg_match('/\P{Cyrillic}/iu', $word))  // not in cyrillic script
                     return $word;
 
-                if ($declWord = DB::Aowow()->selectCell('SELECT dwc.word FROM ?_declinedwordcases dwc JOIN ?_declinedword dc ON dwc.wordId = dc.id WHERE dwc.caseIdx = ?d AND dc.word = ?', $caseIdx, $word))
+                if ($declWord = DB::Aowow()->selectCell('SELECT dwc.`word` FROM ?_declinedwordcases dwc JOIN ?_declinedword dc ON dwc.`wordId` = dc.`id` WHERE dwc.`caseIdx` = ?d AND dc.`word` = ?', $caseIdx, $word))
                     return $declWord;
 
                 return $word;
