@@ -6,7 +6,7 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
-class LocString
+class LocString implements \JsonSerializable
 {
     private \WeakMap $store;
 
@@ -22,6 +22,11 @@ class LocString
         foreach (Locale::cases() as $l)
             if ($l->validate())
                 $this->store[$l] = (string)$callback($data[$key.'_loc'.$l->value] ?? '');
+    }
+
+    public function jsonSerialize() : string
+    {
+        return $this->__toString();
     }
 
     public function __toString() : string
