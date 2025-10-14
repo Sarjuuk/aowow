@@ -212,7 +212,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                     }
                 }
 
-                if ($worldStates = array_filter($zoneIds, function ($x) { return $x['worldStateId'] > 0; }))
+                if ($worldStates = array_filter($zoneIds, fn($x) => $x['worldStateId'] > 0))
                 {
                     $tabData['extraCols']  = ['$Listview.extraCols.condition'];
 
@@ -222,7 +222,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
                             Conditions::extendListviewRow($zoneData[$state['id']], Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $state['worldStateId'], $state['worldStateValue']]);
                         else
                             foreach ($zoneData as &$d)
-                                if (in_array($state['id'], $d['subzones']))
+                                if (in_array($state['id'], $d['subzones'] ?? []))
                                     Conditions::extendListviewRow($d, Conditions::SRC_NONE, $this->typeId, [Conditions::WORLD_STATE, $state['worldStateId'], $state['worldStateValue']]);
                     }
                 }
