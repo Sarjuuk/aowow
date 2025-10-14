@@ -53,6 +53,12 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
 
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
         $this->filter = new GuildListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
+        if ($this->filter->shouldReload)
+        {
+            $_SESSION['error']['fi'] = $this->filter::class;
+            $get = $this->filter->buildGETParam();
+            $this->forward('?' . $this->pageName . $this->subCat . ($get ? '&filter=' . $get : ''));
+        }
         $this->filterError = $this->filter->error;
     }
 

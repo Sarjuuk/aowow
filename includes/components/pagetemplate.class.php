@@ -336,7 +336,7 @@ class PageTemplate
             $result[] = "var fi_type = '".$this->filter->fiType."'";
 
         if ($this->filter->fiSetCriteria)                   // arr:criteria, arr:signs, arr:values
-            $result[] = 'fi_setCriteria('.mb_substr(Util::toJSON(array_values($this->filter->fiSetCriteria)), 1, -1).");";
+            $result[] = 'fi_setCriteria('.mb_substr(Util::toJSON($this->filter->fiSetCriteria), 1, -1).");";
 
         /*
             nt: don't try to match provided weights on predefined weight sets (preselects preset from opt list and ..?)
@@ -496,7 +496,7 @@ class PageTemplate
 
         foreach ($this->lvTabs->iterate() as $lv)
             if ($lv instanceof \Aowow\Listview)
-                $lv->setError();
+                $lv->setError(true);
     }
 
     // pre-serialization: if a var is relevant it was stored in $rawData
@@ -504,6 +504,11 @@ class PageTemplate
     {
         $this->context  = null;                             // unlink from TemplateResponse
         $this->pageData = [];                               // clear modified data
+
+        if ($this->lvTabs)                                  // do not store lvErrors in cache
+            foreach ($this->lvTabs->iterate() as $lv)
+                if ($lv instanceof \Aowow\Listview)
+                    $lv->setError(false);
 
         $vars = [];
         foreach ($this as $k => $_)

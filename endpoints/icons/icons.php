@@ -32,6 +32,12 @@ class IconsBaseResponse extends TemplateResponse implements ICache
 
         $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
         $this->filter = new IconListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
+        if ($this->filter->shouldReload)
+        {
+            $_SESSION['error']['fi'] = $this->filter::class;
+            $get = $this->filter->buildGETParam();
+            $this->forward('?' . $this->pageName . $this->subCat . ($get ? '&filter=' . $get : ''));
+        }
         $this->filterError = $this->filter->error;
     }
 
@@ -43,12 +49,8 @@ class IconsBaseResponse extends TemplateResponse implements ICache
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
-        $this->filter->evalCriteria();
-
         if ($_ = $this->filter->getConditions())
             $conditions[] = $_;
-
-        $this->filterError = $this->filter->error;          // maybe the evalX() caused something
 
 
         /**************/

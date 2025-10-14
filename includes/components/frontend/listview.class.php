@@ -146,9 +146,9 @@ class Listview implements \JsonSerializable
         $this->tabs = $tabVar;
     }
 
-    public function setError() : void
+    public function setError(bool $enable) : void
     {
-        $this->_errors = 1;
+        $this->_errors = $enable ? 1 : null;
     }
 
     public function jsonSerialize() : array

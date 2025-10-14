@@ -91,12 +91,13 @@ abstract class Filter
     protected const ENUM_RACE          = array( null,     1,     2,     3,     4,     5,     6,     7,     8,  null,    10,    11,  true, false);
     protected const ENUM_PROFESSION    = array( null,   171,   164,   185,   333,   202,   129,   755,   165,   186,   197,  true, false,   356,   182,   773);
 
-    public bool  $error     = false;                        // erroneous search fields
+    public bool  $error        = false;
+    public bool  $shouldReload = false;                     // erroneous params have been corrected. Build GET string and reload
 
     // item related
-    public array $upgrades  = [];                           // [itemId => slotId]
-    public array $extraOpts = [];                           // score for statWeights
-    public array $wtCnd     = [];                           // DBType condition for statWeights
+    public array $upgrades     = [];                        // [itemId => slotId]
+    public array $extraOpts    = [];                        // score for statWeights
+    public array $wtCnd        = [];                        // DBType condition for statWeights
 
     private array $cndSet  = [];                            // db type query storage
     private array $rawData = [];
@@ -106,7 +107,7 @@ abstract class Filter
         [self::CR_FLAG,      <string:colName>, <int:testBit>,   <bool:matchAny>]       # default param2: matchExact
         [self::CR_NUMERIC,   <string:colName>, <int:NUM_FLAGS>, <bool:addExtraCol>]
         [self::CR_STRING,    <string:colName>, <int:STR_FLAGS>, null]
-        [self::CR_ENUM,      <string:colName>, <bool:ANYNONE>,  <bool:isEnumVal>]      # param3 ? crv is val in enum : key in enum
+        [self::CR_ENUM,      <string:colName>, <bool:ANY_NONE>, <bool:isEnumVal>]      # param3 ? crv is val in enum : key in enum
         [self::CR_STAFFFLAG, <string:colName>, null,            null]
         [self::CR_CALLBACK,  <string:fnName>,  <mixed:param1>,  <mixed:param2>]
         [self::CR_NYI_PH,    null,             <int:returnVal>, param2]                # mostly 1: to ignore this criterium; 0: to fail the whole query
@@ -126,8 +127,7 @@ abstract class Filter
     public array  $fiReputationCols = [];                   // fn params ([[factionId, factionName], ...])
     public array  $fiExtraCols      = [];                   //
     public string $query            = '';                   // as in url query params
-    public array  $values           = [];                   // old fiData['v']
-    public array  $criteria         = [];                   // old fiData['c']
+    public array  $values           = [];                   // prefiltered rawData
 
     // parse the provided request into a usable format
     public function __construct(string|array $data, array $opts = [])
@@ -157,6 +157,8 @@ abstract class Filter
         }
 
         $this->initFields();
+        $this->evalCriteria();
+        $this->evalWeights();
     }
 
     public function mergeCat(array &$cats) : void
@@ -167,13 +169,13 @@ abstract class Filter
 
     private function &criteriaIterator() : \Generator
     {
-        if (!$this->criteria)
+        if (empty($this->values['cr']))
             return;
 
-        for ($i = 0; $i < count($this->criteria['cr']); $i++)
+        for ($i = 0; $i < count($this->values['cr']); $i++)
         {
             // throws a notice if yielded directly "Only variable references should be yielded by reference"
-            $v = [&$this->criteria['cr'][$i], &$this->criteria['crs'][$i], &$this->criteria['crv'][$i]];
+            $v = [&$this->values['cr'][$i], &$this->values['crs'][$i], &$this->values['crv'][$i]];
             yield $i => $v;
         }
     }
@@ -195,7 +197,7 @@ abstract class Filter
     public function buildGETParam(array $override = [], array $addCr = []) : string
     {
         $get = [];
-        foreach (array_merge($this->criteria, $this->values, $override) as $k => $v)
+        foreach (array_merge($this->values, $override) as $k => $v)
         {
             if (isset($addCr[$k]))
             {
@@ -228,7 +230,7 @@ abstract class Filter
             $this->cndSet = $this->createSQLForValues();
 
             // criteria
-            foreach ($this->criteriaIterator() as &$_cr)
+            foreach ($this->criteriaIterator() as $_cr)
                 if ($cnd = $this->createSQLForCriterium(...$_cr))
                     $this->cndSet[] = $cnd;
 
@@ -241,10 +243,10 @@ abstract class Filter
 
     public function getSetCriteria(int ...$cr) : array
     {
-        if (!$cr || !$this->fiSetCriteria)
-            return $this->fiSetCriteria;
+        if (!$cr || empty($this->values['cr']))
+            return [];
 
-        return array_values(array_intersect($this->fiSetCriteria['cr'], $cr));
+        return array_values(array_intersect($this->values['cr'], $cr));
     }
 
 
@@ -258,12 +260,17 @@ abstract class Filter
             return [];
 
         $data = [];
+
+        // someone copy/pasted a WH filter
+        $get = preg_replace('/^(\d+(:\d+)*);(\d+(:\d+)*);(\P{C}+(:\P{C}+)*)$/', 'cr=$1;crs=$3;crv=$5', $get);
+
         foreach (explode(';', $get) as $field)
         {
             if (!strstr($field, '='))
             {
                 trigger_error('Filter::transformGET - malformed GET string', E_USER_NOTICE);
-                $this->error = true;
+                $this->error =
+                $this->shouldReload = true;
                 continue;
             }
 
@@ -272,7 +279,8 @@ abstract class Filter
             if (!isset(static::$inputFields[$k]))
             {
                 trigger_error('Filter::transformGET - GET param not in filter: '.$k, E_USER_NOTICE);
-                $this->error = true;
+                $this->error =
+                $this->shouldReload = true;
                 continue;
             }
 
@@ -286,13 +294,17 @@ abstract class Filter
 
     private function initFields() : void
     {
+        // quirk: in the POST step criteria will be [[''], null, null] if no criteria are selected,
+        // due to the first criteria selector always being visible
+        if (($this->rawData['cr'] ?? null) === [''] && !isset($this->rawData['crs']) && !isset($this->rawData['crv']))
+            unset($this->rawData['cr']);                    // unset or Filter::checkInput() screams bloody error
+
+        $cleanupCr = [];
         foreach (static::$inputFields as $inp => [$type, $valid, $asArray])
         {
-            $var = in_array($inp, ['cr', 'crs', 'crv']) ? 'criteria' : 'values';
-
             if (!isset($this->rawData[$inp]) || $this->rawData[$inp] === '')
             {
-                $this->$var[$inp] = $asArray ? [] : null;
+                $this->values[$inp] = $asArray ? [] : null;
                 continue;
             }
 
@@ -300,37 +312,57 @@ abstract class Filter
 
             if ($asArray)
             {
-                // quirk: in the POST step criteria can be [[''], null, null] if not selected.
                 $buff = [];
-                foreach ((array)$val as $v)                 // can be string|int in POST step if only one value present
-                    if ($v !== '' && $this->checkInput($type, $valid, $v))
+                foreach ((array)$val as $i => $v)           // can be string|int in POST step if only one value present
+                {
+                    if (in_array($inp, ['cr', 'crs', 'crv']))
+                    {
+                        if (!$this->checkInput($type, $valid, $v))
+                            $cleanupCr[] = $i;
+                        $buff[] = $v;                       // always assign, gets removed later as tuple
+                    }
+                    else if ($this->checkInput($type, $valid, $v))
                        $buff[] = $v;
+                }
 
-                $this->$var[$inp] = $buff;
+                $this->values[$inp] = $buff;
             }
             else
-                $this->$var[$inp] = $this->checkInput($type, $valid, $val) ? $val : null;
+                $this->values[$inp] = $this->checkInput($type, $valid, $val) ? $val : null;
+        }
+
+        if ($cleanupCr)
+        {
+            $this->error =
+            $this->shouldReload = true;
+
+            foreach (array_unique($cleanupCr) as $i)
+                unset($this->values['cr'][$i], $this->values['crs'][$i], $this->values['crv'][$i]);
+
+            $this->values['cr']  = array_values($this->values['cr']);
+            $this->values['crs'] = array_values($this->values['crs']);
+            $this->values['crv'] = array_values($this->values['crv']);
         }
     }
 
-    public function evalCriteria() : void                   // [cr]iterium, [cr].[s]ign, [cr].[v]alue
+    private function evalCriteria() : void                  // [cr]iterium, [cr].[s]ign, [cr].[v]alue
     {
-        if (empty($this->criteria['cr']) && empty($this->criteria['crs']) && empty($this->criteria['crv']))
+        if (empty($this->values['cr']) && empty($this->values['crs']) && empty($this->values['crv']))
             return;
-        else if (empty($this->criteria['cr']) || empty($this->criteria['crs']) || empty($this->criteria['crv']))
-        {
-            unset($this->criteria['cr']);
-            unset($this->criteria['crs']);
-            unset($this->criteria['crv']);
 
-            trigger_error('Filter::setCriteria - one of cr, crs, crv is missing', E_USER_NOTICE);
-            $this->error = true;
+        if (empty($this->values['cr']) || empty($this->values['crs']) || empty($this->values['crv']))
+        {
+            trigger_error('Filter::evalCriteria - one of cr, crs, crv is missing', E_USER_NOTICE);
+            unset($this->values['cr'], $this->values['crs'], $this->values['crv']);
+
+            $this->error =
+            $this->shouldReload = true;
             return;
         }
 
-        $_cr  = &$this->criteria['cr'];
-        $_crs = &$this->criteria['crs'];
-        $_crv = &$this->criteria['crv'];
+        $_cr  = &$this->values['cr'];
+        $_crs = &$this->values['crs'];
+        $_crv = &$this->values['crv'];
 
         if (count($_cr) != count($_crv) || count($_cr) != count($_crs) || count($_cr) > 5 || count($_crs) > 5 /*|| count($_crv) > 5*/)
         {
@@ -345,70 +377,88 @@ abstract class Filter
             if (count($_crs) > $min)
                 array_splice($_crs, $min);
 
-            trigger_error('Filter::setCriteria - cr, crs, crv are imbalanced', E_USER_NOTICE);
-            $this->error = true;
+            trigger_error('Filter::evalCriteria - cr, crs, crv are imbalanced', E_USER_NOTICE);
+            $this->error =
+            $this->shouldReload = true;
         }
 
         for ($i = 0; $i < count($_cr); $i++)
         {
-            // conduct filter specific checks & casts here
-            $unsetme = false;
-            if (isset(static::$genericFilter[$_cr[$i]]))
+            if (!isset(static::$genericFilter[$_cr[$i]]) || $_crs[$i] === '' || $_crv[$i] === '')
             {
-                $gf = static::$genericFilter[$_cr[$i]];
-                switch ($gf[0])
-                {
-                    case self::CR_NUMERIC:
-                        $_ = $_crs[$i];
-                        if (!Util::checkNumeric($_crv[$i], $gf[2]) || !$this->int2Op($_))
-                            $unsetme = true;
-                        break;
-                    case self::CR_BOOLEAN:
-                    case self::CR_FLAG:
-                        $_ = $_crs[$i];
-                        if (!$this->int2Bool($_))
-                            $unsetme = true;
-                        break;
-                    case self::CR_ENUM:
-                    case self::CR_STAFFFLAG:
-                        if (!Util::checkNumeric($_crs[$i], NUM_CAST_INT))
-                            $unsetme = true;
-                        break;
-                }
+                if ($_crs[$i] === '' || $_crv[$i] === '')
+                    trigger_error('Filter::evalCriteria - received malformed criterium ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
+                else
+                    trigger_error('Filter::evalCriteria - received unhandled criterium: '.$_cr[$i], E_USER_NOTICE);
+
+                unset($_cr[$i], $_crs[$i], $_crv[$i]);
+
+                $this->error =
+                $this->shouldReload = true;
+                continue;
             }
 
-            if (!$unsetme && intval($_cr[$i]) && $_crs[$i] !== '' && $_crv[$i] !== '')
-                continue;
+            [$crType, $colOrFn, $param1, $param2] = array_pad(static::$genericFilter[$_cr[$i]], 4, null);
 
-            unset($_cr[$i]);
-            unset($_crs[$i]);
-            unset($_crv[$i]);
+            // conduct filter specific checks & casts here
+            switch ($crType)
+            {
+                case self::CR_NUMERIC:
+                    $_ = $_crs[$i];
+                    if (Util::checkNumeric($_crv[$i], $param1) && $this->int2Op($_))
+                        continue 2;
+                    break;
+                case self::CR_BOOLEAN:
+                case self::CR_FLAG:
+                    $_ = $_crs[$i];
+                    if ($this->int2Bool($_))
+                        continue 2;
+                    break;
+                case self::CR_STAFFFLAG:
+                    if (User::isInGroup(U_GROUP_EMPLOYEE) && Util::checkNumeric($_crs[$i], NUM_CAST_INT))
+                        continue 2;
+                    break;
+                case self::CR_ENUM:
+                    if (Util::checkNumeric($_crs[$i], NUM_CAST_INT) && (
+                        (!$param2 && isset(static::$enums[$_cr[$i]][$_crs[$i]])) ||
+                        ($param2 && in_array($_crs[$i], static::$enums[$_cr[$i]])) ||
+                        ($param1 && ($_crs[$i] == self::ENUM_ANY || $_crs[$i] == self::ENUM_NONE))
+                    ))
+                        continue 2;
+                    break;
+                case self::CR_STRING:
+                case self::CR_CALLBACK:
+                case self::CR_NYI_PH:
+                    continue 2;
+                default:
+                    trigger_error('Filter::evalCriteria - unknown criteria type: '.$crType, E_USER_WARNING);
+                    break;
+            }
 
-            trigger_error('Filter::setCriteria - generic check failed ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
-            $this->error = true;
+            trigger_error('Filter::evalCriteria - generic check failed ["'.$_cr[$i].'", "'.$_crs[$i].'", "'.$_crv[$i].'"]', E_USER_NOTICE);
+            unset($_cr[$i], $_crs[$i], $_crv[$i]);
+
+            $this->error =
+            $this->shouldReload = true;
         }
 
-        $this->fiSetCriteria = array(
-            'cr'  => $_cr,
-            'crs' => $_crs,
-            'crv' => $_crv
-        );
+        $this->fiSetCriteria = [$_cr, $_crs, $_crv];
     }
 
-    public function evalWeights() : void
+    private function evalWeights() : void
     {
         // both empty: not in use; not an error
-        if (!$this->values['wt'] && !$this->values['wtv'])
+        if (empty($this->values['wt']) && empty($this->values['wtv']))
             return;
 
         // one empty: erroneous manual input?
         if (!$this->values['wt'] || !$this->values['wtv'])
         {
-            unset($this->values['wt']);
-            unset($this->values['wtv']);
-
             trigger_error('Filter::setWeights - one of wt, wtv is missing', E_USER_NOTICE);
-            $this->error = true;
+            unset($this->values['wt'], $this->values['wtv']);
+
+            $this->error =
+            $this->shouldReload = true;
             return;
         }
 
@@ -421,7 +471,8 @@ abstract class Filter
         if ($nwt != $nwtv)
         {
             trigger_error('Filter::setWeights - wt, wtv are imbalanced', E_USER_NOTICE);
-            $this->error = true;
+            $this->error =
+            $this->shouldReload = true;
         }
 
         if ($nwt > $nwtv)
@@ -649,83 +700,72 @@ abstract class Filter
         return null;
     }
 
-    private function genericCriterion(int $cr, int $crs, string $crv) : ?array
-    {
-        [$crType, $colOrFn, $param1, $param2] = array_pad(static::$genericFilter[$cr], 4, null);
-        $result = null;
-
-        switch ($crType)
-        {
-            case self::CR_NUMERIC:
-                $result = $this->genericNumeric($colOrFn, $crv, $crs, $param1);
-                break;
-            case self::CR_FLAG:
-                $result = $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2);
-                break;
-            case self::CR_STAFFFLAG:
-                if (User::isInGroup(U_GROUP_EMPLOYEE) && $crs > 0)
-                    $result = $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true);
-                break;
-            case self::CR_BOOLEAN:
-                $result = $this->genericBoolean($colOrFn, $crs, !empty($param1));
-                break;
-            case self::CR_STRING:
-                $result = $this->genericString($colOrFn, $crv, $param1);
-                break;
-            case self::CR_ENUM:
-                if (!$param2 && isset(static::$enums[$cr][$crs]))
-                    $result = $this->genericEnum($colOrFn, static::$enums[$cr][$crs]);
-                if ($param2 && in_array($crs, static::$enums[$cr]))
-                    $result = $this->genericEnum($colOrFn, $crs);
-                else if ($param1 && ($crs == self::ENUM_ANY || $crs == self::ENUM_NONE))
-                    $result = $this->genericEnum($colOrFn, $crs);
-                break;
-            case self::CR_CALLBACK:
-                $result = $this->{$colOrFn}($cr, $crs, $crv, $param1, $param2);
-                break;
-            case self::CR_NYI_PH:                           // do not limit with not implemented filters
-                if (is_int($param1))
-                    return [$param1];
-
-                // for nonsensical values; compare against 0
-                if ($this->int2Op($crs) && Util::checkNumeric($crv))
-                {
-                    if ($crs == '=')
-                        $crs = '==';
-
-                    return eval('return ('.$crv.' '.$crs.' 0);') ? [1] : [0];
-                }
-                else
-                    return [0];
-        }
-
-        if ($result && $crType == self::CR_NUMERIC && !empty($param2))
-            $this->fiExtraCols[] = $cr;
-
-        return $result;
-    }
-
 
     /***********************************/
     /*     create conditions from      */
     /* non-generic values and criteria */
     /***********************************/
 
-    protected function createSQLForCriterium(int &$cr, int &$crs, string &$crv) : array
+    protected function createSQLForCriterium(int $cr, int $crs, string $crv) : array
     {
         if (!static::$genericFilter)                        // criteria not in use - no error
             return [];
 
-        if (isset(static::$genericFilter[$cr]))
-            if ($genCr = $this->genericCriterion($cr, $crs, $crv))
-                return $genCr;
+        [$crType, $colOrFn, $param1, $param2] = array_pad(static::$genericFilter[$cr], 4, null);
 
-        trigger_error('Filter::createSQLForCriterium - received unhandled criterium: ["'.$cr.'", "'.$crs.'", "'.$crv.'"]', E_USER_NOTICE);
-        $this->error = true;
+        $handleEnum = function(int $cr, int $crs, string $col, bool $hasAnyNone, bool $crsAsVal) : ?array
+        {
+            if ($hasAnyNone && ($crs == self::ENUM_ANY || $crs == self::ENUM_NONE))
+                return $this->genericEnum($col, $crs);
+            else if (!$crsAsVal && isset(static::$enums[$cr][$crs]))
+                return $this->genericEnum($col, static::$enums[$cr][$crs]);
+            else if ($crsAsVal && in_array($crs, static::$enums[$cr]))
+                return $this->genericEnum($col, $crs);
 
-        unset($cr, $crs, $crv);
+            return null;
+        };
 
-        return [];
+        $handleNYIPH = function(int $crs, string $crv, ?int $forceResult) : ?array
+        {
+            if (is_int($forceResult))
+                return [$forceResult];
+
+            // for nonsensical values; compare against 0
+            if ($this->int2Op($crs) && Util::checkNumeric($crv))
+            {
+                if ($crs == '=')
+                    $crs = '==';
+
+                return eval('return ('.$crv.' '.$crs.' 0);') ? [1] : [0];
+            }
+            else
+                return [0];
+        };
+
+        $result = match ($crType)
+        {
+            self::CR_NUMERIC   => $this->genericNumeric($colOrFn, $crv, $crs, $param1),
+            self::CR_FLAG      => $this->genericBooleanFlags($colOrFn, $param1, $crs, $param2),
+            self::CR_STAFFFLAG => $this->genericBooleanFlags($colOrFn, (1 << ($crs - 1)), true),
+            self::CR_BOOLEAN   => $this->genericBoolean($colOrFn, $crs, !empty($param1)),
+            self::CR_STRING    => $this->genericString($colOrFn, $crv, $param1),
+            self::CR_CALLBACK  => $this->{$colOrFn}($cr, $crs, $crv, $param1, $param2),
+            self::CR_ENUM      => $handleEnum($cr, $crs, $colOrFn, $param1, $param2),
+            self::CR_NYI_PH    => $handleNYIPH($crs, $crv, $param1),
+            default            => null
+        };
+
+        if (!$result)
+        {
+            // this really should not have happened. The relevant checks are run on __construct()
+            trigger_error('Filter::createSQLForCriterium - failed to resolve criterium: ["'.$cr.'", "'.$crs.'", "'.$crv.'"]', E_USER_WARNING);
+            return [];
+        }
+
+        if ($crType == self::CR_NUMERIC && !empty($param2))
+            $this->fiExtraCols[] = $cr;
+
+        return $result;
     }
 
     abstract protected function createSQLForValues() : array;

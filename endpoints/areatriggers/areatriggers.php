@@ -33,14 +33,18 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
         parent::__construct($pageParam);
 
         $this->filter = new AreaTriggerListFilter($this->_get['filter'] ?? '');
+        if ($this->filter->shouldReload)
+        {
+            $_SESSION['error']['fi'] = $this->filter::class;
+            $get = $this->filter->buildGETParam();
+            $this->forward('?' . $this->pageName . ($get ? '&filter=' . $get : ''));
+        }
         $this->filterError = $this->filter->error;
     }
 
     protected function generate() : void
     {
         $this->h1 = Util::ucFirst(Lang::game('areatriggers'));
-
-        $this->filter->evalCriteria();
 
         $fiForm = $this->filter->values;
 
@@ -72,8 +76,6 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
         $conditions = [];
         if ($_ = $this->filter->getConditions())
             $conditions[] = $_;
-
-        $this->filterError = $this->filter->error;          // maybe the evalX() caused something
 
         $tabData = [];
         $trigger = new AreaTriggerList($conditions, ['calcTotal' => true]);

@@ -269,8 +269,8 @@ class ProfileListFilter extends Filter
     {
         parent::__construct($data, $opts);
 
-        if (!empty($this->criteria['cr']))
-            if (array_intersect($this->criteria['cr'], [2, 5, 6, 7, 21]))
+        if (!empty($this->values['cr']))
+            if (array_intersect($this->values['cr'], [2, 5, 6, 7, 21]))
                 $this->useLocalList = true;
     }
 
