@@ -143,7 +143,10 @@
                     else {
                         $WH.ae(_status, createStatusIcon(xhr.responseText));
                     }
-
+                },
+                onFailure: function(xhr) {
+                    $WH.ee(_status);
+                    $WH.ae(_status, createStatusIcon(xhr.status == 403 ? 'Forbidden' : 'Failed to add Cfg'));
                 }
             });
         }
@@ -204,6 +207,10 @@
                 onSuccess: function(xhr) {
                     $WH.ee(_status);
                     $WH.ae(_status, createStatusIcon(xhr.responseText));
+                },
+                onFailure: function(xhr) {
+                    $WH.ee(_status);
+                    $WH.ae(_status, createStatusIcon(xhr.status == 403 ? 'Forbidden' : 'Failed to update Cfg'));
                 }
             });
         }
@@ -254,7 +261,10 @@
                         $WH.ee(_status);
                         $WH.ae(_status, createStatusIcon(xhr.responseText));
                     }
-
+                },
+                onFailure: function(xhr) {
+                    $WH.ee(_status);
+                    $WH.ae(_status, createStatusIcon(xhr.status == 403 ? 'Forbidden' : 'Failed to remove Cfg'));
                 }
             });
         }
