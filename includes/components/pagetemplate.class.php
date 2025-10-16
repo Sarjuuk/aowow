@@ -541,7 +541,7 @@ class PageTemplate
             if (!$this->context)
                 return null;
 
-            if (!property_exists($this->context, $var))
+            if (!isset(get_object_vars($this->context)[$var]))
                 return null;
 
             $this->rawData[$var] = $this->context->$var;
