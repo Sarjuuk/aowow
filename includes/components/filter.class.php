@@ -713,7 +713,7 @@ abstract class Filter
 
         [$crType, $colOrFn, $param1, $param2] = array_pad(static::$genericFilter[$cr], 4, null);
 
-        $handleEnum = function(int $cr, int $crs, string $col, bool $hasAnyNone, bool $crsAsVal) : ?array
+        $handleEnum = function(int $cr, int $crs, string $col, ?bool $hasAnyNone, ?bool $crsAsVal) : ?array
         {
             if ($hasAnyNone && ($crs == self::ENUM_ANY || $crs == self::ENUM_NONE))
                 return $this->genericEnum($col, $crs);
