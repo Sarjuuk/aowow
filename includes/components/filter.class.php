@@ -299,6 +299,10 @@ abstract class Filter
         if (($this->rawData['cr'] ?? null) === [''] && !isset($this->rawData['crs']) && !isset($this->rawData['crv']))
             unset($this->rawData['cr']);                    // unset or Filter::checkInput() screams bloody error
 
+        // same for stat weights on ItemListFilter
+        if ($this instanceof ItemListFilter && ($this->rawData['wt'] ?? null) === [''] && !isset($this->rawData['wtv']))
+            unset($this->rawData['wt']);
+
         $cleanupCr = [];
         foreach (static::$inputFields as $inp => [$type, $valid, $asArray])
         {
