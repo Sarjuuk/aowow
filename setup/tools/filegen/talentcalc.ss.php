@@ -100,7 +100,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                          LOWER(SUBSTRING_INDEX(si.`iconPath`, "\\\\", -1)) AS "iconString"
                 FROM     dbc_talent t, dbc_spell s, dbc_spellicon si
                 WHERE    si.`id` = s.`iconId` AND t.`tabId`= ?d AND s.`id` = t.`rank1`
-                ORDER BY t.`row`, t.`column`',
+                ORDER BY t.`row`, t.`column`, t.`id` ASC',
                 $tabs[$tabIdx]['id']
             );
 

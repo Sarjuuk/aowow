@@ -1919,7 +1919,7 @@ CREATE TABLE `aowow_profiler_pets` (
   `family` tinyint(3) unsigned DEFAULT NULL,
   `npc` smallint(5) unsigned DEFAULT NULL,
   `displayId` smallint(5) unsigned DEFAULT NULL,
-  `talents` varchar(20) DEFAULT NULL,
+  `talents` varchar(22) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `owner` (`owner`),
   CONSTRAINT `FK_pr_pets` FOREIGN KEY (`owner`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE

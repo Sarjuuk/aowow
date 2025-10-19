@@ -230,56 +230,48 @@ class SpellList extends DBTypeList
         // <statistic> => [123, 'add']
         // <statistic> => <value>  ...  as from getStatGain()
 
-        $modXByStat = function (&$arr, $stat, $pts) use (&$mv)
+        $modXByStat = function (array &$arr, int $srcStat, ?string $destStat, int $pts) : void
         {
-            if ($mv == STAT_STRENGTH)
-                $arr[$stat ?: 'str'] = [$pts / 100, 'percentOf', 'str'];
-            else if ($mv == STAT_AGILITY)
-                $arr[$stat ?: 'agi'] = [$pts / 100, 'percentOf', 'agi'];
-            else if ($mv == STAT_STAMINA)
-                $arr[$stat ?: 'sta'] = [$pts / 100, 'percentOf', 'sta'];
-            else if ($mv == STAT_INTELLECT)
-                $arr[$stat ?: 'int'] = [$pts / 100, 'percentOf', 'int'];
-            else if ($mv == STAT_SPIRIT)
-                $arr[$stat ?: 'spi'] = [$pts / 100, 'percentOf', 'spi'];
+            match ($srcStat)
+            {
+                STAT_STRENGTH  => $arr[$destStat ?: 'str'] = [$pts / 100, 'percentOf', 'str'],
+                STAT_AGILITY   => $arr[$destStat ?: 'agi'] = [$pts / 100, 'percentOf', 'agi'],
+                STAT_STAMINA   => $arr[$destStat ?: 'sta'] = [$pts / 100, 'percentOf', 'sta'],
+                STAT_INTELLECT => $arr[$destStat ?: 'int'] = [$pts / 100, 'percentOf', 'int'],
+                STAT_SPIRIT    => $arr[$destStat ?: 'spi'] = [$pts / 100, 'percentOf', 'spi']
+            };
         };
 
-        $modXBySchool = function (&$arr, $stat, $val, $mask = null) use (&$mv)
+        $modXBySchool = function (array &$arr, int $srcStat, string $destStat, array|int $val) : void
         {
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_HOLY))
-                $arr['hol'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'hol'.$stat];
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_FIRE))
-                $arr['fir'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fir'.$stat];
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_NATURE))
-                $arr['nat'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'nat'.$stat];
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_FROST))
-                $arr['fro'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fro'.$stat];
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_SHADOW))
-                $arr['sha'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'sha'.$stat];
-            if (($mask ?: $mv) & (1 << SPELL_SCHOOL_ARCANE))
-                $arr['arc'.$stat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'arc'.$stat];
+            if ($srcStat & (1 << SPELL_SCHOOL_HOLY))
+                $arr['hol'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'hol'.$destStat];
+            if ($srcStat & (1 << SPELL_SCHOOL_FIRE))
+                $arr['fir'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fir'.$destStat];
+            if ($srcStat & (1 << SPELL_SCHOOL_NATURE))
+                $arr['nat'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'nat'.$destStat];
+            if ($srcStat & (1 << SPELL_SCHOOL_FROST))
+                $arr['fro'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'fro'.$destStat];
+            if ($srcStat & (1 << SPELL_SCHOOL_SHADOW))
+                $arr['sha'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'sha'.$destStat];
+            if ($srcStat & (1 << SPELL_SCHOOL_ARCANE))
+                $arr['arc'.$destStat] = is_array($val) ? $val : [$val / 100, 'percentOf', 'arc'.$destStat];
         };
 
-        $jsonStat = function ($stat)
+        $jsonStat = function (int $statId) : string
         {
-            if ($stat == STAT_STRENGTH)
-                return 'str';
-            if ($stat == STAT_AGILITY)
-                return 'agi';
-            if ($stat == STAT_STAMINA)
-                return 'sta';
-            if ($stat == STAT_INTELLECT)
-                return 'int';
-            if ($stat == STAT_SPIRIT)
-                return 'spi';
+            return match ($statId)
+            {
+                STAT_STRENGTH  => Stat::getJsonString(Stat::STRENGTH),
+                STAT_AGILITY   => Stat::getJsonString(Stat::AGILITY),
+                STAT_STAMINA   => Stat::getJsonString(Stat::STAMINA),
+                STAT_INTELLECT => Stat::getJsonString(Stat::INTELLECT),
+                STAT_SPIRIT    => Stat::getJsonString(Stat::SPIRIT)
+            };
         };
 
         foreach ($this->iterate() as $id => $__)
         {
-            // kept for reference - if (($this->getField('cuFlags') & SPELL_CU_TALENTSPELL) && $id != 20711)
-            if (!($this->getField('attributes0') & SPELL_ATTR0_PASSIVE))
-                continue;
-
             // Shaman - Spirit Weapons (16268) (parry is normaly stored in g_statistics)
             // i should recurse into SPELL_EFFECT_LEARN_SPELL and apply SPELL_EFFECT_PARRY from there
             if ($id == 16268)
@@ -287,6 +279,9 @@ class SpellList extends DBTypeList
                 $data[$id]['parrypct'] = [5, 'add'];
                 continue;
             }
+
+            if (!($this->getField('attributes0') & SPELL_ATTR0_PASSIVE))
+                continue;
 
             for ($i = 1; $i < 4; $i++)
             {
@@ -311,18 +306,18 @@ class SpellList extends DBTypeList
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                             $data[$id]['armor'] = [$pts / 100, 'percentOf', ['armor', 0]];
                         else if ($mv)
-                            $modXBySchool($data[$id], 'res', $pts);
+                            $modXBySchool($data[$id], $mv, 'res', $pts);
                         break;
                     case SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT:
                         // Armor only if explicitly specified
                         if ($mv == (1 << SPELL_SCHOOL_NORMAL))
                             $data[$id]['armor'] = [$pts / 100, 'percentOf', $jsonStat($mvB)];
                         else if ($mv)
-                            $modXBySchool($data[$id], 'res', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
+                            $modXBySchool($data[$id], $mv, 'res', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
                         break;
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                         if ($mv > -1)                       // one stat
-                            $modXByStat($data[$id], null, $pts);
+                            $modXByStat($data[$id], $mv, null, $pts);
                         else if ($mv < 0)                   // all stats
                             for ($iMod = ITEM_MOD_AGILITY; $iMod <= ITEM_MOD_STAMINA; $iMod++)
                                 if ($idx = Stat::getIndexFrom(Stat::IDX_ITEM_MOD, $iMod))
@@ -331,19 +326,19 @@ class SpellList extends DBTypeList
                         break;
                     case SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
-                        $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
+                        $modXBySchool($data[$id], $mv, 'spldmg', [$pts / 100, 'percentOf', $jsonStat($mvB)]);
                         break;
                     case SPELL_AURA_MOD_RANGED_ATTACK_POWER_OF_STAT_PERCENT:
-                        $modXByStat($data[$id], 'rgdatkpwr', $pts);
+                        $modXByStat($data[$id], $mv, 'rgdatkpwr', $pts);
                         break;
                     case SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT:
-                        $modXByStat($data[$id], 'mleatkpwr', $pts);
+                        $modXByStat($data[$id], $mv, 'mleatkpwr', $pts);
                         break;
                     case SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT:
-                        $modXByStat($data[$id], 'splheal', $pts);
+                        $modXByStat($data[$id], $mv, 'splheal', $pts);
                         break;
                     case SPELL_AURA_MOD_MANA_REGEN_FROM_STAT:
-                        $modXByStat($data[$id], 'manargn', $pts);
+                        $modXByStat($data[$id], $mv, 'manargn', $pts);
                         break;
                     case SPELL_AURA_MOD_MANA_REGEN_INTERRUPT:
                         $data[$id]['icmanargn'] = [$pts / 100, 'percentOf', 'oocmanargn'];
@@ -351,7 +346,7 @@ class SpellList extends DBTypeList
                     case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
                     case SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
-                        $modXBySchool($data[$id], 'splcritstrkpct', [$pts, 'add']);
+                        $modXBySchool($data[$id], $mv, 'splcritstrkpct', [$pts, 'add']);
                         if (($mv & SPELL_MAGIC_SCHOOLS) == SPELL_MAGIC_SCHOOLS)
                             $data[$id]['splcritstrkpct'] = [$pts, 'add'];
                         break;
@@ -392,7 +387,7 @@ class SpellList extends DBTypeList
                         $data[$id]['health'] = [$pts / 100, 'percentOf', 'health'];
                         break;
                     case SPELL_AURA_MOD_BASE_HEALTH_PCT:    // only Tauren - Endurance (20550) ... if you are looking for something elegant, look away!
-                        $data[$id]['health'] = [$pts / 100, 'functionOf', '$function(p) { return g_statistics.combo[p.classs][p.level][5]; }'];
+                        $data[$id]['health'] = [$pts / 100, 'functionOf', '$(x) => g_statistics.combo[x.classs][x.level][5]'];
                         break;
                     case SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT:
                         $data[$id]['block'] = [$pts / 100, 'percentOf', 'block'];
@@ -404,7 +399,7 @@ class SpellList extends DBTypeList
                         break;
                     case SPELL_AURA_MOD_SPELL_DAMAGE_OF_ATTACK_POWER:
                         $mv = $mv ?: SPELL_MAGIC_SCHOOLS;
-                        $modXBySchool($data[$id], 'spldmg', [$pts / 100, 'percentOf', 'mleatkpwr']);
+                        $modXBySchool($data[$id], $mv, 'spldmg', [$pts / 100, 'percentOf', 'mleatkpwr']);
                         break;
                     case SPELL_AURA_MOD_SPELL_HEALING_OF_ATTACK_POWER:
                         $data[$id]['splheal'] = [$pts / 100, 'percentOf', 'mleatkpwr'];

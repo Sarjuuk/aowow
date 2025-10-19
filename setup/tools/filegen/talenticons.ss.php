@@ -85,7 +85,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             JOIN     dbc_talent t ON t.`rank1` = s.`id`
             JOIN     dbc_talenttab tt ON tt.`id` = t.`tabId`
             WHERE    tt.?# = ?d AND tt.`tabNumber` = ?d
-            ORDER BY t.`row`, t.`column` ASC, s.`id` DESC',
+            ORDER BY t.`row`, t.`column`, t.`id` ASC',
             $ttField, $searchMask, $tabIdx);
 
         if (empty($icons))
