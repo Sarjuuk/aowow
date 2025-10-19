@@ -619,6 +619,12 @@ class Profiler
                     $petData['entry']
                 );
 
+                if (!$morePet)
+                {
+                    trigger_error('char #'.$charGuid.' on realm #'.$realmId.' owns pet #'.$petGuid.' (creature entry: #'.$petData['entry'].') without pet family. skipping...', E_USER_WARNING);
+                    continue;
+                }
+
                 $_ = DB::Aowow()->selectCol('SELECT `spell` AS ARRAY_KEY, MAX(IF(`spell` IN (?a), `rank`, 0)) FROM ?_talents WHERE `class` = 0 AND `petTypeMask` = ?d GROUP BY `row`, `col` ORDER BY `row`, `col` ASC', $petSpells ?: [0], 1 << $morePet['type']);
                 $pet = array(
                     'id'        => $petGuid,
