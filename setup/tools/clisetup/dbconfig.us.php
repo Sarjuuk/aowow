@@ -216,7 +216,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', '?_dbversion'))
                             Cfg::load();                    // first time load after successful db setup
                         else
                             $error[] = ' * '.$what.': doesn\'t seem to contain aowow tables!';
@@ -255,7 +255,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', '?_dbversion'))
                         {
                             if ($date = DB::Aowow()->selectCell('SELECT `date` FROM ?_dbversion'))
                             {

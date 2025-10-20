@@ -703,10 +703,10 @@ class Profiler
         // get base values for this race/class
         $reputation = [];
         $baseRep    = DB::Aowow()->selectCol(
-           'SELECT `id` AS ARRAY_KEY, `baseRepValue1` FROM aowow_factions WHERE `baseRepValue1` AND (`baseRepRaceMask1` & ?d OR (`baseRepClassMask1` AND NOT `baseRepRaceMask1`)) AND ((`baseRepClassMask1` & ?d) OR NOT `baseRepClassMask1`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue2` FROM aowow_factions WHERE `baseRepValue2` AND (`baseRepRaceMask2` & ?d OR (`baseRepClassMask2` AND NOT `baseRepRaceMask2`)) AND ((`baseRepClassMask2` & ?d) OR NOT `baseRepClassMask2`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue3` FROM aowow_factions WHERE `baseRepValue3` AND (`baseRepRaceMask3` & ?d OR (`baseRepClassMask3` AND NOT `baseRepRaceMask3`)) AND ((`baseRepClassMask3` & ?d) OR NOT `baseRepClassMask3`) UNION
-            SELECT `id` AS ARRAY_KEY, `baseRepValue4` FROM aowow_factions WHERE `baseRepValue4` AND (`baseRepRaceMask4` & ?d OR (`baseRepClassMask4` AND NOT `baseRepRaceMask4`)) AND ((`baseRepClassMask4` & ?d) OR NOT `baseRepClassMask4`)',
+           'SELECT `id` AS ARRAY_KEY, `baseRepValue1` FROM ?_factions WHERE `baseRepValue1` AND (`baseRepRaceMask1` & ?d OR (`baseRepClassMask1` AND NOT `baseRepRaceMask1`)) AND ((`baseRepClassMask1` & ?d) OR NOT `baseRepClassMask1`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue2` FROM ?_factions WHERE `baseRepValue2` AND (`baseRepRaceMask2` & ?d OR (`baseRepClassMask2` AND NOT `baseRepRaceMask2`)) AND ((`baseRepClassMask2` & ?d) OR NOT `baseRepClassMask2`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue3` FROM ?_factions WHERE `baseRepValue3` AND (`baseRepRaceMask3` & ?d OR (`baseRepClassMask3` AND NOT `baseRepRaceMask3`)) AND ((`baseRepClassMask3` & ?d) OR NOT `baseRepClassMask3`) UNION
+            SELECT `id` AS ARRAY_KEY, `baseRepValue4` FROM ?_factions WHERE `baseRepValue4` AND (`baseRepRaceMask4` & ?d OR (`baseRepClassMask4` AND NOT `baseRepRaceMask4`)) AND ((`baseRepClassMask4` & ?d) OR NOT `baseRepClassMask4`)',
             $ra->toMask(), $cl->toMask(), $ra->toMask(), $cl->toMask(), $ra->toMask(), $cl->toMask(), $ra->toMask(), $cl->toMask()
         );
 

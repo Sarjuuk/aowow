@@ -42,8 +42,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         $this->dummyGOs = DB::Aowow()->select(
            'SELECT    l1.`objectId` AS ARRAY_KEY, BIT_OR(l1.`difficulty`) AS "0", IFNULL(l2.`npcId`, l1.`npcId`) AS "1"
-            FROM      aowow_loot_link l1
-            LEFT JOIN aowow_loot_link l2 ON l1.`objectId` = l2.`objectId` AND l2.`priority` = 1
+            FROM      ?_loot_link l1
+            LEFT JOIN ?_loot_link l2 ON l1.`objectId` = l2.`objectId` AND l2.`priority` = 1
             GROUP BY l1.`objectid`'
         );
 
