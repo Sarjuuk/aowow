@@ -123,7 +123,7 @@ abstract class WorldPosition
                 x.`id`,
                 x.`areaId`,
                 IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
-                IF(dm.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`,
+                IF(dm.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
                 ROUND((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
                 ROUND((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
                 SQRT(POWER(ABS((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
@@ -133,7 +133,7 @@ abstract class WorldPosition
                  SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma
                  JOIN   ?_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
             LEFT JOIN
-                ?_dungeonmap dm ON dm.`mapId` = x.`mapId` AND dm.`worldMapAreaId` = x.`worldMapAreaId` AND dm.`floor` <> x.`floor` AND dm.`worldMapAreaId` > 0
+                ?_dungeonmap dm ON dm.`mapId` = x.`mapId` AND dm.`worldMapAreaId` = x.`worldMapAreaId` AND dm.`floor` = x.`floor` AND dm.`worldMapAreaId` > 0
             WHERE
                 x.`mapId` = ?d AND IF(?d, x.`areaId` = ?d, x.`areaId` <> 0){ AND x.`floor` = ?d - IF(x.`defaultDungeonMapId` < 0, 1, 0)}
             GROUP BY
@@ -141,7 +141,7 @@ abstract class WorldPosition
             HAVING
                 (`posX` BETWEEN 0.1 AND 99.9 AND `posY` BETWEEN 0.1 AND 99.9)
             ORDER BY
-                `multifloor` DESC, `dist` ASC';
+                `srcPrio` DESC, `dist` ASC';
 
         // dist BETWEEN 0 (center) AND 70.7 (corner)
         $points = DB::Aowow()->select($query, $mapY, $mapX, $mapY, $mapX, $mapId, $preferedAreaId, $preferedAreaId, $preferedFloor < 0 ? DBSIMPLE_SKIP : $preferedFloor);
