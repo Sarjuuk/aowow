@@ -335,7 +335,7 @@ class Profiler
             // error out all profiles with status WORKING, that are older than 60sec
             DB::Aowow()->query('UPDATE ?_profiler_sync SET `status` = ?d, `errorCode` = ?d WHERE `status` = ?d AND `requestTime` < ?d', PR_QUEUE_STATUS_ERROR, PR_QUEUE_ERROR_UNK, PR_QUEUE_STATUS_WORKING, time() - MINUTE);
 
-            $subjectStatus = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, `status`, `realm`, `errorCode` FROM ?_profiler_sync WHERE `type` = ?d AND `typeId` IN (?a)', $type, $subjectGUIDs);
+            $subjectStatus = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, `status`, `realm`, `errorCode`, `requestTime` FROM ?_profiler_sync WHERE `type` = ?d AND `typeId` IN (?a)', $type, $subjectGUIDs);
             $queue         = DB::Aowow()->selectCol('SELECT CONCAT(`type`, ":", `typeId`) FROM ?_profiler_sync WHERE `status` = ?d AND `requestTime` < UNIX_TIMESTAMP() ORDER BY `requestTime` ASC', PR_QUEUE_STATUS_WAITING);
             foreach ($subjectGUIDs as $guid)
             {
@@ -343,6 +343,8 @@ class Profiler
                     $response[] = [PR_QUEUE_STATUS_ERROR, 0, 0, PR_QUEUE_ERROR_UNK];
                 else if ($subjectStatus[$guid]['status'] == PR_QUEUE_STATUS_ERROR)
                     $response[] = [PR_QUEUE_STATUS_ERROR, 0, 0, $subjectStatus[$guid]['errorCode']];
+                else if ($subjectStatus[$guid]['requestTime'] > time())
+                    $response[] = [PR_QUEUE_STATUS_READY, 0, 0, 0];
                 else
                     $response[] = array(
                         $subjectStatus[$guid]['status'],
