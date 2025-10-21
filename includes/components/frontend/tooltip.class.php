@@ -19,8 +19,11 @@ class Tooltip implements \JsonSerializable
     private ?string    $buff       = null;
     private ?array     $buffspells = null;
 
-    public function __construct(private string $__powerTpl, private string $__subject, array $opts = [])
+    public function __construct(private string $__powerTpl, private int|string $__subject, array $opts = [])
     {
+        if (!is_int($this->__subject))
+            $this->__subject = Util::toJSON($this->__subject, JSON_UNESCAPED_UNICODE);
+
         foreach ($opts as $k => $v)
         {
             if (property_exists($this, $k))
@@ -54,7 +57,7 @@ class Tooltip implements \JsonSerializable
 
     public function __toString() : string
     {
-        return sprintf($this->__powerTpl, Util::toJSON($this->__subject, JSON_AOWOW_POWER), Lang::getLocale()->value, Util::toJSON($this, JSON_AOWOW_POWER))."\n";
+        return sprintf($this->__powerTpl, $this->__subject, Lang::getLocale()->value, Util::toJSON($this, JSON_AOWOW_POWER))."\n";
     }
 }
 
