@@ -63,7 +63,7 @@ abstract class Filter
     protected const PATTERN_NAME  = '/[\p{C};%\\\\]/ui';
     protected const PATTERN_CRV   = '/[\p{C};:%\\\\]/ui';
     protected const PATTERN_INT   = '/\D/';
-    public    const PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/i';
+    public    const PATTERN_PARAM = '/^[\p{L}\p{Sm} \d\p{P}]+$/ui';
 
     protected const ENUM_FACTION       = array(  469,  1037,  1106,   529,  1012,    87,    21,   910,   609,   942,   909,   530,    69,   577,   930,  1068,  1104,   729,   369,    92,
                                                   54,   946,    67,  1052,   749,    47,   989,  1090,  1098,   978,  1011,    93,  1015,  1038,    76,   470,   349,  1031,  1077,   809,
