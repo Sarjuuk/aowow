@@ -82,15 +82,17 @@ class ProfileBaseResponse extends TemplateResponse
             $this->notFound();
 
         // 2) not yet synced but exists on realm (and not a gm character)
-        if ($subject = DB::Characters($this->realmId)->selectRow(
+        $subjects = DB::Characters($this->realmId)->select(
            'SELECT    c.`guid` AS "realmGUID", c.`name`, c.`race`, c.`class`, c.`level`, c.`gender`, c.`at_login`, g.`guildid` AS "guildGUID", IFNULL(g.`name`, "") AS "guildName", IFNULL(gm.`rank`, 0) AS "guildRank"
             FROM      characters c
             LEFT JOIN guild_member gm ON gm.`guid` = c.`guid`
             LEFT JOIN guild g ON g.`guildid` = gm.`guildid`
             WHERE     c.`name` = ? AND `level` <= ?d AND (`extra_flags` & ?d) = 0',
             Util::ucFirst($this->subjectName), MAX_LEVEL, Profiler::CHAR_GMFLAGS
-        ))
+        );
+        if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
         {
+            $subject = $subject[0];
             $subject['realm']   = $this->realmId;
             $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
 

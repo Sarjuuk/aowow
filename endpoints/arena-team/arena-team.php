@@ -57,8 +57,10 @@ class ArenateamBaseResponse extends TemplateResponse
         }
 
         // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
-        else if ($subject = DB::Characters($this->realmId)->selectRow('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = ?', Util::ucFirst($this->subjectName)))
+        $subjects = DB::Characters($this->realmId)->select('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = ?', $this->subjectName);
+        if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
         {
+            $subject = $subject[0];
             $subject['realm']   = $this->realmId;
             $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
             $subject['nameUrl'] = Profiler::urlize($subject['name']);
