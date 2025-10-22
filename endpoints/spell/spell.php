@@ -1166,6 +1166,55 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // tab: unlocks (object or item)
+        $lockIds = DB::Aowow()->selectCol(
+           'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
+            (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
+            (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+            LOCK_TYPE_SPELL, $this->typeId, LOCK_TYPE_SPELL, $this->typeId,
+            LOCK_TYPE_SPELL, $this->typeId, LOCK_TYPE_SPELL, $this->typeId,
+            LOCK_TYPE_SPELL, $this->typeId
+        );
+
+        // we know this spell effect is only in use on index 1
+        if ($this->subject->getField('effect1Id') == SPELL_EFFECT_OPEN_LOCK && ($lockId = $this->subject->getField('effect1MiscValue')))
+            $lockIds += DB::Aowow()->selectCol(
+               'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
+                (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
+                (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+                LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
+                LOCK_TYPE_SKILL, $lockId, LOCK_TYPE_SKILL, $lockId,
+                LOCK_TYPE_SKILL, $lockId
+            );
+
+        if ($lockIds)
+        {
+            // objects
+            $lockedObj = new GameObjectList(array(Cfg::get('SQL_LIMIT_NONE'), ['lockId', $lockIds]));
+            if (!$lockedObj->error)
+            {
+                $this->addDataLoader('zones');
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'        => $lockedObj->getListviewData(),
+                    'name'        => '$LANG.tab_unlocks',
+                    'id'          => 'unlocks-object',
+                    'visibleCols' => $lockedObj->hasSetFields('reqSkill') ? ['skill'] : null
+                ), GameObjectList::$brickFile));
+            }
+
+            $lockedItm = new ItemList(array(Cfg::get('SQL_LIMIT_NONE'), ['lockId', $lockIds]));
+            if (!$lockedItm->error)
+            {
+                $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));
+
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data' => $lockedItm->getListviewData(),
+                    'name' => '$LANG.tab_unlocks',
+                    'id'   => 'unlocks-item'
+                ), ItemList::$brickFile));
+            }
+        }
+
         // find associated NPC, Item and merge results
         // taughtbypets (unused..?)
         // taughtbyquest (usually the spell casted as quest reward teaches something; exclude those seplls from taughtBySpell)

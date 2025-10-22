@@ -592,12 +592,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ), SpellList::$brickFile));
         }
 
-        // tab: unlocks (object or item) - LOCK_TYPE_ITEM: 1
+        // tab: unlocks (object or item)
         $lockIds = DB::Aowow()->selectCol(
-           'SELECT `id` FROM ?_lock WHERE           (`type1` = 1 AND `properties1` = ?d) OR
-            (`type2` = 1 AND `properties2` = ?d) OR (`type3` = 1 AND `properties3` = ?d) OR
-            (`type4` = 1 AND `properties4` = ?d) OR (`type5` = 1 AND `properties5` = ?d)',
-            $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId
+           'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
+            (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
+            (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+            LOCK_TYPE_ITEM, $this->typeId, LOCK_TYPE_ITEM, $this->typeId,
+            LOCK_TYPE_ITEM, $this->typeId, LOCK_TYPE_ITEM, $this->typeId,
+            LOCK_TYPE_ITEM, $this->typeId
         );
 
         if ($lockIds)

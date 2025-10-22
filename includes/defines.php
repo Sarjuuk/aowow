@@ -609,6 +609,7 @@ define('TEAM_NEUTRAL',                      2);
 // Lock Types
 define('LOCK_TYPE_ITEM',                    1);
 define('LOCK_TYPE_SKILL',                   2);
+define('LOCK_TYPE_SPELL',                   3);
 
 // Lock-Properties (also categorizes GOs)
 define('LOCK_PROPERTY_FOOTLOCKER',          1);

@@ -267,75 +267,87 @@ class Lang
             $rank = $lock['reqSkill'.$i];
             $name = '';
 
-            if ($lock['type'.$i] == LOCK_TYPE_ITEM)
+            switch ($lock['type'.$i])
             {
-                $name = ItemList::getName($prop);
-                if (!$name)
-                    continue;
-
-                if ($fmt == self::FMT_HTML)
-                    $name = $interactive ? '<a class="q1" href="?item='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
-                else if ($interactive && $fmt == self::FMT_MARKUP)
-                {
-                    $name = '[item='.$prop.']';
-                    $ids[Type::ITEM][] = $prop;
-                }
-                else
-                    $name = $prop;
-
-            }
-            else if ($lock['type'.$i] == LOCK_TYPE_SKILL)
-            {
-                $name = self::spell('lockType', $prop);
-                if (!$name)
-                    continue;
-
-                // skills
-                if (in_array($prop, [1, 2, 3, 20]))
-                {
-                    $skills = array(
-                        1 => SKILL_LOCKPICKING,
-                        2 => SKILL_HERBALISM,
-                        3 => SKILL_MINING,
-                       20 => SKILL_INSCRIPTION
-                    );
+                case LOCK_TYPE_ITEM:
+                    $name = ItemList::getName($prop);
+                    if (!$name)
+                        continue 2;
 
                     if ($fmt == self::FMT_HTML)
-                        $name = $interactive ? '<a href="?skill='.$skills[$prop].'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                        $name = $interactive ? '<a class="q1" href="?item='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
                     else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
-                        $name = '[skill='.$skills[$prop].']';
-                        $ids[Type::SKILL][] = $skills[$prop];
+                        $name = '[item='.$prop.']';
+                        $ids[Type::ITEM][] = $prop;
+                    }
+
+                    break;
+                case LOCK_TYPE_SKILL:
+                    $name = self::spell('lockType', $prop);
+                    if (!$name)
+                        continue 2;
+
+                    // skills
+                    if (in_array($prop, [1, 2, 3, 20]))
+                    {
+                        $skills = array(
+                             1 => SKILL_LOCKPICKING,
+                             2 => SKILL_HERBALISM,
+                             3 => SKILL_MINING,
+                            20 => SKILL_INSCRIPTION
+                        );
+
+                        if ($fmt == self::FMT_HTML)
+                            $name = $interactive ? '<a href="?skill='.$skills[$prop].'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                        else if ($interactive && $fmt == self::FMT_MARKUP)
+                        {
+                            $name = '[skill='.$skills[$prop].']';
+                            $ids[Type::SKILL][] = $skills[$prop];
+                        }
+                        else
+                            $name = SkillList::getName($prop);
+
+                        if ($rank > 0)
+                            $name .= ' ('.$rank.')';
+                    }
+                    // Lockpicking
+                    else if ($prop == 4)
+                    {
+                        if ($fmt == self::FMT_HTML)
+                            $name = $interactive ? '<a href="?spell=1842">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                        else if ($interactive && $fmt == self::FMT_MARKUP)
+                        {
+                            $name = '[spell=1842]';
+                            $ids[Type::SPELL][] = 1842;
+                        }
+                    }
+                    // exclude unusual stuff
+                    else if (User::isInGroup(U_GROUP_STAFF))
+                    {
+                        if ($rank > 0)
+                            $name .= ' ('.$rank.')';
                     }
                     else
-                        $name = $skills[$prop];
+                        continue 2;
+                    break;
+                case LOCK_TYPE_SPELL:
+                    $name = SpellList::getName($prop);
+                    if (!$name)
+                        continue 2;
 
-                    if ($rank > 0)
-                        $name .= ' ('.$rank.')';
-                }
-                // Lockpicking
-                else if ($prop == 4)
-                {
                     if ($fmt == self::FMT_HTML)
-                        $name = $interactive ? '<a href="?spell=1842">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
+                        $name = $interactive ? '<a class="q1" href="?spell='.$prop.'">'.$name.'</a>' : '<span class="q1">'.$name.'</span>';
                     else if ($interactive && $fmt == self::FMT_MARKUP)
                     {
-                        $name = '[spell=1842]';
-                        $ids[Type::SPELL][] = 1842;
+                        $name = '[spell='.$prop.']';
+                        $ids[Type::SPELL][] = $prop;
                     }
-                    // else $name = $name
-                }
-                // exclude unusual stuff
-                else if (User::isInGroup(U_GROUP_STAFF))
-                {
-                    if ($rank > 0)
-                        $name .= ' ('.$rank.')';
-                }
-                else
-                    continue;
+
+                    break;
+                default:
+                    continue 2;
             }
-            else
-                continue;
 
             $locks[$lock['type'.$i] == LOCK_TYPE_ITEM ? $prop : -$prop] = $name;
         }

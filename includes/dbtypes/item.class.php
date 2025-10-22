@@ -937,7 +937,7 @@ class ItemList extends DBTypeList
 
         // locked or openable
         if ($locks = Lang::getLocks($this->curTpl['lockId'], $arr, true))
-            $x .= '<span class="q0">'.Lang::item('locked').'<br />'.implode('<br />', array_map(function($x) { return sprintf(Lang::game('requires'), $x); }, $locks)).'</span><br />';
+            $x .= '<span class="q0">'.Lang::item('locked').'<br />'.implode('<br />', array_map(fn($x) => Lang::game('requires', [$x]), $locks)).'</span><br />';
         else if ($this->curTpl['flags'] & ITEM_FLAG_OPENABLE)
             $x .= '<span class="q2">'.Lang::item('openClick').'</span><br />';
 
