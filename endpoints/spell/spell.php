@@ -1066,6 +1066,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $tbsData = [];
         if (!$tbSpell->error)
         {
+            $tbsData = $tbSpell->getFoundIDs();
             $this->lvTabs->addListviewTab(new Listview(array(
                 'data' => $tbSpell->getListviewData(),
                 'id'   => 'taught-by-spell',
@@ -1076,15 +1077,14 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: taught by quest
-        $conditions = ['OR', ['sourceSpellId', $this->typeId], ['rewardSpell', $this->typeId]];
+        $conditions = array(
+            'OR',
+            ['sourceSpellId',   $this->typeId],
+            ['rewardSpell',     $this->typeId],
+            ['rewardSpellCast', $this->typeId]
+        );
         if ($tbsData)
-        {
-            $conditions[] = ['rewardSpell', array_keys($tbsData)];
-            if (User::isInGroup(U_GROUP_EMPLOYEE))
-                $conditions[] = ['rewardSpellCast', array_keys($tbsData)];
-        }
-        if (User::isInGroup(U_GROUP_EMPLOYEE))
-            $conditions[] = ['rewardSpellCast', $this->typeId];
+            array_push($conditions, ['rewardSpell', $tbsData], ['rewardSpellCast', $tbsData]);
 
         $tbQuest = new QuestList($conditions);
         if (!$tbQuest->error)
