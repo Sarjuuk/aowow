@@ -148,9 +148,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = Lang::item('tool').'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
-        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->subject->id]))
+        if (!empty($this->subject->getExtendedCost([], $_reqRating)[$this->typeId]))
         {
-            $vendors  = $this->subject->getExtendedCost()[$this->subject->id];
+            $vendors  = $this->subject->getExtendedCost()[$this->typeId];
             $stack    = $this->subject->getField('buyCount');
             $divisor  = $stack;
             $each     = '';
@@ -480,9 +480,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tabs: this item contains..
         $sourceFor = array(
-             [LOOT_ITEM,        $this->subject->id,                       '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
-             [LOOT_PROSPECTING, $this->subject->id,                       '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-             [LOOT_MILLING,     $this->subject->id,                       '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+             [LOOT_ITEM,        $this->typeId,                            '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
+             [LOOT_PROSPECTING, $this->typeId,                            '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+             [LOOT_MILLING,     $this->typeId,                            '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
              [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
         );
 
@@ -735,9 +735,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: sold by
-        if (!empty($this->subject->getExtendedCost()[$this->subject->id]))
+        if (!empty($this->subject->getExtendedCost()[$this->typeId]))
         {
-            $vendors = $this->subject->getExtendedCost()[$this->subject->id];
+            $vendors = $this->subject->getExtendedCost()[$this->typeId];
             $soldBy  = new CreatureList(array(['id', array_keys($vendors)]));
             if (!$soldBy->error)
             {

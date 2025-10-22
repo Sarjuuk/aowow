@@ -192,7 +192,7 @@ class ItemXmlResponse extends TextResponse implements ICache
         }
 
         // link
-        $xml->addChild('link', Cfg::get('HOST_URL').'?item='.$this->subject->id);
+        $xml->addChild('link', Cfg::get('HOST_URL').'?item='.$this->typeId);
 
         $this->result = $root->asXML();
     }

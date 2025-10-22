@@ -449,7 +449,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             ['s.effect1Id', $this->subject->getField('effect1Id')],
             ['s.effect2Id', $this->subject->getField('effect2Id')],
             ['s.effect3Id', $this->subject->getField('effect3Id')],
-            ['s.id', $this->subject->id, '!'],
+            ['s.id', $this->typeId, '!'],
             ['s.name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)]
         );
 
@@ -534,7 +534,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: used by - spell
-        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ?_spelloverride WHERE `spellId1` = ?d OR `spellId2` = ?d OR `spellId3` = ?d OR `spellId4` = ?d OR `spellId5` = ?d', $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id, $this->subject->id))
+        if ($so = DB::Aowow()->selectCell('SELECT `id` FROM ?_spelloverride WHERE `spellId1` = ?d OR `spellId2` = ?d OR `spellId3` = ?d OR `spellId4` = ?d OR `spellId5` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId))
         {
             $conditions = array(
                 'OR',
@@ -559,8 +559,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: used by - itemset
         $conditions = array(
             'OR',
-            ['spell1', $this->subject->id], ['spell2', $this->subject->id], ['spell3', $this->subject->id], ['spell4', $this->subject->id],
-            ['spell5', $this->subject->id], ['spell6', $this->subject->id], ['spell7', $this->subject->id], ['spell8', $this->subject->id]
+            ['spell1', $this->typeId], ['spell2', $this->typeId], ['spell3', $this->typeId], ['spell4', $this->typeId],
+            ['spell5', $this->typeId], ['spell6', $this->typeId], ['spell7', $this->typeId], ['spell8', $this->typeId]
         );
 
         $ubSets = new ItemsetList($conditions);
@@ -578,11 +578,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: used by - item
         $conditions = array(
             'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->subject->id]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN, '!'], ['spellId2', $this->subject->id]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN, '!'], ['spellId3', $this->subject->id]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN, '!'], ['spellId4', $this->subject->id]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->subject->id]]
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN, '!'], ['spellId1', $this->typeId]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN, '!'], ['spellId2', $this->typeId]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN, '!'], ['spellId3', $this->typeId]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN, '!'], ['spellId4', $this->typeId]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN, '!'], ['spellId5', $this->typeId]]
         );
 
         $ubItems = new ItemList($conditions);
@@ -600,8 +600,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: used by - object
         $conditions = array(
             'OR',
-            ['onUseSpell', $this->subject->id], ['onSuccessSpell', $this->subject->id],
-            ['auraSpell',  $this->subject->id], ['triggeredSpell', $this->subject->id]
+            ['onUseSpell', $this->typeId], ['onSuccessSpell', $this->typeId],
+            ['auraSpell',  $this->typeId], ['triggeredSpell', $this->typeId]
         );
         if (!empty($ubSAI[Type::OBJECT]))
             $conditions[] = ['id', $ubSAI[Type::OBJECT]];
@@ -656,52 +656,51 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: contains
-        // spell_loot_template & skill_extra_item_template
-        $extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = ?d', $this->subject->id);
+        // spell_loot_template
         $spellLoot = new Loot();
-
-        if ($spellLoot->getByContainer(LOOT_SPELL, $this->subject->id) || $extraItem)
+        if ($spellLoot->getByContainer(LOOT_SPELL, $this->typeId))
         {
             $this->extendGlobalData($spellLoot->jsGlobals);
 
-            $lv = $spellLoot->getResult();
             $extraCols   = $spellLoot->extraCols;
             $extraCols[] = '$Listview.extraCols.percent';
-            $lvName      = '$LANG.tab_contains';
-
-            if ($extraItem && $this->subject->canCreateItem())
-            {
-                $foo = $this->subject->relItems->getListviewData();
-
-                for ($i = 1; $i < 4; $i++)
-                {
-                    if (($bar = $this->subject->getField('effect'.$i.'CreateItemId')) && isset($foo[$bar]))
-                    {
-                        $lvName = '$LANG.tab_bonusloot';
-                        $lv[$bar] = $foo[$bar];
-                        $lv[$bar]['percent']  = $extraItem['additionalCreateChance'];
-                        $lv[$bar]['pctstack'] = $this->buildPctStack($extraItem['additionalCreateChance'] / 100, $extraItem['additionalMaxNum']);
-                        if ($max = ($extraItem['additionalMaxNum'] - 1))
-                            $lv[$bar]['stack'] = [1, $max];
-
-                        if (Conditions::extendListviewRow($lv[$bar], Conditions::SRC_NONE, $this->typeId, [Conditions::SPELL, $extraItem['requiredSpecialization']]))
-                        {
-                            $this->extendGlobalIds(Type::SPELL, $extraItem['requiredSpecialization']);
-                            $extraCols[] = '$Listview.extraCols.condition';
-                        }
-
-                        break;                              // skill_extra_item_template can only contain 1 item
-                    }
-                }
-            }
 
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data'       => $lv,
-                'name'       => $lvName,
+                'data'       => $spellLoot->getResult(),
+                'name'       => '$LANG.tab_contains',
                 'id'         => 'contains',
                 'hiddenCols' => ['side', 'slot', 'source', 'reqlevel'],
                 'extraCols'  => array_unique($extraCols)
             ), ItemList::$brickFile));
+        }
+
+        // tab: bonus loot
+        if ($extraItemData = DB::World()->select('SELECT `spellId` AS ARRAY_KEY, `additionalCreateChance` AS "0", `additionalMaxNum` AS "1" FROM skill_extra_item_template WHERE `requiredSpecialization` = ?d', $this->typeId))
+        {
+            $extraSpells = new SpellList(array(['id', array_keys($extraItemData)]));
+            if (!$extraSpells->error)
+            {
+                $this->extendGlobalData($extraSpells->getJSGlobals(GLOBALINFO_RELATED));
+                $lvItems = $extraSpells->getListviewData();
+
+                foreach ($lvItems as $iId => $data)
+                {
+                    [$chance, $maxItr] = $extraItemData[$iId];
+
+                    $lvItems[$iId]['count']       = 1;      // expected by js or the pct-col becomes unsortable
+                    $lvItems[$iId]['percent']     = $chance;
+                    $lvItems[$iId]['pctstack']    = $this->buildPctStack($chance / 100, $maxItr, $data['creates'][1]);
+                    $lvItems[$iId]['creates'][2] *= $maxItr;
+                }
+
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'       => $lvItems,
+                    'name'       => '$LANG.tab_bonusloot',
+                    'id'         => 'bonusloot',
+                    'hiddenCols' => ['side', 'reqlevel'],
+                    'extraCols'  => ['$Listview.extraCols.percent']
+                ), SpellList::$brickFile));
+            }
         }
 
         // tab: exclusive with
@@ -819,9 +818,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: triggered by
         $conditions = array(
             'OR',
-            ['AND', ['OR', ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->subject->id]],
-            ['AND', ['OR', ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->subject->id]],
-            ['AND', ['OR', ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->subject->id]],
+            ['AND', ['OR', ['effect1Id', SpellList::EFFECTS_TRIGGER], ['effect1AuraId', SpellList::AURAS_TRIGGER]], ['effect1TriggerSpell', $this->typeId]],
+            ['AND', ['OR', ['effect2Id', SpellList::EFFECTS_TRIGGER], ['effect2AuraId', SpellList::AURAS_TRIGGER]], ['effect2TriggerSpell', $this->typeId]],
+            ['AND', ['OR', ['effect3Id', SpellList::EFFECTS_TRIGGER], ['effect3AuraId', SpellList::AURAS_TRIGGER]], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $trigger = new SpellList($conditions);
@@ -1057,9 +1056,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: taught by spell
         $conditions = array(
             'OR',
-            ['AND', ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->subject->id]],
-            ['AND', ['effect2Id', SpellList::EFFECTS_TEACH], ['effect2TriggerSpell', $this->subject->id]],
-            ['AND', ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->subject->id]],
+            ['AND', ['effect1Id', SpellList::EFFECTS_TEACH], ['effect1TriggerSpell', $this->typeId]],
+            ['AND', ['effect2Id', SpellList::EFFECTS_TEACH], ['effect2TriggerSpell', $this->typeId]],
+            ['AND', ['effect3Id', SpellList::EFFECTS_TEACH], ['effect3TriggerSpell', $this->typeId]],
         );
 
         $tbSpell = new SpellList($conditions);
@@ -1101,11 +1100,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // tab: taught by item (i'd like to precheck $this->subject->sources, but there is no source:item only complicated crap like "drop" and "vendor")
         $conditions = array(
             'OR',
-            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->subject->id]],
-            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN], ['spellId2', $this->subject->id]],
-            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN], ['spellId3', $this->subject->id]],
-            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN], ['spellId4', $this->subject->id]],
-            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->subject->id]],
+            ['AND', ['spellTrigger1', SPELL_TRIGGER_LEARN], ['spellId1', $this->typeId]],
+            ['AND', ['spellTrigger2', SPELL_TRIGGER_LEARN], ['spellId2', $this->typeId]],
+            ['AND', ['spellTrigger3', SPELL_TRIGGER_LEARN], ['spellId3', $this->typeId]],
+            ['AND', ['spellTrigger4', SPELL_TRIGGER_LEARN], ['spellId4', $this->typeId]],
+            ['AND', ['spellTrigger5', SPELL_TRIGGER_LEARN], ['spellId5', $this->typeId]],
         );
 
         $tbItem = new ItemList($conditions);
@@ -1240,7 +1239,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     /* SpellLoot recursive dropchance builder */
     /******************************************/
 
-    private function buildPctStack(float $baseChance, int $maxStack) : string
+    private function buildPctStack(float $baseChance, int $maxStack, int $baseCount = 1) : string
     {
         // note: pctStack does not contain absolute values but chances relative to the overall drop chance
         // e.g.: dropChance is 17% then [1 => 50, 2 => 25, 3 => 25] displays > Stack of 1: 8%; Stack of 2: 4%; Stack of 3: 4%
@@ -1260,6 +1259,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // cleanup tiny fractions
         $pctStack = array_filter($pctStack, fn($x) => ($x * $baseChance) >= 0.01);
+
+        if ($baseCount > 1)
+            $pctStack = array_combine(array_map(fn($x) => $x * $baseCount, array_keys($pctStack)), $pctStack);
 
         return json_encode($pctStack, JSON_NUMERIC_CHECK);  // do not replace with Util::toJSON !
     }
@@ -1640,7 +1642,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     if (!$cndSpell->error)
                     {
                         $_perfItem = array(
-                            'spellId'   => $perfItem['reqSpellId'],
+                            'spellId'   => $cndSpell->id,
                             'spellName' => $cndSpell->getField('name', true),
                             'icon'      => $cndSpell->getField('iconString'),
                             'chance'    => $perfItem['chance'],
@@ -1648,6 +1650,32 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 Type::ITEM,
                                 $perfItem['itemId'],
                                 $this->subject->relItems->getField('name', true),
+                                quality: $this->subject->relItems->getField('quality')
+                            )
+                        );
+                    }
+                }
+                else if ($extraItem = DB::World()->selectRow('SELECT * FROM skill_extra_item_template WHERE `spellid` = ?d', $this->typeId))
+                {
+                    $cndSpell = new SpellList(array(['id', $extraItem['requiredSpecialization']]));
+                    if (!$cndSpell->error)
+                    {
+                        $num = '+'.($effBP + 1);
+                        if ($extraItem['additionalMaxNum'] > 1)
+                            $num .= '-'.($extraItem['additionalMaxNum'] * ($effBP + $effDS));
+                        else if ($effDS > 1)
+                            $num .= '-'.($effBP + $effDS);
+
+                        $_perfItem = array(
+                            'spellId'   => $cndSpell->id,
+                            'spellName' => $cndSpell->getField('name', true),
+                            'icon'      => $cndSpell->getField('iconString'),
+                            'chance'    => $extraItem['additionalCreateChance'],
+                            'item'      => new IconElement(
+                                Type::ITEM,
+                                $this->subject->relItems->id,
+                                $this->subject->relItems->getField('name', true),
+                                num: $num,
                                 quality: $this->subject->relItems->getField('quality')
                             )
                         );
