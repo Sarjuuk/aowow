@@ -444,8 +444,11 @@ var ModelViewer = new function()
 
             rightDiv.append(animDiv);
 
-            var a1 = $('<a/>', { 'class': 'modelviewer-help', href: '?help=modelviewer', target: '_blank', text: LANG.help }),
-                a2 = $('<a/>', { 'class': 'modelviewer-close', href: 'javascript:;', click: Lightbox.hide, text: LANG.close });
+            var a1 = $('<a/>', { 'class': 'modelviewer-help', href: '?help=modelviewer', target: '_blank'/* , text: LANG.help  */ }),
+                a2 = $('<a/>', { 'class': 'modelviewer-close', href: 'javascript:;', click: Lightbox.hide/* , text: LANG.close */ });
+
+            a1.append($('<span/>'));
+            a2.append($('<span/>'));
 
             rightDiv.append(a2);
             rightDiv.append(a1);
