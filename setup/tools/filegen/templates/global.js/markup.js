@@ -3126,7 +3126,7 @@ var Markup = {
                         str += "<li><b><a href='#guide-changelog' onclick=\"Markup.toggleReveal('changelog');\">Changelog</a></b></li>";
                         lastNode = "h2";
                     }
-                    if (node.name == 'h2' && node.attr.toc !== false)
+                    if (node.name == 'h2' && node.attr.toc !== 'false')
                     {
                         if (lastNode == 'h3')
                         {
@@ -3136,7 +3136,7 @@ var Markup = {
                         str += '<li><b><a href=\'#' + (node.attr.id ? g_urlize(node.attr.id) : g_urlize(node.attr._textContents)) + '\'>' + node.attr._textContents + '</a></b></li>';
                         lastNode = 'h2';
                     }
-                    if (node.name == 'h3' && allowH3 && node.attr.toc !== false && (lastNode != '' || nodes.h2.length == 0))
+                    if (node.name == 'h3' && allowH3 && node.attr.toc !== 'false' && (lastNode != '' || nodes.h2.length == 0))
                     {
                         if (lastNode == 'h2')
                         {

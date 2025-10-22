@@ -295,7 +295,7 @@ endif;
                 }
                 updateQfPreview();
             }).bind(this), 50)"><?=Lang::guide('editor', 'autoupdate');?></label></h2>
-        <div id="guide-body"><div id="livePreview" style="margin-right:10px"></div></div>
+        <div id="guide-body" class="text"><div id="livePreview" style="margin-right:10px"></div></div>
         <script>updatePreview(true);</script>
     </div>
 </div>
