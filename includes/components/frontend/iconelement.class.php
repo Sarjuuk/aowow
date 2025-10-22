@@ -148,9 +148,9 @@ class IconElement
 
         $params = [$this->typeId, $this->size];
         if ($this->num || $this->qty)
-            $params[] = is_numeric($this->num) ? $this->num : "'".$this->num."'";
+            $params[] = is_int($this->num) ? $this->num : "'".$this->num."'";
         if ($this->qty)
-            $params[] = is_numeric($this->qty) ? $this->qty : "'".$this->qty."'";
+            $params[] = is_int($this->qty) ? $this->qty : "'".$this->qty."'";
 
         return str_repeat(' ', $lpad) . sprintf(self::CREATE_ICON_TPL, $this->element, $this->idx, Type::getJSGlobalString($this->type), implode(', ', $params));
     }
