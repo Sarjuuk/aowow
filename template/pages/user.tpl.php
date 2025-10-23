@@ -13,12 +13,11 @@
     $this->brick('announcement');
 
     $this->brick('pageTemplate');
-
+?>
+            <script type="text/javascript">var g_pageInfo = { username: '<?=$this->escJS($this->username); ?>' }</script>
+<?php
     $this->brick('infobox');
 ?>
-
-            <script type="text/javascript">var g_pageInfo = { username: '<?=$this->escJS($this->username); ?>' }</script>
-
             <div class="text">
 <?php
     if ($this->userIcon):
@@ -31,19 +30,20 @@
 <?php else: ?>
                 <h1><?=$this->h1; ?></h1>
 <?php endif; ?>
-            </div>
-            <h3 class="first"><?=Lang::user('publicDesc'); ?></h3>
-            <div id="description" class="left"><?php #  must follow directly, no whitespaces allowed
+                <h3 class="first"><?=Lang::user('publicDesc'); ?></h3>
+                <div id="description" class="left"><?php #  must follow directly, no whitespaces allowed
 if ($this->description):
 ?>
-                <div id="description-generic"></div>
-                <script type="text/javascript">//<![CDATA[
-                    <?=$this->description; ?>
-                //]]></script>
+                    <div id="description-generic"></div>
+                    <script type="text/javascript">//<![CDATA[
+                        <?=$this->description; ?>
+                    //]]></script>
 <?php
 endif;
-          ?></div>
-            <script type="text/javascript">us_addDescription()</script>
+              ?></div>
+                <script type="text/javascript">us_addDescription()</script>
+                <h2 id="related" class="clear"><?=Lang::main('related'); ?></h2>
+            </div>
 
             <div id="roster-status" class="profiler-message clear" style="display: none"></div>
 
