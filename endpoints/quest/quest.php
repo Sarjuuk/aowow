@@ -320,7 +320,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $olItems[$i] = [$id, $qty, $id == $olItems[0][0]];
         }
 
-        if ($ids = array_column($olItems, 0))
+        if ($ids = array_filter(array_column($olItems, 0)))
         {
             $olItemData = new ItemList(array(['id', $ids]));
             $this->extendGlobalData($olItemData->getJSGlobals(GLOBALINFO_SELF));
@@ -498,7 +498,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         if ($_ = $this->subject->getField('sourceSpellId'))
         {
             $this->extendGlobalIds(Type::SPELL, $_);
-            $this->objectiveList[] = [0, new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon')];
+            $this->objectiveList[] = [0, new IconElement(Type::SPELL, $_, SpellList::getName($_), extraText: Lang::quest('provided'), element: 'iconlist-icon', size: IconElement::SIZE_SMALL)];
         }
 
         // required money
