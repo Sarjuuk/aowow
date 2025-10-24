@@ -1173,7 +1173,7 @@ abstract class Util
         $menu   = [[null, "Move Location to..."]];
         foreach ($points as $p)
         {
-            if ($p['srcPrio'])
+            if ($p['multifloor'])
                 $floors[$p['areaId']][] = $p['floor'];
 
             if (isset($menu[$p['areaId']]))

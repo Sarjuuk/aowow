@@ -123,7 +123,8 @@ abstract class WorldPosition
                 x.`id`,
                 x.`areaId`,
                 IF(x.`defaultDungeonMapId` < 0, x.`floor` + 1, x.`floor`) AS `floor`,
-                IF(dm.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
+                IF(useDM.`id`   IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `srcPrio`,
+                IF(multiDM.`id` IS NOT NULL OR x.`defaultDungeonMapId` < 0, 1, 0) AS `multifloor`,
                 ROUND((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`), 1) AS `posX`,
                 ROUND((x.`maxX` - ?d) * 100 / (x.`maxX` - x.`minX`), 1) AS `posY`,
                 SQRT(POWER(ABS((x.`maxY` - ?d) * 100 / (x.`maxY` - x.`minY`) - 50), 2) +
@@ -133,7 +134,9 @@ abstract class WorldPosition
                  SELECT   dm.`id`, `areaId`, wma.`mapId`,            `minY`,           `maxY`,          `maxX`,             `minX`,      `floor`,      `worldMapAreaId`, `defaultDungeonMapId` FROM ?_worldmaparea wma
                  JOIN   ?_dungeonmap dm ON dm.`mapId` = wma.`mapId` WHERE wma.`mapId` NOT IN (0, 1, 530, 571) OR wma.`areaId` = 4395) x
             LEFT JOIN
-                ?_dungeonmap dm ON dm.`mapId` = x.`mapId` AND dm.`worldMapAreaId` = x.`worldMapAreaId` AND dm.`floor` = x.`floor` AND dm.`worldMapAreaId` > 0
+                ?_dungeonmap useDM   ON useDM.`mapId`   = x.`mapId` AND useDM.`worldMapAreaId`   = x.`worldMapAreaId` AND useDM.`floor`   =  x.`floor` AND useDM.`worldMapAreaId`   > 0
+            LEFT JOIN
+                ?_dungeonmap multiDM ON multiDM.`mapId` = x.`mapId` AND multiDM.`worldMapAreaId` = x.`worldMapAreaId` AND multiDM.`floor` <> x.`floor` AND multiDM.`worldMapAreaId` > 0
             WHERE
                 x.`mapId` = ?d AND IF(?d, x.`areaId` = ?d, x.`areaId` <> 0){ AND x.`floor` = ?d - IF(x.`defaultDungeonMapId` < 0, 1, 0)}
             GROUP BY
