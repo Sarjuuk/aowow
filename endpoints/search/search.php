@@ -70,7 +70,7 @@ class SearchBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(...$lvData));
 
             // we already have a target > can't have more targets > no redirects
-            if ($canRedirect && $redirectTo)
+            if (($canRedirect && $redirectTo) || count($lvData[0]['data']) > 1)
                 $canRedirect = false;
 
             if ($canRedirect)                                // note - we are very lucky that in case of searches $template is identical to the typeString
