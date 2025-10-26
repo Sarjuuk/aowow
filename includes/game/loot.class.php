@@ -19,6 +19,41 @@ if (!defined('AOWOW_REVISION'))
     quest_mail_loot_template        entry                               quest_template          RewMailTemplateId
     reference_loot_template         entry           many <- many        *_loot_template         reference
 */
+/* 4.3 loot-example
+
+    template: 'item',
+    id: 'drops',
+    name: LANG.tab_drops,
+    tabs: tabsRelated,
+    parent: 'lkljbjkb574',
+    extraCols: [Listview.extraCols.count, Listview.extraCols.percent],
+    sort:['-percent', 'name'],
+    _totalCount: 448092, // total # creature killed/looted
+    computeDataFunc: Listview.funcBox.initLootTable,
+    onAfterCreate: Listview.funcBox.addModeIndicator,
+    data: [
+        {
+            "classs":15,        // Tab Type
+            "commondrop":true,  // loot filtered as "not noteworthy"
+            "id":25445,
+            "level":1,
+            "name":"7Wretched Ichor",
+            "slot":0,
+            "source":[2],
+            "sourcemore":[{"z":3520}],
+            "subclass":0,       // Tab:Type
+            modes:{
+                "mode":4,   // &1: heroic; &4: noteworthy(?); &8: reg10; &16: reg25; &32: hc10; &64: hc25; &128: RaidFinder
+                "4":{"count":363318,"outof":448092} // calculate pct chance
+            },
+            count:363318,
+            stack:[1,1],
+            pctstack:'{1: 50.0123, 2: 49.9877}'
+            }
+        ]
+    });
+*/
+
 
 class Loot
 {

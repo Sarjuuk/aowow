@@ -164,10 +164,11 @@ class Listview implements \JsonSerializable
 
     public function __toString() : string
     {
+        $addIn = '';
         if ($this->__addIn)
-            include($this->__addIn);
+            $addIn = file_get_contents($this->__addIn).PHP_EOL;
 
-        return "new Listview(".Util::toJSON($this).");\n";
+        return $addIn.'new Listview('.Util::toJSON($this).');'.PHP_EOL;
     }
 }
 
