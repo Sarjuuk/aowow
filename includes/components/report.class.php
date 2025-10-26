@@ -144,11 +144,11 @@ class Report
         $this->subject ??= 0;                               // 0 for utility, tools and misc pages?
     }
 
-    private function checkTargetContext() : int
+    private function checkTargetContext(?string $url) : int
     {
         // check already reported
         $field = User::isLoggedIn() ? 'userId' : 'ip';
-        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d AND ?# = ?', $this->mode, $this->reason, $this->subject, $field, User::$id ?: User::$ip))
+        if (DB::Aowow()->selectCell('SELECT 1 FROM ?_reports WHERE `mode` = ?d AND `reason`= ?d AND `subject` = ?d{ AND `url` = ?} AND ?# = ?', $this->mode, $this->reason, $this->subject, $url ?: DBSIMPLE_SKIP, $field, User::$id ?: User::$ip))
             return self::ERR_ALREADY_REPORTED;
 
         // check targeted post/postOwner staff status
@@ -190,7 +190,28 @@ class Report
             return false;
         }
 
-        if($err = $this->checkTargetContext())
+        // clean up src url: dont use anchors, clean up query
+        if ($pageUrl)
+        {
+            $urlParts = parse_url($pageUrl);
+            if (!empty($urlParts['query']))
+            {
+                parse_str($urlParts['query'], $query);      // kills redundant param declarations
+                unset($query['locale']);                    // locale param shouldn't be needed. more..?
+                $urlParts['query'] = http_build_query($query);
+            }
+
+            $pageUrl = '';
+            if (isset($urlParts['scheme']))
+                $pageUrl .= $urlParts['scheme'].':';
+
+            $pageUrl .= '//'.($urlParts['host'] ?? '').($urlParts['path'] ?? '');
+
+            if (isset($urlParts['query']))
+                $pageUrl .= '?'.$urlParts['query'];
+        }
+
+        if ($err = $this->checkTargetContext($pageUrl))
         {
             $this->errorCode = $err;
             return false;
