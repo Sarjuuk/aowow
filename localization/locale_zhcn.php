@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => "，加%s每连击",
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
-        '_scaling'      => "缩放比例",
+        'apMod'         => "（攻强 mod：%.3g）",
+        'spMod'         => "（法力 mod：%.3g）",
         'instantPhys'   => "瞬发",
         'castTime' => array(
             "瞬发法术",
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay
               -1 => "弹药",              -41 => "蓝铁",            -61 => "蒸汽动力",   -101 => "热能",             -121 => "软泥",             -141 => "鲜血能量",
             -142 => "愤怒"
-        ),
-        'scaling'       => array(
-            'directSP' => "直接效果的攻击强度 +%.2f%%",         'directAP' => "直接效果的攻击强度 +%.2f%%",
-            'dotSP'    => "每个周期的法术强度 +%.2f%%",                    'dotAP'    => "每个周期的攻击强度 +%.2f%%"
         ),
         'relItems'      => array(
             'base'    => "<small>显示与<b>%s</b>相关的 %s</small>",

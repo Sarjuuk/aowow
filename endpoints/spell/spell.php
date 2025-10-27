@@ -26,7 +26,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     public  int    $type       = Type::SPELL;
     public  int    $typeId     = 0;
     public  array  $reagents   = [false, null];
-    public  array  $scaling    = [];
     public  string $items      = '';
     public  array  $tools      = [];
     public  array  $effects    = [];
@@ -159,13 +158,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         /*******************/
 
         $this->createReagentList();
-
-
-        /**********************/
-        /* Spell Scaling Info */
-        /**********************/
-
-        $this->createScalingData();
 
 
         /******************/
@@ -1423,15 +1415,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $this->reagents = [$enhanced, $reagentResult];
     }
 
-    private function createScalingData() : void            // calculation mostly like seen in TC
+    private function calculateEffectScaling() : array       // calculation mostly like seen in TC
     {
         if ($this->subject->getField('attributes3') & SPELL_ATTR3_NO_DONE_BONUS)
-            return;
+            return [0, 0, 0, 0];
 
         if (!$this->subject->isScalableDamagingSpell() && !$this->subject->isScalableHealingSpell())
-            return;
+            return [0, 0, 0, 0];
 
-        $scaling = ['directSP' => 0, 'dotSP' => 0, 'directAP' => 0, 'dotAP' =>  0];
+        $scaling = [0, 0, 0, 0];
         $pMask   = $this->subject->periodicEffectsMask();
         $allDoTs = true;
 
@@ -1442,23 +1434,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             if ($pMask & 1 << ($i - 1))
             {
-                $scaling['dotSP'] = $this->subject->getField('effect'.$i.'BonusMultiplier');
+                $scaling[1] = $this->subject->getField('effect'.$i.'BonusMultiplier');
                 continue;
             }
             else
-                $scaling['directSP'] = $this->subject->getField('effect'.$i.'BonusMultiplier');
+                $scaling[0] = $this->subject->getField('effect'.$i.'BonusMultiplier');
 
             $allDoTs = false;
         }
 
-        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "directSP", `dot_bonus` AS "dotSP", `ap_bonus` AS "directAP", `ap_dot_bonus` AS "dotAP" FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
+        if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "0", `dot_bonus` AS "1", `ap_bonus` AS "2", `ap_dot_bonus` AS "3" FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
             $scaling = $s;
 
         if (!in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]) || $this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
-        {
-            $this->scaling = array_filter($scaling, fn($x) => $x > 0);
-            return;
-        }
+            return array_map(fn($x) => $x < 0 ? 0 : $x, $scaling);
 
         foreach ($scaling as $k => $v)
         {
@@ -1467,15 +1456,15 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 continue;
 
             // no known calculation for physical abilities
-            if ($k == 'directAP' || $k == 'dotAP')
+            if (in_array($k, [2, 3]))                       // [direct AP, DoT AP]
                 continue;
 
             // dont use spellPower to scale physical Abilities
-            if ($this->subject->getField('schoolMask') == (1 << SPELL_SCHOOL_NORMAL) && ($k == 'directSP' || $k == 'dotSP'))
+            if ($this->subject->getField('schoolMask') == (1 << SPELL_SCHOOL_NORMAL) && in_array($k, [0, 1]))
                 continue;
 
             $isDOT = false;
-            if ($k == 'dotSP' || $k == 'dotAP')
+            if (in_array($k, [1, 3]))                       // [DoT SP, DoT AP]
             {
                 if ($pMask)
                     $isDOT = true;
@@ -1523,7 +1512,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $scaling[$k] = 0;                           // would be 1 ($dotFactor), but we dont want it to be displayed
         }
 
-        $this->scaling = array_filter($scaling, fn($x) => $x > 0);
+        return array_map(fn($x) => $x < 0 ? 0 : $x, $scaling);
     }
 
     private function createRequiredItems() : void
@@ -1585,6 +1574,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $spellIdx = array_unique(array_merge($this->subject->canTriggerSpell(), $this->subject->canTeachSpell()));
         $itemIdx  = $this->subject->canCreateItem();
         $perfItem = DB::World()->selectRow('SELECT `perfectItemType` AS "itemId", `requiredSpecialization` AS "reqSpellId", `perfectCreateChance` AS "chance" FROM skill_perfect_item_template WHERE `spellId` = ?d', $this->typeId);
+        $scaling  = $this->calculateEffectScaling();
 
         // Iterate through all effects:
         for ($i = 1; $i < 4; $i++)
@@ -2219,6 +2209,21 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $buffer .= Lang::spell('pointsPerCP', [sprintf($valueFmt, $effPPCP)]);
                 if (isset($_footer['value'][2]))
                     $buffer .= $_footer['value'][2];
+
+                if (in_array($effId, SpellList::EFFECTS_SCALING_DAMAGE))
+                {
+                    if ($scaling[2])
+                        $buffer .= Lang::spell('apMod', [$scaling[2]]);
+                    if ($scaling[0])
+                        $buffer .= Lang::spell('spMod', [$scaling[0]]);
+                }
+                if (in_array($effAura, SpellList::AURAS_SCALING_DAMAGE))
+                {
+                    if ($scaling[3])
+                        $buffer .= Lang::spell('apMod', [$scaling[3]]);
+                    if ($scaling[1])
+                        $buffer .= Lang::spell('spMod', [$scaling[1]]);
+                }
 
                 $_footer['value'] = $buffer;
             }

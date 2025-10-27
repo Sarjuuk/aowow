@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => ", plus %s par point de combo",
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
-        '_scaling'      => "[Scaling]",
+        'apMod'         => " (Mod. AP : %.2f)",
+        'spMod'         => " (Mod. SP : %.2f)",
         'instantPhys'   => "Instantané",
         'castTime' => array(
             "Incantation immédiate",
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay
               -1 => "Munitions",         -41 => "Pyrite",            -61 => "Pression vapeur",  -101 => "Chaleur",          -121 => "Limon",            -141 => "Puissance de sang",
             -142 => "Courroux"
-        ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% de la puissance des sorts directe",        'directAP' => "+%.2f%% de la puissance d'attaque directe",
-            'dotSP'    => "+%.2f%% de la puissance des sorts par tick",       'dotAP'    => "+%.2f%% de la puissance d'attaque par tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Montre %s reliés à <b>%s</b></small>",

@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => ", mas %s por punto de combo",
         'stackGroup'    => "Grupo de aplilamiento",
         'linkedWith'    => "Asociado con",
-        '_scaling'      => "Escala",
+        'apMod'         => " (Mod AP: %.3g)",
+        'spMod'         => " (Mod SP: %.3g)",
         'instantPhys'   => "Instantáneo",
         'castTime' => array(
             "Hechizo instantáneo",
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay
               -1 => "Munición",          -41 => "Pirita",            -61 => "Presión de vapor", -101 => "Calor",            -121 => "Moco",             -141 => "Poder de sangre",
             -142 => "Cólera"
-        ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% del poder de hechizo al componente directo",        'directAP' => "+%.2f%% del poder de ataque al componente directo",
-            'dotSP'    => "+%.2f%% del poder de hechizo por tick",                     'dotAP'    => "+%.2f%% del poder de ataque por tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Muestra %s relacionados con <b>%s</b></small>",

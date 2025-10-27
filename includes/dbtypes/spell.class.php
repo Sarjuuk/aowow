@@ -47,9 +47,9 @@ class SpellList extends DBTypeList
     public const EFFECTS_MODEL_NPC        = array(
         SPELL_EFFECT_SUMMON,                SPELL_EFFECT_SUMMON_PET,                        SPELL_EFFECT_SUMMON_DEMON,                      SPELL_EFFECT_KILL_CREDIT,                       SPELL_EFFECT_KILL_CREDIT2
     );
-    public const EFFECTS_DIRECT_SCALING   = array(
+    public const EFFECTS_DIRECT_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
         SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_ENVIRONMENTAL_DAMAGE,              SPELL_EFFECT_POWER_DRAIN,                       SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN,
-        SPELL_EFFECT_HEAL_MAX_HEALTH
+        SPELL_EFFECT_HEAL
     );
     public const EFFECTS_ENCHANTMENT      = array(
         SPELL_EFFECT_ENCHANT_ITEM,          SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY,            SPELL_EFFECT_ENCHANT_HELD_ITEM,                 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
@@ -72,7 +72,7 @@ class SpellList extends DBTypeList
         SPELL_AURA_TRANSFORM,               SPELL_AURA_MOUNTED,                             SPELL_AURA_CHANGE_MODEL_FOR_ALL_HUMANOIDS,      SPELL_AURA_X_RAY,
         SPELL_AURA_MOD_FAKE_INEBRIATE
     );
-    public const AURAS_PERIODIC_SCALING   = array(
+    public const AURAS_PERIODIC_SCALING   = array( // as per Unit::GetCastingTimeForBonus()
         SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_LEECH
     );
 

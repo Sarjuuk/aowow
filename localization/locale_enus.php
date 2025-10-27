@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => ", plus %s per combo point",
         'stackGroup'    => "Stack Group",
         'linkedWith'    => "Linked with",
-        '_scaling'      => "Scaling",
+        'apMod'         => " (AP mod: %.3g)",
+        'spMod'         => " (SP mod: %.3g)",
         'instantPhys'   => "Instant",                       // SPELL_CAST_TIME_INSTANT_NO_MANA
         'castTime' => array(
             "Instant cast",                                 // SPELL_CAST_TIME_INSTANT
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay - PowerDisplay.dbc -> GlobalStrings.lua POWER_TYPE_*
               -1 => "Ammo",              -41 => "Pyrite",            -61 => "Steam Pressure",   -101 => "Heat",             -121 => "Ooze",             -141 => "Blood Power",
             -142 => "Wrath"
-        ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% of spell power to direct component",         'directAP' => "+%.2f%% of attack power to direct component",
-            'dotSP'    => "+%.2f%% of spell power per tick",                    'dotAP'    => "+%.2f%% of attack power per tick"
         ),
         'relItems'      => array(
             'base'    => "<small>Show %s related to <b>%s</b></small>",

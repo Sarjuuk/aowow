@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => ", plus %s pro Combopunkt",
         'stackGroup'    => "Stack Gruppierung",
         'linkedWith'    => "Verknüpft mit",
-        '_scaling'      => "Skalierung",
+        'apMod'         => " (AP mod: %.3g)",
+        'spMod'         => " (ZM mod: %.3g)",
         'instantPhys'   => "Sofort",
         'castTime' => array(
             "Spontanzauber",
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay
               -1 => "Munition",          -41 => "Pyrit",             -61 => "Dampfdruck",       -101 => "Hitze",            -121 => "Schlamm",          -141 => "Blutmacht",
             -142 => "Wrath"
-        ),
-        'scaling'       => array(
-            'directSP' => "+%.2f%% der Zaubermacht zum direkten Effekt",         'directAP' => "+%.2f%% der Angriffskraft zum direkten Effekt",
-            'dotSP'    => "+%.2f%% der Zaubermacht pro Tick",                    'dotAP'    => "+%.2f%% der Angriffskraft pro Tick"
         ),
         'relItems'      => array(
             'base'    => "<small>%s im Zusammenhang mit <b>%s</b> anzeigen</small>",

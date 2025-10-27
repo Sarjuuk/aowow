@@ -134,23 +134,6 @@ endif;
                         <td><?=$this->gcd;?></td>
                     </tr>
 <?php
-// not default values
-if ($this->scaling):
-?>
-                    <tr>
-                        <th><?=Lang::spell('_scaling');?></th>
-                        <td colspan="3">
-
-<?php
-    foreach ($this->scaling as $k => $v):
-        echo '                            '.Lang::spell('scaling', $k, [$v * 100])."<br />\n";
-    endforeach;
-?>
-                        </td>
-                    </tr>
-<?php
-endif;
-
 if ($this->stances):
 ?>
                     <tr>

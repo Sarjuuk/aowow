@@ -1678,7 +1678,8 @@ $lang = array(
         'pointsPerCP'   => ", плюс %s в прием в серии",
         'stackGroup'    => "[Stack Group]",
         'linkedWith'    => "[Linked with]",
-        '_scaling'      => "[Scaling]",
+        'apMod'         => " (Мод.-р АП:%.3g)",
+        'spMod'         => " (Мод.-р СП:%.3g)",
         'instantPhys'   => "Мгновенное действие",
         'castTime' => array(
             "Мгновенное действие",
@@ -1724,10 +1725,6 @@ $lang = array(
             // powerDisplay
               -1 => "Боеприпасы",        -41 => "Колчедан",          -61 => "Давление пара",    -101 => "Жар",              -121 => "Слизнюк",          -141 => "Сила крови",
             -142 => "Гнев"
-        ),
-        'scaling'       => array(
-            'directSP' => "[+%.2f%% of spell power to direct component]",        'directAP' => "[+%.2f%% of attack power to direct component]",
-            'dotSP'    => "[+%.2f%% of spell power per tick]",                   'dotAP'    => "[+%.2f%% of attack power per tick]"
         ),
         'relItems'      => array(
             'base'    => "<small>Показать %s, относящиеся к профессии <b>%s</b></small>",
