@@ -1425,6 +1425,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
     private function createScalingData() : void            // calculation mostly like seen in TC
     {
+        if ($this->subject->getField('attributes3') & SPELL_ATTR3_NO_DONE_BONUS)
+            return;
+
+        if (!$this->subject->isScalableDamagingSpell() && !$this->subject->isScalableHealingSpell())
+            return;
+
         $scaling = ['directSP' => 0, 'dotSP' => 0, 'directAP' => 0, 'dotAP' =>  0];
         $pMask   = $this->subject->periodicEffectsMask();
         $allDoTs = true;
@@ -1448,9 +1454,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($s = DB::World()->selectRow('SELECT `direct_bonus` AS "directSP", `dot_bonus` AS "dotSP", `ap_bonus` AS "directAP", `ap_dot_bonus` AS "dotAP" FROM spell_bonus_data WHERE `entry` = ?d', $this->firstRank))
             $scaling = $s;
 
-        if ((!$this->subject->isDamagingSpell() && !$this->subject->isHealingSpell()) ||
-            !in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]) ||
-            $this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
+        if (!in_array($this->subject->getField('typeCat'), [-2, -3, -7, 7]) || $this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_NONE)
         {
             $this->scaling = array_filter($scaling, fn($x) => $x > 0);
             return;
@@ -1509,7 +1513,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 }
             }
 
-            if ($this->subject->isHealingSpell())
+            if ($this->subject->isScalableHealingSpell())
                 $castingTime *= 1.88;
 
             // SPELL_SCHOOL_MASK_NORMAL

@@ -23,12 +23,11 @@ class SpellList extends DBTypeList
         11 => SKILLS_TRADE_PRIMARY                                                                        // prim. Professions
     );
 
-    public const EFFECTS_HEAL             = array(
-        SPELL_EFFECT_NONE,                  /*SPELL_EFFECT_DUMMY*/                          SPELL_EFFECT_HEAL,                              SPELL_EFFECT_HEAL_MAX_HEALTH,                   SPELL_EFFECT_HEAL_MECHANICAL,
-        SPELL_EFFECT_HEAL_PCT
+    public const EFFECTS_SCALING_HEAL     = array( // as per Unit::SpellHealingBonusDone() calls in TC
+        SPELL_EFFECT_HEAL,                  SPELL_EFFECT_HEAL_PCT,                          SPELL_EFFECT_HEAL_MECHANICAL,                   SPELL_EFFECT_HEALTH_LEECH
     );
-    public const EFFECTS_DAMAGE           = array(
-        SPELL_EFFECT_NONE,                  SPELL_EFFECT_DUMMY,                             SPELL_EFFECT_SCHOOL_DAMAGE,                     SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN
+    public const EFFECTS_SCALING_DAMAGE   = array( // as per Unit::SpellDamageBonusDone() calls in TC
+        SPELL_EFFECT_SCHOOL_DAMAGE,         SPELL_EFFECT_HEALTH_LEECH,                      SPELL_EFFECT_POWER_BURN
     );
     public const EFFECTS_ITEM_CREATE      = array(
         SPELL_EFFECT_CREATE_ITEM,           SPELL_EFFECT_SUMMON_CHANGE_ITEM,                SPELL_EFFECT_CREATE_RANDOM_ITEM,                SPELL_EFFECT_CREATE_MANA_GEM,                   SPELL_EFFECT_CREATE_ITEM_2
@@ -56,13 +55,11 @@ class SpellList extends DBTypeList
         SPELL_EFFECT_ENCHANT_ITEM,          SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY,            SPELL_EFFECT_ENCHANT_HELD_ITEM,                 SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC
     );
 
-    public const AURAS_HEAL               = array(
-        SPELL_AURA_DUMMY,                   SPELL_AURA_PERIODIC_HEAL,                       SPELL_AURA_PERIODIC_HEALTH_FUNNEL,              SPELL_AURA_SCHOOL_ABSORB,                       SPELL_AURA_MANA_SHIELD,
-        SPELL_AURA_PERIODIC_DUMMY
+    public const AURAS_SCALING_HEAL       = array( // as per Unit::SpellHealingBonusDone() calls in TC (SPELL_AURA_SCHOOL_ABSORB + SPELL_AURA_MANA_SHIELD priest/mage cases are scripted)
+        SPELL_AURA_PERIODIC_HEAL,           SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_OBS_MOD_HEALTH
     );
-    public const AURAS_DAMAGE             = array(
-        SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_DUMMY,                               SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_PERIODIC_DAMAGE_PERCENT,
-        SPELL_AURA_POWER_BURN,              SPELL_AURA_PERIODIC_DUMMY
+    public const AURAS_SCALING_DAMAGE     = array( // as per Unit::SpellDamageBonusDone() calls in TC
+        SPELL_AURA_PERIODIC_DAMAGE,         SPELL_AURA_PERIODIC_LEECH,                      SPELL_AURA_DAMAGE_SHIELD,                       SPELL_AURA_PROC_TRIGGER_DAMAGE
     );
     public const AURAS_ITEM_CREATE        = array(
         SPELL_AURA_CHANNEL_DEATH_ITEM
@@ -770,22 +767,22 @@ class SpellList extends DBTypeList
         return $this->curTpl['attributes1'] & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2);
     }
 
-    public function isHealingSpell() : bool
+    public function isScalableHealingSpell() : bool
     {
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_HEAL) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_HEAL))
-                return false;
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_SCALING_HEAL) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_SCALING_HEAL))
+                return true;
 
-        return true;
+        return false;
     }
 
-    public function isDamagingSpell() : bool
+    public function isScalableDamagingSpell() : bool
     {
         for ($i = 1; $i < 4; $i++)
-            if (!in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_DAMAGE) && !in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_DAMAGE))
-                return false;
+            if (in_array($this->curTpl['effect'.$i.'Id'], SpellList::EFFECTS_SCALING_DAMAGE) || in_array($this->curTpl['effect'.$i.'AuraId'], SpellList::AURAS_SCALING_DAMAGE))
+                return true;
 
-        return true;
+        return false;
     }
 
     public function periodicEffectsMask() : int
