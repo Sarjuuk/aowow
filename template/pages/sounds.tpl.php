@@ -26,7 +26,7 @@ $this->brick('redButtons');
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <div class="rightpanel">
-                        <div style="float: left"><?=Lang::game('type').Lang::main('colon'); ?></div>
+                        <div style="float: left"><?=Lang::game('type'); ?></div>
                         <small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="ty[]" size="6" multiple="multiple" class="rightselect">

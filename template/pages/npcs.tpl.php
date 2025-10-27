@@ -58,17 +58,17 @@ $this->brick('redButtons');
                             <td class="padded" width="100%">
                                 <table><tr>
                                     <td>&nbsp;&nbsp;&nbsp;<?=Lang::npc('react', ['']); ?></td>
-                                    <td>&nbsp;<select name="ra" onchange="fi_dropdownSync(this)" onkeyup="fi_dropdownSync(this)" style="background-color: #181818"<?=($f['ra'] ? ' class="q'.($f['ra'] == 1 ? '2' : ($f['ra'] == -1 ? '10' : '')).'"' : ''); ?>>
+                                    <td>&nbsp;<select name="ra" onchange="fi_dropdownSync(this)" onkeyup="fi_dropdownSync(this)" style="background-color: #181818" <?=(!is_null($f['ra']) ? ' class="q'.($f['ra'] == 1 ? '2' : ($f['ra'] == -1 ? '10' : '')).'"' : ''); ?>>
                                         <option></option>
-                                        <option value="1" class="q2"<?=(  $f['ra'] ==  1 ? ' selected' : ''); ?>>A</option>
-                                        <option value="0" class="q"<?=(   $f['ra'] ==  0 ? ' selected' : ''); ?>>A</option>
-                                        <option value="-1" class="q10"<?=($f['ra'] == -1 ? ' selected' : ''); ?>>A</option>
+                                        <option value="1" class="q2"<?=(  $f['ra'] ===  1 ? ' selected' : ''); ?>>A</option>
+                                        <option value="0" class="q"<?=(   $f['ra'] ===  0 ? ' selected' : ''); ?>>A</option>
+                                        <option value="-1" class="q10"<?=($f['ra'] === -1 ? ' selected' : ''); ?>>A</option>
                                     </select>
-                                    <select name="rh" onchange="fi_dropdownSync(this)" onkeyup="fi_dropdownSync(this)" style="background-color: #181818"<?=($f['rh'] ? ' class="q'.($f['rh'] == 1 ? '2' : ($f['rh'] == -1 ? '10' : '')).'"' : ''); ?>>
+                                    <select name="rh" onchange="fi_dropdownSync(this)" onkeyup="fi_dropdownSync(this)" style="background-color: #181818"<?=(!is_null($f['rh']) ? ' class="q'.($f['rh'] == 1 ? '2' : ($f['rh'] == -1 ? '10' : '')).'"' : ''); ?>>
                                         <option></option>
-                                        <option value="1" class="q2"<?=(  $f['rh'] ==  1 ? ' selected' : ''); ?>>H</option>
-                                        <option value="0" class="q"<?=(   $f['rh'] ==  0 ? ' selected' : ''); ?>>H</option>
-                                        <option value="-1" class="q10"<?=($f['rh'] == -1 ? ' selected' : ''); ?>>H</option>
+                                        <option value="1" class="q2"<?=(  $f['rh'] ===  1 ? ' selected' : ''); ?>>H</option>
+                                        <option value="0" class="q"<?=(   $f['rh'] ===  0 ? ' selected' : ''); ?>>H</option>
+                                        <option value="-1" class="q10"<?=($f['rh'] === -1 ? ' selected' : ''); ?>>H</option>
                                     </select>
                                     </td>
                                 </tr></table>

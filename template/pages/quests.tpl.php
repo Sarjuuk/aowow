@@ -26,7 +26,7 @@ $this->brick('redButtons');
                         <h1><?=$this->h1; ?></h1>
                     </div>
                     <div class="rightpanel">
-                        <div style="float: left"><?=Lang::game('type').Lang::main('colon'); ?></div><small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
+                        <div style="float: left"><?=Lang::game('type'); ?></div><small><a href="javascript:;" onclick="document.forms['fi'].elements['ty[]'].selectedIndex = -1; return false" onmousedown="return false"><?=Lang::main('clear'); ?></a></small>
                         <div class="clear"></div>
                         <select name="ty[]" size="6" multiple="multiple" class="rightselect">
 <?=$this->makeOptionsList(Lang::quest('questInfo'), $f['ty'], 28); ?>
@@ -49,13 +49,13 @@ $this->brick('redButtons');
                             <td class="padded">&nbsp;<input type="text" name="minle" maxlength="2" class="smalltextbox" <?=($f['minle'] ? 'value="'.$f['minle'].'" ' : ''); ?>/> - <input type="text" name="maxle" maxlength="2" class="smalltextbox" <?=($f['maxle'] ? 'value="'.$f['maxle'].'" ' : ''); ?>/></td>
                             <td class="padded" width="100%">
                                 <table><tr>
-                                    <td>&nbsp;&nbsp;&nbsp;<?=Lang::main('_reqLevel').Lang::main('colon'); ?></td>
+                                    <td>&nbsp;&nbsp;&nbsp;<?=Lang::main('_reqLevel'); ?></td>
                                     <td>&nbsp;<input type="text" name="minrl" maxlength="2" class="smalltextbox" <?=($f['minrl'] ? 'value="'.$f['minrl'].'" ' : ''); ?>/> - <input type="text" name="maxrl" maxlength="2" class="smalltextbox" <?=($f['maxrl'] ? 'value="'.$f['maxrl'].'" ' : ''); ?>/></td>
                                 </tr></table>
                             </td>
                         </tr>
                         <tr>
-                            <td class="padded"><?=Lang::main('side').Lang::main('colon'); ?></td>
+                            <td class="padded"><?=Lang::main('side'); ?></td>
                             <td class="padded" colspan="3">&nbsp;<select name="si">
                                 <option></option>
 <?=$this->makeOptionsList(Lang::game('si'), $f['si'], 36); ?>

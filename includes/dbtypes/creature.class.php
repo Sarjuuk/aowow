@@ -376,11 +376,11 @@ class CreatureListFilter extends Filter
             $parts[] = ['rank', $_v['cl']];
 
         // react Alliance [int]
-        if ($_v['ra'])
+        if (!is_null($_v['ra']))
             $parts[] = ['ft.A', $_v['ra']];
 
         // react Horde [int]
-        if ($_v['rh'])
+        if (!is_null($_v['rh']))
             $parts[] = ['ft.H', $_v['rh']];
 
         return $parts;
