@@ -1839,8 +1839,13 @@ class SpellList extends DBTypeList
 
         // get reagents
         $reagents = $this->getReagentsForCurrent();
-        foreach ($reagents as &$r)
-            $r[2] = ItemList::getName($r[0]);
+        foreach ($reagents as $k => $r)
+        {
+            if ($item = $this->relItems->getEntry($r[0]))
+                $reagents[$k] += [2 => new LocString($item), 3 => true];
+            else
+                $reagents[$k] += [2 => 'Item #'.$r[0], 3 => false];
+        }
 
         $reagents = array_reverse($reagents);
 
@@ -1940,11 +1945,11 @@ class SpellList extends DBTypeList
         if ($reagents)
         {
             $_ = Lang::spell('reagents').':<br/><div class="indent q1">';
-            while ($reagent = array_pop($reagents))
+            while ([$iId, $qty, $text, $exists] = array_pop($reagents))
             {
-                $_ .= '<a href="?item='.$reagent[0].'">'.$reagent[2].'</a>';
-                if ($reagent[1] > 1)
-                    $_ .= ' ('.$reagent[1].')';
+                $_ .= $exists ? '<a href="?item='.$iId.'">'.$text.'</a>' : $text;
+                if ($qty > 1)
+                    $_ .= ' ('.$qty.')';
 
                 $_ .= empty($reagents) ? '<br />' : ', ';
             }

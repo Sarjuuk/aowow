@@ -15,12 +15,12 @@ class IconElement
     private const CREATE_ICON_TPL  = "\$WH.ge('%s%d').appendChild(%s.createIcon(%s));\n";
 
     private int    $idx    = 0;
-    private string $href   = '';
-    private bool   $noIcon = false;
 
     public readonly  string $quality;
     public readonly ?string $align;
+    public readonly ?string $href;
     public readonly  int    $size;
+    public readonly  bool   $noIcon;
 
     public function __construct(
         public  readonly  int        $type,
@@ -70,6 +70,8 @@ class IconElement
 
         if ($link || $url)
             $this->href = $url ?: '?'.Type::getFileString($this->type).'='.$this->typeId;
+        else
+            $this->href = null;
 
         // see Spell/Tools having icon container but no actual icon and having to be inline with other IconElements
         $this->noIcon = !$typeId || !Type::hasIcon($type);

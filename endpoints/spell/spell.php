@@ -1384,10 +1384,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (!$reagents)
             return;
 
-        foreach ($this->subject->relItems->iterate() as $iId => $__)
+        foreach ($reagents as [$iId, $num])
         {
-            if (!in_array($iId, array_keys($reagents)))
-                continue;
+            $relItem = $this->subject->relItems->getEntry($iId);
 
             $data = array(
                 'path'    => Type::ITEM.'-'.$iId,           // id of the html-element
@@ -1396,11 +1395,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 'typeStr' => Type::getFileString(Type::ITEM),
                 'icon'    => new IconElement(
                     Type::ITEM,
-                    $iId,
-                    $this->subject->relItems->getField('name', true),
-                    $reagents[$iId][1],
-                    quality: $this->subject->relItems->getField('quality'),
+                    is_null($relItem) ? 0 : $iId,
+                    is_null($relItem) ? 'Item #'.$iId : $this->subject->relItems->getField('name', true),
+                    $num,
+                    quality: $relItem['quality'] ?? 'q',
                     size: IconElement::SIZE_SMALL,
+                    link: !is_null($relItem),
                     align: 'right',
                     element: 'iconlist-icon'
                 )

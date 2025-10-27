@@ -185,8 +185,12 @@ endif;
 
 foreach ($reagents as $k => ['path' => $path, 'level' => $level, 'final' => $final, 'typeStr' => $typeStr, 'icon' => $icon]):
     $icon->renderContainer(0, $k);                          // just to set offset
-    echo '<tr id="reagent-list-generic.'.$path.'"'.($level ? ' style="display: none"' : '').'><th align="right" id="iconlist-icon'.$k.'"></th>' .
-         '<td'.($level ? ' style="padding-left: '.$level.'em"' : '').'>';
+    if ($icon->noIcon):
+        echo '<tr><th><ul><li><var>&nbsp;</var></li></ul></th><td>';
+    else:
+        echo '<tr id="reagent-list-generic.'.$path.'"'.($level ? ' style="display: none"' : '').'><th align="right" id="iconlist-icon'.$k.'"></th>' .
+            '<td'.($level ? ' style="padding-left: '.$level.'em"' : '').'>';
+    endif;
 
     if ($final && $enhanced):
         echo '<div class="iconlist-tree" style="width: 15px; float: left">&nbsp;</div>';
@@ -194,7 +198,7 @@ foreach ($reagents as $k => ['path' => $path, 'level' => $level, 'final' => $fin
         echo '<div class="iconlist-tree disclosure-off" onclick="iconlist_showhide(this);" style="padding-left: 0; cursor: pointer; width: 15px; float: left" id="spn.reagent-list-generic.'.$path.'">&nbsp;</div>';
     endif;
 
-    echo '<span class="'.$icon->quality.'"><a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a></span>'.($icon->num > 1 ? '&nbsp;('.$icon->num.')' : '')."</td></tr>\n";
+    echo '<span class="'.$icon->quality.'">'.($icon->href ? '<a href="?'.$typeStr.'='.$icon->typeId.'">'.$icon->text.'</a>' : $icon->text).'</span>'.($icon->num > 1 ? '&nbsp;('.$icon->num.')' : '')."</td></tr>\n";
 endforeach;
 ?>
 </table>
