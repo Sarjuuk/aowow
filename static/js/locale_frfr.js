@@ -3820,7 +3820,7 @@ var LANG = {
                             [31,  "Increase Run Speed %"],          [32,  "Mod Mounted Speed %"],           [33,  "Decrease Run Speed %"],          [34,  "Mod Maximum Health - Flat"],     [35,  "Mod Maximum Power - Flat"],
                             [36,  "Shapeshift"],                    [37,  "Spell Effect Immunity"],         [38,  "Spell Aura Immunity"],           [39,  "Spell School Immunity"],         [40,  "Damage Immunity"],
                             [41,  "Dispel Type Immunity"],          [42,  "Proc Trigger Spell"],            [43,  "Proc Trigger Damage"],           [44,  "Track Creatures"],               [45,  "Track Resources"],
-                            [46,  "Ignore All Gear"],               [47,  "Mod Parry %"],                   /* [48, null] */                        [49,  "Mod Dodge %"],                   [50,  "Mod Critical Healing Amount %"],
+                            [46,  "Ignore All Gear"],               [47,  "Mod Parry %"],                   [48,  "Periodic Trigger Spell from Client"],[49,  "Mod Dodge %"],               [50,  "Mod Critical Healing Amount %"],
                             [51,  "Mod Block %"],                   [52,  "Mod Physical Crit Chance"],      [53,  "Periodically Drain Health"],     [54,  "Mod Physical Hit Chance"],       [55,  "Mod Spell Hit Chance"],
                             [56,  "Transform"],                     [57,  "Mod Spell Crit Chance"],         [58,  "Increase Swim Speed %"],         [59, "Mod Damage Done Versus Creature"],[60,  "Pacify & Silence"],
                             [61,  "Mod Size %"],                    [62,  "Periodically Transfer Health"],  [63,  "Periodically Transfer Power"],   [64,  "Periodically Drain Power"],      [65,  "Mod Spell Haste % (not stacking)"],
@@ -3902,11 +3902,10 @@ var LANG = {
                             [131, "Play Sound"],                    [132, "Play Music"],                    [133, "Unlearn Specialization"],        [134, "Kill Credit2"],                  [135, "Call Pet"],
                             [136, "Heal for % of Total Health"],    [137, "Give % of Total Power"],         [138, "Leap Back"],                     [139, "Abandon Quest"],                 [140, "Force Spell Cast"],
                             [141, "Force Spell Cast with Value"],   [142, "Trigger Spell with Value"],      [143, "Apply Area Aura - Pet Owner"],   [144, "Knockback to Dest."],            [145, "Pull Towards Dest."],
-                            [146, "Activate Rune"],                 [147, "Fail Quest"],                                                            [149, "Charge to Dest."],               [150, "Start Quest"],
+                            [146, "Activate Rune"],                 [147, "Fail Quest"],                    [148, "Trigger Missile with Value"],    [149, "Charge to Dest."],               [150, "Start Quest"],
                             [151, "Trigger Spell 2"],               [152, "Summon - Refer-A-Friend"],       [153, "Create Tamed Pet"],              [154, "Discover Flight Path"],          [155, "Dual Wield 2H Weapons"],
-                            [156, "Add Socket to Item"],            [157, "Create Tradeskill Item"],        [158, "Milling"],                       [159, "Rename Pet"],
-                            [161, "Change Talent Spec. Count"],     [162, "Activate Talent Spec."],                                                 [164, "Remove Aura"],
-                                                                    [167, "Update Player Phase"]
+                            [156, "Add Socket to Item"],            [157, "Create Tradeskill Item"],        [158, "Milling"],                       [159, "Rename Pet"],                    [160, "Force Cast 2"],
+                            [161, "Change Talent Spec. Count"],     [162, "Activate Talent Spec."],                                                 [164, "Remove Aura"]
                         ],
         damagetype:     [
                             [1, "Aucun"],                           [2, "Magie"],                           [3, "En mêlée"],                        [4, "À distance"]
