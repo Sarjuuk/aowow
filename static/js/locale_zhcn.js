@@ -2863,7 +2863,7 @@ var LANG = {
 
     lvnote_sort: "分类：",
 
-    lvnote_tryfiltering: "试试筛选您的结果",
+    lvnote_tryfiltering: "试试<a>筛选</a>您的结果",
     lvnote_trynarrowing: "请尝试缩小搜索范围",
     lvnote_upgradesfor:  '寻找升级 <a href="?item=$1" class="q$2"><b>$3</b></a>.',
     lvnote_witherrors:   "您搜索中的部分筛选词无效，已被忽略。",
