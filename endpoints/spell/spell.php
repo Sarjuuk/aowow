@@ -1437,7 +1437,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $scaling[1] = $this->subject->getField('effect'.$i.'BonusMultiplier');
                 continue;
             }
-            else
+            else if ($this->subject->getField('damageClass') == SPELL_DAMAGE_CLASS_MAGIC)
                 $scaling[0] = $this->subject->getField('effect'.$i.'BonusMultiplier');
 
             $allDoTs = false;
@@ -1716,7 +1716,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             if (in_array($i, $this->subject->canTriggerSpell()) && $procData['chance'] && $procData['chance'] < 100)
             {
-                $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [Lang::nf(-$procData['chance'], 1)]) : Lang::spell('procChance') . $procData['chance'] . '%';
+                $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [-$procData['chance']]) : Lang::spell('procChance', [$procData['chance']]);
                 if ($procData['cooldown'])
                     $_footer['procCD'] = Lang::game('cooldown', [Util::formatTime($procData['cooldown'], true)]);
             }

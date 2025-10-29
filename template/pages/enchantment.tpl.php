@@ -62,9 +62,9 @@ foreach ($this->effects as $i => $e):
         echo '<br />';
 
         if ($e['proc'] < 0):
-            echo Lang::spell('ppm', [Lang::nf(-$e['proc'], 1)]);
+            echo Lang::spell('ppm', [-$e['proc']]);
         elseif ($e['proc'] < 100.0):
-            echo Lang::spell('procChance').Lang::main('colon').$e['proc'].'%';
+            echo Lang::spell('procChance', [$e['proc']]);
         endif;
     endif;
 

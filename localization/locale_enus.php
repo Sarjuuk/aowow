@@ -1661,8 +1661,8 @@ $lang = array(
 
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Learned via discovery",
-        'ppm'           => "(%s procs per minute)",
-        'procChance'    => "Proc chance: ",
+        'ppm'           => "(%.1f procs per minute)",
+        'procChance'    => "Proc chance: %.4g%%",
         'starter'       => "Starter spell",
         'trainingCost'  => "Training cost: ",
         'channeled'     => "Channeled",                     // SPELL_CAST_CHANNELED

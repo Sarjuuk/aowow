@@ -1661,8 +1661,8 @@ $lang = array(
 
         'currentArea'   => '&lt;当前区域&gt;',
         'discovered'    => "通过发现学习",
-        'ppm'           => "%s每分钟触发几率",
-        'procChance'    => "触发几率：",
+        'ppm'           => "%.1f每分钟触发几率",
+        'procChance'    => "触发几率：%.4g%%",
         'starter'       => "初始法术",
         'trainingCost'  => "训练成本：",
         'channeled'     => "需引导",

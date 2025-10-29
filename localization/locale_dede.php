@@ -1661,8 +1661,8 @@ $lang = array(
 
         'currentArea'   => '&lt;Momentanes Gebiet&gt;',
         'discovered'    => "Durch Geistesblitz erlernt",
-        'ppm'           => "(%s Auslösungen pro Minute)",
-        'procChance'    => "Procchance: ",
+        'ppm'           => "(%.1f Auslösungen pro Minute)",
+        'procChance'    => "Procchance: %.4g%%",
         'starter'       => "Basiszauber",
         'trainingCost'  => "Trainingskosten: ",
         'channeled'     => "Kanalisiert",

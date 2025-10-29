@@ -1661,8 +1661,8 @@ $lang = array(
 
         'currentArea'   => '&lt;current area&gt;',
         'discovered'    => "Appris via une découverte",
-        'ppm'           => "(%s déclenchements par minute)",
-        'procChance'    => "Chance : ",
+        'ppm'           => "(%.1f déclenchements par minute)",
+        'procChance'    => "Chance : %.4g%%",
         'starter'       => "Sortilège initiaux",
         'trainingCost'  => "Coût d'entraînement : ",
         'channeled'     => "Canalisée",
