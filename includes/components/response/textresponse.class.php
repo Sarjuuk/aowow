@@ -89,7 +89,7 @@ trait TrCommunityHelper
     }
 }
 
-abstract class TextResponse extends BaseResponse
+class TextResponse extends BaseResponse
 {
     protected  string $contentType = MIME_TYPE_JAVASCRIPT;
     protected ?string $redirectTo  = null;
@@ -163,6 +163,8 @@ abstract class TextResponse extends BaseResponse
 
         echo $out;
     }
+
+    protected function generate() : void {}
 }
 
 ?>
