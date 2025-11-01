@@ -21,14 +21,10 @@ trait SmartHelper
 
     private function numRange(int $min, int $max, bool $isTime) : string
     {
-        if (!$min && !$max)
-            return '';
+        if ($isTime)
+            return Util::createNumRange($min, $max, ' &ndash; ', fn($x) => Util::formatTime($x, true));
 
-        $str = $isTime ? Util::formatTime($min, true) : $min;
-        if ($max > $min)
-            $str .= ' &ndash; '.($isTime ? Util::formatTime($max, true) : $max);
-
-        return $str;
+        return Util::createNumRange($min, $max, ' &ndash; ');
     }
 
     private function formatTime(int $time, int $_, bool $isMilliSec) : string

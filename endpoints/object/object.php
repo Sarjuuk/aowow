@@ -148,9 +148,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         if ($this->subject->getField('lootStack'))
         {
             [$min, $max, $restock] = $this->subject->getField('lootStack');
-            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').$min;
-            if ($min < $max)
-                $buff .= Lang::game('valueDelim').$max;
+            $buff = Lang::spell('spellModOp', 4).Lang::main('colon').Util::createNumRange($min, $max);
 
             // since Veins don't have charges anymore, the timer is questionable
             $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [Util::formatTime($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
@@ -163,10 +161,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
 
             $this->extendGlobalIds(Type::ZONE, $zone);
             $m = Lang::game('meetingStone').'[zone='.$zone.']';
-
-            $l = $minLevel;
-            if ($minLevel > 1 && $maxLevel > $minLevel)
-                $l .= Lang::game('valueDelim').min($maxLevel, MAX_LEVEL);
+            $l = Util::createNumRange($minLevel, min($maxLevel, MAX_LEVEL));
 
             $infobox[] = $l ? '[tooltip name=meetingstone]'.Lang::game('reqLevel', [$l]).'[/tooltip][span class=tip tooltip=meetingstone]'.$m.'[/span]' : $m;
         }
@@ -181,11 +176,11 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             if ($minTime > 1 || $minPlayer || $radius)
                 $buff .= Lang::main('colon').'[ul]';
 
-            if ($minTime > 1)
-                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').($maxTime > $minTime ? Util::FormatTime($maxTime * 1000, true).' - ' : '').Util::FormatTime($minTime * 1000, true).'[/li]';
+            if ($minTime > 1)                               // sign shenannigans reverse the display order
+                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').Util::createNumRange(-$maxTime, -$minTime, fn: fn($x) => Util::FormatTime(-$x * 1000, true)).'[/li]';
 
             if ($minPlayer)
-                $buff .= '[li]'.Lang::main('players').Lang::main('colon').$minPlayer.($maxPlayer > $minPlayer ? ' - '.$maxPlayer : '').'[/li]';
+                $buff .= '[li]'.Lang::main('players').Lang::main('colon').Util::createNumRange($minPlayer, $maxPlayer).'[/li]';
 
             if ($radius)
                 $buff .= '[li]'.Lang::spell('range', [$radius]).'[/li]';

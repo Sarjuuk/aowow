@@ -1606,7 +1606,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
              */
 
             $_nameEffect = $_nameAura = $_nameMV = $_nameMVB = $_markup = '';
-            $_icon   = $_perfItem = $_footer = [];
+            $_icon = $_perfItem = $_footer = [];
 
             $_footer['value'] = [0, 0];
             $valueFmt = '%s';
@@ -1623,7 +1623,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                         Type::ITEM,
                         $itemId,
                         $itemEntry ? $this->subject->relItems->getField('name', true) : Util::ucFirst(Lang::game('item')).' #'.$itemId,
-                        ($effBP + 1) . ($effDS > 1 ? '-' . ($effBP + $effDS) : ''),
+                        $this->createNumRange($effBP, $effDS),
                         quality: $itemEntry ? $this->subject->relItems->getField('quality') : '',
                         link: !empty($itemEntry)
                     );
@@ -1654,12 +1654,6 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                     $cndSpell = new SpellList(array(['id', $extraItem['requiredSpecialization']]));
                     if (!$cndSpell->error)
                     {
-                        $num = '+'.($effBP + 1);
-                        if ($extraItem['additionalMaxNum'] > 1)
-                            $num .= '-'.($extraItem['additionalMaxNum'] * ($effBP + $effDS));
-                        else if ($effDS > 1)
-                            $num .= '-'.($effBP + $effDS);
-
                         $_perfItem = array(
                             'spellId'   => $cndSpell->id,
                             'spellName' => $cndSpell->getField('name', true),
@@ -1669,7 +1663,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                                 Type::ITEM,
                                 $this->subject->relItems->id,
                                 $this->subject->relItems->getField('name', true),
-                                num: $num,
+                                num: '+'.$this->createNumRange($effBP, $effDS, $extraItem['additionalMaxNum']),
                                 quality: $this->subject->relItems->getField('quality')
                             )
                         );
@@ -2283,6 +2277,11 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         $this->attributes = $list;
+    }
+
+    private function createNumRange(int $bp, int $ds, int $mult = 1) : string
+    {
+        return Util::createNumRange($bp + 1, ($bp + $ds) * $mult, '-');
     }
 
     private function generatePath()
