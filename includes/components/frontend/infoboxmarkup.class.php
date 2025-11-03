@@ -23,26 +23,43 @@ class InfoboxMarkup extends Markup
 
     public function append(string $text) : self
     {
-        if ($this->items && !$this->__text)
-            $this->replace('[ul][li]' . implode('[/li][li]', $this->items) . '[/li][/ul]');
+        if ($_ = $this->prepare())
+            $this->replace($_);
 
         return parent::append($text);
     }
 
     public function __toString() : string
     {
-        if ($this->items && !$this->__text)
-            $this->replace('[ul][li]' . implode('[/li][li]', $this->items) . '[/li][/ul]');
+        if ($_ = $this->prepare())
+            $this->replace($_);
 
         return parent::__toString();
     }
 
     public function getJsGlobals() : array
     {
-        if ($this->items && !$this->__text)
-            $this->replace('[ul][li]' . implode('[/li][li]', $this->items) . '[/li][/ul]');
+        if ($_ = $this->prepare())
+            $this->replace($_);
 
         return parent::getJsGlobals();
+    }
+
+    private function prepare() : string
+    {
+        if (!$this->items || $this->__text)
+            return '';
+
+        $buff = '';
+        foreach ($this->items as $row)
+        {
+            if (is_array($row))
+                $buff .= '[li'.Util::nodeAttributes($row[1]).']' . $row[0] . '[/li]';
+            else if (is_string($row))
+                $buff .= '[li]' . $row . '[/li]';
+        }
+
+        return $buff ? '[ul]'.$buff.'[/ul]' : '';
     }
 }
 

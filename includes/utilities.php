@@ -35,7 +35,7 @@ abstract class Util
 
     private static $perfectGems             = null;
 
-    public static $regions                   = array(
+    public static $regions                  = array(
         'us',           'eu',           'kr',           'tw',           'cn',           'dev'
     );
 
@@ -1173,6 +1173,22 @@ abstract class Util
         }
 
         return (string)$var;
+    }
+
+    public static function nodeAttributes(?array $attribs) : string
+    {
+        if (!$attribs)
+            return '';
+
+        return array_reduce(array_keys($attribs), fn($carry, $name) => $carry . match(gettype($attribs[$name]))
+            {
+                'boolean'  => ' ' . $attribs[$name] ? $name : '',
+                'integer',
+                'double'   => ' ' . $name . '="' . $attribs[$name] . '"',
+                'string'   => ' ' . $name . '="' . self::htmlEscape($attribs[$name]) . '"',
+                'array'    => ' ' . $name . '="' . implode(' ', self::htmlEscape($attribs[$name])) . '"',
+                default    => ''
+            }, '');
     }
 
     public static function buildPosFixMenu(int $mapId, float $posX, float $posY, int $type, int $guid, int $parentArea = 0, int $parentFloor = 0) : array
