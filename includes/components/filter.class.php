@@ -294,14 +294,17 @@ abstract class Filter
 
     private function initFields() : void
     {
-        // quirk: in the POST step criteria will be [[''], null, null] if no criteria are selected,
-        // due to the first criteria selector always being visible
-        if (($this->rawData['cr'] ?? null) === [''] && !isset($this->rawData['crs']) && !isset($this->rawData['crv']))
-            unset($this->rawData['cr']);                    // unset or Filter::checkInput() screams bloody error
+        /* quirks:
+         * - in the POST step there may be excess criteria selectors with a value of '', as unselecting a criteria that is not the last will not remove the row from the UI
+         * - if there are no criteria selected, the placeholder selection will always be sent as ['', null, null], similar to the previous quirk
+         *
+         * same for stat weights on ItemListFilter
+         */
+        if (!empty($this->rawData['cr']))
+            $this->rawData['cr'] = array_filter($this->rawData['cr'], fn($x) => $x !== '') ?: null;
 
-        // same for stat weights on ItemListFilter
-        if ($this instanceof ItemListFilter && ($this->rawData['wt'] ?? null) === [''] && !isset($this->rawData['wtv']))
-            unset($this->rawData['wt']);
+        if (!empty($this->rawData['wt']))
+            $this->rawData['wt'] = array_filter($this->rawData['wt'], fn($x) => $x !== '') ?: null;
 
         $cleanupCr = [];
         foreach (static::$inputFields as $inp => [$type, $valid, $asArray])
