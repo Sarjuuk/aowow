@@ -319,12 +319,15 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if ($_bagFamily & 0x0100)
             $infobox[] = Lang::item('atKeyring');
 
+        // completion row added by InfoboxMarkup
+
         // original name
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
+        $hasCompletion = !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW) && ($_class == ITEM_CLASS_RECIPE || ($_class == ITEM_CLASS_MISC && in_array($_subClass, [2, 5, -7])));
         if ($infobox)
-            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
 
 
         /****************/

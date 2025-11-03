@@ -4903,6 +4903,12 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // Profiler completions import
+    completion:    'Завершено',    // WH.TERMS.completion
+    complete:      'Завершено',    // WH.TERMS.complete
+    incomplete:    'Не завершено', // WH.TERMS.incomplete
+    parens_format: '$1 ($2)',      // WH.TERMS.parens_format
+
     // click to copy fn
     copied:            'Скопировано',
     clickToCopy:       'Нажмите, чтобы скопировать',

@@ -2352,8 +2352,9 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
     private function createInfobox() : void
     {
-        $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
-        $typeCat = $this->subject->getField('typeCat');
+        $infobox       = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
+        $typeCat       = $this->subject->getField('typeCat');
+        $hasCompletion = in_array($typeCat, [-5, -6]) && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
         // level
         if (!in_array($typeCat, [-5, -6]))                  // not mount or vanity pet
@@ -2445,16 +2446,13 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
-        if (Cfg::get('PROFILER_ENABLE') && in_array($this->subject->getField('typeCat'), [-5, -6]) && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_spells WHERE `spellId` = ?d', $this->typeId);
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
-            // - js component missing;
-            // - can't yet assign styles to li element
-            // if (User::getPinnedCharacter())
-                // $infobox[] = Lang::profiler('completion') . '[span class="compact-completion-display"][/span]'; // [li style="display:none"]...[/li]
+            // completion row added by InfoboxMarkup
         }
 
         // original name
@@ -2484,7 +2482,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = 'Script'.Lang::main('colon').$_;
 
 
-        $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+        $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
 
         // append glyph symbol if available
         $glyphId = 0;

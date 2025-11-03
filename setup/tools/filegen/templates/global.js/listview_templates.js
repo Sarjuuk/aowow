@@ -905,11 +905,54 @@ Listview.templates = {
                     var _ = Listview.funcBox.getItemType;
                     return $WH.strcmp(_(a.classs, a.subclass, a.subsubclass).text, _(b.classs, b.subclass, b.subsubclass).text);
                 }
+            },
+            {
+                id: 'completed', // Listview.COLUMN_ID_COMPLETION
+                name: LANG.completion, // WH.TERMS.completion
+                hidden: true,
+                compute: function (item, td)
+                {
+                    var skip = !item.hasOwnProperty('classs') || !Listview.templates.item._validCompletionCategory(item.classs, item.subclass, item.quality);
+                    $WH.addCompletionIcons(td, 3, item.id, skip);
+                },
+                sortFunc: function (a, b)
+                {
+                    // return $WH.stringCompare(
+                    return $WH.strcmp(
+                        $WH.getCompletionFlags(3, a.id),
+                        $WH.getCompletionFlags(3, b.id)
+                    );
+                },
+                getValue: function (item) {
+                    var value = 0;
+                    var completionData = g_user.completion?.hasOwnProperty(3) ? g_user.completion[3] : {};
+
+                    if (!item.hasOwnProperty('classs') || !Listview.templates.item._validCompletionCategory(item.classs, item.subclass, item.quality))
+                        return -1;
+
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        if ($WH.in_array(completionData[profile.id], item.id) != -1)
+                            value++;
+                    }
+
+                    return value;
+                }
             }
         ],
 
         getItemLink: function(item) {
             return item.name.charAt(0) == '@' ? 'javascript:;' : '?item=' + item.id;
+        },
+
+        _validCompletionCategory: function (classs, subclass, quality) {
+            return $WH.in_array(g_completion_categories[3], classs) != -1 ||
+                   $WH.in_array(g_completion_categories[3], '' + classs + '-' + subclass) != -1 ||
+                   $WH.in_array(g_completion_categories[3], '' + classs + 'q' + quality) != -1
         },
 
         onBeforeCreate: function() {
@@ -929,6 +972,23 @@ Listview.templates = {
             if (nComparable > 0) {
                 this.mode = Listview.MODE_CHECKBOX;
                 this._nComparable = nComparable;
+            }
+
+            for (var i in this.columns)
+            {
+                if (this.columns[i].id == 'completed' && this.columns[i].hidden)
+                {
+                    if ($WH.isset('g_user') && 'characters' in g_user && $WH.in_array(this.hiddenCols, this.columns[i].id) == -1)
+                    {
+                        var n = 0;
+                        for (var j in this.data)
+                            if (this.data[j].hasOwnProperty('classs') && Listview.templates.item._validCompletionCategory(this.data[j].classs, this.data[j].subclass, this.data[j].quality))
+                                n++;
+
+                        if (n > this.data.length * 0.1)
+                            this.visibility.push(parseInt(i));
+                    }
+                }
             }
         },
 
@@ -1148,7 +1208,7 @@ Listview.templates = {
                         }
                     }
                     else {
-                        return - 1;
+                        return -1;
                     }
                 },
                 sortFunc: function(a, b, col) {
@@ -1902,11 +1962,69 @@ Listview.templates = {
                     var _ = Listview.funcBox.getQuestCategory;
                     return $WH.strcmp(_(a.category), _(b.category));
                 }
+            },
+            {
+                id: 'completed', // Listview.COLUMN_ID_COMPLETION
+                name: LANG.completion, // WH.TERMS.completion
+                hidden: true,
+                compute: function (quest, td)
+                {
+                    if (quest.daily || quest.weekly)
+                        return;
+
+                    $WH.addCompletionIcons(td, 5, quest.id)
+                },
+                sortFunc: function (a, b)
+                {
+                    // return $WH.stringCompare(
+                    return $WH.strcmp(
+                        $WH.getCompletionFlags(5, a.id),
+                        $WH.getCompletionFlags(5, b.id)
+                    );
+                },
+                getValue: function (quest) {
+                    var value = 0;
+                    var completionData = g_user.completion?.hasOwnProperty(5) ? g_user.completion[5] : {};
+
+                    if (quest.daily || quest.weekly)
+                        return -1;
+
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        if ($WH.in_array(completionData[profile.id], quest.id) != -1)
+                            value++;
+                    }
+
+                    return value;
+                }
             }
         ],
 
         getItemLink: function(quest) {
             return '?quest=' + quest.id;
+        },
+
+        onBeforeCreate: function () {
+            for (var i in this.columns)
+            {
+                if (this.columns[i].id == 'completed' && this.columns[i].hidden)
+                {
+                    if ($WH.isset('g_user') && 'characters' in g_user && $WH.in_array(this.hiddenCols, this.columns[i].id) == -1)
+                    {
+                        var n = 0;
+                        for (var j in this.data)
+                            if (!this.data[j].daily && !this.data[j].weekly)
+                                n++;
+
+                        if (n > this.data.length * 0.1)
+                            this.visibility.push(parseInt(i));
+                    }
+                }
+            }
         }
     },
 
@@ -3432,12 +3550,74 @@ Listview.templates = {
 
                     return 0;
                 }
-            }
+            },
     /* AoWoW: custom end */
+            {
+                id: 'completed', // Listview.COLUMN_ID_COMPLETION
+                name: LANG.completion, // WH.TERMS.completion
+                hidden: true,
+                compute: function (spell, td)
+                {
+                    if (!spell.hasOwnProperty('cat') || !Listview.templates.spell._validCompletionCategory(spell.cat))
+                        return;
+
+                    $WH.addCompletionIcons(td, 6, spell.id)
+                },
+                sortFunc: function (a, b)
+                {
+                    // return $WH.stringCompare(
+                    return $WH.strcmp(
+                        $WH.getCompletionFlags(6, a.id),
+                        $WH.getCompletionFlags(6, b.id)
+                    );
+                },
+                getValue: function (spell) {
+                    var value = 0;
+                    var completionData = g_user.completion?.hasOwnProperty(6) ? g_user.completion[6] : {};
+
+                    if (!spell.hasOwnProperty('cat') || !Listview.templates.spell._validCompletionCategory(spell.cat))
+                        return -1;
+
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        if ($WH.in_array(completionData[profile.id], spell.id) != -1)
+                            value++;
+                    }
+
+                    return value;
+                }
+            }
         ],
 
         getItemLink: function(spell) {
             return '?spell=' + spell.id;
+        },
+
+        _validCompletionCategory: function (category) {
+            return $WH.in_array(g_completion_categories[6], category) != -1;
+        },
+
+        onBeforeCreate: function () {
+            for (var i in this.columns)
+            {
+                if (this.columns[i].id == 'completed' && this.columns[i].hidden)
+                {
+                    if ($WH.isset('g_user') && 'characters' in g_user && $WH.in_array(this.hiddenCols, this.columns[i].id) == -1)
+                    {
+                        var n = 0;
+                        for (var j in this.data)
+                            if (this.data[j].hasOwnProperty('cat') && Listview.templates.spell._validCompletionCategory(this.data[j].cat))
+                                n++;
+
+                        if (n > this.data.length * 0.1)
+                            this.visibility.push(parseInt(i));
+                    }
+                }
+            }
         }
     },
 
@@ -5834,11 +6014,69 @@ Listview.templates = {
                     return $WH.strcmp(g_achievement_categories[a.category], g_achievement_categories[b.category]);
                 },
                 hidden: true
+            },
+            {
+                id: 'completed', // Listview.COLUMN_ID_COMPLETION
+                name: LANG.completion, // WH.TERMS.completion
+                hidden: true,
+                compute: function (achievement, td)
+                {
+                    if (achievement.type)
+                        return;
+
+                    $WH.addCompletionIcons(td, 10, achievement.id)
+                },
+                sortFunc: function (a, b)
+                {
+                    // return $WH.stringCompare(
+                    return $WH.strcmp(
+                        $WH.getCompletionFlags(10, a.id),
+                        $WH.getCompletionFlags(10, b.id)
+                    );
+                },
+                getValue: function (achievement) {
+                    var value = 0;
+                    var completionData = g_user.completion?.hasOwnProperty(10) ? g_user.completion[10] : {};
+
+                    if (achievement.type)
+                        return -1;
+
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        if ($WH.in_array(completionData[profile.id], achievement.id) != -1)
+                            value++;
+                    }
+
+                    return value;
+                }
             }
         ],
 
         getItemLink: function(achievement) {
             return '?achievement=' + achievement.id;
+        },
+
+        onBeforeCreate: function () {
+            for (var i in this.columns)
+            {
+                if (this.columns[i].id == 'completed' && this.columns[i].hidden)
+                {
+                    if ($WH.isset('g_user') && 'characters' in g_user && $WH.in_array(this.hiddenCols, this.columns[i].id) == -1)
+                    {
+                        var n = 0;
+                        for (var j in this.data)
+                            if (!this.data[j].type)
+                                n++;
+
+                        if (n > this.data.length * 0.1)
+                            this.visibility.push(parseInt(i));
+                    }
+                }
+            }
         }
     },
 
@@ -6052,11 +6290,55 @@ Listview.templates = {
                     return $WH.strcmp(g_title_categories[a.category], g_title_categories[b.category]);
                 },
                 hidden: true
+            },
+            {
+                id: 'completed', // Listview.COLUMN_ID_COMPLETION
+                name: LANG.completion, // WH.TERMS.completion
+                hidden: true,
+                compute: function (title, td)
+                {
+                    $WH.addCompletionIcons(td, 11, title.id)
+                },
+                sortFunc: function (a, b)
+                {
+                    // return $WH.stringCompare(
+                    return $WH.strcmp(
+                        $WH.getCompletionFlags(11, a.id),
+                        $WH.getCompletionFlags(11, b.id)
+                    );
+                },
+                getValue: function (title) {
+                    var value = 0;
+                    var completionData = g_user.completion?.hasOwnProperty(11) ? g_user.completion[11] : {};
+
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        if ($WH.in_array(completionData[profile.id], title.id) != -1)
+                            value++;
+                    }
+
+                    return value;
+                }
             }
         ],
 
         getItemLink: function(title) {
             return '?title=' + title.id;
+        },
+
+        onBeforeCreate: function () {
+            for (var i in this.columns)
+            {
+                if (this.columns[i].id == 'completed' && this.columns[i].hidden)
+                {
+                    if ($WH.isset('g_user') && 'characters' in g_user && $WH.in_array(this.hiddenCols, this.columns[i].id) == -1)
+                        this.visibility.push(parseInt(i));
+                }
+            }
         }
     },
 

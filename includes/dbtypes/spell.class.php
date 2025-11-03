@@ -2150,8 +2150,11 @@ class SpellList extends DBTypeList
             {
                 $data[Type::SPELL][$id] = array(
                     'icon' => $this->curTpl['iconStringAlt'] ?: $this->curTpl['iconString'],
-                    'name' => $this->getField('name', true),
+                    'name' => $this->getField('name', true)
                 );
+
+                if (($_ = $this->curTpl['typeCat']) && in_array($_, [-5, -6, 9, 11]))
+                    $data[Type::SPELL][$id]['completion_category'] = $_;
             }
 
             if ($addMask & GLOBALINFO_EXTRA)

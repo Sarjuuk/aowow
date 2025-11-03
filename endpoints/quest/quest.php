@@ -64,6 +64,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $_flags        = $this->subject->getField('flags');
         $_specialFlags = $this->subject->getField('specialFlags');
         $_side         = ChrRace::sideFromMask($this->subject->getField('reqRaceMask'));
+        $hasCompletion = !($_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
 
         /*************/
@@ -275,16 +276,13 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         $infobox[] = Lang::quest('id') . $this->typeId;
 
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
-        if (Cfg::get('PROFILER_ENABLE') && !($_flags & QUEST_FLAG_UNAVAILABLE || $this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_quests WHERE `questId` = ?d', $this->typeId);
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
-            // - js component missing;
-            // - can't yet assign styles to li element
-            // if (User::getPinnedCharacter())
-                // $infobox[] = Lang::profiler('completion') . '[span class="compact-completion-display"][/span]'; // [li style="display:none"]...[/li]
+            // completion row added by InfoboxMarkup
         }
 
         // original name
@@ -292,7 +290,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         if ($infobox)
-            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', $hasCompletion);
 
 
         /*******************/

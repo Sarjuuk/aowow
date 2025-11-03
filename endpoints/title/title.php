@@ -94,10 +94,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
-            // - js component missing;
-            // - can't yet assign styles to li element
-            // if (User::getPinnedCharacter())
-                // $infobox[] = Lang::profiler('completion') . '[span class="compact-completion-display"][/span]'; // [li style="display:none"]...[/li]
+            // completion row added by InfoboxMarkup
         }
 
         // original name
@@ -105,7 +102,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
 
         if ($infobox)
-            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0');
+            $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF, 'dbpage' => true], 'infobox-contents0', 1);
 
 
         /****************/

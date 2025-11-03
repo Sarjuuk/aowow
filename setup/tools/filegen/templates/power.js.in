@@ -644,6 +644,49 @@ if (typeof $WowheadPower == "undefined") {
                 }
             }
 
+            if (!isRemote && window.g_user && g_user.characters)
+            {
+                var completion = '';
+                let completionData = g_user.completion.hasOwnProperty(currentType) ? g_user.completion[currentType] : false;
+
+                let entity = {};
+                if (currentType == TYPE_QUEST && $WH.isset('g_quests'))
+                    entity = g_quests[currentId] || {};
+                if (currentType == TYPE_ACHIEVEMENT && $WH.isset('g_achievements'))
+                    entity = g_achievements[currentId] || {};
+                if (currentType == TYPE_ITEM && $WH.isset('g_items'))
+                    entity = g_items[currentId] || {};
+                if (currentType == TYPE_SPELL && $WH.isset('g_spells'))
+                    entity = g_spells[currentId] || {};
+
+                if ((!LOOKUPS[currentType][0] || LOOKUPS[currentType][0][currentId].status[currentLocale] !== STATUS_OK) ||
+                    (currentType === TYPE_QUEST && (entity.daily || entity.weekly)) ||
+                    (currentType === TYPE_ACHIEVEMENT && entity.type))
+                    completionData = false;
+
+                let CompetionWithoutCatg = !(completionData && currentType in g_completion_categories && $WH.in_array(g_completion_categories[currentType], entity.completion_category) === -1);
+
+                if (completionData)
+                {
+                    for (var i in g_user.characters)
+                    {
+                        var profile = g_user.characters[i];
+                        if (!(profile.id in completionData))
+                            continue;
+
+                        let isComplete = $WH.in_array(completionData[profile.id], currentId) !== - 1;
+                        if (!isComplete && !CompetionWithoutCatg)
+                            continue;
+
+                        completion += '<br><span class="progress-icon ' + (isComplete ? 'progress-8' : 'progress-0') + '"></span> ';
+                        completion += profile.name + ' - ' + profile.realmname + ' ' + profile.region.toUpperCase();
+                    }
+                }
+
+                if (completion !== '')
+                    html += '<br><span class="q">' + LANG.completion + ':</span>' + completion;
+            }
+
             if (currentParams.map && map && map.getMap) {
                 html2 = map.getMap();
             }

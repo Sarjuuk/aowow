@@ -269,6 +269,12 @@ var g_types = {
    504: 'mail'
 };
 
+var g_completion_categories = {
+ // 1: [12],                                                // NPCs: Battle Pets
+    3: [9, "15-2", "15-5", "15--7"],                        // Items: Recipes, Minipets, Mounts (Ground), Mounts (Flying)
+    6: [-5, -6, 9, 11]                                      // Spells: Mounts, Minipets, Sec. Skills, Prim. Skills
+};
+
 // Items
 $WH.cO(g_items, {
     add: function(id, json)

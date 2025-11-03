@@ -4260,3 +4260,33 @@ a.button-red.fa-clipboard > em > span {
 .fav-star-1 {
     background-position: -65px center;
 }
+
+/* imported from lists */
+.compact-completion-display a {
+    margin-left: 2px;
+    vertical-align: text-top; /* middle; */
+}
+
+.progress-icon {
+    /* background: url(/images/ListManager/completion.png?4) no-repeat; */
+    background: url(../images/ui/check.png) no-repeat -1px -15px;
+    border-radius: 99px;
+    display: inline-block;
+    height: 13px; /* 16px; */
+    line-height: 16px;
+    vertical-align: sub; /* bottom; */
+    width: 13px; /* 16px; */
+}
+
+.progress-icon:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* newer atlas has 9 icons */
+.progress-icon.progress-8 {
+    background-position: -1px 0px;
+}
+
+.progress-icon.with-text {
+    padding-left: 16px;
+}

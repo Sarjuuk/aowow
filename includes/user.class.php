@@ -569,6 +569,7 @@ class User
         $gUser['downvoteRep']       = Cfg::get('REP_REQ_DOWNVOTE');
         $gUser['upvoteRep']         = Cfg::get('REP_REQ_UPVOTE');
         $gUser['characters']        = self::getCharacters();
+        $gUser['completion']        = self::getCompletion();
         $gUser['excludegroups']     = self::$excludeGroups;
 
         if (self::$debug)
@@ -722,6 +723,58 @@ class User
         }
 
         return $data;
+    }
+
+    public static function getCompletion() : array
+    {
+        $ids = [];
+        foreach (self::$profiles->iterate() as $_)
+            if (!self::$profiles->isCustom())
+                $ids[] = self::$profiles->id;
+
+        if (!$ids)
+            return [];
+
+        $completion = [];
+
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `questId` AS ARRAY_KEY2, `questId` FROM ?_profiler_completion_quests WHERE `id` IN (?a)', $ids);
+        $completion[Type::QUEST] = $x ? array_map(array_values(...), $x) : [];
+
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `achievementId` AS ARRAY_KEY2, `achievementId` FROM ?_profiler_completion_achievements WHERE `id` IN (?a)', $ids);
+        $completion[Type::ACHIEVEMENT] = $x ? array_map(array_values(...), $x) : [];
+
+        $x = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, `titleId` AS ARRAY_KEY2, `titleId` FROM ?_profiler_completion_titles WHERE `id` IN (?a)', $ids);
+        $completion[Type::TITLE] = $x ? array_map(array_values(...), $x) : [];
+
+        $completion[Type::ITEM] = [];
+
+        $spells = DB::Aowow()->select(
+           'SELECT    pcs.`id` AS ARRAY_KEY, pcs.`spellId` AS ARRAY_KEY2, pcs.`spellId`, i.`id` AS "itemId"
+            FROM      ?_spell s
+            JOIN      ?_profiler_completion_spells pcs ON s.`id` = pcs.`spellId`
+            LEFT JOIN ?_items i ON i.spellId1 IN (?a) AND i.spellId2 = pcs.spellId
+            WHERE     s.`typeCat` IN (?a) AND pcs.`id` IN (?a)',
+            LEARN_SPELLS, [-5, -6, 9, 11], $ids
+        );
+
+        if ($spells)
+        {
+            $completion[Type::SPELL] = array_map(fn($x) => array_column($x, 'spellId'), $spells);
+
+            if ($recipes = array_map(fn($x) => array_filter(array_column($x, 'itemId')),  $spells))
+                foreach ($ids as $id)                       // array_merge_recursive does not respect numeric keys
+                    $completion[Type::ITEM][$id] = array_merge($completion[Type::ITEM][$id] ?? [], $recipes[$id] ?? []);
+        }
+        else
+            $completion[Type::SPELL] = [];
+
+        // init empty result sets
+        foreach ($completion as &$c)
+            foreach ($ids as $id)
+                if (!isset($c[$id]))
+                    $c[$id] = [];
+
+        return $completion;
     }
 }
 

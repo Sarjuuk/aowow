@@ -415,7 +415,15 @@ class QuestList extends DBTypeList
             }
 
             if ($addMask & GLOBALINFO_SELF)
+            {
                 $data[Type::QUEST][$this->id] = ['name' => $this->getField('name', true)];
+
+                if ($this->curTpl['flags'] & QUEST_FLAG_DAILY)
+                    $data[Type::QUEST][$this->id]['daily'] = true;
+
+                if ($this->curTpl['flags'] & QUEST_FLAG_WEEKLY)
+                    $data[Type::QUEST][$this->id]['weekly'] = true;
+            }
         }
 
         return $data;

@@ -4927,6 +4927,12 @@ var LANG = {
 
     /* AoWoW: start custom */
 
+    // Profiler completions import
+    completion:    '达成',     // WH.TERMS.completion
+    complete:      '完成',     // WH.TERMS.complete
+    incomplete:    '未完成',   // WH.TERMS.incomplete
+    parens_format: '$1（$2）', // WH.TERMS.parens_format
+
     // click to copy fn
     copied:            '已复制',
     clickToCopy:       '点击复制',

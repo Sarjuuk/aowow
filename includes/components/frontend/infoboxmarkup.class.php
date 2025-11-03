@@ -8,7 +8,7 @@ if (!defined('AOWOW_REVISION'))
 
 class InfoboxMarkup extends Markup
 {
-    public function __construct(private array $items, array $opts, string $parent = '')
+    public function __construct(private array $items, array $opts, string $parent = '', private int $completionRowType = 0)
     {
         parent::__construct('', $opts, $parent);
     }
@@ -31,6 +31,10 @@ class InfoboxMarkup extends Markup
 
     public function __toString() : string
     {
+        // inject before output to avoid adding it to cache
+        if ($this->completionRowType && User::getCharacters())
+            $this->items[] = [Lang::profiler('completion') . '[span class="compact-completion-display"][/span]', ['style' => 'display:none']];
+
         if ($_ = $this->prepare())
             $this->replace($_);
 

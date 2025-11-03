@@ -8538,10 +8538,15 @@ function ProfilerCompletion(_parent) {
                 _tabsListview.show((_subtotal[_category].complete[_subcategory] ? 2 : 3));
 
                 if (_opt.subname) {
-                    _listview.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_listview, _listview.columns[_listview.columns.length - 2], ''));
-                    _excluded.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_excluded, _listview.columns[_listview.columns.length - 2], ''));
-                    setTimeout(Listview.headerFilter.bind(_listview, _listview.columns[_listview.columns.length - 2], _opt.subname(_subcategory)), 1);
-                    setTimeout(Listview.headerFilter.bind(_excluded, _excluded.columns[_excluded.columns.length - 2], _opt.subname(_subcategory)), 1);
+                 // aowow - adressing col by offset breaks everytime we add/remove cols in a listview template
+                 // _listview.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_listview, _listview.columns[_listview.columns.length - 2], ''));
+                 // _excluded.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_excluded, _listview.columns[_listview.columns.length - 2], ''));
+                 // setTimeout(Listview.headerFilter.bind(_listview, _listview.columns[_listview.columns.length - 2], _opt.subname(_subcategory)), 1);
+                 // setTimeout(Listview.headerFilter.bind(_excluded, _excluded.columns[_excluded.columns.length - 2], _opt.subname(_subcategory)), 1);
+                    _listview.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_listview, _listview.columns.find((x) => x.id == (_opt.catgcol || 'category')), ''));
+                    _excluded.createIndicator($WH.sprintf(LANG['lvnote_' + _mode + 'ind'], _category, _subcategory, _opt.subname(_subcategory)), Listview.headerFilter.bind(_excluded, _listview.columns.find((x) => x.id == (_opt.catgcol || 'category')), ''));
+                    setTimeout(Listview.headerFilter.bind(_listview, _listview.columns.find((x) => x.id == (_opt.catgcol || 'category')), _opt.subname(_subcategory)), 1);
+                    setTimeout(Listview.headerFilter.bind(_excluded, _excluded.columns.find((x) => x.id == (_opt.catgcol || 'category')), _opt.subname(_subcategory)), 1);
                 }
             }
         }

@@ -51,6 +51,7 @@ echo "    <table class=\"infobox\">\n";
 ?>
         <tr><th id="infobox-videos"><?=Lang::main('videos'); ?></th></tr>
         <tr><td><div class="infobox-spacer"></div><div id="infobox-sticky-vi"></div></td></tr>
+    <script type="text/javascript">$WH.prepInfobox()</script>
 <?php
     endif;
 

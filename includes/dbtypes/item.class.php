@@ -487,6 +487,11 @@ class ItemList extends DBTypeList
                     'quality' => $this->curTpl['quality'],
                     'icon'    => $this->curTpl['iconString']
                 );
+
+                if ($this->curTpl['class'] == ITEM_CLASS_RECIPE)
+                    $data[Type::ITEM][$id]['completion_category'] = $this->curTpl['class'];
+                else if ($this->curTpl['class'] == ITEM_CLASS_MISC && in_array($this->curTpl['subClass'], [2, 5, -7]))
+                    $data[Type::ITEM][$id]['completion_category'] = $this->curTpl['class'].'-'.$this->curTpl['subClass'];
             }
 
             if ($addMask & GLOBALINFO_EXTRA)
