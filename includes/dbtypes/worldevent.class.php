@@ -91,7 +91,7 @@ class WorldEventList extends DBTypeList
         if ($rec < 0 || $date['lastDate'] < time())
             return true;
 
-        $nIntervals = ceil((time() - $start) / $rec);
+        $nIntervals = (int)ceil((time() - $end) / $rec);
 
         $start += $nIntervals * $rec;
         $end   += $nIntervals * $rec;
@@ -157,9 +157,9 @@ class WorldEventList extends DBTypeList
 
         // use string-placeholder for dates
         // start
-        $x .= Lang::event('start').Lang::main('colon').'%s<br />';
+        $x .= Lang::event('start').'%s<br />';
         // end
-        $x .= Lang::event('end').Lang::main('colon').'%s';
+        $x .= Lang::event('end').'%s';
 
         $x .= '</td></tr></table>';
 
