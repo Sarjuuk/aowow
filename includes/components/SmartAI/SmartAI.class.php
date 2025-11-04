@@ -37,6 +37,12 @@ trait SmartHelper
 
     private function castFlags(int $flags) : string
     {
+        if ($x = ($flags & ~SmartAI::CAST_FLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::castFlags - unknown SmartCastFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= SmartAI::CAST_FLAG_VALIDATE;
+        }
+
         $cf = [];
         for ($i = 1; $i <= SmartAI::CAST_FLAG_COMBAT_MOVE; $i <<= 1)
             if (($flags & $i) && ($x = Lang::smartAI('castFlags', $i)))
@@ -47,6 +53,12 @@ trait SmartHelper
 
     private function npcFlags(int $flags) : string
     {
+        if ($x = ($flags & ~NPC_FLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::npcFlags - unknown NpcFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= NPC_FLAG_VALIDATE;
+        }
+
         $nf = [];
         for ($i = 1; $i <= NPC_FLAG_MAILBOX; $i <<= 1)
             if (($flags & $i) && ($x = Lang::npc('npcFlags', $i)))
@@ -57,6 +69,12 @@ trait SmartHelper
 
     private function dynFlags(int $flags) : string
     {
+        if ($x = ($flags & ~UNIT_DYNFLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::dynFlags - unknown unit dynFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= UNIT_DYNFLAG_VALIDATE;
+        }
+
         $df = [];
         for ($i = 1; $i <= UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST; $i <<= 1)
             if (($flags & $i) && ($x = Lang::unit('dynFlags', $i)))
@@ -67,6 +85,12 @@ trait SmartHelper
 
     private function goFlags(int $flags) : string
     {
+        if ($x = ($flags & ~GO_FLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::goFlags - unknown GameobjectFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= GO_FLAG_VALIDATE;
+        }
+
         $gf = [];
         for ($i = 1; $i <= GO_FLAG_DESTROYED; $i <<= 1)
             if (($flags & $i) && ($x = Lang::gameObject('goFlags', $i)))
@@ -77,6 +101,12 @@ trait SmartHelper
 
     private function spawnFlags(int $flags) : string
     {
+        if ($x = ($flags & ~SmartAI::SPAWN_FLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::spawnFlags - unknown SmartSpawnFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= SmartAI::SPAWN_FLAG_VALIDATE;
+        }
+
         $sf = [];
         for ($i = 1; $i <= SmartAI::SPAWN_FLAG_NOSAVE_RESPAWN; $i <<= 1)
             if (($flags & $i) && ($x = Lang::smartAI('spawnFlags', $i)))
@@ -87,6 +117,18 @@ trait SmartHelper
 
     private function unitFlags(int $flags, int $flags2) : string
     {
+        if ($x = ($flags & ~UNIT_FLAG_VALIDATE))
+        {
+            trigger_error('SmartAI::unitFlags - unknown UnitFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= UNIT_FLAG_VALIDATE;
+        }
+
+        if ($x = ($flags2 & ~UNIT_FLAG2_VALIDATE))
+        {
+            trigger_error('SmartAI::unitFlags - unknown UnitFlags2 '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags2 &= UNIT_FLAG2_VALIDATE;
+        }
+
         $field = $flags2 ? 'flags2' : 'flags';
         $max   = $flags2 ? UNIT_FLAG2_ALLOW_CHEAT_SPELLS : UNIT_FLAG_UNK_31;
         $uf    = [];
@@ -181,6 +223,7 @@ class SmartAI
 //  public const CAST_FORCE_TARGET_SELF   = 0x10;           // the target to cast this spell on itself
     public const CAST_FLAG_AURA_MISSING   = 0x20;           // Only casts the spell if the target does not have an aura from the spell
     public const CAST_FLAG_COMBAT_MOVE    = 0x40;           // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    public const CAST_FLAG_VALIDATE       = self::CAST_FLAG_INTERRUPT_PREV | self::CAST_FLAG_TRIGGERED | self::CAST_FLAG_AURA_MISSING | self::CAST_FLAG_COMBAT_MOVE;
 
     public const REACT_PASSIVE    = 0;
     public const REACT_DEFENSIVE  = 1;
@@ -207,6 +250,7 @@ class SmartAI
     public const SPAWN_FLAG_IGNORE_RESPAWN = 0x01;          // onSpawnIn - ignore & reset respawn timer
     public const SPAWN_FLAG_FORCE_SPAWN    = 0x02;          // onSpawnIn - force additional spawn if already in world
     public const SPAWN_FLAG_NOSAVE_RESPAWN = 0x04;          // onDespawn - remove respawn time
+    public const SPAWN_FLAG_VALIDATE       = self::SPAWN_FLAG_IGNORE_RESPAWN | self::SPAWN_FLAG_FORCE_SPAWN | self::SPAWN_FLAG_NOSAVE_RESPAWN;
 
     private array $jsGlobals  = [];
     private array $rawData    = [];

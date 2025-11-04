@@ -1139,14 +1139,15 @@ $lang = array(
         'foundIn'       => "Esta entidad se puede encontrar en",
         'restock'       => "Se renueva cada %s.",
         'goFlags'       => array(
-            GO_FLAG_IN_USE         => 'En uso',
-            GO_FLAG_LOCKED         => 'Bloqueado',
-            GO_FLAG_INTERACT_COND  => 'No se puede interactuar',
-            GO_FLAG_TRANSPORT      => 'Transporte',
-            GO_FLAG_NOT_SELECTABLE => 'No seleccionable',
-            GO_FLAG_TRIGGERED      => 'Activado',
-            GO_FLAG_DAMAGED        => 'Dañado por asedio',
-            GO_FLAG_DESTROYED      => 'Destruido por asedio'
+            GO_FLAG_IN_USE           => 'En uso',
+            GO_FLAG_LOCKED           => 'Bloqueado',
+            GO_FLAG_INTERACT_COND    => 'No se puede interactuar',
+            GO_FLAG_TRANSPORT        => 'Transporte',
+            GO_FLAG_NOT_SELECTABLE   => 'No seleccionable',
+            GO_FLAG_AI_OBSTACLE      => 'Activado',
+            GO_FLAG_FREEZE_ANIMATION => 'Congelar animación',
+            GO_FLAG_DAMAGED          => 'Dañado por asedio',
+            GO_FLAG_DESTROYED        => 'Destruido por asedio'
         ),
         'actions'       => array(
             "Ninguno",                      "Animar personalizado 0",       "Animar personalizado 1",       "Animar personalizado 2",       "Animar personalizado 3",

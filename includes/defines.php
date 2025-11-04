@@ -681,6 +681,7 @@ define('NPC_FLAG_STABLE_MASTER',            0x00400000);
 define('NPC_FLAG_GUILD_BANK',               0x00800000);
 define('NPC_FLAG_SPELLCLICK',               0x01000000);
 define('NPC_FLAG_MAILBOX',                  0x04000000);
+define('NPC_FLAG_VALIDATE',                 0x05FFFFF3);
 
 define('CREATURE_FLAG_EXTRA_INSTANCE_BIND',                   0x00000001);    // creature kill binds instance to killer and killer's group
 define('CREATURE_FLAG_EXTRA_CIVILIAN',                        0x00000002);    // creature does not aggro (ignore faction/reputation hostility)
@@ -740,6 +741,7 @@ define('UNIT_FLAG_UNK_28',                  0x10000000);    // (PreventKneelingW
 define('UNIT_FLAG_UNK_29',                  0x20000000);    // Used in Feign Death spell or NPC will play dead. (PreventEmotes)
 define('UNIT_FLAG_SHEATHE',                 0x40000000);    //
 define('UNIT_FLAG_UNK_31',                  0x80000000);    //
+define('UNIT_FLAG_VALIDATE',                0x7FFFFFFF);    //
 
 define('UNIT_FLAG2_FEIGN_DEATH',            0x00000001);    //
 define('UNIT_FLAG2_UNK1',                   0x00000002);    // Hide unit model (show only player equip)
@@ -759,6 +761,7 @@ define('UNIT_FLAG2_DISABLE_TURN',           0x00008000);    //
 define('UNIT_FLAG2_UNK2',                   0x00010000);    //
 define('UNIT_FLAG2_PLAY_DEATH_ANIM',        0x00020000);    // Plays special death animation upon death
 define('UNIT_FLAG2_ALLOW_CHEAT_SPELLS',     0x00040000);    // allows casting spells with AttributesEx7 & SPELL_ATTR7_IS_CHEAT_SPELL
+define('UNIT_FLAG2_VALIDATE',               0x0006FDFF);    //
 
 // UNIT_FIELD_BYTES_1 - idx 0 (UnitStandStateType)
 define('UNIT_STAND_STATE_STAND',            0);
@@ -794,6 +797,7 @@ define('UNIT_DYNFLAG_SPECIALINFO',               0x10);     //
 define('UNIT_DYNFLAG_DEAD',                      0x20);     // Makes the creature appear dead (this DOES NOT make the creature's name grey or not attack players).
 define('UNIT_DYNFLAG_REFER_A_FRIEND',            0x40);     //
 define('UNIT_DYNFLAG_TAPPED_BY_ALL_THREAT_LIST', 0x80);     // Lua_UnitIsTappedByAllThreatList
+define('UNIT_DYNFLAG_VALIDATE',                  0xFF);     //
 
 define('PET_TALENT_TYPE_FEROCITY', 0);
 define('PET_TALENT_TYPE_TENACITY', 1);
@@ -863,9 +867,11 @@ define('GO_FLAG_INTERACT_COND',   0x0004);                  // Untargetable, can
 define('GO_FLAG_TRANSPORT',       0x0008);                  // Gameobject can transport (boat, elevator, car)
 define('GO_FLAG_NOT_SELECTABLE',  0x0010);                  // Not selectable (Not even in GM-mode)
 define('GO_FLAG_NODESPAWN',       0x0020);                  // Never despawns. Typical for gameobjects with on/off state (doors for example)
-define('GO_FLAG_TRIGGERED',       0x0040);                  // typically, summoned objects. Triggered by spell or other events
+define('GO_FLAG_AI_OBSTACLE',     0x0040);                  // makes the client register the object in something called AIObstacleMgr, unknown what it does
+define('GO_FLAG_FREEZE_ANIMATION',0x0080);                  //
 define('GO_FLAG_DAMAGED',         0x0200);                  // Gameobject has been siege damaged
 define('GO_FLAG_DESTROYED',       0x0400);                  // Gameobject has been destroyed
+define('GO_FLAG_VALIDATE',        0x06FF);                  //
 
 define('GO_STATE_ACTIVE',             0);                   // show in world as used and not reset (closed door open)
 define('GO_STATE_READY',              1);                   // show in world as ready (closed door close)

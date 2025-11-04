@@ -1139,14 +1139,15 @@ $lang = array(
         'foundIn'       => "Этот НИП может быть найден в следующих зонах:",
         'restock'       => "[Restocks every %s.]",
         'goFlags'       => array(
-            GO_FLAG_IN_USE         => 'In use',
-            GO_FLAG_LOCKED         => 'Locked',
-            GO_FLAG_INTERACT_COND  => 'Cannot interact',
-            GO_FLAG_TRANSPORT      => 'Transport',
-            GO_FLAG_NOT_SELECTABLE => 'Not selectable',
-            GO_FLAG_TRIGGERED      => 'Triggered',
-            GO_FLAG_DAMAGED        => 'Siege damaged',
-            GO_FLAG_DESTROYED      => 'Siege destroyed'
+            GO_FLAG_IN_USE           => 'In use',
+            GO_FLAG_LOCKED           => 'Locked',
+            GO_FLAG_INTERACT_COND    => 'Cannot interact',
+            GO_FLAG_TRANSPORT        => 'Transport',
+            GO_FLAG_NOT_SELECTABLE   => 'Not selectable',
+            GO_FLAG_AI_OBSTACLE      => 'Triggered',
+            GO_FLAG_FREEZE_ANIMATION => 'Freeze Animation',
+            GO_FLAG_DAMAGED          => 'Siege damaged',
+            GO_FLAG_DESTROYED        => 'Siege destroyed'
         ),
         'actions'       => array(
             "None",                         "Animate Custom 0",             "Animate Custom 1",             "Animate Custom 2",             "Animate Custom 3",

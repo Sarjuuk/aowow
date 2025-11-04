@@ -112,6 +112,7 @@ class SmartEvent
     public const FLAG_NO_RESET         = 0x0100;
     public const FLAG_WHILE_CHARMED    = 0x0200;
     public const FLAG_ALL_DIFFICULTIES = self::FLAG_DIFFICULTY_0 | self::FLAG_DIFFICULTY_1 | self::FLAG_DIFFICULTY_2 | self::FLAG_DIFFICULTY_3;
+    public const FLAG_VALIDATE         = self::FLAG_NO_REPEAT | self::FLAG_DEBUG_ONLY | self::FLAG_NO_RESET | self::FLAG_WHILE_CHARMED | self::FLAG_ALL_DIFFICULTIES;
 
     private const EVENT_CELL_TPL = '[tooltip name=e-#rowIdx#]%1$s[/tooltip][span tooltip=e-#rowIdx#]%2$s[/span]';
 
@@ -304,7 +305,7 @@ class SmartEvent
                 );
 
                 if ($gmo)
-                    $this->param[10] = Util::jsEscape(Util::localizedString($gmo, 'text'));
+                    $this->param[10] = Util::localizedString($gmo, 'text');
                 else
                     trigger_error('SmartAI::event - could not find gossip menu option for event #'.$this->type);
                 break;
@@ -373,6 +374,12 @@ class SmartEvent
     private function formatFlags() : string
     {
         $flags = $this->flags;
+
+        if ($x = ($flags & ~self::FLAG_VALIDATE))
+        {
+            trigger_error('SmartEvent::formatFlags - unused SmartEventFlags '.Util::asBin($x).' set on id #'.$this->id, E_USER_NOTICE);
+            $flags &= self::FLAG_VALIDATE;
+        }
 
         if (($flags & self::FLAG_ALL_DIFFICULTIES) == self::FLAG_ALL_DIFFICULTIES)
             $flags &= ~self::FLAG_ALL_DIFFICULTIES;

@@ -467,8 +467,8 @@ class SmartAction
                     WHERE  tp.`id` = ?d',
                     Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, Lang::getLocale()->value, $this->param[0]
                 );
-                $this->param[10] = Util::jsEscape(Util::localizedString($nodes, 'start'));
-                $this->param[11] = Util::jsEscape(Util::localizedString($nodes, 'end'));
+                $this->param[10] = Util::localizedString($nodes, 'start');
+                $this->param[11] = Util::localizedString($nodes, 'end');
                 break;
             case self::ACTION_SET_INGAME_PHASE_MASK:        // 44 -> any target
                 if ($this->param[0])

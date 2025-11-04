@@ -1139,14 +1139,15 @@ $lang = array(
         'foundIn'       => "Dieses Objekt befindet sich in",
         'restock'       => "Wird alle %s wieder aufgefüllt.",
         'goFlags'       => array(
-            GO_FLAG_IN_USE         => 'In Benutzung',
-            GO_FLAG_LOCKED         => 'Verschlossen',
-            GO_FLAG_INTERACT_COND  => 'Nicht interagierbar',
-            GO_FLAG_TRANSPORT      => 'Transporter',
-            GO_FLAG_NOT_SELECTABLE => 'Nicht anwählbar',
-            GO_FLAG_TRIGGERED      => 'Ausgelöst',
-            GO_FLAG_DAMAGED        => 'Belagerung beschädigt',
-            GO_FLAG_DESTROYED      => 'Belagerung zerstört'
+            GO_FLAG_IN_USE           => 'In Benutzung',
+            GO_FLAG_LOCKED           => 'Verschlossen',
+            GO_FLAG_INTERACT_COND    => 'Nicht interagierbar',
+            GO_FLAG_TRANSPORT        => 'Transporter',
+            GO_FLAG_NOT_SELECTABLE   => 'Nicht anwählbar',
+            GO_FLAG_AI_OBSTACLE      => 'Ausgelöst',
+            GO_FLAG_FREEZE_ANIMATION => 'Pausiert Animation',
+            GO_FLAG_DAMAGED          => 'Belagerung beschädigt',
+            GO_FLAG_DESTROYED        => 'Belagerung zerstört'
         ),
         'actions'       => array(
             "None",                         "Animate Custom 0",             "Animate Custom 1",             "Animate Custom 2",             "Animate Custom 3",

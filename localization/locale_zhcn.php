@@ -1139,14 +1139,15 @@ $lang = array(
         'foundIn'       => "这个游戏对象可以在以下地区找到：",
         'restock'       => "每%s重新补给一次。",
         'goFlags'       => array(
-            GO_FLAG_IN_USE         => '正在使用',
-            GO_FLAG_LOCKED         => '已锁定',
-            GO_FLAG_INTERACT_COND  => '无法交互',
-            GO_FLAG_TRANSPORT      => '传送',
-            GO_FLAG_NOT_SELECTABLE => '不可选择',
-            GO_FLAG_TRIGGERED      => '已触发',
-            GO_FLAG_DAMAGED        => 'Siege damaged',
-            GO_FLAG_DESTROYED      => 'Siege destroyed'
+            GO_FLAG_IN_USE           => '正在使用',
+            GO_FLAG_LOCKED           => '已锁定',
+            GO_FLAG_INTERACT_COND    => '无法交互',
+            GO_FLAG_TRANSPORT        => '传送',
+            GO_FLAG_NOT_SELECTABLE   => '不可选择',
+            GO_FLAG_AI_OBSTACLE      => '已触发',
+            GO_FLAG_FREEZE_ANIMATION => 'Freeze Animation',
+            GO_FLAG_DAMAGED          => 'Siege damaged',
+            GO_FLAG_DESTROYED        => 'Siege destroyed'
         ),
         'actions'       => array(
             "None",                         "Animate Custom 0",             "Animate Custom 1",             "Animate Custom 2",             "Animate Custom 3",
