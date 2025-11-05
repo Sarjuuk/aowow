@@ -662,7 +662,7 @@ class LocalProfileList extends ProfileList
     protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ?_profiler_profiles p';
     protected array  $queryOpts = array(
                         'p'   => [['g'], 'g' => 'p.`id`'],
-                        'ap'  => ['j' => ['?_account_profiles ap ON ap.`profileId` = p.`id`', true], 's' => ', (IFNULL(ap.`ExtraFlags`, 0) | p.`cuFlags`) AS "cuFlags"'],
+                        'ap'  => ['j' => ['?_account_profiles ap ON ap.`profileId` = p.`id`', true], 's' => ', (IFNULL(ap.`extraFlags`, 0) | p.`cuFlags`) AS "cuFlags"'],
                         'atm' => ['j' => ['?_profiler_arena_team_member atm ON atm.`profileId` = p.`id`', true], 's' => ', atm.`captain`, atm.`personalRating` AS "rating", atm.`seasonGames`, atm.`seasonWins`'],
                         'at'  => [['atm'], 'j' => ['?_profiler_arena_team at ON at.`id` = atm.`arenaTeamId`', true], 's' => ', at.`type`'],
                         'g'   => ['j' => ['?_profiler_guild g ON g.`id` = p.`guild`', true], 's' => ', g.`name` AS "guildname"']

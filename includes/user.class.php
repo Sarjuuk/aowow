@@ -780,7 +780,10 @@ class User
 
         if (self::$profiles === null)
         {
-            $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
+            $ap = DB::Aowow()->selectCol('SELECT `profileId` FROM ?_account_profiles WHERE `accountId` = ?d', self::$id);
+
+            // the old approach ['OR', ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
+            $conditions = $ap ? [['OR', ['user', self::$id], ['id', array_keys($ap)]]] : ['user', self::$id];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
 
