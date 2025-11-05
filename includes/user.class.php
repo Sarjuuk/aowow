@@ -29,7 +29,28 @@ class User
 
     public static function init()
     {
-        self::setIP();
+        # set ip #
+
+        $ipAddr = '';
+        foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'] as $env)
+        {
+            if ($rawIp = getenv($env))
+            {
+                if ($env == 'HTTP_X_FORWARDED')
+                    $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
+
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
+                    break;
+
+                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
+                    break;
+            }
+        }
+
+        self::$ip = $ipAddr ?: null;
+
+
+        # set locale #
 
         if (isset($_SESSION['locale']) && $_SESSION['locale'] instanceof Locale)
             self::$preferedLoc = $_SESSION['locale']->validate() ?? Locale::getFallback();
@@ -38,8 +59,10 @@ class User
         else
             self::$preferedLoc = Locale::getFallback();
 
-        // session have a dataKey to access the JScripts (yes, also the anons)
-        if (empty($_SESSION['dataKey']))
+
+        # set basic data #
+
+        if (empty($_SESSION['dataKey']))                    // session have a dataKey to access the JScripts (yes, also the anons)
             $_SESSION['dataKey'] = Util::createHash();      // just some random numbers for identification purpose
 
         self::$dataKey = $_SESSION['dataKey'];
@@ -48,7 +71,9 @@ class User
         if (!self::$ip)
             return false;
 
-        // check IP bans
+
+        # check IP bans #
+
         if ($ipBan = DB::Aowow()->selectRow('SELECT `count`, IF(`unbanDate` > UNIX_TIMESTAMP(), 1, 0) AS "active" FROM ?_account_bannedips WHERE `ip` = ? AND `type` = ?d', self::$ip, IP_BAN_TYPE_LOGIN_ATTEMPT))
         {
             if ($ipBan['count'] > Cfg::get('ACC_FAILED_AUTH_COUNT') && $ipBan['active'])
@@ -57,7 +82,9 @@ class User
                 DB::Aowow()->query('DELETE FROM ?_account_bannedips WHERE `ip` = ?', self::$ip);
         }
 
-        // try to restore session
+
+        # try to restore session #
+
         if (empty($_SESSION['user']))
             return false;
 
@@ -122,16 +149,9 @@ class User
         self::$email         = $userData['email'];
         self::$avatarborder  = $userData['avatarborder'];
 
-        if (Cfg::get('PROFILER_ENABLE'))
-        {
-            $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
-            if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-                $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
 
-            self::$profiles = (new LocalProfileList($conditions));
-        }
+        # reset premium options #
 
-        // reset premium options
         if (!self::isPremium())
         {
             if ($userData['avatar'] == 2)
@@ -144,17 +164,16 @@ class User
             // do not reset, it's just not sent to the browser
         }
 
-        // stuff, that updates on a daily basis goes here (if you keep you session alive indefinitly, the signin-handler doesn't do very much)
-        // - consecutive visits
-        // - votes per day
-        // - reputation for daily visit
+
+        # update daily limits #
+
         if (!self::isBanned())
         {
             $lastLogin = DB::Aowow()->selectCell('SELECT `curLogin` FROM ?_account WHERE `id` = ?d', self::$id);
             // either the day changed or the last visit was >24h ago
             if (date('j', $lastLogin) != date('j') || (time() - $lastLogin) > 1 * DAY)
             {
-                // daily votes (we need to reset this one)
+                // - daily votes (we need to reset this one)
                 self::$dailyVotes = self::getMaxDailyVotes();
 
                 DB::Aowow()->query(
@@ -166,12 +185,11 @@ class User
                     self::$id
                 );
 
-                // gain rep for daily visit
+                // - gain reputation for daily visit
                 if (!(self::isBanned()) && !self::isInGroup(U_GROUP_PENDING))
                     Util::gainSiteReputation(self::$id, SITEREP_ACTION_DAILYVISIT);
 
-                // increment consecutive visits (next day or first of new month and not more than 48h)
-                // i bet my ass i forgot a corner case
+                // - increment consecutive visits (next day or first of new month and not more than 48h)
                 if ((date('j', $lastLogin) + 1 == date('j') || (date('j') == 1 && date('n', $lastLogin) != date('n'))) && (time() - $lastLogin) < 2 * DAY)
                     DB::Aowow()->query('UPDATE ?_account SET `consecutiveVisits` = `consecutiveVisits` + 1 WHERE `id` = ?d', self::$id);
                 else
@@ -180,31 +198,6 @@ class User
         }
 
         return true;
-    }
-
-    private static function setIP() : void
-    {
-        $ipAddr = '';
-        $method = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'];
-
-        foreach ($method as $m)
-        {
-            if ($rawIp = getenv($m))
-            {
-                if ($m == 'HTTP_X_FORWARDED')
-                    $rawIp = explode(',', $rawIp)[0];       // [ip, proxy1, proxy2]
-
-                // check IPv4
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))
-                    break;
-
-                // check IPv6
-                if ($ipAddr = filter_var($rawIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))
-                    break;
-            }
-        }
-
-        self::$ip = $ipAddr ?: null;
     }
 
     public static function save(bool $toDB = false)
@@ -640,7 +633,7 @@ class User
 
     public static function getCharacters() : array
     {
-        if (!self::$profiles)
+        if (!self::loadProfiles())
             return [];
 
         return self::$profiles->getJSGlobals(PROFILEINFO_CHARACTER);
@@ -648,7 +641,7 @@ class User
 
     public static function getProfiles() : array
     {
-        if (!self::$profiles)
+        if (!self::loadProfiles())
             return [];
 
         return self::$profiles->getJSGlobals(PROFILEINFO_PROFILE);
@@ -656,7 +649,7 @@ class User
 
     public static function getPinnedCharacter() : array
     {
-        if (!self::$profiles)
+        if (!self::loadProfiles())
             return [];
 
         $realms = Profiler::getRealms();
@@ -727,6 +720,9 @@ class User
 
     public static function getCompletion() : array
     {
+        if (!self::loadProfiles())
+            return [];
+
         $ids = [];
         foreach (self::$profiles->iterate() as $_)
             if (!self::$profiles->isCustom())
@@ -752,7 +748,7 @@ class User
            'SELECT    pcs.`id` AS ARRAY_KEY, pcs.`spellId` AS ARRAY_KEY2, pcs.`spellId`, i.`id` AS "itemId"
             FROM      ?_spell s
             JOIN      ?_profiler_completion_spells pcs ON s.`id` = pcs.`spellId`
-            LEFT JOIN ?_items i ON i.spellId1 IN (?a) AND i.spellId2 = pcs.spellId
+            LEFT JOIN ?_items i ON i.`spellId1` IN (?a) AND i.`spellId2` = pcs.`spellId`
             WHERE     s.`typeCat` IN (?a) AND pcs.`id` IN (?a)',
             LEARN_SPELLS, [-5, -6, 9, 11], $ids
         );
@@ -775,6 +771,23 @@ class User
                     $c[$id] = [];
 
         return $completion;
+    }
+
+    private static function loadProfiles() : bool
+    {
+        if (!Cfg::get('PROFILER_ENABLE'))
+            return false;
+
+        if (self::$profiles === null)
+        {
+            $conditions = [['OR', ['user', self::$id], ['ap.accountId', self::$id]]];
+            if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+                $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
+
+            self::$profiles = (new LocalProfileList($conditions));
+        }
+
+        return !!self::$profiles->getFoundIDs();
     }
 }
 

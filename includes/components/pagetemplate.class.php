@@ -30,6 +30,8 @@ class PageTemplate
     private    string $gStaticUrl;
     private    string $gHost;
     private    string $gServerTime;
+    private    string $gUser;
+    private    string $gFavorites;
     private   ?string $analyticsTag  = null;
     private    bool   $consentFooter = false;
     private    string $dbProfiles    = '';
@@ -483,6 +485,9 @@ class PageTemplate
 
         // js + css
         $this->prepareScripts();
+
+        $this->gUser      = Util::toJSON(User::getUserGlobal());
+        $this->gFavorites = Util::toJSON(User::getFavorites());
 
         // db profiling
         if (Cfg::get('DEBUG') >= LOG_LEVEL_INFO && User::isInGroup(U_GROUP_DEV | U_GROUP_ADMIN))

@@ -22,10 +22,10 @@ endif;
     </script>
 <?=$this->renderArray('js', 4); ?>
 <script type="text/javascript">
-        var g_user = <?=$this->json($this->user::getUserGlobal()); ?>;
+        var g_user = <?=$this->gUser; ?>;
 <?php
-if ($fav = $this->user::getFavorites()):
-    echo "        g_favorites = ".$this->json($fav).";\n";
+if ($this->gFavorites):
+    echo "        g_favorites = ".$this->gFavorites.";\n";
 endif;
 ?>
     </script>
