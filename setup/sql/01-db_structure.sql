@@ -2737,7 +2737,24 @@ CREATE TABLE `aowow_spell` (
   KEY `spell` (`id`) USING BTREE,
   KEY `effects` (`effect1Id`,`effect2Id`,`effect3Id`),
   KEY `items` (`effect1CreateItemId`,`effect2CreateItemId`,`effect3CreateItemId`),
-  KEY `iconId` (`iconId`)
+  KEY `iconId` (`iconId`),
+  KEY `reagent1` (`reagent1`),
+  KEY `reagent2` (`reagent2`),
+  KEY `reagent3` (`reagent3`),
+  KEY `reagent4` (`reagent4`),
+  KEY `reagent5` (`reagent5`),
+  KEY `reagent6` (`reagent6`),
+  KEY `reagent7` (`reagent7`),
+  KEY `reagent8` (`reagent8`),
+  KEY `effect1CreateItemId` (`effect1CreateItemId`),
+  KEY `effect2CreateItemId` (`effect2CreateItemId`),
+  KEY `effect3CreateItemId` (`effect3CreateItemId`),
+  KEY `effect1Id` (`effect1Id`),
+  KEY `effect2Id` (`effect2Id`),
+  KEY `effect3Id` (`effect3Id`),
+  KEY `effect1AuraId` (`effect1AuraId`),
+  KEY `effect2AuraId` (`effect2AuraId`),
+  KEY `effect3AuraId` (`effect3AuraId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

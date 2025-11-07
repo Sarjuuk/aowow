@@ -1,0 +1,18 @@
+ALTER TABLE `aowow_spell`
+    ADD KEY reagent1 (`reagent1`),
+    ADD KEY reagent2 (`reagent2`),
+    ADD KEY reagent3 (`reagent3`),
+    ADD KEY reagent4 (`reagent4`),
+    ADD KEY reagent5 (`reagent5`),
+    ADD KEY reagent6 (`reagent6`),
+    ADD KEY reagent7 (`reagent7`),
+    ADD KEY reagent8 (`reagent8`),
+    ADD KEY effect1CreateItemId (`effect1CreateItemId`),
+    ADD KEY effect2CreateItemId (`effect2CreateItemId`),
+    ADD KEY effect3CreateItemId (`effect3CreateItemId`),
+    ADD KEY effect1Id (`effect1Id`),
+    ADD KEY effect2Id (`effect2Id`),
+    ADD KEY effect3Id (`effect3Id`),
+    ADD KEY effect1AuraId (`effect1AuraId`),
+    ADD KEY effect2AuraId (`effect2AuraId`),
+    ADD KEY effect3AuraId (`effect3AuraId`);
