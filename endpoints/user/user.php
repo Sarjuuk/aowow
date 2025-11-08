@@ -233,29 +233,32 @@ class UserBaseResponse extends TemplateResponse
 
         if (Cfg::get('PROFILER_ENABLE'))
         {
-            $conditions = array(
-                ['OR', ['cuFlags', PROFILER_CU_PUBLISHED, '&'], ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&']],
-                ['deleted', 0],
-                ['OR', ['user', $this->user['id']], ['ap.accountId', $this->user['id']]]
-            );
-
-            if (User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-                $conditions = array_slice($conditions, 2);
-            else if (User::$id == $this->user['id'])
-                array_shift($conditions);
+            $conditions = [['user', $this->user['id']]];
+            if (User::$id != $this->user['id'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+                $conditions[] = ['cuFlags', PROFILER_CU_PUBLISHED, '&'];
+            if (!User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+                $conditions[] = ['deleted', 0];
 
             $profiles = new LocalProfileList($conditions);
             if (!$profiles->error)
             {
                 $this->addDataLoader('weight-presets');
 
-                // Characters
-                if ($chars = $profiles->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
-                    $this->charactersLvData = array_values($chars);
-
-                // Profiles
                 if ($prof = $profiles->getListviewData(PROFILEINFO_PROFILE | PROFILEINFO_USER))
                     $this->profilesLvData = array_values($prof);
+            }
+
+            $conditions = [['ap.accountId', $this->user['id']]];
+            if (User::$id != $this->user['id'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+                $conditions[] = ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&'];
+
+            $characters = new LocalProfileList($conditions);
+            if (!$characters->error)
+            {
+                $this->addDataLoader('weight-presets');
+
+                if ($chars = $characters->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
+                    $this->charactersLvData = array_values($chars);
             }
         }
 
