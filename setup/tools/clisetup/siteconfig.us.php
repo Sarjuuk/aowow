@@ -451,7 +451,7 @@ CLISetup::registerUtility(new class extends UtilityScript
 
         $res = get_headers($protocol.$host.$testFile, true, $ctx);
 
-        if (!preg_match('/HTTP\/[0-9\.]+\s+([0-9]+)/', $res[0], $m))
+        if (!$res || !preg_match('/HTTP\/[0-9\.]+\s+([0-9]+)/', $res[0], $m))
             return false;
 
         $status = $m[1];
