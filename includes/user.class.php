@@ -783,7 +783,7 @@ class User
             $ap = DB::Aowow()->selectCol('SELECT `profileId` FROM ?_account_profiles WHERE `accountId` = ?d', self::$id);
 
             // the old approach ['OR', ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
-            $conditions = $ap ? [['OR', ['user', self::$id], ['id', $ap]]] : ['user', self::$id];
+            $conditions = $ap ? [['OR', ['user', self::$id], ['id', $ap]]] : [['user', self::$id]];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
                 $conditions[] = ['deleted', 0];
 
