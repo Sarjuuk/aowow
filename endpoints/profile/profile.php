@@ -67,11 +67,11 @@ class ProfileBaseResponse extends TemplateResponse
 
         // 3 possibilities
         // 1) already synced to aowow
-        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `cuFlags` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ? AND `renameItr` = ?d', $this->realmId, Util::ucFirst($this->subjectName), $rnItr))
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ? AND `renameItr` = ?d', $this->realmId, Util::ucFirst($this->subjectName), $rnItr))
         {
             $this->typeId = $subject['id'];
 
-            if ($subject['cuFlags'] & PROFILER_CU_NEEDS_RESYNC)
+            if ($subject['stub'])
                 $this->handleIncompleteData(Type::PROFILE, $subject['realmGUID']);
 
             return;
@@ -93,18 +93,18 @@ class ProfileBaseResponse extends TemplateResponse
         if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
         {
             $subject = $subject[0];
-            $subject['realm']   = $this->realmId;
-            $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+            $subject['realm'] = $this->realmId;
+            $subject['stub']  = 1;
 
             if ($subject['at_login'] & 0x1)
-                $subject['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ?', $this->realmId, $subject['name']);
+                $subject['renameItr'] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $this->realmId, $subject['name']);
 
             if ($subject['guildGUID'])
             {
                 // create empty guild if necessary to satisfy foreign keys
                 $subject['guild'] = DB::Aowow()->selectCell('SELECT `id` FROM ?_profiler_guild WHERE `realm` = ?d AND `realmGUID` = ?d', $this->realmId, $subject['guildGUID']);
                 if (!$subject['guild'])
-                    $subject['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (`realm`, `realmGUID`, `cuFlags`, `name`, `nameUrl`) VALUES (?d, ?d, ?d, ?, ?)', $this->realmId, $subject['guildGUID'], PROFILER_CU_NEEDS_RESYNC, $subject['guildName'], Profiler::urlize($subject['guildName']));
+                    $subject['guild'] = DB::Aowow()->query('INSERT INTO ?_profiler_guild (`realm`, `realmGUID`, `stub`, `name`, `nameUrl`) VALUES (?d, ?d, 1, ?, ?)', $this->realmId, $subject['guildGUID'], $subject['guildName'], Profiler::urlize($subject['guildName']));
             }
 
             unset($subject['guildGUID'], $subject['guildName'], $subject['at_login']);

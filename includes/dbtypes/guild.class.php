@@ -48,18 +48,16 @@ class GuildList extends DBTypeList
         if (!$guilds)
             return;
 
-        $stats = DB::Aowow()->select('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints`, IF(`cuFlags` & ?d, 0, 1) AS "synced" FROM ?_profiler_profiles WHERE `guild` IN (?a) ORDER BY `gearscore` DESC', PROFILER_CU_NEEDS_RESYNC, $guilds);
+        $stats = DB::Aowow()->select('SELECT `guild` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `level`, `gearscore`, `achievementpoints` FROM ?_profiler_profiles WHERE `guild` IN (?a) AND `stub` = 0 ORDER BY `gearscore` DESC', $guilds);
         foreach ($this->iterate() as &$_curTpl)
         {
             $id = $_curTpl['id'];
             if (empty($stats[$id]))
                 continue;
 
-            $guildStats = array_filter($stats[$id], function ($x) { return $x['synced']; } );
-            if (!$guildStats)
-                continue;
+            $guildStats = $stats[$id];
 
-            $nMaxLevel = count(array_filter($stats[$id], function ($x) { return $x['level'] >= MAX_LEVEL; } ));
+            $nMaxLevel = count(array_filter($stats[$id], fn($x) => $x['level'] >= MAX_LEVEL));
             $levelMod  = 1.0;
 
             if ($nMaxLevel < 25)
@@ -227,7 +225,7 @@ class RemoteGuildList extends GuildList
                 'realmGUID' => $this->getField('guildid'),
                 'name'      => $this->getField('name'),
                 'nameUrl'   => Profiler::urlize($this->getField('name')),
-                'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                'stub'      => 1
             );
         }
 

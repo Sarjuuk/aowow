@@ -503,7 +503,7 @@ class Profiler
         // char is flagged for rename
         if ($char['at_login'] & 0x1)
         {
-            $ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ?', $realmId, $char['name']);
+            $ri = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $realmId, $char['name']);
             $data['renameItr'] = $ri ? ++$ri : 1;
         }
 
@@ -827,7 +827,7 @@ class Profiler
                     'realmGUID' => $guild['id'],
                     'name'      => $guild['name'],
                     'nameUrl'   => self::urlize($guild['name']),
-                    'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                    'stub'      => 1
                 );
 
                 $guildId = DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_guild (?#) VALUES (?a)', array_keys($gData), array_values($gData));
@@ -853,7 +853,7 @@ class Profiler
                     'name'      => $t['name'],
                     'nameUrl'   => self::urlize($t['name']),
                     'type'      => $t['type'],
-                    'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                    'stub'      => 1
                 );
 
                 $teamId = DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team (?#) VALUES (?a)', array_keys($team), array_values($team));
@@ -889,7 +889,7 @@ class Profiler
         /*********************/
 
         if (DB::Aowow()->query('UPDATE ?_profiler_profiles SET ?a WHERE `realm` = ?d AND `realmGUID` = ?d', $data, $realmId, $charGuid) !== null)
-            DB::Aowow()->query('UPDATE ?_profiler_profiles SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $profileId);
+            DB::Aowow()->query('UPDATE ?_profiler_profiles SET `stub` = 0 WHERE `id` = ?d', $profileId);
 
         return true;
     }
@@ -956,7 +956,7 @@ class Profiler
         /* mark guild as done */
         /*********************/
 
-        DB::Aowow()->query('UPDATE ?_profiler_guild SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $guildId);
+        DB::Aowow()->query('UPDATE ?_profiler_guild SET `stub` = 0 WHERE `id` = ?d', $guildId);
 
         return true;
     }
@@ -1056,7 +1056,7 @@ class Profiler
         /* mark team as done */
         /*********************/
 
-        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET `cuFlags` = `cuFlags` & ?d WHERE `id` = ?d', ~PROFILER_CU_NEEDS_RESYNC, $teamId);
+        DB::Aowow()->query('UPDATE ?_profiler_arena_team SET `stub` = 0 WHERE `id` = ?d', $teamId);
 
         return true;
     }

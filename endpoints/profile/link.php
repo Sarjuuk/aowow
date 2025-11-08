@@ -38,8 +38,8 @@ class ProfileLinkResponse extends TextResponse
         // only link characters, not custom profiles
         $newId = DB::Aowow()->query(
            'REPLACE INTO ?_account_profiles (`accountId`, `profileId`, `extraFlags`)
-            SELECT ?d, p.`id`, 0 FROM ?_profiler_profiles p WHERE p.`id` = ?d AND (`cuFlags` & ?d) = 0',
-            User::$id, $this->_get['id'], PROFILER_CU_PROFILE
+            SELECT ?d, p.`id`, 0 FROM ?_profiler_profiles p WHERE p.`id` = ?d AND `custom` = 0',
+            User::$id, $this->_get['id']
         );
 
         if (!is_int($newId))

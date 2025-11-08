@@ -1663,6 +1663,7 @@ CREATE TABLE `aowow_profiler_arena_team` (
   `nameUrl` varchar(24) NOT NULL,
   `type` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
+  `stub` tinyint(1) DEFAULT 0 COMMENT 'arena team stub needs resync',
   `rating` smallint(5) unsigned NOT NULL DEFAULT 0,
   `seasonGames` smallint(5) unsigned NOT NULL DEFAULT 0,
   `seasonWins` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -1676,7 +1677,8 @@ CREATE TABLE `aowow_profiler_arena_team` (
   `borderColor` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
-  KEY `name` (`name`)
+  KEY `name` (`name`),
+  KEY `idx_stub` (`stub`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1849,6 +1851,7 @@ CREATE TABLE `aowow_profiler_guild` (
   `realm` int(10) unsigned NOT NULL,
   `realmGUID` int(10) unsigned NOT NULL,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
+  `stub` tinyint(1) DEFAULT 0 COMMENT 'guild stub needs resync',
   `name` varchar(26) NOT NULL,
   `nameUrl` varchar(26) NOT NULL,
   `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
@@ -1860,7 +1863,8 @@ CREATE TABLE `aowow_profiler_guild` (
   `createDate` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `realm_realmGUID` (`realm`,`realmGUID`),
-  KEY `name` (`name`)
+  KEY `name` (`name`),
+  KEY `idx_stub` (`stub`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1940,6 +1944,9 @@ CREATE TABLE `aowow_profiler_profiles` (
   `realm` tinyint(3) unsigned DEFAULT NULL,
   `realmGUID` int(10) unsigned DEFAULT NULL,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
+  `custom` tinyint(1) DEFAULT 0 COMMENT 'custom profile',
+  `stub` tinyint(1) DEFAULT 0 COMMENT 'profile stub needs resync',
+  `deleted` tinyint(1) DEFAULT 0 COMMENT 'only on custom profiles',
   `sourceId` int(10) unsigned DEFAULT NULL,
   `sourceName` varchar(50) DEFAULT NULL,
   `copy` int(10) unsigned DEFAULT NULL,
@@ -1978,6 +1985,9 @@ CREATE TABLE `aowow_profiler_profiles` (
   KEY `user` (`user`),
   KEY `guild` (`guild`),
   KEY `name` (`name`),
+  KEY `idx_custom` (`custom`),
+  KEY `idx_stub` (`stub`),
+  KEY `idx_deleted` (`deleted`),
   CONSTRAINT `FK_aowow_profiler_profiles_aowow_profiler_guild` FOREIGN KEY (`guild`) REFERENCES `aowow_profiler_guild` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

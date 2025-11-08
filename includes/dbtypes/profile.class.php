@@ -83,7 +83,7 @@ class ProfileList extends DBTypeList
             if ($this->getField('cuFlags') & PROFILER_CU_PINNED)
                 $data[$this->id]['pinned'] = 1;
 
-            if ($this->getField('cuFlags') & PROFILER_CU_DELETED)
+            if ($this->getField('deleted'))
                 $data[$this->id]['deleted'] = 1;
         }
 
@@ -168,7 +168,7 @@ class ProfileList extends DBTypeList
 
     public function isCustom() : bool
     {
-        return $this->getField('cuFlags') & PROFILER_CU_PROFILE;
+        return $this->getField('custom');
     }
 
     public function isVisibleToUser() : bool
@@ -176,7 +176,7 @@ class ProfileList extends DBTypeList
         if (!$this->isCustom() || User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
             return true;
 
-        if ($this->getField('cuFlags') & PROFILER_CU_DELETED)
+        if ($this->getField('deleted'))
             return false;
 
         if (User::$id == $this->getField('user'))
@@ -515,7 +515,7 @@ class RemoteProfileList extends ProfileList
             if ($curTpl['at_login'] & 0x1)
             {
                 if (!isset($this->rnItr[$curTpl['name']]))
-                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` IS NOT NULL AND `name` = ?', $r, $curTpl['name']) ?: 0;
+                    $this->rnItr[$curTpl['name']] = DB::Aowow()->selectCell('SELECT MAX(`renameItr`) FROM ?_profiler_profiles WHERE `realm` = ?d AND `custom` = 0 AND `name` = ?', $r, $curTpl['name']) ?: 0;
 
                 // already saved as "pending rename"
                 if ($rnItr = DB::Aowow()->selectCell('SELECT `renameItr` FROM ?_profiler_profiles WHERE `realm` = ?d AND `realmGUID` = ?d', $r, $g))
@@ -606,7 +606,7 @@ class RemoteProfileList extends ProfileList
                 'gender'    => $this->getField('gender'),
                 'guild'     => $guildGUID ?: null,
                 'guildrank' => $guildGUID ? $this->getField('guildrank') : null,
-                'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                'stub'      => 1
             );
 
             if ($guildGUID && empty($guildData[$realmId.'-'.$guildGUID]))
@@ -615,7 +615,7 @@ class RemoteProfileList extends ProfileList
                     'realmGUID' => $guildGUID,
                     'name'      => $this->getField('guildname'),
                     'nameUrl'   => Profiler::urlize($this->getField('guildname')),
-                    'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                    'stub'      => 1
                 );
         }
 
@@ -643,8 +643,7 @@ class RemoteProfileList extends ProfileList
 
             // merge back local ids
             $localIds = DB::Aowow()->select(
-               'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id`, `gearscore` FROM ?_profiler_profiles WHERE (`cuFlags` & ?d) = 0 AND `realm` IN (?a) AND `realmGUID` IN (?a)',
-                PROFILER_CU_PROFILE,
+               'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id`, `gearscore` FROM ?_profiler_profiles WHERE `custom` = 0 AND `realm` IN (?a) AND `realmGUID` IN (?a)',
                 array_column($baseData, 'realm'),
                 array_column($baseData, 'realmGUID')
             );

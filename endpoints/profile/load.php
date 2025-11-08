@@ -47,7 +47,7 @@ class ProfileLoadResponse extends TextResponse
             return;
         }
 
-        if (($pBase['cuFlags'] & PROFILER_CU_DELETED) && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
+        if ($pBase['deleted'] && !User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
             return;
 
 
@@ -56,7 +56,7 @@ class ProfileLoadResponse extends TextResponse
             if ($rId == $pBase['realm'])
                 break;
 
-        if (!$rData)                                        // realm doesn't exist or access is restricted
+        if ($pBase['realm'] && !$rData)                     // realm doesn't exist or access is restricted
             return;
 
         $profile = array(
@@ -103,7 +103,7 @@ class ProfileLoadResponse extends TextResponse
             'activity'          => [],                      // recent raid activity [achievementId => 1] (is a subset of statistics)
         );
 
-        if ($pBase['cuFlags'] & PROFILER_CU_PROFILE)
+        if ($pBase['custom'])
         {
             // this parameter is _really_ strange .. probably still not doing this right
             $profile['source']      = $pBase['realm'] ? $pBase['sourceId'] : 0;
@@ -135,7 +135,7 @@ class ProfileLoadResponse extends TextResponse
             $profile['pets'] = $pets;
 
         // source for custom profiles; profileId => [name, ownerId, iconString(optional)]
-        if ($customs = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `name`, `user`, `icon` FROM ?_profiler_profiles WHERE `sourceId` = ?d AND `sourceId` <> `id` {AND (`cuFlags` & ?d) = 0}', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : PROFILER_CU_DELETED))
+        if ($customs = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `name`, `user`, `icon` FROM ?_profiler_profiles WHERE `sourceId` = ?d AND `sourceId` <> `id` {AND `deleted` = ?d}', $pBase['id'], User::isInGroup(U_GROUP_STAFF) ? DBSIMPLE_SKIP : 0))
         {
             foreach ($customs as $id => $cu)
             {

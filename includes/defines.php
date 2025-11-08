@@ -374,9 +374,9 @@ define('QUEST_CU_PART_OF_SERIES',           0x0200);
 
 define('PROFILER_CU_PUBLISHED',             0x01);
 define('PROFILER_CU_PINNED',                0x02);
-define('PROFILER_CU_DELETED',               0x04);
-define('PROFILER_CU_PROFILE',               0x08);
-define('PROFILER_CU_NEEDS_RESYNC',          0x10);
+// define('PROFILER_CU_DELETED',            0x04);          // migrated to separate db cols
+// define('PROFILER_CU_PROFILE',            0x08);
+// define('PROFILER_CU_NEEDS_RESYNC',       0x10);
 
 define('GUIDE_CU_NO_QUICKFACTS',            0x100);         // merge with CC_FLAG_*
 define('GUIDE_CU_NO_RATING',                0x200);

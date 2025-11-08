@@ -235,7 +235,7 @@ class RemoteArenaTeamList extends ArenaTeamList
                 'nameUrl'   => Profiler::urlize($this->getField('name')),
                 'type'      => $this->getField('type'),
                 'rating'    => $this->getField('rating'),
-                'cuFlags'   => PROFILER_CU_NEEDS_RESYNC
+                'stub'      => 1
             );
         }
 

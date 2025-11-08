@@ -37,10 +37,8 @@ class ProfileDeleteResponse extends TextResponse
 
         // only flag as deleted; only custom profiles
         DB::Aowow()->query(
-           'UPDATE ?_profiler_profiles SET `cuFlags` = `cuFlags` | ?d WHERE `id` IN (?a) AND `cuFlags` & ?d {AND `user` = ?d}',
-            PROFILER_CU_DELETED,
+           'UPDATE ?_profiler_profiles SET `deleted` = 1 WHERE `id` IN (?a) AND `custom` = 1 {AND `user` = ?d}',
             $this->_get['id'],
-            PROFILER_CU_PROFILE,
             User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU) ? DBSIMPLE_SKIP : User::$id
         );
     }

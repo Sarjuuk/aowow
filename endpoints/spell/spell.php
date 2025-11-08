@@ -2449,7 +2449,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if (Cfg::get('PROFILER_ENABLE') && $hasCompletion)
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_spells WHERE `spellId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup

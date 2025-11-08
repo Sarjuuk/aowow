@@ -72,7 +72,8 @@ class ProfileSaveResponse extends TextResponse
             'glyphs2'      => $this->_post['glyphs2'],
             'gearscore'    => $this->_post['gearscore'],
             'icon'         => $this->_post['icon'],
-            'cuFlags'      => PROFILER_CU_PROFILE | ($this->_post['public'] ? PROFILER_CU_PUBLISHED : 0)
+            'custom'       => 1,
+            'cuFlags'      => $this->_post['public'] ? PROFILER_CU_PUBLISHED : 0
         );
 
         // remnant of a conflict between wotlk generic icons and cata+ auto-generated, char-based icons (see profile=avatar)
@@ -88,7 +89,7 @@ class ProfileSaveResponse extends TextResponse
         if ($_ = $this->_post['copy'])                      // gets set to source profileId when "save as" is clicked. Whats the difference to 'source' though?
         {
             // get character origin info if possible
-            if ($r = DB::Aowow()->selectCell('SELECT `realm` FROM ?_profiler_profiles WHERE `id` = ?d AND `realm` IS NOT NULL', $_))
+            if ($r = DB::Aowow()->selectCell('SELECT `realm` FROM ?_profiler_profiles WHERE `id` = ?d AND `custom` = 0', $_))
                 $cuProfile['realm'] = $r;
 
             $cuProfile['sourceId'] = $_;
@@ -105,7 +106,7 @@ class ProfileSaveResponse extends TextResponse
         }
         else                                                // new
         {
-            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ?_profiler_profiles WHERE `user` = ?d AND (`cuFlags` & ?d) = 0 AND `realmGUID` IS NULL', User::$id, PROFILER_CU_DELETED);
+            $nProfiles = DB::Aowow()->selectCell('SELECT COUNT(*) FROM ?_profiler_profiles WHERE `user` = ?d AND `deleted` = 0 AND `custom` = 1', User::$id);
             if ($nProfiles < 10 || User::isPremium())
                 if ($newId = DB::Aowow()->query('INSERT INTO ?_profiler_profiles (?#) VALUES (?a)', array_keys($cuProfile), array_values($cuProfile)))
                     $charId = $newId;

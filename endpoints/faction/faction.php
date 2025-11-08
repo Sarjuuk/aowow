@@ -103,7 +103,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
             $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_reputation WHERE `standing` >= ?d AND `factionId` = ?d', 42000, $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `realm` IS NOT NULL AND `realmGUID` IS NOT NULL AND `cuFlags` & ?d = 0', PROFILER_CU_NEEDS_RESYNC);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup

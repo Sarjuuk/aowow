@@ -235,7 +235,7 @@ class UserBaseResponse extends TemplateResponse
         {
             $conditions = array(
                 ['OR', ['cuFlags', PROFILER_CU_PUBLISHED, '&'], ['ap.extraFlags', PROFILER_CU_PUBLISHED, '&']],
-                [['cuFlags', PROFILER_CU_DELETED, '&'], 0],
+                ['deleted', 0],
                 ['OR', ['user', $this->user['id']], ['ap.accountId', $this->user['id']]]
             );
 

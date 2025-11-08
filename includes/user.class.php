@@ -785,7 +785,7 @@ class User
             // the old approach ['OR', ['user', self::$id], ['ap.accountId', self::$id]] caused keys to not get used
             $conditions = $ap ? [['OR', ['user', self::$id], ['id', $ap]]] : ['user', self::$id];
             if (!self::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-                $conditions[] = [['cuFlags', PROFILER_CU_DELETED, '&'], 0];
+                $conditions[] = ['deleted', 0];
 
             self::$profiles = (new LocalProfileList($conditions));
         }

@@ -46,11 +46,11 @@ class GuildBaseResponse extends TemplateResponse
 
         // 3 possibilities
         // 1) already synced to aowow
-        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `cuFlags` FROM ?_profiler_guild WHERE `realm` = ?d AND `nameUrl` = ?', $this->realmId, Profiler::urlize($this->subjectName)))
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ?_profiler_guild WHERE `realm` = ?d AND `nameUrl` = ?', $this->realmId, Profiler::urlize($this->subjectName)))
         {
             $this->typeId = $subject['id'];
 
-            if ($subject['cuFlags'] & PROFILER_CU_NEEDS_RESYNC)
+            if ($subject['stub'])
                 $this->handleIncompleteData(Type::GUILD, $subject['realmGUID']);
 
             return;
@@ -62,7 +62,7 @@ class GuildBaseResponse extends TemplateResponse
         {
             $subject = $subject[0];
             $subject['realm']   = $this->realmId;
-            $subject['cuFlags'] = PROFILER_CU_NEEDS_RESYNC;
+            $subject['stub']    = 1;
             $subject['nameUrl'] = Profiler::urlize($subject['name']);
 
             // create entry from realm with basic info
