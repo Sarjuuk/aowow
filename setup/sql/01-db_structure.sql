@@ -1749,8 +1749,10 @@ CREATE TABLE `aowow_profiler_completion_reputation` (
   `id` int(10) unsigned NOT NULL,
   `factionId` smallint(5) unsigned NOT NULL,
   `standing` mediumint(9) DEFAULT NULL,
+  `exalted` tinyint(1) GENERATED ALWAYS AS (`standing` >= 42000) STORED,
   KEY `id` (`id`),
   KEY `typeId` (`factionId`),
+  KEY `idx_exalted` (`exalted`),
   CONSTRAINT `FK_pr_completion_reputation` FOREIGN KEY (`id`) REFERENCES `aowow_profiler_profiles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -102,7 +102,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_reputation WHERE `standing` >= ?d AND `factionId` = ?d', 42000, $this->typeId);
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_reputation WHERE `exalted` = 1 AND `factionId` = ?d', $this->typeId);
             $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
