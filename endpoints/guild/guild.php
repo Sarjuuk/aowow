@@ -58,9 +58,9 @@ class GuildBaseResponse extends TemplateResponse
 
         // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
         $subjects = DB::Characters($this->realmId)->select('SELECT `guildid` AS "realmGUID", `name` FROM guild WHERE `name` = ?', $this->subjectName);
-        if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) == Util::lower($this->subjectName)))
+        if ($subject = array_filter($subjects, fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
         {
-            $subject = $subject[0];
+            $subject = array_pop($subject);
             $subject['realm']   = $this->realmId;
             $subject['stub']    = 1;
             $subject['nameUrl'] = Profiler::urlize($subject['name']);
