@@ -42,7 +42,9 @@ if ($this->description):
 endif;
               ?></div>
                 <script type="text/javascript">us_addDescription()</script>
+<?php if (count($this->lvTabs)): ?>
                 <h2 id="related" class="clear"><?=Lang::main('related'); ?></h2>
+<?php endif; ?>
             </div>
 
             <div id="roster-status" class="profiler-message clear" style="display: none"></div>
