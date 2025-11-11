@@ -260,6 +260,17 @@ class UserBaseResponse extends TemplateResponse
                 if ($chars = $characters->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_USER))
                     $this->charactersLvData = array_values($chars);
             }
+
+            // signatures
+            /*  $this->lvTabs->addListviewTab(new Listview(array(
+             *      'id'             => 'signatures',
+             *      'name'           => '$LANG.tab_signatures',
+             *      'hiddenCols'     => ['name','faction','location','guild'],
+             *      'extraCols'      => ['$Listview.extraCols.signature'],
+             *      'onBeforeCreate' => '$Listview.funcBox.beforeUserSignatures',
+             *      'data'           => [ ProfileList->getListviewData() ] // no extra signature related data observed
+             *  ), 'profile'));
+             */
         }
 
         // My Guides
