@@ -37,14 +37,20 @@ trait TrListPage
     public function getCacheKeyComponents() : array
     {
         // max. 3 catgs
-        // catg max 65535
+        // catg max 32767 - largest in use should be 11.197.26801 (Spells: Professions > Tailoring > Spellfire Tailoring)
         if ($this->category)
         {
             $catg = 0x0;
             for ($i = 0; $i < 3; $i++)
             {
-                $catg <<= 4;
-                $catg |= ($this->category[$i] ?? 0) & 0xFFFF;
+                $catg <<= 4 * 4;
+                if (!isset($this->category[$i]))
+                    continue;
+
+                if ($this->category[$i])
+                    $catg |= ($this->category[$i] << 1) & 0xFFFF;
+                else
+                    $catg |= 1;
             }
         }
 
