@@ -653,7 +653,7 @@ trait spawnHelper
                         $label = [Lang::npc('waypoint').Lang::main('colon').$p['point']];
 
                         if ($p['wait'])
-                            $label[] = Lang::npc('wait').Lang::main('colon').Util::formatTime($p['wait'], false);
+                            $label[] = Lang::npc('wait').Lang::main('colon').DateTime::formatTimeElapsedFloat($p['wait']);
 
                         $opts = array(                      // \0 doesn't get printed and tricks Util::toJSON() into handling this as a string .. i feel slightly dirty now
                             'label' => "\0$<br /><span class=\"q0\">".implode('<br />', $label).'</span>',

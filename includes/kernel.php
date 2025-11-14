@@ -32,6 +32,7 @@ if ($error)
 require_once 'includes/defines.php';
 require_once 'includes/locale.class.php';
 require_once 'localization/lang.class.php';
+require_once 'localization/datetime.class.php';
 require_once 'includes/libs/DbSimple/Generic.php';          // Libraray: http://en.dklab.ru/lib/DbSimple (using variant: https://github.com/ivan1986/DbSimple/tree/master)
 require_once 'includes/database.class.php';                 // wrap DBSimple
 require_once 'includes/utilities.php';                      // helper functions

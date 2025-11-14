@@ -151,7 +151,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
             $buff = Lang::spell('spellModOp', 4).Lang::main('colon').Util::createNumRange($min, $max);
 
             // since Veins don't have charges anymore, the timer is questionable
-            $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [Util::formatTime($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
+            $infobox[] = $restock > 1 ? '[tooltip name=restock]'.Lang::gameObject('restock', [DateTime::formatTimeElapsed($restock * 1000)]).'[/tooltip][span class=tip tooltip=restock]'.$buff.'[/span]' : $buff;
         }
 
         // meeting stone [minLevel, maxLevel, zone]
@@ -177,7 +177,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $buff .= Lang::main('colon').'[ul]';
 
             if ($minTime > 1)                               // sign shenannigans reverse the display order
-                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').Util::createNumRange(-$maxTime, -$minTime, fn: fn($x) => Util::FormatTime(-$x * 1000, true)).'[/li]';
+                $buff .= '[li]'.Lang::game('duration').Lang::main('colon').Util::createNumRange(-$maxTime, -$minTime, fn: fn($x) => DateTime::formatTimeElapsed(-$x * 1000)).'[/li]';
 
             if ($minPlayer)
                 $buff .= '[li]'.Lang::main('players').Lang::main('colon').Util::createNumRange($minPlayer, $maxPlayer).'[/li]';

@@ -149,14 +149,14 @@ class TextResponse extends BaseResponse
             $this->sumSQLStats();
 
             echo "/*\n";
-            echo " * generated in ".Util::formatTime((microtime(true) - self::$time) * 1000)."\n";
-            echo " * " . parent::$sql['count'] . " SQL queries in " . Util::formatTime(parent::$sql['time'] * 1000) . "\n";
+            echo " * generated in ".DateTime::formatTimeElapsedFloat((microtime(true) - self::$time) * 1000)."\n";
+            echo " * " . parent::$sql['count'] . " SQL queries in " . DateTime::formatTimeElapsedFloat(parent::$sql['time'] * 1000) . "\n";
             if ($this instanceof ICache && static::$cacheStats)
             {
                 [$mode, $set, $lifetime] = static::$cacheStats;
                 echo " * stored in " . ($mode == CACHE_MODE_MEMCACHED ? 'Memcached' : 'filecache') . ":\n";
-                echo " *  + ".date('c', $set) . ' - ' . Util::formatTimeDiff($set) . "\n";
-                echo " *  - ".date('c', $set + $lifetime) . ' - in '.Util::formatTime(($set + $lifetime - time()) * 1000) . "\n";
+                echo " *  + ".date('c', $set) . ' - ' . DateTime::formatTimeElapsedFloat((time() - $set) * 1000) . " ago\n";
+                echo " *  - ".date('c', $set + $lifetime) . ' - in '.DateTime::formatTimeElapsedFloat(($set + $lifetime - time()) * 1000) . "\n";
             }
             echo " */\n\n";
         }

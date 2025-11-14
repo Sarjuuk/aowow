@@ -19,7 +19,7 @@ trait TrRecoveryHelper
 
         // check if already processing
         if ($_ = DB::Aowow()->selectCell('SELECT `statusTimer` - UNIX_TIMESTAMP() FROM ?_account WHERE `email` = ? AND `status` > ?d AND `statusTimer` > UNIX_TIMESTAMP()', $email, ACC_STATUS_NEW))
-            return Lang::account('inputbox', 'error', 'isRecovering', [Util::formatTime($_ * 1000)]);
+            return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsed($_ * 1000)]);
 
         // create new token and write to db
         $token = Util::createHash();

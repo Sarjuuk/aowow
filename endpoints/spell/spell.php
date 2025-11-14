@@ -228,7 +228,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         $this->castTime  = $this->subject->createCastTimeForCurrent(false, false);
         $this->level     = $this->subject->getField('spellLevel');
         $this->rangeName = $this->subject->getField('rangeText', true);
-        $this->gcd       = Util::formatTime($this->subject->getField('startRecoveryTime'));
+        $this->gcd       = DateTime::formatTimeElapsedFloat($this->subject->getField('startRecoveryTime'));
         $this->school    = $this->fmtStaffTip(Lang::getMagicSchools($this->subject->getField('schoolMask')), Util::asHex($this->subject->getField('schoolMask')));
         $this->dispel    = $this->subject->getField('dispelType') ? Lang::game('dt', $this->subject->getField('dispelType')) : null;
         $this->mechanic  = $this->subject->getField('mechanic') ? Lang::game('me', $this->subject->getField('mechanic')) : null;
@@ -258,12 +258,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $this->stances = Lang::getStances($this->subject->getField('stanceMask'));
 
         if (($_ = $this->subject->getField('recoveryTime')) && $_ > 0)
-            $this->cooldown = Util::formatTime($_);
+            $this->cooldown = DateTime::formatTimeElapsedFloat($_);
         else if (($_ = $this->subject->getField('recoveryCategory')) && $_ > 0)
-            $this->cooldown = Util::formatTime($_);
+            $this->cooldown = DateTime::formatTimeElapsedFloat($_);
 
         if (($_ = $this->subject->getField('duration')) && $_ > 0)
-            $this->duration = Util::formatTime($_);
+            $this->duration = DateTime::formatTimeElapsedFloat($_);
 
 
         /**************/
@@ -1703,7 +1703,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $_footer['radius'] = Lang::spell('_radius').$this->subject->getField('effect'.$i.'RadiusMax').' '.Lang::spell('_distUnit');
 
             if ($this->subject->getField('effect'.$i.'Periode') > 0)
-                $_footer['interval'] = Lang::spell('_interval').Util::formatTime($this->subject->getField('effect'.$i.'Periode'));
+                $_footer['interval'] = Lang::spell('_interval').DateTime::formatTimeElapsedFloat($this->subject->getField('effect'.$i.'Periode'));
 
             if ($_ = $this->subject->getField('effect'.$i.'Mechanic'))
                 $_footer['mechanic'] = Lang::game('mechanic').Lang::main('colon').Lang::game('me', $_);
@@ -1712,7 +1712,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             {
                 $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [-$procData['chance']]) : Lang::spell('procChance', [$procData['chance']]);
                 if ($procData['cooldown'])
-                    $_footer['procCD'] = Lang::game('cooldown', [Util::formatTime($procData['cooldown'], true)]);
+                    $_footer['procCD'] = Lang::game('cooldown', [DateTime::formatTimeElapsed($procData['cooldown'] * 1000)]);
             }
 
             // Effect Name

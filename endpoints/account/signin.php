@@ -99,7 +99,7 @@ class AccountSigninResponse extends TemplateResponse
          // AUTH_BANNED          => Lang::account('accBanned'); // ToDo: should this return an error? the actual account functionality should be blocked elsewhere
             AUTH_WRONGUSER       => Lang::account('userNotFound'),
             AUTH_WRONGPASS       => Lang::account('wrongPass'),
-            AUTH_IPBANNED        => Lang::account('inputbox', 'error', 'loginExceeded', [Util::formatTime(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]),
+            AUTH_IPBANNED        => Lang::account('inputbox', 'error', 'loginExceeded', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]),
             AUTH_INTERNAL_ERR    => Lang::main('intError'),
             default              => Lang::main('intError')
         };

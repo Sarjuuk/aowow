@@ -134,8 +134,25 @@ $lang = array(
         'dateFmtShort'  => "Y-m-d",
         'dateFmtLong'   => "Y-m-d в g:i A",
         'dateFmtIntl'   => "d MMMM y г.",
-        'timeAgo'       => '%s назад',
         'nfSeparators'  => [' ', ','],
+        'n_a'           => "нет",
+
+        // date time
+        'date'          => "По дате",
+        'date_colon'    => "Дата: ",
+        'date_on'       => "на ",
+        'date_ago'      => "%s назад",
+        'date_at'       => " в ",
+        'date_to'       => " в ",
+        'date_simple'   => '%1$d.%2$d.%3$d',
+        'unknowndate'   => "Неизвестная дата",
+        'ddaysago'      => "%d дней назад",
+        'today'         => "сегодня",
+        'yesterday'     => "вчера",
+        'noon'          => "полдень",
+        'midnight'      => "полночь",
+        'am'            => "a.m.",
+        'pm'            => "p.m.",
 
         // error
         'intError'      => "[An internal error occured.]",
@@ -1656,7 +1673,6 @@ $lang = array(
         '_rankRange'    => "Ранг:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Показать на %d больше",
 
-        'n_a'           => "нет",
         'normal'        => "Обычный",
         'special'       => "Особый",
 

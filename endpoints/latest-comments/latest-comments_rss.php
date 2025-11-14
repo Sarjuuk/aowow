@@ -14,6 +14,8 @@ class LatestcommentsRssResponse extends TextResponse
 
     protected function generate() : void
     {
+        $now = new DateTime();
+
         foreach (CommunityContent::getCommentPreviews(['comments' => 1, 'replies' => 1], dateFmt: false) as $comment)
         {
             if (empty($comment['commentid']))
@@ -25,7 +27,7 @@ class LatestcommentsRssResponse extends TextResponse
             $this->feedData[] = array(
                 'title'       => [true,  [], Lang::typeName($comment['type']).Lang::main('colon').htmlentities($comment['subject'])],
                 'link'        => [false, [], $url],
-                'description' => [true,  [], htmlentities($comment['preview'])."<br /><br />".Lang::main('byUser', [$comment['user'], '']) . Util::formatTimeDiff($comment['date'])],
+                'description' => [true,  [], htmlentities($comment['preview'])."<br /><br />".Lang::main('byUser', [$comment['user'], '']) . $now->formatDate($comment['date'], true)],
                 'pubDate'     => [false, [], date(DATE_RSS, $comment['date'])],
                 'guid'        => [false, [], $url]
              // 'domain'      => [false, [], null]

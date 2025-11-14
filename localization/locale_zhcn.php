@@ -134,8 +134,25 @@ $lang = array(
         'dateFmtShort'  => "Y/m/d",
         'dateFmtLong'   => "Y/m/d \a\\t g:i A",
         'dateFmtIntl'   => "y年M月d日",
-        'timeAgo'       => '%s之前',
         'nfSeparators'  => [',', '.'],
+        'n_a'           => "n/a",
+
+        // date time
+        'date'          => "日期",
+        'date_colon'    => "日期：",
+        'date_on'       => "在 ",
+        'date_ago'      => "%s前",
+        'date_at'       => "于",
+        'date_to'       => "至",
+        'date_simple'   => '%3$d/%2$d/%1$d',
+        'unknowndate'   => "未知日期",
+        'ddaysago'      => "%d天前",
+        'today'         => "今日",
+        'yesterday'     => "昨天",
+        'noon'          => "正午",
+        'midnight'      => "午夜",
+        'am'            => "AM",
+        'pm'            => "PM",
 
         // error
         'intError'      => "发生内部错误。",
@@ -1656,7 +1673,6 @@ $lang = array(
         '_rankRange'    => "排名:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "[Show %d More]",
 
-        'n_a'           => "n/a",
         'normal'        => "普通",
         'special'       => "特殊",
 

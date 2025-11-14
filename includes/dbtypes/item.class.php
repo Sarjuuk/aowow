@@ -965,7 +965,7 @@ class ItemList extends DBTypeList
                     $extra = [];
                     if ($cd >= 5000 && $this->curTpl['spellTrigger'.$j] != SPELL_TRIGGER_EQUIP)
                     {
-                        $pt = Util::parseTime($cd);
+                        $pt = DateTime::parse($cd);
                         if (count(array_filter($pt)) == 1)  // simple time: use simple method
                             $extra[] = Lang::formatTime($cd, 'item', 'cooldown');
                         else                                // build block with generic time

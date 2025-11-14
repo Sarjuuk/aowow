@@ -55,7 +55,7 @@ class AccountUpdatepasswordResponse extends TextResponse
 
         $userData = DB::Aowow()->selectRow('SELECT `status`, `passHash`, `statusTimer` FROM ?_account WHERE `id` = ?d', User::$id);
         if ($userData['status'] != ACC_STATUS_NONE && $userData['status'] != ACC_STATUS_CHANGE_PASS && $userData['statusTimer'] > time())
-            return Lang::account('isRecovering', [Util::formatTime(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
+            return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
 
         if (!User::verifyCrypt($this->_post['currentPassword'], $userData['passHash']))
             return Lang::account('wrongPass');

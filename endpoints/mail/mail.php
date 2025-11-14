@@ -99,7 +99,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
                 }
 
                 if ($q['rewardMailDelay'] > 0)
-                    $infobox[] = Lang::mail('delay', [Util::formatTime($q['rewardMailDelay'] * 1000)]);
+                    $infobox[] = Lang::mail('delay', [DateTime::formatTimeElapsed($q['rewardMailDelay'] * 1000)]);
             }
             else if ($npcId = DB::World()->selectCell('SELECT `Sender` FROM achievement_reward WHERE `MailTemplateId` = ?d', $this->typeId))
             {

@@ -14,12 +14,14 @@ class LatestscreenshotsRssResponse extends TextResponse
 
     protected function generate() : void
     {
+        $now = new DateTime();
+
         foreach (CommunityContent::getScreenshots(dateFmt: false) as $screenshot)
         {
             $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($screenshot['type']).'='.$screenshot['typeId'].'#screenshots:id='.$screenshot['id'].'"><img src="'.Cfg::get('STATIC_URL').'/uploads/screenshots/thumb/'.$screenshot['id'].'.jpg" alt="" /></a>';
             if ($screenshot['caption'])
                 $desc .= '<br />'.$screenshot['caption'];
-            $desc .= "<br /><br />".Lang::main('byUser', [$screenshot['user'], '']) . Util::formatTimeDiff($screenshot['date'], true);
+            $desc .= "<br /><br />".Lang::main('byUser', [$screenshot['user'], '']) . $now->formatDate($screenshot['date'], true);
 
             // enclosure/length => filesize('static/uploads/screenshots/thumb/'.$screenshot['id'].'.jpg') .. always set to this placeholder value though
             $this->feedData[] = array(

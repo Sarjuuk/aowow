@@ -79,20 +79,21 @@ class GuideChangelogResponse extends TemplateResponse
 
         $buff = '<ul>';
         $inp  = fn($rev) => User::isInGroup(U_GROUP_STAFF) && false ? ($rev !== null ? '<input name="a" value="'.$rev.'" type="radio"/><input name="b" value="'.$rev.'" type="radio"/><b>' : '<b style="margin-left:38px;">') : '';
+        $now  = new DateTime();
 
         $logEntries = DB::Aowow()->select('SELECT a.`username` AS `name`, gcl.`date`, gcl.`status`, gcl.`msg`, gcl.`rev` FROM ?_guides_changelog gcl JOIN ?_account a ON a.`id` = gcl.`userId` WHERE gcl.`id` = ?d ORDER BY gcl.`date` DESC', $this->_get['id']);
         foreach ($logEntries as $log)
         {
             if ($log['status'] != GuideMgr::STATUS_NONE)
-                $buff .= '<li class="guide-changelog-status-change">'.$inp($log['rev']).'<b>'.Lang::guide('clStatusSet', [Lang::guide('status', $log['status'])]).'</b>'.Util::formatTimeDiff($log['date'])."</li>\n";
+                $buff .= '<li class="guide-changelog-status-change">'.$inp($log['rev']).'<b>'.Lang::guide('clStatusSet', [Lang::guide('status', $log['status'])]).'</b>'.$now->formatDate($log['date'], true)."</li>\n";
             else if ($log['msg'])
-                $buff .= '<li>'.$inp($log['rev']).'<b>'.Util::formatTimeDiff($log['date']).Lang::main('colon').'</b>'.$log['msg'].' <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
+                $buff .= '<li>'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b>'.$log['msg'].' <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
             else
-                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.Util::formatTimeDiff($log['date']).Lang::main('colon').'</b><i>'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
+                $buff .= '<li class="guide-changelog-minor-edit">'.$inp($log['rev']).'<b>'.$now->formatDate($log['date'], true).Lang::main('colon').'</b><i>'.Lang::guide('clMinorEdit').'</i> <i class="q0">'.Lang::main('byUser', [$log['name'], 'style="text-decoration:underline"'])."</i></li>\n";
         }
 
         // append creation
-        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.Util::formatTimeDiff($guide->getField('date'))."</li>\n</ul>\n";
+        $buff .= '<li class="guide-changelog-created">'.$inp(0).'<b>'.Lang::guide('clCreated').'</b>'.$now->formatDate($guide->getField('date'), true)."</li>\n</ul>\n";
 
         if (User::isInGroup(U_GROUP_STAFF) && false)
             $buff .= '<input type="button" value="Compare" onclick="alert(\'NYI\');" style="margin-left: 40px;"/>';

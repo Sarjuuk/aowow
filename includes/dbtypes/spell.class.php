@@ -668,7 +668,7 @@ class SpellList extends DBTypeList
         else if ($noInstant && !in_array($this->curTpl['typeCat'], [11, 7, -3, -6, -8, 0]) && !($this->curTpl['cuFlags'] & SPELL_CU_TALENTSPELL))
             return '';
         else
-            return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : Util::formatTime($this->curTpl['castTime'] * 1000);
+            return $short ? Lang::formatTime($this->curTpl['castTime'] * 1000, 'spell', 'castTime') : DateTime::formatTimeElapsedFloat($this->curTpl['castTime'] * 1000);
     }
 
     private function createCooldownForCurrent() : string

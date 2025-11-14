@@ -535,7 +535,7 @@ class Lang
         if ($msec < 0)
             $msec = 0;
 
-        $time   = Util::parseTime($msec);                   // [$ms, $s, $m, $h, $d]
+        $time   = DateTime::parse($msec);                   // [$ms, $s, $m, $h, $d]
         $mult   = [0, 1000, 60, 60, 24];
         $total  = 0;
         $ref    = [];
@@ -552,33 +552,22 @@ class Lang
         if (!$msec)
             return self::vspf($ref[0], [0]);
 
-        if ($concat)
-        {
-            for ($i = 4; $i > 0; $i--)
-            {
-                $total += $time[$i];
-                if (isset($ref[$i]) && ($total || ($i == 1 && !$result)))
-                {
-                    $result[] = self::vspf($ref[$i], [$total]);
-                    $total = 0;
-                }
-                else
-                    $total *= $mult[$i];
-            }
-
-            return implode(', ', $result);
-        }
-
         for ($i = 4; $i > 0; $i--)
         {
             $total += $time[$i];
-            if (isset($ref[$i]) && ($total || $i == 1))
-                return self::vspf($ref[$i], [$total + ($time[$i-1] ?? 0) / $mult[$i]]);
+            if (isset($ref[$i]) && ($total || ($i == 1 && !$result)))
+            {
+                if (!$concat)
+                    return self::vspf($ref[$i], [$total + ($time[$i-1] ?? 0) / $mult[$i]]);
+
+                $result[] = self::vspf($ref[$i], [$total]);
+                $total = 0;
+            }
             else
                 $total *= $mult[$i];
         }
 
-        return '';
+        return implode(', ', $result);
     }
 
     private static function vspf(null|array|string $var, array $args = []) : null|array|string

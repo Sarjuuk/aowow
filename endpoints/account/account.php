@@ -112,7 +112,7 @@ class AccountBaseResponse extends TemplateResponse
 
         // Username
         $this->curName  = User::$username;
-        $this->renameCD = Util::formatTime(Cfg::get('ACC_RENAME_DECAY') * 1000);
+        $this->renameCD = DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RENAME_DECAY') * 1000);
         if ($user['renameCooldown'] > time())
         {
             $locCode = implode('_', str_split(Lang::getLocale()->json(), 2)); // ._.

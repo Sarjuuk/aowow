@@ -148,110 +148,6 @@ abstract class Util
         return $money;
     }
 
-    public static function parseTime(int $msec) : array
-    {
-        $time = [0, 0, 0, 0, 0];
-
-        if ($_ = ($msec % 1000))
-            $time[0] = $_;
-
-        $sec = $msec / 1000;
-
-        if ($sec >= 3600 * 24)
-        {
-            $time[4] = floor($sec / 3600 / 24);
-            $sec -= $time[4] * 3600 * 24;
-        }
-
-        if ($sec >= 3600)
-        {
-            $time[3] = floor($sec / 3600);
-            $sec -= $time[3] * 3600;
-        }
-
-        if ($sec >= 60)
-        {
-            $time[2] = floor($sec / 60);
-            $sec -= $time[2] * 60;
-        }
-
-        if ($sec > 0)
-        {
-            $time[1] = (int)$sec;
-            $sec -= $time[1];
-        }
-
-        return $time;
-    }
-
-    public static function formatTime(int $msec, bool $short = false) : string
-    {
-        [$ms, $s, $m, $h, $d] = self::parseTime(abs($msec));
-        // \u00A0 is &nbsp, but also usable by js
-
-        if ($short)
-        {
-            if ($_ = round($d / 365))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 0);
-            if ($_ = round($d / 30))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 1);
-            if ($_ = round($d / 7))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 2);
-            if ($_ = round($d))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 3);
-            if ($_ = round($h))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 4);
-            if ($_ = round($m))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 5);
-            if ($_ = round($s + $ms / 1000, 2))
-                return $_."\u{00A0}".Lang::timeUnits('ab', 6);
-            if ($ms)
-                return $ms."\u{00A0}".Lang::timeUnits('ab', 7);
-
-            return "0\u{00A0}".Lang::timeUnits('ab', 6);
-        }
-        else
-        {
-            $_ = $d + $h / 24;
-            if ($_ > 1 && !($_ % 365))                      // whole years
-                return round(($d + $h / 24) / 365, 2)."\u{00A0}".Lang::timeUnits($d / 365 == 1 && !$h ? 'sg' : 'pl', 0);
-            if ($_ > 1 && !($_ % 30))                       // whole months
-                return round(($d + $h / 24) /  30, 2)."\u{00A0}".Lang::timeUnits($d /  30 == 1 && !$h ? 'sg' : 'pl', 1);
-            if ($_ > 1 && !($_ % 7))                        // whole weeks
-                return round(($d + $h / 24) /   7, 2)."\u{00A0}".Lang::timeUnits($d /   7 == 1 && !$h ? 'sg' : 'pl', 2);
-            if ($d)
-                return round($d + $h  /   24, 2)."\u{00A0}".Lang::timeUnits($d == 1 && !$h  ? 'sg' : 'pl', 3);
-            if ($h)
-                return round($h + $m  /   60, 2)."\u{00A0}".Lang::timeUnits($h == 1 && !$m  ? 'sg' : 'pl', 4);
-            if ($m)
-                return round($m + $s  /   60, 2)."\u{00A0}".Lang::timeUnits($m == 1 && !$s  ? 'sg' : 'pl', 5);
-            if ($s)
-                return round($s + $ms / 1000, 2)."\u{00A0}".Lang::timeUnits($s == 1 && !$ms ? 'sg' : 'pl', 6);
-            if ($ms)
-                return $ms."\u{00A0}".Lang::timeUnits($ms == 1 ? 'sg' : 'pl', 7);
-
-            return "0\u{00A0}".Lang::timeUnits('pl', 6);
-        }
-    }
-
-    public static function formatTimeDiff(int $sec) : string
-    {
-        $delta = abs(time() - $sec);
-
-        [, $s, $m, $h, $d] = self::parseTime($delta * 1000);
-
-        if ($delta > (1 * MONTH))                           // use absolute
-            return date(Lang::main('dateFmtLong'), $sec);
-        else if ($delta > (2 * DAY))                        // days ago
-            return Lang::main('timeAgo', [$d . ' ' . Lang::timeUnits('pl', 3)]);
-        else if ($h)                                        // hours, minutes ago
-            return Lang::main('timeAgo', [$h . ' ' . Lang::timeUnits('ab', 4) . ' ' . $m . ' ' . Lang::timeUnits('ab', 5)]);
-        else if ($m)                                        // minutes, seconds ago
-            return Lang::main('timeAgo', [$m . ' ' . Lang::timeUnits('ab', 5) . ' ' . $s . ' ' . Lang::timeUnits('ab', 6)]);
-        else                                                // seconds ago
-            return Lang::main('timeAgo', [$s . ' ' . Lang::timeUnits($s == 1 ? 'sg' : 'pl', 6)]);
-    }
-
     // pageTexts, questTexts and mails
     public static function parseHtmlText(string|array $text, bool $markdown = false) : string|array
     {
@@ -1264,7 +1160,7 @@ abstract class Util
         if ($expiration)
         {
             $vars += array_fill(0, 9, null);                // vsprintf requires all unused indizes to also be set...
-            $vars[9] = Util::formatTime($expiration * 1000);
+            $vars[9] = DateTime::formatTimeElapsed($expiration * 1000, 0);
         }
 
         if ($vars)

@@ -134,8 +134,25 @@ $lang = array(
         'dateFmtShort'  => "d/m/Y",
         'dateFmtLong'   => "d/m/Y \a \l\a\s g:i A",
         'dateFmtIntl'   => "d 'de' MMMM 'de' y",
-        'timeAgo'       => 'hace %s',
         'nfSeparators'  => ['.', ','],
+        'n_a'           => "n/d",
+
+        // date time
+        'date'          => "Fecha",
+        'date_colon'    => "Fecha: ",
+        'date_on'       => "el ",
+        'date_ago'      => "hace %s",
+        'date_at'       => " a las ",
+        'date_to'       => " al ",
+        'date_simple'   => '%1$d/%2$d/%3$d',
+        'unknowndate'   => "Fecha desconocida",
+        'ddaysago'      => "Hace %d días",
+        'today'         => "hoy",
+        'yesterday'     => "ayer",
+        'noon'          => "medio día",
+        'midnight'      => "medianoche",
+        'am'            => "a.m.",
+        'pm'            => "p.m.",
 
         // error
         'intError'      => "Un error interno ha ocurrido.",
@@ -1656,7 +1673,6 @@ $lang = array(
         '_rankRange'    => "Rango:&nbsp;%d&nbsp;-&nbsp;%d",
         '_showXmore'    => "Mostrar %d más",
 
-        'n_a'           => "n/d",
         'normal'        => "Normal",
         'special'       => "Especial",
 

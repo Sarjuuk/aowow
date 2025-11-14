@@ -14,12 +14,14 @@ class LatestvideosRssResponse extends TextResponse
 
     protected function generate() : void
     {
+        $now = new DateTime();
+
         foreach (CommunityContent::getvideos(dateFmt: false) as $video)
         {
             $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($video['type']).'='.$video['typeId'].'#videos:id='.$video['id'].'"><img src="//i3.ytimg.com/vi/'.$video['videoId'].'/default.jpg" alt="" /></a>';
             if ($video['caption'])
                 $desc .= '<br />'.$video['caption'];
-            $desc .= "<br /><br />".Lang::main('byUser', [$video['user'], '']) . Util::formatTimeDiff($video['date'], true);
+            $desc .= "<br /><br />".Lang::main('byUser', [$video['user'], '']) . $now->formatDate($video['date'], true);
 
             // is enclosure/length .. is this even relevant..?
             $this->feedData[] = array(

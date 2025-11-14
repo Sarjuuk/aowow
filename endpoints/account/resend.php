@@ -73,7 +73,7 @@ class AccountResendResponse extends TemplateResponse
 
         // on cooldown pretend we dont know the email address
         if ($timeout && $timeout > time())
-            return Cfg::get('DEBUG') ? 'resend on cooldown: '.Util::formatTimeDiff($timeout).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
+            return Cfg::get('DEBUG') ? 'resend on cooldown: '.DateTime::formatTimeElapsed($timeout * 1000).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
 
         // check email and account status
         if ($token = DB::Aowow()->selectCell('SELECT `token` FROM ?_account WHERE `email` = ? AND `status` = ?d', $this->_post['email'], ACC_STATUS_NEW))

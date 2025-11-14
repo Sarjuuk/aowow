@@ -327,7 +327,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
 
         // interval
         if ($rec > 0)
-            $infobox[] = Lang::event('interval').Util::formatTime($rec * 1000);
+            $infobox[] = Lang::event('interval').DateTime::formatTimeElapsed($rec * 1000);
 
         // in progress
         if ($start < time() && $end > time())

@@ -46,7 +46,7 @@ class UserBaseResponse extends TemplateResponse
         // do not display system account
         if (!$this->user['id'])
             $this->generateNotFound(Lang::user('notFound', [$pageParam]));
-   }
+    }
 
     protected function generate() : void
     {
@@ -74,14 +74,16 @@ class UserBaseResponse extends TemplateResponse
         }
 
         if ($this->user['joinDate'])
-            $infobox[] = Lang::user('joinDate') . '[tooltip name=joinDate]'. date('l, G:i:s', $this->user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'. date(Lang::main('dateFmtShort'), $this->user['joinDate']). '[/span]';
+            $infobox[] = Lang::user('joinDate') . '[tooltip name=joinDate]'. date('l, G:i:s', $this->user['joinDate']). '[/tooltip][span class=tip tooltip=joinDate]'.(new DateTime())->formatDate($this->user['joinDate']). '[/span]';
         if ($this->user['prevLogin'])
-            $infobox[] = Lang::user('lastLogin') . '[tooltip name=lastLogin]'.date('l, G:i:s', $this->user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.date(Lang::main('dateFmtShort'), $this->user['prevLogin']).'[/span]';
+            $infobox[] = Lang::user('lastLogin') . '[tooltip name=lastLogin]'.date('l, G:i:s', $this->user['prevLogin']).'[/tooltip][span class=tip tooltip=lastLogin]'.(new DateTime())->formatDate($this->user['prevLogin']).'[/span]';
         if ($groups)
             $infobox[] = Lang::user('userGroups') . implode(', ', $groups);
 
         $infobox[] = Lang::user('consecVisits'). $this->user['consecutiveVisits'];
-        $infobox[] = Lang::main('siteRep') . Lang::nf($this->user['sumRep']);
+
+        if ($this->user['sumRep'])
+            $infobox[] = Lang::main('siteRep') . Lang::nf($this->user['sumRep']);
 
         if ($infobox)
             $this->infobox = new InfoboxMarkup($infobox, ['allow' => Markup::CLASS_STAFF], 'infobox-contents0');
@@ -298,6 +300,9 @@ class UserBaseResponse extends TemplateResponse
 
         [$sum, $nRatings] = $co;
 
+        if (!$sum)
+            return null;
+
         return Lang::user('comments').$sum.($nRatings ? ' [small]([tooltip=tooltip_totalratings]'.$nRatings.'[/tooltip])[/small]' : '');
     }
 
@@ -312,6 +317,9 @@ class UserBaseResponse extends TemplateResponse
             return null;
 
         [$sum, $nSticky, $nPending] = $ss;
+
+        if (!$sum)
+            return null;
 
         $buff = [];
         if ($nSticky || $nPending)
@@ -340,6 +348,9 @@ class UserBaseResponse extends TemplateResponse
             return null;
 
         [$sum, $nSticky, $nPending] = $vi;
+
+        if (!$sum)
+            return null;
 
         $buff = [];
         if ($nSticky || $nPending)
@@ -372,6 +383,9 @@ class UserBaseResponse extends TemplateResponse
 
         if ($nReplies)
             $buff[] = '[tooltip=replies]'.$nReplies.'[/tooltip]';
+
+        if (!$buff)
+            return null;
 
         return Lang::user('posts').($nTopics + $nReplies).($buff ? ' [small]('.implode(' + ', $buff).')[/small]' : '');
     }

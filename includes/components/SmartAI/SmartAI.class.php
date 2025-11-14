@@ -22,7 +22,7 @@ trait SmartHelper
     private function numRange(int $min, int $max, bool $isTime) : string
     {
         if ($isTime)
-            return Util::createNumRange($min, $max, ' &ndash; ', fn($x) => Util::formatTime($x, true));
+            return Util::createNumRange($min, $max, ' &ndash; ', fn($x) => DateTime::formatTimeElapsed($x));
 
         return Util::createNumRange($min, $max, ' &ndash; ');
     }
@@ -32,7 +32,7 @@ trait SmartHelper
         if (!$time)
             return '';
 
-        return Util::formatTime($time * ($isMilliSec ? 1 : 1000), false);
+        return DateTime::formatTimeElapsedFloat($time * ($isMilliSec ? 1 : 1000));
     }
 
     private function castFlags(int $flags) : string

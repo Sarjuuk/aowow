@@ -228,9 +228,9 @@ class TemplateResponse extends BaseResponse
     {
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            $stats['time']  = Util::formatTime((microtime(true) - self::$time) * 1000, true);
-            $stats['sql']   = ['count' => parent::$sql['count'], 'time' => Util::formatTime(parent::$sql['time'] * 1000, true)];
-            $stats['cache'] = !empty(static::$cacheStats) ? [static::$cacheStats[0], Util::formatTimeDiff(static::$cacheStats[1])] : null;
+            $stats['time']  = DateTime::formatTimeElapsed((microtime(true) - self::$time) * 1000);
+            $stats['sql']   = ['count' => parent::$sql['count'], 'time' => DateTime::formatTimeElapsed(parent::$sql['time'] * 1000)];
+            $stats['cache'] = !empty(static::$cacheStats) ? [static::$cacheStats[0], (new DateTime())->formatDate(static::$cacheStats[1])] : null;
         }
         else
             $stats = [];

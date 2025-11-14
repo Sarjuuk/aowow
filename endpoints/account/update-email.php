@@ -53,7 +53,7 @@ class AccountUpdateemailResponse extends TextResponse
 
         $status = DB::Aowow()->selectCell('SELECT `status` FROM ?_account WHERE `statusTimer` > UNIX_TIMESTAMP() AND `id` = ?d', User::$id);
         if ($status != ACC_STATUS_NONE && $status != ACC_STATUS_CHANGE_EMAIL)
-            return Lang::account('isRecovering', [Util::formatTime(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
+            return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
 
         $oldEmail = DB::Aowow()->selectCell('SELECT `email` FROM ?_account WHERE `id` = ?d', User::$id);
         if ($this->_post['newemail'] == $oldEmail)

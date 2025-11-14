@@ -112,7 +112,7 @@ class AccountSignupResponse extends TemplateResponse
         if (DB::Aowow()->selectRow('SELECT 1 FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ? AND `count` >= ?d AND `unbanDate` >= UNIX_TIMESTAMP()', IP_BAN_TYPE_REGISTRATION_ATTEMPT, User::$ip, Cfg::get('ACC_FAILED_AUTH_COUNT')))
         {
             DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ? AND `type` = ?d', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT);
-            return Lang::account('inputbox', 'error', 'signupExceeded', [Util::formatTime(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]);
+            return Lang::account('inputbox', 'error', 'signupExceeded', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]);
         }
 
         // username / email taken

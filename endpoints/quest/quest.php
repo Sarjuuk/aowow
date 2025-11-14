@@ -197,7 +197,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // timer
         if ($_ = $this->subject->getField('timeLimit'))
-            $infobox[] = Lang::quest('timer').Util::formatTime($_ * 1000);
+            $infobox[] = Lang::quest('timer').DateTime::formatTimeElapsedFloat($_ * 1000);
 
         $startEnd = DB::Aowow()->select('SELECT * FROM ?_quests_startend WHERE `questId` = ?d', $this->typeId);
 
@@ -1159,7 +1159,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             'header'      => array(
                 $rmtId,
                 null,
-                $delay  ? Lang::mail('mailIn', [Util::formatTime($delay * 1000)]) : null,
+                $delay  ? Lang::mail('mailIn', [DateTime::formatTimeElapsed($delay * 1000)]) : null,
             )
         );
 
