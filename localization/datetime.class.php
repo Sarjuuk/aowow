@@ -141,6 +141,7 @@ class DateTime extends \DateTimeImmutable
     public static function formatTimeElapsedFloat(int $delay) : string
     {
         $delay = abs($delay);
+        $nbsp  = Lang::getLocale()->isLogographic() ? '' : self::NBSP;
 
         for ($i = 0; $i < count(self::RANGE); ++$i)
         {
@@ -148,10 +149,10 @@ class DateTime extends \DateTimeImmutable
                 continue;
 
             $v = round($delay / self::RANGE[$i], 2);
-            return $v . self::NBSP . Lang::timeUnits($v === 1.0 ? 'sg' : 'pl', $i);
+            return $v . $nbsp . Lang::timeUnits($v === 1.0 ? 'sg' : 'pl', $i);
         }
 
-        return '0' . self::NBSP . Lang::timeUnits('pl', 6); // 0 seconds
+        return '0' . $nbsp . Lang::timeUnits('pl', 6); // 0 seconds
     }
 
     /**
@@ -181,9 +182,10 @@ class DateTime extends \DateTimeImmutable
                     $i2     = $subunit[$i1];
                     $delay %= self::RANGE[$i1];
                     $v2     = floor($delay / self::RANGE[$i2]);
+                    $nbsp   = Lang::getLocale()->isLogographic() ? '' : self::NBSP;
 
                     if ($v2 > 0)
-                        return self::OMG($v1, $i1, true) . self::NBSP . self::OMG($v2, $i2, true);
+                        return self::OMG($v1, $i1, true) . $nbsp . self::OMG($v2, $i2, true);
                 }
 
                 return self::OMG($v1, $i1, false);
@@ -206,7 +208,9 @@ class DateTime extends \DateTimeImmutable
         if ($abbrv && !Lang::timeUnits('ab', $unit))
             $abbrv = false;
 
-        return $value .= self::NBSP . match(true)
+        $nbsp  = Lang::getLocale()->isLogographic() ? '' : self::NBSP;
+
+        return $value .= $nbsp . match(true)
         {
             $abbrv      => Lang::timeUnits('ab', $unit),
             $value == 1 => Lang::timeUnits('sg', $unit),

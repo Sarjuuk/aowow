@@ -119,7 +119,7 @@ endif;
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_range');?></th>
-                        <td><?=$this->range.' '.Lang::spell('_distUnit').' <small>('.$this->rangeName.')</small>';?></td>
+                        <td><?=$this->range.Lang::spell('_distUnit').' <small>('.$this->rangeName.')</small>';?></td>
                     </tr>
                     <tr>
                         <th><?=Lang::spell('_castTime');?></th>
