@@ -140,7 +140,7 @@ class DateTime extends \DateTimeImmutable
      */
     public static function formatTimeElapsedFloat(int $delay) : string
     {
-        $delay = max($delay, 1);
+        $delay = abs($delay);
 
         for ($i = 0; $i < count(self::RANGE); ++$i)
         {
@@ -151,7 +151,7 @@ class DateTime extends \DateTimeImmutable
             return $v . self::NBSP . Lang::timeUnits($v === 1.0 ? 'sg' : 'pl', $i);
         }
 
-        return Lang::main('n_a');
+        return '0' . self::NBSP . Lang::timeUnits('pl', 6); // 0 seconds
     }
 
     /**
