@@ -183,9 +183,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             !empty($this->disables[Type::SPELL]) ? array_values($this->disables[Type::SPELL]) : DBSIMPLE_SKIP
         );
 
-        // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawnd, quests granting items may be disabled)
+        // flagging aowow_items for source (note: this is not exact! creatures dropping items may not be spawned, etc.)
         DB::Aowow()->query('UPDATE ?_items SET `cuFlags` = `cuFlags` & ?d', ~CUSTOM_UNAVAILABLE);
-        DB::Aowow()->query('UPDATE ?_items i LEFT JOIN ?_source s ON s.`typeId` = i.`id` AND s.`type` = ?d SET i.`cuFlags` = i.`cuFlags` | ?d WHERE s.`typeId` IS NULL AND i.`id` NOT IN (?a)', Type::ITEM, CUSTOM_UNAVAILABLE, $itemSpellSource);
+        DB::Aowow()->query(
+           'UPDATE    ?_items i
+            LEFT JOIN ?_source s ON s.`typeId` = i.`id` AND s.`type` = ?d
+            SET       i.`cuFlags` = i.`cuFlags` | ?d
+            WHERE     (s.`typeId` IS NULL AND i.`id` NOT IN (?a)) OR i.`quality` = ?d',
+            Type::ITEM, CUSTOM_UNAVAILABLE, $itemSpellSource, ITEM_QUALITY_ARTIFACT
+        );
 
         return true;
     }
