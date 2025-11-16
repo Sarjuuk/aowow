@@ -24,19 +24,19 @@ CLISetup::registerSetup("sql", new class extends SetupScript
    );
 
     protected $dbcSourceFiles  = ['worldmaparea', 'map', 'taxipathnode', 'soundemitters', 'areatrigger', 'areatable'];
-    protected $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'script_waypoint', 'waypoints', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
+    protected $worldDependency = ['creature', 'creature_addon', 'creature_template_addon', 'gameobject', 'gameobject_template', 'vehicle_accessory', 'vehicle_accessory_template', 'waypoint_data', 'smart_scripts', 'areatrigger_teleport'];
     protected $setupAfter      = [['dungeonmap', 'worldmaparea', 'zones'], ['img-maps']];
 
     private $transports         = [];
     private $overrideData       = [];
 
     private $steps = array(
-        0x01 => ['creature',     Type::NPC,         false, '`creature` spawns',                                                 ],
-        0x02 => ['gameobject',   Type::OBJECT,      false, '`gameobject` spawns',                                               ],
-        0x04 => ['soundemitter', Type::SOUND,       false, 'SoundEmitters.dbc positions',                                       ],
-        0x08 => ['areatrigger',  Type::AREATRIGGER, false, 'AreaTrigger.dbc positions and teleporter endpoints'                 ],
-        0x10 => ['instances',    Type::ZONE,        false, 'Map.dbc instance portals positions'                                 ],
-        0x20 => ['waypoints',    Type::NPC,         true,  'NPC waypoints from `script_waypoint`, `waypoints` & `waypoint_data`'],
+        0x01 => ['creature',     Type::NPC,         false, '`creature` spawns',                                ],
+        0x02 => ['gameobject',   Type::OBJECT,      false, '`gameobject` spawns',                              ],
+        0x04 => ['soundemitter', Type::SOUND,       false, 'SoundEmitters.dbc positions',                      ],
+        0x08 => ['areatrigger',  Type::AREATRIGGER, false, 'AreaTrigger.dbc positions and teleporter endpoints'],
+        0x10 => ['instances',    Type::ZONE,        false, 'Map.dbc instance portals positions'                ],
+        0x20 => ['waypoints',    Type::NPC,         true,  'NPC waypoints from `waypoint_data`'                ]
     );
 
 
@@ -276,27 +276,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function waypoints() : array
     {
-        // todo (med): at least `waypoints` can contain paths that do not belong to a creature but get assigned by SmartAI (or script) during runtime
+        // todo (med): `waypoint_data` can contain paths that do not belong to a creature but get assigned by SmartAI (or script) during runtime
         // in the future guid should be optional and additional parameters substituting guid should be passed down from NpcPage after SmartAI has been evaluated
 
         // assume that creature_template_addon data isn't stupid and only creatures with a single spawn are referenced here
         return DB::World()->select(
-           'SELECT  c.`guid`, w.`entry` AS `creatureOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`, w.`waittime` AS `wait`, w.`location_x` AS `posX`, w.`location_y` AS `posY`
-              FROM  creature c
-              JOIN  script_waypoint w ON c.`id` = w.`entry` UNION
-            SELECT  c.`guid`, w.`entry` AS `creatureOrPath`, w.`pointId` AS `point`, c.`zoneId` AS `areaId`, c.`map`,            0 AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
-              FROM  creature c
-              JOIN  waypoints w ON c.`id` = w.`entry` UNION
-            SELECT  c.`guid`,   -w.`id` AS `creatureOrPath`,              w.`point`, c.`zoneId` AS `areaId`, c.`map`,    w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
-              FROM  creature c
-              JOIN  creature_addon ca ON ca.`guid` = c.`guid`
-              JOIN  waypoint_data w ON w.`id` = ca.`path_id`
-              WHERE ca.`path_id` <> 0 UNION
-            SELECT  c.`guid`,   -w.`id` AS `creatureOrPath`,              w.`point`, c.`zoneId` AS `areaId`, c.`map`,    w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
-              FROM  creature c
-              JOIN  creature_template_addon cta ON cta.`entry` = c.`id`
-              JOIN  waypoint_data w ON w.`id` = cta.`path_id`
-              WHERE cta.`path_id` <> 0'
+           'SELECT c.`guid`, -w.`id` AS `creatureOrPath`, w.`point`, c.`zoneId` AS `areaId`, c.`map`, w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
+            FROM   creature c
+            JOIN   creature_addon ca ON ca.`guid` = c.`guid`
+            JOIN   waypoint_data w ON w.`id` = ca.`path_id`
+            WHERE  ca.`path_id` <> 0 UNION
+            SELECT  c.`guid`, -w.`id` AS `creatureOrPath`, w.`point`, c.`zoneId` AS `areaId`, c.`map`, w.`delay` AS `wait`, w.`position_x` AS `posX`, w.`position_y` AS `posY`
+            FROM   creature c
+            JOIN   creature_template_addon cta ON cta.`entry` = c.`id`
+            JOIN   waypoint_data w ON w.`id` = cta.`path_id`
+            WHERE  cta.`path_id` <> 0'
         );
     }
 

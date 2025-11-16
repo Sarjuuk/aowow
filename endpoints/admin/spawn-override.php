@@ -74,29 +74,20 @@ class AdminSpawnoverrideResponse extends TextResponse
         // if creature try for waypoints
         if ($type == Type::NPC)
         {
-            $jobs = array(
-                'SELECT -w.`id` AS "entry", w.`point` AS "pointId", w.`position_x` AS "posX", w.`position_y` AS "posY" FROM creature_addon ca JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`guid` = ?d AND ca.`path_id` <> 0',
-                'SELECT `entry`, `pointId`, `location_x` AS "posX", `location_y` AS "posY" FROM `script_waypoint` WHERE `entry` = ?d',
-                'SELECT `entry`, `pointId`, `position_x` AS "posX", `position_y` AS "posY" FROM `waypoints` WHERE `entry` = ?d'
-            );
-
-            foreach ($jobs as $idx => $job)
+            if ($swp = DB::World()->select('SELECT -w.`id` AS "entry", w.`point` AS "pointId", w.`position_x` AS "posX", w.`position_y` AS "posY" FROM creature_addon ca JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`guid` = ?d AND ca.`path_id` <> 0', $guid))
             {
-                if ($swp = DB::World()->select($job, $idx ? $wPos[$guid]['id'] : $guid))
+                foreach ($swp as $w)
                 {
-                    foreach ($swp as $w)
+                    if ($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
                     {
-                        if ($point = WorldPosition::toZonePos($wPos[$guid]['mapId'], $w['posX'], $w['posY'], $area, $floor))
-                        {
-                            $p = array(
-                                'posX'   => $point[0]['posX'],
-                                'posY'   => $point[0]['posY'],
-                                'areaId' => $point[0]['areaId'],
-                                'floor'  => $point[0]['floor']
-                            );
+                        $p = array(
+                            'posX'   => $point[0]['posX'],
+                            'posY'   => $point[0]['posY'],
+                            'areaId' => $point[0]['areaId'],
+                            'floor'  => $point[0]['floor']
+                        );
 
-                            DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
-                        }
+                        DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
                     }
                 }
             }

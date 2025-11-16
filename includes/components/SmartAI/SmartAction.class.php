@@ -64,7 +64,7 @@ class SmartAction
     public const ACTION_SUMMON_GO                          = 50;  //  Spawns Gameobject, use target_type to set spawn position.
     public const ACTION_KILL_UNIT                          = 51;  //  Kills Creature.
     public const ACTION_ACTIVATE_TAXI                      = 52;  //  Sends player to flight path. You have to be close to Flight Master, which gives Taxi ID you need.
-    public const ACTION_WP_START                           = 53;  //  Creature starts Waypoint Movement. Use waypoints table to create movement.
+    public const ACTION_WP_START                           = 53;  //  Creature starts Waypoint Movement. Use waypoint_data table to create movement.
     public const ACTION_WP_PAUSE                           = 54;  //  Creature pauses its Waypoint Movement for given time.
     public const ACTION_WP_STOP                            = 55;  //  Creature stops its Waypoint Movement.
     public const ACTION_ADD_ITEM                           = 56;  //  Adds item(s) to player.
