@@ -54,6 +54,8 @@ spl_autoload_register(function (string $class) : void
         require_once 'includes/game/chrstatistics.php';
     else if (file_exists('includes/game/'.strtolower($class).'.class.php'))
         require_once 'includes/game/'.strtolower($class).'.class.php';
+    else if (file_exists('includes/game/loot/'.strtolower($class).'.class.php'))
+        require_once 'includes/game/loot/'.strtolower($class).'.class.php';
 });
 
 // our site components

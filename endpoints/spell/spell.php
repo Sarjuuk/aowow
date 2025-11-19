@@ -49,6 +49,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
     private int       $firstRank    = 0;
     private array     $modelInfo    = [];
     private array     $difficulties = [];
+    private int       $mapType      = 0;
 
     public function __construct(string $id)
     {
@@ -67,15 +68,20 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($jsg = $this->subject->getJSGlobals(GLOBALINFO_ANY, $extra))
             $this->extendGlobalData($jsg, $extra);
 
-        $this->modelInfo    = $this->subject->getModelInfo($this->typeId);
-        $this->difficulties = DB::Aowow()->selectRow(       // has difficulty versions of itself
+        $this->modelInfo     = $this->subject->getModelInfo($this->typeId);
+        if ($spelldifficulty = DB::Aowow()->select(         // has difficulty versions of itself
             'SELECT `normal10` AS "0", `normal25` AS "1",
-                    `heroic10` AS "2", `heroic25` AS "3"
+                    `heroic10` AS "2", `heroic25` AS "3",
+                    `mapType`  AS ARRAY_KEY
              FROM   ?_spelldifficulty
              WHERE  `normal10` = ?d OR `normal25` = ?d OR
                     `heroic10` = ?d OR `heroic25` = ?d',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId
-        );
+        ))
+        {
+            $this->mapType      = key($spelldifficulty);
+            $this->difficulties = array_pop($spelldifficulty);
+        }
 
         // returns self or firstRank
         if ($fr = DB::World()->selectCell('SELECT `first_spell_id` FROM spell_ranks WHERE `spell_id` = ?d', $this->typeId))
@@ -445,39 +451,28 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             ['s.name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)]
         );
 
+        if ($this->difficulties)
+            $conditions = ['OR', ['AND', ...$conditions], ['AND', ['s.id', $this->difficulties], ['s.id', $this->typeId, '!']]];
+
         $saSpells = new SpellList($conditions);
         if (!$saSpells->error)
         {
             $data = $saSpells->getListviewData();
-            if ($this->difficulties)                        // needs a way to distinguish between dungeon and raid :x; creature using this -> map -> areaType?
+            if ($this->difficulties)
             {
                 $saE = ['$Listview.extraCols.mode'];
 
                 foreach ($data as $id => &$d)
                 {
-                    $d['modes'] = ['mode' => 0];
-
-                    if ($this->difficulties[0] == $id)      // b0001000
+                    if (($modeBit = array_search($id, $this->difficulties)) !== false)
                     {
-                        if (!$this->difficulties[2] && !$this->difficulties[3])
-                            $d['modes']['mode'] |= 0x2;
+                        if ($this->mapType)
+                            $d['modes'] = ['mode' => 1 << ($modeBit + 3)];
                         else
-                            $d['modes']['mode'] |= 0x8;
+                            $d['modes'] = ['mode' => 2 - $modeBit];
                     }
-
-                    if ($this->difficulties[1] == $id)      // b0010000
-                    {
-                        if (!$this->difficulties[2] && !$this->difficulties[3])
-                            $d['modes']['mode'] |= 0x1;
-                        else
-                            $d['modes']['mode'] |= 0x10;
-                    }
-
-                    if ($this->difficulties[2] == $id)      // b0100000
-                        $d['modes']['mode'] |= 0x20;
-
-                    if ($this->difficulties[3] == $id)      // b1000000
-                        $d['modes']['mode'] |= 0x40;
+                    else
+                        $d['modes'] = ['mode' => 0];
                 }
             }
 
@@ -649,8 +644,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: contains
         // spell_loot_template
-        $spellLoot = new Loot();
-        if ($spellLoot->getByContainer(LOOT_SPELL, $this->typeId))
+        $spellLoot = new LootByContainer();
+        if ($spellLoot->getByContainer(Loot::SPELL, [$this->typeId]))
         {
             $this->extendGlobalData($spellLoot->jsGlobals);
 
@@ -658,11 +653,12 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             $extraCols[] = '$Listview.extraCols.percent';
 
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data'       => $spellLoot->getResult(),
-                'name'       => '$LANG.tab_contains',
-                'id'         => 'contains',
-                'hiddenCols' => ['side', 'slot', 'source', 'reqlevel'],
-                'extraCols'  => array_unique($extraCols)
+                'data'            => $spellLoot->getResult(),
+                'name'            => '$LANG.tab_contains',
+                'id'              => 'contains',
+                'hiddenCols'      => ['side', 'slot', 'source', 'reqlevel'],
+                'extraCols'       => array_unique($extraCols),
+                'computeDataFunc' => '$Listview.funcBox.initLootTable'
             ), ItemList::$brickFile));
         }
 
@@ -991,7 +987,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: taught by npc
-        if ($this->subject->getSources($s) && in_array(SRC_TRAINER, $s))
+        if ($this->subject->getRawSource(SRC_TRAINER))
         {
             $trainers = DB::World()->select(
                'SELECT  cdt.`CreatureId` AS ARRAY_KEY, ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
@@ -2423,13 +2419,10 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // accquisition..   10: starter spell; 7: discovery
-        if ($this->subject->getSources($s))
-        {
-            if (in_array(SRC_STARTER, $s))
-                $infobox[] = Lang::spell('starter');
-            else if (in_array(SRC_DISCOVERY, $s))
-                $infobox[] = Lang::spell('discovered');
-        }
+        if ($this->subject->getRawSource(SRC_STARTER))
+            $infobox[] = Lang::spell('starter');
+        else if ($this->subject->getRawSource(SRC_DISCOVERY))
+            $infobox[] = Lang::spell('discovered');
 
         // training cost
         if ($cost = $this->subject->getField('trainingCost'))
@@ -2462,7 +2455,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         // used in mode
         foreach ($this->difficulties as $n => $id)
             if ($id == $this->typeId)
-                $infobox[] = Lang::game('mode').Lang::game('modes', $n);
+                $infobox[] = Lang::game('mode').Lang::game('modes', $this->mapType, $n);
 
         // Creature Type from Aura: Shapeshift
         foreach ($this->modelInfo as $mI)

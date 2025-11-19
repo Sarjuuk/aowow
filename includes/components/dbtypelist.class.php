@@ -306,6 +306,11 @@ abstract class DBTypeList
         $this->error = false;
     }
 
+    /**
+     * iterate over fetched templates
+     *
+     * @return array the current template
+     */
     public function &iterate() : \Generator
     {
         if (!$this->templates)
@@ -483,7 +488,7 @@ abstract class DBTypeList
          't':   type [always set]
         'ti':   typeId [always set]
         'bd':   BossDrop [0; 1] [Creature / GO]
-        'dd':   DungeonDifficulty [-2: DungeonHC; -1: DungeonNM; 1: Raid10NM; 2:Raid25NM; 3:Raid10HM; 4: Raid25HM] [Creature / GO]
+        'dd':   DungeonDifficulty [-2: DungeonHC; -1: DungeonNM; 1: Raid10NM; 2:Raid25NM; 3:Raid10HM; 4: Raid25HM; 99: filler trash] [Creature / GO]
          'q':   cssQuality [Items]
          'z':   zone [set when all happens in here]
          'p':   PvP [pvpSourceId]
@@ -632,7 +637,18 @@ trait spawnHelper
         $wpSum    = [];
         $wpIdx    = 0;
         $worldPos = [];
-        $spawns   = DB::Aowow()->select("SELECT * FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) AND `posX` > 0 AND `posY` > 0", self::$type, $this->getFoundIDs()) ?: [];
+        $spawns   = DB::Aowow()->select(
+           'SELECT CASE WHEN z.`type` = ?d THEN 1
+                        WHEN z.`type` = ?d THEN 2
+                        WHEN z.`type` = ?d THEN 2
+                        ELSE 0
+                   END AS "mapType", s.*
+            FROM   ?_spawns s
+            JOIN   ?_zones z ON s.areaId = z.id
+            WHERE s.`type` = ?d AND s.`typeId` IN (?a) AND s.`posX` > 0 AND s.`posY` > 0',
+            MAP_TYPE_DUNGEON_HC, MAP_TYPE_MMODE_RAID, MAP_TYPE_MMODE_RAID_HC,
+            self::$type, $this->getFoundIDs()
+        ) ?: [];
 
         if (!$skipAdmin && User::isInGroup(U_GROUP_MODERATOR))
             if ($guids = array_column(array_filter($spawns, fn($x) => $x['guid'] > 0 || $x['type'] != Type::NPC), 'guid'))
@@ -696,13 +712,13 @@ trait spawnHelper
                     $info[2] = Lang::game('phases').Lang::main('colon').Util::asHex($s['phaseMask']);
 
                 if ($s['spawnMask'] == 15)
-                    $info[3] = Lang::game('mode').Lang::game('modes', -1);
+                    $info[3] = Lang::game('mode').Lang::game('modes', 0, -1);
                 else if ($s['spawnMask'])
                 {
                     $_ = [];
                     for ($i = 0; $i < 4; $i++)
                         if ($s['spawnMask'] & 1 << $i)
-                            $_[] = Lang::game('modes', $i);
+                            $_[] = Lang::game('modes', $s['mapType'], $i);
 
                     $info[4] = Lang::game('mode').implode(', ', $_);
                 }
@@ -880,8 +896,13 @@ trait profilerHelper
 
 trait sourceHelper
 {
-    protected $sources    = [];
-    protected $sourceMore = null;
+    protected  array $sources    = [];
+    protected ?array $sourceMore = null;
+
+    public function getRawSource(int $src) : array
+    {
+        return $this->sources[$this->id][$src] ?? [];
+    }
 
     public function getSources(?array &$s = [], ?array &$sm = []) : bool
     {
@@ -923,7 +944,9 @@ trait sourceHelper
                 10H         0b0100      2       0b011
                 25H         0b1000      3       0b100
             */
-            if ($this->curTpl['moreMask'] & SRC_FLAG_DUNGEON_DROP)
+            if ($this->curTpl['moreMask'] & SRC_FLAG_COMMON)
+                $sm['dd'] = 99;
+            else if ($this->curTpl['moreMask'] & SRC_FLAG_DUNGEON_DROP)
                 $sm['dd'] = $this->sources[$this->id][SRC_DROP][0] * -1;
             else if ($this->curTpl['moreMask'] & SRC_FLAG_RAID_DROP)
             {

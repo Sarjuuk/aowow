@@ -397,7 +397,11 @@ $lang = array(
 
         'phases'        => "Fases",
         'mode'          => "Modo: ",
-        'modes'         => [-1 => "Cualquiera", "Normal / Normal 10", "Heroico / Normal 25", "Heróico 10", "Heróico 25"],
+        'modes'         => array(
+            [-1 => "Cualquiera", "Normal / Normal 10", "Heroico / Normal 25", "Heróico 10", "Heróico 25"],
+            ["Normal", "Heroico"],
+            ["Normal 10", "Normal 25", "Heróico 10", "Heróico 25"],
+        ),
         'expansions'    => ["World of Warcraft", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Fuerza", "Agilidad", "Aguante", "Intelecto", "Espíritu"],
         'timeAbbrev'    => array(
@@ -1208,10 +1212,6 @@ $lang = array(
         'mechanicimmune'=> 'No afectado por la mecánica: %s',
         '_extraFlags'   => 'Banderas extra: ',
         'versions'      => 'Versiones de dificultad: ',
-        'modes'         => array(
-            1 => ["Normal", "Heroico"],
-            2 => ["10 jugadores Normal", "25 jugadores Normal", "10 jugadores Heroico", "25 jugadores Heroico"]
-        ),
         'cat'           => array(
             "Sin categoría",            "Bestia",                   "Dragonante",               "Demonio",                  "Elemental",                "Gigante",                  "No-muerto",                "Humanoide",
             "Alimaña",                  "Mecánico",                 "Sin especificar",          "Tótem",                    "Mascota mansa",            "Nube de gas"

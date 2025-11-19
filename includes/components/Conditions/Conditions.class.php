@@ -398,22 +398,22 @@ class Conditions
 
     public static function lootTableToConditionSource(string $lootTable) : int
     {
-        switch ($lootTable)
+        return match ($lootTable)
         {
-            case LOOT_FISHING:     return self::SRC_FISHING_LOOT_TEMPLATE;
-            case LOOT_CREATURE:    return self::SRC_CREATURE_LOOT_TEMPLATE;
-            case LOOT_GAMEOBJECT:  return self::SRC_GAMEOBJECT_LOOT_TEMPLATE;
-            case LOOT_ITEM:        return self::SRC_ITEM_LOOT_TEMPLATE;
-            case LOOT_DISENCHANT:  return self::SRC_DISENCHANT_LOOT_TEMPLATE;
-            case LOOT_PROSPECTING: return self::SRC_PROSPECTING_LOOT_TEMPLATE;
-            case LOOT_MILLING:     return self::SRC_MILLING_LOOT_TEMPLATE;
-            case LOOT_PICKPOCKET:  return self::SRC_PICKPOCKETING_LOOT_TEMPLATE;
-            case LOOT_SKINNING:    return self::SRC_SKINNING_LOOT_TEMPLATE;
-            case LOOT_MAIL:        return self::SRC_MAIL_LOOT_TEMPLATE;
-            case LOOT_SPELL:       return self::SRC_SPELL_LOOT_TEMPLATE;
-            case LOOT_REFERENCE:   return self::SRC_REFERENCE_LOOT_TEMPLATE;
-            default:               return self::SRC_NONE;
-        }
+            Loot::FISHING     => self::SRC_FISHING_LOOT_TEMPLATE,
+            Loot::CREATURE    => self::SRC_CREATURE_LOOT_TEMPLATE,
+            Loot::GAMEOBJECT  => self::SRC_GAMEOBJECT_LOOT_TEMPLATE,
+            Loot::ITEM        => self::SRC_ITEM_LOOT_TEMPLATE,
+            Loot::DISENCHANT  => self::SRC_DISENCHANT_LOOT_TEMPLATE,
+            Loot::PROSPECTING => self::SRC_PROSPECTING_LOOT_TEMPLATE,
+            Loot::MILLING     => self::SRC_MILLING_LOOT_TEMPLATE,
+            Loot::PICKPOCKET  => self::SRC_PICKPOCKETING_LOOT_TEMPLATE,
+            Loot::SKINNING    => self::SRC_SKINNING_LOOT_TEMPLATE,
+            Loot::MAIL        => self::SRC_MAIL_LOOT_TEMPLATE,
+            Loot::SPELL       => self::SRC_SPELL_LOOT_TEMPLATE,
+            Loot::REFERENCE   => self::SRC_REFERENCE_LOOT_TEMPLATE,
+            default           => self::SRC_NONE
+        };
     }
 
     public static function extendListviewRow(array &$lvRow, int $srcType, int $groupKey, array $condition) : bool

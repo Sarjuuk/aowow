@@ -443,9 +443,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         }
 
         // tabs: this item is contained in..
-        $lootTabs  = new Loot();
+        $lootTabs  = new LootByItem($this->typeId);
         $createdBy = [];
-        if ($lootTabs->getByItem($this->typeId))
+        if ($lootTabs->getByItem())
         {
             $this->extendGlobalData($lootTabs->jsGlobals);
 
@@ -454,27 +454,26 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if (!$tabData['data'])
                     continue;
 
-                if ($idx == 16)
+                if ($idx == LootByItem::SPELL_CREATED)
                     $createdBy = array_column($tabData['data'], 'id');
 
-                if ($idx == 1)
+                if ($idx == LootByItem::ITEM_DISENCHANTED)
                     $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=163;crs='.$this->typeId.';crv=0');
 
-                if ($idx == 4 && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
-                {
-                    switch ($sm[0]['dd'])
+                if ($idx == LootByItem::NPC_DROPPED && $this->subject->getSources($s, $sm) && $s[0] == SRC_DROP && isset($sm[0]['dd']))
+                    $tabData['note'] = match($sm[0]['dd'])
                     {
-                        case -1: $tabData['note'] = '$LANG.lvnote_itemdropsinnormalonly';   break;
-                        case -2: $tabData['note'] = '$LANG.lvnote_itemdropsinheroiconly';   break;
-                        case -3: $tabData['note'] = '$LANG.lvnote_itemdropsinnormalheroic'; break;
-                        case  1: $tabData['note'] = '$LANG.lvnote_itemdropsinnormal10only'; break;
-                        case  2: $tabData['note'] = '$LANG.lvnote_itemdropsinnormal25only'; break;
-                        case  3: $tabData['note'] = '$LANG.lvnote_itemdropsinheroic10only'; break;
-                        case  4: $tabData['note'] = '$LANG.lvnote_itemdropsinheroic25only'; break;
-                    }
-                }
+                        -1      => '$LANG.lvnote_itemdropsinnormalonly',
+                        -2      => '$LANG.lvnote_itemdropsinheroiconly',
+                        -3      => '$LANG.lvnote_itemdropsinnormalheroic',
+                         1      => '$LANG.lvnote_itemdropsinnormal10only',
+                         2      => '$LANG.lvnote_itemdropsinnormal25only',
+                         3      => '$LANG.lvnote_itemdropsinheroic10only',
+                         4      => '$LANG.lvnote_itemdropsinheroic25only',
+                        default => null
+                    };
 
-                if ($idx == 15 && !$this->map)
+                if ($idx == LootByItem::OBJECT_FISHED && !$this->map)
                 {
                     $nodeIds  = array_map(fn($x) => $x['id'], $tabData['data']);
                     $fishedIn = new GameObjectList(array(['id', $nodeIds]));
@@ -505,24 +504,25 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tabs: this item contains..
         $sourceFor = array(
-             [LOOT_ITEM,        $this->typeId,                            '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
-             [LOOT_PROSPECTING, $this->typeId,                            '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-             [LOOT_MILLING,     $this->typeId,                            '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
-             [LOOT_DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
+            [Loot::ITEM,        $this->typeId,                            '$LANG.tab_contains',      'contains',      ['$Listview.extraCols.percent'], []                          ],
+            [Loot::PROSPECTING, $this->typeId,                            '$LANG.tab_prospecting',   'prospecting',   ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+            [Loot::MILLING,     $this->typeId,                            '$LANG.tab_milling',       'milling',       ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']],
+            [Loot::DISENCHANT,  $this->subject->getField('disenchantId'), '$LANG.tab_disenchanting', 'disenchanting', ['$Listview.extraCols.percent'], ['side', 'slot', 'reqlevel']]
         );
 
         foreach ($sourceFor as [$lootTemplate, $lootId, $tabName, $tabId, $extraCols, $hiddenCols])
         {
-            $lootTab = new Loot();
-            if ($lootTab->getByContainer($lootTemplate, $lootId))
+            $lootTab = new LootByContainer();
+            if ($lootTab->getByContainer($lootTemplate, [$lootId]))
             {
                 $this->extendGlobalData($lootTab->jsGlobals);
                 $extraCols = array_merge($extraCols, $lootTab->extraCols);
 
                 $tabData = array(
-                    'data' => $lootTab->getResult(),
-                    'name' => $tabName,
-                    'id'   => $tabId,
+                    'data'            => $lootTab->getResult(),
+                    'name'            => $tabName,
+                    'id'              => $tabId,
+                    'computeDataFunc' => '$Listview.funcBox.initLootTable'
                 );
 
                 if ($extraCols)

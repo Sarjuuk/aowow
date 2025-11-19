@@ -518,8 +518,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         // todo (med): this double list creation very much sucks ...
         $getItemSource = function ($itemId, $method = 0) use (&$mapNPCs, &$mapGOs)
         {
-            $lootTabs  = new Loot();
-            if ($lootTabs->getByItem($itemId))
+            $lootTabs  = new LootByItem($itemId);
+            if ($lootTabs->getByItem())
             {
                 /*
                     todo (med): sanity check:
@@ -1175,8 +1175,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             $this->mail['header'][1] = Lang::mail('mailBy', [$senderTypeId, $ti]);
 
         // while mail attachemnts are handled as loot, it has no variance. Always 100% chance, always one item.
-        $mailLoot = new Loot();
-        if ($mailLoot->getByContainer(LOOT_MAIL, $rmtId))
+        $mailLoot = new LootByContainer();
+        if ($mailLoot->getByContainer(Loot::MAIL, [$rmtId]))
         {
             $this->extendGlobalData($mailLoot->jsGlobals);
             foreach ($mailLoot->getResult() as $loot)

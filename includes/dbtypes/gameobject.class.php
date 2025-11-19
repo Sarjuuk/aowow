@@ -70,7 +70,7 @@ class GameObjectList extends DBTypeList
             $data[$this->id] = array(
                 'id'       => $this->id,
                 'name'     => Lang::unescapeUISequences($this->getField('name', true), Lang::FMT_RAW),
-                'type'     => $this->curTpl['typeCat'],
+                'type'     => $this->getField('typeCat'),
                 'location' => $this->getSpawns(SPAWNINFO_ZONES)
             );
 

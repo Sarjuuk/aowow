@@ -26,7 +26,20 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     private array $disables  = [];
 
     private const /* array */ PVP_MONEY        = [26045, 24581, 24579, 43589, 37836]; // Nagrand, Hellfire Pen. H, Hellfire Pen. A, Wintergrasp, Grizzly Hills
-    private const /* int */   COMMON_THRESHOLD = 100;
+    private const /* int */   COMMON_THRESHOLD = 30;        // if an item has more than X sources it gets filtered by default in loot listviews; ancient WH versions have chance < 1% instead of checking for commonloot property.
+                                                            // but that would include the super rare vanity pet drops etc, so.. idk? Make it depend of item class and/or quality? That sounds like pain. :<
+    private const /* array */ FAKE_CHESTS      = array(     // special cases where multiple chests share the same loot and are spawned for the same encounter
+        // icc - gunship armory                             // if we process it like normal the contained items show up as zone drop because technically they have multiple sources. So lets avoid that!
+        201873 => 202178,                                   // A -> H
+        201874 => 202180,
+        201872 => 202177,
+        201875 => 202179,
+        // ulduar freya's gift - point +1 and +2 hardmode chests to max chest
+        194329 => 194331,                                   // 25
+        194330 => 194331,
+        194325 => 194327,                                   // 10
+        194326 => 194327
+    );
 
     public function generate(array $ids = []) : bool
     {
@@ -41,10 +54,10 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         $this->dummyGOs = DB::Aowow()->select(
-           'SELECT    l1.`objectId` AS ARRAY_KEY, BIT_OR(l1.`difficulty`) AS "0", IFNULL(l2.`npcId`, l1.`npcId`) AS "1"
-            FROM      ?_loot_link l1
-            LEFT JOIN ?_loot_link l2 ON l1.`objectId` = l2.`objectId` AND l2.`priority` = 1
-            GROUP BY l1.`objectid`'
+           'SELECT `normal10` AS ARRAY_KEY, 1 AS "0", `normal10` AS "1", `mapType` AS "2" FROM ?_objectdifficulty WHERE `normal10` > 0 UNION
+            SELECT `normal25` AS ARRAY_KEY, 2 AS "0", `normal10` AS "1", `mapType` AS "2" FROM ?_objectdifficulty WHERE `normal25` > 0 UNION
+            SELECT `heroic10` AS ARRAY_KEY, 4 AS "0", `normal10` AS "1", `mapType` AS "2" FROM ?_objectdifficulty WHERE `heroic10` > 0 UNION
+            SELECT `heroic25` AS ARRAY_KEY, 8 AS "0", `normal10` AS "1", `mapType` AS "2" FROM ?_objectdifficulty WHERE `heroic25` > 0'
         );
 
         $this->disables = DB::World()->selectCol(
@@ -142,23 +155,27 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         $this->itemset();                                   # Meta category .. inherit from items #
 
 
-        $t = new Timer(500);
+        $d = new Timer(500);
         foreach ($this->srcBuffer as $type => $data)
         {
             $j    = 0;
             $rows = [];
             $sum  = count($data);
-            foreach ($data as $d)
+            foreach ($data as [$t, $ti, $mt, $mti, $mz, $mFlags, $modes, $sumSources])
             {
-                $rows[++$j] = array_slice($d, 0, 6);
-                for ($i = 1; $i < 25; $i++)
-                    $rows[$j][] = $d[6][$i] ?? 0;
+                // can only ever be either/or .. unset if both
+                if (($mFlags & (SRC_FLAG_RAID_DROP | SRC_FLAG_DUNGEON_DROP)) == (SRC_FLAG_RAID_DROP | SRC_FLAG_DUNGEON_DROP))
+                    $mFlags &= ~(SRC_FLAG_RAID_DROP | SRC_FLAG_DUNGEON_DROP);
 
-                if ($d[7] > self::COMMON_THRESHOLD)
+                $rows[++$j] = [$t, $ti, $mt, $mti, $mz, $mFlags];
+                for ($i = 1; $i < 25; $i++)
+                    $rows[$j][] = $modes[$i] ?? 0;
+
+                if ($sumSources > self::COMMON_THRESHOLD)
                     $rows[$j][5] |= SRC_FLAG_COMMON;
 
-                if ($t->update())
-                    CLI::write('[source] - Inserting... (['.$type.'] '.$j.' / '.$sum.')', CLI::LOG_BLANK, true, true);
+                if ($d->update())
+                    CLI::write('[source] - Inserting... (['.Type::getFileString($type).'] '.$j.' / '.$sum.')', CLI::LOG_BLANK, true, true);
 
                 if (!($j % 300))
                     $this->insert($rows);
@@ -196,7 +213,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         return true;
     }
 
-    private function pushBuffer(int $type, int $typeId, int $srcId, int $srcBit = 1, int $mType = 0, int $mTypeId = 0, ?int $mZoneId = null, int $mMask = 0x0, int $qty = 1) : void
+    private function pushBuffer(int $type, int $typeId, int $srcId, int $srcBit = 1, int $mType = 0, int $mTypeId = 0, ?int $mZoneId = null, ?int $mMask = null, int $qty = 1) : void
     {
         if (!isset($this->srcBuffer[$type]))
             $this->srcBuffer[$type] = [];
@@ -207,19 +224,26 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $b = &$this->srcBuffer[$type][$typeId];
+        [, , &$bType, &$bTypeId, &$bZone, &$bFlags, &$bSrc, &$bQty] = $this->srcBuffer[$type][$typeId];
 
-        if ($mType != $b[2] || $mTypeId != $b[3])
-            $b[2] = $b[3] = null;
+        if ($mType != $bType || $mTypeId != $bTypeId)
+            $bType = $bTypeId = null;
 
-        if ($mZoneId && $b[4] === null)
-            $b[4] = $mZoneId;
-        else if ($mZoneId && $b[4] && $mZoneId != $b[4])
-            $b[4] = 0;
+        if ($bZone === null)
+            $bZone = $mZoneId;
+        else if ($mZoneId !== null && $mZoneId != $bZone)
+            $bZone = 0;
 
-        $b[5] = ($b[5] ?? 0) & $mMask;                      // only bossdrop for now .. remove flag if regular source is available
-        $b[6][$srcId] = ($b[6][$srcId] ?? 0) | $srcBit;     // SIDE_X for quests, modeMask for drops, subSrc for pvp, else: 1
-        $b[7] += $qty;
+        if ($bFlags === null)                               // bossdrop, raid drop, dungeon drop .. remove flag if regular source is available
+            $bFlags = $mMask;
+        else if ($mMask !== null)
+        {
+            $bFlags &= ($mMask & SRC_FLAG_BOSSDROP);
+            $bFlags |= ($mMask & (SRC_FLAG_DUNGEON_DROP | SRC_FLAG_RAID_DROP));
+        }
+
+        $bSrc[$srcId] = ($bSrc[$srcId] ?? 0) | $srcBit;     // SIDE_X for quests, modeMask for drops, subSrc for pvp, else: 1
+        $bQty += $qty;
     }
 
     private function insert(array &$rows) : void
@@ -293,7 +317,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #2  Drop [NPC]', CLI::LOG_BLANK, true, true);
 
         $creatureLoot = DB::World()->select(
-           'SELECT    IF(clt.`Reference` > 0, -clt.`Reference`, clt.`Item`) AS "refOrItem", ct.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(clt.`Reference` > 0, -clt.`Reference`, clt.`Item`) AS "refOrItem", ct.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT clt.`Reference`) AS "qty"
             FROM      creature_loot_template clt
             JOIN      creature_template ct ON clt.`entry` = ct.`lootid`
             LEFT JOIN item_template it ON it.`entry` = clt.`Item` AND clt.`Reference` <= 0
@@ -301,20 +325,21 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             GROUP BY  `refOrItem`, ct.`entry`'
         );
 
-        $npcSpawns = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ?_spawns s JOIN ?_zones z ON z.`id` = s.`areaId` WHERE s.`type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC, array_merge(array_column($this->dummyGOs, 1), array_filter(array_column($creatureLoot, 'entry'))));
-        $bosses    = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, IF(`cuFlags` & ?d, 1, IF(`typeFlags` & 0x4 AND `rank` > 0, 1, 0)) FROM ?_creature WHERE `id` IN (?a)', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
+        $linkedNpcs = DB::Aowow()->selectCol('SELECT l1.`objectId` AS ARRAY_KEY, IFNULL(l2.`npcId`, l1.`npcId`) FROM ?_loot_link l1 LEFT JOIN ?_loot_link l2 ON l1.`objectId` = l2.`objectId` AND l2.`priority` = 1 GROUP BY l1.`objectid`');
+        $npcSpawns  = DB::Aowow()->select('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT s.`areaId`) > 1, 0, s.`areaId`) AS "areaId", z.`type` FROM ?_spawns s JOIN ?_zones z ON z.`id` = s.`areaId` WHERE s.`type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`', Type::NPC, array_merge($linkedNpcs, array_filter(array_column($creatureLoot, 'entry'))));
+        $bosses     = DB::Aowow()->selectCol('SELECT `id` AS ARRAY_KEY, IF(`cuFlags` & ?d, 1, IF(`typeFlags` & 0x4 AND `rank` > 0, 1, 0)) FROM ?_creature WHERE `id` IN (?a)', NPC_CU_INSTANCE_BOSS, array_filter(array_column($creatureLoot, 'entry')));
 
         foreach ($creatureLoot as $l)
         {
             $roi    = $l['refOrItem'];
             $entry  = $l['entry'];
             $mode   = 1;
-            $zoneId = 0;
+            $zoneId = null;
             $mMask  = 0x0;
             if (isset($this->dummyNPCs[$l['entry']]))
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            if (isset($bosses[$entry]) && $bosses[$entry])  // can be empty...?
+            if (!empty($bosses[$entry]))
                 $mMask |= SRC_FLAG_BOSSDROP;
 
             if (isset($npcSpawns[$entry]))
@@ -355,10 +380,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::NPC, $entry, $zoneId, $mMask, $l['qty']);
         }
 
+
         CLI::write('[source] * #2  Drop [Object]', CLI::LOG_BLANK, true, true);
 
         $objectLoot = DB::World()->select(
-           'SELECT    IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS "refOrItem", gt.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS "refOrItem", gt.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT glt.`Reference`) AS "qty"
             FROM      gameobject_loot_template glt
             JOIN      gameobject_template gt ON glt.`entry` = gt.`data1`
             LEFT JOIN item_template it ON it.`entry` = glt.`Item` AND glt.`Reference` <= 0
@@ -373,23 +399,25 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         foreach ($objectLoot as $l)
         {
             $roi    = $l['refOrItem'];
-            $entry  = $l['entry'];
-            $mode   = 1 | ($this->dummyGOs[$entry][0] ?? 0);
-            $zoneId = 0;
+            $entry  = self::FAKE_CHESTS[$l['entry']] ?? $l['entry'];
+            $mode   = 1;
+            $zoneId = null;
             $mMask  = 0x0;
-            $spawn  = [];
 
-            if (isset($this->dummyGOs[$entry]))             // we know these are all boss drops
-                $mMask |= SRC_FLAG_BOSSDROP;
-
-            if (isset($goSpawns[$entry]))
-                $spawn = $goSpawns[$entry];
-            else if (isset($this->dummyGOs[$entry]) && isset($npcSpawns[$this->dummyGOs[$entry][1]]))
-                $spawn = $npcSpawns[$this->dummyGOs[$entry][1]];
-
-            if ($spawn)
+            if ([$modeBit, $baseEntry, $mapType] = ($this->dummyGOs[$entry] ?? null))
             {
-                switch ($spawn['type'])
+                $mMask |= SRC_FLAG_BOSSDROP;                // we know these are all boss drops
+                $mode   = $modeBit;
+                $entry  = $baseEntry ?: $entry;
+
+                if ($mapType == 1)
+                    $mMask |= SRC_FLAG_DUNGEON_DROP;
+                if ($mapType == 2)
+                    $mMask |= SRC_FLAG_RAID_DROP;
+            }
+            else if (isset($goSpawns[$entry]))
+            {
+                switch ($goSpawns[$entry]['type'])
                 {
                     case MAP_TYPE_DUNGEON_HC:
                         $mMask |= SRC_FLAG_DUNGEON_DROP; break;
@@ -397,8 +425,16 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     case MAP_TYPE_MMODE_RAID_HC:
                         $mMask |= SRC_FLAG_RAID_DROP; break;
                 }
+            }
 
-                $zoneId = $spawn['areaId'];
+            if (isset($goSpawns[$entry]))
+                $zoneId = $goSpawns[$entry]['areaId'];
+            else if (isset($linkedNpcs[$entry]))
+            {
+                if (!empty($bosses[$linkedNpcs[$entry]]))
+                    $mMask |= SRC_FLAG_BOSSDROP;
+                if (isset($npcSpawns[$linkedNpcs[$entry]]))
+                    $zoneId = $npcSpawns[$linkedNpcs[$entry]]['areaId'];
             }
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
@@ -406,26 +442,27 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 foreach ($this->refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer(Type::SPELL, $_, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry'], $zoneId, $mMask, $l['qty']);
+                        $this->pushBuffer(Type::SPELL, $_, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $entry, $zoneId, $mMask, $l['qty']);
 
                     $objectOT[] = $iId;
-                    $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry'], $zoneId, $mMask, $l['qty']);
+                    $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $entry, $zoneId, $mMask, $l['qty']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer(Type::SPELL, $_, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry'], $zoneId, $mMask, $l['qty']);
+                $this->pushBuffer(Type::SPELL, $_, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $entry, $zoneId, $mMask, $l['qty']);
 
             $objectOT[] = $roi;
-            $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $l['entry'], $zoneId, $mMask, $l['qty']);
+            $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, $mode, $l['qty'] > 1 ? 0 : Type::OBJECT, $entry, $zoneId, $mMask, $l['qty']);
         }
+
 
         CLI::write('[source] * #2  Drop [Item]', CLI::LOG_BLANK, true, true);
 
         $itemLoot = DB::World()->select(
-           'SELECT    IF(ilt.`Reference` > 0, -ilt.`Reference`, ilt.`Item`) AS ARRAY_KEY, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(ilt.`Reference` > 0, -ilt.`Reference`, ilt.`Item`) AS ARRAY_KEY, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(DISTINCT ilt.`Reference`) AS "qty"
             FROM      item_loot_template ilt
             JOIN      item_template itA ON ilt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = ilt.`Item` AND ilt.`Reference` <= 0
@@ -441,24 +478,26 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                 foreach ($this->refLoot[-$roi] as $iId => $r)
                 {
                     if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], 0, $l['qty']);
+                        $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
 
                     $itemOT[] = $iId;
-                    $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], 0, $l['qty']);
+                    $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
                 }
 
                 continue;
             }
 
             if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], 0, $l['qty']);
+                $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
 
             $itemOT[] = $roi;
-            $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], 0, $l['qty']);
+            $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
         }
 
-        DB::Aowow()->query('UPDATE ?_items SET `cuFLags` = `cuFlags` | ?d WHERE `id` IN (?a)', ITEM_CU_OT_ITEMLOOT,   $itemOT);
-        DB::Aowow()->query('UPDATE ?_items SET `cuFLags` = `cuFlags` | ?d WHERE `id` IN (?a)', ITEM_CU_OT_OBJECTLOOT, $objectOT);
+        if ($itemOT)
+            DB::Aowow()->query('UPDATE ?_items SET `cuFLags` = `cuFlags` | ?d WHERE `id` IN (?a)', ITEM_CU_OT_ITEMLOOT,   $itemOT);
+        if ($objectOT)
+            DB::Aowow()->query('UPDATE ?_items SET `cuFLags` = `cuFlags` | ?d WHERE `id` IN (?a)', ITEM_CU_OT_OBJECTLOOT, $objectOT);
     }
 
     private function itemPvP() : void
@@ -537,7 +576,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         }
 
         $mailLoot = DB::World()->select(
-           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS ARRAY_KEY, qt.`Id` AS "entry", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone", BIT_OR(IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, ?d))) AS "side"
+           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS ARRAY_KEY, qt.`Id` AS "entry", it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT mlt.`Reference`) AS "qty", IF(COUNT(DISTINCT `QuestSortID`) > 1, 0, GREATEST(`QuestSortID`, 0)) AS "zone", BIT_OR(IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, IF(qt.`AllowableRaces` & ?d AND NOT (qt.`AllowableRaces` & ?d), ?d, ?d))) AS "side"
             FROM      mail_loot_template mlt
             JOIN      quest_template_addon qta ON qta.`RewardMailTemplateId` = mlt.`entry`
             JOIN      quest_template qt ON qt.`ID` = qta.`ID`
@@ -659,7 +698,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #15 Disenchanted', CLI::LOG_BLANK, true, true);
 
         $deLoot = DB::World()->select(
-           'SELECT    IF(dlt.`Reference` > 0, -dlt.`Reference`, dlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(dlt.`Reference` > 0, -dlt.`Reference`, dlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(DISTINCT dlt.`Reference`) AS "qty"
             FROM      disenchant_loot_template dlt
             JOIN      item_template itA ON dlt.`entry` = itA.`DisenchantId`
             LEFT JOIN item_template itB ON itB.`entry` = dlt.`Item` AND dlt.`Reference` <= 0
@@ -696,7 +735,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #16 Fished', CLI::LOG_BLANK, true, true);
 
         $fishLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", IF(COUNT(DISTINCT `zone`) > 2, 0, MAX(`zone`)) AS "zone"
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty", IF(COUNT(DISTINCT `zone`) > 2, 0, MAX(`zone`)) AS "zone"
             FROM      (SELECT 0 AS "entry", IF(flt.`Reference` > 0, -flt.`Reference`, flt.`Item`) AS "itemOrRef", `entry` AS "zone" FROM fishing_loot_template flt UNION
                        SELECT   gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) AS "itemOrRef",       0 AS "zone" FROM gameobject_template   gt  JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1` WHERE `type` = ?d AND gt.`data1` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
@@ -717,7 +756,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         {
             $roi       = $l['refOrItem'];
             $l['zone'] = $areaParent[$l['zone']] ?? $l['zone'];
-            $zoneId    = $goSpawns[$l['entry']]  ?? 0;
+            $zoneId    = $goSpawns[$l['entry']]  ?? null;
             if ($l['zone'] != $zoneId)
                 $zoneId = 0;
 
@@ -746,7 +785,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #17 Gathered', CLI::LOG_BLANK, true, true);
 
         $herbLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", src.`srcType`
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty", src.`srcType`
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS "srcType" FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
                        SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
@@ -761,8 +800,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($herbLoot, function($x) { return $x['srcType'] == Type::OBJECT; }), 'entry'));
-        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`', Type::NPC,    array_column(array_filter($herbLoot, function($x) { return $x['srcType'] == Type::NPC; }), 'entry'));
+        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
+        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`', Type::NPC,    array_column(array_filter($herbLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
 
         foreach ($herbLoot as $l)
         {
@@ -772,7 +811,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (isset($this->dummyNPCs[$l['entry']]) && $l['srcType'] == Type::NPC)
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            $zoneId = $spawns[$l['srcType']][$l['entry']] ?? 0;
+            $zoneId = $spawns[$l['srcType']][$l['entry']] ?? null;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {
@@ -799,7 +838,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #18 Milled', CLI::LOG_BLANK, true, true);
 
         $millLoot  = DB::World()->select(
-           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(mlt.`Reference` > 0, -mlt.`Reference`, mlt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(DISTINCT mlt.`Reference`) AS "qty"
             FROM      milling_loot_template mlt
             JOIN      item_template itA ON mlt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = mlt.`Item` AND mlt.`Reference` <= 0
@@ -835,7 +874,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #19 Mined', CLI::LOG_BLANK, true, true);
 
         $mineLoot = DB::World()->select(
-           'SELECT      src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty", src.`srcType`
+           'SELECT      src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty", src.`srcType`
             FROM        (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef`, ?d AS "srcType" FROM creature_template   ct JOIN skinning_loot_template   slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0 UNION
                          SELECT gt.`entry`, IF(glt.`Reference` > 0, -glt.`Reference`, glt.`Item`) `itemOrRef`, ?d AS "srcType" FROM gameobject_template gt JOIN gameobject_loot_template glt ON glt.`entry` = gt.`data1`    WHERE gt.`type` = ?d AND gt.`data1` > 0 AND gt.`data0` IN (?a)) src
             LEFT JOIN   item_template it ON src.itemOrRef > 0 AND src.`itemOrRef` = it.`entry`
@@ -850,8 +889,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             return;
         }
 
-        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($mineLoot, function($x) { return $x['srcType'] == Type::OBJECT; }), 'entry'));
-        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC,    array_column(array_filter($mineLoot, function($x) { return $x['srcType'] == Type::NPC; }), 'entry'));
+        $spawns[Type::OBJECT] = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::OBJECT, array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::OBJECT), 'entry'));
+        $spawns[Type::NPC]    = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId`IN (?a) GROUP BY `typeId`', Type::NPC,    array_column(array_filter($mineLoot, fn($x) => $x['srcType'] == Type::NPC), 'entry'));
 
         foreach ($mineLoot as $l)
         {
@@ -861,7 +900,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (isset($this->dummyNPCs[$l['entry']]) && $l['srcType'] == Type::NPC)
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            $zoneId = $spawns[$l['srcType']][$l['entry']] ?? 0;
+            $zoneId = $spawns[$l['srcType']][$l['entry']] ?? null;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {
@@ -888,7 +927,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #20 Prospected', CLI::LOG_BLANK, true, true);
 
         $prospectLoot = DB::World()->select(
-           'SELECT    IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) AS "refOrItem", itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(DISTINCT plt.`Reference`) AS "qty"
             FROM      prospecting_loot_template plt
             JOIN      item_template itA ON plt.`entry` = itA.`entry`
             LEFT JOIN item_template itB ON itB.`entry` = plt.`Item` AND plt.`Reference` <= 0
@@ -924,7 +963,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #21 Pickpocket', CLI::LOG_BLANK, true, true);
 
         $theftLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty"
             FROM      (SELECT ct.`entry`, IF(plt.`Reference` > 0, -plt.`Reference`, plt.`Item`) `itemOrRef` FROM creature_template ct JOIN pickpocketing_loot_template plt ON plt.`entry` = ct.`pickpocketloot` WHERE ct.`pickpocketloot` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`'
@@ -946,7 +985,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (isset($this->dummyNPCs[$l['entry']]))
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            $zoneId = $spawns[$l['entry']] ?? 0;
+            $zoneId = $spawns[$l['entry']] ?? null;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {
@@ -973,7 +1012,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #22 Salvaged', CLI::LOG_BLANK, true, true);
 
         $salvageLoot = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty"
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef` FROM creature_template ct JOIN skinning_loot_template slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) AND ct.`skinloot` > 0) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
@@ -996,7 +1035,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (isset($this->dummyNPCs[$l['entry']]))
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            $zoneId = $spawns[$l['entry']] ?? 0;
+            $zoneId = $spawns[$l['entry']] ?? null;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {
@@ -1023,7 +1062,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         CLI::write('[source] * #23 Skinned', CLI::LOG_BLANK, true, true);
 
         $skinLoot  = DB::World()->select(
-           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(1) AS "qty"
+           'SELECT    src.`itemOrRef` AS "refOrItem", src.`entry`, it.`class`, it.`subclass`, it.`spellid_1`, it.`spelltrigger_1`, it.`spellid_2`, it.`spelltrigger_2`, COUNT(DISTINCT src.`itemOrRef`) AS "qty"
             FROM      (SELECT ct.`entry`, IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) `itemOrRef` FROM creature_template ct JOIN skinning_loot_template slt ON slt.`entry` = ct.`skinloot` WHERE (`type_flags` & ?d) = 0 AND ct.`skinloot` > 0 AND ct.`type` <> 13) src
             LEFT JOIN item_template it ON src.`itemOrRef` > 0 AND src.`itemOrRef` = it.`entry`
             GROUP BY  `refOrItem`, src.`entry`',
@@ -1046,7 +1085,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             if (isset($this->dummyNPCs[$l['entry']]))
                 [$mode, $entry] = $this->dummyNPCs[$l['entry']];
 
-            $zoneId = $spawns[$l['entry']] ?? 0;
+            $zoneId = $spawns[$l['entry']] ?? null;
 
             if ($roi < 0 && !empty($this->refLoot[-$roi]))
             {

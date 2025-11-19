@@ -57,8 +57,8 @@ class AchievementList extends DBTypeList
                 if ($rewards[$_id]['MailTemplateID'])
                 {
                     // using class Loot creates an inifinite loop cirling between Loot, ItemList and SpellList or something
-                    // $mailSrc = new Loot();
-                    // $mailSrc->getByContainer(LOOT_MAIL, $rewards[$_id]['MailTemplateID']);
+                    // $mailSrc = new LootByContainer();
+                    // $mailSrc->getByContainer(Loot::MAIL, $rewards[$_id]['MailTemplateID']);
                     // foreach ($mailSrc->iterate() as $loot)
                         // $_curTpl['rewards'][] = [Type::ITEM, $loot['id']];
 

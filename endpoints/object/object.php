@@ -22,6 +22,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
     public ?Book  $book    = null;
     public ?array $relBoss = null;
 
+    private array $difficulties = [];
+    private int   $mapType      = 0;
+
     private GameObjectList $subject;
 
     public function __construct(string $id)
@@ -59,6 +62,37 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         /**************/
 
         array_unshift($this->title, Lang::unescapeUISequences($this->subject->getField('name', true), Lang::FMT_RAW), Util::ucFirst(Lang::game('object')));
+
+
+        /**********************/
+        /* Determine Map Type */
+        /**********************/
+
+        if ($objectdifficulty = DB::Aowow()->select(        // has difficulty versions of itself
+           'SELECT `normal10` AS "0", `normal25` AS "1",
+                   `heroic10` AS "2", `heroic25` AS "3",
+                   `mapType`  AS ARRAY_KEY
+            FROM   ?_objectdifficulty
+            WHERE  `normal10` = ?d OR `normal25` = ?d OR
+                   `heroic10` = ?d OR `heroic25` = ?d',
+            $this->typeId, $this->typeId, $this->typeId, $this->typeId
+        ))
+        {
+            $this->mapType      = key($objectdifficulty);
+            $this->difficulties = array_pop($objectdifficulty);
+        }
+        else if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::OBJECT, $this->typeId))
+        {
+            $this->mapType = match ((int)DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps))
+            {
+                // MAP_TYPE_DUNGEON,
+                MAP_TYPE_DUNGEON_HC    => 1,
+                // MAP_TYPE_RAID,
+                MAP_TYPE_MMODE_RAID,
+                MAP_TYPE_MMODE_RAID_HC => 2,
+                default                => 0
+            };
+        }
 
 
         /***********/
@@ -197,6 +231,11 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // original name
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
+
+        // used in mode
+        foreach ($this->difficulties as $n => $id)
+            if ($id == $this->typeId)
+                $infobox[] = Lang::game('mode').Lang::game('modes', $this->mapType, $n);
 
         // AI
         if (User::isInGroup(U_GROUP_EMPLOYEE))
@@ -402,12 +441,37 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: contains
         if ($_ = $this->subject->getField('lootId'))
         {
-            $goLoot = new Loot();
-            if ($goLoot->getByContainer(LOOT_GAMEOBJECT, $_))
+            // check if loot_link entry exists (only difficulty: 1)
+            if ($npcId = DB::Aowow()->selectCell('SELECT `npcId` FROM ?_loot_link WHERE `objectId` = ?d AND `difficulty` = 1', $this->typeId))
             {
-                $extraCols   = $goLoot->extraCols;
-                $extraCols[] = '$Listview.extraCols.percent';
-                $hiddenCols  = ['source', 'side', 'slot', 'reqlevel'];
+                // get id set of npc
+                $lootEntries = DB::Aowow()->selectCol(
+                   'SELECT    ll.`difficulty` AS ARRAY_KEY, o.`lootId`
+                    FROM      ?_creature c
+                    LEFT JOIN ?_loot_link ll ON ll.`npcId` IN (c.`id`, c.`difficultyEntry1`, c.`difficultyEntry2`, c.`difficultyEntry3`)
+                    LEFT JOIN ?_objects o    ON o.`id` = ll.`objectId`
+                    WHERE     c.`id` = ?d
+                    ORDER BY  ll.`difficulty` ASC',
+                    $npcId
+                );
+
+                if ($this->mapType == 2 || count($lootEntries) > 2) // always raid
+                    $lootEntries = array_combine(array_map(fn($x) => 1 << (2 + $x), array_keys($lootEntries)), array_values($lootEntries));
+                else if ($this->mapType == 1 || count($lootEntries) == 2) // dungeon or raid, assume dungeon
+                    $lootEntries = array_combine(array_map(fn($x) => 1 << (2 - $x), array_keys($lootEntries)), array_values($lootEntries));
+            }
+            else
+                $lootEntries = [4 => $_];
+
+            $goLoot = new LootByContainer();
+            if ($goLoot->getByContainer(Loot::GAMEOBJECT, $lootEntries))
+            {
+                $extraCols  = $goLoot->extraCols;
+                array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');
+                if (count($lootEntries) > 1)
+                    $extraCols[] = '$Listview.extraCols.mode';
+
+                $hiddenCols = ['source', 'side', 'slot', 'reqlevel', 'count'];
 
                 $this->extendGlobalData($goLoot->jsGlobals);
                 $lootResult = $goLoot->getResult();
@@ -421,12 +485,16 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 }
 
                 $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'       => $lootResult,
-                    'id'         => 'contains',
-                    'name'       => '$LANG.tab_contains',
-                    'sort'       => ['-percent', 'name'],
-                    'extraCols'  => array_unique($extraCols),
-                    'hiddenCols' => $hiddenCols ?: null
+                    'data'            => $lootResult,
+                    'id'              => 'contains',
+                    'name'            => '$LANG.tab_contains',
+                    'sort'            => ['-percent', 'name'],
+                    'extraCols'       => array_unique($extraCols),
+                    'hiddenCols'      => $hiddenCols ?: null,
+                    'sort'            => ['-percent', 'name'],
+                    '_totalCount'     => 10000,
+                    'computeDataFunc' => '$Listview.funcBox.initLootTable',
+                    'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',
                 ), ItemList::$brickFile));
             }
         }
@@ -469,6 +537,51 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 'id'   => 'triggerd-by',
                 'note' => sprintf(Util::$filterResultString, '?objects=6')
             ), GameObjectList::$brickFile));
+        }
+
+        // tab: see also
+        if ($this->difficulties)
+        {
+            $conditions = array(
+                'AND',
+                ['id', $this->difficulties],
+                ['id', $this->typeId, '!']
+            );
+
+            $saObjects = new GameObjectList($conditions);
+            if (!$saObjects->error)
+            {
+                $data = $saObjects->getListviewData();
+                if ($this->difficulties)
+                {
+                    $saE = ['$Listview.extraCols.mode'];
+
+                    foreach ($data as $id => &$d)
+                    {
+                        if (($modeBit = array_search($id, $this->difficulties)) !== false)
+                        {
+                            if ($this->mapType)
+                                $d['modes'] = ['mode' => 1 << ($modeBit + 3)];
+                            else
+                                $d['modes'] = ['mode' => 2 - $modeBit];
+                        }
+                        else
+                            $d['modes'] = ['mode' => 0];
+                    }
+                }
+
+                $tabData = array(
+                    'data'        => $data,
+                    'id'          => 'see-also',
+                    'name'        => '$LANG.tab_seealso',
+                    'visibleCols' => ['level'],
+                );
+
+                if (isset($saE))
+                    $tabData['extraCols'] = $saE;
+
+                $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
+            }
         }
 
         // tab: Same model as

@@ -117,9 +117,9 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
         if ($this->typeId != CURRENCY_HONOR_POINTS && $this->typeId != CURRENCY_ARENA_POINTS)
         {
             // tabs: this currency is contained in..
-            $lootTabs = new Loot();
+            $lootTabs = new LootByItem($_relItemId);
 
-            if ($lootTabs->getByItem($_relItemId))
+            if ($lootTabs->getByItem())
             {
                 $this->extendGlobalData($lootTabs->jsGlobals);
 
@@ -198,7 +198,7 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // tab: created by (spell) [for items its handled in Loot::getByContainer()]
+        // tab: created by (spell) [for items its handled in LootByItem]
         if ($this->typeId == CURRENCY_HONOR_POINTS)
         {
             $createdBy = new SpellList(array(['effect1Id', SPELL_EFFECT_ADD_HONOR], ['effect2Id', SPELL_EFFECT_ADD_HONOR], ['effect3Id', SPELL_EFFECT_ADD_HONOR], 'OR'));

@@ -397,7 +397,11 @@ $lang = array(
 
         'phases'        => "Phases",
         'mode'          => "Mode: ",
-        'modes'         => [-1 => "Any", "Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
+        'modes'         => array(
+            [-1 => "Any", "Normal / Normal 10", "Heroic / Normal 25", "Heroic 10", "Heroic 25"],
+            ["Normal", "Heroic"],
+            ["Normal 10", "Normal 25", "Heroic 10", "Heroic 25"]
+        ),
         'expansions'    => ["Classic", "The Burning Crusade", "Wrath of the Lich King"],
         'stats'         => ["Strength", "Agility", "Stamina", "Intellect", "Spirit"],
         'timeAbbrev'    => array(                           // <time>S_ABBR
@@ -1208,10 +1212,6 @@ $lang = array(
         'mechanicimmune'=> 'Not affected by mechanic: %s',
         '_extraFlags'   => 'Extra Flags: ',
         'versions'      => 'Difficulty Versions: ',
-        'modes'         => array(
-            1 => ["Normal", "Heroic"],
-            2 => ["10-player Normal", "25-player Normal", "10-player Heroic", "25-player Heroic"]
-        ),
         'cat'           => array(
             "Uncategorized",            "Beasts",                   "Dragonkins",               "Demons",                   "Elementals",               "Giants",                   "Undead",                   "Humanoids",
             "Critters",                 "Mechanicals",              "Not specified",            "Totems",                   "Non-combat Pets",          "Gas Clouds"

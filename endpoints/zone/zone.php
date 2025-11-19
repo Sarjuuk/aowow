@@ -565,6 +565,48 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
+        // tab: Drops
+        if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
+        {
+            // Issue 1 - if the bosses drop items that are also sold by vendors moreZoneId will be 0 as vendor location and boss location are likely in conflict with each other
+            // Issue 2 - if the boss/chest isn't spawned the loot will not show up
+            $items   = new ItemList(array(Cfg::get('SQL_LIMIT_NONE'), ['src.moreZoneId', $this->typeId], ['src.src2', 0, '>'], ['quality', ITEM_QUALITY_UNCOMMON, '>=']), ['calcTotal' => true]);
+            $data    = $items->getListviewData();
+            $subTabs = false;
+            foreach ($items->iterate() as $id => $__)
+            {
+                $src = $items->getRawSource(SRC_DROP);
+                $map = ($items->getField('moreMask') ?: 0) & (SRC_FLAG_DUNGEON_DROP | SRC_FLAG_RAID_DROP);
+                if (!$src || !$map)
+                    continue;
+
+                $subTabs = true;
+
+                if ($map & SRC_FLAG_RAID_DROP)
+                    $mode = ($src[0] << 3);
+                else
+                    $mode = ($src[0] & 0x1 ? 0x2 : 0) | ($src[0] & 0x2 ? 0x1 : 0);
+
+                $data[$id] += ['modes' => ['mode' => $mode]];
+            }
+
+            $tabData = array(
+                'data'            => $data,
+                'id'              => 'drops',
+                'name'            => '$LANG.tab_drops',
+                'extraCols'       => $subTabs ? ['$Listview.extraCols.mode'] : null,
+                'computeDataFunc' => '$Listview.funcBox.initLootTable',
+                'onAfterCreate'   => $subTabs ? '$Listview.funcBox.addModeIndicator' : null
+            );
+
+            if (!is_null(ItemListFilter::getCriteriaIndex(16, $this->typeId)))
+                $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=16;crs='.$this->typeId.';crv=0');
+
+            $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
+
+            $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
+        }
+
         // tab: NPCs
         if ($cSpawns && !$creatureSpawns->error)
         {
@@ -683,8 +725,8 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: achievements
 
         // tab: fished in zone
-        $fish = new Loot();
-        if ($fish->getByContainer(LOOT_FISHING, $this->typeId))
+        $fish = new LootByContainer();
+        if ($fish->getByContainer(Loot::FISHING, [$this->typeId]))
         {
             $this->extendGlobalData($fish->jsGlobals);
             $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
@@ -696,12 +738,13 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
 
             $this->lvTabs->addListviewTab(new Listview(array(
-                'data'       => $fish->getResult(),
-                'name'       => '$LANG.tab_fishing',
-                'id'         => 'fishing',
-                'extraCols'  => array_unique($xCols),
-                'hiddenCols' => ['side'],
-                'note'       => $note
+                'data'            => $fish->getResult(),
+                'name'            => '$LANG.tab_fishing',
+                'id'              => 'fishing',
+                'extraCols'       => array_unique($xCols),
+                'hiddenCols'      => ['side'],
+                'note'            => $note,
+                'computeDataFunc' => '$Listview.funcBox.initLootTable'
             ), ItemList::$brickFile));
         }
 

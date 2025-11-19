@@ -1572,6 +1572,26 @@ CREATE TABLE `aowow_mails` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `aowow_objectdifficulty`
+--
+
+DROP TABLE IF EXISTS `aowow_objectdifficulty`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aowow_objectdifficulty` (
+  `normal10` mediumint(8) unsigned NOT NULL,
+  `normal25` mediumint(8) unsigned NOT NULL,
+  `heroic10` mediumint(8) unsigned NOT NULL,
+  `heroic25` mediumint(8) unsigned NOT NULL,
+  `mapType` tinyint(3) unsigned NOT NULL,
+  KEY `normal10` (`normal10`),
+  KEY `normal25` (`normal25`),
+  KEY `heroic10` (`heroic10`),
+  KEY `heroic25` (`heroic25`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `aowow_objects`
 --
 
@@ -2813,6 +2833,7 @@ CREATE TABLE `aowow_spelldifficulty` (
   `normal25` mediumint(8) unsigned NOT NULL,
   `heroic10` mediumint(8) unsigned NOT NULL,
   `heroic25` mediumint(8) unsigned NOT NULL,
+  `mapType` tinyint(3) unsigned NOT NULL,
   KEY `normal10` (`normal10`),
   KEY `normal25` (`normal25`),
   KEY `heroic10` (`heroic10`),

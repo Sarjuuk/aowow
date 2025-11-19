@@ -103,18 +103,17 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /**********************/
 
         $mapType = 0;
-        if ($maps = DB::Aowow()->selectCol('SELECT DISTINCT `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $this->typeId))
+        if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $this->typeId))
         {
-            if (count($maps) == 1)                          // should only exist in one instance
-                $mapType = match (DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps[0]))
-                {
-                 // MAP_TYPE_DUNGEON,
-                    MAP_TYPE_DUNGEON_HC    => 1,
-                 // MAP_TYPE_RAID,
-                    MAP_TYPE_MMODE_RAID,
-                    MAP_TYPE_MMODE_RAID_HC => 2,
-                    default                => 0
-                };
+            $mapType = match ((int)DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps[0]))
+            {
+                // MAP_TYPE_DUNGEON,
+                MAP_TYPE_DUNGEON_HC    => 1,
+                // MAP_TYPE_RAID,
+                MAP_TYPE_MMODE_RAID,
+                MAP_TYPE_MMODE_RAID_HC => 2,
+                default                => 0
+            };
         }
         // npc is difficulty dummy: get max difficulty from parent npc
         if ($this->placeholder && ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = ?d, 1, 2) FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId)))
@@ -244,7 +243,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         if ($stats = $this->getCreatureStats($mapType, $_altIds))
-            $infobox[] = Lang::npc('stats').($_altIds ? ' ('.Lang::npc('modes', $mapType, 0).')' : '').Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
+            $infobox[] = Lang::npc('stats').($_altIds ? ' ('.Lang::game('modes', $mapType, 0).')' : '').Lang::main('colon').'[ul][li]'.implode('[/li][li]', $stats).'[/li][/ul]';
 
         if ($infobox)
         {
@@ -566,79 +565,108 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // tabs: this creature contains..
-        $skinTab = ['tab_skinning', 'skinning', SKILL_SKINNING];
-        if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_HERBALISM)
-            $skinTab = ['tab_herbalism', 'herbalism', SKILL_HERBALISM];
-        else if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_MINING)
-            $skinTab = ['tab_mining', 'mining', SKILL_MINING];
-        else if ($_typeFlags & NPC_TYPEFLAG_SKIN_WITH_ENGINEERING)
-            $skinTab = ['tab_engineering', 'engineering', SKILL_ENGINEERING];
-
-    /*
-            extraCols: [Listview.extraCols.count, Listview.extraCols.percent, Listview.extraCols.mode],
-            _totalCount: 22531,
-            computeDataFunc: Listview.funcBox.initLootTable,
-            onAfterCreate: Listview.funcBox.addModeIndicator,
-
-            modes:{"mode":1,"1":{"count":4408,"outof":16013},"4":{"count":4408,"outof":22531}}
-    */
+        if ($this->subject->isGatherable())
+            $skinTab = ['$LANG.tab_herbalism',   'herbalism',   SKILL_HERBALISM];
+        else if ($this->subject->isMineable())
+            $skinTab = ['$LANG.tab_mining',      'mining',      SKILL_MINING];
+        else if ($this->subject->isSalvageable())
+            $skinTab = ['$LANG.tab_engineering', 'engineering', SKILL_ENGINEERING];
+        else
+            $skinTab = ['$LANG.tab_skinning',    'skinning',    SKILL_SKINNING];
 
         $sourceFor = array(
-            0 => [LOOT_CREATURE,   $this->subject->getField('lootId'),           '$LANG.tab_drops',         'drops',         [                          ], ''],
-            8 => [LOOT_PICKPOCKET, $this->subject->getField('pickpocketLootId'), '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
-            9 => [LOOT_SKINNING,   $this->subject->getField('skinLootId'),       '$LANG.'.$skinTab[0],      $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
+            0 => [Loot::CREATURE,   [4 => $this->subject->getField('lootId')],           '$LANG.tab_drops',         'drops',         [                          ], ''],
+            1 => [Loot::GAMEOBJECT, [],                                                  '$LANG.tab_drops',         'drops-object',  [                          ], ''],
+            2 => [Loot::PICKPOCKET, [4 => $this->subject->getField('pickpocketLootId')], '$LANG.tab_pickpocketing', 'pickpocketing', ['side', 'slot', 'reqlevel'], ''],
+            3 => [Loot::SKINNING,   [4 => $this->subject->getField('skinLootId')],       $skinTab[0],               $skinTab[1],     ['side', 'slot', 'reqlevel'], '']
         );
 
-        // temp: manually add loot for difficulty-versions
-        $langref = array(
-            "-2" => '$LANG.tab_heroic',
-            "-1" => '$LANG.tab_normal',
-               1 => '$$WH.sprintf(LANG.tab_normalX, 10)',
-               2 => '$$WH.sprintf(LANG.tab_normalX, 25)',
-               3 => '$$WH.sprintf(LANG.tab_heroicX, 10)',
-               4 => '$$WH.sprintf(LANG.tab_heroicX, 25)'
-        );
+        /* loot tabs to sub tabs
+         *   (1 << 0) => '$LANG.tab_heroic',
+         *   (1 << 1) => '$LANG.tab_normal',
+         *   (1 << 2) => '$LANG.tab_drops',
+         *   (1 << 3) => '$$WH.sprintf(LANG.tab_normalX, 10)',
+         *   (1 << 4) => '$$WH.sprintf(LANG.tab_normalX, 25)',
+         *   (1 << 5) => '$$WH.sprintf(LANG.tab_heroicX, 10)',
+         *   (1 << 6) => '$$WH.sprintf(LANG.tab_heroicX, 25)'
+         */
+
+        $getBit = function(int $type, int $difficulty) : int
+        {
+            if ($type == 1)                                 // dungeon
+                return 1 << (2 - $difficulty);
+            if ($type == 2)                                 // raid
+                return 1 << (2 + $difficulty);
+            return 4;                                       // generic case
+        };
+
+        foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d ORDER BY `difficulty` ASC', $this->typeId) as $difficulty => $lgo)
+        {
+            $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
+            $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
+        }
 
         if ($_altIds)
         {
-            $sourceFor[0][2] = $mapType == 1 ? $langref[-1] : $langref[1];
+            if ($mapType == 1)                              // map generic loot to dungeon NH
+            {
+                $sourceFor[0][1] = [2 => $sourceFor[0][1][4]];
+                $sourceFor[2][1] = [2 => $sourceFor[2][1][4]];
+                $sourceFor[3][1] = [2 => $sourceFor[3][1][4]];
+            }
+            if ($mapType == 2)                              // map generic loot to raid 10NH
+            {
+                $sourceFor[0][1] = [8 => $sourceFor[0][1][4]];
+                $sourceFor[2][1] = [8 => $sourceFor[2][1][4]];
+                $sourceFor[3][1] = [8 => $sourceFor[3][1][4]];
+            }
+
             foreach ($this->altNPCs->iterate() as $id => $__)
             {
-                $mode = ($_altIds[$id] + 1) * ($mapType == 1 ? -1 : 1);
-                foreach (DB::Aowow()->select('SELECT o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8`, l.`difficulty` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d', $id) as $l)
-                    $sourceFor[(($l['difficulty'] - 1) * 2) + 1] = [LOOT_GAMEOBJECT, $l['lootId'], $langref[$l['difficulty'] * ($mapType == 1 ? -1 : 1)], 'drops-object-'.$l['difficulty'], [], '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$l['id'].', "'.Util::localizedString($l, 'name').'")'];
+                foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d ORDER BY `difficulty` ASC', $id) as $difficulty => $lgo)
+                {
+                    $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
+                    $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
+                }
+
                 if ($lootId = $this->altNPCs->getField('lootId'))
-                    $sourceFor[($mode - 1) * 2] =                  [LOOT_CREATURE,   $lootId,      $langref[$mode],                                       'drops-'.abs($mode),              [], ''];
+                    $sourceFor[0][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
+                if ($lootId = $this->altNPCs->getField('pickpocketLootId'))
+                    $sourceFor[2][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
+                if ($lootId = $this->altNPCs->getField('skinLootId'))
+                    $sourceFor[3][1][$getBit($mapType, $_altIds[$id] + 1)] = $lootId;
             }
         }
 
-        foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d', $this->typeId) as $difficulty => $lgo)
-            $sourceFor[(($difficulty - 1) * 2) + 1] = [LOOT_GAMEOBJECT, $lgo['lootId'], $mapType ? $langref[$difficulty * ($mapType == 1 ? -1 : 1)] : '$LANG.tab_drops', 'drops-object-'.$difficulty, [], '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")'];
-
-        ksort($sourceFor);
-
-        foreach ($sourceFor as [$lootTpl, $lootId, $tabName, $tabId, $hiddenCols, $note])
+        foreach ($sourceFor as [$lootTpl, $lootEntries, $tabName, $tabId, $hiddenCols, $note])
         {
-            $creatureLoot = new Loot();
-            if ($creatureLoot->getByContainer($lootTpl, $lootId))
+            $creatureLoot = new LootByContainer();
+            if ($creatureLoot->getByContainer($lootTpl, $lootEntries))
             {
                 $extraCols   = $creatureLoot->extraCols;
-                $extraCols[] = '$Listview.extraCols.percent';
+                array_push($extraCols, '$Listview.extraCols.count', '$Listview.extraCols.percent');
+                if (count($lootEntries) > 1)
+                    $extraCols[] = '$Listview.extraCols.mode';
+
+                $hiddenCols[] = 'count';
 
                 $this->extendGlobalData($creatureLoot->jsGlobals);
 
                 $tabData = array(
-                    'data'       => $creatureLoot->getResult(),
-                    'name'       => $tabName,
-                    'id'         => $tabId,
-                    'extraCols'  => array_unique($extraCols),
-                    'hiddenCols' => $hiddenCols ?: null,
-                    'sort'       => ['-percent', 'name']
+                    'data'            => $creatureLoot->getResult(),
+                    'id'              => $tabId,
+                    'name'            => $tabName,
+                    'extraCols'       => array_unique($extraCols),
+                    'hiddenCols'      => $hiddenCols ?: null,
+                    'sort'            => ['-percent', 'name'],
+                    '_totalCount'     => 10000,
+                    'computeDataFunc' => '$Listview.funcBox.initLootTable',
+                    'onAfterCreate'   => '$Listview.funcBox.addModeIndicator',
                 );
 
                 if ($note)
                     $tabData['note'] = $note;
-                else if ($lootTpl == LOOT_SKINNING)
+                else if ($lootTpl == Loot::SKINNING)
                     $tabData['note'] = '<b>'.Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill($skinTab[2], $this->subject->getField('maxLevel') * 5), Lang::FMT_HTML).'</b>';
 
                 $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
@@ -848,7 +876,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // base NPC
         if ($base = $this->getRepForId([$this->typeId], $spilledParents))
-            $reputation[] = [Lang::npc('modes', 1, 0), $base];
+            $reputation[] = [Lang::game('modes', 1, 0), $base];
 
         // difficulty dummys
         if ($dummyIds && ($mapType == 1 || $mapType == 2))
@@ -862,7 +890,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             // apply by difficulty
             foreach ($alt as $mode => $dat)
-                $reputation[] = [Lang::npc('modes', $mapType, $mode), $dat];
+                $reputation[] = [Lang::game('modes', $mapType, $mode), $dat];
         }
 
         // get spillover factions and apply
@@ -964,7 +992,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             if (!$this->altNPCs->getEntry($id))
                 continue;
 
-            $m = Lang::npc('modes', $mapType, $mode);
+            $m = Lang::game('modes', $mapType, $mode);
 
             // Health
             $health = $this->altNPCs->getBaseStats('health');

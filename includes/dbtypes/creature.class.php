@@ -59,7 +59,7 @@ class CreatureList extends DBTypeList
         $row3  = [Lang::game('level')];
         $fam   = $this->curTpl['family'];
 
-        if (!($this->curTpl['typeFlags'] & 0x4))
+        if (!($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB))
         {
             $level = $this->curTpl['minLevel'];
             if ($level != $this->curTpl['maxLevel'])
@@ -152,6 +152,21 @@ class CreatureList extends DBTypeList
     public function isBoss() : bool
     {
         return ($this->curTpl['cuFlags'] & NPC_CU_INSTANCE_BOSS) || ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_BOSS_MOB && $this->curTpl['rank']);
+    }
+
+    public function isMineable() : bool
+    {
+        return $this->curTpl['skinLootId'] && ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_MINING);
+    }
+
+    public function isGatherable() : bool
+    {
+        return $this->curTpl['skinLootId'] && ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_HERBALISM);
+    }
+
+    public function isSalvageable() : bool
+    {
+        return $this->curTpl['skinLootId'] && ($this->curTpl['typeFlags'] & NPC_TYPEFLAG_SKIN_WITH_ENGINEERING);
     }
 
     public function getListviewData(int $addInfoMask = 0x0) : array

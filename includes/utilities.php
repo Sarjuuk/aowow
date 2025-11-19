@@ -6,6 +6,27 @@ if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
 
+
+// PHP 8.4 polyfill
+if (version_compare(PHP_VERSION, '8.4.0') < 0)
+{
+    function array_find(array $array, callable $callback) : mixed
+    {
+        foreach ($array as $k => $v)
+            if ($callback($v, $k))
+                return $array[$k];
+        return null;
+    }
+
+    function array_find_key(array $array, callable $callback) : mixed
+    {
+        foreach ($array as $k => $v)
+            if ($callback($v, $k))
+                return $k;
+        return null;
+    }
+}
+
 class SimpleXML extends \SimpleXMLElement
 {
     public function addCData(string $cData) : \SimpleXMLElement

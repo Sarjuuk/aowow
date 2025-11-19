@@ -1688,7 +1688,6 @@ class ItemList extends DBTypeList
             'level'       => $this->curTpl['itemLevel'],
             'reqlevel'    => $this->curTpl['requiredLevel'],
             'displayid'   => $this->curTpl['displayId'],
-         // 'commondrop'  => 'true' / null                  // set if the item is a loot-filler-item .. check common ref-templates..?
             'holres'      => $this->curTpl['resHoly'],
             'firres'      => $this->curTpl['resFire'],
             'natres'      => $this->curTpl['resNature'],
@@ -2486,14 +2485,14 @@ class ItemListFilter extends Filter
             return null;
 
         $refResults = [];
-        $newRefs = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `item` = ?d AND `reference` = 0', LOOT_REFERENCE, $crs);
+        $newRefs = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `item` = ?d AND `reference` = 0', Loot::REFERENCE, $crs);
         while ($newRefs)
         {
             $refResults += $newRefs;
-            $newRefs     = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `reference` IN (?a)', LOOT_REFERENCE, $newRefs);
+            $newRefs     = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE `reference` IN (?a)', Loot::REFERENCE, $newRefs);
         }
 
-        $lootIds = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE {`reference` IN (?a) OR }(`reference` = 0 AND `item` = ?d)', LOOT_DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $crs);
+        $lootIds = DB::World()->selectCol('SELECT `entry` FROM ?# WHERE {`reference` IN (?a) OR }(`reference` = 0 AND `item` = ?d)', Loot::DISENCHANT, $refResults ?: DBSIMPLE_SKIP, $crs);
 
         return $lootIds ? ['disenchantId', $lootIds] : [0];
     }

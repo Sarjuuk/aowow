@@ -1651,7 +1651,7 @@ span.icon-instance8 {
 
 .listview-note {
     line-height: 16px;
-    clear: left;
+    /* clear: left; */
 }
 
 .listview table {
