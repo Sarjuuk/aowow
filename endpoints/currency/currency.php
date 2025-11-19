@@ -128,6 +128,15 @@ class CurrencyBaseResponse extends TemplateResponse implements ICache
                     if ($template == 'npc' || $template == 'object')
                         $this->addDataLoader('zones');
 
+                    if ($template != 'quest')
+                    {
+                        foreach ($tabData['data'] as &$row)
+                            if (!empty($row['stack']))
+                                $row['currency'] = [[$this->typeId, $row['stack'][0]]];
+
+                        $tabData['extraCols'][] = '$Listview.extraCols.currency';
+                    }
+
                     $this->lvTabs->addListviewTab(new Listview($tabData, $template));
                 }
             }
