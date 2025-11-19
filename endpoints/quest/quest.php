@@ -531,22 +531,22 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                     for the moment:
                         if an item has >10 sources, only display sources with >80% chance
-                        always filter sources with <1% chance
+                        always filter sources with <5% chance
                 */
 
                 $nSources = 0;
                 foreach ($lootTabs->iterate() as [$type, $data])
                     if ($type == 'creature' || $type == 'object')
-                        $nSources += count(array_filter($data['data'], function($val) { return $val['percent'] >= 1.0; }));
+                        $nSources += count(array_filter($data['data'], fn($x) => $x['percent'] >= 5.0));
 
-                foreach ($lootTabs->iterate() as $idx => [$file, $tabData])
+                foreach ($lootTabs->iterate() as [$file, $tabData])
                 {
                     if (!$tabData['data'])
                         continue;
 
                     foreach ($tabData['data'] as $data)
                     {
-                        if ($data['percent'] < 1.0)
+                        if ($data['percent'] < 5.0)
                             continue;
 
                         if ($nSources > 10 && $data['percent'] < 80.0)
