@@ -2945,7 +2945,6 @@ Listview.extraCols = {
         id: 'condition',
         name: LANG.tab_conditions,
         type: 'text',
-        width: '25%',
         compute: function(row, td)
         {
             if (!row.condition)
@@ -2954,6 +2953,7 @@ Listview.extraCols = {
             td.className = 'small';
             td.style.lineHeight = '18px';
             td.style.textAlign  = 'left';
+            td.style.whiteSpace = 'nowrap';
 
             // tiny links are hard to hit, hmkey?
             td.onclick = (e) => $WH.sp(e);
