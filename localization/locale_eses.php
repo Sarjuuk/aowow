@@ -936,7 +936,7 @@ $lang = array(
         'forgot'        => "Se me olvidó mi",
         'forgotUser'    => "Nombre de usuario",
         'forgotPass'    => "Contraseña",
-        'accCreate '    => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
+        'accCreate'     => '¿No tienes una cuenta? <a href="?account=signup">¡Crea una ahora!</a>',
 
         // recovery
         'newPass'       => "Nueva Contraseña:",
