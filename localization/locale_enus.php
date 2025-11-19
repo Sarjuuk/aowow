@@ -2265,8 +2265,10 @@ $lang = array(
         'uniqueEquipped'=> ["Unique-Equipped", null,          "Unique-Equipped: %s (%d)"],   // ITEM_UNIQUE_EQUIPPABLE, null, ITEM_LIMIT_CATEGORY_MULTIPLE
         'speed'         => "Speed",                         // SPEED
         'dps'           => "(%.1f damage per second)",      // DPS_TEMPLATE
-        'vendorIn'      => "Vendor Locations",
+        'vendorLoc'     => "Vendor Locations",
         'purchasedIn'   => "This item can be purchased in",
+        'fishingLoc'    => "Fishing Locations",
+        'fishedIn'      => "This item can be fished in",
         'duration'      => array(                           // ITEM_DURATION_*
             '',
             "Duration: %d sec",

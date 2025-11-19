@@ -34,8 +34,8 @@ endif;
 
     $this->brick('markup', ['markup' => $this->article]);
 
-if (isset($this->map)):
-    echo "            <h3>".Lang::item('vendorIn')."</h3>\n";
+if ($this->map):
+    echo "            <h3>".$this->map[4]."</h3>\n";
     $this->brick('mapper');
 endif;
 

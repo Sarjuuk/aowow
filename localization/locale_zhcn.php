@@ -2265,8 +2265,10 @@ $lang = array(
         'uniqueEquipped'=> ["装备唯一", null,     "装备唯一：%s （%d）"],
         'speed'         => "速度",
         'dps'           => "（每秒伤害%.1f）",
-        'vendorIn'      => "[Vendor Locations]",
+        'vendorLoc'     => "[Vendor Locations]",
         'purchasedIn'   => "[This item can be purchased in]",
+        'fishingLoc'    => "钓鱼地点",
+        'fishedIn'      => "此物品位于",
         'duration'      => array(
             '',
             "持续时间：%d秒",

@@ -474,6 +474,28 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     }
                 }
 
+                if ($idx == 15 && !$this->map)
+                {
+                    $nodeIds  = array_map(fn($x) => $x['id'], $tabData['data']);
+                    $fishedIn = new GameObjectList(array(['id', $nodeIds]));
+                    if (!$fishedIn->error)
+                    {
+                        // show mapper for fishing locations
+                        if ($nodeSpawns = $fishedIn->getSpawns(SPAWNINFO_FULL, true, true, true, true))
+                        {
+                            $this->map = array(
+                                ['parent' => 'mapper-generic'], // Mapper
+                                $nodeSpawns,                    // mapperData
+                                null,                           // ShowOnMap
+                                [Lang::item('fishedIn')],       // foundIn
+                                Lang::item('fishingLoc')        // title
+                            );
+                            foreach ($nodeSpawns as $areaId => $_)
+                                $this->map[3][$areaId] = ZoneList::getName($areaId);
+                        }
+                    }
+                }
+
                 if ($template == 'npc' || $template == 'object')
                     $this->addDataLoader('zones');
 
@@ -633,40 +655,6 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // tab: see also
-        $conditions = array(
-            ['id', $this->typeId, '!'],
-            [
-                'OR',
-                ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
-                [
-                    'AND',
-                    ['class',         $_class],
-                    ['subClass',      $_subClass],
-                    ['slot',          $_slot],
-                    ['itemLevel',     $_ilvl - 15, '>'],
-                    ['itemLevel',     $_ilvl + 15, '<'],
-                    ['quality',       $this->subject->getField('quality')],
-                    ['requiredClass', $this->subject->getField('requiredClass') ?: -1]  // todo: fix db data in setup and not on fetch
-                ]
-            ]
-        );
-
-        if ($_ = $this->subject->getField('itemset'))
-            $conditions[1][] = ['AND', ['slot', $_slot], ['itemset', $_]];
-
-        $saItems = new ItemList($conditions);
-        if (!$saItems->error)
-        {
-            $this->extendGlobalData($saItems->getJSGlobals(GLOBALINFO_SELF));
-
-            $this->lvTabs->addListviewTab(new Listview(array(
-                'data' => $saItems->getListviewData(),
-                'name' => '$LANG.tab_seealso',
-                'id'   => 'see-also'
-            ), ItemList::$brickFile));
-        }
-
         // tab: starts (quest)
         if ($qId = $this->subject->getField('startQuest'))
         {
@@ -719,24 +707,6 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             ), QuestList::$brickFile));
         }
 
-        // tab: same model as
-        // todo (low): should also work for creatures summoned by item
-        if (($model = $this->subject->getField('model')) && $_slot)
-        {
-            $sameModel = new ItemList(array(['model', $model], ['id', $this->typeId, '!'], ['slot', $_slot]));
-            if (!$sameModel->error)
-            {
-                $this->extendGlobalData($sameModel->getJSGlobals(GLOBALINFO_SELF));
-
-                $this->lvTabs->addListviewTab(new Listview(array(
-                    'data'            => $sameModel->getListviewData(ITEMINFO_MODEL),
-                    'name'            => '$LANG.tab_samemodelas',
-                    'id'              => 'same-model-as',
-                    'genericlinktype' => 'item'
-                ), 'genericmodel'));
-            }
-        }
-
         // tab: sold by
         if (!empty($this->subject->getExtendedCost()[$this->typeId]))
         {
@@ -748,13 +718,14 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 if ($vendorSpawns = $soldBy->getSpawns(SPAWNINFO_FULL, true, true, true, true))
                 {
                     $this->map = array(
-                        ['parent' => 'mapper-generic'],             // Mapper
-                        $vendorSpawns,                              // mapperData
-                        null,                                       // ShowOnMap
-                        [Lang::item('purchasedIn')]                 // foundIn
+                        ['parent' => 'mapper-generic'],     // Mapper
+                        $vendorSpawns,                      // mapperData
+                        null,                               // ShowOnMap
+                        [Lang::item('purchasedIn')],        // foundIn
+                        Lang::item('vendorLoc')             // title
                     );
                     foreach ($vendorSpawns as $areaId => $_)
-                        $this->map['extra'][$areaId] = ZoneList::getName($areaId);
+                        $this->map[3][$areaId] = ZoneList::getName($areaId);
                 }
 
                 $sbData = $soldBy->getListviewData();
@@ -901,6 +872,58 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                     'id'          => 'teaches',
                     'visibleCols' => $visCols
                 ), SpellList::$brickFile));
+            }
+        }
+
+        // tab: see also
+        $conditions = array(
+            ['id', $this->typeId, '!'],
+            [
+                'OR',
+                ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
+                [
+                    'AND',
+                    ['class',         $_class],
+                    ['subClass',      $_subClass],
+                    ['slot',          $_slot],
+                    ['itemLevel',     $_ilvl - 15, '>'],
+                    ['itemLevel',     $_ilvl + 15, '<'],
+                    ['quality',       $this->subject->getField('quality')],
+                    ['requiredClass', $this->subject->getField('requiredClass') ?: -1]  // todo: fix db data in setup and not on fetch
+                ]
+            ]
+        );
+
+        if ($_ = $this->subject->getField('itemset'))
+            $conditions[1][] = ['AND', ['slot', $_slot], ['itemset', $_]];
+
+        $saItems = new ItemList($conditions);
+        if (!$saItems->error)
+        {
+            $this->extendGlobalData($saItems->getJSGlobals(GLOBALINFO_SELF));
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $saItems->getListviewData(),
+                'name' => '$LANG.tab_seealso',
+                'id'   => 'see-also'
+            ), ItemList::$brickFile));
+        }
+
+        // tab: same model as
+        // todo (low): should also work for creatures summoned by item
+        if (($model = $this->subject->getField('model')) && $_slot)
+        {
+            $sameModel = new ItemList(array(['model', $model], ['id', $this->typeId, '!'], ['slot', $_slot]));
+            if (!$sameModel->error)
+            {
+                $this->extendGlobalData($sameModel->getJSGlobals(GLOBALINFO_SELF));
+
+                $this->lvTabs->addListviewTab(new Listview(array(
+                    'data'            => $sameModel->getListviewData(ITEMINFO_MODEL),
+                    'name'            => '$LANG.tab_samemodelas',
+                    'id'              => 'same-model-as',
+                    'genericlinktype' => 'item'
+                ), 'genericmodel'));
             }
         }
 
