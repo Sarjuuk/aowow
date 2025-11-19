@@ -9,15 +9,15 @@ if (!defined('AOWOW_REVISION'))
 class ContactusBaseResponse extends TextResponse
 {
     protected array $expectedPOST = array(
-        'mode'       => ['filter' => FILTER_VALIDATE_INT                                         ],
-        'reason'     => ['filter' => FILTER_VALIDATE_INT                                         ],
-        'ua'         => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
-        'appname'    => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']],
-        'page'       => ['filter' => FILTER_SANITIZE_URL                                         ],
-        'desc'       => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextBlob']],
-        'id'         => ['filter' => FILTER_VALIDATE_INT                                         ],
-        'relatedurl' => ['filter' => FILTER_SANITIZE_URL                                         ],
-        'email'      => ['filter' => FILTER_SANITIZE_EMAIL                                       ]
+        'mode'       => ['filter' => FILTER_VALIDATE_INT                                                  ],
+        'reason'     => ['filter' => FILTER_VALIDATE_INT                                                  ],
+        'ua'         => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkTextLine']  ],
+        'appname'    => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkTextLine']  ],
+        'page'       => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[[:print:]]+$/']],
+        'desc'       => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkTextBlob']  ],
+        'id'         => ['filter' => FILTER_VALIDATE_INT                                                  ],
+        'relatedurl' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[[:print:]]+$/']],
+        'email'      => ['filter' => FILTER_SANITIZE_EMAIL                                                ]
     );
 
     /* responses

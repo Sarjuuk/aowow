@@ -11,8 +11,8 @@ class AccountSignoutResponse extends TextResponse
     use TrGetNext;
 
     protected array $expectedGET = array(
-        'next'   => ['filter' => FILTER_SANITIZE_URL, 'flags' => FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH],
-        'global' => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkEmptySet']              ]
+        'next'   => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[[:print:]]+$/']],
+        'global' => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkEmptySet']  ]
     );
 
     public function __construct(string $pageParam)

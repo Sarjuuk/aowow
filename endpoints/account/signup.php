@@ -26,7 +26,7 @@ class AccountSignupResponse extends TemplateResponse
     );
 
     protected array  $expectedGET  = array(
-        'next' => ['filter' => FILTER_SANITIZE_URL, 'flags' => FILTER_FLAG_STRIP_AOWOW]
+        'next' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => '/^[[:print:]]+$/']]
     );
 
     private bool $success = false;
