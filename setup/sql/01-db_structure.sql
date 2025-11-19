@@ -196,7 +196,7 @@ DROP TABLE IF EXISTS `aowow_account_reputation`;
 CREATE TABLE `aowow_account_reputation` (
   `userId` int(10) unsigned NOT NULL,
   `action` tinyint(3) unsigned NOT NULL COMMENT 'e.g. upvote a comment',
-  `amount` tinyint(3) unsigned NOT NULL,
+  `amount` tinyint(3) NOT NULL,
   `sourceA` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'e.g. upvoting user',
   `sourceB` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'e.g. upvoted commentId',
   `date` int(10) unsigned NOT NULL DEFAULT 0,
