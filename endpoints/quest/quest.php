@@ -979,7 +979,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
         // tab: conditions
         $cnd = new Conditions();
-        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_QUEST_AVAILABLE, Conditions::SRC_QUEST_SHOW_MARK)
+        $cnd->getBySource([Conditions::SRC_QUEST_AVAILABLE, Conditions::SRC_QUEST_SHOW_MARK], entry: $this->typeId)
             ->getByCondition(Type::QUEST, $this->typeId)
             ->prepare();
 

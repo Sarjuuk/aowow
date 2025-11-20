@@ -257,8 +257,16 @@ class SmartAI
     private array $result     = [];
     private array $tabs       = [];
     private array $itr        = [];
+    private array $quotes     = [];
 
-    private array  $quotes    = [];
+    public string $css = <<<CSS
+        #smartai-generic .grid { clear:left; display: grid; }
+        #smartai-generic .tabbed-contents { padding:0px; clear:left; }
+        #smartai-generic .grid thead,
+        #smartai-generic .grid tbody,
+        #smartai-generic .grid tr { display: contents; }
+        #sai { display: grid; }
+    CSS;
 
     // misc data
     public readonly int    $baseEntry;                      // I'm a timed action list belonging to this entry
@@ -271,24 +279,28 @@ class SmartAI
         $this->title              = $miscData['title']              ?? '';
         $this->teleportTargetArea = $miscData['teleportTargetArea'] ?? 0;
 
+        if ($this->baseEntry)                               // my parent handles base css
+            $this->css = '';
+
         $raw = DB::World()->select(
-            'SELECT   `id`, `link`,
-                      `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`,
-                      `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
-                      `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`
-             FROM     smart_scripts
-             WHERE    `entryorguid` = ?d AND `source_type` = ?d
-             ORDER BY `id` ASC',
+           'SELECT   `id`, `link`,
+                     `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`,
+                     `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
+                     `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`
+            FROM     smart_scripts
+            WHERE    `entryorguid` = ?d AND `source_type` = ?d
+            ORDER BY `id` ASC',
             $this->entry, $this->srcType);
 
         foreach ($raw as $r)
         {
             $this->rawData[$r['id']] = array(
-                'id'     => $r['id'],
-                'link'   => $r['link'],
-                'event'  => new SmartEvent($r['id'], $r['event_type'], $r['event_phase_mask'], $r['event_chance'], $r['event_flags'], [$r['event_param1'], $r['event_param2'], $r['event_param3'], $r['event_param4'], $r['event_param5']], $this),
-                'action' => new SmartAction($r['id'], $r['action_type'], [$r['action_param1'], $r['action_param2'], $r['action_param3'], $r['action_param4'], $r['action_param5'], $r['action_param6']], $this),
-                'target' => new SmartTarget($r['id'], $r['target_type'], [$r['target_param1'], $r['target_param2'], $r['target_param3'], $r['target_param4']], [$r['target_x'], $r['target_y'], $r['target_z'], $r['target_o']], $this)
+                'id'        => $r['id'],
+                'link'      => $r['link'],
+                'event'     => new SmartEvent($r['id'], $r['event_type'], $r['event_phase_mask'], $r['event_chance'], $r['event_flags'], [$r['event_param1'], $r['event_param2'], $r['event_param3'], $r['event_param4'], $r['event_param5']], $this),
+                'action'    => new SmartAction($r['id'], $r['action_type'], [$r['action_param1'], $r['action_param2'], $r['action_param3'], $r['action_param4'], $r['action_param5'], $r['action_param6']], $this),
+                'target'    => new SmartTarget($r['id'], $r['target_type'], [$r['target_param1'], $r['target_param2'], $r['target_param3'], $r['target_param4']], [$r['target_x'], $r['target_y'], $r['target_z'], $r['target_o']], $this),
+                'condition' => (new Conditions())->getBySource(Conditions::SRC_SMART_EVENT, $r['id'] + 1, $entry, $srcType)
             );
         }
     }
@@ -619,10 +631,9 @@ class SmartAI
         if ($this->result)
             return true;
 
-        $hidePhase  =
-        $hideChance = true;
+        $visibleCols = (1 << 0) | (1 << 2) | (1 << 4);
 
-        foreach ($this->iterate() as $id => $__)
+        foreach ($this->iterate() as $__)
         {
             $rowIdx = Util::createHash(8);
 
@@ -636,52 +647,59 @@ class SmartAI
             $evtBody = str_replace(['#target#', '#rowIdx#'], [$this->itr['target']->process(), $rowIdx], $evtBody);
             $actBody = str_replace(['#target#', '#rowIdx#'], [$this->itr['target']->process(), $rowIdx], $actBody);
 
-            if (!$this->itr['event']->hasPhases())
-                $hidePhase = false;
+            if ($this->itr['event']->hasPhases())
+                $visibleCols |= (1 << 1);
 
             if ($this->itr['event']->chance != 100)
-                $hideChance = false;
+                $visibleCols |= (1 << 3);
+
+            if ($this->itr['condition']->prepare())
+            {
+                $visibleCols |= (1 << 5);
+                Util::mergeJsGlobals($this->jsGlobals, $this->itr['condition']->getJsGlobals());
+            }
 
             $this->result[] = array(
                 $this->itr['id'],
                 implode(', ', Util::mask2bits($this->itr['event']->phaseMask, 1)),
-                $evtBody.($evtFooter ? '[div float=right margin=0px clear=both][i][small class=q0]'.$evtFooter.'[/small][/i][/div]' : null),
+                $evtBody.($evtFooter ? '[div float=right margin=0px clear=both width=100% align=right][i][small class=q0]'.$evtFooter.'[/small][/i][/div]' : ''),
                 $this->itr['event']->chance.'%',
-                $actBody.($actFooter ? '[div float=right margin=0px clear=both][i][small class=q0]'.$actFooter.'[/small][/i][/div]' : null)
+                $actBody.($actFooter ? '[div float=right margin=0px clear=both width=100% align=right][i][small class=q0]'.$actFooter.'[/small][/i][/div]' : ''),
+                $this->itr['condition']->toMarkupTag()
             );
         }
 
         $th = array(
-            '#'      => 16,
-            'Phase'  => 32,
-            'Event'  => 350,
-            'Chance' => 24,
-            'Action' => 0
+            ['#' ,        '24px'],
+            ['Phase',     '48px'],
+            ['Event',     '30%%'],
+            ['Chance',    '60px'],
+            ['Action',    'auto'],
+            ['Condition', 'auto']
         );
 
-        if ($hidePhase)
+        for ($i = 0, $j = count($th); $i < $j; $i++)
         {
-            unset($th['Phase']);
-            foreach ($this->result as &$r)
-                unset($r[1]);
-        }
-        unset($r);
+            if ($visibleCols & (1 << $i))
+                continue;
 
-        if ($hideChance)
-        {
-            unset($th['Chance']);
+            unset($th[$i]);
             foreach ($this->result as &$r)
-                unset($r[3]);
-        }
-        unset($r);
+                unset($r[$i]);
 
-        $tbl = '[tr]';
-        foreach ($th as $n => $w)
-            $tbl .= '[td header '.($w ? 'width='.$w.'px' : null).']'.$n.'[/td]';
-        $tbl .= '[/tr]';
+            unset($r);
+        }
+
+        $tblId = Util::createHash(12);
+
+        $this->css .= "\n#tbl-".$tblId." { grid-template-columns: ".implode(' ', array_column($th, 1))."; }";
+
+        $tbl = '[tr]' . array_reduce(array_column($th, 0), fn($out, $n) => $out .= '[td header]'.$n.'[/td]', '') . '[/tr]';
 
         foreach ($this->result as $r)
             $tbl .= '[tr][td]'.implode('[/td][td]', $r).'[/td][/tr]';
+
+        $tbl = '[table id=tbl-'.$tblId.' class=grid]'.$tbl.'[/table]';
 
         if ($this->srcType == self::SRC_TYPE_ACTIONLIST)
             $this->tabs[$this->entry] = $tbl;
@@ -698,16 +716,16 @@ class SmartAI
         if (!$this->rawData)
             return null;
 
-        $wrapper = '[table class=grid width=940px]%s[/table]';
-        $return  = '[style]#smartai-generic .grid { clear:left; } #smartai-generic .tabbed-contents { padding:0px; clear:left; }[/style][pad][h3][toggler id=sai]SmartAI'.$this->title.'[/toggler][/h3][div id=sai clear=left]%s[/div]';
+        $wrapper = '%s';
+        $return  = '[style]'.strtr($this->css, "\n", ' ').'[/style][pad][h3][toggler id=sai]SmartAI'.$this->title.'[/toggler][/h3][div id=sai clear=left]%s[/div]';
         $tabs    = '';
         if (count($this->tabs) > 1)
         {
-            $wrapper = '[tabs name=sai width=942px]%s[/tabs]';
+            $wrapper = '[tabs name=sai]%s[/tabs]';
             $return  = "[script]function TalTabClick(id) { $('#dsf67g4d-sai').find('[href=\'#sai-actionlist-' + id + '\']').click(); }[/script]" . $return;
             foreach ($this->tabs as $guid => $data)
             {
-                $buff = '[tab name="'.($guid ? 'ActionList #'.$guid : 'Main').'"][table class=grid width=940px]'.$data.'[/table][/tab]';
+                $buff = '[tab name="'.($guid ? 'ActionList #'.$guid : 'Main').'"]'.$data.'[/tab]';
                 if ($guid)
                     $tabs .= $buff;
                 else

@@ -138,7 +138,7 @@ class LootByContainer extends Loot
             $groupChances[$k] = (100 - $sum) / ($nGroupEquals[$k] ?: 1);
         }
 
-        if ($cnd->getBySourceGroup($lootId, Conditions::lootTableToConditionSource($tableName))->prepare())
+        if ($cnd->getBySource(Conditions::lootTableToConditionSource($tableName), group: $lootId)->prepare())
         {
             $this->storeJSGlobals($cnd->getJsGlobals());
             $cnd->toListviewColumn($loot, $this->extraCols, $lootId, 'content');

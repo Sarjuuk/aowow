@@ -465,6 +465,18 @@ var Markup = {
                 return [str, '</span>'];
             }
         },
+        condition:
+        {
+            ltrim: true,
+            rtrim: true,
+            empty: false,
+            allowedClass: MARKUP_CLASS_STAFF,
+            allowedChildren: { '<text>': 1 },
+            toHtml: function(attr)
+            {
+                return ['<span>' + Markup.toHtml(ConditionList.createCell(JSON.parse(attr._nodes[0].attr._rawText)), { skipReset: true }) + '</span>'];
+            }
+        },
         copy:
         {
             empty: false,

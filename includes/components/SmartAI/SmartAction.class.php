@@ -562,6 +562,8 @@ class SmartAction
                 $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $this->param[0], ['baseEntry' => $this->smartAI->getEntry()]);
                 $tal->prepare();
 
+                $this->smartAI->css .= $tal->css;
+
                 Util::mergeJsGlobals($this->jsGlobals, $tal->getJSGlobals());
 
                 foreach ($tal->getTabs() as $guid => $tt)
@@ -587,6 +589,8 @@ class SmartAction
                     $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $this->param[$i], ['baseEntry' => $this->smartAI->getEntry()]);
                     $tal->prepare();
 
+                    $this->smartAI->css .= $tal->css;
+
                     Util::mergeJsGlobals($this->jsGlobals, $tal->getJSGlobals());
 
                     foreach ($tal->getTabs() as $guid => $tt)
@@ -602,6 +606,8 @@ class SmartAction
 
                     $tal = new SmartAI(SmartAI::SRC_TYPE_ACTIONLIST, $i, ['baseEntry' => $this->smartAI->getEntry()]);
                     $tal->prepare();
+
+                    $this->smartAI->css .= $tal->css;
 
                     Util::mergeJsGlobals($this->jsGlobals, $tal->getJSGlobals());
 

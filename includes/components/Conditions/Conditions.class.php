@@ -221,29 +221,26 @@ class Conditions
     /* IN */
     /******/
 
-    public function getBySourceEntry(int $entry, int ...$srcType) : self
+    public function getBySource(int|array $type, int|array $group = 0, int|array $entry = 0, int|array $id = 0) : self
     {
+        if ($group)
+            $group = is_int($group) ? [$group] : array_map('intVal', $group);
+        if ($entry)
+            $entry = is_int($entry) ? [$entry] : array_map('intVal', $entry);
+        if ($id)
+            $id    = is_int($id)    ? [$id]    : array_map('intVal', $id);
+        if ($type)
+            $type  = is_int($type)  ? [$type]  : array_map('intVal', $type);
+        else
+            return $this;
+
         $this->rows = array_merge($this->rows, DB::World()->select(
            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
             FROM     conditions
-            WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceEntry` = ?d
+            WHERE    `SourceTypeOrReferenceId` IN (?a){ AND `SourceGroup` IN (?a)}{ AND `SourceEntry` IN (?a)}{ AND `SourceId` IN (?a)}
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
-            $srcType, $entry
-        ));
-
-        return $this;
-    }
-
-    public function getBySourceGroup(int $group, int ...$srcType) : self
-    {
-        $this->rows = array_merge($this->rows, DB::World()->select(
-           'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
-                     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
-            FROM     conditions
-            WHERE    `SourceTypeOrReferenceId` IN (?a) AND `SourceGroup` = ?d
-            ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
-            $srcType, $group
+            $type, $group ?: DBSIMPLE_SKIP, $entry ?: DBSIMPLE_SKIP, $id ?: DBSIMPLE_SKIP
         ));
 
         return $this;
@@ -386,6 +383,14 @@ class Conditions
         return $success;
     }
 
+    public function toMarkupTag() : string
+    {
+        if (!$this->result)
+            return '';
+
+        return '[condition]' . json_encode($this->result, JSON_NUMERIC_CHECK) . '[/condition]';
+    }
+
     public function getJsGlobals() : array
     {
         return $this->jsGlobals;
@@ -486,9 +491,9 @@ class Conditions
             $this->jsGlobals[$grp][$sGroup] = $sGroup;
         if (is_int($entry))
             $this->jsGlobals[$entry][$sEntry] = $sEntry;
-    //  Note: sourceId currently has no typed content
-    //  if (is_int($id))
-    //      $this->jsGlobals[$id][$sId] = $sId;
+     // Note: sourceId currently has no typed content
+     // if (is_int($id))
+     //     $this->jsGlobals[$id][$sId] = $sId;
 
         // more checks? not all sources can retarget
         $cTarget = min(1, max(0, $cTarget));

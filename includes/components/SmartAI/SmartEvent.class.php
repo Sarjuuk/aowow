@@ -368,7 +368,7 @@ class SmartEvent
 
     public function hasPhases() : bool
     {
-        return $this->phaseMask == 0;
+        return $this->phaseMask && ($this->phaseMask & 0xFFF) != 0xFFF;
     }
 
     private function formatFlags() : string

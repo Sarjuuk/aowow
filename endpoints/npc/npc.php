@@ -385,7 +385,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 }
 
                 $cnd = new Conditions();
-                $cnd->getBySourceGroup($this->typeId, Conditions::SRC_VEHICLE_SPELL)->prepare();
+                $cnd->getBySource(Conditions::SRC_VEHICLE_SPELL, group: $this->typeId)->prepare();
                 if ($cnd->toListviewColumn($controled, $extraCols, $this->typeId, 'id'))
                     $this->extendGlobalData($cnd->getJsGlobals());
 
@@ -547,7 +547,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 }
 
                 $cnd = new Conditions();
-                if ($cnd->getBySourceGroup($this->typeId, Conditions::SRC_NPC_VENDOR)->prepare())
+                if ($cnd->getBySource(Conditions::SRC_NPC_VENDOR, group: $this->typeId)->prepare())
                 {
                     $this->extendGlobalData($cnd->getJsGlobals());
                     $cnd->toListviewColumn($lvData, $extraCols, $this->typeId, 'id');
@@ -805,8 +805,8 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: conditions
         $cnd = new Conditions();
-        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_CREATURE_TEMPLATE_VEHICLE)
-            ->getBySourceGroup($this->typeId, Conditions::SRC_SPELL_CLICK_EVENT)
+        $cnd->getBySource(Conditions::SRC_CREATURE_TEMPLATE_VEHICLE, entry: $this->typeId)
+            ->getBySource(Conditions::SRC_SPELL_CLICK_EVENT, group: $this->typeId)
             ->getByCondition(Type::NPC, $this->typeId)
             ->prepare();
         if ($tab = $cnd->toListviewTab())

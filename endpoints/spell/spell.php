@@ -1210,7 +1210,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: conditions
         $cnd = new Conditions();
-        $cnd->getBySourceEntry($this->typeId, Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC)
+        $cnd->getBySource([Conditions::SRC_SPELL_IMPLICIT_TARGET, Conditions::SRC_SPELL, Conditions::SRC_SPELL_CLICK_EVENT, Conditions::SRC_VEHICLE_SPELL, Conditions::SRC_SPELL_PROC], entry: $this->typeId)
             ->getByCondition(Type::SPELL, $this->typeId)
             ->prepare();
         if ($tab = $cnd->toListviewTab())

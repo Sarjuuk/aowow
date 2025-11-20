@@ -734,7 +734,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $extraCols = ['$Listview.extraCols.stock', "\$Listview.funcBox.createSimpleCol('stack', 'stack', '10%', 'stack')", '$Listview.extraCols.cost'];
 
                 $cnd = new Conditions();
-                $cnd->getBySourceEntry($this->typeId, Conditions::SRC_NPC_VENDOR)->prepare();
+                $cnd->getBySource(Conditions::SRC_NPC_VENDOR, entry: $this->typeId)->prepare();
                 foreach ($sbData as $k => &$row)
                 {
                     $currency = [];
