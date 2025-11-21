@@ -1304,7 +1304,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             ['reqQ',       array('OR', ['AND', ['nextQuestId', $this->typeId], ['exclusiveGroup', 0, '<']], ['AND', ['id', $this->subject->getField('prevQuestId')], ['nextQuestIdChain', $this->typeId, '!']])],
 
             // Requires one of these quests (Requires one of the quests to choose from)
-            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>'], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
+            ['reqOneQ',    array('OR', ['AND', ['exclusiveGroup', 0, '>='], ['nextQuestId', $this->typeId]], ['breadCrumbForQuestId', $this->typeId])],
 
             // Opens Quests (Quests that become available only after complete this quest (optionally only one))
             ['opensQ',     array('OR', ['AND', ['prevQuestId', $this->typeId], ['id', $this->subject->getField('nextQuestIdChain'), '!']], ['id', $this->subject->getField('nextQuestId')], ['id', $this->subject->getField('breadcrumbForQuestId')])],
