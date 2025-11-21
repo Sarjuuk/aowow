@@ -600,7 +600,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         // npc spells (-8) (run as last! .. missing from npc_scripts? "enum Spells { \s+(\w\d_)+\s+=\s(\d+) }" and "#define SPELL_(\d\w_)+\s+(\d+)") // RAID_MODE(1, 2[, 3, 4]) - macro still not considered
         $world = DB::World()->selectCol(
            'SELECT ss.`action_param1` FROM smart_scripts ss            WHERE ss.`action_type` IN (?a) UNION
-            SELECT cts.`Spell`        FROM creature_template_spell cts',
+            SELECT cts.`Spell`        FROM creature_template_spell cts                                UNION
+            SELECT nscs.`spell_id`    FROM npc_spellclick_spells nscs',
             [SmartAction::ACTION_CAST, SmartAction::ACTION_ADD_AURA, SmartAction::ACTION_SELF_CAST, SmartAction::ACTION_CROSS_CAST]
         );
 

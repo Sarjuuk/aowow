@@ -318,6 +318,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // tab: abilities / tab_controlledabilities (dep: VehicleId)
         $tplSpells  = [];
         $genSpells  = [];
+        $spellClick = [];
         $conditions = ['OR'];
 
         for ($i = 1; $i < 9; $i++)
@@ -338,6 +339,12 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if ($genSpells)
             $conditions[] = ['id', $genSpells];
+
+        if ($spellClick = DB::World()->select('SELECT `spell_id` AS ARRAY_KEY, `cast_flags` AS "0", `user_type` AS "1" FROM npc_spellclick_spells WHERE `npc_entry` = ?d', $this->typeId))
+        {
+            $genSpells = array_merge($genSpells, array_keys($spellClick));
+            $conditions[] = ['id', array_keys($spellClick)];
+        }
 
         // Pet-Abilities
         if (($_typeFlags & NPC_TYPEFLAG_TAMEABLE) && ($_ = $this->subject->getField('family')))
@@ -376,6 +383,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
                 foreach ($controled as $id => $values)
                 {
+                    if (isset($spellClick[$id]))
+                        $values['spellclick'] = $spellClick[$id];
+
                     if (in_array($id, $genSpells))
                     {
                         $normal[$id] = $values;

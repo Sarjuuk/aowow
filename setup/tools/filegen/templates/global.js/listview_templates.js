@@ -2635,6 +2635,30 @@ Listview.templates = {
                         }
                         $WH.ae(wrapper, d);
                     }
+                    else if (spell.spellclick) {
+                        td.style.position = 'relative';
+
+                        [flags, who] = spell.spellclick;
+
+                        let buff = 'onClick';
+                        if (who == 1)                       // Friendly
+                            buff += $WH.sprintf(LANG.qty, g_reputation_standings[4]);
+                        else if (who == 2)                  // Raid
+                            buff += $WH.sprintf(LANG.qty, g_quest_types[62]);
+                        else if (who == 3)                  // Party
+                            buff += $WH.sprintf(LANG.qty, g_quest_types[1]);
+
+                        buff += LANG.colon + '<span class="breadcrumb-arrow">' + (flags & 0x1 ? g_world_object_types[4] : g_pageInfo.name) + '</span>';
+                        buff +=                                                   flags & 0x2 ? g_world_object_types[4] : g_pageInfo.name;
+
+                        $(td).append($('<div>', {class: 'small'})
+                            .css('fontStyle', 'italic')
+                            .css('position',  'absolute')
+                            .css('right',     '3px')
+                            .css('bottom',    '3px')
+                            .html(buff)
+                        );
+                    }
                     $WH.ae(td, wrapper);
                 },
                 getVisibleText: function(spell) {
