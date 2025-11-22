@@ -13,9 +13,15 @@ $pageParam = '';
 parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
 foreach ($query as $page => $param)
 {
-    $page = preg_replace('/[^\w\-]/i', '', $page);
+    // fix page calls - pages like saerch use the page call directly and expect it as lower case
+    if (preg_match('/[A-Z]/', $page))
+    {
+        $url = str_replace('?'.$page.'=', '?'.Util::lower($page).'=', $_SERVER['REQUEST_URI']);
+        header('Location: '.$url, true, 302);
+        exit;
+    }
 
-    $pageCall  = Util::lower($page);
+    $pageCall  = preg_replace('/[^\w\-]/i', '', $page);
     $pageParam = $param ?? '';
     break;                                                  // only use first k/v-pair to determine page
 }
