@@ -217,8 +217,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
            'SELECT    c.`guid`, ?d AS `type`, c.`id` AS `typeId`, c.`map`, c.`position_x` AS `posX`, c.`position_y` AS `posY`, c.`spawntimesecs` AS `respawn`, c.`spawnMask`, c.`phaseMask`, c.`zoneId` AS `areaId`, IFNULL(ca.`path_id`, IFNULL(cta.`path_id`, 0)) AS `pathId`
             FROM      creature c
             LEFT JOIN creature_addon ca           ON ca.guid   = c.guid
-            LEFT JOIN creature_template_addon cta ON cta.entry = c.id
-            GROUP BY  c.id',
+            LEFT JOIN creature_template_addon cta ON cta.entry = c.id',
             Type::NPC
         );
     }
