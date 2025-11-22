@@ -115,8 +115,8 @@ class ItemsetList extends DBTypeList
         {
             $x .= '<span>';
 
-            foreach ($bonuses as $b)
-                $x .= '<br /><span class="q13">'.$b['bonus'].' '.Lang::itemset('_pieces').Lang::main('colon').'</span>'.$b['desc'];
+            foreach ($bonuses as [$nItems, , $text])
+                $x .= '<br /><span class="q13">'.Lang::itemset('_pieces', [$nItems]).'</span>'.$text;
 
             $x .= '</span>';
         }
@@ -136,22 +136,19 @@ class ItemsetList extends DBTypeList
 
             // cant use spell as index, would change order
             if ($spl && $qty)
-                $spells[] = ['id' => $spl, 'bonus' => $qty];
+                $spells[] = [$qty, $spl];
         }
 
         // sort by required pieces ASC
-        usort($spells, fn(array $a, array $b) => $a['bonus'] <=> $b['bonus']);
+        usort($spells, fn(array $a, array $b) => $a[0] <=> $b[0]);
 
-        $setSpells = new SpellList(array(['s.id', array_column($spells, 'id')]));
-        foreach ($setSpells->iterate() as $spellId => $__)
+        $setSpells = new SpellList(array(['s.id', array_column($spells, 1)]));
+        foreach ($spells as &$s)
         {
-            foreach ($spells as &$s)
-            {
-                if ($spellId != $s['id'])
-                    continue;
-
-                $s['desc'] = $setSpells->parseText('description', $this->getField('reqLevel') ?: MAX_LEVEL)[0];
-            }
+            if ($setSpells->getEntry($s[1]))
+                $s[2] = $setSpells->parseText('description', $this->getField('reqLevel') ?: MAX_LEVEL)[0];
+            else
+                $s[2] = Lang::spell('unkAura', [$s[1]]);
         }
 
         return $spells;

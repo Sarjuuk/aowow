@@ -67,8 +67,8 @@ endforeach;
 <?="                ".Lang::itemset('_conveyBonus')."\n"; ?>
                 <ul>
 <?php
-foreach ($this->spells as $i => $s):
-    echo '                    <li><div>'.$s['bonus'].' '.Lang::itemset('_pieces').Lang::main('colon').'<a href="?spell='.$s['id'].'">'.$s['desc']."</a></div></li>\n";
+foreach ($this->spells as [$nItems, $spellId, $text]):
+    echo '                    <li><div>'.Lang::itemset('_pieces', [$nItems]).'<a href="?spell='.$spellId.'">'.$text."</a></div></li>\n";
 endforeach;
 ?>
                 </ul>
