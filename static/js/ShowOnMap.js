@@ -107,10 +107,8 @@ ShowOnMap.prototype.construct = function() {
                 }
                 if (nCoords > 0) {
                     var url = (g_types[group[p][0].type] && group[p][0].id ? '?' + g_types[group[p][0].type] + '=' + group[p][0].id : '');
-                    // legend[submenu.length+1] = [p, url]; aowow - switch to numeric groupIdx to support mail
-                    // entry.push(p + $WH.sprintf(LANG.qty, nPins));
-                    legend[submenu.length+1] = [group[p][0].name, url];
-                    entry.push(group[p][0].name + $WH.sprintf(LANG.qty, nPins));
+                    legend[submenu.length+1] = [p, url];
+                    entry.push(p + $WH.sprintf(LANG.qty, nPins));
                     entry.push(this.showStuff.bind(this, coords, [i, i2], legend));
                     submenu.push(entry);
                     for (var l in coords) {

@@ -206,15 +206,15 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $addToSOM = function (string $what, array $entry) use (&$som) : void
+        $addToSOM = function (string $what, string $group, array $entry) use (&$som) : void
         {
             // entry always contains: type, id, name, level, coords[]
-            if (!isset($som[$what][$entry['name']]))        // not found yet
-                $som[$what][$entry['id']][] = $entry;
+            if (!isset($som[$what][$group]))                // not found yet
+                $som[$what][$group][] = $entry;
             else                                            // found .. something..
             {
                 // check for identical floors
-                foreach ($som[$what][$entry['id']] as &$byFloor)
+                foreach ($som[$what][$group] as &$byFloor)
                 {
                     if ($byFloor['level'] != $entry['level'])
                         continue;
@@ -225,7 +225,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 }
 
                 // floor not used yet, create it
-                $som[$what][$entry['id']][] = $entry;
+                $som[$what][$group][] = $entry;
             }
         };
 
@@ -310,9 +310,12 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     );
 
                     if ($what == 'mail')
-                       $blob['side'] = (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2));
-
-                    $addToSOM($what, $blob);
+                    {
+                        $blob['side'] = (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE));
+                        $addToSOM($what, $tpl['id'], $blob);
+                    }
+                    else
+                        $addToSOM($what, $n, $blob);
                 }
 
                 if ($tpl['startsQuests'])
@@ -339,24 +342,24 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         $this->extendGlobalData($started->getJSGlobals());
 
                         if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', array(
+                            $addToSOM('alliancequests', $n, array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
                                 'type'   => Type::OBJECT,
                                 'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
+                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
                                 'quests' => array_values($_)
                             ));
 
                         if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', array(
+                            $addToSOM('hordequests', $n, array(
                                 'coords' => [[$spawn['posX'], $spawn['posY']]],
                                 'level'  => $spawn['floor'],
                                 'name'   => $n,
                                 'type'   => Type::OBJECT,
                                 'id'     => $tpl['id'],
-                                'side'   => (($tpl['A'] < 0 ? 0 : 0x1) | ($tpl['H'] < 0 ? 0 : 0x2)),
+                                'side'   => (($tpl['A'] < 0 ? 0 : SIDE_ALLIANCE) | ($tpl['H'] < 0 ? 0 : SIDE_HORDE)),
                                 'quests' => array_values($_)
                             ));
                 }
@@ -390,7 +393,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
                 if ($creatureSpawns->isBoss())
                     $what = 'boss';
-                else if ($tpl['rank'] == 2 || $tpl['rank'] == 4)
+                else if ($tpl['rank'] == NPC_RANK_RARE_ELITE || $tpl['rank'] == NPC_RANK_RARE)
                     $what = 'rare';
                 else
                     foreach ($flagsMap as $flag => $what)
@@ -401,7 +404,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     $flightNodes[$tpl['id']] = [$spawn['posX'], $spawn['posY']];
 
                 if ($what)
-                    $addToSOM($what, array(
+                    $addToSOM($what, $n, array(
                         'coords'        => [[$spawn['posX'], $spawn['posY']]],
                         'level'         => $spawn['floor'],
                         'name'          => $n,
@@ -436,7 +439,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         $this->extendGlobalData($started->getJSGlobals());
 
                         if (($tpl['A'] != -1) && ($_ = $started->getSOMData(SIDE_ALLIANCE)))
-                            $addToSOM('alliancequests', array(
+                            $addToSOM('alliancequests', $n, array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -449,7 +452,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                             ));
 
                         if (($tpl['H'] != -1) && ($_ = $started->getSOMData(SIDE_HORDE)))
-                            $addToSOM('hordequests', array(
+                            $addToSOM('hordequests', $n, array(
                                 'coords'        => [[$spawn['posX'], $spawn['posY']]],
                                 'level'         => $spawn['floor'],
                                 'name'          => $n,
@@ -472,10 +475,11 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 if (!$tpl)
                     continue;
 
-                $addToSOM('areatrigger', array(
+                $n = Util::localizedString($tpl, 'name', true, true);
+                $addToSOM('areatrigger', $n, array(
                     'coords'        => [[$spawn['posX'], $spawn['posY']]],
                     'level'         => $spawn['floor'],
-                    'name'          => Util::localizedString($tpl, 'name', true, true),
+                    'name'          => $n,
                     'type'          => Type::AREATRIGGER,
                     'id'            => $spawn['typeId'],
                     'description'   => Lang::game('type').Lang::areatrigger('types', $tpl['type'])
