@@ -11,17 +11,14 @@ if (!CLI)
 
 class ItemStatSetup extends ItemList
 {
-    private $relSpells   = [];
-    private $relEnchants = [];
-
-    public function __construct($start, $limit, array $ids, array $relEnchants, array $relSpells)
+    public function __construct(int $start, int $limit, int $itemClass, array $ids, private bool $applyTriggered, private array $relEnchants, private array $relSpells)
     {
         $this->queryOpts['i']['o'] = 'i.id ASC';
         unset($this->queryOpts['is']);                      // do not reference the stats table we are going to write to
 
         $conditions = array(
             ['i.id', $start, '>'],
-            ['class', [ITEM_CLASS_WEAPON, ITEM_CLASS_GEM, ITEM_CLASS_ARMOR, ITEM_CLASS_CONSUMABLE, ITEM_CLASS_AMMUNITION]],
+            ['class', $itemClass],
             $limit
         );
 
@@ -29,23 +26,29 @@ class ItemStatSetup extends ItemList
             $conditions[] = ['id', $ids];
 
         parent::__construct($conditions);
-
-        $this->relSpells   = $relSpells;
-        $this->relEnchants = $relEnchants;
     }
 
     public function writeStatsTable() : void
     {
         foreach ($this->iterate() as $id => $curTpl)
         {
-            $spellIds  = [];
+            $spellIds = [];
 
             for ($i = 1; $i <= 5; $i++)
                 if ($this->curTpl['spellId'.$i] > 0 && !isset($this->relSpells[$this->curTpl['spellId'.$i]]) && (($this->curTpl['class'] == ITEM_CLASS_CONSUMABLE && $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_USE) || $this->curTpl['spellTrigger'.$i] == SPELL_TRIGGER_EQUIP))
                     $spellIds[] = $this->curTpl['spellId'.$i];
 
             if ($spellIds)                                  // array_merge kills the keys
-                $this->relSpells = array_replace($this->relSpells, DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spellIds));
+            {
+                $newSpells = DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $spellIds);
+                $this->relSpells = array_replace($this->relSpells, $newSpells);
+
+                // include triggered spell to calculate nutritional values
+                if ($this->applyTriggered)
+                    if ($t = array_filter(array_merge(array_column($newSpells, 'effect1TriggerSpell'), array_column($newSpells, 'effect2TriggerSpell'), array_column($newSpells, 'effect3TriggerSpell'))))
+                        if ($t = array_diff($t, array_keys($this->relSpells)))
+                            $this->relSpells = array_replace($this->relSpells, DB::Aowow()->select('SELECT *, id AS ARRAY_KEY FROM ?_spell WHERE id IN (?a)', $t));
+            }
 
             // fromItem: itemMods, spell, enchants from template - fromJson: calculated stats (feralAP, dps, ...)
             if ($stats = (new StatsContainer($this->relSpells, $this->relEnchants))->fromItem($curTpl)->fromJson($this->json[$id])->toJson(Stat::FLAG_ITEM | Stat::FLAG_SERVERSIDE))
@@ -75,7 +78,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $dbcSourceFiles = ['spellitemenchantment'];
     protected $setupAfter     = [['items', 'spell'], []];
 
-    private   $relSpells = [];
+    private array $relSpells = [];
 
     private function enchantment_stats(?int &$total = 0, ?int &$effective = 0) : array
     {
@@ -114,19 +117,29 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write('[stats] - applying stats for items');
 
-        $i = 0;
-        $offset = 0;
-        while (true)
+        $classes = array(
+            ITEM_CLASS_WEAPON     => [false, 'weapons'],
+            ITEM_CLASS_ARMOR      => [false, 'armor'],
+            ITEM_CLASS_GEM        => [false, 'gems'],
+            ITEM_CLASS_CONSUMABLE => [true,  'consumables'],
+            ITEM_CLASS_AMMUNITION => [false, 'ammunition']
+        );
+        foreach ($classes as $itemClass =>  [$applyTriggered, $name])
         {
-            $items = new ItemStatSetup($offset, CLISetup::SQL_BATCH, $ids, $enchStats, $this->relSpells);
-            if ($items->error)
-                break;
+            $i       = 0;
+            $offset  = 0;
+            while (true)
+            {
+                $items = new ItemStatSetup($offset, CLISetup::SQL_BATCH, $itemClass, $ids, $applyTriggered, $enchStats, $this->relSpells);
+                if ($items->error)
+                    break;
 
-            CLI::write('[stats] * batch #' . ++$i . ' (' . count($items->getFoundIDs()) . ')', CLI::LOG_BLANK, true, true);
+                CLI::write('[stats] * '.$name.' batch #' . ++$i . ' (' . count($items->getFoundIDs()) . ')', CLI::LOG_BLANK, true, true);
 
-            $offset = max($items->getFoundIDs());
+                $offset = max($items->getFoundIDs());
 
-            $items->writeStatsTable();
+                $items->writeStatsTable();
+            }
         }
 
         return true;

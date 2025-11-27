@@ -400,9 +400,12 @@ class StatsContainer implements \Countable
         return $this;
     }
 
-    public function fromSpell(array $spell) : self
+    public function fromSpell(array $spell, bool $onlyFoodBuff = false) : self
     {
         if (!$spell)
+            return $this;
+
+        if ($onlyFoodBuff && !($spell['attributes2'] & SPELL_ATTR2_FOOD_BUFF))
             return $this;
 
         // if spells grant an equal, non-zero amount of SPELL_DAMAGE and SPELL_HEALING, combine them to SPELL_POWER
@@ -418,6 +421,11 @@ class StatsContainer implements \Countable
 
             if (in_array($eff, SpellList::EFFECTS_ENCHANTMENT) && ($relE = $this->relE($mVal)))
                 $this->fromEnchantment($relE);
+            else if ($aura == SPELL_AURA_PERIODIC_TRIGGER_SPELL && ($ts = $spell['effect'.$i.'TriggerSpell']))
+            {
+                if ($relS = $this->relS($ts))
+                    $this->fromSpell($relS, true);
+            }
             else
                 foreach ($this->convertSpellEffect($aura, $mVal, $amt) as $idx)
                     Util::arraySumByKey($tmpStore, [$idx => $amt]);
@@ -519,18 +527,12 @@ class StatsContainer implements \Countable
 
     private function relE(int $enchantmentId) : array
     {
-        if ($enchantmentId <= 0 || !isset($this->relEnchantments[$enchantmentId]))
-            return [];
-
-        return $this->relEnchantments[$enchantmentId];
+        return $this->relEnchantments[$enchantmentId] ?? [];
     }
 
     private function relS(int $spellId) : array
     {
-        if ($spellId <= 0 || !isset($this->relSpells[$spellId]))
-            return [];
-
-        return $this->relSpells[$spellId];
+        return $this->relSpells[$spellId] ?? [];
     }
 
     private static function convertEnchantment(int $type, int $object) : array
