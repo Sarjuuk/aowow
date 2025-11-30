@@ -602,6 +602,16 @@ define('LOCK_PROPERTY_FOOTLOCKER',          1);
 define('LOCK_PROPERTY_HERBALISM',           2);
 define('LOCK_PROPERTY_MINING',              3);
 
+// FactionFlags
+define('FACTION_FLAG_VISIBLE',          0x01);
+define('FACTION_FLAG_AT_WAR',           0x02);
+define('FACTION_FLAG_HIDDEN',           0x04);
+define('FACTION_FLAG_INVISIBLE_FORCED', 0x08);
+define('FACTION_FLAG_PEACE_FORCED',     0x10);
+define('FACTION_FLAG_INACTIVE',         0x20);
+define('FACTION_FLAG_RIVAL',            0x40);
+define('FACTION_FLAG_SPECIAL',          0x80);
+
 // Creature
 define('NPC_TYPEFLAG_TAMEABLE',                          0x00000001);
 define('NPC_TYPEFLAG_VISIBLE_TO_GHOSTS',                 0x00000002);
