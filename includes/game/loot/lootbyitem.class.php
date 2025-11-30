@@ -127,11 +127,13 @@ class LootByItem extends Loot
                 continue;
 
             $result[$rId] = array(
-                'percent'  => $chance,
-                'stack'    => [$ref['min'], $ref['max']],
-                'count'    => 1,                        // ..and one for the sort script
-                'pctstack' => self::buildStack($ref['min'], $ref['max'])
+                'percent' => $chance,
+                'stack'   => [$ref['min'], $ref['max']],
+                'count'   => 1                          // ..and one for the sort script
             );
+
+            if ($_ = self::buildStack($ref['min'], $ref['max']))
+                $result[$rId]['pctstack'] = $_;
         }
 
         // sort by % DESC
