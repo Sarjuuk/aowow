@@ -344,8 +344,17 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             if ($items->error)
                 continue;
 
+            // if sold by vendor; append cost column
+            if ($this->filter->getSetCriteria(92) && is_array($this->sharedLV['extraCols']))
+            {
+                $this->sharedLV['extraCols']['cost'] = '$Listview.extraCols.cost';
+                $data = $items->getListviewData($infoMask | ITEMINFO_VENDOR);
+            }
+            else
+                $data = $items->getListviewData($infoMask);
+
             $tabData = array_merge(
-                ['data' => $items->getListviewData($infoMask)],
+                ['data' => $data],
                 $this->sharedLV
             );
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
