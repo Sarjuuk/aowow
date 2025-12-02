@@ -634,7 +634,12 @@ class TemplateResponse extends BaseResponse
                 if (!isset($ptJSG[$type]) || $type == Type::USER)
                     $ptJSG[$type] = $this->jsGlobals[$type];
                 else
-                    Util::mergeJsGlobals($ptJSG[$type][1], $data);
+                {
+                    $masterJSG = [$type => &$ptJSG[$type][1]];
+                    Util::mergeJsGlobals($masterJSG, [$type => $data]);
+                }
+
+                unset($masterJSG);
             }
 
             $this->result->jsGlobals = $ptJSG;
