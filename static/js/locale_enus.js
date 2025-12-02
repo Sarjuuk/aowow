@@ -3146,6 +3146,8 @@ var LANG = {
     tooltip_uprate:                    "Insightful/funny",
     tooltip_zonelink:                  "Clicking on this link will<br />take you to the zone page.",
 
+    tooltip_immune:                    "Immune",            // aowow - custom
+
     reputationhistory: "Reputation History",
     reputationaction:  "Reputation Action",
 

@@ -3097,6 +3097,8 @@ var LANG = {
     tooltip_uprate:                    "Hilfreich/lustig",
     tooltip_zonelink:                  "Ein Klick auf diesen Link<br />bringt Euch zur Gebietsseite.",
 
+    tooltip_immune:                    "Immun",            // aowow - custom
+
     reputationhistory: "Rufgeschichte",
     reputationaction:  "Aktion",
 

@@ -3098,6 +3098,8 @@ var LANG = {
     tooltip_uprate:                    "Высокий",
     tooltip_zonelink:                  "Щелкнув по этой ссылке вы<br />попадете на страницу местности.",
 
+    tooltip_immune:                    "Иммунный",            // aowow - custom
+
     reputationhistory: "История репутации",
     reputationaction:  "Действие Репутации",
 

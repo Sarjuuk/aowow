@@ -565,6 +565,7 @@ CREATE TABLE `aowow_creature` (
   `resistance6` smallint(6) NOT NULL DEFAULT 0,
   `racialLeader` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `mechanicImmuneMask` int(10) unsigned NOT NULL DEFAULT 0,
+  `schoolImmuneMask` int(10) unsigned NOT NULL DEFAULT 0,
   `flagsExtra` int(10) unsigned NOT NULL DEFAULT 0,
   `scriptName` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),

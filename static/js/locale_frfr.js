@@ -3098,6 +3098,8 @@ var LANG = {
     tooltip_uprate:                    "Intéressant/drôle",
     tooltip_zonelink:                  "Cliquer sur ce lien vous amènera<br />à la page de la zone correspondante.",
 
+    tooltip_immune:                    "Immunisé",          // aowow - custom
+
     reputationhistory: "Historique de réputation",
     reputationaction:  "Action de réputation",
 

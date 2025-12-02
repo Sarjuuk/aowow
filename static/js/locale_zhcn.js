@@ -3145,6 +3145,8 @@ var LANG = {
     tooltip_uprate:                    "犀利/有趣",
     tooltip_zonelink:                  "点击此链接就能够<br />跳转到地区页。",
 
+    tooltip_immune:                    "免疫", // aowow - custom
+
     reputationhistory: "声望历史",
     reputationaction:  "声望行动",
 

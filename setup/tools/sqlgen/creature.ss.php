@@ -71,6 +71,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       IFNULL(ctr1.Resistance, 0), IFNULL(ctr2.Resistance, 0), IFNULL(ctr3.Resistance, 0), IFNULL(ctr4.Resistance, 0), IFNULL(ctr5.Resistance, 0), IFNULL(ctr6.Resistance, 0),
                       RacialLeader,
                       mechanic_immune_mask,
+                      spell_school_immune_mask,
                       flags_extra,
                       ScriptName
             FROM      creature_template ct

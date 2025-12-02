@@ -972,10 +972,18 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // Resistances
         $resNames = [null, 'hol', 'fir', 'nat', 'fro', 'sha', 'arc'];
         $tmpRes   = [];
+        $res      = $this->subject->getBaseStats('resistance'); // $sc => $amt
         $stats['resistance'] = '';
-        foreach ($this->subject->getBaseStats('resistance') as $sc => $amt)
-            if ($amt)
-                $tmpRes[] = '[span class="moneyschool'.$resNames[$sc].'"]'.$amt.'[/span]';
+        foreach ($resNames as $idx => $sc)
+        {
+            if (!$sc)
+                continue;
+
+            if ((1 << $idx) & $this->subject->getField('schoolImmuneMask'))
+                $tmpRes[] = '[tooltip=tooltip_immune][span class="tip moneyschool'.$sc.'"]∞[/span][/tooltip]';
+            else if ($res[$idx])
+                $tmpRes[] = '[span class="moneyschool'.$sc.'"]'.$res[$idx].'[/span]';
+        }
 
         if ($tmpRes)
         {
@@ -1026,8 +1034,17 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                     $stats['resistance'] = Lang::npc('resistances').'…';
 
                 $tmpRes = '';
-                foreach ($this->altNPCs->getBaseStats('resistance') as $sc => $amt)
-                    $tmpRes .= '[td][span style="margin: 0px 5px"]'.$amt.'[/span][/td]';
+                $res    = $this->altNPCs->getBaseStats('resistance');
+                foreach ($resNames as $idx => $sc)
+                {
+                    if (!$sc)
+                        continue;
+
+                    if ((1 << $idx) & $this->altNPCs->getField('schoolImmuneMask'))
+                        $tmpRes .= '[td][span style="margin: 0px 5px"]∞[/span][/td]';
+                    else if ($res[$idx])
+                        $tmpRes .= '[td][span style="margin: 0px 5px"]'.$res[$idx].'[/span][/td]';
+                }
 
                 $modes['resistance'][] = '[td]'.$m.'&nbsp;&nbsp;&nbsp;&nbsp;[/td]'.$tmpRes;
             }
