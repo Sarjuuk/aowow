@@ -12,7 +12,12 @@ class CharRaceList extends DBTypeList
     public static string $brickFile = 'race';
     public static string $dataTable = '?_races';
 
-    protected string $queryBase = 'SELECT r.*, id AS ARRAY_KEY FROM ?_races r';
+    protected string $queryBase = 'SELECT r.*, r.`id` AS ARRAY_KEY FROM ?_races r';
+    protected array  $queryOpts = array(
+                        'r'  => [['ic0', 'ic1']],
+                        'ic0' => ['j' => ['?_icons ic0 ON ic0.`id` = r.`iconId0`', true], 's' => ', ic0.`name` AS "iconStringMale"'],
+                        'ic1' => ['j' => ['?_icons ic1 ON ic1.`id` = r.`iconId1`', true], 's' => ', ic1.`name` AS "iconStringFemale"']
+                    );
 
     public function getListviewData() : array
     {

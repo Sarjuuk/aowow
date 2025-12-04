@@ -12,10 +12,11 @@ class WorldEventList extends DBTypeList
     public static string $brickFile = 'event';
     public static string $dataTable = '?_events';
 
-    protected string $queryBase = 'SELECT e.`holidayId`, e.`cuFlags`, e.`startTime`, e.`endTime`, e.`occurence`, e.`length`, e.`requires`, e.`description` AS "nameINT", e.`id` AS "eventId", e.`id` AS "ARRAY_KEY", h.* FROM ?_events e';
+    protected string $queryBase = 'SELECT e.`holidayId`, e.`cuFlags`, e.`startTime`, e.`endTime`, e.`occurence`, e.`length`, e.`requires`, e.`description` AS "nameINT", e.`id` AS "eventId", e.`id` AS ARRAY_KEY FROM ?_events e';
     protected array  $queryOpts = array(
-                        'e' => [['h']],
-                        'h' => ['j' => ['?_holidays h ON e.`holidayId` = h.`id`', true], 'o' => '-e.`id` ASC']
+                        'e'  => [['h', 'ic']],
+                        'h'  => ['j' => ['?_holidays h ON e.`holidayId` = h.`id`', true], 's' => ', h.*', 'o' => '-e.`id` ASC'],
+                        'ic' => ['j' => ['?_icons ic ON ic.`id` = h.`iconId`',     true], 's' => ', ic.`name` AS "iconString"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

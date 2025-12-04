@@ -106,6 +106,13 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         // id
         $infobox[] = Lang::chrClass('id') . $this->typeId;
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(Type::ICON, $_);
+        }
+
         // original name
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
@@ -119,13 +126,15 @@ class ClassBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         $this->expansion  = Util::$expansionString[$this->subject->getField('expansion')];
-        $this->headIcons  = ['class_'.$cl->json()];
         $this->redButtons = array(
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId],
             BUTTON_WOWHEAD => true,
             BUTTON_TALENT  => ['href' => '?talent#'.Util::$tcEncoding[self::TC_CLASS_IDS[$this->typeId] * 3], 'pet' => false],
             BUTTON_FORUM   => false                         // todo (low): Cfg::get('BOARD_URL') + X
         );
+
+        if ($_ = $this->subject->getField('iconString'))
+            $this->headIcons[] = $_;
 
 
         /**************/

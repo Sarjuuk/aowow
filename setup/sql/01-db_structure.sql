@@ -404,6 +404,7 @@ DROP TABLE IF EXISTS `aowow_classes`;
 CREATE TABLE `aowow_classes` (
   `id` int(11) NOT NULL,
   `fileString` varchar(128) DEFAULT NULL,
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `name_loc0` varchar(128) DEFAULT NULL,
   `name_loc2` varchar(128) DEFAULT NULL,
   `name_loc3` varchar(128) DEFAULT NULL,
@@ -994,7 +995,7 @@ CREATE TABLE `aowow_holidays` (
   `looping` tinyint(4) NOT NULL,
   `scheduleType` tinyint(4) NOT NULL,
   `textureString` varchar(30) NOT NULL DEFAULT '',
-  `iconString` varchar(51) NOT NULL DEFAULT '0',
+  `iconId` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2269,6 +2270,8 @@ CREATE TABLE `aowow_races` (
   `baseLanguage` tinyint(3) unsigned NOT NULL,
   `side` tinyint(3) unsigned NOT NULL,
   `fileString` varchar(64) DEFAULT NULL,
+  `iconId0` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'male icon',
+  `iconId1` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'female icon',
   `name_loc0` varchar(64) DEFAULT NULL,
   `name_loc2` varchar(64) DEFAULT NULL,
   `name_loc3` varchar(64) DEFAULT NULL,

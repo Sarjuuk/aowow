@@ -66,7 +66,7 @@ class IconList extends DBTypeList
         {
             $data[$this->id] = array(
                 'id'                  => $this->id,
-                'name'                => $this->getField('name', true, true),
+                'name'                => $this->getField('name_source', true, true),
                 'icon'                => $this->getField('name', true, true),
                 'itemcount'           => (int)$this->getField('nItems'),
                 'spellcount'          => (int)$this->getField('nSpells'),
@@ -113,7 +113,7 @@ class IconListFilter extends Filter
     //    8 => '',                                          // garrisonbuildings [num]
           9 => '?_pet',                                     // hunterpets [num]
     //   10 => '',                                          // garrisonmissionthreats [num]
-         11 => '',                                          // classes [num]
+         11 => '?_classes',                                 // classes [num]
          13 => ''                                           // used [num]
     );
 
@@ -124,7 +124,7 @@ class IconListFilter extends Filter
          3 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // achievements [num]
          6 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // currencies [num]
          9 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // hunterpets [num]
-        11 => [parent::CR_NYI_PH,   null,       0   ],      // classes [num]
+        11 => [parent::CR_CALLBACK, 'cbUsedBy'      ],      // classes [num]
         13 => [parent::CR_CALLBACK, 'cbUsedBy', true]       // used [num]
     );
 

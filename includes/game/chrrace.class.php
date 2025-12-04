@@ -86,7 +86,7 @@ enum ChrRace : int
             self::ORC      => 'orc',
             self::DWARF    => 'dwarf',
             self::NIGHTELF => 'nightelf',
-            self::UNDEAD   => 'undead',
+            self::UNDEAD   => 'scourge',
             self::TAUREN   => 'tauren',
             self::GNOME    => 'gnome',
             self::TROLL    => 'troll',

@@ -17,6 +17,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'classes' => [[], CLISetup::ARGV_PARAM, 'Compiles data for type: PlayerClass from dbc.']
     );
 
+    protected $setupAfter     = [['icons'], []];
     protected $dbcSourceFiles = ['spell', 'charbaseinfo', 'skillraceclassinfo', 'skilllineability', 'chrclasses'];
 
     public function generate(array $ids = []) : bool
@@ -33,6 +34,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         if ($skills = DB::Aowow()->selectCol('SELECT LOG(2, `classMask`) + 1 AS ARRAY_KEY, GROUP_CONCAT(`skillLine` SEPARATOR \' \') FROM dbc_skillraceclassinfo WHERE `flags` = ?d GROUP BY `classMask` HAVING ARRAY_KEY = CAST(LOG(2, `classMask`) + 1 AS SIGNED)', 0x410))
             foreach ($skills as $classId => $skillStr)
                 $classes[$classId]['skills'] = $skillStr;
+
+        // collect iconIds
+        $iconIds = DB::Aowow()->selectCol('SELECT `id`, `name` AS ARRAY_KEY FROM ?_icons WHERE `name` IN (?a)', array_filter(array_map(fn($x) => 'class_'.strtolower($x['fileString']), $classes)));
+        foreach ($classes AS $id => $class)
+            $classes[$id]['iconId'] = $iconIds['class_'.strtolower($class['fileString'])] ?? 0;
 
         // add weaponTypeMask & armorTypeMask
         foreach ($classes as $id => &$data)

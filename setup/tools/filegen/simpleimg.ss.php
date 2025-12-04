@@ -220,7 +220,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                             foreach ($row as $x => $name)
                             {
                                 $j++;
-                                $outFile = CLI::nicePath(($isIcon ? strtolower($name) : $name).'.'.$ext, $dest);
+                                $outFile = CLI::nicePath(($isIcon ? $this->fixIconName($name) : $name).'.'.$ext, $dest);
 
                                 $this->status = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
 
@@ -293,7 +293,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
                     {
                         $j++;
                         $this->status = ' - '.str_pad($j.'/'.$nFiles, 12).str_pad('('.number_format($j * 100 / $nFiles, 2).'%)', 9);
-                        $outFile = CLI::nicePath(($isIcon ? strtolower($img) : $img).'.'.$ext, $dest);
+                        $outFile = CLI::nicePath(($isIcon ? $this->fixIconName($img) : $img).'.'.$ext, $dest);
 
                         if (!CLISetup::getOpt('force') && file_exists($outFile))
                         {
@@ -380,6 +380,11 @@ CLISetup::registerSetup("build", new class extends SetupScript
         }
 
         return $this->success;
+    }
+
+    private function fixIconName(string $name) : string
+    {
+        return preg_replace('/[^a-z0-9_-]/', '-', strtolower($name));
     }
 });
 

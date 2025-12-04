@@ -39,7 +39,7 @@ class IconBaseResponse extends TemplateResponse implements ICache
 
         $this->extendGlobalData($this->subject->getJSGlobals());
 
-        $this->h1   = $this->subject->getField('name');
+        $this->h1   = $this->subject->getField('name_source');
         $this->icon = $this->subject->getField('name', true, true);
 
         $this->gPageInfo += array(

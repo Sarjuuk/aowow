@@ -95,6 +95,13 @@ class EventBaseResponse extends TemplateResponse implements ICache
         if ($_holidayId && User::isInGroup(U_GROUP_STAFF))
             $infobox[] = 'Holiday ID'.Lang::main('colon').$_holidayId;
 
+        // icon
+        if ($_ = $this->subject->getField('iconId'))
+        {
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').'[icondb='.$_.' name=true]';
+            $this->extendGlobalIds(Type::ICON, $_);
+        }
+
         // original name
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';

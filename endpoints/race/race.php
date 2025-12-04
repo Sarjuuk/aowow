@@ -102,6 +102,26 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         // id
         $infobox[] = Lang::race('id') . $this->typeId;
 
+        // icon
+        $mIcon = $this->subject->getField('iconId0');
+        $fIcon = $this->subject->getField('iconId1');
+        if ($mIcon || $fIcon)
+        {
+            $buff = '';
+            if ($mIcon)
+            {
+                $buff .= '[icondb='.$mIcon.(!$fIcon ? ' name=true': '').']';
+                $this->extendGlobalIds(Type::ICON, $mIcon);
+            }
+            if ($fIcon)
+            {
+                $buff .= '[icondb='.$fIcon.' name=true]';
+                $this->extendGlobalIds(Type::ICON, $fIcon);
+            }
+
+            $infobox[] = Util::ucFirst(Lang::game('icon')).Lang::main('colon').$buff;
+        }
+
         // original name
         if (Lang::getLocale() != Locale::EN)
             $infobox[] = Util::ucFirst(Lang::lang(Locale::EN->value) . Lang::main('colon')) . '[copy button=false]'.$this->subject->getField('name_loc0').'[/copy][/li]';
@@ -120,8 +140,10 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             BUTTON_LINKS   => ['type' => $this->type, 'typeId' => $this->typeId]
         );
 
-        if ($_ = $ra->json())
-            $this->headIcons = ['race_'.$_.'_male', 'race_'.$_.'_female'];
+        if ($_ = $this->subject->getField('iconStringMale'))
+            $this->headIcons[] = $_;
+        if ($_ = $this->subject->getField('iconStringFemale'))
+            $this->headIcons[] = $_;
 
 
         /**************/
