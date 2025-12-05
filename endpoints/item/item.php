@@ -535,6 +535,35 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             }
         }
 
+        // append spell loot mimicking item opening
+        if ($this->subject->getField('spellTrigger1') === SPELL_TRIGGER_USE && ($s = $this->subject->getField('spellId1')))
+        {
+            if (($spellLoot = new LootByContainer())->getByContainer(Loot::SPELL, [$s]))
+            {
+                $this->extendGlobalData($spellLoot->jsGlobals);
+
+                $makeNew = true;
+                foreach ($this->lvTabs->iterate() as $k => $tab)
+                {
+                    if ($tab->getId() != 'contains')
+                        continue;
+
+                    $tab->appendData($spellLoot->getResult());
+                    $makeNew = false;
+                    break;
+                }
+
+                if ($makeNew)
+                    $this->lvTabs->addListviewTab(new Listview(array(
+                        'data'            => $spellLoot->getResult(),
+                        'name'            => '$LANG.tab_contains',
+                        'id'              => 'contains',
+                        'computeDataFunc' => '$Listview.funcBox.initLootTable',
+                        'extraCols'       => array_merge(['$Listview.extraCols.percent'], $spellLoot->extraCols)
+                    ), ItemList::$brickFile));
+            }
+        }
+
         // tab: container can contain
         if ($this->subject->getField('slots') > 0)
         {

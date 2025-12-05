@@ -125,6 +125,9 @@ class Listview implements \JsonSerializable
             $this->__addIn = 'template/listviews/'.$addIn.'.tpl';
     }
 
+    /**
+     * @return \Generator<int, array> rowIndex => dataRow
+     */
     public function &iterate() : \Generator
     {
         reset($this->data);
@@ -133,9 +136,20 @@ class Listview implements \JsonSerializable
             yield $idx => $row;
     }
 
+    public function appendData(array $moreData) : void
+    {
+        foreach ($moreData as $md)
+            $this->data[] = $md;
+    }
+
     public function getTemplate() : string
     {
         return $this->template;
+    }
+
+    public function getId() : string
+    {
+        return $this->id;
     }
 
     public function setTabs(string $tabVar) : void

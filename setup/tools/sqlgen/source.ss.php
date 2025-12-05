@@ -104,7 +104,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /* Item & inherited Spells */
         /***************************/
 
-        CLI::write('[source] - Items & Spells [inherited]');
+        CLI::write('[source] - Items & inherited Spells');
         # also everything from items that teach spells, is src of spell
 
         $this->itemCrafted();                               #  1: Crafted      #
@@ -128,7 +128,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         /* Spell */
         /*********/
 
-        CLI::write('[source] - Spells [original]');
+        CLI::write('[source] - Spells');
 
         $this->spellQuest();                                #  4: Quest     #
         $this->spellTrainer();                              #  6: Trainer   #
@@ -298,6 +298,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             $itemSpells[$item] = $spell;
 
         $itemSpells = array_filter($itemSpells, fn($x) => empty($this->disables[Type::SPELL][$x]));
+
+        $spellLoot = DB::World()->selectCol('SELECT IF(`Reference` > 0, -`Reference`, `Item`) AS ARRAY_KEY, `entry` FROM spell_loot_template WHERE `entry` IN (?a)', $itemSpells);
+        if ($_ = array_filter($spellLoot, fn($x) => $x > 0, ARRAY_FILTER_USE_KEY))
+            $itemSpells = array_replace($itemSpells, $_);
+
+        foreach (array_filter($spellLoot, fn($x) => $x < 0, ARRAY_FILTER_USE_KEY) as $r => $spellId)
+            if (isset($this->refLoot[-$r]))
+                $itemSpells = array_replace(array_fill_keys(array_keys($this->refLoot[-$r]), $spellId));
 
         $spellItems = DB::World()->select('SELECT `entry` AS ARRAY_KEY, `class`, `subclass`, `spellid_1`, `spelltrigger_1`, `spellid_2`, `spelltrigger_2` FROM item_template WHERE `entry` IN (?a)', array_keys($itemSpells));
         foreach ($spellItems as $iId => $si)
@@ -471,27 +479,42 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             ITEM_FLAG_OPENABLE
         );
 
-        foreach ($itemLoot as $roi => $l)
-        {
-            if ($roi < 0 && !empty($this->refLoot[-$roi]))
-            {
-                foreach ($this->refLoot[-$roi] as $iId => $r)
-                {
-                    if ($_ = $this->taughtSpell($r))
-                        $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
+        // Clams are not item containers but have SpellLoot
+        $lootSpells = DB::Aowow()->selectCol('SELECT s.`id` FROM ?_spell s JOIN ?_items i ON i.`spellId1` = s.`id` AND i.`spellTrigger1` = ?d WHERE s.`effect1Id` = ?d', SPELL_TRIGGER_USE, SPELL_EFFECT_CREATE_RANDOM_ITEM);
+        $spellLoot  = DB::World()->select(
+           'SELECT    IF(slt.`Reference` > 0, -slt.`Reference`, slt.`Item`) AS ARRAY_KEY, itA.`entry`, itB.`class`, itB.`subclass`, itB.`spellid_1`, itB.`spelltrigger_1`, itB.`spellid_2`, itB.`spelltrigger_2`, COUNT(DISTINCT slt.`Reference`) AS "qty"
+            FROM      spell_loot_template slt
+            JOIN      item_template itA ON slt.`entry` = itA.`spellid_1`
+            LEFT JOIN item_template itB ON itB.`entry` = slt.`Item` AND slt.`Reference` <= 0
+            WHERE     itA.`spellid_1` IN (?a) AND itA.`spelltrigger_1` = ?d
+            GROUP BY  ARRAY_KEY',
+            $lootSpells, SPELL_TRIGGER_USE
+        );
 
-                    $itemOT[] = $iId;
-                    $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
+        foreach ([$itemLoot, $spellLoot] as $container)
+        {
+            foreach ($container as $roi => $l)
+            {
+                if ($roi < 0 && !empty($this->refLoot[-$roi]))
+                {
+                    foreach ($this->refLoot[-$roi] as $iId => $r)
+                    {
+                        if ($_ = $this->taughtSpell($r))
+                            $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
+
+                        $itemOT[] = $iId;
+                        $this->pushBuffer(Type::ITEM, $iId, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
+                    }
+
+                    continue;
                 }
 
-                continue;
+                if ($_ = $this->taughtSpell($l))
+                    $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
+
+                $itemOT[] = $roi;
+                $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
             }
-
-            if ($_ = $this->taughtSpell($l))
-                $this->pushBuffer(Type::SPELL, $_, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
-
-            $itemOT[] = $roi;
-            $this->pushBuffer(Type::ITEM, $roi, SRC_DROP, 1, $l['qty'] > 1 ? 0 : Type::ITEM, $l['entry'], qty: $l['qty']);
         }
 
         if ($itemOT)

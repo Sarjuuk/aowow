@@ -31,6 +31,9 @@ class Tabs implements \JsonSerializable, \Countable
         }
     }
 
+    /**
+     * @return \Generator<int, Listview> tabIndex => Listview
+     */
     public function &iterate() : \Generator
     {
         reset($this->__tabs);
