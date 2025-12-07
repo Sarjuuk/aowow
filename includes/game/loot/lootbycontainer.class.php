@@ -264,10 +264,11 @@ class LootByContainer extends Loot
                 else if (User::isInGroup(U_GROUP_EMPLOYEE))     // create dummy for ref-drop
                 {
                     $data = array(
-                        'id'    => $loot['reference'],
-                        'name'  => '@REFERENCE: '.$loot['reference'],
-                        'icon'  => 'trade_engineering',
-                        'stack' => [$loot['multiplier'], $loot['multiplier']]
+                        'id'         => $loot['reference'],
+                        'name'       => '@REFERENCE: '.$loot['reference'],
+                        'icon'       => 'trade_engineering',
+                        'stack'      => [$loot['multiplier'], $loot['multiplier']],
+                        'commondrop' => 1
                     );
                     $this->results[] = array_merge($base, $data);
 

@@ -411,7 +411,10 @@ Listview.templates = {
                     }
 
                     if (item.id) {
-                        $WH.ae(i, g_items.createIcon(item.id, (this.iconSize == null ? 1 : this.iconSize), num, qty));
+                        if (item.name.charAt(0) == '@')     // aowow - don't create link on icon for ref loot
+                            $WH.ae(i, Icon.create(g_items.getIcon(item.id), this.iconSize ?? 1, null, null, num, qty));
+                        else
+                            $WH.ae(i, g_items.createIcon(item.id, (this.iconSize == null ? 1 : this.iconSize), num, qty));
                     }
                     $WH.ae(tr, i);
                     td.style.borderLeft = 'none';
