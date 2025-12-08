@@ -743,7 +743,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
                             $tabData = array(
                                 'data'        => $data,
-                                'id'          => 'spell-group-stack-'.$rules[$gId],
+                                'id'          => 'spell-group-stack-'.$gId,
                                 'name'        => Lang::spell('stackGroup'),
                                 'visibleCols' => ['stackRules']
                             );
