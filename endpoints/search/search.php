@@ -62,19 +62,23 @@ class SearchBaseResponse extends TemplateResponse implements ICache
 
         $canRedirect = true;
         $redirectTo  = '';
-        foreach ($this->searchObj->perform() as $lvData)
+
+        if ($this->searchObj->canPerform())
         {
-            if ($lvData[1] == 'npc' || $lvData[1] == 'object')
-                $this->addDataLoader('zones');
+            foreach ($this->searchObj->perform() as $lvData)
+            {
+                if ($lvData[1] == 'npc' || $lvData[1] == 'object')
+                    $this->addDataLoader('zones');
 
-            $this->lvTabs->addListviewTab(new Listview(...$lvData));
+                $this->lvTabs->addListviewTab(new Listview(...$lvData));
 
-            // we already have a target > can't have more targets > no redirects
-            if (($canRedirect && $redirectTo) || count($lvData[0]['data']) > 1)
-                $canRedirect = false;
+                // we already have a target > can't have more targets > no redirects
+                if (($canRedirect && $redirectTo) || count($lvData[0]['data']) > 1)
+                    $canRedirect = false;
 
-            if ($canRedirect)                                // note - we are very lucky that in case of searches $template is identical to the typeString
-                $redirectTo = '?'.$lvData[1].'='.key($lvData[0]['data']);
+                if ($canRedirect)                                // note - we are very lucky that in case of searches $template is identical to the typeString
+                    $redirectTo = '?'.$lvData[1].'='.key($lvData[0]['data']);
+            }
         }
 
         $this->extendGlobalData($this->searchObj->getJSGlobals());

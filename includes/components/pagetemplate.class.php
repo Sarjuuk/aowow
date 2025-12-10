@@ -216,7 +216,7 @@ class PageTemplate
         if (is_string($var) && $this->$var)
             $var = $this->$var;
 
-        return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($var, $jsonFlags));
+        return preg_replace('/script\s*\>/i', 'scr"+"ipt>', Util::toJSON($var, $jsonFlags) ?: "{}");
     }
 
     private function escHTML(string $var) : string|array

@@ -981,7 +981,11 @@ $WH.g_getQueryString = function() {
 };
 
 $WH.g_parseQueryString = function(str) {
-    str = decodeURIComponent(str);
+    // aowow - set to catch invalid unicode escapes (%ff)
+    // str = decodeURIComponent(str);
+    try { str = decodeURIComponent(str); }
+    catch (e) { return {}; }
+
     var words = str.split('&');
     var params = {};
 

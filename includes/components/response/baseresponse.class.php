@@ -456,8 +456,8 @@ trait TrProfilerList
 
 abstract class BaseResponse
 {
-    protected const PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
-    protected const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/ui';
+    protected const PATTERN_TEXT_LINE = '/[\p{Cc}\p{Cf}\p{Co}\p{Cs}\p{Cn}]/i';
+    protected const PATTERN_TEXT_BLOB = '/[\x00-\x09\x0B-\x1F\p{Cf}\p{Co}\p{Cs}\p{Cn}]/i';
 
     protected static array $sql = [];                       // debug: sql stats container
 
@@ -638,7 +638,7 @@ abstract class BaseResponse
     protected static function checkTextLine(string $val) : string
     {
         // trim non-printable chars
-        return preg_replace(self::PATTERN_TEXT_LINE, '', trim(urldecode($val)));
+        return preg_replace(self::PATTERN_TEXT_LINE, '', trim($val));
     }
 
     protected static function checkTextBlob(string $val) : string
