@@ -276,6 +276,12 @@ var MapViewer = new function()
 
     this.show = function(opt)
     {
+        $WH.Track.interactiveEvent({
+            category: "Zone Maps",
+            action: "Show",
+            label: opt.link ? opt.link : "General"
+        });
+
         if (opt.link)
         {
             tempParent = $WH.ce('div');

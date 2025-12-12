@@ -176,7 +176,13 @@ var VideoViewer = new function()
 
         if (!resizing)
         {
-            g_trackEvent('Videos', 'Show', video.id + (video.caption.length ? ' (' + video.caption + ')' : ''));
+            var hasCaption = (video.caption != null && video.caption.length);
+
+            $WH.Track.interactiveEvent({
+                category: 'Videos',
+                action: 'Show',
+                label: video.id + (hasCaption ? ` (${ video.caption })` : '')
+            });
 
             if (video.videoType == 1)
                 imgDiv.innerHTML = Markup.toHtml('[youtube=' + video.videoId + ' width=' + imgWidth + ' height=' + imgHeight + ' autoplay=true]', {mode:Markup.MODE_ARTICLE});
@@ -249,7 +255,6 @@ var VideoViewer = new function()
 
             // CAPTION
 
-            var hasCaption = (video.caption != null && video.caption.length);
             var hasSubject = (video.subject != null && video.subject.length && video.type && video.typeId);
 
             if (hasCaption || hasSubject)

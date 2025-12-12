@@ -27,14 +27,14 @@ class PageTemplate
     private array $pageData = [];                           // processed by display hooks
 
     // template data that needs further processing .. ! WARNING ! they will not get aut fetched from $context as they are already defined here
-    private    string $gStaticUrl;
-    private    string $gHost;
-    private    string $gServerTime;
-    private    string $gUser;
-    private    string $gFavorites;
-    private   ?string $analyticsTag  = null;
-    private    bool   $consentFooter = false;
-    private    string $dbProfiles    = '';
+    private string $gStaticUrl;
+    private string $gHost;
+    private string $gServerTime;
+    private string $gUser;
+    private string $gFavorites;
+    private bool   $hasAnalytics  = false;
+    private bool   $consentFooter = false;
+    private string $dbProfiles    = '';
 
     private readonly string $user;                          // becomes User object
 
@@ -49,7 +49,7 @@ class PageTemplate
         $this->locale       = Lang::getLocale();
         $this->gStaticUrl   = Cfg::get('STATIC_URL');
         $this->gHost        = Cfg::get('HOST_URL');
-        $this->analyticsTag = Cfg::get('GTAG_MEASUREMENT_ID');
+        $this->hasAnalytics = !!Cfg::get('GTAG_MEASUREMENT_ID');
         $this->gServerTime  = sprintf("new Date('%s')", date(Util::$dateFormatInternal));
         $this->user         = User::class;
     }
@@ -472,16 +472,16 @@ class PageTemplate
     private function update() : void
     {
         // analytics + consent
-        if ($this->analyticsTag && !isset($_COOKIE['consent']))
+        if ($this->hasAnalytics && !isset($_COOKIE['consent']))
         {
             $this->addScript(SC_CSS_FILE, 'css/consent.css');
             $this->addScript(SC_JS_FILE,  'js/consent.js');
 
             $this->consentFooter = true;
-            $this->analyticsTag  = null;
+            $this->hasAnalytics  = false;
         }
-        else if ($this->analyticsTag && !$_COOKIE['consent'])
-            $this->analyticsTag = null;
+        else if ($this->hasAnalytics && !$_COOKIE['consent'])
+            $this->hasAnalytics = false;
 
         // js + css
         $this->prepareScripts();
@@ -526,7 +526,7 @@ class PageTemplate
     {
         $this->gStaticUrl   = Cfg::get('STATIC_URL');
         $this->gHost        = Cfg::get('HOST_URL');
-        $this->analyticsTag = Cfg::get('GTAG_MEASUREMENT_ID');
+        $this->hasAnalytics = !!Cfg::get('GTAG_MEASUREMENT_ID');
         $this->gServerTime  = sprintf("new Date('%s')", date(Util::$dateFormatInternal));
     }
 

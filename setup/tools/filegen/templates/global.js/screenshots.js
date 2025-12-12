@@ -182,7 +182,11 @@ var ScreenshotViewer = new function()
 
         if (!resizing)
         {
-            g_trackEvent('Screenshots', 'Show', screenshot.id + ( (screenshot.caption && screenshot.caption.length) ? ' (' + screenshot.caption + ')' : ''));
+            $WH.Track.interactiveEvent({
+                category: 'Screenshots',
+                action: 'Show',
+                label: screenshot.id + (screenshot.caption && screenshot.caption.length ? ` (${ screenshot.caption })` : '')
+            });
 
             // ORIGINAL
 

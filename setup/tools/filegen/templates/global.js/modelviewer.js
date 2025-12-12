@@ -604,7 +604,11 @@ var ModelViewer = new function()
             }
         }
 
-        g_trackEvent('Model Viewer', 'Show', g_urlize(trackCode));
+        $WH.Track.interactiveEvent({
+            category: 'Model Viewer',
+            action: 'Show',
+            label: g_urlize(trackCode)                      // WH.Strings.slug(trackCode)
+        });
 
         oldHash = location.hash;
     }

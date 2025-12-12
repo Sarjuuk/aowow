@@ -1088,15 +1088,20 @@ function fi_setCriteria(cr, crs, crv) {
 
     var
         i,
-        c = _.childNodes[0].childNodes[0];
+        c = _.childNodes[0].childNodes[0],
+        s;
 
     _ = c.getElementsByTagName('option');
     for (i = 0; i < _.length; ++i) {
         if (_[i].value == cr[0]) {
             _[i].selected = true;
 
-            if (fi_Lookup(cr[0])) {
-                g_trackEvent('Filters', fi_type, fi_Lookup(cr[0]).name);
+            if (s = fi_Lookup(cr[0])) {
+                $WH.Track.nonInteractiveEvent({
+                    category: "Filters",
+                    action: fi_type,                        // vars.page,
+                    label: s.name
+                });
             }
 
             break;
@@ -1108,8 +1113,12 @@ function fi_setCriteria(cr, crs, crv) {
     for (i = 1; i < cr.length && i < 5; ++i) {
         fi_criterionChange(fi_addCriterion(a, cr[i]), crs[i], crv[i]);
 
-        if (fi_Lookup(cr[i])) {
-            g_trackEvent('Filters', fi_type, fi_Lookup(cr[i]).name);
+        if (s = fi_Lookup(cr[i])) {
+            $WH.Track.nonInteractiveEvent({
+                category: "Filters",
+                action: fi_type,                            // vars.page,
+                label: s.name
+            });
         }
     }
 }

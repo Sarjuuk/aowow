@@ -792,7 +792,7 @@ var Menu = new function()
         });
 
         explodeInto(menu, implodedMenu);
-    };
+    }
 
     function explodeInto(menu, implodedMenu) // Reverse of implode
     {

@@ -30,13 +30,9 @@ endif;
 ?>
     </script>
 
-<?php if ($this->analyticsTag): ?>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<?=$this->analyticsTag; ?>"></script>
+<?php if ($this->hasAnalytics): ?>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', '<?=$this->analyticsTag; ?>');
+        $WH.Track.gaInit();
     </script>
 <?php
 endif;

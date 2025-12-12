@@ -3296,7 +3296,7 @@ Listview.templates = {
                     return Listview.funcBox.assocArrCmp(a.skill, b.skill, g_spell_skills);
                 }
             },
-    /* AoWoW: custom start */
+            /* AoWoW: custom start */
             {
                 id: 'stackRules',
                 name: LANG.asr_behaviour,
@@ -3578,7 +3578,7 @@ Listview.templates = {
                     return 0;
                 }
             },
-    /* AoWoW: custom end */
+            /* AoWoW: custom end */
             {
                 id: 'completed', // Listview.COLUMN_ID_COMPLETION
                 name: LANG.completion, // WH.TERMS.completion
@@ -7350,7 +7350,7 @@ Listview.templates = {
                     $(td).mouseover(function (event, menu) { $WH.Tooltip.showAtCursor(menu, event, 0, 0); }.bind(td, tt));
                     $(td).mousemove(function (event) { $WH.Tooltip.cursorUpdate(event); })
                          .mouseout(function () { $WH.Tooltip.hide(); });
-/* aowow - we dont do patches
+                    /* aowow - we dont do patches
                     var g = typeof g_hearthhead != "undefined" && g_hearthhead ? "hearthstone" : "wow";
                     if (!g_getPatchVersionObject.hasOwnProperty("parsed") || !g_getPatchVersionObject.parsed[g]) {
                         g_getPatchVersionObject();
@@ -7369,7 +7369,7 @@ Listview.templates = {
                             j = j.replace(f, f + " (" + new Date(c.timestamp).toDateString() + ")");
                         }
                     }
-*/
+                    */
                     let j = changelog.version; // aowow - tmp
                     $(td).html(j);
                 },

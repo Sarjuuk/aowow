@@ -359,6 +359,11 @@ Tabs.trackClick = function(tab)
     if (!this.trackable || tab.tracked)
         return;
 
-    g_trackEvent('Tabs', 'Show', this.trackable + ': ' + tab.id);
+    $WH.Track.interactiveEvent({
+        category: 'Tab Click',
+        action:   'Page: ' + this.trackable,
+        label:    'Tab: ' + tab.id
+    });
+
     tab.tracked = 1;
 }

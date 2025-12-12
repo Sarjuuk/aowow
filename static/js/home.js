@@ -16,7 +16,7 @@ $(document).ready(function () {
     $('.home-featuredbox-links a').hover(
         function () { $(this).next('var').addClass('active') },
         function () { $(this).next('var').removeClass('active') }
-    ).click(function () { g_trackEvent('Featured Box', 'Click',      this.title) }
-    ).each( function () { g_trackEvent('Featured Box', 'Impression', this.title) }
-    )
+    ).click(function () { $WH.Track.interactiveEvent({category: 'Featured Box', action: 'Click', label: this.title}) }
+    ).each( function () { $WH.Track.nonInteractiveEvent({category: 'Featured Box', action: 'Show', label: this.title}) }
+    );
 });

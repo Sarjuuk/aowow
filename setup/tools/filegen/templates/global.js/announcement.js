@@ -110,7 +110,12 @@ Announcement.prototype = {
         // aowow - animation fix - jQuery.animate hard snaps into place after half the time passed
         this.parentDiv.style.opacity = '100';
         this.parentDiv.style.height = (this.parentDiv.offsetHeight + 10) + 'px';
-        g_trackEvent('Announcements', 'Show', '' + this.name);
+
+        $WH.Track.nonInteractiveEvent({
+            category: 'Announcements',
+            action:   'Show',
+            label:    '' + this.name
+        });
     },
 
     hide: function()
@@ -132,7 +137,11 @@ Announcement.prototype = {
 
     markRead: function()
     {
-        g_trackEvent('Announcements', 'Close', '' + this.name);
+        $WH.Track.interactiveEvent({
+            category: 'Announcements',
+            action:   'Close',
+            label:    '' + this.name
+        });
         g_setWowheadCookie('announcement-' + this.id, 'closed');
         this.hide();
     },
@@ -147,11 +156,22 @@ Announcement.prototype = {
     {
         this.text = text;
         Markup.printHtml(this.text, this.parent + '-markup');
-        g_addAnalyticsToNode($WH.ge(this.parent + '-markup'), {
-            'category': 'Announcements',
-            'actions': {
-                'Follow link': function(node) { return true; }
-            }
-        }, this.id);
+
+        let parent = $WH.ge(this.parent + '-markup');
+        $WH.qsa('a', parent).forEach(link => {
+            $WH.aE(link, 'click', () => {
+                let label = 'unknown';
+                let txt   = g_getFirstTextContent(link);
+                if (txt)
+                    label = g_urlize(txt).substr(0, 80);
+                else if (link.title)
+                    label = g_urlize(link.title).substr(0, 80);
+                else if (link.id)
+                    label = g_urlize(link.id).substr(0, 80);
+
+                label = `${ this.id || 0 }-${ label }`;
+                $WH.Track.linkClick(link, { category: 'Announcements', label: label });
+            });
+        });
     }
 };
