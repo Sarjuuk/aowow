@@ -13,7 +13,14 @@ $pageParam = '';
 parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $query);
 foreach ($query as $page => $param)
 {
-    // fix page calls - pages like saerch use the page call directly and expect it as lower case
+    // could be an array
+    if (!is_string($param))
+    {
+        $pageCall = '';                                     // just .. fail
+        break;
+    }
+
+    // fix page calls - pages like search use the page call directly and expect it as lower case
     if (preg_match('/[A-Z]/', $page))
     {
         $url = str_replace('?'.$page.'=', '?'.Util::lower($page).'=', $_SERVER['REQUEST_URI']);
