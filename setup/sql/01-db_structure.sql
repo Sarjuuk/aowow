@@ -1108,6 +1108,7 @@ CREATE TABLE `aowow_icons` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `cuFlags` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'see defines.php for flags',
   `name` varchar(55) NOT NULL DEFAULT '',
+  `name_source` varchar(55) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
