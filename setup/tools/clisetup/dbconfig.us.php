@@ -216,7 +216,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', '?_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
                             Cfg::load();                    // first time load after successful db setup
                         else
                             $error[] = ' * '.$what.': doesn\'t seem to contain aowow tables!';
@@ -255,7 +255,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', '?_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
                         {
                             if ($date = DB::Aowow()->selectCell('SELECT `date` FROM ?_dbversion'))
                             {
@@ -266,7 +266,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                                 $note = CLI::yellow('AoWoW DB version empty! Import of DB dump failed?');
                         }
                         else
-                            $note = CLI::yellow('DB test failed to find dbversion table. setup/db_structure.sql not yet imported?');
+                            $note = CLI::yellow('DB test failed to find dbversion table. ').CLI::bold('setup/sql/01-db_structure.sql').CLI::yellow(' not yet imported?');
                         break;
                     case DB_WORLD:
                         if (DB::World()->selectCell('SHOW TABLES LIKE ?', 'version'))
