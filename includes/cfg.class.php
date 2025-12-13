@@ -63,7 +63,7 @@ class Cfg
 
     public static function load() : void
     {
-        if (!DB::isConnectable(DB_AOWOW))
+        if (!DB::isConnected(DB_AOWOW))
             return;
 
         $sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value` AS "0", `flags` AS "1", `cat` AS "2", `default` AS "3", `comment` AS "4" FROM ?_config ORDER BY `key` ASC');

@@ -162,10 +162,13 @@ set_error_handler(function(int $errNo, string $errStr, string $errFile, int $err
             AOWOW_REVISION, $errNo, $errFile, $errLine, CLI ? 'CLI' : substr($_SERVER['QUERY_STRING'] ?? '', 0, 250), empty($_POST) ? '' : http_build_query($_POST), User::$groups, $errStr
         );
 
-    if (CLI)
-        CLI::write($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, $logLevel);
+    $logMsg = $errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine;
+    if (CLI && class_exists('CLI'))
+        CLI::write($logMsg, $logLevel);
+    else if (CLI)
+        fwrite(STDERR, $logMsg);
     else if (Cfg::get('DEBUG') >= $logLevel)
-        Util::addNote($errName.' - '.$errStr.' @ '.$errFile. ':'.$errLine, U_GROUP_EMPLOYEE, $logLevel);
+        Util::addNote($logMsg, U_GROUP_EMPLOYEE, $logLevel);
 
     return true;
 }, E_ALL);
