@@ -383,6 +383,7 @@ $lang = array(
         'school'        => "Magieart",
         'type'          => "Art: ",
         'valueDelim'    => " - ",                           // " bis "
+        'target'        => "<Ziel>",
 
         'pvp'           => "PvP",
         'honorPoints'   => "Ehrenpunkte",

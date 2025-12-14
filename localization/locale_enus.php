@@ -383,6 +383,7 @@ $lang = array(
         'school'        => "School",
         'type'          => "Type: ",
         'valueDelim'    => " to ",
+        'target'        => "<target>",
 
         'pvp'           => "PvP",                           // PVP
         'honorPoints'   => "Honor Points",                  // HONOR_POINTS

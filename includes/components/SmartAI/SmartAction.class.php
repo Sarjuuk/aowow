@@ -718,13 +718,19 @@ class SmartAction
                 $this->param[10] = $this->param[1] + $this->param[2] / pow(10, floor(log10($this->param[2] ?: 1.0) + 1));  // i know string concatenation is a thing. don't @ me!
                 break;
             case self::ACTION_TALK:                         // 1 -> any target
+                $talkTarget = $this->param[2];
             case self::ACTION_SIMPLE_TALK:                  // 84 -> any target
                 $playerSrc = false;
                 if ($npcId = $this->smartAI->getTarget()->getTalkSource($playerSrc))
                 {
                     if ($quotes = $this->smartAI->getQuote($npcId, $this->param[0], $npcSrc))
+                    {
                         foreach ($quotes as ['text' => $text])
-                            $this->param[10] .= sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc);
+                        {
+                            $talkTarget = ($talkTarget ?? true) ? Lang::game('target') : $npcSrc;
+                            $this->param[10] .= sprintf($text, $playerSrc ? Lang::main('thePlayer') : $npcSrc, $talkTarget);
+                        }
+                    }
                 }
                 else
                     trigger_error('SmartAI::action - could not determine talk source for action #'.$this->type);

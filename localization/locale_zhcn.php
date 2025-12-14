@@ -383,6 +383,7 @@ $lang = array(
         'school'        => "类型",
         'type'          => "类型：",
         'valueDelim'    => "到",
+        'target'        => "<目标>",
 
         'pvp'           => "PvP",
         'honorPoints'   => "荣誉点数",

@@ -383,6 +383,7 @@ $lang = array(
         'school'        => "Escuela",
         'type'          => "Tipo: ",
         'valueDelim'    => " - ",
+        'target'        => "<objetivo>",
 
         'pvp'           => "JcJ",
         'honorPoints'   => "Puntos de Honor",
