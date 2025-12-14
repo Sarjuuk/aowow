@@ -1711,7 +1711,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
             {
                 $_footer['proc']   = $procData['chance'] < 0 ? Lang::spell('ppm', [-$procData['chance']]) : Lang::spell('procChance', [$procData['chance']]);
                 if ($procData['cooldown'])
-                    $_footer['procCD'] = Lang::game('cooldown', [DateTime::formatTimeElapsed($procData['cooldown'] * 1000)]);
+                    $_footer['procCD'] = Lang::game('cooldown', [DateTime::formatTimeElapsed($procData['cooldown'])]);
             }
 
             // Effect Name
