@@ -623,6 +623,10 @@ class SpellList extends DBTypeList
         $pps  = $this->curTpl['powerPerSecond'];
         $pcpl = $this->curTpl['powerCostPerLevel'];
 
+        // some potion effects have this set, but it's not displayed by client (or enforced by core)
+        if ($pt == POWER_HAPPINESS)
+            return '';
+
         if ($pt == POWER_RAGE || $pt == POWER_RUNIC_POWER)
             $pc /= 10;
 
