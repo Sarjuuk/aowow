@@ -137,7 +137,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
-        // tab: quest source
+        // tab: reward-from-quest
         $quests = new QuestList(array(['rewardTitleId', $this->typeId]));
         if (!$quests->error)
         {
@@ -152,7 +152,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             ), QuestList::$brickFile));
         }
 
-        // tab: achievement source
+        // tab: reward-from-achievement
         if ($aIds = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE `TitleA` = ?d OR `TitleH` = ?d', $this->typeId, $this->typeId))
         {
             $acvs = new AchievementList(array(['id', $aIds]));
@@ -170,8 +170,8 @@ class TitleBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // tab: criteria of
-        if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = 23 AND `value1` = ?d', $this->typeId))
+        // tab: criteria-of
+        if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE, $this->typeId))
         {
             $acvs = new AchievementList(array(['ac.id', $crt]));
             if (!$acvs->error)

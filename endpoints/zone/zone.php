@@ -569,7 +569,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
-        // tab: Drops
+        // tab: drops
         if (in_array($this->subject->getField('category'), [MAP_TYPE_DUNGEON, MAP_TYPE_RAID]))
         {
             // Issue 1 - if the bosses drop items that are also sold by vendors moreZoneId will be 0 as vendor location and boss location are likely in conflict with each other
@@ -611,7 +611,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, ItemList::$brickFile));
         }
 
-        // tab: NPCs
+        // tab: npcs
         if ($cSpawns && !$creatureSpawns->error)
         {
             $tabData = ['data' => $creatureSpawns->getListviewData()];
@@ -627,7 +627,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, CreatureList::$brickFile));
         }
 
-        // tab: Objects
+        // tab: objects
         if ($oSpawns && !$objectSpawns->error)
         {
             $tabData = ['data' => $objectSpawns->getListviewData()];
@@ -659,7 +659,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // tab: Quests [including data collected by SOM-routine]
+        // tab: quests [including data collected by SOM-routine]
         if ($questsLV)
         {
             $tabData = ['data' => $questsLV];
@@ -679,7 +679,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
         }
 
-        // tab: item-quest starter
+        // tab: starts-quest
         // select every quest starter, that is a drop
         $questStartItem = DB::Aowow()->select(
            'SELECT qse.`typeId` AS ARRAY_KEY, `moreType`, `moreTypeId`, `moreZoneId`
@@ -705,7 +705,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // tab: Quest Rewards [ids collected by SOM-routine]
+        // tab: quest-rewards [ids collected by SOM-routine]
         if ($rewardsLV)
         {
             $rewards = new ItemList(array(['id', array_unique($rewardsLV)]));
@@ -728,7 +728,47 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         // tab: achievements
 
-        // tab: fished in zone
+        // tab: criteria-of
+        $conditions = array('OR',
+            array(
+                'AND',
+                ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA]],
+                ['ac.value1', $this->typeId]
+            )
+        );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA, $this->typeId))
+            $conditions[] = ['ac.id', $extraCrt];
+
+        if ($this->subject->getField('category') != MAP_TYPE_ZONE)
+        {
+            $conditions[] = array (
+                'AND',
+                ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_WIN_BG,      ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA,
+                             ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA,  ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND,
+                             ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP]
+                ],
+                ['ac.value1', $this->subject->getField('mapId')]
+            );
+
+            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID, $this->subject->getField('mapId')))
+                $conditions[] = ['ac.id', $extraCrt];
+
+        }
+
+        $crtOf = new AchievementList($conditions);
+        if (!$crtOf->error)
+        {
+            $this->extendGlobalData($crtOf->getJSGlobals());
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $crtOf->getListviewData(),
+                'name' => '$LANG.tab_criteriaof',
+                'id'   => 'criteria-of'
+            ), AchievementList::$brickFile));
+        }
+
+        // tab: fishing
         $fish = new LootByContainer();
         if ($fish->getByContainer(Loot::FISHING, [$this->typeId]))
         {

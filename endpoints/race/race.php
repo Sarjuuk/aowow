@@ -152,7 +152,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
-        // Classes
+        // tab: classes
         $classes = new CharClassList(array(['racemask', $ra->toMask(), '&']));
         if (!$classes->error)
         {
@@ -160,7 +160,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(['data' => $classes->getListviewData()], CharClassList::$brickFile));
         }
 
-        // Tongues
+        // tab: languages
         $conditions = array(
             ['typeCat', -11],                               // proficiencies
             ['reqRaceMask', $ra->toMask(), '&']             // only languages are race-restricted
@@ -178,7 +178,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             ), SpellList::$brickFile));
         }
 
-        // Racials
+        // tab: racial-traits
         $conditions = array(
             ['typeCat', -4],                               // racial traits
             ['reqRaceMask', $ra->toMask(), '&']
@@ -200,7 +200,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, SpellList::$brickFile));
         }
 
-        // Quests
+        // tab: quests
         $conditions = array(
             ['reqRaceMask', $ra->toMask(), '&'],
             [['reqRaceMask', ChrRace::MASK_HORDE, '&'], ChrRace::MASK_HORDE, '!'],
@@ -214,7 +214,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview(['data' => $quests->getListviewData()], QuestList::$brickFile));
         }
 
-        // Mounts
+        // tab: mounts
         // ok, this sucks, but i rather hardcode the trainer, than fetch items by namepart
         if (isset(self::MOUNT_VENDORS[$this->typeId]))
         {
@@ -240,7 +240,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        // Sounds
+        // tab: sounds
         if ($vo = DB::Aowow()->selectCol('SELECT `soundId` AS ARRAY_KEY, `gender` FROM ?_races_sounds WHERE `raceId` = ?d', $this->typeId))
         {
             $sounds = new SoundList(array(['id', array_keys($vo)]));
@@ -256,6 +256,28 @@ class RaceBaseResponse extends TemplateResponse implements ICache
                     'extraCols' => ['$Listview.templates.title.columns[1]']
                 ), SoundList::$brickFile));
             }
+        }
+
+        // tab: criteria-of
+        $conditions = array(
+            'AND',
+            ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_HK_RACE],
+            ['ac.value1', $this->typeId]
+        );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value2` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
+            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+
+        $crtOf = new AchievementList($conditions);
+        if (!$crtOf->error)
+        {
+            $this->extendGlobalData($crtOf->getJSGlobals());
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $crtOf->getListviewData(),
+                'name' => '$LANG.tab_criteriaof',
+                'id'   => 'criteria-of'
+            ), AchievementList::$brickFile));
         }
 
         // tab: condition-for

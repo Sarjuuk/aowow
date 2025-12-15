@@ -738,9 +738,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria of [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE have no data set to check for]
         $conditions = array(
+            'AND',
             ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE]],
             ['ac.value1', $this->typeId]
         );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE, $this->typeId))
+            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
 
         $crtOf = new AchievementList($conditions);
         if (!$crtOf->error)

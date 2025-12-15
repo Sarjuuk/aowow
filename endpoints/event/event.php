@@ -177,6 +177,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: achievements
+        $exclAcvs = [];
         if ($_ = $this->subject->getField('achievementCatOrId'))
         {
             $condition = $_ > 0 ? [['category', $_]] : [['id', -$_]];
@@ -190,6 +191,9 @@ class EventBaseResponse extends TemplateResponse implements ICache
                     'visibleCols' => ['category']
                 );
 
+                // don't reuse for criteria-of tab
+                $exclAcvs = array_keys($tabData['data']);
+
                 if ($_holidayId && AchievementListFilter::getCriteriaIndex(11, $_holidayId))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?achievements&filter=cr=11;crs='.$_holidayId.';crv=0');
 
@@ -200,6 +204,26 @@ class EventBaseResponse extends TemplateResponse implements ICache
         $itemCnd = [];
         if ($_holidayId)
         {
+            // tab: criteria-of
+            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY, $_holidayId))
+            {
+                $condition = array(['ac.id', $extraCrt]);
+                if ($exclAcvs)
+                    $condition[] = ['a.id', $exclAcvs, '!'];
+
+                $crtOf = new AchievementList($condition);
+                if (!$crtOf->error)
+                {
+                    $this->extendGlobalData($crtOf->getJSGlobals());
+
+                    $this->lvTabs->addListviewTab(new Listview(array(
+                        'data' => $crtOf->getListviewData(),
+                        'name' => '$LANG.tab_criteriaof',
+                        'id'   => 'criteria-of'
+                    ), AchievementList::$brickFile));
+                }
+            }
+
             $itemCnd = array(
                 'OR',
                 ['eventId', $this->typeId],                    // direct requirement on item

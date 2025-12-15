@@ -143,7 +143,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
-        // Tab: Spells (grouped)
+        // tab: spells (grouped)
         //     '$LANG.tab_armorproficiencies',
         //     '$LANG.tab_weaponskills',
         //     '$LANG.tab_glyphs',
@@ -185,7 +185,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), SpellList::$brickFile));
         }
 
-        // Tab: Items (grouped)
+        // tab: items (grouped)
         $conditions = array(
             ['requiredClass', 0, '>'],
             ['requiredClass', $cl->toMask(), '&'],
@@ -216,7 +216,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), ItemList::$brickFile));
         }
 
-        // Tab: Quests
+        // tab: quests
         $conditions = array(
             ['reqClassMask', $cl->toMask(), '&'],
             [['reqClassMask', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!']
@@ -233,7 +233,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), QuestList::$brickFile));
         }
 
-        // Tab: Itemsets
+        // tab: itemsets
         $sets = new ItemsetList(array(['classMask', $cl->toMask(), '&']));
         if (!$sets->error)
         {
@@ -247,7 +247,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), ItemsetList::$brickFile));
         }
 
-        // Tab: Trainer
+        // tab: trainers
         $conditions = array(
             ['npcflag', NPC_FLAG_TRAINER | NPC_FLAG_CLASS_TRAINER, '&'],
             ['trainerType', 0],                             // trains class spells
@@ -265,10 +265,32 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ), CreatureList::$brickFile));
         }
 
-        // Tab: Races
+        // tab: races
         $races = new CharRaceList(array(['classMask', $cl->toMask(), '&']));
         if (!$races->error)
             $this->lvTabs->addListviewTab(new Listview(['data' => $races->getListviewData()], CharRaceList::$brickFile));
+
+        // tab: criteria-of
+        $conditions = array(
+            'AND',
+            ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS],
+            ['ac.value1', $this->typeId]
+        );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value1` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
+            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+
+        $crtOf = new AchievementList($conditions);
+        if (!$crtOf->error)
+        {
+            $this->extendGlobalData($crtOf->getJSGlobals());
+
+            $this->lvTabs->addListviewTab(new Listview(array(
+                'data' => $crtOf->getListviewData(),
+                'name' => '$LANG.tab_criteriaof',
+                'id'   => 'criteria-of'
+            ), AchievementList::$brickFile));
+        }
 
         // tab: condition-for
         $cnd = new Conditions();

@@ -625,11 +625,16 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria of
         $conditions = array(
+            'AND',
             ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL,
                          ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2,     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL]
             ],
             ['ac.value1', $this->typeId]
         );
+
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value1` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA], $this->typeId))
+            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+
         $coAchievemnts = new AchievementList($conditions);
         if (!$coAchievemnts->error)
         {
