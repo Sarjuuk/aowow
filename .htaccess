@@ -26,8 +26,10 @@ AddDefaultCharset utf8
 </IfModule>
 
 # UHD screenshots can get pretty large (cannot be set in config)
+<IfModule mod_php.c>
     php_value       upload_max_filesize                         20M
     php_value       post_max_size                               25M
+</IfModule>
 
 RewriteEngine on
 # RewriteBase /~user/localPath/     # enable if the rules do not work, when they should
