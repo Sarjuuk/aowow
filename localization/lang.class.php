@@ -239,10 +239,10 @@ class Lang
         $tmp = [];
 
         if ($cuFlags & CUSTOM_DISABLED)
-            $tmp[] = '[tooltip name=disabledHint]'.Util::jsEscape(self::main('disabledHint')).'[/tooltip][span class=tip tooltip=disabledHint]'.Util::jsEscape(self::main('disabled')).'[/span]';
+            $tmp[] = '[tooltip name=disabledHint]'.self::main('disabledHint').'[/tooltip][span class=tip tooltip=disabledHint]'.self::main('disabled').'[/span]';
 
         if ($cuFlags & CUSTOM_SERVERSIDE)
-            $tmp[] = '[tooltip name=serversideHint]'.Util::jsEscape(self::main('serversideHint')).'[/tooltip][span class=tip tooltip=serversideHint]'.Util::jsEscape(self::main('serverside')).'[/span]';
+            $tmp[] = '[tooltip name=serversideHint]'.self::main('serversideHint').'[/tooltip][span class=tip tooltip=serversideHint]'.self::main('serverside').'[/span]';
 
         if ($cuFlags & CUSTOM_UNAVAILABLE)
             $tmp[] = self::main('unavailable');
