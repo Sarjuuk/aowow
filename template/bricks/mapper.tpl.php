@@ -74,7 +74,7 @@ if ([$mapper, $mapperData, $som, $foundIn] = $this->map):
                             if (rsp /* == x */)
                                 alert('move failed. details tbd');
                             else
-                                location.reload(true);
+                                location.search += "&refresh";
                         },
                     });
                 }
