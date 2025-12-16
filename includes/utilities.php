@@ -125,26 +125,6 @@ abstract class Util
         return [$notes, $severity];
     }
 
-    private static $execTime = 0.0;
-
-    public static function execTime(bool $set = false) : string
-    {
-        if ($set)
-        {
-            self::$execTime = microTime(true);
-            return '';
-        }
-
-        if (!self::$execTime)
-            return '';
-
-        $newTime        = microTime(true);
-        $tDiff          = $newTime - self::$execTime;
-        self::$execTime = $newTime;
-
-        return self::formatTime($tDiff * 1000, true);
-    }
-
     public static function formatMoney(int $qty) : string
     {
         $money = '';
