@@ -101,8 +101,8 @@ class ItemsetList extends DBTypeList
         {
             $jsg = [];
             $cl  = Lang::getClassString($_, $jsg);
-            $nCl = count($jsg);
-            $x .= Util::ucFirst($nCl > 1 ? Lang::game('classes') : Lang::game('class')).Lang::main('colon').$cl.'<br />';
+            $t   = count($jsg) == 1 ? Lang::game('class') : Lang::game('classes');
+            $x  .= Util::ucFirst($t).Lang::main('colon').$cl.'<br />';
         }
 
         if ($_ = $this->getField('contentGroup'))

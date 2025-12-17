@@ -98,6 +98,7 @@ class ItemsetBaseResponse extends TemplateResponse implements ICache
             $infobox[] = Lang::game('level').Lang::main('colon').Util::createNumRange($min, $this->subject->getField('maxLevel'), ' - ');
 
         // class
+        $jsg = [];
         if ($cl = Lang::getClassString($this->subject->getField('classMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);

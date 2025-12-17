@@ -2369,8 +2369,8 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 $infobox[] = (in_array($typeCat, [-2, 7, -13]) ? Lang::game('reqLevel', [$_]) : Lang::game('level').Lang::main('colon').$_);
         }
 
-        $jsg = [];
         // races
+        $jsg = [];
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
@@ -2379,6 +2379,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         }
 
         // classes
+        $jsg = [];
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);

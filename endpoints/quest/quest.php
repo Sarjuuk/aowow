@@ -167,8 +167,8 @@ class QuestBaseResponse extends TemplateResponse implements ICache
             default       => Lang::game('si', SIDE_BOTH)    // 0, 3
         };
 
-        $jsg = [];
         // races
+        $jsg = [];
         if ($_ = Lang::getRaceString($this->subject->getField('reqRaceMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
@@ -177,6 +177,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // classes
+        $jsg = [];
         if ($_ = Lang::getClassString($this->subject->getField('reqClassMask'), $jsg, Lang::FMT_MARKUP))
         {
             $this->extendGlobalIds(Type::CHR_CLASS, ...$jsg);

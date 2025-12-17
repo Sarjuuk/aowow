@@ -71,17 +71,19 @@ class MailBaseResponse extends TemplateResponse implements ICache
         }
         else if ($mlr = DB::World()->selectRow('SELECT * FROM mail_level_reward WHERE `mailTemplateId` = ?d', $this->typeId))  // level rewards
         {
-                if ($mlr['level'])
-                    $infobox[] = Lang::game('level').Lang::main('colon').$mlr['level'];
+            if ($mlr['level'])
+                $infobox[] = Lang::game('level').Lang::main('colon').$mlr['level'];
 
-                if ($r = Lang::getRaceString($mlr['raceMask'], $rIds, Lang::FMT_MARKUP))
-                {
-                    $infobox[] = Lang::game('races').Lang::main('colon').$r;
-                    $this->extendGlobalIds(Type::CHR_RACE, ...$rIds);
-                }
+            $jsg = [];
+            if ($r = Lang::getRaceString($mlr['raceMask'], $jsg, Lang::FMT_MARKUP))
+            {
+                $this->extendGlobalIds(Type::CHR_RACE, ...$jsg);
+                $t = count($jsg) == 1 ? Lang::game('race') : Lang::game('races');
+                $infobox[] = Util::ucFirst($t).Lang::main('colon').$r;
+            }
 
-                $infobox[] = Lang::mail('sender', ['[npc='.$mlr['senderEntry'].']']);
-                $this->extendGlobalIds(Type::NPC, $mlr['senderEntry']);
+            $infobox[] = Lang::mail('sender', ['[npc='.$mlr['senderEntry'].']']);
+            $this->extendGlobalIds(Type::NPC, $mlr['senderEntry']);
         }
         else                                                // achievement or quest
         {

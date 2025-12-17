@@ -447,7 +447,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getClassString(int $classMask, ?array &$ids = [], int $fmt = self::FMT_HTML) : string
+    public static function getClassString(int $classMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $classMask &= ChrClass::MASK_ALL;                   // clamp to available classes..
 
@@ -471,7 +471,7 @@ class Lang
         return implode(', ', $tmp);
     }
 
-    public static function getRaceString(int $raceMask, ?array &$ids = [], int $fmt = self::FMT_HTML) : string
+    public static function getRaceString(int $raceMask, array &$ids = [], int $fmt = self::FMT_HTML) : string
     {
         $raceMask &= ChrRace::MASK_ALL;                     // clamp to available races..
 

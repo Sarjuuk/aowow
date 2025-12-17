@@ -880,23 +880,22 @@ class ItemList extends DBTypeList
             $x .= Lang::formatTime(abs($dur) * 1000, 'item', 'duration').$rt."<br />";
         }
 
-        $jsg = [];
         // required classes
+        $jsg = [];
         if ($classes = Lang::getClassString($this->curTpl['requiredClass'], $jsg))
         {
             foreach ($jsg as $js)
-                if (empty($this->jsGlobals[Type::CHR_CLASS][$js]))
-                    $this->jsGlobals[Type::CHR_CLASS][$js] = $js;
+                $this->jsGlobals[Type::CHR_CLASS][$js] ??= $js;
 
             $x .= Lang::game('classes').Lang::main('colon').$classes.'<br />';
         }
 
         // required races
+        $jsg = [];
         if ($races = Lang::getRaceString($this->curTpl['requiredRace'], $jsg))
         {
             foreach ($jsg as $js)
-                if (empty($this->jsGlobals[Type::CHR_RACE][$js]))
-                    $this->jsGlobals[Type::CHR_RACE][$js] = $js;
+                $this->jsGlobals[Type::CHR_RACE][$js] ??= $js;
 
             $x .= Lang::game('races').Lang::main('colon').$races.'<br />';
         }
