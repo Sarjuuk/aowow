@@ -55,6 +55,7 @@ define ('SC_FLAG_PREFIX',                   0x01);
 define ('SC_FLAG_NO_TIMESTAMP',             0x02);
 define ('SC_FLAG_APPEND_LOCALE',            0x04);
 define ('SC_FLAG_LOCALIZED',                0x08);
+define ('SC_FLAG_NOCACHE',                  0x10);
 
 define('ICON_SIZE_TINY',                    15);
 define('ICON_SIZE_SMALL',                   18);

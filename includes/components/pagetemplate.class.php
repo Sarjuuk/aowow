@@ -71,8 +71,6 @@ class PageTemplate
             default       => ''
         };
 
-        if (!$tpl || !$str)
-
         if (!$str)
         {
             trigger_error('PageTemplate::addScript - content empty', E_USER_WARNING);
@@ -474,8 +472,8 @@ class PageTemplate
         // analytics + consent
         if ($this->hasAnalytics && !isset($_COOKIE['consent']))
         {
-            $this->addScript(SC_CSS_FILE, 'css/consent.css');
-            $this->addScript(SC_JS_FILE,  'js/consent.js');
+            $this->addScript(SC_CSS_FILE, 'css/consent.css', SC_FLAG_NOCACHE);
+            $this->addScript(SC_JS_FILE,  'js/consent.js', SC_FLAG_NOCACHE);
 
             $this->consentFooter = true;
             $this->hasAnalytics  = false;
@@ -514,6 +512,9 @@ class PageTemplate
             foreach ($this->lvTabs->iterate() as $lv)
                 if ($lv instanceof \Aowow\Listview)
                     $lv->setError(false);
+
+        // clear out scripts flagged as non-caching
+        $this->scripts = array_filter($this->scripts, fn($x) => !($x[2] & SC_FLAG_NOCACHE));
 
         $vars = [];
         foreach ($this as $k => $_)
