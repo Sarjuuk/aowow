@@ -718,10 +718,10 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         // tab: objective of quest
         $conditions = array(
             'OR',
-            ['AND', ['reqNpcOrGo1', $this->typeId], ['reqNpcOrGoCount1', 0, '>']],
-            ['AND', ['reqNpcOrGo2', $this->typeId], ['reqNpcOrGoCount2', 0, '>']],
-            ['AND', ['reqNpcOrGo3', $this->typeId], ['reqNpcOrGoCount3', 0, '>']],
-            ['AND', ['reqNpcOrGo4', $this->typeId], ['reqNpcOrGoCount4', 0, '>']],
+            ['AND', ['reqNpcOrGo1', [$this->typeId, $this->subject->getField('KillCredit1'), $this->subject->getField('KillCredit2')]], ['reqNpcOrGoCount1', 0, '>']],
+            ['AND', ['reqNpcOrGo2', [$this->typeId, $this->subject->getField('KillCredit1'), $this->subject->getField('KillCredit2')]], ['reqNpcOrGoCount2', 0, '>']],
+            ['AND', ['reqNpcOrGo3', [$this->typeId, $this->subject->getField('KillCredit1'), $this->subject->getField('KillCredit2')]], ['reqNpcOrGoCount3', 0, '>']],
+            ['AND', ['reqNpcOrGo4', [$this->typeId, $this->subject->getField('KillCredit1'), $this->subject->getField('KillCredit2')]], ['reqNpcOrGoCount4', 0, '>']]
         );
 
         $objectiveOf = new QuestList($conditions);
