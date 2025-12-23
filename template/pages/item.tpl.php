@@ -47,46 +47,21 @@ if ($this->subItems):
 ?>
                 <div class="clear"></div>
                 <h3><?=Lang::item('_rndEnchants'); ?></h3>
-
+<?php
+    foreach (array_chunk($this->subItems['data'], ceil(count($this->subItems['data']) / 2)) as $columns):
+?>
                 <div class="random-enchantments" style="margin-right: 25px">
                     <ul>
 <?php
-        foreach ($this->subItems['data'] as $k => $i):
-            if ($k < (count($this->subItems['data']) / 2)):
-                $eText = [];
-                foreach ($i['enchantment'] as $eId => $txt):
-                    $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
-                endforeach;
-
-                echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="tip q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.Lang::item('_chance', [$i['chance']]).'</small><br />'.implode(', ', $eText).'</div></li>';
-            endif;
+        foreach ($columns as $k => ['name' => $name, 'enchantment' => $enchantment, 'chance' => $chance]):
+            echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="tip q'.$this->subItems['quality'].'">...'.$name.'</span> <small class="q0">'.Lang::item('_chance', [$chance]).'</small><br />';
+            echo Lang::concat($enchantment, Lang::CONCAT_NONE, fn($txt, $eId) => '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>')."</div></li>\n";
         endforeach;
 ?>
                     </ul>
                 </div>
 <?php
-    if (count($this->subItems) > 1):
-?>
-                <div class="random-enchantments" style="margin-right: 25px">
-                    <ul>
-<?php
-        foreach ($this->subItems['data'] as $k => $i):
-            if ($k >= (count($this->subItems['data']) / 2)):
-                $eText = [];
-                foreach ($i['enchantment'] as $eId => $txt):
-                    $eText[] = '<a style="text-decoration:none; color:#CCCCCC;" href="?enchantment='.$eId.'">'.$txt.'</a>';
-                endforeach;
-
-                echo '                        <li><div><span title="ID'.Lang::main('colon').$this->subItems['randIds'][$k].'" class="tip q'.$this->subItems['quality'].'">...'.$i['name'].'</span>';
-                echo '                        <small class="q0">'.sprintf(Lang::item('_chance'), $i['chance']).'</small><br />'.implode(', ', $eText).'</div></li>';
-            endif;
-        endforeach;
-?>
-                    </ul>
-                </div>
-<?php
-    endif;
+    endforeach;
 endif;
 
 $this->brick('book');

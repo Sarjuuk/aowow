@@ -375,6 +375,8 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             );
 
             // merge identical stats and names for normal users (e.g. spellPower of a specific school became general spellPower with 3.0)
+            // see: https://web.archive.org/web/20101118041612/wowhead.com/item=11946
+            // stats should also be merged if only the keys are the same, resulting in "+(8 - 9) Spirit" etc.
 
             if (!User::isInGroup(U_GROUP_EMPLOYEE))
             {
