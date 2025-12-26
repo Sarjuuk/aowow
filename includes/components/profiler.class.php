@@ -743,14 +743,7 @@ class Profiler
 
         DB::Aowow()->query('DELETE FROM ?_profiler_completion_titles WHERE `id` = ?d', $profileId);
 
-        $tBlocks = explode(' ', $char['knownTitles']);
-        $indizes = [];
-        for ($i = 0; $i < 6; $i++)
-            for ($j = 0; $j < 32; $j++)
-                if ($tBlocks[$i] & (1 << $j))
-                    $indizes[] = $j + ($i * 32);
-
-        if ($indizes)
+        if ($indizes = Util::indexBitBlob($char['knownTitles']))
             DB::Aowow()->query('INSERT INTO ?_profiler_completion_titles SELECT ?d, `id` FROM ?_titles WHERE `bitIdx` IN (?a)', $profileId, $indizes);
 
         CLI::write(' ..titles');

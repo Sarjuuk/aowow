@@ -1051,6 +1051,18 @@ abstract class Util
         return $bits;
     }
 
+    public static function indexBitBlob(string $bitBlob, int $blobSize = 32) : array
+    {
+        $indizes = [];
+        $blocks  = explode(' ', $bitBlob);
+        for ($i = 0; $i < count($blocks); $i++)
+            for ($j = 0; $j < $blobSize; $j++)
+                if ($blocks[$i] & (1 << $j))
+                    $indizes[] = $j + ($i * $blobSize);
+
+        return $indizes;
+    }
+
     public static function toString(mixed $var) : string
     {
         if (is_array($var))

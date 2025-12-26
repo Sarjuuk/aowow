@@ -29,11 +29,7 @@ class SkillList extends DBTypeList
             if (!$_)
                 $_ = [0, 0, 0, 0, 0];
             else
-            {
-                $_ = explode(' ', $_);
-                while (count($_) < 5)
-                    $_[] = 0;
-            }
+                $_ = array_pad(explode(' ', $_), 5, 0);
 
             if (!$_curTpl['iconId'])
                 $_curTpl['iconString'] = DEFAULT_ICON;
