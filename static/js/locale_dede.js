@@ -2520,7 +2520,8 @@ var g_conditions = {
     47: 'Der Spieler hat [quest=$1]$N: nicht; $2',
     48: 'Der Questfortschritt für Ziel #$2 von [quest=$1] ist$N: nicht; $3',
     49: 'Der aktuelle Schwierigkeitsgrad für diese Instanz ist #$1',
-    50: 'Der Spieler $C$1kann$N: nicht; Gamemaster sein:ist $Nein:kein; Gamemaster;'
+    50: 'Der Spieler $C$1kann$N: nicht; Gamemaster sein:ist $Nein:kein; Gamemaster;',
+    58: 'Die StringID dieser Entität ist$N: nicht; $4'
 };
 
 /* end aowow custom */

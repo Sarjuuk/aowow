@@ -118,6 +118,9 @@ class Conditions
 //  public const SCENARIO_STEP            = 54;             // ❌ reserved for TC master
 //  public const SCENE_IN_PROGRESS        = 55;             // ❌ reserved for TC master
 //  public const PLAYER_CONDITION         = 56;             // ❌ reserved for TC master
+//  public const PRIVATE_OBJECT           = 57;             // ❌ reserved for TC master
+    public const STRING_ID                = 58;             // go or npc has StringId   NULL,           NULL,           NULL
+//  public const LABEL                    = 59;             // ❌ reserved for TC master
 
     private const IDX_SRC_GROUP = 0;
     private const IDX_SRC_ENTRY = 1;
@@ -208,7 +211,8 @@ class Conditions
         self::QUESTSTATE               => [Type::QUEST,       true, null, null],
         self::QUEST_OBJECTIVE_PROGRESS => [Type::QUEST,       true, true, null],
         self::DIFFICULTY_ID            => [true,              null, null, null],
-        self::GAMEMASTER               => [true,              null, null, null]
+        self::GAMEMASTER               => [true,              null, null, null],
+        self::STRING_ID                => [true,              null, null, null]
     );
 
     private $jsGlobals   = [];
@@ -236,7 +240,7 @@ class Conditions
 
         $this->rows = array_merge($this->rows, DB::World()->select(
            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
-                     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`
+                     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `ConditionStringValue1`, `NegativeCondition`
             FROM     conditions
             WHERE    `SourceTypeOrReferenceId` IN (?a){ AND `SourceGroup` IN (?a)}{ AND `SourceEntry` IN (?a)}{ AND `SourceId` IN (?a)}
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
@@ -263,7 +267,7 @@ class Conditions
 
         $this->rows = array_merge($this->rows, DB::World()->select(sprintf(
            'SELECT   c1.`SourceTypeOrReferenceId`, c1.`SourceEntry`, c1.`SourceGroup`, c1.`SourceId`, c1.`ElseGroup`,
-                     c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`NegativeCondition`
+                     c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`ConditionStringValue1`, c1.`NegativeCondition`
             FROM     conditions c1
             JOIN     conditions c2 ON c1.SourceTypeOrReferenceId = c2.SourceTypeOrReferenceId AND c1.SourceEntry = c2.SourceEntry AND c1.SourceGroup = c2.SourceGroup AND c1.SourceId = c2.SourceId
             WHERE    %s
@@ -280,7 +284,7 @@ class Conditions
         if (!isset(self::$source[$srcType]))
             return;
 
-        [$cId, $cVal1, $cVal2, $cVal3] = array_pad($condition, 5, 0);
+        [$cId, $cVal1, $cVal2, $cVal3, $cString] = array_pad(array_pad($condition, 5, 0), 6, '');
         if (!isset(self::$conditions[abs($cId)]))
             return;
 
@@ -290,7 +294,7 @@ class Conditions
         if (!$this->prepareSource($srcType, ...explode(':', $groupKey)))
             return;
 
-        if ($c = $this->prepareCondition($cId, $cVal1, $cVal2, $cVal3))
+        if ($c = $this->prepareCondition($cId, $cVal1, $cVal2, $cVal3, $cString))
         {
             if ($orGroup)
                 $this->result[$srcType][$groupKey][] = [$c];
@@ -426,14 +430,14 @@ class Conditions
         if (!isset(self::$source[$srcType]))
             return false;
 
-        [$cId, $cVal1, $cVal2, $cVal3] = array_pad($condition, 5, 0);
+        [$cId, $cVal1, $cVal2, $cVal3, $cString1] = array_pad(array_pad($condition, 5, 0), 6, '');
         if (!isset(self::$conditions[abs($cId)]))
             return false;
 
         while (substr_count($groupKey, ':') < 3)
             $groupKey .= ':0';                              // pad with missing srcEntry, SrcId, cndTarget to group key
 
-        if ($c = (new self())->prepareCondition($cId, $cVal1, $cVal2, $cVal3))
+        if ($c = (new self())->prepareCondition($cId, $cVal1, $cVal2, $cVal3, $cString1))
             $lvRow['condition'][$srcType][$groupKey][] = [$c];
 
         return true;
@@ -467,7 +471,8 @@ class Conditions
                 $r['NegativeCondition'] ? -$r['ConditionTypeOrReference'] : $r['ConditionTypeOrReference'],
                 $r['ConditionValue1'],
                 $r['ConditionValue2'],
-                $r['ConditionValue3']
+                $r['ConditionValue3'],
+                $r['ConditionStringValue1']
             );
             if (!$cnd)
                 continue;
@@ -501,10 +506,10 @@ class Conditions
         return [$sType, $sGroup, $sEntry, $sId, $cTarget];
     }
 
-    private function prepareCondition($cId, $cVal1, $cVal2, $cVal3) : array
+    private function prepareCondition($cId, $cVal1, $cVal2, $cVal3, $cString1) : array
     {
         if ($fn = self::$conditions[abs($cId)][self::IDX_CND_FN])
-            if (!$this->$fn(abs($cId), $cVal1, $cVal2, $cVal3))
+            if (!$this->$fn(abs($cId), $cVal1, $cVal2, $cVal3, $cString1))
                 return [];
 
         $result = [$cId];
@@ -519,10 +524,16 @@ class Conditions
                 $result[] = ${'cVal'.($i+1)};               // variable amount of condition values
         }
 
+        if ($cString1)
+        {
+            $result    = array_pad($result, 4, null);
+            $result[4] = $cString1;
+        }
+
         return $result;
     }
 
-    private function factionToSide($cndId, &$cVal1, $cVal2, $cVal3) : bool
+    private function factionToSide($cndId, &$cVal1, $cVal2, $cVal3, $cString1) : bool
     {
         if ($cVal1 == 469)
             $cVal1 = SIDE_ALLIANCE;
@@ -534,7 +545,7 @@ class Conditions
         return true;
     }
 
-    private function mapToZone($cndId, &$cVal1, &$cVal2, $cVal3) : bool
+    private function mapToZone($cndId, &$cVal1, &$cVal2, $cVal3, $cString1) : bool
     {
         // use g_zone_categories id
         if ($cVal1 == 530)                                  // outland
@@ -559,7 +570,7 @@ class Conditions
         return true;
     }
 
-    private function maskToBits($cndId, &$cVal1, $cVal2, $cVal3) : bool
+    private function maskToBits($cndId, &$cVal1, $cVal2, $cVal3, $cString1) : bool
     {
         if ($cndId == self::CHR_CLASS)
         {
@@ -578,7 +589,7 @@ class Conditions
         return true;
     }
 
-    private function typeidToId($cndId, $cVal1, &$cVal2, &$cVal3) : bool
+    private function typeidToId($cndId, $cVal1, &$cVal2, &$cVal3, $cString1) : bool
     {
         if ($cVal1 == self::TYPEID_UNIT)
         {

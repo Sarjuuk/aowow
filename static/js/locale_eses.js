@@ -2520,7 +2520,8 @@ var g_conditions = {
     47: 'El Jugador $Nha: no ha; $2 [quest=$1]',
     48: 'El Jugador $Nha: no ha; recolectado $3 para el objetivo #$2 de [quest=$1]',
     49: 'La dificultad actual del mapa es #$1',
-    50: 'El Jugador $C$1$Npuede:no puede; ser:es$N: no es;; un Maestro de Juego'
+    50: 'El Jugador $C$1$Npuede:no puede; ser:es$N: no es;; un Maestro de Juego',
+    58: 'El StringID de esta entidad es$N: no es; $4'
 };
 
 /* end aowow custom */

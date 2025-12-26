@@ -194,13 +194,11 @@ var ConditionList = new function() {
         str = g_conditions[strIdx];
 
         // fill in params
-        str = $WH.sprintfa(str, param[0], param[1], param[2]);
-
+        return $WH.sprintfa(str, param[0], param[1], param[2], param[3])
         // resolve NegativeCondition
-        str = str.replace(/\$N([^:]*):([^;]*);/g, '$' + (negate > 0 ? 2 : 1));
-
+        .replace(/\$N([^:]*):([^;]*);/g, '$' + (negate > 0 ? 2 : 1))
         // resolve vars
-        return str.replace(/\$C(\d+)([^:]*):([^;]*);/g, (_, i, y, n) => (i > 0 ? y : n));
+        .replace(/\$C(\d+)([^:]*):([^;]*);/g, (_, i, y, n) => (i > 0 ? y : n));
     }
 
     function _createTab()

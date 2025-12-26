@@ -2568,7 +2568,8 @@ var g_conditions = {
     47: 'The Player has$N: not; $2 [quest=$1]',
     48: 'The Player has$N: not; collected $3 towards objective #$2 of [quest=$1]',
     49: 'The current map difficulty is #$1',
-    50: 'The Player $C$1$Ncan:can\'t; be:is$N: not;; a Gamemaster'
+    50: 'The Player $C$1$Ncan:can\'t; be:is$N: not;; a Gamemaster',
+    58: 'The StringID of this entity is$N: not; $4'
 };
 
 /* end aowow custom */
