@@ -3,6 +3,7 @@
 namespace Aowow;
 
 mb_internal_encoding('UTF-8');
+mb_substitute_character('none');                            // drop invalid chars entirely instead of replacing them with '?'
 error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 

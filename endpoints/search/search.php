@@ -76,7 +76,7 @@ class SearchBaseResponse extends TemplateResponse implements ICache
                 if (($canRedirect && $redirectTo) || count($lvData[0]['data']) > 1)
                     $canRedirect = false;
 
-                if ($canRedirect)                                // note - we are very lucky that in case of searches $template is identical to the typeString
+                if ($canRedirect)                           // note - we are very lucky that in case of searches $template is identical to the typeString
                     $redirectTo = '?'.$lvData[1].'='.key($lvData[0]['data']);
             }
         }
