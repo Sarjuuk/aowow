@@ -338,13 +338,15 @@ class QuestList extends DBTypeList
             $rng    = $this->curTpl['reqNpcOrGo'.$i];
             $rngQty = $this->curTpl['reqNpcOrGoCount'.$i];
 
-            if ($rngQty < 1 && (!$rng || $ot))
+            if (!$ot && ($rngQty < 1 || !$rng))
                 continue;
 
             if ($ot)
                 $name = $ot;
-            else
-                $name = $rng > 0 ? CreatureList::getName($rng) : Lang::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
+            else if ($rng > 0)
+                $name = CreatureList::getName($rng);
+            else if ($rng < 0)
+                $name = Lang::unescapeUISequences(GameObjectList::getName(-$rng), Lang::FMT_HTML);
 
             if (!$name)
                 $name = Util::ucFirst(Lang::game($rng > 0 ? 'npc' : 'object')).' #'.abs($rng);

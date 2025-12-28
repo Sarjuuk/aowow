@@ -335,7 +335,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
 
                 if (!$olItemData->getEntry($itemId))
                 {
-                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', extraText: $provided ? Lang::quest('provided') : null)];
+                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('item')).' #'.$itemId, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL, extraText: $provided ? Lang::quest('provided') : null)];
                     continue;
                 }
 
@@ -448,7 +448,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
                     continue;
 
                 if (!$olGOData->getEntry($i))
-                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '')];
+                    $this->objectiveList[] = [0, new IconElement(0, 0, Util::ucFirst(Lang::game('object')).' #'.$i, $qty > 1 ? $qty : '', size: IconElement::SIZE_SMALL)];
                 else
                     $this->objectiveList[] = [0, new IconElement(
                         Type::OBJECT,
