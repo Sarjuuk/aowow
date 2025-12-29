@@ -53,7 +53,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                           IF(`type` =  3, CONCAT_WS(" ", data4, data5, data2),                    -- miscInfo: loot v
                               IF(`type` = 25, CONCAT_WS(" ", data2, data3, 0),
                                   IF(`type` = 23, CONCAT_WS(" ", data0, data1, data2), "")))),    -- miscInfo: meetingStone
-                      IF(ScriptName <> "", ScriptName, AIName)
+                      NULLIF(IF(ScriptName <> "", ScriptName, AIName), ""),
+                      StringId
             FROM      gameobject_template go
             LEFT JOIN gameobject_template_addon goa ON go.entry = goa.entry
             LEFT JOIN gameobject_template_locale gtl2 ON go.entry = gtl2.entry AND gtl2.`locale` = "frFR"

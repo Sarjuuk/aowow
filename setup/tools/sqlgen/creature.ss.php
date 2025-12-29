@@ -61,7 +61,6 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       PetSpellDataId,
                       VehicleId,
                       mingold, maxgold,
-                      AIName,
                       (CASE ct.exp WHEN 0 THEN min.basehp0 WHEN 1 THEN min.basehp1 ELSE min.basehp2 END) * ct.HealthModifier AS healthMin,
                       (CASE ct.exp WHEN 0 THEN max.basehp0 WHEN 1 THEN max.basehp1 ELSE max.basehp2 END) * ct.HealthModifier AS healthMax,
                       min.basemana  * ct.ManaModifier AS manaMin,
@@ -73,7 +72,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       mechanic_immune_mask,
                       spell_school_immune_mask,
                       flags_extra,
-                      ScriptName
+                      NULLIF(IF(ScriptName <> "", ScriptName, AIName), ""),
+                      StringId
             FROM      creature_template ct
             JOIN      creature_classlevelstats min ON ct.unit_class = min.class AND ct.minlevel = min.level
             JOIN      creature_classlevelstats max ON ct.unit_class = max.class AND ct.maxlevel = max.level

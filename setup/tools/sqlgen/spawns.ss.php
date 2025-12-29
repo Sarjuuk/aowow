@@ -212,9 +212,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function creature() : array
     {
-        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId]]
+        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
         return DB::World()->select(
-           'SELECT    c.`guid`, ?d AS `type`, c.`id` AS `typeId`, c.`map`, c.`position_x` AS `posX`, c.`position_y` AS `posY`, c.`spawntimesecs` AS `respawn`, c.`spawnMask`, c.`phaseMask`, c.`zoneId` AS `areaId`, IFNULL(ca.`path_id`, IFNULL(cta.`path_id`, 0)) AS `pathId`
+           'SELECT    c.`guid`, ?d AS `type`, c.`id` AS `typeId`, c.`map`, c.`position_x` AS `posX`, c.`position_y` AS `posY`, c.`spawntimesecs` AS `respawn`, c.`spawnMask`, c.`phaseMask`, c.`zoneId` AS `areaId`, IFNULL(ca.`path_id`, IFNULL(cta.`path_id`, 0)) AS `pathId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
             FROM      creature c
             LEFT JOIN creature_addon ca           ON ca.guid   = c.guid
             LEFT JOIN creature_template_addon cta ON cta.entry = c.id',
@@ -224,9 +224,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function gameobject() : array
     {
-        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId]]
+        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
         return DB::World()->select(
-           'SELECT `guid`, ?d AS `type`, `id` AS `typeId`, `map`, `position_x` AS `posX`, `position_y` AS `posY`, `spawntimesecs` AS `respawn`, `spawnMask`, `phaseMask`, `zoneId` AS `areaId`
+           'SELECT `guid`, ?d AS `type`, `id` AS `typeId`, `map`, `position_x` AS `posX`, `position_y` AS `posY`, `spawntimesecs` AS `respawn`, `spawnMask`, `phaseMask`, `zoneId` AS `areaId`, NULLIF(`ScriptName`, "") AS "ScriptName", NULLIF(`StringId`, "") AS "StringId"
             FROM   gameobject',
             Type::OBJECT
         );
@@ -234,7 +234,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function soundemitter() : array
     {
-        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId]]
+        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
         return DB::Aowow()->select(
            'SELECT `id` AS `guid`, ?d AS `type`, `soundId` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
             FROM   dbc_soundemitters',
@@ -244,7 +244,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private function areatrigger() : array
     {
-        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId]]
+        // [guid, type, typeId, map, posX, posY [, respawn, spawnMask, phaseMask, areaId, floor, pathId, ScriptName, StringId]]
         $base = DB::Aowow()->select(
            'SELECT `id` AS `guid`, ?d AS `type`, `id` AS `typeId`, `mapId` AS `map`, `posX`, `posY`
             FROM   dbc_areatrigger',

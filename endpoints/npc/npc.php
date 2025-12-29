@@ -202,11 +202,51 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
+            $spawnData = DB::Aowow()->select('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::NPC, $this->typeId);
+
             // AI
-            if ($_ = $this->subject->getField('scriptName'))
-                $infobox[] = 'Script'.Lang::main('colon').$_;
-            else if ($_ = $this->subject->getField('aiName'))
-                $infobox[] = 'AI'.Lang::main('colon').$_;
+            $scripts = null;
+            if ($_ = $this->subject->getField('ScriptOrAI'))
+                $scripts = match($_)
+                {
+                    'NullAI',    'AggressorAI',
+                    'ReactorAI', 'GuardAI',
+                    'PetAI',     'TotemAI',
+                    'SmartAI' => 'AI'.Lang::main('colon').$_,
+                    default   => 'Script'.Lang::main('colon').$_
+                };
+
+
+            if ($moreAI = array_filter(array_column($spawnData, 1, 0)))
+            {
+                $scripts ??= 'Script'.Lang::main('colon').'…';
+                $scripts   = '[toggler=hidden id=scriptName]'.$scripts.'[/toggler][div=hidden id=scriptName][ul]';
+                foreach ($moreAI as $guid => $script)
+                    $scripts .= sprintf('[li]GUID: %d - %s[/li]', $guid, $script);
+
+                $scripts .= '[/ul][/div]';
+            }
+
+            if ($scripts)
+                $infobox[] = $scripts;
+
+            // StringId
+            $stringIDs = null;
+            if ($_ = $this->subject->getField('StringId'))
+                $stringIDs = 'StringID'.Lang::main('colon').$_;
+
+            if ($moreStrings = array_filter(array_column($spawnData, 2, 0)))
+            {
+                $stringIDs ??= 'StringID'.Lang::main('colon').'…';
+                $stringIDs   = '[toggler=hidden id=stringId]'.$stringIDs.'[/toggler][div=hidden id=stringId][ul]';
+                foreach ($moreStrings as $guid => $stringId)
+                    $stringIDs .= sprintf('[li]GUID: %d - %s[/li]', $guid, $stringId);
+
+                $stringIDs .= '[/ul][/div]';
+            }
+
+            if ($stringIDs)
+                $infobox[] = $stringIDs;
 
             // Mechanic immune
             if ($immuneMask = $this->subject->getField('mechanicImmuneMask'))
@@ -272,7 +312,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // smart AI
         $sai = null;
-        if ($this->subject->getField('aiName') == 'SmartAI')
+        if ($this->subject->getField('ScriptOrAI') == 'SmartAI')
         {
             $sai = new SmartAI(SmartAI::SRC_TYPE_CREATURE, $this->typeId);
             if (!$sai->prepare())                           // no smartAI found .. check per guid
@@ -293,7 +333,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $this->smartAI = $sai->getMarkup();
             }
             else
-                trigger_error('Creature has SmartAI set in template but no SmartAI defined.');
+                trigger_error('Creature has `AIName`: SmartAI set in template but no SmartAI defined.');
         }
 
         // consider pooled spawns

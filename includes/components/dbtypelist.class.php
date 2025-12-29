@@ -723,18 +723,23 @@ trait spawnHelper
                     $info[4] = Lang::game('mode').implode(', ', $_);
                 }
 
+                if ($s['ScriptName'])
+                    $info[5] = 'ScriptName'.Lang::main('colon').$s['ScriptName'];
+                if ($s['StringId'])
+                    $info[6] = 'StringId'.Lang::main('colon').$s['StringId'];
+
                 if ($s['type'] == Type::AREATRIGGER)
                 {
                     // teleporter endpoint
                     if ($s['guid'] < 0)
                     {
                         $opts['type'] = 4;
-                        $info[5] = 'Teleport Destination';
+                        $info[7] = 'Teleport Destination';
                     }
                     else
                     {
                         $o = Util::O2Deg($this->getField('orientation'));
-                        $info[5] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
+                        $info[7] = 'Orientation'.Lang::main('colon').$o[0].'° ('.$o[1].')';
                     }
                 }
 
