@@ -1054,7 +1054,7 @@ abstract class Util
     public static function indexBitBlob(string $bitBlob, int $blobSize = 32) : array
     {
         $indizes = [];
-        $blocks  = explode(' ', $bitBlob);
+        $blocks  = explode(' ', trim($bitBlob));
         for ($i = 0; $i < count($blocks); $i++)
             for ($j = 0; $j < $blobSize; $j++)
                 if ($blocks[$i] & (1 << $j))
