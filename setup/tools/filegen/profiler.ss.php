@@ -67,7 +67,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             if ($cat2 < 0)
                 continue;
 
-            $cond = array_merge($condition, [['zoneOrSort', $cat]]);
+            $cond = array_merge($condition, [['questSortId', $cat]]);
             $questz = new QuestList($cond);
             if ($questz->error)
                 continue;

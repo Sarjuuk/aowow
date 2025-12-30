@@ -2047,13 +2047,13 @@ DROP TABLE IF EXISTS `aowow_quests`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `aowow_quests` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `method` tinyint(3) unsigned NOT NULL DEFAULT 2,
+  `questType` tinyint(3) unsigned NOT NULL DEFAULT 2,
   `level` smallint(6) NOT NULL DEFAULT 1,
   `minLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `maxLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `zoneOrSort` smallint(6) NOT NULL DEFAULT 0,
-  `zoneOrSortBak` smallint(6) NOT NULL DEFAULT 0,
-  `type` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `questSortId` smallint(6) NOT NULL DEFAULT 0,
+  `questSortIdBak` smallint(6) NOT NULL DEFAULT 0,
+  `questInfoId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `suggestedPlayers` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `timeLimit` int(10) unsigned NOT NULL DEFAULT 0,
   `eventId` smallint(5) unsigned NOT NULL DEFAULT 0,

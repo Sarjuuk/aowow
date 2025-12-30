@@ -74,9 +74,9 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
             $conditions[] = $_;
 
         if (isset($this->category[1]))
-            $conditions[] = ['zoneOrSort', $this->category[1]];
+            $conditions[] = ['questSortId', $this->category[1]];
         else if (isset($this->category[0]))
-            $conditions[] = ['zoneOrSort', $this->validCats[$this->category[0]]];
+            $conditions[] = ['questSortId', $this->validCats[$this->category[0]]];
 
 
         /*************/

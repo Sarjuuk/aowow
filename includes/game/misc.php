@@ -46,7 +46,7 @@ class Game
         10 =>  [   65,    66,    67,   210,   394,   495,  2817,  3537,  3711,  4024,  4197,  4395,  4742]
     );
 
-    // zoneorsort for quests need updating
+    // questSortId for quests need updating
     // partially points non-instanced area with identical name for instance quests
     public static array $questSortFix             = array(
         -221 => 440,                                        // Treasure Map => Tanaris

@@ -33,7 +33,7 @@ class QuestList extends DBTypeList
         // post processing
         foreach ($this->iterate() as $id => &$_curTpl)
         {
-            $_curTpl['cat1'] = $_curTpl['zoneOrSort'];      // should probably be in a method...
+            $_curTpl['cat1'] = $_curTpl['questSortId'];     // should probably be in a method...
             $_curTpl['cat2'] = 0;
 
             foreach (Game::QUEST_CLASSES as $k => $arr)
@@ -138,7 +138,7 @@ class QuestList extends DBTypeList
     // by TC definition
     public function isSeasonal() : bool
     {
-        return in_array($this->getField('zoneOrSortBak'), [-22, -284, -366, -369, -370, -376, -374]) && !$this->isRepeatable();
+        return in_array($this->getField('questSortIdBak'), [-22, -284, -366, -369, -370, -376, -374]) && !$this->isRepeatable();
     }
 
     public function getSourceData(int $id = 0) : array
@@ -225,7 +225,7 @@ class QuestList extends DBTypeList
             if ($_ = $this->curTpl['rewardTitleId'])
                 $data[$this->id]['titlereward'] = $_;
 
-            if ($_ = $this->curTpl['type'])
+            if ($_ = $this->curTpl['questInfoId'])
                 $data[$this->id]['type'] = $_;
 
             if ($_ = $this->curTpl['reqClassMask'])
@@ -548,9 +548,9 @@ class QuestListFilter extends Filter
             };
         }
 
-        // type [list]
+        // questInfoId [list]
         if ($_v['ty'] !== null)
-            $parts[] = ['type', $_v['ty']];
+            $parts[] = ['questInfoId', $_v['ty']];
 
         return $parts;
     }
@@ -650,9 +650,9 @@ class QuestListFilter extends Filter
             return null;
 
         if ($crs)
-            return ['AND', ['zoneOrSort', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
+            return ['AND', ['questSortId', 0, '>'], [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], 0], [['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&'], 0]];
         else
-            return ['OR', ['zoneOrSort', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
+            return ['OR', ['questSortId', 0, '<'], ['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE, '&'], ['specialFlags', QUEST_FLAG_SPECIAL_REPEATABLE | QUEST_FLAG_SPECIAL_MONTHLY, '&']];
     }
 
     protected function cbSpellRewards(int $cr, int $crs, string $crv) : ?array

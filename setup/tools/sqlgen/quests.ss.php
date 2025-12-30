@@ -29,8 +29,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       MinLevel,
                       IFNULL(qa.MaxLevel, 0),
                       QuestSortID,
-                      QuestSortID AS zoneOrSortBak,                   -- ZoneOrSortBak
-                      QuestInfoID,                                    -- QuestType
+                      QuestSortID AS questSortIdBak,
+                      QuestInfoID,
                       SuggestedGroupNum,
                       TimeAllowed,
                       IFNULL(gesqr.eventEntry, 0) AS eventId,
@@ -193,7 +193,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         // fix questSorts for instance quests
         foreach (Game::$questSortFix as $child => $parent)
-            DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `zoneOrSortBak` = ?d', $parent, $child);
+            DB::Aowow()->query('UPDATE ?_quests SET `questSortId` = ?d WHERE `questSortIdBak` = ?d', $parent, $child);
 
 
         // move quests linked to holidays into appropirate quests-sorts. create dummy sorts as needed
@@ -207,14 +207,14 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         foreach ($holidaySorts as $hId => $sort)
             if (!empty($eventSet[$hId]))
-                DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `eventId` = ?d{ AND `id` IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
+                DB::Aowow()->query('UPDATE ?_quests SET `questSortId` = ?d WHERE `eventId` = ?d{ AND `id` IN (?a)}', $sort, $eventSet[$hId], $ids ?: DBSIMPLE_SKIP);
 
 
         // 'special' special cases
         // fishing quests to stranglethorn extravaganza
-        DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE `id` IN (?a){ AND `id` IN (?a)}',  -101, [8228, 8229], $ids ?: DBSIMPLE_SKIP);
+        DB::Aowow()->query('UPDATE ?_quests SET `questSortId` = ?d WHERE `id` IN (?a){ AND `id` IN (?a)}',  -101, [8228, 8229], $ids ?: DBSIMPLE_SKIP);
         // dungeon quests to Misc/Dungeon Finder
-        DB::Aowow()->query('UPDATE ?_quests SET `zoneOrSort` = ?d WHERE (`specialFlags` & ?d OR `id` IN (?a)){ AND `id` IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
+        DB::Aowow()->query('UPDATE ?_quests SET `questSortId` = ?d WHERE (`specialFlags` & ?d OR `id` IN (?a)){ AND `id` IN (?a)}', -1010, QUEST_FLAG_SPECIAL_DUNGEON_FINDER, [24789, 24791, 24923], $ids ?: DBSIMPLE_SKIP);
 
 
         // flag internal/unsued quests as unsearchable

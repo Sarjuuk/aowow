@@ -327,7 +327,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
-                            if ($started->getField('zoneOrSort') > 0 && !in_array($started->getField('zoneOrSort'), $relQuestZOS))
+                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
                                 continue;
 
                             if (!empty($started->rewards[$id][Type::ITEM]))
@@ -424,7 +424,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                         // store data for misc tabs
                         foreach ($started->getListviewData() as $id => $data)
                         {
-                            if ($started->getField('zoneOrSort') > 0 && !in_array($started->getField('zoneOrSort'), $relQuestZOS))
+                            if ($started->getField('questSortId') > 0 && !in_array($started->getField('questSortId'), $relQuestZOS))
                                 continue;
 
                             if (!empty($started->rewards[$id][Type::ITEM]))
@@ -643,7 +643,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $this->lvTabs->addListviewTab(new Listview($tabData, GameObjectList::$brickFile));
         }
 
-        $quests = new QuestList(array(['zoneOrSort', $this->typeId]));
+        $quests = new QuestList(array(['questSortId', $this->typeId]));
         if (!$quests->error)
         {
             $this->extendGlobalData($quests->getJSGlobals());

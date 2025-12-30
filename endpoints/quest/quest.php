@@ -117,11 +117,11 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         }
 
         // loremaster (i dearly hope those flags cover every case...)
-        if ($this->subject->getField('zoneOrSortBak') > 0 && !$this->subject->isRepeatable())
+        if ($this->subject->getField('questSortIdBak') > 0 && !$this->subject->isRepeatable())
         {
             $conditions = array(
                 ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE],
-                ['ac.value1', $this->subject->getField('zoneOrSortBak')],
+                ['ac.value1', $this->subject->getField('questSortIdBak')],
                 ['a.faction', $_side, '&']
             );
             $loremaster = new AchievementList($conditions);
@@ -153,7 +153,7 @@ class QuestBaseResponse extends TemplateResponse implements ICache
         else if ($_specialFlags & QUEST_FLAG_SPECIAL_MONTHLY)
             $_[] = Lang::quest('monthly');
 
-        if ($t = $this->subject->getField('type'))
+        if ($t = $this->subject->getField('questInfoId'))
             $_[] = Lang::quest('questInfo', $t);
 
         if ($_)

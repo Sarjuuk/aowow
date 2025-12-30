@@ -337,7 +337,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         if ($sort)
         {
-            $quests = new QuestList(array(['zoneOrSort', -$sort]));
+            $quests = new QuestList(array(['questSortId', -$sort]));
             if (!$quests->error)
             {
                 $this->extendGlobalData($quests->getJSGlobals());
