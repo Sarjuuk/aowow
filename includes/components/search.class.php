@@ -8,6 +8,9 @@ if (!defined('AOWOW_REVISION'))
 
 class Search
 {
+    public const /* int */ DEFAULT_MAX_RESULTS     = 500;
+    public const /* int */ SUGGESTIONS_MAX_RESULTS = 10;
+
     public const /* int */ MOD_CLASS            = 0;
     public const /* int */ MOD_RACE             = 1;
     public const /* int */ MOD_TITLE            = 2;
@@ -81,7 +84,7 @@ class Search
 
     public array $invalid = [];
 
-    public function __construct(private string $query, private int $moduleMask = -1, private int $maxResults = 500, private array $extraCnd = [], private array $extraOpts = [])
+    public function __construct(private string $query, private int $moduleMask = -1, private array $extraCnd = [], private array $extraOpts = [], private int $maxResults = self::DEFAULT_MAX_RESULTS)
     {
         $this->tokenizeQuery();
 
@@ -467,7 +470,7 @@ class Search
         {
             if (!empty($shared['pcsToSet']))
             {
-                $cnd      = [['i.id', array_keys($shared['pcsToSet'])], Cfg::get('SQL_LIMIT_NONE')];
+                $cnd      = [['i.id', array_keys($shared['pcsToSet'])]];
                 $miscData = ['pcsToSet' => $shared['pcsToSet']];
             }
             else

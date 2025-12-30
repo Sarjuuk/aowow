@@ -52,7 +52,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             WHERE  i.classBak = ?d',
             ITEM_CLASS_GLYPH);
 
-        $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)], Cfg::get('SQL_LIMIT_NONE')));
+        $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)]));
 
         foreach (CLISetup::$locales as $loc)
         {

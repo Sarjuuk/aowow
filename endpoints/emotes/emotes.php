@@ -41,7 +41,7 @@ class EmotesBaseResponse extends TemplateResponse implements ICache
         /* Main Content */
         /****************/
 
-        $cnd = [Cfg::get('SQL_LIMIT_NONE')];
+        $cnd = [];                                          // don't limit, for we have no filter or category
         if (!User::isInGroup(U_GROUP_STAFF))
             $cnd[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

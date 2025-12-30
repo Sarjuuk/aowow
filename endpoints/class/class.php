@@ -164,8 +164,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
                 'OR',
                 ['s.cuFlags', SPELL_CU_LAST_RANK, '&'],
                 ['s.rankNo', 0]
-            ],
-            Cfg::get('SQL_LIMIT_NONE')
+            ]
         );
 
         $genSpells = new SpellList($conditions);
@@ -190,8 +189,7 @@ class ClassBaseResponse extends TemplateResponse implements ICache
             ['requiredClass', 0, '>'],
             ['requiredClass', $cl->toMask(), '&'],
             [['requiredClass', ChrClass::MASK_ALL, '&'], ChrClass::MASK_ALL, '!'],
-            ['itemset', 0],
-            Cfg::get('SQL_LIMIT_NONE')
+            ['itemset', 0]
         );
 
         $items = new ItemList($conditions);

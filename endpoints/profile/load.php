@@ -160,7 +160,7 @@ class ProfileLoadResponse extends TextResponse
         $profile['quests'] = [];
         if ($quests = DB::Aowow()->selectCol('SELECT `questId` FROM ?_profiler_completion_quests WHERE `id` = ?d', $pBase['id']))
         {
-            $qList = new QuestList(array(['id', $quests], Cfg::get('SQL_LIMIT_NONE')));
+            $qList = new QuestList(array(['id', $quests]));
             if (!$qList->error)
                 foreach ($qList->iterate() as $id => $__)
                     $profile['quests'][$id] = [$qList->getField('cat1'), $qList->getField('cat2')];
@@ -226,7 +226,7 @@ class ProfileLoadResponse extends TextResponse
 
         if ($items = DB::Aowow()->select('SELECT * FROM ?_profiler_items WHERE `id` = ?d', $pBase['id']))
         {
-            $itemz = new ItemList(array(['id', array_column($items, 'item')], Cfg::get('SQL_LIMIT_NONE')));
+            $itemz = new ItemList(array(['id', array_column($items, 'item')]));
             if (!$itemz->error)
             {
                 $data = $itemz->getListviewData(ITEMINFO_JSON | ITEMINFO_SUBITEMS);
@@ -255,7 +255,7 @@ class ProfileLoadResponse extends TextResponse
 
         // if ($au = $char->getField('auras'))
         // {
-            // $auraz = new SpellList(array(['id', $char->getField('auras')], Cfg::get('SQL_LIMIT_NONE')));
+            // $auraz = new SpellList(array(['id', $char->getField('auras')]));
             // $dataz = $auraz->getListviewData();
             // $modz  = $auraz->getProfilerMods();
 

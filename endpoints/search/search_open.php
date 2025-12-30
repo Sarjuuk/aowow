@@ -53,6 +53,8 @@ class SearchOpenResponse extends TextResponse implements ICache
         1 << Search::MOD_ZONE     | 1 << Search::MOD_OBJECT   | 1 << Search::MOD_FACTION | 1 << Search::MOD_SKILL       |
         1 << Search::MOD_PET;
 
+    private int $maxResults = Search::SUGGESTIONS_MAX_RESULTS;
+
     protected string $contentType = MIME_TYPE_OPENSEARCH;
     protected int    $cacheType   = CACHE_TYPE_SEARCH;
 
@@ -66,12 +68,9 @@ class SearchOpenResponse extends TextResponse implements ICache
 
         $this->query = $this->_get['search'];               // technically pageParam, but prepared
 
-        if ($limit = Cfg::get('SQL_LIMIT_QUICKSEARCH'))
-            $this->maxResults = $limit;
-
         $this->searchMask = Search::TYPE_OPEN | self::SEARCH_MODS_OPEN;
 
-        $this->searchObj = new Search($this->query, $this->searchMask, $this->maxResults);
+        $this->searchObj = new Search($this->query, $this->searchMask, maxResults: $this->maxResults);
     }
 
     protected function generate() : void

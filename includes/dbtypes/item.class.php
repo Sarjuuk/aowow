@@ -1581,7 +1581,7 @@ class ItemList extends DBTypeList
             array_column($randEnchants, 'enchantId5')
         ));
 
-        $enchants = new EnchantmentList(array(['id', $enchIds], Cfg::get('SQL_LIMIT_NONE')));
+        $enchants = new EnchantmentList(array(['id', $enchIds]));
         foreach ($enchants->iterate() as $eId => $_)
         {
             $this->rndEnchIds[$eId] = array(

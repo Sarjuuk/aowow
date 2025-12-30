@@ -240,7 +240,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::NPC);
         $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::AREATRIGGER) : [];
 
-        $conditions = [Cfg::get('SQL_LIMIT_NONE'), ['s.areaId', $this->typeId]];
+        $conditions = [['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -574,7 +574,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         {
             // Issue 1 - if the bosses drop items that are also sold by vendors moreZoneId will be 0 as vendor location and boss location are likely in conflict with each other
             // Issue 2 - if the boss/chest isn't spawned the loot will not show up
-            $items   = new ItemList(array(Cfg::get('SQL_LIMIT_NONE'), ['src.moreZoneId', $this->typeId], ['src.src2', 0, '>'], ['quality', ITEM_QUALITY_UNCOMMON, '>=']), ['calcTotal' => true]);
+            $items   = new ItemList(array(['src.moreZoneId', $this->typeId], ['src.src2', 0, '>'], ['quality', ITEM_QUALITY_UNCOMMON, '>=']), ['calcTotal' => true]);
             $data    = $items->getListviewData();
             $subTabs = false;
             foreach ($items->iterate() as $id => $__)
@@ -619,7 +619,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             if (!is_null(CreatureListFilter::getCriteriaIndex(6, $this->typeId)))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=6;crs='.$this->typeId.';crv=0');
 
-            if ($creatureSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($creatureSpawns->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($creatureSpawns->getJSGlobals(GLOBALINFO_SELF));
@@ -635,7 +635,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             if (!is_null(GameObjectListFilter::getCriteriaIndex(1, $this->typeId)))
                 $tabData['note'] = sprintf(Util::$filterResultString, '?objects&filter=cr=1;crs='.$this->typeId.';crv=0');
 
-            if ($objectSpawns->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($objectSpawns->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['_truncated'] = 1;
 
             $this->extendGlobalData($objectSpawns->getJSGlobals(GLOBALINFO_SELF));

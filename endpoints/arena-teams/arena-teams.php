@@ -90,7 +90,7 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
         /* Main Content */
         /****************/
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = ['at.seasonGames', 0, '>'];
 
@@ -129,12 +129,12 @@ class ArenateamsBaseResponse extends TemplateResponse implements IProfilerList
             $tabData['data'] = $teams->getListviewData();
 
             // create note if search limit was exceeded
-            if ($this->filter->query && $teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filter->query && $teams->getMatches() > Listview::DEFAULT_SIZE)
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound2', $this->sumSubjects, $teams->getMatches());
                 $tabData['_truncated'] = 1;
             }
-            else if ($teams->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            else if ($teams->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_arenateamsfound', $this->sumSubjects, 0);
         }
 

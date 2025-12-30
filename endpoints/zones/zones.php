@@ -60,7 +60,7 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
 
-        $conditions  = [Cfg::get('SQL_LIMIT_NONE')];
+        $conditions  = [];                                  // do not limit
         $visibleCols = [];
         $hiddenCols  = [];
 

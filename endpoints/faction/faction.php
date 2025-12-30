@@ -213,7 +213,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: items
-        $items = new ItemList(array(['requiredFaction', $this->typeId]), ['calcTotal' => true]);
+        $items = new ItemList(array(Listview::DEFAULT_SIZE, ['requiredFaction', $this->typeId]), ['calcTotal' => true]);
         if (!$items->error)
         {
             $this->extendGlobalData($items->getJSGlobals(GLOBALINFO_SELF));
@@ -224,7 +224,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 'sort'      => ['standing', 'name']
             );
 
-            if ($items->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($items->getMatches() > Listview::DEFAULT_SIZE)
                 if (!is_null(ItemListFilter::getCriteriaIndex(17, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?items&filter=cr=17;crs='.$this->typeId.';crv=0');
 
@@ -246,7 +246,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
             if ($cRep)
             {
-                $killCreatures = new CreatureList(array(['id', array_keys($cRep)]), ['calcTotal' => true]);
+                $killCreatures = new CreatureList(array(Listview::DEFAULT_SIZE, ['id', array_keys($cRep)]), ['calcTotal' => true]);
                 if (!$killCreatures->error)
                 {
                     $data = $killCreatures->getListviewData();
@@ -259,7 +259,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                         'sort'      => ['-reputation', 'name']
                     );
 
-                    if ($killCreatures->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+                    if ($killCreatures->getMatches() > Listview::DEFAULT_SIZE)
                         if (!is_null(CreatureListFilter::getCriteriaIndex(42, $this->typeId)))
                             $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=42;crs='.$this->typeId.';crv=0');
 
@@ -272,7 +272,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // tab: members
         if ($_ = $this->subject->getField('templateIds'))
         {
-            $members = new CreatureList(array(['faction', $_]), ['calcTotal' => true]);
+            $members = new CreatureList(array(Listview::DEFAULT_SIZE, ['faction', $_]), ['calcTotal' => true]);
             if (!$members->error)
             {
                 $tabData = array(
@@ -281,7 +281,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                     'name' => '$LANG.tab_members'
                 );
 
-                if ($members->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+                if ($members->getMatches() > Listview::DEFAULT_SIZE)
                     if (!is_null(CreatureListFilter::getCriteriaIndex(3, $this->typeId)))
                         $tabData['note'] = sprintf(Util::$filterResultString, '?npcs&filter=cr=3;crs='.$this->typeId.';crv=0');
 
@@ -303,12 +303,13 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // tab: quests
         $conditions = array(
+            'OR',
+            Listview::DEFAULT_SIZE,
             ['AND', ['rewardFactionId1', $this->typeId], ['rewardFactionValue1', 0, '>']],
             ['AND', ['rewardFactionId2', $this->typeId], ['rewardFactionValue2', 0, '>']],
             ['AND', ['rewardFactionId3', $this->typeId], ['rewardFactionValue3', 0, '>']],
             ['AND', ['rewardFactionId4', $this->typeId], ['rewardFactionValue4', 0, '>']],
-            ['AND', ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']],
-            'OR'
+            ['AND', ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']]
         );
         $quests = new QuestList($conditions, ['calcTotal' => true]);
         if (!$quests->error)
@@ -320,7 +321,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
                 'extraCols' => '$_'
             );
 
-            if ($quests->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($quests->getMatches() > Listview::DEFAULT_SIZE)
                 if (!is_null(QuestListFilter::getCriteriaIndex(1, $this->typeId)))
                     $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=1;crs='.$this->typeId.';crv=0');
 

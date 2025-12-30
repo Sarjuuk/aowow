@@ -56,7 +56,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
         $questorder = [];
         $questtotal = [];
         $condition  = [
-            Cfg::get('SQL_LIMIT_NONE'),
             'AND',
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE | CUSTOM_DISABLED, '&'], 0],
             [['flags', QUEST_FLAG_DAILY | QUEST_FLAG_WEEKLY | QUEST_FLAG_REPEATABLE | QUEST_FLAG_AUTO_REWARDED, '&'], 0],
@@ -125,11 +124,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function titles(): void
     {
-        $condition = array(
-            Cfg::get('SQL_LIMIT_NONE'),
-            [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
-        );
-        $titlez = new TitleList($condition);
+        $titlez = new TitleList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
 
         // get titles for exclusion
         foreach ($titlez->iterate() as $id => $__)
@@ -161,7 +156,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private function mounts() : void
     {
         $condition = array(
-            Cfg::get('SQL_LIMIT_NONE'),
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             ['typeCat', -5],
             ['castTime', 0, '!']
@@ -210,7 +204,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private function companions() : void
     {
         $condition = array(
-            Cfg::get('SQL_LIMIT_NONE'),
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             ['typeCat', -6]
         );
@@ -246,11 +239,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     private function factions() : void
     {
-        $condition = array(
-            Cfg::get('SQL_LIMIT_NONE'),
-            [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]
-        );
-        $factionz = new FactionList($condition);
+        $factionz = new FactionList(array([['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0]));
 
         foreach (CLISetup::$locales as $loc)
         {
@@ -279,7 +268,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
         );
 
         $baseCnd = array(
-            Cfg::get('SQL_LIMIT_NONE'),
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             //                                                                                          Inscryption                                                            Engineering
             ['effect1Id', [SPELL_EFFECT_APPLY_AURA, SPELL_EFFECT_TRADE_SKILL, SPELL_EFFECT_PROSPECTING, SPELL_EFFECT_OPEN_LOCK, SPELL_EFFECT_MILLING, SPELL_EFFECT_DISENCHANT, SPELL_EFFECT_SUMMON, SPELL_EFFECT_SKINNING], '!'],
@@ -340,7 +328,6 @@ CLISetup::registerSetup("build", new class extends SetupScript
     private function achievements() : void
     {
         $condition = array(
-            Cfg::get('SQL_LIMIT_NONE'),
             [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0],
             [['flags', 1, '&'], 0],                     // no statistics
         );

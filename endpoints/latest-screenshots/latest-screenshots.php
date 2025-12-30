@@ -33,7 +33,7 @@ class LatestscreenshotsBaseResponse extends TemplateResponse
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $data = CommunityContent::getScreenshots();
+        $data = CommunityContent::getScreenshots(resultLimit: Listview::DEFAULT_SIZE);
         $this->lvTabs->addListviewTab(new Listview(['data' => $data], 'screenshot'));
 
         parent::generate();

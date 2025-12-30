@@ -286,7 +286,7 @@ class SoundBaseResponse extends TemplateResponse implements ICache
         if ($creatureIds || $displayIds)
         {
             $extra = [];
-            $cnds = [Cfg::get('SQL_LIMIT_NONE'), &$extra];
+            $cnds  = [&$extra];
             if (!User::isInGroup(U_GROUP_STAFF))
                 $cnds[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 

@@ -569,7 +569,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // tab: container can contain
         if ($this->subject->getField('slots') > 0)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<'], Cfg::get('SQL_LIMIT_NONE')));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 1, '<']));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));
@@ -590,7 +590,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         // tab: can be contained in (except keys)
         else if ($_bagFamily != 0x0100)
         {
-            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>'], Cfg::get('SQL_LIMIT_NONE')));
+            $contains = new ItemList(array(['bagFamily', $_bagFamily, '&'], ['slots', 0, '>']));
             if (!$contains->error)
             {
                 $this->extendGlobalData($contains->getJSGlobals(GLOBALINFO_SELF));

@@ -108,7 +108,7 @@ class CommunityContent
             if (!$_)
                 continue;
 
-            $obj = Type::newList($type, [Cfg::get('SQL_LIMIT_NONE'), ['id', $_]]);
+            $obj = Type::newList($type, [['id', $_]]);
             if (!$obj)
                 continue;
 
@@ -117,7 +117,7 @@ class CommunityContent
         }
     }
 
-    public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getCommentPreviews(array $opt = [], ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
     {
         /*
             purged:0,           <- doesnt seem to be used anymore
@@ -149,7 +149,7 @@ class CommunityContent
             CC_FLAG_DELETED,
             User::$id,
             User::isInGroup(U_GROUP_COMMENTS_MODERATOR),
-            Cfg::get('SQL_LIMIT_DEFAULT')
+            $resultLimit ?: DBSIMPLE_SKIP
         );
 
         if (!$comments)
@@ -295,17 +295,17 @@ class CommunityContent
         return $comments;
     }
 
-    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getVideos(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
     {
         $videos = DB::Aowow()->select(self::$viQuery,
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId                     : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'                       : 'pos',
-            !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
+            !$typeOrUser    ? 'date'       : 'pos',
+            $resultLimit ?: DBSIMPLE_SKIP
         );
 
         if (!$videos)
@@ -354,17 +354,17 @@ class CommunityContent
         return array_values($videos);
     }
 
-    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true) : array
+    public static function getScreenshots(int $typeOrUser = 0, int $typeId = 0, ?int &$nFound = 0, bool $dateFmt = true, int $resultLimit = 0) : array
     {
         $screenshots = DB::Aowow()->select(self::$ssQuery,
             CC_FLAG_STICKY,
-            $typeOrUser < 0 ? -$typeOrUser                 : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeOrUser                 : DBSIMPLE_SKIP,
-            $typeOrUser > 0 ?  $typeId                     : DBSIMPLE_SKIP,
+            $typeOrUser < 0 ? -$typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeOrUser : DBSIMPLE_SKIP,
+            $typeOrUser > 0 ?  $typeId     : DBSIMPLE_SKIP,
             CC_FLAG_APPROVED,
             CC_FLAG_DELETED,
-            !$typeOrUser    ? 'date'                       : DBSIMPLE_SKIP,
-            !$typeOrUser    ? Cfg::get('SQL_LIMIT_SEARCH') : DBSIMPLE_SKIP
+            !$typeOrUser    ? 'date'       : DBSIMPLE_SKIP,
+            $resultLimit ?: DBSIMPLE_SKIP
         );
 
         if (!$screenshots)
@@ -410,19 +410,6 @@ class CommunityContent
         }
 
         return array_values($screenshots);
-    }
-
-    public static function getAll(int $type, int $typeId, array &$jsg) : array
-    {
-        $result = array(
-            'vi' => self::getVideos($type, $typeId),
-            'ss' => self::getScreenshots($type, $typeId),
-            'co' => self::getComments($type, $typeId)
-        );
-
-        Util::mergeJsGlobals($jsg, self::$jsGlobals);
-
-        return $result;
     }
 
     public static function getJSGlobals() : array

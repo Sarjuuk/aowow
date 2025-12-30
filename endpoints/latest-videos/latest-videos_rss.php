@@ -16,7 +16,7 @@ class LatestvideosRssResponse extends TextResponse
     {
         $now = new DateTime();
 
-        foreach (CommunityContent::getvideos(dateFmt: false) as $video)
+        foreach (CommunityContent::getvideos(dateFmt: false, resultLimit: 100) as $video)
         {
             $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($video['type']).'='.$video['typeId'].'#videos:id='.$video['id'].'"><img src="//i3.ytimg.com/vi/'.$video['videoId'].'/default.jpg" alt="" /></a>';
             if ($video['caption'])

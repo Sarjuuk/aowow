@@ -133,7 +133,7 @@ class GuildBaseResponse extends TemplateResponse
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated');
 
         // tab: members
-        $member = new LocalProfileList(array(['p.guild', $this->typeId], Cfg::get('SQL_LIMIT_NONE')));
+        $member = new LocalProfileList(array(['p.guild', $this->typeId]));
         $this->lvTabs->addListviewTab(new Listview(array(
             'data'        => $member->getListviewData(PROFILEINFO_CHARACTER | PROFILEINFO_GUILD),
             'sort'        => [-15],

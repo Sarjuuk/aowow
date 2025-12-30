@@ -535,7 +535,7 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
         // tab: Spell Focus for
         if ($sfId = $this->subject->getField('spellFocusId'))
         {
-            $focusSpells = new SpellList(array(['spellFocusObject', $sfId]), ['calcTotal' => true]);
+            $focusSpells = new SpellList(array(Listview::DEFAULT_SIZE, ['spellFocusObject', $sfId]), ['calcTotal' => true]);
             if (!$focusSpells->error)
             {
                 $tabData = array(
@@ -547,9 +547,9 @@ class ObjectBaseResponse extends TemplateResponse implements ICache
                 $this->extendGlobalData($focusSpells->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
 
                 // create note if search limit was exceeded
-                if ($focusSpells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+                if ($focusSpells->getMatches() > Listview::DEFAULT_SIZE)
                 {
-                    $tabData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                    $tabData['note'] = sprintf(Util::$tryNarrowingString, 'LANG.lvnote_spellsfound', $focusSpells->getMatches(), Listview::DEFAULT_SIZE);
                     $tabData['_truncated'] = 1;
                 }
 

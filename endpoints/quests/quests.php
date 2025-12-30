@@ -66,7 +66,7 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1   = Util::ucFirst(Lang::game('quests'));
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -125,9 +125,9 @@ class QuestsBaseResponse extends TemplateResponse implements ICache
             $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
         // create note if search limit was exceeded
-        if ($quests->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+        if ($quests->getMatches() > Listview::DEFAULT_SIZE)
         {
-            $tabData['note']       = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+            $tabData['note']       = sprintf(Util::$tryFilteringString, 'LANG.lvnote_questsfound', $quests->getMatches(), Listview::DEFAULT_SIZE);
             $tabData['_truncated'] = 1;
         }
         else if (isset($this->category[1]) && $this->category[1] > 0)

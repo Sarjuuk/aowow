@@ -142,7 +142,7 @@ class PetBaseResponse extends TemplateResponse implements ICache
             if ($mask & (1 << ($i - 1)))
                 $list[] = $i;
 
-        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $list], Cfg::get('SQL_LIMIT_NONE')));
+        $food = new ItemList(array(['i.subClass', [ITEM_SUBCLASS_FOOD, ITEM_SUBCLASS_MISC_CONSUMABLE]], ['i.FoodType', $list]));
         $this->extendGlobalData($food->getJSGlobals());
 
         $this->lvTabs->addListviewTab(new Listview(array(

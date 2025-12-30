@@ -7,7 +7,7 @@ mb_substitute_character('none');                            // drop invalid char
 error_reporting(E_ALL);
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-define('AOWOW_REVISION', 44);
+define('AOWOW_REVISION', 45);
 define('OS_WIN', substr(PHP_OS, 0, 3) == 'WIN');            // OS_WIN as per compile info of php
 define('CLI', PHP_SAPI === 'cli');
 define('CLI_HAS_E', CLI &&                                  // WIN10 and later usually support ANSI escape sequences

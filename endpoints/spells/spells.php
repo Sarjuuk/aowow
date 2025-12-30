@@ -112,7 +112,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Util::ucFirst(Lang::game('spells'));
 
-        $conditions  = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -484,9 +484,9 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
             $visibleCols[] = 'source';
 
         // create note if search limit was exceeded; overwriting 'note' is intentional
-        if ($spells->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+        if ($spells->getMatches() > Listview::DEFAULT_SIZE)
         {
-            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+            $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_spellsfound', $spells->getMatches(), Listview::DEFAULT_SIZE);
             $tabData['_truncated'] = 1;
         }
 

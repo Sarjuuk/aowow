@@ -16,7 +16,7 @@ class LatestscreenshotsRssResponse extends TextResponse
     {
         $now = new DateTime();
 
-        foreach (CommunityContent::getScreenshots(dateFmt: false) as $screenshot)
+        foreach (CommunityContent::getScreenshots(dateFmt: false, resultLimit: 100) as $screenshot)
         {
             $desc = '<a href="'.Cfg::get('HOST_URL').'/?'.Type::getFileString($screenshot['type']).'='.$screenshot['typeId'].'#screenshots:id='.$screenshot['id'].'"><img src="'.Cfg::get('STATIC_URL').'/uploads/screenshots/thumb/'.$screenshot['id'].'.jpg" alt="" /></a>';
             if ($screenshot['caption'])

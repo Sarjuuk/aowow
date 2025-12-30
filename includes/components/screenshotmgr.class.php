@@ -198,7 +198,7 @@ class ScreenshotMgr extends ImageUpload
                 if (!$ids)
                     continue;
 
-                $obj = Type::newList($t, [Cfg::get('SQL_LIMIT_NONE'), ['id', $ids]]);
+                $obj = Type::newList($t, [['id', $ids]]);
                 if (!$obj || $obj->error)
                     continue;
 

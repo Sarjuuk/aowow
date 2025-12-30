@@ -91,6 +91,7 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
         /****************/
 
         $conditions = array(
+            Listview::DEFAULT_SIZE,
             ['c.deleteInfos_Account', null],
             ['c.level', MAX_LEVEL, '<='],                   // prevents JS errors
             [['c.extra_flags', Profiler::CHAR_GMFLAGS, '&'], 0]
@@ -126,12 +127,12 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
             $tabData['data'] = $guilds->getListviewData();
 
             // create note if search limit was exceeded
-            if ($this->filter->query && $guilds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filter->query && $guilds->getMatches() > Listview::DEFAULT_SIZE)
             {
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound2', $this->sumSubjects, $guilds->getMatches());
                 $tabData['_truncated'] = 1;
             }
-            else if ($guilds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            else if ($guilds->getMatches() > Listview::DEFAULT_SIZE)
                 $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_guildsfound', $this->sumSubjects, 0);
         }
 

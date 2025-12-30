@@ -149,13 +149,10 @@ class LootByItem extends Loot
      * @param  array $lootTableList [optional] limit lookup to provided loot template table names
      * @return bool  success
      */
-    public function getByItem(int $maxResults = -1, array $lootTableList = []) : bool
+    public function getByItem(int $maxResults = Listview::DEFAULT_SIZE, array $lootTableList = []) : bool
     {
         if (!$this->entry)
             return false;
-
-        if ($maxResults < 0)
-            $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
 
         $refResults = [];
 
@@ -271,7 +268,7 @@ class LootByItem extends Loot
 
         [$type, &$data, , , &$extraCols, ,] = $this->listviewTabs[$tabId];
 
-        $srcObj = Type::newList($type, array([$dbField, $ids]));
+        $srcObj = Type::newList($type, [[$dbField, $ids]]);
         if (!$srcObj || $srcObj->error)
             return false;
 
@@ -342,7 +339,7 @@ class LootByItem extends Loot
             'OR',
             ['AND', ['effect1CreateItemId', $this->entry], ['OR', ['effect1Id', SpellList::EFFECTS_ITEM_CREATE], ['effect1AuraId', SpellList::AURAS_ITEM_CREATE]]],
             ['AND', ['effect2CreateItemId', $this->entry], ['OR', ['effect2Id', SpellList::EFFECTS_ITEM_CREATE], ['effect2AuraId', SpellList::AURAS_ITEM_CREATE]]],
-            ['AND', ['effect3CreateItemId', $this->entry], ['OR', ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]],
+            ['AND', ['effect3CreateItemId', $this->entry], ['OR', ['effect3Id', SpellList::EFFECTS_ITEM_CREATE], ['effect3AuraId', SpellList::AURAS_ITEM_CREATE]]]
         );
         if ($ids)
             $conditions[] = ['id', $ids];

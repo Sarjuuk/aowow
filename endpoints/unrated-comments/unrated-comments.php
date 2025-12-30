@@ -31,7 +31,7 @@ class UnratedcommentsBaseResponse extends TemplateResponse
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $data = CommunityContent::getCommentPreviews(['unrated' => true, 'comments' => true]);
+        $data = CommunityContent::getCommentPreviews(['unrated' => true, 'comments' => true], resultLimit: Listview::DEFAULT_SIZE);
         $this->lvTabs->addListviewTab(new Listview(['data' => $data], 'commentpreview'));
 
         parent::generate();

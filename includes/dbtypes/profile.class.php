@@ -535,11 +535,12 @@ class RemoteProfileList extends ProfileList
 
         $talentSpells = DB::Aowow()->select('SELECT `spell` AS ARRAY_KEY, `tab`, `rank` FROM ?_talents WHERE `class` IN (?a)', array_unique($talentSpells));
 
+        // equalize subject distribution across realms
+        $limit = 0;
         foreach ($conditions as $c)
-            if (is_int($c))
-                $limit = $c;
+            if (is_numeric($c))
+                $limit = max(0, (int)$c);
 
-        $limit ??= Cfg::get('SQL_LIMIT_DEFAULT');
         if (!$limit)                                        // int:0 means unlimited, so skip process
             $distrib = [];
 

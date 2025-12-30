@@ -73,7 +73,7 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = false;
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if ($_ = $this->filter->getConditions())
             $conditions[] = $_;
 
@@ -84,9 +84,9 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
             $tabData['data'] = $trigger->getListviewData();
 
             // create note if search limit was exceeded; overwriting 'note' is intentional
-            if ($trigger->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($trigger->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringEntityString, $trigger->getMatches(), '"'.Lang::game('areatriggers').'"', Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
         }

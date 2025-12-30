@@ -115,8 +115,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             // tab: recipes [spells] (crafted)
             $condition = array(
                 ['OR', ['s.reagent1', 0, '>'], ['s.reagent2', 0, '>'], ['s.reagent3', 0, '>'], ['s.reagent4', 0, '>'], ['s.reagent5', 0, '>'], ['s.reagent6', 0, '>'], ['s.reagent7', 0, '>'], ['s.reagent8', 0, '>']],
-                ['OR', ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]],
-                Cfg::get('SQL_LIMIT_NONE')
+                ['OR', ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
             );
 
             $recipes = new SpellList($condition);           // also relevant for 3
@@ -136,8 +135,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             $filterRecipe = [null, SKILL_LEATHERWORKING, SKILL_TAILORING, SKILL_ENGINEERING, SKILL_BLACKSMITHING, SKILL_COOKING, SKILL_ALCHEMY, SKILL_FIRST_AID, SKILL_ENCHANTING, SKILL_FISHING, SKILL_JEWELCRAFTING, SKILL_INSCRIPTION, SKILL_MINING, SKILL_HERBALISM];
             $conditions   = array(
                 ['requiredSkill', $this->typeId],
-                ['class', ITEM_CLASS_RECIPE],
-                Cfg::get('SQL_LIMIT_NONE')
+                ['class', ITEM_CLASS_RECIPE]
             );
 
             $recipeItems = new ItemList($conditions);
@@ -166,7 +164,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
             if ($created)
             {
-                $created = new ItemList(array(['i.id', $created], Cfg::get('SQL_LIMIT_NONE')));
+                $created = new ItemList(array(['i.id', $created]));
                 if (!$created->error)
                 {
                     $this->extendGlobalData($created->getJSGlobals(GLOBALINFO_SELF));
@@ -187,8 +185,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             // tab: required by [item]
             $conditions = array(
                 ['requiredSkill', $this->typeId],
-                ['class', ITEM_CLASS_RECIPE, '!'],
-                Cfg::get('SQL_LIMIT_NONE')
+                ['class', ITEM_CLASS_RECIPE, '!']
             );
 
             $reqBy = new ItemList($conditions);
@@ -209,12 +206,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             }
 
             // tab: required by [itemset]
-            $conditions = array(
-                ['skillId', $this->typeId],
-                Cfg::get('SQL_LIMIT_NONE')
-            );
-
-            $reqBy = new ItemsetList($conditions);
+            $reqBy = new ItemsetList(array(['skillId', $this->typeId]));
             if (!$reqBy->error)
             {
                 $this->extendGlobalData($reqBy->getJSGlobals(GLOBALINFO_SELF));
@@ -252,8 +244,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         $reqRace   = 0x0;
         $condition = array(
             ['AND', ['s.reagent1', 0], ['s.reagent2', 0], ['s.reagent3', 0], ['s.reagent4', 0], ['s.reagent5', 0], ['s.reagent6', 0], ['s.reagent7', 0], ['s.reagent8', 0]],
-            ['OR',  ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]],
-            Cfg::get('SQL_LIMIT_NONE')
+            ['OR',  ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
         );
 
         foreach (Game::$skillLineMask as $line1 => $sets)
@@ -310,7 +301,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
             $list = $spellIds ? DB::World()->selectCol('SELECT cdt.`CreatureId` FROM creature_default_trainer cdt JOIN trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId` WHERE ts.`SpellID` IN (?a)', $spellIds) : [];
             if ($list)
             {
-                $trainer = new CreatureList(array(Cfg::get('SQL_LIMIT_NONE'), ['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
+                $trainer = new CreatureList(array(['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));
 
                 if (!$trainer->error)
                 {
@@ -346,7 +337,7 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         if ($sort)
         {
-            $quests = new QuestList(array(['zoneOrSort', -$sort], Cfg::get('SQL_LIMIT_NONE')));
+            $quests = new QuestList(array(['zoneOrSort', -$sort]));
             if (!$quests->error)
             {
                 $this->extendGlobalData($quests->getJSGlobals());

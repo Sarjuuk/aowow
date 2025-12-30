@@ -49,12 +49,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         // my neighbour is noisy as fuck and my head hurts, so ..
         $this->petFamIcons = ['Ability_Druid_KingoftheJungle', 'Ability_Druid_DemoralizingRoar', 'Ability_EyeOfTheOwl']; // .. i've no idea where to fetch these from
-        $this->spellMods   = (new SpellList(array(['typeCat', -2], Cfg::get('SQL_LIMIT_NONE'))))->getProfilerMods();
+        $this->spellMods   = (new SpellList(array(['typeCat', -2])))->getProfilerMods();
 
         $petIcons  = Util::toJSON(DB::Aowow()->SelectCol('SELECT `id` AS ARRAY_KEY, LOWER(SUBSTRING_INDEX(`iconString`, "\\\\", -1)) AS "iconString" FROM dbc_creaturefamily WHERE `petTalentType` IN (0, 1, 2)'));
 
         $tSpellIds = DB::Aowow()->selectCol('SELECT `rank1` FROM dbc_talent UNION SELECT `rank2` FROM dbc_talent UNION SELECT `rank3` FROM dbc_talent UNION SELECT `rank4` FROM dbc_talent UNION SELECT `rank5` FROM dbc_talent');
-        $this->tSpells = new SpellList(array(['s.id', $tSpellIds], Cfg::get('SQL_LIMIT_NONE')));
+        $this->tSpells = new SpellList(array(['s.id', $tSpellIds]));
 
         foreach (CLISetup::$locales as $loc)
         {

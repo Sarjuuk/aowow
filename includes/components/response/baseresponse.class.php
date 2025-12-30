@@ -316,7 +316,6 @@ trait TrCache
 
 trait TrSearch
 {
-    private int    $maxResults = 500;
     private string $query      = '';                        // sanitized search string
     private int    $searchMask = 0;                         // what to search for
     private Search $searchObj;

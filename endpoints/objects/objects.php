@@ -48,7 +48,7 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Util::ucFirst(Lang::game('objects'));
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -93,9 +93,9 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
                 $tabData['visibleCols'] = ['skill'];
 
             // create note if search limit was exceeded
-            if ($objects->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($objects->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_objectsfound', $objects->getMatches(), Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
         }

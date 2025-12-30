@@ -55,7 +55,7 @@ class EventsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
 
-        $condition = [];
+        $condition = [Listview::DEFAULT_SIZE];
 
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $condition[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];

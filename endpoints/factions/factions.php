@@ -71,7 +71,7 @@ class FactionsBaseResponse extends TemplateResponse implements ICache
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
 
         if (!User::isInGroup(U_GROUP_EMPLOYEE))             // unlisted factions
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];

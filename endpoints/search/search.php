@@ -35,12 +35,9 @@ class SearchBaseResponse extends TemplateResponse implements ICache
 
         $this->query = $this->_get['search'];               // technically pageParam, but prepared
 
-        if ($limit = Cfg::get('SQL_LIMIT_SEARCH'))
-            $this->maxResults = $limit;
-
         $this->searchMask = Search::TYPE_REGULAR | self::SEARCH_MODS_ALL;
 
-        $this->searchObj = new Search($this->query, $this->searchMask, $this->maxResults);
+        $this->searchObj = new Search($this->query, $this->searchMask);
     }
 
     protected function generate() : void

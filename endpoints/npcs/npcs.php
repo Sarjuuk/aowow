@@ -48,7 +48,7 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Lang::game('npcs');
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -109,9 +109,9 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
                 $tabData['hiddenCols'] = ['type'];
 
             // create note if search limit was exceeded
-            if ($npcs->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($npcs->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_npcsfound', $npcs->getMatches(), Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
         }

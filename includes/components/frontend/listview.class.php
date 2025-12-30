@@ -8,12 +8,14 @@ if (!defined('AOWOW_REVISION'))
 
 class Listview implements \JsonSerializable
 {
-    public const MODE_DEFAULT  = 0;
-    public const MODE_CHECKBOX = 1;
-    public const MODE_DIV      = 2;
-    public const MODE_TILED    = 3;
-    public const MODE_CALENDAR = 4;
-    public const MODE_FLEXGRID = 5;
+    public const /* int */ MODE_DEFAULT  = 0;
+    public const /* int */ MODE_CHECKBOX = 1;
+    public const /* int */ MODE_DIV      = 2;
+    public const /* int */ MODE_TILED    = 3;
+    public const /* int */ MODE_CALENDAR = 4;
+    public const /* int */ MODE_FLEXGRID = 5;
+
+    public const /* int */ DEFAULT_SIZE  = 300;
 
     private const TEMPLATES = array(
         'achievement'       => ['template' => 'achievement',       'id' => 'achievements',    'name' => '$LANG.tab_achievements'  ],

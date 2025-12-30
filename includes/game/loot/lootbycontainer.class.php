@@ -169,7 +169,7 @@ class LootByContainer extends Loot
             if (!$lootRows)
                 continue;
 
-            $items = new ItemList(array(['i.id', $itemIds], Cfg::get('SQL_LIMIT_NONE')));
+            $items = new ItemList(array(['i.id', $itemIds]));
             $this->storeJSGlobals($items->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_RELATED));
             $itemRows = $items->getListviewData();
 

@@ -94,7 +94,7 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
         /* Main Content */
         /****************/
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if ($_ = $this->filter->getConditions())
             $conditions[] = $_;
 
@@ -175,12 +175,12 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
                 $lvVisibleCols[] = 'guildrank';
 
             // create note if search limit was exceeded
-            if ($this->filter->query && $profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($this->filter->query && $profiles->getMatches() > Listview::DEFAULT_SIZE)
             {
                 $lvNote = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound2', $this->sumSubjects, $profiles->getMatches());
                 $lv_truncated = 1;
             }
-            else if ($profiles->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            else if ($profiles->getMatches() > Listview::DEFAULT_SIZE)
                 $lvNote = sprintf(Util::$tryFilteringString, 'LANG.lvnote_charactersfound', $this->sumSubjects, 0);
 
             if ($this->filter->useLocalList)

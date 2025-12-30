@@ -67,7 +67,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Util::ucFirst(Lang::game('achievements'));
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -118,7 +118,7 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
         if (!$acvList->getMatches() && $this->category)
         {
             // ToDo - we also branch into here if the filter prohibits results. That should be skipped.
-            $conditions = [];
+            $conditions = [Listview::DEFAULT_SIZE];
             if ($fiCnd)
                 $conditions[] = $fiCnd;
             if ($catList = DB::Aowow()->SelectCol('SELECT `id` FROM ?_achievementcategory WHERE `parentCat` IN (?a) OR `parentCat2` IN (?a) ', $this->category, $this->category))
@@ -143,9 +143,9 @@ class AchievementsBaseResponse extends TemplateResponse implements ICache
                 $tabData['extraCols'] = '$fi_getExtraCols(fi_extraCols, 0, 0)';
 
             // create note if search limit was exceeded
-            if ($acvList->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($acvList->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_achievementsfound', $acvList->getMatches(), Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
         }

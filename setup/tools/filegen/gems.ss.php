@@ -53,7 +53,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             EXP_BC, EXP_WOTLK
         );
 
-        $enchantments = new EnchantmentList(array(['id', array_column($gems, 'enchId')], Cfg::get('SQL_LIMIT_NONE')));
+        $enchantments = new EnchantmentList(array(['id', array_column($gems, 'enchId')]));
         if ($enchantments->error)
         {
             CLI::write('[gems] Required table ?_itemenchantment seems to be empty!', CLI::LOG_ERROR);

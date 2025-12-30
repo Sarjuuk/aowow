@@ -201,7 +201,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $itemCnd = [];
+        $itemCnd = ['OR'];
         if ($_holidayId)
         {
             // tab: criteria-of
@@ -224,10 +224,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
                 }
             }
 
-            $itemCnd = array(
-                'OR',
-                ['eventId', $this->typeId],                    // direct requirement on item
-            );
+            $itemCnd[] = ['eventId', $this->typeId];        // direct requirement on item
 
             // tab: quests (by table, go & creature)
             $quests = new QuestList(array(['eventId', $this->typeId]));

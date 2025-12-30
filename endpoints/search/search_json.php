@@ -52,16 +52,13 @@ class SearchJsonResponse extends TextResponse implements ICache
         if ($_ = array_filter($this->_get['slots'] ?? []))
             $this->extraCnd[] = ['slot', $_];
 
-        if ($limit = Cfg::get('SQL_LIMIT_SEARCH'))
-            $this->maxResults = $limit;
-
         $this->searchMask = Search::TYPE_JSON;
         if ($this->_get['slots'] || $this->_get['type'] == Type::ITEM)
             $this->searchMask |= 1 << Search::MOD_ITEM;
         else if ($this->_get['type'] == Type::ITEMSET)
             $this->searchMask |= 1 << Search::MOD_ITEM | 1 << Search::MOD_ITEMSET;
 
-        $this->searchObj = new Search($this->query, $this->searchMask, $this->maxResults, $this->extraCnd, $this->extraOpts);
+        $this->searchObj = new Search($this->query, $this->searchMask, $this->extraCnd, $this->extraOpts);
     }
 
     // !note! dear reader, if you ever try to generate a string, that is to be evaled by JS, NEVER EVER terminate with a \n   .....   $totalHoursWasted +=2;

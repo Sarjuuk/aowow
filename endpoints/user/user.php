@@ -158,7 +158,7 @@ class UserBaseResponse extends TemplateResponse
             }
 
         // Comments
-        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'comments' => true], $nFound))
+        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'comments' => true], $nFound, resultLimit: Listview::DEFAULT_SIZE))
         {
             $tabData = array(
                 'data'           => $_,
@@ -167,7 +167,7 @@ class UserBaseResponse extends TemplateResponse
                 '_totalCount'    => $nFound
             );
 
-            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($nFound > Listview::DEFAULT_SIZE)
             {
                 $tabData['name'] = '$LANG.tab_latestcomments';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_usercomments, '.$nFound.')';
@@ -177,7 +177,7 @@ class UserBaseResponse extends TemplateResponse
         }
 
         // Comment Replies
-        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'replies' => true], $nFound))
+        if ($_ = CommunityContent::getCommentPreviews(['user' => $this->user['id'], 'replies' => true], $nFound, resultLimit: Listview::DEFAULT_SIZE))
         {
             $tabData = array(
                 'data'           => $_,
@@ -186,7 +186,7 @@ class UserBaseResponse extends TemplateResponse
                 '_totalCount'    => $nFound
             );
 
-            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($nFound > Listview::DEFAULT_SIZE)
             {
                 $tabData['name'] = '$LANG.tab_latestreplies';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userreplies, '.$nFound.')';
@@ -196,14 +196,14 @@ class UserBaseResponse extends TemplateResponse
         }
 
         // Screenshots
-        if ($_ = CommunityContent::getScreenshots(-$this->user['id'], 0, $nFound))
+        if ($_ = CommunityContent::getScreenshots(-$this->user['id'], 0, $nFound, resultLimit: Listview::DEFAULT_SIZE))
         {
             $tabData = array(
                 'data'        => $_,
                 '_totalCount' => $nFound
             );
 
-            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($nFound > Listview::DEFAULT_SIZE)
             {
                 $tabData['name'] = '$LANG.tab_latestscreenshots';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_userscreenshots, '.$nFound.')';
@@ -213,14 +213,14 @@ class UserBaseResponse extends TemplateResponse
         }
 
         // Videos
-        if ($_ = CommunityContent::getVideos(-$this->user['id'], 0, $nFound))
+        if ($_ = CommunityContent::getVideos(-$this->user['id'], 0, $nFound, resultLimit: Listview::DEFAULT_SIZE))
         {
             $tabData = array(
                 'data'        => $_,
                 '_totalCount' => $nFound
             );
 
-            if ($nFound > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($nFound > Listview::DEFAULT_SIZE)
             {
                 $tabData['name'] = '$LANG.tab_latestvideos';
                 $tabData['note'] = '$$WH.sprintf(LANG.lvnote_uservideos, '.$nFound.')';

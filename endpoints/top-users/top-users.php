@@ -8,6 +8,8 @@ if (!defined('AOWOW_REVISION'))
 
 class TopusersBaseResponse extends TemplateResponse
 {
+    private const /* int */ MAX_RESULTS = 500;
+
     protected  string $template   = 'list-page-generic';
     protected  string $pageName   = 'top-users';
     protected ?int    $activeTab  = parent::TAB_COMMUNITY;
@@ -57,7 +59,7 @@ class TopusersBaseResponse extends TemplateResponse
                 ORDER BY reputation DESC
                 LIMIT    ?d',
                 SITEREP_ACTION_COMMENT, SITEREP_ACTION_SUBMIT_SCREENSHOT, SITEREP_ACTION_GOOD_REPORT,
-                $time ?: DBSIMPLE_SKIP, Cfg::get('SQL_LIMIT_SEARCH')
+                $time ?: DBSIMPLE_SKIP, self::MAX_RESULTS
             );
 
             $data = [];

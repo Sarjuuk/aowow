@@ -16,7 +16,7 @@ class LatestcommentsRssResponse extends TextResponse
     {
         $now = new DateTime();
 
-        foreach (CommunityContent::getCommentPreviews(['comments' => 1, 'replies' => 1], dateFmt: false) as $comment)
+        foreach (CommunityContent::getCommentPreviews(['comments' => 1, 'replies' => 1], dateFmt: false, resultLimit: 100) as $comment)
         {
             if (empty($comment['commentid']))
                 $url = Cfg::get('HOST_URL').'/?go-to-comment&amp;id='.$comment['id'];

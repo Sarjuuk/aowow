@@ -177,7 +177,7 @@ class SpellList extends DBTypeList
         }
 
         if ($foo)
-            $this->relItems = new ItemList(array(['i.id', array_unique($foo)], Cfg::get('SQL_LIMIT_NONE')));
+            $this->relItems = new ItemList(array(['i.id', array_unique($foo)]));
     }
 
     // required for item-comparison

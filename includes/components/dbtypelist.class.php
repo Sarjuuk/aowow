@@ -59,9 +59,9 @@ abstract class DBTypeList
     */
     public function __construct(array $conditions = [], array $miscData = [])
     {
-        $where     = [];
-        $linking   = ' AND ';
-        $limit     = Cfg::get('SQL_LIMIT_DEFAULT');
+        $where   = [];
+        $linking = ' AND ';
+        $limit   = 0;
 
         $calcTotal  = false;
         $totalQuery = '';
@@ -205,10 +205,10 @@ abstract class DBTypeList
                     break;
                 case 'string':
                 case 'integer':
-                    if (is_string($c))
-                        $linking = $c == 'AND' ? ' AND ' : ' OR ';
+                    if (is_numeric($c))
+                        $limit = max(0, (int)$c);
                     else
-                        $limit = $c > 0 ? $c : 0;
+                        $linking = $c == 'AND' ? ' AND ' : ' OR ';
                 default:
                     unset($conditions[$i]);
             }
@@ -925,7 +925,7 @@ trait sourceHelper
                     $buff[$_curTpl['moreType']][] = $_curTpl['moreTypeId'];
 
             foreach ($buff as $type => $ids)
-                $this->sourceMore[$type] = Type::newList($type, [Cfg::get('SQL_LIMIT_NONE'), ['id', $ids]]);
+                $this->sourceMore[$type] = Type::newList($type, [['id', $ids]]);
         }
 
         $s = array_keys($this->sources[$this->id]);

@@ -33,7 +33,7 @@ class LatestvideosBaseResponse extends TemplateResponse
 
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"]);
 
-        $data = CommunityContent::getVideos();
+        $data = CommunityContent::getVideos(resultLimit: Listview::DEFAULT_SIZE);
         $this->lvTabs->addListviewTab(new Listview(['data' => $data], 'video'));
 
         parent::generate();

@@ -1007,7 +1007,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
 
             if ($trainers)
             {
-                $tbTrainer = new CreatureList(array(Cfg::get('SQL_LIMIT_NONE'), ['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
+                $tbTrainer = new CreatureList(array(['ct.id', array_keys($trainers)], ['s.guid', null, '!'], ['ct.npcflag', NPC_FLAG_TRAINER, '&']));
                 if (!$tbTrainer->error)
                 {
                     $this->extendGlobalData($tbTrainer->getJSGlobals());
@@ -1185,7 +1185,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
         if ($lockIds)
         {
             // objects
-            $lockedObj = new GameObjectList(array(Cfg::get('SQL_LIMIT_NONE'), ['lockId', $lockIds]));
+            $lockedObj = new GameObjectList(array(['lockId', $lockIds]));
             if (!$lockedObj->error)
             {
                 $this->addDataLoader('zones');
@@ -1197,7 +1197,7 @@ class SpellBaseResponse extends TemplateResponse implements ICache
                 ), GameObjectList::$brickFile));
             }
 
-            $lockedItm = new ItemList(array(Cfg::get('SQL_LIMIT_NONE'), ['lockId', $lockIds]));
+            $lockedItm = new ItemList(array(['lockId', $lockIds]));
             if (!$lockedItm->error)
             {
                 $this->extendGlobalData($lockedItm->getJSGlobals(GLOBALINFO_SELF));

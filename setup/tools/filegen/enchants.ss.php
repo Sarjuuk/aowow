@@ -83,7 +83,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         $enchIds = array_column($enchantSpells, 'effect1MiscValue');
 
-        $enchantments = new EnchantmentList(array(['id', $enchIds], Cfg::get('SQL_LIMIT_NONE')));
+        $enchantments = new EnchantmentList(array(['id', $enchIds]));
         if ($enchantments->error)
         {
             CLI::write('[enchants] Required table ?_itemenchantment seems to be empty!', CLI::LOG_ERROR);
@@ -91,7 +91,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             return false;
         }
 
-        $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!'], Cfg::get('SQL_LIMIT_NONE')));
+        $castItems = new ItemList(array(['spellId1', array_keys($enchantSpells)], ['src.typeId', null, '!']));
         if ($castItems->error)
         {
             CLI::write('[enchants] Required table ?_items seems to be empty!', CLI::LOG_ERROR);

@@ -112,7 +112,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Util::ucFirst(Lang::game('items'));
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -255,7 +255,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
         $nameSource = [];
         $grouping   = $fiForm['gb'] ?? ItemListFilter::GROUP_BY_NONE;
         $extraOpts  = [];
-        $maxResults = Cfg::get('SQL_LIMIT_DEFAULT');
+        $maxResults = Listview::DEFAULT_SIZE;
         $forceTabs  = false;
         $tabs       = [];
 
@@ -435,7 +435,7 @@ class ItemsBaseResponse extends TemplateResponse implements ICache
             }
             else if ($items->getMatches() > $maxResults)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_itemsfound', $items->getMatches(), Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
 

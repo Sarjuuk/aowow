@@ -177,11 +177,11 @@ class RemoteArenaTeamList extends ArenaTeamList
             );
 
         // equalize subject distribution across realms
+        $limit = 0;
         foreach ($conditions as $c)
-            if (is_int($c))
-                $limit = $c;
+            if (is_numeric($c))
+                $limit = max(0, (int)$c);
 
-        $limit ??= Cfg::get('SQL_LIMIT_DEFAULT');
         if (!$limit)                                        // int:0 means unlimited, so skip early
             return;
 
@@ -219,7 +219,7 @@ class RemoteArenaTeamList extends ArenaTeamList
             foreach ($teams as $team)
                 $gladiators = array_merge($gladiators, array_keys($team));
 
-            $profiles[$realmId] = new RemoteProfileList(array(['c.guid', $gladiators], Cfg::get('SQL_LIMIT_NONE')), ['sv' => $realmId]);
+            $profiles[$realmId] = new RemoteProfileList(array(['c.guid', $gladiators]), ['sv' => $realmId]);
 
             if (!$profiles[$realmId]->error)
                 $profiles[$realmId]->initializeLocalEntries();

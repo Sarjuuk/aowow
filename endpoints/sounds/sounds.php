@@ -47,7 +47,7 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
     {
         $this->h1 = Util::ucFirst(Lang::game('sounds'));
 
-        $conditions = [];
+        $conditions = [Listview::DEFAULT_SIZE];
         if (!User::isInGroup(U_GROUP_EMPLOYEE))
             $conditions[] = [['cuFlags', CUSTOM_EXCLUDE_FOR_LISTVIEW, '&'], 0];
 
@@ -92,9 +92,9 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
             $tabData['data'] = $sounds->getListviewData();
 
             // create note if search limit was exceeded; overwriting 'note' is intentional
-            if ($sounds->getMatches() > Cfg::get('SQL_LIMIT_DEFAULT'))
+            if ($sounds->getMatches() > Listview::DEFAULT_SIZE)
             {
-                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), Cfg::get('SQL_LIMIT_DEFAULT'));
+                $tabData['note'] = sprintf(Util::$tryFilteringString, 'LANG.lvnote_soundsfound', $sounds->getMatches(), Listview::DEFAULT_SIZE);
                 $tabData['_truncated'] = 1;
             }
         }
