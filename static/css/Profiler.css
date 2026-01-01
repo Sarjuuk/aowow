@@ -780,6 +780,11 @@ a.profiler-achievements-total-right {
     border-color: #101010;
 }
 
+/* aowow - spell schools table in stats tooltip had no cell spacing */
+.wowhead-tooltip td td:nth-child(2) {
+    padding-left: 8px;
+}
+
 /********************/
 /* PROFILER BUTTONS */
 /********************/
