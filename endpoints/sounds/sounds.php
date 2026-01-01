@@ -24,15 +24,17 @@ class SoundsBaseResponse extends TemplateResponse implements ICache
     );
     protected  array  $validCats   = [1, 2, 3, 4, 6, 9, 10, 12, 13, 14, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50, 52, 53];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
         if ($this->category)
             $this->forward('?sounds&filter=ty='.$this->category[0]);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new SoundListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {

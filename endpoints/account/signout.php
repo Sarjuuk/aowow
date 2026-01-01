@@ -15,13 +15,13 @@ class AccountSignoutResponse extends TextResponse
         'global' => ['filter' => FILTER_CALLBACK,        'options' => [self::class, 'checkEmptySet']  ]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         // if the user not is logged in goto login page
         if (!User::isLoggedIn())
             $this->forwardToSignIn();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

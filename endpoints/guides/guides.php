@@ -20,11 +20,11 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
 
     protected  array  $validCats  = [null, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

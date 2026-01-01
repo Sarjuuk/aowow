@@ -25,12 +25,12 @@ class AccountUpdatepasswordResponse extends TextResponse
 
     private bool $success = false;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         if (Cfg::get('ACC_AUTH_MODE') != AUTH_MODE_SELF)
             (new TemplateResponse())->generateError();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

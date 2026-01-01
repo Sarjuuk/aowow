@@ -13,9 +13,9 @@ class ProfileLoadResponse extends TextResponse
         'items' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkItemList']]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generate404();

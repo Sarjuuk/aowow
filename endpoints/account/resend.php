@@ -22,7 +22,7 @@ class AccountResendResponse extends TemplateResponse
 
     private bool $success = false;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         if (Cfg::get('ACC_EXT_RECOVER_URL'))
             $this->forward(Cfg::get('ACC_EXT_RECOVER_URL'));
@@ -30,7 +30,7 @@ class AccountResendResponse extends TemplateResponse
         if (!Cfg::get('ACC_ALLOW_REGISTER') || Cfg::get('ACC_AUTH_MODE') != AUTH_MODE_SELF)
             $this->generateError();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

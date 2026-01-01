@@ -15,11 +15,11 @@ class TopusersBaseResponse extends TemplateResponse
     protected ?int    $activeTab  = parent::TAB_COMMUNITY;
     protected  array  $breadcrumb = [3, 11];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if ($pageParam)
+        if ($rawParam)
             $this->generateError();
     }
 

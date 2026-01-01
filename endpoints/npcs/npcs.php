@@ -27,13 +27,15 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
 
     public bool $petFamPanel = false;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new CreatureListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {
@@ -93,6 +95,8 @@ class NpcsBaseResponse extends TemplateResponse implements ICache
         /****************/
 
         $this->redButtons[BUTTON_WOWHEAD] = true;
+        if ($fiQuery = $this->filter->buildGETParam())
+            $this->wowheadLink .= '&filter='.$fiQuery;
 
         // beast subtypes are selected via filter
         $tabData = ['data' => []];

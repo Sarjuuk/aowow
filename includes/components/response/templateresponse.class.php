@@ -31,7 +31,7 @@ trait TrDetailPage
 
 trait TrListPage
 {
-    public ?string $subCat = null;
+    public  string $subCat = '';
     public ?Filter $filter = null;
 
     public function getCacheKeyComponents() : array
@@ -150,7 +150,7 @@ class TemplateResponse extends BaseResponse
     public  array  $pageTemplate = [];                      // js PageTemplate object
     public  array  $jsGlobals    = [];                      // ready to be used in template
 
-    public function __construct(string $pageParam = '')
+    public function __construct(string $rawParam = '')
     {
         $this->title[] = Cfg::get('NAME');
         self::$time = microtime(true);
@@ -158,8 +158,8 @@ class TemplateResponse extends BaseResponse
         parent::__construct();
 
         $this->fullParams = $this->pageName;
-        if ($pageParam)
-            $this->fullParams .= '='.$pageParam;
+        if ($this->category)
+            $this->fullParams .= '='.implode('.', $this->category);
 
         // prep js+css includes
         $parentVars = get_class_vars(__CLASS__);
@@ -175,7 +175,7 @@ class TemplateResponse extends BaseResponse
 
         if ($this->pageName)
         {
-            $this->wowheadLink = sprintf(WOWHEAD_LINK, Lang::getLocale()->domain(), $this->pageName, $pageParam ? '=' . $pageParam : '');
+            $this->wowheadLink = sprintf(WOWHEAD_LINK, Lang::getLocale()->domain(), $this->fullParams, '');
             $this->pageTemplate['pageName'] = $this->pageName;
         }
 
@@ -672,15 +672,13 @@ class TemplateResponse extends BaseResponse
     // has a valid combination of categories
     private function isValidPage() : bool
     {
-        if (!$this->category || !$this->validCats)
+        if (!$this->category)
             return true;
 
         $c = $this->category;                               // shorthand
 
         switch (count($c))
         {
-            case 0: // no params works always
-                return true;
             case 1: // null is valid  || value in a 1-dim-array     || (key for a n-dim-array           && ( has more subcats                 || no further subCats ))
                 $filtered = array_filter($this->validCats, fn ($x) => is_int($x));
                 return $c[0] === null || in_array($c[0], $filtered) || (!empty($this->validCats[$c[0]]) && (is_array($this->validCats[$c[0]]) || $this->validCats[$c[0]] === true));

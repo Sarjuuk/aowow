@@ -14,9 +14,9 @@ class ProfileLinkResponse extends TextResponse
         'id' => ['filter' => FILTER_VALIDATE_INT]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generate404();

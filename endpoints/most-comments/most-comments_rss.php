@@ -14,9 +14,9 @@ class MostcommentsRssResponse extends TextResponse
 
     private   array  $validCats   = [1, 7, 30];
 
-    public function __construct($pageParam)
+    public function __construct($rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if ($this->params && !in_array($this->params[0], $this->validCats))
             $this->forward('?most-comments=1&rss');

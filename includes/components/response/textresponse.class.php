@@ -96,12 +96,12 @@ class TextResponse extends BaseResponse
     protected  array  $params      = [];
 
     /// generation stats
-    protected static float $time       = 0.0;
+    protected static float $time = 0.0;
 
-    public function __construct(string $pageParam = '')
+    public function __construct(string $rawParam = '')
     {
         self::$time   = microtime(true);
-        $this->params = explode('.', $pageParam);
+        $this->params = explode('.', $rawParam);
         // todo - validate params?
 
         parent::__construct();

@@ -29,7 +29,7 @@ class AccountforgotpasswordResponse extends TemplateResponse
 
     private bool $success = false;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         // don't redirect logged in users
         // you can be forgetful AND logged in
@@ -40,7 +40,7 @@ class AccountforgotpasswordResponse extends TemplateResponse
         if (Cfg::get('ACC_AUTH_MODE') != AUTH_MODE_SELF)
             $this->generateError();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

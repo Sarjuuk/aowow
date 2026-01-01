@@ -17,9 +17,9 @@ class DataBaseResponse extends TextResponse
         'callback' => ['filter' => FILTER_CALLBACK,     'options' => [self::class, 'checkCallback'       ]]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if ($this->_get['locale']?->validate())
             Lang::load($this->_get['locale']);

@@ -17,18 +17,18 @@ class HelpBaseResponse extends TemplateResponse
 
     private string $catg = '';
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if (!$pageParam)
+        if (!$rawParam)
             $this->generateError();
 
-        $pageId = array_search($pageParam, $this->validCats);
+        $pageId = array_search($rawParam, $this->validCats);
         if ($pageId === false)
             $this->generateError();
 
-        $this->catg = $pageParam;
+        $this->catg = $rawParam;
     }
 
     protected function generate() : void

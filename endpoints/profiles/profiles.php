@@ -33,11 +33,11 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
 
     private int $sumSubjects = 0;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getSubjectFromUrl($pageParam);
+        $this->getSubjectFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generateError();
@@ -55,7 +55,9 @@ class ProfilesBaseResponse extends TemplateResponse implements IProfilerList
             $realms[] = $idx;
         }
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new ProfileListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
         if ($this->filter->shouldReload)
         {

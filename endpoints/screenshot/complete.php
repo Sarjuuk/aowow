@@ -30,9 +30,9 @@ class ScreenshotCompleteResponse extends TextResponse
     private int    $destTypeId  = 0;
     private string $imgHash     = '';
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         // get screenshot destination
         // target delivered as screenshot=<command>&<type>.<typeId>.<hash:16> (hash is optional)

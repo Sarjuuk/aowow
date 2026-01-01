@@ -24,13 +24,15 @@ class ItemsetsBaseResponse extends TemplateResponse implements ICache
         'filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new ItemsetListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {

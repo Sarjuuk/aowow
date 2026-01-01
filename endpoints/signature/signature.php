@@ -18,12 +18,12 @@ class SignatureBaseResponse extends TemplateResponse
 
     private int $id = 0;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if ($pageParam)
-            $this->id = intVal($pageParam);
+        if ($rawParam)
+            $this->id = intVal($rawParam);
         else if ($this->assertGET('profile'))
             $this->id = $this->_get['profile'];
         else

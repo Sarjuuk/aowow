@@ -13,11 +13,11 @@ class AboutusBaseResponse extends TemplateResponse
     protected ?int    $activeTab  = parent::TAB_MORE;
     protected  array  $breadcrumb = [2, 0];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if ($pageParam)
+        if ($rawParam)
             $this->generateError();
     }
 

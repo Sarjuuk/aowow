@@ -27,13 +27,15 @@ class ObjectsBaseResponse extends TemplateResponse implements ICache
 
     public bool $petFamPanel = false;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new GameObjectListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {

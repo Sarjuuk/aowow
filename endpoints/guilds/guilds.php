@@ -29,14 +29,14 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
 
     private int $sumSubjects = 0;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generateError();
 
-        $this->getSubjectFromUrl($pageParam);
+        $this->getSubjectFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         $realms = [];
         foreach (Profiler::getRealms() as $idx => $r)
@@ -51,7 +51,9 @@ class GuildsBaseResponse extends TemplateResponse implements IProfilerList
             $realms[] = $idx;
         }
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new GuildListFilter($this->_get['filter'] ?? '', ['realms' => $realms]);
         if ($this->filter->shouldReload)
         {

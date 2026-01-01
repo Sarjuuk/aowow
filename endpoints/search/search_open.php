@@ -62,11 +62,11 @@ class SearchOpenResponse extends TextResponse implements ICache
         'search' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkTextLine']]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);                    // just to set g_user and g_locale
+        parent::__construct($rawParam);                    // just to set g_user and g_locale
 
-        $this->query = $this->_get['search'];               // technically pageParam, but prepared
+        $this->query = $this->_get['search'];               // technically rawParam, but prepared
 
         $this->searchMask = Search::TYPE_OPEN | self::SEARCH_MODS_OPEN;
 

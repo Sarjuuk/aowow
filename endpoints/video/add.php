@@ -27,9 +27,9 @@ class VideoAddResponse extends TextResponse
     private int    $destType   = 0;
     private int    $destTypeId = 0;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         // get video destination
         // target delivered as video=<command>&<type>.<typeId>.<hash:16> (hash is optional)

@@ -20,11 +20,11 @@ class PetsBaseResponse extends TemplateResponse implements ICache
 
     protected  array  $validCats  = [PET_TALENT_TYPE_FEROCITY, PET_TALENT_TYPE_TENACITY, PET_TALENT_TYPE_CUNNING];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

@@ -12,18 +12,18 @@ class FilterBaseResponse extends TextResponse
     private  string $page   = '';
     private ?Filter $filter = null;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        if (!$pageParam)
+        if (!$rawParam)
             return;
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         $catg = null;
-        if (strstr($pageParam, '='))
-            [$this->page, $catg] = explode('=', $pageParam);
+        if (strstr($rawParam, '='))
+            [$this->page, $catg] = explode('=', $rawParam);
         else
-            $this->page = $pageParam;
+            $this->page = $rawParam;
 
         if ($catg !== null)
             $this->catg = explode('.', $catg);

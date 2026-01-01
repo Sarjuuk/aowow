@@ -23,8 +23,9 @@ foreach ($query as $page => $param)
     // fix page calls - pages like search use the page call directly and expect it as lower case
     if (preg_match('/[A-Z]/', $page))
     {
-        $url = str_replace('?'.$page.'=', '?'.Util::lower($page).'=', $_SERVER['REQUEST_URI']);
-        header('Location: '.$url, true, 302);
+        $url  = explode('=', $_SERVER['REQUEST_URI'], 2);
+        $page = Util::lower(array_shift($url)).($url ? '=' . $url[0] : '');
+        header('Location: '.$page, true, 302);
         exit;
     }
 

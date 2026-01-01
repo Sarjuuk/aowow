@@ -34,9 +34,9 @@ class CompareBaseResponse extends TemplateResponse
 
     private string $compareString = '';
 
-    public function __construct($pageParam)
+    public function __construct($rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         // prefer GET over COOKIE
         if ($this->_get['compare'])

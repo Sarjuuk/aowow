@@ -19,12 +19,12 @@ class UploadImagecompleteResponse extends TextResponse
     public string $imgHash;
     public int    $newId;
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         if (User::isBanned())
             $this->generate404();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!preg_match('/^upload=image-complete&(\d+)\.(\w{16})$/i', $_SERVER['QUERY_STRING'] ?? '', $m, PREG_UNMATCHED_AS_NULL))
             $this->generate404();

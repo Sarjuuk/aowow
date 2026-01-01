@@ -19,9 +19,9 @@ class ProfilePowerResponse extends TextResponse implements ICache
         'domain' => ['filter' => FILTER_CALLBACK, 'options' => [Locale::class, 'tryFromDomain']]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generate404();
@@ -30,9 +30,9 @@ class ProfilePowerResponse extends TextResponse implements ICache
         if ($this->_get['domain'])
             Lang::load($this->_get['domain']);
 
-        $this->getSubjectFromUrl($pageParam);
+        $this->getSubjectFromUrl($rawParam);
 
-        if ($this->subjectName)                             // pageParam is fully defined profiler string
+        if ($this->subjectName)                             // rawParam is fully defined profiler string
         {
             // pending rename
             if (preg_match('/([^\-]+)-(\d+)/i', $this->subjectName, $m))

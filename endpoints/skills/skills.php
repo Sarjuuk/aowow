@@ -20,11 +20,11 @@ class SkillsBaseResponse extends TemplateResponse implements ICache
 
     protected  array  $validCats  = [-6, -5, -4, 6, 7, 8, 9, 10, 11];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

@@ -33,11 +33,11 @@ class SearchJsonResponse extends TextResponse implements ICache
     private array $extraOpts = [];                          // for weighted search
     private array $extraCnd  = [];                          // for weighted search
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        $this->query = $this->_get['search'];               // technically pageParam, but prepared
+        $this->query = $this->_get['search'];               // technically rawParam, but prepared
 
         if ($this->_get['wt'] && $this->_get['wtv'])        // slots and type should get ignored
         {

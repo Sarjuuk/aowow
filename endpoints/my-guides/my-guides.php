@@ -17,11 +17,11 @@ class MyguidesBaseResponse extends TemplateResponse
     protected ?int    $activeTab  = parent::TAB_GUIDES;
  // protected  array  $breadcrumb = [6];                    // breadcrumb menu not displayed by WH.?
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if (!User::isLoggedIn() || $pageParam)
+        if (!User::isLoggedIn() || $rawParam)
             $this->generateError();
     }
 

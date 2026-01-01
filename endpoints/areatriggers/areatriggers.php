@@ -23,14 +23,14 @@ class AreatriggersBaseResponse extends TemplateResponse implements ICache
     protected  array  $expectedGET       = ['filter' => ['filter' => FILTER_VALIDATE_REGEXP, 'options' => ['regexp' => Filter::PATTERN_PARAM]]];
     protected  array  $validCats         = [0, 1, 2, 3, 4, 5];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
         if (isset($this->category[0]))
             $this->forward('?areatriggers&filter=ty='.$this->category[0]);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         $this->filter = new AreaTriggerListFilter($this->_get['filter'] ?? '');
         if ($this->filter->shouldReload)

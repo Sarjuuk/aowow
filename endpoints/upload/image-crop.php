@@ -23,12 +23,12 @@ class UploadImagecropResponse extends TemplateResponse
     public int    $nextId     = 0;
     public string $imgHash    = '';
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
         if (User::isBanned())
             $this->generateError();
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

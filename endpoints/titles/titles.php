@@ -20,11 +20,11 @@ class TitlesBaseResponse extends TemplateResponse implements ICache
 
     protected  array  $validCats  = [0, 1, 2, 3, 4, 5, 6];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

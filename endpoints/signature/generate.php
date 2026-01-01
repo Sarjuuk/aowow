@@ -24,9 +24,9 @@ class SignatureGenerateResponse extends TextResponse
         'id' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkProfileId']]
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function generate() : void

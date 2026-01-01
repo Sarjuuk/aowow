@@ -24,16 +24,18 @@ class EnchantmentsBaseResponse extends TemplateResponse implements ICache
     );
     protected  array  $validCats   = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if ($this->category)
             $this->forward('?enchantments&filter=ty='.$this->category[0]);
 
-        $this->subCat = $pageParam !== '' ? '='.$pageParam : '';
+        if ($this->category)
+            $this->subCat = '='.implode('.', $this->category);
+
         $this->filter = new EnchantmentListFilter($this->_get['filter'] ?? '', ['parentCats' => $this->category]);
         if ($this->filter->shouldReload)
         {

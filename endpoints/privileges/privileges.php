@@ -31,11 +31,11 @@ class PrivilegesBaseResponse extends TemplateResponse
         17 => 'REP_REQ_PREMIUM'                             // premium status
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if ($pageParam)
+        if ($rawParam)
             $this->generateError();
 
         // apply actual values and order by requirement ASC

@@ -28,24 +28,24 @@ class UserBaseResponse extends TemplateResponse
 
     private array $user = [];
 
-    public function __construct($pageParam)
+    public function __construct($rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if (!$pageParam && User::isLoggedIn())
+        if (!$rawParam && User::isLoggedIn())
             $this->forward('?user='.User::$username);
 
-        if (!$pageParam)
+        if (!$rawParam)
             $this->forwardToSignIn('user');
 
-        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $pageParam))
+        if ($user = DB::Aowow()->selectRow('SELECT a.`id`, a.`username`, a.`consecutiveVisits`, a.`userGroups`, a.`avatar`, a.`avatarborder`, a.`wowicon`, a.`title`, a.`description`, a.`joinDate`, a.`prevLogin`, IFNULL(SUM(ar.`amount`), 0) AS "sumRep", a.`prevIP`, a.`email` FROM ?_account a LEFT JOIN ?_account_reputation ar ON a.`id` = ar.`userId` WHERE LOWER(a.`username`) = LOWER(?) GROUP BY a.`id`', $rawParam))
             $this->user = $user;
         else
-            $this->generateNotFound(Lang::user('notFound', [$pageParam]));
+            $this->generateNotFound(Lang::user('notFound', [$rawParam]));
 
         // do not display system account
         if (!$this->user['id'])
-            $this->generateNotFound(Lang::user('notFound', [$pageParam]));
+            $this->generateNotFound(Lang::user('notFound', [$rawParam]));
     }
 
     protected function generate() : void

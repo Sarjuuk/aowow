@@ -16,9 +16,9 @@ class ProfilePublicResponse extends TextResponse
      // 'bookmarked' => ['filter' => FILTER_CALLBACK, 'options' => [self::class, 'checkEmptySet']   ] // something with signatures? (must have bookmarked profile to create signature from)
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
         if (!Cfg::get('PROFILER_ENABLE'))
             $this->generate404();

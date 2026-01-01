@@ -34,17 +34,17 @@ class PrivilegeBaseResponse extends TemplateResponse
         17 => 'REP_REQ_PREMIUM'                             // premium status
     );
 
-    public function __construct(string $pageParam)
+    public function __construct(string $rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
 
-        if (!$pageParam)
+        if (!$rawParam)
             $this->generateError();
 
         // apply actual values
-        $this->repVal = Cfg::get($this->req2priv[$pageParam]);
+        $this->repVal = Cfg::get($this->req2priv[$rawParam]);
     }
 
     protected function generate() : void

@@ -15,11 +15,11 @@ class MostcommentsBaseResponse extends TemplateResponse
 
     protected  array  $validCats  = [1, 7, 30];
 
-    public function __construct($pageParam)
+    public function __construct($rawParam)
     {
-        $this->getCategoryFromUrl($pageParam);
+        $this->getCategoryFromUrl($rawParam);
 
-        parent::__construct($pageParam);
+        parent::__construct($rawParam);
     }
 
     protected function onInvalidCategory() : never
