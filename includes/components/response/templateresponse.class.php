@@ -160,6 +160,8 @@ class TemplateResponse extends BaseResponse
         $this->fullParams = $this->pageName;
         if ($this->category)
             $this->fullParams .= '='.implode('.', $this->category);
+        else if (in_array(__NAMESPACE__.'\TrDetailPage', class_uses($this)) && ($id = intVal($rawParam)))
+            $this->fullParams .= '='.$id;
 
         // prep js+css includes
         $parentVars = get_class_vars(__CLASS__);
