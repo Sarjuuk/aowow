@@ -201,7 +201,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
             }
         }
 
-        $itemCnd = ['OR'];
+        $itemCnd = [];
         if ($_holidayId)
         {
             // tab: criteria-of
@@ -272,6 +272,7 @@ class EventBaseResponse extends TemplateResponse implements ICache
         // not checking for loot ... cant distinguish between eventLoot and fillerCrapLoot
         if ($itemCnd)
         {
+            array_unshift($itemCnd, 'OR');
             $eventItems = new ItemList($itemCnd);
             if (!$eventItems->error)
             {
