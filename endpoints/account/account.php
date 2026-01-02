@@ -131,24 +131,6 @@ class AccountBaseResponse extends TemplateResponse
         $this->wowicon = $user['wowicon'];
         $this->avMode  = $user['avatar'];
 
-        // status [reviewing, ok, rejected]? (only 2: rejected processed in js)
-        if (User::isPremium() && ($cuAvatars = DB::Aowow()->select('SELECT `id`, `name`, `current`, `size`, `status`, `when` FROM ?_account_avatars WHERE `userId` = ?d', User::$id)))
-        {
-            array_walk($cuAvatars, function (&$x) {
-                $x['when']   *= 1000;                       // uploaded timestamp expected as msec for some reason
-                $x['caption'] = $x['name'];                 // only used for getVisibleText, duplicates name?
-                $x['type']    = 1;                          // always 1 ?, Dialog-popup doesn't work without it
-            });
-
-            foreach ($cuAvatars as $a)
-                if ($a['status'] != AvatarMgr::STATUS_REJECTED)
-                    $this->customicons[$a['id']] = $a['name'];
-
-            // TODO - replace with array_find in PHP 8.4
-            if ($x = array_filter($cuAvatars, fn($x) => $x['current'] > 0 ))
-                $this->customicon = array_pop($x)['id'];
-        }
-
         /* PREMIUM */
 
         $this->premium = User::isPremium();
@@ -156,7 +138,22 @@ class AccountBaseResponse extends TemplateResponse
         if (!$this->premium)
             return;
 
+        // required by js to calc reputation border color in user selection
         $this->reputation = User::getReputation();
+
+        // status [reviewing, ok, rejected]? (only 2: rejected processed in js)
+        // * 'when': uploaded timestamp expected as msec for some reason
+        // * 'caption': only used for getVisibleText, duplicates name?
+        // * 'type': always 1 ?, Dialog-popup doesn't work without it
+        if ($cuAvatars = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `id`, `name`, `name` AS "caption", `current`, `size`, `status`, `when` * 1000 AS "when", 1 AS "type" FROM ?_account_avatars WHERE `userId` = ?d', User::$id))
+        {
+            foreach ($cuAvatars as $id => $a)
+                if ($a['status'] != AvatarMgr::STATUS_REJECTED)
+                    $this->customicons[$id] = $a['name'];
+
+            if ($id = array_find_key($cuAvatars, fn($x) => $x['current'] > 0 ))
+                $this->customicon = $id;
+        }
 
         // Avatar Manager
         $this->avatarManager = new Listview([
