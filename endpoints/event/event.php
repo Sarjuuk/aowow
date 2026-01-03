@@ -225,33 +225,33 @@ class EventBaseResponse extends TemplateResponse implements ICache
             }
 
             $itemCnd[] = ['eventId', $this->typeId];        // direct requirement on item
+        }
 
-            // tab: quests (by table, go & creature)
-            $quests = new QuestList(array(['eventId', $this->typeId]));
-            if (!$quests->error)
-            {
-                $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
+        // tab: quests (by table, go & creature)
+        $quests = new QuestList(array(['eventId', $this->typeId]));
+        if (!$quests->error)
+        {
+            $this->extendGlobalData($quests->getJSGlobals(GLOBALINFO_SELF | GLOBALINFO_REWARDS));
 
-                $tabData = ['data'=> $quests->getListviewData()];
+            $tabData = ['data'=> $quests->getListviewData()];
 
-                if (QuestListFilter::getCriteriaIndex(33, $_holidayId))
-                    $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_holidayId.';crv=0');
+            if (QuestListFilter::getCriteriaIndex(33, $_holidayId))
+                $tabData['note'] = sprintf(Util::$filterResultString, '?quests&filter=cr=33;crs='.$_holidayId.';crv=0');
 
-                $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
+            $this->lvTabs->addListviewTab(new Listview($tabData, QuestList::$brickFile));
 
-                $questItems = [];
-                foreach (array_column($quests->rewards, Type::ITEM) as $arr)
-                    $questItems = array_merge($questItems, array_keys($arr));
+            $questItems = [];
+            foreach (array_column($quests->rewards, Type::ITEM) as $arr)
+                $questItems = array_merge($questItems, array_keys($arr));
 
-                foreach (array_column($quests->choices, Type::ITEM) as $arr)
-                    $questItems = array_merge($questItems, array_keys($arr));
+            foreach (array_column($quests->choices, Type::ITEM) as $arr)
+                $questItems = array_merge($questItems, array_keys($arr));
 
-                foreach (array_column($quests->requires, Type::ITEM) as $arr)
-                    $questItems = array_merge($questItems, $arr);
+            foreach (array_column($quests->requires, Type::ITEM) as $arr)
+                $questItems = array_merge($questItems, $arr);
 
-                if ($questItems)
-                    $itemCnd[] = ['id', $questItems];
-            }
+            if ($questItems)
+                $itemCnd[] = ['id', $questItems];
         }
 
         // items from creature
