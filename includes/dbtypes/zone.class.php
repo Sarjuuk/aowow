@@ -12,9 +12,9 @@ class ZoneList extends DBTypeList
 
     public static int    $type      = Type::ZONE;
     public static string $brickFile = 'zone';
-    public static string $dataTable = '?_zones';
+    public static string $dataTable = '::zones';
 
-    protected string $queryBase = 'SELECT z.*, z.`id` AS ARRAY_KEY FROM ?_zones z';
+    protected string $queryBase = 'SELECT z.*, z.`id` AS ARRAY_KEY FROM ::zones z';
 
     public function __construct(array $conditions = [], array $miscData = [])
     {

@@ -73,7 +73,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         while ($curCat > 0)
         {
             $catPath[] = $curCat;
-            $curCat = DB::Aowow()->SelectCell('SELECT `parentCat` FROM ?_achievementcategory WHERE `id` = ?d', $curCat);
+            $curCat = DB::Aowow()->SelectCell('SELECT `parentCat` FROM ::achievementcategory WHERE `id` = %i', $curCat);
         }
 
         $this->breadcrumb = array_merge($this->breadcrumb, array_reverse($catPath));
@@ -120,8 +120,8 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('flags') & ACHIEVEMENT_FLAG_COUNTER))
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_achievements WHERE `achievementId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_achievements WHERE `achievementId` = %i', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup
@@ -207,7 +207,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
             $this->rewards = [$rewItems, $rewTitles, $text];
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_achievement WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_achievement WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altAcv = new AchievementList(array(['id', abs($pendant)]));
             if (!$altAcv->error)
@@ -230,7 +230,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         // serverside extra-Data (not sure why ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE is set, let a lone a couple hundred times)
         if ($crtIds = array_column($this->subject->getCriteria(), 'id'))
-            $crtExtraData = DB::World()->select('SELECT `criteria_id` AS ARRAY_KEY, `type` AS ARRAY_KEY2, `value1`, `value2`, `ScriptName` FROM achievement_criteria_data WHERE `type` <> ?d AND `criteria_id` IN (?a)', ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE, $crtIds);
+            $crtExtraData = DB::World()->selectAssoc('SELECT `criteria_id` AS ARRAY_KEY, `type` AS ARRAY_KEY2, `value1`, `value2`, `ScriptName` FROM achievement_criteria_data WHERE `type` <> %i AND `criteria_id` IN %in', ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE, $crtIds);
         else
             $crtExtraData = [];
 
@@ -261,7 +261,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
                 case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
                 case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
                 case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
-                    $zoneId  = DB::Aowow()->selectCell('SELECT `id` FROM ?_zones WHERE `mapId` = ?', $obj);
+                    $zoneId  = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %s', $obj);
                     $crtIcon = new IconElement(Type::ZONE, $zoneId ?: 0, $crtName ?: ZoneList::getName($zoneId), size: IconElement::SIZE_SMALL, element: 'iconlist-icon');
                     break;
                 // link to area
@@ -423,7 +423,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: criteria of
-        $refs = DB::Aowow()->SelectCol('SELECT `refAchievementId` FROM ?_achievementcriteria WHERE `type` = ?d AND `value1` = ?d',
+        $refs = DB::Aowow()->SelectCol('SELECT `refAchievementId` FROM ::achievementcriteria WHERE `type` = %i AND `value1` = %i',
             ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT,
             $this->typeId
         );
@@ -463,7 +463,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
     {
         if ($_ = $this->subject->getField('mailTemplate'))
         {
-            $letter = DB::Aowow()->selectRow('SELECT * FROM ?_mails WHERE `id` = ?d', $_);
+            $letter = DB::Aowow()->selectRow('SELECT * FROM ::mails WHERE `id` = %i', $_);
             if (!$letter)
                 return false;
 
@@ -502,7 +502,7 @@ class AchievementBaseResponse extends TemplateResponse implements ICache
 
         $avlb = [];
         foreach (Profiler::getRealms() AS $rId => $rData)
-            if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE `achievement` = ?d', $pt->typeId))
+            if (!DB::Characters($rId)->selectCell('SELECT 1 FROM character_achievement WHERE `achievement` = %i', $pt->typeId))
                 $avlb[] = Util::ucWords($rData['name']);
 
         if (!$avlb)

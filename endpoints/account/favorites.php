@@ -37,13 +37,13 @@ class AccountFavoritesResponse extends TextResponse
     private function removeFavorite() : void
     {
         if ($this->assertPOST('id', 'remove'))
-            DB::Aowow()->query('DELETE FROM ?_account_favorites WHERE `userId` = ?d AND `type` = ?d AND `typeId` = ?d', User::$id, $this->_post['remove'], $this->_post['id']);
+            DB::Aowow()->qry('DELETE FROM ::account_favorites WHERE `userId` = %i AND `type` = %i AND `typeId` = %i', User::$id, $this->_post['remove'], $this->_post['id']);
     }
 
     private function addFavorite() : void
     {
         if ($this->assertPOST('id', 'add') && Type::validateIds($this->_post['add'], $this->_post['id']))
-            DB::Aowow()->query('INSERT INTO ?_account_favorites (`userId`, `type`, `typeId`) VALUES (?d, ?d, ?d)', User::$id, $this->_post['add'], $this->_post['id']);
+            DB::Aowow()->qry('INSERT INTO ::account_favorites (`userId`, `type`, `typeId`) VALUES (%i, %i, %i)', User::$id, $this->_post['add'], $this->_post['id']);
         else
             trigger_error('AccountFavoritesResponse::addFavorite() - failed to add [userId: '.User::$id.', type: '.$this->_post['add'].', typeId: '.$this->_post['id'], E_USER_NOTICE);
     }

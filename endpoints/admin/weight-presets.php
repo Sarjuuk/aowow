@@ -27,8 +27,8 @@ class AdminWeightpresetsResponse extends TemplateResponse
 
         $head = $body = '';
 
-        $scales  = DB::Aowow()->select('SELECT `class` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `name`, `icon` FROM ?_account_weightscales WHERE `userId` = 0');
-        $weights = DB::Aowow()->selectCol('SELECT awd.`id` AS ARRAY_KEY, awd.`field` AS ARRAY_KEY2, awd.`val` FROM ?_account_weightscale_data awd JOIN ?_account_weightscales ad ON awd.`id` = ad.`id` WHERE ad.`userId` = 0');
+        $scales  = DB::Aowow()->selectAssoc('SELECT `class` AS ARRAY_KEY, `id` AS ARRAY_KEY2, `name`, `icon` FROM ::account_weightscales WHERE `userId` = 0');
+        $weights = DB::Aowow()->selectCol('SELECT awd.`id` AS ARRAY_KEY, awd.`field` AS ARRAY_KEY2, awd.`val` FROM ::account_weightscale_data awd JOIN ::account_weightscales ad ON awd.`id` = ad.`id` WHERE ad.`userId` = 0');
         foreach ($scales as $cl => $data)
         {
             $ul = '';

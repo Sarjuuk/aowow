@@ -30,7 +30,7 @@ class CommentAddResponse extends TextResponse
         // we now have a valid return target
         $idOrUrl = $this->_get['typeid'];
         if ($this->_get['type'] == Type::GUIDE)
-            if ($_ = DB::Aowow()->selectCell('SELECT `url` FROM ?_guides WHERE `id` = ?d', $this->_get['typeid']))
+            if ($_ = DB::Aowow()->selectCell('SELECT `url` FROM ::guides WHERE `id` = %i', $this->_get['typeid']))
                 $idOrUrl = $_;
 
         $this->redirectTo = '?'.Type::getFileString($this->_get['type']).'='.$idOrUrl.'#comments';
@@ -57,16 +57,16 @@ class CommentAddResponse extends TextResponse
             return;
         }
 
-        if ($postId = DB::Aowow()->query('INSERT INTO ?_comments (`type`, `typeId`, `userId`, `roles`, `body`, `date`) VALUES (?d, ?d, ?d, ?d, ?, UNIX_TIMESTAMP())', $this->_get['type'], $this->_get['typeid'], User::$id, User::$groups, $this->_post['commentbody']))
+        if ($postId = DB::Aowow()->qry('INSERT INTO ::comments (`type`, `typeId`, `userId`, `roles`, `body`, `date`) VALUES (%i, %i, %i, %i, %s, UNIX_TIMESTAMP())', $this->_get['type'], $this->_get['typeid'], User::$id, User::$groups, $this->_post['commentbody']))
         {
             Util::gainSiteReputation(User::$id, SITEREP_ACTION_COMMENT, ['id' => $postId]);
 
             // every comment starts with a rating of +1 and i guess the simplest thing to do is create a db-entry with the system as owner
-            DB::Aowow()->query('INSERT INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, 0, 1)', RATING_COMMENT, $postId);
+            DB::Aowow()->qry('INSERT INTO ::user_ratings (`type`, `entry`, `userId`, `value`) VALUES (%i, %i, 0, 1)', RATING_COMMENT, $postId);
 
             // flag target with hasComment
             if ($tbl = Type::getClassAttrib($this->_get['type'], 'dataTable'))
-                DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_COMMENT, $this->_get['typeid']);
+                DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_COMMENT, $this->_get['typeid']);
 
             return;
         }

@@ -52,7 +52,7 @@ class AdminVideosResponse extends TemplateResponse
         else if ($this->_get['user'])
         {
             if (mb_strlen($this->_get['user']) >= 3)
-                if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']))
+                if ($uId = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_get['user']))
                     $viData = VideoMgr::getVideos(userId: $uId, nFound: $nMatches);
         }
         else

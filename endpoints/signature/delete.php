@@ -23,7 +23,7 @@ class SignatureDeleteResponse extends TextResponse
         if (!$this->assertGET('id'))
             $this->generate404();
 
-        // DB::Aowow()->query(DELETE FROM ?_account_signatures WHERE `id` IN (?a) { AND `accountId` = ?d }', $this->_get['id], User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id);
+        // DB::Aowow()->qry(DELETE FROM ::account_signatures WHERE %if', !User::isInGroup(U_GROUP_MODERATOR), '`accountId` = %i AND', User::$id, '%end `id` IN %in', $this->_get['id]);
     }
 }
 

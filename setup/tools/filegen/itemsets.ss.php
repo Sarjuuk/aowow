@@ -43,7 +43,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     public function generate() : bool
     {
-        $setList   = DB::Aowow()->Select('SELECT * FROM ?_itemset ORDER BY `refSetId` DESC');
+        $setList   = DB::Aowow()->selectAssoc('SELECT * FROM ::itemset ORDER BY `refSetId` DESC');
         $jsonBonus = [];
 
         foreach (CLISetup::$locales as $loc)

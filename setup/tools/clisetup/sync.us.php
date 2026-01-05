@@ -45,14 +45,14 @@ CLISetup::registerUtility(new class extends UtilityScript
         {
             $io = ['doSql' => $s, 'doneSql' => []];
             CLISetup::run('sql', $io);
-            DB::Aowow()->query('UPDATE ?_dbversion SET `sql` = ?', implode(' ', array_diff($io['doSql'], $io['doneSql'])));
+            DB::Aowow()->qry('UPDATE ::dbversion SET `sql` = %s', implode(' ', array_diff($io['doSql'], $io['doneSql'])));
         }
 
         if ($b)
         {
             $io = ['doBuild' => $b, 'doneBuild' => []];
             CLISetup::run('build', $io);
-            DB::Aowow()->query('UPDATE ?_dbversion SET `build` = ?', implode(' ', array_diff($io['doBuild'], $io['doneBuild'])));
+            DB::Aowow()->qry('UPDATE ::dbversion SET `build` = %s', implode(' ', array_diff($io['doBuild'], $io['doneBuild'])));
         }
 
         return true;

@@ -53,7 +53,7 @@ class AccountSigninResponse extends TemplateResponse
         // coming from user recovery or creation, prefill username
         if ($this->_get['key'])
         {
-            if ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ?_account a LEFT JOIN ?_account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN (?a) AND a.`token` = ?',
+            if ($userData = DB::Aowow()->selectRow('SELECT a.`login` AS "0", IF(s.`expires`, 0, 1) AS "1" FROM ::account a LEFT JOIN ::account_sessions s ON a.`id` = s.`userId` AND a.`token` = s.`sessionId` WHERE a.`status` IN %in AND a.`token` = %s',
                 [ACC_STATUS_RECOVER_USER, ACC_STATUS_NONE], $this->_get['key']))
                 [$username, $rememberMe] = $userData;
         }
@@ -116,7 +116,7 @@ class AccountSigninResponse extends TemplateResponse
         }
 
         // reset account status, update expiration
-        $ok = DB::Aowow()->query('UPDATE ?_account SET `prevIP` = IF(`curIp` = ?, `prevIP`, `curIP`), `curIP` = IF(`curIp` = ?, `curIP`, ?), `status` = IF(`status` = ?d, `status`, 0), `statusTimer` = IF(`status` = ?d, `statusTimer`, 0), `token` = IF(`status` = ?d, `token`, "") WHERE `id` = ?d',
+        $ok = DB::Aowow()->qry('UPDATE ::account SET `prevIP` = IF(`curIp` = %s, `prevIP`, `curIP`), `curIP` = IF(`curIp` = %s, `curIP`, %s), `status` = IF(`status` = %i, `status`, 0), `statusTimer` = IF(`status` = %i, `statusTimer`, 0), `token` = IF(`status` = %i, `token`, "") WHERE `id` = %i',
             User::$ip, User::$ip, User::$ip,
             ACC_STATUS_NEW, ACC_STATUS_NEW, ACC_STATUS_NEW,
             User::$id                                       // available after successful User:authenticate
@@ -130,12 +130,12 @@ class AccountSigninResponse extends TemplateResponse
 
         // DELETE temp session
         if ($this->_get['key'])
-            DB::Aowow()->query('DELETE FROM ?_account_sessions WHERE `sessionId` = ?', $this->_get['key']);
+            DB::Aowow()->qry('DELETE FROM ::account_sessions WHERE `sessionId` = %s', $this->_get['key']);
 
         session_regenerate_id(true);                        // user status changed => regenerate id
 
         // create new session entry
-        DB::Aowow()->query('INSERT INTO ?_account_sessions (`userId`, `sessionId`, `created`, `expires`, `touched`, `deviceInfo`, `ip`, `status`) VALUES (?d, ?, ?d, ?d, ?d, ?, ?, ?d)',
+        DB::Aowow()->qry('INSERT INTO ::account_sessions (`userId`, `sessionId`, `created`, `expires`, `touched`, `deviceInfo`, `ip`, `status`) VALUES (%i, %s, %i, %i, %i, %s, %s, %i)',
             User::$id, session_id(), time(), $this->_post['remember_me'] ? 0 : time() + Cfg::get('SESSION_TIMEOUT_DELAY'), time(), User::$agent, User::$ip, SESSION_ACTIVE);
 
         if (User::init())                                   // reinitialize the user

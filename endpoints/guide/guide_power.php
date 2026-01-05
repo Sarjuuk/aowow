@@ -32,7 +32,7 @@ class GuidePowerResponse extends TextResponse implements ICache
 
         if (Util::checkNumeric($idOrName, NUM_CAST_INT))
             $this->typeId = $idOrName;
-        else if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_guides WHERE `url` = ?', Util::lower($idOrName)))
+        else if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ::guides WHERE `url` = %s', Util::lower($idOrName)))
         {
             $this->typeId = intVal($id);
             $this->url    = Util::lower($idOrName);

@@ -41,15 +41,15 @@ class AccountUpdategeneralsettingsResponse extends TextResponse
         if ($this->_post['modelrace'] && !ChrRace::tryFrom($this->_post['modelrace']))
             return Lang::main('genericError');
 
-        // js handles this as cookie, so saved as cookie; Q - also save in ?_account table?
-        if (!DB::Aowow()->query('REPLACE INTO ?_account_cookies (`userId`, `name`, `data`) VALUES (?d, ?, ?)', User::$id, 'default_3dmodel', $this->_post['modelrace']. ',' . $this->_post['modelgender']))
+        // js handles this as cookie, so saved as cookie; Q - also save in ::account table?
+        if (!DB::Aowow()->qry('REPLACE INTO ::account_cookies (`userId`, `name`, `data`) VALUES (%i, %s, %s)', User::$id, 'default_3dmodel', $this->_post['modelrace']. ',' . $this->_post['modelgender']))
             return Lang::main('genericError');
 
         if (!setcookie('default_3dmodel', $this->_post['modelrace']. ',' . $this->_post['modelgender'], 0, '/'))
             return Lang::main('intError');
 
         // int > number of edited rows > no changes is still success
-        if (!is_int(DB::Aowow()->query('UPDATE ?_account SET `debug` = ?d WHERE `id` = ?d', $this->_post['idsInLists'] ? 1 : 0, User::$id)))
+        if (!is_int(DB::Aowow()->qry('UPDATE ::account SET `debug` = %i WHERE `id` = %i', $this->_post['idsInLists'] ? 1 : 0, User::$id)))
             return Lang::main('intError');
 
         $this->success = true;

@@ -37,36 +37,36 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected $dbcSourceFiles = ['spellicon', 'itemdisplayinfo', 'creaturefamily'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_icons');
-        DB::Aowow()->query('ALTER TABLE ?_icons AUTO_INCREMENT = 1');
-        DB::Aowow()->query(
-           'INSERT INTO ?_icons (`name`, `name_source`) SELECT REGEXP_REPLACE(x, "\\\\W", "-"), x FROM
+        DB::Aowow()->qry('TRUNCATE ::icons');
+        DB::Aowow()->qry('ALTER TABLE ::icons AUTO_INCREMENT = 1');
+        DB::Aowow()->qry(
+           'INSERT INTO ::icons (`name`, `name_source`) SELECT REGEXP_REPLACE(x, "\\W", "-"), x FROM
             (
-                (SELECT LOWER(SUBSTRING_INDEX(`iconPath`, "\\\\", -1))   AS x FROM dbc_spellicon       WHERE `iconPath` LIKE "%icons%") UNION
-                (SELECT LOWER(`inventoryIcon1`)                          AS x FROM dbc_itemdisplayinfo WHERE `inventoryIcon1` <> "")    UNION
-                (SELECT LOWER(SUBSTRING_INDEX(`iconString`, "\\\\", -1)) AS x FROM dbc_creaturefamily  WHERE `iconString` LIKE "%icons%")
+                (SELECT LOWER(SUBSTRING_INDEX(`iconPath`, "\\", -1))   AS x FROM dbc_spellicon       WHERE `iconPath` LIKE "%icons%") UNION
+                (SELECT LOWER(`inventoryIcon1`)                        AS x FROM dbc_itemdisplayinfo WHERE `inventoryIcon1` <> "")    UNION
+                (SELECT LOWER(SUBSTRING_INDEX(`iconString`, "\\", -1)) AS x FROM dbc_creaturefamily  WHERE `iconString` LIKE "%icons%")
             ) y GROUP BY x'
         );
 
         // invent class icons
         foreach (ChrClass::cases() as $cl)
-            DB::Aowow()->query('INSERT INTO ?_icons (`name`, `name_source`) VALUES (?, ?)', 'class_'.$cl->json(), 'class_'.$cl->json());
+            DB::Aowow()->qry('INSERT INTO ::icons (`name`, `name_source`) VALUES (%s, %s)', 'class_'.$cl->json(), 'class_'.$cl->json());
 
         // invent race icons
         foreach (ChrRace::cases() as $ra)
         {
             if ($na = $ra->json())                          // unused races have no json
             {
-                DB::Aowow()->query('INSERT INTO ?_icons (`name`, `name_source`) VALUES (?, ?)', 'race_'.$na.'_male',   'race_'.$na.'_male');
-                DB::Aowow()->query('INSERT INTO ?_icons (`name`, `name_source`) VALUES (?, ?)', 'race_'.$na.'_female', 'race_'.$na.'_female');
+                DB::Aowow()->qry('INSERT INTO ::icons (`name`, `name_source`) VALUES (%s, %s)', 'race_'.$na.'_male',   'race_'.$na.'_male');
+                DB::Aowow()->qry('INSERT INTO ::icons (`name`, `name_source`) VALUES (%s, %s)', 'race_'.$na.'_female', 'race_'.$na.'_female');
             }
         }
 
         // halucinate holidays
         foreach (self::HOLIDAY_ICONS as $h)
-            DB::Aowow()->query('INSERT INTO ?_icons (`name`, `name_source`) VALUES (?, ?)', $h, $h);
+            DB::Aowow()->qry('INSERT INTO ::icons (`name`, `name_source`) VALUES (%s, %s)', $h, $h);
 
         $this->reapplyCCFlags('icons', Type::ICON);
 

@@ -12,7 +12,7 @@ trait SmartHelper
 {
     private function resolveGuid(int $type, int $guid) : ?int
     {
-        if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d', $type, $guid))
+        if ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', $type, $guid))
             return $_;
 
         trigger_error('SmartAI::resolveGuid - failed to resolve guid '.$guid.' of type '.$type, E_USER_WARNING);
@@ -282,13 +282,13 @@ class SmartAI
         if ($this->baseEntry)                               // my parent handles base css
             $this->css = '';
 
-        $raw = DB::World()->select(
+        $raw = DB::World()->selectAssoc(
            'SELECT   `id`, `link`,
-                     `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`,
+                     `event_type`,  `event_param1`,  `event_param2`,  `event_param3`,  `event_param4`,  `event_param5`, `event_phase_mask`, `event_chance`, `event_flags`,
                      `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
                      `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`
             FROM     smart_scripts
-            WHERE    `entryorguid` = ?d AND `source_type` = ?d
+            WHERE    `entryorguid` = %i AND `source_type` = %i
             ORDER BY `id` ASC',
             $this->entry, $this->srcType);
 
@@ -320,15 +320,15 @@ class SmartAI
             SmartAction::ACTION_MOUNT_TO_ENTRY_OR_MODEL => [1 => $npcId]
         );
 
-        if ($npcGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $npcId))
-            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 0 AND `spawnId` IN (?a)', $npcGuids))
+        if ($npcGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::NPC, $npcId))
+            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 0 AND `spawnId` IN %in', $npcGuids))
                 foreach ($groups as $g)
                     $lookup[SmartAction::ACTION_SPAWN_SPAWNGROUP][1] = $g;
 
         $result = self::getActionOwner($lookup, $typeFilter);
 
         // can skip lookups for SmartAction::ACTION_SUMMON_CREATURE_GROUP as creature_summon_groups already contains summoner info
-        if ($sgs = DB::World()->select('SELECT `summonerType` AS "0", `summonerId` AS "1" FROM creature_summon_groups WHERE `entry` = ?d', $npcId))
+        if ($sgs = DB::World()->selectAssoc('SELECT `summonerType` AS "0", `summonerId` AS "1" FROM creature_summon_groups WHERE `entry` = %i', $npcId))
             foreach ($sgs as [$type, $typeId])
                 $result[$type][] = $typeId;
 
@@ -344,8 +344,8 @@ class SmartAI
             SmartAction::ACTION_SUMMON_GO => [1 => $objectId]
         );
 
-        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::OBJECT, $objectId))
-            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN (?a)', $objGuids))
+        if ($objGuids = DB::Aowow()->selectCol('SELECT `guid` FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::OBJECT, $objectId))
+            if ($groups = DB::World()->selectCol('SELECT `groupId` FROM spawn_group WHERE `spawnType` = 1 AND `spawnId` IN %in', $objGuids))
                 foreach ($groups as $g)
                     $lookup[SmartAction::ACTION_SPAWN_SPAWNGROUP][1] = $g;
 
@@ -402,38 +402,62 @@ class SmartAI
                 break;
         }
 
+        $where = $qParts = [];
         foreach ($lookup as $action => $params)
         {
-            $aq = '(`action_type` = '.(int)$action.' AND (';
             $pq = [];
+            $aq = [DB::AND, [['`action_type` = %i', $action], [DB::OR, &$pq]]];
             foreach ($params as $idx => $p)
-                $pq[] = '`action_param'.(int)$idx.'` = '.(int)$p;
+                $pq[] = ["`action_param$idx` = %i", $p];
 
-            if ($pq)
-                $qParts[] = $aq.implode(' OR ', $pq).'))';
+            $qParts[] = $aq;
+            unset($pq);
         }
 
-        $smartS = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE (%s){ AND `source_type` IN (?a)}', $qParts ? implode(' OR ', $qParts) : '0'), $genFilter ?: DBSIMPLE_SKIP);
+        if ($genFilter)
+            $where[] = ['`source_type` IN %in', $genFilter];
+        if ($qParts)
+            $where[] = [DB::OR, $qParts];
+
+        $smartS = DB::World()->selectAssoc('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE %and', $where ?: [0]);
 
         // filter for TAL shenanigans
         if ($smartTAL = array_filter($smartS, fn($x) => $x[0] == self::SRC_TYPE_ACTIONLIST))
         {
             $smartS = array_diff_key($smartS, $smartTAL);
 
-            $q = [];
+            $q = $where = [];
             foreach ($smartTAL as [, $eog])
             {
                 // SmartAction::ACTION_CALL_TIMED_ACTIONLIST
-                $q[] = '`action_type` = '.SmartAction::ACTION_CALL_TIMED_ACTIONLIST.' AND `action_param1` = '.$eog;
+                $q[] = [DB::AND, array(
+                    ['`action_type` = %i', SmartAction::ACTION_CALL_TIMED_ACTIONLIST],
+                    ['`action_param1` = %i', $eog]
+                )];
 
                 // SmartAction::ACTION_CALL_RANDOM_TIMED_ACTIONLIST
-                $q[] = '`action_type` = '.SmartAction::ACTION_CALL_RANDOM_TIMED_ACTIONLIST.' AND (`action_param1` = '.$eog.' OR `action_param2` = '.$eog.' OR `action_param3` = '.$eog.' OR `action_param4` = '.$eog.' OR `action_param5` = '.$eog.')';
+                $q[] = [DB::AND, array(
+                    ['`action_type` = %i', SmartAction::ACTION_CALL_RANDOM_TIMED_ACTIONLIST],
+                    ['`action_param1` = %i', $eog],
+                    ['`action_param2` = %i', $eog],
+                    ['`action_param3` = %i', $eog],
+                    ['`action_param4` = %i', $eog],
+                    ['`action_param5` = %i', $eog]
+                )];
 
                 // SmartAction::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST
-                $q[] = '`action_type` = '.SmartAction::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST.' AND `action_param1` <= '.$eog.' AND `action_param2` >= '.$eog;
+                $q[] = [DB::AND, array(
+                    ['`action_type` = %i', SmartAction::ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST],
+                    ['%i BETWEEN `action_param1` AND `action_param2`', $eog]
+                )];
             }
 
-            if ($_ = DB::World()->select(sprintf('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE ((%s)){ AND `source_type` IN (?a)}', $q ? implode(') OR (', $q) : '0'), $talFilter ?: DBSIMPLE_SKIP))
+            if ($talFilter)
+                $where[] = ['`source_type` IN %in', $talFilter];
+            if ($q)
+                $where[] = [DB::OR, $q];
+
+            if ($_ = DB::World()->selectAssoc('SELECT `source_type` AS "0", `entryOrGUID` AS "1" FROM smart_scripts WHERE %and', $where ?: [0]))
                 $smartS = array_merge($smartS, $_);
         }
 
@@ -442,18 +466,18 @@ class SmartAI
         {
             $smartS = array_diff_key($smartS, $smartG);
 
-            $q = [];
+            $where = [];
             foreach ($smartG as [$st, $eog])
             {
                 if ($st == self::SRC_TYPE_CREATURE)
-                    $q[] = '`type` = '.Type::NPC.' AND `guid` = '.-$eog;
+                    $where[] = [DB::AND, [['`type` = %i', Type::NPC],    ['`guid` = %i', -$eog]]];
                 else if ($st == self::SRC_TYPE_OBJECT)
-                    $q[] = '`type` = '.Type::OBJECT.' AND `guid` = '.-$eog;
+                    $where[] = [DB::AND, [['`type` = %i', Type::OBJECT], ['`guid` = %i', -$eog]]];
             }
 
-            if ($q)
+            if ($where)
             {
-                $owner = DB::Aowow()->select(sprintf('SELECT `type`, `typeId` FROM ?_spawns WHERE (%s)', implode(') OR (', $q)));
+                $owner = DB::Aowow()->selectAssoc('SELECT `type`, `typeId` FROM ::spawns WHERE %or', $where);
                 foreach ($owner as $o)
                     $result[$o['type']][] = $o['typeId'];
             }
@@ -492,15 +516,15 @@ class SmartAI
         if ($srcType == self::SRC_TYPE_CREATURE || $srcType == self::SRC_TYPE_OBJECT)
         {
             $st = $srcType == self::SRC_TYPE_CREATURE ? SUMMONER_TYPE_CREATURE : SUMMONER_TYPE_GAMEOBJECT;
-            if ($csg = DB::World()->selectCol('SELECT `entry` FROM creature_summon_groups WHERE `summonerType` = ?d AND `summonerId` = ?d', $st, $entry))
+            if ($csg = DB::World()->selectCol('SELECT `entry` FROM creature_summon_groups WHERE `summonerType` = %i AND `summonerId` = %i', $st, $entry))
                 $result = array_merge($result, $csg);
         }
 
         if (!empty($moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP]))
         {
             $grp = $moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP];
-            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', SUMMONER_TYPE_CREATURE, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', Type::NPC, $sgs))
+            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = %i AND `groupId` IN %in', SUMMONER_TYPE_CREATURE, $grp))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` IN %in', Type::NPC, $sgs))
                     $result = array_merge($result, $ids);
         }
 
@@ -520,8 +544,8 @@ class SmartAI
         if (!empty($moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP]))
         {
             $grp = $moreInfo[SmartAction::ACTION_SPAWN_SPAWNGROUP];
-            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = ?d AND `groupId` IN (?a)', SUMMONER_TYPE_GAMEOBJECT, $grp))
-                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` IN (?a)', Type::OBJECT, $sgs))
+            if ($sgs = DB::World()->selectCol('SELECT `spawnId` FROM spawn_group WHERE `spawnType` = %i AND `groupId` IN %in', SUMMONER_TYPE_GAMEOBJECT, $grp))
+                if ($ids = DB::Aowow()->selectCol('SELECT DISTINCT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` IN %in', Type::OBJECT, $sgs))
                     $result = array_merge($result, $ids);
         }
 
@@ -557,9 +581,9 @@ class SmartAI
         if ($entry < 0)                                     // no lookup by GUID
             return [];
 
-        $actionQuery = 'SELECT `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6` FROM smart_scripts WHERE `source_type` = ?d AND `action_type` IN (?a) AND `entryOrGUID` IN (?a)';
+        $actionQuery = 'SELECT `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6` FROM smart_scripts WHERE `source_type` = %i AND `action_type` IN %in AND `entryOrGUID` IN %in';
 
-        $smartScripts = DB::World()->select($actionQuery, $sourceType, array_merge(array_keys($lookup), SmartAction::ACTION_ALL_TIMED_ACTION_LISTS), [$entry]);
+        $smartScripts = DB::World()->selectAssoc($actionQuery, $sourceType, array_merge(array_keys($lookup), SmartAction::ACTION_ALL_TIMED_ACTION_LISTS), [$entry]);
         $smartResults = [];
         $smartTALs    = [];
         foreach ($smartScripts as $s)
@@ -588,7 +612,7 @@ class SmartAI
 
         if ($smartTALs)
         {
-            if ($TALActList = DB::World()->select($actionQuery, self::SRC_TYPE_ACTIONLIST, array_keys($lookup), $smartTALs))
+            if ($TALActList = DB::World()->selectAssoc($actionQuery, self::SRC_TYPE_ACTIONLIST, array_keys($lookup), $smartTALs))
             {
                 foreach ($TALActList as $e)
                 {

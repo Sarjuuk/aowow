@@ -12,12 +12,12 @@ class PetList extends DBTypeList
 
     public static int    $type      = Type::PET;
     public static string $brickFile = 'pet';
-    public static string $dataTable = '?_pet';
+    public static string $dataTable = '::pet';
 
-    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ?_pet p';
+    protected string $queryBase = 'SELECT p.*, p.`id` AS ARRAY_KEY FROM ::pet p';
     protected array  $queryOpts = array(
                         'p'  => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON p.`iconId` = ic.`id`', true], 's' => ', ic.`name` AS "iconString"'],
+                        'ic' => ['j' => ['::icons ic ON p.`iconId` = ic.`id`', true], 's' => ', ic.`name` AS "iconString"'],
                     );
 
     public function getListviewData() : array

@@ -52,13 +52,13 @@ class AccountActivateResponse extends TemplateResponse
         if (!$this->assertGET('key'))
             return Lang::main('intError');
 
-        if (DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `status` IN (?a) AND `token` = ?', [ACC_STATUS_NONE, ACC_STATUS_NEW], $this->_get['key']))
+        if (DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE `status` IN %in AND `token` = %s', [ACC_STATUS_NONE, ACC_STATUS_NEW], $this->_get['key']))
         {
             // don't remove the token yet. It's needed on signin page.
-            DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = 0, `userGroups` = ?d WHERE `token` = ?', ACC_STATUS_NONE, U_GROUP_NONE, $this->_get['key']);
+            DB::Aowow()->qry('UPDATE ::account SET `status` = %i, `statusTimer` = 0, `userGroups` = %i WHERE `token` = %s', ACC_STATUS_NONE, U_GROUP_NONE, $this->_get['key']);
 
             // fully apply block for further registration attempts from this ip
-            DB::Aowow()->query('REPLACE INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, ?d, ?d + 1, UNIX_TIMESTAMP() + ?d)',
+            DB::Aowow()->qry('REPLACE INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, %i + 1, UNIX_TIMESTAMP() + %i)',
                 User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
 
             $this->success = true;

@@ -238,13 +238,21 @@ class Conditions
         else
             return $this;
 
-        $this->rows = array_merge($this->rows, DB::World()->select(
+        $where = [['`SourceTypeOrReferenceId` IN %in', $type]];
+        if ($group)
+            $where[] = ['`SourceGroup` IN %in', $group];
+        if ($entry)
+            $where[] = ['`SourceEntry` IN %in', $entry];
+        if ($id)
+            $where[] = ['`SourceId` IN %in', $id];
+
+        $this->rows = array_merge($this->rows, DB::World()->selectAssoc(
            'SELECT   `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `SourceId`, `ElseGroup`,
                      `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `ConditionStringValue1`, `NegativeCondition`
             FROM     conditions
-            WHERE    `SourceTypeOrReferenceId` IN (?a){ AND `SourceGroup` IN (?a)}{ AND `SourceEntry` IN (?a)}{ AND `SourceId` IN (?a)}
+            WHERE    %and
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
-            $type, $group ?: DBSIMPLE_SKIP, $entry ?: DBSIMPLE_SKIP, $id ?: DBSIMPLE_SKIP
+            $where
         ));
 
         return $this;
@@ -257,23 +265,23 @@ class Conditions
             if ($type === $cVal1 /* && (!$conditionIds || in_array($cId, $conditionIds)) */ )
             {
                 if ($cId == self::CHR_CLASS || $cId == self::CHR_RACE)
-                    $lookups[] = sprintf("(c2.`ConditionTypeOrReference` = %d AND (c2.`ConditionValue1` & %d) > 0)", $cId, 1 << ($typeId - 1));
+                    $lookups[] = [DB::AND, [['c2.`ConditionTypeOrReference` = %i', $cId], ['(c2.`ConditionValue1` & %i) > 0', 1 << ($typeId - 1)]]];
                 else
-                    $lookups[] = sprintf("(c2.`ConditionTypeOrReference` = %d AND  c2.`ConditionValue1` = %d)", $cId, $typeId);
+                    $lookups[] = [DB::AND, [['c2.`ConditionTypeOrReference` = %i', $cId], ['c2.`ConditionValue1` = %i', $typeId]]];
             }
 
         if (!$lookups)
             return $this;
 
-        $this->rows = array_merge($this->rows, DB::World()->select(sprintf(
+        $this->rows = array_merge($this->rows, DB::World()->selectAssoc(
            'SELECT   c1.`SourceTypeOrReferenceId`, c1.`SourceEntry`, c1.`SourceGroup`, c1.`SourceId`, c1.`ElseGroup`,
                      c1.`ConditionTypeOrReference`, c1.`ConditionTarget`, c1.`ConditionValue1`, c1.`ConditionValue2`, c1.`ConditionValue3`, c1.`ConditionStringValue1`, c1.`NegativeCondition`
             FROM     conditions c1
             JOIN     conditions c2 ON c1.SourceTypeOrReferenceId = c2.SourceTypeOrReferenceId AND c1.SourceEntry = c2.SourceEntry AND c1.SourceGroup = c2.SourceGroup AND c1.SourceId = c2.SourceId
-            WHERE    %s
+            WHERE    %or
             GROUP BY `SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`
             ORDER BY `SourceTypeOrReferenceId`, `SourceEntry`, `SourceGroup`, `ElseGroup` ASC',
-            implode(' OR ', $lookups))
+            $lookups
         ));
 
         return $this;
@@ -554,7 +562,7 @@ class Conditions
             $cVal1 = 10;
         else if ($cVal1 == 0 || $cVal1 == 1)                // eastern kingdoms / kalimdor
             ;                                               // cVal alrady correct - NOP
-        else if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_zones WHERE `mapId` = ?d AND `parentArea` = 0 AND (`cuFlags` & ?d) = 0', $cVal1, CUSTOM_EXCLUDE_FOR_LISTVIEW))
+        else if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ::zones WHERE `mapId` = %i AND `parentArea` = 0 AND (`cuFlags` & %i) = 0', $cVal1, CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
             // remap for instanced area - do not use List (pointless overhead)
             $this->jsGlobals[Type::ZONE][$id] = $id;
@@ -593,7 +601,7 @@ class Conditions
     {
         if ($cVal1 == self::TYPEID_UNIT)
         {
-            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d', Type::NPC, $cVal3)))
+            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', Type::NPC, $cVal3)))
                 $cVal2 = intVal($_);
 
             if ($cVal2)
@@ -601,7 +609,7 @@ class Conditions
         }
         else if ($cVal1 == self::TYPEID_GAMEOBJECT)
         {
-            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_spawns WHERE `type` = ?d AND `guid` = ?d', Type::OBJECT, $cVal3)))
+            if ($cVal3 && ($_ = DB::Aowow()->selectCell('SELECT `typeId` FROM ::spawns WHERE `type` = %i AND `guid` = %i', Type::OBJECT, $cVal3)))
                 $cVal2 = intVal($_);
 
             if ($cVal2)
@@ -622,7 +630,7 @@ class Conditions
             return false;
         }
 
-        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ?_creature WHERE `lootId` = ?d', $sGroup))
+        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ::creature WHERE `lootId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($npcs as $npcId)
@@ -646,7 +654,7 @@ class Conditions
             return false;
         }
 
-        if ($items = DB::Aowow()->selectCol('SELECT `id` FROM ?_items WHERE `disenchantId` = ?d', $sGroup))
+        if ($items = DB::Aowow()->selectCol('SELECT `id` FROM ::items WHERE `disenchantId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($items as $itemId)
@@ -670,7 +678,7 @@ class Conditions
             return false;
         }
 
-        if ($gos = DB::Aowow()->selectCol('SELECT `id` FROM ?_objects WHERE `lootId` = ?d', $sGroup))
+        if ($gos = DB::Aowow()->selectCol('SELECT `id` FROM ::objects WHERE `lootId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($gos as $goId)
@@ -694,7 +702,7 @@ class Conditions
             return false;
         }
 
-        if ($quests = DB::Aowow()->selectCol('SELECT `id` FROM ?_quests WHERE `rewardMailTemplateId` = ?d', $sGroup))
+        if ($quests = DB::Aowow()->selectCol('SELECT `id` FROM ::quests WHERE `rewardMailTemplateId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($quests as $questId)
@@ -718,7 +726,7 @@ class Conditions
             return false;
         }
 
-        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ?_creature WHERE `pickpocketLootId` = ?d', $sGroup))
+        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ::creature WHERE `pickpocketLootId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($npcs as $npcId)
@@ -742,7 +750,7 @@ class Conditions
             return false;
         }
 
-        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ?_creature WHERE `skinLootId` = ?d', $sGroup))
+        if ($npcs = DB::Aowow()->selectCol('SELECT `id` FROM ::creature WHERE `skinLootId` = %i', $sGroup))
         {
             $group = $sGroup . ':' . $sEntry . ':' . $sId . ':' . $cTarget;
             foreach ($npcs as $npcId)

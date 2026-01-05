@@ -194,10 +194,10 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         // used by spell
         // used by useItem
         $cnd = array(
-            'OR',
-            ['AND', ['effect1Id', SpellList::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', SpellList::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', SpellList::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
+            DB::OR,
+            [DB::AND, ['effect1Id', SpellList::EFFECTS_ENCHANTMENT], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', SpellList::EFFECTS_ENCHANTMENT], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', SpellList::EFFECTS_ENCHANTMENT], ['effect3MiscValue', $this->typeId]],
         );
         $spellList = new SpellList($cnd);
         if (!$spellList->error)
@@ -207,12 +207,12 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
 
             $spellIds = $spellList->getFoundIDs();
             $conditions = array(
-                'OR',
-                ['AND', ['spellTrigger1', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId1', $spellIds]],
-                ['AND', ['spellTrigger2', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId2', $spellIds]],
-                ['AND', ['spellTrigger3', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId3', $spellIds]],
-                ['AND', ['spellTrigger4', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId4', $spellIds]],
-                ['AND', ['spellTrigger5', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId5', $spellIds]]
+                DB::OR,
+                [DB::AND, ['spellTrigger1', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId1', $spellIds]],
+                [DB::AND, ['spellTrigger2', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId2', $spellIds]],
+                [DB::AND, ['spellTrigger3', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId3', $spellIds]],
+                [DB::AND, ['spellTrigger4', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId4', $spellIds]],
+                [DB::AND, ['spellTrigger5', [SPELL_TRIGGER_USE, SPELL_TRIGGER_USE_NODELAY]], ['spellId5', $spellIds]]
             );
 
             $ubItems = new ItemList($conditions);
@@ -259,13 +259,13 @@ class EnchantmentBaseResponse extends TemplateResponse implements ICache
         }
 
         // used by randomAttrItem
-        $ire = DB::Aowow()->select(
-           'SELECT *, ABS(`id`) AS ARRAY_KEY FROM ?_itemrandomenchant WHERE `enchantId1` = ?d OR `enchantId2` = ?d OR `enchantId3` = ?d OR `enchantId4` = ?d OR `enchantId5` = ?d',
+        $ire = DB::Aowow()->selectAssoc(
+           'SELECT *, ABS(`id`) AS ARRAY_KEY FROM ::itemrandomenchant WHERE `enchantId1` = %i OR `enchantId2` = %i OR `enchantId3` = %i OR `enchantId4` = %i OR `enchantId5` = %i',
             $this->typeId, $this->typeId, $this->typeId, $this->typeId, $this->typeId
         );
         if ($ire)
         {
-            if ($iet = DB::World()->select('SELECT `entry` AS ARRAY_KEY, `ench`, `chance` FROM item_enchantment_template WHERE `ench` IN (?a)', array_keys($ire)))
+            if ($iet = DB::World()->selectAssoc('SELECT `entry` AS ARRAY_KEY, `ench`, `chance` FROM item_enchantment_template WHERE `ench` IN %in', array_keys($ire)))
             {
                 $randIds = [];                                  // transform back to signed format
                 foreach ($iet as $tplId => $data)

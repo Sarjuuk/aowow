@@ -257,7 +257,7 @@ class Lang
     {
         $locks = [];
         $ids   = [];
-        $lock  = DB::Aowow()->selectRow('SELECT * FROM ?_lock WHERE `id` = ?d', $lockId);
+        $lock  = DB::Aowow()->selectRow('SELECT * FROM ::lock WHERE `id` = %i', $lockId);
         if (!$lock)
             return $locks;
 
@@ -709,7 +709,7 @@ class Lang
                         $spfVars[0] = $linkType;
                         break;
                     case 'talent':
-                        if ($spell = DB::Aowow()->selectCell('SELECT `spell` FROM ?_talents WHERE `id` = ?d AND `rank` = ?d', $linkVars[0], $linkVars[1]))
+                        if ($spell = DB::Aowow()->selectCell('SELECT `spell` FROM ::talents WHERE `id` = %i AND `rank` = %i', $linkVars[0], $linkVars[1]))
                         {
                             $spfVars[0] = 'spell';
                             $spfVars[1] = $spell;
@@ -778,7 +778,7 @@ class Lang
                 if (preg_match('/\P{Cyrillic}/iu', $word))  // not in cyrillic script
                     return $word;
 
-                if ($declWord = DB::Aowow()->selectCell('SELECT dwc.`word` FROM ?_declinedwordcases dwc JOIN ?_declinedword dc ON dwc.`wordId` = dc.`id` WHERE dwc.`caseIdx` = ?d AND dc.`word` = ?', $caseIdx, $word))
+                if ($declWord = DB::Aowow()->selectCell('SELECT dwc.`word` FROM ::declinedwordcases dwc JOIN ::declinedword dc ON dwc.`wordId` = dc.`id` WHERE dwc.`caseIdx` = %i AND dc.`word` = %s', $caseIdx, $word))
                     return $declWord;
 
                 return $word;

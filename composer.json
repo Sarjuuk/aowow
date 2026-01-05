@@ -14,6 +14,7 @@
         "vendor-dir": "includes/libs"
     },
     "require": {
+        "dibi/dibi": "^5.1",
         "php": "8.2 - 8.4",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
@@ -23,7 +24,6 @@
         "ext-intl": "*"
     },
     "require-dev": {
-        "dibi/dibi": "^5.1",
         "jfcherng/php-diff": "6.16",
         "triggerhappy/mpq": "dev-master"
     }

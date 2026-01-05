@@ -218,7 +218,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         // ok, this sucks, but i rather hardcode the trainer, than fetch items by namepart
         if (isset(self::MOUNT_VENDORS[$this->typeId]))
         {
-            if ($items = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` IN (?a)', self::MOUNT_VENDORS[$this->typeId]))
+            if ($items = DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `entry` IN %in', self::MOUNT_VENDORS[$this->typeId]))
             {
                 $conditions = array(
                     ['i.id', $items],
@@ -241,7 +241,7 @@ class RaceBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: sounds
-        if ($vo = DB::Aowow()->selectCol('SELECT `soundId` AS ARRAY_KEY, `gender` FROM ?_races_sounds WHERE `raceId` = ?d', $this->typeId))
+        if ($vo = DB::Aowow()->selectCol('SELECT `soundId` AS ARRAY_KEY, `gender` FROM ::races_sounds WHERE `raceId` = %i', $this->typeId))
         {
             $sounds = new SoundList(array(['id', array_keys($vo)]));
             if (!$sounds->error)
@@ -260,13 +260,13 @@ class RaceBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria-of
         $conditions = array(
-            'AND',
+            DB::AND,
             ['ac.type', ACHIEVEMENT_CRITERIA_TYPE_HK_RACE],
             ['ac.value1', $this->typeId]
         );
 
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN (?a) AND `value2` = ?d', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
-            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` IN %in AND `value2` = %i', [ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE, ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE], $this->typeId))
+            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
         $crtOf = new AchievementList($conditions);
         if (!$crtOf->error)

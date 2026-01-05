@@ -31,11 +31,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $setupAfter     = [['icons'], []];
     protected $dbcSourceFiles = ['holidays', 'holidaydescriptions', 'holidaynames'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_holidays');
-        DB::Aowow()->query(
-           'INSERT INTO ?_holidays (`id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `description_loc0`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc6`, `description_loc8`, `looping`, `scheduleType`, `textureString`)
+        DB::Aowow()->qry('TRUNCATE ::holidays');
+        DB::Aowow()->qry(
+           'INSERT INTO ::holidays (`id`, `name_loc0`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc6`, `name_loc8`, `description_loc0`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc6`, `description_loc8`, `looping`, `scheduleType`, `textureString`)
             SELECT      h.`id`, n.`name_loc0`, n.`name_loc2`, n.`name_loc3`, n.`name_loc4`, n.`name_loc6`, n.`name_loc8`, d.`description_loc0`, d.`description_loc2`, d.`description_loc3`, d.`description_loc4`, d.`description_loc6`, d.`description_loc8`, h.`looping`, h.`scheduleType`, h.`textureString`
             FROM        dbc_holidays h
             LEFT JOIN   dbc_holidaynames n ON n.`id` = h.`nameId`
@@ -43,11 +43,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // set derived icons
-        DB::Aowow()->query('UPDATE ?_holidays h, ?_icons i SET h.`iconId` = i.`id` WHERE i.`name_source` LIKE CONCAT(LOWER(h.`textureString`), "%") AND h.`textureString` <> ""');
+        DB::Aowow()->qry('UPDATE ::holidays h, ::icons i SET h.`iconId` = i.`id` WHERE i.`name_source` LIKE CONCAT(LOWER(h.`textureString`), "%") AND h.`textureString` <> ""');
 
         // set custom icons
         foreach (self::CUSTOM_ICONS as $hId => $iconString)
-            DB::Aowow()->query('UPDATE ?_holidays h SET h.`iconId` = (SELECT i.`id` FROM ?_icons i WHERE `name_source` = ?) WHERE `id` = ?d', $iconString, $hId);
+            DB::Aowow()->qry('UPDATE ::holidays h SET h.`iconId` = (SELECT i.`id` FROM ::icons i WHERE `name_source` = ?) WHERE `id` = %i', $iconString, $hId);
 
         return true;
     }

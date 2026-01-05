@@ -100,29 +100,23 @@ class ScreenshotMgr extends ImageUpload
 
     public static function getScreenshots(int $type = 0, int $typeId = 0, $userId = 0, ?int &$nFound = 0) : array
     {
-        $screenshots = DB::Aowow()->select(
+        if ($userId)
+            $where = [['s.`userIdOwner` = %i', $userId]];
+        else
+            $where = [['s.`type` = %i', $type], ['s.`typeId` = %i', $typeId]];
+
+        $screenshots = DB::Aowow()->selectAssoc(
            'SELECT    s.`id`, a.`username` AS "user", s.`date`, s.`width`, s.`height`, s.`type`, s.`typeId`, s.`caption`, s.`status`, s.`status` AS "flags"
-            FROM      ?_screenshots s
-            LEFT JOIN ?_account a ON s.`userIdOwner` = a.`id`
-            WHERE
-                    { s.`type` = ?d }
-                    { AND s.`typeId` = ?d }
-                    { s.`userIdOwner` = ?d }
-          { LIMIT    ?d }',
-            $userId ? DBSIMPLE_SKIP : $type,
-            $userId ? DBSIMPLE_SKIP : $typeId,
-            $userId ? $userId : DBSIMPLE_SKIP,
-            $userId || $type ? DBSIMPLE_SKIP : 100
+            FROM      ::screenshots s
+            LEFT JOIN ::account a ON s.`userIdOwner` = a.`id`
+            WHERE     %and
+                      %lmt',
+            $where, $userId || $type ? PHP_INT_MAX : 100
         );
 
         $num = [];
         foreach ($screenshots as $s)
-        {
-            if (empty($num[$s['type']][$s['typeId']]))
-                $num[$s['type']][$s['typeId']] = 1;
-            else
-                $num[$s['type']][$s['typeId']]++;
-        }
+            $num[$s['type']][$s['typeId']] = ($num[$s['type']][$s['typeId']] ?? 0) + 1;
 
         $nFound = 0;
 
@@ -177,15 +171,7 @@ class ScreenshotMgr extends ImageUpload
     {
         // i GUESS .. ss_getALL ? everything : pending
         $nFound = 0;
-        $pages  = DB::Aowow()->select(
-           'SELECT   s.`type`, s.`typeId`, COUNT(1) AS "count", MIN(s.`date`) AS "date"
-            FROM     ?_screenshots s
-          { WHERE    (s.`status` & ?d) = 0 }
-            GROUP BY s.`type`, s.`typeId`',
-            $all ? DBSIMPLE_SKIP : CC_FLAG_APPROVED | CC_FLAG_DELETED
-        );
-
-        if ($pages)
+        if ($pages = DB::Aowow()->selectAssoc('SELECT `type`, `typeId`, COUNT(1) AS "count", MIN(`date`) AS "date" FROM ::screenshots %if', !$all, 'WHERE (`status` & %i) = 0', CC_FLAG_APPROVED | CC_FLAG_DELETED, '%end GROUP BY `type`, `typeId`'))
         {
             // limit to one actually existing type each
             foreach (array_unique(array_column($pages, 'type')) as $t)

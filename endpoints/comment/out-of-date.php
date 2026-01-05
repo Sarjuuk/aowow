@@ -30,9 +30,9 @@ class CommentOutofdateResponse extends TextResponse
         if (User::isInGroup(U_GROUP_MODERATOR))             // directly mark as outdated
         {
             if (!$this->_post['remove'])
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` |  ?d WHERE `id` = ?d', CC_FLAG_OUTDATED, $this->_post['id']);
+                $ok = DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` |  %i WHERE `id` = %i', CC_FLAG_OUTDATED, $this->_post['id']);
             else
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` = ?d', CC_FLAG_OUTDATED, $this->_post['id']);
+                $ok = DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` & ~%i WHERE `id` = %i', CC_FLAG_OUTDATED, $this->_post['id']);
         }
         else                                                // try to report as outdated
         {
@@ -41,7 +41,7 @@ class CommentOutofdateResponse extends TextResponse
                 $this->result = Lang::main('intError');
 
             if (count($report->getSimilar()) >= CommunityContent::REPORT_THRESHOLD_AUTO_OUT_OF_DATE)
-                $ok = DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` | ?d WHERE `id` = ?d', CC_FLAG_OUTDATED, $this->_post['id']);
+                $ok = DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` | %i WHERE `id` = %i', CC_FLAG_OUTDATED, $this->_post['id']);
         }
 
         if (!$ok)

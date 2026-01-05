@@ -74,7 +74,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         /* Infobox */
         /***********/
 
-        $quickFactsRows = DB::Aowow()->selectCol('SELECT `orderIdx` AS  ARRAY_KEY, `row` FROM ?_quickfacts WHERE `type` = ?d AND `typeId` = ?d ORDER BY `orderIdx` ASC', $this->type, $this->typeId);
+        $quickFactsRows = DB::Aowow()->selectCol('SELECT `orderIdx` AS  ARRAY_KEY, `row` FROM ::quickfacts WHERE `type` = %i AND `typeId` = %i ORDER BY `orderIdx` ASC', $this->type, $this->typeId);
         $quickFactsRows = preg_replace_callback('/\|L:(\w+)((:\w+)+)\|/i', function ($m)
         {
             [, $grp, $args] = $m;
@@ -148,14 +148,14 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // Instances
-        if ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_spawns WHERE `type`= ?d AND `areaId` = ?d ', Type::ZONE, $this->typeId))
+        if ($_ = DB::Aowow()->selectCol('SELECT `typeId` FROM ::spawns WHERE `type`= %i AND `areaId` = %i ', Type::ZONE, $this->typeId))
         {
             $this->extendGlobalIds(Type::ZONE, ...$_);
             $infobox[] = Lang::maps('Instances').Lang::main('colon').Lang::concat($_, Lang::CONCAT_NONE, fn($x) => "\n[zone=".$x."]");
         }
 
         // start area
-        if ($_ = DB::Aowow()->selectCol('SELECT `id` FROM ?_races WHERE `startAreaId` = ?d', $this->typeId))
+        if ($_ = DB::Aowow()->selectCol('SELECT `id` FROM ::races WHERE `startAreaId` = %i', $this->typeId))
         {
             $this->extendGlobalIds(Type::CHR_RACE, ...$_);
             $infobox[] = Lang::concat($_, Lang::CONCAT_NONE, fn($x) => '[race='.$x.']').' '.Lang::race('startZone');
@@ -164,7 +164,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         parent::generate(); // calls applyGlobals .. probably too early here, but addMoveLocationMenu requires PageTemplate to be initialized
 
         // location (if instance)
-        if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ?_spawns WHERE `type`= ?d AND `typeId` = ?d ', Type::ZONE, $this->typeId))
+        if ($pa = DB::Aowow()->selectRow('SELECT `areaId`, `posX`, `posY`, `floor` FROM ::spawns WHERE `type`= %i AND `typeId` = %i ', Type::ZONE, $this->typeId))
         {
             $this->addMoveLocationMenu($pa['areaId'], $pa['floor']);
 
@@ -236,9 +236,9 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // we cannot fetch spawns via lists. lists are grouped by entry
-        $oSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::OBJECT);
-        $cSpawns = DB::Aowow()->select('SELECT * FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::NPC);
-        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->select('SELECT * FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::AREATRIGGER) : [];
+        $oSpawns = DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::OBJECT);
+        $cSpawns = DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::NPC);
+        $aSpawns = User::isInGroup(U_GROUP_STAFF) ? DB::Aowow()->selectAssoc('SELECT * FROM ::spawns WHERE `areaId` = %i AND `type` = %i AND `posX` > 0 AND `posY` > 0', $this->typeId, Type::AREATRIGGER) : [];
 
         $conditions = [['s.areaId', $this->typeId]];
         if (!User::isInGroup(U_GROUP_STAFF))
@@ -519,7 +519,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                     return $n1 <=> $n2;
                 });
 
-                $paths = DB::Aowow()->select('SELECT n1.`typeId` AS "0", n2.`typeId` AS "1" FROM ?_taxipath p JOIN ?_taxinodes n1 ON n1.`id` = p.`startNodeId` JOIN ?_taxinodes n2 ON n2.`id` = p.`endNodeId` WHERE n1.`typeId` IN (?a) AND n2.`typeId` IN (?a)', array_keys($flightNodes), array_keys($flightNodes));
+                $paths = DB::Aowow()->selectAssoc('SELECT n1.`typeId` AS "0", n2.`typeId` AS "1" FROM ::taxipath p JOIN ::taxinodes n1 ON n1.`id` = p.`startNodeId` JOIN ::taxinodes n2 ON n2.`id` = p.`endNodeId` WHERE n1.`typeId` IN %in AND n2.`typeId` IN %in', array_keys($flightNodes), array_keys($flightNodes));
 
                 foreach ($paths as $k => $path)
                 {
@@ -681,10 +681,10 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
 
         // tab: starts-quest
         // select every quest starter, that is a drop
-        $questStartItem = DB::Aowow()->select(
+        $questStartItem = DB::Aowow()->selectAssoc(
            'SELECT qse.`typeId` AS ARRAY_KEY, `moreType`, `moreTypeId`, `moreZoneId`
-            FROM   ?_quests_startend qse JOIN ?_source src ON src.`type` = qse.`type` AND src.`typeId` = qse.`typeId`
-            WHERE  src.`src2` IS NOT NULL AND qse.`type` = ?d AND (`moreZoneId` = ?d OR (`moreType` = ?d AND `moreTypeId` IN (?a)) OR (`moreType` = ?d AND `moreTypeId` IN (?a)))',
+            FROM   ::quests_startend qse JOIN ::source src ON src.`type` = qse.`type` AND src.`typeId` = qse.`typeId`
+            WHERE  src.`src2` IS NOT NULL AND qse.`type` = %i AND (`moreZoneId` = %i OR (`moreType` = %i AND `moreTypeId` IN %in) OR (`moreType` = %i AND `moreTypeId` IN %in))',
             Type::ITEM,   $this->typeId,
             Type::NPC,    array_unique(array_column($cSpawns, 'typeId')) ?: [0],
             Type::OBJECT, array_unique(array_column($oSpawns, 'typeId')) ?: [0]
@@ -729,21 +729,21 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         // tab: achievements
 
         // tab: criteria-of
-        $conditions = array('OR',
+        $conditions = array(DB::OR,
             array(
-                'AND',
+                DB::AND,
                 ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA]],
                 ['ac.value1', $this->typeId]
             )
         );
 
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA, $this->typeId))
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA, $this->typeId))
             $conditions[] = ['ac.id', $extraCrt];
 
         if ($this->subject->getField('category') != MAP_TYPE_ZONE)
         {
             $conditions[] = array (
-                'AND',
+                DB::AND,
                 ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_WIN_BG,      ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA,
                              ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA,  ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND,
                              ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP]
@@ -751,7 +751,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
                 ['ac.value1', $this->subject->getField('mapId')]
             );
 
-            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID, $this->subject->getField('mapId')))
+            if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID, $this->subject->getField('mapId')))
                 $conditions[] = ['ac.id', $extraCrt];
 
         }
@@ -776,9 +776,9 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
             $xCols = array_merge(['$Listview.extraCols.percent'], $fish->extraCols);
 
             $note = null;
-            if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $this->typeId))
+            if ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = %i', $this->typeId))
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
-            else if ($_parentArea && ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = ?d', $_parentArea)))
+            else if ($_parentArea && ($skill = DB::World()->selectCell('SELECT `skill` FROM skill_fishing_base_level WHERE `entry` = %i', $_parentArea)))
                 $note = sprintf(Util::$lvTabNoteString, Lang::zone('fishingSkill'), Lang::formatSkillBreakpoints(Game::getBreakpointsForSkill(SKILL_FISHING, $skill), Lang::FMT_HTML));
 
             $this->lvTabs->addListviewTab(new Listview(array(
@@ -793,7 +793,7 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: spells
-        if ($saData = DB::World()->select('SELECT * FROM spell_area WHERE `area` = ?d', $this->typeId))
+        if ($saData = DB::World()->selectAssoc('SELECT * FROM spell_area WHERE `area` = %i', $this->typeId))
         {
             $spells = new SpellList(array(['id', array_column($saData, 'spell')]));
             if (!$spells->error)
@@ -856,18 +856,18 @@ class ZoneBaseResponse extends TemplateResponse implements ICache
         $areaIds[] = $this->typeId;
 
         $soundIds  = [];
-        $zoneMusic = DB::Aowow()->select(
+        $zoneMusic = DB::Aowow()->selectAssoc(
            'SELECT   x.`soundId` AS ARRAY_KEY, x.`soundId`, x.`worldStateId`, x.`worldStateValue`, x.`type`
-            FROM    (SELECT `ambienceDay`   AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceDay`   > 0 UNION
-                     SELECT `ambienceNight` AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `ambienceNight` > 0 UNION
-                     SELECT `musicDay`      AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicDay`      > 0 UNION
-                     SELECT `musicNight`    AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `musicNight`    > 0 UNION
-                     SELECT `intro`         AS "soundId", `worldStateId`, `worldStateValue`, 3 AS "type" FROM ?_zones_sounds WHERE `id` IN (?a) AND `intro`         > 0) x
+            FROM    (SELECT `ambienceDay`   AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ::zones_sounds WHERE `id` IN %in AND `ambienceDay`   > 0 UNION
+                     SELECT `ambienceNight` AS "soundId", `worldStateId`, `worldStateValue`, 1 AS "type" FROM ::zones_sounds WHERE `id` IN %in AND `ambienceNight` > 0 UNION
+                     SELECT `musicDay`      AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ::zones_sounds WHERE `id` IN %in AND `musicDay`      > 0 UNION
+                     SELECT `musicNight`    AS "soundId", `worldStateId`, `worldStateValue`, 2 AS "type" FROM ::zones_sounds WHERE `id` IN %in AND `musicNight`    > 0 UNION
+                     SELECT `intro`         AS "soundId", `worldStateId`, `worldStateValue`, 3 AS "type" FROM ::zones_sounds WHERE `id` IN %in AND `intro`         > 0) x
             GROUP BY x.soundId, x.worldStateId, x.worldStateValue',
             $areaIds, $areaIds, $areaIds, $areaIds, $areaIds
         );
 
-        if ($sSpawns = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_spawns WHERE `areaId` = ?d AND `type` = ?d', $this->typeId, Type::SOUND))
+        if ($sSpawns = DB::Aowow()->selectCol('SELECT `typeId` FROM ::spawns WHERE `areaId` = %i AND `type` = %i', $this->typeId, Type::SOUND))
             $soundIds = array_merge($soundIds, $sSpawns);
 
         if ($zoneMusic)

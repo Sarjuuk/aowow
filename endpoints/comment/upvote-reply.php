@@ -26,7 +26,7 @@ class CommentUpvotereplyResponse extends TextResponse
         if (!User::canUpvote())
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'cannot upvote' : '');
 
-        $comment = DB::Aowow()->selectRow('SELECT `userId`, IF(`flags` & ?d, 1, 0) AS "deleted" FROM ?_comments WHERE `id` = ?d', CC_FLAG_DELETED, $this->_post['id']);
+        $comment = DB::Aowow()->selectRow('SELECT `userId`, IF(`flags` & %i, 1, 0) AS "deleted" FROM ::comments WHERE `id` = %i', CC_FLAG_DELETED, $this->_post['id']);
         if (!$comment)
         {
             trigger_error('CommentUpvotereplyResponse - comment #'.$this->_post['id'].' not found in db', E_USER_ERROR);
@@ -39,15 +39,9 @@ class CommentUpvotereplyResponse extends TextResponse
         if ($comment['deleted'])
             $this->generate404('LANG.votedeleted_tip');
 
-        $ok = DB::Aowow()->query(
-           'INSERT INTO ?_user_ratings (`type`, `entry`, `userId`, `value`) VALUES (?d, ?d, ?d, ?d)',
-            RATING_COMMENT,
-            $this->_post['id'],
-            User::$id,
-            User::canSupervote() ? 2 : 1
-        );
-
-        if (!is_int($ok))
+        if (is_null(DB::Aowow()->qry('INSERT INTO ::user_ratings (`type`, `entry`, `userId`, `value`) VALUES (%i, %i, %i, %i)',
+            RATING_COMMENT, $this->_post['id'], User::$id, User::canSupervote() ? 2 : 1
+        )))
         {
             trigger_error('CommentUpvotereplyResponse - write to db failed', E_USER_ERROR);
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'write to db failed' : '');

@@ -25,9 +25,9 @@ class CommentStickyResponse extends TextResponse
         }
 
         if ($this->_post['sticky'])
-            DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` |  ?d WHERE `id` = ?d', CC_FLAG_STICKY, $this->_post['id']);
+            DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` |  %i WHERE `id` = %i', CC_FLAG_STICKY, $this->_post['id']);
         else
-            DB::Aowow()->query('UPDATE ?_comments SET `flags` = `flags` & ~?d WHERE `id` = ?d', CC_FLAG_STICKY, $this->_post['id']);
+            DB::Aowow()->qry('UPDATE ::comments SET `flags` = `flags` & ~%i WHERE `id` = %i', CC_FLAG_STICKY, $this->_post['id']);
     }
 }
 

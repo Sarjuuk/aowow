@@ -37,7 +37,7 @@ class LootByContainer extends Loot
         if (!$tableName || !$lootId)
             return [null, null];
 
-        $rows = DB::World()->select('SELECT * FROM ?# WHERE entry = ?d{ AND groupid = ?d}', $tableName, $lootId, $groupId ?: DBSIMPLE_SKIP);
+        $rows = DB::World()->selectAssoc('SELECT * FROM %n', $tableName, 'WHERE %if', $groupId, '`groupid` = %i AND', $groupId, '%end `entry` = %i', $lootId);
         if (!$rows)
             return [null, null];
 
@@ -54,9 +54,14 @@ class LootByContainer extends Loot
                 'groupChance'   => 0
             );
 
-            if ($entry['QuestRequired'])
-                foreach (DB::Aowow()->selectCol('SELECT id FROM ?_quests WHERE (`reqSourceItemId1` = ?d OR `reqSourceItemId2` = ?d OR `reqSourceItemId3` = ?d OR `reqSourceItemId4` = ?d OR `reqItemId1` = ?d OR `reqItemId2` = ?d OR `reqItemId3` = ?d OR `reqItemId4` = ?d OR `reqItemId5` = ?d OR `reqItemId6` = ?d) AND (`cuFlags` & ?d) = 0',
-                    $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], $entry['Item'], CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE) as $questId)
+            $where = [['(`cuFlags` & %i) = 0', CUSTOM_EXCLUDE_FOR_LISTVIEW | CUSTOM_UNAVAILABLE], [DB::OR, []]];
+            for ($i = 1; $i < 5; $i++)
+                $where[1][1][] = ["`reqSourceItemId$i` = %i", $entry['Item']];
+            for ($i = 1; $i < 7; $i++)
+                $where[1][1][] = ["`reqItemId$i` = %i", $entry['Item']];
+
+            if ($entry['QuestRequired'] && ($quests = DB::Aowow()->selectCol('SELECT `id` FROM ::quests WHERE %and', $where)))
+                foreach ($quests as $questId)
                     $cnd->addExternalCondition(Conditions::lootTableToConditionSource($tableName), $lootId . ':' . $entry['Item'], [Conditions::QUESTTAKEN, $questId], true);
 
             // TC 'mode' (dynamic loot modifier)

@@ -10,12 +10,12 @@ class CharClassList extends DBTypeList
 {
     public static int    $type      = Type::CHR_CLASS;
     public static string $brickFile = 'class';
-    public static string $dataTable = '?_classes';
+    public static string $dataTable = '::classes';
 
-    protected string $queryBase = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ?_classes c';
+    protected string $queryBase = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ::classes c';
     protected array  $queryOpts = array(
                         'c'  => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
+                        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
                     );
 
     public function __construct($conditions = [], array $miscData = [])

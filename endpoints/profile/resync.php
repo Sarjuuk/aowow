@@ -27,7 +27,7 @@ class ProfileResyncResponse extends TextResponse
     */
     protected function generate() : void
     {
-        if ($chars = DB::Aowow()->select('SELECT `realm`, `realmGUID` FROM ?_profiler_profiles WHERE `id` IN (?a)', $this->_get['id']))
+        if ($chars = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_profiles WHERE `id` IN %in', $this->_get['id']))
         {
             foreach ($chars as $c)
                 Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);

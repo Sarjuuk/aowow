@@ -55,7 +55,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
         sleep(2);
 
-        $tTabs = DB::Aowow()->select('SELECT tt.`creatureFamilyMask`, tt.`textureFile`, tt.`tabNumber`, cc.`fileString` FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.`id` = IF(tt.`classMask`, LOG(2, tt.`classMask`) + 1, 0)');
+        $tTabs = DB::Aowow()->selectAssoc('SELECT tt.`creatureFamilyMask`, tt.`textureFile`, tt.`tabNumber`, cc.`fileString` FROM dbc_talenttab tt LEFT JOIN dbc_chrclasses cc ON cc.`id` = IF(tt.`classMask`, LOG(2, tt.`classMask`) + 1, 0)');
         if (!$tTabs)
         {
             CLI::write(' - TalentTab.dbc or ChrClasses.dbc is empty...?', CLI::LOG_ERROR);

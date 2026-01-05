@@ -24,7 +24,7 @@ class AdminScreenshotsActionEditaltResponse extends TextResponse
         if (!$this->assertGET('id'))
             return;
 
-        DB::Aowow()->query('UPDATE ?_screenshots SET `caption` = ? WHERE `id` = ?d',
+        DB::Aowow()->qry('UPDATE ::screenshots SET `caption` = %s WHERE `id` = %i',
             $this->handleCaption($this->_post['alt']),
             $this->_get['id']
         );

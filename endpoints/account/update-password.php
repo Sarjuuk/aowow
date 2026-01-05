@@ -53,7 +53,7 @@ class AccountUpdatepasswordResponse extends TextResponse
         if ($this->_post['newPassword'] !== $this->_post['confirmPassword'])
             return Lang::account('passMismatch');
 
-        $userData = DB::Aowow()->selectRow('SELECT `status`, `passHash`, `statusTimer` FROM ?_account WHERE `id` = ?d', User::$id);
+        $userData = DB::Aowow()->selectRow('SELECT `status`, `passHash`, `statusTimer` FROM ::account WHERE `id` = %i', User::$id);
         if ($userData['status'] != ACC_STATUS_NONE && $userData['status'] != ACC_STATUS_CHANGE_PASS && $userData['statusTimer'] > time())
             return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RECOVERY_DECAY') * 1000)]);
 
@@ -66,17 +66,17 @@ class AccountUpdatepasswordResponse extends TextResponse
         $token = Util::createHash();
 
         // store new hash in updateValue field, exchange when confirmation mail gets confirmed
-        if (!DB::Aowow()->query('UPDATE ?_account SET `updateValue` = ?, `status` = ?d, `statusTimer` = UNIX_TIMESTAMP() + ?d, `token` = ? WHERE `id` = ?d',
+        if (!DB::Aowow()->qry('UPDATE ::account SET `updateValue` = %s, `status` = %i, `statusTimer` = UNIX_TIMESTAMP() + %i, `token` = %s WHERE `id` = %i',
             User::hashCrypt($this->_post['newPassword']), ACC_STATUS_CHANGE_PASS, Cfg::get('ACC_RECOVERY_DECAY'), $token, User::$id))
             return Lang::main('intError');
 
-        $email = DB::Aowow()->selectCell('SELECT `email` FROM ?_account WHERE `id` = ?d', User::$id);
+        $email = DB::Aowow()->selectCell('SELECT `email` FROM ::account WHERE `id` = %i', User::$id);
         if (!Util::sendMail($email, 'update-password', [$token, $email], Cfg::get('ACC_RECOVERY_DECAY')))
             return Lang::main('intError2', ['send mail']);
 
         // logout all other active sessions
         if ($this->_post['globalLogout'])
-            DB::Aowow()->query('UPDATE ?_account_sessions SET `status` = ?d, `touched` = ?d WHERE `userId` = ?d AND `sessionId` <> ? AND `status` = ?d', SESSION_FORCED_LOGOUT, time(), User::$id, session_id(), SESSION_ACTIVE);
+            DB::Aowow()->qry('UPDATE ::account_sessions SET `status` = %i, `touched` = %i WHERE `userId` = %i AND `sessionId` <> ? AND `status` = %i', SESSION_FORCED_LOGOUT, time(), User::$id, session_id(), SESSION_ACTIVE);
 
         $this->success = true;
         return Lang::account('updateMessage', 'personal', [User::$email]);

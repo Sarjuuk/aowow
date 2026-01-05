@@ -36,9 +36,9 @@ class ProfileLinkResponse extends TextResponse
         }
 
         // only link characters, not custom profiles
-        $newId = DB::Aowow()->query(
-           'REPLACE INTO ?_account_profiles (`accountId`, `profileId`, `extraFlags`)
-            SELECT ?d, p.`id`, 0 FROM ?_profiler_profiles p WHERE p.`id` = ?d AND `custom` = 0',
+        $newId = DB::Aowow()->qry(
+           'REPLACE INTO ::account_profiles (`accountId`, `profileId`, `extraFlags`)
+            SELECT %i, p.`id`, 0 FROM ::profiler_profiles p WHERE p.`id` = %i AND `custom` = 0',
             User::$id, $this->_get['id']
         );
 

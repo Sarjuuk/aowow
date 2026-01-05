@@ -54,7 +54,7 @@ class AccountBaseResponse extends TemplateResponse
     {
         array_unshift($this->title, Lang::account('settings'));
 
-        $user = DB::Aowow()->selectRow('SELECT `debug`, `email`, `description`, `avatar`, `wowicon`, `renameCooldown` FROM ?_account WHERE `id` = ?d', User::$id);
+        $user = DB::Aowow()->selectRow('SELECT `debug`, `email`, `description`, `avatar`, `wowicon`, `renameCooldown` FROM ::account WHERE `id` = %i', User::$id);
 
         Lang::sort('game', 'ra');
 
@@ -65,11 +65,11 @@ class AccountBaseResponse extends TemplateResponse
         /* Ban Popup */
         /*************/
 
-        $b = DB::Aowow()->select(
+        $b = DB::Aowow()->selectAssoc(
            'SELECT    ab.`end` AS "0", ab.`reason` AS "1", a.`username` AS "2"
-            FROM      ?_account_banned ab
-            LEFT JOIN ?_account a ON a.`id` = ab.`staffId`
-            WHERE     ab.`userId` = ?d AND ab.`typeMask` & ?d AND (ab.`end` = 0 OR ab.`end` > UNIX_TIMESTAMP())',
+            FROM      ::account_banned ab
+            LEFT JOIN ::account a ON a.`id` = ab.`staffId`
+            WHERE     ab.`userId` = %i AND ab.`typeMask` & %i AND (ab.`end` = 0 OR ab.`end` > UNIX_TIMESTAMP())',
             User::$id, ACC_BAN_TEMP | ACC_BAN_PERM
         );
 
@@ -99,7 +99,7 @@ class AccountBaseResponse extends TemplateResponse
         /* GENERAL */
 
         // Modelviewer
-        if ($_ = DB::Aowow()->selectCell('SELECT `data` FROM ?_account_cookies WHERE `name` = ? AND `userId` = ?d', 'default_3dmodel', User::$id))
+        if ($_ = DB::Aowow()->selectCell('SELECT `data` FROM ::account_cookies WHERE `name` = %s AND `userId` = %i', 'default_3dmodel', User::$id))
             [$this->modelrace, $this->modelgender] = explode(',', $_);
 
         // Lists
@@ -115,7 +115,7 @@ class AccountBaseResponse extends TemplateResponse
         $this->renameCD = DateTime::formatTimeElapsedFloat(Cfg::get('ACC_RENAME_DECAY') * 1000);
         if ($user['renameCooldown'] > time())
         {
-            $locCode = implode('_', str_split(Lang::getLocale()->json(), 2)); // ._.
+            $locCode = substr_replace(Lang::getLocale()->json(), '_', 2, 0); // ._.
             $this->activeCD = (new \IntlDateFormatter($locCode, pattern: Lang::main('dateFmtIntl')))->format($user['renameCooldown']);
         }
 
@@ -145,7 +145,7 @@ class AccountBaseResponse extends TemplateResponse
         // * 'when': uploaded timestamp expected as msec for some reason
         // * 'caption': only used for getVisibleText, duplicates name?
         // * 'type': always 1 ?, Dialog-popup doesn't work without it
-        if ($cuAvatars = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `id`, `name`, `name` AS "caption", `current`, `size`, `status`, `when` * 1000 AS "when", 1 AS "type" FROM ?_account_avatars WHERE `userId` = ?d', User::$id))
+        if ($cuAvatars = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `id`, `name`, `name` AS "caption", `current`, `size`, `status`, `when` * 1000 AS "when", 1 AS "type" FROM ::account_avatars WHERE `userId` = %i', User::$id))
         {
             foreach ($cuAvatars as $id => $a)
                 if ($a['status'] != AvatarMgr::STATUS_REJECTED)

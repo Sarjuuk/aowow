@@ -117,15 +117,15 @@ class ZonesBaseResponse extends TemplateResponse implements ICache
         if ($mapFile)
         {
             $somData = ['flightmaster' => []];
-            $nodes   = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, tn.* FROM ?_taxinodes tn WHERE `mapId` = ?d AND `type` <> 0 AND `typeId` <> 0', $spawnMap);
-            $paths   = DB::Aowow()->select(
+            $nodes   = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, tn.* FROM ::taxinodes tn WHERE `mapId` = %i AND `type` <> 0 AND `typeId` <> 0', $spawnMap);
+            $paths   = DB::Aowow()->selectAssoc(
                'SELECT IF(tn1.`reactA` = tn1.`reactH` AND tn2.`reactA` = tn2.`reactH`, 1, 0) AS "neutral",
                        tp.`startNodeId` AS "startId", tn1.`mapX` AS "startPosX", tn1.`mapY` AS "startPosY",
                        tp.`endNodeId`   AS "endId",   tn2.`mapX` AS "endPosX",   tn2.`mapY` AS "endPosY"
-                FROM   ?_taxipath tp, ?_taxinodes tn1, ?_taxinodes tn2
+                FROM   ::taxipath tp, ::taxinodes tn1, ::taxinodes tn2
                 WHERE  tn1.`Id` = tp.`endNodeId` AND tn2.`Id` = tp.`startNodeId` AND
                        tn1.`type` <> 0 AND tn2.`type` <> 0 AND
-                       (tp.`startNodeId` IN (?a) OR tp.`EndNodeId` IN (?a))',
+                       (tp.`startNodeId` IN %in OR tp.`EndNodeId` IN %in)',
                 array_keys($nodes), array_keys($nodes)
             );
 

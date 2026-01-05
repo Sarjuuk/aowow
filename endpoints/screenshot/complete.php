@@ -77,8 +77,8 @@ class ScreenshotCompleteResponse extends TextResponse
         ['oWidth' => $w, 'oHeight' => $h] = ScreenshotMgr::calcImgDimensions();
 
         // write to db
-        $newId = DB::Aowow()->query(
-           'INSERT INTO ?_screenshots (`type`, `typeId`, `userIdOwner`, `date`, `width`, `height`, `caption`, `status`) VALUES (?d, ?d, ?d, UNIX_TIMESTAMP(), ?d, ?d, ?, 0)',
+        $newId = DB::Aowow()->qry(
+           'INSERT INTO ::screenshots (`type`, `typeId`, `userIdOwner`, `date`, `width`, `height`, `caption`, `status`) VALUES (%i, %i, %i, UNIX_TIMESTAMP(), %i, %i, %s, 0)',
             $this->destType, $this->destTypeId,
             User::$id,
             $w, $h,

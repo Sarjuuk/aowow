@@ -120,7 +120,7 @@ class RemoteArenaTeamList extends ArenaTeamList
         // ranks in DB are inaccurate. recalculate from rating (fetched as DESC from DB)
         foreach ($this->dbNames as $rId => $__)
             foreach ([2, 3, 5] as $type)
-                $this->rankOrder[$rId][$type] = DB::Characters($rId)->selectCol('SELECT `arenaTeamId` FROM arena_team WHERE `type` = ?d ORDER BY `rating` DESC', $type);
+                $this->rankOrder[$rId][$type] = DB::Characters($rId)->selectCol('SELECT `arenaTeamId` FROM arena_team WHERE `type` = %i ORDER BY `rating` DESC', $type);
 
         reset($this->dbNames);                              // only use when querying single realm
         $realms  = Profiler::getRealms();
@@ -168,11 +168,11 @@ class RemoteArenaTeamList extends ArenaTeamList
 
         // get team members
         foreach ($this->members as $realmId => &$teams)
-            $teams = DB::Characters($realmId)->select(
+            $teams = DB::Characters($realmId)->selectAssoc(
                'SELECT at.`arenaTeamId` AS ARRAY_KEY, c.`guid` AS ARRAY_KEY2, c.`name` AS "0", c.`class` AS "1", IF(at.`captainguid` = c.`guid`, 1, 0) AS "2"
                 FROM   arena_team at
                 JOIN   arena_team_member atm ON atm.`arenaTeamId` = at.`arenaTeamId` JOIN characters c ON c.`guid` = atm.`guid`
-                WHERE  at.`arenaTeamId` IN (?a) AND c.`deleteInfos_Account` IS NULL AND c.`level` <= ?d AND (c.`extra_flags` & ?d) = 0',
+                WHERE  at.`arenaTeamId` IN %in AND c.`deleteInfos_Account` IS NULL AND c.`level` <= %i AND (c.`extra_flags` & %i) = 0',
                 $teams, MAX_LEVEL, Profiler::CHAR_GMFLAGS
             );
 
@@ -228,26 +228,21 @@ class RemoteArenaTeamList extends ArenaTeamList
         $data = [];
         foreach ($this->iterate() as $guid => $__)
         {
-            $data[$guid] = array(
-                'realm'     => $this->getField('realm'),
-                'realmGUID' => $this->getField('arenaTeamId'),
-                'name'      => $this->getField('name'),
-                'nameUrl'   => Profiler::urlize($this->getField('name')),
-                'type'      => $this->getField('type'),
-                'rating'    => $this->getField('rating'),
-                'stub'      => 1
-            );
+            $data['realm'][$guid]     = $this->getField('realm');
+            $data['realmGUID'][$guid] = $this->getField('arenaTeamId');
+            $data['name'][$guid]      = $this->getField('name');
+            $data['nameUrl'][$guid]   = Profiler::urlize($this->getField('name'));
+            $data['type'][$guid]      = $this->getField('type');
+            $data['rating'][$guid]    = $this->getField('rating');
+            $data['stub'][$guid]      = 1;
         }
 
         // basic arena team data
-        foreach (Util::createSqlBatchInsert($data) as $ins)
-            DB::Aowow()->query('INSERT INTO ?_profiler_arena_team (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `id` = `id`', array_keys(reset($data)));
+        DB::Aowow()->qry('INSERT INTO ::profiler_arena_team %m ON DUPLICATE KEY UPDATE `id` = `id`', $data);
 
         // merge back local ids
-        $localIds = DB::Aowow()->selectCol(
-           'SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ?_profiler_arena_team WHERE `realm` IN (?a) AND `realmGUID` IN (?a)',
-            array_column($data, 'realm'),
-            array_column($data, 'realmGUID')
+        $localIds = DB::Aowow()->selectCol('SELECT CONCAT(`realm`, ":", `realmGUID`) AS ARRAY_KEY, `id` FROM ::profiler_arena_team WHERE `realm` IN %in AND `realmGUID` IN %in',
+            $data['realm'], $data['realmGUID']
         );
 
         foreach ($this->iterate() as $guid => &$_curTpl)
@@ -268,26 +263,24 @@ class RemoteArenaTeamList extends ArenaTeamList
                 foreach ($team as $memberId => $member)
                 {
                     $clearMembers[] = $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'];
-                    $memberData[]   = array(
-                        'arenaTeamId' => $localIds[$realmId.':'.$teamId],
-                        'profileId'   => $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'],
-                        'captain'     => $member[2]
-                    );
+
+                    $memberData['arenaTeamId'][] = $localIds[$realmId.':'.$teamId];
+                    $memberData['profileId'][]   = $profiles[$realmId]->getEntry($realmId.':'.$memberId)['id'];
+                    $memberData['captain'][]     = $member[2];
                 }
 
                 // Delete members from other teams of the same type
-                DB::Aowow()->query(
+                DB::Aowow()->qry(
                    'DELETE atm
-                    FROM   ?_profiler_arena_team_member atm
-                    JOIN   ?_profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = ?d
-                    WHERE  atm.`profileId` IN (?a)',
-                    $data[$realmId.':'.$teamId]['type'] ?? 0,
+                    FROM   ::profiler_arena_team_member atm
+                    JOIN   ::profiler_arena_team at ON atm.`arenaTeamId` = at.`id` AND at.`type` = %i
+                    WHERE  atm.`profileId` IN %in',
+                    $data['type'][$realmId.':'.$teamId] ?? 0,
                     $clearMembers
                 );
             }
 
-            foreach (Util::createSqlBatchInsert($memberData) as $ins)
-                DB::Aowow()->query('INSERT INTO ?_profiler_arena_team_member (?#) VALUES '.$ins.' ON DUPLICATE KEY UPDATE `profileId` = `profileId`', array_keys(reset($memberData)));
+            DB::Aowow()->qry('INSERT INTO ::profiler_arena_team_member %m ON DUPLICATE KEY UPDATE `profileId` = `profileId`', $memberData);
         }
     }
 }
@@ -295,11 +288,11 @@ class RemoteArenaTeamList extends ArenaTeamList
 
 class LocalArenaTeamList extends ArenaTeamList
 {
-    protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ?_profiler_arena_team at';
+    protected string $queryBase = 'SELECT at.*, at.id AS ARRAY_KEY FROM ::profiler_arena_team at';
     protected array  $queryOpts = array(
                     'at'  => [['atm', 'c'], 'g' => 'ARRAY_KEY', 'o' => 'rating DESC'],
-                    'atm' => ['j' => '?_profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id`'],
-                    'c'   => ['j' => '?_profiler_profiles c ON c.`id` = atm.`profileId`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
+                    'atm' => ['j' => '::profiler_arena_team_member atm ON atm.`arenaTeamId` = at.`id`'],
+                    'c'   => ['j' => '::profiler_profiles c ON c.`id` = atm.`profileId`', 's' => ', BIT_OR(IF(c.`race` IN (1, 3, 4, 7, 11), 1, 2)) - 1 AS "faction"']
                 );
 
     public function __construct(array $conditions = [], array $miscData = [])
@@ -321,8 +314,8 @@ class LocalArenaTeamList extends ArenaTeamList
 
         if ($conditions)
         {
-            array_unshift($conditions, 'AND');
-            $conditions = ['AND', ['realm', array_keys($realms)], $conditions];
+            array_unshift($conditions, DB::AND);
+            $conditions = [DB::AND, ['realm', array_keys($realms)], $conditions];
         }
         else
             $conditions = [['realm', array_keys($realms)]];
@@ -333,11 +326,11 @@ class LocalArenaTeamList extends ArenaTeamList
             return;
 
         // post processing
-        $members = DB::Aowow()->select(
+        $members = DB::Aowow()->selectAssoc(
            'SELECT `arenaTeamId` AS ARRAY_KEY, p.`id` AS ARRAY_KEY2, p.`name` AS "0", p.`class` AS "1", atm.`captain` AS "2"
-            FROM   ?_profiler_arena_team_member atm
-            JOIN   ?_profiler_profiles p ON p.`id` = atm.`profileId`
-            WHERE  `arenaTeamId` IN (?a)',
+            FROM   ::profiler_arena_team_member atm
+            JOIN   ::profiler_profiles p ON p.`id` = atm.`profileId`
+            WHERE  `arenaTeamId` IN %in',
             $this->getFoundIDs()
         );
 

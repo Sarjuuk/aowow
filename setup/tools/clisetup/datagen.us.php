@@ -111,6 +111,14 @@ CLISetup::registerUtility(new class extends UtilityScript
             CLI::write('[sql] subscript \''.$cmd.'\' returned '.($success ? 'successfully' : 'with errors'), $success ? CLI::LOG_OK : CLI::LOG_ERROR);
             CLI::write();
             set_time_limit($this->defaultExecTime);         // reset to default for the next script
+
+            // try to free memory
+            unset($scriptRef, $this->generators[$cmd]);
+            if (gc_enabled())
+            {
+                gc_collect_cycles();
+                gc_mem_caches();
+            }
         }
 
         return $allOk;

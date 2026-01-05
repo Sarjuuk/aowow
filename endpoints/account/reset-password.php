@@ -59,7 +59,7 @@ class AccountresetpasswordResponse extends TemplateResponse
         $errMsg = '';
         if (!$this->assertGET('key') && !$this->assertPOST('key'))
             $errMsg = Lang::account('inputbox', 'error', 'passTokenLost');
-        else if ($this->_get['key'] && !DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE `token` = ? AND `status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()', $this->_get['key'], ACC_STATUS_RECOVER_PASS))
+        else if ($this->_get['key'] && !DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `token` = %s AND `status` = %i AND `statusTimer` > UNIX_TIMESTAMP()', $this->_get['key'], ACC_STATUS_RECOVER_PASS))
             $errMsg = Lang::account('inputbox', 'error', 'passTokenUsed');
 
         if ($errMsg)
@@ -99,7 +99,7 @@ class AccountresetpasswordResponse extends TemplateResponse
         if ($this->_post['password'] != $this->_post['c_password'])
             return Lang::account('passCheckFail');
 
-        $userData = DB::Aowow()->selectRow('SELECT `id`, `passHash` FROM ?_account WHERE `token` = ? AND `email` = ? AND `status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()',
+        $userData = DB::Aowow()->selectRow('SELECT `id`, `passHash` FROM ::account WHERE `token` = %s AND `email` = %s AND `status` = %i AND `statusTimer` > UNIX_TIMESTAMP()',
             $this->_post['key'],
             $this->_post['email'],
             ACC_STATUS_RECOVER_PASS
@@ -110,7 +110,7 @@ class AccountresetpasswordResponse extends TemplateResponse
         if (!User::verifyCrypt($this->_post['c_password'], $userData['passHash']))
             return Lang::account('newPassDiff');
 
-        if (!DB::Aowow()->query('UPDATE ?_account SET `passHash` = ?, `status` = ?d WHERE `id` = ?d', User::hashCrypt($this->_post['c_password']), ACC_STATUS_NONE, $userData['id']))
+        if (!DB::Aowow()->qry('UPDATE ::account SET `passHash` = %s, `status` = %i WHERE `id` = %i', User::hashCrypt($this->_post['c_password']), ACC_STATUS_NONE, $userData['id']))
             return Lang::main('intError');
 
         $this->success = true;

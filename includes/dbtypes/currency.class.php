@@ -10,12 +10,12 @@ class CurrencyList extends DBTypeList
 {
     public static int    $type      = Type::CURRENCY;
     public static string $brickFile = 'currency';
-    public static string $dataTable = '?_currencies';
+    public static string $dataTable = '::currencies';
 
-    protected string $queryBase = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ?_currencies c';
+    protected string $queryBase = 'SELECT c.*, c.`id` AS ARRAY_KEY FROM ::currencies c';
     protected array  $queryOpts = array(
                         'c'  => [['ic']],
-                        'ic' => ['j' => ['?_icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
+                        'ic' => ['j' => ['::icons ic ON ic.`id` = c.`iconId`', true], 's' => ', ic.`name` AS "iconString"']
                     );
 
     public function __construct(array $conditions = [], array $miscData = [])

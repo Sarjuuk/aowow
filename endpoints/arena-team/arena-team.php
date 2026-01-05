@@ -46,7 +46,7 @@ class ArenateamBaseResponse extends TemplateResponse
 
         // 3 possibilities
         // 1) already synced to aowow
-        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ?_profiler_arena_team WHERE `realm` = ?d AND `nameUrl` = ?', $this->realmId, Profiler::urlize($this->subjectName)))
+        if ($subject = DB::Aowow()->selectRow('SELECT `id`, `realmGUID`, `stub` FROM ::profiler_arena_team WHERE `realm` = %i AND `nameUrl` = %s', $this->realmId, Profiler::urlize($this->subjectName)))
         {
             $this->typeId = $subject['id'];
 
@@ -57,16 +57,15 @@ class ArenateamBaseResponse extends TemplateResponse
         }
 
         // 2) not yet synced but exists on realm (wont work if we get passed an urlized name, but there is nothing we can do about it)
-        $subjects = DB::Characters($this->realmId)->select('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = ?', $this->subjectName);
-        if ($subject = array_filter($subjects ?: [], fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
+        $subjects = DB::Characters($this->realmId)->selectAssoc('SELECT at.`arenaTeamId` AS "realmGUID", at.`name`, at.`type` FROM arena_team at WHERE at.`name` = %s', $this->subjectName);
+        if ($subject = array_find($subjects ?: [], fn($x) => Util::lower($x['name']) === Util::lower($this->subjectName)))
         {
-            $subject = array_pop($subject);
             $subject['realm']   = $this->realmId;
             $subject['stub']    = 1;
             $subject['nameUrl'] = Profiler::urlize($subject['name']);
 
             // create entry from realm with basic info
-            DB::Aowow()->query('INSERT IGNORE INTO ?_profiler_arena_team (?#) VALUES (?a)', array_keys($subject), array_values($subject));
+            DB::Aowow()->qry('INSERT IGNORE INTO ::profiler_arena_team %v', $subject);
 
             $this->handleIncompleteData(Type::ARENA_TEAM, $subject['realmGUID']);
             return;

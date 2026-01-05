@@ -52,7 +52,7 @@ audio processing may require [lame](https://sourceforge.net/projects/lame/files/
 
 #### 2. Prepare the database  
 Ensure that the account you are going to use has **full** access on the database AoWoW is going to occupy and ideally only **read** access on the world database you are going to reference.  
-Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
+Import files 01 - 03 from `setup/sql/` in order into the AoWoW database `mysql --default-character-set=utf8 -p {your-db-here} < setup/sql/01-db_structure.sql`, etc.  
 
 **Optional**: If you are using MySQL ≥ 8.4.0 and want to support fulltext search for locale zhCN, additionally import `setup/sql/04-db_optional_mysql_only.sql`. Enables this in settings after AoWoW has been set up.  
 

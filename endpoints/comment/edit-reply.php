@@ -26,7 +26,7 @@ class CommentEditreplyResponse extends TextResponse
             $this->generate404(User::isInGroup(U_GROUP_STAFF) ? 'request malformed' : '');
         }
 
-        $ownerId = DB::Aowow()->selectCell('SELECT `userId` FROM ?_comments WHERE `id` = ?d AND `replyTo` = ?d', $this->_post['replyId'], $this->_post['commentId']);
+        $ownerId = DB::Aowow()->selectCell('SELECT `userId` FROM ::comments WHERE `id` = %i AND `replyTo` = %i', $this->_post['replyId'], $this->_post['commentId']);
 
         if (!User::canReply() || (User::$id != $ownerId && !User::isInGroup(U_GROUP_MODERATOR)))
             $this->generate404(Lang::main('cannotComment'));
@@ -48,8 +48,11 @@ class CommentEditreplyResponse extends TextResponse
         if (User::$id == $ownerId)
             $update['roles'] = User::$groups;
 
-        if (!DB::Aowow()->query('UPDATE ?_comments SET `editCount` = `editCount` + 1, ?a WHERE `id` = ?d AND `replyTo` = ?d { AND `userId` = ?d }',
-            $update, $this->_post['replyId'], $this->_post['commentId'], User::isInGroup(U_GROUP_MODERATOR) ? DBSIMPLE_SKIP : User::$id))
+        $where = [['`id` = %i', $this->_post['replyId']], ['`replyTo` = %i', $this->_post['commentId']]];
+        if (!User::isInGroup(U_GROUP_MODERATOR))
+            $where[] = ['`userId` = %i',  User::$id];
+
+        if (!DB::Aowow()->qry('UPDATE ::comments SET `editCount` = `editCount` + 1, %a WHERE %and', $update, $where))
         {
             trigger_error('CommentEditreplyResponse - write to db failed', E_USER_ERROR);
             $this->generate404(Lang::main('intError'));

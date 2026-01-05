@@ -45,7 +45,7 @@ class GuideMgr
 
         self::$ratingsStore = array_fill_keys($guideIds, ['nvotes' => 0, 'rating' => -1]);
 
-        $ratings = DB::Aowow()->select('SELECT `entry` AS ARRAY_KEY, IFNULL(SUM(`value`), 0) AS "0", IFNULL(COUNT(*), 0) AS "1", IFNULL(MAX(IF(`userId` = ?d, `value`, 0)), 0) AS "2" FROM ?_user_ratings WHERE `type` = ?d AND `entry` IN (?a) GROUP BY `entry`', User::$id, RATING_GUIDE, $guideIds);
+        $ratings = DB::Aowow()->selectAssoc('SELECT `entry` AS ARRAY_KEY, IFNULL(SUM(`value`), 0) AS "0", IFNULL(COUNT(*), 0) AS "1", IFNULL(MAX(IF(`userId` = %i, `value`, 0)), 0) AS "2" FROM ::user_ratings WHERE `type` = %i AND `entry` IN %in GROUP BY `entry`', User::$id, RATING_GUIDE, $guideIds);
         foreach ($ratings as $id => [$total, $count, $self])
         {
             self::$ratingsStore[$id]['nvotes'] = (int)$count;

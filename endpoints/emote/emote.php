@@ -109,7 +109,7 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
 
         if ($this->subject->getField('cuFlags') & EMOTE_CU_MISSING_CMD)
             $text .= Lang::emote('noCommand').'[br][br]';
-        else if ($aliasses = DB::Aowow()->selectCol('SELECT `command` FROM ?_emotes_aliasses WHERE `id` = ?d AND `locales` & ?d', $this->typeId, 1 << Lang::getLocale()->value))
+        else if ($aliasses = DB::Aowow()->selectCol('SELECT `command` FROM ::emotes_aliasses WHERE `id` = %i AND `locales` & %i', $this->typeId, 1 << Lang::getLocale()->value))
         {
             $text .= '[h3]'.Lang::emote('aliases').'[/h3][ul]';
             foreach ($aliasses as $a)
@@ -184,13 +184,12 @@ class EmoteBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: sound
-        $ems = DB::Aowow()->select(
+        $ems = DB::Aowow()->selectAssoc(
            'SELECT   `soundId` AS ARRAY_KEY, BIT_OR(1 << (`raceId` - 1)) AS "raceMask", BIT_OR(1 << (`gender` - 1)) AS "gender"
-            FROM     ?_emotes_sounds
-            WHERE    `emoteId` = ?d { OR -`emoteId` = ?d }
+            FROM     ::emotes_sounds
+            WHERE    %if', $this->typeId < 0, '-`emoteId` = %i OR', $this->subject->getField('parentEmote'), '%end `emoteId` = %i
             GROUP BY `soundId`',
             $this->typeId,
-            $this->typeId < 0 ? $this->subject->getField('parentEmote') : DBSIMPLE_SKIP
         );
 
         if ($ems)

@@ -90,7 +90,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 $this->altNPCs = new CreatureList(array(['id', array_keys($_altIds)]));
         }
 
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT `entry` FROM vehicle_template_accessory WHERE `accessory_entry` = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT `entry` FROM vehicle_template_accessory WHERE `accessory_entry` = %i', $this->typeId))
         {
             $vehicles = new CreatureList(array(['id', $_]));
             foreach ($vehicles->iterate() as $id => $__)
@@ -103,9 +103,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         /**********************/
 
         $mapType = 0;
-        if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d', Type::NPC, $this->typeId))
+        if ($maps = DB::Aowow()->selectCell('SELECT IF(COUNT(DISTINCT `areaId`) > 1, 0, `areaId`) FROM ::spawns WHERE `type` = %i AND `typeId` = %i', Type::NPC, $this->typeId))
         {
-            $mapType = match ((int)DB::Aowow()->selectCell('SELECT `type` FROM ?_zones WHERE `id` = ?d', $maps[0]))
+            $mapType = match (DB::Aowow()->selectCell('SELECT `type` FROM ::zones WHERE `id` = %i', $maps))
             {
                 // MAP_TYPE_DUNGEON,
                 MAP_TYPE_DUNGEON_HC    => 1,
@@ -116,13 +116,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             };
         }
         // npc is difficulty dummy: get max difficulty from parent npc
-        if ($this->placeholder && ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = ?d, 1, 2) FROM ?_creature WHERE `difficultyEntry1` = ?d OR `difficultyEntry2` = ?d OR `difficultyEntry3` = ?d', $this->typeId, $this->typeId, $this->typeId, $this->typeId)))
+        if ($this->placeholder && ($mt = DB::Aowow()->selectCell('SELECT IF(`difficultyEntry1` = %i, 1, 2) FROM ::creature WHERE `difficultyEntry1` = %i OR `difficultyEntry2` = %i OR `difficultyEntry3` = %i', $this->typeId, $this->typeId, $this->typeId, $this->typeId)))
             $mapType = max($mapType, $mt);
         // npc has difficulty dummys: 2+ dummies -> definitely raid (10/25 + hc); 1 dummy -> may be heroic (used here), but may also be 10/25-raid
         if ($_altIds)
             $mapType = max($mapType, count($_altIds) > 1 ? 2 : 1);
         // for event encounters a single npc may be reused over multiple difficulties but have different chests assigned
-        if ($d = DB::Aowow()->selectCell('SELECT MAX(`difficulty`) FROM ?_loot_link WHERE `npcId` IN (?a)', array_merge($_altIds, [$this->typeId])))
+        if ($d = DB::Aowow()->selectCell('SELECT MAX(`difficulty`) FROM ::loot_link WHERE `npcId` IN %in', array_merge($_altIds, [$this->typeId])))
             $mapType = max($mapType, $d > 2 ? 2 : 1);
 
 
@@ -133,7 +133,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $infobox = Lang::getInfoBoxForFlags($this->subject->getField('cuFlags'));
 
         // Event (ignore events, where the object only gets removed)
-        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_creature gec, creature c WHERE ge.`eventEntry` = gec.`eventEntry` AND c.`guid` = gec.`guid` AND c.`id` = ?d', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT DISTINCT ge.`eventEntry` FROM game_event ge, game_event_creature gec, creature c WHERE ge.`eventEntry` = gec.`eventEntry` AND c.`guid` = gec.`guid` AND c.`id` = %i', $this->typeId))
         {
             $this->extendGlobalIds(Type::WORLDEVENT, ...$_);
             $ev = [];
@@ -202,7 +202,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         if (User::isInGroup(U_GROUP_EMPLOYEE))
         {
-            $spawnData = DB::Aowow()->select('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ?_spawns WHERE `type` = ?d AND `typeId` = ?d AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::NPC, $this->typeId);
+            $spawnData = DB::Aowow()->selectAssoc('SELECT `guid` AS "0", `ScriptName` AS "1", `StringId` AS "2" FROM ::spawns WHERE `type` = %i AND `typeId` = %i AND `ScriptName` IS NOT NULL ORDER BY `guid` ASC', Type::NPC, $this->typeId);
 
             // AI
             $scripts = null;
@@ -318,7 +318,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             if (!$sai->prepare())                           // no smartAI found .. check per guid
             {
                 // at least one of many
-                $guids = DB::World()->selectCol('SELECT `guid` FROM creature WHERE `id` = ?d', $this->typeId);
+                $guids = DB::World()->selectCol('SELECT `guid` FROM creature WHERE `id` = %i', $this->typeId);
                 while ($_ = array_pop($guids))
                 {
                     $sai = new SmartAI(SmartAI::SRC_TYPE_CREATURE, -$_, ['baseEntry' => $this->typeId, 'title' => ' [small](for GUID: '.$_.')[/small]']);
@@ -359,7 +359,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $tplSpells  = [];
         $genSpells  = [];
         $spellClick = [];
-        $conditions = ['OR'];
+        $conditions = [DB::OR];
 
         for ($i = 1; $i < 9; $i++)
             if ($_ = $this->subject->getField('spell'.$i))
@@ -371,7 +371,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($smartSpells = SmartAI::getSpellCastsForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE))
             $genSpells = $smartSpells;
 
-        if ($auras = DB::World()->selectCell('SELECT `auras` FROM creature_template_addon WHERE `entry` = ?d', $this->typeId))
+        if ($auras = DB::World()->selectCell('SELECT `auras` FROM creature_template_addon WHERE `entry` = %i', $this->typeId))
         {
             $auras = preg_replace('/[^\d ]/', ' ', $auras);  // remove erroneous chars from string
             $genSpells = array_merge($genSpells, array_filter(explode(' ', $auras)));
@@ -380,7 +380,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         if ($genSpells)
             $conditions[] = ['id', $genSpells];
 
-        if ($spellClick = DB::World()->select('SELECT `spell_id` AS ARRAY_KEY, `cast_flags` AS "0", `user_type` AS "1" FROM npc_spellclick_spells WHERE `npc_entry` = ?d', $this->typeId))
+        if ($spellClick = DB::World()->selectAssoc('SELECT `spell_id` AS ARRAY_KEY, `cast_flags` AS "0", `user_type` AS "1" FROM npc_spellclick_spells WHERE `npc_entry` = %i', $this->typeId))
         {
             $genSpells = array_merge($genSpells, array_keys($spellClick));
             $conditions[] = ['id', array_keys($spellClick)];
@@ -401,13 +401,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 break;
             }
             $conditions[] = [
-                'AND',
+                DB::AND,
                 ['s.typeCat', -3],
                 [
-                    'OR',
+                    DB::OR,
                     ['skillLine1', $skill],
-                    ['AND', ['skillLine1', 0, '>'], ['skillLine2OrMask', $skill]],
-                    ['AND', ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
+                    [DB::AND, ['skillLine1', 0, '>'], ['skillLine2OrMask', $skill]],
+                    [DB::AND, ['skillLine1', -1], ['skillLine2OrMask', $mask, '&']]
                 ]
             ];
         }
@@ -458,10 +458,10 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: summoned by [spell]
         $conditions = array(
-            'OR',
-            ['AND', ['effect1Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect3MiscValue', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['effect1Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3Id', [SPELL_EFFECT_SUMMON, SPELL_EFFECT_SUMMON_PET, SPELL_EFFECT_SUMMON_DEMON]], ['effect3MiscValue', $this->typeId]]
         );
 
         $sbSpell = new SpellList($conditions);
@@ -518,9 +518,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                'SELECT ts.`SpellId` AS ARRAY_KEY, ts.`MoneyCost` AS "cost", ts.`ReqSkillLine` AS "reqSkillId", ts.`ReqSkillRank` AS "reqSkillValue", ts.`ReqLevel` AS "reqLevel", ts.`ReqAbility1` AS "reqSpellId1", ts.`reqAbility2` AS "reqSpellId2"
                 FROM   trainer_spell ts
                 JOIN   creature_default_trainer cdt ON cdt.`TrainerId` = ts.`TrainerId`
-                WHERE  cdt.`Creatureid` = ?d';
+                WHERE  cdt.`Creatureid` = %i';
 
-            if ($tSpells = DB::World()->select($teachQuery, $this->typeId))
+            if ($tSpells = DB::World()->selectAssoc($teachQuery, $this->typeId))
             {
                 $teaches = new SpellList(array(['id', array_keys($tSpells)]));
                 if (!$teaches->error)
@@ -573,9 +573,9 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: sells
         if ($sells = DB::World()->selectCol(
-           'SELECT   nv.`item` FROM npc_vendor nv                                                               WHERE   nv.`entry` = ?d UNION
-            SELECT  nv1.`item` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE  nv2.`entry` = ?d UNION
-            SELECT genv.`item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE    c.`id`    = ?d',
+           'SELECT   nv.`item` FROM npc_vendor nv                                                               WHERE   nv.`entry` = %i UNION
+            SELECT  nv1.`item` FROM npc_vendor nv1             JOIN npc_vendor nv2 ON -nv1.`entry` = nv2.`item` WHERE  nv2.`entry` = %i UNION
+            SELECT genv.`item` FROM game_event_npc_vendor genv JOIN creature   c   ON genv.`guid`  =   c.`guid` WHERE    c.`id`    = %i',
             $this->typeId, $this->typeId, $this->typeId)
         )
         {
@@ -650,7 +650,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
             return 4;                                       // generic case
         };
 
-        foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d ORDER BY `difficulty` ASC', $this->typeId) as $difficulty => $lgo)
+        foreach (DB::Aowow()->selectAssoc('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ::loot_link l JOIN ::objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = %i ORDER BY `difficulty` ASC', $this->typeId) as $difficulty => $lgo)
         {
             $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
             $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
@@ -673,7 +673,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
             foreach ($this->altNPCs->iterate() as $id => $__)
             {
-                foreach (DB::Aowow()->select('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ?_loot_link l JOIN ?_objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = ?d ORDER BY `difficulty` ASC', $id) as $difficulty => $lgo)
+                foreach (DB::Aowow()->selectAssoc('SELECT l.`difficulty` AS ARRAY_KEY, o.`id`, o.`lootId`, o.`name_loc0`, o.`name_loc2`, o.`name_loc3`, o.`name_loc4`, o.`name_loc6`, o.`name_loc8` FROM ::loot_link l JOIN ::objects o ON o.`id` = l.`objectId` WHERE l.`npcId` = %i ORDER BY `difficulty` ASC', $id) as $difficulty => $lgo)
                 {
                     $sourceFor[1][1][$getBit($mapType, $difficulty)] = $lgo['lootId'];
                     $sourceFor[1][5] = $sourceFor[1][5] ?: '$$WH.sprintf(LANG.lvnote_npcobjectsource, '.$lgo['id'].', "'.Util::localizedString($lgo, 'name').'")';
@@ -757,11 +757,11 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: objective of quest
         $conditions = array(
-            'OR',
-            ['AND', ['reqNpcOrGo1', [$this->typeId]], ['reqNpcOrGoCount1', 0, '>']],
-            ['AND', ['reqNpcOrGo2', [$this->typeId]], ['reqNpcOrGoCount2', 0, '>']],
-            ['AND', ['reqNpcOrGo3', [$this->typeId]], ['reqNpcOrGoCount3', 0, '>']],
-            ['AND', ['reqNpcOrGo4', [$this->typeId]], ['reqNpcOrGoCount4', 0, '>']]
+            DB::OR,
+            [DB::AND, ['reqNpcOrGo1', [$this->typeId]], ['reqNpcOrGoCount1', 0, '>']],
+            [DB::AND, ['reqNpcOrGo2', [$this->typeId]], ['reqNpcOrGoCount2', 0, '>']],
+            [DB::AND, ['reqNpcOrGo3', [$this->typeId]], ['reqNpcOrGoCount3', 0, '>']],
+            [DB::AND, ['reqNpcOrGo4', [$this->typeId]], ['reqNpcOrGoCount4', 0, '>']]
         );
         foreach ([1, 2] as $i)
             if (($_ = $this->subject->getField('KillCredit'.$i)) > 0)
@@ -782,13 +782,13 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
         // tab: criteria of [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE have no data set to check for]
         $conditions = array(
-            'AND',
+            DB::AND,
             ['ac.type', [ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE]],
             ['ac.value1', $this->typeId]
         );
 
-        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE, $this->typeId))
-            $conditions = ['OR', $conditions, ['ac.id', $extraCrt]];
+        if ($extraCrt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE, $this->typeId))
+            $conditions = [DB::OR, $conditions, ['ac.id', $extraCrt]];
 
         $crtOf = new AchievementList($conditions);
         if (!$crtOf->error)
@@ -803,7 +803,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: passengers
-        if ($_ = DB::World()->selectCol('SELECT `accessory_entry` AS ARRAY_KEY, GROUP_CONCAT(`seat_id` SEPARATOR ", ") FROM vehicle_template_accessory WHERE `entry` = ?d GROUP BY `accessory_entry`', $this->typeId))
+        if ($_ = DB::World()->selectCol('SELECT `accessory_entry` AS ARRAY_KEY, GROUP_CONCAT(`seat_id` SEPARATOR ", ") FROM vehicle_template_accessory WHERE `entry` = %i GROUP BY `accessory_entry`', $this->typeId))
         {
             $passengers = new CreatureList(array(['id', array_keys($_)]));
             if (!$passengers->error)
@@ -839,7 +839,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
         $this->soundIds = array_merge($this->soundIds, SmartAI::getSoundsPlayedForOwner($this->typeId, SmartAI::SRC_TYPE_CREATURE));
 
         // up to 4 possible displayIds .. for the love of things betwixt, just use the first!
-        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ?_creature_sounds WHERE `id` = ?d', $this->subject->getField('displayId1'));
+        $activitySounds = DB::Aowow()->selectRow('SELECT * FROM ::creature_sounds WHERE `id` = %i', $this->subject->getField('displayId1'));
         array_shift($activitySounds);                       // remove id-column
         $this->soundIds = array_merge($this->soundIds, array_values($activitySounds));
 
@@ -878,11 +878,11 @@ class NpcBaseResponse extends TemplateResponse implements ICache
 
     private function getRepForId(array $entries, array &$spillover) : array
     {
-        $rows  = DB::World()->select(
+        $rows  = DB::World()->selectAssoc(
            'SELECT `creature_id` AS "npc", `RewOnKillRepFaction1` AS "faction", `RewOnKillRepValue1` AS "qty", `MaxStanding1` AS "maxRank", `isTeamAward1` AS "spillover"
-            FROM   creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction1` > 0 UNION
+            FROM   creature_onkill_reputation WHERE `creature_id` IN %in AND `RewOnKillRepFaction1` > 0 UNION
             SELECT `creature_id` AS "npc", `RewOnKillRepFaction2` AS "faction", `RewOnKillRepValue2` AS "qty", `MaxStanding2` AS "maxRank", `isTeamAward2` AS "spillover"
-            FROM   creature_onkill_reputation WHERE `creature_id` IN (?a) AND `RewOnKillRepFaction2` > 0',
+            FROM   creature_onkill_reputation WHERE `creature_id` IN %in AND `RewOnKillRepFaction2` > 0',
             $entries, $entries
         );
 
@@ -903,7 +903,7 @@ class NpcBaseResponse extends TemplateResponse implements ICache
                 0                                           // spilloverCat
             );
 
-            $cuRate = DB::World()->selectCell('SELECT `creature_rate` FROM reputation_reward_rate WHERE `creature_rate` <> 1 AND `faction` = ?d', $row['faction']);
+            $cuRate = DB::World()->selectCell('SELECT `creature_rate` FROM reputation_reward_rate WHERE `creature_rate` <> 1 AND `faction` = %i', $row['faction']);
             if ($cuRate && User::isInGroup(U_GROUP_EMPLOYEE))
                 $set[1][1] = $set[1][0] . sprintf(Util::$dfnString, Lang::faction('customRewRate'), ($set[1][0] > 0 ? '+' : '').($set[1][0] * ($cuRate - 1)));
             else if ($cuRate)

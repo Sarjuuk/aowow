@@ -102,8 +102,8 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE') && !($this->subject->getField('cuFlags') & CUSTOM_EXCLUDE_FOR_LISTVIEW))
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_reputation WHERE `exalted` = 1 AND `factionId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_reputation WHERE `exalted` = 1 AND `factionId` = %i', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup
@@ -132,7 +132,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             CONCAT_WS(" ", faction1, faction2, faction3, faction4) AS faction,
             CONCAT_WS(" ", rate_1,   rate_2,   rate_3,   rate_4)   AS rate,
             CONCAT_WS(" ", rank_1,   rank_2,   rank_3,   rank_4)   AS rank
-            FROM reputation_spillover_template WHERE faction = ?d', $this->typeId);
+            FROM reputation_spillover_template WHERE faction = %i', $this->typeId);
         */
 
 
@@ -142,7 +142,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         );
 
         if ($p = $this->subject->getField('parentFactionId')) // linked via parent
-            $conditions[] = ['OR', ['id', $p], ['parentFactionId', $p]];
+            $conditions[] = [DB::OR, ['id', $p], ['parentFactionId', $p]];
         else                                                // self as parent
             $conditions[] = ['parentFactionId', $this->typeId];
 
@@ -162,7 +162,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
             );
 
         // reward rates (ultimately this should be calculated into each reward display)
-        if ($rates = DB::World()->selectRow('SELECT `quest_rate`, `quest_daily_rate`, `quest_weekly_rate`, `quest_monthly_rate`, `quest_repeatable_rate`, `creature_rate`, `spell_rate` FROM reputation_reward_rate WHERE `faction` = ?d', $this->typeId))
+        if ($rates = DB::World()->selectRow('SELECT `quest_rate`, `quest_daily_rate`, `quest_weekly_rate`, `quest_monthly_rate`, `quest_repeatable_rate`, `creature_rate`, `spell_rate` FROM reputation_reward_rate WHERE `faction` = %i', $this->typeId))
         {
             $buff = '';
             foreach ($rates as $k => $v)
@@ -191,7 +191,7 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         }
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_reputations WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_reputations WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altFac = new FactionList(array(['id', abs($pendant)]));
             if (!$altFac->error)
@@ -237,11 +237,11 @@ class FactionBaseResponse extends TemplateResponse implements ICache
         {
             // inherit siblings/children from $spillover
             $cRep = DB::World()->selectCol('SELECT DISTINCT `creature_id` AS ARRAY_KEY, `qty` FROM (
-                    SELECT `creature_id`, `RewOnKillRepValue1` as "qty" FROM creature_onkill_reputation WHERE `RewOnKillRepValue1` > 0 AND (`RewOnKillRepFaction1` = ?d { OR (`RewOnKillRepFaction1` IN (?a) AND `IsTeamAward1` <> 0) } ) UNION
-                    SELECT `creature_id`, `RewOnKillRepValue2` as "qty" FROM creature_onkill_reputation WHERE `RewOnKillRepValue2` > 0 AND (`RewOnKillRepFaction2` = ?d { OR (`RewOnKillRepFaction2` IN (?a) AND `IsTeamAward2` <> 0) } )
+                    SELECT `creature_id`, `RewOnKillRepValue1` as "qty" FROM creature_onkill_reputation WHERE `RewOnKillRepValue1` > 0 AND (`RewOnKillRepFaction1` = %i OR (`RewOnKillRepFaction1` IN %in AND `IsTeamAward1` <> 0) ) UNION
+                    SELECT `creature_id`, `RewOnKillRepValue2` as "qty" FROM creature_onkill_reputation WHERE `RewOnKillRepValue2` > 0 AND (`RewOnKillRepFaction2` = %i OR (`RewOnKillRepFaction2` IN %in AND `IsTeamAward2` <> 0) )
                 ) x',
-                $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP,
-                $this->typeId, $spillover->getFoundIDs() ?: DBSIMPLE_SKIP
+                $this->typeId, $spillover->getFoundIDs() ?: [0],
+                $this->typeId, $spillover->getFoundIDs() ?: [0]
             );
 
             if ($cRep)
@@ -303,13 +303,13 @@ class FactionBaseResponse extends TemplateResponse implements ICache
 
         // tab: quests
         $conditions = array(
-            'OR',
+            DB::OR,
             Listview::DEFAULT_SIZE,
-            ['AND', ['rewardFactionId1', $this->typeId], ['rewardFactionValue1', 0, '>']],
-            ['AND', ['rewardFactionId2', $this->typeId], ['rewardFactionValue2', 0, '>']],
-            ['AND', ['rewardFactionId3', $this->typeId], ['rewardFactionValue3', 0, '>']],
-            ['AND', ['rewardFactionId4', $this->typeId], ['rewardFactionValue4', 0, '>']],
-            ['AND', ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']]
+            [DB::AND, ['rewardFactionId1', $this->typeId], ['rewardFactionValue1', 0, '>']],
+            [DB::AND, ['rewardFactionId2', $this->typeId], ['rewardFactionValue2', 0, '>']],
+            [DB::AND, ['rewardFactionId3', $this->typeId], ['rewardFactionValue3', 0, '>']],
+            [DB::AND, ['rewardFactionId4', $this->typeId], ['rewardFactionValue4', 0, '>']],
+            [DB::AND, ['rewardFactionId5', $this->typeId], ['rewardFactionValue5', 0, '>']]
         );
         $quests = new QuestList($conditions, ['calcTotal' => true]);
         if (!$quests->error)

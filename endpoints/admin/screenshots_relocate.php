@@ -24,7 +24,7 @@ class AdminScreenshotsActionRelocateResponse extends TextResponse
             return;
         }
 
-        [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT `type`, `typeId` FROM ?_screenshots WHERE `id` = ?d', $this->_get['id']));
+        [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT `type`, `typeId` FROM ::screenshots WHERE `id` = %i', $this->_get['id']));
         $typeId             = $this->_get['typeid'];
 
         if (Type::validateIds($type, $typeId))
@@ -32,15 +32,15 @@ class AdminScreenshotsActionRelocateResponse extends TextResponse
             $tbl = Type::getClassAttrib($type, 'dataTable');
 
             // move screenshot
-            DB::Aowow()->query('UPDATE ?_screenshots SET `typeId` = ?d WHERE `id` = ?d', $typeId, $this->_get['id']);
+            DB::Aowow()->qry('UPDATE ::screenshots SET `typeId` = %i WHERE `id` = %i', $typeId, $this->_get['id']);
 
             // flag target as having screenshot
-            DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_SCREENSHOT, $typeId);
+            DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_SCREENSHOT, $typeId);
 
             // deflag source for having had screenshots (maybe)
-            $ssInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~`status`) & ?d, 1, 0) AS "hasMore" FROM ?_screenshots WHERE `status`& ?d AND `type` = ?d AND `typeId` = ?d', CC_FLAG_DELETED, CC_FLAG_APPROVED, $type, $oldTypeId);
+            $ssInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~`status`) & %i, 1, 0) AS "hasMore" FROM ::screenshots WHERE `status`& %i AND `type` = %i AND `typeId` = %i', CC_FLAG_DELETED, CC_FLAG_APPROVED, $type, $oldTypeId);
             if ($ssInfo || !$ssInfo['hasMore'])
-                DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` & ~?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_SCREENSHOT, $oldTypeId);
+                DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` & ~%i WHERE `id` = %i', $tbl, CUSTOM_HAS_SCREENSHOT, $oldTypeId);
         }
         else
             trigger_error('AdminScreenshotsActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);

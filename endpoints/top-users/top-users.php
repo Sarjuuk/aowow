@@ -49,25 +49,25 @@ class TopusersBaseResponse extends TemplateResponse
         foreach ($tabs as [$time, $tabId, $tabName])
         {
             // stuff received
-            $res = DB::Aowow()->select(
+            $res = DB::Aowow()->selectAssoc(
                'SELECT   a.`id` AS ARRAY_KEY, a.`username`, a.`userGroups` AS "groups", a.`joinDate` AS "creation",
-                         SUM(r.`amount`) AS "reputation", SUM(IF(r.`action` = ?d, 1, 0)) AS "comments", SUM(IF(r.`action` = ?d, 1, 0)) AS "screenshots", SUM(IF(r.`action` = ?d, 1, 0)) AS "reports"
-                FROM     ?_account_reputation r
-                JOIN     ?_account a ON a.`id` = r.`userId`
-              { WHERE    r.`date` > ?d }
+                         SUM(r.`amount`) AS "reputation", SUM(IF(r.`action` = %i, 1, 0)) AS "comments", SUM(IF(r.`action` = %i, 1, 0)) AS "screenshots", SUM(IF(r.`action` = %i, 1, 0)) AS "reports"
+                FROM     ::account_reputation r
+                JOIN     ::account a ON a.`id` = r.`userId`',
+                SITEREP_ACTION_COMMENT, SITEREP_ACTION_SUBMIT_SCREENSHOT, SITEREP_ACTION_GOOD_REPORT,
+               '%if', $time, 'WHERE r.`date` > %i', $time, '%end
                 GROUP BY a.`id`
                 ORDER BY reputation DESC
-                LIMIT    ?d',
-                SITEREP_ACTION_COMMENT, SITEREP_ACTION_SUBMIT_SCREENSHOT, SITEREP_ACTION_GOOD_REPORT,
-                $time ?: DBSIMPLE_SKIP, self::MAX_RESULTS
+                LIMIT    %i',
+                self::MAX_RESULTS
             );
 
             $data = [];
             if ($res)
             {
                 // stuff given
-                $votes = DB::Aowow()->selectCol('SELECT `sourceB` AS ARRAY_KEY, SUM(1) FROM ?_account_reputation WHERE `action` IN (?a) AND `sourceB` IN (?a) { AND `date` > ?d } GROUP BY `sourceB`',
-                    [SITEREP_ACTION_UPVOTED, SITEREP_ACTION_DOWNVOTED], array_keys($res), $time ?: DBSIMPLE_SKIP
+                $votes = DB::Aowow()->selectCol('SELECT `sourceB` AS ARRAY_KEY, SUM(1) FROM ::account_reputation WHERE %if', $time, '`date` > %i AND', $time, '%end `action` IN %in AND `sourceB` IN %in GROUP BY `sourceB`',
+                    [SITEREP_ACTION_UPVOTED, SITEREP_ACTION_DOWNVOTED], array_keys($res),
                 );
                 foreach ($res as $uId => &$r)
                 {

@@ -13,10 +13,10 @@ class UserList extends DBTypeList
     public static string $dataTable  = '';
     public static int    $contribute = CONTRIBUTE_NONE;
 
-    protected string $queryBase = 'SELECT *, a.`id` AS ARRAY_KEY FROM ?_account a';
+    protected string $queryBase = 'SELECT *, a.`id` AS ARRAY_KEY FROM ::account a';
     protected array  $queryOpts = array(
                         'a' => [['r']],
-                        'r' => ['j' => ['?_account_reputation r ON r.`userId` = a.`id`', true], 's' => ', IFNULL(SUM(r.`amount`), 0) AS "reputation"', 'g' => 'a.`id`']
+                        'r' => ['j' => ['::account_reputation r ON r.`userId` = a.`id`', true], 's' => ', IFNULL(SUM(r.`amount`), 0) AS "reputation"', 'g' => 'a.`id`']
                     );
 
     public function getJSGlobals(int $addMask = 0) : array
@@ -49,7 +49,7 @@ class UserList extends DBTypeList
                 case 2:
                     if ($this->isPremium())
                     {
-                        if ($av = DB::Aowow()->selectCell('SELECT `id` FROM ?_account_avatars WHERE `userId` = ?d AND `current` = 1 AND `status` <> ?d', $userId, AvatarMgr::STATUS_REJECTED))
+                        if ($av = DB::Aowow()->selectCell('SELECT `id` FROM ::account_avatars WHERE `userId` = %i AND `current` = 1 AND `status` <> %i', $userId, AvatarMgr::STATUS_REJECTED))
                         {
                             $data[$this->curTpl['username']]['avatar']     = $this->curTpl['avatar'];
                             $data[$this->curTpl['username']]['avatarmore'] = $av;

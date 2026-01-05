@@ -63,13 +63,13 @@ class MailBaseResponse extends TemplateResponse implements ICache
         // sender + delay
         if ($this->typeId < 0)                              // def. achievement
         {
-            if ($npcId = DB::World()->selectCell('SELECT `Sender` FROM achievement_reward WHERE `ID` = ?d', -$this->typeId))
+            if ($npcId = DB::World()->selectCell('SELECT `Sender` FROM achievement_reward WHERE `ID` = %i', -$this->typeId))
             {
                 $infobox[] = Lang::mail('sender', ['[npc='.$npcId.']']);
                 $this->extendGlobalIds(Type::NPC, $npcId);
             }
         }
-        else if ($mlr = DB::World()->selectRow('SELECT * FROM mail_level_reward WHERE `mailTemplateId` = ?d', $this->typeId))  // level rewards
+        else if ($mlr = DB::World()->selectRow('SELECT * FROM mail_level_reward WHERE `mailTemplateId` = %i', $this->typeId))  // level rewards
         {
             if ($mlr['level'])
                 $infobox[] = Lang::game('level').Lang::main('colon').$mlr['level'];
@@ -87,14 +87,14 @@ class MailBaseResponse extends TemplateResponse implements ICache
         }
         else                                                // achievement or quest
         {
-            if ($q = DB::Aowow()->selectRow('SELECT `id`, `rewardMailDelay` FROM ?_quests WHERE `rewardMailTemplateId` = ?d', $this->typeId))
+            if ($q = DB::Aowow()->selectRow('SELECT `id`, `rewardMailDelay` FROM ::quests WHERE `rewardMailTemplateId` = %i', $this->typeId))
             {
-                if ($npcId= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = ?d', $q['id']))
+                if ($npcId= DB::World()->selectCell('SELECT `RewardMailSenderEntry` FROM quest_mail_sender WHERE `QuestId` = %i', $q['id']))
                 {
                     $infobox[] = Lang::mail('sender', ['[npc='.$npcId.']']);
                     $this->extendGlobalIds(Type::NPC, $npcId);
                 }
-                else if ($npcId = DB::Aowow()->selectCell('SELECT `typeId` FROM ?_quests_startend WHERE `questId` = ?d AND `type` = ?d AND `method` & ?d', $q['id'], Type::NPC, 0x2))
+                else if ($npcId = DB::Aowow()->selectCell('SELECT `typeId` FROM ::quests_startend WHERE `questId` = %i AND `type` = %i AND `method` & %i', $q['id'], Type::NPC, 0x2))
                 {
                     $infobox[] = Lang::mail('sender', ['[npc='.$npcId.']']);
                     $this->extendGlobalIds(Type::NPC, $npcId);
@@ -103,7 +103,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
                 if ($q['rewardMailDelay'] > 0)
                     $infobox[] = Lang::mail('delay', [DateTime::formatTimeElapsed($q['rewardMailDelay'] * 1000)]);
             }
-            else if ($npcId = DB::World()->selectCell('SELECT `Sender` FROM achievement_reward WHERE `MailTemplateId` = ?d', $this->typeId))
+            else if ($npcId = DB::World()->selectCell('SELECT `Sender` FROM achievement_reward WHERE `MailTemplateId` = %i', $this->typeId))
             {
                 $infobox[] = Lang::mail('sender', ['[npc='.$npcId.']']);
                 $this->extendGlobalIds(Type::NPC, $npcId);
@@ -151,7 +151,7 @@ class MailBaseResponse extends TemplateResponse implements ICache
         }
 
         if ($this->typeId < 0 ||                            // used by: achievement
-           ($acvId = DB::World()->selectCell('SELECT `ID` FROM achievement_reward WHERE `MailTemplateId` = ?d', $this->typeId)))
+           ($acvId = DB::World()->selectCell('SELECT `ID` FROM achievement_reward WHERE `MailTemplateId` = %i', $this->typeId)))
         {
             $ubAchievements = new AchievementList(array(['id', $this->typeId < 0 ? -$this->typeId : $acvId]));
             if (!$ubAchievements->error)

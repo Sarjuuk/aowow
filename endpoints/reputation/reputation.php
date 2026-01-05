@@ -29,7 +29,7 @@ class ReputationBaseResponse extends TemplateResponse
 
         array_unshift($this->title, $this->h1);
 
-        if ($repData = DB::Aowow()->select('SELECT `action`, `amount`, `date` AS "when", IF(`action` IN (?a), `sourceA`, 0) AS "param" FROM ?_account_reputation WHERE `userId` = ?d',
+        if ($repData = DB::Aowow()->selectAssoc('SELECT `action`, `amount`, `date` AS "when", IF(`action` IN %in, `sourceA`, 0) AS "param" FROM ::account_reputation WHERE `userId` = %i',
             [SITEREP_ACTION_COMMENT, SITEREP_ACTION_UPVOTED, SITEREP_ACTION_DOWNVOTED], User::$id))
         {
             array_walk($repData, fn(&$x) => $x['when'] = date(Util::$dateFormatInternal, $x['when']));

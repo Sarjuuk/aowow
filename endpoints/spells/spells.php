@@ -207,26 +207,26 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                             {
                                 if ($skillLineId == $this->category[1])
                                 {
-                                    $xCond = ['AND', ['s.skillLine1', $i], ['s.skillLine2OrMask', 1 << $idx, '&']];
+                                    $xCond = [DB::AND, ['s.skillLine1', $i], ['s.skillLine2OrMask', 1 << $idx, '&']];
                                     break;
                                 }
                             }
                         }
 
                         $conditions[] = [
-                            'OR',
+                            DB::OR,
                             $xCond,
                             ['s.skillLine1', $this->category[1]],
-                            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
+                            [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
                         ];
                     }
                     else
                     {
                         $conditions[] = [
-                            'OR',
+                            DB::OR,
                             ['s.skillLine1', [-1, -2]],
                             ['s.skillLine1', $this->validCats[-3]],
-                            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->validCats[-3]]]
+                            [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->validCats[-3]]]
                         ];
                     }
 
@@ -248,16 +248,16 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                         switch ($this->category[1])
                         {
                             case 1:
-                                $conditions[] = ['OR',
-                                    ['AND', ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']],
-                                    ['AND', ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']]
+                                $conditions[] = [DB::OR,
+                                    [DB::AND, ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']],
+                                    [DB::AND, ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED], ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']]
                                 ];
                                 break;
                             case 2:
-                                $conditions[] = ['OR', ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED]];
+                                $conditions[] = [DB::OR, ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED]];
                                 break;
                             case 3:
-                                $conditions[] = ['AND',
+                                $conditions[] = [DB::AND,
                                     ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, '!'], ['effect2AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!'],
                                     ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED, '!'], ['effect3AuraId', SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED, '!']
                                 ];
@@ -306,7 +306,7 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                     if (isset($this->category[1]))
                     {
                         if ($this->category[1] == 6)        // todo (med): we know Weapon(6) includes spell Shoot(3018), that has a mask; but really, ANY proficiency or petSkill should be in that mask so there is no need to differenciate
-                            $conditions[] = ['OR', ['s.skillLine1', SpellList::$skillLines[$this->category[1]]], ['s.skillLine1', -3]];
+                            $conditions[] = [DB::OR, ['s.skillLine1', SpellList::$skillLines[$this->category[1]]], ['s.skillLine1', -3]];
                         else
                             $conditions[] = ['s.skillLine1', SpellList::$skillLines[$this->category[1]]];
                     }
@@ -339,24 +339,24 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                         // $conditions[] = [
                             // [['s.attributes0', 0x80, '&'], 0],      // ~SPELL_ATTR0_HIDDEN_CLIENTSIDE
                             // ['s.attributes0', 0x20, '&'],           // SPELL_ATTR0_TRADESPELL (DK: Runeforging)
-                            // 'OR'
+                            // DB::OR
                         // ];
 
                     if (isset($this->category[2]))
                     {
                         $conditions[] = [
-                            'OR',
+                            DB::OR,
                             ['s.skillLine1', $this->category[2]],
-                            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[2]]]
+                            [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[2]]]
                         ];
 
                     }
                     else if (isset($this->category[1]))
                     {
                         $conditions[] = [
-                            'OR',
+                            DB::OR,
                             ['s.skillLine1', $this->validCats[7][$this->category[1]]],
-                            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->validCats[7][$this->category[1]]]]
+                            [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->validCats[7][$this->category[1]]]]
                         ];
 
                     }
@@ -370,9 +370,9 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                     if (isset($this->category[1]))
                     {
                         $conditions[] = [
-                            'OR',
+                            DB::OR,
                             ['s.skillLine1', $this->category[1]],
-                            ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
+                            [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->category[1]]]
                         ];
 
                         if (!empty(self::SHORT_FILTER[$this->category[1]]))
@@ -440,9 +440,9 @@ class SpellsBaseResponse extends TemplateResponse implements ICache
                     array_push($visibleCols, 'level');
 
                     $conditions[] = [
-                        'OR',
+                        DB::OR,
                         ['s.typeCat', 0],
-                        ['AND', ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
+                        [DB::AND, ['s.cuFlags', SPELL_CU_TRIGGERED, '&'], ['s.typeCat', [7, -2]]]
                     ];
 
                     break;

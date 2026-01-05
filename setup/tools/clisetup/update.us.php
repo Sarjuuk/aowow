@@ -32,7 +32,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     public function __construct()
     {
         if (DB::isConnected(DB_AOWOW))
-            [$this->date, $this->part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ?_dbversion'));
+            [$this->date, $this->part] = array_values(DB::Aowow()->selectRow('SELECT `date`, `part` FROM ::dbversion'));
     }
 
     // args: null, null, sqlToDo, buildToDo // nnoo
@@ -75,21 +75,21 @@ CLISetup::registerUtility(new class extends UtilityScript
                 // semicolon at the end -> end of query
                 if (substr(trim($line), -1, 1) == ';')
                 {
-                    if (DB::Aowow()->query($updQuery))
+                    if (DB::Aowow()->qry($updQuery))
                         $nQuerys++;
 
                     $updQuery = '';
                 }
             }
 
-            DB::Aowow()->query('UPDATE ?_dbversion SET `date`= ?d, `part` = ?d', $fDate, $fPart);
+            DB::Aowow()->qry('UPDATE ::dbversion SET `date`= %i, `part` = %i', $fDate, $fPart);
             CLI::write(' -> '.date('d.m.Y', $fDate).' #'.$fPart.': '.$nQuerys.' queries applied', CLI::LOG_OK);
         }
 
         CLI::write('[update] ' . ($nFiles ? 'applied '.$nFiles.' update(s)' : 'db is already up to date'), CLI::LOG_OK);
 
         // fetch sql/build after applying updates, as they may contain sync-prompts
-        [$sql, $build] = DB::Aowow()->selectRow('SELECT `sql` AS "0", `build` AS "1" FROM ?_dbversion');
+        [$sql, $build] = DB::Aowow()->selectRow('SELECT `sql` AS "0", `build` AS "1" FROM ::dbversion');
 
         $sql   = trim($sql)   ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $sql))))   : [];
         $build = trim($build) ? array_unique(explode(' ', trim(preg_replace('/[^a-z_\-]+/i', ' ', $build)))) : [];

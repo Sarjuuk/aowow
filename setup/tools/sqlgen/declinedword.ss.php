@@ -17,15 +17,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected $dbcSourceFiles  = ['declinedword', 'declinedwordcases'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         CLI::write('[declinedwords] - copying declinedword.dbc into aowow_declinedword');
-        DB::Aowow()->query('TRUNCATE ?_declinedword');
-        DB::Aowow()->query('INSERT INTO ?_declinedword SELECT * FROM dbc_declinedword');
+        DB::Aowow()->qry('TRUNCATE ::declinedword');
+        DB::Aowow()->qry('INSERT INTO ::declinedword SELECT * FROM dbc_declinedword');
 
         CLI::write('[declinedwords] - copying declinedwordcases.dbc into aowow_declinedwordcases');
-        DB::Aowow()->query('TRUNCATE ?_declinedwordcases');
-        DB::Aowow()->query('INSERT INTO ?_declinedwordcases SELECT `wordId`, `caseIdx`, `word` FROM dbc_declinedwordcases');
+        DB::Aowow()->qry('TRUNCATE ::declinedwordcases');
+        DB::Aowow()->qry('INSERT INTO ::declinedwordcases SELECT `wordId`, `caseIdx`, `word` FROM dbc_declinedwordcases');
 
         return true;
     }

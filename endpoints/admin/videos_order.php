@@ -25,7 +25,7 @@ class AdminVideosActionOrderResponse extends TextResponse
 
         $id = $this->_get['id'][0];
 
-        $videos = DB::Aowow()->selectCol('SELECT a.`id` AS ARRAY_KEY, a.`pos` FROM ?_videos a, ?_videos b WHERE a.`type` = b.`type` AND a.`typeId` = b.`typeId` AND (a.`status` & ?d) = 0 AND b.`id` = ?d ORDER BY a.`pos` ASC', CC_FLAG_DELETED, $id);
+        $videos = DB::Aowow()->selectCol('SELECT a.`id` AS ARRAY_KEY, a.`pos` FROM ::videos a, ::videos b WHERE a.`type` = b.`type` AND a.`typeId` = b.`typeId` AND (a.`status` & %i) = 0 AND b.`id` = %i ORDER BY a.`pos` ASC', CC_FLAG_DELETED, $id);
         if (!$videos || count($videos) == 1)
         {
             trigger_error('AdminVideosActionOrderResponse - not enough videos to sort', E_USER_WARNING);
@@ -52,6 +52,6 @@ class AdminVideosActionOrderResponse extends TextResponse
         $videos[$id]     += $dir;
 
         foreach ($videos as $id => $pos)
-            DB::Aowow()->query('UPDATE ?_videos SET `pos` = ?d WHERE `id` = ?d', $pos, $id);
+            DB::Aowow()->qry('UPDATE ::videos SET `pos` = %i WHERE `id` = %i', $pos, $id);
     }
 }

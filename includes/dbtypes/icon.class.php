@@ -12,27 +12,27 @@ class IconList extends DBTypeList
 
     public static int    $type       = Type::ICON;
     public static string $brickFile  = 'icongallery';
-    public static string $dataTable  = '?_icons';
+    public static string $dataTable  = '::icons';
     public static int    $contribute = CONTRIBUTE_CO;
 
-    private string $pseudoQry  = 'SELECT `iconId` AS ARRAY_KEY, COUNT(*) FROM ?# WHERE `iconId` IN (?a) GROUP BY `iconId`';
+    private string $pseudoQry  = 'SELECT `iconId` AS ARRAY_KEY, COUNT(*) FROM %n WHERE `iconId` IN %in GROUP BY `iconId`';
     private array  $pseudoJoin = array(
-        'nItems'        => '?_items',
-        'nSpells'       => '?_spell',
-        'nAchievements' => '?_achievement',
-        'nCurrencies'   => '?_currencies',
-        'nPets'         => '?_pet'
+        'nItems'        => '::items',
+        'nSpells'       => '::spell',
+        'nAchievements' => '::achievement',
+        'nCurrencies'   => '::currencies',
+        'nPets'         => '::pet'
     );
 
-    protected string $queryBase  = 'SELECT ic.*, ic.`id` AS ARRAY_KEY FROM ?_icons ic';
+    protected string $queryBase  = 'SELECT ic.*, ic.`id` AS ARRAY_KEY FROM ::icons ic';
     /* this works, but takes ~100x more time than i'm comfortable with .. kept as reference
     protected array  $queryOpts  = array(                   // 29 => Type::ICON
                         'ic' => [['s', 'i', 'a', 'c', 'p'], 'g' => 'ic.id'],
-                        'i'  => ['j' => ['?_items `i`  ON `i`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `i`.`id`) AS "nItems"'],
-                        's'  => ['j' => ['?_spell `s`  ON `s`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `s`.`id`) AS "nSpells"'],
-                        'a'  => ['j' => ['?_achievement `a`  ON `a`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `a`.`id`) AS "nAchievements"'],
-                        'c'  => ['j' => ['?_currencies `c`  ON `c`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `c`.`id`) AS "nCurrencies"'],
-                        'p'  => ['j' => ['?_pet `p`  ON `p`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `p`.`id`) AS "nPets"']
+                        'i'  => ['j' => ['::items `i`  ON `i`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `i`.`id`) AS "nItems"'],
+                        's'  => ['j' => ['::spell `s`  ON `s`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `s`.`id`) AS "nSpells"'],
+                        'a'  => ['j' => ['::achievement `a`  ON `a`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `a`.`id`) AS "nAchievements"'],
+                        'c'  => ['j' => ['::currencies `c`  ON `c`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `c`.`id`) AS "nCurrencies"'],
+                        'p'  => ['j' => ['::pet `p`  ON `p`.`iconId` = `ic`.`id`', true], 's' => ', COUNT(DISTINCT `p`.`id`) AS "nPets"']
                     );
     */
 
@@ -53,7 +53,7 @@ class IconList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->selectRow('SELECT `name` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->selectRow('SELECT `name` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n);
         return null;
     }
@@ -103,17 +103,17 @@ class IconListFilter extends Filter
 {
     private array $iconTotals      = [];
     private array $criterion2field = array(
-          1 => '?_items',                                   // items [num]
-          2 => '?_spell',                                   // spells [num]
-          3 => '?_achievement',                             // achievements [num]
+          1 => '::items',                                   // items [num]
+          2 => '::spell',                                   // spells [num]
+          3 => '::achievement',                             // achievements [num]
     //    4 => '',                                          // battlepets [num]
     //    5 => '',                                          // battlepetabilities [num]
-          6 => '?_currencies',                              // currencies [num]
+          6 => '::currencies',                              // currencies [num]
     //    7 => '',                                          // garrisonabilities [num]
     //    8 => '',                                          // garrisonbuildings [num]
-          9 => '?_pet',                                     // hunterpets [num]
+          9 => '::pet',                                     // hunterpets [num]
     //   10 => '',                                          // garrisonmissionthreats [num]
-         11 => '?_classes',                                 // classes [num]
+         11 => '::classes',                                 // classes [num]
          13 => ''                                           // used [num]
     );
 
@@ -186,7 +186,7 @@ class IconListFilter extends Filter
             if (!$tbl || isset($this->iconTotals[$cr]) || ($forCr && $forCr != $cr))
                 continue;
 
-            $this->iconTotals[$cr] = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM ?# GROUP BY `iconId`', $tbl);
+            $this->iconTotals[$cr] = DB::Aowow()->selectCol('SELECT `iconId` AS ARRAY_KEY, COUNT(*) AS "n" FROM %n GROUP BY `iconId`', $tbl);
         }
 
         if ($forCr)

@@ -69,19 +69,19 @@ class AccountResendResponse extends TemplateResponse
         if (!$this->_post['email'])
             return Lang::account('emailInvalid');
 
-        $timeout = DB::Aowow()->selectCell('SELECT `unbanDate` FROM ?_account_bannedips WHERE `ip` = ? AND `type` = ?d AND `count` > ?d AND `unbanDate` > UNIX_TIMESTAMP()', User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT'));
+        $timeout = DB::Aowow()->selectCell('SELECT `unbanDate` FROM ::account_bannedips WHERE `ip` = %s AND `type` = %i AND `count` > %i AND `unbanDate` > UNIX_TIMESTAMP()', User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT'));
 
         // on cooldown pretend we dont know the email address
         if ($timeout && $timeout > time())
             return Cfg::get('DEBUG') ? 'resend on cooldown: '.DateTime::formatTimeElapsed($timeout * 1000).' remaining' : Lang::account('inputbox', 'error', 'emailNotFound');
 
         // check email and account status
-        if ($token = DB::Aowow()->selectCell('SELECT `token` FROM ?_account WHERE `email` = ? AND `status` = ?d', $this->_post['email'], ACC_STATUS_NEW))
+        if ($token = DB::Aowow()->selectCell('SELECT `token` FROM ::account WHERE `email` = %s AND `status` = %i', $this->_post['email'], ACC_STATUS_NEW))
         {
             if (!Util::sendMail($this->_post['email'], 'activate-account', [$token]))
                 return Lang::main('intError');
 
-            DB::Aowow()->query('INSERT INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, ?d, ?d, UNIX_TIMESTAMP() + ?d) ON DUPLICATE KEY UPDATE `count` = `count` + ?d, `unbanDate` = UNIX_TIMESTAMP() + ?d',
+            DB::Aowow()->qry('INSERT INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, %i, UNIX_TIMESTAMP() + %i) ON DUPLICATE KEY UPDATE `count` = `count` + %i, `unbanDate` = UNIX_TIMESTAMP() + %i',
                 User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_COUNT') + 1, Cfg::get('ACC_FAILED_AUTH_COUNT'), Cfg::get('ACC_FAILED_AUTH_BLOCK'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
 
             $this->success = true;

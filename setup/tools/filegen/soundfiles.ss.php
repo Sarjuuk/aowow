@@ -21,7 +21,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
     public function generate() : bool
     {
         // ALL files
-        $files  = DB::Aowow()->selectCol('SELECT ABS(`id`) AS ARRAY_KEY, CONCAT(`path`, "/", `file`) FROM ?_sounds_files');
+        $files  = DB::Aowow()->selectCol('SELECT ABS(`id`) AS ARRAY_KEY, CONCAT(`path`, "/", `file`) FROM ::sounds_files');
         $nFiles = count($files);
         $qtLen  = strlen($nFiles);
         $sum    = 0;
@@ -63,7 +63,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
             CLI::write('[soundfiles]  - did not find file: '.CLI::bold(CLI::nicePath($filePath, CLISetup::$srcDir, '['.implode(',', array_map(fn($x) => $x->json(), CLISetup::$locales)).']')), CLI::LOG_WARN);
             $time->reset();
             // flag as unusable in DB
-            DB::Aowow()->query('UPDATE ?_sounds_files SET `id` = ?d WHERE ABS(`id`) = ?d', -$fileId, $fileId);
+            DB::Aowow()->qry('UPDATE ::sounds_files SET `id` = %i WHERE ABS(`id`) = %i', -$fileId, $fileId);
         }
 
         return $this->success;

@@ -64,16 +64,16 @@ CLISetup::registerUtility(new class extends UtilityScript
         else
             $email = '';
 
-        if ($this->fields && CLI::read($this->fields, $uiAccount))
+        if ($this->fields && CLI::read($this->fields, $uiAccount) && $uiAccount)
         {
             CLI::write();
 
-            if (!$name && !Util::validateUsername($uiAccount['name'], $e))
+            if (!$name && !Util::validateUsername($uiAccount['name'], $e) && $e)
                 CLI::write(Lang::account($e == 1 ? 'errNameLength' : 'errNameChars'), CLI::LOG_ERROR);
             else if (!$name)
                 $name = $uiAccount['name'];
 
-            if (!$passw && !Util::validatePassword($uiAccount['pass1'], $e))
+            if (!$passw && !Util::validatePassword($uiAccount['pass1'], $e) && $e)
                 CLI::write($e == 1 ? Lang::account('errPassLength') : Lang::main('intError'), CLI::LOG_ERROR);
             else if (!$passw && $uiAccount['pass1'] != $uiAccount['pass2'])
                 CLI::write(Lang::account('passMismatch'), CLI::LOG_ERROR);
@@ -99,17 +99,17 @@ CLISetup::registerUtility(new class extends UtilityScript
         if (!$name || !$passw || !$email)
             return false;
 
-        if ($username = DB::Aowow()->selectCell('SELECT `username` FROM ?_account WHERE (LOWER(`username`) = LOWER(?) OR LOWER(`email`) = LOWER(?)) AND (`status` <> ?d OR (`status` = ?d AND `statusTimer` > UNIX_TIMESTAMP()))', $name, $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
+        if ($username = DB::Aowow()->selectCell('SELECT `username` FROM ::account WHERE (LOWER(`username`) = LOWER(%s) OR LOWER(`email`) = LOWER(%s)) AND (`status` <> %i OR (`status` = %i AND `statusTimer` > UNIX_TIMESTAMP()))', $name, $email, ACC_STATUS_NEW, ACC_STATUS_NEW))
         {
             CLI::write('[account] ' . (Util::lower($name) == Util::lower($username) ? Lang::account('nameInUse') : Lang::account('mailInUse')), CLI::LOG_ERROR);
             CLI::write();
             return false;
         }
 
-        if (DB::Aowow()->query('REPLACE INTO ?_account (`login`, `passHash`, `username`, `joindate`, `email`, `userGroups`, `userPerms`) VALUES (?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, 1)',
+        if (DB::Aowow()->qry('REPLACE INTO ::account (`login`, `passHash`, `username`, `joindate`, `email`, `userGroups`, `userPerms`) VALUES (%s, %s, %s, UNIX_TIMESTAMP(), %s, %i, 1)',
             $name, User::hashCrypt($passw), $name, $email, U_GROUP_ADMIN))
         {
-            $newId = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $name);
+            $newId = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $name);
             Util::gainSiteReputation($newId, SITEREP_ACTION_REGISTER);
 
             CLI::write("[account] admin ".$name." created successfully", CLI::LOG_OK);
@@ -127,7 +127,7 @@ CLISetup::registerUtility(new class extends UtilityScript
     public function test(?array &$error = []) : bool
     {
         $error = [];
-        return !!DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE `userPerms` = 1');
+        return !!DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE `userPerms` = 1');
     }
 });
 

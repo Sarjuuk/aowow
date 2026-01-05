@@ -17,11 +17,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     protected $worldDependency = ['game_event', 'game_event_prerequisite'];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_events');
+        DB::Aowow()->qry('TRUNCATE ::events');
 
-        $events = DB::World()->select(
+        $events = DB::World()->selectAssoc(
            'SELECT    ge.eventEntry,
                       holiday,
                       0,                                    -- cuFlags
@@ -33,13 +33,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       description
             FROM      game_event ge
             LEFT JOIN game_event_prerequisite gep ON gep.eventEntry = ge.eventEntry
-          { WHERE     ge.eventEntry IN (?a) }
             GROUP BY  ge.eventEntry',
-            $ids ?: DBSIMPLE_SKIP
         );
 
         foreach ($events as $e)
-            DB::Aowow()->query('INSERT INTO ?_events VALUES (?a)', array_values($e));
+            DB::Aowow()->qry('INSERT INTO ::events VALUES %l', $e);
 
         $this->reapplyCCFlags('events', Type::WORLDEVENT);
 

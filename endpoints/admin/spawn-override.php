@@ -45,7 +45,7 @@ class AdminSpawnoverrideResponse extends TextResponse
             return;
         }
 
-        DB::Aowow()->query('REPLACE INTO ?_spawns_override (`type`, `typeGuid`, `areaId`, `floor`, `revision`) VALUES (?d, ?d, ?d, ?d, ?d)', $type, $guid, $area, $floor, AOWOW_REVISION);
+        DB::Aowow()->qry('REPLACE INTO ::spawns_override (`type`, `typeGuid`, `areaId`, `floor`, `revision`) VALUES (%i, %i, %i, %i, %i)', $type, $guid, $area, $floor, AOWOW_REVISION);
 
         $wPos = WorldPosition::getForGUID($type, $guid);
         if (!$wPos)
@@ -72,7 +72,7 @@ class AdminSpawnoverrideResponse extends TextResponse
         // if creature try for waypoints
         if ($type == Type::NPC)
         {
-            if ($swp = DB::World()->select('SELECT -w.`id` AS "entry", w.`point` AS "pointId", w.`position_x` AS "posX", w.`position_y` AS "posY" FROM creature_addon ca JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`guid` = ?d AND ca.`path_id` <> 0', $guid))
+            if ($swp = DB::World()->selectAssoc('SELECT -w.`id` AS "entry", w.`point` AS "pointId", w.`position_x` AS "posX", w.`position_y` AS "posY" FROM creature_addon ca JOIN waypoint_data w ON w.`id` = ca.`path_id` WHERE ca.`guid` = %i AND ca.`path_id` <> 0', $guid))
             {
                 foreach ($swp as $w)
                 {
@@ -85,17 +85,17 @@ class AdminSpawnoverrideResponse extends TextResponse
                             'floor'  => $point[0]['floor']
                         );
 
-                        DB::Aowow()->query('UPDATE ?_creature_waypoints SET ?a WHERE `creatureOrPath` = ?d AND `point` = ?d', $p, $w['entry'], $w['pointId']);
+                        DB::Aowow()->qry('UPDATE ::creature_waypoints SET %a WHERE `creatureOrPath` = %i AND `point` = %i', $p, $w['entry'], $w['pointId']);
                     }
                 }
             }
 
             // also move linked vehicle accessories (on the very same position)
-            $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.`guid` FROM ?_spawns s1 JOIN ?_spawns s2 ON s1.`posX` = s2.`posX` AND s1.`posY` = s2.`posY` AND
-                s1.`areaId` = s2.`areaId` AND s1.`floor` = s2.`floor` AND s2.`guid` < 0 WHERE s1.`guid` = ?d', $guid));
+            $updGUIDs = array_merge($updGUIDs, DB::Aowow()->selectCol('SELECT s2.`guid` FROM ::spawns s1 JOIN ::spawns s2 ON s1.`posX` = s2.`posX` AND s1.`posY` = s2.`posY` AND
+                s1.`areaId` = s2.`areaId` AND s1.`floor` = s2.`floor` AND s2.`guid` < 0 WHERE s1.`guid` = %i', $guid));
         }
 
-        if (DB::Aowow()->query('UPDATE ?_spawns SET ?a WHERE `type` = ?d AND `guid` IN (?a)', $newPos, $type, $updGUIDs))
+        if (DB::Aowow()->qry('UPDATE ::spawns SET %a WHERE `type` = %i AND `guid` IN %in', $newPos, $type, $updGUIDs))
             $this->result = self::ERR_NONE;
         else
             $this->result = self::ERR_WRITE_DB;

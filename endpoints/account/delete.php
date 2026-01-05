@@ -47,11 +47,11 @@ class AccountDeleteResponse extends TemplateResponse
         if ($this->_post['proceed'])
         {
             $error = false;
-            if (!DB::Aowow()->selectCell('SELECT 1 FROM ?_account WHERE `status` NOT IN (?a) AND `statusTimer` > UNIX_TIMESTAMP() AND `id` = ?d', [ACC_STATUS_NEW, ACC_STATUS_NONE, ACC_STATUS_PURGING], User::$id))
+            if (!DB::Aowow()->selectCell('SELECT 1 FROM ::account WHERE `status` NOT IN %in AND `statusTimer` > UNIX_TIMESTAMP() AND `id` = %i', [ACC_STATUS_NEW, ACC_STATUS_NONE, ACC_STATUS_PURGING], User::$id))
             {
                 $token = Util::createHash(40);
 
-                DB::Aowow()->query('UPDATE ?_account SET `status` = ?d, `statusTimer` = UNIX_TIMESTAMP() + ?d, `token` = ? WHERE `id` = ?d',
+                DB::Aowow()->qry('UPDATE ::account SET `status` = %i, `statusTimer` = UNIX_TIMESTAMP() + %i, `token` = %s WHERE `id` = %i',
                     ACC_STATUS_PURGING, Cfg::get('ACC_RECOVERY_DECAY'), $token, User::$id);
 
                 Util::sendMail(User::$email, 'delete-account', [$token, User::$email, User::$username]);

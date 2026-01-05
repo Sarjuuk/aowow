@@ -26,7 +26,7 @@ class CommentEditResponse extends TextResponse
             return;
         }
 
-        $ownerId = DB::Aowow()->selectCell('SELECT `userId` FROM ?_comments WHERE `id` = ?d', $this->_get['id']);
+        $ownerId = DB::Aowow()->selectCell('SELECT `userId` FROM ::comments WHERE `id` = %i', $this->_get['id']);
 
         if (!User::canComment() || (User::$id != $ownerId && !User::isInGroup(U_GROUP_MODERATOR)))
         {
@@ -56,7 +56,7 @@ class CommentEditResponse extends TextResponse
             $update['responseRoles']  = User::$groups;
         }
 
-        DB::Aowow()->query('UPDATE ?_comments SET `editCount` = `editCount` + 1, ?a WHERE `id` = ?d', $update, $this->_get['id']);
+        DB::Aowow()->qry('UPDATE ::comments SET `editCount` = `editCount` + 1, %a WHERE `id` = %i', $update, $this->_get['id']);
     }
 }
 

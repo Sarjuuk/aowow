@@ -20,7 +20,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
     private $textData = [];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         $globStrPath = CLISetup::$srcDir.'%sInterface/FrameXML/GlobalStrings.lua';
         $allOK       = true;
@@ -33,8 +33,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             CLI::write('         Emote aliasses can not be generated for affected locales!', CLI::LOG_WARN);
         }
 
-        DB::Aowow()->query('TRUNCATE ?_emotes');
-        DB::Aowow()->query('TRUNCATE ?_emotes_aliasses');
+        DB::Aowow()->qry('TRUNCATE ::emotes');
+        DB::Aowow()->qry('TRUNCATE ::emotes_aliasses');
 
 
         /*********************/
@@ -53,13 +53,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             12  female  others      no          ext -> none     4               -
         */
 
-        $this->textData = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `text_loc0` AS "0", `text_loc2` AS "2", `text_loc3` AS "3", `text_loc4` AS "4", `text_loc6` AS "6", `text_loc8` AS "8" FROM dbc_emotestextdata');
+        $this->textData = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `text_loc0` AS "0", `text_loc2` AS "2", `text_loc3` AS "3", `text_loc4` AS "4", `text_loc6` AS "6", `text_loc8` AS "8" FROM dbc_emotestextdata');
 
-        $texts = DB::Aowow()->select('SELECT et.`id` AS ARRAY_KEY, LOWER(`command`) AS "cmd", IF(e.`animationId`, 1, 0) AS "anim", -`emoteId` AS "parent", e.`soundId`, `etd0`, `etd1`, `etd2`, `etd4`, `etd6`, `etd8`, `etd9`, `etd12` FROM dbc_emotestext et LEFT JOIN dbc_emotes e ON e.`id` = et.`emoteId`');
+        $texts = DB::Aowow()->selectAssoc('SELECT et.`id` AS ARRAY_KEY, LOWER(`command`) AS "cmd", IF(e.`animationId`, 1, 0) AS "anim", -`emoteId` AS "parent", e.`soundId`, `etd0`, `etd1`, `etd2`, `etd4`, `etd6`, `etd8`, `etd9`, `etd12` FROM dbc_emotestext et LEFT JOIN dbc_emotes e ON e.`id` = et.`emoteId`');
         foreach ($texts AS $id => $t)
         {
-            DB::Aowow()->query(
-               'INSERT INTO ?_emotes (
+            DB::Aowow()->qry(
+               'INSERT INTO ::emotes (
                     `id`, `cmd`, `isAnimated`, `parentEmote`, `soundId`,
                     `extToExt_loc0`, `extToMe_loc0`, `meToExt_loc0`, `extToNone_loc0`, `meToNone_loc0`,
                     `extToExt_loc2`, `extToMe_loc2`, `meToExt_loc2`, `extToNone_loc2`, `meToNone_loc2`,
@@ -68,7 +68,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     `extToExt_loc6`, `extToMe_loc6`, `meToExt_loc6`, `extToNone_loc6`, `meToNone_loc6`,
                     `extToExt_loc8`, `extToMe_loc8`, `meToExt_loc8`, `extToNone_loc8`, `meToNone_loc8`)
                 VALUES
-                    (?d, ?, ?d, ?d, ?d, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    (%i, %s, %i, %i, %i, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
                 $id, $t['cmd'], $t['anim'], $t['parent'], $t['soundId'],
                 $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::EN), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::EN), $this->textData[$t['etd2']][Locale::EN->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::EN), $this->textData[$t['etd6']][Locale::EN->value] ?? '',
                 $this->mergeGenderedStrings($t['etd0'], $t['etd8'], Locale::FR), $this->mergeGenderedStrings($t['etd1'], $t['etd9'], Locale::FR), $this->textData[$t['etd2']][Locale::FR->value] ?? '', $this->mergeGenderedStrings($t['etd4'], $t['etd12'], Locale::FR), $this->textData[$t['etd6']][Locale::FR->value] ?? '',
@@ -88,12 +88,12 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         foreach (CLISetup::searchGlobalStrings('/^VOICEMACRO_LABEL_([A-Z]+)\d+ = \"([^"]+)\";$/') as $locId => [, $cmd, $alias])
             $voiceAliases[$cmd][] = [$locId, $alias];
 
-        $emotes = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, cmd FROM ?_emotes');
+        $emotes = DB::Aowow()->selectCol('SELECT id AS ARRAY_KEY, cmd FROM ::emotes');
 
         foreach($emotes as $eId => $cmd)
         {
             foreach ($voiceAliases[strtoupper($cmd)] ?? [] as [$locId, $alias])
-                DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_aliasses VALUES (?d, ?d, ?) ON DUPLICATE KEY UPDATE `locales` = `locales` | ?d', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
+                DB::Aowow()->qry('INSERT IGNORE INTO ::emotes_aliasses VALUES (%i, %i, %s) ON DUPLICATE KEY UPDATE `locales` = `locales` | %i', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
 
             foreach ($aliasses as $data)
             {
@@ -101,20 +101,20 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     continue;
 
                 foreach ($data as [$locId, $alias])
-                    DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_aliasses VALUES (?d, ?d, ?) ON DUPLICATE KEY UPDATE `locales` = `locales` | ?d', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
+                    DB::Aowow()->qry('INSERT IGNORE INTO ::emotes_aliasses VALUES (%i, %i, %s) ON DUPLICATE KEY UPDATE `locales` = `locales` | %i', $eId, (1 << $locId), mb_strtolower($alias), (1 << $locId));
 
                 break;
             }
         }
 
-        DB::Aowow()->query('UPDATE ?_emotes e LEFT JOIN ?_emotes_aliasses ea ON ea.`id` = e.`id` SET e.`cuFlags` = e.`cuFlags` | ?d WHERE ea.`id` IS NULL', CUSTOM_EXCLUDE_FOR_LISTVIEW | EMOTE_CU_MISSING_CMD);
+        DB::Aowow()->qry('UPDATE ::emotes e LEFT JOIN ::emotes_aliasses ea ON ea.`id` = e.`id` SET e.`cuFlags` = e.`cuFlags` | %i WHERE ea.`id` IS NULL', CUSTOM_EXCLUDE_FOR_LISTVIEW | EMOTE_CU_MISSING_CMD);
 
 
         /*********************/
         /* Server controlled */
         /*********************/
 
-        DB::Aowow()->query('INSERT INTO ?_emotes (`id`, `cmd`, `flags`, `isAnimated`, `parentEmote`, `soundId`, `state`, `stateParam`, `cuFlags`) SELECT -`id`, `name`, `flags`, IF(`animationId`, 1, 0), 0, `soundId`, `state`, `stateParam`, ?d FROM dbc_emotes WHERE 1', CUSTOM_EXCLUDE_FOR_LISTVIEW);
+        DB::Aowow()->qry('INSERT INTO ::emotes (`id`, `cmd`, `flags`, `isAnimated`, `parentEmote`, `soundId`, `state`, `stateParam`, `cuFlags`) SELECT -`id`, `name`, `flags`, IF(`animationId`, 1, 0), 0, `soundId`, `state`, `stateParam`, %i FROM dbc_emotes WHERE 1', CUSTOM_EXCLUDE_FOR_LISTVIEW);
 
 
         $this->reapplyCCFlags('emotes', Type::EMOTE);

@@ -21,13 +21,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
     protected $worldDependency    = ['creature_template', 'creature'];
     protected $setupAfter         = [['icons'], []];
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
-        DB::Aowow()->query('TRUNCATE ?_pet');
+        DB::Aowow()->qry('TRUNCATE ::pet');
 
         // basic copy from creaturefamily.dbc
-        DB::Aowow()->query(
-           'INSERT INTO ?_pet
+        DB::Aowow()->qry(
+           'INSERT INTO ::pet
             SELECT      f.`id`,
                         `categoryEnumId`,
                         0,                                  -- cuFlags
@@ -43,28 +43,28 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                         0, 0, 0, 0,                         -- spell[1-4]
                         0, 0, 0                             -- armor, damage, health
             FROM        dbc_creaturefamily f
-            LEFT JOIN   ?_icons ic ON ic.`name_source` = LOWER(SUBSTRING_INDEX(f.`iconString`, "\\\\", -1))
+            LEFT JOIN   ::icons ic ON ic.`name_source` = LOWER(SUBSTRING_INDEX(f.`iconString`, "\\", -1))
             WHERE       `petTalentType` <> -1'
         );
 
         // stats from craeture_template
-        $spawnInfo = DB::World()->query(
+        $spawnInfo = DB::World()->selectAssoc(
            'SELECT   ct.`family`                    AS ARRAY_KEY,
                      MIN(ct.`minlevel`)             AS "minLevel",
                      MAX(ct.`maxlevel`)             AS "maxLevel",
-                     IF(ct.`type_flags` & ?d, 1, 0) AS "exotic"
+                     IF(ct.`type_flags` & %i, 1, 0) AS "exotic"
             FROM     creature_template ct
             JOIN     creature c ON ct.`entry` = c.`id`
-            WHERE    ct.`type_flags` & ?d
+            WHERE    ct.`type_flags` & %i
             GROUP BY ct.`family`',
             NPC_TYPEFLAG_EXOTIC_PET, NPC_TYPEFLAG_TAMEABLE
         );
         foreach ($spawnInfo as $id => $info)
-            DB::Aowow()->query('UPDATE ?_pet SET ?a WHERE id = ?d', $info, $id);
+            DB::Aowow()->qry('UPDATE ::pet SET %a WHERE id = %i', $info, $id);
 
         // add petFamilyModifier to health, mana, dmg
-        DB::Aowow()->query(
-           'UPDATE ?_pet p,
+        DB::Aowow()->qry(
+           'UPDATE ::pet p,
                    dbc_skilllineability sla,
                    dbc_spell s
             SET    `armor`  = s.`effect2BasePoints` + s.`effect2DieSides`,
@@ -76,13 +76,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         );
 
         // assign pet spells
-        $pets = DB::Aowow()->select(
+        $pets = DB::Aowow()->selectAssoc(
            'SELECT          p.`id`, MAX(s.`id`) AS "spell"
             FROM            dbc_skilllineability sla
-            JOIN            ?_pet p      ON p.`skillLineId` = sla.`skillLineId`
+            JOIN            ::pet p      ON p.`skillLineId` = sla.`skillLineId`
             JOIN            dbc_spell s  ON sla.`spellId` = s.`id`
             LEFT OUTER JOIN dbc_talent t ON s.`id`  = t.`rank1`
-            WHERE           (s.`attributes0` & ?d) = 0 AND t.`id` IS NULL
+            WHERE           (s.`attributes0` & %i) = 0 AND t.`id` IS NULL
             GROUP BY        s.`name_loc0`, p.`id`',
             SPELL_ATTR0_PASSIVE
         );
@@ -97,7 +97,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         }
 
         foreach ($petSpells as $petId => $row)
-            DB::Aowow()->query('UPDATE ?_pet SET ?a WHERE `id` = ?d', $row, $petId);
+            DB::Aowow()->qry('UPDATE ::pet SET %a WHERE `id` = %i', $row, $petId);
 
         $this->reapplyCCFlags('pet', Type::PET);
 

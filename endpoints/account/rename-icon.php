@@ -29,7 +29,7 @@ class AccountRenameiconResponse extends TextResponse
             return;
 
         // regexp same as in account.js
-        DB::Aowow()->query('UPDATE ?_account_avatars SET `name` = ? WHERE `id` = ?d AND `userId` = ?d', trim($this->_post['name']), $this->_post['id'], User::$id);
+        DB::Aowow()->qry('UPDATE ::account_avatars SET `name` = %s WHERE `id` = %i AND `userId` = %i', trim($this->_post['name']), $this->_post['id'], User::$id);
     }
 }
 

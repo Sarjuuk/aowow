@@ -144,7 +144,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tool
         if ($tId = $this->subject->getField('totemCategory'))
-            if ($tName = DB::Aowow()->selectRow('SELECT * FROM ?_totemcategory WHERE `id` = ?d', $tId))
+            if ($tName = DB::Aowow()->selectRow('SELECT * FROM ::totemcategory WHERE `id` = %i', $tId))
                 $infobox[] = Lang::item('tool').'[url=?items&filter=cr=91;crs='.$tId.';crv=0]'.Util::localizedString($tName, 'name').'[/url]';
 
         // extendedCost
@@ -396,7 +396,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         }
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_items WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_items WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altItem = new ItemList(array(['id', abs($pendant)]));
             if (!$altItem->error)
@@ -420,7 +420,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $this->lvTabs = new Tabs(['parent' => "\$\$WH.ge('tabs-generic')"], 'tabsRelated', true);
 
         // tab: createdBy (perfect item specific)
-        if ($perfItem = DB::World()->select('SELECT *, `spellId` AS ARRAY_KEY FROM skill_perfect_item_template WHERE `perfectItemType` = ?d', $this->typeId))
+        if ($perfItem = DB::World()->selectAssoc('SELECT *, `spellId` AS ARRAY_KEY FROM skill_perfect_item_template WHERE `perfectItemType` = %i', $this->typeId))
         {
             $perfSpells = new SpellList(array(['id', array_column($perfItem, 'spellId')]));
             if (!$perfSpells->error)
@@ -630,7 +630,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tab: reagent for
         $conditions = array(
-            'OR',
+            DB::OR,
             ['reagent1', $this->typeId], ['reagent2', $this->typeId], ['reagent3', $this->typeId], ['reagent4', $this->typeId],
             ['reagent5', $this->typeId], ['reagent6', $this->typeId], ['reagent7', $this->typeId], ['reagent8', $this->typeId]
         );
@@ -650,9 +650,9 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tab: unlocks (object or item)
         $lockIds = DB::Aowow()->selectCol(
-           'SELECT `id` FROM ?_lock WHERE            (`type1` = ?d AND `properties1` = ?d) OR
-            (`type2` = ?d AND `properties2` = ?d) OR (`type3` = ?d AND `properties3` = ?d) OR
-            (`type4` = ?d AND `properties4` = ?d) OR (`type5` = ?d AND `properties5` = ?d)',
+           'SELECT `id` FROM ::lock WHERE            (`type1` = %i AND `properties1` = %i) OR
+            (`type2` = %i AND `properties2` = %i) OR (`type3` = %i AND `properties3` = %i) OR
+            (`type4` = %i AND `properties4` = %i) OR (`type5` = %i AND `properties5` = %i)',
             LOCK_TYPE_ITEM, $this->typeId, LOCK_TYPE_ITEM, $this->typeId,
             LOCK_TYPE_ITEM, $this->typeId, LOCK_TYPE_ITEM, $this->typeId,
             LOCK_TYPE_ITEM, $this->typeId
@@ -704,7 +704,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tab: objective of (quest)
         $conditions = array(
-            'OR',
+            DB::OR,
             ['reqItemId1', $this->typeId], ['reqItemId2', $this->typeId], ['reqItemId3', $this->typeId],
             ['reqItemId4', $this->typeId], ['reqItemId5', $this->typeId], ['reqItemId6', $this->typeId]
         );
@@ -722,7 +722,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         // tab: provided for (quest)
         $conditions = array(
-            'OR', ['sourceItemId', $this->typeId],
+            DB::OR, ['sourceItemId', $this->typeId],
             ['reqSourceItemId1', $this->typeId], ['reqSourceItemId2', $this->typeId],
             ['reqSourceItemId3', $this->typeId], ['reqSourceItemId4', $this->typeId]
         );
@@ -838,8 +838,8 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         if (!$n && !is_null(ItemListFilter::getCriteriaIndex(158, $this->typeId)))
             $n = '?items&filter=cr=158;crs='.$this->typeId.';crv=0';
 
-        $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ?_itemextendedcost WHERE '.$w);
-        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN (?a) UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN (?a)', $xCosts, $xCosts) : null;
+        $xCosts   = DB::Aowow()->selectCol('SELECT `id` FROM ::itemextendedcost WHERE '.$w);
+        $boughtBy = $xCosts ? DB::World()->selectCol('SELECT `item` FROM npc_vendor WHERE `extendedCost` IN %in UNION SELECT `item` FROM game_event_npc_vendor WHERE `extendedCost` IN %in', $xCosts, $xCosts) : null;
         if ($boughtBy)
         {
             $boughtBy = new ItemList(array(['id', $boughtBy]));
@@ -910,10 +910,10 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         $conditions = array(
             ['id', $this->typeId, '!'],
             [
-                'OR',
+                DB::OR,
                 ['name_loc'.Lang::getLocale()->value, $this->subject->getField('name', true)],
                 [
-                    'AND',
+                    DB::AND,
                     ['class',         $_class],
                     ['subClass',      $_subClass],
                     ['slot',          $_slot],
@@ -926,7 +926,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
         );
 
         if ($_ = $this->subject->getField('itemset'))
-            $conditions[1][] = ['AND', ['slot', $_slot], ['itemset', $_]];
+            $conditions[1][] = [DB::AND, ['slot', $_slot], ['itemset', $_]];
 
         $saItems = new ItemList($conditions);
         if (!$saItems->error)
@@ -972,7 +972,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 $useSpells[] = $this->subject->getField('spellId'.$i);
         }
         if ($useSpells)
-            if ($_ = DB::Aowow()->selectCol('SELECT `category` FROM ?_spell WHERE `id` IN (?a) AND `recoveryCategory` > 0', $useSpells))
+            if ($_ = DB::Aowow()->selectCol('SELECT `category` FROM ::spell WHERE `id` IN %in AND `recoveryCategory` > 0', $useSpells))
                 $cdCats += $_;
 
         if ($cdCats)
@@ -980,7 +980,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             $conditions = array(
                 ['id', $this->typeId, '!'],
                 [
-                    'OR',
+                    DB::OR,
                     ['spellCategory1', $cdCats],
                     ['spellCategory2', $cdCats],
                     ['spellCategory3', $cdCats],
@@ -989,7 +989,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
                 ]
             );
 
-            if ($spellsByCat = DB::Aowow()->selectCol('SELECT `id` FROM ?_spell WHERE `category` IN (?a)', $cdCats))
+            if ($spellsByCat = DB::Aowow()->selectCol('SELECT `id` FROM ::spell WHERE `category` IN %in', $cdCats))
                 for ($i = 1; $i < 6; $i++)
                     $conditions[1][] = ['spellId'.$i, $spellsByCat];
 
@@ -1014,7 +1014,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
             if ($this->subject->getField('soundOverrideSubclass') > 0)
                 $scm = (1 << $this->subject->getField('soundOverrideSubclass'));
 
-            $soundIds = DB::Aowow()->selectCol('SELECT `soundId` FROM ?_items_sounds WHERE `subClassMask` & ?d', $scm);
+            $soundIds = DB::Aowow()->selectCol('SELECT `soundId` FROM ::items_sounds WHERE `subClassMask` & %i', $scm);
         }
 
         $fields = ['pickUpSoundId', 'dropDownSoundId', 'sheatheSoundId', 'unsheatheSoundId'];
@@ -1024,7 +1024,7 @@ class ItemBaseResponse extends TemplateResponse implements ICache
 
         if ($x = $this->subject->getField('spellVisualId'))
         {
-            if ($spellSounds = DB::Aowow()->selectRow('SELECT * FROM ?_spell_sounds WHERE `id` = ?d', $x))
+            if ($spellSounds = DB::Aowow()->selectRow('SELECT * FROM ::spell_sounds WHERE `id` = %i', $x))
             {
                 array_shift($spellSounds);                  // bye 'id'-field
                 foreach ($spellSounds as $ss)

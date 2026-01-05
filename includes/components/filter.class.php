@@ -249,13 +249,13 @@ abstract class Filter
 
             if ($filters)                                   // if a filter uses criteria it must have a [ma]tch selector
             {
-                $filters[] = empty($this->values['ma']) ? 'AND' : 'OR';
+                array_unshift($filters, $this->values['ma'] ? DB::OR : DB::AND);
                 $this->cndSet[] = $filters;
             }
         }
 
         if ($this->cndSet)
-            array_unshift($this->cndSet, 'AND');
+            array_unshift($this->cndSet, DB::AND);
 
         return $this->cndSet;
     }
@@ -659,7 +659,7 @@ abstract class Filter
                 $sub = array_merge($sub, array_map(fn($x) => [$col, $x, $exact ? null : 'NOT LIKE'], $this->exTokens[$field]));
 
             if (count($sub) > 1)
-                array_unshift($sub, 'AND');
+                array_unshift($sub, DB::AND);
             else if ($sub)
                 $sub = $sub[0];
 
@@ -667,7 +667,7 @@ abstract class Filter
                 $qry[] = $sub;
         }
 
-        return $qry ? ['OR', ...$qry] : [];
+        return $qry ? [DB::OR, ...$qry] : [];
     }
 
     protected function buildMatchLookup(array $fields, bool $exact = false) : array
@@ -686,7 +686,7 @@ abstract class Filter
                 $qry[] = [$col, $tok];
         }
 
-        return $qry ? ['OR', ...$qry] : [];
+        return $qry ? [DB::OR, ...$qry] : [];
     }
 
     protected function int2Op(mixed &$op) : bool

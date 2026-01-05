@@ -33,7 +33,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     public function generate() : bool
     {
-        $glyphList = DB::Aowow()->Select(
+        $glyphList = DB::Aowow()->selectAssoc(
            'SELECT i.`id` AS "itemId",
                    i.*,
                    IF (g.`typeFlags` & 0x1, 2, 1) AS "type",
@@ -44,12 +44,12 @@ CLISetup::registerSetup("build", new class extends SetupScript
                    s1.`skillLine1` AS "skillId",
                    s2.`id` AS "glyphEffect",
                    s2.`id` AS ARRAY_KEY
-            FROM   ?_items i
-            JOIN   ?_spell s1 ON s1.`id` = i.`spellid1`
-            JOIN   ?_glyphproperties g ON g.`id` = s1.`effect1MiscValue`
-            JOIN   ?_spell s2 ON s2.`id` = g.`spellId`
-            JOIN   ?_icons ic ON ic.`id` = s1.`iconIdAlt`
-            WHERE  i.classBak = ?d',
+            FROM   ::items i
+            JOIN   ::spell s1 ON s1.`id` = i.`spellid1`
+            JOIN   ::glyphproperties g ON g.`id` = s1.`effect1MiscValue`
+            JOIN   ::spell s2 ON s2.`id` = g.`spellId`
+            JOIN   ::icons ic ON ic.`id` = s1.`iconIdAlt`
+            WHERE  i.classBak = %i',
             ITEM_CLASS_GLYPH);
 
         $glyphSpells = new SpellList(array(['s.id', array_keys($glyphList)]));

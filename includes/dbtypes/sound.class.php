@@ -12,10 +12,10 @@ class SoundList extends DBTypeList
 
     public static int    $type       = Type::SOUND;
     public static string $brickFile  = 'sound';
-    public static string $dataTable  = '?_sounds';
+    public static string $dataTable  = '::sounds';
     public static int    $contribute = CONTRIBUTE_CO;
 
-    protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ?_sounds s';
+    protected string $queryBase = 'SELECT s.*, s.`id` AS ARRAY_KEY FROM ::sounds s';
 
     private        array $fileBuffer = [];
     private static array $fileTypes  = [SOUND_TYPE_OGG => MIME_TYPE_OGG, SOUND_TYPE_MP3 => MIME_TYPE_MP3];
@@ -42,7 +42,7 @@ class SoundList extends DBTypeList
 
         if ($this->fileBuffer)
         {
-            $files = DB::Aowow()->select('SELECT `id` AS ARRAY_KEY, `id`, `file` AS "title", CAST(`type` AS UNSIGNED) AS "type", `path` FROM ?_sounds_files sf WHERE `id` IN (?a)', array_keys($this->fileBuffer));
+            $files = DB::Aowow()->selectAssoc('SELECT `id` AS ARRAY_KEY, `id`, `file` AS "title", CAST(`type` AS UNSIGNED) AS "type", `path` FROM ::sounds_files sf WHERE `id` IN %in', array_keys($this->fileBuffer));
             foreach ($files as $id => $data)
             {
                 // 3.3.5 bandaid - need fullpath to play via wow API, remove for cata and later
@@ -61,7 +61,7 @@ class SoundList extends DBTypeList
 
     public static function getName(int $id) : ?LocString
     {
-        if ($n = DB::Aowow()->SelectRow('SELECT `name` AS "name_loc0" FROM ?# WHERE `id` = ?d', self::$dataTable, $id))
+        if ($n = DB::Aowow()->SelectRow('SELECT `name` AS "name_loc0" FROM %n WHERE `id` = %i', self::$dataTable, $id))
             return new LocString($n);
         return null;
     }

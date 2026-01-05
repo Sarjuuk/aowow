@@ -42,7 +42,7 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             $this->typeId = $nameOrId;
         else if (preg_match(GuideMgr::VALID_URL, $nameOrId))
         {
-            if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ?_guides WHERE `url` = ?', Util::lower($nameOrId)))
+            if ($id = DB::Aowow()->selectCell('SELECT `id` FROM ::guides WHERE `url` = %s', Util::lower($nameOrId)))
             {
                 $this->typeId     = intVal($id);
                 $this->articleUrl = Util::lower($nameOrId);
@@ -215,9 +215,9 @@ class GuideBaseResponse extends TemplateResponse implements ICache
             return;
 
         // increment and display views
-        DB::Aowow()->query('UPDATE ?_guides SET `views` = `views` + 1 WHERE `id` = ?d', $pt->typeId);
+        DB::Aowow()->qry('UPDATE ::guides SET `views` = `views` + 1 WHERE `id` = %i', $pt->typeId);
 
-        $nViews = DB::Aowow()->selectCell('SELECT `views` FROM ?_guides WHERE `id` = ?d', $pt->typeId);
+        $nViews = DB::Aowow()->selectCell('SELECT `views` FROM ::guides WHERE `id` = %i', $pt->typeId);
 
         $infobox->addItem(Lang::guide('views').'[n5='.$nViews.']');
 

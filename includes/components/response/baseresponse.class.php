@@ -18,12 +18,12 @@ trait TrRecoveryHelper
             return Lang::main('intError');
 
         // check if already processing
-        if ($_ = DB::Aowow()->selectCell('SELECT `statusTimer` - UNIX_TIMESTAMP() FROM ?_account WHERE `email` = ? AND `status` > ?d AND `statusTimer` > UNIX_TIMESTAMP()', $email, ACC_STATUS_NEW))
+        if ($_ = DB::Aowow()->selectCell('SELECT `statusTimer` - UNIX_TIMESTAMP() FROM ::account WHERE `email` = %s AND `status` > %i AND `statusTimer` > UNIX_TIMESTAMP()', $email, ACC_STATUS_NEW))
             return Lang::account('inputbox', 'error', 'isRecovering', [DateTime::formatTimeElapsed($_ * 1000)]);
 
         // create new token and write to db
         $token = Util::createHash();
-        if (!DB::Aowow()->query('UPDATE ?_account SET `token` = ?, `status` = ?d, `statusTimer` =  UNIX_TIMESTAMP() + ?d WHERE `email` = ?', $token, $newStatus, Cfg::get('ACC_RECOVERY_DECAY'), $email))
+        if (!DB::Aowow()->qry('UPDATE ::account SET `token` = %s, `status` = %i, `statusTimer` =  UNIX_TIMESTAMP() + %i WHERE `email` = %s', $token, $newStatus, Cfg::get('ACC_RECOVERY_DECAY'), $email))
             return Lang::main('intError');
 
         // send recovery mail
@@ -544,9 +544,11 @@ abstract class BaseResponse
 
     protected function sumSQLStats() : void
     {
-        Util::arraySumByKey(self::$sql, DB::Aowow()->getStatistics(), DB::World()->getStatistics());
-        foreach (Profiler::getRealms() as $rId => $_)
-            Util::arraySumByKey(self::$sql, DB::Characters($rId)->getStatistics());
+        self::$sql = array(
+            'count'   => \dibi::$numOfQueries,
+            'time'    => \dibi::$totalTime,
+            'elapsed' => \dibi::$elapsedTime
+        );
     }
 
     protected function sendNoCacheHeader()

@@ -47,7 +47,7 @@ class ProfileUnlinkResponse extends TextResponse
         if (!$this->_get['user'] || User::$username == $this->_get['user'])
             $uid = User::$id;
         else if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']);
+            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_get['user']);
 
         if (!$uid)
         {
@@ -55,7 +55,7 @@ class ProfileUnlinkResponse extends TextResponse
             return;
         }
 
-        DB::Aowow()->query('DELETE FROM ?_account_profiles WHERE `accountId` = ?d AND `profileId` IN (?a)', $uid, $this->_get['id']);
+        DB::Aowow()->qry('DELETE FROM ::account_profiles WHERE `accountId` = %i AND `profileId` IN %in', $uid, $this->_get['id']);
     }
 }
 

@@ -90,8 +90,8 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         // profiler relateed (note that this is part of the cache. I don't think this is important enough to calc for every view)
         if (Cfg::get('PROFILER_ENABLE'))
         {
-            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_completion_titles WHERE `titleId` = ?d', $this->typeId);
-            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ?_profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
+            $x = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_completion_titles WHERE `titleId` = %i', $this->typeId);
+            $y = DB::Aowow()->selectCell('SELECT COUNT(1) FROM ::profiler_profiles WHERE `custom` = 0 AND `stub` = 0');
             $infobox[] = Lang::profiler('attainedBy', [round(($x ?: 0) * 100 / ($y ?: 1))]);
 
             // completion row added by InfoboxMarkup
@@ -116,7 +116,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         );
 
         // factionchange-equivalent
-        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = ?d, `alliance_id`, -`horde_id`) FROM player_factionchange_titles WHERE `alliance_id` = ?d OR `horde_id` = ?d', $this->typeId, $this->typeId, $this->typeId))
+        if ($pendant = DB::World()->selectCell('SELECT IF(`horde_id` = %i, `alliance_id`, -`horde_id`) FROM player_factionchange_titles WHERE `alliance_id` = %i OR `horde_id` = %i', $this->typeId, $this->typeId, $this->typeId))
         {
             $altTitle = new TitleList(array(['id', abs($pendant)]));
             if (!$altTitle->error)
@@ -153,7 +153,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: reward-from-achievement
-        if ($aIds = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE `TitleA` = ?d OR `TitleH` = ?d', $this->typeId, $this->typeId))
+        if ($aIds = DB::World()->selectCol('SELECT `ID` FROM achievement_reward WHERE `TitleA` = %i OR `TitleH` = %i', $this->typeId, $this->typeId))
         {
             $acvs = new AchievementList(array(['id', $aIds]));
             if (!$acvs->error)
@@ -171,7 +171,7 @@ class TitleBaseResponse extends TemplateResponse implements ICache
         }
 
         // tab: criteria-of
-        if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = ?d AND `value1` = ?d', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE, $this->typeId))
+        if ($crt = DB::World()->selectCol('SELECT `criteria_id` FROM achievement_criteria_data WHERE `type` = %i AND `value1` = %i', ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE, $this->typeId))
         {
             $acvs = new AchievementList(array(['ac.id', $crt]));
             if (!$acvs->error)

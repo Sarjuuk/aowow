@@ -114,8 +114,8 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         {
             // tab: recipes [spells] (crafted)
             $condition = array(
-                ['OR', ['s.reagent1', 0, '>'], ['s.reagent2', 0, '>'], ['s.reagent3', 0, '>'], ['s.reagent4', 0, '>'], ['s.reagent5', 0, '>'], ['s.reagent6', 0, '>'], ['s.reagent7', 0, '>'], ['s.reagent8', 0, '>']],
-                ['OR', ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
+                [DB::OR, ['s.reagent1', 0, '>'], ['s.reagent2', 0, '>'], ['s.reagent3', 0, '>'], ['s.reagent4', 0, '>'], ['s.reagent5', 0, '>'], ['s.reagent6', 0, '>'], ['s.reagent7', 0, '>'], ['s.reagent8', 0, '>']],
+                [DB::OR, ['s.skillLine1', $this->typeId], [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
             );
 
             $recipes = new SpellList($condition);           // also relevant for 3
@@ -221,10 +221,10 @@ class SkillBaseResponse extends TemplateResponse implements ICache
 
         // tab: modified by [spell]
         $conditions = array(
-            'OR',
-            ['AND', ['effect1AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect1MiscValue', $this->typeId]],
-            ['AND', ['effect2AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect2MiscValue', $this->typeId]],
-            ['AND', ['effect3AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect3MiscValue', $this->typeId]]
+            DB::OR,
+            [DB::AND, ['effect1AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect1MiscValue', $this->typeId]],
+            [DB::AND, ['effect2AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect2MiscValue', $this->typeId]],
+            [DB::AND, ['effect3AuraId', [SPELL_AURA_MOD_SKILL, SPELL_AURA_MOD_SKILL_TALENT]], ['effect3MiscValue', $this->typeId]]
         );
         $modBy = new SpellList($conditions);
         if (!$modBy->error)
@@ -243,15 +243,15 @@ class SkillBaseResponse extends TemplateResponse implements ICache
         $reqClass  = 0x0;
         $reqRace   = 0x0;
         $condition = array(
-            ['AND', ['s.reagent1', 0], ['s.reagent2', 0], ['s.reagent3', 0], ['s.reagent4', 0], ['s.reagent5', 0], ['s.reagent6', 0], ['s.reagent7', 0], ['s.reagent8', 0]],
-            ['OR',  ['s.skillLine1', $this->typeId], ['AND', ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
+            [DB::AND, ['s.reagent1', 0], ['s.reagent2', 0], ['s.reagent3', 0], ['s.reagent4', 0], ['s.reagent5', 0], ['s.reagent6', 0], ['s.reagent7', 0], ['s.reagent8', 0]],
+            [DB::OR,  ['s.skillLine1', $this->typeId], [DB::AND, ['s.skillLine1', 0, '>'], ['s.skillLine2OrMask', $this->typeId]]]
         );
 
         foreach (Game::$skillLineMask as $line1 => $sets)
             foreach ($sets as $idx => [, $skillLineId])
                 if ($skillLineId == $this->typeId)
                 {
-                    $condition[1][] = array('AND', ['s.skillLine1', $line1], ['s.skillLine2OrMask', 1 << $idx, '&']);
+                    $condition[1][] = array(DB::AND, ['s.skillLine1', $line1], ['s.skillLine2OrMask', 1 << $idx, '&']);
                     break 2;
                 }
 
@@ -292,13 +292,12 @@ class SkillBaseResponse extends TemplateResponse implements ICache
                     $mask |= 1 << $idx;
 
             $spellIds = DB::Aowow()->selectCol(
-               'SELECT `id` FROM ?_spell WHERE (`skillLine1` = ?d OR (`skillLine1` > 0 AND `skillLine2OrMask` = ?d) {OR (`skillLine1` = -3 AND `skillLine2OrMask` = ?d)})',
+               'SELECT `id` FROM ::spell WHERE %if', $mask, '(`skillLine1` = -3 AND `skillLine2OrMask` = %i) OR', $mask, '%end (`skillLine1` = %i OR (`skillLine1` > 0 AND `skillLine2OrMask` = %i))',
                 $this->typeId,
-                $this->typeId,
-                $mask ?: DBSIMPLE_SKIP
+                $this->typeId
             );
 
-            $list = $spellIds ? DB::World()->selectCol('SELECT cdt.`CreatureId` FROM creature_default_trainer cdt JOIN trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId` WHERE ts.`SpellID` IN (?a)', $spellIds) : [];
+            $list = $spellIds ? DB::World()->selectCol('SELECT cdt.`CreatureId` FROM creature_default_trainer cdt JOIN trainer_spell ts ON ts.`TrainerId` = cdt.`TrainerId` WHERE ts.`SpellID` IN %in', $spellIds) : [];
             if ($list)
             {
                 $trainer = new CreatureList(array(['ct.id', $list], ['s.guid', NULL, '!'], ['ct.npcflag', 0x10, '&']));

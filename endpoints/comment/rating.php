@@ -21,7 +21,7 @@ class CommentRatingResponse extends TextResponse
             return;
         }
 
-        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS "success", SUM(IF(`value` > 0, `value`, 0)) AS "up", SUM(IF(`value` < 0, -`value`, 0)) AS "down" FROM ?_user_ratings WHERE `type` = ?d AND `entry` = ?d AND `userId` <> 0 GROUP BY `entry`', RATING_COMMENT, $this->_get['id']))
+        if ($votes = DB::Aowow()->selectRow('SELECT 1 AS "success", SUM(IF(`value` > 0, `value`, 0)) AS "up", SUM(IF(`value` < 0, -`value`, 0)) AS "down" FROM ::user_ratings WHERE `type` = %i AND `entry` = %i AND `userId` <> 0 GROUP BY `entry`', RATING_COMMENT, $this->_get['id']))
             $this->result = Util::toJSON($votes);
         else
             $this->result = Util::toJSON(['success' => 1, 'up' => 0, 'down' => 0]);

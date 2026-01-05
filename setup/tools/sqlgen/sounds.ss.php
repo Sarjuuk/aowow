@@ -30,7 +30,7 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         'material', 'itemgroupsounds', 'itemdisplayinfo', 'weaponimpactsounds', 'itemsubclass', 'weaponswingsounds2' /*, 'sheathesoundlookups' data is redundant with material..? */
     );
 
-    public function generate(array $ids = []) : bool
+    public function generate() : bool
     {
         /*
             okay, here's the thing. WMOAreaTable.dbc references WMO-files to get its position in the world (AreTable) and has sparse information on the related AreaTables themself.
@@ -67,15 +67,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                    `file6` AS `soundFile6`, `file7` AS `soundFile7`, `file8` AS `soundFile8`, `file9` AS `soundFile9`, `file10` AS `soundFile10`,
                    `path`, `flags`
             FROM   dbc_soundentries
-            LIMIT  ?d, ?d';
+            LIMIT  %i, %i';
 
-        DB::Aowow()->query('TRUNCATE ?_sounds');
-        DB::Aowow()->query('TRUNCATE ?_sounds_files');
+        DB::Aowow()->qry('TRUNCATE ::sounds');
+        DB::Aowow()->qry('TRUNCATE ::sounds_files');
 
         $soundFileIdx = 0;
         $soundIndex   = [];
         $j = 0;
-        while ($sounds = DB::Aowow()->select($query, $j * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH))
+        while ($sounds = DB::Aowow()->selectAssoc($query, $j * CLISetup::SQL_BATCH, CLISetup::SQL_BATCH))
         {
             CLI::write('[sound] * batch #' . ++$j . ' (' . count($sounds) . ')', CLI::LOG_BLANK, true, true);
 
@@ -108,7 +108,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     {
                         $soundIndex[$nicePath] = ++$soundFileIdx;
 
-                        $fileSets[] = [$soundFileIdx, $s['soundFile'.$i], $s['path'], SOUND_TYPE_OGG];
+                        $fileSets['id'][]   = $soundFileIdx;
+                        $fileSets['file'][] = $s['soundFile'.$i];
+                        $fileSets['path'][] = $s['path'];
+                        $fileSets['type'][] = SOUND_TYPE_OGG;
+
                         $s['soundFile'.$i] = $soundFileIdx;
                     }
                     // mp3 .. keep as is
@@ -116,7 +120,11 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     {
                         $soundIndex[$nicePath] = ++$soundFileIdx;
 
-                        $fileSets[] = [$soundFileIdx, $s['soundFile'.$i], $s['path'], SOUND_TYPE_MP3];
+                        $fileSets['id'][]   = $soundFileIdx;
+                        $fileSets['file'][] = $s['soundFile'.$i];
+                        $fileSets['path'][] = $s['path'];
+                        $fileSets['type'][] = SOUND_TYPE_MP3;
+
                         $s['soundFile'.$i] = $soundFileIdx;
                     }
                     // i call bullshit
@@ -137,14 +145,15 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                     continue;
                 }
                 else if ($fileSets)
-                    DB::Aowow()->query('INSERT INTO ?_sounds_files VALUES (?a)', array_values($fileSets));
+                    DB::Aowow()->qry('INSERT INTO ::sounds_files %m', $fileSets);
 
                 unset($s['path']);
 
                 $groupSets[] = array_values($s);
             }
 
-            DB::Aowow()->query('INSERT INTO ?_sounds VALUES (?a)', array_values($groupSets));
+            foreach ($groupSets as $gs)
+                DB::Aowow()->qry('INSERT INTO ::sounds VALUES %l', $gs);
         }
 
 
@@ -154,9 +163,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write('[sound] - linking to race');
 
-        DB::Aowow()->query('TRUNCATE ?_races_sounds');
-        DB::Aowow()->query(
-           'INSERT IGNORE INTO ?_races_sounds
+        DB::Aowow()->qry('TRUNCATE ::races_sounds');
+        DB::Aowow()->qry(
+           'INSERT IGNORE INTO ::races_sounds
                SELECT `raceId`, `soundIdMale`,   1 FROM dbc_vocaluisounds WHERE `soundIdMale` <> `soundIdFemale` AND `soundIdMale`   > 0 UNION
                SELECT `raceId`, `soundIdFemale`, 2 FROM dbc_vocaluisounds WHERE `soundIdMale` <> `soundIdFemale` AND `soundIdFemale` > 0'
         );
@@ -168,8 +177,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write('[sound] - linking to emotes');
 
-        DB::Aowow()->query('TRUNCATE ?_emotes_sounds');
-        DB::Aowow()->query('INSERT IGNORE INTO ?_emotes_sounds SELECT `emotesTextId`, `raceId`, `gender` + 1, `soundId` FROM dbc_emotestextsound');
+        DB::Aowow()->qry('TRUNCATE ::emotes_sounds');
+        DB::Aowow()->qry('INSERT IGNORE INTO ::emotes_sounds SELECT `emotesTextId`, `raceId`, `gender` + 1, `soundId` FROM dbc_emotestextsound');
 
 
         /*******************/
@@ -184,9 +193,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         //      * customattack2 through 3
         //  in case of conflicting data CreatureDisplayInfo overrides CreatureModelData (seems to be more specialized (Thral > MaleOrc / Maiden > FemaleTitan))
 
-        DB::Aowow()->query('TRUNCATE ?_creature_sounds');
-        DB::Aowow()->query(
-           'INSERT INTO ?_creature_sounds
+        DB::Aowow()->qry('TRUNCATE ::creature_sounds');
+        DB::Aowow()->qry(
+           'INSERT INTO ::creature_sounds
             SELECT      cdi.`id`,
                         GREATEST(IFNULL(ns.`greetSoundId`, 0), 0),
                         GREATEST(IFNULL(ns.`byeSoundId`,   0), 0),
@@ -236,9 +245,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
         //      * missile and impactarea not in js
         //      * ready, castertargeting, casterstate and targetstate not in dbc
 
-        DB::Aowow()->query('TRUNCATE ?_spell_sounds');
-        DB::Aowow()->query(
-           'INSERT INTO ?_spell_sounds
+        DB::Aowow()->qry('TRUNCATE ::spell_sounds');
+        DB::Aowow()->qry(
+           'INSERT INTO ::spell_sounds
             SELECT      sv.`id`,
                         GREATEST(`animationSoundId`, 0),
                         0,                                  -- ready
@@ -282,9 +291,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         // omiting data from WMOAreaTable, as its at the moment impossible to link to actual zones
 
-        DB::Aowow()->query('TRUNCATE ?_zones_sounds');
-        DB::Aowow()->query(
-           'INSERT INTO ?_zones_sounds (`id`, `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight`, `intro`, `worldStateId`, `worldStateValue`)
+        DB::Aowow()->qry('TRUNCATE ::zones_sounds');
+        DB::Aowow()->qry(
+           'INSERT INTO ::zones_sounds (`id`, `ambienceDay`, `ambienceNight`, `musicDay`, `musicNight`, `intro`, `worldStateId`, `worldStateValue`)
             SELECT      a.`id`,
                         IFNULL(sa1.`soundIdDay`, 0),
                         IFNULL(sa1.`soundIdNight`, 0),
@@ -311,13 +320,13 @@ CLISetup::registerSetup("sql", new class extends SetupScript
             LEFT JOIN   dbc_soundambience sa2 ON sa2.`id` = wszs.`soundAmbienceId`
             LEFT JOIN   dbc_zonemusic zm2 ON zm2.`id` = wszs.`zoneMusicId`
             LEFT JOIN   dbc_zoneintromusictable zimt2 ON zimt2.`id` = wszs.`zoneIntroMusicId`
-            WHERE       wszs.`zoneMusicId` > 0 AND (wszs.`areaId` OR wszs.`wmoAreaId` IN (?a))',
+            WHERE       wszs.`zoneMusicId` > 0 AND (wszs.`areaId` OR wszs.`wmoAreaId` IN %in)',
             array_keys($worldStateZoneSoundFix)
         );
 
         // apply post-fix
         foreach ($worldStateZoneSoundFix as $old => $new)
-            DB::Aowow()->query('UPDATE ?_zones_sounds SET `id` = ?d WHERE `id` = ?d', $new, $old);
+            DB::Aowow()->qry('UPDATE ::zones_sounds SET `id` = %i WHERE `id` = %i', $new, $old);
 
 
         /***************/
@@ -326,8 +335,8 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write('[sound] - linking to items');
 
-        DB::Aowow()->query(
-           'UPDATE    ?_items i
+        DB::Aowow()->qry(
+           'UPDATE    ::items i
             LEFT JOIN dbc_itemdisplayinfo idi ON idi.`id` = i.`displayId`
             LEFT JOIN dbc_itemgroupsounds igs ON igs.`id` = idi.`groupSoundId`
             LEFT JOIN dbc_material m          ON   m.`id` = i.`material`
@@ -338,22 +347,22 @@ CLISetup::registerSetup("sql", new class extends SetupScript
                       i.`unsheatheSoundId` = IFNULL(m.`unsheatheSoundId`,  0)'
         );
 
-        DB::Aowow()->query('TRUNCATE ?_items_sounds');
+        DB::Aowow()->qry('TRUNCATE ::items_sounds');
 
         $fields = ['hit', 'crit'];
         foreach ($fields as $f)
             for ($i = 1; $i <= 10; $i++)
-                DB::Aowow()->query(
-                   'INSERT INTO ?_items_sounds
-                        SELECT  ?#, (1 << wis.`subClass`)
+                DB::Aowow()->qry(
+                   'INSERT INTO ::items_sounds
+                        SELECT  %n, (1 << wis.`subClass`)
                         FROM    dbc_weaponimpactsounds wis
-                        WHERE   ?# > 0
+                        WHERE   %n > 0
                     ON DUPLICATE KEY UPDATE `subClassMask` = `subClassMask` | (1 << wis.`subClass`)',
                     $f.$i, $f.$i
                 );
 
-        DB::Aowow()->query(
-           'INSERT INTO ?_items_sounds
+        DB::Aowow()->qry(
+           'INSERT INTO ::items_sounds
                 SELECT  wss.`soundId`, (1 << isc.`subClass`)
                 FROM    dbc_itemsubclass isc
                 JOIN    dbc_weaponswingsounds2 wss ON wss.`weaponSize` = isc.`weaponSize`
@@ -368,9 +377,9 @@ CLISetup::registerSetup("sql", new class extends SetupScript
 
         CLI::write('[sound] - linking to screen effects');
 
-        DB::Aowow()->query('TRUNCATE ?_screeneffect_sounds');
-        DB::Aowow()->query(
-           'INSERT INTO ?_screeneffect_sounds
+        DB::Aowow()->qry('TRUNCATE ::screeneffect_sounds');
+        DB::Aowow()->qry(
+           'INSERT INTO ::screeneffect_sounds
             SELECT      se.`id`, se.`name`, IFNULL(sa.`soundIdDay`, 0), IFNULL(sa.`soundIdNight`, 0), IFNULL(zm.`soundIdDay`, 0), IFNULL(zm.`soundIdNight`, 0)
             FROM        dbc_screeneffect se
             LEFT JOIN   dbc_soundambience sa ON se.`soundAmbienceId` = sa.`id`

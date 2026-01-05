@@ -25,7 +25,7 @@ class AdminVideosActionRelocateResponse extends TextResponse
         }
 
         $id                 = $this->_get['id'][0];
-        [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT `type`, `typeId` FROM ?_videos WHERE `id` = ?d', $id));
+        [$type, $oldTypeId] = array_values(DB::Aowow()->selectRow('SELECT `type`, `typeId` FROM ::videos WHERE `id` = %i', $id));
         $typeId             = $this->_get['typeid'];
 
         if (Type::validateIds($type, $typeId))
@@ -33,15 +33,15 @@ class AdminVideosActionRelocateResponse extends TextResponse
             $tbl = Type::getClassAttrib($type, 'dataTable');
 
             // move video
-            DB::Aowow()->query('UPDATE ?_videos SET `typeId` = ?d WHERE `id` = ?d', $typeId, $id);
+            DB::Aowow()->qry('UPDATE ::videos SET `typeId` = %i WHERE `id` = %i', $typeId, $id);
 
             // flag target as having video
-            DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` | ?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_VIDEO, $typeId);
+            DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` | %i WHERE `id` = %i', $tbl, CUSTOM_HAS_VIDEO, $typeId);
 
             // deflag source for having had videos (maybe)
-            $viInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~`status`) & ?d, 1, 0) AS "hasMore" FROM ?_videos WHERE `status`& ?d AND `type` = ?d AND `typeId` = ?d', CC_FLAG_DELETED, CC_FLAG_APPROVED, $type, $oldTypeId);
+            $viInfo = DB::Aowow()->selectRow('SELECT IF(BIT_OR(~`status`) & %i, 1, 0) AS "hasMore" FROM ::videos WHERE `status`& %i AND `type` = %i AND `typeId` = %i', CC_FLAG_DELETED, CC_FLAG_APPROVED, $type, $oldTypeId);
             if ($viInfo || !$viInfo['hasMore'])
-                DB::Aowow()->query('UPDATE ?# SET `cuFlags` = `cuFlags` & ~?d WHERE `id` = ?d', $tbl, CUSTOM_HAS_VIDEO, $oldTypeId);
+                DB::Aowow()->qry('UPDATE %n SET `cuFlags` = `cuFlags` & ~%i WHERE `id` = %i', $tbl, CUSTOM_HAS_VIDEO, $oldTypeId);
         }
         else
             trigger_error('AdminVideosActionRelocateResponse - invalid typeId #'.$typeId.' for type #'.$type, E_USER_ERROR);

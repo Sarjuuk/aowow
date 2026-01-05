@@ -152,7 +152,7 @@ abstract class Type
         if (!(self::$data[$type][self::IDX_FLAGS] & self::FLAG_DB_TYPE))
             return [];
 
-        return DB::Aowow()->selectCol('SELECT `id` FROM ?# WHERE `id` IN (?a)', self::$data[$type][self::IDX_LIST_OBJ]::$dataTable, (array)$ids);
+        return DB::Aowow()->selectCol('SELECT `id` FROM %n WHERE `id` IN %in', self::$data[$type][self::IDX_LIST_OBJ]::$dataTable, (array)$ids);
     }
 
     public static function hasIcon(int $type) : bool

@@ -49,12 +49,17 @@ class AccountExcludeResponse extends TextResponse
             // we don't get signaled whether an id should be added to or removed from either includes or excludes
             // so we throw everything into one table and toggle the mode if its already in here
 
-            $includes = DB::Aowow()->selectCol('SELECT `typeId` FROM ?_profiler_excludes WHERE `type` = ?d AND `typeId` IN (?a)', $this->_post['type'], $validIds);
-
+            $includes = DB::Aowow()->selectCol('SELECT `typeId` FROM ::profiler_excludes WHERE `type` = %i AND `typeId` IN %in', $this->_post['type'], $validIds);
+            $insert   = [];
             foreach ($validIds as $typeId)
-                DB::Aowow()->query('INSERT INTO ?_account_excludes (`userId`, `type`, `typeId`, `mode`) VALUES (?a) ON DUPLICATE KEY UPDATE `mode` = (`mode` ^ 0x3)',
-                    [User::$id, $this->_post['type'], $typeId, in_array($typeId, $includes) ? 2 : 1]
-            );
+            {
+                $insert['userId'][] = User::$id;
+                $insert['type'][]   = $this->_post['type'];
+                $insert['typeId'][] = $typeId;
+                $insert['mode'][]   = in_array($typeId, $includes) ? Profiler::COMPLETION_INCLUDE : Profiler::COMPLETION_EXCLUDE;
+            };
+
+            DB::Aowow()->qry('INSERT INTO ::account_excludes %m ON DUPLICATE KEY UPDATE `mode` = (`mode` ^ 0x3)', $insert);
         }
         else
             trigger_error('AccountExcludeResponse::excludeById - validation failed [type: '.$this->_post['type'].', typeId: '.implode(',', $this->_post['id']).']', E_USER_NOTICE);
@@ -62,14 +67,14 @@ class AccountExcludeResponse extends TextResponse
 
     private function resetExcludes() : void
     {
-        DB::Aowow()->query('DELETE FROM ?_account_excludes WHERE `userId` = ?d', User::$id);
-        DB::Aowow()->query('UPDATE ?_account SET `excludeGroups` = ?d WHERE `id` = ?d', PR_EXCLUDE_GROUP_UNAVAILABLE, User::$id);
+        DB::Aowow()->qry('DELETE FROM ::account_excludes WHERE `userId` = %i', User::$id);
+        DB::Aowow()->qry('UPDATE ::account SET `excludeGroups` = %i WHERE `id` = %i', PR_EXCLUDE_GROUP_UNAVAILABLE, User::$id);
     }
 
     private function updateGroups() : void
     {
         if ($this->assertPOST('groups'))                    // clamp to real groups
-            DB::Aowow()->query('UPDATE ?_account SET `excludeGroups` = ?d WHERE `id` = ?d', $this->_post['groups'] & PR_EXCLUDE_GROUP_ANY, User::$id);
+            DB::Aowow()->qry('UPDATE ::account SET `excludeGroups` = %i WHERE `id` = %i', $this->_post['groups'] & PR_EXCLUDE_GROUP_ANY, User::$id);
     }
 }
 

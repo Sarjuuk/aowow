@@ -32,12 +32,12 @@ class GuildResyncResponse extends TextResponse
         if (!$this->assertGET('id'))
             return;
 
-        if ($guilds = DB::Aowow()->select('SELECT `realm`, `realmGUID` FROM ?_profiler_guild WHERE `id` IN (?a)', $this->_get['id']))
+        if ($guilds = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_guild WHERE `id` IN %in', $this->_get['id']))
             foreach ($guilds as $g)
                 Profiler::scheduleResync(Type::GUILD, $g['realm'], $g['realmGUID']);
 
         if ($this->_get['profile'])
-            if ($chars = DB::Aowow()->select('SELECT `realm`, `realmGUID` FROM ?_profiler_profiles WHERE `guild` IN (?a)', $this->_get['id']))
+            if ($chars = DB::Aowow()->selectAssoc('SELECT `realm`, `realmGUID` FROM ::profiler_profiles WHERE `guild` IN %in', $this->_get['id']))
                 foreach ($chars as $c)
                     Profiler::scheduleResync(Type::PROFILE, $c['realm'], $c['realmGUID']);
 

@@ -48,7 +48,7 @@ class ProfilePrivateResponse extends TextResponse
         if (!$this->_get['user'] || User::$username == $this->_get['user'])
             $uid = User::$id;
         else if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']);
+            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_get['user']);
 
         if (!$uid)
         {
@@ -56,8 +56,8 @@ class ProfilePrivateResponse extends TextResponse
             return;
         }
 
-        DB::Aowow()->query('UPDATE ?_account_profiles  SET `extraFlags` = `extraFlags` & ~?d WHERE `profileId` IN (?a) AND `accountId` = ?d', PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
-        DB::Aowow()->query('UPDATE ?_profiler_profiles SET `cuFlags`    = `cuFlags`    & ~?d WHERE `id`        IN (?a) AND `user`      = ?d', PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+        DB::Aowow()->qry('UPDATE ::account_profiles  SET `extraFlags` = `extraFlags` & ~%i WHERE `profileId` IN %in AND `accountId` = %i', PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
+        DB::Aowow()->qry('UPDATE ::profiler_profiles SET `cuFlags`    = `cuFlags`    & ~%i WHERE `id`        IN %in AND `user`      = %i', PROFILER_CU_PUBLISHED, $this->_get['id'], $uid);
     }
 }
 

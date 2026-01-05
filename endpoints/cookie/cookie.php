@@ -32,7 +32,7 @@ class CookieBaseResponse extends TextResponse
     {
         if (!$this->param && $this->_get['purge'])
         {
-            if (User::$id && DB::Aowow()->query('UPDATE ?_account_cookies SET `data` = "purged" WHERE `userId` = ?d AND `name` LIKE "announcement-%"', User::$id) !== null)
+            if (User::$id && DB::Aowow()->qry('UPDATE ::account_cookies SET `data` = "purged" WHERE `userId` = %i AND `name` LIKE "announcement-%"', User::$id) !== null)
                 $this->result = 0;
 
             return;
@@ -44,7 +44,7 @@ class CookieBaseResponse extends TextResponse
             return;
         }
 
-        if (DB::Aowow()->query('REPLACE INTO ?_account_cookies VALUES (?d, ?, ?)', User::$id, $this->param, $this->_get[$this->param]))
+        if (DB::Aowow()->qry('REPLACE INTO ::account_cookies VALUES (%i, %s, %s)', User::$id, $this->param, $this->_get[$this->param]))
             $this->result = 0;
         else
             trigger_error('CookieBaseResponse - write to db failed', E_USER_ERROR);

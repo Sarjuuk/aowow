@@ -86,7 +86,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                         CLI::write();
                         if (!DB::isConnectable(DB_AUTH) || !$this->test())
                             CLI::write('[db] auth server not yet set up.', CLI::LOG_ERROR);
-                        else if ($realms = DB::Auth()->select('SELECT `id` AS "0", `name` AS "1", `icon` AS "2", `timezone` AS "3", `allowedSecurityLevel` AS "4" FROM realmlist'))
+                        else if ($realms = DB::Auth()->selectAssoc('SELECT `id` AS "0", `name` AS "1", `icon` AS "2", `timezone` AS "3", `allowedSecurityLevel` AS "4" FROM realmlist'))
                         {
                             $tbl = [['Realm Id', 'Name', 'Type', 'Region', 'GMLevel', 'Status']];
                             foreach ($realms as [$id, $name, $icon, $region, $level])
@@ -216,13 +216,13 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE %s', 'aowow_dbversion'))
                             Cfg::load();                    // first time load after successful db setup
                         else
                             $error[] = ' * '.$what.': doesn\'t seem to contain aowow tables!';
                         break;
                     case DB_WORLD:
-                        if (!DB::World()->selectCell('SHOW TABLES LIKE ?', 'version'))
+                        if (!DB::World()->selectCell('SHOW TABLES LIKE %s', 'version'))
                             $error[] = ' * '.$what.': doesn\'t seem to contain TrinityCore world tables!';
                         else if (DB::World()->selectCell('SELECT `cache_id` FROM `version`') < TDB_WORLD_MINIMUM_VER)
                             $error[] = ' * '.$what.': TDB world db is structurally outdated! (min rev.: '.CLI::bold(TDB_WORLD_MINIMUM_VER).')';
@@ -255,9 +255,9 @@ CLISetup::registerUtility(new class extends UtilityScript
                 switch ($idx)
                 {
                     case DB_AOWOW:
-                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE ?', 'aowow_dbversion'))
+                        if (DB::Aowow()->selectCell('SHOW TABLES LIKE %s', 'aowow_dbversion'))
                         {
-                            if ($date = DB::Aowow()->selectCell('SELECT `date` FROM ?_dbversion'))
+                            if ($date = DB::Aowow()->selectCell('SELECT `date` FROM ::dbversion'))
                             {
                                 $note = 'AoWoW DB version @ ' . date(Util::$dateFormatInternal, $date);
                                 $ok   = true;
@@ -269,7 +269,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                             $note = CLI::yellow('DB test failed to find dbversion table. ').CLI::bold('setup/sql/01-db_structure.sql').CLI::yellow(' not yet imported?');
                         break;
                     case DB_WORLD:
-                        if (DB::World()->selectCell('SHOW TABLES LIKE ?', 'version'))
+                        if (DB::World()->selectCell('SHOW TABLES LIKE %s', 'version'))
                         {
                             [$vString, $vNo] = DB::World()->selectRow('SELECT `db_version` AS "0", `cache_id` AS "1" FROM `version`');
                             if (strpos($vString, 'TDB') === 0)
@@ -289,7 +289,7 @@ CLISetup::registerUtility(new class extends UtilityScript
                             else
                                 $note = CLI::yellow('DB test found unexpected vendor in expected version table. Uhh.. Good Luck..!?');
                         }
-                        else if (DB::World()->selectCell('SHOW TABLES LIKE ?', 'db_version'))
+                        else if (DB::World()->selectCell('SHOW TABLES LIKE %s', 'db_version'))
                             $note = CLI::yellow('DB test found MaNGOS styled version table. MaNGOS DB structure is not supported!');
                         else
                             $note = CLI::yellow('DB test failed to find version table. TrinityDB world not yet imported?');

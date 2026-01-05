@@ -40,7 +40,7 @@ class ProfileUnpinResponse extends TextResponse
         if (!$this->_get['user'] || User::$username == $this->_get['user'])
             $uid = User::$id;
         else if ($this->_get['user'] && User::isInGroup(U_GROUP_ADMIN | U_GROUP_BUREAU))
-            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ?_account WHERE LOWER(`username`) = LOWER(?)', $this->_get['user']);
+            $uid = DB::Aowow()->selectCell('SELECT `id` FROM ::account WHERE LOWER(`username`) = LOWER(%s)', $this->_get['user']);
 
         if (!$uid)
         {
@@ -48,7 +48,7 @@ class ProfileUnpinResponse extends TextResponse
             return;
         }
 
-        DB::Aowow()->query('UPDATE ?_account_profiles SET `extraFlags` = `extraFlags` & ~?d WHERE `accountId` = ?d', PROFILER_CU_PINNED, $uid);
+        DB::Aowow()->qry('UPDATE ::account_profiles SET `extraFlags` = `extraFlags` & ~%i WHERE `accountId` = %i', PROFILER_CU_PINNED, $uid);
     }
 }
 

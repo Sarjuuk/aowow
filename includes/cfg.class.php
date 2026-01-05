@@ -66,7 +66,7 @@ class Cfg
         if (!DB::isConnected(DB_AOWOW))
             return;
 
-        $sets = DB::Aowow()->select('SELECT `key` AS ARRAY_KEY, `value` AS "0", `flags` AS "1", `cat` AS "2", `default` AS "3", `comment` AS "4" FROM ?_config ORDER BY `key` ASC');
+        $sets = DB::Aowow()->selectAssoc('SELECT `key` AS ARRAY_KEY, `value` AS "0", `flags` AS "1", `cat` AS "2", `default` AS "3", `comment` AS "4" FROM ::config ORDER BY `key` ASC');
         foreach ($sets as $key => [$value, $flags, $catg, $default, $comment])
         {
             $php = $flags & self::FLAG_PHP;
@@ -129,7 +129,7 @@ class Cfg
             return 'this configuration option cannot be set';
 
         $flags = self::FLAG_TYPE_STRING | self::FLAG_PHP;
-        if (!is_int(DB::Aowow()->query('INSERT IGNORE INTO ?_config (`key`, `value`, `cat`, `flags`) VALUES (?, ?, ?d, ?d)', $key, $value, self::CAT_MISCELLANEOUS, $flags)))
+        if (!is_int(DB::Aowow()->qry('INSERT IGNORE INTO ::config (`key`, `value`, `cat`, `flags`) VALUES (%s, %s, %i, %i)', $key, $value, self::CAT_MISCELLANEOUS, $flags)))
             return 'internal error';
 
         self::$store[$key] = [$value, $flags, self::CAT_MISCELLANEOUS, null, null];
@@ -155,7 +155,7 @@ class Cfg
         if (self::$store[$key][self::IDX_FLAGS] & self::FLAG_INTERNAL)
             return 'can\'t delete internal option';
 
-        if (!DB::Aowow()->query('DELETE FROM ?_config WHERE `key` = ? AND (`flags` & ?d) = 0 AND (`flags` & ?d) > 0', $key, self::FLAG_PERSISTENT, self::FLAG_PHP))
+        if (!DB::Aowow()->qry('DELETE FROM ::config WHERE `key` = %s AND (`flags` & %i) = 0 AND (`flags` & %i) > 0', $key, self::FLAG_PERSISTENT, self::FLAG_PHP))
             return 'internal error';
 
         unset(self::$store[$key]);
@@ -175,9 +175,9 @@ class Cfg
         }
 
         if ($fromDB && $fullInfo)
-            return array_values(DB::Aowow()->selectRow('SELECT `value`, `flags`, `cat`, `default`, `comment` FROM ?_config WHERE `key` = ?', $key));
+            return array_values(DB::Aowow()->selectRow('SELECT `value`, `flags`, `cat`, `default`, `comment` FROM ::config WHERE `key` = %s', $key));
         if ($fromDB)
-            return DB::Aowow()->selectCell('SELECT `value` FROM ?_config WHERE `key` = ?', $key);
+            return DB::Aowow()->selectCell('SELECT `value` FROM ::config WHERE `key` = %s', $key);
         if ($fullInfo)
             return self::$store[$key];
 
@@ -205,7 +205,7 @@ class Cfg
         if ($flags & self::FLAG_REQUIRED && !strlen($value))
             return 'empty value given for required config';
 
-        DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $value, $key);
+        DB::Aowow()->qry('UPDATE ::config SET `value` = %s WHERE `key` = %s', $value, $key);
         self::$store[$key][self::IDX_VALUE] = $value;
 
         // validate change
@@ -220,7 +220,7 @@ class Cfg
             if ($errMsg)
             {
                 // rollback change
-                DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldValue, $key);
+                DB::Aowow()->qry('UPDATE ::config SET `value` = %s WHERE `key` = %s', $oldValue, $key);
                 self::$store[$key][self::IDX_VALUE] = $oldValue;
 
                 return $errMsg;
@@ -261,7 +261,7 @@ class Cfg
         if (!($flags & Cfg::FLAG_TYPE_STRING))
             $default = @eval('return ('.$default.');');
 
-        DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $default, $key);
+        DB::Aowow()->qry('UPDATE ::config SET `value` = %s WHERE `key` = %s', $default, $key);
         self::$store[$key][self::IDX_VALUE] = $default;
 
         // validate change
@@ -276,7 +276,7 @@ class Cfg
             if ($errMsg)
             {
                 // rollback change
-                DB::Aowow()->query('UPDATE ?_config SET `value` = ? WHERE `key` = ?', $oldValue, $key);
+                DB::Aowow()->qry('UPDATE ::config SET `value` = %s WHERE `key` = %s', $oldValue, $key);
                 self::$store[$key][self::IDX_VALUE] = $oldValue;
 
                 return $errMsg;
@@ -480,9 +480,9 @@ class Cfg
             return true;
 
         $ok = true;
-        foreach (['?_spell', '?_items', '?_objects', '?_creature', '?_quests'] as $tbl)
+        foreach (['::spell', '::items', '::objects', '::creature', '::quests'] as $tbl)
         {
-            if (DB::Aowow()->selectRow('SHOW INDEX FROM ?# WHERE `column_name` = ? AND `index_type` = "FULLTEXT"', $tbl, 'name_loc4'))
+            if (DB::Aowow()->selectRow('SHOW INDEX FROM %n WHERE `column_name` = %s AND `index_type` = "FULLTEXT"', $tbl, 'name_loc4'))
                 continue;
 
             $ok = false;

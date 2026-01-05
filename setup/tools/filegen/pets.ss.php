@@ -15,7 +15,7 @@ if (!CLI)
         name:'Forest Spider',
         minlevel:5,
         maxlevel:6,
-        location:[12],                                  // master-AreaTableId's (?)
+        location:[12],                                  // master-AreaTableId's (%s)
         react:[-1,-1],
         classification:0,                               // 0:"Normal", 1:"Elite", 2:"Rar Elite", 3:"Boss", 4:"Rar"
         family:3,                                       // creatureFamily
@@ -40,7 +40,7 @@ CLISetup::registerSetup("build", new class extends SetupScript
 
     public function generate() : bool
     {
-        $petList   = DB::Aowow()->Select(
+        $petList   = DB::Aowow()->selectAssoc(
            'SELECT   cr.`id`,
                      cr.`name_loc0`, cr.`name_loc2`, cr.`name_loc3`, cr.`name_loc4`, cr.`name_loc6`, cr.`name_loc8`,
                      cr.`minLevel`, cr.`maxLevel`,
@@ -49,17 +49,17 @@ CLISetup::registerSetup("build", new class extends SetupScript
                      cr.`family`,
                      cr.`displayId1` AS "displayId",
                      cr.`textureString` AS "skin",
-                     LOWER(SUBSTRING_INDEX(cf.`iconString`, "\\\\", -1)) AS "icon",
+                     LOWER(SUBSTRING_INDEX(cf.`iconString`, "\\", -1)) AS "icon",
                      cf.`petTalentType` AS "type"
-            FROM     ?_creature cr
-            JOIN     ?_factiontemplate  ft ON ft.`id` = cr.`faction`
+            FROM     ::creature cr
+            JOIN     ::factiontemplate  ft ON ft.`id` = cr.`faction`
             JOIN     dbc_creaturefamily cf ON cf.`id` = cr.`family`
-            WHERE    cr.`typeFlags` & 0x1 AND (cr.`cuFlags` & ?d) = 0
+            WHERE    cr.`typeFlags` & 0x1 AND (cr.`cuFlags` & %i) = 0
             ORDER BY cr.`id` ASC',
             NPC_CU_DIFFICULTY_DUMMY
         );
 
-        $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ?_spawns WHERE `type` = ?d AND `typeId` IN (?a) GROUP BY `typeId`, `areaId`', Type::NPC, array_column($petList, 'id'));
+        $locations = DB::Aowow()->selectCol('SELECT `typeId` AS ARRAY_KEY, `areaId` AS ARRAY_KEY2, `areaId` FROM ::spawns WHERE `type` = %i AND `typeId` IN %in GROUP BY `typeId`, `areaId`', Type::NPC, array_column($petList, 'id'));
 
         foreach (CLISetup::$locales as $loc)
         {

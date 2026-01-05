@@ -47,7 +47,7 @@ class ProfileAvatarResponse extends TextResponse
 
         $profileId = substr($this->_get['id'], 0, -4);
 
-        $charData = DB::Aowow()->selectRow('SELECT `race`, `gender` FROM ?_profiler_profiles WHERE id = ?d', $profileId);
+        $charData = DB::Aowow()->selectRow('SELECT `race`, `gender` FROM ::profiler_profiles WHERE id = %i', $profileId);
         if (!$charData)
             $this->generate404();
 

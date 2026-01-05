@@ -109,24 +109,24 @@ class AccountSignupResponse extends TemplateResponse
             return Lang::main('intError');
 
         // limit account creation
-        if (DB::Aowow()->selectRow('SELECT 1 FROM ?_account_bannedips WHERE `type` = ?d AND `ip` = ? AND `count` >= ?d AND `unbanDate` >= UNIX_TIMESTAMP()', IP_BAN_TYPE_REGISTRATION_ATTEMPT, User::$ip, Cfg::get('ACC_FAILED_AUTH_COUNT')))
+        if (DB::Aowow()->selectRow('SELECT 1 FROM ::account_bannedips WHERE `type` = %i AND `ip` = %s AND `count` >= %i AND `unbanDate` >= UNIX_TIMESTAMP()', IP_BAN_TYPE_REGISTRATION_ATTEMPT, User::$ip, Cfg::get('ACC_FAILED_AUTH_COUNT')))
         {
-            DB::Aowow()->query('UPDATE ?_account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d WHERE `ip` = ? AND `type` = ?d', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT);
+            DB::Aowow()->qry('UPDATE ::account_bannedips SET `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i WHERE `ip` = %s AND `type` = %i', Cfg::get('ACC_FAILED_AUTH_BLOCK'), User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT);
             return Lang::account('inputbox', 'error', 'signupExceeded', [DateTime::formatTimeElapsedFloat(Cfg::get('ACC_FAILED_AUTH_BLOCK') * 1000)]);
         }
 
         // username / email taken
-        if ($inUseData = DB::Aowow()->SelectRow('SELECT `id`, `username`, `status` = ?d AND `statusTimer` < UNIX_TIMESTAMP() AS "expired" FROM ?_account WHERE (LOWER(`username`) = LOWER(?) OR LOWER(`email`) = LOWER(?))', ACC_STATUS_NEW, $this->_post['username'], $this->_post['email']))
+        if ($inUseData = DB::Aowow()->SelectRow('SELECT `id`, `username`, `status` = %i AND `statusTimer` < UNIX_TIMESTAMP() AS "expired" FROM ::account WHERE (LOWER(`username`) = LOWER(%s) OR LOWER(`email`) = LOWER(%s))', ACC_STATUS_NEW, $this->_post['username'], $this->_post['email']))
         {
             if ($inUseData['expired'])
-                DB::Aowow()->query('DELETE FROM ?_account WHERE `id` = ?d', $inUseData['id']);
+                DB::Aowow()->qry('DELETE FROM ::account WHERE `id` = %i', $inUseData['id']);
             else
                 return Util::lower($inUseData['username']) == Util::lower($this->_post['username']) ? Lang::account('nameInUse') : Lang::account('mailInUse');
         }
 
         // create..
         $token  = Util::createHash();
-        $userId = DB::Aowow()->query('INSERT INTO ?_account (`login`, `passHash`, `username`, `email`, `joindate`, `curIP`, `locale`, `userGroups`, `status`, `statusTimer`, `token`) VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?d, ?d, ?d, UNIX_TIMESTAMP() + ?d, ?)',
+        $userId = DB::Aowow()->qry('INSERT INTO ::account (`login`, `passHash`, `username`, `email`, `joindate`, `curIP`, `locale`, `userGroups`, `status`, `statusTimer`, `token`) VALUES (%s, %s, %s, %s, UNIX_TIMESTAMP(), %s, %i, %i, %i, UNIX_TIMESTAMP() + %i, %s)',
             $this->_post['username'],
             User::hashCrypt($this->_post['password']),
             $this->_post['username'],
@@ -143,14 +143,14 @@ class AccountSignupResponse extends TemplateResponse
             return Lang::main('intError');
 
         // create session tied to the token to store remember_me status
-        DB::Aowow()->query('INSERT INTO ?_account_sessions (`userId`, `sessionId`, `created`, `expires`, `touched`, `deviceInfo`, `ip`, `status`) VALUES (?d, ?, ?d, ?d, ?d, ?, ?, ?d)',
+        DB::Aowow()->qry('INSERT INTO ::account_sessions (`userId`, `sessionId`, `created`, `expires`, `touched`, `deviceInfo`, `ip`, `status`) VALUES (%i, %s, %i, %i, %i, %s, %s, %i)',
             $userId, $token, time(), $this->_post['remember_me'] ? 0 : time() + Cfg::get('SESSION_TIMEOUT_DELAY'), time(), User::$agent, User::$ip, SESSION_ACTIVE);
 
         if (!Util::sendMail($this->_post['email'], 'activate-account', [$token], Cfg::get('ACC_CREATE_SAVE_DECAY')))
             return Lang::main('intError2', ['send mail']);
 
         // success: update ip-bans
-        DB::Aowow()->query('INSERT INTO ?_account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (?, ?d, 1, UNIX_TIMESTAMP() + ?d) ON DUPLICATE KEY UPDATE `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + ?d',
+        DB::Aowow()->qry('INSERT INTO ::account_bannedips (`ip`, `type`, `count`, `unbanDate`) VALUES (%s, %i, 1, UNIX_TIMESTAMP() + %i) ON DUPLICATE KEY UPDATE `count` = `count` + 1, `unbanDate` = UNIX_TIMESTAMP() + %i',
             User::$ip, IP_BAN_TYPE_REGISTRATION_ATTEMPT, Cfg::get('ACC_FAILED_AUTH_BLOCK'), Cfg::get('ACC_FAILED_AUTH_BLOCK'));
 
         Util::gainSiteReputation($userId, SITEREP_ACTION_REGISTER);

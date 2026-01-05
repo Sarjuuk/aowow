@@ -45,7 +45,7 @@ class GuidesBaseResponse extends TemplateResponse // implements ICache
             ['locale', Lang::getLocale()->value],
             ['status', GuideMgr::STATUS_ARCHIVED, '!'],     // never archived guides
             [
-                'OR',
+                DB::OR,
                 ['status', GuideMgr::STATUS_APPROVED],      // currently approved
                 ['rev', 0, '>']                             // has previously approved revision
             ]
