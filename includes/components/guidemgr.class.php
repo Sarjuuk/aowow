@@ -2,8 +2,6 @@
 
 namespace Aowow;
 
-use GdImage;
-
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 

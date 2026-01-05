@@ -5,11 +5,6 @@ namespace Aowow;
 if (!defined('AOWOW_REVISION'))
     die('illegal access');
 
-/*
-    Class designed by LordJZ for Aowow3
-
-    https://github.com/LordJZ/aowow3/
-*/
 
 class DB
 {
